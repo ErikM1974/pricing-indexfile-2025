@@ -58,15 +58,9 @@ live-engine specs back on in CI, add `CRM_API_SECRET` under Settings → Secrets
 
 CI setup follow-up (2026-09-09): a Google Chrome apt index checksum mismatch blocked Playwright before tests on two runners. CI uses bundled Chromium; disable only the unrelated Google Chrome source on the disposable runner and keep Ubuntu repositories/checksum verification intact. Require the actual browser steps to pass on the new exact commit.
 
-## 2026-09-08 — Node runtime and dependency audit must match CI
+## Runtime and dependency audit (2026-09-08, archived)
 
-**Problem.** Production and CI selected Node 18 while local checks ran Node 22; 17 high audit findings remained.
-**Root cause.** Old lockfile resolutions and exact transitive pins kept vulnerable packages installed.
-**Solution.** Select Node 22 in engines and all CI jobs; Express 4.22.2, Axios 1.20.0, compatible audit fixes,
-and a qs 6.16 override (Express/body-parser pin an older minor). The repository Actions secret is now configured
-with Erik's explicit approval; verify the live-engine step actually runs on the next CI push.
-**Prevention.** Audit the resolved tree after updating: a green install is not a clean audit. Preserve CRLF in
-these two already-CRLF-tracked package files to avoid hiding the dependency diff. Major upgrades stay separate.
+Match production/CI runtimes, audit the resolved tree and verify actual live-pricing CI steps. Full incident in LESSONS_LEARNED_ARCHIVE.md.
 
 ## Tooling upgrades and visual verification (2026-09-07, archived)
 
@@ -253,3 +247,9 @@ Problem/root cause: incomplete invoices looked empty, failed import logs were cl
 - Problem/root cause: A stale linked quote can update the current lead after refresh; removed kit/art hosts can still receive asynchronous callbacks. Native dialog conversion and fixed banners can also lose focus or cover recovery controls.
 - Solution: bind quote rendering and existing value sync to the current view sequence, lead object, quote ID and connected target. Reject malformed replies, ignore superseded loads, preserve uncertain outreach warnings beside the action, contain modal focus, and block all unknown API traffic in previews.
 - Prevention: mock delayed responses and every write, verify unchanged valid quote sync and original payloads, reverse recorded controller changes into original source hashes, and retain explicit shared-module ownership. Inspect populated PDFs: narrow grids can split money; give the order table full width and verify every row and rendered page. Precompute file updates before writing so a missing preview anchor cannot leave a partial batch.
+
+## Personalization lists must retain failed-load state (2026-09-09)
+
+- Problem/root cause: after a failed refresh, search/status changes rendered old monogram or roster data and removed Retry; missing roster arrays looked like zero records.
+- Solution: clear prior records/counts when loading, validate list arrays, preserve the error while filtering, and accept only the latest request before rendering. Current filters apply after a successful retry.
+- Prevention: synthetic failure/filter/retry, missing-list and out-of-order success cases must exercise the actual controls; wait for debounced handlers before judging output. Keep original rows, field values and controller/service source hashes outside mapped UI/recovery edits.

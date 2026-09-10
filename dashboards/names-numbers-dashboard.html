@@ -1,19 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <title>Names & Numbers Dashboard - NWCA</title>
+    <title>Names &amp; Numbers Dashboard - NWCA</title>
     <link rel="icon" href="/favicon.png" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link href="/shared_components/css/names-numbers.css?v=2026.09.07.19" rel="stylesheet">
-    <link rel="stylesheet" href="/dashboards/css/names-numbers-dashboard.css?v=2026.09.07.10">
+
+
+
     <script src="/config/app.config.js"></script>
-</head>
-<body>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&amp;display=swap"><link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.09.21"><link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.09.21"><link rel="stylesheet" href="/shared_components/css/personalization-workspaces.css?v=2026.09.09.21"></head>
+<body data-ui="unified" data-personalization="names-numbers-dashboard"><a class="skip-link" href="#personalization-main">Skip to content</a>
     <header class="header">
         <div class="header-container">
             <div class="header-left">
@@ -21,20 +20,20 @@
                 <nav class="breadcrumb" aria-label="Breadcrumb">
                     <a href="/staff-dashboard.html">Staff Dashboard</a>
                     <span>/</span>
-                    <span>Names & Numbers Dashboard</span>
+                    <span>Names &amp; Numbers Dashboard</span>
                 </nav>
             </div>
             <div class="header-right">
-                <a href="/pages/names-numbers.html" class="btn-primary"><i class="fas fa-plus" aria-hidden="true"></i> New Roster</a>
-                <a href="/staff-dashboard.html" class="btn-secondary"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back</a>
+                <a href="/pages/names-numbers.html" class="btn-primary btn"><i class="fas fa-plus" aria-hidden="true"></i> New Roster</a>
+                <a href="/staff-dashboard.html" class="btn-secondary btn"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back</a>
             </div>
         </div>
     </header>
 
-    <main class="main-container">
+    <main class="main-container" id="personalization-main" tabindex="-1">
         <div class="page-header">
             <div>
-                <h1 class="page-title"><i class="fas fa-users" aria-hidden="true"></i> Names & Numbers Dashboard</h1>
+                <h1 class="page-title"><i class="fas fa-users" aria-hidden="true"></i> Names &amp; Numbers Dashboard</h1>
                 <p class="page-subtitle">Manage all team rosters</p>
             </div>
         </div>
@@ -53,11 +52,11 @@
         <div class="filter-bar">
             <div class="form-group">
                 <label for="filterSearch">Search</label>
-                <input type="search" id="filterSearch" autocomplete="off" placeholder="Roster name or company...">
+                <input type="search" id="filterSearch" autocomplete="off" placeholder="Roster name or company..." class="field-input">
             </div>
             <div class="form-group">
                 <label for="filterStatus">Status</label>
-                <select id="filterStatus">
+                <select id="filterStatus" class="field-select">
                     <option value="">All</option>
                     <option value="Draft">Draft</option>
                     <option value="Submitted">Submitted</option>
@@ -67,17 +66,17 @@
             </div>
             <div class="form-group">
                 <label for="filterRep">Sales Rep</label>
-                <input type="text" id="filterRep" autocomplete="off" placeholder="Rep name...">
+                <input type="text" id="filterRep" autocomplete="off" placeholder="Rep name..." class="field-input">
             </div>
-            <button type="button" class="btn-primary" id="filterBtn"><i class="fas fa-search" aria-hidden="true"></i> Filter</button>
-            <button type="button" class="btn-secondary" id="clearFilterBtn">Clear</button>
+            <button type="button" class="btn-primary btn" id="filterBtn"><i class="fas fa-search" aria-hidden="true"></i> Filter</button>
+            <button type="button" class="btn-secondary btn" id="clearFilterBtn">Clear</button>
             <span class="nn-result-count" id="nnResultCount" role="status"></span>
         </div>
 
         <!-- Results Table -->
         <div class="card">
-            <div class="roster-table-wrapper">
-                <table class="dashboard-table">
+            <div class="roster-table-wrapper table-wrap" tabindex="0" role="region" aria-label="Names and numbers rosters table">
+                <table class="dashboard-table data-table">
                     <thead>
                         <tr>
                             <th>Roster Name</th>
@@ -103,6 +102,7 @@
     <script src="/shared_components/js/names-numbers-service.js?v=2026.09.06.31"></script>
     <script src="/shared_components/js/caspio-date-utils.js?v=2026.09.06.46"></script>
     <script src="/shared_components/js/data-call-delegator.js?v=2026.09.06.27"></script>
-    <script src="/shared_components/js/names-numbers-dashboard.js?v=2026.09.05.57"></script>
-</body>
-</html>
+    <script src="/shared_components/js/names-numbers-dashboard.js?v=2026.09.09.21"></script>
+
+
+</body></html>

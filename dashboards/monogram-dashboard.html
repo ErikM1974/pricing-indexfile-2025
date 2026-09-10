@@ -1,17 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>Monogram Dashboard - Northwest Custom Apparel</title>
     <link rel="icon" href="/favicon.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/dashboards/css/monogram-dashboard.css?v=2026.09.07.19">
+
+
     <script src="/config/app.config.js"></script>
-</head>
-<body>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&amp;display=swap"><link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.09.21"><link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.09.21"><link rel="stylesheet" href="/shared_components/css/personalization-workspaces.css?v=2026.09.09.21"></head>
+<body data-ui="unified" data-personalization="monogram-dashboard"><a class="skip-link" href="#personalization-main">Skip to content</a>
     <!-- Fixed Header -->
     <header class="dashboard-header">
         <!-- Contact Bar -->
@@ -31,8 +30,7 @@
         <nav class="header-nav">
             <div class="nav-content">
                 <a href="/">
-                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
-                         alt="Northwest Custom Apparel" class="logo-image">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel" class="logo-image">
                 </a>
                 <div class="main-nav-links">
                     <a href="/staff-dashboard.html"><i class="fas fa-th-large" aria-hidden="true"></i> Dashboard</a>
@@ -53,7 +51,7 @@
                     <h1 class="page-title">Monogram Orders</h1>
                 </div>
                 <div class="quick-actions">
-                    <a href="/quote-builders/monogram-form.html" class="quick-btn quick-btn-primary">
+                    <a href="/quote-builders/monogram-form.html" class="quick-btn quick-btn-primary btn">
                         <i class="fas fa-plus" aria-hidden="true"></i> New Monogram
                     </a>
                 </div>
@@ -62,7 +60,7 @@
     </header>
 
     <!-- Main Content -->
-    <main class="main-container">
+    <main class="main-container" id="personalization-main" tabindex="-1">
         <!-- Dashboard Card -->
         <div class="dashboard-card">
             <div class="card-header">
@@ -77,18 +75,17 @@
                 <div class="filters-grid">
                     <div class="filter-group">
                         <label for="searchInput">Search</label>
-                        <input type="search" id="searchInput" class="filter-input" autocomplete="off"
-                               placeholder="Order # or company name...">
+                        <input type="search" id="searchInput" class="filter-input field-input" autocomplete="off" placeholder="Order # or company name...">
                     </div>
                     <div class="filter-group">
                         <label for="salesRepFilter">Sales Rep</label>
-                        <select id="salesRepFilter" class="filter-input filter-select">
+                        <select id="salesRepFilter" class="filter-input filter-select field-select">
                             <option value="">All Reps</option>
                         </select>
                     </div>
                     <div class="filter-group">
                         <label for="statusFilter">Status</label>
-                        <select id="statusFilter" class="filter-input filter-select">
+                        <select id="statusFilter" class="filter-input filter-select field-select">
                             <option value="">All Statuses</option>
                             <option value="Submitted">Submitted</option>
                             <option value="Printed">Printed</option>
@@ -98,11 +95,11 @@
                     </div>
                     <div class="filter-group">
                         <label for="dateFrom">From Date</label>
-                        <input type="date" id="dateFrom" class="filter-input">
+                        <input type="date" id="dateFrom" class="filter-input field-input">
                     </div>
                     <div class="filter-group">
                         <label for="dateTo">To Date</label>
-                        <input type="date" id="dateTo" class="filter-input">
+                        <input type="date" id="dateTo" class="filter-input field-input">
                     </div>
                     <div class="filter-group">
                         <button type="button" class="btn btn-primary" data-call="filterMonograms">
@@ -113,8 +110,8 @@
             </div>
 
             <!-- Table -->
-            <div class="table-container">
-                <table id="monogramsTable" aria-describedby="resultCount">
+            <div class="table-container table-wrap" tabindex="0" role="region" aria-label="Monogram orders table">
+                <table id="monogramsTable" aria-describedby="resultCount" class="data-table">
                     <thead>
                         <tr>
                             <th>Order #</th>
@@ -144,6 +141,7 @@
     </main>
 
     <script src="/shared_components/js/data-call-delegator.js?v=2026.09.06.27"></script>
-    <script src="/shared_components/js/monogram-dashboard.js?v=2026.09.06.31"></script>
-</body>
-</html>
+    <script src="/shared_components/js/monogram-dashboard.js?v=2026.09.09.21"></script>
+
+
+</body></html>

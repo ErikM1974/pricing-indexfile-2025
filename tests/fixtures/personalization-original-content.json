@@ -1,0 +1,629 @@
+{
+  "base": "02af336bb51431d33152d6a2ff9712557f5481a0",
+  "pages": [
+    {
+      "file": "dashboards/monogram-dashboard.html",
+      "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <meta name=\"robots\" content=\"noindex, nofollow\">\n    <title>Monogram Dashboard - Northwest Custom Apparel</title>\n    <link rel=\"icon\" href=\"/favicon.png\" type=\"image/png\">\n    <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link rel=\"stylesheet\" href=\"/dashboards/css/monogram-dashboard.css?v=2026.09.07.19\">\n    <script src=\"/config/app.config.js\"></script>\n</head>\n<body>\n    <!-- Fixed Header -->\n    <header class=\"dashboard-header\">\n        <!-- Contact Bar -->\n        <div class=\"header-contact-bar\">\n            <div class=\"contact-bar-content\">\n                <div class=\"contact-info\">\n                    <span class=\"contact-item\"><i class=\"fas fa-phone\" aria-hidden=\"true\"></i> 253-922-5793</span>\n                    <span class=\"contact-item\"><i class=\"fas fa-envelope\" aria-hidden=\"true\"></i> sales@nwcustomapparel.com</span>\n                </div>\n                <div class=\"contact-info\">\n                    <span class=\"contact-item\"><i class=\"fas fa-clock\" aria-hidden=\"true\"></i> Mon-Fri 8am-5pm PST</span>\n                </div>\n            </div>\n        </div>\n\n        <!-- Navigation Bar -->\n        <nav class=\"header-nav\">\n            <div class=\"nav-content\">\n                <a href=\"/\">\n                    <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\"\n                         alt=\"Northwest Custom Apparel\" class=\"logo-image\">\n                </a>\n                <div class=\"main-nav-links\">\n                    <a href=\"/staff-dashboard.html\"><i class=\"fas fa-th-large\" aria-hidden=\"true\"></i> Dashboard</a>\n                    <a href=\"/quote-builders/monogram-form.html\"><i class=\"fas fa-font\" aria-hidden=\"true\"></i> New Monogram</a>\n                </div>\n            </div>\n        </nav>\n\n        <!-- Context Bar -->\n        <div class=\"context-bar\">\n            <div class=\"context-bar-content\">\n                <div class=\"context-left\">\n                    <nav class=\"breadcrumb\" aria-label=\"Breadcrumb\">\n                        <a href=\"/staff-dashboard.html\" aria-label=\"Staff Dashboard\"><i class=\"fas fa-home\" aria-hidden=\"true\"></i></a>\n                        <i class=\"fas fa-chevron-right breadcrumb-sep\" aria-hidden=\"true\"></i>\n                        <span>Monogram Dashboard</span>\n                    </nav>\n                    <h1 class=\"page-title\">Monogram Orders</h1>\n                </div>\n                <div class=\"quick-actions\">\n                    <a href=\"/quote-builders/monogram-form.html\" class=\"quick-btn quick-btn-primary\">\n                        <i class=\"fas fa-plus\" aria-hidden=\"true\"></i> New Monogram\n                    </a>\n                </div>\n            </div>\n        </div>\n    </header>\n\n    <!-- Main Content -->\n    <main class=\"main-container\">\n        <!-- Dashboard Card -->\n        <div class=\"dashboard-card\">\n            <div class=\"card-header\">\n                <h2><i class=\"fas fa-font\" aria-hidden=\"true\"></i> Monogram Orders</h2>\n                <button type=\"button\" class=\"btn btn-outline\" data-call=\"loadMonograms\">\n                    <i class=\"fas fa-sync-alt\" aria-hidden=\"true\"></i> Refresh\n                </button>\n            </div>\n\n            <!-- Filters -->\n            <div class=\"filters-section\">\n                <div class=\"filters-grid\">\n                    <div class=\"filter-group\">\n                        <label for=\"searchInput\">Search</label>\n                        <input type=\"search\" id=\"searchInput\" class=\"filter-input\" autocomplete=\"off\"\n                               placeholder=\"Order # or company name...\">\n                    </div>\n                    <div class=\"filter-group\">\n                        <label for=\"salesRepFilter\">Sales Rep</label>\n                        <select id=\"salesRepFilter\" class=\"filter-input filter-select\">\n                            <option value=\"\">All Reps</option>\n                        </select>\n                    </div>\n                    <div class=\"filter-group\">\n                        <label for=\"statusFilter\">Status</label>\n                        <select id=\"statusFilter\" class=\"filter-input filter-select\">\n                            <option value=\"\">All Statuses</option>\n                            <option value=\"Submitted\">Submitted</option>\n                            <option value=\"Printed\">Printed</option>\n                            <option value=\"Complete\">Complete</option>\n                            <option value=\"Cancelled\">Cancelled</option>\n                        </select>\n                    </div>\n                    <div class=\"filter-group\">\n                        <label for=\"dateFrom\">From Date</label>\n                        <input type=\"date\" id=\"dateFrom\" class=\"filter-input\">\n                    </div>\n                    <div class=\"filter-group\">\n                        <label for=\"dateTo\">To Date</label>\n                        <input type=\"date\" id=\"dateTo\" class=\"filter-input\">\n                    </div>\n                    <div class=\"filter-group\">\n                        <button type=\"button\" class=\"btn btn-primary\" data-call=\"filterMonograms\">\n                            <i class=\"fas fa-search\" aria-hidden=\"true\"></i> Search\n                        </button>\n                    </div>\n                </div>\n            </div>\n\n            <!-- Table -->\n            <div class=\"table-container\">\n                <table id=\"monogramsTable\" aria-describedby=\"resultCount\">\n                    <thead>\n                        <tr>\n                            <th>Order #</th>\n                            <th>Company</th>\n                            <th>Sales Rep</th>\n                            <th># of Names</th>\n                            <th>Created</th>\n                            <th>Status</th>\n                            <th>Actions</th>\n                        </tr>\n                    </thead>\n                    <tbody id=\"monogramsTableBody\">\n                        <tr>\n                            <td colspan=\"7\" class=\"loading\">\n                                <i class=\"fas fa-spinner\" aria-hidden=\"true\"></i> Loading monograms...\n                            </td>\n                        </tr>\n                    </tbody>\n                </table>\n            </div>\n\n            <!-- Footer -->\n            <div class=\"table-footer\">\n                <span id=\"resultCount\" role=\"status\">Loading...</span>\n            </div>\n        </div>\n    </main>\n\n    <script src=\"/shared_components/js/data-call-delegator.js?v=2026.09.06.27\"></script>\n    <script src=\"/shared_components/js/monogram-dashboard.js?v=2026.09.06.31\"></script>\n</body>\n</html>\n",
+      "title": "Monogram Dashboard - Northwest Custom Apparel",
+      "bodyText": "253-922-5793 sales@nwcustomapparel.com Mon-Fri 8am-5pm PST Dashboard New Monogram Monogram Dashboard Monogram Orders New Monogram Monogram Orders Refresh Search Sales Rep All Reps Status All Statuses Submitted Printed Complete Cancelled From Date To Date Search Order # Company Sales Rep # of Names Created Status Actions Loading monograms... Loading...",
+      "bodyTextSha": "daf49f49439c2ace5fe210bed90eae1073cd4fe136546347ebabd365989cc200",
+      "ids": [
+        "searchInput",
+        "salesRepFilter",
+        "statusFilter",
+        "dateFrom",
+        "dateTo",
+        "monogramsTable",
+        "monogramsTableBody",
+        "resultCount"
+      ],
+      "links": [
+        {
+          "href": "/",
+          "label": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Dashboard"
+        },
+        {
+          "href": "/quote-builders/monogram-form.html",
+          "label": "New Monogram"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": ""
+        },
+        {
+          "href": "/quote-builders/monogram-form.html",
+          "label": "New Monogram"
+        }
+      ],
+      "fields": [
+        {
+          "id": "searchInput",
+          "type": "search",
+          "value": ""
+        },
+        {
+          "id": "salesRepFilter",
+          "type": "select-one",
+          "value": ""
+        },
+        {
+          "id": "statusFilter",
+          "type": "select-one",
+          "value": ""
+        },
+        {
+          "id": "dateFrom",
+          "type": "date",
+          "value": ""
+        },
+        {
+          "id": "dateTo",
+          "type": "date",
+          "value": ""
+        }
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "dashboards/css/monogram-dashboard.css"
+      ],
+      "scripts": [
+        "config/app.config.js",
+        "shared_components/js/data-call-delegator.js",
+        "shared_components/js/monogram-dashboard.js"
+      ],
+      "cssBytes": 26917
+    },
+    {
+      "file": "dashboards/names-numbers-dashboard.html",
+      "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <meta name=\"robots\" content=\"noindex, nofollow\">\n    <title>Names & Numbers Dashboard - NWCA</title>\n    <link rel=\"icon\" href=\"/favicon.png\" type=\"image/png\">\n    <link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap\" rel=\"stylesheet\">\n    <link href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css\" rel=\"stylesheet\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link href=\"/shared_components/css/names-numbers.css?v=2026.09.07.19\" rel=\"stylesheet\">\n    <link rel=\"stylesheet\" href=\"/dashboards/css/names-numbers-dashboard.css?v=2026.09.07.10\">\n    <script src=\"/config/app.config.js\"></script>\n</head>\n<body>\n    <header class=\"header\">\n        <div class=\"header-container\">\n            <div class=\"header-left\">\n                <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\" alt=\"NWCA\" class=\"logo\">\n                <nav class=\"breadcrumb\" aria-label=\"Breadcrumb\">\n                    <a href=\"/staff-dashboard.html\">Staff Dashboard</a>\n                    <span>/</span>\n                    <span>Names & Numbers Dashboard</span>\n                </nav>\n            </div>\n            <div class=\"header-right\">\n                <a href=\"/pages/names-numbers.html\" class=\"btn-primary\"><i class=\"fas fa-plus\" aria-hidden=\"true\"></i> New Roster</a>\n                <a href=\"/staff-dashboard.html\" class=\"btn-secondary\"><i class=\"fas fa-arrow-left\" aria-hidden=\"true\"></i> Back</a>\n            </div>\n        </div>\n    </header>\n\n    <main class=\"main-container\">\n        <div class=\"page-header\">\n            <div>\n                <h1 class=\"page-title\"><i class=\"fas fa-users\" aria-hidden=\"true\"></i> Names & Numbers Dashboard</h1>\n                <p class=\"page-subtitle\">Manage all team rosters</p>\n            </div>\n        </div>\n\n        <!-- KPIs -->\n        <!-- KPI tiles are status filters (synced with the Status select; click the active one to clear) -->\n        <div class=\"kpi-row\" id=\"kpiRow\" role=\"group\" aria-label=\"Rosters by status\">\n            <button type=\"button\" class=\"kpi-card kpi-btn\" data-status=\"\" aria-pressed=\"true\"><div class=\"kpi-value\" id=\"kpiTotal\">-</div><div class=\"kpi-label\">Total Rosters</div></button>\n            <button type=\"button\" class=\"kpi-card kpi-btn\" data-status=\"Draft\" aria-pressed=\"false\"><div class=\"kpi-value\" id=\"kpiDraft\">-</div><div class=\"kpi-label\">Draft</div></button>\n            <button type=\"button\" class=\"kpi-card kpi-btn\" data-status=\"Submitted\" aria-pressed=\"false\"><div class=\"kpi-value\" id=\"kpiSubmitted\">-</div><div class=\"kpi-label\">Submitted</div></button>\n            <button type=\"button\" class=\"kpi-card kpi-btn\" data-status=\"In Production\" aria-pressed=\"false\"><div class=\"kpi-value\" id=\"kpiInProd\">-</div><div class=\"kpi-label\">In Production</div></button>\n            <button type=\"button\" class=\"kpi-card kpi-btn\" data-status=\"Completed\" aria-pressed=\"false\"><div class=\"kpi-value\" id=\"kpiCompleted\">-</div><div class=\"kpi-label\">Completed</div></button>\n        </div>\n\n        <!-- Filters -->\n        <div class=\"filter-bar\">\n            <div class=\"form-group\">\n                <label for=\"filterSearch\">Search</label>\n                <input type=\"search\" id=\"filterSearch\" autocomplete=\"off\" placeholder=\"Roster name or company...\">\n            </div>\n            <div class=\"form-group\">\n                <label for=\"filterStatus\">Status</label>\n                <select id=\"filterStatus\">\n                    <option value=\"\">All</option>\n                    <option value=\"Draft\">Draft</option>\n                    <option value=\"Submitted\">Submitted</option>\n                    <option value=\"In Production\">In Production</option>\n                    <option value=\"Completed\">Completed</option>\n                </select>\n            </div>\n            <div class=\"form-group\">\n                <label for=\"filterRep\">Sales Rep</label>\n                <input type=\"text\" id=\"filterRep\" autocomplete=\"off\" placeholder=\"Rep name...\">\n            </div>\n            <button type=\"button\" class=\"btn-primary\" id=\"filterBtn\"><i class=\"fas fa-search\" aria-hidden=\"true\"></i> Filter</button>\n            <button type=\"button\" class=\"btn-secondary\" id=\"clearFilterBtn\">Clear</button>\n            <span class=\"nn-result-count\" id=\"nnResultCount\" role=\"status\"></span>\n        </div>\n\n        <!-- Results Table -->\n        <div class=\"card\">\n            <div class=\"roster-table-wrapper\">\n                <table class=\"dashboard-table\">\n                    <thead>\n                        <tr>\n                            <th>Roster Name</th>\n                            <th>Company</th>\n                            <th>Order #</th>\n                            <th>People</th>\n                            <th>Sales Rep</th>\n                            <th>Status</th>\n                            <th>Modified</th>\n                            <th>Actions</th>\n                        </tr>\n                    </thead>\n                    <tbody id=\"dashboardBody\">\n                        <tr><td colspan=\"8\" class=\"nn-table-msg\" role=\"status\">Loading...</td></tr>\n                    </tbody>\n                </table>\n            </div>\n        </div>\n    </main>\n\n    <div class=\"toast\" id=\"toast\" role=\"status\" aria-live=\"polite\"></div>\n\n    <script src=\"/shared_components/js/names-numbers-service.js?v=2026.09.06.31\"></script>\n    <script src=\"/shared_components/js/caspio-date-utils.js?v=2026.09.06.46\"></script>\n    <script src=\"/shared_components/js/data-call-delegator.js?v=2026.09.06.27\"></script>\n    <script src=\"/shared_components/js/names-numbers-dashboard.js?v=2026.09.05.57\"></script>\n</body>\n</html>\n",
+      "title": "Names & Numbers Dashboard - NWCA",
+      "bodyText": "Staff Dashboard / Names & Numbers Dashboard New Roster Back Names & Numbers Dashboard Manage all team rosters -Total Rosters -Draft -Submitted -In Production -Completed Search Status All Draft Submitted In Production Completed Sales Rep Filter Clear Roster Name Company Order # People Sales Rep Status Modified Actions Loading...",
+      "bodyTextSha": "1bd38177699120416ce6ce4e83cd339eb37532fa76eac68d1763ff5063449d3c",
+      "ids": [
+        "kpiRow",
+        "kpiTotal",
+        "kpiDraft",
+        "kpiSubmitted",
+        "kpiInProd",
+        "kpiCompleted",
+        "filterSearch",
+        "filterStatus",
+        "filterRep",
+        "filterBtn",
+        "clearFilterBtn",
+        "nnResultCount",
+        "dashboardBody",
+        "toast"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Staff Dashboard"
+        },
+        {
+          "href": "/pages/names-numbers.html",
+          "label": "New Roster"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Back"
+        }
+      ],
+      "fields": [
+        {
+          "id": "filterSearch",
+          "type": "search",
+          "value": ""
+        },
+        {
+          "id": "filterStatus",
+          "type": "select-one",
+          "value": ""
+        },
+        {
+          "id": "filterRep",
+          "type": "text",
+          "value": ""
+        }
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/names-numbers.css",
+        "dashboards/css/names-numbers-dashboard.css"
+      ],
+      "scripts": [
+        "config/app.config.js",
+        "shared_components/js/names-numbers-service.js",
+        "shared_components/js/caspio-date-utils.js",
+        "shared_components/js/data-call-delegator.js",
+        "shared_components/js/names-numbers-dashboard.js"
+      ],
+      "cssBytes": 47131
+    },
+    {
+      "file": "pages/names-numbers.html",
+      "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <meta name=\"robots\" content=\"noindex, nofollow\">\n    <title>Names & Numbers - Northwest Custom Apparel</title>\n    <link rel=\"icon\" href=\"/favicon.png\" type=\"image/png\">\n    <link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap\" rel=\"stylesheet\">\n    <link href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css\" rel=\"stylesheet\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link href=\"/shared_components/css/names-numbers.css?v=2026.09.07.19\" rel=\"stylesheet\">\n    <script src=\"/config/app.config.js\"></script>\n</head>\n<body>\n    <!-- Header -->\n    <header class=\"header\">\n        <div class=\"header-container\">\n            <div class=\"header-left\">\n                <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\"\n                     alt=\"Northwest Custom Apparel\" class=\"logo\">\n                <nav class=\"breadcrumb\">\n                    <a href=\"/staff-dashboard.html\">Staff Dashboard</a>\n                    <span>/</span>\n                    <a href=\"/dashboards/names-numbers-dashboard.html\">Names & Numbers</a>\n                    <span>/</span>\n                    <span id=\"breadcrumbCurrent\">New Roster</span>\n                </nav>\n            </div>\n            <div class=\"header-right\">\n                <span class=\"current-date\" id=\"currentDate\"></span>\n                <a href=\"/dashboards/names-numbers-dashboard.html\" class=\"btn-secondary\" title=\"Back to all rosters\">\n                    <i class=\"fas fa-arrow-left\" aria-hidden=\"true\"></i> All Rosters\n                </a>\n            </div>\n        </div>\n    </header>\n\n    <!-- Main Content -->\n    <main class=\"main-container\">\n        <!-- Page Header -->\n        <div class=\"page-header\">\n            <div class=\"page-header-content\">\n                <h1 class=\"page-title\">\n                    <i class=\"fas fa-users\" aria-hidden=\"true\"></i>\n                    Names & Numbers\n                </h1>\n                <p class=\"page-subtitle\">Team roster management for personalized orders</p>\n            </div>\n            <div class=\"page-header-actions\">\n                <button type=\"button\" class=\"btn-icon\" id=\"searchBtn\" title=\"Search existing rosters\">\n                    <i class=\"fas fa-search\" aria-hidden=\"true\"></i>\n                </button>\n                <button type=\"button\" class=\"btn-icon\" id=\"newRosterBtn\" title=\"Start new roster\">\n                    <i class=\"fas fa-plus\" aria-hidden=\"true\"></i>\n                </button>\n            </div>\n        </div>\n\n        <!-- Search Panel (hidden by default) -->\n        <div class=\"search-panel\" id=\"searchPanel\" style=\"display: none;\">\n            <div class=\"search-row\">\n                <input type=\"text\" id=\"searchInput\" placeholder=\"Search by roster name, company, or order #...\" aria-label=\"Search by roster name, company, or order #\">\n                <button type=\"button\" class=\"btn-primary\" id=\"searchGoBtn\"><i class=\"fas fa-search\" aria-hidden=\"true\"></i> Search</button>\n                <button type=\"button\" class=\"btn-secondary\" id=\"searchCloseBtn\" aria-label=\"Close search\"><i class=\"fas fa-times\" aria-hidden=\"true\"></i></button>\n            </div>\n            <div id=\"searchResults\" style=\"margin-top: 1rem;\"></div>\n        </div>\n\n        <!-- Roster Info Card -->\n        <div class=\"card\" id=\"rosterInfoCard\">\n            <div class=\"card-header\">\n                <span class=\"card-title\"><i class=\"fas fa-info-circle\" aria-hidden=\"true\"></i> Roster Details</span>\n                <span class=\"status-badge status-draft\" id=\"statusBadge\">Draft</span>\n            </div>\n            <div class=\"form-row\">\n                <div class=\"form-group\">\n                    <label for=\"rosterName\">Roster Name *</label>\n                    <input type=\"text\" id=\"rosterName\" placeholder=\"e.g. Lincoln Lynx Football 2026\">\n                </div>\n                <div class=\"form-group\">\n                    <label for=\"companyName\">Company / Customer</label>\n                    <input type=\"text\" id=\"companyName\" placeholder=\"Company name\">\n                </div>\n                <div class=\"form-group\">\n                    <label for=\"orderNumber\">Order # (Optional)</label>\n                    <input type=\"number\" id=\"orderNumber\" placeholder=\"ShopWorks order #\">\n                </div>\n            </div>\n            <div class=\"form-row\">\n                <div class=\"form-group\">\n                    <label for=\"contactName\">Contact Name</label>\n                    <input type=\"text\" id=\"contactName\" placeholder=\"Customer contact\">\n                </div>\n                <div class=\"form-group\">\n                    <label for=\"contactEmail\">Contact Email</label>\n                    <input type=\"email\" id=\"contactEmail\" placeholder=\"email@example.com\">\n                </div>\n                <div class=\"form-group\">\n                    <label for=\"salesRep\">Sales Rep</label>\n                    <input type=\"text\" id=\"salesRep\" placeholder=\"Sales rep name\">\n                </div>\n            </div>\n            <div class=\"form-group\">\n                <label for=\"rosterNotes\">Notes</label>\n                <textarea id=\"rosterNotes\" rows=\"2\" placeholder=\"General notes about this roster...\"></textarea>\n            </div>\n        </div>\n\n        <!-- Import Toolbar -->\n        <div class=\"import-toolbar\">\n            <button type=\"button\" class=\"btn-secondary\" id=\"uploadExcelBtn\">\n                <i class=\"fas fa-file-excel\" aria-hidden=\"true\"></i> Upload Excel\n            </button>\n            <button type=\"button\" class=\"btn-secondary\" id=\"ocrBtn\">\n                <i class=\"fas fa-camera\" aria-hidden=\"true\"></i> Upload Image / PDF (OCR)\n            </button>\n            <button type=\"button\" class=\"btn-secondary\" id=\"pasteNamesBtn\">\n                <i class=\"fas fa-paste\" aria-hidden=\"true\"></i> Paste Names\n            </button>\n            <input type=\"file\" id=\"excelFileInput\" accept=\".xlsx,.xls\" style=\"display:none;\" aria-label=\"Choose a file\">\n            <input type=\"file\" id=\"ocrFileInput\" accept=\"image/jpeg,image/png,image/gif,image/webp,application/pdf\" style=\"display:none;\" aria-label=\"Choose a file\">\n        </div>\n\n        <!-- Tab Bar -->\n        <div class=\"tab-bar\" id=\"tabBar\">\n            <!-- Tabs injected dynamically -->\n            <button type=\"button\" class=\"tab-add-btn\" id=\"addGroupBtn\">\n                <i class=\"fas fa-plus\" aria-hidden=\"true\"></i> Add Group\n            </button>\n        </div>\n\n        <!-- Group Config Panel -->\n        <div class=\"group-config\" id=\"groupConfig\" style=\"display: none;\">\n            <div class=\"group-config-header\">\n                <span class=\"group-config-title\" id=\"groupConfigTitle\">Group Settings</span>\n                <div style=\"display: flex; gap: 0.5rem;\">\n                    <button type=\"button\" class=\"btn-sm btn-secondary\" id=\"toggleConfigBtn\" aria-label=\"Show or hide configuration\">\n                        <i class=\"fas fa-chevron-up\" aria-hidden=\"true\"></i>\n                    </button>\n                    <button type=\"button\" class=\"btn-sm btn-danger\" id=\"deleteGroupBtn\" title=\"Delete this group\">\n                        <i class=\"fas fa-trash\" aria-hidden=\"true\"></i>\n                    </button>\n                </div>\n            </div>\n            <div id=\"groupConfigBody\">\n                <div class=\"form-row\">\n                    <div class=\"form-group\">\n                        <label for=\"groupName\">Group Name</label>\n                        <input type=\"text\" id=\"groupName\" placeholder=\"e.g. Player Hoodies\">\n                    </div>\n                </div>\n\n                <div class=\"config-section\">\n                    <div class=\"config-section-header\">\n                        <label>Garments in this order</label>\n                        <button type=\"button\" class=\"btn-sm btn-secondary\" id=\"addGarmentBtn\">\n                            <i class=\"fas fa-plus\" aria-hidden=\"true\"></i> Add Garment\n                        </button>\n                    </div>\n                    <div class=\"config-section-hint\">\n                        Each garment becomes a size column on every row. Toggle Back/Front Print, Qty, or Back Lines (1–4) to add more columns per garment.\n                    </div>\n                    <div id=\"garmentsEditor\" class=\"garments-editor\"></div>\n                </div>\n\n                <div class=\"config-section\">\n                    <label>Person columns</label>\n                    <div class=\"config-section-hint\">These apply to the whole row (not per garment).</div>\n                    <div id=\"personColumnPicker\" class=\"column-picker\"></div>\n                </div>\n\n                <div class=\"config-section\">\n                    <div class=\"config-section-header\">\n                        <label>Custom columns</label>\n                        <button type=\"button\" class=\"btn-sm btn-secondary\" id=\"addCustomColumnBtn\">\n                            <i class=\"fas fa-plus\" aria-hidden=\"true\"></i> Add Custom Column\n                        </button>\n                    </div>\n                    <div id=\"customColumnsEditor\" class=\"custom-columns-editor\"></div>\n                </div>\n            </div>\n        </div>\n\n        <!-- Data Table -->\n        <div class=\"card\" id=\"tableCard\">\n            <div class=\"roster-table-wrapper\">\n                <table class=\"roster-table\" id=\"rosterTable\">\n                    <thead id=\"rosterTableHead\"><tr></tr></thead>\n                    <tbody id=\"rosterTableBody\"></tbody>\n                    <tfoot id=\"rosterTableFoot\"><tr></tr></tfoot>\n                </table>\n            </div>\n            <div style=\"margin-top: 0.75rem; display: flex; gap: 0.5rem;\">\n                <button type=\"button\" class=\"btn-secondary btn-sm\" id=\"addRowBtn\">\n                    <i class=\"fas fa-plus\" aria-hidden=\"true\"></i> Add Row\n                </button>\n                <button type=\"button\" class=\"btn-secondary btn-sm\" id=\"addFiveRowsBtn\">\n                    <i class=\"fas fa-plus\" aria-hidden=\"true\"></i> Add 5 Rows\n                </button>\n            </div>\n        </div>\n\n        <!-- Size Breakdown (auto-generated from entered sizes) -->\n        <div class=\"card size-breakdown-card\" id=\"sizeBreakdownCard\" style=\"display: none;\">\n            <div class=\"card-header\">\n                <span class=\"card-title\"><i class=\"fas fa-chart-bar\" aria-hidden=\"true\"></i> Size Breakdown</span>\n            </div>\n            <div id=\"sizeBreakdownBody\" class=\"size-breakdown-body\"></div>\n        </div>\n\n        <!-- Empty State (shown when no groups) -->\n        <div class=\"empty-state\" id=\"emptyState\" style=\"display: none;\">\n            <i class=\"fas fa-clipboard-list\" aria-hidden=\"true\"></i>\n            <h3>No Roster Data Yet</h3>\n            <p>Upload an Excel file, take a photo with OCR, paste names, or add a group manually to get started.</p>\n        </div>\n\n        <!-- Action Bar -->\n        <div class=\"action-bar\">\n            <div class=\"action-bar-group\">\n                <button type=\"button\" class=\"btn-primary\" id=\"saveDraftBtn\">\n                    <i class=\"fas fa-save\" aria-hidden=\"true\"></i> Save Draft\n                </button>\n                <button type=\"button\" class=\"btn-success\" id=\"saveSubmitBtn\">\n                    <i class=\"fas fa-check\" aria-hidden=\"true\"></i> Save & Submit\n                </button>\n                <button type=\"button\" class=\"btn-secondary\" id=\"saveAndReturnBtn\" title=\"Save and go back to the rosters list\">\n                    <i class=\"fas fa-check-double\" aria-hidden=\"true\"></i> Save & Back to Dashboard\n                </button>\n            </div>\n            <div class=\"action-bar-group\">\n                <button type=\"button\" class=\"btn-secondary\" id=\"printBtn\">\n                    <i class=\"fas fa-print\" aria-hidden=\"true\"></i> Print\n                </button>\n                <button type=\"button\" class=\"btn-secondary\" id=\"exportExcelBtn\">\n                    <i class=\"fas fa-file-excel\" aria-hidden=\"true\"></i> Export Excel\n                </button>\n            </div>\n        </div>\n    </main>\n\n    <!-- Paste Names Modal -->\n    <div class=\"modal-overlay\" id=\"pasteModal\">\n        <div class=\"modal\">\n            <div class=\"modal-header\">\n                <span class=\"modal-title\"><i class=\"fas fa-paste\" aria-hidden=\"true\"></i> Paste Names</span>\n                <button type=\"button\" class=\"modal-close\" id=\"pasteModalClose\">&times;</button>\n            </div>\n            <div class=\"modal-body\">\n                <p style=\"margin-bottom: 0.75rem; font-size: 0.875rem; color: var(--nn-text-secondary);\">\n                    Paste one name per line. Optionally include number and size separated by commas or tabs.<br>\n                    <strong>Examples:</strong> <code>Smith, 6, L</code> or <code>Smith&lt;tab&gt;6&lt;tab&gt;L</code>\n                </p>\n                <textarea id=\"pasteTextarea\" placeholder=\"Smith, 6, L&#10;Johnson, 12, XL&#10;Williams, 3, M\" aria-label=\"Paste names, quantities and sizes, one per line\"></textarea>\n            </div>\n            <div class=\"modal-footer\">\n                <button type=\"button\" class=\"btn-secondary\" id=\"pasteCancelBtn\">Cancel</button>\n                <button type=\"button\" class=\"btn-primary\" id=\"pasteImportBtn\"><i class=\"fas fa-download\" aria-hidden=\"true\"></i> Import</button>\n            </div>\n        </div>\n    </div>\n\n    <!-- OCR Modal -->\n    <div class=\"modal-overlay\" id=\"ocrModal\">\n        <div class=\"modal\">\n            <div class=\"modal-header\">\n                <span class=\"modal-title\"><i class=\"fas fa-camera\" aria-hidden=\"true\"></i> Upload Image or PDF for OCR</span>\n                <button type=\"button\" class=\"modal-close\" id=\"ocrModalClose\">&times;</button>\n            </div>\n            <div class=\"modal-body\">\n                <div class=\"ocr-drop-zone\" id=\"ocrDropZone\">\n                    <i class=\"fas fa-cloud-upload-alt\" aria-hidden=\"true\"></i>\n                    <p><strong>Drag & drop an image or PDF here</strong></p>\n                    <p>or click to browse (JPEG, PNG, GIF, WebP, or PDF)</p>\n                </div>\n                <div class=\"ocr-preview\" id=\"ocrPreview\" style=\"display: none;\"></div>\n                <div class=\"ocr-processing\" id=\"ocrProcessing\" style=\"display: none;\">\n                    <div class=\"spinner\"></div>\n                    <span>AI is reading the roster... this may take a few seconds</span>\n                </div>\n                <div id=\"ocrResults\" style=\"display: none; margin-top: 1rem;\"></div>\n            </div>\n            <div class=\"modal-footer\">\n                <button type=\"button\" class=\"btn-secondary\" id=\"ocrCancelBtn\">Cancel</button>\n                <button type=\"button\" class=\"btn-primary\" id=\"ocrImportBtn\" style=\"display: none;\">\n                    <i class=\"fas fa-download\" aria-hidden=\"true\"></i> Import Extracted Names\n                </button>\n            </div>\n        </div>\n    </div>\n\n    <!-- Add Group Modal -->\n    <div class=\"modal-overlay\" id=\"addGroupModal\">\n        <div class=\"modal\">\n            <div class=\"modal-header\">\n                <span class=\"modal-title\"><i class=\"fas fa-layer-group\" aria-hidden=\"true\"></i> Add New Group</span>\n                <button type=\"button\" class=\"modal-close\" id=\"addGroupModalClose\">&times;</button>\n            </div>\n            <div class=\"modal-body\">\n                <div class=\"form-group\" style=\"margin-bottom: 1rem;\">\n                    <label for=\"newGroupName\">Group Name</label>\n                    <input type=\"text\" id=\"newGroupName\" placeholder=\"e.g. Player Hoodies, Coach Jackets\">\n                </div>\n                <div class=\"form-row\">\n                    <div class=\"form-group\">\n                        <label for=\"newGroupStyle\">First Garment — Style (optional)</label>\n                        <input type=\"text\" id=\"newGroupStyle\" placeholder=\"e.g. PC54, ST254\">\n                    </div>\n                    <div class=\"form-group\">\n                        <label for=\"newGroupColor\">First Garment — Color (optional)</label>\n                        <input type=\"text\" id=\"newGroupColor\" placeholder=\"e.g. Navy, Black\">\n                    </div>\n                </div>\n                <p style=\"margin-top: 0.75rem; font-size: 0.8rem; color: var(--nn-text-secondary);\">\n                    <i class=\"fas fa-info-circle\" aria-hidden=\"true\"></i> You can add more garments (e.g. T-shirt + Hoodie) after the group is created.\n                </p>\n            </div>\n            <div class=\"modal-footer\">\n                <button type=\"button\" class=\"btn-secondary\" id=\"addGroupCancelBtn\">Cancel</button>\n                <button type=\"button\" class=\"btn-primary\" id=\"addGroupConfirmBtn\"><i class=\"fas fa-plus\" aria-hidden=\"true\"></i> Add Group</button>\n            </div>\n        </div>\n    </div>\n\n    <!-- Toast container -->\n    <div class=\"toast\" id=\"toast\"></div>\n\n    <!-- Scripts -->\n    <script src=\"/shared_components/js/names-numbers-service.js?v=2026.09.06.31\"></script>\n    <script src=\"/shared_components/js/names-numbers-controller.js?v=2026.09.06.25\"></script>\n</body>\n</html>\n",
+      "title": "Names & Numbers - Northwest Custom Apparel",
+      "bodyText": "Staff Dashboard / Names & Numbers / New Roster All Rosters Names & Numbers Team roster management for personalized orders Search Roster Details Draft Roster Name * Company / Customer Order # (Optional) Contact Name Contact Email Sales Rep Notes Upload Excel Upload Image / PDF (OCR) Paste Names Add Group Group Settings Group Name Garments in this order Add Garment Each garment becomes a size column on every row. Toggle Back/Front Print, Qty, or Back Lines (1–4) to add more columns per garment. Person columns These apply to the whole row (not per garment). Custom columns Add Custom Column Add Row Add 5 Rows Size Breakdown No Roster Data Yet Upload an Excel file, take a photo with OCR, paste names, or add a group manually to get started. Save Draft Save & Submit Save & Back to Dashboard Print Export Excel Paste Names × Paste one name per line. Optionally include number and size separated by commas or tabs. Examples: Smith, 6, L or Smith<tab>6<tab>L Cancel Import Upload Image or PDF for OCR × Drag & drop an image or PDF here or click to browse (JPEG, PNG, GIF, WebP, or PDF) AI is reading the roster... this may take a few seconds Cancel Import Extracted Names Add New Group × Group Name First Garment — Style (optional) First Garment — Color (optional) You can add more garments (e.g. T-shirt + Hoodie) after the group is created. Cancel Add Group",
+      "bodyTextSha": "82c2af3d23d584ba6f6b8da158bc0c10d5a001e7cdea5f0c732d85065b14a1e3",
+      "ids": [
+        "breadcrumbCurrent",
+        "currentDate",
+        "searchBtn",
+        "newRosterBtn",
+        "searchPanel",
+        "searchInput",
+        "searchGoBtn",
+        "searchCloseBtn",
+        "searchResults",
+        "rosterInfoCard",
+        "statusBadge",
+        "rosterName",
+        "companyName",
+        "orderNumber",
+        "contactName",
+        "contactEmail",
+        "salesRep",
+        "rosterNotes",
+        "uploadExcelBtn",
+        "ocrBtn",
+        "pasteNamesBtn",
+        "excelFileInput",
+        "ocrFileInput",
+        "tabBar",
+        "addGroupBtn",
+        "groupConfig",
+        "groupConfigTitle",
+        "toggleConfigBtn",
+        "deleteGroupBtn",
+        "groupConfigBody",
+        "groupName",
+        "addGarmentBtn",
+        "garmentsEditor",
+        "personColumnPicker",
+        "addCustomColumnBtn",
+        "customColumnsEditor",
+        "tableCard",
+        "rosterTable",
+        "rosterTableHead",
+        "rosterTableBody",
+        "rosterTableFoot",
+        "addRowBtn",
+        "addFiveRowsBtn",
+        "sizeBreakdownCard",
+        "sizeBreakdownBody",
+        "emptyState",
+        "saveDraftBtn",
+        "saveSubmitBtn",
+        "saveAndReturnBtn",
+        "printBtn",
+        "exportExcelBtn",
+        "pasteModal",
+        "pasteModalClose",
+        "pasteTextarea",
+        "pasteCancelBtn",
+        "pasteImportBtn",
+        "ocrModal",
+        "ocrModalClose",
+        "ocrDropZone",
+        "ocrPreview",
+        "ocrProcessing",
+        "ocrResults",
+        "ocrCancelBtn",
+        "ocrImportBtn",
+        "addGroupModal",
+        "addGroupModalClose",
+        "newGroupName",
+        "newGroupStyle",
+        "newGroupColor",
+        "addGroupCancelBtn",
+        "addGroupConfirmBtn",
+        "toast"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Staff Dashboard"
+        },
+        {
+          "href": "/dashboards/names-numbers-dashboard.html",
+          "label": "Names & Numbers"
+        },
+        {
+          "href": "/dashboards/names-numbers-dashboard.html",
+          "label": "All Rosters"
+        }
+      ],
+      "fields": [
+        {
+          "id": "searchInput",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "rosterName",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "companyName",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "orderNumber",
+          "type": "number",
+          "value": ""
+        },
+        {
+          "id": "contactName",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "contactEmail",
+          "type": "email",
+          "value": ""
+        },
+        {
+          "id": "salesRep",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "rosterNotes",
+          "type": "textarea",
+          "value": ""
+        },
+        {
+          "id": "excelFileInput",
+          "type": "file",
+          "value": ""
+        },
+        {
+          "id": "ocrFileInput",
+          "type": "file",
+          "value": ""
+        },
+        {
+          "id": "groupName",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "pasteTextarea",
+          "type": "textarea",
+          "value": ""
+        },
+        {
+          "id": "newGroupName",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "newGroupStyle",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "newGroupColor",
+          "type": "text",
+          "value": ""
+        }
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/names-numbers.css"
+      ],
+      "scripts": [
+        "config/app.config.js",
+        "shared_components/js/names-numbers-service.js",
+        "shared_components/js/names-numbers-controller.js"
+      ],
+      "cssBytes": 44494
+    },
+    {
+      "file": "quote-builders/monogram-form.html",
+      "html": "﻿<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <meta name=\"robots\" content=\"noindex, nofollow\">\n    <title>Monogram Form - Northwest Custom Apparel</title>\n    <link rel=\"icon\" href=\"/favicon.png\" type=\"image/png\">\n    <link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Dancing+Script:wght@600;700&family=Archivo+Black&display=swap\" rel=\"stylesheet\">\n    <link href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css\" rel=\"stylesheet\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link href=\"/shared_components/css/quote-builder-common.css?v=2026.09.07.19\" rel=\"stylesheet\">\n    <link href=\"/shared_components/css/monogram-form.css?v=2026.09.07.19\" rel=\"stylesheet\">\n</head>\n<body>\n    <!-- Header -->\n    <header class=\"header\">\n        <div class=\"header-container\">\n            <div class=\"header-left\">\n                <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\"\n                     alt=\"Northwest Custom Apparel\" class=\"logo\">\n                <nav class=\"breadcrumb\">\n                    <a href=\"/staff-dashboard.html\">Staff Dashboard</a>\n                    <span>/</span>\n                    <span>Monogram Form</span>\n                </nav>\n            </div>\n            <div class=\"header-right\">\n                <span class=\"current-date\" id=\"currentDate\"></span>\n                <a href=\"/staff-dashboard.html\" class=\"btn-secondary\">\n                    <i class=\"fas fa-arrow-left\" aria-hidden=\"true\"></i>\n                    Back to Dashboard\n                </a>\n            </div>\n        </div>\n    </header>\n\n    <!-- Main Content -->\n    <main class=\"main-container\">\n        <!-- Page Header -->\n        <div class=\"page-header\">\n            <div class=\"page-header-content\">\n                <h1 class=\"page-title\">\n                    <i class=\"fas fa-signature\" aria-hidden=\"true\"></i>\n                    Monogram Form 2026\n                </h1>\n                <p class=\"page-subtitle\">Embroidery personalization tracking for production</p>\n            </div>\n            <div class=\"page-header-actions\">\n                <button type=\"button\" class=\"btn-icon\" id=\"searchBtn\" title=\"Search existing forms\">\n                    <i class=\"fas fa-search\" aria-hidden=\"true\"></i>\n                </button>\n                <button type=\"button\" class=\"btn-icon\" id=\"newFormBtn\" title=\"Start new form\">\n                    <i class=\"fas fa-plus\" aria-hidden=\"true\"></i>\n                </button>\n            </div>\n        </div>\n\n        <!-- Search Panel (Hidden by default) -->\n        <div class=\"search-panel\" id=\"searchPanel\" style=\"display: none;\">\n            <div class=\"search-panel-header\">\n                <h3><i class=\"fas fa-search\" aria-hidden=\"true\"></i> Search Existing Forms</h3>\n                <button type=\"button\" class=\"btn-close\" id=\"closeSearchBtn\">&times;</button>\n            </div>\n            <div class=\"search-panel-body\">\n                <div class=\"search-inputs\">\n                    <div class=\"search-field\">\n                        <label for=\"searchOrderNumber\">Order Number</label>\n                        <input type=\"text\" id=\"searchOrderNumber\" placeholder=\"e.g., 139465\">\n                    </div>\n                    <div class=\"search-field\">\n                        <label for=\"searchCompanyName\">Company Name</label>\n                        <input type=\"text\" id=\"searchCompanyName\" placeholder=\"e.g., Puyallup\">\n                    </div>\n                    <button type=\"button\" class=\"btn-primary\" id=\"doSearchBtn\">\n                        <i class=\"fas fa-search\" aria-hidden=\"true\"></i> Search\n                    </button>\n                </div>\n                <div class=\"search-results\" id=\"searchResults\">\n                    <!-- Results will be populated here -->\n                </div>\n            </div>\n        </div>\n\n        <!-- Form Container -->\n        <form id=\"monogramForm\" class=\"form-container\">\n            <!-- Order Lookup Section -->\n            <section class=\"form-section\">\n                <h2 class=\"section-title\">\n                    <i class=\"fas fa-clipboard-list\" aria-hidden=\"true\"></i>\n                    Order Information\n                </h2>\n                <div class=\"form-row\">\n                    <div class=\"form-group order-lookup-group\">\n                        <label for=\"orderNumber\">Order Number <span class=\"required\">*</span></label>\n                        <div class=\"input-with-button\">\n                            <input type=\"text\" id=\"orderNumber\" name=\"orderNumber\"\n                                   placeholder=\"Enter ShopWorks order number\" required>\n                            <button type=\"button\" id=\"lookupOrderBtn\" class=\"btn-lookup\">\n                                <i class=\"fas fa-search\" aria-hidden=\"true\"></i> Lookup\n                            </button>\n                        </div>\n                        <span class=\"field-hint\">Enter order number to auto-populate order details</span>\n                    </div>\n                    <div class=\"form-group\">\n                        <label for=\"companyName\">Company <span class=\"required\">*</span></label>\n                        <input type=\"text\" id=\"companyName\" name=\"companyName\"\n                               placeholder=\"Auto-filled from order\" required>\n                    </div>\n                    <div class=\"form-group\">\n                        <label for=\"salesRepEmail\">Sales Rep Email</label>\n                        <input type=\"email\" id=\"salesRepEmail\" name=\"salesRepEmail\"\n                               placeholder=\"e.g., sales@nwcustomapparel.com\">\n                    </div>\n                </div>\n\n                <!-- Order Status Indicator -->\n                <div class=\"order-status\" id=\"orderStatus\" style=\"display: none;\">\n                    <div class=\"status-badge status-loading\" id=\"orderStatusBadge\">\n                        <i class=\"fas fa-spinner fa-spin\" aria-hidden=\"true\"></i>\n                        <span id=\"orderStatusText\">Looking up order...</span>\n                    </div>\n                </div>\n            </section>\n\n            <!-- Monogram Details Section -->\n            <section class=\"form-section\">\n                <h2 class=\"section-title\">\n                    <i class=\"fas fa-palette\" aria-hidden=\"true\"></i>\n                    Monogram Details\n                </h2>\n                <div class=\"form-row\">\n                    <div class=\"form-group\">\n                        <label for=\"fontStyle\">Font Style</label>\n                        <input type=\"text\" id=\"fontStyle\" name=\"fontStyle\"\n                               placeholder=\"e.g., Sansita, Script, Block\">\n                    </div>\n                    <div class=\"form-group thread-color-group\">\n                        <label>Thread Color(s)</label>\n                        <div class=\"thread-color-selector\">\n                            <button type=\"button\" id=\"threadColorBtn\" class=\"thread-color-toggle\">\n                                <span id=\"threadColorBtnText\">Select Thread Colors...</span>\n                                <i class=\"fas fa-chevron-down\" aria-hidden=\"true\"></i>\n                            </button>\n                            <div id=\"threadColorDropdown\" class=\"thread-color-dropdown\" hidden>\n                                <div class=\"thread-color-search\">\n                                    <input type=\"text\" id=\"threadColorSearch\" placeholder=\"Search colors...\" aria-label=\"Search colors\">\n                                </div>\n                                <div class=\"thread-color-list\" id=\"threadColorList\">\n                                    <!-- Populated dynamically -->\n                                </div>\n                                <div class=\"thread-color-actions\">\n                                    <button type=\"button\" id=\"threadColorDoneBtn\" class=\"btn-primary btn-sm\">Done</button>\n                                </div>\n                            </div>\n                        </div>\n                        <div class=\"selected-thread-colors\" id=\"selectedThreadColors\">\n                            <!-- Selected color tags appear here -->\n                        </div>\n                    </div>\n                    <div class=\"form-group location-group\">\n                        <label>Monogram Location(s)</label>\n                        <div class=\"location-selector\">\n                            <button type=\"button\" id=\"locationBtn\" class=\"location-toggle\">\n                                <span id=\"locationBtnText\">Select Locations...</span>\n                                <i class=\"fas fa-chevron-down\" aria-hidden=\"true\"></i>\n                            </button>\n                            <div id=\"locationDropdown\" class=\"location-dropdown\" hidden>\n                                <div class=\"location-list\" id=\"locationList\">\n                                    <!-- Populated with checkboxes -->\n                                </div>\n                                <div class=\"location-other-input\" id=\"locationOtherInput\" style=\"display: none;\">\n                                    <input type=\"text\" id=\"locationOtherText\" placeholder=\"Specify custom location...\" aria-label=\"Specify custom location\">\n                                </div>\n                                <div class=\"location-actions\">\n                                    <button type=\"button\" id=\"locationDoneBtn\" class=\"btn-primary btn-sm\">Done</button>\n                                </div>\n                            </div>\n                        </div>\n                        <div class=\"selected-locations\" id=\"selectedLocations\">\n                            <!-- Selected location tags appear here -->\n                        </div>\n                    </div>\n                </div>\n                <div class=\"form-group paste-names-group full-width\">\n                    <label for=\"pasteNamesInput\">Bulk Name Import</label>\n                    <div class=\"paste-names-container\">\n                        <textarea id=\"pasteNamesInput\" class=\"paste-names-textarea\"\n                                  placeholder=\"Paste names here (one per line)...&#10;Example:&#10;Jim Mickelson&#10;Erik Mickelson&#10;Ruthie Nhoung\"\n                                  rows=\"4\"></textarea>\n                        <div class=\"paste-names-actions\">\n                            <button type=\"button\" id=\"importNamesBtn\" class=\"btn-secondary btn-sm\">\n                                <i class=\"fas fa-upload\" aria-hidden=\"true\"></i> Import Names\n                            </button>\n                            <button type=\"button\" id=\"clearNamesBtn\" class=\"btn-secondary btn-sm\">\n                                <i class=\"fas fa-times\" aria-hidden=\"true\"></i> Clear\n                            </button>\n                            <span class=\"imported-count\" id=\"importedCount\"></span>\n                        </div>\n                    </div>\n                    <div class=\"unassigned-names-panel\" id=\"unassignedNamesPanel\" style=\"display: none;\">\n                        <div class=\"unassigned-header\">\n                            <strong><i class=\"fas fa-user-clock\" aria-hidden=\"true\"></i> Unassigned Names</strong>\n                            <span class=\"unassigned-count\" id=\"unassignedCount\">(0)</span>\n                        </div>\n                        <div class=\"unassigned-list\" id=\"unassignedNamesList\">\n                            <!-- Unassigned name tags appear here -->\n                        </div>\n                    </div>\n                </div>\n                <div class=\"form-group full-width\">\n                    <label for=\"notesToProduction\">Notes to Production</label>\n                    <textarea id=\"notesToProduction\" name=\"notesToProduction\" rows=\"3\"\n                              placeholder=\"Special instructions for the production team...\"></textarea>\n                </div>\n            </section>\n\n            <!-- Names Table Section -->\n            <section class=\"form-section names-section\">\n                <div class=\"section-header-row\">\n                    <h2 class=\"section-title\">\n                        <i class=\"fas fa-users\" aria-hidden=\"true\"></i>\n                        Names\n                        <span class=\"name-count\" id=\"nameCount\">(0 entries)</span>\n                    </h2>\n                    <div class=\"section-actions\">\n                        <button type=\"button\" class=\"btn-secondary btn-sm\" id=\"addRowBtn\">\n                            <i class=\"fas fa-plus\" aria-hidden=\"true\"></i> Add Row\n                        </button>\n                        <button type=\"button\" class=\"btn-secondary btn-sm\" id=\"add5RowsBtn\">\n                            <i class=\"fas fa-plus\" aria-hidden=\"true\"></i> Add 5 Rows\n                        </button>\n                    </div>\n                </div>\n\n                <div class=\"table-container\">\n                    <table class=\"names-table\" id=\"namesTable\">\n                        <thead>\n                            <tr>\n                                <th class=\"col-num\">#</th>\n                                <th class=\"col-style\">Style</th>\n                                <th class=\"col-desc\">Description</th>\n                                <th class=\"col-color\">Color</th>\n                                <th class=\"col-size\">Size</th>\n                                <th class=\"col-thread-location\">Thread / Location</th>\n                                <th class=\"col-name\">Monogram Name</th>\n                                <th class=\"col-action\"></th>\n                            </tr>\n                        </thead>\n                        <tbody id=\"namesTableBody\">\n                            <!-- Rows will be added dynamically -->\n                        </tbody>\n                    </table>\n                </div>\n\n                <div class=\"table-footer\">\n                    <button type=\"button\" class=\"btn-secondary\" id=\"addRowBtnBottom\">\n                        <i class=\"fas fa-plus\" aria-hidden=\"true\"></i> Add Row\n                    </button>\n                </div>\n\n                <!-- Stitch Check: live QA on the name list (monogram-name-qa.js) -->\n                <div class=\"stitch-check-panel\" id=\"stitchCheckPanel\" style=\"display: none;\">\n                    <div class=\"stitch-check-header\">\n                        <strong><i class=\"fas fa-spell-check\" aria-hidden=\"true\"></i> Stitch Check</strong>\n                        <span class=\"stitch-check-summary\" id=\"stitchCheckSummary\"></span>\n                    </div>\n                    <ul class=\"stitch-check-list\" id=\"stitchCheckList\"></ul>\n                </div>\n            </section>\n\n            <!-- Action Buttons -->\n            <section class=\"form-actions\">\n                <div class=\"actions-left\">\n                    <button type=\"button\" class=\"btn-secondary\" id=\"clearFormBtn\">\n                        <i class=\"fas fa-eraser\" aria-hidden=\"true\"></i> Clear Form\n                    </button>\n                </div>\n                <div class=\"actions-right\">\n                    <button type=\"button\" class=\"btn-secondary\" id=\"saveDraftBtn\">\n                        <i class=\"fas fa-save\" aria-hidden=\"true\"></i> Save Draft\n                    </button>\n                    <button type=\"button\" class=\"btn-secondary\" id=\"printProofBtn\">\n                        <i class=\"fas fa-file-signature\" aria-hidden=\"true\"></i> Print Customer Proof\n                    </button>\n                    <button type=\"button\" class=\"btn-primary\" id=\"printPdfBtn\">\n                        <i class=\"fas fa-print\" aria-hidden=\"true\"></i> Print PDF\n                    </button>\n                </div>\n            </section>\n        </form>\n    </main>\n\n    <!-- Print Template (Hidden, used for PDF generation) -->\n    <div id=\"printTemplate\" class=\"print-template\">\n        <div class=\"print-header\">\n            <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\"\n                 alt=\"Northwest Custom Apparel\" class=\"print-logo\">\n            <div class=\"print-header-right\">\n                <span class=\"print-date\" id=\"printDate\"></span>\n                <h1 class=\"print-title\">Monogram Form 2026</h1>\n            </div>\n        </div>\n\n        <div class=\"print-order-info\">\n            <div class=\"print-field\">\n                <strong>Order#</strong>\n                <span id=\"printOrderNumber\"></span>\n            </div>\n            <div class=\"print-field\">\n                <strong>Company</strong>\n                <span id=\"printCompanyName\"></span>\n            </div>\n            <div class=\"print-field\">\n                <strong>Sales Rep Email</strong>\n                <span id=\"printSalesRepEmail\"></span>\n            </div>\n        </div>\n\n        <div class=\"print-monogram-details\">\n            <h3>Monogram Details</h3>\n            <div class=\"print-detail-row\">\n                <div class=\"print-field\">\n                    <strong>Font Style</strong>\n                    <span id=\"printFontStyle\"></span>\n                </div>\n                <div class=\"print-field\">\n                    <strong>Thread Color</strong>\n                    <span id=\"printThreadColor\"></span>\n                </div>\n                <div class=\"print-field\">\n                    <strong>Location</strong>\n                    <span id=\"printLocation\"></span>\n                </div>\n            </div>\n            <div class=\"print-notes\">\n                <strong>Notes to Production</strong>\n                <p id=\"printNotes\"></p>\n            </div>\n            <div class=\"print-run-plan\" id=\"printRunPlan\" style=\"display: none;\"></div>\n        </div>\n\n        <div class=\"print-names-section\">\n            <h3>Names</h3>\n            <table class=\"print-names-table\" id=\"printNamesTable\">\n                <thead>\n                    <tr>\n                        <th>#</th>\n                        <th>Style</th>\n                        <th>Description</th>\n                        <th>Shirt Color</th>\n                        <th>Size</th>\n                        <th>Thread / Location</th>\n                        <th>Monogram Name</th>\n                    </tr>\n                </thead>\n                <tbody id=\"printNamesTableBody\">\n                </tbody>\n            </table>\n        </div>\n\n        <div class=\"print-footer\">\n            <span>Page <span class=\"page-number\"></span></span>\n        </div>\n    </div>\n\n    <!-- Customer Proof Template (Hidden; printed via body.print-mode-proof) -->\n    <div id=\"proofTemplate\" class=\"print-template proof-template\">\n        <div class=\"print-header\">\n            <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\"\n                 alt=\"Northwest Custom Apparel\" class=\"print-logo\">\n            <div class=\"print-header-right\">\n                <span class=\"print-date\" id=\"proofDate\"></span>\n                <h1 class=\"print-title\">Embroidery Name Proof</h1>\n            </div>\n        </div>\n\n        <div class=\"print-order-info\">\n            <div class=\"print-field\">\n                <strong>Order#</strong>\n                <span id=\"proofOrderNumber\"></span>\n            </div>\n            <div class=\"print-field\">\n                <strong>Company</strong>\n                <span id=\"proofCompanyName\"></span>\n            </div>\n            <div class=\"print-field\">\n                <strong>Font Style</strong>\n                <span id=\"proofFontStyle\"></span>\n            </div>\n        </div>\n\n        <p class=\"proof-instructions\">\n            Please review each name below. Names are embroidered <strong>exactly as shown</strong> â€”\n            including capitalization, spacing, and punctuation. Check the box beside each name to\n            approve it, then sign at the bottom. On-screen fonts and thread colors are close\n            approximations of the actual embroidery.\n        </p>\n        <p class=\"proof-color-notice\" id=\"proofColorNotice\" style=\"display: none;\"></p>\n\n        <div class=\"proof-list\" id=\"proofList\"></div>\n\n        <div class=\"proof-signoff\">\n            <div class=\"proof-signoff-line\">\n                <span class=\"proof-signoff-label\">Approved by (print name)</span>\n            </div>\n            <div class=\"proof-signoff-line\">\n                <span class=\"proof-signoff-label\">Signature</span>\n            </div>\n            <div class=\"proof-signoff-line proof-signoff-date\">\n                <span class=\"proof-signoff-label\">Date</span>\n            </div>\n        </div>\n    </div>\n\n    <!-- Loading Overlay -->\n    <div class=\"loading-overlay\" id=\"loadingOverlay\">\n        <div class=\"loading-content\">\n            <div class=\"loading-spinner\"></div>\n            <div class=\"loading-text\" id=\"loadingText\">Loading...</div>\n        </div>\n    </div>\n\n    <!-- Toast Container -->\n    <div class=\"toast-container\" id=\"toastContainer\"></div>\n\n    <!-- Scripts -->\n    <script src=\"/config/app.config.js\"></script>\n    <script src=\"/pages/js/dst-palette.js?v=2026.08.05.4\"></script>\n    <script src=\"/shared_components/js/monogram-name-qa.js?v=2026.09.07.33\"></script>\n    <script src=\"/shared_components/js/monogram-form-service.js?v=2026.09.06.31\"></script>\n    <script src=\"/shared_components/js/monogram-form-controller.js?v=2026.09.06.22\"></script>\n</body>\n</html>\n",
+      "title": "Monogram Form - Northwest Custom Apparel",
+      "bodyText": "Monogram Form - Northwest Custom Apparel Staff Dashboard / Monogram Form Back to Dashboard Monogram Form 2026 Embroidery personalization tracking for production Search Existing Forms × Order Number Company Name Search Order Information Order Number * Lookup Enter order number to auto-populate order details Company * Sales Rep Email Looking up order... Monogram Details Font Style Thread Color(s) Select Thread Colors... Done Monogram Location(s) Select Locations... Done Bulk Name Import Import Names Clear Unassigned Names (0) Notes to Production Names (0 entries) Add Row Add 5 Rows # Style Description Color Size Thread / Location Monogram Name Add Row Stitch Check Clear Form Save Draft Print Customer Proof Print PDF Monogram Form 2026 Order# Company Sales Rep Email Monogram Details Font Style Thread Color Location Notes to Production Names # Style Description Shirt Color Size Thread / Location Monogram Name Page Embroidery Name Proof Order# Company Font Style Please review each name below. Names are embroidered exactly as shown â€” including capitalization, spacing, and punctuation. Check the box beside each name to approve it, then sign at the bottom. On-screen fonts and thread colors are close approximations of the actual embroidery. Approved by (print name) Signature Date Loading...",
+      "bodyTextSha": "347311a6b169a94166d082f1a158cf0ec5fab4ef9eb5925a139634496ec532dc",
+      "ids": [
+        "currentDate",
+        "searchBtn",
+        "newFormBtn",
+        "searchPanel",
+        "closeSearchBtn",
+        "searchOrderNumber",
+        "searchCompanyName",
+        "doSearchBtn",
+        "searchResults",
+        "monogramForm",
+        "orderNumber",
+        "lookupOrderBtn",
+        "companyName",
+        "salesRepEmail",
+        "orderStatus",
+        "orderStatusBadge",
+        "orderStatusText",
+        "fontStyle",
+        "threadColorBtn",
+        "threadColorBtnText",
+        "threadColorDropdown",
+        "threadColorSearch",
+        "threadColorList",
+        "threadColorDoneBtn",
+        "selectedThreadColors",
+        "locationBtn",
+        "locationBtnText",
+        "locationDropdown",
+        "locationList",
+        "locationOtherInput",
+        "locationOtherText",
+        "locationDoneBtn",
+        "selectedLocations",
+        "pasteNamesInput",
+        "importNamesBtn",
+        "clearNamesBtn",
+        "importedCount",
+        "unassignedNamesPanel",
+        "unassignedCount",
+        "unassignedNamesList",
+        "notesToProduction",
+        "nameCount",
+        "addRowBtn",
+        "add5RowsBtn",
+        "namesTable",
+        "namesTableBody",
+        "addRowBtnBottom",
+        "stitchCheckPanel",
+        "stitchCheckSummary",
+        "stitchCheckList",
+        "clearFormBtn",
+        "saveDraftBtn",
+        "printProofBtn",
+        "printPdfBtn",
+        "printTemplate",
+        "printDate",
+        "printOrderNumber",
+        "printCompanyName",
+        "printSalesRepEmail",
+        "printFontStyle",
+        "printThreadColor",
+        "printLocation",
+        "printNotes",
+        "printRunPlan",
+        "printNamesTable",
+        "printNamesTableBody",
+        "proofTemplate",
+        "proofDate",
+        "proofOrderNumber",
+        "proofCompanyName",
+        "proofFontStyle",
+        "proofColorNotice",
+        "proofList",
+        "loadingOverlay",
+        "loadingText",
+        "toastContainer"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Staff Dashboard"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Back to Dashboard"
+        }
+      ],
+      "fields": [
+        {
+          "id": "searchOrderNumber",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "searchCompanyName",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "orderNumber",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "companyName",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "salesRepEmail",
+          "type": "email",
+          "value": ""
+        },
+        {
+          "id": "fontStyle",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "threadColorSearch",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "locationOtherText",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "pasteNamesInput",
+          "type": "textarea",
+          "value": ""
+        },
+        {
+          "id": "notesToProduction",
+          "type": "textarea",
+          "value": ""
+        }
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/quote-builder-common.css",
+        "shared_components/css/monogram-form.css"
+      ],
+      "scripts": [
+        "config/app.config.js",
+        "pages/js/dst-palette.js",
+        "shared_components/js/monogram-name-qa.js",
+        "shared_components/js/monogram-form-service.js",
+        "shared_components/js/monogram-form-controller.js"
+      ],
+      "cssBytes": 167534
+    }
+  ],
+  "hashes": {
+    "dashboards/monogram-dashboard.html": "ecadb074e7335d44b0b30ab379b9a4f7d5c080e6c5775a4951c536cc236f2187",
+    "shared_components/css/tokens.css": "2b3ab556bb9eaf40765a5c84683777cb64d50a6c42d1b4e82bc6beff33a127b6",
+    "dashboards/css/monogram-dashboard.css": "bb07ab6ac451de949f35fe674ca4a8f7024527f274c5be3c4b314b392dd38256",
+    "config/app.config.js": "fe83e4329ce3eee97e48dd68dab81d9d5eb6ec94511d9650e2c9ebbb1528d6ea",
+    "shared_components/js/data-call-delegator.js": "50e836385b6804b2b52fd8c549744277fe69ff701c232b7badf4fdcb09f343f6",
+    "shared_components/js/monogram-dashboard.js": "4837abde2c7a6f9147df8e36b7906926200df2339dce22e931b91af317545c2f",
+    "dashboards/names-numbers-dashboard.html": "c35ec8f55a89aa3df532b0ffd4653cc0c45ea905839cde476af2ee5cd125eaaa",
+    "shared_components/css/names-numbers.css": "28e160eedd0fcd48fc315ab4d6459ba31d42a399b1ad88a0c69d9391b4961c08",
+    "dashboards/css/names-numbers-dashboard.css": "137eee0cc2e84f0c00706c1103bccdd96028964d9a8616d6a36798a8963f5137",
+    "shared_components/js/names-numbers-service.js": "041109f11a3d40a5585e901eced56cbf5bb3d32cdb9c388611a2ac52627ebbe8",
+    "shared_components/js/caspio-date-utils.js": "631fad8e38f78d2f7a6d1f424b145ccc3f4bf0f0bf58e61d89e3a1851605474e",
+    "shared_components/js/names-numbers-dashboard.js": "66850f3a4db113b88dfa87832fd4cdd9491cab4ef2fbfe3c70c796a75b9d900c",
+    "pages/names-numbers.html": "847a15901d70ddb085c251d3bccd91c247ad9c164b2c89387976170d815bb2f1",
+    "shared_components/js/names-numbers-controller.js": "5026018ffc423e2d78299c28925448e6bd1bb877770fcd1054bcffb51726ec2d",
+    "quote-builders/monogram-form.html": "6c43779354502d47af97e7085d028f207d6bd16f68c5011632fb82e815ae1e1a",
+    "shared_components/css/quote-builder-common.css": "f11ebe6928a9b92dc6fe96c784990b09eaf6fc16e6da6036940149881ea87a1f",
+    "shared_components/css/monogram-form.css": "78b1e499ff4a73e5cf942915607b6599d853bd0dba338260a54bc7cb140d4fc8",
+    "pages/js/dst-palette.js": "0c68b0375c00e7a1f25524e7281520afd3adf08377ea460d5f86ebc3490b4006",
+    "shared_components/js/monogram-name-qa.js": "38024411fa03f208c56009cb0359d566920477dab728d057926490b0d42947a1",
+    "shared_components/js/monogram-form-service.js": "4672e9a22f9c8dcbc54f439b44729e4d7a970c8da0f95b8849ab79722c711d7e",
+    "shared_components/js/monogram-form-controller.js": "bec8975c190f7dd908965c95bf015d5354f3f15ab67d5e98302542b9db269a22"
+  },
+  "changes": [
+    {
+      "file": "shared_components/js/monogram-dashboard.js",
+      "before": "class=\"action-btn edit\"",
+      "after": "class=\"action-btn edit btn\"",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/monogram-dashboard.js",
+      "before": "class=\"action-btn print\"",
+      "after": "class=\"action-btn print btn\"",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/monogram-dashboard.js",
+      "before": "class=\"action-btn proof\"",
+      "after": "class=\"action-btn proof btn\"",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/monogram-dashboard.js",
+      "before": "class=\"action-btn done\"",
+      "after": "class=\"action-btn done btn\"",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/monogram-dashboard.js",
+      "before": "class=\"action-btn delete\"",
+      "after": "class=\"action-btn delete btn\"",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-dashboard.js",
+      "before": "class=\"btn-secondary btn-sm\"",
+      "after": "class=\"btn-secondary btn-sm btn\"",
+      "count": 2
+    },
+    {
+      "file": "shared_components/js/names-numbers-dashboard.js",
+      "before": "class=\"btn-danger btn-sm\"",
+      "after": "class=\"btn-danger btn-sm btn\"",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/monogram-dashboard.js",
+      "before": "let uniqueSalesReps = [];",
+      "after": "let uniqueSalesReps = [];\nlet monogramLoadSeq = 0;\nlet monogramLoadState = 'loading';",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/monogram-dashboard.js",
+      "before": "async function loadMonograms() {\n    const tbody",
+      "after": "async function loadMonograms() {\n    const requestId = ++monogramLoadSeq;\n    monogramLoadState = 'loading';\n    allMonograms = [];\n    filteredMonograms = [];\n    const tbody",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/monogram-dashboard.js",
+      "before": "    const apiUrl = getApiBaseUrl();\n\n    tbody.innerHTML",
+      "after": "    const apiUrl = getApiBaseUrl();\n    resultCount.textContent = 'Loading monograms…';\n\n    tbody.innerHTML",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/monogram-dashboard.js",
+      "before": "        const data = await response.json();\n\n        if (data.success && data.monograms) {",
+      "after": "        const data = await response.json();\n        if (requestId !== monogramLoadSeq) return;\n\n        if (data && data.success && Array.isArray(data.monograms)) {",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/monogram-dashboard.js",
+      "before": "            populateSalesRepFilter();\n            filterMonograms();",
+      "after": "            populateSalesRepFilter();\n            monogramLoadState = 'ready';\n            filterMonograms();",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/monogram-dashboard.js",
+      "before": "    } catch (error) {\n        console.error('Error loading monograms:', error);",
+      "after": "    } catch (error) {\n        if (requestId !== monogramLoadSeq) return;\n        monogramLoadState = 'error';\n        allMonograms = [];\n        filteredMonograms = [];\n        console.error('Error loading monograms:', error);",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/monogram-dashboard.js",
+      "before": "function filterMonograms() {\n    const searchValue",
+      "after": "function filterMonograms() {\n    if (monogramLoadState !== 'ready') return;\n    const searchValue",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-dashboard.js",
+      "before": "        this.allRosters = [];\n\n        if (document.readyState",
+      "after": "        this.allRosters = [];\n        this.loadSeq = 0;\n        this.loadState = 'loading';\n\n        if (document.readyState",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-dashboard.js",
+      "before": "    async loadAll() {\n        try {",
+      "after": "    async loadAll() {\n        const requestId = ++this.loadSeq;\n        this.loadState = 'loading';\n        this.allRosters = [];\n        ['kpiTotal', 'kpiDraft', 'kpiSubmitted', 'kpiInProd', 'kpiCompleted'].forEach(id => { document.getElementById(id).textContent = '—'; });\n        document.getElementById('nnResultCount').textContent = 'Loading rosters…';\n        document.getElementById('dashboardBody').innerHTML = '<tr><td colspan=\"8\" class=\"nn-table-msg\" role=\"status\">Loading rosters…</td></tr>';\n        try {",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-dashboard.js",
+      "before": "            const result = await this.service.listRosters();\n            this.allRosters = result.rosters || [];\n            this.updateKPIs();\n            this.renderTable(this.allRosters);",
+      "after": "            const result = await this.service.listRosters();\n            if (requestId !== this.loadSeq) return;\n            if (!result || !Array.isArray(result.rosters) || result.success === false) throw new Error('Invalid roster response');\n            this.allRosters = result.rosters;\n            this.loadState = 'ready';\n            this.updateKPIs();\n            this.applyFilters();",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-dashboard.js",
+      "before": "        } catch (err) {\n            this.showToast('Failed to load rosters: ' + err.message, 'error');",
+      "after": "        } catch (err) {\n            if (requestId !== this.loadSeq) return;\n            this.loadState = 'error';\n            this.allRosters = [];\n            document.getElementById('nnResultCount').textContent = 'Rosters unavailable';\n            this.showToast('Failed to load rosters: ' + err.message, 'error');",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-dashboard.js",
+      "before": "    applyFilters() {\n        const search",
+      "after": "    applyFilters() {\n        if (this.loadState !== 'ready') { this.syncKpis(); return; }\n        const search",
+      "count": 1
+    }
+  ]
+}

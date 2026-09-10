@@ -6,6 +6,8 @@ class NamesNumbersDashboard {
     constructor() {
         this.service = new NamesNumbersService();
         this.allRosters = [];
+        this.loadSeq = 0;
+        this.loadState = 'loading';
 
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => this.init());
@@ -54,16 +56,29 @@ class NamesNumbersDashboard {
     }
 
     async loadAll() {
+        const requestId = ++this.loadSeq;
+        this.loadState = 'loading';
+        this.allRosters = [];
+        ['kpiTotal', 'kpiDraft', 'kpiSubmitted', 'kpiInProd', 'kpiCompleted'].forEach(id => { document.getElementById(id).textContent = '—'; });
+        document.getElementById('nnResultCount').textContent = 'Loading rosters…';
+        document.getElementById('dashboardBody').innerHTML = '<tr><td colspan="8" class="nn-table-msg" role="status">Loading rosters…</td></tr>';
         try {
             const result = await this.service.listRosters();
-            this.allRosters = result.rosters || [];
+            if (requestId !== this.loadSeq) return;
+            if (!result || !Array.isArray(result.rosters) || result.success === false) throw new Error('Invalid roster response');
+            this.allRosters = result.rosters;
+            this.loadState = 'ready';
             this.updateKPIs();
-            this.renderTable(this.allRosters);
+            this.applyFilters();
         } catch (err) {
+            if (requestId !== this.loadSeq) return;
+            this.loadState = 'error';
+            this.allRosters = [];
+            document.getElementById('nnResultCount').textContent = 'Rosters unavailable';
             this.showToast('Failed to load rosters: ' + err.message, 'error');
             document.getElementById('dashboardBody').innerHTML =
                 '<tr><td colspan="8" class="nn-table-msg nn-table-msg--error" role="alert">Failed to load rosters (' + this.esc(err.message || 'request failed') + '). '
-                + '<button type="button" class="btn-secondary btn-sm" data-call="dashboard.loadAll">Retry</button></td></tr>';
+                + '<button type="button" class="btn-secondary btn-sm btn" data-call="dashboard.loadAll">Retry</button></td></tr>';
         }
     }
 
@@ -77,6 +92,7 @@ class NamesNumbersDashboard {
     }
 
     applyFilters() {
+        if (this.loadState !== 'ready') { this.syncKpis(); return; }
         const search = document.getElementById('filterSearch').value.trim().toLowerCase();
         const status = document.getElementById('filterStatus').value;
         const rep = document.getElementById('filterRep').value.trim().toLowerCase();
@@ -133,8 +149,8 @@ class NamesNumbersDashboard {
                 <td><span class="status-badge status-${statusCls}">${this.esc(r.Status || 'Draft')}</span></td>
                 <td>${modified}</td>
                 <td class="actions" data-stop="1">
-                    <a href="/pages/names-numbers.html?load=${encodeURIComponent(r.ID_Roster)}" class="btn-secondary btn-sm" aria-label="Edit roster ${name}"><i class="fas fa-edit" aria-hidden="true"></i></a>
-                    <button type="button" class="btn-danger btn-sm" aria-label="Delete roster ${name}" data-call="dashboard.deleteRoster" data-args="${JSON.stringify([r.ID_Roster, r.RosterName || '']).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;')}"><i class="fas fa-trash" aria-hidden="true"></i></button>
+                    <a href="/pages/names-numbers.html?load=${encodeURIComponent(r.ID_Roster)}" class="btn-secondary btn-sm btn" aria-label="Edit roster ${name}"><i class="fas fa-edit" aria-hidden="true"></i></a>
+                    <button type="button" class="btn-danger btn-sm btn" aria-label="Delete roster ${name}" data-call="dashboard.deleteRoster" data-args="${JSON.stringify([r.ID_Roster, r.RosterName || '']).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;')}"><i class="fas fa-trash" aria-hidden="true"></i></button>
                 </td>
             </tr>`;
         }).join('');

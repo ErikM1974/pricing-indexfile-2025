@@ -1,0 +1,402 @@
+/* Personalization workspaces. Canonical controls are owned by components.css. */
+@layer components.pages {
+    :where([data-ui="unified"][data-personalization]) {
+        --ui-accent: var(--gray-900);
+        --ui-accent-hover: var(--gray-700);
+        --ui-tint: var(--gray-50);
+    }
+
+    :where([data-ui="unified"][data-personalization])
+        :is(.header, .dashboard-header) {
+        background: var(--gray-900);
+        color: var(--color-on-brand);
+        border-top: 3px solid var(--amber-400);
+    }
+
+    :where([data-ui="unified"][data-personalization])
+        :is(
+            .header-container,
+            .nav-content,
+            .context-bar-content,
+            .contact-bar-content
+        ) {
+        max-width: 1480px;
+        margin-inline: auto;
+        padding: var(--space-3) var(--space-6);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-4);
+        flex-wrap: wrap;
+    }
+
+    :where([data-ui="unified"][data-personalization])
+        :is(
+            .header-left,
+            .header-right,
+            .main-nav-links,
+            .contact-info,
+            .context-left,
+            .quick-actions,
+            .breadcrumb
+        ) {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        flex-wrap: wrap;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-personalization])
+        :is(.header-contact-bar, .context-bar) {
+        border-top: 1px solid var(--gray-700);
+        font-size: var(--font-size-sm);
+    }
+
+    :where([data-ui="unified"][data-personalization]) .context-left {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-personalization])
+        :is(.header, .dashboard-header)
+        a:not(.btn) {
+        color: var(--color-on-brand);
+        text-decoration-color: var(--gray-400);
+        text-underline-offset: 0.2em;
+    }
+
+    :where([data-ui="unified"][data-personalization]) :is(.logo, .logo-image) {
+        display: block;
+        width: 88px;
+        height: 58px;
+        object-fit: contain;
+        background: var(--color-surface);
+        border-radius: var(--radius-sm);
+        padding: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-personalization]) .main-container {
+        width: 100%;
+        max-width: 1480px;
+        padding: var(--space-6);
+        margin-inline: auto;
+        display: grid;
+        gap: var(--space-5);
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-personalization]) .page-header {
+        padding-block: var(--space-2);
+        background: transparent;
+        border: 0;
+    }
+
+    :where([data-ui="unified"][data-personalization]) .page-title {
+        margin: 0;
+        font-size: var(--font-size-2xl);
+        letter-spacing: -0.025em;
+    }
+
+    :where([data-ui="unified"][data-personalization]) .page-subtitle {
+        color: var(--ui-muted);
+        margin: var(--space-2) 0 0;
+    }
+
+    :where([data-ui="unified"][data-personalization])
+        :is(.card, .section, .dashboard-card) {
+        min-width: 0;
+        background: var(--ui-surface);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-md);
+        padding: var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-personalization])
+        :is(.section-header, .card-header) {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: var(--space-3);
+        margin-bottom: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-personalization])
+        :is(.section-header, .card-header)
+        h2 {
+        margin: 0;
+        font-size: var(--font-size-lg);
+    }
+
+    :where([data-ui="unified"][data-personalization])
+        :is(.filter-bar, .filters-grid) {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        gap: var(--space-3);
+        padding-block: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-personalization])
+        :is(.filter-group, .form-group) {
+        display: grid;
+        gap: var(--space-2);
+        flex: 1 1 150px;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-personalization])
+        :is(.filter-group, .form-group)
+        label {
+        font-size: var(--font-size-sm);
+        font-weight: 600;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-personalization]) .kpi-row {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-personalization]) .kpi-card {
+        display: grid;
+        justify-items: start;
+        text-align: left;
+        gap: var(--space-2);
+        padding: var(--space-4);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-md);
+        background: var(--ui-surface);
+        color: var(--ui-ink);
+        font: inherit;
+        cursor: pointer;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-personalization])
+        .kpi-card[aria-pressed="true"] {
+        border-color: var(--ui-accent);
+        background: var(--ui-tint);
+        box-shadow: inset 0 3px var(--amber-400);
+    }
+
+    :where([data-ui="unified"][data-personalization]) .kpi-value {
+        font-size: var(--font-size-2xl);
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+    }
+
+    :where([data-ui="unified"][data-personalization])
+        :is(.kpi-label, .nn-result-count, .result-count, .table-footer) {
+        color: var(--ui-muted);
+        font-size: var(--font-size-sm);
+    }
+
+    :where([data-ui="unified"][data-personalization]) .table-footer {
+        padding-top: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-personalization]) .data-table {
+        min-width: 850px;
+    }
+
+    :where([data-ui="unified"][data-personalization])
+        :is(.actions, .td-actions) {
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-personalization])
+        :is(.action-btn, .btn-sm) {
+        min-width: 36px;
+        min-height: 36px;
+        padding: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-personalization]) :is(.td-center, .num) {
+        text-align: center;
+        font-variant-numeric: tabular-nums;
+    }
+
+    :where([data-ui="unified"][data-personalization])
+        :is(.status-badge, .badge) {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-1);
+        border-radius: var(--radius-pill);
+        padding: var(--space-1) var(--space-2);
+        background: var(--gray-100);
+        color: var(--gray-700);
+        font-size: var(--font-size-sm);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-personalization])
+        :is(.status-printed, .status-completed, .badge-success) {
+        background: var(--emerald-100);
+        color: var(--emerald-800);
+    }
+
+    :where([data-ui="unified"][data-personalization]) .status-in-production {
+        background: var(--amber-100);
+        color: var(--amber-800);
+    }
+
+    :where([data-ui="unified"][data-personalization]) .status-submitted {
+        background: var(--sky-100);
+        color: var(--blue-800);
+    }
+
+    :where([data-ui="unified"][data-personalization])
+        :is(.loading, .empty-state, .nn-table-msg) {
+        text-align: center;
+        padding: var(--space-8);
+        white-space: normal;
+    }
+
+    :where([data-ui="unified"][data-personalization]) .nn-table-msg--error {
+        color: var(--color-danger-ink);
+    }
+
+    :where([data-ui="unified"][data-personalization]) .toast {
+        position: fixed;
+        right: var(--space-4);
+        bottom: var(--space-4);
+        z-index: 100;
+        max-width: min(420px, calc(100vw - 32px));
+        padding: var(--space-3) var(--space-4);
+        border-radius: var(--radius-sm);
+        background: var(--gray-900);
+        color: var(--color-on-brand);
+        box-shadow: var(--shadow-md);
+        visibility: hidden;
+    }
+
+    :where([data-ui="unified"][data-personalization]) .toast.show {
+        visibility: visible;
+    }
+
+    :where([data-ui="unified"][data-personalization]) .toast.error {
+        background: var(--color-danger-ink);
+    }
+
+    @media (width <= 800px) {
+        :where([data-ui="unified"][data-personalization]) .kpi-row {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+    }
+
+    @media (width <= 480px) {
+        :where([data-ui="unified"][data-personalization])
+            :is(
+                .main-container,
+                .header-container,
+                .nav-content,
+                .context-bar-content,
+                .contact-bar-content
+            ) {
+            padding: var(--space-3);
+        }
+
+        :where([data-ui="unified"][data-personalization])
+            :is(.card, .section, .dashboard-card) {
+            padding: var(--space-3);
+        }
+
+        :where([data-ui="unified"][data-personalization]) .kpi-row {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        :where([data-ui="unified"][data-personalization]) .page-title {
+            font-size: var(--font-size-xl);
+        }
+
+        :where([data-ui="unified"][data-personalization])
+            :is(.filter-group, .form-group) {
+            flex-basis: 100%;
+        }
+    }
+
+    @media print {
+        @page {
+            size: letter landscape;
+            margin: 10mm;
+        }
+
+        :where([data-ui="unified"][data-personalization])
+            :is(
+                .header,
+                .header-contact-bar,
+                .header-nav,
+                .breadcrumb,
+                .quick-actions,
+                .filter-bar,
+                .filters-grid,
+                .toast,
+                .card-header .btn
+            ) {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-personalization]) .dashboard-header {
+            background: transparent;
+            color: var(--ui-ink);
+            border: 0;
+        }
+
+        :where([data-ui="unified"][data-personalization]) .page-header {
+            display: block;
+        }
+
+        :where([data-ui="unified"][data-personalization])
+            :is(
+                .main-container,
+                .context-bar-content,
+                .context-bar,
+                .card,
+                .section,
+                .dashboard-card
+            ) {
+            border: 0;
+            padding: 0;
+            box-shadow: none;
+        }
+
+        :where([data-ui="unified"][data-personalization]) .table-wrap {
+            overflow: visible;
+        }
+
+        :where([data-ui="unified"][data-personalization]) .data-table {
+            width: 100%;
+            min-width: 0;
+            font-size: 9pt;
+        }
+
+        :where([data-ui="unified"][data-personalization])
+            .data-table
+            :is(th, td) {
+            white-space: normal;
+            padding: 6px;
+        }
+
+        :where([data-ui="unified"][data-personalization])
+            .data-table
+            :is(th, td):last-child {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-personalization]) .data-table tr {
+            break-inside: avoid;
+        }
+
+        :where([data-ui="unified"][data-personalization]) .data-table thead {
+            display: table-header-group;
+        }
+
+        :where([data-ui="unified"][data-personalization]) .kpi-row {
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+        }
+    }
+}
