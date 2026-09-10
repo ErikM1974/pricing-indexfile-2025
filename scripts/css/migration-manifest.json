@@ -5138,6 +5138,42 @@
         "rawCssBytes": 215633,
         "localCssRequests": 8
       }
+    },
+    {
+      "source": "dashboards/quote-management.html",
+      "family": "staff-workspace",
+      "status": "pilot",
+      "route": "/dashboards/quote-management.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/staff-quote-management.css",
+        "shared_components/css/vendor-inbound.css",
+        "shared_components/css/vendor-box-labels.css"
+      ],
+      "dynamicStyles": [],
+      "dynamicTokens": [
+        "--c",
+        "--bg",
+        "--m"
+      ],
+      "states": [
+        "four-width-table-and-labelled-phone-cards-preserve-every-original-value",
+        "original-status-filters-tabs-search-pagination-and-owner-permissions",
+        "native-dialog-keyboard-focus-and-cancellation",
+        "pending-delete-email-and-shipstation-actions-preserve-one-request",
+        "failed-and-malformed-refresh-clears-old-data-and-remains-visible-until-retry",
+        "obsolete-date-window-and-inbound-responses-cannot-revive-old-data",
+        "landscape-quote-report-and-shared-inbound-report-with-one-label-per-sheet"
+      ],
+      "test": "tests/e2e/css-unification-quote-management.spec.js",
+      "maxCssBytes": 149999,
+      "measuredRawCssBytes": 148975,
+      "baseline": {
+        "commit": "0f151e3899b8517092b1864babd8ea7f579fc95b",
+        "rawCssBytes": 113392,
+        "localCssRequests": 5
+      }
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",

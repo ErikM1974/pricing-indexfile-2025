@@ -1,5 +1,13 @@
 # Active Files Registry
 
+- `tests/fixtures/staff-workspaces-quotes-original-documents.json` — Original Quote Management inbound calendar/report/box-label output with synthetic costs and per-box details.
+
+- `shared_components/css/staff-quote-management.css` — Scoped Quote Management table/cards and native local dialogs; retires `dashboards/css/quote-management.css`, reuses vendor-inbound/vendor-box-labels.
+- `tests/fixtures/staff-workspaces-quotes-original-{browser,actions,empty,failure,rep}.json` — Reviewed original table, totals, permissions, actions and synthetic request baselines.
+
+- `tests/fixtures/staff-workspaces-quotes-synthetic.json` — Synthetic quote/status/owner/deposit/shipment and pagination records for Quote Management review.
+- `tests/e2e/css-unification-quote-management.spec.js` — Fail-closed original/current table, filters, dialogs, actions, roles and inbound review.
+
 - `tests/fixtures/staff-workspaces-company-original-{browser,empty,failure}.json` — Verified original Company Numbers values, ranges, empty/error and recovery baselines.
 
 - `shared_components/css/staff-company-numbers.css` — Scoped Company Numbers owner; replaces `dashboards/css/company-numbers.css`. Shared staff-dashboard sheets remain for their other consumers.

@@ -5,6 +5,12 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## Quote lists must retain failure and action ownership (2026-09-10)
+
+- Problem/root cause: local filtering replaced failed-load feedback with an empty list; delayed inbound/date-window responses could restore obsolete rows. Native-dialog cancellation could not return focus to a trigger disabled before confirmation. Delete authentication recovery called a removed helper.
+- Solution: retain load failure until a successful retry, clear dependent data and guard render generations. Claim action ownership before confirmation but disable the trigger only after acceptance; contain focus and preserve cancellation. Reject repeated pending sends/deletes and show expired-session feedback without retrying a write.
+- Prevention: synthetic success→failure→filter→retry and reordered reads; keyboard/focus tests at four widths; blocked/expired/pending write tests and exact original payload comparisons. Verify one box label per page, quantities and IDs as well as total PDF text.
+
 ## Reporting freshness must describe the rendered result (2026-09-10)
 
 - Problem/root cause: controllers caught API failures but resolved without a failure value, so Company Numbers labelled failed reads Updated and retained old totals, dates and charts. A recovered sample list kept its old error, and late revenue windows could overwrite a newer selection.

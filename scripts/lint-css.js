@@ -25,6 +25,7 @@ const CSS_LINT_SCOPE = [
     'shared_components/css/staff-payroll.css',
     'shared_components/css/staff-mission-control.css',
     'shared_components/css/staff-company-numbers.css',
+    'shared_components/css/staff-quote-management.css',
     'shared_components/css/vendor-inbound.css',
     'shared_components/css/vendor-box-labels.css',
     'shared_components/css/customer-intake.css',

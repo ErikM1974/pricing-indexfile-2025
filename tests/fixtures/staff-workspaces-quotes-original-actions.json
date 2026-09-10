@@ -1,0 +1,103 @@
+{
+  "dialogs": [
+    {
+      "kind": "copy",
+      "text": "Copy this link\n\nThe clipboard is not available here. Select and copy the link:\n\nCancel\nDone",
+      "value": "http://localhost:3400/quote/EMB0910-3001?k=synthetic-share-only"
+    },
+    {
+      "kind": "email",
+      "text": "Resend quote EMB0910-3001\n\nEdit the address if needed, then click Send.\n\nSend to\nCancel\nSend"
+    },
+    {
+      "kind": "shipstation",
+      "text": "Send to ShipStation\n\nSend DTG0910-3003 to ShipStation? The warehouse will rate and buy the label there.\n\nCancel\nSend"
+    },
+    {
+      "kind": "accepted-delete",
+      "text": "Delete Quote\n\n Warning: Quote DTF0910-3002 has been Accepted. Deleting it will remove the record permanently.\n\nAre you sure you want to proceed?\n\nCancel\nDelete"
+    },
+    {
+      "kind": "bulk-delete",
+      "text": "Delete Selected Quotes\n\n Warning: You selected 2 quotes, including 1 Accepted quote(s).\n\nAccepted: DTF0910-3002\nOther: EMB0910-3001\n\nAre you sure you want to delete all 2 quotes?\n\nCancel\nDelete"
+    }
+  ],
+  "opened": [
+    {
+      "url": "/quote/EMB0910-3001",
+      "target": "_blank"
+    },
+    {
+      "url": "/quote-builders/embroidery-quote-builder.html?edit=EMB0910-3001",
+      "target": "_blank"
+    },
+    {
+      "url": "/quote-builders/embroidery-quote-builder.html?duplicate=EMB0910-3001",
+      "target": "_blank"
+    },
+    {
+      "url": "/pages/quote-audit.html?id=EMB0910-3001",
+      "target": "_blank"
+    }
+  ],
+  "reads": [
+    "/api/crm-session/me",
+    "/api/crm-session/me",
+    "/api/quote_sessions?createdAfter=2026-08-11",
+    "/api/sanmar-orders/batch-status?woIds=890002%2C890003%2C890012%2C890013%2C890014",
+    "/api/quote-sessions/EMB0910-3001/full",
+    "/api/quote-sessions/EMB0910-3001/full",
+    "/api/quote_sessions?createdAfter=2026-08-11",
+    "/api/quote_sessions?createdAfter=2026-08-11",
+    "/api/sanmar-orders/sync-recent-completed-status",
+    "/api/sanmar-orders/batch-status?woIds=890002%2C890003%2C890012%2C890013%2C890014&refresh=true"
+  ],
+  "events": {
+    "errors": [],
+    "writes": [
+      {
+        "path": "/__synthetic-email",
+        "method": "POST",
+        "body": "{\"service\":\"service_jgrave3\",\"template\":\"template_quote_email\",\"params\":{\"to_email\":\"alternate@example.test\",\"customer_name\":\"Synthetic customer 1\",\"quote_id\":\"EMB0910-3001\",\"quote_link\":\"https://www.teamnwca.com/quote/EMB0910-3001?k=synthetic-share-only\",\"reply_to\":\"cedar@example.test\",\"company_name\":\"Northwest Custom Apparel\",\"company_phone\":\"253-922-5793\"}}"
+      },
+      {
+        "path": "/api/quote-sessions/DTG0910-3003/send-to-shipstation",
+        "method": "POST",
+        "body": null
+      },
+      {
+        "path": "/api/quote_sessions/870001",
+        "method": "PUT",
+        "body": "{\"Status\":\"Lost\"}"
+      },
+      {
+        "path": "/api/quote_sessions/870001",
+        "method": "DELETE",
+        "body": null
+      },
+      {
+        "path": "/api/quote_sessions/870002",
+        "method": "DELETE",
+        "body": null
+      },
+      {
+        "path": "/api/quote-sessions/bulk-sync-from-shopworks",
+        "method": "POST",
+        "body": "{\"daysBack\":90,\"olderThanMin\":5,\"full\":true}"
+      },
+      {
+        "path": "/api/sanmar-orders/sync-recent-completed",
+        "method": "POST",
+        "body": "{\"days\":7}"
+      },
+      {
+        "path": "/api/sanmar-orders/sync-shipments",
+        "method": "POST",
+        "body": "{\"limit\":15}"
+      }
+    ],
+    "unknown": [],
+    "missing": [],
+    "providers": []
+  }
+}

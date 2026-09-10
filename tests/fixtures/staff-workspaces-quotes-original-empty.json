@@ -1,0 +1,28 @@
+{
+  "text": "Quote Management\nCedar\n Sync from ShopWorks\n Refresh Inbound\n SanMar Inbound Calendar\n Dashboard\nSTATUS\nAll Statuses\nOpen\nAwaiting Payment\nPayment Received\nCharged · No SW Order\nProcessed (in ShopWorks)\nPush Failed\nAccepted\nLost\nExpired\nCancelled (ShopWorks)\nDATE RANGE\nLast 7 Days\nLast 30 Days\nLast 90 Days\nAll Time\nSEARCH\n Search\n0\nACTIVE QUOTES\n0\nACCEPTED\n0\nEXPIRING SOON\n0\nCANCELLED\n0\nPUSH FAILED\n$0.00\nPIPELINE VALUE\nactive + accepted · lost, expired and cancelled excluded\nQuotes\nDelete Selected (\n0\n)\n0 quotes\n0 in last 30 days · loaded 11:00 AM\nActive (0)\nCompleted (0)\nAll (0)\nNo quotes found\n\nTry adjusting your filters or search terms",
+  "data": {
+    "stats": [
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "$0.00"
+    ],
+    "counts": [
+      "(0)",
+      "(0)",
+      "(0)"
+    ],
+    "window": "30",
+    "tableCount": "0 quotes",
+    "rows": []
+  },
+  "events": {
+    "errors": [],
+    "writes": [],
+    "unknown": [],
+    "missing": [],
+    "providers": []
+  }
+}

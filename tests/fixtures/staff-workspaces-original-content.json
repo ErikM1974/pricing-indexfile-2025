@@ -1967,6 +1967,390 @@
       "before": "   • Production Turnaround is a static estimate — no tick, no stamp; its\n     footer prints how old the data is instead.",
       "after": "   • Production Due is live, with the same result reporting and refresh tick.\n     Failed reads clear prior counts as well as the list.",
       "count": 1
+    },
+    {
+      "file": "dashboards/quote-management.html",
+      "before": "    <!-- Phase 2f (2026-05-23): PNW palette tokens — must load BEFORE quote-management.css to uplift steel-blue header gradient to PNW forest -->",
+      "after": "    <!-- Shared staff typography, controls and quote/vendor presentation owners. -->\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    <link rel=\"stylesheet\" href=\"https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/quote-management.html",
+      "before": "    <link rel=\"stylesheet\" href=\"/shared_components/css/quote-builder-shell.css?v=2026.09.07.19\">",
+      "after": "    <link rel=\"stylesheet\" href=\"/shared_components/css/components.css?v=2026.09.10.3\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/quote-management.html",
+      "before": "/dashboards/css/quote-management.css?v=2026.09.07.19",
+      "after": "/shared_components/css/staff-quote-management.css?v=2026.09.10.3",
+      "count": 1
+    },
+    {
+      "file": "dashboards/quote-management.html",
+      "before": "/dashboards/css/sanmar-inbound.css?v=2026.09.10.3",
+      "after": "/shared_components/css/vendor-inbound.css?v=2026.09.10.3",
+      "count": 1
+    },
+    {
+      "file": "dashboards/quote-management.html",
+      "before": "/shared_components/css/box-label-print.css?v=2026.09.10.3",
+      "after": "/shared_components/css/vendor-box-labels.css?v=2026.09.10.3",
+      "count": 1
+    },
+    {
+      "file": "dashboards/quote-management.html",
+      "before": "<body>",
+      "after": "<body data-ui=\"unified\" data-staff-workspace=\"quote-management\" data-inbound-viewer=\"unified\" data-box-label-viewer=\"unified\">\n    <a class=\"skip-link\" href=\"#quote-management-main\">Skip to Quote Management</a>",
+      "count": 1
+    },
+    {
+      "file": "dashboards/quote-management.html",
+      "before": "    <main class=\"dashboard-container\">",
+      "after": "    <main class=\"dashboard-container\" id=\"quote-management-main\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/quote-management.html",
+      "before": "    <div id=\"delete-modal\" class=\"modal\" hidden role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"delete-modal-title\">",
+      "after": "    <dialog id=\"delete-modal\" class=\"qm-dialog\" hidden aria-labelledby=\"delete-modal-title\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/quote-management.html",
+      "before": "    <div id=\"qm-modal\" class=\"modal\" hidden role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"qm-modal-title\">",
+      "after": "    <dialog id=\"qm-modal\" class=\"qm-dialog\" hidden aria-labelledby=\"qm-modal-title\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/quote-management.html",
+      "before": "    </div>\n\n    <!-- Generic confirm / input modal",
+      "after": "    </dialog>\n\n    <!-- Generic confirm / input modal",
+      "count": 1
+    },
+    {
+      "file": "dashboards/quote-management.html",
+      "before": "    </div>\n\n    <!-- Toasts mount here",
+      "after": "    </dialog>\n\n    <!-- Toasts mount here",
+      "count": 1
+    },
+    {
+      "file": "dashboards/quote-management.html",
+      "before": "/dashboards/js/quote-management.js?v=2026.09.06.36",
+      "after": "/dashboards/js/quote-management.js?v=2026.09.10.3",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "        if (e.key === 'Escape') { closeDeleteModal(); closeModal(null); }\n",
+      "after": "        // Native cancel events dismiss only the active dialog.\n",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "    initTabs();\n}",
+      "after": "    document.getElementById('qm-modal').addEventListener('cancel', function (e) { e.preventDefault(); closeModal(null); });\n    document.getElementById('delete-modal').addEventListener('cancel', function (e) { e.preventDefault(); closeDeleteModal(); });\n    initTabs();\n}",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "let modalResolve = null;",
+      "after": "let modalResolve = null;\nconst dialogReturnFocus = new WeakMap();\nfunction showQmDialog(modal) {\n    dialogReturnFocus.set(modal, document.activeElement);\n    modal.hidden = false;\n    if (!modal.open) modal.showModal();\n}\nfunction hideQmDialog(modal) {\n    if (!modal.open) return;\n    modal.close();\n    modal.hidden = true;\n    const target = dialogReturnFocus.get(modal);\n    if (target?.isConnected) target.focus({ preventScroll: true });\n    else document.getElementById('filter-search')?.focus({ preventScroll: true });\n}",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "    const modal = document.getElementById('qm-modal');\n    document.getElementById('qm-modal-title')",
+      "after": "    const modal = document.getElementById('qm-modal');\n    if (modal.open) return Promise.resolve(null);\n    document.getElementById('qm-modal-title')",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "    modal.hidden = false;\n    if (input)",
+      "after": "    showQmDialog(modal);\n    if (input)",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "    if (modal.hidden) return;\n    modal.hidden = true;",
+      "after": "    if (!modal.open) return;\n    hideQmDialog(modal);",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "    document.getElementById('delete-modal').hidden = false;",
+      "after": "    showQmDialog(document.getElementById('delete-modal'));",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "    document.getElementById('delete-modal').hidden = true;",
+      "after": "    hideQmDialog(document.getElementById('delete-modal'));",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "// Close modal on Escape key\ndocument.addEventListener('keydown', function(e) {\n    if (e.key === 'Escape') {\n        closeDeleteModal();\n    }\n});",
+      "after": "// Escape dismissal is owned by the native dialog cancel listeners.",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "    // Show table\n    tableEl.hidden = false;",
+      "after": "    // Labels follow the table headings for responsive quote cards and paper.\n    const labels = Array.from(tableEl.querySelectorAll('thead th'), th => th.textContent.trim());\n    tbody.querySelectorAll('tr').forEach(row => Array.from(row.cells).forEach((cell, i) => {\n        cell.dataset.label = labels[i] || 'Select';\n    }));\n\n    // Show table\n    tableEl.hidden = false;",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "let loading = false;",
+      "after": "let loading = false;\nlet loadGeneration = 0;\nlet loadError = null;",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "            case 'search': tileFilter = ''; searchWidened = false; return applyFilters();",
+      "after": "            case 'search': tileFilter = ''; searchWidened = false; return applyFilters();\n            case 'retry-quotes': return loadQuotes();",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "    if (loading) return;\n    loading = true;",
+      "after": "    const generation = ++loadGeneration;\n    loading = true;\n    loadError = null;",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "        const data = await response.json();\n        allQuotes = data.Result || data || [];",
+      "after": "        const data = await response.json();\n        if (generation !== loadGeneration) return;\n        const rows = Array.isArray(data) ? data : data?.Result;\n        if (!Array.isArray(rows)) throw new Error('Quote response is missing its records');\n        allQuotes = rows;\n        inboundStatusMap.clear();",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "        // Apply initial filters\n        applyFilters();\n        stampLoaded();",
+      "after": "        // Apply the controls as they stand when this window finishes loading.\n        loading = false;\n        applyFilters();\n        if (generation !== loadGeneration) return;\n        stampLoaded();",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "    } catch (error) {\n        console.error('[QuoteManagement] Error loading quotes:', error);",
+      "after": "    } catch (error) {\n        if (generation !== loadGeneration) return;\n        console.error('[QuoteManagement] Error loading quotes:', error);",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "        allQuotes = [];\n        showError('Failed to load quotes. Please try refreshing.');",
+      "after": "        allQuotes = [];\n        filteredQuotes = [];\n        baseFilteredQuotes = [];\n        loadedWindow = null;\n        loadedAt = 0;\n        loadError = 'Failed to load quotes. Please try refreshing.';\n        document.getElementById('quotes-tbody').replaceChildren();\n        selectedQuotes.clear();\n        updateCheckboxSelection();\n        document.querySelectorAll('.stat-value').forEach(el => { el.textContent = '—'; });\n        document.querySelectorAll('.qm-tab-count').forEach(el => { el.textContent = ''; });\n        document.getElementById('table-count').textContent = 'Unavailable';\n        showError(loadError);",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "    } finally {\n        loading = false;\n    }\n}",
+      "after": "    } finally {\n        if (generation === loadGeneration) loading = false;\n    }\n}",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "function applyFilters() {\n    // Get filter values",
+      "after": "function applyFilters() {\n    if (loadError) { showError(loadError); return; }\n    if (loading) return;\n    // Get filter values",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "async function fetchInboundStatuses({ force = false } = {}) {\n    const allWo",
+      "after": "async function fetchInboundStatuses({ force = false } = {}) {\n    const generation = loadGeneration;\n    const allWo",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "        const data = await resp.json().catch(() => ({}));\n        woIds.forEach(wo => inboundStatusMap.set(wo, (data && data[wo]) ? data[wo] : null));",
+      "after": "        const data = await resp.json();\n        if (generation !== loadGeneration || loadError) return;\n        if (!data || typeof data !== 'object' || Array.isArray(data) || data.error) throw new Error('Inbound status response is incomplete');\n        woIds.forEach(wo => inboundStatusMap.set(wo, data[wo] || null));",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "        console.error('[QuoteManagement] Inbound batch-status failed:', err);",
+      "after": "        if (generation !== loadGeneration || loadError) return;\n        console.error('[QuoteManagement] Inbound batch-status failed:', err);",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "function renderTable() {\n    const tbody",
+      "after": "function renderTable() {\n    if (loadError) { showError(loadError); return; }\n    if (loading) return;\n    const tbody",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "    if (filteredQuotes.length === 0) {\n        tableEl.hidden = true;",
+      "after": "    if (filteredQuotes.length === 0) {\n        tbody.replaceChildren();\n        selectedQuotes.clear();\n        updateCheckboxSelection();\n        tableEl.hidden = true;",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "    const pageQuotes = filteredQuotes.slice(startIdx, endIdx);",
+      "after": "    const pageQuotes = filteredQuotes.slice(startIdx, endIdx);\n    const selectedPks = new Set(Array.from(selectedQuotes, item => String(item.pkId)));",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "                           ${userCanDelete ? '' : 'disabled title=\"You can only delete your own quotes\"'}>",
+      "after": "                           ${userCanDelete && selectedPks.has(String(quote.PK_ID)) ? 'checked' : ''}\n                           ${userCanDelete ? '' : 'disabled title=\"You can only delete your own quotes\"'}>",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "    // Labels follow the table headings for responsive quote cards and paper.",
+      "after": "    updateCheckboxSelection();\n\n    // Labels follow the table headings for responsive quote cards and paper.",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "        <h3>Error Loading Quotes</h3>\n        <p>${escapeHtml(message)}</p>",
+      "after": "        <h3>Error Loading Quotes</h3>\n        <p>${escapeHtml(message)}</p>\n        <button type=\"button\" class=\"btn-search\" data-action=\"retry-quotes\">Retry loading quotes</button>",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "    document.getElementById('qm-modal-input-label').textContent = inputLabel || '';",
+      "after": "    document.getElementById('qm-modal-input-label').textContent = inputLabel || '';\n    inputEl.setAttribute('aria-label', inputLabel || title || 'Value');",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "let pendingDeleteType = null; // 'single' or 'bulk'",
+      "after": "let pendingDeleteType = null; // 'single' or 'bulk'\nlet deleteBusy = false;",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "function showDeleteModal(title, message, data, type) {\n    pendingDeleteData = data;",
+      "after": "function showDeleteModal(title, message, data, type) {\n    if (deleteBusy || document.getElementById('delete-modal').open) return;\n    pendingDeleteData = data;",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "function closeDeleteModal() {\n    hideQmDialog",
+      "after": "function closeDeleteModal() {\n    if (deleteBusy) return;\n    hideQmDialog",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "async function confirmDelete() {\n    if (pendingDeleteData.length === 0)",
+      "after": "async function confirmDelete() {\n    if (deleteBusy) return;\n    if (pendingDeleteData.length === 0)",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "    const confirmBtn = document.querySelector('.btn-confirm-delete');\n    confirmBtn.disabled = true;",
+      "after": "    const items = pendingDeleteData.slice();\n    deleteBusy = true;\n    const confirmBtn = document.querySelector('#delete-modal .btn-confirm-delete');\n    const cancelBtn = document.querySelector('#delete-modal [data-action=\"delete-cancel\"]');\n    cancelBtn.disabled = true;\n    confirmBtn.disabled = true;",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "    for (const item of pendingDeleteData) {",
+      "after": "    for (const item of items) {",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "    // Reset button state\n    confirmBtn.disabled = false;",
+      "after": "    // Reset controls only after the captured batch has finished.\n    deleteBusy = false;\n    cancelBtn.disabled = false;\n    confirmBtn.disabled = false;",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "        // Session expired (MemoryStore cleared on dyno restart) — try to\n        // re-establish once, then retry.\n        if (response.status === 401) {\n            await establishCrmSession();\n            response = await doDelete();\n        }",
+      "after": "        // Staff SAML login must be renewed by the user; the retired Caspio\n        // session initializer cannot restore this session. Never retry a delete\n        // through an undefined helper or imply that the record was removed.\n        if (response.status === 401) {\n            return { ok: false, status: 401, message: 'Your staff session expired. Sign in from the Staff Dashboard and try again.' };\n        }",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "        let response = await doDelete();",
+      "after": "        const response = await doDelete();",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "const resendInFlight = new Set();",
+      "after": "const resendInFlight = new Set();\nfunction setActionBusy(action, key, busy) {\n    document.querySelectorAll('[data-action=\"' + action + '\"]').forEach(button => {\n        if (String(button.dataset.pkId) === String(key) || button.dataset.quoteId === String(key)) button.disabled = busy;\n    });\n}",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "    if (resendInFlight.has(quoteId)) return; // double-click guard\n    if (!ensureEmailJs())",
+      "after": "    if (resendInFlight.has(quoteId)) return; // double-click guard\n    resendInFlight.add(quoteId);\n    setActionBusy('resend', pkId, true);\n    try {\n    if (!ensureEmailJs())",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "    resendInFlight.add(quoteId);\n    showToast('Sending email…');",
+      "after": "    showToast('Sending email…');",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "    } finally {\n        resendInFlight.delete(quoteId);\n    }\n}\n\nfunction viewAudit",
+      "after": "    }\n    } finally {\n        resendInFlight.delete(quoteId);\n        setActionBusy('resend', pkId, false);\n    }\n}\n\nfunction viewAudit",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "data-action=\"resend\" data-pk-id=\"${quote.PK_ID}\" title=",
+      "after": "data-action=\"resend\" data-pk-id=\"${quote.PK_ID}\" ${resendInFlight.has(quote.QuoteID) ? 'disabled' : ''} title=",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "// Click handler — POST to send-to-shipstation, then refresh\nasync function sendToShipStation(quoteId, pkId) {",
+      "after": "// Click handler — POST to send-to-shipstation, then refresh\nconst shipstationInFlight = new Set();\nasync function sendToShipStation(quoteId, pkId) {\n    if (shipstationInFlight.has(quoteId)) return;\n    shipstationInFlight.add(quoteId);\n    setActionBusy('shipstation', quoteId, true);\n    try {",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "        showToast(`Failed to send ${quoteId} to ShipStation: ${err.message}`, 'error');\n    }\n}\n\nfunction updateStats",
+      "after": "        showToast(`Failed to send ${quoteId} to ShipStation: ${err.message}`, 'error');\n    }\n    } finally {\n        shipstationInFlight.delete(quoteId);\n        setActionBusy('shipstation', quoteId, false);\n    }\n}\n\nfunction updateStats",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "data-action=\"shipstation\"\n                    data-quote-id=\"${escapeHtml(quote.QuoteID)}\"",
+      "after": "data-action=\"shipstation\" ${shipstationInFlight.has(quote.QuoteID) ? 'disabled' : ''}\n                    data-quote-id=\"${escapeHtml(quote.QuoteID)}\"",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "    document.getElementById('delete-modal').addEventListener('cancel', function (e) { e.preventDefault(); closeDeleteModal(); });\n    initTabs();",
+      "after": "    document.getElementById('delete-modal').addEventListener('cancel', function (e) { e.preventDefault(); closeDeleteModal(); });\n    document.querySelectorAll('dialog.qm-dialog').forEach(modal => modal.addEventListener('keydown', function (e) {\n        if (e.key !== 'Tab') return;\n        const controls = Array.from(modal.querySelectorAll('button,input,select,a[href],[tabindex]')).filter(n => !n.disabled && n.tabIndex >= 0 && n.getClientRects().length);\n        const first = controls[0] || modal, last = controls[controls.length - 1] || modal;\n        if ((!e.shiftKey && document.activeElement === last) || (e.shiftKey && document.activeElement === first) || !controls.length) {\n            e.preventDefault();\n            (e.shiftKey ? last : first).focus();\n        }\n    }));\n    initTabs();",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "    resendInFlight.add(quoteId);\n    setActionBusy('resend', pkId, true);\n    try {",
+      "after": "    resendInFlight.add(quoteId);\n    try {",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "    const quoteUrl = `${siteOrigin}/quote/${quoteId}${await shareTokenFor(quoteId)}`;",
+      "after": "    setActionBusy('resend', pkId, true);\n    const quoteUrl = `${siteOrigin}/quote/${quoteId}${await shareTokenFor(quoteId)}`;",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "    shipstationInFlight.add(quoteId);\n    setActionBusy('shipstation', quoteId, true);\n    try {",
+      "after": "    shipstationInFlight.add(quoteId);\n    try {",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "    if (!ok) return;\n    try {\n        const resp = await fetch(`/api/quote-sessions/",
+      "after": "    if (!ok) return;\n    setActionBusy('shipstation', quoteId, true);\n    try {\n        const resp = await fetch(`/api/quote-sessions/",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-inbound-print.html",
+      "before": "  <link rel=\"stylesheet\" href=\"/dashboards/css/quote-management.css?v=2026.09.07.19\">",
+      "after": "  <!-- The standalone inbound and box-label owners supply this legacy harness. -->",
+      "count": 1
     }
   ],
   "retiredStyles": [
@@ -1989,6 +2373,10 @@
     {
       "file": "dashboards/css/company-numbers.css",
       "css": "/* stylelint-disable no-duplicate-selectors -- legacy sheet: rules were appended over time; merging them would reorder the cascade (2026-09-07) */\n/* stylelint-disable declaration-no-important -- legacy sheet: these flags override Caspio DataPage markup and inline styles the page does not own; re-examine when it is redesigned (2026-09-07) */\n\n/* =====================================================================\n   company-numbers.css — page-specific styles for dashboards/company-numbers.html\n\n   This page uses the STAFF DASHBOARD stylesheet chain (tokens/base/components/\n   utilities + the unlayered theme and patch), not art-hub/dash-shell, because\n   the report widgets it hosts are styled for the dark dashboard. This file\n   removes the sidebar column the theme assumes and adds what is unique to this\n   page: the back link, the freshness stamps, the estimate label, the sample\n   call-list actions, the art-aging card (was inline styles), and the phone\n   layout. Unlayered and loaded last so it beats the theme.\n   ===================================================================== */\n\n.dashboard-container.cn-shell { grid-template-columns: 1fr; }\n.cn-shell > .main-content { width: 100%; max-width: 1360px; margin: 0 auto; }\n\n.cn-back {\n    display: inline-flex; align-items: center; gap: 8px;\n    height: 30px; padding: 0 11px; border-radius: var(--radius-pill);\n    border: 1px solid var(--line-soft); background: var(--bg-card);\n    color: var(--text-2); font-size: 12.5px; text-decoration: none; white-space: nowrap;\n}\n.cn-back:hover { background: var(--bg-card-2); color: var(--text); }\n.cn-back:focus-visible { outline: none; box-shadow: var(--focus-ring); }\n\n.cn-meta { font-size: 12px; color: var(--text-dim); }\n#cn-updated { color: var(--text-3); }\n\n/* ── Freshness stamps — one per live card (\"Updated 2:14 PM\") ─────────── */\n.cn-stamp {\n    font-size: 11px; color: var(--text-dim); white-space: nowrap;\n    font-variant-numeric: tabular-nums; margin-left: auto;\n}\n.cn-stamp:empty { display: none; }\n.cn-stamp.is-failed { color: var(--amber-500); font-weight: 600; }\n.zone-header .cn-stamp { margin-left: auto; margin-right: 8px; }\n.zone-header .cn-stamp + .zone-refresh { margin-left: 0; }\n.metrics-team-header .cn-stamp, .metrics-revenue-header .cn-stamp { margin-left: auto; margin-right: 8px; }\n.embroidery-bonus-controls .cn-stamp { margin-left: 0; margin-right: 8px; }\n\n/* Column-window hint: \"Accepted quotes — unpaid  LAST 30 DAYS\" */\n.cn-win {\n    font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;\n    color: var(--text-dim); margin-left: 6px; vertical-align: 1px;\n}\n\n/* ── Production: static estimate label ───────────────────────────────── */\n.cn-estimate {\n    font-size: 11.5px; color: var(--text-3); margin-left: 10px;\n    padding: 2px 8px; border-radius: var(--radius-pill); border: 1px solid var(--line-soft);\n}\n.production-header { flex-wrap: wrap; }\n\n@media (width <= 900px) {\n    .cn-estimate { flex-basis: 100%; margin-left: 0; width: max-content; max-width: 100%; }\n}\n\n/* ── Team card: room for full names, one denominator ─────────────────── */\n.cn-shell .rep-card { grid-template-columns: minmax(200px, 1.3fr) 1fr auto; }\n.cn-shell .rep-name { white-space: normal; line-height: 1.2; overflow: visible; }\n\n.rep-goal-note {\n    margin-top: 10px; padding: 8px 10px; border-radius: var(--radius);\n    font-size: 12px; color: var(--amber-400); background: rgb(245 158 11 / 10%);\n    border: 1px solid rgb(245 158 11 / 35%);\n}\n.rep-goal-note i { margin-right: 6px; }\n\n/* ── Sample Follow-ups: something to call ────────────────────────────── */\n.pipeline-actions { display: inline-flex; gap: 6px; flex: none; }\n\n.pipeline-act {\n    display: inline-flex; align-items: center; justify-content: center;\n    width: 28px; height: 28px; border-radius: 999px;\n    border: 1px solid var(--line-soft); background: var(--bg-card-2);\n    color: var(--text-2); text-decoration: none; font-size: 12px;\n}\n.pipeline-act:hover { color: var(--accent); border-color: var(--accent); }\n.pipeline-act:focus-visible { outline: none; box-shadow: var(--focus-ring); }\n.pipeline-actions--none { font-size: 10.5px; color: var(--text-dim); align-self: center; }\n\n/* ── Art Requests Needing Attention (was inline styles in the widget) ── */\n.aa-chips { display: flex; gap: 8px; margin-bottom: 12px; }\n\n.aa-chip {\n    flex: 1; min-width: 90px; text-align: center; padding: 10px 8px; border-radius: 8px;\n    background: rgb(127 127 127 / 10%); border: 1px solid var(--line-soft);\n}\n.aa-chip-num { font-size: 1.5rem; font-weight: 700; }\n.aa-chip-label { font-size: .72rem; opacity: .8; }\n.aa-chip--red   { background: rgb(239 68 68 / 10%);  border-color: rgb(239 68 68 / 33%); }\n.aa-chip--red .aa-chip-num   { color: var(--red-500); }\n.aa-chip--amber { background: rgb(245 158 11 / 10%); border-color: rgb(245 158 11 / 33%); }\n.aa-chip--amber .aa-chip-num { color: var(--amber-500); }\n.aa-chip--green { background: var(--accent-bg); border-color: color-mix(in oklch, var(--accent) 35%, transparent); }\n.aa-chip--green .aa-chip-num { color: var(--accent); }\n.aa-clear { text-align: center; padding: 8px 0; }\n.aa-list { display: flex; flex-direction: column; gap: 6px; }\n\n.aa-row {\n    display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 8px;\n    text-decoration: none; color: inherit; background: rgb(127 127 127 / 8%);\n    border-left: 3px solid var(--text-dim);\n}\n.aa-row:hover { background: rgb(127 127 127 / 14%); }\n.aa-row:focus-visible { outline: none; box-shadow: var(--focus-ring); }\n.aa-row--red   { border-left-color: var(--red-500); }\n.aa-row--amber { border-left-color: var(--amber-500); }\n.aa-company { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; font-size: .85rem; }\n.aa-status  { font-size: .72rem; opacity: .75; white-space: nowrap; }\n.aa-days    { font-size: .78rem; font-weight: 700; white-space: nowrap; }\n.aa-row--red .aa-days   { color: var(--red-500); }\n.aa-row--amber .aa-days { color: var(--amber-500); }\n.aa-more { margin-top: 8px; }\n.aa-more a { color: inherit; }\n.aa-error { text-align: center; padding: 10px 0; }\n.aa-error-msg { font-size: .82rem; color: var(--red-500); margin-bottom: 8px; }\n.aa-retry { width: auto; padding: 4px 14px; font-size: .8rem; }\n\n/* ── Phones ──────────────────────────────────────────────────────────── */\n@media (width <= 768px) {\n    .cn-meta { display: none; }\n}\n\n@media (width <= 640px) {\n    /* Stack the header: back link on its own row, title full width (was a\n       two-line title squeezed beside the button — 111px tall). */\n    .cn-shell .top-header { flex-wrap: wrap; gap: 8px; padding-bottom: 12px; }\n    .cn-shell .header-left { flex-wrap: wrap; gap: 8px; width: 100%; }\n    .cn-shell .page-title { flex-basis: 100%; font-size: 20px; line-height: 1.2; }\n    .cn-shell .main-content { padding-left: 14px; padding-right: 14px; }\n\n    /* Tracked uppercase titles broke mid-word (\"FOLLOW-\" / \"UPS\"). */\n    .cn-shell .zone-title { letter-spacing: .10em; white-space: nowrap; }\n    .cn-shell .zone-header { flex-wrap: wrap; row-gap: 4px; }\n    .cn-shell .rep-card { grid-template-columns: minmax(0, 1.4fr) 1fr auto; }\n}\n\n/* ── Header \"Refresh now\" (the one refresh control, 2026-09-04) ───────── */\n.cn-shell .header-right { display: flex; align-items: center; gap: 12px; }\n\n.cn-refresh {\n    display: inline-flex; align-items: center; gap: 7px;\n    height: 30px; padding: 0 12px; border-radius: var(--radius-pill);\n    border: 1px solid var(--line-soft); background: var(--bg-card);\n    color: var(--text-2); font-size: 12.5px; cursor: pointer; white-space: nowrap;\n}\n.cn-refresh:hover { background: var(--bg-card-2); color: var(--text); }\n.cn-refresh:focus-visible { outline: none; box-shadow: var(--focus-ring); }\n.cn-refresh:disabled { opacity: .6; cursor: progress; }\n.cn-refresh.is-busy i { animation: cn-spin 1s linear infinite; }\n\n@keyframes cn-spin { to { transform: rotate(360deg); } }\n\n/* ── Revenue card: YTD chip shared with the Team card + goal chip ─────── */\n.metrics-ytd {\n    display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;\n    margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line-soft);\n}\n.metrics-ytd-label { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); }\n.metrics-ytd-value { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--color-on-brand); }\n.metrics-ytd-note  { font-size: 11px; color: var(--text-dim); }\n\n/* ── Team card rows that open the rep's account page ─────────────────── */\na.rep-card { text-decoration: none; color: inherit; cursor: pointer; }\na.rep-card:focus-visible { outline: none; box-shadow: var(--focus-ring); }\n\n/* ── Production Due (live, replaced the static predictor) ─────────────── */\n.cn-sub { font-size: 12px; color: var(--text-3); }\n.cn-due-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 6px 0 12px; }\n\n.cn-due-tile {\n    padding: 10px 12px; border-radius: 10px;\n    background: rgb(127 127 127 / 8%); border: 1px solid var(--line-soft);\n}\n.cn-due-num { font-size: 1.6rem; font-weight: 700; line-height: 1.1; }\n.cn-due-label { font-size: .72rem; color: var(--text-3); margin-top: 2px; }\n.cn-due-tile--late { border-color: rgb(239 68 68 / 35%); }   .cn-due-tile--late .cn-due-num { color: var(--red-500); }\n.cn-due-tile--risk { border-color: rgb(245 158 11 / 35%); }  .cn-due-tile--risk .cn-due-num { color: var(--amber-500); }\n.cn-due-tile--nopo { border-color: rgb(239 68 68 / 35%); }   .cn-due-tile--nopo .cn-due-num { color: var(--company-numbers-red-2); }\n.cn-due-tile--ok   { border-color: color-mix(in oklch, var(--accent) 35%, transparent); } .cn-due-tile--ok .cn-due-num { color: var(--accent); }\n.cn-due-list { display: flex; flex-direction: column; gap: 6px; }\n\n.cn-due-row {\n    display: grid; grid-template-columns: 84px minmax(0, 1fr) auto auto 80px; gap: 10px; align-items: center;\n    padding: 7px 10px; border-radius: 8px; background: rgb(127 127 127 / 8%);\n    border-left: 3px solid var(--text-dim); font-size: .85rem;\n}\n.cn-due-row--late { border-left-color: var(--red-500); }\n.cn-due-row--risk { border-left-color: var(--amber-500); }\n.cn-due-wo { font-size: .78rem; color: var(--text-3); white-space: nowrap; }\n.cn-due-main { display: flex; flex-direction: column; min-width: 0; }\n.cn-due-company { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }\n.cn-due-sub { font-size: .72rem; color: var(--text-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }\n.cn-due-blanks { font-size: .72rem; color: var(--text-3); white-space: nowrap; }\n.cn-due-blanks--nopo { color: var(--company-numbers-red-2); font-weight: 600; }\n.cn-due-when { font-size: .78rem; font-weight: 700; white-space: nowrap; }\n.cn-due-row--late .cn-due-when { color: var(--red-500); }\n.cn-due-row--risk .cn-due-when { color: var(--amber-500); }\n.cn-due-value { text-align: right; font-size: .8rem; color: var(--text-2); white-space: nowrap; }\n.cn-due-more { font-size: 12px; color: var(--text-3); margin-top: 6px; }\n.cn-due-more a, .production-footer a { color: inherit; }\n\n@media (width <= 900px) {\n    .cn-due-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }\n    .cn-due-row { grid-template-columns: 74px minmax(0, 1fr) auto; }\n    .cn-due-blanks, .cn-due-value { display: none; }\n}\n\n/* ── Art Requests: zombies (> 30 days) ───────────────────────────────── */\n.aa-chip--stale { background: rgb(239 68 68 / 16%); border-color: rgb(239 68 68 / 50%); }\n.aa-chip--stale .aa-chip-num { color: var(--red-300); }\n.aa-row--stale { border-left-color: var(--red-700); background: rgb(239 68 68 / 8%); }\n.aa-row--stale .aa-days { color: var(--red-300); }\n\n/* ── Wide screens: use the monitor (1360 → 1600, three-up metrics) ─────── */\n.cn-shell > .main-content { max-width: 1600px; }\n\n@media (width >= 1500px) {\n    .cn-shell .zone-metrics { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }\n    .cn-shell #artAgingCard { grid-column: auto !important; }   /* revenue | team | art on one row */\n}\n\n/* ── Print: a light, single-column sheet for the Monday meeting ──────── */\n@media print {\n/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its\n   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;\n   raw hex is allowed ONLY in this block. */\n/* stylelint-disable color-no-hex */\n    :root {\n    --company-numbers-red-2: #f87171;\n\n color-scheme: light; }\n/* stylelint-enable color-no-hex */\n    body, .dashboard-container, .main-content { background: var(--color-surface) !important; color: var(--print-ink) !important; }\n    .cn-shell > .main-content { max-width: none; padding: 0; }\n\n    .cn-back, .cn-refresh, .date-range-toggle, .zone-refresh, .refresh-btn, .pipeline-actions,\n    .cn-due-more, .aa-more, .production-footer a { display: none !important; }\n    .cn-meta { display: inline !important; color: var(--print-ink-soft) !important; }\n    .zone-metrics, .zone-money-row, .inbox-columns { display: block !important; }\n    .zone-metrics > *, .zone-money-row > *, .inbox-col { margin-bottom: 14px; break-inside: avoid; }\n\n    .zone-orders-inbox, .zone-payments, .zone-sample-pipeline, .metrics-card,\n    .production-widget-card, .embroidery-bonus-card, .rep-card, .inbox-row, .pipeline-row,\n    .aa-row, .cn-due-row, .aa-chip, .cn-due-tile, .pay-total {\n        background: var(--color-surface) !important; color: var(--print-ink) !important;\n        border: 1px solid var(--gray-300) !important; box-shadow: none !important;\n    }\n\n    .zone-title, .metrics-revenue-title, .metrics-team-title, .production-title, .inbox-col-title,\n    .rep-name, .rep-revenue, .metrics-revenue-value, .pay-total-value, .inbox-row-title,\n    .aa-company, .cn-due-company, .metrics-ytd-value, .eb-team-value { color: var(--print-ink) !important; }\n\n    .zone-subtitle, .metrics-date-range, .cn-stamp, .cn-sub, .inbox-row-sub, .aa-status,\n    .cn-due-sub, .cn-due-blanks, .rep-orders, .metrics-ytd-note { color: var(--print-ink-soft) !important; }\n    .rep-progress { background: var(--gray-200) !important; }\n    .rep-progress-bar, .eb-ladder-fill { background: var(--color-steve) !important; }\n    a { text-decoration: none; }\n}\n"
+    },
+    {
+      "file": "dashboards/css/quote-management.css",
+      "css": "/* stylelint-disable no-duplicate-selectors -- legacy sheet: rules were appended over time; merging them would reorder the cascade (2026-09-07) */\n\n/**\n * Quote Management Dashboard Styles\n * Created: 2026-01-13 (Phase 5 - Quote builder feature parity)\n */\n\n/* Base Styles */\n* {\n    box-sizing: border-box;\n}\n\nbody {\n    margin: 0;\n    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;\n    background-color: var(--gray-100);\n    color: var(--quote-management-gray-dark);\n}\n\n/* Header */\n.dashboard-header {\n    background: linear-gradient(135deg, var(--pnw-forest, var(--quote-management-cyan)) 0%, var(--pnw-forest-deep, var(--gray-800)) 100%);\n    padding: 12px 24px;\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n    box-shadow: 0 2px 4px rgb(0 0 0 / 10%);\n}\n\n.dashboard-header .logo {\n    height: 40px;\n    filter: brightness(0) invert(1);\n}\n\n.dashboard-header h1 {\n    color: white;\n    font-size: 18px;\n    font-weight: 600;\n    margin: 0;\n}\n\n.header-actions {\n    display: flex;\n    gap: 12px;\n    align-items: center;\n}\n\n.user-info {\n    color: rgb(255 255 255 / 80%);\n    font-size: 13px;\n    padding-right: 12px;\n    border-right: 1px solid rgb(255 255 255 / 30%);\n}\n\n.btn-header {\n    background: rgb(255 255 255 / 15%);\n    color: white;\n    border: 1px solid rgb(255 255 255 / 30%);\n    padding: 8px 16px;\n    border-radius: 4px;\n    font-size: 13px;\n    cursor: pointer;\n    transition: all 0.2s;\n    text-decoration: none;\n}\n\n.btn-header:hover {\n    background: rgb(255 255 255 / 25%);\n}\n\n/* Main Container */\n.dashboard-container {\n    max-width: 1400px;\n    margin: 0 auto;\n    padding: 24px;\n}\n\n/* Filters Section */\n.filters-section {\n    background: white;\n    border-radius: 8px;\n    padding: 16px 20px;\n    margin-bottom: 24px;\n    box-shadow: 0 2px 4px rgb(0 0 0 / 5%);\n    display: flex;\n    gap: 16px;\n    flex-wrap: wrap;\n    align-items: center;\n}\n\n.filter-group {\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n}\n\n.filter-group label {\n    font-size: 11px;\n    font-weight: 600;\n    color: var(--quote-management-gray);\n    text-transform: uppercase;\n    letter-spacing: 0.5px;\n}\n\n.filter-group select,\n.filter-group input {\n    padding: 8px 12px;\n    border: 1px solid var(--store-line);\n    border-radius: 4px;\n    font-size: 14px;\n    min-width: 150px;\n}\n\n.filter-group input[type=\"text\"] {\n    min-width: 250px;\n}\n\n.filter-group select:focus,\n.filter-group input:focus {\n    outline: none;\n    border-color: var(--pnw-forest, var(--quote-management-cyan));\n    box-shadow: 0 0 0 2px rgb(46 74 98 / 10%);\n}\n\n.btn-search {\n    background: var(--pnw-forest, var(--quote-management-cyan));\n    color: white;\n    border: none;\n    padding: 10px 20px;\n    border-radius: 4px;\n    font-size: 14px;\n    font-weight: 500;\n    cursor: pointer;\n    transition: background 0.2s;\n    align-self: flex-end;\n}\n\n.btn-search:hover {\n    background: var(--pnw-forest-deep, var(--gray-800));\n}\n\n/* Stats Cards */\n.stats-section {\n    display: grid;\n    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));\n    gap: 16px;\n    margin-bottom: 24px;\n}\n\n.stat-card {\n    background: white;\n    border-radius: 8px;\n    padding: 20px;\n    box-shadow: 0 2px 4px rgb(0 0 0 / 5%);\n    text-align: center;\n}\n\n.stat-card.active {\n    border-left: 4px solid var(--bs-success);\n}\n\n.stat-card.accepted {\n    border-left: 4px solid var(--pnw-forest, var(--quote-management-cyan));\n}\n\n.stat-card.expiring {\n    border-left: 4px solid var(--bs-warning);\n}\n\n.stat-card.cancelled {\n    border-left: 4px solid var(--red-700);\n}\n\n.stat-card.cancelled .stat-value {\n    color: var(--red-700);\n}\n\n.stat-card.failed {\n    border-left: 4px solid var(--amber-600);\n}\n\n.stat-card.failed .stat-value {\n    color: var(--amber-600);\n}\n\n.stat-card.total {\n    border-left: 4px solid var(--quote-management-teal);\n}\n\n/* Cancelled-in-ShopWorks badge — replaces the status dropdown on\n   cancelled rows. Read-only, red, can't be un-cancelled from the UI. */\n.status-badge.status-cancelled {\n    display: inline-flex;\n    align-items: center;\n    gap: 6px;\n    padding: 5px 10px;\n    background: var(--red-50);\n    border: 1px solid var(--red-200);\n    color: var(--red-700);\n    font-weight: 700;\n    font-size: 12px;\n    letter-spacing: 0.02em;\n    border-radius: 4px;\n    cursor: help;\n    white-space: nowrap;\n}\n\n.status-badge.status-cancelled i {\n    font-size: 11px;\n}\n\n/* Processed-in-ShopWorks badge — system-managed state, not editable.\n   Forest-green to match the \"successful submit\" feel; includes the WO#\n   when known so reps can scan for a specific ShopWorks order. */\n.status-badge.status-processed {\n    display: inline-flex;\n    align-items: center;\n    gap: 6px;\n    padding: 5px 10px;\n    background: var(--store-green-100);\n    border: 1px solid var(--green-200);\n    color: var(--print-green);\n    font-weight: 700;\n    font-size: 12px;\n    letter-spacing: 0.02em;\n    border-radius: 4px;\n    cursor: help;\n    white-space: nowrap;\n}\n.status-badge.status-processed i { font-size: 11px; }\n\n/* Push-Failed badge — amber, demands attention. Order made it into\n   Caspio but the proxy/MO push failed; rep should investigate. */\n.status-badge.status-failed {\n    display: inline-flex;\n    align-items: center;\n    gap: 6px;\n    padding: 5px 10px;\n    background: var(--amber-100);\n    border: 1px solid var(--amber-200);\n    color: var(--amber-800);\n    font-weight: 700;\n    font-size: 12px;\n    letter-spacing: 0.02em;\n    border-radius: 4px;\n    cursor: help;\n    white-space: nowrap;\n}\n.status-badge.status-failed i { font-size: 11px; }\n\n/* Awaiting-Payment badge — soft yellow, informational rather than\n   alarming. 3-Day Tees order; card is processed in ShopWorks. */\n.status-badge.status-pending-payment {\n    display: inline-flex;\n    align-items: center;\n    gap: 6px;\n    padding: 5px 10px;\n    background: var(--store-paper);\n    border: 1px solid var(--amber-200);\n    color: var(--amber-700);\n    font-weight: 700;\n    font-size: 12px;\n    letter-spacing: 0.02em;\n    border-radius: 4px;\n    cursor: help;\n    white-space: nowrap;\n}\n.status-badge.status-pending-payment i { font-size: 11px; }\n\n/* Payment-Received badge — teal, transient good state. Payment is in\n   but the ShopWorks order hasn't been created yet; should advance to\n   In ShopWorks shortly. Distinct from the green \"Processed\" badge so\n   reps can tell it's not fully done. */\n.status-badge.status-payment-confirmed {\n    display: inline-flex;\n    align-items: center;\n    gap: 6px;\n    padding: 5px 10px;\n    background: var(--quote-management-teal-tint);\n    border: 1px solid var(--quote-management-teal-2);\n    color: var(--quote-management-teal-dark);\n    font-weight: 700;\n    font-size: 12px;\n    letter-spacing: 0.02em;\n    border-radius: 4px;\n    cursor: help;\n    white-space: nowrap;\n}\n.status-badge.status-payment-confirmed i { font-size: 11px; }\n\n/* Charged-No-SW-Order badge — RED URGENT. Customer was charged but the\n   order didn't land in ShopWorks. Distinct from amber \"Push Failed\"\n   because there's money in but no record on our side; needs immediate\n   manual entry. Same red as Cancelled (SW) since both are alarming. */\n.status-badge.status-charged-no-sw {\n    display: inline-flex;\n    align-items: center;\n    gap: 6px;\n    padding: 5px 10px;\n    background: var(--red-100);\n    border: 1px solid var(--red-200);\n    color: var(--red-800);\n    font-weight: 700;\n    font-size: 12px;\n    letter-spacing: 0.02em;\n    border-radius: 4px;\n    cursor: help;\n    white-space: nowrap;\n}\n.status-badge.status-charged-no-sw i { font-size: 11px; }\n\n/* Progress column — 5 milestone pills per row (Purchase Received,\n   Produced, Shipped, Invoiced, Paid). Green when ShopWorks marks the\n   milestone done, neutral gray when pending. Hover for full label. */\n.milestone-pills {\n    display: inline-flex;\n    gap: 4px;\n    align-items: center;\n}\n\n.milestone-pill {\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    width: 24px;\n    height: 24px;\n    border-radius: 50%;\n    font-size: 11px;\n    cursor: help;\n    border: 1.5px solid transparent;\n    transition: transform 100ms ease;\n}\n.milestone-pill:hover { transform: scale(1.1); }\n\n.milestone-pill--done {\n    background: var(--store-green-100);\n    color: var(--print-green-dark);\n    border-color: var(--green-300);\n}\n\n.milestone-pill--pending {\n    background: var(--slate-100);\n    color: var(--gray-400);\n    border-color: var(--slate-200);\n}\n\n/* ShopWorks Partial (.5) and N/A (8/222) / unknown (\"—\") states (Erik 2026-06-16)\n   so dashboard pills mirror the OnSite order screen, not a forced done/pending. */\n.milestone-pill--partial {\n    background: var(--amber-100);\n    color: var(--amber-800);\n    border-color: var(--amber-300);\n}\n\n.milestone-pill--na,\n.milestone-pill--unknown {\n    background: var(--slate-50);\n    color: var(--gray-300);\n    border-color: var(--slate-200);\n}\n\n.milestone-na {\n    color: var(--gray-400);\n    font-style: italic;\n}\n\n/* Row tint for cancelled quotes — subtle so it doesn't drown out\n   active quotes when mixed in. */\n.quote-row--cancelled {\n    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */\n    background: var(--gray-50) !important;\n    opacity: 0.85;\n}\n\n.quote-row--cancelled:hover {\n    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */\n    background: var(--red-50) !important;\n    opacity: 1;\n}\n\n.quote-row--cancelled .quote-id,\n.quote-row--cancelled .customer-name {\n    color: var(--gray-500);\n}\n\n.stat-value {\n    font-size: 32px;\n    font-weight: 700;\n    color: var(--quote-management-gray-dark);\n    margin-bottom: 4px;\n}\n\n.stat-label {\n    font-size: 13px;\n    color: var(--quote-management-gray);\n    text-transform: uppercase;\n    letter-spacing: 0.5px;\n}\n\n/* Quote Table */\n.quotes-table-section {\n    background: white;\n    border-radius: 8px;\n    box-shadow: 0 2px 4px rgb(0 0 0 / 5%);\n    overflow: hidden;\n}\n\n.table-header {\n    padding: 16px 20px;\n    border-bottom: 1px solid var(--brand-100);\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n}\n\n.table-header h2 {\n    margin: 0;\n    font-size: 16px;\n    font-weight: 600;\n    color: var(--quote-management-gray-dark);\n}\n\n.table-count {\n    font-size: 13px;\n    color: var(--quote-management-gray);\n}\n\n/* Active / Completed / All tabs (Erik 2026-06-15). Completed orders\n   (shipped+invoiced+paid in ShopWorks) move out of the default Active view. */\n.qm-tabs {\n    display: flex;\n    gap: 4px;\n    padding: 0 16px;\n    border-bottom: 2px solid var(--gray-200);\n    margin-bottom: 4px;\n}\n\n.qm-tab {\n    appearance: none;\n    background: none;\n    border: none;\n    border-bottom: 3px solid transparent;\n    margin-bottom: -2px;\n    padding: 10px 16px;\n    font-size: 14px;\n    font-weight: 600;\n    color: var(--gray-500);\n    cursor: pointer;\n    transition: color 0.15s, border-color 0.15s;\n}\n\n.qm-tab:hover {\n    color: var(--pnw-forest, var(--quote-management-cyan));\n}\n\n.qm-tab--active {\n    color: var(--pnw-forest, var(--quote-management-cyan));\n    border-bottom-color: var(--pnw-forest, var(--quote-management-cyan));\n}\n\n.qm-tab-count {\n    font-weight: 500;\n    color: var(--gray-400);\n    font-size: 13px;\n}\n\n.qm-tab--active .qm-tab-count {\n    color: var(--pnw-forest, var(--quote-management-cyan));\n}\n\n.quotes-table {\n    width: 100%;\n    border-collapse: collapse;\n}\n\n.quotes-table th {\n    background: var(--gray-50);\n    padding: 12px 16px;\n    text-align: left;\n    font-size: 12px;\n    font-weight: 600;\n    color: var(--quote-management-gray);\n    text-transform: uppercase;\n    letter-spacing: 0.5px;\n    border-bottom: 1px solid var(--brand-100);\n}\n\n.quotes-table td {\n    padding: 14px 16px;\n    border-bottom: 1px solid var(--gray-100);\n    font-size: 14px;\n}\n\n.quotes-table tbody tr {\n    cursor: pointer;\n    transition: background 0.15s;\n}\n\n.quotes-table tbody tr:hover {\n    background: var(--gray-50);\n}\n\n.quote-id {\n    font-weight: 600;\n    color: var(--pnw-forest, var(--quote-management-cyan));\n}\n\n/* ShopWorks order-# cross-check, under the Quote ID (Erik 2026-06-25).\n   Confirms at a glance that the order landed in ShopWorks — mirrors the\n   green \"ShopWorks ✓ #NNNNN\" badge on the quote-detail page. Shown on any\n   row that has a WO#, regardless of status (an Accepted order can already\n   be in ShopWorks). */\n.sw-ref {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    margin-top: 3px;\n    font-size: 11px;\n    font-weight: 600;\n    color: var(--print-green);\n    white-space: nowrap;\n}\n.sw-ref i { font-size: 10px; }\n.quote-row--cancelled .sw-ref { color: var(--gray-400); }\n\n.customer-name {\n    font-weight: 500;\n}\n\n.customer-email {\n    font-size: 12px;\n    color: var(--quote-management-gray-2);\n}\n\n/* Salesperson column — ShopWorks order owner (order.CustomerServiceRep),\n   falls back to the quote-time rep. Secondary-text weight so it doesn't\n   compete with the customer name. (Erik 2026-06-15) */\n.salesperson-cell {\n    color: var(--gray-700);\n    white-space: nowrap;\n}\n\n/* Inbound vendor (SanMar) shipment indicator (Erik 2026-06-15). Blank goods\n   shipping vendor → us, distinct from the outbound Progress milestones. */\n.inbound-cell { text-align: center; }\n.inbound-na { color: var(--gray-300); }\n.inbound-pending { color: var(--gray-300); font-weight: 700; }\n\n.inbound-pill {\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    width: 26px;\n    height: 26px;\n    border-radius: 50%;\n    font-size: 12px;\n    text-decoration: none;\n    border: 1px solid transparent;\n}\n.inbound-confirmed { background: var(--slate-100); color: var(--slate-500); border-color: var(--slate-200); }\n.inbound-partial   { background: var(--amber-100); color: var(--amber-800); border-color: var(--amber-300); }\n.inbound-shipped   { background: var(--store-green-100); color: var(--print-green); border-color: var(--green-300); }\n.inbound-canceled  { background: var(--red-100); color: var(--red-800); border-color: var(--red-300); }\na.inbound-pill:hover { filter: brightness(0.95); }\n\n/* SanMar backorder / hold alert pill (next to the inbound dot) */\n.inbound-alert {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    padding: 2px 7px;\n    border-radius: 10px;\n    font-size: 11px;\n    font-weight: 700;\n    border: 1px solid;\n    cursor: help;\n    white-space: nowrap;\n}\n.inbound-backorder { background: var(--red-100); color: var(--red-800); border-color: var(--red-300); }\n.inbound-hold      { background: var(--amber-100); color: var(--amber-800); border-color: var(--amber-300); }\n\n.quote-amount {\n    font-weight: 600;\n    text-align: right;\n}\n\n/* Status Badges */\n.status-badge {\n    display: inline-block;\n    padding: 4px 10px;\n    border-radius: 12px;\n    font-size: 11px;\n    font-weight: 600;\n    text-transform: uppercase;\n}\n\n.status-badge.active {\n    background: var(--store-green-100);\n    color: var(--print-green-dark);\n}\n\n.status-badge.accepted {\n    background: var(--sky-100);\n    color: var(--sky-900);\n}\n\n.status-badge.expired {\n    background: var(--red-100);\n    color: var(--color-ae-dark);\n}\n\n.status-badge.expiring-soon {\n    background: var(--amber-100);\n    color: var(--bs-warning-ink);\n}\n\n/* Created/Expires Date */\n.date-cell {\n    font-size: 13px;\n    color: var(--quote-management-gray);\n}\n\n.date-relative {\n    font-size: 11px;\n    color: var(--print-line);\n}\n\n/* Due (Requested Ship) date + drop-dead flag (Erik 2026-06-17) */\n.due-cell { white-space: nowrap; }\n.due-date { font-size: 13px; font-weight: 600; color: var(--gray-700); }\n.due-date.due-soon { color: var(--amber-700); }            /* within 3 days / today — amber */\n.due-date.due-overdue { color: var(--red-700); }          /* past due — red */\n\n/* Empty State */\n.empty-state {\n    text-align: center;\n    padding: 60px 20px;\n    color: var(--quote-management-gray-2);\n}\n\n.empty-state i {\n    font-size: 48px;\n    color: var(--store-line);\n    margin-bottom: 16px;\n}\n\n.empty-state h3 {\n    margin: 0 0 8px;\n    font-size: 18px;\n    color: var(--quote-management-gray);\n}\n\n.empty-state p {\n    margin: 0;\n    font-size: 14px;\n}\n\n/* Loading State */\n.loading-overlay {\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    padding: 60px 20px;\n}\n\n.loading-spinner {\n    width: 40px;\n    height: 40px;\n    border: 3px solid var(--gray-100);\n    border-top: 3px solid var(--pnw-forest, var(--quote-management-cyan));\n    border-radius: 50%;\n    animation: spin 1s linear infinite;\n}\n\n@keyframes spin {\n    0% { transform: rotate(0deg); }\n    100% { transform: rotate(360deg); }\n}\n\n/* Actions Column */\n.action-btn {\n    background: none;\n    border: none;\n    color: var(--pnw-forest, var(--quote-management-cyan));\n    cursor: pointer;\n    padding: 4px 8px;\n    border-radius: 4px;\n    font-size: 13px;\n    transition: background 0.15s;\n}\n\n.action-btn:hover {\n    background: var(--slate-200);\n}\n\n/* Phase 11.3.5 (Erik 2026-05-24): locked-edit button — quote is in ShopWorks\n   and one-way sync rule says edits happen there, not here. Visually clear\n   that the button is dormant; tooltip explains why. */\n.action-btn.action-btn--locked,\n.action-btn.action-btn--locked:hover {\n    color: var(--qb-text-muted, var(--gray-400));\n    background: transparent;\n    cursor: not-allowed;\n    opacity: 0.55;\n}\n\n/* Pagination */\n.pagination {\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    gap: 8px;\n    padding: 16px;\n    border-top: 1px solid var(--brand-100);\n}\n\n.pagination button {\n    background: white;\n    border: 1px solid var(--store-line);\n    padding: 8px 12px;\n    border-radius: 4px;\n    cursor: pointer;\n    font-size: 13px;\n    transition: all 0.15s;\n}\n\n.pagination button:hover:not(:disabled) {\n    background: var(--gray-50);\n    border-color: var(--pnw-forest, var(--quote-management-cyan));\n}\n\n.pagination button:disabled {\n    opacity: 0.5;\n    cursor: not-allowed;\n}\n\n.pagination .page-info {\n    font-size: 13px;\n    color: var(--quote-management-gray);\n    padding: 0 12px;\n}\n\n/* Status Dropdown */\n.status-dropdown {\n    padding: 6px 10px;\n    border-radius: 6px;\n    border: 1px solid var(--store-line);\n    font-size: 12px;\n    font-weight: 600;\n    cursor: pointer;\n    transition: all 0.15s;\n    min-width: 100px;\n}\n\n.status-dropdown:focus {\n    outline: none;\n    box-shadow: 0 0 0 2px rgb(46 74 98 / 20%);\n}\n\n.status-dropdown.status-open {\n    background: var(--store-green-100);\n    border-color: var(--bs-success);\n    color: var(--print-green-dark);\n}\n\n.status-dropdown.status-accepted {\n    background: var(--sky-100);\n    border-color: var(--quote-management-teal);\n    color: var(--sky-900);\n}\n\n.status-dropdown.status-lost {\n    background: var(--red-100);\n    border-color: var(--bs-danger);\n    color: var(--color-ae-dark);\n}\n\n.status-dropdown.status-expired {\n    background: var(--gray-200);\n    border-color: var(--gray-500);\n    color: var(--gray-700);\n}\n\n/* Status badge for Open */\n.status-badge.open {\n    background: var(--store-green-100);\n    color: var(--print-green-dark);\n}\n\n/* Status badge for Lost */\n.status-badge.lost {\n    background: var(--red-100);\n    color: var(--color-ae-dark);\n}\n\n/* Checkbox Column */\n.checkbox-col {\n    width: 40px;\n    text-align: center;\n}\n\n.quote-checkbox {\n    cursor: pointer;\n    width: 16px;\n    height: 16px;\n}\n\n/* Table Actions */\n.table-actions {\n    display: flex;\n    align-items: center;\n    gap: 16px;\n}\n\n/* Bulk Delete Button */\n.btn-bulk-delete {\n    background: var(--bs-danger);\n    color: white;\n    border: none;\n    padding: 8px 16px;\n    border-radius: 4px;\n    font-size: 13px;\n    font-weight: 500;\n    cursor: pointer;\n    transition: all 0.2s;\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n.btn-bulk-delete:hover:not(:disabled) {\n    background: var(--color-ae-light);\n}\n\n.btn-bulk-delete:disabled {\n    opacity: 0.5;\n    cursor: not-allowed;\n}\n\n/* Audit Action Button */\n.action-audit {\n    color: var(--violet-600);\n}\n\n.action-audit:hover {\n    background: var(--color-ruth-tint);\n}\n\n/* Delete Action Button */\n.action-delete {\n    color: var(--bs-danger);\n}\n\n.action-delete:hover {\n    background: var(--bs-danger);\n    color: white;\n}\n\n/* Delete Modal */\n.modal {\n    position: fixed;\n    inset: 0;\n    background: rgb(0 0 0 / 50%);\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    z-index: 9999;\n}\n\n.modal-content {\n    background: white;\n    padding: 24px;\n    border-radius: 8px;\n    max-width: 480px;\n    width: 90%;\n    box-shadow: 0 4px 20px rgb(0 0 0 / 20%);\n}\n\n.modal-content h3 {\n    margin: 0 0 16px;\n    font-size: 18px;\n    color: var(--quote-management-gray-dark);\n}\n\n.modal-content p {\n    margin: 0 0 20px;\n    font-size: 14px;\n    line-height: 1.6;\n    color: var(--print-ink-soft);\n}\n\n.modal-actions {\n    display: flex;\n    justify-content: flex-end;\n    gap: 12px;\n}\n\n.btn-cancel {\n    background: var(--gray-50);\n    color: var(--quote-management-gray-dark);\n    border: 1px solid var(--store-line);\n    padding: 10px 20px;\n    border-radius: 4px;\n    font-size: 14px;\n    cursor: pointer;\n    transition: all 0.2s;\n}\n\n.btn-cancel:hover {\n    background: var(--gray-200);\n}\n\n.btn-confirm-delete {\n    background: var(--bs-danger);\n    color: white;\n    border: none;\n    padding: 10px 20px;\n    border-radius: 4px;\n    font-size: 14px;\n    font-weight: 500;\n    cursor: pointer;\n    transition: all 0.2s;\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n.btn-confirm-delete:hover:not(:disabled) {\n    background: var(--color-ae-light);\n}\n\n.btn-confirm-delete:disabled {\n    opacity: 0.7;\n    cursor: not-allowed;\n}\n\n/* Warning text in modal */\n.warning-text {\n    color: var(--bs-danger);\n    font-weight: 600;\n}\n\n.warning-text i {\n    margin-right: 4px;\n}\n\n/* Responsive */\n@media (width <= 768px) {\n    .dashboard-container {\n        padding: 16px;\n    }\n\n    .filters-section {\n        flex-direction: column;\n        align-items: stretch;\n    }\n\n    .filter-group select,\n    .filter-group input {\n        min-width: unset;\n        width: 100%;\n    }\n\n    .stats-section {\n        grid-template-columns: repeat(2, 1fr);\n    }\n\n    .quotes-table {\n        display: block;\n        overflow-x: auto;\n    }\n\n    .dashboard-header h1 {\n        display: none;\n    }\n\n    .table-header {\n        flex-direction: column;\n        gap: 12px;\n        align-items: flex-start;\n    }\n\n    .table-actions {\n        width: 100%;\n        justify-content: space-between;\n    }\n\n    .btn-bulk-delete {\n        font-size: 12px;\n        padding: 6px 12px;\n    }\n\n    .checkbox-col {\n        width: 32px;\n    }\n\n    .modal-content {\n        margin: 16px;\n    }\n}\n\n/* Today's Inbound (SanMar) modal, printable reports and box labels now live in\n   dashboards/css/sanmar-inbound.css — ae-mission-control.html loads that modal too\n   and never loaded this file. Load sanmar-inbound.css alongside this one. */\n\n/* Online deposit chips (Storefront Checkout Phase 1, 2026-07-05) —\n   rendered next to the status badge by renderDepositChip(). */\n.status-badge.deposit-chip { margin-top: 4px; display: inline-flex; }\n\n.status-badge.deposit-chip--live {\n    background: var(--color-floor-tint);\n    color: var(--indigo-700);\n    border: 1px solid var(--quote-management-blue-2);\n}\n\n.status-badge.deposit-chip--paid {\n    background: var(--store-green-100);\n    color: var(--print-green);\n    border: 1px solid var(--green-300);\n}\n.status-badge.deposit-chip i { font-size: 11px; }\n\n/* Page theme (2026-09-03, dashboard Workspaces): Saved Quotes gets its own steel\n   blue-grey instead of the quote-builder shell's forest green, so it stops looking\n   like every other green page. Overrides the --pnw-forest hooks this page's header\n   gradient reads (quote-builder-shell.css loads first). */\n\n/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its\n   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;\n   raw hex is allowed ONLY in this block. */\n/* stylelint-disable color-no-hex */\n:root {\n    --quote-management-cyan: #2e4a62;\n    --quote-management-gray: #666;\n    --quote-management-gray-dark: #333;\n    --quote-management-teal: #17a2b8;\n    --quote-management-gray-2: #888;\n    --quote-management-teal-tint: #ccfbf1;\n    --quote-management-teal-2: #99f6e4;\n    --quote-management-teal-dark: #115e59;\n    --quote-management-blue-2: #a5b4fc;\n    --quote-management-cyan-2: #3d6584;\n --pnw-forest: var(--quote-management-cyan); --pnw-forest-deep: var(--gray-800); --pnw-forest-mid: var(--quote-management-cyan-2); }\n/* stylelint-enable color-no-hex */\n\n/* =====================================================================\n   2026-09-05 review additions\n   ===================================================================== */\n\n/* Visibility toggles use the hidden attribute (no inline style=). */\n/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */\n[hidden] { display: none !important; }\n\n/* Header: buttons wrap on phones instead of scrolling the page sideways\n   (the action row was 459px wide at 375px). */\n.header-actions { flex-wrap: wrap; justify-content: flex-end; }\n\n@media (width <= 768px) {\n    .dashboard-header { flex-wrap: wrap; padding: 10px 12px; }\n    .header-actions { width: 100%; justify-content: flex-start; gap: 6px; }\n    .btn-header { padding: 6px 10px; font-size: 12px; }\n    .btn-header__tx { display: inline; }\n    .user-info { width: 100%; }\n}\n\n/* Table: room for the row, one line for the actions, no wrapped IDs.\n   Rows were 167px tall because six icon buttons stacked in an 86px cell. */\n.quotes-table-scroll { overflow-x: auto; }\n\n/* Actions wrap into a compact 2-row block (~150px) — one long line pushed the table to\n   1,650px in a 1,352px container and hid the column behind a scrollbar. */\n.quotes-table td.actions-cell { white-space: normal; min-width: 150px; max-width: 170px; line-height: 1; }\n.th-actions { min-width: 150px; }\n.actions-cell .action-btn { margin: 1px 0; }\n.quotes-table td { padding: 10px 9px; }\n.quotes-table th { padding: 12px 9px; }\n.status-badge { white-space: nowrap; }\n.th-right { text-align: right; }\n.quote-id { white-space: nowrap; }\n.quotes-table td { vertical-align: middle; }\n.action-btn { display: inline-flex; align-items: center; justify-content: center; min-width: 28px; height: 28px; }\n.action-emoji { font-size: 14px; }\n\n/* ShipStation button states (were inline styles) */\n.action-btn--waiting, .action-btn--waiting:hover { opacity: 0.4; cursor: not-allowed; background: transparent; }\n.action-btn--sent, .action-btn--sent:hover { opacity: 0.6; cursor: not-allowed; background: var(--gray-100); }\n.action-btn--shipped, .action-btn--shipped:hover { text-decoration: none; color: var(--print-green); background: var(--store-green-100); }\n.action-btn--shipped-static { cursor: default; }\n.action-btn--ready { color: var(--sky-700); }\n\n/* Cancelled-row purge countdown (was style=\"color:#b91c1c\") */\n.date-relative.qm-purge { color: var(--red-700); }\n\n/* Error state icon (was style=\"color:#dc3545\") */\n.empty-state .qm-error-icon { color: var(--bs-danger); }\n\n/* Phone: hide the low-value columns; the rest stays readable. */\n@media (width <= 768px) {\n    .qm-col-phone-hide { display: none; }\n    .th-actions, td.actions-cell { min-width: 0; }\n    .quotes-table { display: table; }   /* the scroll wrapper handles overflow now */\n}\n\n/* Stat tiles as buttons (filter the table). Reset UA button chrome. */\nbutton.stat-card {\n    font: inherit;\n    text-align: center;\n    cursor: pointer;\n    appearance: none;\n    color: inherit;\n    width: 100%;\n}\nbutton.stat-card:focus-visible { outline: 2px solid var(--pnw-forest, var(--quote-management-cyan)); outline-offset: 2px; }\nbutton.stat-card.is-active { box-shadow: 0 0 0 3px rgb(46 74 98 / 18%); transform: translateY(-1px); }\n.stat-sub { margin-top: 4px; font-size: 11px; color: var(--gray-400); }\n\n/* Loaded-time stamp next to the row count */\n.qm-updated { font-size: 12px; color: var(--gray-400); white-space: nowrap; }\n.qm-updated:empty { display: none; }\n\n/* \"Search widened to All Time\" notice */\n.qm-notice {\n    margin: 0 0 12px;\n    padding: 10px 14px;\n    border-radius: 8px;\n    background: var(--store-paper);\n    color: var(--amber-800);\n    border: 1px solid var(--amber-300);\n    font-size: 13px;\n}\n.qm-notice i { margin-right: 6px; }\n\n/* Real tabs: focus ring for keyboard users */\n.qm-tab:focus-visible { outline: 2px solid var(--pnw-forest, var(--quote-management-cyan)); outline-offset: 2px; }\n\n/* Generic modal input */\n.qm-modal-field { display: block; margin: 12px 0 4px; font-size: 13px; color: var(--slate-600); }\n\n.qm-modal-field input {\n    display: block; width: 100%; margin-top: 6px; padding: 8px 10px;\n    border: 1px solid var(--gray-300); border-radius: 6px; font: inherit; font-size: 14px;\n}\n\n.modal .btn-confirm {\n    background: var(--pnw-forest, var(--quote-management-cyan)); color: var(--color-on-brand); border: none;\n    padding: 8px 16px; border-radius: 6px; font: inherit; cursor: pointer;\n}\n.modal .btn-confirm:hover { filter: brightness(1.1); }\n.modal .btn-confirm:disabled { opacity: 0.6; cursor: progress; }\n\n/* Toasts (were a cssText blob per toast) */\n.qm-toasts { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 8px; align-items: center; pointer-events: none; }\n\n.qm-toast {\n    background: var(--quote-management-gray-dark); color: var(--color-on-brand); padding: 12px 24px; border-radius: 6px; font-size: 14px;\n    max-width: min(90vw, 640px); box-shadow: 0 6px 20px rgb(0 0 0 / 25%); pointer-events: auto; white-space: pre-line;\n}\n.qm-toast--error { background: var(--red-800); }\n.qm-toast--success { background: var(--print-green-dark); }\n"
     }
   ]
 }
