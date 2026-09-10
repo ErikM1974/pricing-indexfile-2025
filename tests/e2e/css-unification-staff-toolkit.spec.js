@@ -162,3 +162,146 @@ test('CSS staff toolkit: original volume quote captures both paper modes and exa
     fs.writeFileSync(path.join(output, 'staff-toolkit-volume-original-workflow.json'), JSON.stringify({ ...before, writes: events.writes }, null, 2) + '\n');
     expect(events.errors).toEqual([]); expect(events.unknown).toEqual([]); expect(events.missing).toEqual([]);
 });
+
+async function populateVolume(page) {
+    await page.locator('.vq-line-style').fill('PC54'); await page.locator('.vq-line-style').press('Tab');
+    await expect(page.locator('.vq-line-title')).toContainText('Synthetic Cotton Tee');
+    await page.locator('.vq-line-qty').fill('500'); await expect(page.locator('.vq-line-stock')).toContainText('1,500 total');
+    await page.locator('#vq-customer').fill('Synthetic Cedar Outfitters'); await page.locator('#vq-rep').fill('Review Staff');
+}
+
+test('CSS staff toolkit: volume quote preserves complete prices and accessible controls at four widths', async ({ page }) => {
+    const events = await open(page, 'volume-quote'); await populateVolume(page);
+    const original = require('../fixtures/staff-toolkit-volume-original-workflow.json');
+    expect(await tables(page)).toEqual(original.tables);
+    expect(await page.locator('#vq-memo').textContent()).toBe(original.memo);
+    for (const width of [1440, 768, 390, 320]) {
+        await page.setViewportSize({ width, height: 1000 });
+        expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+        expect(await tables(page)).toEqual(original.tables); await axe(page);
+        await page.screenshot({ path: path.join(output, 'staff-toolkit-volume-quote-' + width + '.png'), fullPage: true });
+    }
+    for (const name of ['Standard and one-time prices', 'Customer quote prices']) {
+        const region = page.getByRole('region', { name }); await region.focus(); await page.keyboard.press('ArrowRight');
+        await expect.poll(() => region.evaluate(n => n.scrollLeft)).toBeGreaterThan(0);
+    }
+    const memo = page.getByRole('region', { name: 'Internal approval memo' }); await memo.focus(); await page.keyboard.press('ArrowDown');
+    await expect.poll(() => memo.evaluate(n => n.scrollTop)).toBeGreaterThan(0);
+    await page.locator('.vq-stats').screenshot({ path: path.join(output, 'staff-toolkit-volume-mobile-stats.png') });
+    await page.locator('#vq-memo').screenshot({ path: path.join(output, 'staff-toolkit-volume-mobile-memo.png') });
+    clean(events);
+});
+
+test('CSS staff toolkit: volume quote keeps customer paper, internal memo and exact save request bodies', async ({ page }) => {
+    const events = await open(page, 'volume-quote', { respondWrite: async req => new URL(req.url()).pathname === '/api/quote-sequence/VQ' ? { json: { prefix: 'VQ', year: 2026, sequence: 901 } } : { json: { success: true } } });
+    await populateVolume(page);
+    await page.locator('#vq-print').click();
+    await page.pdf({ path: path.join(output, 'staff-toolkit-volume-memo.pdf'), printBackground: true, preferCSSPageSize: true });
+    await page.evaluate(() => window.dispatchEvent(new Event('afterprint')));
+    await page.locator('#vq-print-customer').click();
+    await page.emulateMedia({ media: 'print' });
+    await expect(page.locator('#vq-memo')).toBeHidden(); await expect(page.locator('#vq-cq-rows')).toBeVisible();
+    await page.pdf({ path: path.join(output, 'staff-toolkit-volume-customer.pdf'), printBackground: true, preferCSSPageSize: true });
+    await page.emulateMedia({ media: 'screen' }); await page.evaluate(() => window.dispatchEvent(new Event('afterprint')));
+    await page.locator('#vq-save').click(); await expect(page.locator('#vq-save-status')).toContainText('Saved as VQ-2026-901');
+    expect(events.writes).toEqual(require('../fixtures/staff-toolkit-volume-original-workflow.json').writes);
+    await axe(page);
+    expect(events.errors).toEqual([]); expect(events.unknown).toEqual([]); expect(events.missing).toEqual([]);
+});
+
+test('CSS staff toolkit: native volume controls match the original across quantities, stitches and margin choices', async ({ page, context }) => {
+    const old = await context.newPage();
+    const currentEvents = await open(page, 'volume-quote'), originalEvents = await open(old, 'volume-quote', { original: true });
+    await populateVolume(page); await populateVolume(old);
+    for (const [qty, stitches, denominator] of [[144, 8000, 0.57], [500, 12000, 0.62], [1000, 6000, 0.65], [72, 7500, 0.50]]) {
+        for (const target of [page, old]) {
+            await target.locator('.vq-line-qty').fill(String(qty)); await target.locator('#vq-stitches').fill(String(stitches));
+            await target.locator('#vq-denom').fill(String(denominator));
+        }
+        expect(await tables(page)).toEqual(await tables(old));
+        expect(await page.locator('#vq-memo').textContent()).toBe(await old.locator('#vq-memo').textContent());
+    }
+    clean(currentEvents); clean(originalEvents); await old.close();
+});
+
+for (const latePart of ['pricing', 'inventory']) test('CSS staff toolkit: late volume ' + latePart + ' cannot replace the latest garment', async ({ page }) => {
+    let release, started;
+    const gate = new Promise(r => { release = r; }), requested = new Promise(r => { started = r; });
+    const events = await open(page, 'volume-quote', { respond: async u => {
+        const style = u.searchParams.get('styleNumber');
+        if (latePart === 'pricing' && u.pathname === '/api/pricing-bundle' && style === 'PC54') { started(); await gate; return { json: data.bundle }; }
+        if (latePart === 'inventory' && u.pathname === '/api/sanmar/inventory/PC54') { started(); await gate; return { json: { inventory: [{ color: 'Navy', totalQty: 999 }], grandTotal: 999 } }; }
+        if (u.pathname === '/api/pricing-bundle' && style === 'PC78H') { const bundle = JSON.parse(JSON.stringify(data.bundle)); bundle.sizes.forEach(s => { s.price = 9.25; }); return { json: bundle }; }
+        if (u.pathname === '/api/product-details' && style === 'PC78H') return { json: [{ PRODUCT_TITLE: 'Synthetic Hoodie', BRAND_NAME: 'Synthetic Vendor', PIECE_PRICE: 10.25 }] };
+        if (u.pathname === '/api/sanmar/inventory/PC78H') return { json: { inventory: [{ color: 'Gray', totalQty: 88 }], grandTotal: 88 } };
+    } });
+    await page.locator('.vq-line-style').fill('PC54'); await page.locator('.vq-line-style').press('Tab'); await requested;
+    await page.locator('.vq-line-style').fill('PC78H'); await page.locator('.vq-line-style').press('Tab');
+    await expect(page.locator('.vq-line-title')).toContainText('Synthetic Hoodie'); await expect(page.locator('.vq-line-stock')).toContainText('88 total');
+    const done = page.waitForResponse(r => latePart === 'pricing' ? r.url().includes('/api/pricing-bundle?method=EMB&styleNumber=PC54') : r.url().includes('/api/sanmar/inventory/PC54'));
+    release(); await (await done).finished(); await page.evaluate(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))));
+    await expect(page.locator('.vq-line-title')).toContainText('Synthetic Hoodie'); await expect(page.locator('.vq-line-stock')).toContainText('88 total');
+    clean(events);
+});
+
+for (const part of ['pricing', 'inventory']) test('CSS staff toolkit: volume ' + part + ' failure stays visible and retries in the affected row', async ({ page }) => {
+    let failed = true;
+    const events = await open(page, 'volume-quote', { respond: async u => {
+        if (failed && u.pathname === (part === 'pricing' ? '/api/pricing-bundle' : '/api/sanmar/inventory/PC54')) return { json: {} };
+    } });
+    await page.locator('.vq-line-style').fill('PC54'); await page.locator('.vq-line-style').press('Tab'); await page.locator('.vq-line-qty').fill('500');
+    const retry = page.getByRole('button', { name: part === 'pricing' ? 'Retry pricing' : 'Retry stock for PC54', exact: true });
+    await expect(retry).toBeVisible();
+    if (part === 'pricing') await expect(page.locator('#vq-result tbody tr')).toHaveCount(0);
+    else { await expect(page.locator('.vq-line-stock')).toContainText('stock check failed'); await expect(page.locator('.vq-line-stock')).not.toContainText('0 total'); }
+    await page.setViewportSize({ width: 320, height: 1000 }); await axe(page);
+    failed = false; await retry.click();
+    await expect(page.locator('.vq-line-title')).toContainText('Synthetic Cotton Tee'); await expect(page.locator('.vq-line-stock')).toContainText('1,500 total');
+    await expect(page.locator('#vq-result tbody tr')).toHaveCount(1); clean(events);
+});
+
+for (const action of ['clear', 'remove']) test('CSS staff toolkit: volume inventory finishing after a row is ' + (action === 'clear' ? 'cleared' : 'removed') + ' causes no error or phantom prices', async ({ page }) => {
+    let release, started;
+    const gate = new Promise(r => { release = r; }), requested = new Promise(r => { started = r; });
+    const events = await open(page, 'volume-quote', { respond: async u => { if (u.pathname === '/api/sanmar/inventory/PC54') { started(); await gate; return { json: { inventory: [], grandTotal: 0 } }; } } });
+    await page.locator('.vq-line-style').fill('PC54'); await page.locator('.vq-line-style').press('Tab'); await requested;
+    await page.locator('.vq-line-qty').fill('500');
+    if (action === 'clear') { await page.locator('.vq-line-style').fill(''); await page.locator('.vq-line-style').press('Tab'); }
+    else await page.getByRole('button', { name: 'Remove this style', exact: true }).click();
+    const done = page.waitForResponse(r => r.url().includes('/api/sanmar/inventory/PC54')); release(); await (await done).finished();
+    await page.evaluate(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))));
+    await expect(page.locator('#vq-result tbody tr')).toHaveCount(0); clean(events);
+});
+
+test('CSS staff toolkit: pending volume save holds quote controls and ignores duplicate activation', async ({ page }) => {
+    let release, started;
+    const gate = new Promise(r => { release = r; }), requested = new Promise(r => { started = r; });
+    const events = await open(page, 'volume-quote', { respondWrite: async req => {
+        if (new URL(req.url()).pathname === '/api/quote-sequence/VQ') { started(); await gate; return { json: { prefix: 'VQ', year: 2026, sequence: 901 } }; }
+        return { json: { success: true } };
+    } });
+    await populateVolume(page); await page.locator('#vq-save').click(); await requested;
+    try {
+        for (const selector of ['#vq-customer', '#vq-rep', '#vq-location', '.vq-line-qty', '#vq-save', '#vq-add-line']) await expect(page.locator(selector)).toBeDisabled();
+        await page.locator('#vq-save').dispatchEvent('click'); expect(events.writes).toHaveLength(1);
+    } finally { release(); }
+    await expect(page.locator('#vq-save-status')).toContainText('Saved as VQ-2026-901');
+    await expect(page.locator('#vq-customer')).toBeEnabled(); await expect(page.locator('#vq-save')).toBeEnabled();
+    expect(events.writes).toEqual(require('../fixtures/staff-toolkit-volume-original-workflow.json').writes);
+    expect(events.errors).toEqual([]); expect(events.unknown).toEqual([]); expect(events.missing).toEqual([]);
+});
+
+for (const failure of ['sequence', 'session', 'item']) test('CSS staff toolkit: volume ' + failure + ' save failure reports what can be confirmed', async ({ page }) => {
+    const events = await open(page, 'volume-quote', { respondWrite: async req => {
+        const p = new URL(req.url()).pathname;
+        if (p === '/api/quote-sequence/VQ') return { json: failure === 'sequence' ? {} : { prefix: 'VQ', year: 2026, sequence: 901 } };
+        if ((failure === 'session' && p === '/api/quote_sessions') || (failure === 'item' && p === '/api/quote_items')) return { status: 503, json: { error: 'Synthetic save failure' } };
+        return { json: { success: true } };
+    } });
+    await populateVolume(page); await page.locator('#vq-save').click();
+    if (failure === 'sequence') { await expect(page.locator('#vq-save-status')).toContainText('Quote number response incomplete'); expect(events.writes).toHaveLength(1); }
+    else { await expect(page.locator('#vq-save-status')).toContainText('Check Quote Management before retrying'); await expect(page.locator('#vq-save-status')).not.toContainText('Not saved'); expect(events.writes).toHaveLength(failure === 'session' ? 2 : 3); }
+    await expect(page.locator('#vq-save')).toBeEnabled(); await expect(page.locator('#vq-customer')).toBeEnabled();
+    await page.setViewportSize({ width: 320, height: 1000 }); await axe(page);
+    expect(events.errors).toEqual([]); expect(events.unknown).toEqual([]); expect(events.missing).toEqual([]);
+});

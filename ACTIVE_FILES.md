@@ -266,3 +266,5 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 
 - `shared_components/css/staff-toolkit.css` — scoped draft layout owner for contract comparison and Roland Supplies, using canonical components. Old page sheets retained pending all-consumer review.
 - `tests/e2e/css-unification-staff-toolkit.spec.js`, `tests/e2e/fixtures/staff-toolkit-data.js`, `tests/fixtures/staff-toolkit-original-browser.json`, `tests/fixtures/staff-toolkit-volume-original-workflow.json` — mocked browser, original calculation/payload and provider-boundary evidence.
+
+- Staff toolkit draft expanded to Volume Quote: canonical fields, row retries, request ownership, snapshot saves and separate customer/internal print modes. Original payload/PDF content preserved; all legacy page styles remain pending retirement review.

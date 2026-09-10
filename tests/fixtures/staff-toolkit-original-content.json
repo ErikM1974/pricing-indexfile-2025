@@ -943,6 +943,234 @@
       "before": "        state.card = card;",
       "after": "        for (const product of PRODUCTS) {\n            const rates = card[product.key].perThousandRates || card[product.key].ratesPerThousand;\n            if (!rates || TIERS.some(t => rates[t.label] === null || rates[t.label] === '' || !Number.isFinite(Number(rates[t.label])) || Number(rates[t.label]) < 0)) {\n                throw new Error('Contract rates incomplete for ' + product.title);\n            }\n        }\n        state.card = card;",
       "count": 1
+    },
+    {
+      "file": "dashboards/volume-quote.html",
+      "before": "family=Inter:wght@400;500;600;700",
+      "after": "family=Public+Sans:wght@400;500;600;700",
+      "count": 1
+    },
+    {
+      "file": "dashboards/volume-quote.html",
+      "before": "    <link rel=\"stylesheet\" href=\"/shared_components/css/art-hub.css?v=2026.09.07.19\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/dash-shell.css?v=2026.09.07.10\">\n    <link rel=\"stylesheet\" href=\"/dashboards/css/volume-quote.css?v=2026.09.07.10\">",
+      "after": "    <link rel=\"stylesheet\" href=\"/shared_components/css/components.css?v=2026.09.10.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/staff-toolkit.css?v=2026.09.10.2\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/volume-quote.html",
+      "before": "<body>",
+      "after": "<body data-ui=\"unified\" data-staff-tool=\"volume-quote\">\n    <a class=\"skip-link\" href=\"#staff-tool-main\">Skip to content</a>",
+      "count": 1
+    },
+    {
+      "file": "dashboards/volume-quote.html",
+      "before": "<main class=\"dash-content\">",
+      "after": "<main class=\"dash-content\" id=\"staff-tool-main\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/volume-quote.html",
+      "before": "<script src=\"/dashboards/js/volume-quote.js?v=2026.09.05.69\"></script>",
+      "after": "<script src=\"/dashboards/js/volume-quote.js?v=2026.09.10.2\"></script>",
+      "count": 1
+    },
+    {
+      "file": "dashboards/volume-quote.html",
+      "before": "<input type=\"text\" id=\"vq-customer\" placeholder=\"Braun Northwest Inc.\" autocomplete=\"off\">",
+      "after": "<input class=\"field-input\" type=\"text\" id=\"vq-customer\" placeholder=\"Braun Northwest Inc.\" autocomplete=\"off\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/volume-quote.html",
+      "before": "<input type=\"text\" id=\"vq-rep\" list=\"vq-rep-list\" placeholder=\"Taneisha Clark\" autocomplete=\"off\">",
+      "after": "<input class=\"field-input\" type=\"text\" id=\"vq-rep\" list=\"vq-rep-list\" placeholder=\"Taneisha Clark\" autocomplete=\"off\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/volume-quote.html",
+      "before": "<input type=\"number\" id=\"vq-stitches\" min=\"100\" step=\"1\" value=\"8000\">",
+      "after": "<input class=\"field-input\" type=\"number\" id=\"vq-stitches\" min=\"100\" step=\"1\" value=\"8000\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/volume-quote.html",
+      "before": "<input type=\"text\" id=\"vq-design\" placeholder=\"40514\" autocomplete=\"off\">",
+      "after": "<input class=\"field-input\" type=\"text\" id=\"vq-design\" placeholder=\"40514\" autocomplete=\"off\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/volume-quote.html",
+      "before": "<input type=\"date\" id=\"vq-valid-until\">",
+      "after": "<input class=\"field-input\" type=\"date\" id=\"vq-valid-until\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/volume-quote.html",
+      "before": "<input type=\"number\" id=\"vq-hold-qty\" min=\"1\" step=\"1\" placeholder=\"defaults to the order quantity\">",
+      "after": "<input class=\"field-input\" type=\"number\" id=\"vq-hold-qty\" min=\"1\" step=\"1\" placeholder=\"defaults to the order quantity\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/volume-quote.html",
+      "before": "<input type=\"number\" id=\"vq-emb-price\" min=\"0\" step=\"0.25\">",
+      "after": "<input class=\"field-input\" type=\"number\" id=\"vq-emb-price\" min=\"0\" step=\"0.25\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/volume-quote.html",
+      "before": "<select id=\"vq-location\">",
+      "after": "<select class=\"field-select\" id=\"vq-location\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/volume-quote.html",
+      "before": "class=\"vq-field\"",
+      "after": "class=\"field vq-field\"",
+      "count": 7
+    },
+    {
+      "file": "dashboards/volume-quote.html",
+      "before": "<div class=\"vq-table-wrap\">",
+      "after": "<div class=\"vq-table-wrap\" role=\"region\" aria-label=\"Standard and one-time prices\" tabindex=\"0\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/volume-quote.html",
+      "before": "<table class=\"vq-cq-table\">\n                        <thead>\n                            <tr><th>Style</th><th>Description</th><th>Qty</th><th>S–XL</th><th>2XL</th><th>3XL</th><th>Est. total</th></tr>\n                        </thead>\n                        <tbody id=\"vq-cq-rows\"></tbody>\n                        <tfoot id=\"vq-cq-foot\"></tfoot>\n                    </table>",
+      "after": "<div class=\"vq-cq-table-wrap\" role=\"region\" aria-label=\"Customer quote prices\" tabindex=\"0\"><table class=\"vq-cq-table\">\n                        <thead>\n                            <tr><th>Style</th><th>Description</th><th>Qty</th><th>S–XL</th><th>2XL</th><th>3XL</th><th>Est. total</th></tr>\n                        </thead>\n                        <tbody id=\"vq-cq-rows\"></tbody>\n                        <tfoot id=\"vq-cq-foot\"></tfoot>\n                    </table></div>",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/volume-quote.js",
+      "before": "                    '<input type=\"text\" class=\"vq-line-style\" aria-label=\"Style number\" value=\"' + esc(l.style) + '\" placeholder=\"1566\" autocomplete=\"off\">' +",
+      "after": "                    '<label class=\"vq-line-field\"><span class=\"vq-input-label\">Style number</span><input type=\"text\" class=\"field-input vq-line-style\" aria-label=\"Style number\" value=\"' + esc(l.style) + '\" placeholder=\"1566\" autocomplete=\"off\"></label>' +",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/volume-quote.js",
+      "before": "                    '<input type=\"number\" class=\"vq-line-qty\" aria-label=\"Quantity\" min=\"0\" step=\"1\" value=\"' + (l.qty || '') + '\" placeholder=\"500\">' +",
+      "after": "                    '<label class=\"vq-line-field\"><span class=\"vq-input-label\">Quantity</span><input type=\"number\" class=\"field-input vq-line-qty\" aria-label=\"Quantity\" min=\"0\" step=\"1\" value=\"' + (l.qty || '') + '\" placeholder=\"500\"></label>' +",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/volume-quote.js",
+      "before": "class=\"vq-line-remove\"",
+      "after": "class=\"btn btn-ghost vq-line-remove\"",
+      "count": 1
+    },
+    {
+      "file": "dashboards/volume-quote.html",
+      "before": "<pre id=\"vq-memo\" class=\"vq-memo\">",
+      "after": "<pre id=\"vq-memo\" class=\"vq-memo\" role=\"region\" aria-label=\"Internal approval memo\" tabindex=\"0\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/volume-quote.js",
+      "before": "        const style = line.style.trim().toUpperCase();\n        line.data = null;\n        line.status = 'loading';\n        renderLines();",
+      "after": "        const style = line.style.trim().toUpperCase();\n        const requestId = (line.loadId || 0) + 1;\n        line.loadId = requestId;\n        const isCurrent = () => state.lines.includes(line) && line.loadId === requestId && line.style.trim().toUpperCase() === style;\n        line.data = null;\n        line.status = 'loading';\n        renderLines(); render();",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/volume-quote.js",
+      "before": "            if (!bundle || !bundle.tiersR || !bundle.allEmbroideryCostsR || !bundle.sizes || !bundle.sizes.length) {",
+      "after": "            if (!isCurrent()) return;\n            if (!bundle || !bundle.tiersR || !bundle.allEmbroideryCostsR || !bundle.sizes || !bundle.sizes.length) {",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/volume-quote.js",
+      "before": "            console.error('[volume-quote] style load failed:', err);",
+      "after": "            if (!isCurrent()) return;\n            line.data = null;\n            console.error('[volume-quote] style load failed:', err);",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/volume-quote.js",
+      "before": "    async function loadStock(line) {\n        try {\n            const inv = await DashPage.fetchJson('/api/sanmar/inventory/' + encodeURIComponent(line.data.style));\n            const byColor = {};\n            (inv.inventory || []).forEach((r) => { byColor[r.color] = (byColor[r.color] || 0) + (Number(r.totalQty) || 0); });\n            const top = Object.entries(byColor).sort((a, b) => b[1] - a[1]).slice(0, 3);\n            line.data.stock = { total: Number(inv.grandTotal) || 0, top };\n        } catch (e) {\n            line.data.stock = { error: true };\n        }\n        renderLines();\n    }",
+      "after": "    async function loadStock(line) {\n        const product = line.data;\n        if (!product) return;\n        const isCurrent = () => state.lines.includes(line) && line.data === product;\n        try {\n            const inv = await DashPage.fetchJson('/api/sanmar/inventory/' + encodeURIComponent(product.style));\n            if (!isCurrent()) return;\n            if (!inv || !Array.isArray(inv.inventory) || inv.grandTotal === null || inv.grandTotal === '' || !Number.isFinite(Number(inv.grandTotal)) || Number(inv.grandTotal) < 0) throw new Error('Inventory response incomplete');\n            const byColor = {};\n            inv.inventory.forEach((r) => { byColor[r.color] = (byColor[r.color] || 0) + (Number(r.totalQty) || 0); });\n            const top = Object.entries(byColor).sort((a, b) => b[1] - a[1]).slice(0, 3);\n            product.stock = { total: Number(inv.grandTotal), top };\n        } catch (e) {\n            if (!isCurrent()) return;\n            product.stock = { error: true };\n        }\n        renderLines();\n    }",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/volume-quote.js",
+      "before": "        const isCurrent = () => state.lines.includes(line) && line.data === product;\n        try {",
+      "after": "        const isCurrent = () => state.lines.includes(line) && line.data === product;\n        product.stock = null; renderLines();\n        try {",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/volume-quote.js",
+      "before": "            const btn = e.target.closest('.vq-line-remove'); if (!btn) return;",
+      "after": "            const retry = e.target.closest('.vq-line-retry-stock, .vq-line-retry-price');\n            if (retry) {\n                const row = retry.closest('.vq-line');\n                const line = state.lines.find(l => l.id === Number(row.dataset.id));\n                if (line) { if (retry.classList.contains('vq-line-retry-stock')) loadStock(line); else loadStyle(line); }\n                return;\n            }\n            const btn = e.target.closest('.vq-line-remove'); if (!btn) return;",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/volume-quote.js",
+      "before": "                else if (d.stock.error) stock = '<span class=\"vq-line-stock vq-line-status--error\">stock check failed</span>';",
+      "after": "                else if (d.stock.error) stock = '<span class=\"vq-line-stock vq-line-status--error\">stock check failed</span> <button type=\"button\" class=\"btn btn-ghost vq-line-retry-stock\" aria-label=\"Retry stock for ' + esc(d.style) + '\">Retry stock</button>';",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/volume-quote.js",
+      "before": "                title = '<span class=\"vq-line-status' + (isErr ? ' vq-line-status--error' : '') + '\">' + esc(isErr ? l.status.slice(7) : 'Loading…') + '</span>';",
+      "after": "                title = '<span class=\"vq-line-status' + (isErr ? ' vq-line-status--error' : '') + '\">' + esc(isErr ? l.status.slice(7) : 'Loading…') + '</span>' + (isErr ? ' <button type=\"button\" class=\"btn btn-ghost vq-line-retry-price\">Retry pricing</button>' : '');",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/volume-quote.js",
+      "before": "    async function saveQuote() {\n        const r = compute();",
+      "after": "    async function saveQuote() {\n        if (state.saving) return;\n        const r = JSON.parse(JSON.stringify(compute()));",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/volume-quote.js",
+      "before": "        if (!r.rows.length) { setStatus('Add at least one style with a quantity.', 'error'); return; }",
+      "after": "        if (state.lines.some(l => (l.style.trim() || l.qty > 0) && !l.data)) { setStatus('Finish loading every garment before saving.', 'error'); return; }\n        if (!r.rows.length) { setStatus('Add at least one style with a quantity.', 'error'); return; }",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/volume-quote.js",
+      "before": "        btn.disabled = true;\n        setStatus('Saving…', '');",
+      "after": "        const locSel = $('vq-location');\n        const savedFields = {\n            validUntil: $('vq-valid-until').value,\n            locCode: locSel.value || 'LC',\n            locName: locSel.options.length ? locSel.options[locSel.selectedIndex].textContent : 'Left Chest',\n            hold: parseInt($('vq-hold-qty').value, 10) || r.qty,\n            design: $('vq-design').value.trim(),\n            rep: $('vq-rep').value.trim(),\n            repEmail: repEmailFor($('vq-rep').value)\n        };\n        const controls = [...document.querySelectorAll('.dash-content input, .dash-content select, .dash-content button')].map(node => ({ node, disabled: node.disabled }));\n        state.saving = true;\n        controls.forEach(({ node }) => { node.disabled = true; });\n        let sessionAttempted = false, attemptedQuoteId = '';\n        setStatus('Saving…', '');",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/volume-quote.js",
+      "before": "            const quoteId = seq.prefix + '-' + seq.year + '-' + String(seq.sequence).padStart(3, '0');",
+      "after": "            if (!seq || seq.prefix !== 'VQ' || !/^\\d{4}$/.test(String(seq.year)) || !Number.isSafeInteger(Number(seq.sequence)) || Number(seq.sequence) < 1) throw new Error('Quote number response incomplete');\n            const quoteId = seq.prefix + '-' + seq.year + '-' + String(seq.sequence).padStart(3, '0');\n            attemptedQuoteId = quoteId;",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/volume-quote.js",
+      "before": "            const validUntil = $('vq-valid-until').value;\n            const locSel = $('vq-location');\n            const locCode = locSel.value || 'LC';\n            const locName = locSel.options.length ? locSel.options[locSel.selectedIndex].textContent : 'Left Chest';\n            const hold = parseInt($('vq-hold-qty').value, 10) || r.qty;\n            const design = $('vq-design').value.trim();",
+      "after": "            const { validUntil, locCode, locName, hold, design } = savedFields;",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/volume-quote.js",
+      "before": "                SalesRepName: $('vq-rep').value.trim(),",
+      "after": "                SalesRepName: savedFields.rep,",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/volume-quote.js",
+      "before": "                SalesRepEmail: repEmailFor($('vq-rep').value),",
+      "after": "                SalesRepEmail: savedFields.repEmail,",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/volume-quote.js",
+      "before": "            const sResp = await fetch('/api/quote_sessions',",
+      "after": "            sessionAttempted = true;\n            const sResp = await fetch('/api/quote_sessions',",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/volume-quote.js",
+      "before": "            setStatus('Not saved: ' + err.message, 'error');\n            DashPage.showError('Quote not saved: ' + err.message);\n        } finally {\n            btn.disabled = false;\n        }",
+      "after": "            const message = sessionAttempted\n                ? 'Save could not be completed for ' + attemptedQuoteId + ': ' + err.message + '. Check Quote Management before retrying.'\n                : 'Not saved: ' + err.message;\n            setStatus(message, 'error');\n            DashPage.showError(message);\n        } finally {\n            state.saving = false;\n            controls.forEach(({ node, disabled }) => { node.disabled = disabled; });\n        }",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/volume-quote.js",
+      "before": "        const btn = $('vq-save');\n        const status = $('vq-save-status');",
+      "after": "        const status = $('vq-save-status');",
+      "count": 1
     }
   ]
 }
