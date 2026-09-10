@@ -292,3 +292,4 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - Added tests/fixtures/staff-workspaces-drainpro-original-browser.json: original tab text, links, two provider URLs and four-width overflow measurements.
 
 - Retired dashboards/css/DrainPro-Bundle.css after consumer audit and six browser checks. Original 11787 LF bytes / 7 flags preserved in staff-workspaces-original-content.json; staff-workspaces.css owns the current layout.
+- Added tests/fixtures/staff-workspaces-shifts-original-browser.json: original department tables, timeline text, every employee detail, segment math, four widths and four printed schedule captures.

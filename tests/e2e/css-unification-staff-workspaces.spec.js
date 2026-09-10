@@ -7,6 +7,7 @@ const root = path.resolve(__dirname, '../..'), output = path.join(__dirname, 'sc
 fs.mkdirSync(output, { recursive: true });
 test.use({ reducedMotion: 'reduce', timezoneId: 'America/Los_Angeles' });
 const providerPaths = ['/dp/a0e15000da6b6fa1d16145b4ab86/emb', '/dp/a0e15000848e0baf43604a908d78/emb'];
+const reactPaths = ['/react@18.3.1/umd/react.production.min.js', '/react-dom@18.3.1/umd/react-dom.production.min.js', '/@babel/standalone@7.29.0/babel.min.js'];
 
 async function open(page, name, state = {}) {
     const events = { errors: [], writes: [], unknown: [], missing: [], providers: [] };
@@ -26,7 +27,9 @@ async function open(page, name, state = {}) {
             return route.fulfill({ contentType: 'application/javascript', body: '(function(){const f=document.createElement("iframe");f.title=' + JSON.stringify(title) + ';f.width="100%";f.height="360";f.srcdoc=' + JSON.stringify(html) + ';document.currentScript.parentElement.appendChild(f);})();' });
         }
         if ((u.hostname === 'fonts.googleapis.com' && p === '/css2') || (u.hostname === 'cdnjs.cloudflare.com' && p === '/ajax/libs/font-awesome/6.4.0/css/all.min.css')) return route.continue();
-        if (p.startsWith('/api/') || ['fetch', 'xhr'].includes(req.resourceType())) { events.unknown.push(req.url()); return route.fulfill({ status: 503, json: { error: 'Unmapped synthetic API' } }); }
+        if (u.hostname === 'unpkg.com' && reactPaths.includes(p)) return route.continue();
+        const capturedScript = ['localhost', '127.0.0.1'].includes(u.hostname) && /\.(?:js|jsx)$/.test(p) && source.hashes[p.slice(1)];
+        if (p.startsWith('/api/') || (['fetch', 'xhr'].includes(req.resourceType()) && !capturedScript)) { events.unknown.push(req.url()); return route.fulfill({ status: 503, json: { error: 'Unmapped synthetic API' } }); }
         if (['localhost', '127.0.0.1'].includes(u.hostname)) {
             const file = path.resolve(root, '.' + p), retired = state.original && (source.retiredStyles || []).find(r => '/' + r.file === p);
             if (retired) return route.fulfill({ contentType: 'text/css', body: retired.css });
@@ -38,7 +41,7 @@ async function open(page, name, state = {}) {
                 if (!html) for (const change of source.changes.filter(c => c.file === p.slice(1)).reverse()) { expect(original.split(change.after).length - 1).toBe(change.count); original = original.split(change.after).join(change.before); }
                 expect(crypto.createHash('sha256').update(original).digest('hex')).toBe(source.hashes[p.slice(1)]); body = Buffer.from(original);
             }
-            return route.fulfill({ contentType: { '.html': 'text/html', '.css': 'text/css', '.js': 'application/javascript', '.svg': 'image/svg+xml', '.png': 'image/png', '.pdf': 'application/pdf' }[path.extname(file)] || 'application/octet-stream', body });
+            return route.fulfill({ contentType: { '.html': 'text/html', '.css': 'text/css', '.js': 'application/javascript', '.jsx': 'application/javascript', '.svg': 'image/svg+xml', '.png': 'image/png', '.pdf': 'application/pdf' }[path.extname(file)] || 'application/octet-stream', body });
         }
         if (['font', 'image'].includes(req.resourceType())) return route.continue();
         events.unknown.push(req.url()); return route.abort();
@@ -67,6 +70,35 @@ test('CSS staff workspaces: preserve the original DrainPro provider boundaries, 
     await page.evaluate(() => document.getAnimations().forEach(animation => animation.finish()));
     await page.pdf({ path: path.join(output, 'staff-workspaces-drainpro-original.pdf'), format: 'Letter', printBackground: true, preferCSSPageSize: true });
     fs.writeFileSync(path.join(output, 'staff-workspaces-drainpro-original-browser.json'), JSON.stringify({ base: source.base, views, events }, null, 2) + '\n');
+});
+
+test('CSS staff workspaces: original production schedule retains every department, employee detail and paper view', async ({ page }) => {
+    const events = await open(page, 'production-shifts', { original: true });
+    await expect(page.locator('h1')).toHaveText('Production Shifts');
+    const departments = [], views = [], details = [];
+    for (const dept of ['All', 'Embroidery', 'DTG', 'Ruthie/Mikalah']) {
+        await page.getByRole('button', { name: new RegExp('^' + dept.replace('/', '\\/') + '\\s') }).click();
+        departments.push({ dept, tables: await page.locator('table').evaluateAll(ns => ns.map(n => [...n.rows].map(r => [...r.cells].map(c => c.textContent.replace(/\s+/g, ' ').trim())))), timeline: await page.locator('.timeline-card').innerText() });
+        await page.setViewportSize({ width: 1440, height: 1000 });
+        await page.pdf({ path: path.join(output, 'staff-workspaces-shifts-original-' + dept.replace(/[^a-z]/gi, '-') + '.pdf'), preferCSSPageSize: true, printBackground: true });
+    }
+    await page.getByRole('button', { name: /^All\s/ }).click();
+    for (const width of [1440, 768, 390, 320]) {
+        await page.setViewportSize({ width, height: 1000 });
+        views.push({ width, scrollWidth: await page.evaluate(() => document.documentElement.scrollWidth), title: await page.title(), main: await page.locator('main').innerText() });
+        await page.screenshot({ path: path.join(output, 'staff-workspaces-shifts-original-' + width + '.png'), fullPage: true });
+    }
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    const names = await page.evaluate(() => window.NWCA_SCHEDULE.map(e => e.name));
+    for (const name of names) {
+        await page.getByRole('button', { name: name + ' — show shift details', exact: true }).first().click();
+        await expect(page.getByRole('dialog')).toBeVisible();
+        details.push({ name, text: await page.getByRole('dialog').innerText() });
+        await page.keyboard.press('Escape');
+    }
+    const data = await page.evaluate(() => ({ schedule: window.NWCA_SCHEDULE, segments: window.NWCA_SCHEDULE.map(e => ({ id: e.id, segments: window.NWCA_HELPERS.segments(e) })) }));
+    for (const kind of ['errors', 'unknown', 'missing', 'writes']) expect(events[kind]).toEqual([]);
+    fs.writeFileSync(path.join(output, 'staff-workspaces-shifts-original-browser.json'), JSON.stringify({ base: source.base, departments, views, details, data, events }, null, 2) + '\n');
 });
 
 for (const width of [1440, 768, 390, 320]) test('CSS staff workspaces: DrainPro ' + width + ' retains content, accessible tabs and contained providers', async ({ page }) => {
