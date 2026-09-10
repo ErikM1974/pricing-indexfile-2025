@@ -283,3 +283,12 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - Staff toolkit family: retired dashboards/css/{blog-editor,contract-break-even,customer-portal-admin,jim-mailing-list,past-due-orders,product-manager,roland-printer-supplies,volume-quote}.css after auditing all HTML/JS consumers (including the Jim preview). Shared owner shared_components/css/staff-toolkit.css is registered and linted; original CSS retained only inside the immutable test fixture. art-hub.css, dash-shell.css and blog.css retain other consumers.
 
 - tests/fixtures/staff-workspaces-original-content.json — six remaining staff-workspace HTML contracts and transitive local JS/CSS hashes, verified against live v2026.09.10.1. tests/unit/staff-workspaces-content.test.js preserves original content outside explicit future UI mappings. Planning/baseline only; no migration credit.
+
+### Staff workspaces browser baseline — 2026-09-10
+- Added tests/e2e/css-unification-staff-workspaces.spec.js: synthetic provider boundaries and original four-width/tab/paper capture; remaining workspace fixtures to follow. No application review credit yet.
+
+
+- Added shared_components/css/staff-workspaces.css: scoped staff layout; first Drain-Pro consumer, canonical controls and contained provider regions. Legacy DrainPro-Bundle.css is retained until browser/paper review and consumer audit pass.
+- Added tests/fixtures/staff-workspaces-drainpro-original-browser.json: original tab text, links, two provider URLs and four-width overflow measurements.
+
+- Retired dashboards/css/DrainPro-Bundle.css after consumer audit and six browser checks. Original 11787 LF bytes / 7 flags preserved in staff-workspaces-original-content.json; staff-workspaces.css owns the current layout.

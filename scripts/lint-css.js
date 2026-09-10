@@ -20,6 +20,7 @@ const CSS_LINT_SCOPE = [
     'shared_components/css/crm-records.css',
     'shared_components/css/personalization-workspaces.css',
     'shared_components/css/staff-toolkit.css',
+    'shared_components/css/staff-workspaces.css',
     'shared_components/css/customer-intake.css',
     'shared_components/css/hosted-workspace.css',
     'shared_components/css/staff-admin-tools.css',

@@ -761,5 +761,126 @@
     "shared_components/js/staff-dashboard/services/shopworks-service.js": "21c924e68ee3aaf33c10703d76f11a9bc1d7cf45e34ef8327975fb34b858766a",
     "staff-dashboard-v3/art-aging-widget.js": "671b53812afeeb602fd7ae77c44e4a66a89189c8914dae32275a72b03c5e82b3"
   },
-  "changes": []
+  "changes": [
+    {
+      "file": "dashboards/DrainPro-Bundle.html",
+      "before": "    <!-- Font Awesome -->",
+      "after": "    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    <link rel=\"stylesheet\" href=\"https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap\">\n    <!-- Font Awesome -->",
+      "count": 1
+    },
+    {
+      "file": "dashboards/DrainPro-Bundle.html",
+      "before": "    <link rel=\"stylesheet\" href=\"/dashboards/css/DrainPro-Bundle.css?v=2026.09.07.19\">",
+      "after": "    <link rel=\"stylesheet\" href=\"/shared_components/css/components.css?v=2026.09.10.3\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/staff-workspaces.css?v=2026.09.10.3\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/DrainPro-Bundle.html",
+      "before": "<body>",
+      "after": "<body data-ui=\"unified\" data-staff-workspace=\"drainpro\">\n    <a class=\"skip-link\" href=\"#staff-workspace-main\">Skip to content</a>",
+      "count": 1
+    },
+    {
+      "file": "dashboards/DrainPro-Bundle.html",
+      "before": "    <!-- Fire Engine Red Header -->\n    <div class=\"drain-pro-header\">",
+      "after": "    <!-- Drain-Pro identity in the shared staff workspace layout. -->\n    <header class=\"drain-pro-header\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/DrainPro-Bundle.html",
+      "before": "        <h1 class=\"header-title\">",
+      "after": "        <div class=\"dp-heading\">\n        <h1 class=\"header-title\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/DrainPro-Bundle.html",
+      "before": "        <p class=\"header-subtitle\">Manage team apparel sizes and orders</p>\n    </div>",
+      "after": "        <p class=\"header-subtitle\">Manage team apparel sizes and orders</p>\n        </div>\n    </header>",
+      "count": 1
+    },
+    {
+      "file": "dashboards/DrainPro-Bundle.html",
+      "before": "<main class=\"container\">",
+      "after": "<main class=\"container\" id=\"staff-workspace-main\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/DrainPro-Bundle.html",
+      "before": "<div class=\"tab-navigation\">",
+      "after": "<div class=\"tab-navigation tab-buttons\" role=\"tablist\" aria-label=\"Employee bundle views\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/DrainPro-Bundle.html",
+      "before": "<button class=\"tab-button active\" data-call=\"switchTab\" data-args='[\"labels\"]'>",
+      "after": "<button class=\"tab-button active\" id=\"labels-tab-button\" type=\"button\" role=\"tab\" aria-selected=\"true\" aria-controls=\"labels-tab\" tabindex=\"0\" data-call=\"switchTab\" data-args='[\"labels\"]'>",
+      "count": 1
+    },
+    {
+      "file": "dashboards/DrainPro-Bundle.html",
+      "before": "<button class=\"tab-button\" data-call=\"switchTab\" data-args='[\"employees\"]'>",
+      "after": "<button class=\"tab-button\" id=\"employees-tab-button\" type=\"button\" role=\"tab\" aria-selected=\"false\" aria-controls=\"employees-tab\" tabindex=\"-1\" data-call=\"switchTab\" data-args='[\"employees\"]'>",
+      "count": 1
+    },
+    {
+      "file": "dashboards/DrainPro-Bundle.html",
+      "before": "<div id=\"labels-tab\" class=\"tab-content active\">",
+      "after": "<div id=\"labels-tab\" class=\"tab-content active\" role=\"tabpanel\" aria-labelledby=\"labels-tab-button\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/DrainPro-Bundle.html",
+      "before": "<div id=\"employees-tab\" class=\"tab-content\">",
+      "after": "<div id=\"employees-tab\" class=\"tab-content\" role=\"tabpanel\" aria-labelledby=\"employees-tab-button\" hidden>",
+      "count": 1
+    },
+    {
+      "file": "dashboards/DrainPro-Bundle.html",
+      "before": "<div class=\"table-container\">\n                    <script type=\"text/javascript\" src=\"https://c3eku948.caspio.com/dp/a0e15000da6b6fa1d16145b4ab86/emb\"></script>",
+      "after": "<div class=\"table-container\" role=\"region\" aria-label=\"Drain-Pro box labels\" tabindex=\"0\">\n                    <script type=\"text/javascript\" src=\"https://c3eku948.caspio.com/dp/a0e15000da6b6fa1d16145b4ab86/emb\"></script>",
+      "count": 1
+    },
+    {
+      "file": "dashboards/DrainPro-Bundle.html",
+      "before": "<div class=\"table-container\">\n                    <script type=\"text/javascript\" src=\"https://c3eku948.caspio.com/dp/a0e15000848e0baf43604a908d78/emb\"></script>",
+      "after": "<div class=\"table-container\" role=\"region\" aria-label=\"Drain-Pro bundle details\" tabindex=\"0\">\n                    <script type=\"text/javascript\" src=\"https://c3eku948.caspio.com/dp/a0e15000848e0baf43604a908d78/emb\"></script>",
+      "count": 1
+    },
+    {
+      "file": "dashboards/DrainPro-Bundle.html",
+      "before": "<div class=\"dp-footnote\">",
+      "after": "<footer class=\"dp-footnote\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/DrainPro-Bundle.html",
+      "before": "        <p class=\"dp-footnote-sub\">Serving the Pacific Northwest since 1977</p>\n    </div>",
+      "after": "        <p class=\"dp-footnote-sub\">Serving the Pacific Northwest since 1977</p>\n    </footer>",
+      "count": 1
+    },
+    {
+      "file": "dashboards/DrainPro-Bundle.html",
+      "before": "/dashboards/js/DrainPro-Bundle.js?v=2026.09.05.12",
+      "after": "/dashboards/js/DrainPro-Bundle.js?v=2026.09.10.3",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/DrainPro-Bundle.js",
+      "before": "/* DrainPro-Bundle.js — page script (extracted from inline <script>, 2026.09.05.11) */\n\n// ── moved from inline <script> in dashboards/DrainPro-Bundle.html (Rule 3, 2026.09.05.11) ──\nfunction switchTab(tabName) {\n            // Get all tab buttons and tab contents\n            const tabButtons = document.querySelectorAll('.tab-button');\n            const tabContents = document.querySelectorAll('.tab-content');\n\n            // Remove active class from all tabs and buttons\n            tabButtons.forEach(button => button.classList.remove('active'));\n            tabContents.forEach(content => content.classList.remove('active'));\n\n            // Add active class to selected tab and button\n            const selectedButton = event.target.closest('.tab-button');\n            const selectedContent = document.getElementById(`${tabName}-tab`);\n\n            if (selectedButton && selectedContent) {\n                selectedButton.classList.add('active');\n                selectedContent.classList.add('active');\n            }\n        }\n",
+      "after": "/* Drain-Pro workspace tabs: preserve the two embedded views and all provider URLs. */\nfunction switchTab(tabName) {\n    const selectedButton = document.getElementById(tabName + '-tab-button');\n    const selectedContent = document.getElementById(tabName + '-tab');\n    if (!selectedButton || !selectedContent) return;\n    document.querySelectorAll('.tab-button').forEach(button => {\n        const selected = button === selectedButton;\n        button.classList.toggle('active', selected);\n        button.setAttribute('aria-selected', String(selected));\n        button.tabIndex = selected ? 0 : -1;\n    });\n    document.querySelectorAll('.tab-content').forEach(content => {\n        const selected = content === selectedContent;\n        content.classList.toggle('active', selected);\n        content.hidden = !selected;\n    });\n}\n\ndocument.querySelector('.tab-navigation').addEventListener('keydown', event => {\n    const tabs = [...document.querySelectorAll('.tab-button')];\n    const current = tabs.indexOf(event.target);\n    if (current < 0 || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;\n    event.preventDefault();\n    const next = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 :\n        (current + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;\n    switchTab(tabs[next].getAttribute('aria-controls').replace(/-tab$/, ''));\n    tabs[next].focus();\n});\n",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/DrainPro-Bundle.js",
+      "before": "/* Drain-Pro workspace tabs: preserve the two embedded views and all provider URLs. */\nfunction switchTab(tabName) {\n    const selectedButton = document.getElementById(tabName + '-tab-button');\n    const selectedContent = document.getElementById(tabName + '-tab');\n    if (!selectedButton || !selectedContent) return;\n    document.querySelectorAll('.tab-button').forEach(button => {\n        const selected = button === selectedButton;\n        button.classList.toggle('active', selected);\n        button.setAttribute('aria-selected', String(selected));\n        button.tabIndex = selected ? 0 : -1;\n    });\n    document.querySelectorAll('.tab-content').forEach(content => {\n        const selected = content === selectedContent;\n        content.classList.toggle('active', selected);\n        content.hidden = !selected;\n    });\n}\n\ndocument.querySelector('.tab-navigation').addEventListener('keydown', event => {\n    const tabs = [...document.querySelectorAll('.tab-button')];\n    const current = tabs.indexOf(event.target);\n    if (current < 0 || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;\n    event.preventDefault();\n    const next = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 :\n        (current + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;\n    switchTab(tabs[next].getAttribute('aria-controls').replace(/-tab$/, ''));\n    tabs[next].focus();\n});\n",
+      "after": "/* Drain-Pro workspace tabs: preserve the two embedded views and all provider URLs. */\nfunction switchTab(tabName) {\n    const selectedButton = document.getElementById(tabName + '-tab-button');\n    const selectedContent = document.getElementById(tabName + '-tab');\n    if (!selectedButton || !selectedContent) return;\n    document.querySelectorAll('.tab-button').forEach(button => {\n        const selected = button === selectedButton;\n        button.classList.toggle('active', selected);\n        button.setAttribute('aria-selected', String(selected));\n        button.tabIndex = selected ? 0 : -1;\n    });\n    document.querySelectorAll('.tab-content').forEach(content => {\n        const selected = content === selectedContent;\n        content.classList.toggle('active', selected);\n        content.hidden = !selected;\n    });\n}\n\ndocument.querySelector('.tab-navigation').addEventListener('keydown', event => {\n    const tabs = [...document.querySelectorAll('.tab-button')];\n    const current = tabs.indexOf(event.target);\n    if (current < 0 || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;\n    event.preventDefault();\n    const next = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 :\n        (current + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;\n    switchTab(tabs[next].getAttribute('aria-controls').replace(/-tab$/, ''));\n    tabs[next].focus();\n});\n\n// Both provider views belong on paper. Restore the selected screen view afterward.\nlet paperVisibility = null;\nwindow.addEventListener('beforeprint', () => {\n    if (paperVisibility) return;\n    paperVisibility = [...document.querySelectorAll('.tab-content')].map(content => [content, content.hidden]);\n    paperVisibility.forEach(([content]) => { content.hidden = false; });\n});\nwindow.addEventListener('afterprint', () => {\n    if (!paperVisibility) return;\n    paperVisibility.forEach(([content, hidden]) => { content.hidden = hidden; });\n    paperVisibility = null;\n});\n",
+      "count": 1
+    }
+  ],
+  "retiredStyles": [
+    {
+      "file": "dashboards/css/DrainPro-Bundle.css",
+      "css": "/* DrainPro-Bundle.css — page styles (extracted from inline \\3c style>, 2026.09.05.11) */\n\n/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page\n   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;\n   every rule below uses var(). Raw hex is allowed ONLY in this block. */\n/* stylelint-disable color-no-hex */\n:root {\n    --rainro-undle-gray-dark: #32373c;\n}\n/* stylelint-enable color-no-hex */\n\n/* ── moved from inline \\3c style> in dashboards/DrainPro-Bundle.html (Rule 3, 2026.09.05.11) ── */\n* {\n            margin: 0;\n            padding: 0;\n            box-sizing: border-box;\n        }\n\n        body {\n            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;\n            background: var(--gray-100);\n            color: var(--gray-800);\n            line-height: 1.6;\n        }\n\n        /* Header - Fire Engine Red matching Drain-Pro brand */\n        .drain-pro-header {\n            background: linear-gradient(135deg, var(--red-500) 0%, var(--red-600) 100%);\n            padding: 3rem 2rem;\n            text-align: center;\n            color: white;\n            box-shadow: 0 4px 6px rgb(0 0 0 / 10%);\n        }\n\n        .logo-container {\n            background: white;\n            padding: 1.5rem 2rem;\n            border-radius: 5px;\n            display: inline-block;\n            margin-bottom: 1.5rem;\n            box-shadow: 0 2px 8px rgb(0 0 0 / 10%);\n        }\n\n        .logo-container img {\n            height: 80px;\n            display: block;\n        }\n\n        .header-title {\n            font-size: 2rem;\n            font-weight: 700;\n            margin-bottom: 0.5rem;\n            text-shadow: 0 2px 4px rgb(0 0 0 / 10%);\n        }\n\n        .header-subtitle {\n            font-size: 1.1rem;\n            opacity: 0.95;\n            font-weight: 400;\n        }\n\n        /* Main Content Container */\n        .container {\n            max-width: 1400px;\n            margin: 2rem auto;\n            padding: 0 1.5rem;\n        }\n\n        /* Content Card */\n        .content-card {\n            background: white;\n            border-radius: 5px;\n            padding: 2.5rem;\n            box-shadow: 0 1px 3px rgb(0 0 0 / 10%);\n            border-left: 5px solid var(--red-500);\n        }\n\n        .section-header {\n            display: flex;\n            align-items: center;\n            gap: 0.75rem;\n            color: var(--rainro-undle-gray-dark);\n            font-size: 1.5rem;\n            font-weight: 700;\n            margin-bottom: 1.5rem;\n            padding-bottom: 0.75rem;\n            border-bottom: 2px solid var(--red-500);\n        }\n\n        .section-header i {\n            color: var(--red-500);\n        }\n\n        /* Caspio Table Container */\n        .table-container {\n            margin: 2rem 0;\n            background: var(--gray-50);\n            padding: 1.5rem;\n            border-radius: 5px;\n            border: 1px solid var(--gray-200);\n        }\n\n        /* Navigation Buttons */\n        .nav-buttons {\n            display: flex;\n            gap: 1rem;\n            justify-content: center;\n            margin-top: 2.5rem;\n            padding-top: 2rem;\n            border-top: 1px solid var(--gray-200);\n            flex-wrap: wrap;\n        }\n\n        .btn {\n            padding: 0.875rem 1.75rem;\n            border-radius: 5px;\n            text-decoration: none;\n            font-weight: 600;\n            font-size: 1rem;\n            display: inline-flex;\n            align-items: center;\n            gap: 0.5rem;\n            transition: all 0.3s ease;\n            border: none;\n            cursor: pointer;\n        }\n\n        .btn-primary {\n            background: var(--rainro-undle-gray-dark);\n            color: white;\n        }\n\n        .btn-primary:hover {\n            background: var(--gray-800);\n            transform: translateY(-2px);\n            box-shadow: 0 4px 8px rgb(0 0 0 / 20%);\n        }\n\n        .btn-secondary {\n            background: var(--gray-100);\n            color: var(--gray-700);\n            border: 1px solid var(--gray-300);\n        }\n\n        .btn-secondary:hover {\n            background: var(--gray-200);\n            border-color: var(--gray-400);\n        }\n\n        /* Info Banner */\n        .info-banner {\n            background: linear-gradient(135deg, var(--amber-100) 0%, var(--amber-200) 100%);\n            border-left: 4px solid var(--amber-500);\n            padding: 1rem 1.5rem;\n            border-radius: 5px;\n            margin-bottom: 2rem;\n            display: flex;\n            align-items: flex-start;\n            gap: 1rem;\n        }\n\n        .info-banner i {\n            color: var(--amber-500);\n            font-size: 1.5rem;\n            margin-top: 0.2rem;\n            flex-shrink: 0;\n        }\n\n        .info-banner-content strong {\n            color: var(--amber-800);\n            display: block;\n            margin-bottom: 0.25rem;\n        }\n\n        .info-banner-content {\n            color: var(--amber-900);\n            font-size: 0.95rem;\n        }\n\n        /* Stats Cards */\n        .stats-grid {\n            display: grid;\n            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));\n            gap: 1rem;\n            margin-bottom: 2rem;\n        }\n\n        .stat-card {\n            background: var(--gray-50);\n            padding: 1.25rem;\n            border-radius: 5px;\n            border: 1px solid var(--gray-200);\n            text-align: center;\n        }\n\n        .stat-value {\n            font-size: 2rem;\n            font-weight: 700;\n            color: var(--red-500);\n            margin-bottom: 0.25rem;\n        }\n\n        .stat-label {\n            font-size: 0.875rem;\n            color: var(--gray-500);\n            text-transform: uppercase;\n            letter-spacing: 0.025em;\n        }\n\n        /* Responsive Design */\n        @media (width <= 768px) {\n            .drain-pro-header {\n                padding: 2rem 1rem;\n            }\n\n            .header-title {\n                font-size: 1.5rem;\n            }\n\n            .header-subtitle {\n                font-size: 1rem;\n            }\n\n            .content-card {\n                padding: 1.5rem;\n            }\n\n            .logo-container {\n                padding: 1rem 1.5rem;\n            }\n\n            .logo-container img {\n                height: 60px;\n            }\n\n            .section-header {\n                font-size: 1.25rem;\n            }\n\n            .nav-buttons {\n                flex-direction: column;\n            }\n\n            .btn {\n                width: 100%;\n                justify-content: center;\n            }\n        }\n\n        /* Tab Navigation */\n        .tab-navigation {\n            display: flex;\n            gap: 0;\n            border-bottom: 2px solid var(--gray-200);\n            margin-bottom: 2rem;\n        }\n\n        .tab-button {\n            flex: 1;\n            padding: 1rem 1.5rem;\n            background: transparent;\n            border: none;\n            border-bottom: 3px solid transparent;\n            color: var(--gray-500);\n            font-size: 1rem;\n            font-weight: 600;\n            cursor: pointer;\n            transition: all 0.3s ease;\n            display: flex;\n            align-items: center;\n            justify-content: center;\n            gap: 0.5rem;\n            position: relative;\n            bottom: -2px;\n        }\n\n        .tab-button:hover {\n            color: var(--red-500);\n            background: var(--red-50);\n        }\n\n        .tab-button.active {\n            color: var(--red-500);\n            border-bottom-color: var(--red-500);\n            background: var(--red-50);\n        }\n\n        .tab-button i {\n            font-size: 1.1rem;\n        }\n\n        .tab-content {\n            display: none;\n            animation: fadeIn 0.3s ease-in;\n        }\n\n        .tab-content.active {\n            display: block;\n        }\n\n        @keyframes fadeIn {\n            from {\n                opacity: 0;\n                transform: translateY(10px);\n            }\n\n            to {\n                opacity: 1;\n                transform: translateY(0);\n            }\n        }\n\n        /* Instructions Box */\n        .instructions-box {\n            background: var(--gray-50);\n            border-left: 4px solid var(--red-500);\n            border-radius: 5px;\n            padding: 1.5rem;\n            margin-bottom: 2rem;\n        }\n\n        .instructions-title {\n            display: flex;\n            align-items: center;\n            gap: 0.5rem;\n            color: var(--rainro-undle-gray-dark);\n            font-size: 1.1rem;\n            font-weight: 700;\n            margin-bottom: 1rem;\n        }\n\n        .instructions-title i {\n            color: var(--red-500);\n        }\n\n        .instructions-list {\n            list-style: none;\n            padding: 0;\n            margin: 0;\n        }\n\n        .instructions-list li {\n            display: flex;\n            align-items: flex-start;\n            gap: 0.75rem;\n            padding: 0.75rem 0;\n            color: var(--gray-700);\n            font-size: 0.95rem;\n            line-height: 1.6;\n        }\n\n        .instruction-number {\n            display: inline-flex;\n            align-items: center;\n            justify-content: center;\n            min-width: 28px;\n            height: 28px;\n            background: var(--red-500);\n            color: white;\n            border-radius: 50%;\n            font-weight: 700;\n            font-size: 0.875rem;\n            flex-shrink: 0;\n        }\n\n        .instruction-text {\n            padding-top: 0.2rem;\n        }\n\n        /* Print Styles */\n        @media print {\n            .drain-pro-header {\n                /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */\n                background: white !important;\n                /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */\n                color: var(--gray-800) !important;\n                /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */\n                padding: 1rem !important;\n                border-bottom: 3px solid var(--red-500);\n            }\n\n            .logo-container {\n                /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */\n                background: none !important;\n                /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */\n                box-shadow: none !important;\n            }\n\n            .nav-buttons {\n                display: none;\n            }\n\n            .info-banner {\n                /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */\n                background: white !important;\n                border: 1px solid var(--amber-500);\n            }\n\n            .tab-navigation {\n                display: none;\n            }\n\n            .tab-content {\n                /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */\n                display: block !important;\n            }\n        }\n\n/* 2026-09-06 review */\n.dp-footnote { text-align: center; padding: 2rem; color: var(--gray-500); font-size: 0.875rem; }\n.dp-footnote-sub { margin-top: 0.5rem; }\n"
+    }
+  ]
 }
