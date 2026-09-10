@@ -15,6 +15,12 @@
 - Full local gates passed: 233 unit suites / 5,409 tests plus four existing skips; 88 DOM, four accessibility unit and 84 quote parity; 736 mocked browser plus 16 remaining e2e / three optional screenshot skips; all five calculator surfaces. Build, zero lint/type errors, 485 routes / 24 modules / zero undefined names, boot/version and production audit zero. Focused review: 57 browser cases and 288 preservation/CSS/QA checks.
 - CSS scan: 272 tracked files. Primary also contains the preexisting ignored dashboards/css/staff-portal-final.css, so its local scan reports 273. Preserve this local-only file; it is not deployed. LESSONS_LEARNED has 262 lines. Heroku build reported two dev-dependency audit findings before pruning; production audit after pruning was zero. Heroku-22 future deprecation was noted; stack migration is separate from this CSS release.
 
+### Next isolated batch — staff workspaces (baseline only)
+
+The artifact training-final-worktree is now on codex/staff-workspaces. Its six pages are DrainPro Bundle, AE Mission Control, Company Numbers, Payroll, Production Shifts and Quote Management. All 61 transitive local HTML/CSS/JS sources match live v2026.09.10.1 / 0f151e38; immutable snapshots and source contracts are saved, and all 61 checks pass. No application edits or browser review have started; no migration credit.
+Primary develop is frozen on b98a946b while the staff-toolkit full gates run. Keep this new baseline out of that release. Finish the eight-page toolkit release first, then build fully mocked original browser fixtures for these six pages. Preserve payroll/vacation calculations, shift times, quote attribution and shared inbound/box-label output. Company Numbers shares staff-dashboard controllers; AE and Quote Management share inbound and invoice/label helpers, so audit their other consumers before changing shared owners.
+Exact baseline SHA is in artifact staff-workspaces-baseline-checkpoint.json; active-css-resume-state.json records both the in-progress release and the future worktree.
+
 ### Staff toolkit — eight-page candidate ready for full gates
 
 - Isolated checkout: artifact training-final-worktree, branch codex/staff-toolkit. Exact reviewed SHA and owned paths are recorded in artifact staff-toolkit-reviewed-source.json. The reviewed source 38f4c3af is integrated into primary develop; live remains v2026.09.10.1 / Heroku 2097 until the next verified release.

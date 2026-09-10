@@ -1,0 +1,765 @@
+{
+  "base": "0f151e3899b8517092b1864babd8ea7f579fc95b",
+  "pages": [
+    {
+      "file": "dashboards/DrainPro-Bundle.html",
+      "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Drain-Pro Employee Bundle | Northwest Custom Apparel</title>\n\n    <!-- NWCA Favicon -->\n    <link rel=\"icon\" type=\"image/png\" href=\"/favicon.png\">\n\n    <!-- Font Awesome -->\n    <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css\">\n\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link rel=\"stylesheet\" href=\"/dashboards/css/DrainPro-Bundle.css?v=2026.09.07.19\">\n</head>\n<body>\n    <!-- Fire Engine Red Header -->\n    <div class=\"drain-pro-header\">\n        <div class=\"logo-container\">\n            <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/Drain%20Pro.png?ver=1\"\n                 alt=\"Drain-Pro Inc. Logo\">\n        </div>\n        <h1 class=\"header-title\">Employee Bundle Program</h1>\n        <p class=\"header-subtitle\">Manage team apparel sizes and orders</p>\n    </div>\n\n    <!-- Main Content -->\n    <main class=\"container\">\n        <div class=\"content-card\">\n            <!-- Tab Navigation -->\n            <div class=\"tab-navigation\">\n                <button class=\"tab-button active\" data-call=\"switchTab\" data-args='[\"labels\"]'>\n                    <i class=\"fas fa-tags\" aria-hidden=\"true\"></i>\n                    <span>Avery 5960 (2.5\" x 1\") Box Labels</span>\n                </button>\n                <button class=\"tab-button\" data-call=\"switchTab\" data-args='[\"employees\"]'>\n                    <i class=\"fas fa-users\" aria-hidden=\"true\"></i>\n                    <span>Bundle Details</span>\n                </button>\n            </div>\n\n            <!-- Tab Content: Box Labels -->\n            <div id=\"labels-tab\" class=\"tab-content active\">\n                <h2 class=\"section-header\">\n                    <i class=\"fas fa-tags\" aria-hidden=\"true\"></i>\n                    <span>Drain-Pro Box Labels</span>\n                </h2>\n\n                <!-- Approval Note -->\n                <div class=\"info-banner\">\n                    <i class=\"fas fa-exclamation-circle\" aria-hidden=\"true\"></i>\n                    <div class=\"info-banner-content\">\n                        <strong>Important:</strong> Account Executives must mark each employee name as 'Approved' in the table below to ensure the customer's spreadsheet matches this data.\n                    </div>\n                </div>\n\n                <!-- Instructions Box -->\n                <div class=\"instructions-box\">\n                    <div class=\"instructions-title\">\n                        <i class=\"fas fa-clipboard-list\" aria-hidden=\"true\"></i>\n                        <span>How to Print Labels</span>\n                    </div>\n                    <ol class=\"instructions-list\">\n                        <li>\n                            <span class=\"instruction-number\">1</span>\n                            <span class=\"instruction-text\">Download all the names and sizes into Excel</span>\n                        </li>\n                        <li>\n                            <span class=\"instruction-number\">2</span>\n                            <span class=\"instruction-text\">Import them into Microsoft Word using the mail merge</span>\n                        </li>\n                        <li>\n                            <span class=\"instruction-number\">3</span>\n                            <span class=\"instruction-text\">Print them on the Avery 5960 labels</span>\n                        </li>\n                    </ol>\n                </div>\n\n                <div class=\"table-container\">\n                    <script type=\"text/javascript\" src=\"https://c3eku948.caspio.com/dp/a0e15000da6b6fa1d16145b4ab86/emb\"></script>\n                </div>\n            </div>\n\n            <!-- Tab Content: Bundle Details -->\n            <div id=\"employees-tab\" class=\"tab-content\">\n                <h2 class=\"section-header\">\n                    <i class=\"fas fa-users\" aria-hidden=\"true\"></i>\n                    <span>Bundle Details</span>\n                </h2>\n\n                <div class=\"table-container\">\n                    <script type=\"text/javascript\" src=\"https://c3eku948.caspio.com/dp/a0e15000848e0baf43604a908d78/emb\"></script>\n                </div>\n            </div>\n\n            <!-- Navigation Buttons -->\n            <div class=\"nav-buttons\">\n                <a href=\"/staff-dashboard.html\" class=\"btn btn-primary\">\n                    <i class=\"fas fa-arrow-left\" aria-hidden=\"true\"></i>\n                    <span>Back to Dashboard</span>\n                </a>\n            </div>\n        </div>\n    </main>\n\n    <!-- Footer -->\n    <div class=\"dp-footnote\">\n        <p>Northwest Custom Apparel &bull; (253) 922-5793 &bull; sales@nwcustomapparel.com</p>\n        <p class=\"dp-footnote-sub\">Serving the Pacific Northwest since 1977</p>\n    </div>\n\n    <!-- Tab Switching JavaScript -->\n    <script src=\"/shared_components/js/data-call-delegator.js?v=2026.09.06.27\"></script>\n    <script src=\"/dashboards/js/DrainPro-Bundle.js?v=2026.09.05.12\"></script>\n</body>\n</html>\n",
+      "title": "Drain-Pro Employee Bundle | Northwest Custom Apparel",
+      "bodyText": "Employee Bundle Program Manage team apparel sizes and orders Avery 5960 (2.5\" x 1\") Box Labels Bundle Details Drain-Pro Box Labels Important: Account Executives must mark each employee name as 'Approved' in the table below to ensure the customer's spreadsheet matches this data. How to Print Labels 1 Download all the names and sizes into Excel 2 Import them into Microsoft Word using the mail merge 3 Print them on the Avery 5960 labels Bundle Details Back to Dashboard Northwest Custom Apparel • (253) 922-5793 • sales@nwcustomapparel.com Serving the Pacific Northwest since 1977",
+      "bodyTextSha": "da956eacea7920ae8bca55a34f47d264e10fa43032440ee1c1d0c68a574ce0c7",
+      "ids": [
+        "labels-tab",
+        "employees-tab"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Back to Dashboard"
+        }
+      ],
+      "fields": [],
+      "styles": [
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
+        "/shared_components/css/tokens.css?v=2026.09.08.2",
+        "/dashboards/css/DrainPro-Bundle.css?v=2026.09.07.19"
+      ],
+      "scripts": [
+        "https://c3eku948.caspio.com/dp/a0e15000da6b6fa1d16145b4ab86/emb",
+        "https://c3eku948.caspio.com/dp/a0e15000848e0baf43604a908d78/emb",
+        "/shared_components/js/data-call-delegator.js?v=2026.09.06.27",
+        "/dashboards/js/DrainPro-Bundle.js?v=2026.09.05.12"
+      ],
+      "cssBytes": 27702
+    },
+    {
+      "file": "dashboards/ae-mission-control.html",
+      "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <meta name=\"robots\" content=\"noindex, nofollow\">\n    <title>Mission Control - Northwest Custom Apparel</title>\n    <link rel=\"icon\" href=\"/favicon.png\" type=\"image/png\">\n\n    <!-- Fonts & Icons -->\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    <link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap\" rel=\"stylesheet\">\n    <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css\">\n\n    <!-- 2026 design tokens (must load before dash-shell.css) -->\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/art-hub.css?v=2026.09.07.19\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/dash-shell.css?v=2026.09.07.10\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/sanmar-invoice-viewer.css?v=2026.09.07.10\">\n    <link rel=\"stylesheet\" href=\"/dashboards/css/ae-mission-control.css?v=2026.09.07.10\">\n    <!-- SanMar Inbound modal + its printable reports/box labels (window.openInboundTodayModal) -->\n    <link rel=\"stylesheet\" href=\"/dashboards/css/sanmar-inbound.css?v=2026.09.07.19\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/box-label-print.css?v=2026.09.07.10\">\n</head>\n<body>\n    <div class=\"dash-shell\">\n        <header class=\"dash-header\">\n            <div class=\"dash-header-left\">\n                <a href=\"/staff-dashboard.html\" title=\"Back to Staff Dashboard\">\n                    <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\"\n                         alt=\"Northwest Custom Apparel\" class=\"dash-header-logo\">\n                </a>\n                <h1 class=\"dash-header-title\" id=\"aemc-title\">Mission Control</h1>\n            </div>\n            <div class=\"dash-header-right\">\n                <div class=\"aemc-viewas\" id=\"aemc-viewas\" hidden role=\"group\" aria-label=\"View as rep\">\n                    <span class=\"aemc-viewas-label\"><i class=\"fas fa-user-secret\" aria-hidden=\"true\"></i> View as</span>\n                    <button type=\"button\" class=\"aemc-viewas-btn\" data-rep=\"taneisha@nwcustomapparel.com\">Taneisha</button>\n                    <button type=\"button\" class=\"aemc-viewas-btn\" data-rep=\"nika@nwcustomapparel.com\">Nika</button>\n                </div>\n                <button type=\"button\" id=\"aemc-refresh\" class=\"dash-btn\" title=\"Refresh all data\" aria-label=\"Refresh all data\">\n                    <i class=\"fas fa-rotate\" aria-hidden=\"true\"></i>\n                    Refresh\n                </button>\n                <a href=\"/staff-dashboard.html\" class=\"dash-back-link\">\n                    <i class=\"fas fa-arrow-left\" aria-hidden=\"true\"></i>\n                    Dashboard\n                </a>\n            </div>\n        </header>\n\n        <main class=\"dash-content\">\n            <div class=\"dash-error-banner\" role=\"alert\">\n                <i class=\"fas fa-exclamation-triangle\" aria-hidden=\"true\"></i>\n                <span class=\"dash-error-banner-message\"></span>\n                <button type=\"button\" class=\"dash-error-banner-close\" aria-label=\"Dismiss\">\n                    <i class=\"fas fa-times\" aria-hidden=\"true\"></i>\n                </button>\n            </div>\n\n            <div class=\"aemc-greeting-row\">\n                <div class=\"aemc-greeting\" id=\"aemc-greeting\">Loading your day…</div>\n                <div class=\"aemc-updated\" id=\"aemc-updated\"></div>\n            </div>\n\n            <!-- \"Since you last looked\" — a diff annotation on LIVE values, never a\n                 cached substitute for them. Hidden until there is a real delta. -->\n            <div class=\"mc-diff\" id=\"mc-diff\" role=\"status\" hidden></div>\n\n            <!-- Bonus-hero failure strip. The hero stays hidden rather than show a number we\n                 don't trust, but a silently absent hero reads as a broken page — so the\n                 absence gets explained here instead (Rule 4). -->\n            <div class=\"aemc-bh-fallback\" id=\"aemc-bh-fallback\" role=\"status\" hidden></div>\n\n            <!-- ============================= SPINE =============================\n                 Visible on every tab: am I winning? The bonus hero stays IN FLOW\n                 (it is ~220px — sticking it would eat a quarter of a laptop\n                 viewport); a 48px condensed bar takes over on scroll instead. -->\n            <section class=\"mc-spine\" id=\"mc-spine\" aria-label=\"Your numbers\">\n                <!-- ZONE 1b: Q3 Embroidery Bonus hero (2026-07-25).\n                     This is the ONLY place a rep's bonus dollars appear on a dashboard — the shared\n                     staff dashboard shows the company goal with no compensation on it. Sits above\n                     the KPI strip on purpose: it's the number we want them to see first, with the\n                     next milestone framed as a concrete, reachable ask. Hidden until loaded so it\n                     never flashes a $0. -->\n                <section class=\"aemc-bonus-hero\" id=\"aemc-bonus-hero\" hidden aria-labelledby=\"aemc-bh-eyebrow\">\n                    <!-- DIAL. The ring holds ONLY the percentage — the dollar figure is HTML text\n                         beside it. The old design drew the amount inside the ring, and \"$1,050.00\"\n                         at 34px monospace (~184px) is wider than the ring's ~129px clear centre, so\n                         the number painted over the arc (redesign Option B, 2026-09-01).\n                         Percent-of-GOAL axis, and the 85% tick is drawn on that same axis —\n                         the arc and the tick MUST share a denominator. r=52 → circumference 326.73. -->\n                    <div class=\"aemc-bh-dial\">\n                        <svg viewBox=\"0 0 128 128\" role=\"img\" aria-labelledby=\"aemc-bh-dial-label\">\n                            <title id=\"aemc-bh-dial-label\">Percent of your quarterly embroidery goal</title>\n                            <circle class=\"aemc-bh-dial-track\" cx=\"64\" cy=\"64\" r=\"52\"></circle>\n                            <circle class=\"aemc-bh-dial-tick\" id=\"aemc-bh-dial-tick\" cx=\"64\" cy=\"64\" r=\"52\"\n                                    transform=\"rotate(-90 64 64)\"></circle>\n                            <circle class=\"aemc-bh-dial-arc\" id=\"aemc-bh-dial-arc\" cx=\"64\" cy=\"64\" r=\"52\"\n                                    transform=\"rotate(-90 64 64)\"></circle>\n                            <text class=\"aemc-bh-dial-pct\" id=\"aemc-bh-dial-pct\" x=\"64\" y=\"64\" text-anchor=\"middle\"></text>\n                            <text class=\"aemc-bh-dial-cap\" id=\"aemc-bh-dial-cap\" x=\"64\" y=\"81\" text-anchor=\"middle\">OF GOAL</text>\n                        </svg>\n                        <div class=\"aemc-bh-earned\">\n                            <div class=\"aemc-bh-earned-cap\">Earned · Q3</div>\n                            <div class=\"aemc-bh-earned-amt\" id=\"aemc-bh-amount\">$0</div>\n                        </div>\n                    </div>\n\n                    <div class=\"aemc-bh-ladder\">\n                        <div class=\"aemc-bh-eyebrow\" id=\"aemc-bh-eyebrow\">Your Q3 embroidery bonus</div>\n                        <div class=\"aemc-bh-next\" id=\"aemc-bh-next\">—</div>\n\n                        <!-- Three payout scenarios: what is banked, what today's pace pays, and what\n                             finishing at goal pays. Money, not a percentage — the percentage was the\n                             single biggest source of confusion when this first shipped. -->\n                        <div class=\"aemc-bh-scenarios\" id=\"aemc-bh-scenarios\"></div>\n\n                        <!-- The 85% caption gets its OWN row. When all three labels were absolutely\n                             positioned on one 18px line, this one (176px wide) overlapped the\n                             right-hand goal label at any width below ~1300px — including 1280x800. -->\n                        <div class=\"aemc-bh-startcap\" id=\"aemc-bh-startcap\"></div>\n                        <div class=\"aemc-bh-track\" role=\"img\" aria-label=\"Progress toward your embroidery goal\">\n                            <div class=\"aemc-bh-fill\" id=\"aemc-bh-fill\"></div>\n                            <div class=\"aemc-bh-marks\" id=\"aemc-bh-marks\"></div>\n                        </div>\n                        <!-- Flex, not absolute positioning — that is what makes it collision-proof. -->\n                        <div class=\"aemc-bh-ends\">\n                            <span id=\"aemc-bh-goal\"></span>\n                            <span id=\"aemc-bh-goalmax\"></span>\n                        </div>\n                        <div class=\"aemc-bh-chips\" id=\"aemc-bh-chips\"></div>\n                    </div>\n\n                    <div class=\"aemc-bh-cta\">\n                        <div class=\"aemc-bh-pace\" id=\"aemc-bh-pace\" hidden></div>\n                        <a class=\"aemc-bh-go\" id=\"aemc-bh-go\" href=\"#tab=calls\">\n                            <i class=\"fas fa-map-location-dot\" aria-hidden=\"true\"></i> Who gets me there?\n                        </a>\n                        <button type=\"button\" class=\"aemc-bh-explain\" id=\"aemc-bh-explain\"\n                                aria-expanded=\"false\" aria-controls=\"aemc-bh-how\">\n                            <i class=\"fas fa-circle-question\" aria-hidden=\"true\"></i> How this works\n                        </button>\n                    </div>\n                    <div class=\"aemc-bh-how\" id=\"aemc-bh-how\" hidden>\n                        <div class=\"aemc-bh-how-grid\">\n                            <div>\n                                <h4>1 · Activation bounties</h4>\n                                <p><strong id=\"aemc-bh-h-new\">$75</strong> for an account that has\n                                <em>never</em> embroidered with us. <strong id=\"aemc-bh-h-react\">$50</strong>\n                                for one that has been quiet <span id=\"aemc-bh-h-months\">12</span>+ months.\n                                Counts once that account reaches <strong id=\"aemc-bh-h-min\">$1,000</strong>\n                                of embroidery this quarter. No cap.</p>\n                            </div>\n                            <div>\n                                <h4>2 · Growth rate</h4>\n                                <p>Your goal comes from <em>your own book's</em> embroidery history, so a\n                                bigger book never means an easier target. Once you pass\n                                <strong id=\"aemc-bh-h-start\">85%</strong> of it, every\n                                <strong id=\"aemc-bh-h-step\">—</strong> of embroidery you add pays you\n                                <strong id=\"aemc-bh-h-point\">$60</strong> — no steps, no ceiling.</p>\n                            </div>\n                            <div>\n                                <h4>3 · Team kicker</h4>\n                                <p>Company-wide Q3 total, shared equally. Hitting\n                                <strong id=\"aemc-bh-h-kick\">$740,000</strong> is what keeps the $3M year\n                                in reach.</p>\n                            </div>\n                        </div>\n                        <p class=\"aemc-bh-how-foot\">\n                            Counted on <strong>invoiced</strong> Custom Embroidery (caps included), Jul 1 – Sep 30,\n                            on accounts assigned to you. Repeat orders from existing embroidery customers\n                            earn nothing — this pays for new and won-back business.\n                            <a href=\"/dashboards/embroidery-bonus-plan.html\" target=\"_blank\" rel=\"noopener\">Read the full plan →</a>\n                        </p>\n                    </div>\n                </section>\n\n            <div class=\"mc-spine-kpis\">\n                <div class=\"mc-kpi mc-kpi--accent\">\n                    <div class=\"mc-kpi-value\" id=\"kpi-ytd\">—</div>\n                    <div class=\"mc-kpi-label\">YTD Sales</div>\n                </div>\n                <div class=\"mc-kpi\">\n                    <div class=\"mc-kpi-value\" id=\"kpi-mtd\">—</div>\n                    <div class=\"mc-kpi-label\">This Month <span class=\"mc-kpi-note\" id=\"mc-mtd-note\"></span></div>\n                    <div class=\"mc-spark\" id=\"mc-spark\" aria-hidden=\"true\"></div>\n                </div>\n                <div class=\"mc-kpi\">\n                    <div class=\"mc-kpi-value\" id=\"mc-streak\">—</div>\n                    <div class=\"mc-kpi-label\" id=\"mc-streak-label\">Order Streak</div>\n                </div>\n            </div>\n            </section>\n\n            <!-- Quick actions, cross-tab. Condensed 2026-07-26 from 12 wrapping buttons\n                 (two rows, competing with the spine for the top of the page) to 6 targets:\n                 the 4 builders + Quick Quote fold into one menu, and the three navigational\n                 links into More. Every href/id/title is unchanged so the controller's link\n                 rewiring keeps working; <details> means no JS and free keyboard support. -->\n            <div class=\"aemc-actions\" id=\"aemc-actions\" role=\"toolbar\" aria-label=\"Quick actions\">\n                <details class=\"mc-menu\" id=\"mc-menu-new\">\n                    <summary class=\"dash-btn dash-btn--primary\"><i class=\"fas fa-plus\" aria-hidden=\"true\"></i> New quote</summary>\n                    <div class=\"mc-menu-panel\">\n                        <a href=\"/quote-builders/embroidery-quote-builder.html\">Embroidery (EMB)</a>\n                        <a href=\"/quote-builders/screenprint-quote-builder.html\">Screen print (SCP)</a>\n                        <a href=\"/quote-builders/dtf-quote-builder.html\">DTF</a>\n                        <a href=\"/quote-builders/dtg-quote-builder.html\">DTG</a>\n                        <a href=\"/calculators/quick-quote/\" title=\"Fast price for any style — no customer record, no save. Same prices as the builders.\"><i class=\"fas fa-bolt\" aria-hidden=\"true\"></i> Quick Quote</a>\n                    </div>\n                </details>\n                <a class=\"dash-btn\" href=\"/dashboards/ae-dashboard.html\" title=\"Send artwork to the art team\"><i class=\"fas fa-palette\" aria-hidden=\"true\"></i> Send Artwork <span class=\"aemc-badge\" id=\"aemc-art-badge\" hidden></span></a>\n                <button type=\"button\" class=\"dash-btn\" id=\"aemc-kit-btn\" title=\"Request a sample / marketing kit\" aria-label=\"Request a sample / marketing kit\"><i class=\"fas fa-gift\" aria-hidden=\"true\"></i> Sample Kit</button>\n                <a class=\"dash-btn\" href=\"/dashboards/leads.html\" title=\"Leads Board\"><i class=\"fas fa-table-columns\" aria-hidden=\"true\"></i> Leads</a>\n                <a class=\"dash-btn\" id=\"aemc-accounts-link\" href=\"/dashboards/taneisha-crm.html\" title=\"My Accounts\" hidden><i class=\"fas fa-address-book\" aria-hidden=\"true\"></i> Accounts</a>\n                <details class=\"mc-menu\" id=\"mc-menu-more\">\n                    <summary class=\"dash-btn\"><i class=\"fas fa-ellipsis\" aria-hidden=\"true\"></i> More</summary>\n                    <div class=\"mc-menu-panel\">\n                        <a id=\"aemc-photos-link\" href=\"/dashboards/finished-photos-library.html\" title=\"Finished-product photos for your accounts\"><i class=\"fas fa-images\" aria-hidden=\"true\"></i> My Finished Photos</a>\n                        <a href=\"/dashboards/lead-scorecard.html\"><i class=\"fas fa-trophy\" aria-hidden=\"true\"></i> Scorecard</a>\n                        <a href=\"/dashboards/commission-structure.html\"><i class=\"fas fa-percent\" aria-hidden=\"true\"></i> Commission Plan</a>\n                    </div>\n                </details>\n            </div>\n\n            <!-- Sticky: condensed spine + the tablist. Opaque background is load-bearing —\n                 rows would otherwise scroll through it. -->\n            <div class=\"mc-sticky\">\n                <div class=\"mc-condensed\" id=\"mc-condensed\" hidden aria-hidden=\"true\">\n                    <span class=\"mc-condensed-amount\" id=\"mc-condensed-amount\"></span>\n                    <span class=\"mc-condensed-next\" id=\"mc-condensed-next\"></span>\n                    <span class=\"mc-condensed-track\"><span class=\"mc-condensed-fill\" id=\"mc-condensed-fill\"></span></span>\n                </div>\n                <div class=\"mc-tabs\" role=\"tablist\" id=\"mc-tablist\" aria-label=\"Mission Control sections\">\n                <button type=\"button\" class=\"mc-tab\" role=\"tab\" id=\"mc-tab-today\"\n                        aria-controls=\"mc-panel-today\" aria-selected=\"true\"\n                        tabindex=\"0\" data-tab=\"today\" data-label=\"Today\"\n                        data-badge-noun=\"items\">\n                    <i class=\"fas fa-bolt\" aria-hidden=\"true\"></i> Today\n                    <span class=\"mc-tab-badge\" id=\"mc-badge-today\" hidden></span>\n                    <span class=\"mc-tab-dot\" id=\"mc-dot-today\" hidden title=\"Needs a look\"></span>\n                </button>\n                <button type=\"button\" class=\"mc-tab\" role=\"tab\" id=\"mc-tab-money\"\n                        aria-controls=\"mc-panel-money\" aria-selected=\"false\"\n                        tabindex=\"-1\" data-tab=\"money\" data-label=\"Money\"\n                        data-badge-noun=\"items\">\n                    <i class=\"fas fa-sack-dollar\" aria-hidden=\"true\"></i> Money\n                    <span class=\"mc-tab-badge\" id=\"mc-badge-money\" hidden></span>\n                    <span class=\"mc-tab-dot\" id=\"mc-dot-money\" hidden title=\"Needs a look\"></span>\n                </button>\n                <!-- No badge on purpose. The badge rule (\"five badged tabs read as five\n                     inboxes\") is right, and this list would badge 250 — a number that is\n                     never zero and therefore says nothing. -->\n                <button type=\"button\" class=\"mc-tab\" role=\"tab\" id=\"mc-tab-calls\"\n                        aria-controls=\"mc-panel-calls\" aria-selected=\"false\"\n                        tabindex=\"-1\" data-tab=\"calls\" data-label=\"Call list\"\n                        data-badge-noun=\"calls\">\n                    <i class=\"fas fa-phone\" aria-hidden=\"true\"></i> Call List\n                </button>\n                <button type=\"button\" class=\"mc-tab\" role=\"tab\" id=\"mc-tab-book\"\n                        aria-controls=\"mc-panel-book\" aria-selected=\"false\"\n                        tabindex=\"-1\" data-tab=\"book\" data-label=\"My Book\"\n                        data-badge-noun=\"items\">\n                    <i class=\"fas fa-address-book\" aria-hidden=\"true\"></i> My Book\n                    <span class=\"mc-tab-badge\" id=\"mc-badge-book\" hidden></span>\n                    <span class=\"mc-tab-dot\" id=\"mc-dot-book\" hidden title=\"Needs a look\"></span>\n                </button>\n                <button type=\"button\" class=\"mc-tab\" role=\"tab\" id=\"mc-tab-pipeline\"\n                        aria-controls=\"mc-panel-pipeline\" aria-selected=\"false\"\n                        tabindex=\"-1\" data-tab=\"pipeline\" data-label=\"Pipeline\"\n                        data-badge-noun=\"items\">\n                    <i class=\"fas fa-diagram-project\" aria-hidden=\"true\"></i> Pipeline\n                    <span class=\"mc-tab-badge\" id=\"mc-badge-pipeline\" hidden></span>\n                    <span class=\"mc-tab-dot\" id=\"mc-dot-pipeline\" hidden title=\"Needs a look\"></span>\n                </button>\n                <button type=\"button\" class=\"mc-tab\" role=\"tab\" id=\"mc-tab-wins\"\n                        aria-controls=\"mc-panel-wins\" aria-selected=\"false\"\n                        tabindex=\"-1\" data-tab=\"wins\" data-label=\"Wins\"\n                        data-badge-noun=\"items\">\n                    <i class=\"fas fa-trophy\" aria-hidden=\"true\"></i> Wins\n                    <span class=\"mc-tab-badge\" id=\"mc-badge-wins\" hidden></span>\n                    <span class=\"mc-tab-dot\" id=\"mc-dot-wins\" hidden title=\"Needs a look\"></span>\n                </button>\n                </div>\n            </div>\n\n            <!-- ================== TAB: Today ================== -->\n            <section class=\"mc-panel\" id=\"mc-panel-today\" role=\"tabpanel\"\n                     aria-labelledby=\"mc-tab-today\" tabindex=\"0\">\n                <!-- Chapter chips. Counts come from the same fetches that feed the cards —\n                     no extra requests. A zero-count chip is omitted rather than shown as 0. -->\n                <nav class=\"mc-chapters\" id=\"mc-chapters\" aria-label=\"Jump to a section\" hidden></nav>\n\n                <!-- ROW 1 — the single next action, beside the shape of the whole day. -->\n                <div class=\"mc-grid mc-grid--2-1\">\n                    <!-- Ranked client-side from data already fetched for the other cards. -->\n                    <div class=\"mc-onething\" id=\"mc-onething\" hidden></div>\n\n                    <div class=\"dash-card mc-clock-card\" id=\"mc-clock-card\">\n                        <div class=\"dash-card-header\">\n                            <h2 class=\"dash-card-title\"><i class=\"fas fa-calendar-days\" aria-hidden=\"true\"></i> Order clock</h2>\n                            <span class=\"aemc-sub\" id=\"mc-clock-sub\"></span>\n                        </div>\n                        <div id=\"mc-clock\"><div class=\"dash-loading\">Checking your order due dates…</div></div>\n                    </div>\n                </div>\n                <p class=\"mc-onething-skipped\" id=\"mc-onething-skipped\" hidden></p>\n\n                <!-- ROW 2 — the three things that are actually wrong today. Each capped at 4\n                     rows with the full list behind a drawer, so Today stays ~2 screens. -->\n                <div class=\"mc-grid mc-grid--3\">\n                    <div class=\"dash-card mc-capped\" id=\"mc-fires\">\n                        <div class=\"dash-card-header\">\n                            <h2 class=\"dash-card-title\"><i class=\"fas fa-fire-flame-curved mc-ic-fire\" aria-hidden=\"true\"></i> Late &amp; at risk</h2>\n                            <span class=\"mc-count-pill mc-count-pill--fire\" id=\"aemc-due-sub\"></span>\n                        </div>\n                        <div id=\"aemc-due\"><div class=\"dash-loading\">Checking your order due dates…</div></div>\n                        <button type=\"button\" class=\"mc-viewall-btn\" id=\"mc-fires-all\" hidden aria-label=\"View all\"></button>\n                    </div>\n\n                    <div class=\"dash-card mc-capped\" id=\"mc-artwork\">\n                        <div class=\"dash-card-header\">\n                            <h2 class=\"dash-card-title\"><i class=\"fas fa-palette mc-ic-art\" aria-hidden=\"true\"></i> Artwork to approve</h2>\n                            <span class=\"mc-count-pill mc-count-pill--art\" id=\"aemc-art-sub\"></span>\n                        </div>\n                        <div id=\"aemc-artwork\"><div class=\"dash-loading\">Checking your approvals…</div></div>\n                        <button type=\"button\" class=\"mc-viewall-btn\" id=\"mc-artwork-all\" hidden aria-label=\"View all\"></button>\n                    </div>\n\n                    <div class=\"dash-card mc-capped\" id=\"mc-missing\">\n                        <div class=\"dash-card-header\">\n                            <h2 class=\"dash-card-title\"><i class=\"fas fa-list-check mc-ic-dq\" aria-hidden=\"true\"></i> Missing info</h2>\n                            <span class=\"mc-count-pill\" id=\"aemc-dq-sub\"></span>\n                        </div>\n                        <div id=\"aemc-dq\"><div class=\"dash-loading\">Checking your recent ShopWorks entries…</div></div>\n                        <a class=\"mc-viewall-btn\" id=\"mc-missing-all\" href=\"/dashboards/purchasing-portal.html\" hidden aria-label=\"View all\"></a>\n                    </div>\n                </div>\n\n                <!-- ROW 3 — in-flight goods. Nothing here is wrong, it just needs watching. -->\n                <div class=\"mc-grid mc-grid--3\">\n                    <div class=\"dash-card mc-capped\" id=\"mc-inbound\">\n                        <div class=\"dash-card-header\">\n                            <h2 class=\"dash-card-title\"><i class=\"fas fa-truck-fast\" aria-hidden=\"true\"></i> Arriving today</h2>\n                            <span class=\"mc-count-pill mc-count-pill--ok\" id=\"aemc-inbound-sub\"></span>\n                        </div>\n                        <div id=\"aemc-inbound\" class=\"aemc-inbound\"><div class=\"dash-loading\">Checking today's inbound…</div></div>\n                        <button type=\"button\" class=\"mc-viewall-btn\" id=\"aemc-inbound-open\"><i class=\"fas fa-up-right-from-square\" aria-hidden=\"true\"></i> Full view</button>\n                    </div>\n\n                    <div class=\"dash-card mc-capped\" id=\"mc-purch\">\n                        <div class=\"dash-card-header\">\n                            <h2 class=\"dash-card-title\"><i class=\"fas fa-cart-flatbed\" aria-hidden=\"true\"></i> My purchasing</h2>\n                            <span class=\"mc-count-pill\" id=\"aemc-purch-sub\"></span>\n                        </div>\n                        <div id=\"aemc-purch\"><div class=\"dash-loading\">Checking your purchase requests…</div></div>\n                        <a class=\"mc-viewall-btn\" href=\"/dashboards/purchasing-portal.html\">Full purchasing portal</a>\n                    </div>\n\n                    <!-- The only non-problem on Today, and the reason it stays. -->\n                    <div class=\"dash-card mc-capped\" id=\"mc-momentum\" hidden>\n                        <div class=\"dash-card-header\">\n                            <h2 class=\"dash-card-title\"><i class=\"fas fa-fire mc-ic-streak\" aria-hidden=\"true\"></i> Momentum</h2>\n                        </div>\n                        <div id=\"mc-momentum-body\"></div>\n                    </div>\n                </div>\n\n            </section>\n\n            <!-- ================== TAB: Money ================== -->\n            <section class=\"mc-panel\" id=\"mc-panel-money\" role=\"tabpanel\"\n                     aria-labelledby=\"mc-tab-money\" tabindex=\"0\" hidden>\n                <!-- Shared goal: legitimately everyone's number, and it pulls both reps the\n                     same direction. Revenue + payout tiers only — no per-rep comparison. -->\n                <div class=\"dash-card mc-kicker-card\" id=\"mc-kicker-card\" hidden>\n                    <div class=\"dash-card-header\">\n                        <h2 class=\"dash-card-title\"><i class=\"fas fa-people-group\" aria-hidden=\"true\"></i> Team kicker — everybody's in this one</h2>\n                    </div>\n                    <div id=\"mc-kicker\"></div>\n                </div>\n\n                <div class=\"dash-stat-grid\">\n                    <div class=\"dash-stat-card\">\n                        <div class=\"dash-stat-value\" id=\"kpi-commission\">—</div>\n                        <div class=\"dash-stat-label\" id=\"kpi-commission-label\">Store Commission</div>\n                    </div>\n                </div>\n\n                <!-- 2fr / 1fr per the design: what you earned on the left, the ledger on the\n                     right. The \"who to call\" lists that used to sit here live on the Call List\n                     tab now — Money is what you MADE, that tab is what's next. -->\n                <div class=\"mc-grid mc-grid--2-1\">\n                <!-- Bonus & commission (Commission_Payouts = payroll system of record) -->\n                <div class=\"dash-card aemc-bonus-card aemc-collapsible\" data-collapse-key=\"bonus\">\n                    <div class=\"dash-card-header\">\n                        <h2 class=\"dash-card-title\"><i class=\"fas fa-sack-dollar\" aria-hidden=\"true\"></i> Bonus &amp; Commission</h2>\n                        <a class=\"aemc-viewall\" id=\"aemc-bonus-link\" href=\"https://inksoft-transform-8a3dc4e38097.herokuapp.com/commissions\" target=\"_blank\" rel=\"noopener\">Full bonus dashboard</a>\n                    </div>\n                    <div class=\"aemc-bonus-grid\">\n                        <div>\n                            <h3 class=\"aemc-queue-section-title\" id=\"aemc-bonus-prev-title\">Last quarter payout</h3>\n                            <div id=\"aemc-bonus-prev\"><div class=\"dash-loading\">Loading…</div></div>\n                        </div>\n                        <div>\n                            <h3 class=\"aemc-queue-section-title\" id=\"aemc-bonus-cur-title\">This quarter so far</h3>\n                            <div id=\"aemc-bonus-cur\"><div class=\"dash-loading\">Loading…</div></div>\n                        </div>\n                    </div>\n                    <p class=\"aemc-bonus-foot\" id=\"aemc-bonus-foot\"></p>\n                </div>\n\n                <!-- Which accounts actually produced the bonus. Reps ask \"who paid me this?\" and\n                     without an answer the hero number is just a figure they have to trust. -->\n                <div class=\"dash-card aemc-collapsible\" data-collapse-key=\"embearned\">\n                    <div class=\"dash-card-header\">\n                        <h2 class=\"dash-card-title\"><i class=\"fas fa-receipt\" aria-hidden=\"true\"></i> What earned your bonus <span class=\"aemc-sub\" id=\"aemc-earned-sub\"></span></h2>\n                        <a class=\"aemc-viewall\" id=\"aemc-emb-bonus-link\" href=\"https://inksoft-transform-8a3dc4e38097.herokuapp.com/commissions\" target=\"_blank\" rel=\"noopener\" hidden>Full bonus report</a>\n                    </div>\n                    <div id=\"aemc-earned\"><div class=\"dash-loading\">Loading…</div></div>\n                </div>\n                </div><!-- /mc-grid--2-1 -->\n\n                <!-- The \"who to call\" lists used to live here. They moved to the Call List tab\n                     on 2026-07-27 so there is exactly one home for them — this card is now\n                     what you EARNED, that tab is what's next. -->\n                <p class=\"aemc-hint aemc-calls-pointer\">\n                    Looking for who to call next?\n                    <a href=\"#tab=calls\"><i class=\"fas fa-phone\" aria-hidden=\"true\"></i> Open your Call List</a>\n                </p>\n            </section>\n\n            <!-- ================== TAB: Call List ================== -->\n            <section class=\"mc-panel\" id=\"mc-panel-calls\" role=\"tabpanel\"\n                     aria-labelledby=\"mc-tab-calls\" tabindex=\"0\" hidden>\n                <div class=\"dash-card aemc-emb-card\">\n                    <div class=\"dash-card-header\">\n                        <h2 class=\"dash-card-title\"><i class=\"fas fa-phone\" aria-hidden=\"true\"></i> Who to call <span class=\"aemc-sub\" id=\"aemc-calls-sub\"></span></h2>\n                        <button type=\"button\" class=\"aemc-viewall aemc-calls-print\" id=\"aemc-calls-print\" hidden>\n                            <i class=\"fas fa-print\" aria-hidden=\"true\"></i> Print call sheet\n                        </button>\n                    </div>\n                    <p class=\"aemc-hint\">One list, best opportunity first. Accounts a nudge away from a bounty,\n                    customers who used to embroider, and customers who buy everything else from you but have never\n                    embroidered — ranked together by what a call is realistically worth.</p>\n                    <div id=\"aemc-calls\"><div class=\"dash-loading\">Working out who to call…</div></div>\n                </div>\n            </section>\n\n            <!-- ================== TAB: My Book ================== -->\n            <section class=\"mc-panel\" id=\"mc-panel-book\" role=\"tabpanel\"\n                     aria-labelledby=\"mc-tab-book\" tabindex=\"0\" hidden>\n                <!-- Three tiles, not the design's four. \"Accounts assigned\" and \"ordered this\n                     year\" would need an endpoint this page doesn't call, and the handoff is\n                     explicit that stage 3 adds no backend work — so the row shows what is\n                     genuinely measured rather than a fourth number nobody can trace. -->\n                <div class=\"dash-stat-grid\">\n                    <div class=\"dash-stat-card mc-kpi--accent\">\n                        <div class=\"dash-stat-value\" id=\"mc-book-active\">—</div>\n                        <div class=\"dash-stat-label\">Accounts that ordered (24mo)</div>\n                    </div>\n                    <div class=\"dash-stat-card mc-stat--warn\">\n                        <div class=\"dash-stat-value\" id=\"mc-book-drift\">—</div>\n                        <div class=\"dash-stat-label\">Drifting off their rhythm</div>\n                    </div>\n                    <div class=\"dash-stat-card\">\n                        <div class=\"dash-stat-value\" id=\"mc-book-table\">—</div>\n                        <div class=\"dash-stat-label\">On the table</div>\n                    </div>\n                </div>\n\n                <div class=\"dash-card mc-book-intro\">\n                    <div class=\"dash-card-header\">\n                        <h2 class=\"dash-card-title\"><i class=\"fas fa-address-book\" aria-hidden=\"true\"></i> Your book</h2>\n                        <a class=\"aemc-viewall\" id=\"mc-book-link\" href=\"/dashboards/taneisha-crm.html\" hidden>Full account manager</a>\n                    </div>\n                    <p class=\"aemc-hint\">The accounts assigned to you, and which of them are drifting.\n                       Depth lands here next: health scores, predicted reorder dates and the\n                       month-by-month pattern of who buys when.</p>\n                </div>\n\n                <!-- Growth radar: revenue statistically missing vs each account's own history -->\n                <div class=\"dash-card aemc-growth-card aemc-collapsible\" data-collapse-key=\"growth\">\n                    <div class=\"dash-card-header\">\n                        <h2 class=\"dash-card-title\"><i class=\"fas fa-satellite-dish\" aria-hidden=\"true\"></i> Money on the Table <span class=\"aemc-sub\" id=\"aemc-growth-sub\"></span></h2>\n                        <a class=\"aemc-viewall\" id=\"aemc-growth-accounts-link\" href=\"/dashboards/taneisha-crm.html\" hidden>My Accounts</a>\n                    </div>\n                    <p class=\"aemc-hint aemc-growth-hint\">Accounts that are late against <em>their own</em> ordering rhythm, or spent real money in the next 45 days last year and haven't ordered yet. Call these first.</p>\n                    <div id=\"aemc-growth\"><div class=\"dash-loading\">Scanning 24 months of your order history…</div></div>\n                </div>\n            </section>\n\n            <!-- ================== TAB: Pipeline ================== -->\n            <section class=\"mc-panel\" id=\"mc-panel-pipeline\" role=\"tabpanel\"\n                     aria-labelledby=\"mc-tab-pipeline\" tabindex=\"0\" hidden>\n                <div class=\"dash-stat-grid\">\n                    <div class=\"dash-stat-card\">\n                        <div class=\"dash-stat-value\" id=\"kpi-quotes\">—</div>\n                        <div class=\"dash-stat-label\" id=\"kpi-quotes-label\">Open Quotes</div>\n                    </div>\n                    <div class=\"dash-stat-card\">\n                        <div class=\"dash-stat-value\" id=\"kpi-winrate\">—</div>\n                        <div class=\"dash-stat-label\">Lead Win Rate (90d)</div>\n                    </div>\n                    <div class=\"dash-stat-card\">\n                        <div class=\"dash-stat-value\" id=\"mc-conv\">—</div>\n                        <div class=\"dash-stat-label\" id=\"mc-conv-label\">Quote → Order</div>\n                    </div>\n                    <div class=\"dash-stat-card\">\n                        <div class=\"dash-stat-value\" id=\"kpi-newleads\">—</div>\n                        <div class=\"dash-stat-label\">New leads, untouched</div>\n                    </div>\n                </div>\n                <p class=\"aemc-hint\" id=\"mc-conv-note\"></p>\n\n                <!-- Moved here from Today on 2026-07-27 (stage 3), which is where the design\n                     puts it. Artwork is NOT in this queue — it has its own card on Today. -->\n                <div class=\"dash-card aemc-queue-card\">\n                    <div class=\"dash-card-header\">\n                        <h2 class=\"dash-card-title\"><i class=\"fas fa-bolt\" aria-hidden=\"true\"></i> Needs you: leads, quotes &amp; kits</h2>\n                        <span class=\"aemc-queue-count\" id=\"aemc-queue-count\"></span>\n                    </div>\n                    <div id=\"aemc-queue\" class=\"aemc-queue\">\n                        <div class=\"dash-loading\">Loading your action queue…</div>\n                    </div>\n                </div>\n\n                <!-- ZONE 3: work panels -->\n                <div class=\"aemc-panels\">\n                    <div class=\"dash-card\">\n                        <div class=\"dash-card-header\">\n                            <h2 class=\"dash-card-title\"><i class=\"fas fa-user-plus\" aria-hidden=\"true\"></i> My Leads</h2>\n                            <a class=\"aemc-viewall\" href=\"/dashboards/leads.html\">View all</a>\n                        </div>\n                        <div id=\"panel-leads\"><div class=\"dash-loading\">Loading…</div></div>\n                    </div>\n                    <div class=\"dash-card\">\n                        <div class=\"dash-card-header\">\n                            <h2 class=\"dash-card-title\"><i class=\"fas fa-file-invoice-dollar\" aria-hidden=\"true\"></i> My Quotes</h2>\n                            <a class=\"aemc-viewall\" href=\"/dashboards/quote-management.html\">View all</a>\n                        </div>\n                        <div id=\"panel-quotes\"><div class=\"dash-loading\">Loading…</div></div>\n                    </div>\n                    <div class=\"dash-card\">\n                        <div class=\"dash-card-header\">\n                            <h2 class=\"dash-card-title\"><i class=\"fas fa-palette\" aria-hidden=\"true\"></i> My Art Requests</h2>\n                            <a class=\"aemc-viewall\" href=\"/dashboards/ae-dashboard.html\">View all</a>\n                        </div>\n                        <div id=\"panel-art\"><div class=\"dash-loading\">Loading…</div></div>\n                    </div>\n                    <div class=\"dash-card\">\n                        <div class=\"dash-card-header\">\n                            <h2 class=\"dash-card-title\"><i class=\"fas fa-box\" aria-hidden=\"true\"></i> My Recent Orders <span class=\"aemc-sub\" id=\"panel-orders-sub\"></span></h2>\n                            <a class=\"aemc-viewall\" id=\"aemc-orders-viewall\" href=\"/dashboards/quote-management.html\">View all</a>\n                        </div>\n                        <div id=\"panel-orders\"><div class=\"dash-loading\">Loading…</div></div>\n                    </div>\n                </div>\n            </section>\n\n            <!-- ================== TAB: Wins ================== -->\n            <section class=\"mc-panel\" id=\"mc-panel-wins\" role=\"tabpanel\"\n                     aria-labelledby=\"mc-tab-wins\" tabindex=\"0\" hidden>\n                <div class=\"dash-card mc-records-card\">\n                    <div class=\"dash-card-header\">\n                        <h2 class=\"dash-card-title\"><i class=\"fas fa-medal\" aria-hidden=\"true\"></i> Your records <span class=\"aemc-sub\" id=\"mc-records-sub\"></span></h2>\n                    </div>\n                    <div id=\"mc-records\"><div class=\"dash-loading\">Loading your best days…</div></div>\n                </div>\n\n                <div class=\"dash-card mc-wonback-card\">\n                    <div class=\"dash-card-header\">\n                        <h2 class=\"dash-card-title\"><i class=\"fas fa-hand-holding-heart\" aria-hidden=\"true\"></i> Won back &amp; started this quarter <span class=\"aemc-sub\" id=\"mc-wonback-sub\"></span></h2>\n                    </div>\n                    <div id=\"mc-wonback\"><div class=\"dash-loading\">Loading…</div></div>\n                </div>\n\n                <div class=\"dash-card mc-photos-card\">\n                    <div class=\"dash-card-header\">\n                        <h2 class=\"dash-card-title\"><i class=\"fas fa-images\" aria-hidden=\"true\"></i> Work that shipped <span class=\"aemc-sub\" id=\"mc-photos-sub\"></span></h2>\n                        <a class=\"aemc-viewall\" id=\"mc-photos-all\" href=\"/dashboards/finished-photos-library.html\">Full library</a>\n                    </div>\n                    <p class=\"aemc-hint\">Finished-product photos from your accounts — the actual jobs your quotes turned into.</p>\n                    <div id=\"mc-photos\"><div class=\"dash-loading\">Loading your finished photos…</div></div>\n                </div>\n            </section>\n\n        </main>\n    </div>\n\n    <!-- Sample-kit request modal (standalone — any recipient, optionally no lead) -->\n    <div class=\"aemc-overlay\" id=\"aemc-kit-overlay\" hidden></div>\n    <div class=\"aemc-modal\" id=\"aemc-kit-modal\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"aemc-kit-title\" hidden>\n        <div class=\"aemc-modal-head\">\n            <h2 class=\"aemc-modal-title\" id=\"aemc-kit-title\"><i class=\"fas fa-gift\" aria-hidden=\"true\"></i> Request a sample / marketing kit</h2>\n            <button type=\"button\" class=\"aemc-modal-close\" id=\"aemc-kit-close\" aria-label=\"Close\"><i class=\"fas fa-times\" aria-hidden=\"true\"></i></button>\n        </div>\n        <div class=\"aemc-modal-body\">\n            <p class=\"aemc-hint\">Goes straight to Mikalah's shipping queue. Pick the contents, tell us where it goes.</p>\n            <div class=\"aemc-field-label\">What to send</div>\n            <div id=\"aemc-kit-items\" class=\"aemc-kit-items\"><span class=\"aemc-muted\">Loading kit items…</span></div>\n            <div class=\"aemc-grid2\">\n                <div class=\"aemc-field\"><label class=\"aemc-field-label\" for=\"aemc-kit-recipient\">Recipient</label><input id=\"aemc-kit-recipient\" type=\"text\" autocomplete=\"off\"></div>\n                <div class=\"aemc-field\"><label class=\"aemc-field-label\" for=\"aemc-kit-company\">Company</label><input id=\"aemc-kit-company\" type=\"text\" autocomplete=\"off\"></div>\n            </div>\n            <div class=\"aemc-field\"><label class=\"aemc-field-label\" for=\"aemc-kit-addr1\">Street address *</label><input id=\"aemc-kit-addr1\" type=\"text\" autocomplete=\"off\"></div>\n            <div class=\"aemc-field\"><label class=\"aemc-field-label\" for=\"aemc-kit-addr2\">Suite / unit</label><input id=\"aemc-kit-addr2\" type=\"text\" autocomplete=\"off\"></div>\n            <div class=\"aemc-grid3\">\n                <div class=\"aemc-field\"><label class=\"aemc-field-label\" for=\"aemc-kit-city\">City *</label><input id=\"aemc-kit-city\" type=\"text\"></div>\n                <div class=\"aemc-field\"><label class=\"aemc-field-label\" for=\"aemc-kit-state\">State *</label><input id=\"aemc-kit-state\" type=\"text\" maxlength=\"20\"></div>\n                <div class=\"aemc-field\"><label class=\"aemc-field-label\" for=\"aemc-kit-zip\">ZIP *</label><input id=\"aemc-kit-zip\" type=\"text\" maxlength=\"20\"></div>\n            </div>\n            <div class=\"aemc-grid2\">\n                <div class=\"aemc-field\"><label class=\"aemc-field-label\" for=\"aemc-kit-phone\">Phone</label><input id=\"aemc-kit-phone\" type=\"tel\"></div>\n                <div class=\"aemc-field\"><label class=\"aemc-field-label\" for=\"aemc-kit-email\">Email</label><input id=\"aemc-kit-email\" type=\"email\"></div>\n            </div>\n            <div class=\"aemc-field\"><label class=\"aemc-field-label\" for=\"aemc-kit-notes\">Notes for shipping</label><textarea id=\"aemc-kit-notes\" rows=\"2\"></textarea></div>\n            <div class=\"aemc-modal-actions\">\n                <button type=\"button\" id=\"aemc-kit-send\" class=\"dash-btn dash-btn--primary\"><i class=\"fas fa-paper-plane\" aria-hidden=\"true\"></i> Send to shipping</button>\n                <span id=\"aemc-kit-status\" class=\"aemc-muted\"></span>\n            </div>\n        </div>\n    </div>\n\n    <!-- One-click outreach modal (server-built templates, per lead) -->\n    <div class=\"aemc-overlay\" id=\"aemc-outreach-overlay\" hidden></div>\n    <div class=\"aemc-modal\" id=\"aemc-outreach-modal\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"aemc-outreach-title\" hidden>\n        <div class=\"aemc-modal-head\">\n            <h2 class=\"aemc-modal-title\" id=\"aemc-outreach-title\"><i class=\"fas fa-envelope\" aria-hidden=\"true\"></i> Email this lead</h2>\n            <button type=\"button\" class=\"aemc-modal-close\" id=\"aemc-outreach-close\" aria-label=\"Close\"><i class=\"fas fa-times\" aria-hidden=\"true\"></i></button>\n        </div>\n        <div class=\"aemc-modal-body\">\n            <div class=\"aemc-outreach-lead\" id=\"aemc-outreach-lead\"></div>\n            <div class=\"aemc-outreach-btns\" id=\"aemc-outreach-btns\"></div>\n            <div id=\"aemc-outreach-preview\"></div>\n        </div>\n    </div>\n\n    <!-- Slide-over drawers for the full lists behind the capped Today cards. Scrim 90 /\n         panel 100 matches the existing .aemc-overlay / .aemc-modal ladder (.mc-sticky is 20,\n         .mc-menu-panel 30) so a drawer always sits above the sticky tab bar. -->\n    <div class=\"mc-drawer-scrim\" id=\"mc-drawer-scrim\" hidden></div>\n    <aside class=\"mc-drawer\" id=\"mc-drawer\" hidden role=\"dialog\" aria-modal=\"true\"\n           aria-labelledby=\"mc-drawer-title\">\n        <header class=\"mc-drawer-head\">\n            <div>\n                <h2 class=\"mc-drawer-title\" id=\"mc-drawer-title\"></h2>\n                <p class=\"mc-drawer-sum\" id=\"mc-drawer-sum\"></p>\n            </div>\n            <button type=\"button\" class=\"mc-drawer-close\" id=\"mc-drawer-close\" aria-label=\"Close\">\n                <i class=\"fas fa-times\" aria-hidden=\"true\"></i>\n            </button>\n        </header>\n        <div class=\"mc-drawer-body\" id=\"mc-drawer-body\"></div>\n        <footer class=\"mc-drawer-foot\" id=\"mc-drawer-foot\"></footer>\n    </aside>\n\n    <!-- Load order matters: APP_CONFIG → fetch-timeout → DashPage → inbound modal → page controller -->\n    <script src=\"/config/app.config.js\"></script>\n    <script src=\"/shared_components/js/fetch-timeout.js?v=2026.09.06.26\"></script>\n    <script src=\"/shared_components/js/dash-page-helpers.js?v=2026.09.07.25\"></script>\n    <!-- Shared accessible tab router (ARIA APG tablist + hash sync). Must load before the page controller. -->\n    <!-- Confetti: fired ONLY on a genuinely new rung/win-back, once, and never under reduced motion. -->\n    <script src=\"/shared_components/js/confetti.js?v=2026.09.06.26\"></script>\n    <script src=\"/shared_components/js/dash-tabs.js?v=2026.07.26.6\"></script>\n    <script src=\"/shared_components/js/box-label-template.js?v=2026.09.05.71\"></script>\n    <!-- Normalises stored absolute proxy Box urls onto this origin so the session-gated\n         forwarder authorises them. Must precede every consumer below. -->\n    <script src=\"/shared_components/js/box-url.js?v=2026.08.06.1\"></script>\n    <script src=\"/dashboards/js/sanmar-inbound-today.js?v=2026.09.06.31\"></script>\n    <script src=\"/shared_components/js/sanmar-invoice-viewer.js?v=2026.09.09.13\"></script>\n    <script src=\"/shared_components/js/box-url.js?v=2026.08.06.1\"></script>\n    <script src=\"/dashboards/js/ae-mission-control.js?v=2026.09.07.33\"></script>\n</body>\n</html>\n",
+      "title": "Mission Control - Northwest Custom Apparel",
+      "bodyText": "Mission Control View as Taneisha Nika Refresh Dashboard Loading your day… Percent of your quarterly embroidery goal OF GOAL Earned · Q3 $0 Your Q3 embroidery bonus — Who gets me there? How this works 1 · Activation bounties $75 for an account that has never embroidered with us. $50 for one that has been quiet 12+ months. Counts once that account reaches $1,000 of embroidery this quarter. No cap. 2 · Growth rate Your goal comes from your own book's embroidery history, so a bigger book never means an easier target. Once you pass 85% of it, every — of embroidery you add pays you $60 — no steps, no ceiling. 3 · Team kicker Company-wide Q3 total, shared equally. Hitting $740,000 is what keeps the $3M year in reach. Counted on invoiced Custom Embroidery (caps included), Jul 1 – Sep 30, on accounts assigned to you. Repeat orders from existing embroidery customers earn nothing — this pays for new and won-back business. Read the full plan → — YTD Sales — This Month — Order Streak New quote Embroidery (EMB) Screen print (SCP) DTF DTG Quick Quote Send Artwork Sample Kit Leads Accounts More My Finished Photos Scorecard Commission Plan Today Money Call List My Book Pipeline Wins Order clock Checking your order due dates… Late & at risk Checking your order due dates… Artwork to approve Checking your approvals… Missing info Checking your recent ShopWorks entries… Arriving today Checking today's inbound… Full view My purchasing Checking your purchase requests… Full purchasing portal Momentum Team kicker — everybody's in this one — Store Commission Bonus & Commission Full bonus dashboard Last quarter payout Loading… This quarter so far Loading… What earned your bonus Full bonus report Loading… Looking for who to call next? Open your Call List Who to call Print call sheet One list, best opportunity first. Accounts a nudge away from a bounty, customers who used to embroider, and customers who buy everything else from you but have never embroidered — ranked together by what a call is realistically worth. Working out who to call… — Accounts that ordered (24mo) — Drifting off their rhythm — On the table Your book Full account manager The accounts assigned to you, and which of them are drifting. Depth lands here next: health scores, predicted reorder dates and the month-by-month pattern of who buys when. Money on the Table My Accounts Accounts that are late against their own ordering rhythm, or spent real money in the next 45 days last year and haven't ordered yet. Call these first. Scanning 24 months of your order history… — Open Quotes — Lead Win Rate (90d) — Quote → Order — New leads, untouched Needs you: leads, quotes & kits Loading your action queue… My Leads View all Loading… My Quotes View all Loading… My Art Requests View all Loading… My Recent Orders View all Loading… Your records Loading your best days… Won back & started this quarter Loading… Work that shipped Full library Finished-product photos from your accounts — the actual jobs your quotes turned into. Loading your finished photos… Request a sample / marketing kit Goes straight to Mikalah's shipping queue. Pick the contents, tell us where it goes. What to send Loading kit items… Recipient Company Street address * Suite / unit City * State * ZIP * Phone Email Notes for shipping Send to shipping Email this lead",
+      "bodyTextSha": "8231f3c4a3ed1454bae8fa41ca103dc16620bfe61b79a1c9d8504125eeaa9120",
+      "ids": [
+        "aemc-title",
+        "aemc-viewas",
+        "aemc-refresh",
+        "aemc-greeting",
+        "aemc-updated",
+        "mc-diff",
+        "aemc-bh-fallback",
+        "mc-spine",
+        "aemc-bonus-hero",
+        "aemc-bh-dial-label",
+        "aemc-bh-dial-tick",
+        "aemc-bh-dial-arc",
+        "aemc-bh-dial-pct",
+        "aemc-bh-dial-cap",
+        "aemc-bh-amount",
+        "aemc-bh-eyebrow",
+        "aemc-bh-next",
+        "aemc-bh-scenarios",
+        "aemc-bh-startcap",
+        "aemc-bh-fill",
+        "aemc-bh-marks",
+        "aemc-bh-goal",
+        "aemc-bh-goalmax",
+        "aemc-bh-chips",
+        "aemc-bh-pace",
+        "aemc-bh-go",
+        "aemc-bh-explain",
+        "aemc-bh-how",
+        "aemc-bh-h-new",
+        "aemc-bh-h-react",
+        "aemc-bh-h-months",
+        "aemc-bh-h-min",
+        "aemc-bh-h-start",
+        "aemc-bh-h-step",
+        "aemc-bh-h-point",
+        "aemc-bh-h-kick",
+        "kpi-ytd",
+        "kpi-mtd",
+        "mc-mtd-note",
+        "mc-spark",
+        "mc-streak",
+        "mc-streak-label",
+        "aemc-actions",
+        "mc-menu-new",
+        "aemc-art-badge",
+        "aemc-kit-btn",
+        "aemc-accounts-link",
+        "mc-menu-more",
+        "aemc-photos-link",
+        "mc-condensed",
+        "mc-condensed-amount",
+        "mc-condensed-next",
+        "mc-condensed-fill",
+        "mc-tablist",
+        "mc-tab-today",
+        "mc-badge-today",
+        "mc-dot-today",
+        "mc-tab-money",
+        "mc-badge-money",
+        "mc-dot-money",
+        "mc-tab-calls",
+        "mc-tab-book",
+        "mc-badge-book",
+        "mc-dot-book",
+        "mc-tab-pipeline",
+        "mc-badge-pipeline",
+        "mc-dot-pipeline",
+        "mc-tab-wins",
+        "mc-badge-wins",
+        "mc-dot-wins",
+        "mc-panel-today",
+        "mc-chapters",
+        "mc-onething",
+        "mc-clock-card",
+        "mc-clock-sub",
+        "mc-clock",
+        "mc-onething-skipped",
+        "mc-fires",
+        "aemc-due-sub",
+        "aemc-due",
+        "mc-fires-all",
+        "mc-artwork",
+        "aemc-art-sub",
+        "aemc-artwork",
+        "mc-artwork-all",
+        "mc-missing",
+        "aemc-dq-sub",
+        "aemc-dq",
+        "mc-missing-all",
+        "mc-inbound",
+        "aemc-inbound-sub",
+        "aemc-inbound",
+        "aemc-inbound-open",
+        "mc-purch",
+        "aemc-purch-sub",
+        "aemc-purch",
+        "mc-momentum",
+        "mc-momentum-body",
+        "mc-panel-money",
+        "mc-kicker-card",
+        "mc-kicker",
+        "kpi-commission",
+        "kpi-commission-label",
+        "aemc-bonus-link",
+        "aemc-bonus-prev-title",
+        "aemc-bonus-prev",
+        "aemc-bonus-cur-title",
+        "aemc-bonus-cur",
+        "aemc-bonus-foot",
+        "aemc-earned-sub",
+        "aemc-emb-bonus-link",
+        "aemc-earned",
+        "mc-panel-calls",
+        "aemc-calls-sub",
+        "aemc-calls-print",
+        "aemc-calls",
+        "mc-panel-book",
+        "mc-book-active",
+        "mc-book-drift",
+        "mc-book-table",
+        "mc-book-link",
+        "aemc-growth-sub",
+        "aemc-growth-accounts-link",
+        "aemc-growth",
+        "mc-panel-pipeline",
+        "kpi-quotes",
+        "kpi-quotes-label",
+        "kpi-winrate",
+        "mc-conv",
+        "mc-conv-label",
+        "kpi-newleads",
+        "mc-conv-note",
+        "aemc-queue-count",
+        "aemc-queue",
+        "panel-leads",
+        "panel-quotes",
+        "panel-art",
+        "panel-orders-sub",
+        "aemc-orders-viewall",
+        "panel-orders",
+        "mc-panel-wins",
+        "mc-records-sub",
+        "mc-records",
+        "mc-wonback-sub",
+        "mc-wonback",
+        "mc-photos-sub",
+        "mc-photos-all",
+        "mc-photos",
+        "aemc-kit-overlay",
+        "aemc-kit-modal",
+        "aemc-kit-title",
+        "aemc-kit-close",
+        "aemc-kit-items",
+        "aemc-kit-recipient",
+        "aemc-kit-company",
+        "aemc-kit-addr1",
+        "aemc-kit-addr2",
+        "aemc-kit-city",
+        "aemc-kit-state",
+        "aemc-kit-zip",
+        "aemc-kit-phone",
+        "aemc-kit-email",
+        "aemc-kit-notes",
+        "aemc-kit-send",
+        "aemc-kit-status",
+        "aemc-outreach-overlay",
+        "aemc-outreach-modal",
+        "aemc-outreach-title",
+        "aemc-outreach-close",
+        "aemc-outreach-lead",
+        "aemc-outreach-btns",
+        "aemc-outreach-preview",
+        "mc-drawer-scrim",
+        "mc-drawer",
+        "mc-drawer-title",
+        "mc-drawer-sum",
+        "mc-drawer-close",
+        "mc-drawer-body",
+        "mc-drawer-foot"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Dashboard"
+        },
+        {
+          "href": "#tab=calls",
+          "label": "Who gets me there?"
+        },
+        {
+          "href": "/dashboards/embroidery-bonus-plan.html",
+          "label": "Read the full plan →"
+        },
+        {
+          "href": "/quote-builders/embroidery-quote-builder.html",
+          "label": "Embroidery (EMB)"
+        },
+        {
+          "href": "/quote-builders/screenprint-quote-builder.html",
+          "label": "Screen print (SCP)"
+        },
+        {
+          "href": "/quote-builders/dtf-quote-builder.html",
+          "label": "DTF"
+        },
+        {
+          "href": "/quote-builders/dtg-quote-builder.html",
+          "label": "DTG"
+        },
+        {
+          "href": "/calculators/quick-quote/",
+          "label": "Quick Quote"
+        },
+        {
+          "href": "/dashboards/ae-dashboard.html",
+          "label": "Send Artwork"
+        },
+        {
+          "href": "/dashboards/leads.html",
+          "label": "Leads"
+        },
+        {
+          "href": "/dashboards/taneisha-crm.html",
+          "label": "Accounts"
+        },
+        {
+          "href": "/dashboards/finished-photos-library.html",
+          "label": "My Finished Photos"
+        },
+        {
+          "href": "/dashboards/lead-scorecard.html",
+          "label": "Scorecard"
+        },
+        {
+          "href": "/dashboards/commission-structure.html",
+          "label": "Commission Plan"
+        },
+        {
+          "href": "/dashboards/purchasing-portal.html",
+          "label": ""
+        },
+        {
+          "href": "/dashboards/purchasing-portal.html",
+          "label": "Full purchasing portal"
+        },
+        {
+          "href": "https://inksoft-transform-8a3dc4e38097.herokuapp.com/commissions",
+          "label": "Full bonus dashboard"
+        },
+        {
+          "href": "https://inksoft-transform-8a3dc4e38097.herokuapp.com/commissions",
+          "label": "Full bonus report"
+        },
+        {
+          "href": "#tab=calls",
+          "label": "Open your Call List"
+        },
+        {
+          "href": "/dashboards/taneisha-crm.html",
+          "label": "Full account manager"
+        },
+        {
+          "href": "/dashboards/taneisha-crm.html",
+          "label": "My Accounts"
+        },
+        {
+          "href": "/dashboards/leads.html",
+          "label": "View all"
+        },
+        {
+          "href": "/dashboards/quote-management.html",
+          "label": "View all"
+        },
+        {
+          "href": "/dashboards/ae-dashboard.html",
+          "label": "View all"
+        },
+        {
+          "href": "/dashboards/quote-management.html",
+          "label": "View all"
+        },
+        {
+          "href": "/dashboards/finished-photos-library.html",
+          "label": "Full library"
+        }
+      ],
+      "fields": [
+        {
+          "id": "aemc-kit-recipient",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "aemc-kit-company",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "aemc-kit-addr1",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "aemc-kit-addr2",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "aemc-kit-city",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "aemc-kit-state",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "aemc-kit-zip",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "aemc-kit-phone",
+          "type": "tel",
+          "value": ""
+        },
+        {
+          "id": "aemc-kit-email",
+          "type": "email",
+          "value": ""
+        },
+        {
+          "id": "aemc-kit-notes",
+          "type": "textarea",
+          "value": ""
+        }
+      ],
+      "styles": [
+        "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap",
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
+        "/shared_components/css/tokens.css?v=2026.09.08.2",
+        "/shared_components/css/art-hub.css?v=2026.09.07.19",
+        "/shared_components/css/dash-shell.css?v=2026.09.07.10",
+        "/shared_components/css/sanmar-invoice-viewer.css?v=2026.09.07.10",
+        "/dashboards/css/ae-mission-control.css?v=2026.09.07.10",
+        "/dashboards/css/sanmar-inbound.css?v=2026.09.07.19",
+        "/shared_components/css/box-label-print.css?v=2026.09.07.10"
+      ],
+      "scripts": [
+        "/config/app.config.js",
+        "/shared_components/js/fetch-timeout.js?v=2026.09.06.26",
+        "/shared_components/js/dash-page-helpers.js?v=2026.09.07.25",
+        "/shared_components/js/confetti.js?v=2026.09.06.26",
+        "/shared_components/js/dash-tabs.js?v=2026.07.26.6",
+        "/shared_components/js/box-label-template.js?v=2026.09.05.71",
+        "/shared_components/js/box-url.js?v=2026.08.06.1",
+        "/dashboards/js/sanmar-inbound-today.js?v=2026.09.06.31",
+        "/shared_components/js/sanmar-invoice-viewer.js?v=2026.09.09.13",
+        "/shared_components/js/box-url.js?v=2026.08.06.1",
+        "/dashboards/js/ae-mission-control.js?v=2026.09.07.33"
+      ],
+      "cssBytes": 272063
+    },
+    {
+      "file": "dashboards/company-numbers.html",
+      "html": "<!DOCTYPE html>\n<html lang=\"en\" data-theme=\"dark\" data-accent=\"green\" data-density=\"comfy\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <meta name=\"robots\" content=\"noindex, nofollow\">\n    <title>Company Numbers — Northwest Custom Apparel</title>\n    <link rel=\"icon\" href=\"/favicon.png\" type=\"image/png\">\n\n    <!-- Fonts & Icons -->\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    <link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap\" rel=\"stylesheet\">\n    <link href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css\" rel=\"stylesheet\">\n\n    <!--\n        Company Numbers (2026-09-03). The eight live report widgets that used to\n        sit under the staff dashboard's tool grid, moved here UNCHANGED — same\n        markup, same controllers, same stylesheet chain — because nobody used\n        them on the front page. Opened from the dashboard's goal chip and from\n        Admin → Analysis. Admin-only by default (ADMIN_DEFAULT_PAGES in\n        lib/page-access.js); widen with a Staff_Page_Access row, no deploy.\n\n        The stylesheet chain is the dashboard's own (@layer tokens → base →\n        components → utilities, then the unlayered theme + patch), NOT the\n        art-hub/dash-shell chain the other /dashboards pages use — the widgets\n        are styled for the dark dashboard and would need a redesign on a light\n        shell. company-numbers.css only strips the sidebar column and adds the\n        back link.\n    -->\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/staff-dashboard/tokens.css?v=2026.09.07.3\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/staff-dashboard/base.css?v=2026.09.07.10\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/staff-dashboard/components.css?v=2026.09.07.19\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/staff-dashboard/utilities.css?v=2026.09.07.10\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/staff-dashboard/dashboard-v3-theme.css?v=2026.09.07.19\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/staff-dashboard/dashboard-v3-patch-2.css?v=2026.09.07.19\">\n    <link rel=\"stylesheet\" href=\"/dashboards/css/company-numbers.css?v=2026.09.07.19\">\n</head>\n<body>\n    <div class=\"dashboard-container cn-shell\">\n        <main class=\"main-content\">\n\n            <header class=\"top-header\">\n                <div class=\"header-left\">\n                    <a href=\"/staff-dashboard.html\" class=\"cn-back\" title=\"Back to the Staff Dashboard\">\n                        <i class=\"fas fa-arrow-left\" aria-hidden=\"true\"></i>\n                        <span>Dashboard</span>\n                    </a>\n                    <h1 class=\"page-title\">Company Numbers</h1>\n                </div>\n                <div class=\"header-right\">\n                    <span class=\"cn-meta\">Live from ShopWorks, Stripe and the Caspio archive · <span id=\"cn-updated\" role=\"status\">loading…</span></span>\n                    <!-- ONE refresh for the whole page (2026-09-04): it runs the same tick the\n                         5-minute timer runs, bypassing the client caches. The per-card buttons\n                         (4 of 7 cards had one) are gone. -->\n                    <button type=\"button\" class=\"cn-refresh\" id=\"cn-refresh-all\" title=\"Re-read every card now (bypasses the 5-minute caches)\">\n                        <i class=\"fas fa-rotate\" aria-hidden=\"true\"></i> Refresh now\n                    </button>\n                </div>\n            </header>\n\n            <div class=\"dashboard-zones\">\n\n                <!-- Orders Inbox (2026-07-06) — what came in + what needs a human -->\n                <section class=\"zone-orders-inbox\" aria-labelledby=\"zoneOrdersInboxTitle\">\n                    <header class=\"zone-header\">\n                        <h2 id=\"zoneOrdersInboxTitle\" class=\"zone-title\">\n                            <i class=\"fas fa-inbox\" aria-hidden=\"true\"></i> Orders Inbox\n                        </h2>\n                        <span class=\"zone-subtitle\">Web orders &amp; quote activity, last 7 days</span>\n                        <span class=\"cn-stamp\" data-stamp=\"inbox\"></span>\n                    </header>\n                    <div id=\"ordersInboxAlerts\"></div>\n                    <div class=\"inbox-columns\">\n                        <div class=\"inbox-col\" id=\"inboxPaidOrders\">\n                            <h3 class=\"inbox-col-title\"><i class=\"fas fa-circle-check\" aria-hidden=\"true\"></i> Paid web orders</h3>\n                            <ul class=\"inbox-list\" id=\"inboxPaidList\" aria-busy=\"true\"></ul>\n                        </div>\n                        <div class=\"inbox-col\" id=\"inboxAccepted\">\n                            <h3 class=\"inbox-col-title\"><i class=\"fas fa-file-signature\" aria-hidden=\"true\"></i> Accepted quotes — unpaid <span class=\"cn-win\">last 30 days</span></h3>\n                            <ul class=\"inbox-list\" id=\"inboxAcceptedList\" aria-busy=\"true\"></ul>\n                        </div>\n                    </div>\n                </section>\n\n                <!-- Money row — online payments + sample pipeline (2026-07-06).\n                     \"Money Collected\" → \"Online Payments (Stripe)\" 2026-09-04: this is\n                     the Stripe ledger only (quote deposits/balances, storefronts, samples),\n                     not company cash — the old name read like the latter. -->\n                <div class=\"zone-money-row\">\n                    <section class=\"zone-payments\" aria-labelledby=\"zonePaymentsTitle\">\n                        <header class=\"zone-header\">\n                            <h2 id=\"zonePaymentsTitle\" class=\"zone-title\">\n                                <i class=\"fas fa-money-bill-wave\" aria-hidden=\"true\"></i> Online Payments (Stripe)\n                            </h2>\n                            <span class=\"zone-subtitle\">Quote deposits &amp; balances, storefronts, samples — not ShopWorks invoicing</span>\n                            <span class=\"cn-stamp\" data-stamp=\"payments\"></span>\n                        </header>\n                        <div class=\"pay-totals\">\n                            <div class=\"pay-total\"><div class=\"pay-total-label\">Today</div><div class=\"pay-total-value\" id=\"payToday\">—</div></div>\n                            <div class=\"pay-total\"><div class=\"pay-total-label\">Last 7 days</div><div class=\"pay-total-value\" id=\"payWeek\">—</div></div>\n                            <div class=\"pay-total\"><div class=\"pay-total-label\">Last 30 days</div><div class=\"pay-total-value\" id=\"payMonth\">—</div></div>\n                        </div>\n                        <ul class=\"pay-list\" id=\"payRecentList\" aria-busy=\"true\"></ul>\n                    </section>\n\n                    <section class=\"zone-sample-pipeline\" aria-labelledby=\"zoneSamplesTitle\">\n                        <header class=\"zone-header\">\n                            <h2 id=\"zoneSamplesTitle\" class=\"zone-title\">\n                                <i class=\"fas fa-box-open\" aria-hidden=\"true\"></i> Sample Follow-ups\n                            </h2>\n                            <span class=\"zone-subtitle\">Samples sent, no order yet — call these</span>\n                            <span class=\"cn-stamp\" data-stamp=\"samples\"></span>\n                        </header>\n                        <div id=\"samplePipelineAlerts\"></div>\n                        <ul class=\"pipeline-list\" id=\"samplePipelineList\" aria-busy=\"true\"></ul>\n                    </section>\n                </div>\n\n                <!-- Sales Metrics -->\n                <section class=\"zone-metrics\" aria-labelledby=\"zoneMetricsTitle\">\n                    <h2 id=\"zoneMetricsTitle\" class=\"visually-hidden\">Sales Metrics</h2>\n\n                    <!-- Revenue card -->\n                    <article class=\"metrics-card metrics-revenue-card\">\n                        <header class=\"metrics-revenue-header\">\n                            <h3 class=\"metrics-revenue-title\" id=\"revenueTitle\">\n                                <i class=\"fas fa-dollar-sign\" aria-hidden=\"true\"></i> Revenue: Last 7 Days\n                            </h3>\n                            <div class=\"date-range-toggle\" role=\"group\" aria-label=\"Revenue period\">\n                                <button type=\"button\" class=\"date-range-btn active\" data-action=\"metrics:set-range\" data-days=\"7\"  aria-pressed=\"true\">7D</button>\n                                <button type=\"button\" class=\"date-range-btn\"        data-action=\"metrics:set-range\" data-days=\"30\" aria-pressed=\"false\">30D</button>\n                                <button type=\"button\" class=\"date-range-btn\"        data-action=\"metrics:set-range\" data-days=\"60\" aria-pressed=\"false\">60D</button>\n                                <button type=\"button\" class=\"date-range-btn\"        data-action=\"metrics:set-range\" data-days=\"90\" aria-pressed=\"false\">90D</button>\n                            </div>\n                            <span class=\"cn-stamp\" data-stamp=\"revenue\"></span>\n                        </header>\n                        <div class=\"metrics-revenue-value\" id=\"ytdRevenue\">\n                            <span class=\"skeleton skeleton-value\"></span>\n                        </div>\n                        <div class=\"metrics-revenue-sparkline\" id=\"revenueSparkline\"></div>\n                        <div class=\"metrics-date-range\" id=\"dateRangeDisplay\"></div>\n                        <div class=\"metrics-revenue-comparison\">\n                            <span class=\"metrics-comparison-badge\" id=\"ytdGrowth\"><i class=\"fas fa-minus\" aria-hidden=\"true\"></i> --</span>\n                            <span class=\"metrics-comparison-label\" id=\"comparisonLabel\">vs. last year</span>\n                        </div>\n                        <!-- YTD from the Caspio archive — the SAME number the Team card and the\n                             goal chip use, so the two cards share one headline (filled by\n                             team-performance-controller; hidden until the archive lands). -->\n                        <div class=\"metrics-ytd\" id=\"revenueYtd\" hidden>\n                            <span class=\"metrics-ytd-label\">2026 YTD</span>\n                            <span class=\"metrics-ytd-value num\" id=\"revenueYtdValue\">—</span>\n                            <span class=\"metrics-ytd-note\" id=\"revenueYtdNote\"></span>\n                        </div>\n                        <div class=\"metrics-revenue-stats\" id=\"revenueStats\" aria-live=\"polite\"></div>\n                    </article>\n\n                    <!-- Team Performance card -->\n                    <article class=\"metrics-card metrics-team-card\">\n                        <header class=\"metrics-team-header\">\n                            <div class=\"metrics-team-title-group\">\n                                <h3 class=\"metrics-team-title\" id=\"teamPerformanceTitle\">\n                                    <i class=\"fas fa-users\" aria-hidden=\"true\"></i> Team Performance: 2026 YTD\n                                </h3>\n                                <div class=\"metrics-date-range\" id=\"teamDateRange\">Year-to-date</div>\n                            </div>\n                            <span class=\"cn-stamp\" data-stamp=\"team\"></span>\n                        </header>\n                        <div class=\"rep-list\" id=\"salesTeamList\">\n                            <!-- Populated by team-performance-controller -->\n                        </div>\n                    </article>\n\n                    <!-- Art Requests Needing Attention (aging widget, 2026-07-05).\n                         Rendered entirely by /staff-dashboard-v3/art-aging-widget.js —\n                         lazy-loads after DOMContentLoaded on idle time, GET-only,\n                         self-contained failure state (retry button). -->\n                    <article class=\"metrics-card col-span-full\" id=\"artAgingCard\" aria-labelledby=\"artAgingTitle\">\n                        <header class=\"metrics-team-header\">\n                            <div class=\"metrics-team-title-group\">\n                                <h3 class=\"metrics-team-title\" id=\"artAgingTitle\">\n                                    <i class=\"fas fa-hourglass-half\" aria-hidden=\"true\"></i> Art Requests Needing Attention\n                                </h3>\n                                <div class=\"metrics-date-range\">Open requests by time sitting in current status</div>\n                            </div>\n                            <span class=\"cn-stamp\" data-stamp=\"art\"></span>\n                        </header>\n                        <div id=\"artAgingBody\">\n                            <div class=\"metrics-date-range\">Loading art requests…</div>\n                        </div>\n                    </article>\n\n                    <!-- Production Due (2026-09-04). LIVE unshipped ShopWorks orders past their\n                         requested-ship date or due within 7 days, from the same due-dates-all\n                         forwarder the Past Due Orders report reads. Replaced the \"Production\n                         Turnaround\" predictor, a static estimate compiled Jan 2026 from\n                         completions through Nov 2025 — production logging stopped May 2026, so\n                         that card could never become live again. -->\n                    <article class=\"production-widget-card col-span-full\" data-widget=\"production\">\n                        <header class=\"production-header\">\n                            <h3 class=\"production-title\">\n                                <i class=\"fas fa-truck-fast\" aria-hidden=\"true\"></i> Production Due\n                            </h3>\n                            <span class=\"cn-sub\">Unshipped orders past their ship date or due within 7 days</span>\n                            <span class=\"cn-stamp\" data-stamp=\"production\"></span>\n                        </header>\n                        <div class=\"cn-due-tiles\">\n                            <div class=\"cn-due-tile cn-due-tile--late\"><div class=\"cn-due-num num\" id=\"production-late\">—</div><div class=\"cn-due-label\">Past due</div></div>\n                            <div class=\"cn-due-tile cn-due-tile--risk\"><div class=\"cn-due-num num\" id=\"production-risk\">—</div><div class=\"cn-due-label\">At risk · due this week, blanks not in</div></div>\n                            <div class=\"cn-due-tile cn-due-tile--nopo\"><div class=\"cn-due-num num\" id=\"production-nopo\">—</div><div class=\"cn-due-label\">Past due with no PO raised</div></div>\n                            <div class=\"cn-due-tile cn-due-tile--ok\"><div class=\"cn-due-num num\" id=\"production-ontrack\">—</div><div class=\"cn-due-label\">Due this week · on track</div></div>\n                        </div>\n                        <div id=\"production-due-list\" class=\"cn-due-list\">\n                            <div class=\"production-empty\">Loading due dates…</div>\n                        </div>\n                        <div class=\"production-footer\">\n                            <i class=\"fas fa-database\" aria-hidden=\"true\"></i>\n                            <span id=\"production-asof\">ShopWorks ORDER_ODBC mirror</span>\n                            · <a href=\"/dashboards/past-due-orders.html\">Full list by rep →</a>\n                        </div>\n                    </article>\n\n                    <!-- Quarterly Team Push. 🔒 NO COMPENSATION ON THIS CARD — per-rep bonus\n                         dollars live on each rep's own Mission Control; this shows the company\n                         quarter number and the shared targets only (the /team endpoint forces\n                         that scope). The title's quarter comes from the API (embroidery-bonus-\n                         controller renderDateRange) — never typed here (2026-09-04). -->\n                    <article class=\"embroidery-bonus-card col-span-full\">\n                        <header class=\"metrics-team-header mb-3\">\n                            <div class=\"metrics-team-title-group\">\n                                <h3 class=\"metrics-team-title\" id=\"embroideryBonusTitle\">\n                                    <i class=\"fas fa-bullseye\" aria-hidden=\"true\"></i> Team Push\n                                </h3>\n                                <div class=\"metrics-date-range\" id=\"embroideryBonusDateRange\">Loading…</div>\n                            </div>\n                            <div class=\"embroidery-bonus-controls\">\n                                <span class=\"cn-stamp\" data-stamp=\"bonus\"></span>\n                                <span class=\"sync-status num\" id=\"embroideryBonusStatus\"></span>\n                            </div>\n                        </header>\n                        <div id=\"embroideryBonusContent\">\n                            <div class=\"embroidery-bonus-loading\"><div class=\"loading-spinner\"></div><span>Loading embroidery bonus…</span></div>\n                        </div>\n                    </article>\n\n                </section>\n            </div>\n        </main>\n    </div>\n\n    <!-- Caspio timestamp parser (naive Pacific wall-clock → correct Date).\n         Needed by the art-aging widget below. -->\n    <script src=\"/shared_components/js/caspio-date-utils.js?v=2026.09.06.46\"></script>\n    <!-- Art Requests Needing Attention widget — self-contained, lazy (idle-time\n         fetch after DOMContentLoaded), GET-only, visible retry state on failure. -->\n    <script src=\"/staff-dashboard-v3/art-aging-widget.js?v=2026.09.04.11\" defer></script>\n\n    <!-- APP ENTRY (ES module). Bundled by scripts/build.js (ENTRY_BUNDLES) into one\n         hashed file with its whole module graph, so production makes ONE cached\n         request instead of the entry + 20 no-store source modules (2026-09-04). -->\n    <script type=\"module\" src=\"/dashboards/js/company-numbers.js?v=2026.09.04.11\"></script>\n</body>\n</html>\n",
+      "title": "Company Numbers — Northwest Custom Apparel",
+      "bodyText": "Dashboard Company Numbers Live from ShopWorks, Stripe and the Caspio archive · loading… Refresh now Orders Inbox Web orders & quote activity, last 7 days Paid web orders Accepted quotes — unpaid last 30 days Online Payments (Stripe) Quote deposits & balances, storefronts, samples — not ShopWorks invoicing Today— Last 7 days— Last 30 days— Sample Follow-ups Samples sent, no order yet — call these Sales Metrics Revenue: Last 7 Days 7D 30D 60D 90D -- vs. last year 2026 YTD — Team Performance: 2026 YTD Year-to-date Art Requests Needing Attention Open requests by time sitting in current status Loading art requests… Production Due Unshipped orders past their ship date or due within 7 days —Past due —At risk · due this week, blanks not in —Past due with no PO raised —Due this week · on track Loading due dates… ShopWorks ORDER_ODBC mirror · Full list by rep → Team Push Loading… Loading embroidery bonus…",
+      "bodyTextSha": "75d5761f2f6335e68668c23dbdceabab21adfd2447a4649a9b80b66c748f801a",
+      "ids": [
+        "cn-updated",
+        "cn-refresh-all",
+        "zoneOrdersInboxTitle",
+        "ordersInboxAlerts",
+        "inboxPaidOrders",
+        "inboxPaidList",
+        "inboxAccepted",
+        "inboxAcceptedList",
+        "zonePaymentsTitle",
+        "payToday",
+        "payWeek",
+        "payMonth",
+        "payRecentList",
+        "zoneSamplesTitle",
+        "samplePipelineAlerts",
+        "samplePipelineList",
+        "zoneMetricsTitle",
+        "revenueTitle",
+        "ytdRevenue",
+        "revenueSparkline",
+        "dateRangeDisplay",
+        "ytdGrowth",
+        "comparisonLabel",
+        "revenueYtd",
+        "revenueYtdValue",
+        "revenueYtdNote",
+        "revenueStats",
+        "teamPerformanceTitle",
+        "teamDateRange",
+        "salesTeamList",
+        "artAgingCard",
+        "artAgingTitle",
+        "artAgingBody",
+        "production-late",
+        "production-risk",
+        "production-nopo",
+        "production-ontrack",
+        "production-due-list",
+        "production-asof",
+        "embroideryBonusTitle",
+        "embroideryBonusDateRange",
+        "embroideryBonusStatus",
+        "embroideryBonusContent"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Dashboard"
+        },
+        {
+          "href": "/dashboards/past-due-orders.html",
+          "label": "Full list by rep →"
+        }
+      ],
+      "fields": [],
+      "styles": [
+        "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap",
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
+        "/shared_components/css/tokens.css?v=2026.09.08.2",
+        "/shared_components/css/staff-dashboard/tokens.css?v=2026.09.07.3",
+        "/shared_components/css/staff-dashboard/base.css?v=2026.09.07.10",
+        "/shared_components/css/staff-dashboard/components.css?v=2026.09.07.19",
+        "/shared_components/css/staff-dashboard/utilities.css?v=2026.09.07.10",
+        "/shared_components/css/staff-dashboard/dashboard-v3-theme.css?v=2026.09.07.19",
+        "/shared_components/css/staff-dashboard/dashboard-v3-patch-2.css?v=2026.09.07.19",
+        "/dashboards/css/company-numbers.css?v=2026.09.07.19"
+      ],
+      "scripts": [
+        "/shared_components/js/caspio-date-utils.js?v=2026.09.06.46",
+        "/staff-dashboard-v3/art-aging-widget.js?v=2026.09.04.11",
+        "/dashboards/js/company-numbers.js?v=2026.09.04.11"
+      ],
+      "cssBytes": 221560
+    },
+    {
+      "file": "dashboards/payroll.html",
+      "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <meta name=\"robots\" content=\"noindex, nofollow\">\n  <title>Payroll — Northwest Custom Apparel</title>\n  <link rel=\"icon\" href=\"/favicon.png\" type=\"image/png\">\n  <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n  <link href=\"/dashboards/css/payroll.css?v=2026.09.07.19\" rel=\"stylesheet\">\n</head>\n<body>\n  <main class=\"pr-wrap\">\n    <header class=\"pr-header\">\n      <div>\n        <h1>Payroll</h1>\n        <p class=\"pr-sub\">Vacation and sick balances, hours by pay period, and packet upload. Admin only — pay rates are never shown here.</p>\n      </div>\n      <a class=\"pr-back\" href=\"/staff-dashboard.html\">← Dashboard</a>\n    </header>\n\n    <div id=\"pr-status\" class=\"pr-status\" role=\"status\" aria-live=\"polite\"></div>\n\n    <div class=\"pr-tabs\" role=\"tablist\" aria-label=\"Payroll views\">\n      <button class=\"pr-tab is-active\" id=\"tab-leave\" data-panel=\"leave\" type=\"button\" role=\"tab\" aria-selected=\"true\" aria-controls=\"panel-leave\">Leave Balances</button>\n      <button class=\"pr-tab\" id=\"tab-periods\" data-panel=\"periods\" type=\"button\" role=\"tab\" aria-selected=\"false\" tabindex=\"-1\" aria-controls=\"panel-periods\">Pay Periods</button>\n      <button class=\"pr-tab\" id=\"tab-upload\" data-panel=\"upload\" type=\"button\" role=\"tab\" aria-selected=\"false\" tabindex=\"-1\" aria-controls=\"panel-upload\">Upload Packet</button>\n    </div>\n\n    <!-- LEAVE BALANCES -->\n    <section id=\"panel-leave\" class=\"pr-panel is-active\" role=\"tabpanel\" aria-labelledby=\"tab-leave\">\n      <div class=\"pr-panel-head\">\n        <h2>Leave Balances</h2>\n        <p>Current vacation and sick hours for active employees, refreshed from the last payroll packet.\n          A <strong>negative</strong> balance is not an error — staff accrue their first 40 vacation hours at\n          their one-year anniversary and can run negative until then.</p>\n        <p>Where vacation accrued or used shows <span class=\"pr-adj-demo\">112 → 80</span>, the first figure is\n          what payroll imported and the second is what the slip prints. Payroll books hours to the tax year of\n          the <em>check</em> date, so vacation taken in the last pay period of a year inflates both accrued and\n          used by the same <strong>carryover</strong> in the following year. They cancel, which is why\n          <strong>remaining is always correct as imported</strong>. Sick hours are never adjusted — Washington\n          State sick leave legitimately carries over.</p>\n      </div>\n      <div class=\"pr-toolbar\">\n        <input id=\"leave-search\" aria-label=\"Search employees\" class=\"pr-search\" type=\"search\" placeholder=\"Filter by name or department…\" autocomplete=\"off\">\n        <button id=\"print-slips\" class=\"pr-btn\" type=\"button\">🖨️ Print slips to hand out</button>\n        <span id=\"leave-asof\" class=\"pr-asof\" role=\"status\"></span>\n      </div>\n      <div id=\"leave-flags\" class=\"pr-flags\" hidden></div>\n      <div class=\"pr-tablewrap\">\n        <table class=\"pr-table\">\n          <!-- Grouped header: ten columns only fit the page width once \"Vac\"/\"Sick\" is\n               said once per group instead of on every column. -->\n          <thead>\n            <tr>\n              <th rowspan=\"2\">Employee</th><th rowspan=\"2\">Department</th>\n              <th colspan=\"5\" class=\"pr-group-head\">Vacation</th>\n              <th colspan=\"3\" class=\"pr-group-head\">Sick</th>\n            </tr>\n            <tr>\n              <th class=\"pr-num\">Entitled</th><th class=\"pr-num\">Accrued</th>\n              <th class=\"pr-num\">Used</th><th class=\"pr-num\">Remaining</th><th class=\"pr-num\">Carryover</th>\n              <th class=\"pr-num\">Accrued</th><th class=\"pr-num\">Used</th><th class=\"pr-num\">Remaining</th>\n            </tr>\n          </thead>\n          <tbody id=\"leave-body\"><tr><td colspan=\"10\" class=\"pr-loading\">Loading…</td></tr></tbody>\n        </table>\n      </div>\n    </section>\n\n    <!-- PAY PERIODS -->\n    <section id=\"panel-periods\" class=\"pr-panel\" role=\"tabpanel\" aria-labelledby=\"tab-periods\">\n      <div class=\"pr-panel-head\">\n        <h2>Pay Periods</h2>\n        <p>Hours recorded for each pay date. Select a period to see the per-employee breakdown.</p>\n      </div>\n      <div class=\"pr-toolbar\">\n        <label class=\"pr-label\" for=\"period-select\">Pay date</label>\n        <select id=\"period-select\" class=\"pr-select\"></select>\n      </div>\n      <div class=\"pr-tablewrap\">\n        <table class=\"pr-table\">\n          <thead>\n            <tr>\n              <th>Employee</th><th>Paid</th>\n              <th class=\"pr-num\">Regular</th><th class=\"pr-num\">Overtime</th><th class=\"pr-num\">Sick</th>\n              <th class=\"pr-num\">Vacation/PTO</th><th class=\"pr-num\">Holiday</th><th class=\"pr-num\">Total Hours</th>\n            </tr>\n          </thead>\n          <tbody id=\"period-body\"><tr><td colspan=\"8\" class=\"pr-loading\">Select a pay date.</td></tr></tbody>\n        </table>\n      </div>\n    </section>\n\n    <!-- UPLOAD -->\n    <section id=\"panel-upload\" class=\"pr-panel\" role=\"tabpanel\" aria-labelledby=\"tab-upload\">\n      <div class=\"pr-panel-head\">\n        <h2>Upload from NW Regional Accounting</h2>\n        <p>Upload the PDF. Everything read from it is checked against the document's own printed\n          totals. <strong>Nothing is saved until the numbers reconcile and you confirm.</strong></p>\n      </div>\n\n      <div class=\"pr-upload\">\n        <label class=\"pr-label\" for=\"packet-mode\">Document</label>\n        <select id=\"packet-mode\" class=\"pr-select\">\n          <option value=\"packet\">Full payroll packet</option>\n          <option value=\"leave\">Vacation &amp; sick page only</option>\n        </select>\n        <input id=\"packet-file\" aria-label=\"Payroll packet PDF\" class=\"pr-file\" type=\"file\" accept=\"application/pdf\">\n        <button id=\"packet-parse\" class=\"pr-btn\" type=\"button\" disabled>Read packet</button>\n        <span id=\"packet-note\" class=\"pr-note\" role=\"status\"></span>\n        <!-- Busy indicator lives NEXT TO THE BUTTON, where the eye already is after a click.\n             aria-hidden because #pr-status is a polite live region and a per-second counter\n             in it would re-announce forever; the status line says the sentence once. -->\n        <span id=\"packet-progress\" class=\"pr-progress\" aria-hidden=\"true\" hidden></span>\n      </div>\n      <p id=\"packet-hint\" class=\"pr-sub\"></p>\n\n      <div id=\"review\" class=\"pr-review\" hidden>\n        <div id=\"review-verdict\" class=\"pr-verdict\"></div>\n        <div id=\"review-notes\" class=\"pr-verdict is-warn\" hidden></div>\n\n        <table class=\"pr-table pr-check-table\">\n          <thead><tr><th>Check</th><th class=\"pr-num\">Printed on the document</th><th class=\"pr-num\">From this read</th><th>Result</th></tr></thead>\n          <tbody id=\"review-checks\"></tbody>\n        </table>\n\n        <h3 id=\"review-rows-title\" class=\"pr-h3\">Hours and leave to be saved</h3>\n        <div class=\"pr-tablewrap\">\n          <table class=\"pr-table\">\n            <thead id=\"review-head\"></thead>\n            <tbody id=\"review-rows\"></tbody>\n          </table>\n        </div>\n\n        <div class=\"pr-commit\">\n          <button id=\"packet-commit\" class=\"pr-btn pr-btn-primary\" type=\"button\" disabled>Save to payroll records</button>\n          <button id=\"packet-discard\" class=\"pr-btn pr-btn-ghost\" type=\"button\">Discard</button>\n        </div>\n      </div>\n    </section>\n  </main>\n\n  <!-- Cut-apart slips, one per employee. Hidden on screen; replaces the whole page when\n       the Print-slips button runs (body.print-slips + @media print). Built from whatever\n       the Leave Balances tab is currently showing, so a filter narrows the printout too. -->\n  <div id=\"print-sheet\" aria-hidden=\"true\">\n    <div id=\"print-slips-grid\"></div>\n  </div>\n\n  <!-- The carryover transform is a separate file so it can be unit-tested in Node\n       (tests/unit/vacation-carryover.test.js). It must load before payroll.js. -->\n  <script src=\"/dashboards/js/vacation-carryover.js?v=2026.08.10.7\"></script>\n  <script src=\"/dashboards/js/payroll.js?v=2026.09.05.65\"></script>\n</body>\n</html>\n",
+      "title": "Payroll — Northwest Custom Apparel",
+      "bodyText": "Payroll Vacation and sick balances, hours by pay period, and packet upload. Admin only — pay rates are never shown here. ← Dashboard Leave Balances Pay Periods Upload Packet Leave Balances Current vacation and sick hours for active employees, refreshed from the last payroll packet. A negative balance is not an error — staff accrue their first 40 vacation hours at their one-year anniversary and can run negative until then. Where vacation accrued or used shows 112 → 80, the first figure is what payroll imported and the second is what the slip prints. Payroll books hours to the tax year of the check date, so vacation taken in the last pay period of a year inflates both accrued and used by the same carryover in the following year. They cancel, which is why remaining is always correct as imported. Sick hours are never adjusted — Washington State sick leave legitimately carries over. 🖨️ Print slips to hand out EmployeeDepartment Vacation Sick EntitledAccrued UsedRemainingCarryover AccruedUsedRemaining Loading… Pay Periods Hours recorded for each pay date. Select a period to see the per-employee breakdown. Pay date EmployeePaid RegularOvertimeSick Vacation/PTOHolidayTotal Hours Select a pay date. Upload from NW Regional Accounting Upload the PDF. Everything read from it is checked against the document's own printed totals. Nothing is saved until the numbers reconcile and you confirm. Document Full payroll packet Vacation & sick page only Read packet CheckPrinted on the documentFrom this readResult Hours and leave to be saved Save to payroll records Discard",
+      "bodyTextSha": "d9f990ca51dd021fbd53bf389615348047b4965683e0e95de585a88df2d96fe6",
+      "ids": [
+        "pr-status",
+        "tab-leave",
+        "tab-periods",
+        "tab-upload",
+        "panel-leave",
+        "leave-search",
+        "print-slips",
+        "leave-asof",
+        "leave-flags",
+        "leave-body",
+        "panel-periods",
+        "period-select",
+        "period-body",
+        "panel-upload",
+        "packet-mode",
+        "packet-file",
+        "packet-parse",
+        "packet-note",
+        "packet-progress",
+        "packet-hint",
+        "review",
+        "review-verdict",
+        "review-notes",
+        "review-checks",
+        "review-rows-title",
+        "review-head",
+        "review-rows",
+        "packet-commit",
+        "packet-discard",
+        "print-sheet",
+        "print-slips-grid"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": "← Dashboard"
+        }
+      ],
+      "fields": [
+        {
+          "id": "leave-search",
+          "type": "search",
+          "value": ""
+        },
+        {
+          "id": "period-select",
+          "type": "select-one",
+          "value": ""
+        },
+        {
+          "id": "packet-mode",
+          "type": "select-one",
+          "value": "packet"
+        },
+        {
+          "id": "packet-file",
+          "type": "file",
+          "value": ""
+        }
+      ],
+      "styles": [
+        "/shared_components/css/tokens.css?v=2026.09.08.2",
+        "/dashboards/css/payroll.css?v=2026.09.07.19"
+      ],
+      "scripts": [
+        "/dashboards/js/vacation-carryover.js?v=2026.08.10.7",
+        "/dashboards/js/payroll.js?v=2026.09.05.65"
+      ],
+      "cssBytes": 29573
+    },
+    {
+      "file": "dashboards/production-shifts.html",
+      "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n<meta name=\"robots\" content=\"noindex, nofollow\">\n<title>Production Shifts — NW Custom Apparel</title>\n<link rel=\"icon\" href=\"/favicon.png\" type=\"image/png\">\n\n<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n<link href=\"https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap\" rel=\"stylesheet\">\n\n<link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n<link rel=\"stylesheet\" href=\"/dashboards/production-shifts/styles.css?v=2026.09.07.18\">\n</head>\n<body>\n\n<div id=\"root\"></div>\n\n<script src=\"https://unpkg.com/react@18.3.1/umd/react.production.min.js\" integrity=\"sha384-DGyLxAyjq0f9SPpVevD6IgztCFlnMF6oW/XQGmfe+IsZ8TqEiDrcHkMLKI6fiB/Z\" crossorigin=\"anonymous\"></script>\n<script src=\"https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js\" integrity=\"sha384-gTGxhz21lVGYNMcdJOyq01Edg0jhn/c22nsx0kyqP0TxaV5WVdsSH1fSDUf5YJj1\" crossorigin=\"anonymous\"></script>\n<script src=\"https://unpkg.com/@babel/standalone@7.29.0/babel.min.js\" integrity=\"sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y\" crossorigin=\"anonymous\"></script>\n\n<script src=\"/dashboards/production-shifts/data.js?v=2026.07.30.1\"></script>\n<script type=\"text/babel\" src=\"/dashboards/production-shifts/app.jsx?v=2026.09.05.51\"></script>\n\n</body>\n</html>\n",
+      "title": "Production Shifts — NW Custom Apparel",
+      "bodyText": "",
+      "bodyTextSha": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "ids": [
+        "root"
+      ],
+      "links": [],
+      "fields": [],
+      "styles": [
+        "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap",
+        "/shared_components/css/tokens.css?v=2026.09.08.2",
+        "/dashboards/production-shifts/styles.css?v=2026.09.07.18"
+      ],
+      "scripts": [
+        "https://unpkg.com/react@18.3.1/umd/react.production.min.js",
+        "https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js",
+        "https://unpkg.com/@babel/standalone@7.29.0/babel.min.js",
+        "/dashboards/production-shifts/data.js?v=2026.07.30.1",
+        "/dashboards/production-shifts/app.jsx?v=2026.09.05.51"
+      ],
+      "cssBytes": 62983
+    },
+    {
+      "file": "dashboards/quote-management.html",
+      "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <meta name=\"robots\" content=\"noindex, nofollow\">\n    <title>Quote Management - Northwest Custom Apparel</title>\n    <link rel=\"icon\" href=\"/favicon.png\" type=\"image/png\">\n\n    <!-- Font Awesome (6.4.0 — the same build every other staff page loads) -->\n    <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css\">\n\n    <!-- Phase 2f (2026-05-23): PNW palette tokens — must load BEFORE quote-management.css to uplift steel-blue header gradient to PNW forest -->\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/quote-builder-shell.css?v=2026.09.07.19\">\n    <!-- Dashboard Styles -->\n    <link rel=\"stylesheet\" href=\"/dashboards/css/quote-management.css?v=2026.09.07.19\">\n    <!-- SanMar Inbound modal + its printable reports/box labels (window.openInboundTodayModal) -->\n    <link rel=\"stylesheet\" href=\"/dashboards/css/sanmar-inbound.css?v=2026.09.07.19\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/box-label-print.css?v=2026.09.07.10\">\n</head>\n<body>\n    <!--\n        2026-09-05 review: every click goes through data-action delegation in\n        quote-management.js (no onclick= attributes), visibility toggles use the\n        hidden attribute (no style= attributes), identity comes from the SAML\n        session (/api/crm-session/me), the stat tiles filter the table, and the\n        page carries a loaded-time stamp + a 5-minute visible-tab refresh.\n    -->\n    <!-- Header -->\n    <header class=\"dashboard-header\">\n        <a href=\"/staff-dashboard.html\">\n            <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\"\n                 alt=\"Northwest Custom Apparel\"\n                 class=\"logo\">\n        </a>\n        <h1>Quote Management</h1>\n        <div class=\"header-actions\">\n            <span class=\"user-info\" id=\"user-display\">Loading...</span>\n            <button id=\"btn-sync-sw\" class=\"btn-header\" type=\"button\" data-action=\"sync-sw\" title=\"Pull live order #, status, production progress, and salesperson from ShopWorks for every processed quote in the window. Runs the same reconciliation as the hourly scheduler — use it if the dashboard looks stale.\" aria-label=\"Pull live order #, status, production progress, and salesperson from ShopWorks for every processed quote in the window. Runs the same reconciliation as the hourly scheduler — use it if the dashboard looks stale.\">\n                <i class=\"fas fa-sync\" aria-hidden=\"true\"></i> <span class=\"btn-header__tx\">Sync from ShopWorks</span>\n            </button>\n            <button id=\"btn-refresh-inbound\" class=\"btn-header\" type=\"button\" data-action=\"refresh-inbound\" title=\"Manual SanMar sync. Two passes: (1) ingest orders that shipped & completed BETWEEN the nightly syncs and so never landed in the system at all, then (2) pull live tracking for in-table open orders. An order that just shipped flips to Shipped (with tracking) right now instead of waiting for the daily sync. Bounded — if it says orders are still pending, click again.\" aria-label=\"Manual SanMar sync. Two passes: (1) ingest orders that shipped & completed BETWEEN the nightly syncs and so never landed in the system at all, then (2) pull live tracking for in-table open orders. An order that just shipped flips to Shipped (with tracking) right now instead of waiting for the daily sync. Bounded — if it says orders are still pending, click again.\">\n                <i class=\"fas fa-dolly\" aria-hidden=\"true\"></i> <span class=\"btn-header__tx\">Refresh Inbound</span>\n            </button>\n            <button id=\"btn-inbound-today\" class=\"btn-header\" type=\"button\" data-action=\"inbound-today\" title=\"SanMar Inbound Calendar: pick any day to see its incoming SanMar boxes — each PO + work order, line items with color/size, pieces per box — and print box labels or a PDF for that day.\" aria-label=\"SanMar Inbound Calendar: pick any day to see its incoming SanMar boxes — each PO + work order, line items with color/size, pieces per box — and print box labels or a PDF for that day.\">\n                <i class=\"fas fa-calendar-days\" aria-hidden=\"true\"></i> <span class=\"btn-header__tx\">SanMar Inbound Calendar</span>\n            </button>\n            <a href=\"/staff-dashboard.html\" class=\"btn-header\">\n                <i class=\"fas fa-arrow-left\" aria-hidden=\"true\"></i> <span class=\"btn-header__tx\">Dashboard</span>\n            </a>\n        </div>\n    </header>\n\n    <main class=\"dashboard-container\">\n        <!-- Filters Section -->\n        <div class=\"filters-section\">\n            <div class=\"filter-group\">\n                <label for=\"filter-status\">Status</label>\n                <select id=\"filter-status\">\n                    <option value=\"\">All Statuses</option>\n                    <option value=\"Open\">Open</option>\n                    <option value=\"Pending Payment\">Awaiting Payment</option>\n                    <option value=\"Payment Confirmed\">Payment Received</option>\n                    <option value=\"Payment Confirmed - ShopWorks Failed\">Charged · No SW Order</option>\n                    <option value=\"Processed\">Processed (in ShopWorks)</option>\n                    <option value=\"Processed - ShopWorks Failed\">Push Failed</option>\n                    <option value=\"Accepted\">Accepted</option>\n                    <option value=\"Lost\">Lost</option>\n                    <option value=\"Expired\">Expired</option>\n                    <option value=\"Cancelled_in_ShopWorks\">Cancelled (ShopWorks)</option>\n                </select>\n            </div>\n\n            <div class=\"filter-group\">\n                <label for=\"filter-date\">Date Range</label>\n                <!-- The window is asked of the SERVER (createdAfter) since 2026-09-05 —\n                     the page used to download every quote ever and filter client-side. -->\n                <select id=\"filter-date\">\n                    <option value=\"7\">Last 7 Days</option>\n                    <option value=\"30\" selected>Last 30 Days</option>\n                    <option value=\"90\">Last 90 Days</option>\n                    <option value=\"all\">All Time</option>\n                </select>\n            </div>\n\n            <div class=\"filter-group\">\n                <label for=\"filter-search\">Search</label>\n                <input type=\"text\" id=\"filter-search\" placeholder=\"Customer, company, email, or Quote ID (e.g. DTG-12345)\">\n            </div>\n\n            <button class=\"btn-search\" type=\"button\" data-action=\"search\">\n                <i class=\"fas fa-search\" aria-hidden=\"true\"></i> Search\n            </button>\n        </div>\n\n        <!-- Stats Cards — BUTTONS that filter the table (2026-09-05). Click again to clear. -->\n        <div class=\"stats-section\">\n            <button type=\"button\" class=\"stat-card active qm-tile\" data-tile=\"active\" title=\"Show active quotes (open, awaiting payment, in ShopWorks and not yet complete)\" aria-label=\"Show active quotes (open, awaiting payment, in ShopWorks and not yet complete)\">\n                <div class=\"stat-value\" id=\"stat-active\">-</div>\n                <div class=\"stat-label\">Active Quotes</div>\n            </button>\n            <button type=\"button\" class=\"stat-card accepted qm-tile\" data-tile=\"accepted\" title=\"Show accepted quotes\" aria-label=\"Show accepted quotes\">\n                <div class=\"stat-value\" id=\"stat-accepted\">-</div>\n                <div class=\"stat-label\">Accepted</div>\n            </button>\n            <button type=\"button\" class=\"stat-card expiring qm-tile\" data-tile=\"expiring\" title=\"Show open quotes that expire within 7 days\" aria-label=\"Show open quotes that expire within 7 days\">\n                <div class=\"stat-value\" id=\"stat-expiring\">-</div>\n                <div class=\"stat-label\">Expiring Soon</div>\n            </button>\n            <button type=\"button\" class=\"stat-card cancelled qm-tile\" data-tile=\"cancelled\" title=\"Show quotes cancelled in ShopWorks\" aria-label=\"Show quotes cancelled in ShopWorks\">\n                <div class=\"stat-value\" id=\"stat-cancelled\">-</div>\n                <div class=\"stat-label\">Cancelled</div>\n            </button>\n            <button type=\"button\" class=\"stat-card failed qm-tile\" id=\"stat-card-failed\" data-tile=\"failed\" title=\"Show quotes whose push to ShopWorks failed — these need a hand\" aria-label=\"Show quotes whose push to ShopWorks failed — these need a hand\">\n                <div class=\"stat-value\" id=\"stat-failed\">-</div>\n                <div class=\"stat-label\">Push Failed</div>\n            </button>\n            <div class=\"stat-card total\">\n                <div class=\"stat-value\" id=\"stat-total\">$0</div>\n                <div class=\"stat-label\">Pipeline Value</div>\n                <div class=\"stat-sub\" id=\"stat-total-sub\">active + accepted · lost, expired and cancelled excluded</div>\n            </div>\n        </div>\n\n        <!-- Quotes Table -->\n        <div class=\"quotes-table-section\">\n            <div class=\"table-header\">\n                <h2>Quotes</h2>\n                <div class=\"table-actions\">\n                    <button id=\"btn-bulk-delete\" class=\"btn-bulk-delete\" type=\"button\" data-action=\"bulk-delete\" disabled>\n                        <i class=\"fas fa-trash\" aria-hidden=\"true\"></i> Delete Selected (<span id=\"selected-count\">0</span>)\n                    </button>\n                    <span class=\"table-count\" id=\"table-count\">Loading...</span>\n                    <span class=\"qm-updated\" id=\"qm-updated\" role=\"status\"></span>\n                </div>\n            </div>\n\n            <!-- Active / Completed / All tabs (Erik 2026-06-15). Completed =\n                 shipped + invoiced + paid in ShopWorks, so finished orders drop\n                 out of the default Active view. Real ARIA tabs since 2026-09-05\n                 (roles, aria-selected, arrow keys) — wired in quote-management.js. -->\n            <div class=\"qm-tabs\" role=\"tablist\" aria-label=\"Quote views\">\n                <button type=\"button\" class=\"qm-tab qm-tab--active\" role=\"tab\" aria-selected=\"true\" data-tab=\"active\" data-action=\"tab\">\n                    Active <span class=\"qm-tab-count\" id=\"tab-count-active\"></span>\n                </button>\n                <button type=\"button\" class=\"qm-tab\" role=\"tab\" aria-selected=\"false\" tabindex=\"-1\" data-tab=\"completed\" data-action=\"tab\">\n                    Completed <span class=\"qm-tab-count\" id=\"tab-count-completed\"></span>\n                </button>\n                <button type=\"button\" class=\"qm-tab\" role=\"tab\" aria-selected=\"false\" tabindex=\"-1\" data-tab=\"all\" data-action=\"tab\">\n                    All <span class=\"qm-tab-count\" id=\"tab-count-all\"></span>\n                </button>\n            </div>\n\n            <!-- Shown when a search found nothing in the window and the page widened to All Time. -->\n            <div class=\"qm-notice\" id=\"qm-notice\" hidden></div>\n\n            <!-- Visible on FIRST PAINT (no hidden attribute) so the spinner shows before any JS\n                 runs. JS hides it via showLoading(false) at the end of the first renderTable(). -->\n            <div id=\"table-loading\" class=\"loading-overlay\">\n                <div class=\"loading-spinner\"></div>\n            </div>\n\n            <div id=\"table-empty\" class=\"empty-state\" hidden>\n                <i class=\"fas fa-file-invoice\" aria-hidden=\"true\"></i>\n                <h3>No quotes found</h3>\n                <p>Try adjusting your filters or search terms</p>\n            </div>\n\n            <div class=\"quotes-table-scroll\">\n            <table class=\"quotes-table\" id=\"quotes-table\" hidden>\n                <thead>\n                    <tr>\n                        <th class=\"checkbox-col\">\n                            <input type=\"checkbox\" id=\"select-all\" title=\"Select all\" aria-label=\"Select all quotes on this page\">\n                        </th>\n                        <th>Quote ID</th>\n                        <th>Customer</th>\n                        <th class=\"qm-col-phone-hide\">Salesperson</th>\n                        <th class=\"qm-col-phone-hide\">Items</th>\n                        <th class=\"th-right\">Amount</th>\n                        <th>Status</th>\n                        <th class=\"qm-col-phone-hide\">Progress</th>\n                        <th class=\"qm-col-phone-hide\" title=\"Blank goods inbound from SanMar (vendor → us)\">Inbound</th>\n                        <th title=\"Requested ship date from ShopWorks. Amber = due within 3 days; red = overdue.\">Due</th>\n                        <th class=\"qm-col-phone-hide\">Created</th>\n                        <th class=\"th-actions\">Actions</th>\n                    </tr>\n                </thead>\n                <tbody id=\"quotes-tbody\">\n                    <!-- Rows will be populated by JavaScript -->\n                </tbody>\n            </table>\n            </div>\n\n            <div class=\"pagination\" id=\"pagination\" hidden>\n                <button id=\"btn-prev\" type=\"button\" data-action=\"prev-page\" disabled>\n                    <i class=\"fas fa-chevron-left\" aria-hidden=\"true\"></i> Previous\n                </button>\n                <span class=\"page-info\" id=\"page-info\">Page 1 of 1</span>\n                <button id=\"btn-next\" type=\"button\" data-action=\"next-page\">\n                    Next <i class=\"fas fa-chevron-right\" aria-hidden=\"true\"></i>\n                </button>\n            </div>\n        </div>\n    </main>\n\n    <!-- Delete Confirmation Modal -->\n    <div id=\"delete-modal\" class=\"modal\" hidden role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"delete-modal-title\">\n        <div class=\"modal-content\">\n            <h3 id=\"delete-modal-title\">Confirm Delete</h3>\n            <p id=\"delete-modal-message\"></p>\n            <div class=\"modal-actions\">\n                <button class=\"btn-cancel\" type=\"button\" data-action=\"delete-cancel\">Cancel</button>\n                <button class=\"btn-confirm-delete\" type=\"button\" data-action=\"delete-confirm\">Delete</button>\n            </div>\n        </div>\n    </div>\n\n    <!-- Generic confirm / input modal (2026-09-05) — replaces the browser\n         alert / confirm / prompt dialogs: ShipStation send, resend-email address,\n         copy-link fallback. Driven by openModal() in quote-management.js. -->\n    <div id=\"qm-modal\" class=\"modal\" hidden role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"qm-modal-title\">\n        <div class=\"modal-content\">\n            <h3 id=\"qm-modal-title\"></h3>\n            <p id=\"qm-modal-message\"></p>\n            <label class=\"qm-modal-field\" id=\"qm-modal-field\" hidden>\n                <span id=\"qm-modal-input-label\"></span>\n                <input type=\"text\" id=\"qm-modal-input\" autocomplete=\"off\">\n            </label>\n            <div class=\"modal-actions\">\n                <button class=\"btn-cancel\" type=\"button\" data-action=\"modal-cancel\">Cancel</button>\n                <button class=\"btn-confirm\" type=\"button\" id=\"qm-modal-confirm\" data-action=\"modal-confirm\">OK</button>\n            </div>\n        </div>\n    </div>\n\n    <!-- Toasts mount here (showToast) -->\n    <div id=\"qm-toasts\" class=\"qm-toasts\" aria-live=\"polite\"></div>\n\n    <!-- Auth Helper -->\n    <script src=\"/shared_components/js/staff-auth-helper.js?v=2026.09.06.37\"></script>\n    <!-- Caspio timestamp parser (naive-Pacific → correct local Date). Needed by the\n         Cancelled (SW) purge countdown so it doesn't drift a day across DST. -->\n    <script src=\"/shared_components/js/caspio-date-utils.js?v=2026.09.06.46\"></script>\n    <!-- APP_CONFIG: canonical API base for the batched SanMar inbound-status lookup\n         (Never-Break Rule #6 — proxy URL from config, never hardcoded). -->\n    <script src=\"/config/app.config.js?v=2026.09.03.11\"></script>\n    <!-- Shared box-label template (also used by the standalone Box Labels page) —\n         must load BEFORE sanmar-inbound-today.js. -->\n    <script src=\"/shared_components/js/box-label-template.js?v=2026.09.05.71\"></script>\n    <!-- SanMar Inbound Calendar modal (Erik 2026-06-17). Self-contained;\n         exposes window.openInboundTodayModal for the header button. -->\n    <script src=\"/shared_components/js/box-url.js?v=2026.08.06.1\"></script>\n    <script src=\"/dashboards/js/sanmar-inbound-today.js?v=2026.09.06.31\"></script>\n    <!-- EmailJS browser SDK — same tag the quote builders load; used by\n         \"Resend quote email\" (row action). Loaded before the page script so\n         resendQuoteEmail() can init lazily on first use. -->\n    <script src=\"https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js\"></script>\n    <!-- Dashboard JS (extracted from inline script — Rule 3, 2026-07-05) -->\n    <script src=\"/dashboards/js/quote-management.js?v=2026.09.06.36\"></script>\n</body>\n</html>\n",
+      "title": "Quote Management - Northwest Custom Apparel",
+      "bodyText": "Quote Management Loading... Sync from ShopWorks Refresh Inbound SanMar Inbound Calendar Dashboard Status All Statuses Open Awaiting Payment Payment Received Charged · No SW Order Processed (in ShopWorks) Push Failed Accepted Lost Expired Cancelled (ShopWorks) Date Range Last 7 Days Last 30 Days Last 90 Days All Time Search Search - Active Quotes - Accepted - Expiring Soon - Cancelled - Push Failed $0 Pipeline Value active + accepted · lost, expired and cancelled excluded Quotes Delete Selected (0) Loading... Active Completed All No quotes found Try adjusting your filters or search terms Quote ID Customer Salesperson Items Amount Status Progress Inbound Due Created Actions Previous Page 1 of 1 Next Confirm Delete Cancel Delete Cancel OK",
+      "bodyTextSha": "ab13e65552ce927000d9666be05a8857ea767a096b414c3a0fb97eff6ff61e6c",
+      "ids": [
+        "user-display",
+        "btn-sync-sw",
+        "btn-refresh-inbound",
+        "btn-inbound-today",
+        "filter-status",
+        "filter-date",
+        "filter-search",
+        "stat-active",
+        "stat-accepted",
+        "stat-expiring",
+        "stat-cancelled",
+        "stat-card-failed",
+        "stat-failed",
+        "stat-total",
+        "stat-total-sub",
+        "btn-bulk-delete",
+        "selected-count",
+        "table-count",
+        "qm-updated",
+        "tab-count-active",
+        "tab-count-completed",
+        "tab-count-all",
+        "qm-notice",
+        "table-loading",
+        "table-empty",
+        "quotes-table",
+        "select-all",
+        "quotes-tbody",
+        "pagination",
+        "btn-prev",
+        "page-info",
+        "btn-next",
+        "delete-modal",
+        "delete-modal-title",
+        "delete-modal-message",
+        "qm-modal",
+        "qm-modal-title",
+        "qm-modal-message",
+        "qm-modal-field",
+        "qm-modal-input-label",
+        "qm-modal-input",
+        "qm-modal-confirm",
+        "qm-toasts"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Dashboard"
+        }
+      ],
+      "fields": [
+        {
+          "id": "filter-status",
+          "type": "select-one",
+          "value": ""
+        },
+        {
+          "id": "filter-date",
+          "type": "select-one",
+          "value": "30"
+        },
+        {
+          "id": "filter-search",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "select-all",
+          "type": "checkbox",
+          "value": "on"
+        },
+        {
+          "id": "qm-modal-input",
+          "type": "text",
+          "value": ""
+        }
+      ],
+      "styles": [
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
+        "/shared_components/css/tokens.css?v=2026.09.08.2",
+        "/shared_components/css/quote-builder-shell.css?v=2026.09.07.19",
+        "/dashboards/css/quote-management.css?v=2026.09.07.19",
+        "/dashboards/css/sanmar-inbound.css?v=2026.09.07.19",
+        "/shared_components/css/box-label-print.css?v=2026.09.07.10"
+      ],
+      "scripts": [
+        "/shared_components/js/staff-auth-helper.js?v=2026.09.06.37",
+        "/shared_components/js/caspio-date-utils.js?v=2026.09.06.46",
+        "/config/app.config.js?v=2026.09.03.11",
+        "/shared_components/js/box-label-template.js?v=2026.09.05.71",
+        "/shared_components/js/box-url.js?v=2026.08.06.1",
+        "/dashboards/js/sanmar-inbound-today.js?v=2026.09.06.31",
+        "https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js",
+        "/dashboards/js/quote-management.js?v=2026.09.06.36"
+      ],
+      "cssBytes": 116152
+    }
+  ],
+  "hashes": {
+    "config/app.config.js": "fe83e4329ce3eee97e48dd68dab81d9d5eb6ec94511d9650e2c9ebbb1528d6ea",
+    "dashboards/DrainPro-Bundle.html": "401c474ba9b3e4adc12a84204875fa33059c73bff59133622d46dca86b0ab9b5",
+    "dashboards/ae-mission-control.html": "e33be0ff0d129b9e34876d6f06fff4bb555a41bc3fd98457e624dff037f3c6bd",
+    "dashboards/company-numbers.html": "62271fffdc61b226cf3c48915802eb026c025977babe7bf09e598826b0688a78",
+    "dashboards/css/DrainPro-Bundle.css": "219d9adb6a1852dab55e64b4276b7588478ab5e16cc3dc9015ff1b08829403fd",
+    "dashboards/css/ae-mission-control.css": "b2487dee6c0791b55d5eb2a85fed6528f61c360ac505e61517fa1bdc2789d63d",
+    "dashboards/css/company-numbers.css": "110b570883a265bd98e196fc8cd2ef0d9ef3a24f379f2b42ee9c817535bdc238",
+    "dashboards/css/payroll.css": "fac41368bd3c3162dde87868359a761c6317dc4e55f35ea577fb286140ccf32e",
+    "dashboards/css/quote-management.css": "6b7fe587754c3940c261530ca418bbace37b78e6a0ca7a09083a0f47019325c4",
+    "dashboards/css/sanmar-inbound.css": "8d1d4b9e1c9e64e4c0d077a48fa07e296e569815974c2fc01c0256a32b396247",
+    "dashboards/js/DrainPro-Bundle.js": "0e48c693e4c546aeb4660760604595914655c76fdbd198d06ef8af9cff9d7178",
+    "dashboards/js/ae-mission-control.js": "2c4f9253ed4f204dc0ca6457f4bc330129e963215576dac7aff8c51789e12fee",
+    "dashboards/js/company-numbers.js": "e29bb8e0478d989e14819d6f38229cc2d9a0ee04fbd7309c783a4dd495534dd9",
+    "dashboards/js/payroll.js": "3c9337078913b8c01301b53a745602892acd2650aff9d76f34b8b27e1b1f9663",
+    "dashboards/js/quote-management.js": "161ba6738092d6907a0b2ea5a931cbef3e2de0c67116b31b50d424eff834030c",
+    "dashboards/js/sanmar-inbound-today.js": "79110a6c06758b19c3418234904f74bac9a5644dbf273f82a36eeb08782493e0",
+    "dashboards/js/vacation-carryover.js": "66545f47be4aa59e4abbfb9ab0244549f42c24f1303456e7a45244532795ef0f",
+    "dashboards/payroll.html": "7e2d192863cf55082f79ebb94277e8a474068547e9371308f74f8ca7a31a1c07",
+    "dashboards/production-shifts.html": "415310677ad246ec03ea1197bd0d30d0dd52ac232fcf0648a7a0613951f66a7a",
+    "dashboards/production-shifts/app.jsx": "715d31bad52cd3796e33563822e5787cbb16ffc375a82cb122deb09d0f536ac1",
+    "dashboards/production-shifts/data.js": "a002bc56f92aa827db43ceb9c3e77c3a081f5c63c432297c2be5b79a6a772a5a",
+    "dashboards/production-shifts/styles.css": "ae968d05e575ed4378e03eb1855488b8267032a3adb4abfb7dab23d9e404a6a6",
+    "dashboards/quote-management.html": "aedd4c63560c3aad7aa9aa5e5cb07c2be0658572bb916dfe5dc722d6d725e092",
+    "shared_components/css/art-hub.css": "34d32d4b3bfd1c46635cec73795e7986f974f3abcbb3984681cc9dd804b27ee7",
+    "shared_components/css/box-label-print.css": "a2e41798bf6654bad4bd3b2829b01160ed8135971f9ac176f542b8d7186b5591",
+    "shared_components/css/dash-shell.css": "6e4d20eead7dc51abd47826f3acbbb62b2c2b9aae5de4d2d69be764ec20bfca7",
+    "shared_components/css/quote-builder-shell.css": "143812ba9a0c6a1b9c64cd878c1eb33a00d55dfb1060a32d87b7559b4bb00825",
+    "shared_components/css/sanmar-invoice-viewer.css": "bbb82a8008caa52d99a31d361f31f632c2bbf7046afd18f1d336686ebea1c7ba",
+    "shared_components/css/staff-dashboard/base.css": "9b97f43475a5352a7118bbe57a5c79bcd580b8da75ac076b07784fba68d1dbba",
+    "shared_components/css/staff-dashboard/components.css": "b4de2fc7fc9848226f2cc7cbdc0781344ecd704566d335ace4b20c30284f1b15",
+    "shared_components/css/staff-dashboard/dashboard-v3-patch-2.css": "5d7509cd55af836c64c7ff5df22265786f4a0daf8d400c55ac8b44eca31a50d4",
+    "shared_components/css/staff-dashboard/dashboard-v3-theme.css": "d67fc1e7cb1c16c04d66c1506416d6db191b371885a64e39a8fc40a16bb84e76",
+    "shared_components/css/staff-dashboard/tokens.css": "d26a2805b9e486ef9cdec1dd35bab6616504a8b8c463c3f2a2fe8f98cb62514f",
+    "shared_components/css/staff-dashboard/utilities.css": "7ba88eda80788151c63f7471eb1e4f44eda283d294545f1d851fd83e5cc327f6",
+    "shared_components/css/tokens.css": "2b3ab556bb9eaf40765a5c84683777cb64d50a6c42d1b4e82bc6beff33a127b6",
+    "shared_components/js/box-label-template.js": "4e127db269b469151230269c4c2181f23a29c6de37e9cfed51cc62804708b464",
+    "shared_components/js/box-url.js": "3daf0620159f6c8f4bf5929e90476030307aaf4ecbdcaa1a066d5c8a98e0935f",
+    "shared_components/js/caspio-date-utils.js": "631fad8e38f78d2f7a6d1f424b145ccc3f4bf0f0bf58e61d89e3a1851605474e",
+    "shared_components/js/confetti.js": "dc84559aa6d60722b424c19b0f16c663478c5ec60fff63a98ea43684c725dc0f",
+    "shared_components/js/dash-page-helpers.js": "4ce7902b8502978835949ecec36a95d27ebc2604f86ef1a9665353cd8c38ccbe",
+    "shared_components/js/dash-tabs.js": "10c8457a8430f0a6746733614402f6d54bc4b97c358c12701a65c80e56652a5f",
+    "shared_components/js/data-call-delegator.js": "50e836385b6804b2b52fd8c549744277fe69ff701c232b7badf4fdcb09f343f6",
+    "shared_components/js/fetch-timeout.js": "1d9852795f9af3b674a48ad5e719bc970cae867e36b1962f0c3f1a28dd830179",
+    "shared_components/js/sanmar-invoice-viewer.js": "03cc240f058282830ca87fafabaf7b3a472b0808c01f10b5689bd8fc0b050368",
+    "shared_components/js/staff-auth-helper.js": "b858bb5e30a775c949aaab2e4f0bbb4796e06c02a76f3bb8d8a9c97985f5addd",
+    "shared_components/js/staff-dashboard/controllers/embroidery-bonus-controller.js": "9a104adec2f5e064025214cad4aeee65a170287763976dd4ad950823027e0902",
+    "shared_components/js/staff-dashboard/controllers/metrics-controller.js": "1f55ecc8bbf5aaa2769437dfdb50e5ff194edc953522a18154e9c79ec19da032",
+    "shared_components/js/staff-dashboard/controllers/orders-inbox-controller.js": "2fca40c272945f64b9664a656687a7fcf3bc7e369844c23ba314a7edc55fdf8c",
+    "shared_components/js/staff-dashboard/controllers/production-controller.js": "e03e05e06ce9616510b14c38a0685122b7f54e4b2405f66a8e4b956a837bd9bc",
+    "shared_components/js/staff-dashboard/controllers/sales-goal-controller.js": "ee48ebf6b679a6933f95e580e055205c766299419fa5f40b9da7502f0eba9509",
+    "shared_components/js/staff-dashboard/controllers/team-performance-controller.js": "5ea184951aa0f17866e0d396696a91e0b652c8698bc3fdb89976ff4f8dfd51ec",
+    "shared_components/js/staff-dashboard/core/dashboard-endpoints.js": "235f31162f22a256cd4073354feb634d4c010718969845014bab6368f5650216",
+    "shared_components/js/staff-dashboard/core/dashboard-errors.js": "d8e4bee36eb633899ea67aff6d5d75009d12627a0e881950ad45e632135fd489",
+    "shared_components/js/staff-dashboard/core/dashboard-events.js": "c0915ca032a2f974179efb05facc176f74526f1a791d22a7e8372c5a3e5ea620",
+    "shared_components/js/staff-dashboard/core/dashboard-fetch.js": "2af8da7bf298a975da055f1a378efcf8f7c560e28e3688bee76362b2602e052d",
+    "shared_components/js/staff-dashboard/core/dashboard-store.js": "5c54480ede3183139d1a7eb115d6ec8f2066bdef292dd89cfb3e85ea586d5c3e",
+    "shared_components/js/staff-dashboard/core/dashboard-ui-utils.js": "f28721fa8098f70b81fcdd3eed7300b56d9b7a22acae0fc4cc36eeef1df146a7",
+    "shared_components/js/staff-dashboard/services/caspio-archive-service.js": "0e19b69a842361bb1672b5b2874077097d5c32cc58ddb33c959302231bca0405",
+    "shared_components/js/staff-dashboard/services/company-goal-service.js": "684bddb4822d46612a62dc1d5ebc1dc6606c335d1b5367931c7a962d2fb3e668",
+    "shared_components/js/staff-dashboard/services/shopworks-service.js": "21c924e68ee3aaf33c10703d76f11a9bc1d7cf45e34ef8327975fb34b858766a",
+    "staff-dashboard-v3/art-aging-widget.js": "671b53812afeeb602fd7ae77c44e4a66a89189c8914dae32275a72b03c5e82b3"
+  },
+  "changes": []
+}
