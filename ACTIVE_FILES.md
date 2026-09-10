@@ -384,3 +384,5 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - tests/e2e/css-unification-calibration.spec.js and tests/fixtures/staff-final-tools-calibration-synthetic.json — synthetic print-envelope geometry, layout save/delete/copy and failed-photo baselines. No actual calibration writes or clipboard edits.
 
 - tests/e2e/css-unification-records-admin.spec.js and tests/fixtures/staff-final-tools-records-synthetic.json — synthetic administrator records table, filters, pagination, detail, CSV and failure baselines. No real quote writes.
+
+- `tests/fixtures/customer-documents-original-content.json` and `tests/unit/customer-documents-content.test.js` — frozen three-page customer invoice/quote content and transitive local source contracts before visual changes. Shared runtime dependencies are captured; no migration credit yet.

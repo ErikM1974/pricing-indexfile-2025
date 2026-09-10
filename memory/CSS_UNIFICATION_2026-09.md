@@ -1,5 +1,25 @@
 # CSS unification — design direction and implementation plan
 
+## VERIFIED LIVE — v2026.09.10.7 / Heroku 2100
+
+Four staff tools are live at 1143ffdee13fac81a03dcba969dfb3f97082697a: Calibration, Universal Records Admin, Box Labels and Staff Dashboard. **180/225 pages reviewed; 45 pending.** Exact source 8546e9dd passed all four CI jobs (34525732554), including actual CSS and live pricing. Release main CI34527459945 and develop CI34527648619 also green; their browser job skips are expected. Actual Heroku slug/health and 34 asset/access rollout checks passed. main/develop/tag match. Never rerun completed release helpers or deploy .7 again.
+
+The employee bundle pair is reviewed and backed up at ea622bf4 (12 browser cases,915 guard checks,2 complete paper pages), but not deployed: candidate182/225,43pending. Customer documents are the active next branch codex/customer-documents in the isolated training-final-worktree, starting from that pair. Original source baseline captures24 files/14scripts and all24 source locks passed; no document UI edits yet. Continue original synthetic workflow and complete PDF baselines before edits, then full app gates before the next release. Do not overwrite primary .7 cache-version mappings on integration. node_modules is a junction; never recursively delete it or copy.env. All business writes/allocating reads stay mocked.
+
+## NEXT — customer invoice and quote documents, source baseline only
+
+Frozen source baseline on codex/customer-documents after the reviewed employee pair ea622bf4. Three pages: Customer Portal Invoice, compact Invoice, Quote View. Capture original customer/staff/share-token modes, all monetary values/extended sizes/tax/deposits, ShopWorks versus submitted snapshots, labels/date-only values, links, print/PDF and mutation payloads before visual edits. Quote View also lazy-loads the shared garment art form: preserve its boundary and capture runtime dependencies; that shared runtime needs its own full consumer review before changes.
+
+- [x] Immutable local source hashes, HTML labels/IDs/links/fields and static/dynamic local JS/CSS dependencies captured.
+- [ ] Start Customer Portal Invoice: synthetic original/preview/failure/missing/expired/paid/zero-line/PDF cases and inspect complete original paper. Then replace its CSS entry point with shared controls and scoped customer document layout; keep amounts and PDF behavior authoritative.
+- [ ] Compact Invoice: synthetic ShopWorks/submission/unsupported/empty/status/sync/ShipStation and print baselines before edits.
+- [ ] Quote View: original accepted/pending/deposit/customer/staff/mixed-method/timeline/fulfilment/image/mail/paper and lazy form boundaries before edits. All writes and allocating GETs mocked.
+- [ ] Review each page at four widths, keyboard/axe/error/retry and every generated page. Extend the next batch only with exact reviewed commits; full app gates before deployment.
+
+Design: Public Sans and shared controls around a clear white invoice sheet; navy/green NWCA identity, aligned money columns, compact bill-to/order facts, readable labelled rows on phones and complete Letter paper. Never change saved pricing/tax calculations to fit a layout. Only move visual markup/styles and repair demonstrated UI failures with tests. The AGENTS-linked memory/quote-builder-architecture.md is absent from both repo and private memory; inspect actual dependencies and avoid modifying the shared builder renderer until its consumer contracts are established.
+
+Live frontend .7/Heroku2100/1143ffde verified,180/225 pages,45pending;34 rollout checks. Employee pair ea622bf4 reviewed/backed up (12browser,915guards,2paper) but not deployed, bringing candidate182/225,43pending. Main CI34527459945 green; release develop CI still running. Do not rerun any .7 release helper or Heroku push. node_modules is a junction; no.env copying or recursive deletion. Standing autonomous edit/deploy authorization continues.
+
 ## NEXT — employee bundle pair reviewed; additional customer families follow
 
 Streich Bros. and WCTTR now share Public Sans, canonical navigation controls and one scoped employee-bundles.css owner over tokens/components/hosted-workspace. Customer logos and blue/yellow versus graphite/orange identities remain. Exact Caspio providers, approval instructions, mail-merge steps, employee data and related destinations preserved. Provider controls/approvals/export/sign-in remain externally owned, outside wrapper certification.

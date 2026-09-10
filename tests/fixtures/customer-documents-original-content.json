@@ -1,0 +1,396 @@
+{
+  "base": "ea622bf48c2db0d39cf1ba90979aa1785c8e66db",
+  "pages": [
+    {
+      "file": "pages/customer-invoice.html",
+      "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n  <meta name=\"robots\" content=\"noindex, nofollow\">\n  <title>Invoice — Northwest Custom Apparel</title>\n  <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n  <link rel=\"stylesheet\" href=\"/pages/css/customer-invoice.css?v=2026.09.07.19\">\n  <script src=\"https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js\"></script>\n</head>\n<body>\n  <h1 class=\"sr-only\">Invoice</h1>\n  <div class=\"ci-toolbar\" id=\"ci-toolbar\">\n    <a href=\"/portal\" class=\"ci-back\">&larr; Back to portal</a>\n    <button id=\"ci-download\" class=\"ci-btn\" type=\"button\">Download PDF</button>\n  </div>\n  <main>\n  <div class=\"ci-status\" id=\"ci-loading\">Loading invoice&hellip;</div>\n  <div class=\"ci-status\" id=\"ci-error\" role=\"alert\" hidden>Couldn't load this invoice. <a href=\"/portal\">Back to portal</a>.</div>\n  <div class=\"ci-paper\" id=\"ci-paper\" hidden></div>\n  </main>\n  <script src=\"/pages/js/customer-invoice.js?v=2026.09.06.1\"></script>\n</body>\n</html>\n",
+      "title": "Invoice — Northwest Custom Apparel",
+      "bodyText": "Invoice ← Back to portal Download PDF Loading invoice… Couldn't load this invoice. Back to portal.",
+      "bodyTextSha": "5aba98f881517bbf7b1d50872e0e50697be7f370e2312ae991eacc4cb8e2b3c9",
+      "ids": [
+        "ci-toolbar",
+        "ci-download",
+        "ci-loading",
+        "ci-error",
+        "ci-paper"
+      ],
+      "links": [
+        {
+          "href": "/portal",
+          "label": "← Back to portal"
+        },
+        {
+          "href": "/portal",
+          "label": "Back to portal"
+        }
+      ],
+      "fields": [],
+      "styles": [
+        "/shared_components/css/tokens.css?v=2026.09.08.2",
+        "/pages/css/customer-invoice.css?v=2026.09.07.19"
+      ],
+      "scripts": [
+        "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js",
+        "/pages/js/customer-invoice.js?v=2026.09.06.1"
+      ],
+      "cssBytes": 19995
+    },
+    {
+      "file": "pages/invoice.html",
+      "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <link rel=\"icon\" href=\"/favicon.png\" type=\"image/png\">\n    <title>Invoice — Northwest Custom Apparel</title>\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link rel=\"stylesheet\" href=\"/pages/css/invoice.css?v=2026.09.07.19\">\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    <link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap\" rel=\"stylesheet\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/toast-notifications.css?v=2026.09.07.10\">\n</head>\n<body>\n    <main class=\"invoice-page\">\n        <!-- Loading -->\n        <div id=\"loading\" class=\"invoice-loading\">\n            <p>Loading invoice…</p>\n        </div>\n\n        <!-- Error -->\n        <div id=\"error\" class=\"invoice-error\" style=\"display: none;\">\n            <h2>Invoice Not Found</h2>\n            <p id=\"error-message\">The invoice you're looking for could not be loaded.</p>\n            <p class=\"error-help\">Contact us at <a href=\"tel:2539225793\">(253) 922-5793</a> or\n                <a href=\"mailto:sales@nwcustomapparel.com\">sales@nwcustomapparel.com</a></p>\n        </div>\n\n        <!-- Toolbar (hidden in print) -->\n        <div id=\"toolbar\" class=\"invoice-toolbar\" style=\"display: none;\">\n            <button type=\"button\" id=\"btn-print\" class=\"toolbar-btn toolbar-btn--primary\">\n                🖨 Print / Save as PDF\n            </button>\n            <button type=\"button\" id=\"btn-refresh\" class=\"toolbar-btn\">\n                🔄 Refresh from ShopWorks\n            </button>\n            <a id=\"btn-back-to-quote\" class=\"toolbar-btn toolbar-btn--ghost\" href=\"#\">\n                ← Back to full quote view\n            </a>\n            <button type=\"button\" id=\"btn-shipstation\" class=\"toolbar-btn\" style=\"display: none;\">\n                🚢 Send to ShipStation\n            </button>\n            <span id=\"sync-status\" class=\"toolbar-sync-status\"></span>\n            <span class=\"toolbar-print-tip\" title=\"Chrome print dialog → More Settings → uncheck &quot;Headers and footers&quot; for the cleanest PDF (one-time setting)\">\n                💡 Print tip\n            </span>\n        </div>\n\n        <!-- Invoice content -->\n        <div id=\"invoice\" class=\"invoice\" style=\"display: none;\">\n\n            <!-- Header strip: logo + invoice meta -->\n            <header class=\"invoice-header\">\n                <div class=\"invoice-header-left\">\n                    <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\"\n                         alt=\"Northwest Custom Apparel\" class=\"invoice-logo\">\n                    <div class=\"invoice-company-meta\">\n                        <div class=\"invoice-company-name\">Northwest Custom Apparel</div>\n                        <div class=\"invoice-company-line\">2025 Freeman Road East · Milton, WA 98354</div>\n                        <div class=\"invoice-company-line\">(253) 922-5793 · sales@nwcustomapparel.com</div>\n                    </div>\n                </div>\n                <div class=\"invoice-header-right\">\n                    <div class=\"invoice-title\" id=\"invoice-title\">INVOICE</div>\n                    <div class=\"invoice-meta-row\">\n                        <span class=\"invoice-meta-label\">Order #</span>\n                        <span class=\"invoice-meta-value\" id=\"invoice-order-number\">—</span>\n                    </div>\n                    <div class=\"invoice-meta-row\">\n                        <span class=\"invoice-meta-label\">Quote #</span>\n                        <span class=\"invoice-meta-value\" id=\"invoice-quote-id\">—</span>\n                    </div>\n                    <div class=\"invoice-meta-row\">\n                        <span class=\"invoice-meta-label\">Invoice Date</span>\n                        <span class=\"invoice-meta-value\" id=\"invoice-date\">—</span>\n                    </div>\n                </div>\n            </header>\n\n            <!-- Status banner (RUSH / expedite / etc.) — hidden by default,\n                 shown only when the order qualifies as RUSH. Placed above the\n                 line items per QuickBooks convention for \"high-priority\"\n                 callouts: full-width, accent border, can't be missed. -->\n            <div id=\"status-banner\" class=\"invoice-status-banner\" style=\"display: none;\">\n                <span class=\"invoice-status-icon\">⚡</span>\n                <span class=\"invoice-status-text\">RUSH ORDER</span>\n                <span class=\"invoice-status-detail\" id=\"status-banner-detail\"></span>\n            </div>\n\n            <!-- Bill To + Ship To -->\n            <section class=\"invoice-addresses\">\n                <div class=\"invoice-address-block\">\n                    <div class=\"invoice-address-label\">Bill To</div>\n                    <div class=\"invoice-address-name\" id=\"bill-customer-name\">—</div>\n                    <div class=\"invoice-address-line\" id=\"bill-contact-name\"></div>\n                    <div class=\"invoice-address-line\" id=\"bill-address-line1\"></div>\n                    <div class=\"invoice-address-line\" id=\"bill-address-line2\"></div>\n                    <div class=\"invoice-address-line\" id=\"bill-address-citystate\"></div>\n                    <div class=\"invoice-address-line\" id=\"bill-email\"></div>\n                    <div class=\"invoice-address-line\" id=\"bill-phone\"></div>\n                </div>\n                <div class=\"invoice-address-block\">\n                    <div class=\"invoice-address-label\">Ship To</div>\n                    <div class=\"invoice-address-name\" id=\"ship-recipient\">—</div>\n                    <div class=\"invoice-address-line\" id=\"ship-line1\"></div>\n                    <div class=\"invoice-address-line\" id=\"ship-line2\"></div>\n                    <div class=\"invoice-address-line\" id=\"ship-citystate\"></div>\n                    <div class=\"invoice-address-line invoice-ship-method\" id=\"ship-method\"></div>\n                </div>\n            </section>\n\n            <!-- Order details strip -->\n            <section class=\"invoice-details\">\n                <div class=\"invoice-detail-cell\">\n                    <div class=\"invoice-detail-label\">PO Number</div>\n                    <div class=\"invoice-detail-value\" id=\"detail-po\">—</div>\n                </div>\n                <div class=\"invoice-detail-cell\">\n                    <div class=\"invoice-detail-label\">Sales Rep</div>\n                    <div class=\"invoice-detail-value\" id=\"detail-rep\">—</div>\n                </div>\n                <div class=\"invoice-detail-cell\">\n                    <div class=\"invoice-detail-label\">Req Ship Date</div>\n                    <div class=\"invoice-detail-value\" id=\"detail-ship-date\">—</div>\n                </div>\n                <div class=\"invoice-detail-cell\">\n                    <div class=\"invoice-detail-label\">Terms</div>\n                    <div class=\"invoice-detail-value\" id=\"detail-terms\">—</div>\n                </div>\n                <div class=\"invoice-detail-cell invoice-detail-cell--method\">\n                    <div class=\"invoice-detail-label\">Decoration</div>\n                    <div class=\"invoice-detail-value\" id=\"detail-method\">—</div>\n                </div>\n            </section>\n\n            <!-- Line items table -->\n            <section class=\"invoice-items\">\n                <table class=\"invoice-items-table\">\n                    <thead>\n                        <tr>\n                            <th class=\"col-style\">Item</th>\n                            <th class=\"col-color\">Color</th>\n                            <th class=\"col-desc\">Description</th>\n                            <th class=\"col-qty\">Qty</th>\n                            <th class=\"col-unit\">Unit Price</th>\n                            <th class=\"col-total\">Total</th>\n                        </tr>\n                    </thead>\n                    <tbody id=\"items-tbody\">\n                        <!-- populated by JS -->\n                    </tbody>\n                </table>\n            </section>\n\n            <!-- Totals (right-aligned at bottom) -->\n            <section class=\"invoice-totals\">\n                <div class=\"invoice-totals-inner\">\n                    <div class=\"invoice-totals-row\">\n                        <span class=\"invoice-totals-label\">Subtotal</span>\n                        <span class=\"invoice-totals-value\" id=\"total-subtotal\">$0.00</span>\n                    </div>\n                    <div class=\"invoice-totals-row\" id=\"discount-row\" style=\"display: none;\">\n                        <span class=\"invoice-totals-label\">Discount</span>\n                        <span class=\"invoice-totals-value\" id=\"total-discount\">$0.00</span>\n                    </div>\n                    <div class=\"invoice-totals-row\">\n                        <span class=\"invoice-totals-label\">\n                            Sales Tax <span class=\"invoice-totals-rate\" id=\"total-tax-rate\"></span>\n                        </span>\n                        <span class=\"invoice-totals-value\" id=\"total-tax\">$0.00</span>\n                    </div>\n                    <div class=\"invoice-totals-row\" id=\"shipping-row\">\n                        <span class=\"invoice-totals-label\">Shipping</span>\n                        <span class=\"invoice-totals-value\" id=\"total-shipping\">$0.00</span>\n                    </div>\n                    <div class=\"invoice-totals-row invoice-totals-row--grand\">\n                        <span class=\"invoice-totals-label\">Total</span>\n                        <span class=\"invoice-totals-value\" id=\"total-grand\">$0.00</span>\n                    </div>\n                    <div class=\"invoice-totals-row\" id=\"paid-row\" style=\"display: none;\">\n                        <span class=\"invoice-totals-label\">Payments Received</span>\n                        <span class=\"invoice-totals-value\" id=\"total-paid\">$0.00</span>\n                    </div>\n                    <div class=\"invoice-totals-row invoice-totals-row--amount-due\">\n                        <span class=\"invoice-totals-label\">AMOUNT DUE</span>\n                        <span class=\"invoice-totals-value\" id=\"total-amount-due\">$0.00</span>\n                    </div>\n                </div>\n            </section>\n\n            <!-- Payment instructions — QuickBooks-style \"how to pay\" block.\n                 Always visible; terms text is wired from order/quote data. -->\n            <section class=\"invoice-payment-info\">\n                <div class=\"invoice-payment-block\">\n                    <div class=\"invoice-payment-heading\">Payment Information</div>\n                    <div class=\"invoice-payment-body\">\n                        Payment due\n                        <strong id=\"invoice-payment-terms-text\">on receipt</strong>\n                        from invoice date.\n                        Pay by check (Northwest Custom Apparel, 2025 Freeman Road East, Milton WA 98354)\n                        or ACH/credit card — contact\n                        <a href=\"mailto:ar@nwcustomapparel.com\">ar@nwcustomapparel.com</a>\n                        for routing. Past-due balances accrue 1.5% monthly finance charge.\n                    </div>\n                </div>\n            </section>\n\n            <!-- Footer (NWCA contact + sync timestamp) -->\n            <footer class=\"invoice-footer\">\n                <div class=\"invoice-footer-left\">\n                    Thank you for your business · <strong>Northwest Custom Apparel</strong> ·\n                    <a href=\"https://nwcustomapparel.com\">nwcustomapparel.com</a>\n                </div>\n                <div class=\"invoice-footer-right\" id=\"footer-sync-info\"></div>\n            </footer>\n        </div>\n    </main>\n\n    <!-- SAML identity → legacy nwca_user_* keys (StaffAuthHelper.ready(), 2026-09-05) -->\n\n    <script src=\"/shared_components/js/staff-auth-helper.js?v=2026.09.06.37\"></script>\n\n    <!-- Shared toasts replace the page's browser alert() calls (2026-09-05) -->\n\n    <script src=\"/shared_components/js/toast-notifications.js?v=2026.09.08.3\"></script>\n\n    <script src=\"/pages/js/invoice.js?v=2026.09.05.10\"></script>\n</body>\n</html>\n",
+      "title": "Invoice — Northwest Custom Apparel",
+      "bodyText": "Loading invoice… Invoice Not Found The invoice you're looking for could not be loaded. Contact us at (253) 922-5793 or sales@nwcustomapparel.com 🖨 Print / Save as PDF 🔄 Refresh from ShopWorks ← Back to full quote view 🚢 Send to ShipStation 💡 Print tip Northwest Custom Apparel 2025 Freeman Road East · Milton, WA 98354 (253) 922-5793 · sales@nwcustomapparel.com INVOICE Order # — Quote # — Invoice Date — ⚡ RUSH ORDER Bill To — Ship To — PO Number — Sales Rep — Req Ship Date — Terms — Decoration — Item Color Description Qty Unit Price Total Subtotal $0.00 Discount $0.00 Sales Tax $0.00 Shipping $0.00 Total $0.00 Payments Received $0.00 AMOUNT DUE $0.00 Payment Information Payment due on receipt from invoice date. Pay by check (Northwest Custom Apparel, 2025 Freeman Road East, Milton WA 98354) or ACH/credit card — contact ar@nwcustomapparel.com for routing. Past-due balances accrue 1.5% monthly finance charge. Thank you for your business · Northwest Custom Apparel · nwcustomapparel.com",
+      "bodyTextSha": "b7c4656af7e9cca0f0c7008fff1324221bfafe0b8bfe303f6e9f37e002c2c200",
+      "ids": [
+        "loading",
+        "error",
+        "error-message",
+        "toolbar",
+        "btn-print",
+        "btn-refresh",
+        "btn-back-to-quote",
+        "btn-shipstation",
+        "sync-status",
+        "invoice",
+        "invoice-title",
+        "invoice-order-number",
+        "invoice-quote-id",
+        "invoice-date",
+        "status-banner",
+        "status-banner-detail",
+        "bill-customer-name",
+        "bill-contact-name",
+        "bill-address-line1",
+        "bill-address-line2",
+        "bill-address-citystate",
+        "bill-email",
+        "bill-phone",
+        "ship-recipient",
+        "ship-line1",
+        "ship-line2",
+        "ship-citystate",
+        "ship-method",
+        "detail-po",
+        "detail-rep",
+        "detail-ship-date",
+        "detail-terms",
+        "detail-method",
+        "items-tbody",
+        "total-subtotal",
+        "discount-row",
+        "total-discount",
+        "total-tax-rate",
+        "total-tax",
+        "shipping-row",
+        "total-shipping",
+        "total-grand",
+        "paid-row",
+        "total-paid",
+        "total-amount-due",
+        "invoice-payment-terms-text",
+        "footer-sync-info"
+      ],
+      "links": [
+        {
+          "href": "tel:2539225793",
+          "label": "(253) 922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "label": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "#",
+          "label": "← Back to full quote view"
+        },
+        {
+          "href": "mailto:ar@nwcustomapparel.com",
+          "label": "ar@nwcustomapparel.com"
+        },
+        {
+          "href": "https://nwcustomapparel.com",
+          "label": "nwcustomapparel.com"
+        }
+      ],
+      "fields": [],
+      "styles": [
+        "/shared_components/css/tokens.css?v=2026.09.08.2",
+        "/pages/css/invoice.css?v=2026.09.07.19",
+        "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+        "/shared_components/css/toast-notifications.css?v=2026.09.07.10"
+      ],
+      "scripts": [
+        "/shared_components/js/staff-auth-helper.js?v=2026.09.06.37",
+        "/shared_components/js/toast-notifications.js?v=2026.09.08.3",
+        "/pages/js/invoice.js?v=2026.09.05.10"
+      ],
+      "cssBytes": 45903
+    },
+    {
+      "file": "pages/quote-view.html",
+      "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <link rel=\"icon\" href=\"/favicon.png\" type=\"image/png\">\n    <title>Quote - Northwest Custom Apparel</title>\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link rel=\"stylesheet\" href=\"/pages/css/quote-view.css?v=2026.09.07.19\">\n    <!-- Phase 11 (2026-05-14): QuickBooks-style invoice print stylesheet -->\n    <link rel=\"stylesheet\" href=\"/shared_components/css/quote-print.css?v=2026.09.07.19\" media=\"print\">\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    <link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap\" rel=\"stylesheet\">\n    <!-- Phase 11 (2026-05-14): jsPDF + html2canvas removed. PDF generation\n         now uses native window.print() + the @media print styles in\n         quote-print.css. Vector text, selectable, single-page. -->\n    <link rel=\"stylesheet\" href=\"/shared_components/css/toast-notifications.css?v=2026.09.07.10\">\n</head>\n<body>\n    <main class=\"quote-page\">\n        <!-- Loading State -->\n        <div id=\"loading-state\" class=\"loading-state\">\n            <div class=\"loading-spinner\"></div>\n            <p>Loading quote...</p>\n        </div>\n\n        <!-- Error State -->\n        <div id=\"error-state\" class=\"error-state\" style=\"display: none;\">\n            <div class=\"error-icon\">!</div>\n            <h2>Quote Not Found</h2>\n            <p id=\"error-message\">The quote you're looking for could not be found.</p>\n            <p class=\"error-help\">If you believe this is an error, call us at <a href=\"tel:2539225793\">(253) 922-5793</a> or email <a href=\"mailto:sales@nwcustomapparel.com\">sales@nwcustomapparel.com</a>.</p>\n            <p class=\"error-help\"><a href=\"/\">Browse the catalog</a> to start a new quote.</p>\n        </div>\n\n        <!-- Quote Content -->\n        <div id=\"quote-content\" class=\"quote-container\" style=\"display: none;\">\n            <!-- Header -->\n            <header class=\"quote-header\">\n                <div class=\"header-left\">\n                    <div class=\"logo-container\">\n                        <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\"\n                             alt=\"Northwest Custom Apparel\"\n                             class=\"company-logo\">\n                    </div>\n                </div>\n                <div class=\"header-right\">\n                    <h1 id=\"quote-id-header\">Quote #---</h1>\n                    <div class=\"quote-status\" id=\"quote-status\">\n                        <span class=\"status-badge status-open\">Open</span>\n                    </div>\n                </div>\n            </header>\n\n            <!-- ============================================================\n                 ShopWorks sync strip (Erik 2026-05-21).\n                 Three states by sync status:\n                   • Pending  — gray pill \"Pending import\" + Refresh button\n                   • Imported — green pill \"ShopWorks #141899 ✓\" + last-synced\n                                 + Refresh button\n                   • (no sync info yet on a brand-new draft) — strip hidden\n                 Hidden when no ShopWorks info is available (e.g. legacy quotes).\n                 ============================================================ -->\n            <!-- CANCELLED-IN-SHOPWORKS banner (sits above the sync strip).\n                 Shows when ShopWorks operator deleted the order. Soft-delete\n                 keeps the row 30 days for audit, then bulk-sync cron purges. -->\n            <div id=\"sw-cancelled-banner\" class=\"sw-cancelled-banner\" style=\"display: none;\">\n                <span class=\"sw-cancelled-icon\" aria-hidden=\"true\">⊘</span>\n                <div class=\"sw-cancelled-text\">\n                    <strong>CANCELLED IN SHOPWORKS</strong>\n                    <span id=\"sw-cancelled-detail\" class=\"sw-cancelled-detail\"></span>\n                </div>\n            </div>\n\n            <div id=\"sw-sync-strip\" class=\"sw-sync-strip\" style=\"display: none;\">\n                <div class=\"sw-sync-left\">\n                    <span class=\"sw-sync-pill\" id=\"sw-sync-pill\">\n                        <span class=\"sw-sync-pill-icon\" id=\"sw-sync-pill-icon\">⏳</span>\n                        <span class=\"sw-sync-pill-text\" id=\"sw-sync-pill-text\">Pending import…</span>\n                    </span>\n                    <span class=\"sw-sync-extorder\" id=\"sw-sync-extorder\"></span>\n                </div>\n                <div class=\"sw-sync-right\">\n                    <span class=\"sw-sync-timestamp\" id=\"sw-sync-timestamp\"></span>\n                    <button type=\"button\" class=\"sw-sync-refresh-btn\" id=\"sw-sync-refresh-btn\"\n                            aria-label=\"Refresh from ShopWorks\">\n                        <span class=\"sw-sync-refresh-icon\" aria-hidden=\"true\">🔄</span>\n                        <span class=\"sw-sync-refresh-label\">Refresh</span>\n                    </button>\n                </div>\n            </div>\n\n            <!-- ============================================================\n                 Set ShopWorks Order # — manual entry workaround (Erik 2026-05-21).\n                 The MO /v1/getorderno mapping endpoint returns empty for our\n                 NWCA-* ExtOrderIDs (MO config gap). Until that's fixed\n                 upstream, reps enter the WO# they see in ShopWorks UI here\n                 and the system stores it. Subsequent syncs use the stored\n                 WO# to fetch /v1/orders/{N} directly. Shown only when:\n                   - Status is Processed/Pending (i.e., pushed but not yet\n                     mapped to a ShopWorks order)\n                   - ShopWorks_Order_Number is not yet set\n                 Hidden after the rep enters the number or once auto-mapping\n                 succeeds.\n                 ============================================================ -->\n            <div id=\"sw-manual-wo-strip\" class=\"sw-manual-wo-strip\" style=\"display: none;\">\n                <div class=\"sw-manual-wo-left\">\n                    <span class=\"sw-manual-wo-icon\">🔗</span>\n                    <span class=\"sw-manual-wo-label\">Link to ShopWorks Order #:</span>\n                    <input type=\"text\" id=\"sw-manual-wo-input\" class=\"sw-manual-wo-input\"\n                           inputmode=\"numeric\" pattern=\"[0-9]*\" maxlength=\"7\" placeholder=\"e.g. 141899\" aria-label=\"Link to ShopWorks Order #\">\n                    <button type=\"button\" class=\"sw-manual-wo-btn\" id=\"sw-manual-wo-btn\">Set &amp; Sync</button>\n                </div>\n                <div class=\"sw-manual-wo-help\">\n                    Find the WO# in ShopWorks (top-right of the order detail page) and paste it here. Stored once, used forever.\n                </div>\n            </div>\n\n            <!-- ============================================================\n                 Staff deposit strip (Storefront Checkout Phase 1, 2026-07-05).\n                 Staff-only: the rep confirms shipping $ + tax-rate % (the\n                 numbers WQ quotes intentionally save as 0), the server\n                 computes the grand total + deposit split (Service_Codes\n                 DEPOSIT-PCT) and freezes the terms + totals-hash into Notes\n                 JSON. Managed by quote-view.js setupDepositStrip().\n                 ============================================================ -->\n            <div id=\"qv-deposit-strip\" class=\"qv-deposit-strip\" style=\"display: none;\">\n                <div class=\"qv-deposit-strip-head\">\n                    <span class=\"qv-deposit-strip-icon\">&#128176;</span>\n                    <span class=\"qv-deposit-strip-title\">Online payment</span>\n                    <span class=\"qv-deposit-strip-state\" id=\"qv-deposit-state\"></span>\n                </div>\n                <div class=\"qv-deposit-strip-form\" id=\"qv-deposit-form\" style=\"display: none;\">\n                    <label class=\"qv-deposit-field\">Shipping $\n                        <input type=\"number\" id=\"qv-deposit-shipping\" min=\"0\" step=\"0.01\" value=\"0\">\n                    </label>\n                    <label class=\"qv-deposit-field\">Tax rate %\n                        <input type=\"number\" id=\"qv-deposit-taxrate\" min=\"0\" max=\"15\" step=\"0.001\" placeholder=\"e.g. 10.2\">\n                    </label>\n                    <span class=\"qv-deposit-preview\" id=\"qv-deposit-preview\"></span>\n                    <button type=\"button\" class=\"qv-deposit-enable-btn\" id=\"qv-deposit-enable-btn\">Enable payment link</button>\n                </div>\n                <div class=\"qv-deposit-strip-help\">\n                    Confirms tax + shipping and turns on the customer's Pay button on this page\n                    (amount = Service_Codes DEPOSIT-PCT: 100 = pay in full, lower = deposit).\n                    Tax applies to subtotal + shipping (WA destination rate; enter 0 for out-of-state).\n                </div>\n            </div>\n\n            <!-- ============================================================\n                 Quick Actions row (Erik 2026-05-21).\n                 Common per-order actions consolidated at the top. Always\n                 visible for staff. Hidden in print mode.\n                 ============================================================ -->\n            <div class=\"sw-actions-row\" id=\"sw-actions-row\">\n                <button type=\"button\" class=\"sw-action-btn\" id=\"sw-action-print\" title=\"Print or save as PDF\">\n                    <span class=\"sw-action-icon\">🖨</span> Print / PDF\n                </button>\n                <button type=\"button\" class=\"sw-action-btn\" id=\"sw-action-copy-link\" title=\"Copy this quote's URL to clipboard\">\n                    <span class=\"sw-action-icon\">📋</span> Copy link\n                </button>\n                <button type=\"button\" class=\"sw-action-btn\" id=\"sw-action-email\" title=\"Email this quote to the customer\">\n                    <span class=\"sw-action-icon\">📧</span> Email customer\n                </button>\n                <!-- ShipStation button (Erik 2026-05-22 — B). Hidden by default.\n                     Visibility + label managed by _updateShipStationButton()\n                     (mirrors invoice.js logic: production-complete gate, pickup\n                     skip, UPS/FedEx override, already-sent state, tracking#). -->\n                <button type=\"button\" class=\"sw-action-btn\" id=\"sw-action-shipstation\" style=\"display: none;\" title=\"Push this order to ShipStation. Warehouse will rate + buy the label there.\">\n                    <span class=\"sw-action-icon\">🚢</span> Send to ShipStation\n                </button>\n                <!-- Send to Steve (Erik 2026-06-26). Hidden until a real ShopWorks\n                     order exists in ManageOrders (gated in _updateSendToSteveButton).\n                     Opens Steve's garment art form pre-filled from the synced order,\n                     with the customer's art + approved mockups carried over. -->\n                <button type=\"button\" class=\"sw-action-btn\" id=\"sw-action-send-steve\" style=\"display: none;\" title=\"Open Steve's art form pre-filled from this order — needs a ShopWorks order\">\n                    <span class=\"sw-action-icon\">🎨</span> Send to Steve\n                </button>\n            </div>\n\n            <!-- PO Number (inline with header, shown if present) -->\n            <div id=\"po-number-row\" style=\"display: none; text-align: right; margin: -8px 0 8px; padding-right: 4px;\">\n                <span style=\"font-size: 14px; color: #475569; font-weight: 600;\">PO# <span id=\"po-number-display\" style=\"color: #0f172a;\"></span></span>\n            </div>\n\n            <!-- Quote Meta -->\n            <section class=\"quote-meta\">\n                <div class=\"meta-card customer-card\">\n                    <h3>Prepared For</h3>\n                    <p class=\"customer-name\" id=\"customer-name\">---</p>\n                    <p class=\"company-name\" id=\"company-name\"></p>\n                    <p class=\"customer-email\" id=\"customer-email\">---</p>\n                    <p class=\"customer-phone\" id=\"customer-phone\">---</p>\n                    <!-- Phase 8 (2026-05-14): CEMB billing-block — renders under\n                         the customer info when the saved quote has a billing\n                         address (CEMB-only; legacy quotes don't populate this). -->\n                    <div class=\"billing-block\" id=\"customer-billing-block\" style=\"display: none; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--quote-card-border, #e2e8f0);\">\n                        <p style=\"font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--quote-green, #4caf50); margin: 0 0 4px;\">Billing Address</p>\n                        <p class=\"billing-address\" id=\"customer-billing-address\" style=\"margin: 0; font-size: 14px;\"></p>\n                        <p class=\"billing-city-state\" id=\"customer-billing-city-state\" style=\"margin: 2px 0 0; font-size: 14px;\"></p>\n                    </div>\n                </div>\n                <div class=\"meta-card ship-to-card\" id=\"ship-to-card\" style=\"display: none;\">\n                    <h3>Ship To</h3>\n                    <p id=\"ship-to-address\"></p>\n                    <p id=\"ship-to-city-state\"></p>\n                    <p id=\"ship-to-method\" style=\"margin-top: 4px; font-style: italic; color: #64748b;\"></p>\n                    <p id=\"ship-to-tracking\" style=\"margin-top: 6px; font-size: 13px; display: none;\"></p>\n                </div>\n                <div class=\"meta-card dates-card\">\n                    <h3>Quote Details</h3>\n                    <div class=\"date-row\">\n                        <span class=\"label\">Type:</span>\n                        <span class=\"value\" id=\"quote-type\">---</span>\n                    </div>\n                    <div class=\"date-row\">\n                        <span class=\"label\">Created:</span>\n                        <span class=\"value\" id=\"created-date\">---</span>\n                    </div>\n                    <div class=\"date-row\">\n                        <span class=\"label\">Valid Until:</span>\n                        <span class=\"value\" id=\"expires-date\">---</span>\n                    </div>\n                    <div class=\"date-row\" id=\"sales-rep-row\" style=\"display: none;\">\n                        <span class=\"label\">Sales Rep:</span>\n                        <span class=\"value\" id=\"sales-rep\">---</span>\n                    </div>\n                    <div class=\"date-row\" id=\"order-number-row\" style=\"display: none;\">\n                        <span class=\"label\">Order #:</span>\n                        <span class=\"value\" id=\"order-number\">---</span>\n                    </div>\n                    <div class=\"date-row\" id=\"req-ship-date-row\" style=\"display: none;\">\n                        <span class=\"label\">Req Ship Date:</span>\n                        <span class=\"value\" id=\"req-ship-date\">---</span>\n                    </div>\n                    <div class=\"date-row\" id=\"drop-dead-date-row\" style=\"display: none;\">\n                        <span class=\"label\">Drop Dead Date:</span>\n                        <span class=\"value\" id=\"drop-dead-date\">---</span>\n                    </div>\n                    <div class=\"date-row\" id=\"customer-number-row\" style=\"display: none;\">\n                        <span class=\"label\">Customer #:</span>\n                        <span class=\"value\" id=\"customer-number-display\">---</span>\n                    </div>\n                    <div class=\"date-row\" id=\"payment-terms-row\" style=\"display: none;\">\n                        <span class=\"label\">Terms:</span>\n                        <span class=\"value\" id=\"payment-terms\">---</span>\n                    </div>\n                    <div class=\"date-row\" id=\"revision-row\" style=\"display: none;\">\n                        <span class=\"label\">Last Revised:</span>\n                        <span class=\"value\" id=\"revised-date\">---</span>\n                    </div>\n                </div>\n            </section>\n\n            <!-- Expired Banner -->\n            <div id=\"expired-banner\" class=\"expired-banner\" style=\"display: none;\">\n                <span class=\"expired-icon\">&#9888;</span>\n                <div class=\"expired-text\">\n                    <strong>This quote has expired</strong>\n                    <p>Prices change over time — request an updated quote and we'll refresh it for you.</p>\n                    <div class=\"expired-actions\">\n                        <a class=\"btn btn-primary\" href=\"mailto:sales@nwcustomapparel.com?subject=Updated%20pricing%20request\">Request updated pricing</a>\n                        <a class=\"btn btn-secondary\" href=\"tel:2539225793\">Call (253) 922-5793</a>\n                    </div>\n                </div>\n            </div>\n\n            <!-- Accepted Banner -->\n            <div id=\"accepted-banner\" class=\"accepted-banner\" style=\"display: none;\">\n                <span class=\"accepted-icon\">&#10003;</span>\n                <div class=\"accepted-text\">\n                    <strong>Quote Accepted</strong>\n                    <p id=\"accepted-info\">Accepted on ---</p>\n                </div>\n            </div>\n\n            <!-- ============================================================\n                 Online deposit panel (Storefront Checkout Phase 1, 2026-07-05).\n                 Customer-facing. Shown ONLY when the quote is Accepted AND a\n                 rep enabled the deposit (Notes JSON `deposit` block). Content\n                 is rendered by quote-view.js renderDepositPanel():\n                   enabled + unpaid → totals breakdown + \"Pay deposit\" (Stripe\n                                      hosted Checkout via deposit-checkout API)\n                   paid             → receipt summary + balance-due line\n                 ============================================================ -->\n            <section id=\"deposit-panel\" class=\"deposit-panel\" style=\"display: none;\"></section>\n\n            <!-- ============================================================\n                 Quote Timeline (#15, 2026-07-05). Collapsible event history\n                 assembled from data ALREADY on the page — session CreatedAt,\n                 acceptance info in Notes JSON, customer_view analytics\n                 (staff-only fetch), PushedToShopWorks + ShopWorks ship date\n                 (reused from the sync snapshot, never refetched). Staff-\n                 internal events (push / ShopWorks) render only for staff.\n                 ============================================================ -->\n            <section id=\"qv-timeline-section\" class=\"qv-timeline-section\" style=\"display: none;\">\n                <details class=\"qv-timeline-details\">\n                    <summary class=\"qv-timeline-summary\">\n                        <span class=\"qv-timeline-summary-icon\">&#9656;</span>\n                        <span class=\"qv-timeline-summary-title\">Timeline</span>\n                        <span class=\"qv-timeline-summary-meta\" id=\"qv-timeline-summary-meta\"></span>\n                    </summary>\n                    <ol class=\"qv-timeline-list\" id=\"qv-timeline-list\">\n                        <!-- populated by JS — one <li> per event that exists -->\n                    </ol>\n                </details>\n            </section>\n\n            <!-- DTF Transfer Specs (populated by JS for DTF quotes) -->\n            <section id=\"dtf-specs-section\" class=\"dtf-specs-section\" style=\"display: none;\">\n                <h2>Transfer Specifications</h2>\n                <div id=\"dtf-specs-container\" class=\"dtf-specs-container\">\n                    <!-- DTF location specs will be populated by JavaScript -->\n                </div>\n            </section>\n\n            <!-- ============================================================\n                 ShopWorks Designs panel (Erik 2026-05-21).\n                 Mirrors the Designs block on the ShopWorks production PDF.\n                 Hidden until a ShopWorks snapshot has been synced.\n                 ============================================================ -->\n            <section id=\"sw-designs-section\" class=\"sw-designs-section\" style=\"display: none;\">\n                <h2>Designs</h2>\n                <div class=\"sw-designs-meta\">\n                    <div class=\"sw-designs-counter\">\n                        <span class=\"sw-designs-counter-label\">Product Qty</span>\n                        <span class=\"sw-designs-counter-value\" id=\"sw-designs-product-qty\">—</span>\n                    </div>\n                    <div class=\"sw-designs-counter\">\n                        <span class=\"sw-designs-counter-label\">Total Imprints</span>\n                        <span class=\"sw-designs-counter-value\" id=\"sw-designs-imprints\">—</span>\n                    </div>\n                </div>\n                <div class=\"sw-designs-table-wrap\">\n                    <table class=\"sw-designs-table\" id=\"sw-designs-table\">\n                        <thead>\n                            <tr>\n                                <th class=\"sw-designs-th-thumb\" aria-label=\"Design thumbnail\"></th>\n                                <th>ID</th>\n                                <th>Name</th>\n                                <th>Type</th>\n                                <th>Locations</th>\n                                <th>Imprints</th>\n                            </tr>\n                        </thead>\n                        <tbody id=\"sw-designs-tbody\">\n                            <!-- populated by JS -->\n                        </tbody>\n                    </table>\n                </div>\n            </section>\n\n            <!-- ============================================================\n                 ShopWorks Order Status grid (Erik 2026-05-21 — Phase 4c).\n                 10-tile grid of Yes/No flags mirroring the ShopWorks UI's\n                 right-side Order Status panel. Hidden until snapshot synced.\n                 ============================================================ -->\n            <section id=\"sw-status-section\" class=\"sw-status-section\" style=\"display: none;\">\n                <h2>Order Status</h2>\n                <div class=\"sw-status-grid\" id=\"sw-status-grid\">\n                    <!-- 5 cells populated by JS — each cell: label + state (Yes/No/Partial/n/a) -->\n                </div>\n            </section>\n\n            <!-- Blank Goods — INBOUND vendor (SanMar) shipment. Sits RIGHT UNDER\n                 Order Status (Erik 2026-06-16) because the inbound blanks ARE the\n                 backstory of the \"Purchase Received\" milestone — staff see the status\n                 and where the blanks are in one place. Distinct from the OUTBOUND\n                 Shipping section further down (us → customer). Staff-only overlay. -->\n            <section id=\"sw-vendor-shipment-section\" class=\"sw-vendor-section\" style=\"display: none;\">\n                <h2>Blank Goods — from SanMar</h2>\n                <div class=\"sw-vendor-body\" id=\"sw-vendor-body\">\n                    <span class=\"sw-vendor-loading\">Checking SanMar…</span>\n                </div>\n            </section>\n\n            <!-- Quote Items -->\n            <section class=\"quote-items\">\n                <h2>Quote Details</h2>\n                <div class=\"items-container\" id=\"items-container\">\n                    <!-- Items will be populated by JavaScript -->\n                </div>\n            </section>\n\n            <!-- Special Notes (shown when plain-text notes exist) -->\n            <section id=\"special-notes-section\" class=\"special-notes-section\" style=\"display: none;\">\n                <div class=\"special-notes-card\">\n                    <h3><i class=\"fas fa-sticky-note\" style=\"color: #f9a825; margin-right: 6px;\" aria-hidden=\"true\"></i>Special Notes</h3>\n                    <pre id=\"special-notes-content\" class=\"special-notes-content\"></pre>\n                </div>\n            </section>\n\n            <!-- ============================================================\n                 Notes To Production (Erik 2026-05-21 — Phase 4c).\n                 Numbered timestamped entries from the original submission\n                 (the structured Notes To Production block we pushed). If\n                 ShopWorks operators have added more notes in OnSite, those\n                 aren't surfaced by the MO /v1 read API — we show what we\n                 submitted plus a note explaining the limitation.\n                 ============================================================ -->\n            <section id=\"sw-notes-section\" class=\"sw-notes-section\" style=\"display: none;\">\n                <h2>Notes To Production</h2>\n                <ol class=\"sw-notes-list\" id=\"sw-notes-list\">\n                    <!-- populated by JS — each <li> is a single Production note -->\n                </ol>\n                <div class=\"sw-notes-footer\" id=\"sw-notes-footer\" style=\"display: none;\"></div>\n            </section>\n\n            <!-- ============================================================\n                 ShopWorks Financial Summary (Erik 2026-05-21 — Phase 4d).\n                 Sourced from /v1/orders cur_* fields (post-import, reflects\n                 ShopWorks-side adjustments). Hidden until snapshot synced.\n                 ============================================================ -->\n            <section id=\"sw-financial-section\" class=\"sw-financial-section\" style=\"display: none;\">\n                <h2>Financial Summary</h2>\n                <div class=\"sw-financial-grid\">\n                    <div class=\"sw-financial-row\">\n                        <span class=\"sw-financial-label\">Subtotal</span>\n                        <span class=\"sw-financial-value\" id=\"sw-fin-subtotal\">—</span>\n                    </div>\n                    <div class=\"sw-financial-row\">\n                        <span class=\"sw-financial-label\">\n                            Sales Tax\n                            <span class=\"sw-financial-sublabel\" id=\"sw-fin-tax-rate\"></span>\n                        </span>\n                        <span class=\"sw-financial-value\" id=\"sw-fin-tax\">—</span>\n                    </div>\n                    <div class=\"sw-financial-row\">\n                        <span class=\"sw-financial-label\">Shipping</span>\n                        <span class=\"sw-financial-value\" id=\"sw-fin-shipping\">—</span>\n                    </div>\n                    <div class=\"sw-financial-row sw-financial-row--total\">\n                        <span class=\"sw-financial-label\">Total Invoice</span>\n                        <span class=\"sw-financial-value\" id=\"sw-fin-total\">—</span>\n                    </div>\n                    <div class=\"sw-financial-row\">\n                        <span class=\"sw-financial-label\">Payments Received</span>\n                        <span class=\"sw-financial-value\" id=\"sw-fin-payments\">—</span>\n                    </div>\n                    <div class=\"sw-financial-row sw-financial-row--balance\">\n                        <span class=\"sw-financial-label\">Balance Due</span>\n                        <span class=\"sw-financial-value\" id=\"sw-fin-balance\">—</span>\n                    </div>\n                    <div class=\"sw-financial-row sw-financial-row--terms\">\n                        <span class=\"sw-financial-label\">Terms</span>\n                        <span class=\"sw-financial-value\" id=\"sw-fin-terms\">—</span>\n                    </div>\n                </div>\n            </section>\n\n            <!-- ============================================================\n                 View Original Submission — collapsible audit panel\n                 (Erik 2026-05-21 — Phase 4e). Shows what the original\n                 push contained, side-by-side with current ShopWorks state.\n                 Helps reps + AR answer \"what changed since submit?\".\n                 Hidden until snapshot synced.\n                 ============================================================ -->\n            <section id=\"sw-original-section\" class=\"sw-original-section\" style=\"display: none;\">\n                <details class=\"sw-original-details\">\n                    <summary class=\"sw-original-summary\">\n                        <span class=\"sw-original-summary-icon\">▸</span>\n                        <span class=\"sw-original-summary-title\">View original submission</span>\n                        <span class=\"sw-original-summary-meta\" id=\"sw-original-summary-meta\"></span>\n                    </summary>\n                    <div class=\"sw-original-body\" id=\"sw-original-body\">\n                        <!-- populated by JS -->\n                    </div>\n                </details>\n            </section>\n\n            <!-- ============================================================\n                 Shipping panel (Erik 2026-05-21 — Phase 4c).\n                 Mirrors the ShopWorks PDF's Shipping block: Date Shipped,\n                 Shipped By, # Of Boxes (when populated post-shipment), then\n                 the recipient address + method + Single/Multiple/No-Shipping\n                 indicator. Data sourced from the original submission's\n                 ship.* fields (the MO /v1 /orders endpoint doesn't expose\n                 ShippingAddresses — defer to a separate fetch later).\n                 ============================================================ -->\n            <section id=\"sw-shipping-section\" class=\"sw-shipping-section\" style=\"display: none;\">\n                <h2>Shipping</h2>\n                <div class=\"sw-shipping-meta\">\n                    <div class=\"sw-shipping-meta-row\">\n                        <span class=\"sw-shipping-meta-label\">Date Shipped</span>\n                        <span class=\"sw-shipping-meta-value\" id=\"sw-shipping-date\">—</span>\n                    </div>\n                    <div class=\"sw-shipping-meta-row\">\n                        <span class=\"sw-shipping-meta-label\">Shipped By</span>\n                        <span class=\"sw-shipping-meta-value\" id=\"sw-shipping-by\">—</span>\n                    </div>\n                    <div class=\"sw-shipping-meta-row\">\n                        <span class=\"sw-shipping-meta-label\"># Of Boxes</span>\n                        <span class=\"sw-shipping-meta-value\" id=\"sw-shipping-boxes\">—</span>\n                    </div>\n                </div>\n                <div class=\"sw-shipping-address-block\" id=\"sw-shipping-address-block\">\n                    <div class=\"sw-shipping-recipient\" id=\"sw-shipping-recipient\">—</div>\n                    <div class=\"sw-shipping-line1\" id=\"sw-shipping-line1\"></div>\n                    <div class=\"sw-shipping-line2\" id=\"sw-shipping-line2\"></div>\n                    <div class=\"sw-shipping-citystate\" id=\"sw-shipping-citystate\"></div>\n                    <div class=\"sw-shipping-country\" id=\"sw-shipping-country\"></div>\n                    <div class=\"sw-shipping-method\" id=\"sw-shipping-method\"></div>\n                </div>\n                <div class=\"sw-shipping-mode\" id=\"sw-shipping-mode\">\n                    <!-- Three radio-style indicators: Single Address / Multiple / No Shipping -->\n                    <span class=\"sw-shipping-mode-pill\" data-mode=\"single\">Single Address</span>\n                    <span class=\"sw-shipping-mode-pill\" data-mode=\"multiple\">Multiple Addresses</span>\n                    <span class=\"sw-shipping-mode-pill\" data-mode=\"none\">No Shipping</span>\n                </div>\n            </section>\n\n            <!-- Quote Totals -->\n            <section class=\"quote-totals\">\n                <div class=\"totals-card\">\n                    <div class=\"total-row\">\n                        <span class=\"label\">Subtotal:</span>\n                        <span class=\"value\" id=\"subtotal\">$0.00</span>\n                    </div>\n                    <div class=\"total-row\" id=\"ltm-row\" style=\"display: none;\">\n                        <span class=\"label\">LTM Fee:</span>\n                        <span class=\"value\" id=\"ltm-fee\">$0.00</span>\n                    </div>\n                    <div class=\"total-row grand-total\">\n                        <span class=\"label\">Total:</span>\n                        <span class=\"value\" id=\"grand-total\">$0.00</span>\n                    </div>\n                    <p class=\"total-quantity\" id=\"total-quantity\">Total items: 0</p>\n                </div>\n            </section>\n\n            <!-- Phase 11.1 (2026-05-14): print-only terms paragraph.\n                 Mirrors the email closing — shown ONLY when printing\n                 (Save as PDF). Hidden on the screen quote view. -->\n            <p class=\"print-only-terms\">\n                Pricing is based on customer-supplied blanks. This quote is valid for 30 days.\n                Reply to confirm or send a PO when you're ready.\n            </p>\n\n            <!-- Action Buttons -->\n            <section class=\"quote-actions\" id=\"quote-actions\">\n                <button class=\"btn btn-secondary\" id=\"download-pdf-btn\">\n                    <svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\">\n                        <path d=\"M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3\"/>\n                    </svg>\n                    Download PDF\n                </button>\n                <a class=\"btn btn-secondary\" id=\"open-invoice-link\" href=\"#\" target=\"_blank\" rel=\"noopener\" title=\"Open the clean one-page invoice view (auto-syncs with ShopWorks)\">\n                    <svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\">\n                        <path d=\"M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z\"/>\n                        <polyline points=\"14 2 14 8 20 8\"/>\n                        <line x1=\"16\" y1=\"13\" x2=\"8\" y2=\"13\"/>\n                        <line x1=\"16\" y1=\"17\" x2=\"8\" y2=\"17\"/>\n                        <polyline points=\"10 9 9 9 8 9\"/>\n                    </svg>\n                    Open as Invoice\n                </a>\n                <button class=\"btn btn-primary\" id=\"accept-quote-btn\">\n                    <svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\">\n                        <path d=\"M20 6L9 17l-5-5\"/>\n                    </svg>\n                    Accept Quote\n                </button>\n                <button class=\"btn btn-secondary\" id=\"push-shopworks-btn\" style=\"display:none\">\n                    <svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\">\n                        <path d=\"M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z\"/>\n                    </svg>\n                    <span id=\"push-shopworks-label\">Push to ShopWorks</span>\n                </button>\n            </section>\n\n            <!-- Footer -->\n            <footer class=\"quote-footer\">\n                <div class=\"footer-content\">\n                    <div class=\"footer-section\">\n                        <h4>Questions?</h4>\n                        <p>Contact your sales representative or call us at</p>\n                        <a href=\"tel:2539225793\" class=\"phone-link\">(253) 922-5793</a>\n                    </div>\n                    <div class=\"footer-section\">\n                        <h4>Terms</h4>\n                        <ul class=\"terms-list\">\n                            <li>Quote valid for 30 days</li>\n                            <li>Payment due before production begins</li>\n                            <li>Production time begins after art approval</li>\n                        </ul>\n                    </div>\n                </div>\n                <div class=\"footer-bottom\">\n                    <p>&copy; <span id=\"current-year\"></span> Northwest Custom Apparel - Serving the Pacific Northwest Since 1977</p>\n                </div>\n            </footer>\n        </div>\n\n        <!-- Accept Quote Modal -->\n        <div id=\"accept-modal\" class=\"modal\" style=\"display: none;\">\n            <div class=\"modal-backdrop\"></div>\n            <div class=\"modal-content\">\n                <div class=\"modal-header\">\n                    <h2>Accept Quote</h2>\n                    <button class=\"modal-close\" id=\"modal-close\">&times;</button>\n                </div>\n                <div class=\"modal-body\">\n                    <p class=\"modal-description\">By accepting this quote, you agree to the pricing and terms shown.</p>\n\n                    <form id=\"accept-form\">\n                        <div class=\"form-group\">\n                            <label for=\"accept-name\">Your Name *</label>\n                            <input type=\"text\" id=\"accept-name\" name=\"name\" required placeholder=\"John Doe\">\n                        </div>\n                        <div class=\"form-group\">\n                            <label for=\"accept-email\">Your Email *</label>\n                            <input type=\"email\" id=\"accept-email\" name=\"email\" required placeholder=\"john@company.com\">\n                        </div>\n                        <!-- Delivery method (pickup skip-the-rep, 2026-07-06): pickup has\n                             $0 shipping + fixed Milton tax, so the server auto-enables the\n                             online payment right at acceptance. Ship-to keeps the rep gate. -->\n                        <div class=\"form-group qv-delivery-choice\">\n                            <label>How will you get your order? *</label>\n                            <label class=\"qv-delivery-option\">\n                                <input type=\"radio\" name=\"deliveryMethod\" value=\"pickup\" id=\"accept-pickup\">\n                                <span><strong>Pickup — Milton, WA</strong><br><small>Free · pay online right after accepting</small></span>\n                            </label>\n                            <label class=\"qv-delivery-option\">\n                                <input type=\"radio\" name=\"deliveryMethod\" value=\"ship\" id=\"accept-ship\">\n                                <span><strong>Ship it to me</strong><br><small>Your rep confirms shipping cost, then sends your pay link</small></span>\n                            </label>\n                        </div>\n                        <div class=\"form-info\">\n                            <p><strong>Quote Total:</strong> <span id=\"modal-total\">$0.00</span></p>\n                            <p><strong>Valid Until:</strong> <span id=\"modal-expires\">---</span></p>\n                        </div>\n                    </form>\n                </div>\n                <div class=\"modal-footer\">\n                    <button class=\"btn btn-secondary\" id=\"modal-cancel\">Cancel</button>\n                    <button class=\"btn btn-primary\" id=\"modal-accept\">\n                        <span id=\"accept-btn-text\">Accept Quote</span>\n                        <span id=\"accept-btn-loading\" style=\"display: none;\">Processing...</span>\n                    </button>\n                </div>\n            </div>\n        </div>\n\n        <!-- Success Modal -->\n        <div id=\"success-modal\" class=\"modal\" style=\"display: none;\">\n            <div class=\"modal-backdrop\"></div>\n            <div class=\"modal-content success-modal\">\n                <div class=\"success-icon\">&#10003;</div>\n                <h2>Quote Accepted!</h2>\n                <!-- Copy swapped by quote-view.js: pickup + auto-enabled payment gets\n                     \"pay online right now\"; ship-to gets the rep-will-confirm message. -->\n                <p id=\"success-next-steps\">Thank you for accepting this quote. Our team will confirm the final details and send your online payment link.</p>\n                <p class=\"success-contact\">Questions? Call us at <a href=\"tel:2539225793\">(253) 922-5793</a></p>\n                <button class=\"btn btn-primary\" id=\"success-close\">Close</button>\n            </div>\n        </div>\n\n        <!-- Send to Steve modal (staff only) — mounts the shared garment art form\n             (GarmentSubmitForm) pre-filled from this order. Deps are lazy-loaded\n             on first open so this customer-facing page stays lean. -->\n        <div id=\"sts-modal\" class=\"sts-modal\" style=\"display:none;\">\n            <div class=\"sts-modal-backdrop\" id=\"sts-modal-backdrop\"></div>\n            <div class=\"sts-modal-dialog\" role=\"dialog\" aria-modal=\"true\" aria-label=\"Send artwork to Steve\">\n                <button type=\"button\" class=\"sts-modal-close\" id=\"sts-modal-close\" title=\"Close\">&times;</button>\n                <div id=\"sts-form-mount\"></div>\n            </div>\n        </div>\n    </main>\n\n    <script src=\"/shared_components/js/staff-auth-helper.js?v=2026.09.06.37\"></script>\n    <!-- Deposit money-math (dual-load with the server; preview-only in the browser) -->\n    <script src=\"/shared_components/js/quote-deposit-math.js?v=2026.07.09.1\"></script>\n    <!-- Same-origin rewrite for gated /api/box/* image URLs (design thumbnails) -->\n    <script src=\"/shared_components/js/box-url.js?v=2026.08.06.1\"></script>\n    <!-- Shared toasts replace the page's browser alert() calls (2026-09-05) -->\n    <script src=\"/shared_components/js/toast-notifications.js?v=2026.09.08.3\"></script>\n    <!-- Proxy host for product-image lookups (Rule 6) -->\n    <script src=\"/config/app.config.js\"></script>\n    <script src=\"/pages/js/quote-view.js?v=2026.09.07.35\"></script>\n</body>\n</html>\n",
+      "title": "Quote - Northwest Custom Apparel",
+      "bodyText": "Loading quote... ! Quote Not Found The quote you're looking for could not be found. If you believe this is an error, call us at (253) 922-5793 or email sales@nwcustomapparel.com. Browse the catalog to start a new quote. Quote #--- Open ⊘ CANCELLED IN SHOPWORKS ⏳ Pending import… 🔄 Refresh 🔗 Link to ShopWorks Order #: Set & Sync Find the WO# in ShopWorks (top-right of the order detail page) and paste it here. Stored once, used forever. 💰 Online payment Shipping $ Tax rate % Enable payment link Confirms tax + shipping and turns on the customer's Pay button on this page (amount = Service_Codes DEPOSIT-PCT: 100 = pay in full, lower = deposit). Tax applies to subtotal + shipping (WA destination rate; enter 0 for out-of-state). 🖨 Print / PDF 📋 Copy link 📧 Email customer 🚢 Send to ShipStation 🎨 Send to Steve PO# Prepared For --- --- --- Billing Address Ship To Quote Details Type: --- Created: --- Valid Until: --- Sales Rep: --- Order #: --- Req Ship Date: --- Drop Dead Date: --- Customer #: --- Terms: --- Last Revised: --- ⚠ This quote has expired Prices change over time — request an updated quote and we'll refresh it for you. Request updated pricing Call (253) 922-5793 ✓ Quote Accepted Accepted on --- ▸ Timeline Transfer Specifications Designs Product Qty — Total Imprints — ID Name Type Locations Imprints Order Status Blank Goods — from SanMar Checking SanMar… Quote Details Special Notes Notes To Production Financial Summary Subtotal — Sales Tax — Shipping — Total Invoice — Payments Received — Balance Due — Terms — ▸ View original submission Shipping Date Shipped — Shipped By — # Of Boxes — — Single Address Multiple Addresses No Shipping Subtotal: $0.00 LTM Fee: $0.00 Total: $0.00 Total items: 0 Pricing is based on customer-supplied blanks. This quote is valid for 30 days. Reply to confirm or send a PO when you're ready. Download PDF Open as Invoice Accept Quote Push to ShopWorks Questions? Contact your sales representative or call us at (253) 922-5793 Terms Quote valid for 30 days Payment due before production begins Production time begins after art approval © Northwest Custom Apparel - Serving the Pacific Northwest Since 1977 Accept Quote × By accepting this quote, you agree to the pricing and terms shown. Your Name * Your Email * How will you get your order? * Pickup — Milton, WAFree · pay online right after accepting Ship it to meYour rep confirms shipping cost, then sends your pay link Quote Total: $0.00 Valid Until: --- Cancel Accept Quote Processing... ✓ Quote Accepted! Thank you for accepting this quote. Our team will confirm the final details and send your online payment link. Questions? Call us at (253) 922-5793 Close ×",
+      "bodyTextSha": "2baa4e9aa88fb627d81f8858c12717aee4b5de85d908b3f7190ff772705d188e",
+      "ids": [
+        "loading-state",
+        "error-state",
+        "error-message",
+        "quote-content",
+        "quote-id-header",
+        "quote-status",
+        "sw-cancelled-banner",
+        "sw-cancelled-detail",
+        "sw-sync-strip",
+        "sw-sync-pill",
+        "sw-sync-pill-icon",
+        "sw-sync-pill-text",
+        "sw-sync-extorder",
+        "sw-sync-timestamp",
+        "sw-sync-refresh-btn",
+        "sw-manual-wo-strip",
+        "sw-manual-wo-input",
+        "sw-manual-wo-btn",
+        "qv-deposit-strip",
+        "qv-deposit-state",
+        "qv-deposit-form",
+        "qv-deposit-shipping",
+        "qv-deposit-taxrate",
+        "qv-deposit-preview",
+        "qv-deposit-enable-btn",
+        "sw-actions-row",
+        "sw-action-print",
+        "sw-action-copy-link",
+        "sw-action-email",
+        "sw-action-shipstation",
+        "sw-action-send-steve",
+        "po-number-row",
+        "po-number-display",
+        "customer-name",
+        "company-name",
+        "customer-email",
+        "customer-phone",
+        "customer-billing-block",
+        "customer-billing-address",
+        "customer-billing-city-state",
+        "ship-to-card",
+        "ship-to-address",
+        "ship-to-city-state",
+        "ship-to-method",
+        "ship-to-tracking",
+        "quote-type",
+        "created-date",
+        "expires-date",
+        "sales-rep-row",
+        "sales-rep",
+        "order-number-row",
+        "order-number",
+        "req-ship-date-row",
+        "req-ship-date",
+        "drop-dead-date-row",
+        "drop-dead-date",
+        "customer-number-row",
+        "customer-number-display",
+        "payment-terms-row",
+        "payment-terms",
+        "revision-row",
+        "revised-date",
+        "expired-banner",
+        "accepted-banner",
+        "accepted-info",
+        "deposit-panel",
+        "qv-timeline-section",
+        "qv-timeline-summary-meta",
+        "qv-timeline-list",
+        "dtf-specs-section",
+        "dtf-specs-container",
+        "sw-designs-section",
+        "sw-designs-product-qty",
+        "sw-designs-imprints",
+        "sw-designs-table",
+        "sw-designs-tbody",
+        "sw-status-section",
+        "sw-status-grid",
+        "sw-vendor-shipment-section",
+        "sw-vendor-body",
+        "items-container",
+        "special-notes-section",
+        "special-notes-content",
+        "sw-notes-section",
+        "sw-notes-list",
+        "sw-notes-footer",
+        "sw-financial-section",
+        "sw-fin-subtotal",
+        "sw-fin-tax-rate",
+        "sw-fin-tax",
+        "sw-fin-shipping",
+        "sw-fin-total",
+        "sw-fin-payments",
+        "sw-fin-balance",
+        "sw-fin-terms",
+        "sw-original-section",
+        "sw-original-summary-meta",
+        "sw-original-body",
+        "sw-shipping-section",
+        "sw-shipping-date",
+        "sw-shipping-by",
+        "sw-shipping-boxes",
+        "sw-shipping-address-block",
+        "sw-shipping-recipient",
+        "sw-shipping-line1",
+        "sw-shipping-line2",
+        "sw-shipping-citystate",
+        "sw-shipping-country",
+        "sw-shipping-method",
+        "sw-shipping-mode",
+        "subtotal",
+        "ltm-row",
+        "ltm-fee",
+        "grand-total",
+        "total-quantity",
+        "quote-actions",
+        "download-pdf-btn",
+        "open-invoice-link",
+        "accept-quote-btn",
+        "push-shopworks-btn",
+        "push-shopworks-label",
+        "current-year",
+        "accept-modal",
+        "modal-close",
+        "accept-form",
+        "accept-name",
+        "accept-email",
+        "accept-pickup",
+        "accept-ship",
+        "modal-total",
+        "modal-expires",
+        "modal-cancel",
+        "modal-accept",
+        "accept-btn-text",
+        "accept-btn-loading",
+        "success-modal",
+        "success-next-steps",
+        "success-close",
+        "sts-modal",
+        "sts-modal-backdrop",
+        "sts-modal-close",
+        "sts-form-mount"
+      ],
+      "links": [
+        {
+          "href": "tel:2539225793",
+          "label": "(253) 922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "label": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "label": "Browse the catalog"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com?subject=Updated%20pricing%20request",
+          "label": "Request updated pricing"
+        },
+        {
+          "href": "tel:2539225793",
+          "label": "Call (253) 922-5793"
+        },
+        {
+          "href": "#",
+          "label": "Open as Invoice"
+        },
+        {
+          "href": "tel:2539225793",
+          "label": "(253) 922-5793"
+        },
+        {
+          "href": "tel:2539225793",
+          "label": "(253) 922-5793"
+        }
+      ],
+      "fields": [
+        {
+          "id": "sw-manual-wo-input",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "qv-deposit-shipping",
+          "type": "number",
+          "value": "0"
+        },
+        {
+          "id": "qv-deposit-taxrate",
+          "type": "number",
+          "value": ""
+        },
+        {
+          "id": "accept-name",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "accept-email",
+          "type": "email",
+          "value": ""
+        },
+        {
+          "id": "accept-pickup",
+          "type": "radio",
+          "value": "pickup"
+        },
+        {
+          "id": "accept-ship",
+          "type": "radio",
+          "value": "ship"
+        }
+      ],
+      "styles": [
+        "/shared_components/css/tokens.css?v=2026.09.08.2",
+        "/pages/css/quote-view.css?v=2026.09.07.19",
+        "/shared_components/css/quote-print.css?v=2026.09.07.19",
+        "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+        "/shared_components/css/toast-notifications.css?v=2026.09.07.10"
+      ],
+      "scripts": [
+        "/shared_components/js/staff-auth-helper.js?v=2026.09.06.37",
+        "/shared_components/js/quote-deposit-math.js?v=2026.07.09.1",
+        "/shared_components/js/box-url.js?v=2026.08.06.1",
+        "/shared_components/js/toast-notifications.js?v=2026.09.08.3",
+        "/config/app.config.js",
+        "/pages/js/quote-view.js?v=2026.09.07.35"
+      ],
+      "cssBytes": 159871
+    }
+  ],
+  "hashes": {
+    "config/app.config.js": "fe83e4329ce3eee97e48dd68dab81d9d5eb6ec94511d9650e2c9ebbb1528d6ea",
+    "pages/css/customer-invoice.css": "40003ebeaac02cee87310218bf94e1a59125af535cc319ee31d346fcbe82b484",
+    "pages/css/invoice.css": "4c2f27fd4eb4d87049b65de5389b7858bd27a1ae5e75d79a89fcd85596a6a1d8",
+    "pages/css/quote-view.css": "89abaf5078d1e169cce43330aeafa8c0550c0569f21c95da902086ec7b776df6",
+    "pages/customer-invoice.html": "a98e8fa005a36b455204e9a869cfef911583c30ad1088895dd7e3a4dd5282acd",
+    "pages/invoice.html": "1123543b1848099f353862616a0a2365c4ef0b865315107d8c95b9809e013a61",
+    "pages/js/customer-invoice.js": "d09cf86c62e9b4ce67ce70e6689127941ff8fad4e9e1c6f0cc672de66dc22938",
+    "pages/js/invoice.js": "26a7989a45da2d0c8de016b4c707dac366692efeee5f3b9d2af2e2747db4e89b",
+    "pages/js/quote-view.js": "6c01ca3f33af11d9291773e707022feaf3d1e36f51ab550dfe3fc1baaa6b044b",
+    "pages/quote-view.html": "7b86dcf9cfb2130b38cab32e85f7c82a0108d71192d879282a133118339d9507",
+    "shared_components/css/garment-submit-form.css": "e377447718644932cebce1e59aab6a1044065768eae0868877a2795421255814",
+    "shared_components/css/quote-print.css": "ee06c011e5518e9d3d77afe1de33f3c500fa3a5bca88afb22ba56e9e5af9f780",
+    "shared_components/css/toast-notifications.css": "11aa2cfe4f96e2bb311b60cb9088c39126a3c0f9e0e49e7cc6ee06445bab31a4",
+    "shared_components/css/tokens.css": "2b3ab556bb9eaf40765a5c84683777cb64d50a6c42d1b4e82bc6beff33a127b6",
+    "shared_components/js/app-config.js": "fffd8cd7d934fcb67ea5165373f870cc20cd14a6c3dd62b1c36fe8ab2be44311",
+    "shared_components/js/box-url.js": "3daf0620159f6c8f4bf5929e90476030307aaf4ecbdcaa1a066d5c8a98e0935f",
+    "shared_components/js/customer-lookup-service.js": "2114d0f8a93506556dfc26b01c7c922e12093e25a4ff541896527002e9c73ca1",
+    "shared_components/js/design-name-picker.js": "60d0fb1aa9ccc547cb4574d191eb8297379416e7b9b96bfc26f56b7d0a22f6b4",
+    "shared_components/js/garment-submit-form.js": "eecc509073fc1cf52cf780e5811480ea0408bbdf1f8af5604a27891577ebdebf",
+    "shared_components/js/nwca-date-utils.js": "c8e96a9c4efb6cbf46e0c10091ede767ca8f19450d544f3a62a63ccd99fcdf5f",
+    "shared_components/js/quote-deposit-math.js": "5bd5f00f2c7e1a25b72994ba448be7c4eadf042e3f3821217975e0b36fc9901c",
+    "shared_components/js/staff-auth-helper.js": "b858bb5e30a775c949aaab2e4f0bbb4796e06c02a76f3bb8d8a9c97985f5addd",
+    "shared_components/js/toast-notifications.js": "f893a986b204e6d1890f43bcd7eef7e9391169b980fc6284d4b38e0576a4c34e",
+    "shared_components/js/work-order-picker.js": "47fd14872b2bed46d8fcfa86078c42e42e5598509ede38b48808c035eec1988f"
+  },
+  "changes": [],
+  "retiredStyles": []
+}
