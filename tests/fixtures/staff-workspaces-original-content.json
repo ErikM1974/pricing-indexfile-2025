@@ -1157,6 +1157,570 @@
       "before": "/shared_components/css/staff-schedules.css?v=2026.09.10.3",
       "after": "/shared_components/css/staff-payroll.css?v=2026.09.10.3",
       "count": 1
+    },
+    {
+      "file": "dashboards/ae-mission-control.html",
+      "before": "family=Inter:wght@400;500;600;700;800",
+      "after": "family=Public+Sans:wght@400;500;600;700;800",
+      "count": 1
+    },
+    {
+      "file": "dashboards/ae-mission-control.html",
+      "before": "    <link rel=\"stylesheet\" href=\"/shared_components/css/art-hub.css?v=2026.09.07.19\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/dash-shell.css?v=2026.09.07.10\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/sanmar-invoice-viewer.css?v=2026.09.07.10\">\n    <link rel=\"stylesheet\" href=\"/dashboards/css/ae-mission-control.css?v=2026.09.07.10\">",
+      "after": "    <link rel=\"stylesheet\" href=\"/shared_components/css/components.css?v=2026.09.10.3\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/vendor-invoice.css?v=2026.09.10.3\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/staff-mission-control.css?v=2026.09.10.3\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/ae-mission-control.html",
+      "before": "<body>",
+      "after": "<body data-ui=\"unified\" data-staff-workspace=\"mission-control\" data-department=\"ae\" data-invoice-viewer>\n    <a class=\"ui-skip-link\" href=\"#mission-control-main\">Skip to Mission Control</a>",
+      "count": 1
+    },
+    {
+      "file": "dashboards/ae-mission-control.html",
+      "before": "<main class=\"dash-content\">",
+      "after": "<main class=\"dash-content\" id=\"mission-control-main\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/ae-mission-control.html",
+      "before": "/dashboards/js/ae-mission-control.js?v=2026.09.07.33",
+      "after": "/dashboards/js/ae-mission-control.js?v=2026.09.10.3",
+      "count": 1
+    },
+    {
+      "file": "dashboards/ae-mission-control.html",
+      "before": "<div class=\"aemc-modal\" id=\"aemc-kit-modal\"",
+      "after": "<dialog class=\"aemc-modal\" id=\"aemc-kit-modal\"",
+      "count": 1
+    },
+    {
+      "file": "dashboards/ae-mission-control.html",
+      "before": "<div class=\"aemc-modal\" id=\"aemc-outreach-modal\"",
+      "after": "<dialog class=\"aemc-modal\" id=\"aemc-outreach-modal\"",
+      "count": 1
+    },
+    {
+      "file": "dashboards/ae-mission-control.html",
+      "before": "    </div>\n\n    <!-- One-click outreach modal",
+      "after": "    </dialog>\n\n    <!-- One-click outreach modal",
+      "count": 1
+    },
+    {
+      "file": "dashboards/ae-mission-control.html",
+      "before": "    </div>\n\n    <!-- Slide-over drawers",
+      "after": "    </dialog>\n\n    <!-- Slide-over drawers",
+      "count": 1
+    },
+    {
+      "file": "dashboards/ae-mission-control.html",
+      "before": "<aside class=\"mc-drawer\"",
+      "after": "<dialog class=\"mc-drawer\"",
+      "count": 1
+    },
+    {
+      "file": "dashboards/ae-mission-control.html",
+      "before": "    </aside>\n\n    <!-- Load order",
+      "after": "    </dialog>\n\n    <!-- Load order",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/ae-mission-control.js",
+      "before": "        scrim.hidden = false;\n        d.hidden = false;",
+      "after": "        scrim.hidden = true;\n        d.hidden = false;\n        d.showModal();",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/ae-mission-control.js",
+      "before": "        d.hidden = true;\n        scrim.hidden = true;",
+      "after": "        d.close();\n        d.hidden = true;\n        scrim.hidden = true;",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/ae-mission-control.js",
+      "before": "        el('aemc-kit-overlay').hidden = false;\n        el('aemc-kit-modal').hidden = false;",
+      "after": "        el('aemc-kit-modal').hidden = false;\n        el('aemc-kit-modal').showModal();\n        document.body.classList.add('is-modal-open');",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/ae-mission-control.js",
+      "before": "        el('aemc-kit-overlay').hidden = true;\n        el('aemc-kit-modal').hidden = true;",
+      "after": "        el('aemc-kit-modal').close();\n        el('aemc-kit-modal').hidden = true;\n        if (!document.querySelector('dialog[open]')) document.body.classList.remove('is-modal-open');",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/ae-mission-control.js",
+      "before": "        el('aemc-outreach-overlay').hidden = false;\n        el('aemc-outreach-modal').hidden = false;",
+      "after": "        el('aemc-outreach-modal').hidden = false;\n        el('aemc-outreach-modal').showModal();\n        document.body.classList.add('is-modal-open');",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/ae-mission-control.js",
+      "before": "        el('aemc-outreach-overlay').hidden = true;\n        el('aemc-outreach-modal').hidden = true;",
+      "after": "        el('aemc-outreach-modal').close();\n        el('aemc-outreach-modal').hidden = true;\n        if (!document.querySelector('dialog[open]')) document.body.classList.remove('is-modal-open');",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/ae-mission-control.js",
+      "before": "        el('aemc-kit-btn').addEventListener('click', openKitModal);",
+      "after": "        [['aemc-kit-modal', closeKitModal], ['aemc-outreach-modal', closeOutreachModal], ['mc-drawer', closeDrawer]].forEach(function (entry) {\n            var dialog = el(entry[0]);\n            dialog.addEventListener('cancel', function (event) { event.preventDefault(); entry[1](); });\n            dialog.addEventListener('click', function (event) {\n                var rect = dialog.getBoundingClientRect();\n                if (event.target === dialog && (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom)) entry[1]();\n            });\n        });\n        el('aemc-kit-btn').addEventListener('click', openKitModal);",
+      "count": 1
+    },
+    {
+      "file": "dashboards/ae-mission-control.html",
+      "before": "class=\"ui-skip-link\"",
+      "after": "class=\"skip-link\"",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/dash-tabs.js",
+      "before": "            var isFirst = !mounted[current];\n            mounted[current] = true;\n            if (timer) { clearTimeout(timer); timer = null; }\n            var run = function () { timer = null; onActivate(current, isFirst); };",
+      "after": "            if (timer) { clearTimeout(timer); timer = null; }\n            var run = function () {\n                timer = null;\n                // A cancelled debounce has never mounted its panel.\n                var isFirst = !mounted[next];\n                mounted[next] = true;\n                onActivate(next, isFirst);\n            };",
+      "count": 1
+    },
+    {
+      "file": "dashboards/ae-mission-control.html",
+      "before": "/shared_components/js/dash-tabs.js?v=2026.07.26.6",
+      "after": "/shared_components/js/dash-tabs.js?v=2026.09.10.3",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/box-label-template.js",
+      "before": "    const cleanup = () => {\n      document.body.classList.remove('sit-label-printing');\n      const s = document.getElementById('sit-label-sheet'); if (s) s.remove();\n      window.removeEventListener('afterprint', cleanup);\n    };",
+      "after": "    let cleanupTimer;\n    const cleanup = () => {\n      clearTimeout(cleanupTimer);\n      if (document.getElementById('sit-label-sheet') === sheet) document.body.classList.remove('sit-label-printing');\n      sheet.remove();\n      window.removeEventListener('afterprint', cleanup);\n    };",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/box-label-template.js",
+      "before": "    window.print();",
+      "after": "    cleanupTimer = setTimeout(cleanup, 1500);\n    window.print();",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/box-label-template.js",
+      "before": "    setTimeout(() => { if (document.body.classList.contains('sit-label-printing')) cleanup(); }, 1500);",
+      "after": "    // Each cleanup owns only its captured sheet.",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/sanmar-inbound-today.js",
+      "before": "    const cleanup = () => {\n      document.body.classList.remove('sit-printing');\n      const s = document.getElementById('sit-print-sheet'); if (s) s.remove();\n      window.removeEventListener('afterprint', cleanup);\n    };",
+      "after": "    let cleanupTimer;\n    const cleanup = () => {\n      clearTimeout(cleanupTimer);\n      if (document.getElementById('sit-print-sheet') === sheet) document.body.classList.remove('sit-printing');\n      sheet.remove();\n      window.removeEventListener('afterprint', cleanup);\n    };",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/sanmar-inbound-today.js",
+      "before": "    window.print();",
+      "after": "    cleanupTimer = setTimeout(cleanup, 1500);\n    window.print();",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/sanmar-inbound-today.js",
+      "before": "    setTimeout(() => { if (document.body.classList.contains('sit-printing')) cleanup(); }, 1500);",
+      "after": "    // Each cleanup owns only its captured sheet.",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/sanmar-invoice-viewer.js",
+      "before": "        var cleanup = function () {\n            document.body.classList.remove('smiv-printing');\n            var s = document.getElementById('smiv-print-sheet');\n            if (s) s.remove();",
+      "after": "        var cleanupTimer;\n        var cleanup = function () {\n            clearTimeout(cleanupTimer);\n            if (document.getElementById('smiv-print-sheet') === sheet) document.body.classList.remove('smiv-printing');\n            sheet.remove();",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/sanmar-invoice-viewer.js",
+      "before": "        window.print();\n        setTimeout(function () { if (document.body.classList.contains('smiv-printing')) cleanup(); }, 1500);",
+      "after": "        cleanupTimer = setTimeout(cleanup, 1500);\n        window.print();",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/sanmar-inbound-today.js",
+      "before": "    await awaitSheetImages(sheet);\n    document.body.classList.add('sit-printing');",
+      "after": "    await awaitSheetImages(sheet);\n    if (document.getElementById('sit-print-sheet') !== sheet) return;\n    document.body.classList.add('sit-printing');",
+      "count": 1
+    },
+    {
+      "file": "dashboards/ae-mission-control.html",
+      "before": "/shared_components/js/box-label-template.js?v=2026.09.05.71",
+      "after": "/shared_components/js/box-label-template.js?v=2026.09.10.3",
+      "count": 1
+    },
+    {
+      "file": "dashboards/ae-mission-control.html",
+      "before": "/dashboards/js/sanmar-inbound-today.js?v=2026.09.06.31",
+      "after": "/dashboards/js/sanmar-inbound-today.js?v=2026.09.10.3",
+      "count": 1
+    },
+    {
+      "file": "dashboards/ae-mission-control.html",
+      "before": "/shared_components/js/sanmar-invoice-viewer.js?v=2026.09.09.13",
+      "after": "/shared_components/js/sanmar-invoice-viewer.js?v=2026.09.10.3",
+      "count": 1
+    },
+    {
+      "file": "dashboards/ae-mission-control.html",
+      "before": "data-invoice-viewer>",
+      "after": "data-invoice-viewer=\"unified\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/ae-mission-control.js",
+      "before": "            loadSummary(false);\n            loadInbound();",
+      "after": "            loadSummary(false).then(loadInbound);",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/ae-mission-control.js",
+      "before": "        state.viewAs = email;\n        resetData();\n        loadSummary(false);\n        loadInbound();",
+      "after": "        state.viewAs = email;\n        resetData();\n        loadSummary(false).then(loadInbound);",
+      "count": 1
+    },
+    {
+      "file": "shared_components/css/box-label-print.css",
+      "before": ".sit-label { break-after: always; }",
+      "after": ".sit-label { break-after: page; }",
+      "count": 1
+    },
+    {
+      "file": "dashboards/css/sanmar-inbound.css",
+      "before": ".sit-ps-rep { break-before: always; }",
+      "after": ".sit-ps-rep { break-before: page; }",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/ae-mission-control.js",
+      "before": "            setTimeout(closeKitModal, 2200);",
+      "after": "            // Keep the confirmed result visible until the user closes it.",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/ae-mission-control.js",
+      "before": "            statusEl.textContent = '';\n            DashPage.showError('Kit request NOT saved: ' + err.message);",
+      "after": "            statusEl.textContent = 'Could not confirm the kit request: ' + err.message + '. Check the shipping queue before trying again.';",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/ae-mission-control.js",
+      "before": "                        DashPage.showError('The send timed out before the server confirmed — the email MAY have gone out. Check the lead’s timeline before resending so ' + lead.email + ' isn’t emailed twice.');",
+      "after": "                        el('aemc-outreach-note').textContent = 'The send timed out before the server confirmed — the email MAY have gone out. Check the lead’s timeline before resending so ' + lead.email + ' isn’t emailed twice.';",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/ae-mission-control.js",
+      "before": "                        DashPage.showError('Email NOT sent: ' + err.message);",
+      "after": "                        el('aemc-outreach-note').textContent = 'Could not confirm the email: ' + err.message + '. Check the lead’s timeline before trying again.';",
+      "count": 1
+    },
+    {
+      "file": "dashboards/ae-mission-control.html",
+      "before": "<span id=\"aemc-kit-status\" class=\"aemc-muted\"></span>",
+      "after": "<span id=\"aemc-kit-status\" class=\"aemc-muted\" role=\"status\" aria-live=\"polite\"></span>",
+      "count": 1
+    },
+    {
+      "file": "shared_components/css/box-label-print.css",
+      "before": ".sl-printed { color: var(--gray-400); flex: none; }",
+      "after": ".sl-printed { color: var(--gray-600); flex: none; }",
+      "count": 1
+    },
+    {
+      "file": "shared_components/css/box-label-print.css",
+      "before": "#sit-label-sheet { color: var(--print-ink); font-family: system-ui, \"Segoe UI\", Arial, sans-serif; }",
+      "after": "#sit-label-sheet { color: var(--print-ink); background: var(--color-surface); font-family: system-ui, \"Segoe UI\", Arial, sans-serif; }",
+      "count": 1
+    },
+    {
+      "file": "dashboards/css/sanmar-inbound.css",
+      "before": "#sit-print-sheet { color: var(--print-ink); font-family: system-ui, \"Segoe UI\", sans-serif; font-size: 11px; }",
+      "after": "#sit-print-sheet { color: var(--print-ink); background: var(--color-surface); font-family: system-ui, \"Segoe UI\", sans-serif; font-size: 11px; }",
+      "count": 1
+    },
+    {
+      "file": "dashboards/ae-mission-control.html",
+      "before": "/dashboards/css/sanmar-inbound.css?v=2026.09.07.19",
+      "after": "/shared_components/css/vendor-inbound.css?v=2026.09.10.3",
+      "count": 1
+    },
+    {
+      "file": "dashboards/ae-mission-control.html",
+      "before": "/shared_components/css/box-label-print.css?v=2026.09.07.10",
+      "after": "/shared_components/css/vendor-box-labels.css?v=2026.09.10.3",
+      "count": 1
+    },
+    {
+      "file": "dashboards/ae-mission-control.html",
+      "before": "data-invoice-viewer=\"unified\"",
+      "after": "data-invoice-viewer=\"unified\" data-inbound-viewer=\"unified\" data-box-label-viewer=\"unified\"",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/sanmar-inbound-today.js",
+      "before": "    modalEl = document.createElement('div');\n    modalEl.className = 'modal sit-modal';",
+      "after": "    const unified = document.body.dataset.inboundViewer === 'unified';\n    modalEl = document.createElement(unified ? 'dialog' : 'div');\n    modalEl.className = 'modal sit-modal';",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/sanmar-inbound-today.js",
+      "before": "    modalEl.addEventListener('click', (e) => { if (e.target === modalEl) close(); });",
+      "after": "    modalEl.addEventListener('cancel', (e) => {\n      e.preventDefault();\n      const menu = modalEl.querySelector('#sit-printmenu');\n      if (menu && !menu.hidden) togglePrintMenu(false);\n      else close();\n    });\n    modalEl.addEventListener('click', (e) => { if (e.target === modalEl) close(); });",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/sanmar-inbound-today.js",
+      "before": "      if (e.key !== 'Escape' || !modalEl || modalEl.hidden) return;",
+      "after": "      if (e.key !== 'Escape' || !modalEl || modalEl.hidden || modalEl.tagName === 'DIALOG') return;",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/sanmar-inbound-today.js",
+      "before": "    if (modalEl) modalEl.hidden = true;",
+      "after": "    if (modalEl) {\n      if (modalEl.tagName === 'DIALOG' && modalEl.open) modalEl.close();\n      modalEl.hidden = true;\n      document.body.classList.remove('sit-dialog-open');\n    }",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/sanmar-inbound-today.js",
+      "before": "    modalEl.hidden = false;\n    setTimeout(() => { const c = modalEl.querySelector('.btn-cancel, [data-close], button'); if (c) c.focus(); }, 30);",
+      "after": "    modalEl.hidden = false;\n    if (modalEl.tagName === 'DIALOG') {\n      if (!modalEl.open) modalEl.showModal();\n      document.body.classList.add('sit-dialog-open');\n    } else {\n      setTimeout(() => { const c = modalEl.querySelector('.btn-cancel, [data-close], button'); if (c && !modalEl.hidden) c.focus(); }, 30);\n    }",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/sanmar-inbound-today.js",
+      "before": "    if (body) body.innerHTML = html;\n    syncOutputButtons();",
+      "after": "    if (body) {\n      body.innerHTML = html;\n      if (document.body.dataset.inboundViewer === 'unified') {\n        body.querySelectorAll('.sit-lines').forEach(table => {\n          const region = document.createElement('div');\n          region.className = 'sit-lines-wrap'; region.tabIndex = 0;\n          region.setAttribute('role', 'region'); region.setAttribute('aria-label', 'Shipment items — scroll horizontally');\n          table.before(region); region.appendChild(table);\n        });\n      }\n    }\n    syncOutputButtons();",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/ae-mission-control.js",
+      "before": "    // ---------- sample-kit modal ----------",
+      "after": "    // ---------- sample-kit modal ----------\n    var kitLoadGeneration = 0, kitSending = false;\n    var outreachGeneration = 0, outreachSending = false;",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/ae-mission-control.js",
+      "before": "    function openKitModal() {\n        el('aemc-kit-modal').hidden = false;",
+      "after": "    function openKitModal() {\n        if (kitSending) return;\n        var generation = ++kitLoadGeneration;\n        el('aemc-kit-send').disabled = false;\n        el('aemc-kit-modal').hidden = false;",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/ae-mission-control.js",
+      "before": "        kitFetch('/items').then(function (body) {\n            var items",
+      "after": "        kitFetch('/items').then(function (body) {\n            if (generation !== kitLoadGeneration) return;\n            var items",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/ae-mission-control.js",
+      "before": "            box.innerHTML = '<span class=\"aemc-muted\">Could not load kit items ('",
+      "after": "            if (generation !== kitLoadGeneration) return;\n            box.innerHTML = '<span class=\"aemc-muted\">Could not load kit items ('",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/ae-mission-control.js",
+      "before": "    function closeKitModal() {\n        el('aemc-kit-modal').close();",
+      "after": "    function closeKitModal() {\n        if (kitSending) return;\n        kitLoadGeneration += 1;\n        el('aemc-kit-modal').close();",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/ae-mission-control.js",
+      "before": "    function sendKit() {\n        var statusEl",
+      "after": "    function sendKit() {\n        if (kitSending || el('aemc-kit-send').disabled) return;\n        var statusEl",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/ae-mission-control.js",
+      "before": "        var sendBtn = el('aemc-kit-send');\n        sendBtn.disabled = true;",
+      "after": "        var sendBtn = el('aemc-kit-send');\n        kitSending = true;\n        el('aemc-kit-close').disabled = true;\n        el('aemc-kit-modal').setAttribute('aria-busy', 'true');\n        sendBtn.disabled = true;",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/ae-mission-control.js",
+      "before": "            sendBtn.disabled = false;\n            // Keep the confirmed result visible until the user closes it.",
+      "after": "            kitSending = false;\n            el('aemc-kit-close').disabled = false;\n            el('aemc-kit-modal').removeAttribute('aria-busy');\n            // Keep the confirmed result and block a duplicate request until the dialog is reopened.",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/ae-mission-control.js",
+      "before": "            sendBtn.disabled = false;\n            statusEl.textContent = 'Could not confirm the kit request:",
+      "after": "            kitSending = false;\n            el('aemc-kit-close').disabled = false;\n            el('aemc-kit-modal').removeAttribute('aria-busy');\n            sendBtn.disabled = false;\n            statusEl.textContent = 'Could not confirm the kit request:",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/ae-mission-control.js",
+      "before": "    function openOutreachModal(lead) {\n        el('aemc-outreach-modal').hidden",
+      "after": "    function openOutreachModal(lead) {\n        if (outreachSending) return;\n        outreachGeneration += 1;\n        el('aemc-outreach-modal').hidden",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/ae-mission-control.js",
+      "before": "    function closeOutreachModal() {\n        el('aemc-outreach-modal').close();",
+      "after": "    function closeOutreachModal() {\n        if (outreachSending) return;\n        outreachGeneration += 1;\n        el('aemc-outreach-modal').close();",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/ae-mission-control.js",
+      "before": "    function previewOutreach(lead, tpl) {\n        var box",
+      "after": "    function previewOutreach(lead, tpl) {\n        if (outreachSending) return;\n        var generation = ++outreachGeneration;\n        var box",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/ae-mission-control.js",
+      "before": "        outreachFetch(outreachBody(lead, tpl, true)).then(function (p) {\n            box.innerHTML",
+      "after": "        outreachFetch(outreachBody(lead, tpl, true)).then(function (p) {\n            if (generation !== outreachGeneration) return;\n            box.innerHTML",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/ae-mission-control.js",
+      "before": "'<span id=\"aemc-outreach-note\" class=\"aemc-muted\"></span>'",
+      "after": "'<span id=\"aemc-outreach-note\" class=\"aemc-muted\" role=\"status\" aria-live=\"polite\"></span>'",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/ae-mission-control.js",
+      "before": "                var btn = this;\n                btn.disabled = true;\n                el('aemc-outreach-note').textContent = 'Sending…';",
+      "after": "                if (outreachSending || this.disabled || generation !== outreachGeneration) return;\n                var btn = this;\n                outreachSending = true;\n                setOutreachPending(true);\n                btn.disabled = true;\n                el('aemc-outreach-note').textContent = 'Sending…';",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/ae-mission-control.js",
+      "before": "                outreachFetch(outreachBody(lead, tpl, false)).then(function (r) {\n                    box.innerHTML",
+      "after": "                outreachFetch(outreachBody(lead, tpl, false)).then(function (r) {\n                    outreachSending = false;\n                    setOutreachPending(false);\n                    if (generation !== outreachGeneration) return;\n                    box.innerHTML",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/ae-mission-control.js",
+      "before": "                    btn.disabled = false;\n                    el('aemc-outreach-note').textContent = '';",
+      "after": "                    outreachSending = false;\n                    setOutreachPending(false);\n                    if (generation !== outreachGeneration) return;\n                    btn.disabled = false;\n                    el('aemc-outreach-note').textContent = '';",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/ae-mission-control.js",
+      "before": "            box.innerHTML = '<span class=\"aemc-muted\">Preview failed ('",
+      "after": "            if (generation !== outreachGeneration) return;\n            box.innerHTML = '<span class=\"aemc-muted\">Preview failed ('",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/ae-mission-control.js",
+      "before": "    // ---------- art notification toasts ----------",
+      "after": "    function setOutreachPending(pending) {\n        el('aemc-outreach-close').disabled = pending;\n        el('aemc-outreach-modal').setAttribute('aria-busy', String(pending));\n        Array.prototype.forEach.call(el('aemc-outreach-btns').querySelectorAll('[data-tpl]'), function (button) { button.disabled = pending; });\n    }\n\n    // ---------- art notification toasts ----------",
+      "count": 1
+    },
+    {
+      "file": "dashboards/purchasing-portal.html",
+      "before": "/shared_components/js/sanmar-invoice-viewer.js?v=2026.09.09.13",
+      "after": "/shared_components/js/sanmar-invoice-viewer.js?v=2026.09.10.3",
+      "count": 1
+    },
+    {
+      "file": "dashboards/purchasing-portal.html",
+      "before": "/shared_components/css/vendor-invoice.css?v=2026.09.09.13",
+      "after": "/shared_components/css/vendor-invoice.css?v=2026.09.10.3",
+      "count": 1
+    },
+    {
+      "file": "dashboards/sanmar-payables.html",
+      "before": "/shared_components/js/sanmar-invoice-viewer.js?v=2026.09.09.13",
+      "after": "/shared_components/js/sanmar-invoice-viewer.js?v=2026.09.10.3",
+      "count": 1
+    },
+    {
+      "file": "dashboards/sanmar-payables.html",
+      "before": "/shared_components/css/vendor-invoice.css?v=2026.09.09.13",
+      "after": "/shared_components/css/vendor-invoice.css?v=2026.09.10.3",
+      "count": 1
+    },
+    {
+      "file": "dashboards/quote-management.html",
+      "before": "/shared_components/js/box-label-template.js?v=2026.09.05.71",
+      "after": "/shared_components/js/box-label-template.js?v=2026.09.10.3",
+      "count": 1
+    },
+    {
+      "file": "dashboards/quote-management.html",
+      "before": "/dashboards/js/sanmar-inbound-today.js?v=2026.09.06.31",
+      "after": "/dashboards/js/sanmar-inbound-today.js?v=2026.09.10.3",
+      "count": 1
+    },
+    {
+      "file": "dashboards/quote-management.html",
+      "before": "/shared_components/css/box-label-print.css?v=2026.09.07.10",
+      "after": "/shared_components/css/box-label-print.css?v=2026.09.10.3",
+      "count": 1
+    },
+    {
+      "file": "dashboards/quote-management.html",
+      "before": "/dashboards/css/sanmar-inbound.css?v=2026.09.07.19",
+      "after": "/dashboards/css/sanmar-inbound.css?v=2026.09.10.3",
+      "count": 1
+    },
+    {
+      "file": "pages/box-labels.html",
+      "before": "/shared_components/js/box-label-template.js?v=2026.09.05.71",
+      "after": "/shared_components/js/box-label-template.js?v=2026.09.10.3",
+      "count": 1
+    },
+    {
+      "file": "pages/box-labels.html",
+      "before": "/shared_components/css/box-label-print.css?v=2026.09.07.10",
+      "after": "/shared_components/css/box-label-print.css?v=2026.09.10.3",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-inbound-print.html",
+      "before": "/shared_components/js/box-label-template.js?v=2026.09.05.71",
+      "after": "/shared_components/js/box-label-template.js?v=2026.09.10.3",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-inbound-print.html",
+      "before": "/dashboards/js/sanmar-inbound-today.js?v=2026.09.06.31",
+      "after": "/dashboards/js/sanmar-inbound-today.js?v=2026.09.10.3",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-inbound-print.html",
+      "before": "/shared_components/css/box-label-print.css?v=2026.09.07.10",
+      "after": "/shared_components/css/box-label-print.css?v=2026.09.10.3",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-inbound-print.html",
+      "before": "/dashboards/css/sanmar-inbound.css?v=2026.09.07.19",
+      "after": "/dashboards/css/sanmar-inbound.css?v=2026.09.10.3",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-purchasing-portal.html",
+      "before": "/shared_components/js/sanmar-invoice-viewer.js?v=2026.09.09.13",
+      "after": "/shared_components/js/sanmar-invoice-viewer.js?v=2026.09.10.3",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-purchasing-portal.html",
+      "before": "/shared_components/css/vendor-invoice.css?v=2026.09.09.13",
+      "after": "/shared_components/css/vendor-invoice.css?v=2026.09.10.3",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-sanmar-payables.html",
+      "before": "/shared_components/js/sanmar-invoice-viewer.js?v=2026.09.09.13",
+      "after": "/shared_components/js/sanmar-invoice-viewer.js?v=2026.09.10.3",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-sanmar-payables.html",
+      "before": "/shared_components/css/vendor-invoice.css?v=2026.09.09.13",
+      "after": "/shared_components/css/vendor-invoice.css?v=2026.09.10.3",
+      "count": 1
+    },
+    {
+      "file": "dashboards/purchasing-portal.html",
+      "before": "/dashboards/js/purchasing-portal.js?v=2026.09.09.13",
+      "after": "/dashboards/js/purchasing-portal.js?v=2026.09.10.3",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-purchasing-portal.html",
+      "before": "/dashboards/js/purchasing-portal.js?v=2026.09.09.13",
+      "after": "/dashboards/js/purchasing-portal.js?v=2026.09.10.3",
+      "count": 1
     }
   ],
   "retiredStyles": [
@@ -1171,6 +1735,10 @@
     {
       "file": "dashboards/css/payroll.css",
       "css": "/* Payroll — admin-only leave/hours dashboard. NWCA green theme; no inline styles. */\n\n/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page\n   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;\n   every rule below uses var(). Raw hex is allowed ONLY in this block. */\n/* stylelint-disable color-no-hex */\n:root {\n    --payroll-gray: #5a665e;\n    --payroll-green: #1a7c3a;\n    --payroll-gray-2: #8a968f;\n    --payroll-green-dark: #2c3b33;\n    --payroll-gray-dark: #000;\n    --payroll-orange: #8a5a10;\n    --payroll-orange-2: #7a4f0d;\n    --payroll-orange-3: #d9932a;\n    --payroll-green-dark-2: #14682f;\n    --payroll-orange-4: #7a4b06;\n    --payroll-orange-5: #c77700;\n}\n/* stylelint-enable color-no-hex */\n\n* { box-sizing: border-box; }\nbody { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background: var(--gray-100); color: var(--store-ink); }\n\n.pr-wrap { max-width: 1240px; margin: 0 auto; padding: 1.5rem 1.25rem 4rem; }\n\n.pr-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; border-bottom: 3px solid var(--brand-800); padding-bottom: 1rem; margin-bottom: 1rem; }\n.pr-header h1 { color: var(--brand-800); font-size: 1.6rem; margin: 0; }\n.pr-sub { color: var(--payroll-gray); margin: .35rem 0 0; font-size: .92rem; max-width: 72ch; }\n.pr-back { color: var(--brand-mid); text-decoration: none; font-weight: 600; font-size: .9rem; white-space: nowrap; }\n.pr-back:hover { color: var(--brand-800); }\n\n.pr-status { min-height: 1.4rem; margin: .25rem 0 .75rem; font-size: .9rem; font-weight: 500; }\n.pr-status.is-ok { color: var(--payroll-green); }\n.pr-status.is-error { color: var(--red-700); }\n.pr-status.is-info { color: var(--payroll-gray); }\n\n.pr-tabs { display: flex; gap: .5rem; margin-bottom: 1rem; flex-wrap: wrap; }\n.pr-tab { background: var(--store-green-100); border: none; color: var(--store-ink-soft); padding: .55rem 1.1rem; border-radius: 8px 8px 0 0; font-weight: 600; cursor: pointer; font-size: .95rem; }\n.pr-tab.is-active { background: var(--brand-800); color: var(--color-on-brand); }\n\n.pr-panel { display: none; background: var(--color-surface); border-radius: 10px; padding: 1.25rem; box-shadow: 0 1px 3px rgb(26 71 42 / 8%); }\n.pr-panel.is-active { display: block; }\n.pr-panel-head h2 { color: var(--brand-800); font-size: 1.15rem; margin: 0 0 .35rem; }\n.pr-panel-head p { color: var(--payroll-gray); font-size: .9rem; margin: 0 0 1rem; max-width: 80ch; line-height: 1.5; }\n.pr-h3 { color: var(--brand-800); font-size: 1rem; margin: 1.5rem 0 .6rem; }\n\n.pr-toolbar { display: flex; align-items: center; gap: .75rem; margin-bottom: .9rem; flex-wrap: wrap; }\n.pr-label { font-size: .88rem; font-weight: 600; color: var(--store-ink-soft); }\n.pr-search, .pr-select { border: 1px solid var(--gray-300); border-radius: 7px; padding: .5rem .7rem; font-size: .92rem; font-family: inherit; color: var(--store-ink); background: var(--color-surface); }\n.pr-search { min-width: 18rem; }\n.pr-search:focus, .pr-select:focus { outline: 2px solid var(--brand-mid); outline-offset: 1px; }\n.pr-asof { font-size: .85rem; color: var(--payroll-gray); margin-left: auto; }\n\n/* Wide tables scroll inside their own container — the page never scrolls sideways. */\n.pr-tablewrap { overflow-x: auto; }\n.pr-table { width: 100%; border-collapse: collapse; font-size: .9rem; }\n.pr-table th { text-align: left; background: var(--store-green-50); color: var(--payroll-green-dark); font-weight: 600; padding: .55rem .65rem; border-bottom: 2px solid var(--gray-300); white-space: nowrap; }\n\n/* Spanning \"Vacation\"/\"Sick\" caption over their columns — see the two-row thead.\n   Qualified with th so it outspecifies `.pr-table th { text-align: left }` above. */\n.pr-table th.pr-group-head { text-align: center; font-size: .8rem; letter-spacing: .04em; text-transform: uppercase; color: var(--payroll-gray); border-bottom: 1px solid var(--gray-300); padding-bottom: .3rem; border-left: 1px solid var(--gray-300); }\n.pr-table thead tr:first-child th { padding-bottom: .3rem; }\n.pr-table thead tr:last-child th { padding-top: .3rem; }\n.pr-table td { padding: .5rem .65rem; border-bottom: 1px solid var(--brand-100); white-space: nowrap; }\n.pr-table tbody tr:hover { background: var(--gray-50); }\n.pr-num { text-align: right; }\n.pr-loading { color: var(--payroll-gray-2); font-style: italic; padding: 1rem .65rem; }\n\n.pr-neg { color: var(--red-700); font-weight: 600; }\n.pr-zero { color: var(--print-line); }\n.pr-name { font-weight: 600; color: var(--store-ink); }\n.pr-dept { color: var(--payroll-gray); }\n.pr-pill { display: inline-block; font-size: .74rem; font-weight: 600; padding: .1rem .45rem; border-radius: 20px; background: var(--store-green-100); color: var(--store-ink-soft); margin-left: .4rem; }\n.pr-pill-wait { background: var(--store-rush-soft); color: var(--payroll-orange); }\n.pr-pill-flag { background: var(--store-rush-soft); color: var(--red-800); }\n.pr-yes { color: var(--payroll-green); font-weight: 600; }\n.pr-no { color: var(--print-line); }\n\n/* --- carryover correction ------------------------------------------------\n   The imported figure stays on screen next to the printed one, so the page can\n   still be reconciled against the accountant's report at a glance. */\n.pr-raw { color: var(--payroll-gray-2); text-decoration: line-through; }\n.pr-arrow { color: var(--payroll-gray-2); margin: 0 .3rem; }\n.pr-adj-demo { font-family: inherit; white-space: nowrap; color: var(--store-ink-soft); background: var(--store-green-50); border-radius: 4px; padding: 0 .3rem; }\n.pr-entitle { color: var(--store-ink-soft); }\n\n/* An unset entitlement is not zero — it blocks the slip, so it must not read as a number. */\n.pr-missing { color: var(--red-700); font-weight: 600; font-size: .82rem; }\n.pr-row-flag { background: var(--store-paper); }\n.pr-row-flag:hover { background: var(--red-50); }\n\n.pr-flags { margin-bottom: .9rem; }\n.pr-flag-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .4rem; }\n.pr-flag-list li { font-size: .88rem; line-height: 1.45; padding: .55rem .8rem; border-radius: 7px; }\n.pr-flag-block { background: var(--store-rush-soft); color: var(--red-800); border-left: 4px solid var(--red-700); }\n.pr-flag-warn { background: var(--store-rush-soft); color: var(--payroll-orange-2); border-left: 4px solid var(--payroll-orange-3); }\n.pr-flag-list em { font-style: normal; font-weight: 600; }\n\n.pr-upload { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; padding: 1rem; background: var(--gray-50); border: 1px dashed var(--gray-300); border-radius: 9px; }\n.pr-file { font-size: .9rem; font-family: inherit; }\n.pr-note { font-size: .85rem; color: var(--payroll-gray); }\n\n/* Busy indicator for the packet read. The read takes ~40s, and a greyed-out button with no\n   motion reads as BROKEN rather than working — Erik, 2026-08-10, having just been burned by a\n   read that genuinely was dead. Motion is the part that says \"still alive\"; the seconds\n   counter is the part that says \"and it is making progress\".\n   🔑 display:inline-flex would BEAT the UA's [hidden]{display:none}, so the attribute alone\n   would not hide it — the explicit [hidden] rule is what makes it actually disappear. */\n.pr-progress { display: inline-flex; align-items: center; gap: .45rem; font-size: .85rem; font-weight: 600; color: var(--store-ink-soft); }\n.pr-progress[hidden] { display: none; }\n\n.pr-spin {\n  width: .85em; height: .85em; flex: none;\n  border: 2px solid var(--gray-300); border-top-color: var(--brand-800); border-radius: 50%;\n  animation: pr-spin .7s linear infinite;\n}\n\n@keyframes pr-spin { to { transform: rotate(360deg); } }\n\n/* Still turns, just slowly — a frozen ring next to \"reading…\" would read as hung. */\n@media (prefers-reduced-motion: reduce) { .pr-spin { animation-duration: 2.4s; } }\n\n.pr-btn { background: var(--store-green-100); border: none; color: var(--payroll-green-dark); padding: .55rem 1.1rem; border-radius: 7px; font-weight: 600; font-size: .92rem; cursor: pointer; font-family: inherit; }\n.pr-btn:hover:not(:disabled) { background: var(--store-line); }\n.pr-btn:disabled { opacity: .5; cursor: not-allowed; }\n.pr-btn-primary { background: var(--brand-800); color: var(--color-on-brand); }\n.pr-btn-primary:hover:not(:disabled) { background: var(--print-green); }\n.pr-btn-ghost { background: transparent; color: var(--payroll-gray); }\n.pr-btn-ghost:hover:not(:disabled) { background: var(--store-green-50); }\n\n.pr-review { margin-top: 1.5rem; border-top: 1px solid var(--gray-200); padding-top: 1.25rem; }\n.pr-verdict { padding: .8rem 1rem; border-radius: 8px; font-size: .93rem; font-weight: 600; margin-bottom: 1rem; line-height: 1.5; }\n\n/* [hidden]{display:none} is only a UA default — any author display: on these would beat it\n   and leave a \"hidden\" block on screen. Both blocks are toggled by the hidden attribute. */\n.pr-review[hidden], .pr-verdict[hidden] { display: none; }\n.pr-verdict.is-ok { background: var(--brand-100); color: var(--payroll-green-dark-2); border-left: 4px solid var(--payroll-green); }\n.pr-verdict.is-bad { background: var(--store-rush-soft); color: var(--red-800); border-left: 4px solid var(--red-700); }\n\n/* Reconciled, but something on the page is worth a second look before saving — an\n   over-drawn balance the report floors at zero, say. Not a failure: Save stays live. */\n.pr-verdict.is-warn { background: var(--store-rush-soft); color: var(--payroll-orange-4); border-left: 4px solid var(--payroll-orange-5); }\n.pr-verdict ul { margin: .5rem 0 0; padding-left: 1.2rem; font-weight: 400; }\n\n.pr-check-table { max-width: 44rem; }\n.pr-ok { color: var(--payroll-green); font-weight: 600; }\n.pr-bad { color: var(--red-700); font-weight: 600; }\n\n.pr-commit { display: flex; gap: .6rem; margin-top: 1.25rem; align-items: center; flex-wrap: wrap; }\n\n@media (width <= 720px) {\n  .pr-header { flex-direction: column; }\n  .pr-search { min-width: 100%; }\n  .pr-asof { margin-left: 0; }\n}\n\n/* ============================================================\n   CUT-APART SLIPS — one per employee, handed out on paper.\n   Letter portrait, 0.5in margins → 7.5in x 10in of usable page.\n   Grid is 2 cols x 3.333in rows = exactly 6 slips per sheet, so the\n   page break lands on a slip boundary instead of slicing one in half.\n   ============================================================ */\n#print-sheet { display: none; }\n\n@media print {\n  /* Only the Print-slips button prints slips. A plain Ctrl+P still prints the\n     dashboard, which is what someone expects when they didn't ask for slips. */\n  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */\n  body.print-slips .pr-wrap { display: none !important; }\n  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */\n  body.print-slips #print-sheet { display: block !important; }\n\n  @page { size: 8.5in 11in; margin: 0.5in; }\n  body.print-slips { background: var(--color-surface); margin: 0; }\n\n  #print-slips-grid {\n    display: grid;\n    grid-template-columns: 1fr 1fr;\n\n    /* Dashed guides on the outside; each slip draws its own right/bottom edge, so\n       adjacent slips share ONE line and every cut is a single scissor pass. */\n    border-top: 1px dashed var(--print-line);\n    border-left: 1px dashed var(--print-line);\n  }\n\n  .slip {\n    height: 3.333in;\n    border-right: 1px dashed var(--print-line);\n    border-bottom: 1px dashed var(--print-line);\n    padding: 0.3in 0.32in;\n    break-inside: avoid;\n    display: flex;\n    flex-direction: column;\n    color: var(--payroll-gray-dark);\n\n    /* Serif reads as a document rather than a screenshot — this is handed to a person. */\n    font-family: Georgia, 'Times New Roman', serif;\n  }\n  .slip-co { font-size: 8pt; letter-spacing: .06em; text-transform: uppercase; color: var(--gray-700); }\n  .slip-name { font-size: 13.5pt; font-weight: 700; margin: .04in 0 .01in; line-height: 1.1; }\n  .slip-asof { font-size: 8pt; color: var(--print-ink-soft); margin-bottom: .1in; }\n\n  .slip-rows { border-top: 1.5px solid var(--payroll-gray-dark); padding-top: .05in; }\n\n  /* Vacation and sick both print accrued/used/remaining, so each set is labelled —\n     six bare rows would be ambiguous about which balance is which. */\n  .slip-group { font-size: 8pt; letter-spacing: .07em; text-transform: uppercase;\n                color: var(--print-ink-soft); font-weight: 700; margin: .05in 0 .01in; }\n\n  .slip-row { display: flex; justify-content: space-between; align-items: baseline;\n              font-size: 10pt; padding: .028in 0; }\n  .slip-row + .slip-row { border-top: 1px solid var(--store-line); }\n  .slip-label { color: var(--print-ink); }\n\n  /* Ties the vacation line to the footnote below it. */\n  .slip-star { font-weight: 700; margin-left: .04in; }\n  .slip-val { font-weight: 700; font-variant-numeric: tabular-nums; }\n\n  /* A negative balance is legitimate here (vacation accrues at one year), so it is\n     printed plainly with a note rather than flagged red like an error on screen. */\n  .slip-note { font-size: 7.5pt; color: var(--print-ink-soft); margin-top: auto; padding-top: .07in;\n               line-height: 1.3; font-style: italic; }\n}\n\n/* 2026-09-05 review */\n/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */\n[hidden] { display: none !important; }\n.pr-retry { margin-left: .5rem; padding: .3rem .7rem; font-size: .85rem; }\n.pr-tab:focus-visible, .pr-btn:focus-visible, .pr-back:focus-visible { outline: 2px solid var(--brand-800); outline-offset: 2px; }\n"
+    },
+    {
+      "file": "dashboards/css/ae-mission-control.css",
+      "css": "/* stylelint-disable no-duplicate-selectors -- legacy sheet: rules were appended over time; merging them would reorder the cascade (2026-09-07) */\n\n/* ae-mission-control.css — AE Mission Control (per-AE cockpit)\n * Page-specific styles only; tokens come from art-hub.css, shell from\n * dash-shell.css. Prefix: aemc-. */\n\n/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its\n   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;\n   raw hex is allowed ONLY in this block. */\n/* stylelint-disable color-no-hex */\n:root {\n    --ae-mission-control-orange: #f5d3ad;\n    --ae-mission-control-green: #b7e0c5;\n    --ae-mission-control-orange-2: #ffd27a;\n    --ae-mission-control-green-2: #198754;\n    --ae-mission-control-blue: #0a4fb5;\n    --ae-mission-control-blue-tint: #c4d7f7;\n    --ae-mission-control-red: #f2b8b8;\n    --ae-mission-control-yellow: #ffb703;\n    --ae-mission-control-indigo: #6d28d9;\n    --ae-mission-control-indigo-tint: #ddd6fe;\n    --ae-mission-control-green-tint: #c9f0cd;\n    --ae-mission-control-green-3: #8fe19a;\n    --ae-mission-control-blue-2: #0d6efd;\n    --ae-mission-control-orange-3: #fd7e14;\n    --ae-mission-control-teal: #14b8a6;\n    --ae-mission-control-red-tint: #f0c4c2;\n    --ae-mission-control-green-4: #bfe6c9;\n    --ae-mission-control-red-tint-2: #f3c3c3;\n --art-theme: var(--brand-500); }\n/* stylelint-enable color-no-hex */\n\n/* ---------- file-wide [hidden] guard — REQUIRED, do not remove ----------\n * An author `display` rule beats the UA sheet's [hidden]{display:none} regardless of\n * specificity, so any element the JS toggles with `.hidden = true` silently never hides.\n * LESSONS_LEARNED 2026-07-19, recurrence #5 — and it was live on this page in three places\n * until 2026-07-26:\n *   #aemc-viewas      vs .aemc-viewas{display:inline-flex}  → the ADMIN \"View as Taneisha /\n *                                                             Nika\" switcher rendered on both\n *                                                             reps' own cockpits\n *   #aemc-art-badge   vs .aemc-badge{display:inline-block}  → empty red pill on Send Artwork\n *                                                             whenever nothing awaited approval\n *   #aemc-accounts-link vs .dash-btn{display:inline-flex}   → \"My Accounts\" shown with no page\n * Nothing on this page relies on a [hidden] element being painted (audited every toggle), and\n * the tab panels below use `hidden` for visibility — so this rule is load-bearing now. */\n/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */\n[hidden] { display: none !important; }\n\n/* ---------- greeting row ---------- */\n.aemc-greeting-row {\n    display: flex;\n    align-items: baseline;\n    justify-content: space-between;\n    gap: var(--space-3);\n    margin-bottom: var(--space-4);\n    flex-wrap: wrap;\n}\n\n.aemc-greeting {\n    font-size: 1.3rem;\n    font-weight: 700;\n    color: var(--gray-900);\n}\n\n.aemc-updated {\n    font-size: 0.78rem;\n    color: var(--gray-500);\n}\n\n/* ---------- Q3 embroidery bonus hero ----------\n * The only place on any dashboard where a rep's bonus dollars appear (the shared staff\n * dashboard carries the company goal with no compensation on it). Deliberately the loudest\n * thing above the fold: big earned-to-date number on the left, the nearest concrete ask on\n * the right. NW green so it reads as \"yours / good news\" rather than another data card.\n *\n * ⚠️ CONTRAST (fixed 2026-07-26): the original ramp ran to #63c96b, and white text over that\n * is ≈2.0:1 — failing AA outright — while the old 55% stop (#4cb354) is ≈2.9:1, also failing\n * for anything under 24px bold. The goal line, the rung chips and the pace pill all sat in\n * exactly that light region. Re-aimed so the whole typeset area stays on the dark half\n * (#1f5f27 ≈8.4:1, #2f7d38 ≈5.6:1); the bright green survives only as an untyped accent. */\n.aemc-bonus-hero {\n    position: relative;\n    display: flex;\n    flex-wrap: wrap;\n    align-items: center;\n    gap: var(--space-6);\n    padding: var(--space-5) var(--space-6);\n    margin-bottom: var(--space-4);\n    border-radius: var(--radius-xl);\n    background: linear-gradient(112deg, var(--store-green-950) 0%, var(--print-green-dark) 42%, var(--store-green-700) 100%);\n    color: var(--color-on-brand);\n    box-shadow: 0 10px 26px -12px rgb(18 50 26 / 50%);\n    overflow: hidden;\n}\n\n/* Keeps the lively NW green in the design without putting any text on top of it.\n * 🔒 CONTRAST RULE: no text may sit on the light end of the gradient, and muted hero text\n * uses a COLOUR, never opacity — opacity composites toward the gradient and lands at a\n * different effective contrast at each end of the band. */\n.aemc-bonus-hero::after {\n    content: '';\n    position: absolute;\n    left: 38%;\n    top: -140px;\n    width: 420px;\n    height: 420px;\n    border-radius: 50%;\n    background: radial-gradient(circle, rgb(99 201 107 / 30%) 0%, rgb(99 201 107 / 0%) 70%);\n    pointer-events: none;\n}\n.aemc-bonus-hero > * { position: relative; z-index: 1; }\n\n/* Stands in for the hero when the bonus feed fails, so the missing centerpiece is explained\n * rather than just absent. Warning-toned, not danger — nothing else on the page is broken. */\n.aemc-bh-fallback {\n    display: flex;\n    align-items: center;\n    gap: var(--space-2);\n    padding: var(--space-3) var(--space-4);\n    margin-bottom: var(--space-4);\n    border: 1px solid var(--state-warning);\n    border-left-width: 4px;\n    border-radius: var(--radius-md);\n    background: var(--state-warning-bg);\n    color: var(--gray-800);\n    font-size: 0.88rem;\n}\n.aemc-bh-fallback i { color: var(--state-warning); }\n\n/* ── DIAL ── percent-of-goal ring + the earned figure beside it. The ring holds ONLY the\n * percentage (which always fits); the dollar amount is HTML text next to it, free to be any\n * width — the old design drew the amount INSIDE a 176px ring, and \"$1,050.00\" at 34px\n * monospace (~184px) is wider than the ring's ~129px clear centre, so the number painted\n * over the arc (redesign Option B, 2026-09-01). Both the arc and the 85% tick are set from\n * ONE axis in renderBonusSpine; nothing here encodes a percentage. */\n.aemc-bh-dial {\n    flex: 0 0 288px;\n    box-sizing: border-box;\n    display: flex;\n    align-items: center;\n    gap: 16px;\n    padding-right: var(--space-6);\n    border-right: 1px solid rgb(255 255 255 / 22%);\n}\n.aemc-bh-dial svg { width: 112px; height: 112px; flex: 0 0 auto; }\n.aemc-bh-dial-track { fill: none; stroke: rgb(0 0 0 / 28%); stroke-width: 11; }\n.aemc-bh-dial-tick  { fill: none; stroke: var(--ae-mission-control-yellow); stroke-width: 11; }\n\n.aemc-bh-dial-arc {\n    fill: none;\n    stroke: var(--color-surface);\n    stroke-width: 11;\n    stroke-linecap: round;\n    transition: stroke-dasharray 420ms var(--ease-out, cubic-bezier(.2,.8,.2,1));\n}\n\n/* Viewbox is 128 but the svg renders at 112, so these px sizes are set for the 0.875 scale. */\n.aemc-bh-dial-pct {\n    font-family: 'JetBrains Mono', monospace;\n    font-size: 24px;\n    font-weight: 700;\n    fill: var(--color-surface);\n    font-variant-numeric: tabular-nums;\n}\n\n.aemc-bh-dial-cap {\n    font-size: 9.5px; font-weight: 700; letter-spacing: 1px;\n    fill: rgb(255 255 255 / 75%);\n}\n.aemc-bh-earned { display: flex; flex-direction: column; gap: 5px; min-width: 0; }\n\n.aemc-bh-earned-cap {\n    font-size: 11px; font-weight: 700; letter-spacing: 1px;\n    text-transform: uppercase; color: rgb(255 255 255 / 85%);\n}\n\n.aemc-bh-earned-amt {\n    font-family: 'JetBrains Mono', monospace;\n    font-size: 24px;\n    font-weight: 700;\n    line-height: 1.1;\n    font-variant-numeric: tabular-nums;\n}\n\n/* ── LADDER ── flex-basis 0, NOT auto: with basis auto a wrapping flex container places\n * items on lines by their MAX-CONTENT width, and the headline sentence measures ~1100px\n * unwrapped — which shoved the 208px CTA column onto its own row at every desktop width\n * (the \"empty green corner\"). Basis 0 keeps dial | ladder | CTA on one band; the explainer\n * still wraps because its basis is 100%. */\n.aemc-bh-ladder { flex: 1 1 0; min-width: 0; }\n\n.aemc-bh-eyebrow {\n    font-size: 0.7rem;\n    font-weight: 700;\n    letter-spacing: 0.11em;\n    text-transform: uppercase;\n    color: rgb(255 255 255 / 75%);\n}\n\n.aemc-bh-next {\n    font-size: 1.45rem;\n    font-weight: 800;\n    letter-spacing: -0.02em;\n    line-height: 1.25;\n    margin-top: 5px;\n}\n\n/* Three payout scenarios. The \"now\" card is an opaque white chip precisely so its text is\n * never sitting on the gradient. */\n.aemc-bh-scenarios { display: flex; gap: 9px; margin-top: 15px; flex-wrap: wrap; }\n.aemc-bh-sc { flex: 1 1 150px; border-radius: 10px; padding: 10px 13px; }\n.aemc-bh-sc--now { background: rgb(255 255 255 / 94%); color: var(--store-green-950); }\n\n.aemc-bh-sc--pace,\n.aemc-bh-sc--goal { background: rgb(0 0 0 / 26%); border: 1px solid rgb(255 255 255 / 24%); }\n\n.aemc-bh-sc-eyebrow {\n    font-size: 0.66rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase;\n}\n.aemc-bh-sc--now  .aemc-bh-sc-eyebrow { color: var(--store-green-700); }\n.aemc-bh-sc--pace .aemc-bh-sc-eyebrow { color: var(--ae-mission-control-orange-2); }\n.aemc-bh-sc--goal .aemc-bh-sc-eyebrow { color: var(--ae-mission-control-green-tint); }\n\n.aemc-bh-sc-amt {\n    font-family: 'JetBrains Mono', monospace;\n    font-size: 1.35rem; font-weight: 700; margin-top: 3px;\n    font-variant-numeric: tabular-nums;\n}\n.aemc-bh-sc-sub { font-size: 0.72rem; margin-top: 2px; color: rgb(255 255 255 / 80%); }\n.aemc-bh-sc--now .aemc-bh-sc-sub { color: var(--store-ink-soft); }\n\n/* The start caption owns a whole row. Sharing one absolutely-positioned line with the\n * endpoint labels made this 176px label overlap \"goal $66,609\" below ~1300px — including\n * 1280x800, which this repo treats as load-bearing. */\n.aemc-bh-startcap { position: relative; height: 16px; margin-top: 15px; font-size: 0.68rem; }\n\n.aemc-bh-startcap span {\n    position: absolute;\n    transform: translateX(-100%);\n    padding-right: 8px;\n    color: var(--ae-mission-control-orange-2);\n    font-weight: 700;\n    white-space: nowrap;\n}\n\n.aemc-bh-track {\n    height: 12px;\n    margin-top: 2px;\n    border-radius: 999px;\n    background: rgb(0 0 0 / 30%);\n    box-shadow: inset 0 1px 2px rgb(0 0 0 / 25%);\n}\n\n.aemc-bh-fill {\n    height: 12px;\n    border-radius: 999px;\n    background: linear-gradient(90deg, var(--ae-mission-control-green-3), var(--color-surface));\n    transition: width 420ms var(--ease-out, cubic-bezier(.2,.8,.2,1));\n}\n\n/* Flex, not absolute — that is what makes the endpoint labels collision-proof. */\n.aemc-bh-ends {\n    display: flex;\n    align-items: baseline;\n    justify-content: space-between;\n    gap: 12px;\n    margin-top: 6px;\n    font-size: 0.68rem;\n    color: rgb(255 255 255 / 78%);\n    font-variant-numeric: tabular-nums;\n}\n.aemc-bh-ends strong { color: var(--color-on-brand); }\n#aemc-bh-goalmax { color: var(--color-on-brand); font-weight: 700; white-space: nowrap; }\n\n.aemc-bh-endcap {\n    position: absolute;\n    right: 0; top: -6px; bottom: -6px;\n    width: 3px;\n    border-radius: 2px;\n    background: rgb(255 255 255 / 75%);\n}\n\n/* ── CTA column ── */\n.aemc-bh-cta { flex: 0 0 208px; display: flex; flex-direction: column; gap: 9px; }\n\n.aemc-bh-go {\n    display: flex; align-items: center; justify-content: center; gap: 8px;\n    padding: 11px 14px;\n    border-radius: 9px;\n    background: var(--color-surface);\n    color: var(--print-green-dark);\n    font-size: 0.85rem;\n    font-weight: 700;\n    text-decoration: none;\n}\n.aemc-bh-go:hover { background: var(--brand-100); color: var(--store-green-950); }\n\n/* Pace line — tells the rep whether a big raw gap is actually on track. */\n.aemc-bh-pace {\n    display: inline-flex;\n    align-items: flex-start;\n    gap: 8px;\n    padding: 9px 12px;\n    border-radius: 9px;\n    font-size: 0.76rem;\n    font-weight: 600;\n    line-height: 1.4;\n}\n.aemc-bh-pace.is-onpace { background: rgb(255 255 255 / 92%); color: var(--brand-700); }\n.aemc-bh-pace.is-behind { background: rgb(0 0 0 / 30%); color: var(--color-on-brand); border: 1px solid rgb(255 255 255 / 50%); }\n\n.aemc-bh-track { position: relative; overflow: visible; }\n.aemc-bh-marks { position: absolute; inset: 0; }\n\n/* The 85% start line on the track. Amber, matching the dial's tick — same threshold, so it\n * must read as the same thing in both places. */\n.aemc-bh-mark {\n    position: absolute;\n    top: -6px;\n    bottom: -6px;\n    width: 3px;\n    border-radius: 2px;\n    background: var(--ae-mission-control-yellow);\n    transform: translateX(-1px);\n}\n.aemc-bh-mark.is-hit { background: var(--color-surface); }\n\n/* .aemc-bh-rungs / .aemc-bh-rung were retired with the rung ladder (2026-07-27) — the\n * banner now shows three payout SCENARIOS instead. The rung fallback path in\n * renderBonusSpine() no longer paints chips, only the headline sentence, so there is\n * nothing left to style. */\n\n.aemc-bh-explain {\n    border: 1px solid rgb(255 255 255 / 35%);\n    background: transparent;\n    color: var(--color-on-brand);\n    font: inherit;\n    font-size: 0.76rem;\n    font-weight: 600;\n    padding: 4px 10px;\n    border-radius: var(--radius-pill, 999px);\n    cursor: pointer;\n}\n.aemc-bh-explain:hover { background: rgb(255 255 255 / 16%); }\n\n.aemc-bh-how {\n    flex: 1 1 100%;\n    margin-top: var(--space-3);\n    padding-top: var(--space-3);\n    border-top: 1px solid rgb(255 255 255 / 28%);\n}\n\n.aemc-bh-how-grid {\n    display: grid;\n    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));\n    gap: var(--space-4);\n}\n.aemc-bh-how h4 { margin: 0 0 4px; font-size: 0.82rem; font-weight: 700; }\n.aemc-bh-how p { margin: 0; font-size: 0.8rem; line-height: 1.5; color: rgb(255 255 255 / 92%); }\n\n.aemc-bh-how-foot {\n    margin: var(--space-3) 0 0;\n    font-size: 0.76rem;\n    line-height: 1.5;\n    color: rgb(255 255 255 / 90%);\n}\n.aemc-bh-how-foot a { color: var(--color-on-brand); font-weight: 600; }\n\n/* \"Q3 buyer\" — this account historically orders in exactly this quarter. */\n.aemc-growth-reason--season {\n    background: var(--brand-50);\n    color: var(--brand-800);\n    border: 1px solid var(--ae-mission-control-green);\n}\n\n.aemc-bh-chips {\n    display: flex;\n    flex-wrap: wrap;\n    gap: var(--space-2);\n}\n\n.aemc-bh-chip {\n    display: inline-flex;\n    align-items: baseline;\n    gap: 6px;\n    padding: 5px 10px;\n    border-radius: var(--radius-pill, 999px);\n    background: rgb(255 255 255 / 16%);\n    border: 1px solid rgb(255 255 255 / 26%);\n    font-size: 0.8rem;\n    line-height: 1.2;\n}\n\n.aemc-bh-chip.is-on {\n    background: rgb(255 255 255 / 92%);\n    color: var(--brand-700);\n    border-color: transparent;\n    font-weight: 600;\n}\n\n.aemc-bh-chip strong {\n    font-size: 0.95rem;\n    font-variant-numeric: tabular-nums;\n}\n\n/* Colour, not opacity — same reason as the rest of the hero text: opacity composites toward\n   the gradient behind it, so one rule renders at a different effective contrast at each end.\n   ⚠️ Needs BOTH states: .is-on flips the chip to a near-white background, so a single white\n   rate colour renders white-on-white and the \"$75.00 ea\" silently disappears. */\n.aemc-bh-chip-rate { color: rgb(255 255 255 / 82%); font-size: 0.72rem; }\n.aemc-bh-chip.is-on .aemc-bh-chip-rate { color: rgb(26 82 33 / 82%); }\n\n/* The band is dial | ladder | CTA on desktop. Below 1100px the 208px CTA column squeezes the\n * scenario cards under their content width, so it drops to a full-width row first; the dial\n * only stacks at phone widths, where it becomes the page's headline number. */\n@media (width <= 1100px) {\n    .aemc-bh-cta { flex: 1 1 100%; flex-direction: row; }\n    .aemc-bh-cta > * { flex: 1; justify-content: center; }\n}\n\n@media (width <= 640px) {\n    .aemc-bonus-hero { padding: var(--space-4); gap: var(--space-3); }\n\n    /* Full-width row at phone widths; the divider only makes sense in the desktop band. */\n    .aemc-bh-dial { flex: 1 1 100%; border-right: 0; padding-right: 0; justify-content: center; }\n    .aemc-bh-ladder { flex: 1 1 100%; }\n    .aemc-bh-next { font-size: 1.15rem; }\n    .aemc-bh-scenarios { gap: 7px; }\n    .aemc-bh-sc { flex: 1 1 100%; }\n    .aemc-bh-cta { flex-direction: column; }\n}\n\n/* ---------- view-as (admin only) ---------- */\n.aemc-viewas {\n    display: inline-flex;\n    align-items: center;\n    gap: var(--space-1);\n    background: var(--surface-inset);\n    border: 1px solid var(--gray-200);\n    border-radius: var(--radius-lg);\n    padding: 2px 6px;\n}\n\n.aemc-viewas-label {\n    font-size: 0.75rem;\n    color: var(--gray-500);\n    padding: 0 4px;\n    white-space: nowrap;\n}\n\n.aemc-viewas-btn {\n    border: none;\n    background: transparent;\n    font: inherit;\n    font-size: 0.8rem;\n    font-weight: 600;\n    color: var(--gray-600);\n    padding: 4px 10px;\n    border-radius: var(--radius-md);\n    cursor: pointer;\n}\n.aemc-viewas-btn:hover { background: var(--surface-hover); }\n\n.aemc-viewas-btn.is-active {\n    background: var(--art-theme);\n    color: var(--color-on-brand);\n}\n\n/* ---------- quick actions rail ---------- */\n.aemc-actions {\n    display: flex;\n    align-items: center;\n    gap: var(--space-2);\n    flex-wrap: wrap;\n    margin-bottom: var(--space-4);\n    padding: var(--space-3);\n    background: var(--surface-card);\n    border: 1px solid var(--gray-200);\n    border-radius: var(--radius-lg);\n    box-shadow: var(--shadow-sm);\n}\n\n.aemc-actions-label {\n    font-size: 0.8rem;\n    font-weight: 600;\n    color: var(--gray-500);\n}\n\n.aemc-actions-sep {\n    width: 1px;\n    align-self: stretch;\n    background: var(--gray-200);\n    margin: 0 var(--space-1);\n}\n\n.aemc-badge {\n    display: inline-block;\n    min-width: 18px;\n    padding: 0 5px;\n    border-radius: 9px;\n    background: var(--red-600);\n    color: var(--color-on-brand);\n    font-size: 0.7rem;\n    font-weight: 700;\n    text-align: center;\n    line-height: 18px;\n}\n\n/* ---------- action queue ---------- */\n.aemc-queue-card { margin-bottom: var(--space-4); }\n\n.aemc-queue-count {\n    font-size: 0.8rem;\n    color: var(--gray-500);\n}\n.aemc-queue { display: grid; gap: var(--space-3); }\n\n.aemc-queue-section-title {\n    font-size: 0.75rem;\n    font-weight: 700;\n    letter-spacing: 0.05em;\n    text-transform: uppercase;\n    color: var(--gray-500);\n    margin: 0 0 var(--space-1);\n}\n.aemc-queue-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }\n\n.aemc-queue-item {\n    display: flex;\n    align-items: center;\n    gap: var(--space-2);\n    padding: 8px 12px;\n    border-left: 4px solid var(--gray-300);\n    background: var(--surface-inset);\n    border-radius: var(--radius-sm);\n    flex-wrap: wrap;\n}\n.aemc-queue-item--overdue { border-left-color: var(--red-600); background: var(--red-50); }\n.aemc-queue-item--today { border-left-color: var(--ae-mission-control-green-2); background: var(--brand-50); }\n.aemc-queue-item--new { border-left-color: var(--ae-mission-control-blue-2); background: var(--color-ruth-tint); }\n.aemc-queue-item--quote { border-left-color: var(--ae-mission-control-orange-3); background: var(--store-paper); }\n.aemc-queue-item--art { border-left-color: var(--color-ruth-light); background: var(--color-ruth-tint); }\n.aemc-queue-item--kit { border-left-color: var(--ae-mission-control-teal); background: var(--color-bradley-tint); }\n.aemc-queue-main { font-weight: 600; color: var(--gray-900); text-decoration: none; }\n.aemc-queue-main:hover { text-decoration: underline; }\n.aemc-queue-meta { font-size: 0.78rem; color: var(--gray-500); }\n.aemc-queue-actions { margin-left: auto; display: inline-flex; gap: 6px; }\n\n.aemc-queue-empty {\n    padding: var(--space-4);\n    text-align: center;\n    color: var(--gray-500);\n}\n.aemc-queue-empty i { color: var(--ae-mission-control-green-2); margin-right: 6px; }\n\n.aemc-mini-btn {\n    border: 1px solid var(--gray-300);\n    background: var(--surface-card);\n    color: var(--gray-600);\n    font: inherit;\n    font-size: 0.75rem;\n    padding: 3px 8px;\n    border-radius: var(--radius-sm);\n    cursor: pointer;\n    text-decoration: none;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n}\n.aemc-mini-btn:hover { background: var(--surface-hover); color: var(--gray-900); }\n\n/* ---------- work panels ---------- */\n.aemc-panels {\n    display: grid;\n    grid-template-columns: repeat(2, minmax(0, 1fr));\n    gap: var(--space-4);\n    margin-bottom: var(--space-4);\n}\n\n@media (width <= 900px) { .aemc-panels { grid-template-columns: 1fr; } }\n\n.aemc-viewall {\n    font-size: 0.8rem;\n    font-weight: 600;\n    color: var(--art-theme);\n    text-decoration: none;\n}\n.aemc-viewall:hover { text-decoration: underline; }\n.aemc-sub { font-size: 0.75rem; font-weight: 400; color: var(--gray-500); }\n.aemc-rows { list-style: none; margin: 0; padding: 0; }\n\n.aemc-row {\n    display: flex;\n    align-items: center;\n    gap: var(--space-2);\n    padding: 8px 4px;\n    border-bottom: 1px solid var(--gray-100);\n    flex-wrap: wrap;\n}\n.aemc-row:last-child { border-bottom: none; }\n.aemc-row-main { font-weight: 600; color: var(--gray-900); text-decoration: none; min-width: 0; }\na.aemc-row-main:hover { text-decoration: underline; }\n.aemc-row-meta { font-size: 0.78rem; color: var(--gray-500); }\n.aemc-row-right { margin-left: auto; text-align: right; font-size: 0.8rem; color: var(--gray-600); white-space: nowrap; }\n.aemc-money { font-family: 'JetBrains Mono', monospace; font-weight: 600; }\n\n.aemc-status {\n    display: inline-block;\n    font-size: 0.7rem;\n    font-weight: 600;\n    padding: 2px 8px;\n    border-radius: 999px;\n    background: var(--surface-inset);\n    color: var(--gray-600);\n    border: 1px solid var(--gray-200);\n    white-space: nowrap;\n}\n.aemc-empty { padding: var(--space-3); color: var(--gray-500); font-size: 0.85rem; }\n\n.aemc-panel-error {\n    padding: var(--space-3);\n    color: var(--red-700);\n    background: var(--red-50);\n    border-radius: var(--radius-sm);\n    font-size: 0.85rem;\n}\n\n/* ---------- bonus card ---------- */\n.aemc-bonus-card { margin-bottom: var(--space-4); }\n\n.aemc-bonus-grid {\n    display: grid;\n    grid-template-columns: 1fr 1fr;\n    gap: var(--space-4);\n}\n\n@media (width <= 700px) { .aemc-bonus-grid { grid-template-columns: 1fr; } }\n\n.aemc-bonus-total {\n    font-size: 1.25rem;\n    font-weight: 700;\n    font-family: 'JetBrains Mono', monospace;\n    color: var(--gray-900);\n    margin: 4px 0 6px;\n}\n.aemc-bonus-when { font-size: 0.8rem; color: var(--gray-500); margin-bottom: var(--space-2); }\n.aemc-status--paid { background: var(--brand-50); color: var(--brand-800); border-color: var(--ae-mission-control-green); }\n.aemc-status--pending { background: var(--store-paper); color: var(--amber-700); border-color: var(--ae-mission-control-orange); }\n\n.aemc-bonus-foot {\n    margin: var(--space-3) 0 0;\n    font-size: 0.78rem;\n    color: var(--gray-500);\n}\n\n/* ---------- purchasing tracker card ---------- */\n.aemc-purch-card { margin-bottom: var(--space-4); }\n\n.aemc-purch-chip {\n    display: inline-block;\n    font-size: 0.72rem;\n    font-weight: 700;\n    padding: 2px 10px;\n    border-radius: 999px;\n    white-space: nowrap;\n}\n.aemc-purch--sent { background: var(--surface-inset); color: var(--gray-600); border: 1px solid var(--gray-300); }\n.aemc-purch--ordered { background: var(--color-ruth-tint); color: var(--ae-mission-control-blue); border: 1px solid var(--ae-mission-control-blue-tint); }\n.aemc-purch--partial { background: var(--store-paper); color: var(--amber-700); border: 1px solid var(--ae-mission-control-orange); }\n.aemc-purch--received { background: var(--brand-50); color: var(--brand-800); border: 1px solid var(--ae-mission-control-green); }\n.aemc-purch--invoiced { background: var(--brand-50); color: var(--brand-800); border: 1px solid var(--ae-mission-control-green); }\n.aemc-purch--shipped { background: var(--brand-500); color: var(--color-on-brand); border: 1px solid var(--brand-500); }\n\n/* ---------- order due dates card ---------- */\n.aemc-due-card { margin-bottom: var(--space-4); }\n.aemc-due-card .aemc-queue-section-title { margin-top: var(--space-3); }\n\n.aemc-due-flag {\n    display: inline-block;\n    font-size: 0.72rem;\n    font-weight: 700;\n    padding: 2px 10px;\n    border-radius: 999px;\n    white-space: nowrap;\n}\n.aemc-due-flag--late { background: var(--red-50); color: var(--red-800); border: 1px solid var(--ae-mission-control-red); }\n.aemc-due-flag--risk { background: var(--store-paper); color: var(--amber-700); border: 1px solid var(--ae-mission-control-orange); }\n\n/* ---------- growth radar card ---------- */\n.aemc-growth-card { margin-bottom: var(--space-4); }\n.aemc-growth-hint { margin-bottom: var(--space-2); }\n\n.aemc-growth-reason {\n    display: inline-block;\n    font-size: 0.75rem;\n    padding: 2px 8px;\n    border-radius: 999px;\n    white-space: nowrap;\n}\n.aemc-growth-reason--rhythm { background: var(--store-paper); color: var(--amber-700); border: 1px solid var(--ae-mission-control-orange); }\n.aemc-growth-reason--season { background: var(--color-ruth-tint); color: var(--ae-mission-control-blue); border: 1px solid var(--ae-mission-control-blue-tint); }\n.aemc-growth-total { font-weight: 700; color: var(--gray-900); }\n\n/* ---------- data-quality radar card ---------- */\n.aemc-dq-card { margin-bottom: var(--space-4); }\n.aemc-dq-card .aemc-queue-section-title { margin-top: var(--space-3); }\n\n.aemc-dq-chip {\n    display: inline-block;\n    font-size: 0.72rem;\n    font-weight: 600;\n    padding: 2px 8px;\n    border-radius: 999px;\n    white-space: nowrap;\n}\n.aemc-dq-chip--err { background: var(--red-50); color: var(--red-800); border: 1px solid var(--ae-mission-control-red-tint); }\n.aemc-dq-chip--warn { background: var(--store-paper); color: var(--amber-700); border: 1px solid var(--ae-mission-control-orange); }\n\n/* ---------- progressive disclosure (\"show N more\") ---------- */\n.aemc-row--collapsed { display: none; }\n.aemc-rows.is-expanded .aemc-row--collapsed { display: flex; }\n\n.aemc-more-toggle {\n    display: inline-flex;\n    align-items: center;\n    gap: 6px;\n    margin-top: var(--space-2);\n    padding: 5px 12px;\n    border: 1px solid var(--gray-200);\n    border-radius: 999px;\n    background: var(--surface-inset);\n    color: var(--art-theme);\n    font: inherit;\n    font-size: 0.8rem;\n    font-weight: 600;\n    cursor: pointer;\n}\n.aemc-more-toggle:hover { background: var(--surface-hover); border-color: var(--gray-300); }\n.aemc-more-toggle i { font-size: 0.7rem; }\n\n/* ---------- whole-card collapse (declutter) ---------- */\n.aemc-collapsible > .dash-card-header {\n    cursor: pointer;\n    user-select: none;\n    justify-content: flex-start;\n}\n.aemc-collapsible > .dash-card-header > .dash-card-title { margin-right: auto; }\n\n.aemc-collapse-caret {\n    color: var(--gray-400);\n    font-size: 0.8rem;\n    flex-shrink: 0;\n    transition: transform 0.2s ease;\n}\n.aemc-collapsible > .dash-card-header:hover .aemc-collapse-caret { color: var(--gray-600); }\n.dash-card.is-collapsed .aemc-collapse-caret { transform: rotate(180deg); }\n.dash-card.is-collapsed > *:not(.dash-card-header) { display: none; }\n\n.dash-card.is-collapsed > .dash-card-header {\n    margin-bottom: 0;\n    padding-bottom: 0;\n    border-bottom: none;\n}\n\n/* ---------- inbound card ---------- */\n.aemc-inbound-card { margin-bottom: var(--space-4); }\n.aemc-inbound { font-size: 0.9rem; color: var(--gray-600); }\n\n/* ---------- modals ---------- */\n.aemc-overlay {\n    position: fixed;\n    inset: 0;\n    background: rgb(15 23 42 / 45%);\n    z-index: 90;\n}\n\n.aemc-modal {\n    position: fixed;\n    top: 50%;\n    left: 50%;\n    transform: translate(-50%, -50%);\n    width: min(560px, calc(100vw - 32px));\n    max-height: min(85vh, 720px);\n    overflow: auto;\n    background: var(--surface-card);\n    border-radius: var(--radius-lg);\n    box-shadow: var(--shadow-lg);\n    z-index: 100;\n}\n\n.aemc-modal-head {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: var(--space-2);\n    padding: var(--space-3) var(--space-4);\n    border-bottom: 1px solid var(--gray-200);\n}\n.aemc-modal-title { font-size: 1rem; font-weight: 700; color: var(--gray-900); margin: 0; }\n\n.aemc-modal-close {\n    border: none;\n    background: transparent;\n    color: var(--gray-500);\n    font-size: 1rem;\n    cursor: pointer;\n    padding: 6px;\n}\n.aemc-modal-close:hover { color: var(--gray-900); }\n.aemc-modal-body { padding: var(--space-4); }\n\n.aemc-modal-actions {\n    display: flex;\n    align-items: center;\n    gap: var(--space-2);\n    margin-top: var(--space-3);\n}\n.aemc-hint { font-size: 0.83rem; color: var(--gray-500); margin: 0 0 var(--space-3); }\n.aemc-muted { color: var(--gray-500); font-size: 0.83rem; }\n.aemc-field { margin-bottom: var(--space-2); min-width: 0; }\n\n.aemc-field-label {\n    display: block;\n    font-size: 0.78rem;\n    font-weight: 600;\n    color: var(--gray-600);\n    margin-bottom: 4px;\n}\n\n.aemc-field input,\n.aemc-field textarea {\n    width: 100%;\n    box-sizing: border-box;\n    font: inherit;\n    font-size: 0.9rem;\n    padding: 7px 10px;\n    border: 1px solid var(--gray-300);\n    border-radius: var(--radius-sm);\n    background: var(--surface-card);\n    color: var(--gray-900);\n}\n.aemc-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2); }\n.aemc-grid3 { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: var(--space-2); }\n.aemc-kit-items { display: grid; gap: 6px; margin-bottom: var(--space-3); }\n\n.aemc-kit-item {\n    display: flex;\n    align-items: center;\n    gap: var(--space-2);\n    padding: 6px 10px;\n    border: 1px solid var(--gray-200);\n    border-radius: var(--radius-sm);\n    background: var(--surface-inset);\n}\n.aemc-kit-item-label { flex: 1; font-size: 0.88rem; }\n.aemc-kit-qty { width: 60px; font: inherit; font-size: 0.85rem; padding: 4px 6px; border: 1px solid var(--gray-300); border-radius: var(--radius-sm); }\n\n/* ---------- outreach modal ---------- */\n.aemc-outreach-lead { font-weight: 600; margin-bottom: var(--space-2); color: var(--gray-900); }\n.aemc-outreach-btns { display: flex; gap: var(--space-2); flex-wrap: wrap; margin-bottom: var(--space-3); }\n.aemc-outreach-subject { font-weight: 700; margin-bottom: var(--space-2); }\n\n.aemc-outreach-body {\n    border: 1px solid var(--gray-200);\n    border-radius: var(--radius-sm);\n    padding: var(--space-3);\n    background: var(--surface-inset);\n    font-size: 0.88rem;\n    max-height: 280px;\n    overflow: auto;\n    margin-bottom: var(--space-2);\n}\n.aemc-outreach-sent { color: var(--ae-mission-control-green-2); font-weight: 600; padding: var(--space-2) 0; }\n\n/* ---------- toasts (art notifications) ---------- */\n.aemc-toasts {\n    position: fixed;\n    right: 16px;\n    bottom: 16px;\n    display: grid;\n    gap: 8px;\n    z-index: 120;\n}\n\n.aemc-toast {\n    background: var(--gray-900);\n    color: var(--color-on-brand);\n    padding: 10px 14px;\n    border-radius: var(--radius-md);\n    box-shadow: var(--shadow-lg);\n    font-size: 0.85rem;\n    max-width: 320px;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   TABBED SHELL (prefix mc-, added 2026-07-26)\n   Sixteen cards on one 3,400px scroll became five tabs over a persistent spine.\n   Everything above keeps the aemc- prefix; only the shell is mc-.\n\n   Tokens from art-hub.css ONLY. staff-dashboard/tokens.css redefines --space-5,\n   --radius-sm/md/lg/xl, --shadow-* and --ease-out with DIFFERENT values and is\n   @layer-wrapped, so borrowing a component from there silently reskins it.\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* Gutter must track .dash-content's own padding, which dash-shell.css drops to\n   --space-4 at 640px. Hardcoding --space-6 makes the sticky bar overhang 8px each\n   side on mobile and gives the whole page a horizontal scrollbar. */\n:root { --mc-gutter: var(--space-6); }\n\n/* ---------- spine: the \"am I winning?\" strip, visible from every tab ---------- */\n.mc-spine { margin-bottom: var(--space-4); }\n\n.mc-spine-kpis {\n    display: grid;\n    grid-template-columns: repeat(3, minmax(0, 1fr));\n    gap: var(--space-3);\n}\n\n.mc-kpi {\n    background: var(--surface-card);\n    border: 1px solid var(--gray-200);\n    border-radius: var(--radius-lg);\n    padding: var(--space-3) var(--space-4);\n    box-shadow: var(--shadow-sm);\n}\n.mc-kpi--accent { border-top: 3px solid var(--art-theme); }\n\n.mc-kpi-value {\n    font-family: \"JetBrains Mono\", ui-monospace, monospace;\n    font-size: 1.5rem;\n    font-weight: 600;\n    font-variant-numeric: tabular-nums;\n    color: var(--gray-900);\n    line-height: 1.15;\n}\n\n.mc-kpi-label {\n    font-size: 0.72rem;\n    font-weight: 600;\n    letter-spacing: 0.06em;\n    text-transform: uppercase;\n    color: var(--gray-500);\n    margin-top: 2px;\n}\n.mc-kpi-note { text-transform: none; letter-spacing: 0; font-weight: 500; color: var(--gray-400); }\n.mc-spark { margin-top: var(--space-2); color: var(--art-theme); line-height: 0; }\n.mc-streak--hot { color: var(--store-rush-deep); }\n\n/* ---------- sticky bar: condensed spine + tablist ---------- */\n.mc-sticky {\n    position: sticky;\n    top: 0;\n    z-index: 20;                        /* under .aemc-overlay (90) and .aemc-modal (100) */\n    background: var(--surface-page);    /* MUST be opaque — rows scroll through otherwise */\n    margin-inline: calc(-1 * var(--mc-gutter));\n    padding-inline: var(--mc-gutter);\n    border-bottom: 1px solid var(--gray-200);\n    margin-bottom: var(--space-4);\n}\n\n/* Anything scrolled to must clear the sticky bar or its heading tucks underneath. */\n.mc-panel, .dash-card { scroll-margin-top: 92px; }\n\n/* The 48px stand-in once the hero scrolls away. The full hero is ~220px; making THAT\n   sticky would cost ~28% of an 800px laptop viewport before any content appears. */\n.mc-condensed {\n    display: flex;\n    align-items: center;\n    gap: var(--space-3);\n    padding: var(--space-2) 0 0;\n    font-size: 0.85rem;\n    color: var(--gray-700);\n}\n\n.mc-condensed-amount {\n    font-family: \"JetBrains Mono\", ui-monospace, monospace;\n    font-weight: 600;\n    font-variant-numeric: tabular-nums;\n    color: var(--print-green-dark);\n}\n\n.mc-condensed-next {\n    color: var(--gray-500);\n    flex: 1 1 auto;\n    min-width: 0;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n\n.mc-condensed-track {\n    flex: 0 0 120px;\n    height: 6px;\n    border-radius: var(--radius-pill);\n    background: var(--gray-200);\n    overflow: hidden;\n}\n\n.mc-condensed-fill {\n    display: block;\n    height: 100%;\n    background: var(--art-theme);\n    transition: width var(--dur-base) var(--ease-out);\n}\n\n/* ---------- tabs ----------\n   Modeled on unqualified-leads.css, deliberately NOT art-hub.css .tab-button: that one\n   is background:var(--art-theme) with white text = ~2.9:1, which fails AA for its 14px\n   label. --gray-900 on white is ~17:1. Styling hangs off [aria-selected] rather than a\n   parallel .is-active class, so visual state and accessible state cannot diverge. */\n.mc-tabs {\n    display: flex;\n    gap: 6px;\n    align-items: center;\n    padding: var(--space-2) 0;\n    overflow-x: auto;\n    scrollbar-width: none;\n    scroll-snap-type: x proximity;\n    -webkit-overflow-scrolling: touch;\n}\n.mc-tabs::-webkit-scrollbar { display: none; }\n\n.mc-tab {\n    font: inherit;\n    font-size: 0.9rem;\n    font-weight: 600;\n    color: var(--gray-600);\n    background: var(--gray-100);\n    border: 1px solid var(--gray-200);\n    border-radius: var(--radius-md);\n    padding: 9px 16px;\n    min-height: 44px;                   /* touch target on every viewport, not just mobile */\n    cursor: pointer;\n    display: inline-flex;\n    align-items: center;\n    gap: 8px;\n    white-space: nowrap;\n    flex: 0 0 auto;\n    scroll-snap-align: start;\n    transition: background var(--dur-fast) var(--ease-out),\n                color var(--dur-fast) var(--ease-out),\n                border-color var(--dur-fast) var(--ease-out);\n}\n.mc-tab:hover { background: var(--gray-200); color: var(--gray-800); }\n\n.mc-tab[aria-selected=\"true\"] {\n    background: var(--gray-900);\n    border-color: var(--gray-900);\n    color: var(--surface-card);\n}\n.mc-tab:focus-visible { outline: 2px solid var(--art-theme); outline-offset: 2px; }\n.mc-tab i { font-size: 0.85em; opacity: 0.8; }\n\n.mc-tab-badge {\n    font-family: \"JetBrains Mono\", ui-monospace, monospace;\n    font-size: 0.72rem;\n    font-weight: 700;\n    background: var(--state-danger);\n    color: var(--color-on-brand);\n    border-radius: var(--radius-pill);\n    padding: 1px 7px;\n    min-width: 18px;\n    text-align: center;\n}\n\n/* Inverted inside the dark active pill so the count stays legible. */\n.mc-tab[aria-selected=\"true\"] .mc-tab-badge { background: var(--surface-card); color: var(--gray-900); }\n\n/* Only Today carries a number. Other tabs get a dot at most — a \"12\" on Money (12 target\n   accounts) reads as twelve problems, and five badged tabs read as five inboxes, which\n   undercuts the calm this redesign exists for. */\n.mc-tab-dot {\n    width: 7px;\n    height: 7px;\n    border-radius: 50%;\n    background: var(--amber-500);\n}\n\n/* ---------- panels ----------\n   NO `display` declared here on purpose: it would beat the UA [hidden] rule (silently\n   breaking tab switching) AND double-space against .dash-card's own margin-bottom. */\n.mc-panel { animation: fadeIn var(--dur-base) var(--ease-out); }\n.mc-panel:focus { outline: none; }\n.mc-panel:focus-visible { outline: 2px solid var(--art-theme); outline-offset: 4px; }\n\n/* ---------- \"since you last looked\" ---------- */\n.mc-diff {\n    display: flex;\n    align-items: baseline;\n    flex-wrap: wrap;\n    gap: var(--space-2);\n    font-size: 0.85rem;\n    color: var(--gray-600);\n    margin: 0 0 var(--space-4);\n}\n.mc-diff-since { font-weight: 600; color: var(--gray-700); }\n.mc-diff-up { color: var(--print-green); font-weight: 600; }\n\n/* ---------- The One Thing ---------- */\n.mc-onething {\n    border: 1px solid var(--gray-200);\n    border-left: 4px solid var(--art-theme);\n    border-radius: var(--radius-lg);\n    background: var(--surface-card);\n    box-shadow: var(--shadow-md);\n    padding: var(--space-4) var(--space-5);\n    margin-bottom: var(--space-4);\n}\n\n.mc-ot-eyebrow {\n    font-size: 0.7rem;\n    font-weight: 700;\n    letter-spacing: 0.09em;\n    text-transform: uppercase;\n    color: var(--store-green-700);\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n.mc-ot-title {\n    font-size: 1.12rem;\n    font-weight: 700;\n    color: var(--gray-900);\n    margin: var(--space-2) 0 4px;\n}\n.mc-ot-why { font-size: 0.9rem; color: var(--gray-600); line-height: 1.5; }\n\n.mc-ot-worth {\n    display: inline-flex;\n    align-items: center;\n    gap: 5px;\n    margin-top: var(--space-2);\n    font-size: 0.82rem;\n    font-weight: 700;\n    color: var(--print-green-dark);\n    background: var(--brand-100);\n    border-radius: var(--radius-pill);\n    padding: 3px 11px;\n}\n.mc-ot-worth--urgent { color: var(--store-rush-deeper); background: var(--state-warning-bg); }\n.mc-ot-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-3); }\n\n.mc-onething-skipped {\n    font-size: 0.8rem;\n    color: var(--gray-500);\n    margin: calc(-1 * var(--space-2)) 0 var(--space-4);\n}\n\n.mc-onething-skipped button {\n    font: inherit;\n    background: none;\n    border: none;\n    padding: 0;\n    color: var(--store-green-700);\n    font-weight: 600;\n    cursor: pointer;\n    text-decoration: underline;\n}\n\n/* ---------- team kicker (Money) ---------- */\n.mc-kicker-track {\n    height: 12px;\n    border-radius: var(--radius-pill);\n    background: var(--gray-200);\n    overflow: hidden;\n    margin: var(--space-3) 0 var(--space-2);\n}\n\n.mc-kicker-fill {\n    display: block;\n    height: 100%;\n    border-radius: var(--radius-pill);\n    background: linear-gradient(90deg, var(--store-green-700), var(--art-theme));\n    transition: width 420ms var(--ease-out);\n}\n.mc-kicker-line { font-size: 0.9rem; color: var(--gray-700); }\n.mc-kicker-tiers { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-2); }\n\n.mc-kicker-tier {\n    font-size: 0.78rem;\n    font-weight: 600;\n    color: var(--gray-600);\n    background: var(--surface-inset);\n    border-radius: var(--radius-pill);\n    padding: 3px 10px;\n}\n.mc-kicker-tier.is-hit { color: var(--print-green-dark); background: var(--brand-100); }\n\n/* ---------- records (Wins) ---------- */\n.mc-records { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: var(--space-3); }\n\n.mc-record {\n    background: var(--surface-inset);\n    border-radius: var(--radius-lg);\n    padding: var(--space-3) var(--space-4);\n}\n\n.mc-record-value {\n    font-family: \"JetBrains Mono\", ui-monospace, monospace;\n    font-size: 1.25rem;\n    font-weight: 600;\n    font-variant-numeric: tabular-nums;\n    color: var(--gray-900);\n}\n\n.mc-record-label {\n    font-size: 0.72rem;\n    font-weight: 600;\n    color: var(--gray-500);\n    text-transform: uppercase;\n    letter-spacing: 0.05em;\n    margin-top: 2px;\n}\n.mc-record-when { font-size: 0.8rem; color: var(--gray-500); margin-top: 2px; }\n\n/* ---------- finished photos (Wins) ---------- */\n.mc-photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--space-3); }\n\n.mc-photo {\n    display: block;\n    border-radius: var(--radius-md);\n    overflow: hidden;\n    background: var(--surface-inset);\n    border: 1px solid var(--gray-200);\n    text-decoration: none;\n    transition: transform var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out);\n}\n.mc-photo:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }\n.mc-photo img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; }\n\n.mc-photo-cap {\n    font-size: 0.75rem;\n    color: var(--gray-600);\n    padding: 6px 8px;\n    white-space: nowrap;\n    overflow: hidden;\n    text-overflow: ellipsis;\n}\n\n/* ---------- skeletons (reuse art-hub's .skeleton-line + shimmer keyframe) ---------- */\n.mc-skel { display: grid; gap: 10px; padding: var(--space-2) 0; }\n\n/* ---------- reduced motion ----------\n   CSS alone is NOT enough: the count-up is requestAnimationFrame and the confetti is\n   canvas, both invisible to @media. ae-mission-control.js reads matchMedia once in init()\n   and skips them outright. This block covers the declarative half — and the whole\n   /dash-page family had no reduced-motion handling at all before this. */\n@media (prefers-reduced-motion: reduce) {\n    .mc-panel { animation: none; }\n    .mc-tab, .mc-photo { transition: none; }\n    .mc-photo:hover { transform: none; }\n    .aemc-bh-fill, .mc-kicker-fill, .mc-condensed-fill, .mc-bh-pace-mark { transition: none; }\n    .skeleton-line, .skeleton-header { animation: none; background: var(--gray-200); }\n    /* stylelint-disable-next-line declaration-no-important -- prefers-reduced-motion kill switch must beat every animation */\n    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }\n}\n\n/* ---------- mobile ---------- */\n@media (width <= 900px) {\n    .mc-spine-kpis { grid-template-columns: 1fr 1fr; }\n    .mc-spine-kpis > .mc-kpi:last-child { grid-column: 1 / -1; }\n}\n\n@media (width <= 640px) {\n    :root { --mc-gutter: var(--space-4); }\n    .mc-kpi-value { font-size: 1.25rem; }\n    .mc-condensed-next { display: none; }\n\n    /* iOS zooms any focused input under 16px. .aemc-field inputs are .9rem = 14.4px, so\n       every one of the kit modal's nine fields zoomed the page on focus. */\n    .aemc-field input, .aemc-field textarea, .aemc-field select { font-size: 16px; }\n    .aemc-mini-btn, .aemc-more-toggle { min-height: 44px; }\n\n    /* nowrap + margin-left:auto on the money/date column forced page-wide overflow at 375px */\n    .aemc-row-right { margin-left: 0; text-align: left; white-space: normal; }\n    .mc-records { grid-template-columns: 1fr; }\n\n    /* dash-shell.css sets .dash-header-right to flex-wrap:nowrap, so at 375px this page's\n       header measured 467px and pushed the whole document 103px sideways. Only bites an\n       ADMIN — the extra view-as group is what overflows, and a rep's header fits in 243px —\n       but a sideways-scrolling page is worth 3 lines to avoid. Scoped here rather than in the\n       shared shell so no other dashboard's header shifts; see the spawned task for the\n       repo-wide fix. */\n    .dash-header-right { flex-wrap: wrap; justify-content: flex-end; row-gap: var(--space-2); }\n\n    /* .aemc-dq-chip is white-space:nowrap, and a Missing-Info chip like \"no requested-ship\n       date\" measured 347px — wider than the row could give it, so it pushed the page 13px\n       sideways. The chips are the whole point of that card, so let them wrap their text\n       rather than shrink or truncate. */\n    .aemc-dq-chip { white-space: normal; max-width: 100%; }\n}\n\n/* ---------- pace marker on the bonus track ----------\n   Where she LANDS at today's pace, on the SAME axis as the rung ticks (identical\n   denominator in the JS, so it can never disagree with the ladder). A flag rather than\n   another tick, so it never reads as one more milestone to hit.\n   .aemc-bh-track is already position:relative + overflow:visible, so the negative top\n   is not clipped. */\n.mc-bh-pace-mark {\n    position: absolute;\n    top: -9px;\n    width: 0;\n    height: 0;\n    border-left: 5px solid transparent;\n    border-right: 5px solid transparent;\n    border-top: 7px solid var(--color-surface);\n    transform: translateX(-5px);\n    filter: drop-shadow(0 1px 1px rgb(0 0 0 / 30%));\n    transition: left var(--dur-base) var(--ease-out);\n}\n.mc-bh-pace-mark.is-behind { border-top-color: var(--ae-mission-control-orange-2); }\n\n/* ---------- action-rail menus (<details>, no JS) ----------\n   The rail was 12 wrapping buttons across two rows, competing with the spine for the top of\n   the page. Now 6 targets, with the builders behind one primary menu. <details>/<summary>\n   gives keyboard operation and Escape-free toggling for nothing; the only thing it needs is\n   a marker reset and an absolutely-positioned panel. */\n.mc-menu { position: relative; }\n\n.mc-menu > summary {\n    list-style: none;\n    cursor: pointer;\n\n    /* .dash-btn already supplies the look; summary just needs to stop being a disclosure. */\n}\n.mc-menu > summary::-webkit-details-marker { display: none; }\n.mc-menu > summary::marker { content: ''; }\n\n.mc-menu > summary::after {\n    content: '▾';                     /* small down triangle */\n    font-size: 0.7em;\n    margin-left: 2px;\n    opacity: 0.7;\n}\n.mc-menu[open] > summary::after { content: '▴'; }\n\n.mc-menu-panel {\n    position: absolute;\n    top: calc(100% + 4px);\n    left: 0;\n    z-index: 30;                           /* above .mc-sticky (20), below overlay (90) */\n    min-width: 220px;\n    display: grid;\n    padding: var(--space-2);\n    gap: 2px;\n    background: var(--surface-card);\n    border: 1px solid var(--gray-200);\n    border-radius: var(--radius-md);\n    box-shadow: var(--shadow-lg);\n}\n\n.mc-menu-panel a {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 9px 10px;\n    min-height: 40px;\n    border-radius: var(--radius-sm);\n    font-size: 0.875rem;\n    font-weight: 500;\n    color: var(--gray-700);\n    text-decoration: none;\n}\n.mc-menu-panel a:hover { background: var(--surface-hover); color: var(--gray-900); }\n.mc-menu-panel a:focus-visible { outline: 2px solid var(--art-theme); outline-offset: -2px; }\n.mc-menu-panel a i { width: 1em; text-align: center; color: var(--gray-400); }\n\n/* On a phone the panel would run off the right edge of a right-aligned trigger. */\n@media (width <= 640px) {\n    .mc-menu-panel { left: auto; right: 0; min-width: 200px; }\n    .mc-menu-panel a { min-height: 44px; }\n}\n\n/* ── Call List ─────────────────────────────────────────────────────────────\n   A worklist row, not a stat row: it has to survive being read one-handed on a\n   phone between calls, so the company, the reason and the phone number each get\n   their own line rather than competing on one. Chip colours reuse the existing\n   growth-reason palette so the page keeps one visual language. */\n.aemc-calls { list-style: none; margin: 0; padding: 0; }\n\n.aemc-call {\n    padding: 12px 4px;\n    border-bottom: 1px solid var(--gray-100);\n}\n.aemc-call:last-child { border-bottom: none; }\n.aemc-call-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }\n.aemc-call-co { font-weight: 600; color: var(--gray-900); }\n\n.aemc-call-chip {\n    display: inline-block;\n    font-size: 0.72rem;\n    padding: 2px 8px;\n    border-radius: 999px;\n    white-space: nowrap;\n    border: 1px solid var(--gray-200);\n    background: var(--surface-inset);\n    color: var(--gray-600);\n}\n.aemc-call-chip--near { background: var(--color-dash-theme-bg); color: var(--print-green); border-color: var(--ae-mission-control-green-4); }\n.aemc-call-chip--back { background: var(--color-ruth-tint); color: var(--ae-mission-control-blue); border-color: var(--ae-mission-control-blue-tint); }\n.aemc-call-chip--new  { background: var(--store-paper); color: var(--amber-700); border-color: var(--ae-mission-control-orange); }\n\n/* A promise the rep made — loud on purpose, it outranks the ranking. */\n.aemc-call-chip--due  { background: var(--red-50); color: var(--red-700); border-color: var(--ae-mission-control-red-tint-2); font-weight: 600; }\n.aemc-call-chip--done { background: var(--slate-100); color: var(--gray-600); border-color: var(--gray-300); }\n.aemc-call-conf { margin-left: auto; font-size: 0.72rem; font-weight: 600; white-space: nowrap; }\n.aemc-call-conf--strong    { color: var(--print-green); }\n.aemc-call-conf--fair      { color: var(--amber-700); }\n.aemc-call-conf--long-shot { color: var(--gray-500); font-weight: 500; }\n.aemc-call-why { font-size: 0.84rem; color: var(--gray-600); margin: 4px 0 6px; line-height: 1.45; }\n.aemc-call-foot { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }\n.aemc-call-worth { margin-left: auto; font-size: 0.8rem; color: var(--gray-600); white-space: nowrap; }\n\n.aemc-call-tel, .aemc-call-mail {\n    font-family: 'JetBrains Mono', monospace;\n    font-size: 0.85rem;\n    color: var(--nw-green, var(--store-green-700));\n    text-decoration: none;\n    font-weight: 600;\n}\n.aemc-call-tel:hover, .aemc-call-mail:hover { text-decoration: underline; }\n\n/* Matches how the data-quality radar talks about the same gap — a missing phone is a\n   fixable record problem, not a shrug. */\n.aemc-call-nophone { font-size: 0.8rem; color: var(--amber-700); }\n\n/* Called today: greyed and sunk, never removed. A row that vanishes makes the rep ask\n   \"did I call them, or did it break?\" */\n.aemc-call--done { opacity: 0.55; }\n.aemc-call-saved { font-size: 0.82rem; color: var(--print-green); font-weight: 600; }\n.aemc-call-saved--local { color: var(--amber-700); }\n.aemc-call-strip { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 8px; }\n.aemc-call-strip-sep { font-size: 0.76rem; color: var(--gray-500); margin-left: 4px; }\n\n.aemc-call-btn, .aemc-call-fu, .aemc-call-retry {\n    font-size: 0.78rem;\n    padding: 5px 10px;\n    border-radius: 6px;\n    border: 1px solid var(--gray-200);\n    background: var(--color-surface);\n    color: var(--gray-700);\n    cursor: pointer;\n}\n.aemc-call-btn:hover, .aemc-call-fu:hover, .aemc-call-retry:hover { border-color: var(--gray-400); background: var(--surface-inset); }\n.aemc-call-btn.is-on { border-color: var(--print-green); color: var(--print-green); font-weight: 600; }\n\n/* Separate class from .aemc-more-toggle on purpose — that one has a document-level\n   delegated handler, and sharing the class would fire both. */\n.aemc-loadmore {\n    display: block;\n    width: 100%;\n    margin-top: 10px;\n    padding: 9px;\n    font-size: 0.82rem;\n    border: 1px dashed var(--gray-300);\n    border-radius: 8px;\n    background: var(--surface-inset);\n    color: var(--gray-600);\n    cursor: pointer;\n}\n.aemc-loadmore:hover:not(:disabled) { border-color: var(--gray-400); color: var(--gray-800); }\n.aemc-loadmore:disabled { cursor: progress; opacity: 0.7; }\n.aemc-calls-pointer { margin-top: var(--space-3); }\n.aemc-calls-print { background: none; border: none; cursor: pointer; font: inherit; }\n\n@media (width <= 640px) {\n    .aemc-call-conf { margin-left: 0; width: 100%; }\n    .aemc-call-worth { margin-left: 0; }\n}\n\n/* ══════════ TODAY — capped card grid (Briefing redesign, 2026-07-27) ══════════\n   Today was six full-length stacked cards and ~3,400px of scroll. It is now a grid of\n   cards each capped at 4 rows, with the full list behind a drawer. The cap is enforced in\n   JS (cappedRows), not CSS — hiding overflow with `display:none` leaves every row in the\n   DOM, which is what made the old page long in the first place. */\n.mc-grid { display: grid; gap: 14px; margin-bottom: 14px; }\n.mc-grid--2-1 { grid-template-columns: 2fr 1fr; }\n.mc-grid--3   { grid-template-columns: repeat(3, minmax(0, 1fr)); }\n\n/* Chapter chips — anchor jumps. Targets carry scroll-margin-top so the sticky tab bar\n   doesn't cover the card you just jumped to. */\n.mc-chapters {\n    display: flex; gap: 7px; flex-wrap: wrap; align-items: center;\n    margin-bottom: var(--space-4);\n}\n\n.mc-chapters-label {\n    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.07em;\n    text-transform: uppercase; color: var(--gray-500); margin-right: 4px;\n}\n\n.mc-chip {\n    display: inline-flex; align-items: center; gap: 6px;\n    font-size: 0.78rem; font-weight: 600; text-decoration: none;\n    color: var(--gray-600); background: var(--surface-inset);\n    border: 1px solid var(--gray-200);\n    padding: 6px 12px; border-radius: 999px;\n}\n.mc-chip:hover { border-color: var(--gray-400); color: var(--gray-800); }\n.mc-chip.is-fire { color: var(--red-800); background: var(--red-50); border-color: var(--ae-mission-control-red); font-weight: 700; }\n.mc-chip.is-art  { color: var(--ae-mission-control-indigo); background: var(--color-ruth-tint); border-color: var(--ae-mission-control-indigo-tint); font-weight: 700; }\n.mc-chip-dot { width: 7px; height: 7px; border-radius: 50%; }\n#mc-fires, #mc-artwork, #mc-missing, #mc-inbound, #mc-purch { scroll-margin-top: 90px; }\n\n/* A capped card is a fixed head, a body of at most 4 rows, and a full-width escape hatch\n   pinned to the bottom so three side-by-side cards line up however tall their rows run. */\n.mc-capped { display: flex; flex-direction: column; }\n.mc-capped .dash-card-header { margin-bottom: 11px; padding-bottom: 10px; border-bottom: 1px solid var(--gray-200); }\n.mc-capped .dash-card-title { font-size: 0.92rem; font-weight: 700; color: var(--gray-800); }\n.mc-capped > div:not(.dash-card-header) { flex: 1; }\n.mc-rows { list-style: none; margin: 0; padding: 0; }\n.mc-rows .aemc-row { padding: 8px 0; border-bottom: 1px solid var(--gray-100); }\n.mc-rows .aemc-row:last-child { border-bottom: none; }\n\n.mc-count-pill {\n    margin-left: auto;\n    font-family: 'JetBrains Mono', monospace;\n    font-size: 0.7rem; font-weight: 700;\n    padding: 2px 8px; border-radius: 999px;\n    background: var(--surface-inset); color: var(--gray-600); border: 1px solid var(--gray-200);\n}\n.mc-count-pill--fire { color: var(--red-800); background: var(--red-50); border-color: var(--ae-mission-control-red); }\n.mc-count-pill--art  { color: var(--ae-mission-control-indigo); background: var(--color-ruth-tint); border-color: var(--ae-mission-control-indigo-tint); }\n.mc-count-pill--ok   { color: var(--brand-800); background: var(--brand-50); border-color: var(--ae-mission-control-green); }\n.mc-count-pill:empty { display: none; }\n.mc-ic-fire { color: var(--state-danger); }\n.mc-ic-art  { color: var(--color-ruth-light); }\n.mc-ic-dq   { color: var(--gray-400); }\n.mc-ic-streak { color: var(--amber-500); }\n\n.mc-viewall-btn {\n    display: inline-flex; align-items: center; justify-content: center; gap: 7px;\n    width: 100%; margin-top: 12px;\n    padding: 9px 12px;\n    font: inherit; font-size: 0.8rem; font-weight: 700;\n    border-radius: var(--radius-md);\n    border: 1px solid var(--gray-200);\n    background: var(--surface-inset);\n    color: var(--gray-700);\n    text-decoration: none;\n    cursor: pointer;\n    min-height: 44px;          /* touch target */\n}\n.mc-viewall-btn:hover { border-color: var(--gray-400); color: var(--gray-900); }\n\n/* Artwork age — a fortnight-old approval is holding up a job, so it says so in colour AND\n   in the date text, never colour alone. */\n.aemc-row-meta.is-warm { color: var(--amber-700); font-weight: 600; }\n.aemc-row-meta.is-old  { color: var(--red-800); font-weight: 600; }\n\n/* Order clock — the shape of the day in one glance. Arcs are derived from live counts. */\n.mc-clock { display: flex; align-items: center; gap: 14px; }\n.mc-clock-svg { width: 104px; height: 104px; flex: 0 0 104px; }\n.mc-clock-n { font-family: 'JetBrains Mono', monospace; font-size: 23px; font-weight: 700; fill: var(--gray-900); }\n.mc-clock-l { font-size: 10px; font-weight: 600; fill: var(--gray-500); }\n.mc-clock-key { display: flex; flex-direction: column; gap: 9px; min-width: 0; font-size: 0.77rem; color: var(--gray-600); }\n.mc-clock-key b { font-family: 'JetBrains Mono', monospace; font-size: 0.92rem; color: var(--gray-900); margin-right: 4px; }\n.mc-sw { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 8px; }\n\n/* ── Drawers ── scrim 90 / panel 100, above .mc-sticky (20) and .mc-menu-panel (30). */\n.mc-drawer-scrim { position: fixed; inset: 0; background: rgb(15 23 42 / 45%); z-index: 90; }\n\n.mc-drawer {\n    position: fixed; top: 0; right: 0; bottom: 0;\n    width: min(620px, 92vw);\n    background: var(--surface-card);\n    box-shadow: -12px 0 40px -10px rgb(15 23 42 / 35%);\n    z-index: 100;\n    display: flex; flex-direction: column;\n    animation: mcSlideIn 180ms var(--ease-out, cubic-bezier(.2,.8,.2,1));\n}\n\n@keyframes mcSlideIn { from { transform: translateX(28px); opacity: 0 } to { transform: translateX(0); opacity: 1 } }\n\n.mc-drawer-head {\n    display: flex; align-items: flex-start; gap: 12px;\n    padding: 16px 20px; border-bottom: 1px solid var(--gray-200);\n}\n.mc-drawer-title { margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--gray-900); }\n.mc-drawer-sum { margin: 2px 0 0; font-size: 0.78rem; color: var(--gray-500); }\n\n.mc-drawer-close {\n    margin-left: auto; width: 36px; height: 36px;\n    border: 1px solid var(--gray-200); border-radius: var(--radius-md);\n    background: var(--surface-card); color: var(--gray-600); cursor: pointer;\n}\n.mc-drawer-close:hover { background: var(--surface-inset); color: var(--gray-900); }\n.mc-drawer-body { flex: 1; min-height: 0; overflow-y: auto; padding: 16px 20px; }\n.mc-drawer-foot { padding: 14px 20px; border-top: 1px solid var(--gray-200); background: var(--surface-inset); }\n.mc-drawer-foot .aemc-hint { margin: 0 0 8px; }\n\n/* [hidden] on a flex/grid element needs the guard at the top of this file to win. */\n\n@media (width <= 900px) {\n    .mc-grid--2-1, .mc-grid--3 { grid-template-columns: 1fr; }\n}\n\n@media (width <= 640px) {\n    .mc-drawer { width: 100vw; }\n    .mc-clock { gap: 10px; }\n}\n\n/* Stage 3 — a stat tile that carries a warning meaning (drifting accounts). Same top-border\n   language as .mc-kpi--accent so the two read as one family. */\n.mc-stat--warn { border-top: 3px solid var(--state-warning); }\n.mc-stat--warn .dash-stat-value { color: var(--amber-700); }\n\n/* 2026-09-05 review: colours that were inline style= on generated markup. */\n.aemc-bh-fill { width: 0; }                       /* JS animates the width; starts empty */\n.mc-sw--late { background: var(--red-600); }\n.mc-sw--risk { background: var(--amber-500); }\n.mc-sw--ok   { background: var(--brand-500); }\n.mc-chip.is-fire .mc-chip-dot { background: var(--red-600); }\n.mc-chip.is-art  .mc-chip-dot { background: var(--color-ruth-light); }\n\n/* 2026-09-05 hygiene — bar widths / marker positions via custom properties; reload control; modal scroll lock */\nbody.is-modal-open { overflow: hidden; }\n.aemc-bh-fill, .mc-kicker-fill, .mc-condensed-fill { width: var(--w, 0%); }\n.aemc-bh-mark, .mc-bh-pace-mark, .aemc-bh-startcap span { left: var(--x, 0%); }\n.aemc-reload { margin-left: 6px; padding: 2px 10px; border: 1px solid currentcolor; border-radius: 6px; background: transparent; color: inherit; cursor: pointer; font: inherit; font-size: 12px; }\n.aemc-reload:focus-visible { outline: 2px solid currentcolor; outline-offset: 2px; }\n"
     }
   ]
 }

@@ -1,5 +1,14 @@
 # Active Files Registry
 
+- `tests/fixtures/staff-workspaces-ae-original-{expanded,rep,secondRep,degraded,documents}.json` — Verified original Mission Control drawer, identity and synthetic paper baselines; existing browser/actions fixtures refreshed from the completed original checks.
+
+- Retired `dashboards/css/ae-mission-control.css`; its two HTML consumers use `shared_components/css/staff-mission-control.css`. Original stylesheet retained in the source-preservation fixture.
+
+- `shared_components/css/vendor-inbound.css` — Scoped opt-in inbound dialog and role-specific paper reports; first consumer Mission Control.
+- `shared_components/css/vendor-box-labels.css` — Scoped opt-in one-box-per-page labels; legacy box-label owner remains for unmigrated consumers.
+
+Added tests/unit/staff-workspace-runtime-lifetimes.test.js: rapid tab navigation and independent print cleanup regressions.
+
 Reviewed: shared_components/css/purchasing-workspaces.css — canonical Purchasing Portal and Payables arrangements; two legacy page owners retired.
 
 Reviewed: shared_components/css/vendor-invoice.css — native opt-in purchasing invoice dialog and complete printed documents; legacy AE CSS retained with compatibility coverage.
@@ -311,3 +320,5 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - Added tests/e2e/helpers/staff-workspaces-browser.js: extracted original-source loader and fail-closed API boundary, now covering the whole browser context including popups. Added tests/fixtures/staff-workspaces-ae-synthetic.json and tests/e2e/css-unification-ae-workspace.spec.js for Mission Control original UI capture; representative local harness payloads have customer/contact labels and contact details replaced. Preparation only, no page review credit.
 
 - Added tests/fixtures/staff-workspaces-ae-original-browser.json and staff-workspaces-ae-original-actions.json: settled original six-tab/four-width text and links, kit validation/fields, four outreach previews and six locally intercepted actions. Invoice/inbound/box labels, expanded lists/drawers and rep/error states remain to capture. No Mission Control CSS has changed.
+
+- Added shared_components/css/staff-mission-control.css for the Mission Control draft: canonical staff typography/controls and a scoped layout, native kit/outreach/drawer dialogs, existing vendor-invoice.css reuse. Legacy AE stylesheet retained until consumer and screen/paper review. No release credit yet.

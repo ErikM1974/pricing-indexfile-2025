@@ -703,16 +703,20 @@
     const sheet = renderPrintSheet(builder(lastData, arg));
     // Before the dialog, not after — once print() is called the snapshot is taken.
     await awaitSheetImages(sheet);
+    if (document.getElementById('sit-print-sheet') !== sheet) return;
     document.body.classList.add('sit-printing');
+    let cleanupTimer;
     const cleanup = () => {
-      document.body.classList.remove('sit-printing');
-      const s = document.getElementById('sit-print-sheet'); if (s) s.remove();
+      clearTimeout(cleanupTimer);
+      if (document.getElementById('sit-print-sheet') === sheet) document.body.classList.remove('sit-printing');
+      sheet.remove();
       window.removeEventListener('afterprint', cleanup);
     };
     window.addEventListener('afterprint', cleanup);
+    cleanupTimer = setTimeout(cleanup, 1500);
     window.print();
     // Fallback cleanup if afterprint doesn't fire (some browsers)
-    setTimeout(() => { if (document.body.classList.contains('sit-printing')) cleanup(); }, 1500);
+    // Each cleanup owns only its captured sheet.
   }
 
   // ── Per-box receiving LABEL (8.5×11 portrait, one page per box) ──
@@ -761,7 +765,17 @@
   }
   function setContent(html) {
     const body = modalEl.querySelector('#sit-body');
-    if (body) body.innerHTML = html;
+    if (body) {
+      body.innerHTML = html;
+      if (document.body.dataset.inboundViewer === 'unified') {
+        body.querySelectorAll('.sit-lines').forEach(table => {
+          const region = document.createElement('div');
+          region.className = 'sit-lines-wrap'; region.tabIndex = 0;
+          region.setAttribute('role', 'region'); region.setAttribute('aria-label', 'Shipment items — scroll horizontally');
+          table.before(region); region.appendChild(table);
+        });
+      }
+    }
     syncOutputButtons();
   }
 
@@ -1020,7 +1034,8 @@
   }
 
   function build() {
-    modalEl = document.createElement('div');
+    const unified = document.body.dataset.inboundViewer === 'unified';
+    modalEl = document.createElement(unified ? 'dialog' : 'div');
     modalEl.className = 'modal sit-modal';
     modalEl.hidden = true;
     modalEl.setAttribute('role', 'dialog');
@@ -1065,6 +1080,12 @@
       </div>`;
     document.body.appendChild(modalEl);
 
+    modalEl.addEventListener('cancel', (e) => {
+      e.preventDefault();
+      const menu = modalEl.querySelector('#sit-printmenu');
+      if (menu && !menu.hidden) togglePrintMenu(false);
+      else close();
+    });
     modalEl.addEventListener('click', (e) => { if (e.target === modalEl) close(); });
     modalEl.querySelector('#sit-close').onclick = close;
     modalEl.querySelector('#sit-refresh').onclick = () => load(true, viewDate);
@@ -1110,7 +1131,7 @@
       });
     });
     document.addEventListener('keydown', (e) => {
-      if (e.key !== 'Escape' || !modalEl || modalEl.hidden) return;
+      if (e.key !== 'Escape' || !modalEl || modalEl.hidden || modalEl.tagName === 'DIALOG') return;
       const menu = modalEl.querySelector('#sit-printmenu');
       if (menu && !menu.hidden) { togglePrintMenu(false); return; } // Esc closes the print menu first
       close();
@@ -1120,7 +1141,11 @@
   let returnFocus = null;
   function close() {
     togglePrintMenu(false);
-    if (modalEl) modalEl.hidden = true;
+    if (modalEl) {
+      if (modalEl.tagName === 'DIALOG' && modalEl.open) modalEl.close();
+      modalEl.hidden = true;
+      document.body.classList.remove('sit-dialog-open');
+    }
     if (returnFocus && document.body.contains(returnFocus)) { try { returnFocus.focus(); } catch (e) { /* gone */ } }
     returnFocus = null;
   }
@@ -1129,7 +1154,12 @@
     if (!modalEl) build();
     returnFocus = document.activeElement;
     modalEl.hidden = false;
-    setTimeout(() => { const c = modalEl.querySelector('.btn-cancel, [data-close], button'); if (c) c.focus(); }, 30);
+    if (modalEl.tagName === 'DIALOG') {
+      if (!modalEl.open) modalEl.showModal();
+      document.body.classList.add('sit-dialog-open');
+    } else {
+      setTimeout(() => { const c = modalEl.querySelector('.btn-cancel, [data-close], button'); if (c && !modalEl.hidden) c.focus(); }, 30);
+    }
     if (!window.BoxLabelTemplate) {
       // The shared label renderer didn't load — refuse to run rather than render sheets
       // with blank rush badges and a dead Box Labels button (Never-Break Rule #4).

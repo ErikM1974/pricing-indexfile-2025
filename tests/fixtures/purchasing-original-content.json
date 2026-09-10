@@ -452,6 +452,16 @@
       "from": "    function clearShopworks() {\n        state.sw = null;",
       "to": "    function clearShopworks() {\n        state.sw = null;\n        el('purchasing-feed-status').textContent = 'ShopWorks paid status cleared. Upload an export to check payments.';",
       "kind": "visible-load-state"
+    },
+    {
+      "file": "shared_components/js/sanmar-invoice-viewer.js",
+      "from": "        var cleanup = function () {\n            document.body.classList.remove('smiv-printing');\n            var s = document.getElementById('smiv-print-sheet');\n            if (s) s.remove();",
+      "to": "        var cleanupTimer;\n        var cleanup = function () {\n            clearTimeout(cleanupTimer);\n            if (document.getElementById('smiv-print-sheet') === sheet) document.body.classList.remove('smiv-printing');\n            sheet.remove();"
+    },
+    {
+      "file": "shared_components/js/sanmar-invoice-viewer.js",
+      "from": "        window.print();\n        setTimeout(function () { if (document.body.classList.contains('smiv-printing')) cleanup(); }, 1500);",
+      "to": "        cleanupTimer = setTimeout(cleanup, 1500);\n        window.print();"
     }
   ]
 }

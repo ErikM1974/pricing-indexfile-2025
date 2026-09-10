@@ -5071,6 +5071,44 @@
         "rawCssBytes": 29573,
         "localCssRequests": 2
       }
+    },
+    {
+      "source": "dashboards/ae-mission-control.html",
+      "family": "staff-workspace",
+      "status": "pilot",
+      "route": "/dashboards/ae-mission-control.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/vendor-invoice.css",
+        "shared_components/css/staff-mission-control.css",
+        "shared_components/css/vendor-inbound.css",
+        "shared_components/css/vendor-box-labels.css"
+      ],
+      "dynamicStyles": [],
+      "dynamicTokens": [
+        "--w",
+        "--x",
+        "--c",
+        "--bg",
+        "--m"
+      ],
+      "states": [
+        "six-tabs-four-widths-preserved-figures-and-accessibility",
+        "rep-admin-readonly-degraded-and-cancelled-tab-loads",
+        "native-kit-outreach-full-lists-focus-and-error-feedback",
+        "unchanged-mocked-request-bodies-and-late-preview-ownership",
+        "invoice-seven-inbound-profiles-eight-separate-box-labels",
+        "26-row-call-sheet-preserved-across-three-pages"
+      ],
+      "test": "tests/e2e/css-unification-ae-workspace.spec.js",
+      "maxCssBytes": 217270,
+      "measuredRawCssBytes": 216246,
+      "baseline": {
+        "commit": "0f151e3899b8517092b1864babd8ea7f579fc95b",
+        "rawCssBytes": 263878,
+        "localCssRequests": 7
+      }
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",

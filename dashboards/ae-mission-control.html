@@ -10,20 +10,20 @@
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- 2026 design tokens (must load before dash-shell.css) -->
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/dash-shell.css?v=2026.09.07.10">
-    <link rel="stylesheet" href="/shared_components/css/sanmar-invoice-viewer.css?v=2026.09.07.10">
-    <link rel="stylesheet" href="/dashboards/css/ae-mission-control.css?v=2026.09.07.10">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.10.3">
+    <link rel="stylesheet" href="/shared_components/css/vendor-invoice.css?v=2026.09.10.3">
+    <link rel="stylesheet" href="/shared_components/css/staff-mission-control.css?v=2026.09.10.3">
     <!-- SanMar Inbound modal + its printable reports/box labels (window.openInboundTodayModal) -->
-    <link rel="stylesheet" href="/dashboards/css/sanmar-inbound.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/box-label-print.css?v=2026.09.07.10">
+    <link rel="stylesheet" href="/shared_components/css/vendor-inbound.css?v=2026.09.10.3">
+    <link rel="stylesheet" href="/shared_components/css/vendor-box-labels.css?v=2026.09.10.3">
 </head>
-<body>
+<body data-ui="unified" data-staff-workspace="mission-control" data-department="ae" data-invoice-viewer="unified" data-inbound-viewer="unified" data-box-label-viewer="unified">
+    <a class="skip-link" href="#mission-control-main">Skip to Mission Control</a>
     <div class="dash-shell">
         <header class="dash-header">
             <div class="dash-header-left">
@@ -50,7 +50,7 @@
             </div>
         </header>
 
-        <main class="dash-content">
+        <main class="dash-content" id="mission-control-main">
             <div class="dash-error-banner" role="alert">
                 <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                 <span class="dash-error-banner-message"></span>
@@ -591,7 +591,7 @@
 
     <!-- Sample-kit request modal (standalone — any recipient, optionally no lead) -->
     <div class="aemc-overlay" id="aemc-kit-overlay" hidden></div>
-    <div class="aemc-modal" id="aemc-kit-modal" role="dialog" aria-modal="true" aria-labelledby="aemc-kit-title" hidden>
+    <dialog class="aemc-modal" id="aemc-kit-modal" role="dialog" aria-modal="true" aria-labelledby="aemc-kit-title" hidden>
         <div class="aemc-modal-head">
             <h2 class="aemc-modal-title" id="aemc-kit-title"><i class="fas fa-gift" aria-hidden="true"></i> Request a sample / marketing kit</h2>
             <button type="button" class="aemc-modal-close" id="aemc-kit-close" aria-label="Close"><i class="fas fa-times" aria-hidden="true"></i></button>
@@ -618,14 +618,14 @@
             <div class="aemc-field"><label class="aemc-field-label" for="aemc-kit-notes">Notes for shipping</label><textarea id="aemc-kit-notes" rows="2"></textarea></div>
             <div class="aemc-modal-actions">
                 <button type="button" id="aemc-kit-send" class="dash-btn dash-btn--primary"><i class="fas fa-paper-plane" aria-hidden="true"></i> Send to shipping</button>
-                <span id="aemc-kit-status" class="aemc-muted"></span>
+                <span id="aemc-kit-status" class="aemc-muted" role="status" aria-live="polite"></span>
             </div>
         </div>
-    </div>
+    </dialog>
 
     <!-- One-click outreach modal (server-built templates, per lead) -->
     <div class="aemc-overlay" id="aemc-outreach-overlay" hidden></div>
-    <div class="aemc-modal" id="aemc-outreach-modal" role="dialog" aria-modal="true" aria-labelledby="aemc-outreach-title" hidden>
+    <dialog class="aemc-modal" id="aemc-outreach-modal" role="dialog" aria-modal="true" aria-labelledby="aemc-outreach-title" hidden>
         <div class="aemc-modal-head">
             <h2 class="aemc-modal-title" id="aemc-outreach-title"><i class="fas fa-envelope" aria-hidden="true"></i> Email this lead</h2>
             <button type="button" class="aemc-modal-close" id="aemc-outreach-close" aria-label="Close"><i class="fas fa-times" aria-hidden="true"></i></button>
@@ -635,13 +635,13 @@
             <div class="aemc-outreach-btns" id="aemc-outreach-btns"></div>
             <div id="aemc-outreach-preview"></div>
         </div>
-    </div>
+    </dialog>
 
     <!-- Slide-over drawers for the full lists behind the capped Today cards. Scrim 90 /
          panel 100 matches the existing .aemc-overlay / .aemc-modal ladder (.mc-sticky is 20,
          .mc-menu-panel 30) so a drawer always sits above the sticky tab bar. -->
     <div class="mc-drawer-scrim" id="mc-drawer-scrim" hidden></div>
-    <aside class="mc-drawer" id="mc-drawer" hidden role="dialog" aria-modal="true"
+    <dialog class="mc-drawer" id="mc-drawer" hidden role="dialog" aria-modal="true"
            aria-labelledby="mc-drawer-title">
         <header class="mc-drawer-head">
             <div>
@@ -654,7 +654,7 @@
         </header>
         <div class="mc-drawer-body" id="mc-drawer-body"></div>
         <footer class="mc-drawer-foot" id="mc-drawer-foot"></footer>
-    </aside>
+    </dialog>
 
     <!-- Load order matters: APP_CONFIG → fetch-timeout → DashPage → inbound modal → page controller -->
     <script src="/config/app.config.js"></script>
@@ -663,14 +663,14 @@
     <!-- Shared accessible tab router (ARIA APG tablist + hash sync). Must load before the page controller. -->
     <!-- Confetti: fired ONLY on a genuinely new rung/win-back, once, and never under reduced motion. -->
     <script src="/shared_components/js/confetti.js?v=2026.09.06.26"></script>
-    <script src="/shared_components/js/dash-tabs.js?v=2026.07.26.6"></script>
-    <script src="/shared_components/js/box-label-template.js?v=2026.09.05.71"></script>
+    <script src="/shared_components/js/dash-tabs.js?v=2026.09.10.3"></script>
+    <script src="/shared_components/js/box-label-template.js?v=2026.09.10.3"></script>
     <!-- Normalises stored absolute proxy Box urls onto this origin so the session-gated
          forwarder authorises them. Must precede every consumer below. -->
     <script src="/shared_components/js/box-url.js?v=2026.08.06.1"></script>
-    <script src="/dashboards/js/sanmar-inbound-today.js?v=2026.09.06.31"></script>
-    <script src="/shared_components/js/sanmar-invoice-viewer.js?v=2026.09.09.13"></script>
+    <script src="/dashboards/js/sanmar-inbound-today.js?v=2026.09.10.3"></script>
+    <script src="/shared_components/js/sanmar-invoice-viewer.js?v=2026.09.10.3"></script>
     <script src="/shared_components/js/box-url.js?v=2026.08.06.1"></script>
-    <script src="/dashboards/js/ae-mission-control.js?v=2026.09.07.33"></script>
+    <script src="/dashboards/js/ae-mission-control.js?v=2026.09.10.3"></script>
 </body>
 </html>

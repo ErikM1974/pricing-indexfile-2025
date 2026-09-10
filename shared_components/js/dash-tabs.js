@@ -154,10 +154,14 @@
             }
 
             // --- data hook: debounced, and only the trailing one wins ---
-            var isFirst = !mounted[current];
-            mounted[current] = true;
             if (timer) { clearTimeout(timer); timer = null; }
-            var run = function () { timer = null; onActivate(current, isFirst); };
+            var run = function () {
+                timer = null;
+                // A cancelled debounce has never mounted its panel.
+                var isFirst = !mounted[next];
+                mounted[next] = true;
+                onActivate(next, isFirst);
+            };
             if (o.immediate || delay <= 0) run(); else timer = setTimeout(run, delay);
         }
 

@@ -10,20 +10,20 @@
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- 2026 design tokens (must load before dash-shell.css) -->
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/art-hub.css">
-    <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/shared_components/css/sanmar-invoice-viewer.css?v=2026.09.07.10">
-    <link rel="stylesheet" href="/dashboards/css/ae-mission-control.css?v=2026.09.07.10">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.10.3">
+    <link rel="stylesheet" href="/shared_components/css/vendor-invoice.css?v=2026.09.10.3">
+    <link rel="stylesheet" href="/shared_components/css/staff-mission-control.css?v=2026.09.10.3">
     <!-- SanMar Inbound modal + its printable reports/box labels (window.openInboundTodayModal) -->
-    <link rel="stylesheet" href="/dashboards/css/sanmar-inbound.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/box-label-print.css?v=2026.09.07.10">
+    <link rel="stylesheet" href="/shared_components/css/vendor-inbound.css?v=2026.09.10.3">
+    <link rel="stylesheet" href="/shared_components/css/vendor-box-labels.css?v=2026.09.10.3">
 </head>
-<body>
+<body data-ui="unified" data-staff-workspace="mission-control" data-department="ae" data-invoice-viewer="unified" data-inbound-viewer="unified" data-box-label-viewer="unified">
+    <a class="skip-link" href="#mission-control-main">Skip to Mission Control</a>
     <div class="dash-shell">
         <header class="dash-header">
             <div class="dash-header-left">
@@ -35,27 +35,27 @@
             </div>
             <div class="dash-header-right">
                 <div class="aemc-viewas" id="aemc-viewas" hidden role="group" aria-label="View as rep">
-                    <span class="aemc-viewas-label"><i class="fas fa-user-secret"></i> View as</span>
+                    <span class="aemc-viewas-label"><i class="fas fa-user-secret" aria-hidden="true"></i> View as</span>
                     <button type="button" class="aemc-viewas-btn" data-rep="taneisha@nwcustomapparel.com">Taneisha</button>
                     <button type="button" class="aemc-viewas-btn" data-rep="nika@nwcustomapparel.com">Nika</button>
                 </div>
-                <button type="button" id="aemc-refresh" class="dash-btn" title="Refresh all data">
-                    <i class="fas fa-rotate"></i>
+                <button type="button" id="aemc-refresh" class="dash-btn" title="Refresh all data" aria-label="Refresh all data">
+                    <i class="fas fa-rotate" aria-hidden="true"></i>
                     Refresh
                 </button>
                 <a href="/staff-dashboard.html" class="dash-back-link">
-                    <i class="fas fa-arrow-left"></i>
+                    <i class="fas fa-arrow-left" aria-hidden="true"></i>
                     Dashboard
                 </a>
             </div>
         </header>
 
-        <main class="dash-content">
+        <main class="dash-content" id="mission-control-main">
             <div class="dash-error-banner" role="alert">
-                <i class="fas fa-exclamation-triangle"></i>
+                <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                 <span class="dash-error-banner-message"></span>
-                <button class="dash-error-banner-close" aria-label="Dismiss">
-                    <i class="fas fa-times"></i>
+                <button type="button" class="dash-error-banner-close" aria-label="Dismiss">
+                    <i class="fas fa-times" aria-hidden="true"></i>
                 </button>
             </div>
 
@@ -68,7 +68,9 @@
                  cached substitute for them. Hidden until there is a real delta. -->
             <div class="mc-diff" id="mc-diff" role="status" hidden></div>
 
-            <!-- Bonus-hero failure strip — mirrors dashboards/ae-mission-control.html -->
+            <!-- Bonus-hero failure strip. The hero stays hidden rather than show a number we
+                 don't trust, but a silently absent hero reads as a broken page — so the
+                 absence gets explained here instead (Rule 4). -->
             <div class="aemc-bh-fallback" id="aemc-bh-fallback" role="status" hidden></div>
 
             <!-- ============================= SPINE =============================
@@ -76,7 +78,12 @@
                  (it is ~220px — sticking it would eat a quarter of a laptop
                  viewport); a 48px condensed bar takes over on scroll instead. -->
             <section class="mc-spine" id="mc-spine" aria-label="Your numbers">
-                <!-- ZONE 1b: Q3 Embroidery Bonus hero — mirrors dashboards/ae-mission-control.html -->
+                <!-- ZONE 1b: Q3 Embroidery Bonus hero (2026-07-25).
+                     This is the ONLY place a rep's bonus dollars appear on a dashboard — the shared
+                     staff dashboard shows the company goal with no compensation on it. Sits above
+                     the KPI strip on purpose: it's the number we want them to see first, with the
+                     next milestone framed as a concrete, reachable ask. Hidden until loaded so it
+                     never flashes a $0. -->
                 <section class="aemc-bonus-hero" id="aemc-bonus-hero" hidden aria-labelledby="aemc-bh-eyebrow">
                     <!-- DIAL. The ring holds ONLY the percentage — the dollar figure is HTML text
                          beside it. The old design drew the amount inside the ring, and "$1,050.00"
@@ -194,25 +201,25 @@
                  rewiring keeps working; <details> means no JS and free keyboard support. -->
             <div class="aemc-actions" id="aemc-actions" role="toolbar" aria-label="Quick actions">
                 <details class="mc-menu" id="mc-menu-new">
-                    <summary class="dash-btn dash-btn--primary"><i class="fas fa-plus"></i> New quote</summary>
+                    <summary class="dash-btn dash-btn--primary"><i class="fas fa-plus" aria-hidden="true"></i> New quote</summary>
                     <div class="mc-menu-panel">
                         <a href="/quote-builders/embroidery-quote-builder.html">Embroidery (EMB)</a>
                         <a href="/quote-builders/screenprint-quote-builder.html">Screen print (SCP)</a>
                         <a href="/quote-builders/dtf-quote-builder.html">DTF</a>
                         <a href="/quote-builders/dtg-quote-builder.html">DTG</a>
-                        <a href="/calculators/quick-quote/" title="Fast price for any style — no customer record, no save. Same prices as the builders."><i class="fas fa-bolt"></i> Quick Quote</a>
+                        <a href="/calculators/quick-quote/" title="Fast price for any style — no customer record, no save. Same prices as the builders."><i class="fas fa-bolt" aria-hidden="true"></i> Quick Quote</a>
                     </div>
                 </details>
-                <a class="dash-btn" href="/dashboards/ae-dashboard.html" title="Send artwork to the art team"><i class="fas fa-palette"></i> Send Artwork <span class="aemc-badge" id="aemc-art-badge" hidden></span></a>
-                <button type="button" class="dash-btn" id="aemc-kit-btn" title="Request a sample / marketing kit"><i class="fas fa-gift"></i> Sample Kit</button>
-                <a class="dash-btn" href="/dashboards/leads.html" title="Leads Board"><i class="fas fa-table-columns"></i> Leads</a>
-                <a class="dash-btn" id="aemc-accounts-link" href="/dashboards/taneisha-crm.html" title="My Accounts" hidden><i class="fas fa-address-book"></i> Accounts</a>
+                <a class="dash-btn" href="/dashboards/ae-dashboard.html" title="Send artwork to the art team"><i class="fas fa-palette" aria-hidden="true"></i> Send Artwork <span class="aemc-badge" id="aemc-art-badge" hidden></span></a>
+                <button type="button" class="dash-btn" id="aemc-kit-btn" title="Request a sample / marketing kit" aria-label="Request a sample / marketing kit"><i class="fas fa-gift" aria-hidden="true"></i> Sample Kit</button>
+                <a class="dash-btn" href="/dashboards/leads.html" title="Leads Board"><i class="fas fa-table-columns" aria-hidden="true"></i> Leads</a>
+                <a class="dash-btn" id="aemc-accounts-link" href="/dashboards/taneisha-crm.html" title="My Accounts" hidden><i class="fas fa-address-book" aria-hidden="true"></i> Accounts</a>
                 <details class="mc-menu" id="mc-menu-more">
-                    <summary class="dash-btn"><i class="fas fa-ellipsis"></i> More</summary>
+                    <summary class="dash-btn"><i class="fas fa-ellipsis" aria-hidden="true"></i> More</summary>
                     <div class="mc-menu-panel">
-                        <a id="aemc-photos-link" href="/dashboards/finished-photos-library.html" title="Finished-product photos for your accounts"><i class="fas fa-images"></i> My Finished Photos</a>
-                        <a href="/dashboards/lead-scorecard.html"><i class="fas fa-trophy"></i> Scorecard</a>
-                        <a href="/dashboards/commission-structure.html"><i class="fas fa-percent"></i> Commission Plan</a>
+                        <a id="aemc-photos-link" href="/dashboards/finished-photos-library.html" title="Finished-product photos for your accounts"><i class="fas fa-images" aria-hidden="true"></i> My Finished Photos</a>
+                        <a href="/dashboards/lead-scorecard.html"><i class="fas fa-trophy" aria-hidden="true"></i> Scorecard</a>
+                        <a href="/dashboards/commission-structure.html"><i class="fas fa-percent" aria-hidden="true"></i> Commission Plan</a>
                     </div>
                 </details>
             </div>
@@ -584,10 +591,10 @@
 
     <!-- Sample-kit request modal (standalone — any recipient, optionally no lead) -->
     <div class="aemc-overlay" id="aemc-kit-overlay" hidden></div>
-    <div class="aemc-modal" id="aemc-kit-modal" role="dialog" aria-modal="true" aria-labelledby="aemc-kit-title" hidden>
+    <dialog class="aemc-modal" id="aemc-kit-modal" role="dialog" aria-modal="true" aria-labelledby="aemc-kit-title" hidden>
         <div class="aemc-modal-head">
-            <h2 class="aemc-modal-title" id="aemc-kit-title"><i class="fas fa-gift"></i> Request a sample / marketing kit</h2>
-            <button type="button" class="aemc-modal-close" id="aemc-kit-close" aria-label="Close"><i class="fas fa-times"></i></button>
+            <h2 class="aemc-modal-title" id="aemc-kit-title"><i class="fas fa-gift" aria-hidden="true"></i> Request a sample / marketing kit</h2>
+            <button type="button" class="aemc-modal-close" id="aemc-kit-close" aria-label="Close"><i class="fas fa-times" aria-hidden="true"></i></button>
         </div>
         <div class="aemc-modal-body">
             <p class="aemc-hint">Goes straight to Mikalah's shipping queue. Pick the contents, tell us where it goes.</p>
@@ -610,31 +617,31 @@
             </div>
             <div class="aemc-field"><label class="aemc-field-label" for="aemc-kit-notes">Notes for shipping</label><textarea id="aemc-kit-notes" rows="2"></textarea></div>
             <div class="aemc-modal-actions">
-                <button type="button" id="aemc-kit-send" class="dash-btn dash-btn--primary"><i class="fas fa-paper-plane"></i> Send to shipping</button>
-                <span id="aemc-kit-status" class="aemc-muted"></span>
+                <button type="button" id="aemc-kit-send" class="dash-btn dash-btn--primary"><i class="fas fa-paper-plane" aria-hidden="true"></i> Send to shipping</button>
+                <span id="aemc-kit-status" class="aemc-muted" role="status" aria-live="polite"></span>
             </div>
         </div>
-    </div>
+    </dialog>
 
     <!-- One-click outreach modal (server-built templates, per lead) -->
     <div class="aemc-overlay" id="aemc-outreach-overlay" hidden></div>
-    <div class="aemc-modal" id="aemc-outreach-modal" role="dialog" aria-modal="true" aria-labelledby="aemc-outreach-title" hidden>
+    <dialog class="aemc-modal" id="aemc-outreach-modal" role="dialog" aria-modal="true" aria-labelledby="aemc-outreach-title" hidden>
         <div class="aemc-modal-head">
-            <h2 class="aemc-modal-title" id="aemc-outreach-title"><i class="fas fa-envelope"></i> Email this lead</h2>
-            <button type="button" class="aemc-modal-close" id="aemc-outreach-close" aria-label="Close"><i class="fas fa-times"></i></button>
+            <h2 class="aemc-modal-title" id="aemc-outreach-title"><i class="fas fa-envelope" aria-hidden="true"></i> Email this lead</h2>
+            <button type="button" class="aemc-modal-close" id="aemc-outreach-close" aria-label="Close"><i class="fas fa-times" aria-hidden="true"></i></button>
         </div>
         <div class="aemc-modal-body">
             <div class="aemc-outreach-lead" id="aemc-outreach-lead"></div>
             <div class="aemc-outreach-btns" id="aemc-outreach-btns"></div>
             <div id="aemc-outreach-preview"></div>
         </div>
-    </div>
+    </dialog>
 
     <!-- Slide-over drawers for the full lists behind the capped Today cards. Scrim 90 /
          panel 100 matches the existing .aemc-overlay / .aemc-modal ladder (.mc-sticky is 20,
          .mc-menu-panel 30) so a drawer always sits above the sticky tab bar. -->
     <div class="mc-drawer-scrim" id="mc-drawer-scrim" hidden></div>
-    <aside class="mc-drawer" id="mc-drawer" hidden role="dialog" aria-modal="true"
+    <dialog class="mc-drawer" id="mc-drawer" hidden role="dialog" aria-modal="true"
            aria-labelledby="mc-drawer-title">
         <header class="mc-drawer-head">
             <div>
@@ -647,20 +654,21 @@
         </header>
         <div class="mc-drawer-body" id="mc-drawer-body"></div>
         <footer class="mc-drawer-foot" id="mc-drawer-foot"></footer>
-    </aside>
+    </dialog>
 
     <!-- Load order matters: APP_CONFIG → fetch-timeout → DashPage → inbound modal → page controller -->
     <script src="/config/app.config.js"></script>
-    <script src="/shared_components/js/fetch-timeout.js"></script>
-    <script src="/shared_components/js/dash-page-helpers.js"></script>
+    <script src="/shared_components/js/fetch-timeout.js?v=2026.09.06.26"></script>
+    <script src="/shared_components/js/dash-page-helpers.js?v=2026.09.07.25"></script>
     <!-- Shared accessible tab router (ARIA APG tablist + hash sync). Must load before the page controller. -->
     <!-- Confetti: fired ONLY on a genuinely new rung/win-back, once, and never under reduced motion. -->
-    <script src="/shared_components/js/confetti.js"></script>
-    <script src="/shared_components/js/dash-tabs.js?v=2026.07.26.6"></script>
-    <script src="/shared_components/js/box-label-template.js?v=2026.09.05.71"></script>
-    <script src="/dashboards/js/sanmar-inbound-today.js?v=2026.09.06.31"></script>
-    <script src="/shared_components/js/sanmar-invoice-viewer.js?v=2026.09.09.13"></script>
+    <script src="/shared_components/js/confetti.js?v=2026.09.06.26"></script>
+    <script src="/shared_components/js/dash-tabs.js?v=2026.09.10.3"></script>
+    <script src="/shared_components/js/box-label-template.js?v=2026.09.10.3"></script>
+    <script src="/shared_components/js/box-url.js?v=2026.08.06.1"></script>
+    <script src="/dashboards/js/sanmar-inbound-today.js?v=2026.09.10.3"></script>
+    <script src="/shared_components/js/sanmar-invoice-viewer.js?v=2026.09.10.3"></script>
     <script src="/tests/ui/test-ae-mission-control-stub.js?v=2026.07.27.2"></script>
-    <script src="/dashboards/js/ae-mission-control.js?v=2026.09.07.33"></script>
+    <script src="/dashboards/js/ae-mission-control.js?v=2026.09.10.3"></script>
 </body>
 </html>

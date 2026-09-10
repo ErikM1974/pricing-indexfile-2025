@@ -5975,6 +5975,504 @@
       "json": {
         "error": "Stubbed failure"
       }
+    },
+    "response-cedar-1": {
+      "status": 200,
+      "json": {
+        "success": true,
+        "program": "EMB",
+        "quarter": "Q3",
+        "year": 2026,
+        "dateRange": {
+          "start": "2026-07-01",
+          "end": "2026-09-30"
+        },
+        "configSource": "caspio",
+        "orderTypeIds": [
+          21
+        ],
+        "historyOrderTypeIds": [
+          21,
+          1
+        ],
+        "minAccountRevenue": 1000,
+        "dormancyMonths": 12,
+        "teamKicker": {
+          "companyRevenue": 73328.48,
+          "companyOrders": 66,
+          "tiers": [
+            {
+              "target": 310000,
+              "pay": 500
+            },
+            {
+              "target": 340000,
+              "pay": 1000
+            }
+          ],
+          "reached": null,
+          "next": {
+            "target": 310000,
+            "pay": 500
+          },
+          "amountToNext": 236671.52,
+          "payoutEach": 0
+        },
+        "reps": {
+          "Cedar Sample": {
+            "rep": "Aster Sample",
+            "accounts": {
+              "new": [
+                {
+                  "idCustomer": "13656",
+                  "company": "Sample Workshop 16",
+                  "tier": "House-2026",
+                  "revenue": 1541,
+                  "orders": 1,
+                  "lifetimeEmbroidery": 0,
+                  "lastEmbroideryDate": null,
+                  "bounty": 150
+                },
+                {
+                  "idCustomer": "13644",
+                  "company": "Sample Workshop 17",
+                  "tier": "House-2026",
+                  "revenue": 1379.48,
+                  "orders": 1,
+                  "lifetimeEmbroidery": 0,
+                  "lastEmbroideryDate": null,
+                  "bounty": 150
+                },
+                {
+                  "idCustomer": "12436",
+                  "company": "Sample Workshop 18",
+                  "tier": "Win Back '26 TANEISHA",
+                  "revenue": 1300,
+                  "orders": 1,
+                  "lifetimeEmbroidery": 0,
+                  "lastEmbroideryDate": null,
+                  "bounty": 150
+                }
+              ],
+              "reactivated": [],
+              "repeat": [
+                {
+                  "idCustomer": "4691",
+                  "company": "Sample Workshop 19",
+                  "tier": "GOLD '26- TANEISHA",
+                  "revenue": 5400,
+                  "orders": 1,
+                  "lifetimeEmbroidery": 63817.1,
+                  "lastEmbroideryDate": "2025-09-24"
+                },
+                {
+                  "idCustomer": "13542",
+                  "company": "Sample Workshop 20",
+                  "tier": "GOLD '26- TANEISHA",
+                  "revenue": 2230,
+                  "orders": 1,
+                  "lifetimeEmbroidery": 22041.36,
+                  "lastEmbroideryDate": "2026-06-29"
+                }
+              ]
+            },
+            "counts": {
+              "new": 3,
+              "reactivated": 0,
+              "repeat": 2
+            },
+            "bounties": {
+              "newAccountBounty": 150,
+              "reactivatedBounty": 100,
+              "payout": 450
+            },
+            "ladder": {
+              "baseline": 66609,
+              "revenue": 15841.48,
+              "pctOfBaseline": 23.78,
+              "excludedOnlineStoreAccounts": 3,
+              "excludedOnlineStoreRevenue": 2563,
+              "rate": {
+                "startPct": 85,
+                "perPoint": 60,
+                "pointsEarned": 0,
+                "revenueAtStart": 56617.65,
+                "payout": 0
+              },
+              "payout": 0,
+              "rungs": [],
+              "rungReached": null,
+              "nextRung": null,
+              "amountToNextRung": 0,
+              "pace": {
+                "asOf": "2026-07-27",
+                "pctOfQuarterElapsed": 26.1,
+                "basis": "seasonal (Jul 30% / Aug 37% / Sep 33%, 2021-25 avg)",
+                "projectedRevenue": 60627.89,
+                "projectedPct": 91.02,
+                "onPaceForPay": 361.23,
+                "shortfallToStartAtPace": 0,
+                "status": "earning"
+              }
+            },
+            "totalBonus": 450
+          }
+        },
+        "generatedAt": "2026-07-26T15:39:18.793Z",
+        "scope": "rep"
+      }
+    },
+    "response-cedar-2": {
+      "status": 200,
+      "json": {
+        "success": true,
+        "quarter": "Q3",
+        "year": 2026,
+        "asOf": "2026-07-01",
+        "minAccountRevenue": 1000,
+        "dormancyMonths": 12,
+        "configSource": "caspio",
+        "reps": {
+          "Cedar Sample": {
+            "winBack": [
+              {
+                "idCustomer": "6273",
+                "company": "Sample Workshop 21",
+                "tier": "SILVER '26-TANEISHA",
+                "lifetimeEmbroidery": 75687.8,
+                "embroideryOrders": 8,
+                "avgOrderValue": 9460.98,
+                "monthsDormant": 18,
+                "medianReorderDays": 76,
+                "q3SharePct": 0,
+                "bounty": 100,
+                "score": 9460.98
+              },
+              {
+                "idCustomer": "7466",
+                "company": "Sample Workshop 22",
+                "tier": "SILVER '26-TANEISHA",
+                "lifetimeEmbroidery": 36108.5,
+                "embroideryOrders": 8,
+                "avgOrderValue": 4513.56,
+                "monthsDormant": 19,
+                "medianReorderDays": 109,
+                "q3SharePct": 25,
+                "bounty": 100,
+                "score": 5641.95
+              },
+              {
+                "idCustomer": "5144",
+                "company": "Sample Workshop 23",
+                "tier": "SILVER '26-TANEISHA",
+                "lifetimeEmbroidery": 23044.5,
+                "embroideryOrders": 4,
+                "avgOrderValue": 5761.13,
+                "monthsDormant": 18,
+                "medianReorderDays": 329,
+                "q3SharePct": 0,
+                "bounty": 100,
+                "score": 3840.75
+              },
+              {
+                "idCustomer": "13073",
+                "company": "Sample Workshop 24",
+                "tier": "SILVER '26-TANEISHA",
+                "lifetimeEmbroidery": 9104.5,
+                "embroideryOrders": 1,
+                "avgOrderValue": 9104.5,
+                "monthsDormant": 21,
+                "medianReorderDays": 0,
+                "q3SharePct": 100,
+                "bounty": 100,
+                "score": 3034.83
+              },
+              {
+                "idCustomer": "123",
+                "company": "Sample Workshop 25",
+                "tier": "GOLD '26- TANEISHA",
+                "lifetimeEmbroidery": 33463.7,
+                "embroideryOrders": 15,
+                "avgOrderValue": 2230.91,
+                "monthsDormant": 19,
+                "medianReorderDays": 89,
+                "q3SharePct": 13,
+                "bounty": 100,
+                "score": 2528.37
+              },
+              {
+                "idCustomer": "3238",
+                "company": "Sample Workshop 26",
+                "tier": "SILVER '26-TANEISHA",
+                "lifetimeEmbroidery": 11343.19,
+                "embroideryOrders": 6,
+                "avgOrderValue": 1890.53,
+                "monthsDormant": 14,
+                "medianReorderDays": 236,
+                "q3SharePct": 33,
+                "bounty": 100,
+                "score": 2520.71
+              },
+              {
+                "idCustomer": "12854",
+                "company": "Sample Workshop 27",
+                "tier": "SILVER '26-TANEISHA",
+                "lifetimeEmbroidery": 8408,
+                "embroideryOrders": 2,
+                "avgOrderValue": 4204,
+                "monthsDormant": 19,
+                "medianReorderDays": 91,
+                "q3SharePct": 50,
+                "bounty": 100,
+                "score": 2102
+              },
+              {
+                "idCustomer": "9701",
+                "company": "Sample Workshop 28",
+                "tier": "GOLD '26- TANEISHA",
+                "lifetimeEmbroidery": 9912,
+                "embroideryOrders": 7,
+                "avgOrderValue": 1416,
+                "monthsDormant": 12,
+                "medianReorderDays": 145,
+                "q3SharePct": 43,
+                "bounty": 100,
+                "score": 2022.86
+              },
+              {
+                "idCustomer": "11454",
+                "company": "Sample Workshop 29",
+                "tier": "SILVER '26-TANEISHA",
+                "lifetimeEmbroidery": 13220.5,
+                "embroideryOrders": 5,
+                "avgOrderValue": 2644.1,
+                "monthsDormant": 26,
+                "medianReorderDays": 127,
+                "q3SharePct": 40,
+                "bounty": 100,
+                "score": 1850.87
+              },
+              {
+                "idCustomer": "10282",
+                "company": "Sample Workshop 30",
+                "tier": "SILVER '26-TANEISHA",
+                "lifetimeEmbroidery": 10408.6,
+                "embroideryOrders": 6,
+                "avgOrderValue": 1734.77,
+                "monthsDormant": 19,
+                "medianReorderDays": 157,
+                "q3SharePct": 0,
+                "bounty": 100,
+                "score": 1734.77
+              },
+              {
+                "idCustomer": "1438",
+                "company": "Sample Workshop 31",
+                "tier": "GOLD '26- TANEISHA",
+                "lifetimeEmbroidery": 13836.2,
+                "embroideryOrders": 8,
+                "avgOrderValue": 1729.53,
+                "monthsDormant": 18,
+                "medianReorderDays": 0,
+                "q3SharePct": 0,
+                "bounty": 100,
+                "score": 1729.53
+              },
+              {
+                "idCustomer": "2575",
+                "company": "Sample Workshop 32",
+                "tier": "BRONZE '26-TANEISHA",
+                "lifetimeEmbroidery": 11374,
+                "embroideryOrders": 7,
+                "avgOrderValue": 1624.86,
+                "monthsDormant": 13,
+                "medianReorderDays": 113,
+                "q3SharePct": 0,
+                "bounty": 100,
+                "score": 1624.86
+              }
+            ],
+            "firstProgram": [
+              {
+                "idCustomer": "13565",
+                "company": "Sample Workshop 33",
+                "tier": "SILVER '26-TANEISHA",
+                "otherSpend": 6358,
+                "otherOrders": 1,
+                "monthsSinceOrder": 4,
+                "bounty": 150,
+                "score": 6358
+              },
+              {
+                "idCustomer": "13629",
+                "company": "Sample Workshop 34",
+                "tier": "House-2026",
+                "otherSpend": 4734.5,
+                "otherOrders": 3,
+                "monthsSinceOrder": 0,
+                "bounty": 150,
+                "score": 4734.5
+              },
+              {
+                "idCustomer": "13510",
+                "company": "Sample Workshop 35",
+                "tier": "BRONZE '26-TANEISHA",
+                "otherSpend": 4420,
+                "otherOrders": 3,
+                "monthsSinceOrder": 1,
+                "bounty": 150,
+                "score": 4420
+              },
+              {
+                "idCustomer": "13179",
+                "company": "Sample Workshop 36",
+                "tier": "SILVER '26-TANEISHA",
+                "otherSpend": 3424.25,
+                "otherOrders": 1,
+                "monthsSinceOrder": 17,
+                "bounty": 150,
+                "score": 3424.25
+              },
+              {
+                "idCustomer": "13584",
+                "company": "Sample Workshop 37",
+                "tier": "House-2026",
+                "otherSpend": 3420,
+                "otherOrders": 1,
+                "monthsSinceOrder": 3,
+                "bounty": 150,
+                "score": 3420
+              },
+              {
+                "idCustomer": "13573",
+                "company": "Sample Workshop 38",
+                "tier": "House-2026",
+                "otherSpend": 2760,
+                "otherOrders": 1,
+                "monthsSinceOrder": 4,
+                "bounty": 150,
+                "score": 2760
+              },
+              {
+                "idCustomer": "13609",
+                "company": "Sample Workshop 39",
+                "tier": "House-2026",
+                "otherSpend": 2552,
+                "otherOrders": 2,
+                "monthsSinceOrder": 1,
+                "bounty": 150,
+                "score": 2552
+              },
+              {
+                "idCustomer": "13265",
+                "company": "Sample Workshop 40",
+                "tier": "BRONZE '26-TANEISHA",
+                "otherSpend": 2339,
+                "otherOrders": 3,
+                "monthsSinceOrder": 6,
+                "bounty": 150,
+                "score": 2339
+              },
+              {
+                "idCustomer": "13470",
+                "company": "Sample Workshop 41",
+                "tier": "BRONZE '26-TANEISHA",
+                "otherSpend": 2167.35,
+                "otherOrders": 3,
+                "monthsSinceOrder": 2,
+                "bounty": 150,
+                "score": 2167.35
+              },
+              {
+                "idCustomer": "13453",
+                "company": "Sample Workshop 42",
+                "tier": "BRONZE '26-TANEISHA",
+                "otherSpend": 2087.92,
+                "otherOrders": 2,
+                "monthsSinceOrder": 7,
+                "bounty": 150,
+                "score": 2087.92
+              },
+              {
+                "idCustomer": "13450",
+                "company": "Sample Workshop 43",
+                "tier": "BRONZE '26-TANEISHA",
+                "otherSpend": 2078.3,
+                "otherOrders": 1,
+                "monthsSinceOrder": 8,
+                "bounty": 150,
+                "score": 2078.3
+              },
+              {
+                "idCustomer": "13583",
+                "company": "Sample Workshop 44",
+                "tier": "House-2026",
+                "otherSpend": 1985,
+                "otherOrders": 2,
+                "monthsSinceOrder": 3,
+                "bounty": 150,
+                "score": 1985
+              }
+            ],
+            "almostThere": [
+              {
+                "idCustomer": "12989",
+                "company": "Sample Workshop 45",
+                "tier": "Win Back '26 TANEISHA",
+                "quarterRevenue": 892.5,
+                "gapToBounty": 107.5,
+                "category": "Reactivated",
+                "bounty": 100
+              },
+              {
+                "idCustomer": "13670",
+                "company": "Sample Workshop 46",
+                "tier": "House-2026",
+                "quarterRevenue": 730,
+                "gapToBounty": 270,
+                "category": "New",
+                "bounty": 150
+              },
+              {
+                "idCustomer": "12337",
+                "company": "Sample Workshop 47",
+                "tier": "SILVER '26-TANEISHA",
+                "quarterRevenue": 426,
+                "gapToBounty": 574,
+                "category": "Reactivated",
+                "bounty": 100
+              },
+              {
+                "idCustomer": "13000",
+                "company": "Sample Workshop 48",
+                "tier": "BRONZE '26-TANEISHA",
+                "quarterRevenue": 360,
+                "gapToBounty": 640,
+                "category": "New",
+                "bounty": 150
+              },
+              {
+                "idCustomer": "13693",
+                "company": "Sample Workshop 49",
+                "tier": "House-2026",
+                "quarterRevenue": 187.5,
+                "gapToBounty": 812.5,
+                "category": "New",
+                "bounty": 150
+              }
+            ],
+            "summary": {
+              "winBackCount": 189,
+              "winBackLifetime": 770895.65,
+              "firstProgramCount": 80,
+              "firstProgramSpend": 72855.95,
+              "almostThereCount": 5,
+              "almostThereGap": 2404,
+              "almostThereBounty": 650
+            }
+          }
+        }
+      }
     }
   },
   "scenarios": {
@@ -6037,10 +6535,10 @@
       "/api/crm-proxy/ae-dashboard/due-dates": "response-04",
       "/api/crm-proxy/ae-dashboard/growth": "response-05",
       "/api/crm-proxy/ae-dashboard/data-quality": "response-06",
-      "/api/crm-proxy/embroidery-bonus": "response-07",
-      "/api/crm-proxy/embroidery-bonus/targets": "response-08",
-      "/api/crm-proxy/embroidery-bonus/call-list": "response-09",
-      "/api/crm-proxy/embroidery-bonus/call-list?hydrate=all": "response-10",
+      "/api/crm-proxy/embroidery-bonus": "response-cedar-1",
+      "/api/crm-proxy/embroidery-bonus/targets": "response-cedar-2",
+      "/api/crm-proxy/embroidery-bonus/call-list": "response-19",
+      "/api/crm-proxy/embroidery-bonus/call-list?hydrate=all": "response-20",
       "/api/crm-proxy/marketing-shipments/items": "response-11",
       "/api/sanmar-orders/inbound-today": "response-12",
       "/api/staff/finished-photos/library?limit=24": "response-13",
