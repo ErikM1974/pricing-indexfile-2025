@@ -1154,3 +1154,7 @@ Reviewed source 315cc03bea6e9e235a5ea46e48113d0a40144ce5;57 focused browser/288 
 ## Personalization release checks complete — v2026.09.10.1
 
 Full integrated source passed build/lint/types,485routes/24modules,233unit suites/5409tests/four existing skips,88DOM,four accessibility unit,84quote parity,736mocked browser,16remaining browser/three optional screenshot skips,all five calculators,273CSS clean,boot200 and production audit zero.57 focused personalization scenarios;288 preservation/CSS/name-QA/historical checks;8PDF outputs/18reviewed pages.22 original hashes/167 reversible mappings;4retired owners/78408bytes/9flags. Live remains158/67 until exact-source CI and verified release raises it to162/63.
+
+## Personalization release record — v2026.09.10.1
+
+Exact-source CI 34451390044 passed all four jobs on b3147eab9220ef47330bc3a9a8c8d58287b3730a, including actual live money/calculator parity and736mocked browser checks. Four personalization pages share canonical controls and one scoped owner.57 focused scenarios,288 preservation/CSS/QA checks,22 original hashes/167 mapped changes,8PDFs/18pages. Four old sheets/78408bytes/nine flags retired;485 routes unchanged. Count becomes162 reviewed/63 pending only after verified rollout.

@@ -1,3 +1,16 @@
+## v2026.09.10.1 (2026.09.10)
+
+- Plan personalization workflow CSS review with immutable original contracts
+- Checkpoint personalization dashboards with canonical styles and recovery guards
+- Refine personalization dashboard paper layouts
+- Record verified lead records release and personalization continuation
+- Draft unified roster entry and preserve personalization details
+- Harden roster recovery, OCR and save state
+- Finish roster import and group recovery checks
+- Unify personalization forms and preserve production workflows
+- Integrate reviewed personalization workspaces with current production
+- Deploy v2026.09.10.1: unify personalization dashboards, roster entry and monogram production forms
+
 ## v2026.09.09.20 (2026.09.09)
 
 - Plan lead detail and Forms Inbox CSS consolidation with original source locks
