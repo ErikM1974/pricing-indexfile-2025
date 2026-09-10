@@ -1150,3 +1150,15 @@ Three application pages: lead detail, form submissions and marketing shipments. 
 Five reviewed PDF outputs total seven pages: lead two, Inbox list one, shipment list one, Inbox dialog one and populated lead two; complete orders, amounts, statuses, contact, quote and art reference are visible. Order cells stay on one line in print. The final paper spacing adjustment passed both affected browser cases. Full CSS scope275clean before this final whitespace/print adjustment. Direct CSS graphs 129469LFbytes each (original186,763/167,810/177,211); lead art-trigger graph 165253bytes, counted separately. Original garment-submit-form.css/js stay source locked and remain on the shared runtime modernization backlog.
 
 Local census becomes158 reviewed migrations/67pending/79excluded; LIVE REMAINS.19 at155/70 until full local gates, exact-source CI actual browser/money/calculator checks and verified deployment. Integrate only the recorded reviewed SHA with the primary .19 checkpoint, preserving current live memory. Backend unchanged.
+
+## Personalization workflows — next family plan, 2026-09-09
+
+Four related consumers: dashboards/monogram-dashboard.html, dashboards/names-numbers-dashboard.html, pages/names-numbers.html and quote-builders/monogram-form.html. Isolated codex/personalization-workflows starts at reviewed lead-record source 02af336bb51431d33152d6a2ff9712557f5481a0. Candidate v2026.09.09.21. Primary .20 checks run on immutable8be8ee84ecdf123ca8d7335440859897b842998d; live is still.19/2095/155reviewed/70pending. This plan grants no migration credit.
+
+- [x] Preserve original HTML contracts, CSS graph costs and every local stylesheet/controller/helper hash before edits.
+- [ ] Capture synthetic populated lists, roster edit/import states, monogram entry/name QA/thread choices and both print sheets at four widths; intercept all APIs, uploads, OCR, saves, deletes and exports.
+- [ ] Consolidate the two list dashboards and two entry forms with canonical controls, Public Sans and a scoped personalization owner. Preserve names, numbers, fonts, thread colors, prices, quantities, sorting, statuses, roster/item grouping and service payloads. Existing decorative sample fonts are product data and must remain.
+- [ ] Cover loading/malformed/empty/error/retry, stale responses, keyboard/modals, full roster output and printable name proofs. Hash original service/QA logic; map only necessary UI/recovery edits. Inventory every names-numbers.css/monogram-form.css consumer and static preview before retiring owners.
+- [ ] Register reviewed owners and lifecycle; integrate exact reviewed SHA only after .20 live verification. Full local and actual exact-source CI browser/money/parity gates precede one deployment. Never modify primary source during running tests.
+
+Private evidence: personalization-original-baseline.json and personalization-original-* copies. Never recapture originals after editing. node_modules is still a junction into primary; never recursively delete through it or copy.env. No real business actions or notifications.
