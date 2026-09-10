@@ -1,0 +1,507 @@
+{
+  "windows": [
+    {
+      "days": "30",
+      "tables": [
+        {
+          "id": "",
+          "rows": [
+            [
+              "WO",
+              "Customer",
+              "Due",
+              "Late · Due in",
+              "Value",
+              "Blanks",
+              "Type"
+            ],
+            [
+              "99501",
+              "Synthetic Cedar Outfitters",
+              "2026-09-07",
+              "2d late",
+              "$1,420",
+              "no PO raised",
+              "Embroidery"
+            ],
+            [
+              "99503",
+              "Synthetic Pine Team",
+              "2026-09-11",
+              "in 2d",
+              "$560",
+              "ordered, not inSynthetic Vendor",
+              "Embroidery"
+            ]
+          ]
+        },
+        {
+          "id": "",
+          "rows": [
+            [
+              "WO",
+              "Customer",
+              "Due",
+              "Late · Due in",
+              "Value",
+              "Blanks",
+              "Type"
+            ],
+            [
+              "99502",
+              "Synthetic Harbor Club partially shipped",
+              "2026-09-05",
+              "4d late",
+              "$780",
+              "partialSynthetic Vendor",
+              "Screen Print"
+            ]
+          ]
+        }
+      ],
+      "stats": [
+        "\n                    2\n                    Past due\n                    $2,200 of work\n                ",
+        "\n                    1\n                    At risk · due within 7 days, blanks not in house\n                    $560 of work\n                ",
+        "\n                    1\n                    Past due, no PO raised\n                    $1,420 waiting on a PO\n                ",
+        "\n                    4\n                    Due within 7 days, on track\n                    blanks in house\n                "
+      ],
+      "asof": "as of 2026-09-09 · 30-day window · 24 orders scanned · loaded 1:00 PM"
+    },
+    {
+      "days": "60",
+      "tables": [
+        {
+          "id": "",
+          "rows": [
+            [
+              "WO",
+              "Customer",
+              "Due",
+              "Late · Due in",
+              "Value",
+              "Blanks",
+              "Type"
+            ],
+            [
+              "99501",
+              "Synthetic Cedar Outfitters",
+              "2026-09-07",
+              "2d late",
+              "$1,420",
+              "no PO raised",
+              "Embroidery"
+            ],
+            [
+              "99503",
+              "Synthetic Pine Team",
+              "2026-09-11",
+              "in 2d",
+              "$560",
+              "ordered, not inSynthetic Vendor",
+              "Embroidery"
+            ]
+          ]
+        },
+        {
+          "id": "",
+          "rows": [
+            [
+              "WO",
+              "Customer",
+              "Due",
+              "Late · Due in",
+              "Value",
+              "Blanks",
+              "Type"
+            ],
+            [
+              "99502",
+              "Synthetic Harbor Club partially shipped",
+              "2026-09-05",
+              "4d late",
+              "$780",
+              "partialSynthetic Vendor",
+              "Screen Print"
+            ]
+          ]
+        }
+      ],
+      "stats": [
+        "\n                    2\n                    Past due\n                    $2,200 of work\n                ",
+        "\n                    1\n                    At risk · due within 7 days, blanks not in house\n                    $560 of work\n                ",
+        "\n                    1\n                    Past due, no PO raised\n                    $1,420 waiting on a PO\n                ",
+        "\n                    4\n                    Due within 7 days, on track\n                    blanks in house\n                "
+      ],
+      "asof": "as of 2026-09-09 · 60-day window · 24 orders scanned · loaded 1:00 PM"
+    },
+    {
+      "days": "90",
+      "tables": [
+        {
+          "id": "",
+          "rows": [
+            [
+              "WO",
+              "Customer",
+              "Due",
+              "Late · Due in",
+              "Value",
+              "Blanks",
+              "Type"
+            ],
+            [
+              "99501",
+              "Synthetic Cedar Outfitters",
+              "2026-09-07",
+              "2d late",
+              "$1,420",
+              "no PO raised",
+              "Embroidery"
+            ],
+            [
+              "99503",
+              "Synthetic Pine Team",
+              "2026-09-11",
+              "in 2d",
+              "$560",
+              "ordered, not inSynthetic Vendor",
+              "Embroidery"
+            ]
+          ]
+        },
+        {
+          "id": "",
+          "rows": [
+            [
+              "WO",
+              "Customer",
+              "Due",
+              "Late · Due in",
+              "Value",
+              "Blanks",
+              "Type"
+            ],
+            [
+              "99502",
+              "Synthetic Harbor Club partially shipped",
+              "2026-09-05",
+              "4d late",
+              "$780",
+              "partialSynthetic Vendor",
+              "Screen Print"
+            ]
+          ]
+        }
+      ],
+      "stats": [
+        "\n                    2\n                    Past due\n                    $2,200 of work\n                ",
+        "\n                    1\n                    At risk · due within 7 days, blanks not in house\n                    $560 of work\n                ",
+        "\n                    1\n                    Past due, no PO raised\n                    $1,420 waiting on a PO\n                ",
+        "\n                    4\n                    Due within 7 days, on track\n                    blanks in house\n                "
+      ],
+      "asof": "as of 2026-09-09 · 90-day window · 24 orders scanned · loaded 1:00 PM"
+    }
+  ],
+  "reports": [
+    {
+      "who": "",
+      "tables": [
+        {
+          "id": "",
+          "rows": [
+            [
+              "WO",
+              "Customer",
+              "Due",
+              "Late · Due in",
+              "Value",
+              "Blanks",
+              "Type"
+            ],
+            [
+              "99501",
+              "Synthetic Cedar Outfitters",
+              "2026-09-07",
+              "2d late",
+              "$1,420",
+              "no PO raised",
+              "Embroidery"
+            ],
+            [
+              "99503",
+              "Synthetic Pine Team",
+              "2026-09-11",
+              "in 2d",
+              "$560",
+              "ordered, not inSynthetic Vendor",
+              "Embroidery"
+            ]
+          ]
+        },
+        {
+          "id": "",
+          "rows": [
+            [
+              "WO",
+              "Customer",
+              "Due",
+              "Late · Due in",
+              "Value",
+              "Blanks",
+              "Type"
+            ],
+            [
+              "99502",
+              "Synthetic Harbor Club partially shipped",
+              "2026-09-05",
+              "4d late",
+              "$780",
+              "partialSynthetic Vendor",
+              "Screen Print"
+            ]
+          ]
+        },
+        {
+          "id": "",
+          "rows": [
+            [
+              "Northwest Custom Apparel · Past Due OrdersNika Lao1 past due · 1 at risk · September 9, 202690-day window — orders that slipped more than 90 days ago are not listed. Printed 1:00 PM."
+            ],
+            [
+              "Past due1 order"
+            ],
+            [
+              "WO",
+              "Customer",
+              "Type",
+              "Placed",
+              "Due",
+              "Late",
+              "Value",
+              "Blanks"
+            ],
+            [
+              "99501",
+              "Synthetic Cedar Outfitters",
+              "Embroidery",
+              "",
+              "9/7/26",
+              "2d",
+              "$1,420",
+              "no PO raised"
+            ],
+            [
+              "Total · 1 order",
+              "$1,420",
+              ""
+            ]
+          ]
+        },
+        {
+          "id": "",
+          "rows": [
+            [
+              "Nika Lao"
+            ],
+            [
+              "At risk — due within 7 days, blanks not in house1 order"
+            ],
+            [
+              "WO",
+              "Customer",
+              "Type",
+              "Placed",
+              "Due",
+              "Late",
+              "Value",
+              "Blanks"
+            ],
+            [
+              "99503",
+              "Synthetic Pine Team",
+              "Embroidery",
+              "",
+              "9/11/26",
+              "in 2d",
+              "$560",
+              "ordered, not inSynthetic Vendor"
+            ],
+            [
+              "Total · 1 order",
+              "$560",
+              ""
+            ]
+          ]
+        },
+        {
+          "id": "",
+          "rows": [
+            [
+              "Northwest Custom Apparel · Past Due OrdersHouse1 past due · September 9, 202690-day window — orders that slipped more than 90 days ago are not listed. Printed 1:00 PM."
+            ],
+            [
+              "Past due1 order"
+            ],
+            [
+              "WO",
+              "Customer",
+              "Type",
+              "Placed",
+              "Due",
+              "Late",
+              "Value",
+              "Blanks"
+            ],
+            [
+              "99502",
+              "Synthetic Harbor Club",
+              "Screen Print",
+              "",
+              "9/5/26",
+              "4d",
+              "$780",
+              "partialSynthetic Vendor"
+            ],
+            [
+              "Total · 1 order",
+              "$780",
+              ""
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "who": "Nika Lao",
+      "tables": [
+        {
+          "id": "",
+          "rows": [
+            [
+              "WO",
+              "Customer",
+              "Due",
+              "Late · Due in",
+              "Value",
+              "Blanks",
+              "Type"
+            ],
+            [
+              "99501",
+              "Synthetic Cedar Outfitters",
+              "2026-09-07",
+              "2d late",
+              "$1,420",
+              "no PO raised",
+              "Embroidery"
+            ],
+            [
+              "99503",
+              "Synthetic Pine Team",
+              "2026-09-11",
+              "in 2d",
+              "$560",
+              "ordered, not inSynthetic Vendor",
+              "Embroidery"
+            ]
+          ]
+        },
+        {
+          "id": "",
+          "rows": [
+            [
+              "WO",
+              "Customer",
+              "Due",
+              "Late · Due in",
+              "Value",
+              "Blanks",
+              "Type"
+            ],
+            [
+              "99502",
+              "Synthetic Harbor Club partially shipped",
+              "2026-09-05",
+              "4d late",
+              "$780",
+              "partialSynthetic Vendor",
+              "Screen Print"
+            ]
+          ]
+        },
+        {
+          "id": "",
+          "rows": [
+            [
+              "Northwest Custom Apparel · Past Due OrdersNika Lao1 past due · 1 at risk · September 9, 202690-day window — orders that slipped more than 90 days ago are not listed. Printed 1:00 PM."
+            ],
+            [
+              "Past due1 order"
+            ],
+            [
+              "WO",
+              "Customer",
+              "Type",
+              "Placed",
+              "Due",
+              "Late",
+              "Value",
+              "Blanks"
+            ],
+            [
+              "99501",
+              "Synthetic Cedar Outfitters",
+              "Embroidery",
+              "",
+              "9/7/26",
+              "2d",
+              "$1,420",
+              "no PO raised"
+            ],
+            [
+              "Total · 1 order",
+              "$1,420",
+              ""
+            ]
+          ]
+        },
+        {
+          "id": "",
+          "rows": [
+            [
+              "Nika Lao"
+            ],
+            [
+              "At risk — due within 7 days, blanks not in house1 order"
+            ],
+            [
+              "WO",
+              "Customer",
+              "Type",
+              "Placed",
+              "Due",
+              "Late",
+              "Value",
+              "Blanks"
+            ],
+            [
+              "99503",
+              "Synthetic Pine Team",
+              "Embroidery",
+              "",
+              "9/11/26",
+              "in 2d",
+              "$560",
+              "ordered, not inSynthetic Vendor"
+            ],
+            [
+              "Total · 1 order",
+              "$560",
+              ""
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

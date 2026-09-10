@@ -43,14 +43,33 @@
     const money = (n) => '$' + (Math.round(n * 100) / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-    document.addEventListener('DOMContentLoaded', () => {
-        wire();
-        load().then(render).catch((err) => {
+    let loading = false;
+    let ready = false;
+    document.addEventListener('DOMContentLoaded', () => { wire(); refresh(); });
+
+    async function refresh() {
+        if (loading) return;
+        loading = true; ready = false;
+        DashPage.hideError();
+        document.querySelectorAll('[data-case], [data-view], #cbe-print').forEach(b => { b.disabled = true; });
+        $('cbe-assumptions').setAttribute('aria-busy', 'true');
+        $('cbe-assumptions').textContent = 'Loading…';
+        $('cbe-tables').replaceChildren();
+        $('cbe-case-note').textContent = '';
+        try {
+            await load(); render(); ready = true;
+        } catch (err) {
             console.error('[contract-break-even] load failed:', err);
             DashPage.showError('Unable to load the cost model or the contract card: ' + err.message + '. Nothing is shown rather than a wrong cost.');
-            $('cbe-assumptions').textContent = 'Not loaded.';
-        });
-    });
+            $('cbe-assumptions').textContent = 'Cost comparison unavailable. ';
+            const retry = document.createElement('button');
+            retry.type = 'button'; retry.className = 'dash-btn no-print'; retry.textContent = 'Retry';
+            retry.addEventListener('click', refresh); $('cbe-assumptions').appendChild(retry);
+        } finally {
+            loading = false; $('cbe-assumptions').setAttribute('aria-busy', 'false');
+            document.querySelectorAll('[data-case], [data-view], #cbe-print').forEach(b => { b.disabled = !ready; });
+        }
+    }
 
     function wire() {
         document.querySelectorAll('[data-case]').forEach((b) => b.addEventListener('click', () => {
@@ -59,7 +78,7 @@
         document.querySelectorAll('[data-view]').forEach((b) => b.addEventListener('click', () => {
             state.view = b.dataset.view; syncToggles(); render();
         }));
-        $('cbe-print').addEventListener('click', () => window.print());
+        $('cbe-print').addEventListener('click', () => { if (ready && !loading) window.print(); });
     }
 
     function syncToggles() {
@@ -93,6 +112,12 @@
         });
         state.cfg = cfg;
         if (!card || !card.garments || !card.caps || !card.fullBack) throw new Error('contract-pricing payload incomplete');
+        for (const product of PRODUCTS) {
+            const rates = card[product.key].perThousandRates || card[product.key].ratesPerThousand;
+            if (!rates || TIERS.some(t => rates[t.label] === null || rates[t.label] === '' || !Number.isFinite(Number(rates[t.label])) || Number(rates[t.label]) < 0)) {
+                throw new Error('Contract rates incomplete for ' + product.title);
+            }
+        }
         state.card = card;
         const minRows = Array.isArray(minRes) ? minRes : (minRes.data || []);
         const minV = minRows.length ? Number(minRows[0].SellPrice) : NaN;
@@ -181,7 +206,7 @@
         return '<section class="dash-card cbe-product">' +
             '<div class="dash-card-header"><h2 class="dash-card-title">' + esc(product.title) + ' <span class="cbe-sub">' + esc(product.code) + ' · ' +
             (isProfit ? 'profit per piece at the card' : 'break-even cost per piece') + ' · ' + (state.prodCase === 'worst' ? 'worst case' : 'typical run') + '</span></h2></div>' +
-            '<div class="cbe-table-wrap"><table class="cbe-table"><thead>' + head + '</thead><tbody>' + body + '</tbody><tfoot>' + foot + '</tfoot></table></div>' +
+            '<div class="cbe-table-wrap" role="region" aria-label="Contract price comparison" tabindex="0"><table class="cbe-table"><thead>' + head + '</thead><tbody>' + body + '</tbody><tfoot>' + foot + '</tfoot></table></div>' +
             (isProfit ? '<div class="cbe-legend"><span><span class="sw loss"></span>loses money</span><span><span class="sw thin"></span>under ' + money(THIN) + ' a piece</span><span>minimum ÷ qty is used where the card total is below the order minimum</span></div>' : '') +
             '</section>';
     }

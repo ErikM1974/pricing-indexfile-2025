@@ -1,0 +1,109 @@
+{
+  "fields": [
+    {
+      "id": "fId",
+      "value": "99602",
+      "checked": false,
+      "disabled": false
+    },
+    {
+      "id": "fStyle",
+      "value": "REVIEW-CAP",
+      "checked": false,
+      "disabled": true
+    },
+    {
+      "id": "fName",
+      "value": "Synthetic Cap",
+      "checked": false,
+      "disabled": false
+    },
+    {
+      "id": "fBrand",
+      "value": "Synthetic Vendor",
+      "checked": false,
+      "disabled": false
+    },
+    {
+      "id": "fCategory",
+      "value": "Caps",
+      "disabled": false
+    },
+    {
+      "id": "fCost",
+      "value": "6.25",
+      "checked": false,
+      "disabled": false
+    },
+    {
+      "id": "fPricingMethod",
+      "value": "FixedPrice",
+      "disabled": false
+    },
+    {
+      "id": "fSell",
+      "value": "14",
+      "checked": false,
+      "disabled": false
+    },
+    {
+      "id": "fSizes",
+      "value": "",
+      "checked": false,
+      "disabled": false
+    },
+    {
+      "id": "fColors",
+      "value": "",
+      "checked": false,
+      "disabled": false
+    },
+    {
+      "id": "fVendorSelect",
+      "value": "__other",
+      "disabled": false
+    },
+    {
+      "id": "fVendor",
+      "value": "LEGACY-SUPPLIER",
+      "checked": false,
+      "disabled": false
+    },
+    {
+      "id": "fVendorUrl",
+      "value": "",
+      "checked": false,
+      "disabled": false
+    },
+    {
+      "id": "fImageFile",
+      "value": "",
+      "checked": false,
+      "disabled": false
+    },
+    {
+      "id": "fImageUrl",
+      "value": "",
+      "checked": false,
+      "disabled": false
+    },
+    {
+      "id": "fNotes",
+      "value": "",
+      "disabled": false
+    },
+    {
+      "id": "fActive",
+      "value": "on",
+      "checked": true,
+      "disabled": false
+    }
+  ],
+  "writes": [
+    {
+      "path": "/api/non-sanmar-products/99602",
+      "method": "PUT",
+      "body": "{\"StyleNumber\":\"REVIEW-CAP\",\"ProductName\":\"Synthetic Cap\",\"Brand\":\"Synthetic Vendor\",\"Category\":\"Caps\",\"DefaultCost\":6.25,\"DefaultSellPrice\":14,\"PricingMethod\":\"FixedPrice\",\"AvailableSizes\":\"\",\"DefaultColors\":\"\",\"VendorCode\":\"LEGACY-SUPPLIER\",\"VendorURL\":\"\",\"ImageURL\":\"\",\"Notes\":\"\",\"IsActive\":true}"
+    }
+  ]
+}

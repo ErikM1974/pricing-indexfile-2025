@@ -140,14 +140,18 @@
 
     async function loadStyle(line) {
         const style = line.style.trim().toUpperCase();
+        const requestId = (line.loadId || 0) + 1;
+        line.loadId = requestId;
+        const isCurrent = () => state.lines.includes(line) && line.loadId === requestId && line.style.trim().toUpperCase() === style;
         line.data = null;
         line.status = 'loading';
-        renderLines();
+        renderLines(); render();
         try {
             const [bundle, details] = await Promise.all([
                 DashPage.fetchJson('/api/pricing-bundle?method=EMB&styleNumber=' + encodeURIComponent(style)),
                 DashPage.fetchJson('/api/product-details?styleNumber=' + encodeURIComponent(style)).catch(() => null)
             ]);
+            if (!isCurrent()) return;
             if (!bundle || !bundle.tiersR || !bundle.allEmbroideryCostsR || !bundle.sizes || !bundle.sizes.length) {
                 throw new Error('No embroidery pricing for ' + style);
             }
@@ -196,6 +200,8 @@
             render();
             loadStock(line);
         } catch (err) {
+            if (!isCurrent()) return;
+            line.data = null;
             console.error('[volume-quote] style load failed:', err);
             line.status = 'error: ' + err.message;
             renderLines();
@@ -204,14 +210,21 @@
     }
 
     async function loadStock(line) {
+        const product = line.data;
+        if (!product) return;
+        const isCurrent = () => state.lines.includes(line) && line.data === product;
+        product.stock = null; renderLines();
         try {
-            const inv = await DashPage.fetchJson('/api/sanmar/inventory/' + encodeURIComponent(line.data.style));
+            const inv = await DashPage.fetchJson('/api/sanmar/inventory/' + encodeURIComponent(product.style));
+            if (!isCurrent()) return;
+            if (!inv || !Array.isArray(inv.inventory) || inv.grandTotal === null || inv.grandTotal === '' || !Number.isFinite(Number(inv.grandTotal)) || Number(inv.grandTotal) < 0) throw new Error('Inventory response incomplete');
             const byColor = {};
-            (inv.inventory || []).forEach((r) => { byColor[r.color] = (byColor[r.color] || 0) + (Number(r.totalQty) || 0); });
+            inv.inventory.forEach((r) => { byColor[r.color] = (byColor[r.color] || 0) + (Number(r.totalQty) || 0); });
             const top = Object.entries(byColor).sort((a, b) => b[1] - a[1]).slice(0, 3);
-            line.data.stock = { total: Number(inv.grandTotal) || 0, top };
+            product.stock = { total: Number(inv.grandTotal), top };
         } catch (e) {
-            line.data.stock = { error: true };
+            if (!isCurrent()) return;
+            product.stock = { error: true };
         }
         renderLines();
     }
@@ -251,6 +264,13 @@
             }
         });
         $('vq-lines').addEventListener('click', (e) => {
+            const retry = e.target.closest('.vq-line-retry-stock, .vq-line-retry-price');
+            if (retry) {
+                const row = retry.closest('.vq-line');
+                const line = state.lines.find(l => l.id === Number(row.dataset.id));
+                if (line) { if (retry.classList.contains('vq-line-retry-stock')) loadStock(line); else loadStyle(line); }
+                return;
+            }
             const btn = e.target.closest('.vq-line-remove'); if (!btn) return;
             const row = btn.closest('.vq-line');
             state.lines = state.lines.filter((l) => l.id !== Number(row.dataset.id));
@@ -279,38 +299,49 @@
     // internal rationale is kept in the first item's LogoSpecs (short JSON), never in Notes,
     // because Notes can surface on customer-facing quote views.
     async function saveQuote() {
-        const r = compute();
-        const btn = $('vq-save');
+        if (state.saving) return;
+        const r = JSON.parse(JSON.stringify(compute()));
         const status = $('vq-save-status');
         const setStatus = (msg, cls) => { status.textContent = msg; status.className = 'vq-save-status' + (cls ? ' vq-save-status--' + cls : ''); };
+        if (state.lines.some(l => (l.style.trim() || l.qty > 0) && !l.data)) { setStatus('Finish loading every garment before saving.', 'error'); return; }
         if (!r.rows.length) { setStatus('Add at least one style with a quantity.', 'error'); return; }
         const customer = $('vq-customer').value.trim();
         if (!customer) { setStatus('Enter the customer name first.', 'error'); return; }
-        btn.disabled = true;
+        const locSel = $('vq-location');
+        const savedFields = {
+            validUntil: $('vq-valid-until').value,
+            locCode: locSel.value || 'LC',
+            locName: locSel.options.length ? locSel.options[locSel.selectedIndex].textContent : 'Left Chest',
+            hold: parseInt($('vq-hold-qty').value, 10) || r.qty,
+            design: $('vq-design').value.trim(),
+            rep: $('vq-rep').value.trim(),
+            repEmail: repEmailFor($('vq-rep').value)
+        };
+        const controls = [...document.querySelectorAll('.dash-content input, .dash-content select, .dash-content button')].map(node => ({ node, disabled: node.disabled }));
+        state.saving = true;
+        controls.forEach(({ node }) => { node.disabled = true; });
+        let sessionAttempted = false, attemptedQuoteId = '';
         setStatus('Saving…', '');
         try {
             const seqResp = await fetch('/api/quote-sequence/VQ');
             if (!seqResp.ok) throw new Error('quote number service returned ' + seqResp.status);
             const seq = await seqResp.json();
+            if (!seq || seq.prefix !== 'VQ' || !/^\d{4}$/.test(String(seq.year)) || !Number.isSafeInteger(Number(seq.sequence)) || Number(seq.sequence) < 1) throw new Error('Quote number response incomplete');
             const quoteId = seq.prefix + '-' + seq.year + '-' + String(seq.sequence).padStart(3, '0');
+            attemptedQuoteId = quoteId;
             const now = new Date().toISOString().replace(/\.\d{3}Z$/, '');
-            const validUntil = $('vq-valid-until').value;
-            const locSel = $('vq-location');
-            const locCode = locSel.value || 'LC';
-            const locName = locSel.options.length ? locSel.options[locSel.selectedIndex].textContent : 'Left Chest';
-            const hold = parseInt($('vq-hold-qty').value, 10) || r.qty;
-            const design = $('vq-design').value.trim();
+            const { validUntil, locCode, locName, hold, design } = savedFields;
             const session = {
                 QuoteID: quoteId,
                 SessionID: 'volume_quote_' + Date.now(),
                 CustomerName: customer,
                 CompanyName: customer,
                 CustomerEmail: '',
-                SalesRepName: $('vq-rep').value.trim(),
+                SalesRepName: savedFields.rep,
                 // The rep's real email, not sales@ (2026-09-05): Mission Control's Pipeline tab
                 // attributes quotes by SalesRepEmail, so Taneisha's $30,959 Braun NW volume
                 // quote showed as "no quotes carry your name". Unknown names keep sales@.
-                SalesRepEmail: repEmailFor($('vq-rep').value),
+                SalesRepEmail: savedFields.repEmail,
                 TotalQuantity: r.qty,
                 SubtotalAmount: Math.round(r.orderVol * 100) / 100,
                 LTMFeeTotal: 0,
@@ -325,6 +356,7 @@
                        '+ pcs on one PO, ' + locName + ', ' + r.stitches.toLocaleString() + ' stitches' + (design ? ', design #' + design : '') +
                        (validUntil ? ', valid until ' + validUntil : '') + '. Standard price applies below that quantity.'
             };
+            sessionAttempted = true;
             const sResp = await fetch('/api/quote_sessions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(session) });
             if (!sResp.ok) throw new Error('quote_sessions save returned ' + sResp.status);
             const internal = JSON.stringify({ vq: { emb: r.embVol, std: state.embStandard, denom: r.denomVol, hrs: r.cost ? +r.cost.hours.toFixed(1) : null, gm: r.gmTotal === null ? null : +r.gmTotal.toFixed(3), given: Math.round(r.orderStd - r.orderVol) } });
@@ -362,10 +394,14 @@
             render();
         } catch (err) {
             console.error('[volume-quote] save failed:', err);
-            setStatus('Not saved: ' + err.message, 'error');
-            DashPage.showError('Quote not saved: ' + err.message);
+            const message = sessionAttempted
+                ? 'Save could not be completed for ' + attemptedQuoteId + ': ' + err.message + '. Check Quote Management before retrying.'
+                : 'Not saved: ' + err.message;
+            setStatus(message, 'error');
+            DashPage.showError(message);
         } finally {
-            btn.disabled = false;
+            state.saving = false;
+            controls.forEach(({ node, disabled }) => { node.disabled = disabled; });
         }
     }
 
@@ -458,10 +494,10 @@
                 row.className = 'vq-line';
                 row.dataset.id = l.id;
                 row.innerHTML =
-                    '<input type="text" class="vq-line-style" aria-label="Style number" value="' + esc(l.style) + '" placeholder="1566" autocomplete="off">' +
-                    '<input type="number" class="vq-line-qty" aria-label="Quantity" min="0" step="1" value="' + (l.qty || '') + '" placeholder="500">' +
+                    '<label class="vq-line-field"><span class="vq-input-label">Style number</span><input type="text" class="field-input vq-line-style" aria-label="Style number" value="' + esc(l.style) + '" placeholder="1566" autocomplete="off"></label>' +
+                    '<label class="vq-line-field"><span class="vq-input-label">Quantity</span><input type="number" class="field-input vq-line-qty" aria-label="Quantity" min="0" step="1" value="' + (l.qty || '') + '" placeholder="500"></label>' +
                     '<div class="vq-line-info"></div><div class="vq-line-info"></div><div class="vq-line-info"></div>' +
-                    '<button type="button" class="vq-line-remove" title="Remove" aria-label="Remove this style"><i class="fas fa-times" aria-hidden="true"></i></button>';
+                    '<button type="button" class="btn btn-ghost vq-line-remove" title="Remove" aria-label="Remove this style"><i class="fas fa-times" aria-hidden="true"></i></button>';
                 root.appendChild(row);
             }
             const d = l.data;
@@ -470,12 +506,12 @@
                 title = '<div class="vq-line-title">' + esc(d.title) + (d.brand ? '<small>' + esc(d.brand) + '</small>' : '') + '</div>';
                 cost = '<div class="vq-line-cost">' + money(d.caseCost) + (d.pieceCost !== null ? ' <small>/ ' + money(d.pieceCost) + ' piece</small>' : '') + '</div>';
                 if (d.stock === null) stock = '<span class="vq-line-stock">checking…</span>';
-                else if (d.stock.error) stock = '<span class="vq-line-stock vq-line-status--error">stock check failed</span>';
+                else if (d.stock.error) stock = '<span class="vq-line-stock vq-line-status--error">stock check failed</span> <button type="button" class="btn btn-ghost vq-line-retry-stock" aria-label="Retry stock for ' + esc(d.style) + '">Retry stock</button>';
                 else stock = '<span class="vq-line-stock">' + d.stock.total.toLocaleString() + ' total' +
                     (d.stock.top.length ? '<br>' + d.stock.top.map((t) => esc(t[0]) + ' ' + t[1].toLocaleString()).join(' · ') : '') + '</span>';
             } else if (l.status) {
                 const isErr = l.status.startsWith('error');
-                title = '<span class="vq-line-status' + (isErr ? ' vq-line-status--error' : '') + '">' + esc(isErr ? l.status.slice(7) : 'Loading…') + '</span>';
+                title = '<span class="vq-line-status' + (isErr ? ' vq-line-status--error' : '') + '">' + esc(isErr ? l.status.slice(7) : 'Loading…') + '</span>' + (isErr ? ' <button type="button" class="btn btn-ghost vq-line-retry-price">Retry pricing</button>' : '');
             }
             const cells = row.querySelectorAll('.vq-line-info');
             cells[0].innerHTML = title;

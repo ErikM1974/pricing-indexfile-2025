@@ -1,0 +1,111 @@
+{
+  "cards": [
+    "Synthetic Cedar OutfittersAvery Example123 Example LaneTacoma, WA 98402253-555-0100review0@example.test Construction ProspectSynthetic only; no outreach. Found in: Synthetic reviewStatus: Not contactedMailedRespondedCustomerDo not mail Edit Delete",
+    "Synthetic Harbor ClubJordan ExampleTacoma, WA 98402253-555-0101 Construction ProspectSynthetic only; no outreach. Found in: Synthetic reviewStatus: Not contactedMailedRespondedCustomerDo not mail Edit Delete",
+    "Synthetic Pine TeamCasey ExampleTacoma, WA 98402253-555-0102review2@example.test Construction ProspectSynthetic only; no outreach. Found in: Synthetic reviewStatus: Not contactedMailedRespondedCustomerDo not mail Edit Delete"
+  ],
+  "fields": [
+    {
+      "id": "jml-company",
+      "value": "Synthetic Cedar Outfitters"
+    },
+    {
+      "id": "jml-first",
+      "value": "Avery"
+    },
+    {
+      "id": "jml-last",
+      "value": "Example"
+    },
+    {
+      "id": "jml-address",
+      "value": "123 Example Lane"
+    },
+    {
+      "id": "jml-city",
+      "value": "Tacoma"
+    },
+    {
+      "id": "jml-state",
+      "value": "WA"
+    },
+    {
+      "id": "jml-zip",
+      "value": "98402"
+    },
+    {
+      "id": "jml-phone",
+      "value": "253-555-0100"
+    },
+    {
+      "id": "jml-email",
+      "value": "review0@example.test"
+    },
+    {
+      "id": "jml-website",
+      "value": ""
+    },
+    {
+      "id": "jml-source",
+      "value": "Synthetic review"
+    },
+    {
+      "id": "jml-category",
+      "value": "Construction Prospect"
+    },
+    {
+      "id": "jml-notes",
+      "value": "Synthetic only; no outreach."
+    }
+  ],
+  "csv": "﻿Email Address,First Name,Last Name,Company,Address,City,State,Zip,Phone,Tags\r\nreview0@example.test,Avery,Example,Synthetic Cedar Outfitters,123 Example Lane,Tacoma,WA,98402,253-555-0100,Construction Prospect\r\n,Jordan,Example,Synthetic Harbor Club,,Tacoma,WA,98402,253-555-0101,Construction Prospect\r\nreview2@example.test,Casey,Example,Synthetic Pine Team,,Tacoma,WA,98402,253-555-0102,Construction Prospect",
+  "filename": "jim-list-all.csv",
+  "labels": "<!doctype html><html><head><meta charset=\"utf-8\"><title>Mailing labels</title><style>@page{size:letter;margin:0.5in 0.1875in;}body{margin:0;font-family:Arial,Helvetica,sans-serif;}.sheet{display:grid;grid-template-columns:repeat(3,2.625in);grid-auto-rows:1in;column-gap:0.125in;}.lbl{padding:0.12in 0.2in;font-size:11pt;line-height:1.25;overflow:hidden;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;}@media screen{.lbl{outline:1px dashed #ccc;}}</style></head><body><div class=\"sheet\"><div class=\"lbl\">Avery Example<br>Synthetic Cedar Outfitters<br>123 Example Lane<br>Tacoma, WA 98402</div><div class=\"lbl\">Jordan Example<br>Synthetic Harbor Club<br>Tacoma, WA 98402</div><div class=\"lbl\">Casey Example<br>Synthetic Pine Team<br>Tacoma, WA 98402</div></div><script>window.onload=function(){setTimeout(function(){window.print();},250);};</script></body></html>",
+  "writes": [
+    {
+      "path": "/api/crm-proxy/jim-mailing-list/99401",
+      "method": "PUT",
+      "body": "{\"Company\":\"Synthetic Cedar Outfitters\",\"First_Name\":\"Avery\",\"Last_Name\":\"Example\",\"Address\":\"123 Example Lane\",\"City\":\"Tacoma\",\"State\":\"WA\",\"Zip\":\"98402\",\"Phone\":\"253-555-0100\",\"Email\":\"review0@example.test\",\"Website\":\"\",\"Source\":\"Synthetic review\",\"Category\":\"Construction Prospect\",\"Notes\":\"Synthetic reviewed note.\",\"Contact_Name\":\"Avery Example\"}"
+    },
+    {
+      "path": "/api/crm-proxy/jim-mailing-list/99401",
+      "method": "PUT",
+      "body": "{\"Status\":\"Mailed\",\"Last_Mailed_At\":\"2026-09-09\"}"
+    },
+    {
+      "path": "/api/crm-proxy/jim-mailing-list/99403",
+      "method": "DELETE",
+      "body": null
+    },
+    {
+      "path": "/api/crm-proxy/jim-mailing-list/extract",
+      "method": "POST",
+      "body": "{\"text\":\"Synthetic Maple Workshop, Alex Example, 456 Sample Avenue, Fife WA 98424.\"}"
+    },
+    {
+      "path": "/api/crm-proxy/jim-mailing-list",
+      "method": "POST",
+      "body": "{\"Company\":\"Synthetic Maple Workshop\",\"First_Name\":\"Alex\",\"Last_Name\":\"Example\",\"Address\":\"456 Sample Avenue\",\"City\":\"Fife\",\"State\":\"WA\",\"Zip\":\"98424\",\"Phone\":\"253-555-0199\",\"Email\":\"maple@example.test\",\"Website\":\"\",\"Source\":\"Found online\",\"Category\":\"Construction Prospect\",\"Notes\":\"Synthetic extraction only.\",\"Contact_Name\":\"Alex Example\"}"
+    },
+    {
+      "path": "/api/crm-proxy/jim-mailing-list/mailchimp/engagement",
+      "method": "POST",
+      "body": "{\"emails\":[\"review0@example.test\",\"review2@example.test\"]}"
+    },
+    {
+      "path": "/api/crm-proxy/jim-mailing-list/mailchimp/sync",
+      "method": "POST",
+      "body": "{\"members\":[{\"email\":\"review0@example.test\",\"first\":\"Avery\",\"last\":\"Example\",\"company\":\"Synthetic Cedar Outfitters\",\"address\":\"123 Example Lane\",\"city\":\"Tacoma\",\"state\":\"WA\",\"zip\":\"98402\",\"phone\":\"253-555-0100\",\"tag\":\"Construction Prospect\"}]}"
+    },
+    {
+      "path": "/api/crm-proxy/jim-mailing-list/mailchimp/sync",
+      "method": "POST",
+      "body": "{\"members\":[{\"email\":\"review0@example.test\",\"first\":\"Avery\",\"last\":\"Example\",\"company\":\"Synthetic Cedar Outfitters\",\"address\":\"123 Example Lane\",\"city\":\"Tacoma\",\"state\":\"WA\",\"zip\":\"98402\",\"phone\":\"253-555-0100\",\"tag\":\"Construction Prospect\"},{\"email\":\"review2@example.test\",\"first\":\"Casey\",\"last\":\"Example\",\"company\":\"Synthetic Pine Team\",\"address\":\"\",\"city\":\"Tacoma\",\"state\":\"WA\",\"zip\":\"98402\",\"phone\":\"253-555-0102\",\"tag\":\"Construction Prospect\"}]}"
+    },
+    {
+      "path": "/api/crm-proxy/jim-mailing-list/mailchimp/record-sends",
+      "method": "POST",
+      "body": "{}"
+    }
+  ]
+}

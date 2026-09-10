@@ -78,7 +78,7 @@ describe('purchasing portal hygiene', () => {
 describe('product manager', () => {
     const html = read('dashboards/product-manager.html').replace(/<!--[\s\S]*?-->/g, '');
     const js = read('dashboards/js/product-manager.js');
-    const css = read('dashboards/css/product-manager.css');
+    const css = read('shared_components/css/staff-toolkit.css');
     test('retry, named actions, focus, hygiene', () => {
         expect(js).toMatch(/function boot\(\)/);
         expect(js).toMatch(/id="pmRetry"/);
@@ -89,7 +89,7 @@ describe('product manager', () => {
         expect(js).not.toMatch(BARE);
         expect(html).not.toMatch(BARE);
         expect(html).toMatch(/<button type="button" class="dash-error-banner-close" aria-label="Dismiss">/);
-        expect(css).toMatch(/^\[hidden\] \{ display: none !important; \}/m);
+        expect(read('shared_components/css/components.css')).toMatch(/\[hidden\] \{\s*display: none;\s*\}/);
         expect(html).toMatch(/product-manager\.js\?v=2026\.09\./);
     });
 });

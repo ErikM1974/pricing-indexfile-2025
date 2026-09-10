@@ -1,0 +1,4528 @@
+/* Staff toolkit: page-specific layout. Common controls and cards live in components.css. */
+@page staff-toolkit-contract {
+    size: letter;
+    margin: 12mm;
+}
+
+@layer components.pages {
+    :where([data-ui="unified"][data-staff-tool]) {
+        --ui-accent: var(--gray-900);
+        --ui-accent-hover: var(--gray-700);
+        --ui-tint: var(--gray-50);
+    }
+
+    :where([data-ui="unified"][data-staff-tool]) .dash-header {
+        background: var(--gray-900);
+        border-top-color: var(--amber-400);
+        color: var(--color-on-brand);
+        padding-inline: max(var(--space-5), calc((100% - 1432px) / 2));
+    }
+
+    :where([data-ui="unified"][data-staff-tool]) .dash-header-logo {
+        width: 88px;
+        height: 58px;
+        padding: var(--space-2);
+        object-fit: contain;
+        background: var(--color-surface);
+        border-radius: var(--radius-sm);
+    }
+
+    :where([data-ui="unified"][data-staff-tool]) .dash-content {
+        max-width: 1480px;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-tool])
+        :is(.dash-header-left, .dash-header-right) {
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-tool]) .dash-header-title {
+        overflow-wrap: anywhere;
+    }
+
+    /* Contract comparison: numeric alignment and meaning survive every view. */
+    :where([data-ui="unified"][data-staff-tool]) :is(.cbe-intro, .rps-intro) {
+        max-width: 88ch;
+        margin: 0 0 var(--space-5);
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-tool])
+        :is(.cbe-intro, .rps-intro)
+        strong {
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-staff-tool])
+        :is(.cbe-controls, .cbe-toggle, .cbe-legend) {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-staff-tool]) .cbe-controls {
+        gap: var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-staff-tool]) .cbe-actions {
+        margin-inline-start: auto;
+    }
+
+    :where([data-ui="unified"][data-staff-tool]) .cbe-assumptions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+        gap: var(--space-3);
+        font-size: var(--font-size-sm);
+    }
+
+    :where([data-ui="unified"][data-staff-tool]) .cbe-assumptions div {
+        padding: var(--space-3);
+        background: var(--ui-tint);
+        border-radius: var(--radius-sm);
+    }
+
+    :where([data-ui="unified"][data-staff-tool]) .cbe-assumptions b {
+        font-variant-numeric: tabular-nums;
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-staff-tool]) .cbe-assumptions small {
+        display: block;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-tool])
+        :is(.cbe-note, .cbe-sub, .cbe-legend) {
+        color: var(--ui-muted);
+        font-size: var(--font-size-sm);
+    }
+
+    :where([data-ui="unified"][data-staff-tool]) .cbe-note {
+        margin-block: var(--space-4) 0;
+        max-width: 90ch;
+    }
+
+    :where([data-ui="unified"][data-staff-tool]) .cbe-warn {
+        color: var(--color-warning-ink);
+    }
+
+    :where([data-ui="unified"][data-staff-tool]) .cbe-table-wrap {
+        max-width: 100%;
+        overflow-x: auto;
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+    }
+
+    :where([data-ui="unified"][data-staff-tool]) .cbe-table {
+        width: 100%;
+        min-width: 600px;
+        border-collapse: collapse;
+        font-size: var(--font-size-md);
+        font-variant-numeric: tabular-nums;
+    }
+
+    :where([data-ui="unified"][data-staff-tool]) .cbe-table :is(th, td) {
+        padding: var(--space-3);
+        border-bottom: 1px solid var(--ui-line);
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool])
+        .cbe-table
+        :is(th, td):first-child {
+        text-align: left;
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-tool]) .cbe-table :is(th, tfoot td) {
+        background: var(--ui-tint);
+        color: var(--ui-ink);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-tool]) .cbe-table th {
+        font-size: var(--font-size-xs);
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+    }
+
+    :where([data-ui="unified"][data-staff-tool]) .cbe-table th small {
+        display: block;
+    }
+
+    :where([data-ui="unified"][data-staff-tool])
+        :is(.cbe-table td.loss, .cbe-legend .sw.loss) {
+        color: var(--color-danger-ink);
+        background: var(--color-danger-bg);
+    }
+
+    :where([data-ui="unified"][data-staff-tool])
+        :is(.cbe-table td.thin, .cbe-legend .sw.thin) {
+        color: var(--color-warning-ink);
+        background: var(--color-warning-bg);
+    }
+
+    :where([data-ui="unified"][data-staff-tool]) .cbe-table td.card {
+        color: var(--ui-muted);
+        font-size: var(--font-size-xs);
+    }
+
+    :where([data-ui="unified"][data-staff-tool]) .cbe-legend {
+        margin-top: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-staff-tool]) .cbe-legend .sw {
+        display: inline-block;
+        width: 0.9em;
+        height: 0.9em;
+        margin-right: var(--space-1);
+        border: 1px solid currentcolor;
+        border-radius: var(--radius-sm);
+        vertical-align: -1px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool]) .cbe-howto {
+        max-width: 95ch;
+        padding-left: var(--space-5);
+        font-size: var(--font-size-sm);
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-tool]) .cbe-howto li + li {
+        margin-top: var(--space-3);
+    }
+
+    /* Supply form wrapper; the external provider owns the embedded form. */
+    :where([data-ui="unified"][data-staff-tool]) .rps-title-icon {
+        margin-right: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-staff-tool]) .rps-pdf-callout {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-4);
+        padding: var(--space-4);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+        background: var(--ui-tint);
+    }
+
+    :where([data-ui="unified"][data-staff-tool]) .rps-pdf-callout-text {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        min-width: 0;
+        flex: 1 1 260px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool]) .rps-pdf-icon {
+        font-size: var(--font-size-2xl);
+        color: var(--color-danger-ink);
+    }
+
+    :where([data-ui="unified"][data-staff-tool]) .rps-pdf-title {
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-tool]) .rps-pdf-sub {
+        color: var(--ui-muted);
+        font-size: var(--font-size-sm);
+    }
+
+    :where([data-ui="unified"][data-staff-tool]) .rps-pdf-btn {
+        max-width: 100%;
+        text-align: center;
+        white-space: normal;
+    }
+
+    :where([data-ui="unified"][data-staff-tool]) .rps-form-wrap {
+        min-height: 600px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool]) .rps-form-wrap iframe {
+        width: 100%;
+        max-width: 100%;
+        border: 0;
+    }
+
+    @media (width <= 600px) {
+        :where([data-ui="unified"][data-staff-tool])
+            :is(.cbe-toggle, .cbe-actions, .rps-pdf-btn) {
+            width: 100%;
+        }
+
+        :where([data-ui="unified"][data-staff-tool]) .cbe-toggle .dash-btn {
+            flex: 1 1 100px;
+        }
+    }
+
+    @media print {
+        :where([data-ui="unified"][data-staff-tool="contract-break-even"]) {
+            --ui-canvas: var(--color-surface);
+
+            page: staff-toolkit-contract;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="contract-break-even"])
+            .dash-header {
+            display: flex;
+            padding: 0 0 8pt;
+            border: 0;
+            background: var(--ui-surface);
+            color: var(--ui-ink);
+        }
+
+        :where([data-ui="unified"][data-staff-tool="contract-break-even"])
+            .dash-header-logo {
+            width: 60px;
+            height: 40px;
+            padding: 0;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="contract-break-even"])
+            .dash-header-title {
+            font-size: 15pt;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="contract-break-even"])
+            .dash-header-right {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-staff-tool])
+            :is(.cbe-controls, .dash-error-banner) {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-staff-tool]) .dash-card {
+            box-shadow: none;
+            border: 0;
+            padding: 0;
+            border-radius: 0;
+            break-inside: avoid;
+        }
+
+        :where([data-ui="unified"][data-staff-tool]) .cbe-table-wrap {
+            overflow: visible;
+        }
+
+        :where([data-ui="unified"][data-staff-tool]) .cbe-table {
+            min-width: 0;
+            font-size: 9pt;
+            line-height: 1.25;
+            print-color-adjust: exact;
+        }
+
+        :where([data-ui="unified"][data-staff-tool]) .cbe-table :is(th, td) {
+            padding: 4pt;
+            white-space: normal;
+        }
+
+        :where([data-ui="unified"][data-staff-tool])
+            .cbe-product
+            + .cbe-product {
+            break-before: page;
+        }
+
+        :where([data-ui="unified"][data-staff-tool]) .cbe-legend {
+            print-color-adjust: exact;
+        }
+    }
+}
+
+/* Volume Quote layout and its separate internal/customer paper modes. */
+@page staff-toolkit-volume {
+    size: letter;
+    margin: 12mm;
+}
+
+@layer components.pages {
+    :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-intro {
+        color: var(--ui-muted);
+        margin: 0 0 1rem;
+        max-width: 70ch;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-step {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.6em;
+        height: 1.6em;
+        margin-right: 0.4em;
+        border-radius: var(--radius-pill);
+        background: var(--gray-800);
+        color: var(--ui-surface);
+        font-size: 0.8em;
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+        gap: 0.9rem;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"])
+        .vq-field--check {
+        flex-direction: row;
+        align-items: center;
+        gap: 0.5rem;
+        align-self: end;
+        padding-bottom: 0.5rem;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"])
+        .vq-field--check
+        input {
+        width: 1.1rem;
+        height: 1.1rem;
+        accent-color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-lines-head,
+    :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-line {
+        display: grid;
+        grid-template-columns: 120px 90px 1.6fr 1.2fr 1fr 40px;
+        gap: 0.6rem;
+        align-items: center;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-lines-head {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--ui-muted);
+        padding: 0 0 0.4rem;
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-line {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid var(--gray-100);
+        font-size: 0.9rem;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-line-title {
+        color: var(--gray-800);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"])
+        .vq-line-title
+        small {
+        display: block;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-line-cost {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.85rem;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"])
+        .vq-line-cost
+        small {
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-line-stock {
+        font-size: 0.8rem;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"])
+        .vq-line-status {
+        font-size: 0.8rem;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"])
+        .vq-line-status--error {
+        color: var(--color-danger-ink);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-hint {
+        font-size: 0.8rem;
+        color: var(--ui-muted);
+        margin: 0.8rem 0 0;
+        max-width: 80ch;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-levers {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+        gap: 1rem;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"])
+        .vq-lever
+        label {
+        display: block;
+        font-size: 0.85rem;
+        color: var(--ui-muted);
+        margin-bottom: 0.35rem;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-lever-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"])
+        .vq-lever
+        input[type="number"] {
+        width: 110px;
+        font-family: "JetBrains Mono", monospace;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"])
+        .vq-lever
+        input[type="range"] {
+        flex: 1 1 140px;
+        accent-color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"])
+        .vq-lever
+        output {
+        font-family: "JetBrains Mono", monospace;
+        font-weight: 600;
+        min-width: 3ch;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-lever-note {
+        font-size: 0.8rem;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-stats {
+        margin-bottom: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr));
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"])
+        .vq-warnings:empty {
+        display: none;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-warning {
+        padding: 0.6rem 0.8rem;
+        margin-bottom: 0.6rem;
+        border-radius: var(--radius-md);
+        background: var(--color-warning-bg);
+        color: var(--color-warning-ink);
+        font-size: 0.85rem;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"])
+        .vq-warning--danger {
+        background: var(--color-danger-bg);
+        color: var(--color-danger-ink);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-table-wrap {
+        overflow-x: auto;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.88rem;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-table th,
+    :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-table td {
+        padding: 0.55rem 0.6rem;
+        text-align: right;
+        border-bottom: 1px solid var(--gray-200);
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"])
+        .vq-table
+        th:first-child,
+    :where([data-ui="unified"][data-staff-tool="volume-quote"])
+        .vq-table
+        td:first-child {
+        text-align: left;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-table th {
+        font-weight: 600;
+        color: var(--ui-muted);
+        background: var(--ui-tint);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"])
+        .vq-table
+        th
+        small {
+        font-weight: 400;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"])
+        .vq-table
+        td.vq-num {
+        font-family: "JetBrains Mono", monospace;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"])
+        .vq-table
+        td.vq-vol {
+        font-weight: 600;
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"])
+        .vq-table
+        tfoot
+        td {
+        font-weight: 600;
+        background: var(--ui-tint);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-gm-low {
+        color: var(--color-danger-ink);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"])
+        .vq-memo-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-memo {
+        white-space: pre-wrap;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.82rem;
+        line-height: 1.5;
+        background: var(--ui-tint);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-md);
+        padding: 1rem;
+        margin: 0;
+        color: var(--gray-800);
+        overflow-wrap: anywhere;
+        max-height: min(38rem, 70vh);
+        overflow: auto;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"])
+        .vq-save-status {
+        font-size: 0.8rem;
+        color: var(--ui-muted);
+        align-self: center;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"])
+        .vq-save-status--ok {
+        color: var(--color-brand-deep);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"])
+        .vq-save-status--error {
+        color: var(--color-danger-ink);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-cq {
+        background: var(--ui-surface);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-md);
+        padding: var(--space-4);
+        margin-top: 0.75rem;
+        color: var(--ui-ink);
+        font-size: 0.9rem;
+        max-width: 860px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-cq-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1rem;
+        border-bottom: 3px solid var(--ui-accent);
+        padding-bottom: 0.9rem;
+        margin-bottom: 1rem;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-cq-logo {
+        height: 52px;
+        width: auto;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-cq-title {
+        text-align: right;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"])
+        .vq-cq-title
+        h3 {
+        margin: 0 0 0.25rem;
+        font-size: 1.25rem;
+        color: var(--ui-accent);
+        letter-spacing: 0.02em;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-cq-meta {
+        font-size: 0.8rem;
+        color: var(--ui-muted);
+        line-height: 1.5;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"])
+        .vq-cq-meta
+        strong {
+        color: var(--ui-ink);
+        font-family: "JetBrains Mono", monospace;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-cq-parties {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        font-size: 0.85rem;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"])
+        .vq-cq-parties
+        h4,
+    :where([data-ui="unified"][data-staff-tool="volume-quote"])
+        .vq-cq-block
+        h4 {
+        margin: 0 0 0.25rem;
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-cq-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0.5rem 0 1rem;
+        font-size: 0.85rem;
+        min-width: 620px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-cq-table th,
+    :where([data-ui="unified"][data-staff-tool="volume-quote"])
+        .vq-cq-table
+        td {
+        padding: 0.5rem 0.55rem;
+        border-bottom: 1px solid var(--gray-200);
+        text-align: right;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"])
+        .vq-cq-table
+        th:nth-child(-n + 2),
+    :where([data-ui="unified"][data-staff-tool="volume-quote"])
+        .vq-cq-table
+        td:nth-child(-n + 2) {
+        text-align: left;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"])
+        .vq-cq-table
+        th {
+        background: var(--ui-tint);
+        color: var(--gray-700);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"])
+        .vq-cq-table
+        td.vq-num {
+        font-family: "JetBrains Mono", monospace;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"])
+        .vq-cq-table
+        tfoot
+        td {
+        font-weight: 600;
+        background: var(--ui-tint);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"])
+        .vq-cq-table
+        td
+        small {
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-cq-block {
+        margin: 0.75rem 0;
+        font-size: 0.85rem;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"])
+        .vq-cq-block
+        ul {
+        margin: 0.25rem 0 0;
+        padding-left: 1.1rem;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"])
+        .vq-cq-block
+        li {
+        margin-bottom: 0.2rem;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-cq-foot {
+        margin-top: 1.25rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid var(--gray-200);
+        font-size: 0.75rem;
+        color: var(--ui-muted);
+        text-align: center;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-cq-empty {
+        color: var(--ui-muted);
+        font-style: italic;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-line-field {
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"])
+        .vq-input-label {
+        display: none;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"])
+        :is(.vq-memo-actions, .vq-lever-row, .vq-cq-head) {
+        flex-wrap: wrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"])
+        .vq-cq-table-wrap {
+        max-width: 100%;
+        overflow-x: auto;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="volume-quote"])
+        .vq-line-remove {
+        min-width: var(--ui-control-height);
+    }
+
+    @media (width <= 720px) {
+        :where([data-ui="unified"][data-staff-tool="volume-quote"])
+            .vq-lines-head {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-line {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem 0.6rem;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="volume-quote"])
+            .vq-line
+            > * {
+            min-width: 0;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="volume-quote"])
+            .vq-line-info {
+            flex: 1 1 100%;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="volume-quote"])
+            .vq-line-field {
+            flex: 1 1 100px;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="volume-quote"])
+            .vq-input-label {
+            display: block;
+            font-size: var(--font-size-sm);
+            margin-bottom: var(--space-2);
+            color: var(--ui-muted);
+        }
+
+        :where([data-ui="unified"][data-staff-tool="volume-quote"])
+            .vq-cq-parties {
+            grid-template-columns: minmax(0, 1fr);
+        }
+    }
+
+    @media (width <= 600px) {
+        :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-stats {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        :where([data-ui="unified"][data-staff-tool="volume-quote"])
+            .vq-stats
+            .dash-stat-card {
+            padding: var(--space-3);
+        }
+
+        :where([data-ui="unified"][data-staff-tool="volume-quote"])
+            .vq-stats
+            .dash-stat-value {
+            font-size: var(--font-size-xl);
+        }
+    }
+
+    @media print {
+        :where([data-ui="unified"][data-staff-tool="volume-quote"])
+            .dash-header,
+        :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-intro,
+        :where([data-ui="unified"][data-staff-tool="volume-quote"])
+            .dash-error-banner,
+        :where([data-ui="unified"][data-staff-tool="volume-quote"])
+            .vq-memo-actions,
+        :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-cq-hint,
+        :where([data-ui="unified"][data-staff-tool="volume-quote"])
+            .dash-card-header {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="volume-quote"]) .dash-shell,
+        :where([data-ui="unified"][data-staff-tool="volume-quote"])
+            .dash-content {
+            padding: 0;
+            margin: 0;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="volume-quote"]).vq-mode-memo
+            .dash-card:not(.vq-print-keep) {
+            display: none;
+        }
+
+        :where(
+                [data-ui="unified"][data-staff-tool="volume-quote"]
+            ).vq-mode-customer
+            .dash-card:not(.vq-print-customer-keep) {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="volume-quote"]) .dash-card {
+            border: 0;
+            box-shadow: none;
+            padding: 0;
+            break-inside: auto;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-memo {
+            border: 0;
+            background: transparent;
+            padding: 0;
+            font-size: 11pt;
+            max-height: none;
+            overflow: visible;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-cq {
+            border: 0;
+            margin: 0;
+            padding: 0;
+            max-width: none;
+            font-size: 11pt;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="volume-quote"])
+            .vq-cq-head {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="volume-quote"])
+            .vq-cq-table
+            th,
+        :where([data-ui="unified"][data-staff-tool="volume-quote"])
+            .vq-cq-table
+            tfoot
+            td {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="volume-quote"]) {
+            --ui-canvas: var(--color-surface);
+
+            page: staff-toolkit-volume;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="volume-quote"])
+            .vq-cq-table-wrap {
+            overflow: visible;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="volume-quote"])
+            .vq-cq-table {
+            min-width: 0;
+            font-size: 9pt;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="volume-quote"])
+            .vq-cq-table
+            tr {
+            break-inside: avoid;
+        }
+    }
+}
+
+/* Product catalog editor: shared controls, preserved vendor and pricing fields. */
+@page staff-toolkit-products {
+    size: letter landscape;
+    margin: 12mm;
+}
+
+@layer components.pages {
+    :where([data-ui="unified"][data-staff-tool="product-manager"])
+        .pm-subtitle {
+        font-size: 0.75em;
+        font-weight: 500;
+        color: var(--gray-300);
+        margin-left: 8px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="product-manager"])
+        .pm-header-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+        max-width: 540px;
+        width: 100%;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="product-manager"]) .pm-help {
+        font-size: 13px;
+        color: var(--ui-muted);
+        background: var(--gray-50);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-md);
+        padding: 10px 14px;
+        margin: 0 0 14px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="product-manager"])
+        .pm-table-wrap {
+        overflow-x: auto;
+        max-width: 100%;
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="product-manager"]) .pm-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: var(--font-size-md);
+        min-width: 900px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="product-manager"])
+        .pm-table
+        th {
+        text-align: left;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--ui-muted);
+        padding: 8px 10px;
+        border-bottom: 1px solid var(--gray-200);
+        background: var(--ui-tint);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="product-manager"])
+        .pm-table
+        td {
+        padding: 8px 10px;
+        border-bottom: 1px solid var(--gray-100);
+        vertical-align: middle;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="product-manager"]) .pm-num {
+        text-align: right;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="product-manager"]) .pm-style {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 12.5px;
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="product-manager"])
+        .pm-row-inactive
+        td {
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="product-manager"])
+        .pm-warn-text {
+        color: var(--color-warning-ink);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="product-manager"]) .pm-thumb {
+        width: 44px;
+        height: 44px;
+        object-fit: contain;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-sm);
+        background: var(--gray-50);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="product-manager"])
+        .pm-thumb-empty {
+        font-size: 16px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="product-manager"]) .pm-chip {
+        display: inline-block;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 2px 10px;
+        border-radius: 999px;
+        background: var(--gray-100);
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="product-manager"])
+        .pm-chip-live {
+        background: var(--color-success-bg);
+        color: var(--color-brand-deep);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="product-manager"]) .pm-actions {
+        white-space: nowrap;
+        text-align: right;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="product-manager"]) .pm-empty {
+        color: var(--ui-muted);
+        font-size: 14px;
+        padding: 18px 4px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="product-manager"])
+        .pm-form-card {
+        margin-top: 16px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="product-manager"]) .pm-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px 18px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="product-manager"]) .pm-span-2 {
+        grid-column: span 2;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="product-manager"])
+        .pm-field
+        small {
+        font-size: 11.5px;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="product-manager"]) .pm-req {
+        color: var(--color-danger-ink);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="product-manager"])
+        .pm-field
+        input:disabled {
+        background: var(--gray-100);
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="product-manager"])
+        .pm-image-row {
+        display: flex;
+        gap: 14px;
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="product-manager"])
+        .pm-image-preview {
+        width: 84px;
+        height: 84px;
+        object-fit: contain;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-md);
+        background: var(--gray-50);
+        flex: none;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="product-manager"])
+        .pm-image-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        flex: 1 1 220px;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="product-manager"])
+        .pm-form-actions {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        margin-top: 18px;
+        padding-top: 14px;
+        border-top: 1px solid var(--gray-200);
+        flex-wrap: wrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="product-manager"])
+        .pm-active-toggle {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13.5px;
+        font-weight: 600;
+        color: var(--gray-700);
+        cursor: pointer;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="product-manager"])
+        .pm-active-toggle
+        input {
+        width: 16px;
+        height: 16px;
+        accent-color: var(--color-brand-deep);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="product-manager"]) .pm-filter {
+        max-width: 380px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="product-manager"])
+        .pm-table
+        :is(th, td).pm-num {
+        text-align: right;
+    }
+
+    @media (width <= 720px) {
+        :where([data-ui="unified"][data-staff-tool="product-manager"])
+            .pm-grid {
+            grid-template-columns: 1fr;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="product-manager"])
+            .pm-span-2 {
+            grid-column: span 1;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="product-manager"])
+            .pm-header-actions {
+            flex-wrap: wrap;
+        }
+    }
+
+    @media print {
+        :where([data-ui="unified"][data-staff-tool="product-manager"]) {
+            --ui-canvas: var(--color-surface);
+
+            page: staff-toolkit-products;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="product-manager"])
+            :is(.pm-header-actions, .pm-actions, .pm-form-actions) {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="product-manager"])
+            .pm-table-wrap {
+            overflow: visible;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="product-manager"])
+            .pm-table {
+            min-width: 0;
+            font-size: 9pt;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="product-manager"])
+            .pm-table
+            tr {
+            break-inside: avoid;
+        }
+    }
+}
+
+@page staff-toolkit-blog {
+    size: letter;
+    margin: 12mm;
+}
+
+@layer components.pages {
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-list-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 14px;
+        gap: var(--space-3);
+        flex-wrap: wrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"])
+        .be-list-head
+        h2 {
+        margin: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-empty {
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-list-row {
+        display: grid;
+        grid-template-columns: 92px minmax(0, 1fr) auto;
+        gap: 14px;
+        align-items: center;
+        text-align: left;
+        background: var(--color-surface);
+        border: 1px solid var(--gray-200);
+        border-radius: 10px;
+        padding: 12px 16px;
+        font: inherit;
+        cursor: pointer;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"])
+        .be-list-row:hover {
+        border-color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-list-status {
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        border-radius: 999px;
+        padding: 3px 10px;
+        text-align: center;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"])
+        .be-list-status.is-live {
+        background: var(--color-success-bg);
+        color: var(--color-brand-deep);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"])
+        .be-list-status.is-draft {
+        background: var(--color-warning-bg);
+        color: var(--color-warning-ink);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-list-title {
+        font-weight: 600;
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-list-meta {
+        font-size: 0.78rem;
+        color: var(--ui-muted);
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-editor-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 14px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"])
+        .be-editor-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-save-state {
+        font-size: 0.82rem;
+        color: var(--ui-muted);
+        margin-right: 4px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 22px;
+        align-items: start;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-hint {
+        font-weight: 400;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-note {
+        font-size: 0.75rem;
+        color: var(--color-warning-ink);
+        margin: 4px 0 0;
+        line-height: 1.6;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-input--mono {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.84rem;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-row {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-hero-row {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"])
+        .be-hero-preview {
+        width: 130px;
+        aspect-ratio: 16/9;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 1px solid var(--gray-200);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"])
+        .be-hero-controls {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-toolbar {
+        display: flex;
+        gap: 4px;
+        border: 1px solid var(--gray-300);
+        border-bottom: none;
+        border-radius: 8px 8px 0 0;
+        background: var(--ui-tint);
+        padding: 6px 8px;
+        flex-wrap: wrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-body {
+        border-radius: 0 0 8px 8px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.86rem;
+        line-height: 1.6;
+        resize: vertical;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-preview-col {
+        position: sticky;
+        top: 14px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"])
+        .be-preview-head {
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: var(--ui-ink);
+        margin-bottom: 8px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-preview {
+        background: var(--color-surface);
+        border: 1px solid var(--gray-200);
+        border-radius: 10px;
+        padding: 20px 22px;
+        max-height: min(42rem, 70vh);
+        overflow-y: auto;
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-google {
+        background: var(--color-surface);
+        border: 1px solid var(--gray-200);
+        border-radius: 10px;
+        padding: 12px 16px;
+        margin-bottom: 12px;
+        font-family: arial, sans-serif;
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"])
+        .be-google-title {
+        color: var(--blue-800);
+        font-size: 1.05rem;
+        line-height: 1.3;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-google-url {
+        color: var(--color-brand-deep);
+        font-size: 0.8rem;
+        margin: 2px 0;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-google-desc {
+        color: var(--ui-muted);
+        font-size: 0.82rem;
+        line-height: 1.45;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"])
+        .be-file-btn:focus-visible,
+    :where([data-ui="unified"][data-staff-tool="blog-editor"])
+        .be-toolbar
+        button:focus-visible,
+    :where([data-ui="unified"][data-staff-tool="blog-editor"])
+        .be-btn:focus-visible,
+    :where([data-ui="unified"][data-staff-tool="blog-editor"])
+        .be-list-row:focus-visible {
+        outline: 2px solid var(--ui-accent);
+        outline-offset: 2px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"])
+        .be-preview-fail {
+        color: var(--color-danger-ink);
+        font-size: 14px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .blog-prose {
+        font-size: 1.05rem;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .blog-prose h2 {
+        font-family: var(--ui-font);
+        font-size: 1.5rem;
+        margin: 34px 0 10px;
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .blog-prose h3 {
+        font-size: 1.2rem;
+        margin: 26px 0 8px;
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .blog-prose p {
+        margin: 0 0 16px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .blog-prose a {
+        color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"])
+        .blog-prose
+        a:hover {
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .blog-prose img {
+        max-width: 100%;
+        border-radius: var(--radius-sm);
+        display: block;
+        margin: 18px auto;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .blog-prose ul,
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .blog-prose ol {
+        padding-left: 24px;
+        margin: 0 0 16px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .blog-prose li {
+        margin-bottom: 6px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"])
+        .blog-prose
+        blockquote {
+        margin: 20px 0;
+        padding: 10px 18px;
+        border-left: 4px solid var(--ui-accent);
+        background: var(--ui-tint);
+        border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"])
+        .blog-prose
+        table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 18px 0;
+        font-size: 0.92rem;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .blog-prose th,
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .blog-prose td {
+        border: 1px solid var(--ui-line);
+        padding: 8px 10px;
+        text-align: left;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .blog-prose th {
+        background: var(--ui-tint);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"])
+        .blog-prose
+        code {
+        background: var(--ui-tint);
+        border-radius: 4px;
+        padding: 1px 5px;
+        font-size: 0.9em;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .blog-prose pre {
+        background: var(--ui-tint);
+        border-radius: var(--radius-sm);
+        padding: 14px;
+        overflow-x: auto;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .blog-video {
+        position: relative;
+        aspect-ratio: 16 / 9;
+        margin: 22px 0;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"])
+        .blog-video
+        iframe {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        border: 0;
+        border-radius: var(--radius-sm);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-label {
+        margin-block: var(--space-4) var(--space-1);
+        display: block;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .blog-prose h1 {
+        font-size: var(--font-size-2xl);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"])
+        .be-print-metadata {
+        display: none;
+    }
+
+    @media (width <= 980px) {
+        :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-grid {
+            grid-template-columns: 1fr;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="blog-editor"])
+            .be-preview-col {
+            position: static;
+        }
+    }
+
+    @media (width <= 640px) {
+        :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-row {
+            grid-template-columns: 1fr;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="blog-editor"])
+            .be-list-row {
+            grid-template-columns: 1fr;
+            gap: var(--space-2);
+        }
+
+        :where([data-ui="unified"][data-staff-tool="blog-editor"])
+            .be-list-status {
+            justify-self: start;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-preview {
+            padding: var(--space-4);
+        }
+    }
+
+    @media print {
+        :where([data-ui="unified"][data-staff-tool="blog-editor"]) {
+            --ui-canvas: var(--color-surface);
+
+            page: staff-toolkit-blog;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="blog-editor"])
+            :is(.be-editor-head, .be-toolbar, .be-file-btn,[id="newPostBtn"]) {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-grid {
+            display: block;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="blog-editor"])
+            .be-preview-col {
+            position: static;
+            break-before: auto;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-preview {
+            max-height: none;
+            overflow: visible;
+            padding: 0;
+            border: 0;
+            border-radius: 0;
+            outline: none;
+            box-shadow: none;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-fields {
+            break-after: page;
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="blog-editor"])
+            .be-list-row {
+            break-inside: avoid;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="blog-editor"])
+            .be-print-metadata {
+            display: block;
+            overflow-wrap: anywhere;
+            margin-bottom: 16pt;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="blog-editor"])
+            .be-print-metadata
+            h1 {
+            font-size: 20pt;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="blog-editor"])
+            .be-print-metadata
+            dt {
+            font-weight: 700;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="blog-editor"])
+            .be-print-metadata
+            dd {
+            margin: 0 0 8pt;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="blog-editor"])
+            .be-preview-head,
+        :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-google {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="blog-editor"])
+            .blog-prose
+            pre {
+            white-space: pre-wrap;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="blog-editor"])
+            .blog-prose
+            tr {
+            break-inside: avoid;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="blog-editor"]) .blog-video {
+            break-inside: avoid;
+        }
+    }
+}
+
+@page staff-toolkit-portal {
+    size: letter landscape;
+    margin: 12mm;
+}
+
+@layer components.pages {
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-intro {
+        color: var(--ui-muted);
+        font-size: 0.95rem;
+        line-height: 1.5;
+        margin: 0 0 1.25rem;
+        max-width: 760px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-controls {
+        display: flex;
+        gap: var(--space-3);
+        align-items: center;
+        margin: 0 0 1rem;
+        flex-wrap: wrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-search-wrap {
+        position: relative;
+        flex: 1 1 260px;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-search-wrap
+        > i {
+        position: absolute;
+        left: 13px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--gray-500);
+        font-size: 0.85rem;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-btn-ghost.cpa-btn-active {
+        background: var(--ui-tint);
+        color: var(--ui-accent-hover);
+        border-color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-count {
+        color: var(--ui-muted);
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: var(--font-size-md);
+        min-width: 1040px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-table
+        th {
+        text-align: left;
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--ui-muted);
+        font-weight: 600;
+        padding: 8px 12px;
+        border-bottom: 2px solid var(--gray-200);
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-table
+        td {
+        padding: 11px 12px;
+        border-bottom: 1px solid var(--gray-100);
+        vertical-align: middle;
+        color: var(--gray-800);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-table
+        tr:hover
+        td {
+        background: var(--gray-50);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-company {
+        font-weight: 600;
+        color: var(--gray-900);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-email {
+        color: var(--ui-muted);
+        font-size: 0.85rem;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-cid {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.82rem;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rep {
+        color: var(--gray-700);
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rep-none {
+        color: var(--gray-300);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-lastlogin {
+        font-size: 0.83rem;
+        color: var(--ui-muted);
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-lastlogin.cpa-never {
+        color: var(--gray-500);
+        font-style: italic;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 0.76rem;
+        font-weight: 600;
+        padding: 3px 10px;
+        border-radius: 999px;
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-badge::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentcolor;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-badge--enabled {
+        background: var(--ui-tint);
+        color: var(--ui-accent-hover);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-badge--disabled {
+        background: var(--gray-100);
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-actions {
+        display: flex;
+        gap: 6px;
+        justify-content: flex-end;
+        flex-wrap: nowrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-empty {
+        text-align: center;
+        color: var(--ui-muted);
+        padding: 2.5rem 1rem;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-empty
+        i {
+        font-size: 2rem;
+        color: var(--gray-300);
+        display: block;
+        margin-bottom: 0.6rem;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgb(17 24 39 / 50%);
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 5vh 16px;
+        z-index: 1000;
+        overflow-y: auto;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-modal {
+        background: var(--color-surface);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        width: 100%;
+        max-width: 900px;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-modal-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 18px 22px;
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-modal-head
+        h3 {
+        margin: 0;
+        font-size: 1.15rem;
+        color: var(--ui-accent-hover);
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-modal-body {
+        padding: 20px 22px;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-modal-foot {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        padding: 16px 22px;
+        border-top: 1px solid var(--gray-200);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-field {
+        display: block;
+        margin-bottom: 14px;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-field-label
+        small {
+        font-weight: 400;
+        color: var(--gray-500);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-field-row {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-search-inline {
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-search-inline
+        input {
+        padding-left: 36px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-lookup-results {
+        margin-top: 8px;
+        max-height: 230px;
+        overflow-y: auto;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-lookup-item {
+        padding: 9px 12px;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-md);
+        margin-bottom: 6px;
+        cursor: pointer;
+        transition:
+            border-color 0.12s,
+            background 0.12s;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-lookup-item:hover {
+        border-color: var(--ui-accent);
+        background: var(--ui-tint);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-lookup-item
+        .li-co {
+        font-weight: 600;
+        color: var(--gray-900);
+        font-size: 0.9rem;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-lookup-item
+        .li-meta {
+        font-size: 0.8rem;
+        color: var(--ui-muted);
+        margin-top: 2px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-lookup-hint {
+        font-size: 0.82rem;
+        color: var(--gray-500);
+        padding: 6px 2px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-divider {
+        text-align: center;
+        margin: 16px 0;
+        position: relative;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-divider::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: var(--gray-200);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-divider
+        span {
+        position: relative;
+        background: var(--color-surface);
+        padding: 0 12px;
+        font-size: 0.78rem;
+        color: var(--gray-500);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-checkline {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.88rem;
+        color: var(--gray-700);
+        cursor: pointer;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-checkline
+        input {
+        width: 16px;
+        height: 16px;
+        accent-color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-modal-error {
+        color: var(--color-danger-ink);
+        font-size: 0.85rem;
+        margin-top: 10px;
+        min-height: 1em;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-toast {
+        position: fixed;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%) translateY(20px);
+        background: var(--ui-accent-hover);
+        color: var(--color-on-brand);
+        padding: 12px 20px;
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-md);
+        font-size: 0.9rem;
+        font-weight: 500;
+        opacity: 0;
+        pointer-events: none;
+        transition:
+            opacity 0.25s,
+            transform 0.25s;
+        z-index: 1100;
+        max-width: 90vw;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-toast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-toast.cpa-toast-error {
+        background: var(--color-danger-ink);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-tabs {
+        display: flex;
+        gap: 4px;
+        border-bottom: 1px solid var(--gray-200);
+        margin: 0 0 1.25rem;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-tab {
+        background: none;
+        border: none;
+        border-bottom: 2px solid transparent;
+        margin-bottom: -1px;
+        padding: 10px 16px;
+        font-size: 0.92rem;
+        font-weight: 600;
+        color: var(--ui-muted);
+        cursor: pointer;
+        font-family: inherit;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        transition:
+            color 0.15s,
+            border-color 0.15s;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-tab:hover {
+        color: var(--ui-accent-hover);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-tab-active {
+        color: var(--color-on-brand);
+        background: var(--ui-accent);
+        border-color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-tab-badge {
+        background: var(--color-danger-ink);
+        color: var(--color-on-brand);
+        font-size: 0.68rem;
+        font-weight: 700;
+        min-width: 17px;
+        height: 17px;
+        padding: 0 5px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-req-prod {
+        font-weight: 600;
+        color: var(--gray-900);
+        font-size: 0.9rem;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-req-sub {
+        font-size: 0.82rem;
+        color: var(--ui-muted);
+        margin-top: 1px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-req-note {
+        font-size: 0.82rem;
+        color: var(--ui-muted);
+        font-style: italic;
+        margin-top: 3px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-status-new {
+        background: var(--red-50);
+        color: var(--color-ae);
+        border-color: var(--red-200);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-status-in-progress {
+        background: var(--store-rush-soft);
+        color: var(--color-warning-ink);
+        border-color: var(--amber-200);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-status-quoted {
+        background: var(--color-floor-tint);
+        color: var(--color-info-ink);
+        border-color: var(--blue-200);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-status-closed {
+        background: var(--gray-100);
+        color: var(--ui-muted);
+        border-color: var(--gray-200);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-balance {
+        font-size: 0.95rem;
+        color: var(--gray-700);
+        margin-bottom: 16px;
+        padding: 10px 14px;
+        background: var(--ui-tint);
+        border-radius: var(--radius-md);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-balance
+        strong {
+        color: var(--ui-accent-hover);
+        font-size: 1.15rem;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-select {
+        width: 100%;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-save-btn {
+        width: 100%;
+        justify-content: center;
+        margin-top: 2px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-ledger-head {
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--ui-muted);
+        font-weight: 600;
+        margin: 20px 0 8px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-ledger {
+        max-height: 240px;
+        overflow-y: auto;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-entry {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 8px 2px;
+        border-bottom: 1px solid var(--gray-100);
+        grid-template-columns: 100px minmax(0, 1fr) 120px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-amt {
+        font-weight: 700;
+        font-size: 0.9rem;
+        min-width: 74px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-amt.pos {
+        color: var(--ui-accent-hover);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-amt.neg {
+        color: var(--color-danger-ink);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-mid {
+        flex: 1;
+        font-size: 0.88rem;
+        color: var(--gray-800);
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-meta {
+        font-size: 0.76rem;
+        color: var(--gray-500);
+        margin-top: 1px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-when {
+        font-size: 0.78rem;
+        color: var(--gray-500);
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-empty {
+        color: var(--gray-500);
+        font-size: 0.85rem;
+        padding: 12px 2px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-accrual {
+        font-size: 0.86rem;
+        overflow-x: auto;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-acc-hint {
+        margin-top: 8px;
+        line-height: 1.5;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-acc-hint
+        code,
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-notconf
+        code {
+        background: rgb(0 0 0 / 6%);
+        padding: 0 4px;
+        border-radius: 3px;
+        font-size: 0.95em;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-acc-window {
+        font-weight: 400;
+        text-transform: none;
+        letter-spacing: 0;
+        color: var(--gray-500);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-acc-sum {
+        padding: 10px 12px;
+        background: var(--ui-tint);
+        border-radius: var(--radius-md);
+        margin-bottom: 10px;
+        color: var(--gray-700);
+        line-height: 1.5;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-acc-sum
+        .pos {
+        color: var(--ui-accent-hover);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-acc-sum
+        .neg {
+        color: var(--color-danger-ink);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-acc-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.82rem;
+        min-width: 650px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-acc-table
+        th {
+        text-align: left;
+        font-weight: 600;
+        color: var(--ui-muted);
+        padding: 6px;
+        border-bottom: 1px solid var(--gray-200);
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-acc-table
+        td {
+        padding: 6px;
+        border-bottom: 1px solid var(--gray-100);
+        vertical-align: top;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-acc-table
+        .num {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-acc-table
+        td.pos {
+        color: var(--ui-accent-hover);
+        font-weight: 700;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-acc-table
+        summary {
+        cursor: pointer;
+        list-style: none;
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-acc-table
+        summary::-webkit-details-marker {
+        display: none;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-acc-lines {
+        margin-top: 4px;
+        font-size: 0.76rem;
+        color: var(--ui-muted);
+        line-height: 1.5;
+        font-weight: 400;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-acc-actions {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-top: 10px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-notconf {
+        padding: 10px 12px;
+        background: var(--store-rush-soft);
+        border: 1px solid var(--amber-200);
+        border-radius: var(--radius-md);
+        color: var(--color-warning-ink);
+        line-height: 1.55;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-cell {
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-chip {
+        font: inherit;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+        color: var(--ui-accent-hover);
+        background: var(--ui-tint);
+        border: 1px solid var(--green-200);
+        border-radius: 999px;
+        padding: 3px 10px;
+        cursor: pointer;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-chip:hover {
+        background: var(--store-green-100);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-th-sort {
+        font: inherit;
+        font-weight: inherit;
+        text-transform: inherit;
+        letter-spacing: inherit;
+        color: inherit;
+        background: none;
+        border: 0;
+        padding: 0;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-th-sort
+        i {
+        opacity: 0.45;
+        font-size: 0.85em;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-th-sort--on,
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-th-sort--on
+        i {
+        color: var(--ui-accent-hover);
+        opacity: 1;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-table-scroll {
+        overflow-x: auto;
+        max-width: 100%;
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+        background: var(--color-surface);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-th-right {
+        text-align: right;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-btn:focus-visible,
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-btn-icon:focus-visible,
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-tab:focus-visible,
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-chip:focus-visible,
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-th-sort:focus-visible,
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-modal-close:focus-visible,
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-lookup-item:focus-visible,
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .dash-error-banner-close:focus-visible {
+        outline: 3px solid var(--ui-accent);
+        outline-offset: 2px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-lookup-item.is-active {
+        border-color: var(--ui-accent);
+        background: var(--ui-tint);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-btn-ghost[aria-pressed="true"] {
+        background: var(--ui-tint);
+        color: var(--ui-accent-hover);
+        border-color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-empty
+        .cpa-btn {
+        margin-top: 12px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-lastlogin.cpa-today {
+        color: var(--ui-accent-hover);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-search-wrap
+        input {
+        padding-inline-start: 36px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-status-select {
+        min-width: 140px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-modal-close {
+        flex-shrink: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-field-label {
+        display: block;
+        margin-bottom: var(--space-1);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-dialog-status:not(:empty),
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-data-error {
+        padding: var(--space-3) var(--space-4);
+        background: var(--ui-tint);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+        margin-bottom: var(--space-4);
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-dialog-error:not(:empty) {
+        color: var(--color-danger-ink);
+        background: var(--color-danger-bg);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-print-draft {
+        display: none;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-accrual-print {
+        display: none;
+    }
+
+    @media (width <= 640px) {
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-field-row {
+            grid-template-columns: 1fr;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-actions {
+            justify-content: flex-start;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            [id="cpa-filter"],
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-search-wrap
+            input {
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-tabs {
+            flex-wrap: wrap;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-tab {
+            padding: 8px 10px;
+            font-size: 0.86rem;
+            flex: 1 1 180px;
+            min-height: 44px;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .dash-stat-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .dash-stat-card--accent {
+            grid-column: auto;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-controls
+            .cpa-btn {
+            flex: 1 1 auto;
+            justify-content: center;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-modal-overlay {
+            padding: 2vh 8px;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-modal-body,
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-modal-head,
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-modal-foot {
+            padding-left: 14px;
+            padding-right: 14px;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-rw-entry {
+            grid-template-columns: 90px minmax(0, 1fr);
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-rw-when {
+            grid-column: 2;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-modal-foot {
+            flex-wrap: wrap;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .dash-stat-card:last-child {
+            grid-column: 1 / -1;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-search-wrap {
+            flex-basis: 100%;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .dash-stat-value {
+            font-size: 1.75rem;
+        }
+    }
+
+    @media print {
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"]) {
+            --ui-canvas: var(--color-surface);
+
+            page: staff-toolkit-portal;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            :is(
+                .cpa-tabs,
+                .cpa-controls,
+                .cpa-actions,
+                .cpa-toast,
+                .cpa-modal-foot,
+                .cpa-modal-close,
+                .cpa-rw-save-btn,
+                .cpa-rw-acc-actions,
+                .cpa-rw-reverse
+            ) {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-table-scroll,
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-rw-accrual,
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-rw-ledger {
+            overflow: visible;
+            max-height: none;
+            outline: none;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-table,
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-rw-acc-table {
+            min-width: 0;
+            font-size: 9pt;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            tr {
+            break-inside: avoid;
+        }
+
+        :where(
+                [data-ui="unified"][data-staff-tool="customer-portal-admin"]
+            ):has(.cpa-modal-overlay:not([hidden]))
+            .dash-shell {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-modal-overlay {
+            position: static;
+            padding: 0;
+            background: var(--color-surface);
+            overflow: visible;
+            display: block;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-modal {
+            max-width: none;
+            box-shadow: none;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-rw-acc-lines {
+            display: block;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            [id="cpa-rewards-modal"]
+            .cpa-field-row {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-table
+            th:last-child,
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-table
+            td:last-child {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-print-draft:not(:empty) {
+            display: block;
+            border: 1px solid var(--ui-line);
+            padding: 10pt;
+            margin-bottom: 12pt;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-rw-entry {
+            break-inside: avoid;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-rw-acc-table
+            summary {
+            font-weight: 600;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-rw-acc-table
+            :is(summary, a, button):focus-visible {
+            outline: none;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-rw-accrual {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-accrual-print {
+            display: block;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-print-order-title {
+            font-weight: 600;
+        }
+    }
+}
+
+@page staff-toolkit-mailing {
+    size: letter;
+    margin: 12mm;
+}
+
+@layer components.pages {
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-welcome,
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"]) .jml-intro,
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-form-card,
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-list-section {
+        max-width: 880px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-welcome {
+        display: flex;
+        align-items: center;
+        gap: var(--space-4);
+        margin-bottom: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-portrait {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid var(--ui-accent);
+        box-shadow: var(--shadow-sm);
+        flex: 0 0 auto;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-greeting {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--ui-ink);
+        margin: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-viewtoggle {
+        display: flex;
+        gap: var(--space-2);
+        margin-bottom: var(--space-5);
+        flex-wrap: wrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-view-n {
+        font-size: 15px;
+        font-weight: 600;
+        opacity: 0.9;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-mc-details {
+        max-width: 880px;
+        margin: var(--space-6) auto 0;
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-lg);
+        background: var(--ui-surface);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-mc-summary {
+        list-style: none;
+        cursor: pointer;
+        padding: var(--space-4) var(--space-5);
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--ui-muted);
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-mc-summary::-webkit-details-marker {
+        display: none;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-mc-summary::after {
+        content: "▾";
+        margin-left: auto;
+        color: var(--ui-muted);
+        font-size: 18px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-mc-details[open]
+        .jml-mc-summary::after {
+        content: "▴";
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-mc-summary
+        i {
+        color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-mc-summary:hover {
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-mc-body {
+        padding: 0 var(--space-5) var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-mc-scope {
+        font-size: 15px;
+        color: var(--ui-muted);
+        font-weight: 600;
+        margin: 0 0 var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-mc-scope:empty {
+        display: none;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-mc-engaged-btn {
+        border-color: var(--ui-accent);
+        color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-mc-engaged-btn
+        i {
+        color: var(--color-warning-ink);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-mc-engaged-btn:hover {
+        background: var(--ui-tint, var(--ui-tint));
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"]) .jml-intro {
+        font-size: 20px;
+        line-height: 1.55;
+        color: var(--ui-ink);
+        background: var(--ui-tint, var(--ui-tint));
+        border: 1px solid color-mix(in srgb, var(--ui-accent) 25%, transparent);
+        border-radius: var(--radius-lg);
+        padding: var(--space-5) var(--space-6);
+        margin-bottom: var(--space-6);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-intro
+        strong {
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"]) .jml-ok {
+        max-width: 880px;
+        margin: 0 auto var(--space-5);
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        font-size: 19px;
+        font-weight: 600;
+        color: var(--color-brand-deep);
+        background: var(--color-success-bg);
+        border: 1px solid
+            color-mix(in srgb, var(--color-brand-deep) 35%, transparent);
+        border-radius: var(--radius-md);
+        padding: var(--space-4) var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"]) .jml-ok i {
+        font-size: 22px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"]) .jml-card,
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-list-section {
+        background: var(--ui-surface);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        padding: var(--space-8);
+        margin-bottom: var(--space-8);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-form-title,
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-list-title {
+        font-size: 26px;
+        font-weight: 700;
+        color: var(--ui-ink);
+        margin: 0 0 var(--space-6);
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-form-title
+        i {
+        color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-ai-card {
+        border: 1px solid var(--ui-line);
+        border-top: 4px solid var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-ai-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--ui-ink);
+        margin: 0 0 var(--space-3);
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-ai-title
+        i {
+        color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-ai-help {
+        font-size: 18px;
+        line-height: 1.55;
+        color: var(--ui-ink);
+        margin: 0 0 var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-ai-help
+        strong {
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-ai-label {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--ui-ink);
+        display: block;
+        margin-bottom: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-ai-image-row {
+        display: flex;
+        align-items: center;
+        gap: var(--space-4);
+        flex-wrap: wrap;
+        margin-top: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-ai-orpaste {
+        font-size: 15px;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-ai-orpaste
+        kbd {
+        font-family: inherit;
+        font-size: 13px;
+        background: var(--ui-tint);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+        padding: 1px 6px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-ai-thumb-wrap {
+        display: flex;
+        align-items: flex-start;
+        gap: var(--space-3);
+        margin-top: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-ai-thumb {
+        max-width: min(220px, 100%);
+        max-height: 160px;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--ui-line);
+        box-shadow: var(--shadow-sm);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-btn-ai {
+        margin-top: var(--space-5);
+        background: var(--ui-accent);
+        color: var(--color-on-brand);
+        width: 100%;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-btn-ai:hover {
+        background: var(--ui-accent-hover, var(--ui-accent-hover));
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-btn-ai:disabled {
+        opacity: 0.6;
+        cursor: default;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-ai-status {
+        margin: var(--space-4) 0 0;
+        font-size: 17px;
+        font-weight: 600;
+        color: var(--color-brand-deep);
+        padding: var(--space-3) var(--space-4);
+        background: var(--color-success-bg);
+        border-radius: var(--radius-md);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-ai-status.is-warn {
+        color: var(--color-warning-ink);
+        background: var(--color-warning-bg);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"]) .jml-field {
+        margin-bottom: var(--space-5);
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-field
+        label {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--ui-ink);
+        margin-bottom: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"]) .jml-opt {
+        font-weight: 400;
+        color: var(--ui-muted);
+        font-size: 16px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"]) .jml-hint {
+        font-size: 15px;
+        color: var(--ui-muted);
+        margin-top: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"]) .jml-row {
+        display: flex;
+        gap: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-row
+        .jml-field {
+        flex: 1 1 0;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"]) .jml-grow {
+        flex: 1 1 0;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"]) .jml-state {
+        flex: 0 0 110px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"]) .jml-zip {
+        flex: 0 0 130px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-form-actions {
+        display: flex;
+        gap: var(--space-4);
+        margin-top: var(--space-6);
+        flex-wrap: wrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-btn-save {
+        background: var(--ui-accent);
+        color: var(--color-on-brand);
+        flex: 1 1 auto;
+        min-width: 220px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-btn-save:hover {
+        background: var(--ui-accent-hover, var(--ui-accent-hover));
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-btn-cancel {
+        background: var(--ui-surface);
+        color: var(--ui-ink);
+        border-color: var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-btn-cancel:hover {
+        background: var(--ui-tint);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-list-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-4);
+        flex-wrap: wrap;
+        margin-bottom: var(--space-6);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-list-title {
+        margin: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"]) .jml-count {
+        font-size: 18px;
+        font-weight: 500;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-search-wrap {
+        position: relative;
+        flex: 0 0 300px;
+        max-width: 100%;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-search-wrap
+        i {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--ui-muted);
+        font-size: 17px;
+        pointer-events: none;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-filterbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-4);
+        flex-wrap: wrap;
+        margin-bottom: var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"]) .jml-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+        flex: 1 1 auto;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-chip-n {
+        font-size: 13px;
+        font-weight: 600;
+        background: color-mix(in srgb, currentcolor 16%, transparent);
+        border-radius: var(--radius-pill);
+        padding: 1px 8px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"]) .jml-sort {
+        font-size: 16px;
+        color: var(--ui-muted);
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        flex: 0 0 auto;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-list-actions {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        flex-wrap: wrap;
+        margin-bottom: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-tool-hint {
+        font-size: 14px;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-entry-status {
+        margin-top: var(--space-3);
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        flex-wrap: wrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-status-label {
+        font-size: 15px;
+        color: var(--ui-muted);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-lastmailed {
+        font-size: 14px;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-entry.is-mailed {
+        border-left: 5px solid var(--blue-800);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-entry.is-responded {
+        border-left: 5px solid var(--color-warning-ink);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-entry.is-customer {
+        border-left: 5px solid var(--color-brand-deep);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-entry.is-donotmail {
+        border-left: 5px solid var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-mc-title {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--ui-ink);
+        margin: 0 0 var(--space-3);
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-mc-title
+        i {
+        color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-mc-help {
+        font-size: 16px;
+        line-height: 1.5;
+        color: var(--ui-muted);
+        margin: 0 0 var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-mc-help
+        strong {
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-mc-actions {
+        display: flex;
+        gap: var(--space-3);
+        flex-wrap: wrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-mc-status {
+        margin: var(--space-4) 0 0;
+        font-size: 16px;
+        font-weight: 600;
+        padding: var(--space-3) var(--space-4);
+        border-radius: var(--radius-md);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-mc-status.is-ok {
+        color: var(--color-brand-deep);
+        background: var(--color-success-bg);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-mc-status.is-warn {
+        color: var(--color-warning-ink);
+        background: var(--color-warning-bg);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-mc-status.is-err {
+        color: var(--color-danger-ink);
+        background: var(--color-danger-bg);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"]) .jml-list {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"]) .jml-entry {
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-lg);
+        padding: var(--space-5);
+        background: var(--ui-surface);
+        display: flex;
+        gap: var(--space-4);
+        align-items: flex-start;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        box-shadow: var(--shadow-sm);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-entry-main {
+        flex: 1 1 320px;
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-entry-name {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--ui-ink);
+        margin: 0 0 var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-entry-line {
+        font-size: 17px;
+        color: var(--ui-ink);
+        line-height: 1.5;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-entry-line
+        i {
+        color: var(--ui-muted);
+        width: 22px;
+        text-align: center;
+        margin-right: var(--space-1);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-entry-line
+        a {
+        color: var(--blue-800);
+        text-decoration: underline;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-entry-line
+        a:hover {
+        text-decoration: underline;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-entry-notes {
+        margin-top: var(--space-2);
+        font-size: 16px;
+        color: var(--ui-muted);
+        font-style: italic;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-entry-source {
+        display: inline-block;
+        margin-top: var(--space-2);
+        font-size: 15px;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-entry-cat {
+        display: inline-block;
+        margin-top: var(--space-2);
+        margin-right: var(--space-3);
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--ui-accent);
+        background: var(--ui-tint, var(--ui-tint));
+        border: 1px solid color-mix(in srgb, var(--ui-accent) 30%, transparent);
+        border-radius: var(--radius-pill);
+        padding: 3px 12px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-entry-cat
+        i {
+        margin-right: 4px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-entry-actions {
+        display: flex;
+        gap: var(--space-3);
+        flex: 0 0 auto;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-edit:hover {
+        border-color: var(--ui-accent);
+        color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"]) .jml-empty,
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-loading {
+        text-align: center;
+        padding: var(--space-8) var(--space-6);
+        font-size: 19px;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-empty
+        i {
+        font-size: 40px;
+        color: var(--ui-line);
+        display: block;
+        margin-bottom: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-form-card.is-editing {
+        border-color: var(--ui-accent);
+        box-shadow: var(--shadow-md);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"]) .jml-card {
+        border: 1px solid var(--ui-line);
+        box-shadow: var(--shadow-sm);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-search-wrap
+        .field-input {
+        padding-left: calc(var(--space-5) * 2);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        :is(.field-input, .field-select, .field-textarea) {
+        font-size: 18px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        :is(.field-input, .field-select) {
+        min-height: 54px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"]) .btn {
+        min-height: 52px;
+        font-size: 17px;
+        white-space: normal;
+        text-align: center;
+        line-height: 1.4;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-viewbtn.is-active,
+    .jml-chip.is-active {
+        background: var(--ui-accent);
+        color: var(--color-on-brand);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-sort
+        select {
+        width: auto;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .jml-status {
+        width: auto;
+        max-width: 100%;
+    }
+
+    @media (width <= 640px) {
+        :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+            .jml-card,
+        :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+            .jml-list-section {
+            padding: var(--space-5);
+        }
+
+        :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+            .jml-row {
+            flex-direction: column;
+            gap: 0;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+            .jml-state,
+        :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+            .jml-zip {
+            flex: 1 1 auto;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+            .jml-search-wrap {
+            flex: 1 1 100%;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+            .jml-btn-save {
+            min-width: 0;
+            width: 100%;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+            .jml-entry-actions {
+            width: 100%;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+            :is(.jml-card, .jml-list-section) {
+            padding: var(--space-4);
+        }
+
+        :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+            :is(.jml-viewbtn, .jml-tool-btn) {
+            flex: 1 1 100%;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+            .jml-mini-btn {
+            flex: 1 1 0;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+            .jml-sort {
+            flex-wrap: wrap;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+            .jml-ai-title {
+            align-items: flex-start;
+        }
+    }
+
+    @media print {
+        :where([data-ui="unified"][data-staff-tool="jim-mailing-list"]) {
+            page: staff-toolkit-mailing;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+            :is(
+                .jml-ai-card,
+                .jml-form-card,
+                .jml-mc-details,
+                .jml-intro,
+                .jml-welcome,
+                .jml-viewtoggle,
+                .jml-list-actions,
+                .jml-filterbar,
+                .jml-search-wrap,
+                .jml-entry-actions,
+                .jml-ok
+            ) {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+            .jml-entry {
+            break-inside: avoid;
+            border: 1px solid var(--ui-line);
+            box-shadow: none;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+            .jml-list-section {
+            max-width: none;
+        }
+    }
+}
+
+@layer components.pages {
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+        .dash-content {
+        max-width: 960px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="jim-mailing-list"]) .jml-card {
+        padding: var(--space-6);
+    }
+
+    @media (width <= 640px) {
+        :where([data-ui="unified"][data-staff-tool="jim-mailing-list"])
+            .jml-card {
+            padding: var(--space-4);
+        }
+    }
+}
+
+@page staff-toolkit-pastdue {
+    size: letter portrait;
+    margin: 0.5in;
+}
+
+@layer components.pages {
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"]) .pdo-window {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: var(--font-size-sm);
+        color: var(--color-on-brand);
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-printfor
+        select {
+        max-width: 18rem;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"]) .pdo-asof {
+        font-size: 0.8rem;
+        color: var(--ui-muted);
+        display: block;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"]) .pdo-rep {
+        margin-bottom: 28px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-rep-name {
+        display: flex;
+        align-items: baseline;
+        gap: 12px;
+        margin: 0 0 8px;
+        font-size: var(--font-size-lg);
+        font-weight: 700;
+        color: var(--ui-ink);
+        flex-wrap: wrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-rep-count {
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"]) .pdo-scroll {
+        overflow-x: auto;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"]) .pdo-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: var(--font-size-sm);
+        min-width: 760px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-table
+        th {
+        text-align: left;
+        padding: var(--space-3);
+        border-bottom: 2px solid var(--ui-line);
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        color: var(--ui-muted);
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-table
+        td {
+        padding: var(--space-3);
+        border-bottom: 1px solid var(--gray-100);
+        color: var(--ui-ink);
+        vertical-align: top;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-table
+        tbody
+        tr:hover {
+        background: var(--gray-50);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"]) .pdo-num {
+        text-align: right;
+        white-space: nowrap;
+        font-variant-numeric: tabular-nums;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"]) .pdo-wo {
+        font-family: var(--font-mono);
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-late
+        .pdo-wo,
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-late
+        td:nth-child(2) {
+        font-weight: 700;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"]) .pdo-badge {
+        display: inline-block;
+        padding: 1px 7px;
+        border-radius: var(--radius-sm);
+        background: var(--color-danger-bg, var(--red-100));
+        color: var(--color-danger-ink, var(--red-800));
+        font-weight: 700;
+        font-size: 0.78rem;
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"]) .pdo-risk {
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"]) .pdo-nopo {
+        font-weight: 700;
+        color: var(--color-danger-ink, var(--red-800));
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"]) .pdo-none {
+        padding: 18px;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"]) .pdo-none i {
+        color: var(--color-brand-deep, var(--green-700));
+        margin-right: 6px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"]) .pdo-trunc,
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"]) .pdo-failed {
+        padding: 12px 14px;
+        margin-bottom: 14px;
+        border-radius: var(--radius-md);
+        background: var(--color-warning-bg, var(--amber-100));
+        color: var(--color-warning-ink, var(--amber-800));
+        font-size: 0.85rem;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        [id="pdo-print-sheet"] {
+        display: none;
+        color: var(--print-ink);
+        font-family: var(--ui-font);
+        font-size: 9.5px;
+        line-height: 1.3;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"]) .pdo-ps-brk {
+        break-before: page;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"]) .pdo-ps-tbl {
+        width: 100%;
+        table-layout: fixed;
+        border-collapse: collapse;
+        margin-bottom: 14px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-ps-tbl
+        thead {
+        display: table-header-group;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-ps-tbl
+        tbody
+        tr {
+        break-inside: avoid;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-ps-banner
+        th {
+        text-align: left;
+        padding: 0 0 5px;
+        border-bottom: 2px solid var(--ui-accent);
+        font-weight: 400;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-ps-brand {
+        font-size: 10px;
+        font-weight: 800;
+        color: var(--ui-accent);
+        letter-spacing: 0.02em;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-ps-repname {
+        font-size: 19px;
+        font-weight: 800;
+        color: var(--print-ink);
+        line-height: 1.15;
+        margin-top: 1px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-ps-repname--cont {
+        font-size: 12px;
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"]) .pdo-ps-sub {
+        font-size: 10px;
+        color: var(--ui-ink);
+        margin-top: 2px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-ps-note {
+        font-size: 8.5px;
+        color: var(--ui-muted);
+        margin-top: 2px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-ps-sect
+        th {
+        text-align: left;
+        padding: 9px 0 3px;
+        font-size: 10.5px;
+        font-weight: 800;
+        color: var(--ui-accent);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-ps-sect-n {
+        float: right;
+        font-weight: 600;
+        text-transform: none;
+        letter-spacing: 0;
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-ps-cols
+        th {
+        text-align: left;
+        padding: 3px 5px;
+        border-top: 1px solid var(--ui-accent);
+        border-bottom: 1px solid var(--ui-accent);
+        font-size: 8.5px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-ps-cols
+        th.pdo-ps-c {
+        text-align: center;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-ps-cols
+        th.pdo-ps-val {
+        text-align: right;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-ps-w-wo {
+        width: 8%;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-ps-w-cust {
+        width: 26%;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-ps-w-type {
+        width: 14.5%;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-ps-w-date {
+        width: 8.5%;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-ps-w-late {
+        width: 7%;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-ps-w-val {
+        width: 9.5%;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-ps-w-blank {
+        width: 18%;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-ps-tbl
+        td {
+        padding: 3.5px 5px;
+        border-bottom: 1px solid var(--ui-line);
+        vertical-align: top;
+        overflow-wrap: break-word;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"]) .pdo-ps-wo {
+        font-family: var(--font-mono);
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-ps-cust {
+        font-weight: 700;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-ps-nowrap {
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"]) .pdo-ps-c {
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"]) .pdo-ps-val {
+        text-align: right;
+        white-space: nowrap;
+        font-variant-numeric: tabular-nums;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"]) .pdo-ps-due {
+        font-weight: 800;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-ps-risk
+        td {
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-ps-risk
+        .pdo-ps-cust,
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-ps-risk
+        .pdo-ps-wo {
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-ps-vendor {
+        display: block;
+        font-size: 8.5px;
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-ps-tot
+        td {
+        border-top: 1.5px solid var(--ui-accent);
+        border-bottom: none;
+        padding-top: 4px;
+        font-weight: 800;
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-ps-badge {
+        display: inline-block;
+        padding: 0 5px;
+        border-radius: 2px;
+        background: var(--print-ink);
+        color: var(--color-on-brand);
+        font-weight: 800;
+        white-space: nowrap;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-ps-nopo {
+        font-weight: 900;
+        color: var(--print-ink);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-stat-sub {
+        margin-top: 4px;
+        font-size: 0.78rem;
+        color: var(--ui-muted);
+        min-height: 1.1em;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-asof
+        [id="pdo-summary"] {
+        color: var(--ui-ink);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-rep-link {
+        color: inherit;
+        text-decoration: none;
+        border-bottom: 1px dashed var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-rep-link:hover {
+        color: var(--ui-accent, var(--ui-accent));
+        border-bottom-color: currentcolor;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-rep-link
+        i {
+        font-size: 0.7em;
+        opacity: 0.6;
+        margin-left: 2px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-rep-total {
+        margin-left: auto;
+        font-family: var(--font-mono);
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--ui-ink);
+        font-variant-numeric: tabular-nums;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-nopo-link {
+        color: inherit;
+        text-decoration: none;
+        border-bottom: 1px dashed currentcolor;
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-nopo-link:hover {
+        text-decoration: none;
+        opacity: 0.8;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-nopo-link
+        i {
+        font-size: 0.85em;
+        margin-left: 3px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"]) .pdo-vendor {
+        display: block;
+        font-size: 0.75rem;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .pdo-partial {
+        display: inline-block;
+        margin-left: 6px;
+        padding: 0 6px;
+        border-radius: var(--radius-sm);
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        background: var(--color-warning-bg, var(--amber-100));
+        color: var(--color-warning-ink, var(--amber-800));
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"]) .pdo-dash {
+        color: var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .dash-header {
+        flex-wrap: wrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .dash-header-right {
+        flex-wrap: wrap;
+        gap: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        .dash-card-header {
+        flex-wrap: wrap;
+        gap: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+        [id="content-root"] {
+        padding: var(--space-5);
+    }:where([data-ui="unified"][data-staff-tool="past-due-orders"]) .pdo-window span { flex: 0 0 auto; white-space: nowrap; }
+:where([data-ui="unified"][data-staff-tool="past-due-orders"]) .pdo-window select { width: auto; }
+
+    @media (width <= 760px) {
+        :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+            .dash-header-right {
+            width: 100%;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+            .pdo-window {
+            flex: 1 1 100%;
+            justify-content: space-between;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+            .pdo-printfor
+            select {
+            max-width: none;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+            .dash-header-right
+            .dash-back-link {
+            flex: 1 1 auto;
+            justify-content: center;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+            .pdo-rep-name {
+            flex-wrap: wrap;
+        }
+    }
+
+    @media (width <= 1100px) {
+        :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+            .dash-header-right {
+            width: 100%;
+            justify-content: flex-start;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+            .pdo-window {
+            flex: 1 1 260px;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+            .pdo-window
+            select {
+            flex: 1;
+            min-width: 0;
+            max-width: 100%;
+        }
+    }
+
+    @media (width <= 640px) {
+        :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+            .dash-stat-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+            .dash-stat-card--accent {
+            grid-column: auto;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+            .dash-stat-value {
+            font-size: var(--font-size-2xl);
+        }
+
+        :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+            [id="content-root"] {
+            padding: var(--space-3);
+        }
+
+        :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+            .pdo-window {
+            flex-wrap: wrap;
+            flex-basis: 100%;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+            .pdo-window
+            select {
+            flex-basis: 100%;
+            width: 100%;
+        }
+    }
+
+    @media print {
+        :where(
+                [data-ui="unified"][data-staff-tool="past-due-orders"]
+            ).pdo-printing
+            > *:not([id="pdo-print-sheet"]) {
+            display: none;
+        }
+
+        :where(
+                [data-ui="unified"][data-staff-tool="past-due-orders"]
+            ).pdo-printing
+            [id="pdo-print-sheet"] {
+            display: block;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="past-due-orders"]):not(
+                .pdo-printing
+            )
+            .dash-header-right,
+        :where([data-ui="unified"][data-staff-tool="past-due-orders"]):not(
+                .pdo-printing
+            )
+            .dash-error-banner,
+        :where([data-ui="unified"][data-staff-tool="past-due-orders"]):not(
+                .pdo-printing
+            )
+            .dash-stat-grid {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="past-due-orders"]):not(
+                .pdo-printing
+            )
+            .pdo-rep {
+            break-inside: avoid;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="past-due-orders"]):not(
+                .pdo-printing
+            )
+            .pdo-table
+            tbody
+            tr {
+            break-inside: avoid;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="past-due-orders"]):not(
+                .pdo-printing
+            )
+            .pdo-badge {
+            background: var(--print-ink);
+            color: var(--color-on-brand);
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="past-due-orders"]):not(
+                .pdo-printing
+            )
+            .pdo-nopo {
+            color: var(--print-ink);
+            font-weight: 900;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="past-due-orders"]) {
+            --ui-canvas: var(--color-surface);
+
+            page: staff-toolkit-pastdue;
+            background: var(--color-surface);
+        }
+
+        :where([data-ui="unified"][data-staff-tool="past-due-orders"])
+            [id="pdo-print-sheet"] {
+            width: 100%;
+        }
+    }
+}

@@ -22,7 +22,7 @@
         });
     }
 
-    var realFetch = window.fetch ? window.fetch.bind(window) : null;
+    // This preview never forwards an unstubbed request to a real service.
 
     window.fetch = function (url, options) {
         var u = String(url);
@@ -33,7 +33,7 @@
             return json(200, { authenticated: true, firstName: 'Jim', email: 'jim@nwcustomapparel.com', permissions: ['staff'] });
         }
         if (u.indexOf('/api/crm-proxy/jim-mailing-list') !== 0) {
-            return realFetch ? realFetch(url, options) : json(404, { error: 'not stubbed' });
+            return json(503, { error: 'This preview has no fixture for that request.' });
         }
 
         // Mailchimp (Phase 2)

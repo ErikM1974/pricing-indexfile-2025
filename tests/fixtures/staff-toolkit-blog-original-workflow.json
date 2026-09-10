@@ -1,0 +1,104 @@
+{
+  "fields": [
+    {
+      "id": "fldTitle",
+      "value": "Synthetic Team Apparel Guide",
+      "disabled": false
+    },
+    {
+      "id": "fldSlug",
+      "value": "synthetic-team-guide-0",
+      "disabled": false
+    },
+    {
+      "id": "fldMeta",
+      "value": "Synthetic editorial content for layout review.",
+      "disabled": false
+    },
+    {
+      "id": "fldCategory",
+      "value": "Guides",
+      "disabled": false
+    },
+    {
+      "id": "fldAuthor",
+      "value": "Review Staff",
+      "disabled": false
+    },
+    {
+      "id": "fldHeroFile",
+      "value": "",
+      "disabled": false
+    },
+    {
+      "id": "fldHeroUrl",
+      "value": "",
+      "disabled": false
+    },
+    {
+      "id": "fldBodyImage",
+      "value": "",
+      "disabled": false
+    },
+    {
+      "id": "fldBody",
+      "value": "# Synthetic team guide\n\nChoose comfortable apparel for your team.\n\n- Preserve names\n- Check quantities",
+      "disabled": false
+    }
+  ],
+  "preview": "Synthetic team guide\n<p>Choose comfortable apparel for your team.</p>\n<ul>\n<li>Preserve names</li>\n<li>Check quantities</li>\n</ul>\n",
+  "published": [
+    {
+      "id": "fldTitle",
+      "value": "Synthetic Embroidery Care Guide",
+      "disabled": false
+    },
+    {
+      "id": "fldSlug",
+      "value": "synthetic-team-guide-1",
+      "disabled": true
+    },
+    {
+      "id": "fldMeta",
+      "value": "Synthetic editorial content for layout review.",
+      "disabled": false
+    },
+    {
+      "id": "fldCategory",
+      "value": "Guides",
+      "disabled": false
+    },
+    {
+      "id": "fldAuthor",
+      "value": "Review Staff",
+      "disabled": false
+    },
+    {
+      "id": "fldHeroFile",
+      "value": "",
+      "disabled": false
+    },
+    {
+      "id": "fldHeroUrl",
+      "value": "",
+      "disabled": false
+    },
+    {
+      "id": "fldBodyImage",
+      "value": "",
+      "disabled": false
+    },
+    {
+      "id": "fldBody",
+      "value": "# Synthetic team guide\n\nChoose comfortable apparel for your team.\n\n- Preserve names\n- Check quantities",
+      "disabled": false
+    }
+  ],
+  "writes": [
+    {
+      "path": "/api/crm-proxy/blog-posts/synthetic-team-guide-0",
+      "method": "PUT",
+      "body": "{\"slug\":\"synthetic-team-guide-0\",\"title\":\"Synthetic updated team guide\",\"metaDescription\":\"Synthetic editorial content for layout review.\",\"category\":\"Guides\",\"author\":\"Review Staff\",\"heroImageUrl\":\"\",\"bodyMarkdown\":\"# Synthetic team guide\\n\\nChoose comfortable apparel for your team.\\n\\n- Preserve names\\n- Check quantities\",\"status\":\"Draft\"}"
+    }
+  ]
+}

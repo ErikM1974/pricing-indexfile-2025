@@ -10,16 +10,16 @@
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- 2026 design tokens (must load before dash-shell.css) -->
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/dash-shell.css?v=2026.09.07.10">
-    <link rel="stylesheet" href="/dashboards/css/product-manager.css?v=2026.09.07.10">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.10.2">
+    <link rel="stylesheet" href="/shared_components/css/staff-toolkit.css?v=2026.09.10.2">
 </head>
-<body>
+<body data-ui="unified" data-staff-tool="product-manager">
+    <a class="skip-link" href="#staff-tool-main">Skip to content</a>
     <div class="dash-shell">
         <header class="dash-header">
             <div class="dash-header-left">
@@ -37,7 +37,7 @@
             </div>
         </header>
 
-        <main class="dash-content">
+        <main class="dash-content" id="staff-tool-main">
             <div class="dash-error-banner" role="alert">
                 <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                 <span class="dash-error-banner-message"></span>
@@ -65,8 +65,8 @@
                 <div class="dash-card-header">
                     <h2 class="dash-card-title">Non-SanMar products</h2>
                     <div class="pm-header-actions">
-                        <input type="search" id="pmFilter" class="pm-filter" placeholder="Filter by style, name, brand…" aria-label="Filter products">
-                        <button type="button" class="pm-btn pm-btn-primary" id="pmAddBtn">
+                        <input type="search" id="pmFilter" class="field-input pm-filter" placeholder="Filter by style, name, brand…" aria-label="Filter products">
+                        <button type="button" class="btn pm-btn pm-btn-primary btn-primary" id="pmAddBtn">
                             <i class="fas fa-plus" aria-hidden="true"></i> Add product
                         </button>
                     </div>
@@ -84,27 +84,27 @@
             <div class="dash-card pm-form-card" id="pmFormCard" hidden>
                 <div class="dash-card-header">
                     <h2 class="dash-card-title" id="pmFormTitle">Add product</h2>
-                    <button type="button" class="pm-btn pm-btn-ghost" id="pmFormClose"><i class="fas fa-times" aria-hidden="true"></i> Close</button>
+                    <button type="button" class="btn pm-btn pm-btn-ghost btn-ghost" id="pmFormClose"><i class="fas fa-times" aria-hidden="true"></i> Close</button>
                 </div>
                 <form id="pmForm">
                     <input type="hidden" id="fId">
                     <div class="pm-grid">
-                        <div class="pm-field">
-                            <label for="fStyle">Style number <span class="pm-req">*</span></label>
-                            <input type="text" id="fStyle" required maxlength="40" placeholder="e.g. PC-TUMBLER-30">
+                        <div class="field pm-field">
+                            <label class="field-label" for="fStyle">Style number <span class="pm-req">*</span></label>
+                            <input class="field-input" type="text" id="fStyle" required maxlength="40" placeholder="e.g. PC-TUMBLER-30">
                             <small>Must be unique — this is the catalog + ShopWorks key.</small>
                         </div>
-                        <div class="pm-field">
-                            <label for="fName">Product name <span class="pm-req">*</span></label>
-                            <input type="text" id="fName" required maxlength="120" placeholder="e.g. Polar Camel 30oz Tumbler">
+                        <div class="field pm-field">
+                            <label class="field-label" for="fName">Product name <span class="pm-req">*</span></label>
+                            <input class="field-input" type="text" id="fName" required maxlength="120" placeholder="e.g. Polar Camel 30oz Tumbler">
                         </div>
-                        <div class="pm-field">
-                            <label for="fBrand">Brand <span class="pm-req">*</span></label>
-                            <input type="text" id="fBrand" required maxlength="60" placeholder="e.g. Polar Camel">
+                        <div class="field pm-field">
+                            <label class="field-label" for="fBrand">Brand <span class="pm-req">*</span></label>
+                            <input class="field-input" type="text" id="fBrand" required maxlength="60" placeholder="e.g. Polar Camel">
                         </div>
-                        <div class="pm-field">
-                            <label for="fCategory">Category</label>
-                            <select id="fCategory">
+                        <div class="field pm-field">
+                            <label class="field-label" for="fCategory">Category</label>
+                            <select class="field-select" id="fCategory">
                                 <option value="T-Shirts">T-Shirts</option>
                                 <option value="Polos/Knits">Polos/Knits</option>
                                 <option value="Sweatshirts/Fleece">Sweatshirts/Fleece</option>
@@ -117,58 +117,58 @@
                                 <option value="Other">Other</option>
                             </select>
                         </div>
-                        <div class="pm-field">
-                            <label for="fCost">Your cost (per piece) <span class="pm-req">*</span></label>
-                            <input type="number" id="fCost" min="0" step="0.01" inputmode="decimal" placeholder="12.40">
+                        <div class="field pm-field">
+                            <label class="field-label" for="fCost">Your cost (per piece) <span class="pm-req">*</span></label>
+                            <input class="field-input" type="number" id="fCost" min="0" step="0.01" inputmode="decimal" placeholder="12.40">
                             <small>The catalog margins this automatically — customers never see it.</small>
                         </div>
-                        <div class="pm-field">
-                            <label for="fPricingMethod">Pricing</label>
-                            <select id="fPricingMethod">
+                        <div class="field pm-field">
+                            <label class="field-label" for="fPricingMethod">Pricing</label>
+                            <select class="field-select" id="fPricingMethod">
                                 <option value="Margin">Automatic (cost ÷ margin + logo — same as SanMar)</option>
                                 <option value="FixedPrice">Fixed sell price (special cases)</option>
                             </select>
                         </div>
-                        <div class="pm-field" id="fSellWrap" hidden>
-                            <label for="fSell">Fixed sell price</label>
-                            <input type="number" id="fSell" min="0" step="0.01" inputmode="decimal" placeholder="49.00">
+                        <div class="field pm-field" id="fSellWrap" hidden>
+                            <label class="field-label" for="fSell">Fixed sell price</label>
+                            <input class="field-input" type="number" id="fSell" min="0" step="0.01" inputmode="decimal" placeholder="49.00">
                         </div>
-                        <div class="pm-field">
-                            <label for="fSizes">Sizes (comma-separated)</label>
-                            <input type="text" id="fSizes" placeholder="S, M, L, XL, 2XL" maxlength="120">
+                        <div class="field pm-field">
+                            <label class="field-label" for="fSizes">Sizes (comma-separated)</label>
+                            <input class="field-input" type="text" id="fSizes" placeholder="S, M, L, XL, 2XL" maxlength="120">
                         </div>
-                        <div class="pm-field">
-                            <label for="fColors">Colors (comma-separated)</label>
-                            <input type="text" id="fColors" placeholder="Black, Navy, White" maxlength="240">
+                        <div class="field pm-field">
+                            <label class="field-label" for="fColors">Colors (comma-separated)</label>
+                            <input class="field-input" type="text" id="fColors" placeholder="Black, Navy, White" maxlength="240">
                         </div>
-                        <div class="pm-field">
-                            <label for="fVendorSelect">Vendor</label>
-                            <select id="fVendorSelect"></select>
-                            <input type="text" id="fVendor" aria-label="Vendor" maxlength="40" placeholder="Vendor code, e.g. JDS" hidden>
+                        <div class="field pm-field">
+                            <label class="field-label" for="fVendorSelect">Vendor</label>
+                            <select class="field-select" id="fVendorSelect"></select>
+                            <input class="field-input" type="text" id="fVendor" aria-label="Vendor" maxlength="40" placeholder="Vendor code, e.g. JDS" hidden>
                             <small>Who we buy the blank from. Pick from the list so vendor reports stay accurate.</small>
                         </div>
-                        <div class="pm-field">
-                            <label for="fVendorUrl">Vendor URL</label>
-                            <input type="url" id="fVendorUrl" maxlength="240" placeholder="https://…">
+                        <div class="field pm-field">
+                            <label class="field-label" for="fVendorUrl">Vendor URL</label>
+                            <input class="field-input" type="url" id="fVendorUrl" maxlength="240" placeholder="https://…">
                         </div>
-                        <div class="pm-field pm-span-2">
-                            <label for="fImageFile">Product image</label>
+                        <div class="field pm-field pm-span-2">
+                            <label class="field-label" for="fImageFile">Product image</label>
                             <div class="pm-image-row">
                                 <img id="fImagePreview" class="pm-image-preview" alt="" hidden>
                                 <div class="pm-image-controls">
-                                    <input type="file" id="fImageFile" accept=".png,.jpg,.jpeg,.webp,.gif">
+                                    <input class="field-input" type="file" id="fImageFile" accept=".png,.jpg,.jpeg,.webp,.gif">
                                     <small>PNG/JPG up to 20&nbsp;MB — uploads to our CDN and fills the URL below.</small>
-                                    <input type="url" id="fImageUrl" aria-label="Image URL" placeholder="…or paste an image URL" maxlength="400">
+                                    <input class="field-input" type="url" id="fImageUrl" aria-label="Image URL" placeholder="…or paste an image URL" maxlength="400">
                                 </div>
                             </div>
                         </div>
-                        <div class="pm-field pm-span-2">
-                            <label for="fNotes">Notes / description (shows on the product page)</label>
-                            <textarea id="fNotes" rows="3" maxlength="1000"></textarea>
+                        <div class="field pm-field pm-span-2">
+                            <label class="field-label" for="fNotes">Notes / description (shows on the product page)</label>
+                            <textarea class="field-textarea" id="fNotes" rows="3" maxlength="1000"></textarea>
                         </div>
                     </div>
                     <div class="pm-form-actions">
-                        <button type="submit" class="pm-btn pm-btn-primary" id="pmSaveBtn">
+                        <button type="submit" class="btn pm-btn pm-btn-primary btn-primary" id="pmSaveBtn">
                             <i class="fas fa-floppy-disk" aria-hidden="true"></i> Save product
                         </button>
                         <label class="pm-active-toggle">
@@ -185,6 +185,6 @@
     <script src="/config/app.config.js"></script>
     <script src="/shared_components/js/fetch-timeout.js?v=2026.09.06.26"></script>
     <script src="/shared_components/js/dash-page-helpers.js?v=2026.09.07.25"></script>
-    <script src="/dashboards/js/product-manager.js?v=2026.09.05.71"></script>
+    <script src="/dashboards/js/product-manager.js?v=2026.09.10.2"></script>
 </body>
 </html>

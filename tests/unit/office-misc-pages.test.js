@@ -15,18 +15,20 @@ const BARE = /<i class="(?:fa[sr]|fa-solid|fa-regular) [^"]*"><\/i>/;
 describe("jim's mailing list", () => {
     const html = read('dashboards/jim-mailing-list.html').replace(/<!--[\s\S]*?-->/g, '');
     const js = read('dashboards/js/jim-mailing-list.js');
-    const css = read('dashboards/css/jim-mailing-list.css');
+    const css = read('shared_components/css/staff-toolkit.css');
     test('hidden guard, pressed states, retry, keyboard label, hygiene', () => {
-        expect(css).toMatch(/^\[hidden\] \{ display: none !important; \}/m);
+        expect(read('shared_components/css/components.css')).toMatch(/\[hidden\] \{\s*display: none;\s*\}/);
         expect(html).toMatch(/id="jml-view-mine" data-view="mine" aria-pressed="false"/);
         expect(js).toMatch(/el\('jml-view-all'\)\.setAttribute\('aria-pressed', isAll \? 'true' : 'false'\);/);
         expect(js).toMatch(/data-cat="' \+ esc\(c\.cat\) \+ '" aria-pressed="' \+ \(active \? 'true' : 'false'\) \+ '"/);
         expect(js).toMatch(/data-act="retry">Try again<\/button>/);
         expect(js).toMatch(/if \(act === 'retry'\) \{ load\(\); return; \}/);
         expect(js).not.toMatch(/\.style\./);
-        expect(html).toMatch(/<label class="jml-ai-imgbtn" for="jml-ai-file" role="button" tabindex="0">/);
-        expect(html).toMatch(/id="jml-ai-file" accept="image\/\*" class="jml-visually-hidden" aria-label="Choose a screenshot"/);
-        expect(js).toMatch(/e\.preventDefault\(\); el\('jml-ai-file'\)\.click\(\);/);
+        const document = new (require('jsdom').JSDOM)(html).window.document;
+        expect(document.querySelector('button.jml-ai-imgbtn').type).toBe('button');
+        expect(document.getElementById('jml-ai-file').hidden).toBe(true);
+        expect(document.getElementById('jml-ai-file').getAttribute('aria-label')).toBe('Choose a screenshot');
+        expect(js).toMatch(/if \(!el\('jml-ai-file'\)\.disabled\) el\('jml-ai-file'\)\.click\(\)/);
         expect(html).not.toMatch(BARE);
         expect(html).toMatch(/<button type="button" class="dash-error-banner-close" aria-label="Dismiss">/);
         expect(html).toMatch(/jim-mailing-list\.js\?v=2026\.09\./);

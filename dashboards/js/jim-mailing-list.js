@@ -22,6 +22,10 @@
 
     var state = {
         entries: [],       // rows from the API
+        loaded: false,
+        loadId: 0,
+        busy: false,
+        heldControls: new Map(),
         me: { email: '', firstName: '' }, // the logged-in user (for "your companies")
         view: 'mine',      // 'mine' = only what I added (default) · 'all' = full list
         search: '',
@@ -51,6 +55,24 @@
         'jml-notes': 'Notes',
     };
 
+    function holdPage() {
+        state.busy = true;
+        document.querySelectorAll('input, textarea, select, button').forEach(function (node) {
+            if (!state.heldControls.has(node)) state.heldControls.set(node, node.disabled);
+            node.disabled = true;
+        });
+        el('jml-form').setAttribute('aria-busy', 'true');
+    }
+    function releasePage() {
+        state.busy = false;
+        state.heldControls.forEach(function (disabled, node) { node.disabled = disabled; });
+        state.heldControls.clear();
+        el('jml-form').setAttribute('aria-busy', 'false');
+        updateListControls();
+    }
+    function updateListControls() {
+        ['jml-export', 'jml-labels', 'jml-mc-check', 'jml-mc-sync', 'jml-mc-sync-engaged'].forEach(function (id) { el(id).disabled = state.busy || !state.loaded; });
+    }
     function el(id) { return document.getElementById(id); }
     function esc(s) {
         return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
@@ -87,9 +109,7 @@
         el('jml-mc-refresh').addEventListener('click', mcRefresh);
         el('jml-view-mine').addEventListener('click', function () { setView('mine'); });
         var imgLabel = document.querySelector('.jml-ai-imgbtn');
-        if (imgLabel) imgLabel.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el('jml-ai-file').click(); }
-        });
+        if (imgLabel) imgLabel.addEventListener('click', function () { if (!el('jml-ai-file').disabled) el('jml-ai-file').click(); });
         el('jml-view-all').addEventListener('click', function () { setView('all'); });
         var portrait = el('jml-portrait');
         if (portrait) portrait.addEventListener('error', function () { portrait.hidden = true; });
@@ -154,6 +174,7 @@
 
     // ── outreach status (per-card dropdown → PUT) ─────────────────────────
     function onListChange(e) {
+        if (state.busy || !state.loaded) return;
         var sel = e.target.closest('select.jml-status');
         if (!sel) return;
         var id = sel.getAttribute('data-statusfor');
@@ -162,17 +183,17 @@
         var val = sel.value;
         var body = { Status: val === 'Not contacted' ? '' : val };
         if (val === 'Mailed' && !row.Last_Mailed_At) body.Last_Mailed_At = todayLocal();
-        sel.disabled = true;
+        holdPage();
         jsonFetch(API + '/' + encodeURIComponent(id), { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
             .then(function () {
                 row.Status = body.Status;
                 if (body.Last_Mailed_At) row.Last_Mailed_At = body.Last_Mailed_At;
-                sel.disabled = false;
+                releasePage();
                 showOk('Marked ' + row.Company + ': ' + val + '.');
                 render();
             })
             .catch(function (err) {
-                sel.disabled = false;
+                releasePage();
                 sel.value = row.Status || 'Not contacted';
                 DashPage.showError('Could not update status: ' + err.message);
             });
@@ -188,6 +209,7 @@
         setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
     }
     function exportMailchimp() {
+        if (state.busy || !state.loaded) return;
         var rows = currentRows();
         if (!rows.length) { DashPage.showError('Nothing to export in this view — clear your search or filter first.'); return; }
         var headers = ['Email Address', 'First Name', 'Last Name', 'Company', 'Address', 'City', 'State', 'Zip', 'Phone', 'Tags'];
@@ -204,6 +226,7 @@
 
     // ── printable mailing labels (Avery 5160, current filtered view) ──────
     function printLabels() {
+        if (state.busy || !state.loaded) return;
         var rows = currentRows().filter(function (r) { return r.Address || r.City; });
         if (!rows.length) { DashPage.showError('No mailing addresses to print in this view.'); return; }
         var cells = rows.map(function (r) {
@@ -234,13 +257,15 @@
         s.hidden = false;
     }
     function mcTest() {
+        if (state.busy) return;
+        holdPage();
         var b = el('jml-mc-test'); b.disabled = true;
         setMcStatus('Checking the connection…', 'ok');
         jsonFetch(API + '/mailchimp/status').then(function (d) {
             b.disabled = false;
             if (d.ok) setMcStatus('✓ Connected. Audience “' + (d.audience && d.audience.name) + '” has ' + (d.audience && d.audience.members) + ' contact(s) in Mailchimp.', 'ok');
             else setMcStatus('Not connected: ' + (d.error || 'unknown') + (d.audiences ? ' — audiences found: ' + d.audiences.join(', ') : ''), 'err');
-        }).catch(function (err) { b.disabled = false; setMcStatus('Could not reach the server: ' + err.message, 'err'); });
+        }).catch(function (err) { b.disabled = false; setMcStatus('Could not reach the server: ' + err.message, 'err'); }).finally(releasePage);
     }
     function memberFromRow(r) {
         var nm = splitName(r);
@@ -253,9 +278,11 @@
 
     // Check the current group against Mailchimp — how many are known, how many opened.
     function mcCheckEngagement() {
+        if (state.busy || !state.loaded) return;
         var rows = currentRows().filter(hasEmail);
         if (!rows.length) { setMcStatus('No companies with an email in ' + syncScopeLabel() + ' to check.', 'warn'); return; }
         var emails = rows.map(function (r) { return r.Email; });
+        holdPage();
         var b = el('jml-mc-check'); b.disabled = true;
         setMcStatus('Checking Mailchimp for ' + emails.length + ' emails… (the first check can take a minute)', 'ok');
         jsonFetch(API + '/mailchimp/engagement', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ emails: emails }) }).then(function (d) {
@@ -270,14 +297,16 @@
             var i = document.createElement('i'); i.className = 'fas fa-star'; i.setAttribute('aria-hidden', 'true');
             el('jml-mc-sync-engaged').insertBefore(i, el('jml-mc-sync-engaged').firstChild);
             setMcStatus('Of ' + d.checked + ' with an email in ' + syncScopeLabel() + ': ' + d.inMailchimp + ' are in Mailchimp, and ' + d.opened + ' have opened your emails. Use “Sync engaged only” to add just the ' + d.opened + ' openers.', d.opened ? 'ok' : 'warn');
-        }).catch(function (err) { b.disabled = false; setMcStatus('Engagement check failed: ' + err.message, 'err'); });
+        }).catch(function (err) { b.disabled = false; setMcStatus('Engagement check failed: ' + err.message, 'err'); }).finally(releasePage);
     }
 
     // Sync a set of rows (with an email) to Mailchimp, tagged by segment.
     function doSync(rows, whatLabel) {
+        if (state.busy || !state.loaded) return;
         if (!rows.length) { setMcStatus('No ' + whatLabel + ' to sync in ' + syncScopeLabel() + '.', 'warn'); return; }
         if (!window.confirm('Add ' + rows.length + ' ' + whatLabel + ' from ' + syncScopeLabel() + ' to your Mailchimp audience, tagged by group?\n\n⚠ This adds ' + rows.length + ' to your Mailchimp contact count. They go in NON-subscribed — not emailed until you subscribe them.')) return;
         var members = rows.map(memberFromRow);
+        holdPage();
         var b1 = el('jml-mc-sync'), b2 = el('jml-mc-sync-engaged');
         b1.disabled = true; if (b2) b2.disabled = true;
         setMcStatus('Syncing ' + members.length + ' to Mailchimp…', 'ok');
@@ -287,11 +316,13 @@
             var msg = '✓ Synced ' + d.attempted + ' to “' + d.audience + '” (' + d.created + ' new, ' + d.updated + ' updated).';
             if (d.errors) msg += ' ' + d.errors + ' had a problem.';
             setMcStatus(msg, d.errors ? 'warn' : 'ok');
-        }).catch(function (err) { b1.disabled = false; if (b2) b2.disabled = false; setMcStatus('Sync failed: ' + err.message, 'err'); });
+        }).catch(function (err) { b1.disabled = false; if (b2) b2.disabled = false; setMcStatus('Sync failed: ' + err.message, 'err'); }).finally(releasePage);
     }
     function mcSync() { doSync(currentRows().filter(hasEmail), 'companies (with an email)'); }
     function mcSyncEngaged() { doSync(currentRows().filter(hasEmail).filter(rowIsEngaged), 'engaged companies (have opened your emails)'); }
     function mcRefresh() {
+        if (state.busy) return;
+        holdPage();
         var b = el('jml-mc-refresh'); b.disabled = true;
         setMcStatus('Checking Mailchimp for who has been emailed…', 'ok');
         jsonFetch(API + '/mailchimp/record-sends', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' }).then(function (d) {
@@ -299,7 +330,7 @@
             if (d.error) { setMcStatus(d.error, 'err'); return; }
             setMcStatus('✓ ' + (d.message || ('Updated ' + d.updated + ' prospect(s) from ' + d.campaigns + ' campaign(s).')), 'ok');
             if (d.updated) load();
-        }).catch(function (err) { b.disabled = false; setMcStatus(err.message, 'err'); });
+        }).catch(function (err) { b.disabled = false; setMcStatus(err.message, 'err'); }).finally(releasePage);
     }
 
     // ── AI capture (paste text / screenshot → Claude fills the form) ───────
@@ -346,21 +377,26 @@
     }
 
     function stageImage(file) {
+        if (state.busy) return;
+        holdPage();
         setAiStatus('Getting the screenshot ready…', false);
         fileToDownscaledDataUrl(file, 1400, 0.85)
             .then(function (dataUrl) {
+                releasePage();
                 state.aiImage = dataUrl;
                 el('jml-ai-thumb').src = dataUrl;
                 el('jml-ai-thumb-wrap').hidden = false;
                 setAiStatus('Screenshot ready. Press the button below to read it.', false);
             })
             .catch(function (err) {
+                releasePage();
                 clearAiImage();
                 DashPage.showError('That screenshot could not be read: ' + err.message);
             });
     }
 
     function clearAiImage() {
+        if (state.busy) return;
         state.aiImage = null;
         el('jml-ai-file').value = '';
         el('jml-ai-thumb').removeAttribute('src');
@@ -376,12 +412,12 @@
     }
 
     function runAiExtract() {
+        if (state.busy) return;
         DashPage.hideError();
         var text = el('jml-ai-text').value.trim();
         if (!text && !state.aiImage) { setAiStatus('Paste some text or a screenshot first.', true); return; }
 
-        var btn = el('jml-ai-go');
-        btn.disabled = true;
+        holdPage();
         setAiStatus('Reading… this takes a few seconds.', false);
 
         jsonFetch(API + '/extract', {
@@ -389,7 +425,7 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ text: text || undefined, image: state.aiImage || undefined }),
         }).then(function (data) {
-            btn.disabled = false;
+            releasePage();
             var f = data.fields || {};
             if (!f.company && !f.phone && !f.email && !f.address) {
                 setAiStatus('Claude did not find a company in that — you can type it in below instead.', true);
@@ -402,7 +438,7 @@
             var card = document.querySelector('.jml-form-card');
             window.scrollTo({ top: (card.getBoundingClientRect().top + window.pageYOffset) - 20, behavior: 'smooth' });
         }).catch(function (err) {
-            btn.disabled = false;
+            releasePage();
             setAiStatus('', false);
             DashPage.showError('Could not read that: ' + err.message + ' — please try again.');
         });
@@ -438,23 +474,38 @@
     }
 
     function load() {
+        var loadId = ++state.loadId;
+        state.loaded = false;
+        state.entries = [];
         DashPage.hideError();
-        el('jml-list').innerHTML = '<div class="jml-loading">Loading your list…</div>';
-        jsonFetch(API)
+        ['jml-mine-count', 'jml-all-count'].forEach(function (id) { el(id).textContent = '(—)'; });
+        el('jml-count').textContent = '';
+        el('jml-list').setAttribute('aria-busy', 'true');
+        el('jml-mc-scope').textContent = 'The list is unavailable until loading completes.';
+        updateListControls();
+        el('jml-list').innerHTML = '<div class="jml-loading" role="status">Loading your list…</div>';
+        return jsonFetch(API)
             .then(function (data) {
-                state.entries = (data.entries || []).slice();
+                if (loadId !== state.loadId) return;
+                if (!data || !Array.isArray(data.entries) || data.entries.some(function (row) { return !row || row.PK_ID == null || typeof row.Company !== 'string'; })) throw new Error('Incomplete list response');
+                state.entries = data.entries.slice();
+                state.loaded = true;
+                el('jml-list').setAttribute('aria-busy', 'false');
                 render();
             })
             .catch(function (err) {
+                if (loadId !== state.loadId) return;
+                el('jml-list').setAttribute('aria-busy', 'false');
                 el('jml-list').innerHTML = '<div class="jml-empty" role="alert">Your list could not load (' + esc(err.message || 'request failed') + '). ' +
-                    '<button type="button" class="jml-linkbtn" data-act="retry">Try again</button></div>';
-                DashPage.showError('Could not load the mailing list: ' + err.message + ' — press Refresh or try again.');
+                    '<button type="button" class="btn btn-secondary jml-linkbtn" data-act="retry">Try again</button></div>';
+                DashPage.showError('Could not load the mailing list: ' + err.message + ' — press Try again.');
             });
     }
 
     // ── add / edit ────────────────────────────────────────────────────────
     function onSubmit(e) {
         e.preventDefault();
+        if (state.busy) return;
         DashPage.hideError();
 
         var body = {};
@@ -470,8 +521,7 @@
         }
 
         var editing = state.editingId != null;
-        var save = el('jml-save');
-        save.disabled = true;
+        holdPage();
 
         var req = editing
             ? jsonFetch(API + '/' + encodeURIComponent(state.editingId), {
@@ -483,16 +533,18 @@
 
         req.then(function () {
             var name = body.Company;
+            releasePage();
             resetForm();
             showOk((editing ? 'Saved your changes to ' : 'Added ') + name + '.');
             load();
         }).catch(function (err) {
-            save.disabled = false;
-            DashPage.showError('Could not save: ' + err.message + ' — nothing was changed, please try again.');
+            releasePage();
+            DashPage.showError('Could not confirm the save: ' + err.message + ' — Check the list before trying again. Your form is preserved.');
         });
     }
 
     function startEdit(id) {
+        if (state.busy || !state.loaded) return;
         var row = state.entries.filter(function (r) { return String(r.PK_ID) === String(id); })[0];
         if (!row) return;
         state.editingId = row.PK_ID;
@@ -513,7 +565,7 @@
         el('jml-company').focus();
     }
 
-    function cancelEdit() { resetForm(); }
+    function cancelEdit() { if (!state.busy) resetForm(); }
 
     function resetForm() {
         state.editingId = null;
@@ -527,22 +579,27 @@
 
     // ── delete ────────────────────────────────────────────────────────────
     function remove(id) {
+        if (state.busy || !state.loaded) return;
         var row = state.entries.filter(function (r) { return String(r.PK_ID) === String(id); })[0];
         if (!row) return;
         if (!window.confirm('Remove ' + row.Company + ' from your list?\n\nThis cannot be undone.')) return;
         DashPage.hideError();
+        holdPage();
         jsonFetch(API + '/' + encodeURIComponent(id), { method: 'DELETE' })
             .then(function () {
+                releasePage();
                 if (state.editingId != null && String(state.editingId) === String(id)) resetForm();
                 showOk('Removed ' + row.Company + '.');
                 load();
             })
             .catch(function (err) {
-                DashPage.showError('Could not remove ' + row.Company + ': ' + err.message + ' — it is still on your list.');
+                releasePage();
+                DashPage.showError('Could not confirm removal of ' + row.Company + ': ' + err.message + ' — check the list before trying again.');
             });
     }
 
     function onListClick(e) {
+        if (state.busy) return;
         var btn = e.target.closest('[data-act]');
         if (!btn) return;
         var act = btn.getAttribute('data-act');
@@ -608,6 +665,8 @@
     }
 
     function render() {
+        updateListControls();
+        if (!state.loaded) return;
         var total = state.entries.length;
         var mineCount = state.entries.filter(isMine).length;
         var isAll = state.view === 'all';
@@ -640,10 +699,10 @@
                 el('jml-list').innerHTML = '<div class="jml-empty"><i class="fas fa-user-plus" aria-hidden="true"></i>' +
                     (state.search ? 'None of your companies match “' + esc(state.search) + '”.'
                         : 'You haven’t added any companies yet. Use the form above to add your first one — it shows up here.') +
-                    ' <button type="button" class="jml-linkbtn" data-act="viewall">See all ' + total + ' companies</button></div>';
+                    ' <button type="button" class="btn btn-secondary jml-linkbtn" data-act="viewall">See all ' + total + ' companies</button></div>';
             } else {
                 el('jml-list').innerHTML = '<div class="jml-empty">No companies match your search or filter. ' +
-                    '<button type="button" class="jml-linkbtn" data-act="showall">Show all</button></div>';
+                    '<button type="button" class="btn btn-secondary jml-linkbtn" data-act="showall">Show all</button></div>';
             }
             return;
         }
@@ -651,10 +710,11 @@
         var shown = rows.slice(0, state.renderLimit);
         var html = shown.map(entryHtml).join('');
         if (rows.length > state.renderLimit) {
-            html += '<button type="button" class="jml-showmore" data-act="more">' +
+            html += '<button type="button" class="btn btn-secondary jml-showmore" data-act="more">' +
                 'Show more (' + (rows.length - state.renderLimit) + ' more)</button>';
         }
         el('jml-list').innerHTML = html;
+        if (state.busy) holdPage();
     }
 
     // Segment (Category) filter chips, most common first, each with a count.
@@ -670,7 +730,7 @@
 
         el('jml-chips').innerHTML = chips.map(function (c) {
             var active = (state.category || '') === c.cat;
-            return '<button type="button" class="jml-chip' + (active ? ' is-active' : '') + '" data-cat="' + esc(c.cat) + '" aria-pressed="' + (active ? 'true' : 'false') + '">' +
+            return '<button type="button" class="btn btn-secondary jml-chip' + (active ? ' is-active' : '') + '" data-cat="' + esc(c.cat) + '" aria-pressed="' + (active ? 'true' : 'false') + '">' +
                 esc(c.label) + '<span class="jml-chip-n">' + c.n + '</span></button>';
         }).join('');
     }
@@ -694,7 +754,7 @@
         if (r.Source) extra += '<span class="jml-entry-source"><i class="fas fa-book-open" aria-hidden="true"></i> Found in: ' + esc(r.Source) + '</span>';
 
         var cur = r.Status || 'Not contacted';
-        var statusSel = '<select class="jml-status" data-statusfor="' + esc(r.PK_ID) + '" aria-label="Outreach status for ' + esc(r.Company) + '">' +
+        var statusSel = '<select class="field-select jml-status" data-statusfor="' + esc(r.PK_ID) + '" aria-label="Outreach status for ' + esc(r.Company) + '">' +
             STATUSES.map(function (s) { return '<option' + (s === cur ? ' selected' : '') + '>' + esc(s) + '</option>'; }).join('') + '</select>';
         var mailed = r.Last_Mailed_At ? '<span class="jml-lastmailed">Last contacted ' + esc(fmtDate(r.Last_Mailed_At)) + '</span>' : '';
         var footer = '<div class="jml-entry-status"><span class="jml-status-label">Status:</span> ' + statusSel + mailed + '</div>';
@@ -705,9 +765,9 @@
                 lines.join('') + extra + footer +
             '</div>' +
             '<div class="jml-entry-actions">' +
-                '<button type="button" class="jml-mini-btn jml-edit" data-act="edit" data-id="' + esc(r.PK_ID) + '">' +
+                '<button type="button" class="btn btn-secondary jml-mini-btn jml-edit" data-act="edit" data-id="' + esc(r.PK_ID) + '">' +
                     '<i class="fas fa-pen" aria-hidden="true"></i> Edit</button>' +
-                '<button type="button" class="jml-mini-btn jml-delete" data-act="delete" data-id="' + esc(r.PK_ID) + '">' +
+                '<button type="button" class="btn btn-danger jml-mini-btn jml-delete" data-act="delete" data-id="' + esc(r.PK_ID) + '">' +
                     '<i class="fas fa-trash" aria-hidden="true"></i> Delete</button>' +
             '</div>' +
         '</div>';

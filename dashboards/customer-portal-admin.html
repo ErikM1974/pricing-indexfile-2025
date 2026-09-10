@@ -10,16 +10,16 @@
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- 2026 design tokens (must load before dash-shell.css) -->
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/dash-shell.css?v=2026.09.07.10">
-    <link rel="stylesheet" href="/dashboards/css/customer-portal-admin.css?v=2026.09.07.19">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.10.2">
+    <link rel="stylesheet" href="/shared_components/css/staff-toolkit.css?v=2026.09.10.2">
 </head>
-<body>
+<body data-ui="unified" data-staff-tool="customer-portal-admin">
+    <a class="skip-link" href="#staff-tool-main">Skip to content</a>
     <div class="dash-shell">
         <header class="dash-header">
             <div class="dash-header-left">
@@ -37,7 +37,7 @@
             </div>
         </header>
 
-        <main class="dash-content">
+        <main class="dash-content" id="staff-tool-main">
             <div class="dash-error-banner" role="alert">
                 <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                 <span class="dash-error-banner-message"></span>
@@ -53,8 +53,8 @@
 
             <!-- Tabs -->
             <div class="cpa-tabs" role="tablist" aria-label="Portal console sections">
-                <button type="button" class="cpa-tab cpa-tab-active" role="tab" id="cpa-tab-access" aria-selected="true" aria-controls="cpa-view-access" data-tab="access"><i class="fas fa-id-card-clip" aria-hidden="true"></i> Portal Access</button>
-                <button type="button" class="cpa-tab" role="tab" id="cpa-tab-requests" aria-selected="false" aria-controls="cpa-view-requests" data-tab="requests"><i class="fas fa-cart-shopping" aria-hidden="true"></i> Re-order Requests <span class="cpa-tab-badge" id="cpa-req-badge" hidden>0</span></button>
+                <button type="button" class="btn cpa-tab cpa-tab-active btn-ghost" role="tab" id="cpa-tab-access" aria-selected="true" aria-controls="cpa-view-access" data-tab="access"><i class="fas fa-id-card-clip" aria-hidden="true"></i> Portal Access</button>
+                <button type="button" class="btn cpa-tab btn-ghost" role="tab" id="cpa-tab-requests" aria-selected="false" aria-controls="cpa-view-requests" data-tab="requests"><i class="fas fa-cart-shopping" aria-hidden="true"></i> Re-order Requests <span class="cpa-tab-badge" id="cpa-req-badge" hidden>0</span></button>
             </div>
 
             <div id="cpa-view-access" role="tabpanel" aria-labelledby="cpa-tab-access">
@@ -86,12 +86,12 @@
             <div class="cpa-controls">
                 <div class="cpa-search-wrap">
                     <i class="fas fa-search" aria-hidden="true"></i>
-                    <input type="text" id="cpa-filter" aria-label="Search portal users" placeholder="Filter by company, email, rep or customer #…" autocomplete="off">
+                    <input class="field-input" type="text" id="cpa-filter" aria-label="Search portal users" placeholder="Filter by company, email, rep or customer #…" autocomplete="off">
                 </div>
-                <button type="button" class="cpa-btn cpa-btn-ghost" id="cpa-mine-btn" hidden aria-pressed="false" title="Show only accounts you own">
+                <button type="button" class="btn cpa-btn cpa-btn-ghost btn-ghost" id="cpa-mine-btn" hidden aria-pressed="false" title="Show only accounts you own">
                     <i class="fas fa-user-check" aria-hidden="true"></i> My customers
                 </button>
-                <button type="button" class="cpa-btn cpa-btn-primary" id="cpa-add-btn">
+                <button type="button" class="btn cpa-btn cpa-btn-primary btn-primary" id="cpa-add-btn">
                     <i class="fas fa-user-plus" aria-hidden="true"></i> Add Customer
                 </button>
             </div>
@@ -111,16 +111,16 @@
                 <div class="cpa-controls">
                     <div class="cpa-search-wrap">
                         <i class="fas fa-search" aria-hidden="true"></i>
-                        <input type="text" id="cpa-req-filter" aria-label="Search access requests" placeholder="Filter by company, product, design or rep…" autocomplete="off">
+                        <input class="field-input" type="text" id="cpa-req-filter" aria-label="Search access requests" placeholder="Filter by company, product, design or rep…" autocomplete="off">
                     </div>
-                    <select id="cpa-req-status" aria-label="Request status" class="cpa-select">
+                    <select id="cpa-req-status" aria-label="Request status" class="field-select cpa-select">
                         <option value="">All statuses</option>
                         <option value="New">New</option>
                         <option value="In Progress">In Progress</option>
                         <option value="Quoted">Quoted</option>
                         <option value="Closed">Closed</option>
                     </select>
-                    <button type="button" class="cpa-btn cpa-btn-ghost" id="cpa-req-mine-btn" hidden aria-pressed="false" title="Show only your customers' requests">
+                    <button type="button" class="btn cpa-btn cpa-btn-ghost btn-ghost" id="cpa-req-mine-btn" hidden aria-pressed="false" title="Show only your customers' requests">
                         <i class="fas fa-user-check" aria-hidden="true"></i> My requests
                     </button>
                 </div>
@@ -140,34 +140,35 @@
         <div class="cpa-modal" role="dialog" aria-modal="true" aria-labelledby="cpa-modal-title">
             <div class="cpa-modal-head">
                 <h3 id="cpa-modal-title">Add Customer</h3>
-                <button type="button" class="cpa-modal-close" id="cpa-modal-close" aria-label="Close"><i class="fas fa-times" aria-hidden="true"></i></button>
+                <button type="button" class="btn cpa-modal-close btn-ghost" id="cpa-modal-close" aria-label="Close"><i class="fas fa-times" aria-hidden="true"></i></button>
             </div>
             <div class="cpa-modal-body">
                 <!-- Step 1: find the customer in the CRM -->
-                <div class="cpa-field" id="cpa-lookup-field">
-                    <label class="cpa-field-label" for="cpa-lookup">Find customer <small>(search company name or email)</small></label>
+                <div class="field cpa-field" id="cpa-lookup-field">
+                    <label class="field-label cpa-field-label" for="cpa-lookup">Find customer <small>(search company name or email)</small></label>
                     <div class="cpa-search-wrap cpa-search-inline">
                         <i class="fas fa-search" aria-hidden="true"></i>
-                        <input type="text" id="cpa-lookup" placeholder="e.g. Lincoln High School" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="cpa-lookup-results">
+                        <input class="field-input" type="text" id="cpa-lookup" placeholder="e.g. Lincoln High School" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="cpa-lookup-results">
                     </div>
-                    <div class="cpa-lookup-results" id="cpa-lookup-results" role="listbox" aria-label="Matching customers"></div>
+                    <div id="cpa-lookup-status" class="cpa-lookup-hint" role="status"></div>
+                    <div class="cpa-lookup-results" id="cpa-lookup-results" role="listbox" aria-label="Matching customers" hidden></div>
                 </div>
 
                 <div class="cpa-divider"><span>then confirm the details</span></div>
 
                 <!-- Step 2: confirm / edit the invite fields -->
-                <label class="cpa-field">
-                    <span class="cpa-field-label">Email <small>(the login identity)</small></span>
-                    <input type="email" id="cpa-email" placeholder="buyer@company.com" autocomplete="off">
+                <label class="field cpa-field">
+                    <span class="field-label cpa-field-label">Email <small>(the login identity)</small></span>
+                    <input class="field-input" type="email" id="cpa-email" placeholder="buyer@company.com" autocomplete="off">
                 </label>
                 <div class="cpa-field-row">
-                    <label class="cpa-field">
-                        <span class="cpa-field-label">Customer # <small>(ShopWorks id)</small></span>
-                        <input type="text" id="cpa-idcustomer" placeholder="13616" inputmode="numeric" autocomplete="off">
+                    <label class="field cpa-field">
+                        <span class="field-label cpa-field-label">Customer # <small>(ShopWorks id)</small></span>
+                        <input class="field-input" type="text" id="cpa-idcustomer" placeholder="13616" inputmode="numeric" autocomplete="off">
                     </label>
-                    <label class="cpa-field">
-                        <span class="cpa-field-label">Company name</span>
-                        <input type="text" id="cpa-company" placeholder="Company, Inc." autocomplete="off">
+                    <label class="field cpa-field">
+                        <span class="field-label cpa-field-label">Company name</span>
+                        <input class="field-input" type="text" id="cpa-company" placeholder="Company, Inc." autocomplete="off">
                     </label>
                 </div>
                 <label class="cpa-checkline">
@@ -177,8 +178,8 @@
                 <div class="cpa-modal-error" id="cpa-modal-error" role="alert"></div>
             </div>
             <div class="cpa-modal-foot">
-                <button type="button" class="cpa-btn cpa-btn-ghost" id="cpa-cancel">Cancel</button>
-                <button type="button" class="cpa-btn cpa-btn-primary" id="cpa-save"><i class="fas fa-check" aria-hidden="true"></i> Save & Invite</button>
+                <button type="button" class="btn cpa-btn cpa-btn-ghost btn-ghost" id="cpa-cancel">Cancel</button>
+                <button type="button" class="btn cpa-btn cpa-btn-primary btn-primary" id="cpa-save"><i class="fas fa-check" aria-hidden="true"></i> Save & Invite</button>
             </div>
         </div>
     </div>
@@ -188,18 +189,20 @@
         <div class="cpa-modal" role="dialog" aria-modal="true" aria-labelledby="cpa-rw-title">
             <div class="cpa-modal-head">
                 <h3 id="cpa-rw-title">Reward Dollars</h3>
-                <button type="button" class="cpa-modal-close" id="cpa-rw-close" aria-label="Close"><i class="fas fa-times" aria-hidden="true"></i></button>
+                <button type="button" class="btn cpa-modal-close btn-ghost" id="cpa-rw-close" aria-label="Close"><i class="fas fa-times" aria-hidden="true"></i></button>
             </div>
             <div class="cpa-modal-body">
+                <div id="cpa-rw-status" class="cpa-dialog-status" role="status" aria-live="polite"></div>
+                <div id="cpa-rw-draft-print" class="cpa-print-draft"></div>
                 <div class="cpa-rw-balance">Current balance: <strong id="cpa-rw-balance">—</strong></div>
                 <div class="cpa-field-row">
-                    <label class="cpa-field">
-                        <span class="cpa-field-label">Amount ($)</span>
-                        <input type="text" id="cpa-rw-amount" inputmode="decimal" placeholder="25" autocomplete="off">
+                    <label class="field cpa-field">
+                        <span class="field-label cpa-field-label">Amount ($)</span>
+                        <input class="field-input" type="text" id="cpa-rw-amount" inputmode="decimal" placeholder="25" autocomplete="off">
                     </label>
-                    <label class="cpa-field">
-                        <span class="cpa-field-label">Type</span>
-                        <select id="cpa-rw-type" class="cpa-select cpa-rw-select">
+                    <label class="field cpa-field">
+                        <span class="field-label cpa-field-label">Type</span>
+                        <select id="cpa-rw-type" class="field-select cpa-select cpa-rw-select">
                             <option value="grant">Grant (add)</option>
                             <option value="redeem">Redeem (subtract)</option>
                             <option value="adjust">Adjust (+/−)</option>
@@ -207,21 +210,22 @@
                     </label>
                 </div>
                 <div class="cpa-field-row">
-                    <label class="cpa-field">
-                        <span class="cpa-field-label">Reason <small>(shows in the audit trail)</small></span>
-                        <input type="text" id="cpa-rw-reason" placeholder="e.g. Loyalty bonus, applied to order #…" autocomplete="off">
+                    <label class="field cpa-field">
+                        <span class="field-label cpa-field-label">Reason <small>(shows in the audit trail)</small></span>
+                        <input class="field-input" type="text" id="cpa-rw-reason" placeholder="e.g. Loyalty bonus, applied to order #…" autocomplete="off">
                     </label>
-                    <label class="cpa-field">
-                        <span class="cpa-field-label">ShopWorks order # <small>(ties a redemption to its order)</small></span>
-                        <input type="text" id="cpa-rw-order" inputmode="numeric" placeholder="e.g. 141467" autocomplete="off">
+                    <label class="field cpa-field">
+                        <span class="field-label cpa-field-label">ShopWorks order # <small>(ties a redemption to its order)</small></span>
+                        <input class="field-input" type="text" id="cpa-rw-order" inputmode="numeric" placeholder="e.g. 141467" autocomplete="off">
                     </label>
                 </div>
                 <div class="cpa-modal-error" id="cpa-rw-error" role="alert"></div>
-                <button type="button" class="cpa-btn cpa-btn-primary cpa-rw-save-btn" id="cpa-rw-save"><i class="fas fa-plus" aria-hidden="true"></i> Add ledger entry</button>
+                <button type="button" class="btn cpa-btn cpa-btn-primary cpa-rw-save-btn btn-primary" id="cpa-rw-save"><i class="fas fa-plus" aria-hidden="true"></i> Add ledger entry</button>
                 <div class="cpa-rw-ledger-head">Recent activity</div>
-                <div class="cpa-rw-ledger" id="cpa-rw-ledger">—</div>
+                <div class="cpa-rw-ledger" id="cpa-rw-ledger" role="region" aria-label="Rewards activity" tabindex="0">—</div>
                 <div class="cpa-rw-ledger-head">Earned on paid orders <span class="cpa-rw-acc-window" id="cpa-rw-acc-window"></span></div>
-                <div class="cpa-rw-accrual" id="cpa-rw-accrual"></div>
+                <div id="cpa-rw-accrual-print" class="cpa-accrual-print"></div>
+                <div class="cpa-rw-accrual" id="cpa-rw-accrual" role="region" aria-label="Earned rewards details" tabindex="0"></div>
             </div>
         </div>
     </div>
@@ -233,6 +237,7 @@
     <script src="/config/app.config.js"></script>
     <script src="/shared_components/js/fetch-timeout.js?v=2026.09.06.26"></script>
     <script src="/shared_components/js/dash-page-helpers.js?v=2026.09.07.25"></script>
-    <script src="/dashboards/js/customer-portal-admin.js?v=2026.09.05.31"></script>
+    <script src="/shared_components/js/ui-dialog.js?v=2026.09.10.2"></script>
+    <script src="/dashboards/js/customer-portal-admin.js?v=2026.09.10.2"></script>
 </body>
 </html>
