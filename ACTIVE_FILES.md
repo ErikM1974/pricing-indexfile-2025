@@ -337,3 +337,5 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - Added tests/fixtures/staff-workspaces-ae-original-browser.json and staff-workspaces-ae-original-actions.json: settled original six-tab/four-width text and links, kit validation/fields, four outreach previews and six locally intercepted actions. Invoice/inbound/box labels, expanded lists/drawers and rep/error states remain to capture. No Mission Control CSS has changed.
 
 - Added shared_components/css/staff-mission-control.css for the Mission Control draft: canonical staff typography/controls and a scoped layout, native kit/outreach/drawer dialogs, existing vendor-invoice.css reuse. Legacy AE stylesheet retained until consumer and screen/paper review. No release credit yet.
+
+- tests/fixtures/staff-final-tools-original-content.json — four final staff-tool HTML contracts and transitive local JS/CSS hashes, verified against frozen candidate 9b6d76d6 (not deployed yet). tests/unit/staff-final-tools-content.test.js preserves original content outside explicit future UI mappings. Planning/baseline only; no migration credit.

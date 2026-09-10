@@ -1,0 +1,1024 @@
+{
+  "base": "9b6d76d6d77161818e73bd7caab56b0b02c342c9",
+  "pages": [
+    {
+      "file": "admin/universal-records-admin.html",
+      "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <meta name=\"robots\" content=\"noindex, nofollow\">\n    <title>Universal Records Admin Panel - Northwest Custom Apparel</title>\n    <link rel=\"icon\" href=\"/favicon.png\" type=\"image/png\">\n    <link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap\" rel=\"stylesheet\">\n    <link href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css\" rel=\"stylesheet\">\n    \n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link rel=\"stylesheet\" href=\"/admin/css/universal-records-admin.css?v=2026.09.07.19\">\n    <link rel=\"stylesheet\" href=\"/admin/css/universal-records-admin-injected.css?v=2026.09.07.18\">\n</head>\n<body>\n    <!-- Header -->\n    <header class=\"header\">\n        <div class=\"header-container\">\n            <div class=\"header-left\">\n                <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\" \n                     alt=\"Northwest Custom Apparel\" class=\"logo\">\n            </div>\n            <nav class=\"breadcrumb\">\n                <a href=\"/staff-dashboard.html\">Staff Dashboard</a>\n                <span>/</span>\n                <span>Universal Records Admin</span>\n            </nav>\n        </div>\n    </header>\n\n    <!-- Main Content -->\n    <main class=\"container\">\n        <!-- Page Header -->\n        <div class=\"page-header\">\n            <h1 class=\"page-title\">Universal Records Admin Panel</h1>\n            <p class=\"page-description\">Comprehensive view of all quotes, bonuses, and analytics across all calculator types</p>\n        </div>\n\n        <!-- Filters -->\n        <div class=\"filters\">\n            <div class=\"filters-grid\">\n                <div class=\"filter-group\">\n                    <label class=\"filter-label\">Quote Type</label>\n                    <select class=\"filter-control\" id=\"quoteTypeFilter\" aria-label=\"Quote type\">\n                        <option value=\"\">All Types</option>\n                        <option value=\"DTG\">DTG Contract</option>\n                        <option value=\"RICH\">Richardson Caps</option>\n                        <option value=\"EMB\">Embroidery Contract</option>\n                        <option value=\"EMBC\">Customer Embroidery</option>\n                        <option value=\"LT\">Laser Tumblers</option>\n                        <option value=\"PATCH\">Embroidered Emblems</option>\n                        <option value=\"SPC\">Customer Screen Print</option>\n                        <option value=\"SSC\">Safety Stripe Creator</option>\n                        <option value=\"WEB\">Webstore Setup</option>\n                    </select>\n                </div>\n\n                <div class=\"filter-group\">\n                    <label class=\"filter-label\">Status</label>\n                    <select class=\"filter-control\" id=\"statusFilter\" aria-label=\"Status\">\n                        <option value=\"\">All Statuses</option>\n                        <option value=\"Open\">Open</option>\n                        <option value=\"Sent\">Sent</option>\n                        <option value=\"Converted\">Converted</option>\n                        <option value=\"Expired\">Expired</option>\n                    </select>\n                </div>\n\n                <div class=\"filter-group\">\n                    <label class=\"filter-label\">Date From</label>\n                    <input type=\"date\" class=\"filter-control\" id=\"dateFromFilter\" aria-label=\"From date\">\n                </div>\n\n                <div class=\"filter-group\">\n                    <label class=\"filter-label\">Date To</label>\n                    <input type=\"date\" class=\"filter-control\" id=\"dateToFilter\" aria-label=\"To date\">\n                </div>\n\n                <div class=\"filter-group\">\n                    <label class=\"filter-label\">Customer</label>\n                    <input type=\"text\" class=\"filter-control\" id=\"customerFilter\" aria-label=\"Customer\" placeholder=\"Search by name or email\">\n                </div>\n\n                <div class=\"filter-group\">\n                    <label class=\"filter-label\">Min Amount</label>\n                    <input type=\"number\" class=\"filter-control\" id=\"minAmountFilter\" aria-label=\"Minimum amount\" placeholder=\"$0.00\">\n                </div>\n            </div>\n\n            <div class=\"filter-actions\">\n                <button class=\"btn btn-primary\" data-call=\"applyFilters\">\n                    <i class=\"fas fa-search\" aria-hidden=\"true\"></i>\n                    Apply Filters\n                </button>\n                <button class=\"btn btn-secondary\" data-call=\"clearFilters\">\n                    <i class=\"fas fa-times\" aria-hidden=\"true\"></i>\n                    Clear All\n                </button>\n                <button class=\"btn btn-secondary\" data-call=\"exportData\">\n                    <i class=\"fas fa-download\" aria-hidden=\"true\"></i>\n                    Export CSV\n                </button>\n                <button class=\"btn btn-secondary\" data-call=\"refreshData\">\n                    <i class=\"fas fa-sync-alt\" aria-hidden=\"true\"></i>\n                    Refresh\n                </button>\n            </div>\n        </div>\n\n        <!-- Records Table -->\n        <div class=\"table-container\">\n            <div class=\"table-header\">\n                <h2 class=\"table-title\">All Quote Records</h2>\n                <div class=\"pagination-info\" id=\"recordsCount\">Loading...</div>\n            </div>\n            \n            <div class=\"table-wrapper\">\n                <table class=\"records-table\">\n                    <thead>\n                        <tr>\n                            <th>Quote ID</th>\n                            <th>Type</th>\n                            <th>Customer</th>\n                            <th>Company</th>\n                            <th>Total</th>\n                            <th>Status</th>\n                            <th>Created</th>\n                            <th>Actions</th>\n                        </tr>\n                    </thead>\n                    <tbody id=\"recordsTableBody\">\n                        <tr>\n                            <td colspan=\"8\" class=\"loading\">\n                                <div class=\"spinner\"></div>\n                                Loading records...\n                            </td>\n                        </tr>\n                    </tbody>\n                </table>\n            </div>\n\n            <div class=\"pagination\" id=\"pagination\">\n                <div class=\"pagination-info\" id=\"paginationInfo\">Loading...</div>\n                <button class=\"pagination-btn\" id=\"prevBtn\" data-call=\"changePage\" data-args='[\"prev\"]' disabled>\n                    <i class=\"fas fa-chevron-left\" aria-hidden=\"true\"></i>\n                    Previous\n                </button>\n                <div id=\"pageNumbers\"></div>\n                <button class=\"pagination-btn\" id=\"nextBtn\" data-call=\"changePage\" data-args='[\"next\"]' disabled>\n                    Next\n                    <i class=\"fas fa-chevron-right\" aria-hidden=\"true\"></i>\n                </button>\n            </div>\n        </div>\n    </main>\n\n    <script src=\"/shared_components/js/data-call-delegator.js?v=2026.09.06.27\"></script>\n    <script src=\"/admin/js/universal-records-admin.js?v=2026.09.06.27\"></script>\n</body>\n</html>",
+      "title": "Universal Records Admin Panel - Northwest Custom Apparel",
+      "bodyText": "Staff Dashboard / Universal Records Admin Universal Records Admin Panel Comprehensive view of all quotes, bonuses, and analytics across all calculator types Quote Type All Types DTG Contract Richardson Caps Embroidery Contract Customer Embroidery Laser Tumblers Embroidered Emblems Customer Screen Print Safety Stripe Creator Webstore Setup Status All Statuses Open Sent Converted Expired Date From Date To Customer Min Amount Apply Filters Clear All Export CSV Refresh All Quote Records Loading... Quote ID Type Customer Company Total Status Created Actions Loading records... Loading... Previous Next",
+      "bodyTextSha": "bdd4815717f210915b41c09238dfecfaa7fa276ba57f2a9b7710005784611227",
+      "ids": [
+        "quoteTypeFilter",
+        "statusFilter",
+        "dateFromFilter",
+        "dateToFilter",
+        "customerFilter",
+        "minAmountFilter",
+        "recordsCount",
+        "recordsTableBody",
+        "pagination",
+        "paginationInfo",
+        "prevBtn",
+        "pageNumbers",
+        "nextBtn"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Staff Dashboard"
+        }
+      ],
+      "fields": [
+        {
+          "id": "quoteTypeFilter",
+          "type": "select-one",
+          "value": ""
+        },
+        {
+          "id": "statusFilter",
+          "type": "select-one",
+          "value": ""
+        },
+        {
+          "id": "dateFromFilter",
+          "type": "date",
+          "value": ""
+        },
+        {
+          "id": "dateToFilter",
+          "type": "date",
+          "value": ""
+        },
+        {
+          "id": "customerFilter",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "minAmountFilter",
+          "type": "number",
+          "value": ""
+        }
+      ],
+      "styles": [
+        "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css",
+        "/shared_components/css/tokens.css?v=2026.09.08.2",
+        "/admin/css/universal-records-admin.css?v=2026.09.07.19",
+        "/admin/css/universal-records-admin-injected.css?v=2026.09.07.18"
+      ],
+      "scripts": [
+        "/shared_components/js/data-call-delegator.js?v=2026.09.06.27",
+        "/admin/js/universal-records-admin.js?v=2026.09.06.27"
+      ],
+      "cssBytes": 36104
+    },
+    {
+      "file": "pages/box-labels.html",
+      "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <link rel=\"icon\" href=\"/favicon.png\" type=\"image/png\">\n  <title>Box Labels - NWCA Shipping &amp; Receiving</title>\n  <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n  <link rel=\"stylesheet\" href=\"/pages/css/box-labels.css?v=2026.09.07.19\">\n  <!-- Shared 8.5x11 label styles — the SAME label receiving prints (box-label-template.js) -->\n  <link rel=\"stylesheet\" href=\"/shared_components/css/box-label-print.css?v=2026.09.10.4\">\n</head>\n<body>\n  <!-- Sticky Header -->\n  <header class=\"bl-header\">\n    <div class=\"bl-header__left\">\n      <h1 class=\"bl-header__title\">Box Labels</h1>\n      <div class=\"bl-header__search\">\n        <input type=\"text\" id=\"searchInput\" aria-label=\"Search orders\" class=\"bl-input bl-input--large\" placeholder=\"Enter PO# or Work Order#\" autocomplete=\"off\">\n        <div class=\"bl-radio-group\">\n          <label class=\"bl-radio\"><input type=\"radio\" name=\"searchType\" value=\"po\" checked> SanMar PO#</label>\n          <label class=\"bl-radio\"><input type=\"radio\" name=\"searchType\" value=\"wo\"> Work Order#</label>\n        </div>\n        <button id=\"lookupBtn\" class=\"bl-btn bl-btn--primary bl-btn--large\">Look Up</button>\n      </div>\n    </div>\n    <div class=\"bl-header__right\">\n      <a class=\"bl-back\" href=\"/staff-dashboard.html\" title=\"Back to the staff dashboard\">&larr; Dashboard</a>\n      <div class=\"bl-header__repacker\">\n        <label for=\"repackerName\">Repacker:</label>\n        <input type=\"text\" id=\"repackerName\" class=\"bl-input\" placeholder=\"Your name\" autocomplete=\"off\">\n      </div>\n      <button id=\"printAllBtn\" class=\"bl-btn bl-btn--success bl-btn--xl\" disabled>\n        <svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M6 9V2h12v7\"/><path d=\"M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2\"/><rect x=\"6\" y=\"14\" width=\"12\" height=\"8\"/></svg>\n        PRINT ALL LABELS\n      </button>\n    </div>\n  </header>\n\n  <!-- Loading State -->\n  <main>\n  <div id=\"loadingState\" class=\"bl-loading\" style=\"display:none;\">\n    <div class=\"bl-spinner\"></div>\n    <p>Looking up shipment data...</p>\n  </div>\n\n  <!-- Error State (Rule #4: failures are always visible, never silent) -->\n  <div id=\"errorState\" class=\"bl-error\" style=\"display:none;\">\n    <p id=\"errorMessage\"></p>\n    <span id=\"errorActions\"></span>\n    <button class=\"bl-btn bl-btn--primary\" id=\"errorDismissBtn\">Dismiss</button>\n  </div>\n\n  <!-- Restored-draft note -->\n  <div id=\"draftNote\" class=\"bl-draft-note\" style=\"display:none;\">\n    <span id=\"draftNoteText\"></span>\n    <button id=\"draftResetBtn\" class=\"bl-btn bl-btn--small bl-btn--outline\">Reset to SanMar boxes</button>\n  </div>\n\n  <!-- Totals Summary Bar -->\n  <div id=\"totalsBar\" class=\"bl-totals\" style=\"display:none;\">\n    <span class=\"bl-totals__item\">In boxes: <strong id=\"totalBoxed\">0</strong> pcs</span>\n    <span class=\"bl-totals__item\">SanMar shipped: <strong id=\"totalShipped\">0</strong> pcs</span>\n    <span class=\"bl-totals__item\">Ordered: <strong id=\"totalOrdered\">0</strong> pcs</span>\n    <span id=\"shortShipWarning\" class=\"bl-totals__warning\" style=\"display:none;\">\n      ⚠ SanMar shipped fewer pieces than ordered — check for a short shipment\n    </span>\n  </div>\n\n  <!-- Main Content: order groups render here -->\n  <div id=\"mainContent\" class=\"bl-main\" style=\"display:none;\">\n    <div class=\"bl-column bl-column--boxes\">\n      <div class=\"bl-column__header\">\n        <h2>Boxes</h2>\n        <div class=\"bl-column__actions\">\n          <button id=\"expandAllBtn\" class=\"bl-btn bl-btn--small\">Expand All</button>\n        </div>\n      </div>\n      <div id=\"ordersContainer\"></div>\n    </div>\n\n    <div class=\"bl-column bl-column--unboxed\">\n      <div class=\"bl-column__header\">\n        <h2>Order Reference</h2>\n      </div>\n      <div id=\"orderReference\"></div>\n    </div>\n  </div>\n  </main>\n\n  <!-- Split Modal: move N pieces of one line to another box -->\n  <div id=\"splitModal\" class=\"bl-modal\" style=\"display:none;\">\n    <div class=\"bl-modal__content\">\n      <h3 id=\"splitModalTitle\">Split to another box</h3>\n      <p id=\"splitModalSubtitle\"></p>\n      <div id=\"splitModalBody\" class=\"bl-split-grid\"></div>\n      <div class=\"bl-modal__actions\">\n        <button id=\"splitCancelBtn\" class=\"bl-btn bl-btn--large\">Cancel</button>\n        <button id=\"splitConfirmBtn\" class=\"bl-btn bl-btn--primary bl-btn--large\">Move</button>\n      </div>\n    </div>\n  </div>\n\n  <!-- Libraries: drag/drop + QR only. jsPDF/autotable/JsBarcode removed 2026-08-04 —\n       printing goes through window.print() via the shared BoxLabelTemplate. -->\n  <script src=\"https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js\"></script>\n  <script src=\"https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js\"></script>\n  <script src=\"/config/app.config.js?v=2026.09.03.11\"></script>\n  <script src=\"/shared_components/js/box-label-template.js?v=2026.09.10.4\"></script>\n  <script src=\"/pages/js/box-labels.js?v=2026.09.06.31\"></script>\n</body>\n</html>\n",
+      "title": "Box Labels - NWCA Shipping & Receiving",
+      "bodyText": "Box Labels SanMar PO# Work Order# Look Up ← Dashboard Repacker: PRINT ALL LABELS Looking up shipment data... Dismiss Reset to SanMar boxes In boxes: 0 pcs SanMar shipped: 0 pcs Ordered: 0 pcs ⚠ SanMar shipped fewer pieces than ordered — check for a short shipment Boxes Expand All Order Reference Split to another box Cancel Move",
+      "bodyTextSha": "fec2a3023709ac809e2d9014b06513e3a0128902f71c3b332d6faaaf94c3f9b4",
+      "ids": [
+        "searchInput",
+        "lookupBtn",
+        "repackerName",
+        "printAllBtn",
+        "loadingState",
+        "errorState",
+        "errorMessage",
+        "errorActions",
+        "errorDismissBtn",
+        "draftNote",
+        "draftNoteText",
+        "draftResetBtn",
+        "totalsBar",
+        "totalBoxed",
+        "totalShipped",
+        "totalOrdered",
+        "shortShipWarning",
+        "mainContent",
+        "expandAllBtn",
+        "ordersContainer",
+        "orderReference",
+        "splitModal",
+        "splitModalTitle",
+        "splitModalSubtitle",
+        "splitModalBody",
+        "splitCancelBtn",
+        "splitConfirmBtn"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": "← Dashboard"
+        }
+      ],
+      "fields": [
+        {
+          "id": "searchInput",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "",
+          "type": "radio",
+          "value": "po"
+        },
+        {
+          "id": "",
+          "type": "radio",
+          "value": "wo"
+        },
+        {
+          "id": "repackerName",
+          "type": "text",
+          "value": ""
+        }
+      ],
+      "styles": [
+        "/shared_components/css/tokens.css?v=2026.09.08.2",
+        "/pages/css/box-labels.css?v=2026.09.07.19",
+        "/shared_components/css/box-label-print.css?v=2026.09.10.4"
+      ],
+      "scripts": [
+        "https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js",
+        "https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js",
+        "/config/app.config.js?v=2026.09.03.11",
+        "/shared_components/js/box-label-template.js?v=2026.09.10.4",
+        "/pages/js/box-labels.js?v=2026.09.06.31"
+      ],
+      "cssBytes": 45103
+    },
+    {
+      "file": "staff-dashboard-v3/index.html",
+      "html": "<!DOCTYPE html>\n<html lang=\"en\" data-theme=\"dark\" data-accent=\"green\" data-density=\"comfy\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <meta name=\"robots\" content=\"noindex, nofollow\">\n    <!-- HTML freshness comes from the server's Cache-Control response headers\n         (server.js sends no-cache/no-store for HTML) — meta http-equiv cache\n         tags are ignored by modern browsers and were removed 2026-08-26. -->\n    <title>Staff Dashboard — Northwest Custom Apparel</title>\n    <link rel=\"icon\" href=\"/favicon.png\" type=\"image/png\">\n\n    <!-- Fonts & Icons. Bodoni Moda = the Shop Menu tile; Fraunces = the Contract\n         tiles; Bricolage Grotesque = the customer storefront tiles — each tile\n         borrows the typeface its destination page is set in. -->\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    <link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Bodoni+Moda:opsz,wght@6..96,600;6..96,700&family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,600&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&display=swap\" rel=\"stylesheet\">\n    <link href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css\" rel=\"stylesheet\">\n\n    <!--\n        v3 CSS. Loaded into @layer:\n        reset (browser default) → tokens → base → components → utilities → overrides.\n        Cascade order is enforced by @layer, not source order — the layer-order\n        statement lives at the top of tokens.css (first stylesheet loaded), so\n        this HTML carries no inline <style> (project Rule: no inline code).\n    -->\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/staff-dashboard/tokens.css?v=2026.09.07.3\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/staff-dashboard/base.css?v=2026.09.07.10\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/staff-dashboard/components.css?v=2026.09.07.19\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/staff-dashboard/utilities.css?v=2026.09.07.10\">\n    <!-- Claude Design handoff theme (2026-05-13) — unlayered variant, wins all cascade fights. -->\n    <link rel=\"stylesheet\" href=\"/shared_components/css/staff-dashboard/dashboard-v3-theme.css?v=2026.09.07.19\">\n    <!-- Claude Design PATCH 2 (spacing) — pinned row, header chips, zone tightening.\n         Its §7 tool-grid block was removed 2026-09-03 with the grid it styled. -->\n    <link rel=\"stylesheet\" href=\"/shared_components/css/staff-dashboard/dashboard-v3-patch-2.css?v=2026.09.07.19\">\n    <!-- Phase 1 \"alive + personal\" widgets (2026-07-20): Pride Wall photo\n         strip, My Stuff pinned/recent tools row. (Win Bell removed 2026-07-23.) -->\n    <link rel=\"stylesheet\" href=\"/shared_components/css/staff-dashboard/phase1-widgets.css?v=2026.09.07.10\">\n    <!-- Phase 2 (2026-07-20): Ctrl+K command palette — the Everything Bar. -->\n    <link rel=\"stylesheet\" href=\"/shared_components/css/staff-dashboard/command-palette.css?v=2026.09.07.10\">\n    <!-- Workspaces (2026-09-03): the role-based tabs, tool rows, tiles and the\n         job-family colors. Unlayered and LAST on purpose — the only position\n         that beats the two unlayered files above. -->\n    <link rel=\"stylesheet\" href=\"/shared_components/css/staff-dashboard/workspaces.css?v=2026.09.07.19\">\n\n    <!-- No config bootstrap: every dashboard read is a same-origin\n         /api/staff/* or /api/mo/* or /api/crm-proxy/* path since 2026-08-27,\n         so nothing on this page needs the proxy base URL. -->\n    <script src=\"/config/app.config.js\"></script>\n</head>\n<body>\n\n    <!-- Loading overlay -->\n    <div class=\"loading-overlay\" id=\"loadingOverlay\">\n        <div class=\"loading-spinner\"></div>\n        <div class=\"loading-text\">Loading dashboard…</div>\n    </div>\n\n    <!-- Identity comes from /api/crm-session/me (auth-controller.js). -->\n\n    <!-- ===================================================\n         WORKSPACES LAYOUT (2026-09-03)\n         The left sidebar is gone. Everything it held moved into the tabs:\n         Company Policies / Forms / Training / Employee Bundles / Inksoft →\n         the Company tab; Administration → the Admin tab (admin role only);\n         AE Mission Control + Leads → the Sales tab; Past Due Orders → the\n         header chip. Every tool that was on the page is still on the page —\n         tests/unit/staff-dashboard-workspaces.test.js holds the 2026-09-03\n         href list and fails if one goes missing.\n         =================================================== -->\n    <div class=\"dashboard-container ws-shell\">\n        <main class=\"main-content\">\n\n            <!-- Top header -->\n            <header class=\"top-header\">\n                <div class=\"header-left\">\n                    <a href=\"/\" class=\"ws-brand\" title=\"Go to main site\">\n                        <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\"\n                             alt=\"Northwest Custom Apparel\" class=\"ws-brand__img\">\n                    </a>\n                    <h1 class=\"page-title\">Staff Dashboard</h1>\n                    <!-- Welcome chip — auth-controller.js unhides #userWelcome + fills #userName\n                         once /api/crm-session/me resolves. Hidden by the [hidden] attribute\n                         (no inline style, project Rule 3). -->\n                    <div class=\"user-welcome user-welcome--chip hide-mobile\" id=\"userWelcome\" hidden>\n                        <span class=\"welcome-text\">Welcome,</span>\n                        <span class=\"user-name\" id=\"userName\"></span>\n                    </div>\n                </div>\n                <div class=\"header-right\">\n\n                    <!-- Past Due Orders (moved out of the sidebar 2026-09-03). past-due-badge.js\n                         paints #nav-pd-badge: red count when something is late, green \"All clear\"\n                         on a CONFIRMED zero, nothing at all if the count can't be fetched. -->\n                    <a href=\"/dashboards/past-due-orders.html\" class=\"ws-pd\" data-section=\"past-due-orders\"\n                       title=\"Orders that blew their ship date — and what each one is waiting on\">\n                        <i class=\"fas fa-clock\" aria-hidden=\"true\"></i>\n                        <span class=\"hide-mobile\">Past due</span>\n                        <span class=\"nav-pd-badge\" id=\"nav-pd-badge\" hidden role=\"status\" aria-live=\"polite\"></span>\n                    </a>\n\n                    <!-- Compact 2026 goal chip. Keeps .sales-goal-banner + is-loading + the #goal*\n                         IDs so sales-goal-controller drives it UNCHANGED. Since 2026-09-03 it\n                         is the door to Company Numbers — the live reports moved off this page. -->\n                    <a href=\"/dashboards/company-numbers.html\" class=\"goal-chip sales-goal-banner is-loading\" title=\"2026 sales goal — open Company Numbers\" aria-label=\"2026 sales goal — open Company Numbers\">\n                        <i class=\"fas fa-bullseye goal-chip__icon\" aria-hidden=\"true\"></i>\n                        <span class=\"goal-chip__pct\"><span id=\"goalPercent\">0</span>%</span>\n                        <span class=\"goal-chip__track\" role=\"progressbar\" aria-label=\"Progress to annual goal\" aria-valuemin=\"0\" aria-valuemax=\"100\" aria-valuenow=\"0\">\n                            <span class=\"goal-chip__fill\" id=\"goalProgress\"></span>\n                        </span>\n                        <span class=\"goal-chip__amt\"><span id=\"goalCurrent\">Loading…</span> <span class=\"goal-chip__of\">/ <span id=\"goalOf\">$3M</span></span></span>\n                    </a>\n\n                    <!-- Combined Team widget -->\n                    <div class=\"team-widget\">\n                        <button type=\"button\" id=\"teamBtn\" class=\"team-btn\" data-action=\"team:toggle-dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\" aria-controls=\"teamDropdown\">\n                            <span><i class=\"fas fa-users\" aria-hidden=\"true\"></i> Team</span>\n                            <span class=\"team-btn__divider\" aria-hidden=\"true\"></span>\n                            <span class=\"team-btn__pill\" title=\"Active employees\"><span class=\"team-btn__count\" id=\"teamActiveCount\">--</span></span>\n                            <span class=\"team-btn__pill\" title=\"Upcoming birthdays in 30 days\"><span aria-hidden=\"true\">🎂</span><span class=\"team-btn__count\" id=\"teamBdayCount\">0</span></span>\n                            <span class=\"team-btn__pill\" title=\"Upcoming anniversaries in 30 days\"><span aria-hidden=\"true\">🏆</span><span class=\"team-btn__count\" id=\"teamAnnivCount\">0</span></span>\n                        </button>\n                        <div id=\"teamDropdown\" class=\"team-dropdown\" role=\"region\" aria-label=\"Team celebrations\">\n                            <h4><i class=\"fas fa-cake-candles\" aria-hidden=\"true\"></i> Upcoming Birthdays</h4>\n                            <ul id=\"teamBirthdayList\"></ul>\n\n                            <h4><i class=\"fas fa-trophy\" aria-hidden=\"true\"></i> Upcoming Anniversaries</h4>\n                            <ul id=\"teamAnniversaryList\"></ul>\n\n                            <a href=\"/dashboards/production-shifts.html\" class=\"team-dropdown__view-all\">\n                                <i class=\"fas fa-user-clock\" aria-hidden=\"true\"></i> Shift Schedule\n                            </a>\n                            <button type=\"button\" class=\"team-dropdown__view-all\" data-action=\"staff-directory:show\" data-filter=\"all\">\n                                <i class=\"fas fa-table\" aria-hidden=\"true\"></i> Open Staff Directory\n                            </button>\n                            <a href=\"/pages/policy-detail.html?id=org-chart-2026\" class=\"team-dropdown__view-all\">\n                                <i class=\"fas fa-sitemap\" aria-hidden=\"true\"></i> View Org Chart (2026)\n                            </a>\n                        </div>\n                    </div>\n\n                    <a href=\"/auth/saml/logout\" class=\"sign-out-link\" title=\"Sign out\">\n                        <i class=\"fas fa-sign-out-alt\" aria-hidden=\"true\"></i>\n                        <span class=\"hide-mobile\">Sign Out</span>\n                    </a>\n                </div>\n            </header>\n\n            <!-- ===================================================\n                 TOOL SEARCH — the hero bar (2026-07-20; tools-only since 2026-09-03)\n                 The results panel is ANCHORED here and drops DOWNWARD. #cpInput is\n                 the input command-palette-controller drives; Ctrl+K focuses it.\n                 It harvests every a.ws-link on the page, hidden tabs included — so a\n                 tool on another tab is one keystroke away. Customers, quotes, orders\n                 and designs are NOT searched here (Erik, 2026-09-03): each has its\n                 own page with a better search. No dimming backdrop — an outside click\n                 closes the panel AND lands where it was aimed.\n                 =================================================== -->\n            <section class=\"hero-search-wrap\" aria-label=\"Search the Staff Dashboard\">\n                <div class=\"hero-search\" id=\"heroSearch\">\n                    <i class=\"fas fa-magnifying-glass hero-search__icon\" aria-hidden=\"true\"></i>\n                    <input type=\"text\" id=\"cpInput\" class=\"hero-search__input\"\n                           placeholder=\"Search the Staff Dashboard — any tool or page, on any tab\"\n                           autocomplete=\"off\" spellcheck=\"false\" aria-label=\"Search the Staff Dashboard for a tool or page\"\n                           role=\"combobox\" aria-expanded=\"false\" aria-controls=\"cpResults\">\n                    <button type=\"button\" class=\"hero-search__clear\" id=\"cpClear\" data-action=\"palette:close\" aria-label=\"Clear and close search\" hidden>\n                        <i class=\"fas fa-xmark\" aria-hidden=\"true\"></i>\n                    </button>\n                    <kbd class=\"hero-search__kbd\">Ctrl K</kbd>\n                </div>\n                <div class=\"cp-panel\" id=\"cpPanel\" hidden>\n                    <div class=\"cp-results\" id=\"cpResults\" role=\"listbox\" aria-label=\"Search results\"></div>\n                    <div class=\"cp-status\" id=\"cpStatus\"></div>\n                </div>\n            </section>\n\n            <!-- Pride Wall (2026-07-20 Phase 1) — ambient rotation of recent finished-product\n                 photos. A <details> so anyone can fold it away; the choice is remembered per\n                 browser (tool-grid-controller.js). Compact since 2026-09-03: same 6 tiles at\n                 half the height (workspaces.css), so the tools sit higher. -->\n            <details class=\"pw-strip\" id=\"prideWall\" data-collapse-key=\"prideWall\" aria-label=\"Pride Wall — recent finished work\" open hidden>\n                <summary class=\"pw-head\">\n                    <span class=\"pw-title\">🖼️ Pride Wall — made by us, lately</span>\n                    <a class=\"pw-link\" href=\"/dashboards/finished-photos-library.html\">Open the Photo Library →</a>\n                </summary>\n                <div class=\"pw-track\" id=\"pwTrack\"></div>\n            </details>\n\n            <!-- ===================================================\n                 WORKSPACE TABS — workspace-controller.js\n                 The Admin tab ships hidden + data-requires-role: nav-access-controller\n                 reveals it for the admin permission and REMOVES it for everyone else\n                 (fails closed), exactly like the old Administration sidebar section.\n                 =================================================== -->\n            <div class=\"ws-tabs\" role=\"tablist\" aria-label=\"Workspaces\" id=\"wsTabs\">\n                <button type=\"button\" class=\"ws-tab\" role=\"tab\" data-ws=\"sales\" id=\"ws-tab-sales\" aria-selected=\"false\" aria-controls=\"ws-sales\"><span class=\"ws-tab__you\" aria-hidden=\"true\"></span>Sales</button>\n                <button type=\"button\" class=\"ws-tab\" role=\"tab\" data-ws=\"production\" id=\"ws-tab-production\" aria-selected=\"false\" aria-controls=\"ws-production\"><span class=\"ws-tab__you\" aria-hidden=\"true\"></span>Production</button>\n                <button type=\"button\" class=\"ws-tab\" role=\"tab\" data-ws=\"art\" id=\"ws-tab-art\" aria-selected=\"false\" aria-controls=\"ws-art\"><span class=\"ws-tab__you\" aria-hidden=\"true\"></span>Art</button>\n                <button type=\"button\" class=\"ws-tab\" role=\"tab\" data-ws=\"office\" id=\"ws-tab-office\" aria-selected=\"false\" aria-controls=\"ws-office\"><span class=\"ws-tab__you\" aria-hidden=\"true\"></span>Office</button>\n                <button type=\"button\" class=\"ws-tab\" role=\"tab\" data-ws=\"company\" id=\"ws-tab-company\" aria-selected=\"false\" aria-controls=\"ws-company\"><span class=\"ws-tab__you\" aria-hidden=\"true\"></span>Company</button>\n                <!-- Everything is the safety net (Erik, 2026-09-03): it lists every tool on the\n                     page in one place, so it carries a visible cue and a fuller tooltip. -->\n                <button type=\"button\" class=\"ws-tab ws-tab--everything\" role=\"tab\" data-ws=\"everything\" id=\"ws-tab-everything\" aria-selected=\"false\" aria-controls=\"ws-everything\" title=\"Every tool and page on the dashboard in one list, with a filter box. If it isn't on a tab, it's here.\"><span class=\"ws-tab__you\" aria-hidden=\"true\"></span><i class=\"fas fa-layer-group\" aria-hidden=\"true\"></i> Everything <span class=\"ws-tab__cue\">can't find it? it's here</span></button>\n                <button type=\"button\" class=\"ws-tab ws-tab--admin\" role=\"tab\" data-ws=\"admin\" id=\"ws-tab-admin\" aria-selected=\"false\" aria-controls=\"ws-admin\" data-requires-role=\"admin\" hidden>Admin</button>\n                <span class=\"ws-tabs__hint\"><kbd>Ctrl K</kbd> finds any tool from any tab · green dot = your tab</span>\n            </div>\n\n            <!-- My Stuff (2026-07-20 Phase 1) — per-user pinned + recent tools, learned from\n                 clicks on any a.ws-link, stored in localStorage. Shown on every tab. -->\n            <div class=\"pinned-row pinned-row--mystuff\" id=\"myStuffRow\">\n                <div class=\"pinned-row__label\">📌 My Stuff</div>\n                <div class=\"pinned-row__list\" id=\"myStuffList\"></div>\n            </div>\n\n            <!-- ===================================================\n                 SALES — Nika, Taneisha (and admins land here)\n                 =================================================== -->\n            <section class=\"ws-panel\" id=\"ws-sales\" data-ws=\"sales\" role=\"tabpanel\" aria-labelledby=\"ws-tab-sales\">\n                <div class=\"ws-head\"><h2>Sales</h2><p>Quote it, price it, follow up. What Nika and Taneisha open all day.</p></div>\n                <div class=\"ws-grid\">\n\n                    <!-- Most used (Erik, 2026-09-03): the two pages Nika and Taneisha open first\n                         every day, side by side at the top of their tab. Each link carries its\n                         own data-cat so the Everything tab still files it under its real group. -->\n                    <div class=\"ws-card ws-card--full\" data-cat=\"Most used\">\n                        <div class=\"ws-card-h\"><h3>Most used</h3><span class=\"ws-note\">the two pages the reps open every day</span></div>\n                        <div class=\"ws-pair\">\n                            <a class=\"ws-link ws-tile f-steve\" href=\"/ae-dashboard.html\" data-keywords=\"art request proof approve mockup steve\" data-cat=\"Art &amp; Design\"><span class=\"ws-chip-mk\"><i class=\"fas fa-palette\" aria-hidden=\"true\"></i></span><span class=\"ws-tile__tx\"><b>AE Art Request</b><span class=\"ws-d\">send art to Steve, approve the proofs that come back</span></span><i class=\"fas fa-arrow-right ws-tile__go\" aria-hidden=\"true\"></i></a>\n                            <a class=\"ws-link ws-tile f-purch\" href=\"/calculators/purchasingform.html\" data-keywords=\"blanks supplies buy order bradley purchasing\" data-cat=\"Purchasing\" title=\"The purchase-request form: tell Bradley which blanks or supplies to buy for a work order. Follow it afterwards in Purchase Tracking.\"><span class=\"ws-chip-mk\"><i class=\"fas fa-cart-plus\" aria-hidden=\"true\"></i></span><span class=\"ws-tile__tx\"><b>Purchase Request <span class=\"ws-who\">· Bradley</span></b><span class=\"ws-d\">ask Bradley to buy blanks or supplies for a work order</span></span><i class=\"fas fa-arrow-right ws-tile__go\" aria-hidden=\"true\"></i></a>\n                        </div>\n                    </div>\n\n                    <div class=\"ws-card\" data-cat=\"Quoting\">\n                        <div class=\"ws-card-h\"><h3>Quote</h3></div>\n                        <!-- ONE DOOR IN (2026-07-07 guided-quote entry): the big New Quote button opens\n                             the launcher (one question: what are we decorating?) → guided builder.\n                             Behavior: /staff-dashboard-v3/quote-launcher.js -->\n                        <button type=\"button\" class=\"quote-start-btn\" id=\"quote-start-btn\" aria-haspopup=\"dialog\" aria-controls=\"quote-launcher\">\n                            <span class=\"qs-icon\"><i class=\"fas fa-plus\" aria-hidden=\"true\"></i></span>\n                            <span class=\"qs-txt\">\n                                <span class=\"qs-title\">New Quote</span>\n                                <span class=\"qs-sub\">pick the decoration, price it, send it</span>\n                            </span>\n                            <i class=\"fas fa-arrow-right qs-arrow\" aria-hidden=\"true\"></i>\n                        </button>\n                        <a class=\"quote-continue-chip\" id=\"quote-continue-chip\" href=\"#\" hidden>\n                            <i class=\"fas fa-rotate-right\" aria-hidden=\"true\"></i> <span id=\"quote-continue-label\">Continue</span>\n                        </a>\n                        <div class=\"ws-tools\">\n                            <a class=\"ws-link ws-row f-money\" href=\"/calculators/quick-quote/\" data-keywords=\"price estimate fast line sheet\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Quick Quote</span><span class=\"ws-d\">any style fast, or a multi-style price sheet</span></a>\n                            <a class=\"ws-link ws-row f-steel\" href=\"/dashboards/quote-management.html\" data-keywords=\"quote management sync history\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Saved Quotes</span><span class=\"ws-d\">find, track and sync every saved quote</span></a>\n                        </div>\n                        <details class=\"ws-more\" data-collapse-key=\"sales-builders\">\n                            <summary><i class=\"fas fa-chevron-right\" aria-hidden=\"true\"></i> Go straight to a builder <span class=\"ws-n\">4</span></summary>\n                            <div class=\"ws-tools\">\n                                <a class=\"ws-link ws-row f-money\" href=\"/quote-builders/embroidery-quote-builder.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Embroidery Quote</span><span class=\"ws-d\">garments, caps, 3D puff, patches</span></a>\n                                <a class=\"ws-link ws-row f-money\" href=\"/quote-builders/dtg-quote-builder.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">DTG Quote</span><span class=\"ws-d\">full-color prints on garments</span></a>\n                                <a class=\"ws-link ws-row f-money\" href=\"/quote-builders/screenprint-quote-builder.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Screen Print Quote</span><span class=\"ws-d\">screens, colors, safety stripes</span></a>\n                                <a class=\"ws-link ws-row f-money\" href=\"/quote-builders/dtf-quote-builder.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">DTF Quote</span><span class=\"ws-d\">heat-applied transfers</span></a>\n                            </div>\n                        </details>\n                    </div>\n\n                    <div class=\"ws-card ws-card--wide\" data-cat=\"Pricing\">\n                        <div class=\"ws-card-h\"><h3>Price it</h3><span class=\"ws-n\">2 up front · 16 more</span></div>\n                        <div class=\"ws-tools ws-tools--cols\">\n                            <a class=\"ws-link ws-tile f-money\" href=\"/calculators/manual-pricing.html\" data-keywords=\"markup margin cost calculator blank\"><span class=\"ws-chip-mk\">$</span><span class=\"ws-tile__tx\"><b>Price From Cost</b><span class=\"ws-d\">type any blank's cost, get our price for all five methods</span></span><i class=\"fas fa-arrow-right ws-tile__go\" aria-hidden=\"true\"></i></a>\n                            <!-- The Shop Menu (2026-09-03): styled like the menu page itself so reps recognise it. -->\n                            <a class=\"ws-link ws-tile bs-menu\" href=\"/calculators/service-price-cheat-sheet.html\" data-keywords=\"service prices cheat sheet parts fees\" title=\"The Shop Menu — every service price with its ShopWorks part; rep and customer views, prints to one page\"><span class=\"ws-chip-mk\"><i class=\"fas fa-utensils\" aria-hidden=\"true\"></i></span><span class=\"ws-tile__tx\"><b>Shop Menu</b><span class=\"ws-d\">Est. 1977 · every service price</span></span><i class=\"fas fa-arrow-right ws-tile__go\" aria-hidden=\"true\"></i></a>\n                        </div>\n                        <details class=\"ws-more\" data-collapse-key=\"sales-more-pricing\">\n                            <summary><i class=\"fas fa-chevron-right\" aria-hidden=\"true\"></i> More pricing — add-ons, customer supplied, contract, specialty, customer pages <span class=\"ws-n\">16</span></summary>\n                            <div class=\"ws-tools ws-tools--cols\">\n                                <div>\n                                    <!-- All four ?tab= values are load-bearing: one page, four different questions. -->\n                                    <div class=\"ws-sub\">Embroidery add-ons <small>on NWCA garments</small></div>\n                                    <a class=\"ws-link ws-row f-money\" href=\"/calculators/embroidery-pricing-all/?tab=al-retail\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Extra Logo</span><span class=\"ws-d\">2nd or 3rd logo on a garment we supply</span></a>\n                                    <a class=\"ws-link ws-row f-money\" href=\"/calculators/embroidery-pricing-all/?tab=stitch-charges\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Big Stitch Counts</span><span class=\"ws-d\">add-on over 10,000 stitches</span></a>\n                                    <a class=\"ws-link ws-row f-money\" href=\"/calculators/embroidery-pricing-all/?tab=fullback\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Full-Back Embroidery</span><span class=\"ws-d\">jacket backs, 25K+ designs</span></a>\n                                    <div class=\"ws-sub\">Customer supplied</div>\n                                    <a class=\"ws-link ws-row f-money\" href=\"/calculators/embroidery-pricing-all/?tab=decg-retail\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Customer's Garment</span><span class=\"ws-d\">embroidery labor on blanks they bring</span></a>\n                                    <a class=\"ws-link ws-row f-money\" href=\"/calculators/screenprint-customer/\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Print on Their Shirts</span><span class=\"ws-d\">screen-print labor on blanks they bring</span></a>\n                                    <div class=\"ws-note\">DTF and DTG on customer blanks — coming soon; use Price From Cost</div>\n                                    <div class=\"ws-sub\">Contract <small>wholesale · $250 minimum</small></div>\n                                    <a class=\"ws-link ws-tile ws-tile--sm bs-contract\" href=\"/calculators/embroidery-contract/\"><span class=\"ws-chip-mk\">C</span><span class=\"ws-tile__tx\"><b>Contract Embroidery <em>2026.</em></b><span class=\"ws-d\">wholesale rates for decorators who bring blanks</span></span></a>\n                                    <a class=\"ws-link ws-tile ws-tile--sm bs-contract\" href=\"/calculators/dtg-contract/\"><span class=\"ws-chip-mk\">C</span><span class=\"ws-tile__tx\"><b>Contract DTG <em>2026.</em></b><span class=\"ws-d\">wholesale DTG on partners' own blanks</span></span></a>\n                                </div>\n                                <div>\n                                    <div class=\"ws-sub\">Specialty &amp; non-apparel</div>\n                                    <a class=\"ws-link ws-row f-money\" href=\"/calculators/embroidered-emblem/\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Patch Quote (AI)</span><span class=\"ws-d\">sew-on patches, 25-pc min, 4–6 wks</span></a>\n                                    <a class=\"ws-link ws-row f-money\" href=\"/calculators/laser-tumbler-polarcamel.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Engraved Drinkware</span><span class=\"ws-d\">Polar Camel tumblers: color, stock, price</span></a>\n                                    <a class=\"ws-link ws-row f-money\" href=\"/calculators/custom-decal-pricing.html\" title=\"Staff-only: prices what the sticker grid can't — over 6×6, odd shapes, mixed sizes, or runs under 50 pieces.\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Odd-Size Decals</span><span class=\"ws-d\">over 6×6, odd shapes, under 50 pcs</span><span class=\"ws-lock\">staff</span></a>\n                                    <a class=\"ws-link ws-row f-money\" href=\"/calculators/webstores.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Company Webstores</span><span class=\"ws-d\">quote a branded store or fundraiser</span></a>\n                                    <a class=\"ws-link ws-row f-money\" href=\"/calculators/richardson-2025.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Richardson Direct</span><span class=\"ws-d\">factory-direct caps, and the 23 to buy via SanMar</span></a>\n                                    <div class=\"ws-sub\">Customer price pages <small>what the customer sees</small></div>\n                                    <a class=\"ws-link ws-tile ws-tile--sm bs-store\" href=\"/custom-tees\" data-keywords=\"custom tees shop customers storefront\"><span class=\"ws-chip-mk\"><i class=\"fas fa-shirt\" aria-hidden=\"true\"></i></span><span class=\"ws-tile__tx\"><b>Tees Storefront</b><span class=\"ws-d\">the public tee shop — 20 styles, checkout</span></span></a>\n                                    <a class=\"ws-link ws-row f-store\" href=\"/custom-stickers\" title=\"Customer-facing sticker pricing — 2×2 to 6×6, 50+ pieces. Same Caspio prices reps have always quoted.\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Sticker Prices</span><span class=\"ws-d\">every 2×2–6×6 price, 50+ pieces</span></a>\n                                    <a class=\"ws-link ws-row f-store\" href=\"/custom-banners\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Banner Prices</span><span class=\"ws-d\">any size, priced by the square foot</span></a>\n                                </div>\n                            </div>\n                        </details>\n                    </div>\n\n                    <div class=\"ws-card\" data-cat=\"Customers\">\n                        <div class=\"ws-card-h\"><h3>Customers</h3></div>\n                        <!-- Mission Control: role-gated server-side (taneisha / nika / ruth / admin). -->\n                        <a class=\"ws-link ws-tile f-crm\" href=\"/dashboards/ae-mission-control.html\" data-keywords=\"bonus goals cockpit rep\"><span class=\"ws-chip-mk\"><i class=\"fas fa-gauge-high\" aria-hidden=\"true\"></i></span><span class=\"ws-tile__tx\"><b>Mission Control</b><span class=\"ws-d\">your bonus, your goals, and everything waiting on you today</span></span><i class=\"fas fa-arrow-right ws-tile__go\" aria-hidden=\"true\"></i></a>\n                        <a class=\"ws-link ws-tile f-crm\" href=\"/dashboards/leads.html\" data-keywords=\"enquiry inquiry crm prospects website\"><span class=\"ws-chip-mk\"><i class=\"fas fa-bullhorn\" aria-hidden=\"true\"></i></span><span class=\"ws-tile__tx\"><b>Leads</b><span class=\"ws-d\">every website, phone and walk-in enquiry, with who owns it</span></span><i class=\"fas fa-arrow-right ws-tile__go\" aria-hidden=\"true\"></i></a>\n                        <!-- Per-rep pages: shown only to the person whose page it is (their identity\n                             permission) and to admins, who carry every rep tag. nav-access-controller\n                             REMOVES the others, so a production staffer never sees a link that 403s.\n                             UX only — the real gate is requireCrmRole in server.js. -->\n                        <a class=\"ws-link ws-tile bs-acct\" href=\"/dashboards/taneisha-crm.html\" data-requires-role=\"taneisha\" hidden><span class=\"ws-chip-mk\" aria-hidden=\"true\"><i></i><i></i><i></i></span><span class=\"ws-tile__tx\"><b>My Accounts <span class=\"ws-who\">· Taneisha</span></b><span class=\"ws-d\">your account list by tier, with win-back bonus</span></span><i class=\"fas fa-arrow-right ws-tile__go\" aria-hidden=\"true\"></i></a>\n                        <a class=\"ws-link ws-tile bs-acct\" href=\"/dashboards/nika-crm.html\" data-requires-role=\"nika\" hidden><span class=\"ws-chip-mk\" aria-hidden=\"true\"><i></i><i></i><i></i></span><span class=\"ws-tile__tx\"><b>My Accounts <span class=\"ws-who\">· Nika</span></b><span class=\"ws-d\">your account list by tier, with win-back bonus</span></span><i class=\"fas fa-arrow-right ws-tile__go\" aria-hidden=\"true\"></i></a>\n                        <div class=\"ws-sub\">Also here</div>\n                        <div class=\"ws-tools\">\n                            <a class=\"ws-link ws-row f-crm\" href=\"/dashboards/house-accounts.html\" data-requires-role=\"house\" hidden><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">House Accounts</span><span class=\"ws-d\">unassigned accounts, and who owns what</span><span class=\"ws-lock\">admin</span></a>\n                            <a class=\"ws-link ws-row f-crm\" href=\"/dashboards/portal-directory.html\" data-keywords=\"customer portals browse\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Customer Portals</span><span class=\"ws-d\">browse every customer's portal page</span></a>\n                            <a class=\"ws-link ws-row f-crm\" href=\"/dashboards/customer-portal-admin.html\" data-keywords=\"invite rewards portal reorder\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Portal Access</span><span class=\"ws-d\">invite customers; work re-order requests</span></a>\n                            <a class=\"ws-link ws-row f-crm\" href=\"/dashboards/lead-scorecard.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Lead Scorecard</span><span class=\"ws-d\">how leads convert, by rep and source</span></a>\n                            <a class=\"ws-link ws-row f-crm\" href=\"/dashboards/unqualified-leads.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Unqualified Leads</span><span class=\"ws-d\">spam and no-fit enquiries</span></a>\n                        </div>\n                    </div>\n\n                    <div class=\"ws-card\" data-cat=\"Art &amp; Design\">\n                        <div class=\"ws-card-h\"><h3>Show the customer</h3></div>\n                        <a class=\"ws-link ws-tile bs-vault\" href=\"/dashboards/design-gallery.html\" data-keywords=\"artwork logo history search designs vault\" title=\"Search all 37,600+ designs in one place — digitized designs, ShopWorks thumbnails, Steve's art, Ruth's mockups and finished photos. Enter a Customer # for their whole history.\"><span class=\"ws-chip-mk\"><i class=\"fas fa-vault\" aria-hidden=\"true\"></i></span><span class=\"ws-tile__tx\"><b>Design Vault</b><span class=\"ws-d\">every design we've ever made — search by name, number or customer</span></span><i class=\"fas fa-arrow-right ws-tile__go\" aria-hidden=\"true\"></i></a>\n                        <div class=\"ws-tools\">\n                            <a class=\"ws-link ws-row f-store\" href=\"/pages/garment-designer.html\" data-keywords=\"mockup logo proof tee shirt\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Shirt Designer</span><span class=\"ws-d\">put a logo on a shirt, send for approval</span></a>\n                            <a class=\"ws-link ws-row f-photo\" href=\"/dashboards/finished-photos-library.html\" data-keywords=\"finished photos gallery\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Photo Library</span><span class=\"ws-d\">every finished-job photo; choose what customers see</span></a>\n                            <a class=\"ws-link ws-row f-ox\" href=\"/pages/jds-mockup-creator.html\" data-keywords=\"polar camel laser engrave jds drinkware tumbler\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Tumbler Mockup</span><span class=\"ws-d\">logo on a Polar Camel, download approval</span></a>\n                            <a class=\"ws-link ws-row f-mock\" href=\"/pages/mockup-library.html\" data-keywords=\"ruth mockup library sent\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Saved Mockups</span><span class=\"ws-d\">mockups you've built and sent</span></a>\n                            <a class=\"ws-link ws-row f-store\" href=\"/catalog?topSellers=1\" data-keywords=\"catalog styles samples best sellers\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Top Sellers</span><span class=\"ws-d\">best-selling styles, most with a free sample</span></a>\n                        </div>\n                    </div>\n\n                    <div class=\"ws-card\" data-cat=\"Reference\">\n                        <div class=\"ws-card-h\"><h3>Reference</h3></div>\n                        <div class=\"ws-tools\">\n                            <a class=\"ws-link ws-row f-ref\" href=\"/pages/policy-detail.html?id=sales-office-procedures\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Sales &amp; Office Procedures</span></a>\n                            <a class=\"ws-link ws-row f-ref\" href=\"/pages/policy-detail.html?id=customer-notification-sop\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Customer Notification SOP</span></a>\n                            <a class=\"ws-link ws-row f-ref\" href=\"/pages/policy-detail.html?id=ltm-order-decision-algorithm\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">LTM Order Decision</span></a>\n                            <a class=\"ws-link ws-row f-ref\" href=\"/pages/data-entry-guide.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Data Entry Rules</span><span class=\"ws-d\">ShopWorks entry, live service codes</span></a>\n                            <a class=\"ws-link ws-row f-ref\" href=\"/dashboards/reports/price-audit-report.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Price Audit (Feb 2026)</span><span class=\"ws-d\">frozen study, 80 orders</span></a>\n                        </div>\n                    </div>\n                </div>\n            </section>\n\n            <!-- ===================================================\n                 PRODUCTION — Brian, Mikalah; Ruthie's queue leads it\n                 =================================================== -->\n            <section class=\"ws-panel\" id=\"ws-production\" data-ws=\"production\" role=\"tabpanel\" aria-labelledby=\"ws-tab-production\">\n                <div class=\"ws-head\"><h2>Production</h2><p>Queues, receiving, transfers. Brian's and Mikalah's tab; Ruthie's queue leads it.</p></div>\n                <div class=\"ws-grid\">\n                    <div class=\"ws-card\" data-cat=\"Production\">\n                        <div class=\"ws-card-h\"><h3>Queues</h3></div>\n                        <a class=\"ws-link ws-tile f-mock\" href=\"/dashboards/art-hub-ruth.html\" data-keywords=\"ruth digitizing embroidery mockups\"><span class=\"ws-chip-mk\"><i class=\"fas fa-shirt\" aria-hidden=\"true\"></i></span><span class=\"ws-tile__tx\"><b>Mockup Queue <span class=\"ws-who\">· Ruthie</span></b><span class=\"ws-d\">mockup requests in progress, completed, and on hold</span></span><i class=\"fas fa-arrow-right ws-tile__go\" aria-hidden=\"true\"></i></a>\n                        <div class=\"ws-sub\">Also here</div>\n                        <div class=\"ws-tools\">\n                            <a class=\"ws-link ws-row f-floor\" href=\"/dashboards/monogram-dashboard.html\" data-keywords=\"names stitch proof personalization\" title=\"Every monogram order in one place, with a printable customer proof of each name as it will be stitched.\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Monogram Orders</span><span class=\"ws-d\">every order and its names, printable proof</span></a>\n                            <a class=\"ws-link ws-row f-floor\" href=\"/dashboards/names-numbers-dashboard.html\" data-keywords=\"roster jersey team numbers personalization\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Names &amp; Numbers</span><span class=\"ws-d\">team rosters: name, number, size</span></a>\n                            <a class=\"ws-link ws-row f-ref\" href=\"/dashboards/past-due-orders.html\" data-keywords=\"late orders ship date overdue\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Past Due Orders</span><span class=\"ws-d\">what each late order is waiting on</span></a>\n                            <a class=\"ws-link ws-row f-ref\" href=\"/dashboards/production-shifts.html\" data-keywords=\"hours who works break lunch shifts\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Shift Schedule</span><span class=\"ws-d\">who works when; break and lunch rules</span></a>\n                        </div>\n                    </div>\n                    <div class=\"ws-card\" data-cat=\"Production\">\n                        <div class=\"ws-card-h\"><h3>Receiving &amp; purchasing</h3></div>\n                        <!-- The SanMar Inbound Calendar is a modal on Saved Quotes (?open=inbound-today\n                             auto-opens it — dashboards/js/sanmar-inbound-today.js). Keep the param. -->\n                        <a class=\"ws-link ws-tile f-purch\" href=\"/dashboards/quote-management.html?open=inbound-today\" data-keywords=\"boxes receiving po labels sanmar calendar\" title=\"Pick any day to see its incoming SanMar boxes — each PO + work order, box-by-box contents with color/size — and print box labels or a PDF. Opens over Saved Quotes.\"><span class=\"ws-chip-mk\"><i class=\"fas fa-calendar-days\" aria-hidden=\"true\"></i></span><span class=\"ws-tile__tx\"><b>SanMar Inbound Calendar</b><span class=\"ws-d\">today's SanMar boxes, line by line, with labels to print</span></span><i class=\"fas fa-arrow-right ws-tile__go\" aria-hidden=\"true\"></i></a>\n                        <div class=\"ws-sub\">Also here</div>\n                        <div class=\"ws-tools\">\n                            <a class=\"ws-link ws-row f-floor\" href=\"/pages/box-labels.html\" data-keywords=\"po boxes print labels\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Box Labels</span><span class=\"ws-d\">look up a PO, sort into boxes, print</span></a>\n                            <a class=\"ws-link ws-row f-purch\" href=\"/dashboards/purchasing-portal.html\" data-keywords=\"blanks status bradley purchasing\" title=\"Every blanks-purchase request sent to Bradley (last 60 days) with who requested it and where it stands: Sent → Ordered → Received → Shipped.\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Purchase Tracking</span><span class=\"ws-d\">where every blanks request stands</span></a>\n                            <a class=\"ws-link ws-row f-purch\" href=\"/calculators/purchasingform.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Purchase Request</span><span class=\"ws-who\">· Bradley</span><span class=\"ws-d\">the form that asks Bradley to buy blanks or supplies for a WO</span></a>\n                            <a class=\"ws-link ws-row f-ref\" href=\"/dashboards/roland-printer-supplies.html\" data-keywords=\"ink parts printer supplies\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Roland Supplies</span><span class=\"ws-d\">ink and parts for the Roland — goes to Erik</span></a>\n                        </div>\n                    </div>\n                    <div class=\"ws-card\" data-cat=\"Production\">\n                        <div class=\"ws-card-h\"><h3>Transfers</h3></div>\n                        <a class=\"ws-link ws-tile f-purch\" href=\"/dashboards/bradley-transfers.html\" data-keywords=\"heat transfers dtf supacolor bradley\"><span class=\"ws-chip-mk\"><i class=\"fas fa-truck\" aria-hidden=\"true\"></i></span><span class=\"ws-tile__tx\"><b>Transfer Queue <span class=\"ws-who\">· Bradley</span></b><span class=\"ws-d\">heat transfers waiting to be ordered, rush flagged</span></span><i class=\"fas fa-arrow-right ws-tile__go\" aria-hidden=\"true\"></i></a>\n                        <a class=\"ws-link ws-tile bs-supa\" href=\"/dashboards/supacolor-orders.html\" data-keywords=\"transfers status shipped supacolor\"><span class=\"ws-chip-mk\"><img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/supacolor-mark.png?ver=1\" alt=\"Supacolor\"></span><span class=\"ws-tile__tx\"><b>Supacolor Jobs</b><span class=\"ws-d\">live status at Supacolor, updated every 10 minutes</span></span><i class=\"fas fa-arrow-right ws-tile__go\" aria-hidden=\"true\"></i></a>\n                        <div class=\"ws-sub\">Guides</div>\n                        <div class=\"ws-tools\">\n                            <a class=\"ws-link ws-row f-ref\" href=\"/training/shipping-receiving-guide.html\" data-keywords=\"shipping receiving pickups dock\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Dock Guide</span><span class=\"ws-d\">receiving, shipping, pickups, close-day</span></a>\n                            <a class=\"ws-link ws-row f-purch\" href=\"/training/sanmar-purchasing-guide.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">SanMar Purchasing</span><span class=\"ws-d\">order blanks through ShopWorks</span></a>\n                            <a class=\"ws-link ws-row f-ref\" href=\"/pages/data-entry-guide.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Data Entry Rules</span></a>\n                        </div>\n                    </div>\n                    <div class=\"ws-card ws-card--full\" data-cat=\"Art &amp; Design\">\n                        <div class=\"ws-card-h\"><h3>Art files &amp; photos</h3></div>\n                        <div class=\"ws-tools ws-tools--cols\">\n                            <a class=\"ws-link ws-tile bs-capture\" href=\"/dashboards/finished-photos.html\" data-keywords=\"finished photos shoot publish capture\"><span class=\"ws-chip-mk\"><img src=\"/dashboards/images/fp-icon-192.png\" alt=\"\"></span><span class=\"ws-tile__tx\"><b>Photo Capture</b><span class=\"ws-d\">scan the work order, shoot the piece, publish — works on your phone</span></span><i class=\"fas fa-arrow-right ws-tile__go\" aria-hidden=\"true\"></i></a>\n                            <a class=\"ws-link ws-tile bs-dst\" href=\"/pages/dst-viewer.html\" data-keywords=\"stitch file embroidery viewer dst\" title=\"Open any .DST stitch file — realistic thread preview, exact size and stitch count, true-to-scale mockup on a shirt or cap, density warnings, and a printable customer approval sheet.\"><span class=\"ws-chip-mk\"><i class=\"fas fa-braille\" aria-hidden=\"true\"></i></span><span class=\"ws-tile__tx\"><b>DST Studio</b><span class=\"ws-d\">stitch viewer · true-scale mockup · approval sheet</span></span><i class=\"fas fa-arrow-right ws-tile__go\" aria-hidden=\"true\"></i></a>\n                        </div>\n                        <div class=\"ws-tools ws-tools--cols\">\n                            <div>\n                                <a class=\"ws-link ws-row f-vault\" href=\"/dashboards/design-gallery.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Design Vault</span><span class=\"ws-d\">search every design, any source</span></a>\n                                <a class=\"ws-link ws-row f-ref\" href=\"/dashboards/digitized-designs.html\" data-keywords=\"digitized master list extra logo\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Digitized Designs</span><span class=\"ws-d\">master list, with extra-logo prices</span></a>\n                            </div>\n                            <div>\n                                <a class=\"ws-link ws-row f-photo\" href=\"/dashboards/finished-photos-library.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Photo Library</span><span class=\"ws-d\">browse and publish finished photos</span></a>\n                                <a class=\"ws-link ws-row f-arch\" href=\"/dashboards/old-designs.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Old Designs</span><span class=\"ws-d\">the legacy Megafile archive</span></a>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </section>\n\n            <!-- ===================================================\n                 ART — Steve, Ruthie\n                 =================================================== -->\n            <section class=\"ws-panel\" id=\"ws-art\" data-ws=\"art\" role=\"tabpanel\" aria-labelledby=\"ws-tab-art\">\n                <div class=\"ws-head\"><h2>Art</h2><p>Steve's and Ruthie's queues first, then the design tools.</p></div>\n                <div class=\"ws-grid\">\n                    <div class=\"ws-card\" data-cat=\"Art &amp; Design\">\n                        <div class=\"ws-card-h\"><h3>Queues</h3></div>\n                        <a class=\"ws-link ws-tile f-steve\" href=\"/dashboards/art-hub-steve.html\" data-keywords=\"steve art requests queue\"><span class=\"ws-chip-mk\"><i class=\"fas fa-paint-brush\" aria-hidden=\"true\"></i></span><span class=\"ws-tile__tx\"><b>Art Queue <span class=\"ws-who\">· Steve</span></b><span class=\"ws-d\">incoming art requests, and sending finished art to Bradley</span></span><i class=\"fas fa-arrow-right ws-tile__go\" aria-hidden=\"true\"></i></a>\n                        <a class=\"ws-link ws-tile f-mock\" href=\"/dashboards/art-hub-ruth.html\"><span class=\"ws-chip-mk\"><i class=\"fas fa-shirt\" aria-hidden=\"true\"></i></span><span class=\"ws-tile__tx\"><b>Mockup Queue <span class=\"ws-who\">· Ruthie</span></b><span class=\"ws-d\">mockup requests in progress, completed, and on hold</span></span><i class=\"fas fa-arrow-right ws-tile__go\" aria-hidden=\"true\"></i></a>\n                        <div class=\"ws-sub\">Also here</div>\n                        <div class=\"ws-tools\">\n                            <a class=\"ws-link ws-row f-steve\" href=\"/ae-dashboard.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">AE Art Request</span><span class=\"ws-d\">what the reps submit and approve</span></a>\n                            <a class=\"ws-link ws-row f-steve\" href=\"/dashboards/design-queue.html\" data-keywords=\"steve designs decision\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Design Queue</span><span class=\"ws-d\">designs waiting on a decision</span></a>\n                            <a class=\"ws-link ws-row f-store\" href=\"/dashboards/gear-publisher.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">253gear Publisher</span><span class=\"ws-d\">push a design to the 253gear store</span></a>\n                        </div>\n                    </div>\n                    <div class=\"ws-card\" data-cat=\"Art &amp; Design\">\n                        <div class=\"ws-card-h\"><h3>Design tools</h3></div>\n                        <a class=\"ws-link ws-tile bs-dst\" href=\"/pages/dst-viewer.html\"><span class=\"ws-chip-mk\"><i class=\"fas fa-braille\" aria-hidden=\"true\"></i></span><span class=\"ws-tile__tx\"><b>DST Studio</b><span class=\"ws-d\">stitch viewer · true-scale mockup · approval sheet</span></span><i class=\"fas fa-arrow-right ws-tile__go\" aria-hidden=\"true\"></i></a>\n                        <a class=\"ws-link ws-tile bs-vault\" href=\"/dashboards/design-gallery.html\"><span class=\"ws-chip-mk\"><i class=\"fas fa-vault\" aria-hidden=\"true\"></i></span><span class=\"ws-tile__tx\"><b>Design Vault</b><span class=\"ws-d\">every design we've ever made, one search</span></span><i class=\"fas fa-arrow-right ws-tile__go\" aria-hidden=\"true\"></i></a>\n                        <div class=\"ws-sub\">Also here</div>\n                        <div class=\"ws-tools\">\n                            <a class=\"ws-link ws-row f-store\" href=\"/pages/garment-designer.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Shirt Designer</span><span class=\"ws-d\">logo on a shirt, front/back, spin, proof</span></a>\n                            <a class=\"ws-link ws-row f-ox\" href=\"/pages/jds-mockup-creator.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Tumbler Mockup</span><span class=\"ws-d\">Polar Camel color + logo, approval image</span></a>\n                            <a class=\"ws-link ws-row f-mock\" href=\"/pages/mockup-library.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Saved Mockups</span></a>\n                            <a class=\"ws-link ws-row f-ref\" href=\"/dashboards/digitized-designs.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Digitized Designs</span><span class=\"ws-d\">master list, with extra-logo prices</span></a>\n                            <a class=\"ws-link ws-row f-arch\" href=\"/dashboards/old-designs.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Old Designs</span><span class=\"ws-d\">the legacy Megafile archive</span></a>\n                        </div>\n                    </div>\n                    <div class=\"ws-card\" data-cat=\"Production\">\n                        <div class=\"ws-card-h\"><h3>Photos &amp; hand-off</h3></div>\n                        <a class=\"ws-link ws-tile ws-tile--sm bs-capture\" href=\"/dashboards/finished-photos.html\"><span class=\"ws-chip-mk\"><img src=\"/dashboards/images/fp-icon-192.png\" alt=\"\"></span><span class=\"ws-tile__tx\"><b>Photo Capture</b><span class=\"ws-d\">shoot the finished piece, publish it</span></span></a>\n                        <div class=\"ws-tools\">\n                            <a class=\"ws-link ws-row f-photo\" href=\"/dashboards/finished-photos-library.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Photo Library</span><span class=\"ws-d\">browse and publish finished photos</span></a>\n                        </div>\n                        <div class=\"ws-sub\">To production</div>\n                        <div class=\"ws-tools\">\n                            <a class=\"ws-link ws-row f-floor\" href=\"/dashboards/monogram-dashboard.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Monogram Orders</span></a>\n                            <a class=\"ws-link ws-row f-floor\" href=\"/dashboards/names-numbers-dashboard.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Names &amp; Numbers</span></a>\n                            <a class=\"ws-link ws-row f-purch\" href=\"/dashboards/bradley-transfers.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Transfer Queue</span><span class=\"ws-who\">· Bradley</span><span class=\"ws-d\">send files for Supacolor</span></a>\n                        </div>\n                    </div>\n                </div>\n            </section>\n\n            <!-- ===================================================\n                 OFFICE — Bradley, Jim\n                 =================================================== -->\n            <section class=\"ws-panel\" id=\"ws-office\" data-ws=\"office\" role=\"tabpanel\" aria-labelledby=\"ws-tab-office\">\n                <div class=\"ws-head\"><h2>Office</h2><p>Purchasing, transfers, money and portals. Bradley's and Jim's tab.</p></div>\n                <div class=\"ws-grid\">\n                    <div class=\"ws-card\" data-cat=\"Production\">\n                        <div class=\"ws-card-h\"><h3>Transfers &amp; purchasing</h3></div>\n                        <!-- The transfer workflow: Transfer Queue → Supacolor Jobs. -->\n                        <div class=\"ws-flow\" aria-label=\"Transfer workflow\">\n                            <a class=\"ws-link ws-tile f-purch\" href=\"/dashboards/bradley-transfers.html\"><span class=\"ws-chip-mk\"><i class=\"fas fa-truck\" aria-hidden=\"true\"></i></span><span class=\"ws-tile__tx\"><b>Transfer Queue</b><span class=\"ws-d\">step 1 · what to order</span></span></a>\n                            <i class=\"fas fa-arrow-right ws-flow__arr\" aria-hidden=\"true\"></i>\n                            <a class=\"ws-link ws-tile bs-supa\" href=\"/dashboards/supacolor-orders.html\"><span class=\"ws-chip-mk\"><img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/supacolor-mark.png?ver=1\" alt=\"Supacolor\"></span><span class=\"ws-tile__tx\"><b>Supacolor Jobs</b><span class=\"ws-d\">step 2 · where it is</span></span></a>\n                        </div>\n                        <a class=\"ws-link ws-tile f-purch\" href=\"/dashboards/purchasing-portal.html\"><span class=\"ws-chip-mk\"><i class=\"fas fa-cart-flatbed\" aria-hidden=\"true\"></i></span><span class=\"ws-tile__tx\"><b>Purchase Tracking</b><span class=\"ws-d\">every blanks request: sent → ordered → received → shipped</span></span><i class=\"fas fa-arrow-right ws-tile__go\" aria-hidden=\"true\"></i></a>\n                        <a class=\"ws-link ws-tile f-purch\" href=\"/dashboards/quote-management.html?open=inbound-today\"><span class=\"ws-chip-mk\"><i class=\"fas fa-calendar-days\" aria-hidden=\"true\"></i></span><span class=\"ws-tile__tx\"><b>SanMar Inbound Calendar</b><span class=\"ws-d\">incoming boxes by day, box labels, PDF</span></span><i class=\"fas fa-arrow-right ws-tile__go\" aria-hidden=\"true\"></i></a>\n                        <div class=\"ws-sub\">Also here</div>\n                        <div class=\"ws-tools\">\n                            <a class=\"ws-link ws-row f-purch\" href=\"/calculators/purchasingform.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Purchase Request</span><span class=\"ws-who\">· Bradley</span><span class=\"ws-d\">the form reps fill in to ask Bradley for blanks</span></a>\n                            <a class=\"ws-link ws-row f-ref\" href=\"/dashboards/roland-printer-supplies.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Roland Supplies</span></a>\n                            <a class=\"ws-link ws-row f-floor\" href=\"/pages/box-labels.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Box Labels</span></a>\n                            <a class=\"ws-link ws-row f-ref\" href=\"/dashboards/product-manager.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Non-SanMar Items</span><span class=\"ws-d\">catalog products we don't buy from SanMar</span></a>\n                            <a class=\"ws-link ws-row f-money\" href=\"/calculators/richardson-2025.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Richardson Direct</span><span class=\"ws-d\">and the 23 styles to buy via SanMar</span></a>\n                        </div>\n                    </div>\n                    <div class=\"ws-card\" data-cat=\"Customers\">\n                        <div class=\"ws-card-h\"><h3>Money &amp; customers</h3></div>\n                        <div class=\"ws-tools\">\n                            <a class=\"ws-link ws-row f-steel\" href=\"/dashboards/quote-management.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Saved Quotes</span><span class=\"ws-d\">find, track and sync every saved quote</span></a>\n                            <a class=\"ws-link ws-row f-crm\" href=\"/dashboards/leads.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Leads</span><span class=\"ws-d\">every enquiry, with who owns it</span></a>\n                            <a class=\"ws-link ws-row f-crm\" href=\"/dashboards/house-accounts.html\" data-requires-role=\"house\" hidden><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">House Accounts</span><span class=\"ws-lock\">admin</span></a>\n                            <a class=\"ws-link ws-row f-crm\" href=\"/dashboards/portal-directory.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Customer Portals</span><span class=\"ws-d\">browse every customer's portal page</span></a>\n                            <a class=\"ws-link ws-row f-crm\" href=\"/dashboards/customer-portal-admin.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Portal Access</span><span class=\"ws-d\">invites, rewards, re-order requests</span></a>\n                            <!-- The owner's manual prospect list — NOT the Leads CRM. -->\n                            <a class=\"ws-link ws-row f-crm\" href=\"/dashboards/jim-mailing-list.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Prospect Mailing List</span><span class=\"ws-who\">· Jim</span><span class=\"ws-d\">big-type add, edit, search</span></a>\n                            <a class=\"ws-link ws-row f-ref\" href=\"/dashboards/form-submissions.html\" data-keywords=\"submissions inbox samples out\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Forms Inbox</span><span class=\"ws-d\">submitted forms, samples-out tracker</span></a>\n                        </div>\n                    </div>\n                    <div class=\"ws-card\" data-cat=\"Pricing\">\n                        <div class=\"ws-card-h\"><h3>Customer price pages</h3></div>\n                        <a class=\"ws-link ws-tile bs-store\" href=\"/custom-tees\"><span class=\"ws-chip-mk\"><i class=\"fas fa-shirt\" aria-hidden=\"true\"></i></span><span class=\"ws-tile__tx\"><b>Tees Storefront</b><span class=\"ws-d\">the public tee shop customers buy from</span></span><i class=\"fas fa-arrow-right ws-tile__go\" aria-hidden=\"true\"></i></a>\n                        <div class=\"ws-tools\">\n                            <a class=\"ws-link ws-row f-store\" href=\"/custom-stickers\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Sticker Prices</span><span class=\"ws-d\">every 2×2–6×6 price</span></a>\n                            <a class=\"ws-link ws-row f-store\" href=\"/custom-banners\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Banner Prices</span><span class=\"ws-d\">any size, by the square foot</span></a>\n                            <a class=\"ws-link ws-row f-money\" href=\"/calculators/webstores.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Company Webstores</span><span class=\"ws-d\">quote a store or fundraiser</span></a>\n                            <a class=\"ws-link ws-row f-store\" href=\"/catalog?topSellers=1\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Top Sellers</span></a>\n                        </div>\n                    </div>\n                </div>\n            </section>\n\n            <!-- ===================================================\n                 COMPANY — what the sidebar used to hold\n                 =================================================== -->\n            <section class=\"ws-panel\" id=\"ws-company\" data-ws=\"company\" role=\"tabpanel\" aria-labelledby=\"ws-tab-company\">\n                <div class=\"ws-head\"><h2>Company</h2><p>Policies, forms, training, bundles and people.</p></div>\n                <div class=\"ws-grid\">\n                    <div class=\"ws-card\" data-cat=\"Reference\">\n                        <div class=\"ws-card-h\"><h3>Policies &amp; procedures</h3></div>\n                        <a class=\"ws-link ws-tile f-ref\" href=\"/pages/policies-hub.html\" data-keywords=\"sop procedures handbook policy\"><span class=\"ws-chip-mk\"><i class=\"fas fa-book\" aria-hidden=\"true\"></i></span><span class=\"ws-tile__tx\"><b>Policies Hub</b><span class=\"ws-d\">every company policy and SOP, searchable, always current</span></span><i class=\"fas fa-arrow-right ws-tile__go\" aria-hidden=\"true\"></i></a>\n                        <div class=\"ws-tools\">\n                            <a class=\"ws-link ws-row f-ref\" href=\"/pages/policy-detail.html?id=sales-office-procedures\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Sales &amp; Office Procedures</span></a>\n                            <a class=\"ws-link ws-row f-ref\" href=\"/pages/policy-detail.html?id=customer-notification-sop\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Customer Notification SOP</span></a>\n                            <a class=\"ws-link ws-row f-ref\" href=\"/pages/policy-detail.html?id=ltm-order-decision-algorithm\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">LTM Order Decision</span></a>\n                            <a class=\"ws-link ws-row f-ref\" href=\"/pages/policy-detail.html?id=org-chart-2026\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Org Chart 2026</span><span class=\"ws-d\">interactive, with member search</span></a>\n                        </div>\n                    </div>\n                    <div class=\"ws-card ws-card--wide\" data-cat=\"Training\">\n                        <div class=\"ws-card-h\"><h3>Training</h3></div>\n                        <div class=\"ws-tools ws-tools--cols\">\n                            <div>\n                                <a class=\"ws-link ws-row f-ref\" href=\"/training/index.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Training Center</span><span class=\"ws-d\">every guide by role</span></a>\n                                <a class=\"ws-link ws-row f-ref\" href=\"/pages/data-entry-guide.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Data Entry Rules</span><span class=\"ws-d\">ShopWorks entry, live codes</span></a>\n                                <a class=\"ws-link ws-row f-ref\" href=\"/training/customer-service.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Customer Service Manual</span></a>\n                                <a class=\"ws-link ws-row f-ref\" href=\"/training/sales-coordinator-manual.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Sales Coordinator Book</span><span class=\"ws-d\">chapter by chapter</span></a>\n                            </div>\n                            <div>\n                                <a class=\"ws-link ws-row f-ref\" href=\"/training/shipping-receiving-guide.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Dock Guide</span><span class=\"ws-d\">run the dock, with checklists</span></a>\n                                <a class=\"ws-link ws-row f-purch\" href=\"/training/sanmar-purchasing-guide.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">SanMar Purchasing</span><span class=\"ws-d\">three phases, with videos</span></a>\n                                <a class=\"ws-link ws-row f-ref\" href=\"/training/quick-reference-tips.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Tips Archive</span><span class=\"ws-d\">every quick-hitter tip</span></a>\n                                <a class=\"ws-link ws-row f-ref\" href=\"/training/training-games-hub.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Training Games</span></a>\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"ws-card\" data-cat=\"Forms\">\n                        <div class=\"ws-card-h\"><h3>Forms</h3></div>\n                        <div class=\"ws-tools\">\n                            <a class=\"ws-link ws-row f-ref\" href=\"/dashboards/forms-library.html\" data-keywords=\"printable fillable forms\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Forms Library</span><span class=\"ws-d\">printable and fillable, by category</span></a>\n                            <a class=\"ws-link ws-row f-ref\" href=\"/dashboards/form-submissions.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Forms Inbox</span><span class=\"ws-d\">submissions, samples-out tracker</span></a>\n                        </div>\n                    </div>\n                    <!-- Customer-facing per-company order pages (one Caspio datapage each);\n                         staff open them to send the link or check sizes. Christmas Gift Boxes is\n                         a seasonal gift-box builder, not a roster page — listed here, named honestly. -->\n                    <div class=\"ws-card\" data-cat=\"Employee Bundles\">\n                        <div class=\"ws-card-h\"><h3>Employee bundles</h3><span class=\"ws-n\">customer-facing order pages</span></div>\n                        <div class=\"ws-tools\">\n                            <a class=\"ws-link ws-row f-store\" href=\"/DrainPro-Bundle.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Drain-Pro Bundle</span><span class=\"ws-d\">their staff pick sizes here</span></a>\n                            <a class=\"ws-link ws-row f-store\" href=\"/streich-bros-bundle.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Streich Bros Bundle</span></a>\n                            <a class=\"ws-link ws-row f-store\" href=\"/wcttr-bundle.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">WCTTR Bundle</span></a>\n                            <a class=\"ws-link ws-row f-store\" href=\"/christmas-bundles.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Christmas Gift Boxes</span><span class=\"ws-d\">seasonal Carhartt gift-box builder</span></a>\n                        </div>\n                    </div>\n                    <div class=\"ws-card\" data-cat=\"People &amp; tools\">\n                        <div class=\"ws-card-h\"><h3>People &amp; tools</h3></div>\n                        <div class=\"ws-tools\">\n                            <a class=\"ws-link ws-row f-ref\" href=\"/dashboards/production-shifts.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Shift Schedule</span><span class=\"ws-d\">who works when, break rules</span></a>\n                            <button type=\"button\" class=\"ws-link ws-row f-ref\" data-action=\"staff-directory:show\" data-filter=\"all\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Staff Directory</span><span class=\"ws-d\">birthdays, anniversaries</span></button>\n                            <a class=\"ws-link ws-row f-ref\" href=\"https://inksoft-transform-8a3dc4e38097.herokuapp.com/\" target=\"_blank\" rel=\"noopener\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">InkSoft Transform</span><span class=\"ws-ext\" aria-hidden=\"true\">↗</span><span class=\"ws-d\">InkSoft → ShopWorks; full bonus dashboard</span></a>\n                        </div>\n                    </div>\n                </div>\n            </section>\n\n            <!-- ===================================================\n                 EVERYTHING — generated by workspace-controller.js from the other\n                 panels (union of tools, deduped by href, grouped by data-cat).\n                 =================================================== -->\n            <section class=\"ws-panel\" id=\"ws-everything\" data-ws=\"everything\" role=\"tabpanel\" aria-labelledby=\"ws-tab-everything\">\n                <div class=\"ws-head\"><h2>Everything</h2><p>Every tool on the page, grouped the old way. Built from the other tabs, so it can never miss one.</p></div>\n                <div class=\"ws-filter\"><i class=\"fas fa-magnifying-glass\" aria-hidden=\"true\"></i><input type=\"text\" id=\"wsEveryFilter\" placeholder=\"Type to filter…\" aria-label=\"Filter tools\" autocomplete=\"off\"><span class=\"ws-filter__count\" id=\"wsEveryCount\"></span></div>\n                <div class=\"ws-every\" id=\"wsEveryTools\"></div>\n            </section>\n\n            <!-- ===================================================\n                 ADMIN — admin role only.\n                 `hidden` + data-requires-role=\"admin\": nav-access-controller.js REMOVES\n                 this whole panel (and the Admin tab) unless GET /api/crm-session/me\n                 reports the 'admin' permission (fails CLOSED). Removing — not merely\n                 hiding — also keeps these tools out of the Ctrl+K palette and the\n                 generated Everything tab, both of which read the live DOM.\n\n                 ⚠ This is the UX layer only. The real gate is server-side:\n                 gateStaffPage + the Caspio Staff_Page_Access table, with\n                 ADMIN_DEFAULT_PAGES in lib/page-access.js making every page listed\n                 here admin-only when it has no row. KEEP BOTH IN SYNC —\n                 tests/unit/admin-page-access.test.js slices this markup from\n                 data-section=\"admin\" to the END ADMIN sentinel and fails if the two\n                 lists drift in either direction. Every href in here must be a bare\n                 double-quoted `…html\"` (no query string) for that regex to see it.\n                 =================================================== -->\n            <section class=\"ws-panel\" id=\"ws-admin\" data-ws=\"admin\" role=\"tabpanel\" aria-labelledby=\"ws-tab-admin\" data-section=\"admin\" data-requires-role=\"admin\" hidden>\n                <div class=\"ws-head\"><h2>Admin</h2><p>The Administration links, same six groups. A lock means Erik-only.</p></div>\n                <div class=\"ws-grid\">\n                    <!-- 1. Money & Payroll — anything with dollars attached. -->\n                    <div class=\"ws-card\" data-cat=\"Administration\">\n                        <div class=\"ws-card-h\"><h3>Money &amp; Payroll</h3></div>\n                        <div class=\"ws-tools\">\n                            <a class=\"ws-link ws-row f-money\" href=\"/dashboards/sanmar-payables.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">SanMar Payables</span><span class=\"ws-d\">open invoices, CSV, marketing fund</span></a>\n                            <a class=\"ws-link ws-row f-money\" href=\"/dashboards/payroll.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Payroll</span><span class=\"ws-d\">vacation hours, packet upload</span><i class=\"fas fa-lock ws-lock\" aria-hidden=\"true\" title=\"Erik only\"></i></a>\n                            <a class=\"ws-link ws-row f-money\" href=\"/dashboards/commission-structure.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Store Commissions</span></a>\n                            <a class=\"ws-link ws-row f-money\" href=\"/dashboards/volume-quote.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Volume Quote</span><span class=\"ws-d\">one-time price for 72+ orders</span></a>\n                        </div>\n                    </div>\n                    <!-- 2. Marketing & Content — publishes to the PUBLIC site. -->\n                    <div class=\"ws-card\" data-cat=\"Administration\">\n                        <div class=\"ws-card-h\"><h3>Marketing</h3></div>\n                        <div class=\"ws-tools\">\n                            <a class=\"ws-link ws-row f-ref\" href=\"/dashboards/blog-editor.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Blog Editor</span><span class=\"ws-d\">write and publish posts</span></a>\n                            <a class=\"ws-link ws-row f-ref\" href=\"/dashboards/seo-strategy.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">SEO Strategy</span></a>\n                            <a class=\"ws-link ws-row f-ref\" href=\"/dashboards/brand-standards.html\" data-keywords=\"brand colours colors tokens css design standards style guide\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Brand Standards</span><span class=\"ws-d\">colours, type and spacing every page follows, read live from the token file</span></a>\n                        </div>\n                    </div>\n                    <!-- 3. Access & Policy — who can see what, and policy rollout. -->\n                    <div class=\"ws-card\" data-cat=\"Administration\">\n                        <div class=\"ws-card-h\"><h3>Access &amp; Policy</h3></div>\n                        <div class=\"ws-tools\">\n                            <a class=\"ws-link ws-row f-ref\" href=\"/dashboards/access-admin.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Access Admin</span><span class=\"ws-d\">roles and page access</span><i class=\"fas fa-lock ws-lock\" aria-hidden=\"true\" title=\"Erik only\"></i></a>\n                            <a class=\"ws-link ws-row f-ref\" href=\"/dashboards/policy-migration.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Policy Migration</span></a>\n                            <a class=\"ws-link ws-row f-ref\" href=\"/dashboards/drive-access.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Drive Access</span><span class=\"ws-d\">who sees which network drive</span></a>\n                        </div>\n                    </div>\n                    <!-- 4. Integrations & Data — the plumbing between SanMar / ShopWorks / Caspio / Box. -->\n                    <div class=\"ws-card\" data-cat=\"Administration\">\n                        <div class=\"ws-card-h\"><h3>Integrations</h3></div>\n                        <div class=\"ws-tools\">\n                            <a class=\"ws-link ws-row f-ref\" href=\"/dashboards/bandit-integration.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Bandit Integration</span><span class=\"ws-d\">sync tasks and agents</span></a>\n                            <a class=\"ws-link ws-row f-ref\" href=\"/dashboards/sanmar-ftp-integration.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">SanMar Downloads</span></a>\n                            <a class=\"ws-link ws-row f-ref\" href=\"/dashboards/sanmar-shopworks-converter.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Parts Converter</span><span class=\"ws-d\">SanMar list → ShopWorks parts</span></a>\n                            <a class=\"ws-link ws-row f-ref\" href=\"/sanmar-vendor-portal.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Vendor Invoices</span><span class=\"ws-d\">legacy Caspio portal</span></a>\n                            <a class=\"ws-link ws-row f-ref\" href=\"/universal-records-admin.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Records Admin</span></a>\n                            <!-- Writes DTG_Calibration in Caspio — Erik's admin function, listed by filename in ADMIN_DEFAULT_PAGES. -->\n                            <a class=\"ws-link ws-row f-ref\" href=\"/tools/custom-tees-calibrate.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Print-Box Calibration</span><span class=\"ws-d\">where art prints on each tee</span></a>\n                        </div>\n                    </div>\n                    <!-- 5. Analysis — company-wide revenue and cost figures, so every page here\n                         MUST also be in ADMIN_DEFAULT_PAGES (the drift-lock test enforces it). -->\n                    <div class=\"ws-card\" data-cat=\"Administration\">\n                        <div class=\"ws-card-h\"><h3>Analysis</h3></div>\n                        <div class=\"ws-tools\">\n                            <a class=\"ws-link ws-row f-ref\" href=\"/dashboards/company-numbers.html\" data-keywords=\"revenue reports ytd numbers\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Company Numbers</span><span class=\"ws-d\">revenue, team YTD, Q3 push, payments, turnaround estimates</span></a>\n                            <a class=\"ws-link ws-row f-ref\" href=\"/dashboards/pricing-analysis.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Pricing Analysis</span><span class=\"ws-d\">cost, margin, realization</span></a>\n                            <a class=\"ws-link ws-row f-ref\" href=\"/dashboards/contract-break-even.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Contract Break-Even</span></a>\n                        </div>\n                    </div>\n                    <!-- 6. System & API Reference — read-only developer docs + the Caspio quota meter. -->\n                    <div class=\"ws-card\" data-cat=\"Administration\">\n                        <div class=\"ws-card-h\"><h3>API Reference</h3></div>\n                        <div class=\"ws-tools\">\n                            <a class=\"ws-link ws-row f-ref\" href=\"/dashboards/api-usage.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">API Usage</span><span class=\"ws-d\">Caspio call attribution</span></a>\n                            <a class=\"ws-link ws-row f-ref\" href=\"/dashboards/caspio-api-reference.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Caspio API Docs</span><i class=\"fas fa-lock ws-lock\" aria-hidden=\"true\" title=\"Erik only\"></i></a>\n                            <a class=\"ws-link ws-row f-ref\" href=\"/dashboards/table-usage-audit.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">Table Audit</span></a>\n                            <a class=\"ws-link ws-row f-ref\" href=\"/dashboards/manageorders-api-reference.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">ManageOrders Docs</span></a>\n                            <a class=\"ws-link ws-row f-ref\" href=\"/dashboards/sanmar-api-reference.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">SanMar API Docs</span></a>\n                            <a class=\"ws-link ws-row f-ref\" href=\"/dashboards/shopworks-odbc-reference.html\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">ShopWorks ODBC</span><i class=\"fas fa-lock ws-lock\" aria-hidden=\"true\" title=\"Erik only\"></i></a>\n                        </div>\n                    </div>\n                </div>\n            </section>\n            <!-- END ADMIN — drift-lock sentinel for tests/unit/admin-page-access.test.js. Do not move. -->\n\n        </main>\n    </div>\n\n    <!-- ===================================================\n         STAFF DIRECTORY MODAL — uses <dashboard-modal> custom element\n         =================================================== -->\n    <dashboard-modal id=\"staffDirectoryModal\" labelled-by=\"staffDirectoryTitle\">\n        <div class=\"staff-modal\">\n            <header class=\"staff-modal-header\">\n                <h2 id=\"staffDirectoryTitle\"><i class=\"fas fa-users\" aria-hidden=\"true\"></i> Staff Directory</h2>\n                <button type=\"button\" class=\"staff-modal-close\" data-modal-close aria-label=\"Close\">&times;</button>\n            </header>\n            <div class=\"staff-modal-toolbar\">\n                <input type=\"search\" id=\"staffDirectorySearch\" placeholder=\"Search by name or position…\" aria-label=\"Search staff\">\n                <button type=\"button\" class=\"staff-filter-btn active\" data-action=\"staff-directory:filter\" data-filter=\"all\">All</button>\n                <button type=\"button\" class=\"staff-filter-btn\"        data-action=\"staff-directory:filter\" data-filter=\"active\">Active</button>\n                <button type=\"button\" class=\"staff-filter-btn\"        data-action=\"staff-directory:filter\" data-filter=\"birthdays\">Birthdays</button>\n                <button type=\"button\" class=\"staff-filter-btn\"        data-action=\"staff-directory:filter\" data-filter=\"anniversaries\">Anniversaries</button>\n            </div>\n            <div class=\"staff-modal-content\">\n                <table class=\"staff-table\">\n                    <thead>\n                        <tr>\n                            <th scope=\"col\">Name</th>\n                            <th scope=\"col\">Position</th>\n                            <th scope=\"col\">Start Date</th>\n                            <th scope=\"col\">Years</th>\n                            <th scope=\"col\">Birthday</th>\n                            <th scope=\"col\">Status</th>\n                        </tr>\n                    </thead>\n                    <tbody id=\"staffDirectoryBody\"></tbody>\n                </table>\n            </div>\n        </div>\n    </dashboard-modal>\n\n    <!-- ============ New Quote launcher (2026-07-07 guided-quote entry) ============\n         Opened by #quote-start-btn in the Quote card. ONE question — decoration\n         method — then straight into that guided builder. \"Not sure\" routes to Quick\n         Quote's Quick Price mode (?mode=quick) which compares every method for one\n         style. Behavior: /staff-dashboard-v3/quote-launcher.js -->\n    <div class=\"ql-backdrop\" id=\"quote-launcher-backdrop\" hidden></div>\n    <div class=\"ql-dialog\" id=\"quote-launcher\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"ql-title\" hidden>\n        <button type=\"button\" class=\"ql-close\" id=\"quote-launcher-close\" aria-label=\"Close\">&times;</button>\n        <h2 class=\"ql-title\" id=\"ql-title\">What are we decorating?</h2>\n        <p class=\"ql-sub\">One question — the builder walks you through the rest. Need just a number? Stop after the first step.</p>\n        <div class=\"ql-grid\">\n            <a class=\"ql-chip\" data-method=\"emb\" data-label=\"Embroidery\" href=\"/quote-builders/embroidery-quote-builder.html\">\n                <i class=\"fas fa-tshirt\" aria-hidden=\"true\"></i>\n                <span class=\"ql-name\">Embroidery</span>\n                <span class=\"ql-desc\">polos · jackets · caps · patches</span>\n            </a>\n            <a class=\"ql-chip\" data-method=\"scp\" data-label=\"Screen Print\" href=\"/quote-builders/screenprint-quote-builder.html\">\n                <i class=\"fas fa-layer-group\" aria-hidden=\"true\"></i>\n                <span class=\"ql-name\">Screen Print</span>\n                <span class=\"ql-desc\">24+ pieces · spot-color art</span>\n            </a>\n            <a class=\"ql-chip\" data-method=\"dtg\" data-label=\"DTG\" href=\"/quote-builders/dtg-quote-builder.html\">\n                <i class=\"fas fa-print\" aria-hidden=\"true\"></i>\n                <span class=\"ql-name\">DTG</span>\n                <span class=\"ql-desc\">full-color art · small runs</span>\n            </a>\n            <a class=\"ql-chip\" data-method=\"dtf\" data-label=\"DTF Transfers\" href=\"/quote-builders/dtf-quote-builder.html\">\n                <i class=\"fas fa-fire\" aria-hidden=\"true\"></i>\n                <span class=\"ql-name\">DTF Transfers</span>\n                <span class=\"ql-desc\">mixed garments · poly-friendly</span>\n            </a>\n        </div>\n        <div class=\"ql-alt\">\n            <a href=\"/calculators/quick-quote/?mode=quick\"><i class=\"fas fa-bolt\" aria-hidden=\"true\"></i> <strong>Quick Quote</strong>&nbsp;— not sure? compare every method's price for one style</a>\n            <a href=\"/calculators/quick-quote/\"><i class=\"fas fa-bolt\" aria-hidden=\"true\"></i> <strong>Quick Quote line sheet</strong>&nbsp;— several styles, price sheet to email</a>\n        </div>\n    </div>\n    <script src=\"/staff-dashboard-v3/quote-launcher.js?v=2026.08.26.1\" defer></script>\n    <!-- Live past-due count on the header chip. Shows a red count when something is\n         late, a green \"All clear\" on a CONFIRMED zero, and nothing at all if the count\n         can't be fetched — an all-clear we haven't verified is worse than no badge. -->\n    <script src=\"/staff-dashboard-v3/past-due-badge.js?v=2026.09.03.13\" defer></script>\n\n    <!-- The eight live report widgets and their scripts (production-schedule-*,\n         caspio-date-utils, art-aging-widget) moved to /dashboards/company-numbers.html\n         on 2026-09-03 — nobody used them on the front page. The goal chip is the door. -->\n\n    <!-- Box url normaliser — the Pride Wall renders Finished_Photos rows whose stored\n         Image_URL is an absolute proxy url that 401s cross-origin. Classic (non-module)\n         script on purpose: it sets a global, and classic scripts run before any\n         type=\"module\", so window.boxUrl exists by the time the app entry below runs. -->\n    <script src=\"/shared_components/js/box-url.js?v=2026.08.05.23\"></script>\n\n    <!-- ===================================================\n         APP ENTRY (ES module)\n         =================================================== -->\n    <script type=\"module\" src=\"/shared_components/js/staff-dashboard/core/dashboard-app.js?v=2026.09.04.8\"></script>\n</body>\n</html>\n",
+      "title": "Staff Dashboard — Northwest Custom Apparel",
+      "bodyText": "Loading dashboard… Staff Dashboard Welcome, Past due 0% Loading… / $3M Team -- 🎂0 🏆0 Upcoming Birthdays Upcoming Anniversaries Shift Schedule Open Staff Directory View Org Chart (2026) Sign Out Ctrl K 🖼️ Pride Wall — made by us, lately Open the Photo Library → Sales Production Art Office Company Everything can't find it? it's here Admin Ctrl K finds any tool from any tab · green dot = your tab 📌 My Stuff SalesQuote it, price it, follow up. What Nika and Taneisha open all day. Most usedthe two pages the reps open every day AE Art Requestsend art to Steve, approve the proofs that come back Purchase Request · Bradleyask Bradley to buy blanks or supplies for a work order Quote New Quote pick the decoration, price it, send it Continue Quick Quoteany style fast, or a multi-style price sheet Saved Quotesfind, track and sync every saved quote Go straight to a builder 4 Embroidery Quotegarments, caps, 3D puff, patches DTG Quotefull-color prints on garments Screen Print Quotescreens, colors, safety stripes DTF Quoteheat-applied transfers Price it2 up front · 16 more $Price From Costtype any blank's cost, get our price for all five methods Shop MenuEst. 1977 · every service price More pricing — add-ons, customer supplied, contract, specialty, customer pages 16 Embroidery add-ons on NWCA garments Extra Logo2nd or 3rd logo on a garment we supply Big Stitch Countsadd-on over 10,000 stitches Full-Back Embroideryjacket backs, 25K+ designs Customer supplied Customer's Garmentembroidery labor on blanks they bring Print on Their Shirtsscreen-print labor on blanks they bring DTF and DTG on customer blanks — coming soon; use Price From Cost Contract wholesale · $250 minimum CContract Embroidery 2026.wholesale rates for decorators who bring blanks CContract DTG 2026.wholesale DTG on partners' own blanks Specialty & non-apparel Patch Quote (AI)sew-on patches, 25-pc min, 4–6 wks Engraved DrinkwarePolar Camel tumblers: color, stock, price Odd-Size Decalsover 6×6, odd shapes, under 50 pcsstaff Company Webstoresquote a branded store or fundraiser Richardson Directfactory-direct caps, and the 23 to buy via SanMar Customer price pages what the customer sees Tees Storefrontthe public tee shop — 20 styles, checkout Sticker Pricesevery 2×2–6×6 price, 50+ pieces Banner Pricesany size, priced by the square foot Customers Mission Controlyour bonus, your goals, and everything waiting on you today Leadsevery website, phone and walk-in enquiry, with who owns it My Accounts · Taneishayour account list by tier, with win-back bonus My Accounts · Nikayour account list by tier, with win-back bonus Also here House Accountsunassigned accounts, and who owns whatadmin Customer Portalsbrowse every customer's portal page Portal Accessinvite customers; work re-order requests Lead Scorecardhow leads convert, by rep and source Unqualified Leadsspam and no-fit enquiries Show the customer Design Vaultevery design we've ever made — search by name, number or customer Shirt Designerput a logo on a shirt, send for approval Photo Libraryevery finished-job photo; choose what customers see Tumbler Mockuplogo on a Polar Camel, download approval Saved Mockupsmockups you've built and sent Top Sellersbest-selling styles, most with a free sample Reference Sales & Office Procedures Customer Notification SOP LTM Order Decision Data Entry RulesShopWorks entry, live service codes Price Audit (Feb 2026)frozen study, 80 orders ProductionQueues, receiving, transfers. Brian's and Mikalah's tab; Ruthie's queue leads it. Queues Mockup Queue · Ruthiemockup requests in progress, completed, and on hold Also here Monogram Ordersevery order and its names, printable proof Names & Numbersteam rosters: name, number, size Past Due Orderswhat each late order is waiting on Shift Schedulewho works when; break and lunch rules Receiving & purchasing SanMar Inbound Calendartoday's SanMar boxes, line by line, with labels to print Also here Box Labelslook up a PO, sort into boxes, print Purchase Trackingwhere every blanks request stands Purchase Request· Bradleythe form that asks Bradley to buy blanks or supplies for a WO Roland Suppliesink and parts for the Roland — goes to Erik Transfers Transfer Queue · Bradleyheat transfers waiting to be ordered, rush flagged Supacolor Jobslive status at Supacolor, updated every 10 minutes Guides Dock Guidereceiving, shipping, pickups, close-day SanMar Purchasingorder blanks through ShopWorks Data Entry Rules Art files & photos Photo Capturescan the work order, shoot the piece, publish — works on your phone DST Studiostitch viewer · true-scale mockup · approval sheet Design Vaultsearch every design, any source Digitized Designsmaster list, with extra-logo prices Photo Librarybrowse and publish finished photos Old Designsthe legacy Megafile archive ArtSteve's and Ruthie's queues first, then the design tools. Queues Art Queue · Steveincoming art requests, and sending finished art to Bradley Mockup Queue · Ruthiemockup requests in progress, completed, and on hold Also here AE Art Requestwhat the reps submit and approve Design Queuedesigns waiting on a decision 253gear Publisherpush a design to the 253gear store Design tools DST Studiostitch viewer · true-scale mockup · approval sheet Design Vaultevery design we've ever made, one search Also here Shirt Designerlogo on a shirt, front/back, spin, proof Tumbler MockupPolar Camel color + logo, approval image Saved Mockups Digitized Designsmaster list, with extra-logo prices Old Designsthe legacy Megafile archive Photos & hand-off Photo Captureshoot the finished piece, publish it Photo Librarybrowse and publish finished photos To production Monogram Orders Names & Numbers Transfer Queue· Bradleysend files for Supacolor OfficePurchasing, transfers, money and portals. Bradley's and Jim's tab. Transfers & purchasing Transfer Queuestep 1 · what to order Supacolor Jobsstep 2 · where it is Purchase Trackingevery blanks request: sent → ordered → received → shipped SanMar Inbound Calendarincoming boxes by day, box labels, PDF Also here Purchase Request· Bradleythe form reps fill in to ask Bradley for blanks Roland Supplies Box Labels Non-SanMar Itemscatalog products we don't buy from SanMar Richardson Directand the 23 styles to buy via SanMar Money & customers Saved Quotesfind, track and sync every saved quote Leadsevery enquiry, with who owns it House Accountsadmin Customer Portalsbrowse every customer's portal page Portal Accessinvites, rewards, re-order requests Prospect Mailing List· Jimbig-type add, edit, search Forms Inboxsubmitted forms, samples-out tracker Customer price pages Tees Storefrontthe public tee shop customers buy from Sticker Pricesevery 2×2–6×6 price Banner Pricesany size, by the square foot Company Webstoresquote a store or fundraiser Top Sellers CompanyPolicies, forms, training, bundles and people. Policies & procedures Policies Hubevery company policy and SOP, searchable, always current Sales & Office Procedures Customer Notification SOP LTM Order Decision Org Chart 2026interactive, with member search Training Training Centerevery guide by role Data Entry RulesShopWorks entry, live codes Customer Service Manual Sales Coordinator Bookchapter by chapter Dock Guiderun the dock, with checklists SanMar Purchasingthree phases, with videos Tips Archiveevery quick-hitter tip Training Games Forms Forms Libraryprintable and fillable, by category Forms Inboxsubmissions, samples-out tracker Employee bundlescustomer-facing order pages Drain-Pro Bundletheir staff pick sizes here Streich Bros Bundle WCTTR Bundle Christmas Gift Boxesseasonal Carhartt gift-box builder People & tools Shift Schedulewho works when, break rules Staff Directorybirthdays, anniversaries InkSoft Transform↗InkSoft → ShopWorks; full bonus dashboard EverythingEvery tool on the page, grouped the old way. Built from the other tabs, so it can never miss one. AdminThe Administration links, same six groups. A lock means Erik-only. Money & Payroll SanMar Payablesopen invoices, CSV, marketing fund Payrollvacation hours, packet upload Store Commissions Volume Quoteone-time price for 72+ orders Marketing Blog Editorwrite and publish posts SEO Strategy Brand Standardscolours, type and spacing every page follows, read live from the token file Access & Policy Access Adminroles and page access Policy Migration Drive Accesswho sees which network drive Integrations Bandit Integrationsync tasks and agents SanMar Downloads Parts ConverterSanMar list → ShopWorks parts Vendor Invoiceslegacy Caspio portal Records Admin Print-Box Calibrationwhere art prints on each tee Analysis Company Numbersrevenue, team YTD, Q3 push, payments, turnaround estimates Pricing Analysiscost, margin, realization Contract Break-Even API Reference API UsageCaspio call attribution Caspio API Docs Table Audit ManageOrders Docs SanMar API Docs ShopWorks ODBC Staff Directory × All Active Birthdays Anniversaries Name Position Start Date Years Birthday Status × What are we decorating? One question — the builder walks you through the rest. Need just a number? Stop after the first step. Embroidery polos · jackets · caps · patches Screen Print 24+ pieces · spot-color art DTG full-color art · small runs DTF Transfers mixed garments · poly-friendly Quick Quote — not sure? compare every method's price for one style Quick Quote line sheet — several styles, price sheet to email",
+      "bodyTextSha": "a3a901abec8f6d81650fdc92b8b783c735f48b21d3adce7927a6ed541ee1aa5d",
+      "ids": [
+        "loadingOverlay",
+        "userWelcome",
+        "userName",
+        "nav-pd-badge",
+        "goalPercent",
+        "goalProgress",
+        "goalCurrent",
+        "goalOf",
+        "teamBtn",
+        "teamActiveCount",
+        "teamBdayCount",
+        "teamAnnivCount",
+        "teamDropdown",
+        "teamBirthdayList",
+        "teamAnniversaryList",
+        "heroSearch",
+        "cpInput",
+        "cpClear",
+        "cpPanel",
+        "cpResults",
+        "cpStatus",
+        "prideWall",
+        "pwTrack",
+        "wsTabs",
+        "ws-tab-sales",
+        "ws-tab-production",
+        "ws-tab-art",
+        "ws-tab-office",
+        "ws-tab-company",
+        "ws-tab-everything",
+        "ws-tab-admin",
+        "myStuffRow",
+        "myStuffList",
+        "ws-sales",
+        "quote-start-btn",
+        "quote-continue-chip",
+        "quote-continue-label",
+        "ws-production",
+        "ws-art",
+        "ws-office",
+        "ws-company",
+        "ws-everything",
+        "wsEveryFilter",
+        "wsEveryCount",
+        "wsEveryTools",
+        "ws-admin",
+        "staffDirectoryModal",
+        "staffDirectoryTitle",
+        "staffDirectorySearch",
+        "staffDirectoryBody",
+        "quote-launcher-backdrop",
+        "quote-launcher",
+        "quote-launcher-close",
+        "ql-title"
+      ],
+      "links": [
+        {
+          "href": "/",
+          "label": ""
+        },
+        {
+          "href": "/dashboards/past-due-orders.html",
+          "label": "Past due"
+        },
+        {
+          "href": "/dashboards/company-numbers.html",
+          "label": "0% Loading… / $3M"
+        },
+        {
+          "href": "/dashboards/production-shifts.html",
+          "label": "Shift Schedule"
+        },
+        {
+          "href": "/pages/policy-detail.html?id=org-chart-2026",
+          "label": "View Org Chart (2026)"
+        },
+        {
+          "href": "/auth/saml/logout",
+          "label": "Sign Out"
+        },
+        {
+          "href": "/dashboards/finished-photos-library.html",
+          "label": "Open the Photo Library →"
+        },
+        {
+          "href": "/ae-dashboard.html",
+          "label": "AE Art Requestsend art to Steve, approve the proofs that come back"
+        },
+        {
+          "href": "/calculators/purchasingform.html",
+          "label": "Purchase Request · Bradleyask Bradley to buy blanks or supplies for a work order"
+        },
+        {
+          "href": "#",
+          "label": "Continue"
+        },
+        {
+          "href": "/calculators/quick-quote/",
+          "label": "Quick Quoteany style fast, or a multi-style price sheet"
+        },
+        {
+          "href": "/dashboards/quote-management.html",
+          "label": "Saved Quotesfind, track and sync every saved quote"
+        },
+        {
+          "href": "/quote-builders/embroidery-quote-builder.html",
+          "label": "Embroidery Quotegarments, caps, 3D puff, patches"
+        },
+        {
+          "href": "/quote-builders/dtg-quote-builder.html",
+          "label": "DTG Quotefull-color prints on garments"
+        },
+        {
+          "href": "/quote-builders/screenprint-quote-builder.html",
+          "label": "Screen Print Quotescreens, colors, safety stripes"
+        },
+        {
+          "href": "/quote-builders/dtf-quote-builder.html",
+          "label": "DTF Quoteheat-applied transfers"
+        },
+        {
+          "href": "/calculators/manual-pricing.html",
+          "label": "$Price From Costtype any blank's cost, get our price for all five methods"
+        },
+        {
+          "href": "/calculators/service-price-cheat-sheet.html",
+          "label": "Shop MenuEst. 1977 · every service price"
+        },
+        {
+          "href": "/calculators/embroidery-pricing-all/?tab=al-retail",
+          "label": "Extra Logo2nd or 3rd logo on a garment we supply"
+        },
+        {
+          "href": "/calculators/embroidery-pricing-all/?tab=stitch-charges",
+          "label": "Big Stitch Countsadd-on over 10,000 stitches"
+        },
+        {
+          "href": "/calculators/embroidery-pricing-all/?tab=fullback",
+          "label": "Full-Back Embroideryjacket backs, 25K+ designs"
+        },
+        {
+          "href": "/calculators/embroidery-pricing-all/?tab=decg-retail",
+          "label": "Customer's Garmentembroidery labor on blanks they bring"
+        },
+        {
+          "href": "/calculators/screenprint-customer/",
+          "label": "Print on Their Shirtsscreen-print labor on blanks they bring"
+        },
+        {
+          "href": "/calculators/embroidery-contract/",
+          "label": "CContract Embroidery 2026.wholesale rates for decorators who bring blanks"
+        },
+        {
+          "href": "/calculators/dtg-contract/",
+          "label": "CContract DTG 2026.wholesale DTG on partners' own blanks"
+        },
+        {
+          "href": "/calculators/embroidered-emblem/",
+          "label": "Patch Quote (AI)sew-on patches, 25-pc min, 4–6 wks"
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "label": "Engraved DrinkwarePolar Camel tumblers: color, stock, price"
+        },
+        {
+          "href": "/calculators/custom-decal-pricing.html",
+          "label": "Odd-Size Decalsover 6×6, odd shapes, under 50 pcsstaff"
+        },
+        {
+          "href": "/calculators/webstores.html",
+          "label": "Company Webstoresquote a branded store or fundraiser"
+        },
+        {
+          "href": "/calculators/richardson-2025.html",
+          "label": "Richardson Directfactory-direct caps, and the 23 to buy via SanMar"
+        },
+        {
+          "href": "/custom-tees",
+          "label": "Tees Storefrontthe public tee shop — 20 styles, checkout"
+        },
+        {
+          "href": "/custom-stickers",
+          "label": "Sticker Pricesevery 2×2–6×6 price, 50+ pieces"
+        },
+        {
+          "href": "/custom-banners",
+          "label": "Banner Pricesany size, priced by the square foot"
+        },
+        {
+          "href": "/dashboards/ae-mission-control.html",
+          "label": "Mission Controlyour bonus, your goals, and everything waiting on you today"
+        },
+        {
+          "href": "/dashboards/leads.html",
+          "label": "Leadsevery website, phone and walk-in enquiry, with who owns it"
+        },
+        {
+          "href": "/dashboards/taneisha-crm.html",
+          "label": "My Accounts · Taneishayour account list by tier, with win-back bonus"
+        },
+        {
+          "href": "/dashboards/nika-crm.html",
+          "label": "My Accounts · Nikayour account list by tier, with win-back bonus"
+        },
+        {
+          "href": "/dashboards/house-accounts.html",
+          "label": "House Accountsunassigned accounts, and who owns whatadmin"
+        },
+        {
+          "href": "/dashboards/portal-directory.html",
+          "label": "Customer Portalsbrowse every customer's portal page"
+        },
+        {
+          "href": "/dashboards/customer-portal-admin.html",
+          "label": "Portal Accessinvite customers; work re-order requests"
+        },
+        {
+          "href": "/dashboards/lead-scorecard.html",
+          "label": "Lead Scorecardhow leads convert, by rep and source"
+        },
+        {
+          "href": "/dashboards/unqualified-leads.html",
+          "label": "Unqualified Leadsspam and no-fit enquiries"
+        },
+        {
+          "href": "/dashboards/design-gallery.html",
+          "label": "Design Vaultevery design we've ever made — search by name, number or customer"
+        },
+        {
+          "href": "/pages/garment-designer.html",
+          "label": "Shirt Designerput a logo on a shirt, send for approval"
+        },
+        {
+          "href": "/dashboards/finished-photos-library.html",
+          "label": "Photo Libraryevery finished-job photo; choose what customers see"
+        },
+        {
+          "href": "/pages/jds-mockup-creator.html",
+          "label": "Tumbler Mockuplogo on a Polar Camel, download approval"
+        },
+        {
+          "href": "/pages/mockup-library.html",
+          "label": "Saved Mockupsmockups you've built and sent"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "label": "Top Sellersbest-selling styles, most with a free sample"
+        },
+        {
+          "href": "/pages/policy-detail.html?id=sales-office-procedures",
+          "label": "Sales & Office Procedures"
+        },
+        {
+          "href": "/pages/policy-detail.html?id=customer-notification-sop",
+          "label": "Customer Notification SOP"
+        },
+        {
+          "href": "/pages/policy-detail.html?id=ltm-order-decision-algorithm",
+          "label": "LTM Order Decision"
+        },
+        {
+          "href": "/pages/data-entry-guide.html",
+          "label": "Data Entry RulesShopWorks entry, live service codes"
+        },
+        {
+          "href": "/dashboards/reports/price-audit-report.html",
+          "label": "Price Audit (Feb 2026)frozen study, 80 orders"
+        },
+        {
+          "href": "/dashboards/art-hub-ruth.html",
+          "label": "Mockup Queue · Ruthiemockup requests in progress, completed, and on hold"
+        },
+        {
+          "href": "/dashboards/monogram-dashboard.html",
+          "label": "Monogram Ordersevery order and its names, printable proof"
+        },
+        {
+          "href": "/dashboards/names-numbers-dashboard.html",
+          "label": "Names & Numbersteam rosters: name, number, size"
+        },
+        {
+          "href": "/dashboards/past-due-orders.html",
+          "label": "Past Due Orderswhat each late order is waiting on"
+        },
+        {
+          "href": "/dashboards/production-shifts.html",
+          "label": "Shift Schedulewho works when; break and lunch rules"
+        },
+        {
+          "href": "/dashboards/quote-management.html?open=inbound-today",
+          "label": "SanMar Inbound Calendartoday's SanMar boxes, line by line, with labels to print"
+        },
+        {
+          "href": "/pages/box-labels.html",
+          "label": "Box Labelslook up a PO, sort into boxes, print"
+        },
+        {
+          "href": "/dashboards/purchasing-portal.html",
+          "label": "Purchase Trackingwhere every blanks request stands"
+        },
+        {
+          "href": "/calculators/purchasingform.html",
+          "label": "Purchase Request· Bradleythe form that asks Bradley to buy blanks or supplies for a WO"
+        },
+        {
+          "href": "/dashboards/roland-printer-supplies.html",
+          "label": "Roland Suppliesink and parts for the Roland — goes to Erik"
+        },
+        {
+          "href": "/dashboards/bradley-transfers.html",
+          "label": "Transfer Queue · Bradleyheat transfers waiting to be ordered, rush flagged"
+        },
+        {
+          "href": "/dashboards/supacolor-orders.html",
+          "label": "Supacolor Jobslive status at Supacolor, updated every 10 minutes"
+        },
+        {
+          "href": "/training/shipping-receiving-guide.html",
+          "label": "Dock Guidereceiving, shipping, pickups, close-day"
+        },
+        {
+          "href": "/training/sanmar-purchasing-guide.html",
+          "label": "SanMar Purchasingorder blanks through ShopWorks"
+        },
+        {
+          "href": "/pages/data-entry-guide.html",
+          "label": "Data Entry Rules"
+        },
+        {
+          "href": "/dashboards/finished-photos.html",
+          "label": "Photo Capturescan the work order, shoot the piece, publish — works on your phone"
+        },
+        {
+          "href": "/pages/dst-viewer.html",
+          "label": "DST Studiostitch viewer · true-scale mockup · approval sheet"
+        },
+        {
+          "href": "/dashboards/design-gallery.html",
+          "label": "Design Vaultsearch every design, any source"
+        },
+        {
+          "href": "/dashboards/digitized-designs.html",
+          "label": "Digitized Designsmaster list, with extra-logo prices"
+        },
+        {
+          "href": "/dashboards/finished-photos-library.html",
+          "label": "Photo Librarybrowse and publish finished photos"
+        },
+        {
+          "href": "/dashboards/old-designs.html",
+          "label": "Old Designsthe legacy Megafile archive"
+        },
+        {
+          "href": "/dashboards/art-hub-steve.html",
+          "label": "Art Queue · Steveincoming art requests, and sending finished art to Bradley"
+        },
+        {
+          "href": "/dashboards/art-hub-ruth.html",
+          "label": "Mockup Queue · Ruthiemockup requests in progress, completed, and on hold"
+        },
+        {
+          "href": "/ae-dashboard.html",
+          "label": "AE Art Requestwhat the reps submit and approve"
+        },
+        {
+          "href": "/dashboards/design-queue.html",
+          "label": "Design Queuedesigns waiting on a decision"
+        },
+        {
+          "href": "/dashboards/gear-publisher.html",
+          "label": "253gear Publisherpush a design to the 253gear store"
+        },
+        {
+          "href": "/pages/dst-viewer.html",
+          "label": "DST Studiostitch viewer · true-scale mockup · approval sheet"
+        },
+        {
+          "href": "/dashboards/design-gallery.html",
+          "label": "Design Vaultevery design we've ever made, one search"
+        },
+        {
+          "href": "/pages/garment-designer.html",
+          "label": "Shirt Designerlogo on a shirt, front/back, spin, proof"
+        },
+        {
+          "href": "/pages/jds-mockup-creator.html",
+          "label": "Tumbler MockupPolar Camel color + logo, approval image"
+        },
+        {
+          "href": "/pages/mockup-library.html",
+          "label": "Saved Mockups"
+        },
+        {
+          "href": "/dashboards/digitized-designs.html",
+          "label": "Digitized Designsmaster list, with extra-logo prices"
+        },
+        {
+          "href": "/dashboards/old-designs.html",
+          "label": "Old Designsthe legacy Megafile archive"
+        },
+        {
+          "href": "/dashboards/finished-photos.html",
+          "label": "Photo Captureshoot the finished piece, publish it"
+        },
+        {
+          "href": "/dashboards/finished-photos-library.html",
+          "label": "Photo Librarybrowse and publish finished photos"
+        },
+        {
+          "href": "/dashboards/monogram-dashboard.html",
+          "label": "Monogram Orders"
+        },
+        {
+          "href": "/dashboards/names-numbers-dashboard.html",
+          "label": "Names & Numbers"
+        },
+        {
+          "href": "/dashboards/bradley-transfers.html",
+          "label": "Transfer Queue· Bradleysend files for Supacolor"
+        },
+        {
+          "href": "/dashboards/bradley-transfers.html",
+          "label": "Transfer Queuestep 1 · what to order"
+        },
+        {
+          "href": "/dashboards/supacolor-orders.html",
+          "label": "Supacolor Jobsstep 2 · where it is"
+        },
+        {
+          "href": "/dashboards/purchasing-portal.html",
+          "label": "Purchase Trackingevery blanks request: sent → ordered → received → shipped"
+        },
+        {
+          "href": "/dashboards/quote-management.html?open=inbound-today",
+          "label": "SanMar Inbound Calendarincoming boxes by day, box labels, PDF"
+        },
+        {
+          "href": "/calculators/purchasingform.html",
+          "label": "Purchase Request· Bradleythe form reps fill in to ask Bradley for blanks"
+        },
+        {
+          "href": "/dashboards/roland-printer-supplies.html",
+          "label": "Roland Supplies"
+        },
+        {
+          "href": "/pages/box-labels.html",
+          "label": "Box Labels"
+        },
+        {
+          "href": "/dashboards/product-manager.html",
+          "label": "Non-SanMar Itemscatalog products we don't buy from SanMar"
+        },
+        {
+          "href": "/calculators/richardson-2025.html",
+          "label": "Richardson Directand the 23 styles to buy via SanMar"
+        },
+        {
+          "href": "/dashboards/quote-management.html",
+          "label": "Saved Quotesfind, track and sync every saved quote"
+        },
+        {
+          "href": "/dashboards/leads.html",
+          "label": "Leadsevery enquiry, with who owns it"
+        },
+        {
+          "href": "/dashboards/house-accounts.html",
+          "label": "House Accountsadmin"
+        },
+        {
+          "href": "/dashboards/portal-directory.html",
+          "label": "Customer Portalsbrowse every customer's portal page"
+        },
+        {
+          "href": "/dashboards/customer-portal-admin.html",
+          "label": "Portal Accessinvites, rewards, re-order requests"
+        },
+        {
+          "href": "/dashboards/jim-mailing-list.html",
+          "label": "Prospect Mailing List· Jimbig-type add, edit, search"
+        },
+        {
+          "href": "/dashboards/form-submissions.html",
+          "label": "Forms Inboxsubmitted forms, samples-out tracker"
+        },
+        {
+          "href": "/custom-tees",
+          "label": "Tees Storefrontthe public tee shop customers buy from"
+        },
+        {
+          "href": "/custom-stickers",
+          "label": "Sticker Pricesevery 2×2–6×6 price"
+        },
+        {
+          "href": "/custom-banners",
+          "label": "Banner Pricesany size, by the square foot"
+        },
+        {
+          "href": "/calculators/webstores.html",
+          "label": "Company Webstoresquote a store or fundraiser"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "label": "Top Sellers"
+        },
+        {
+          "href": "/pages/policies-hub.html",
+          "label": "Policies Hubevery company policy and SOP, searchable, always current"
+        },
+        {
+          "href": "/pages/policy-detail.html?id=sales-office-procedures",
+          "label": "Sales & Office Procedures"
+        },
+        {
+          "href": "/pages/policy-detail.html?id=customer-notification-sop",
+          "label": "Customer Notification SOP"
+        },
+        {
+          "href": "/pages/policy-detail.html?id=ltm-order-decision-algorithm",
+          "label": "LTM Order Decision"
+        },
+        {
+          "href": "/pages/policy-detail.html?id=org-chart-2026",
+          "label": "Org Chart 2026interactive, with member search"
+        },
+        {
+          "href": "/training/index.html",
+          "label": "Training Centerevery guide by role"
+        },
+        {
+          "href": "/pages/data-entry-guide.html",
+          "label": "Data Entry RulesShopWorks entry, live codes"
+        },
+        {
+          "href": "/training/customer-service.html",
+          "label": "Customer Service Manual"
+        },
+        {
+          "href": "/training/sales-coordinator-manual.html",
+          "label": "Sales Coordinator Bookchapter by chapter"
+        },
+        {
+          "href": "/training/shipping-receiving-guide.html",
+          "label": "Dock Guiderun the dock, with checklists"
+        },
+        {
+          "href": "/training/sanmar-purchasing-guide.html",
+          "label": "SanMar Purchasingthree phases, with videos"
+        },
+        {
+          "href": "/training/quick-reference-tips.html",
+          "label": "Tips Archiveevery quick-hitter tip"
+        },
+        {
+          "href": "/training/training-games-hub.html",
+          "label": "Training Games"
+        },
+        {
+          "href": "/dashboards/forms-library.html",
+          "label": "Forms Libraryprintable and fillable, by category"
+        },
+        {
+          "href": "/dashboards/form-submissions.html",
+          "label": "Forms Inboxsubmissions, samples-out tracker"
+        },
+        {
+          "href": "/DrainPro-Bundle.html",
+          "label": "Drain-Pro Bundletheir staff pick sizes here"
+        },
+        {
+          "href": "/streich-bros-bundle.html",
+          "label": "Streich Bros Bundle"
+        },
+        {
+          "href": "/wcttr-bundle.html",
+          "label": "WCTTR Bundle"
+        },
+        {
+          "href": "/christmas-bundles.html",
+          "label": "Christmas Gift Boxesseasonal Carhartt gift-box builder"
+        },
+        {
+          "href": "/dashboards/production-shifts.html",
+          "label": "Shift Schedulewho works when, break rules"
+        },
+        {
+          "href": "https://inksoft-transform-8a3dc4e38097.herokuapp.com/",
+          "label": "InkSoft Transform↗InkSoft → ShopWorks; full bonus dashboard"
+        },
+        {
+          "href": "/dashboards/sanmar-payables.html",
+          "label": "SanMar Payablesopen invoices, CSV, marketing fund"
+        },
+        {
+          "href": "/dashboards/payroll.html",
+          "label": "Payrollvacation hours, packet upload"
+        },
+        {
+          "href": "/dashboards/commission-structure.html",
+          "label": "Store Commissions"
+        },
+        {
+          "href": "/dashboards/volume-quote.html",
+          "label": "Volume Quoteone-time price for 72+ orders"
+        },
+        {
+          "href": "/dashboards/blog-editor.html",
+          "label": "Blog Editorwrite and publish posts"
+        },
+        {
+          "href": "/dashboards/seo-strategy.html",
+          "label": "SEO Strategy"
+        },
+        {
+          "href": "/dashboards/brand-standards.html",
+          "label": "Brand Standardscolours, type and spacing every page follows, read live from the token file"
+        },
+        {
+          "href": "/dashboards/access-admin.html",
+          "label": "Access Adminroles and page access"
+        },
+        {
+          "href": "/dashboards/policy-migration.html",
+          "label": "Policy Migration"
+        },
+        {
+          "href": "/dashboards/drive-access.html",
+          "label": "Drive Accesswho sees which network drive"
+        },
+        {
+          "href": "/dashboards/bandit-integration.html",
+          "label": "Bandit Integrationsync tasks and agents"
+        },
+        {
+          "href": "/dashboards/sanmar-ftp-integration.html",
+          "label": "SanMar Downloads"
+        },
+        {
+          "href": "/dashboards/sanmar-shopworks-converter.html",
+          "label": "Parts ConverterSanMar list → ShopWorks parts"
+        },
+        {
+          "href": "/sanmar-vendor-portal.html",
+          "label": "Vendor Invoiceslegacy Caspio portal"
+        },
+        {
+          "href": "/universal-records-admin.html",
+          "label": "Records Admin"
+        },
+        {
+          "href": "/tools/custom-tees-calibrate.html",
+          "label": "Print-Box Calibrationwhere art prints on each tee"
+        },
+        {
+          "href": "/dashboards/company-numbers.html",
+          "label": "Company Numbersrevenue, team YTD, Q3 push, payments, turnaround estimates"
+        },
+        {
+          "href": "/dashboards/pricing-analysis.html",
+          "label": "Pricing Analysiscost, margin, realization"
+        },
+        {
+          "href": "/dashboards/contract-break-even.html",
+          "label": "Contract Break-Even"
+        },
+        {
+          "href": "/dashboards/api-usage.html",
+          "label": "API UsageCaspio call attribution"
+        },
+        {
+          "href": "/dashboards/caspio-api-reference.html",
+          "label": "Caspio API Docs"
+        },
+        {
+          "href": "/dashboards/table-usage-audit.html",
+          "label": "Table Audit"
+        },
+        {
+          "href": "/dashboards/manageorders-api-reference.html",
+          "label": "ManageOrders Docs"
+        },
+        {
+          "href": "/dashboards/sanmar-api-reference.html",
+          "label": "SanMar API Docs"
+        },
+        {
+          "href": "/dashboards/shopworks-odbc-reference.html",
+          "label": "ShopWorks ODBC"
+        },
+        {
+          "href": "/quote-builders/embroidery-quote-builder.html",
+          "label": "Embroidery polos · jackets · caps · patches"
+        },
+        {
+          "href": "/quote-builders/screenprint-quote-builder.html",
+          "label": "Screen Print 24+ pieces · spot-color art"
+        },
+        {
+          "href": "/quote-builders/dtg-quote-builder.html",
+          "label": "DTG full-color art · small runs"
+        },
+        {
+          "href": "/quote-builders/dtf-quote-builder.html",
+          "label": "DTF Transfers mixed garments · poly-friendly"
+        },
+        {
+          "href": "/calculators/quick-quote/?mode=quick",
+          "label": "Quick Quote — not sure? compare every method's price for one style"
+        },
+        {
+          "href": "/calculators/quick-quote/",
+          "label": "Quick Quote line sheet — several styles, price sheet to email"
+        }
+      ],
+      "fields": [
+        {
+          "id": "cpInput",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "wsEveryFilter",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "staffDirectorySearch",
+          "type": "search",
+          "value": ""
+        }
+      ],
+      "styles": [
+        "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Bodoni+Moda:opsz,wght@6..96,600;6..96,700&family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,600&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&display=swap",
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
+        "/shared_components/css/tokens.css?v=2026.09.08.2",
+        "/shared_components/css/staff-dashboard/tokens.css?v=2026.09.07.3",
+        "/shared_components/css/staff-dashboard/base.css?v=2026.09.07.10",
+        "/shared_components/css/staff-dashboard/components.css?v=2026.09.07.19",
+        "/shared_components/css/staff-dashboard/utilities.css?v=2026.09.07.10",
+        "/shared_components/css/staff-dashboard/dashboard-v3-theme.css?v=2026.09.07.19",
+        "/shared_components/css/staff-dashboard/dashboard-v3-patch-2.css?v=2026.09.07.19",
+        "/shared_components/css/staff-dashboard/phase1-widgets.css?v=2026.09.07.10",
+        "/shared_components/css/staff-dashboard/command-palette.css?v=2026.09.07.10",
+        "/shared_components/css/staff-dashboard/workspaces.css?v=2026.09.07.19"
+      ],
+      "scripts": [
+        "/config/app.config.js",
+        "/staff-dashboard-v3/quote-launcher.js?v=2026.08.26.1",
+        "/staff-dashboard-v3/past-due-badge.js?v=2026.09.03.13",
+        "/shared_components/js/box-url.js?v=2026.08.05.23",
+        "/shared_components/js/staff-dashboard/core/dashboard-app.js?v=2026.09.04.8"
+      ],
+      "cssBytes": 246827
+    },
+    {
+      "file": "tools/custom-tees-calibrate.html",
+      "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <meta name=\"robots\" content=\"noindex, nofollow\">\n    <title>Custom Tees — Print-Box Calibration (Staff) | NWCA</title>\n    <link rel=\"icon\" href=\"/favicon.png\" type=\"image/png\">\n    <link href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css\" rel=\"stylesheet\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link rel=\"stylesheet\" href=\"/tools/custom-tees-calibrate.css?v=2026.09.07.19\">\n</head>\n<body>\n    <header class=\"cal-head\">\n        <div>\n            <h1><i class=\"fas fa-crosshairs\" aria-hidden=\"true\"></i> Custom Tees — Print-Box Calibration</h1>\n            <p>Drag the green box onto the chest area once per style — every order preview uses your layout from then on. The box is the 16″×20″ print envelope (aspect locked). Saves to Caspio instantly, no deploy.</p>\n        </div>\n        <a class=\"cal-link\" href=\"/staff-dashboard.html\"><i class=\"fas fa-arrow-left\" aria-hidden=\"true\"></i> Dashboard</a>\n        <a class=\"cal-link\" href=\"/custom-tees\" target=\"_blank\" rel=\"noopener\"><i class=\"fas fa-arrow-up-right-from-square\" aria-hidden=\"true\"></i> Open storefront</a>\n    </header>\n\n    <main class=\"cal-main\">\n        <!-- LEFT: style list -->\n        <aside class=\"cal-styles\">\n            <h2>Styles</h2>\n            <div id=\"style-list\" class=\"style-list\">\n                <div class=\"cal-loading\"><i class=\"fas fa-spinner fa-spin\" aria-hidden=\"true\"></i> Loading catalog…</div>\n            </div>\n        </aside>\n\n        <!-- RIGHT: the canvas -->\n        <section class=\"cal-stage\">\n            <div class=\"cal-toolbar\">\n                <div class=\"cal-tabs\" role=\"tablist\">\n                    <button type=\"button\" id=\"cal-tab-front\" class=\"cal-tab is-active\" role=\"tab\">Front</button>\n                    <button type=\"button\" id=\"cal-tab-back\" class=\"cal-tab\" role=\"tab\">Back</button>\n                </div>\n                <select id=\"cal-color\" class=\"cal-color\" title=\"Color photo to lay out on\"></select>\n                <label class=\"cal-coloronly\">\n                    <input type=\"checkbox\" id=\"cal-color-only\"> Save for this color only\n                </label>\n            </div>\n\n            <div class=\"cal-canvas-wrap\" id=\"cal-canvas-wrap\">\n                <img id=\"cal-photo\" alt=\"Garment photo\" draggable=\"false\">\n                <div id=\"cal-box\" class=\"cal-box\" hidden>\n                    <span class=\"cal-box-label\">16″ × 20″ print envelope</span>\n                    <span class=\"cal-box-handle\" id=\"cal-box-handle\"><i class=\"fas fa-up-right-and-down-left-from-center\" aria-hidden=\"true\"></i></span>\n                </div>\n                <div class=\"cal-empty\" id=\"cal-empty\">Pick a style on the left to start</div>\n            </div>\n\n            <div class=\"cal-readout\" id=\"cal-readout\"></div>\n\n            <div class=\"cal-actions\">\n                <button type=\"button\" id=\"cal-save\" class=\"cal-btn cal-btn-primary\"><i class=\"fas fa-floppy-disk\" aria-hidden=\"true\"></i> Save layout</button>\n                <button type=\"button\" id=\"cal-auto\" class=\"cal-btn\"><i class=\"fas fa-wand-magic-sparkles\" aria-hidden=\"true\"></i> Reset to auto-detect</button>\n                <button type=\"button\" id=\"cal-delete\" class=\"cal-btn cal-btn-danger\" hidden><i class=\"fas fa-trash-can\" aria-hidden=\"true\"></i> Remove saved layout</button>\n                <button type=\"button\" id=\"cal-copy\" class=\"cal-btn\"><i class=\"fas fa-copy\" aria-hidden=\"true\"></i> Copy JSON</button>\n            </div>\n            <p class=\"cal-note\" id=\"cal-status\"></p>\n        </section>\n    </main>\n\n    <div id=\"cal-toasts\" class=\"cal-toasts\" aria-live=\"polite\"></div>\n\n    <script src=\"/config/app.config.js\"></script>\n    <script src=\"/tools/custom-tees-calibrate.js?v=2026.09.06.31\"></script>\n</body>\n</html>\n",
+      "title": "Custom Tees — Print-Box Calibration (Staff) | NWCA",
+      "bodyText": "Custom Tees — Print-Box Calibration Drag the green box onto the chest area once per style — every order preview uses your layout from then on. The box is the 16″×20″ print envelope (aspect locked). Saves to Caspio instantly, no deploy. Dashboard Open storefront Styles Loading catalog… Front Back Save for this color only 16″ × 20″ print envelope Pick a style on the left to start Save layout Reset to auto-detect Remove saved layout Copy JSON",
+      "bodyTextSha": "db428e9bb11cd99de320c03a32706e51235c3ae6bb5e26c8125816dbed0c96dd",
+      "ids": [
+        "style-list",
+        "cal-tab-front",
+        "cal-tab-back",
+        "cal-color",
+        "cal-color-only",
+        "cal-canvas-wrap",
+        "cal-photo",
+        "cal-box",
+        "cal-box-handle",
+        "cal-empty",
+        "cal-readout",
+        "cal-save",
+        "cal-auto",
+        "cal-delete",
+        "cal-copy",
+        "cal-status",
+        "cal-toasts"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Dashboard"
+        },
+        {
+          "href": "/custom-tees",
+          "label": "Open storefront"
+        }
+      ],
+      "fields": [
+        {
+          "id": "cal-color",
+          "type": "select-one",
+          "value": ""
+        },
+        {
+          "id": "cal-color-only",
+          "type": "checkbox",
+          "value": "on"
+        }
+      ],
+      "styles": [
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
+        "/shared_components/css/tokens.css?v=2026.09.08.2",
+        "/tools/custom-tees-calibrate.css?v=2026.09.07.19"
+      ],
+      "scripts": [
+        "/config/app.config.js",
+        "/tools/custom-tees-calibrate.js?v=2026.09.06.31"
+      ],
+      "cssBytes": 21871
+    }
+  ],
+  "hashes": {
+    "admin/css/universal-records-admin-injected.css": "bee1d261db9f387875042ece75437b50081558f6af2470a20cf292e40e758ea2",
+    "admin/css/universal-records-admin.css": "511dd6ddce1180297245f602e053d9e0ac80cda9c5f886861b5a05305f4e9c32",
+    "admin/js/universal-records-admin.js": "feb51c1229d84cdf51a7814ccebf559e7218d228cb978942c2656e307fd988ef",
+    "admin/universal-records-admin.html": "9ead7a646e335ed0a36c7aae074ba0a9106c4b635c3d551bb45530e3dfe173b7",
+    "config/app.config.js": "fe83e4329ce3eee97e48dd68dab81d9d5eb6ec94511d9650e2c9ebbb1528d6ea",
+    "pages/box-labels.html": "c877da7c467b2e6695eb9bf18bca1f4e9db9bd5fb238a245daade3f1aa1ebd8c",
+    "pages/css/box-labels.css": "be79d93a4b5aeb39aa37245b2f9192286b0c12fcfd6950e2495a8825c49f57cc",
+    "pages/js/box-labels.js": "581d470ed78b11498f29c5d84f7507433495bd94f1ff23aae4c25945eefefea3",
+    "shared_components/css/box-label-print.css": "100bd1c4ec88e47884ae4fd54139894ed40ec83dfc51483e14d91e65ae626912",
+    "shared_components/css/staff-dashboard/base.css": "9b97f43475a5352a7118bbe57a5c79bcd580b8da75ac076b07784fba68d1dbba",
+    "shared_components/css/staff-dashboard/command-palette.css": "2fbdfc8044c8306b59d7269b64abdf41e85e9fc98a89c0d3bbe7f628307a8f87",
+    "shared_components/css/staff-dashboard/components.css": "b4de2fc7fc9848226f2cc7cbdc0781344ecd704566d335ace4b20c30284f1b15",
+    "shared_components/css/staff-dashboard/dashboard-v3-patch-2.css": "5d7509cd55af836c64c7ff5df22265786f4a0daf8d400c55ac8b44eca31a50d4",
+    "shared_components/css/staff-dashboard/dashboard-v3-theme.css": "d67fc1e7cb1c16c04d66c1506416d6db191b371885a64e39a8fc40a16bb84e76",
+    "shared_components/css/staff-dashboard/phase1-widgets.css": "0a586699075a7120153491864b7541ad69a909e96c0f36319f7560d49d1a8518",
+    "shared_components/css/staff-dashboard/tokens.css": "d26a2805b9e486ef9cdec1dd35bab6616504a8b8c463c3f2a2fe8f98cb62514f",
+    "shared_components/css/staff-dashboard/utilities.css": "7ba88eda80788151c63f7471eb1e4f44eda283d294545f1d851fd83e5cc327f6",
+    "shared_components/css/staff-dashboard/workspaces.css": "97a20faf6fd4e2a2931d65af42aa894d9e88cdfabb3910016d9d84a1553bf120",
+    "shared_components/css/tokens.css": "2b3ab556bb9eaf40765a5c84683777cb64d50a6c42d1b4e82bc6beff33a127b6",
+    "shared_components/js/box-label-template.js": "98e9b8e615545bb63a9228dd13da2ad8cb759b91df9282975687cb38e768a9a9",
+    "shared_components/js/box-url.js": "3daf0620159f6c8f4bf5929e90476030307aaf4ecbdcaa1a066d5c8a98e0935f",
+    "shared_components/js/data-call-delegator.js": "50e836385b6804b2b52fd8c549744277fe69ff701c232b7badf4fdcb09f343f6",
+    "shared_components/js/staff-dashboard/controllers/auth-controller.js": "6a2f668580dd29a1e2d2970982138de6e03dec52de1c70ecc0db13d9c977af3e",
+    "shared_components/js/staff-dashboard/controllers/celebrations-controller.js": "0a3800732027a1a26eec18df08ee2e04f8a04a2672741c0fb7db04a9fd4ed405",
+    "shared_components/js/staff-dashboard/controllers/command-palette-controller.js": "f26dd83547ca64091429bf5c2c4b0ab65f36c11a7a194119fb13fd4a6833f9f8",
+    "shared_components/js/staff-dashboard/controllers/my-stuff-controller.js": "b3cfce78667a5e43f89087f4faebecf8f89d8a0f2fa6e0e1e0db430454c1de18",
+    "shared_components/js/staff-dashboard/controllers/nav-access-controller.js": "55b672fc9a9ab811363ed06ddf859d23ceb73834a1bc3bb5892fd9f63280f032",
+    "shared_components/js/staff-dashboard/controllers/pride-wall-controller.js": "77d6f96d914ab902901a72925ccd653dfc8522d18ea0cfaf0e072706e42a210f",
+    "shared_components/js/staff-dashboard/controllers/sales-goal-controller.js": "ee48ebf6b679a6933f95e580e055205c766299419fa5f40b9da7502f0eba9509",
+    "shared_components/js/staff-dashboard/controllers/team-performance-controller.js": "60bcd4814c2d4f4c6f93e86346ee169d6bc4ab6e468aaadc634a367fe89b4a4e",
+    "shared_components/js/staff-dashboard/controllers/tool-grid-controller.js": "8bdae76e1ee934e6a898819467815a089d1d0e54ede89bcb92140513139954ef",
+    "shared_components/js/staff-dashboard/controllers/workspace-controller.js": "b902e5eb421e95e128df2597f82451a20d683a6fdd891bb89fd485cdcba97e3c",
+    "shared_components/js/staff-dashboard/core/dashboard-app.js": "e2367ad3d3a71935fd6b703740f161aa9400b634c4bab357797fb4cf9a88469b",
+    "shared_components/js/staff-dashboard/core/dashboard-endpoints.js": "235f31162f22a256cd4073354feb634d4c010718969845014bab6368f5650216",
+    "shared_components/js/staff-dashboard/core/dashboard-errors.js": "d4ff487610a41c549a646fe024336026ca93e740ffcb47649f59bb97c198bc64",
+    "shared_components/js/staff-dashboard/core/dashboard-events.js": "c0915ca032a2f974179efb05facc176f74526f1a791d22a7e8372c5a3e5ea620",
+    "shared_components/js/staff-dashboard/core/dashboard-fetch.js": "2af8da7bf298a975da055f1a378efcf8f7c560e28e3688bee76362b2602e052d",
+    "shared_components/js/staff-dashboard/core/dashboard-store.js": "5c54480ede3183139d1a7eb115d6ec8f2066bdef292dd89cfb3e85ea586d5c3e",
+    "shared_components/js/staff-dashboard/core/dashboard-ui-utils.js": "f28721fa8098f70b81fcdd3eed7300b56d9b7a22acae0fc4cc36eeef1df146a7",
+    "shared_components/js/staff-dashboard/services/caspio-archive-service.js": "0e19b69a842361bb1672b5b2874077097d5c32cc58ddb33c959302231bca0405",
+    "shared_components/js/staff-dashboard/services/company-goal-service.js": "684bddb4822d46612a62dc1d5ebc1dc6606c335d1b5367931c7a962d2fb3e668",
+    "shared_components/js/staff-dashboard/services/employees-service.js": "5691f60d01919cdf955e221bc941e08603dd5b2cc983f87cce45e3bf4c4227af",
+    "shared_components/js/staff-dashboard/widgets/dashboard-modal.js": "c90dec4a72f44350f47ec89820229837575a870c39affa8c61bbcc9fde0e3ace",
+    "staff-dashboard-v3/index.html": "0145c8af865a5ff95267f50b909458d254318e316904ee215617eb4b51e89cde",
+    "staff-dashboard-v3/past-due-badge.js": "6af007cbab26a0f9adba4a148bb431d580042cc85af11ab8a044a8798b12fc29",
+    "staff-dashboard-v3/quote-launcher.js": "5c288885a4136155571b968a39e5aa49351a3cd70aa34de887d73d20c13d135c",
+    "tools/custom-tees-calibrate.css": "9cca05bc1eccdcf6d8848dd7cc78b1adbde8707d21632ffd6d419340e9377c2d",
+    "tools/custom-tees-calibrate.html": "ad653d89ef3f13d5a4a0577484815af9b61350d7a510d6757af13991163075ad",
+    "tools/custom-tees-calibrate.js": "a24dd90b6e655a28f5750d26242453ccbb7ec2f688fe3c894bebd1d59b8e9cbb"
+  },
+  "changes": []
+}

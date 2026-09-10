@@ -1,5 +1,11 @@
 # Handover follow-ups — 2026-09-07
 
+## NEXT isolated batch — final staff tools, baseline only
+
+The isolated checkout is now codex/staff-final-tools. Staff Dashboard, Universal Records Admin, Custom Tees Calibration and Box Labels have 49 immutable transitive source snapshots and passing source contracts, based on frozen release candidate 9b6d76d6. No visual changes or browser review yet; no migration credit. Preserve dashboard role/theme/density/search/pins, all quote/admin records and exports, exact print-box geometry/save payloads, box allocations/repack drafts/label quantities and any provider ownership. All business APIs, writes and allocating GETs must remain synthetic. Use the shared vendor label owner already reviewed for Mission Control/Quote Management.
+
+Primary develop is running the six staff-workspace release gates for v2026.09.10.4. Keep this next branch out of that release. LIVE remains .2/2098/df7bebed,170/225; current six-page candidate176/225,49pending. Finish full gates, actual exact-source CI and rollout before counting six pages live. The prior reviewed branch codex/staff-workspaces stays at5d46c9c5; never merge the new advancing branch for the current release. Details and process status: artifact active-css-resume-state.json.
+
 ## ACTIVE — six staff workspace drafts reviewed, 2026-09-10
 
 All six pages in isolated training-final-worktree on codex/staff-workspaces are reviewed. Exact reviewed commit and backup status are in artifact active-css-resume-state.json. Next is integration and full release verification; no new deployment yet.
