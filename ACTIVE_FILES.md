@@ -1,5 +1,7 @@
 # Active Files Registry
 
+- Added shared_components/css/staff-calibration.css: scoped calibration layout using shared controls. Retired tools/custom-tees-calibrate.css; original preserved in the final-tools source fixture.
+
 - `tests/fixtures/staff-final-tools-box-labels-original-browser.json` — Original synthetic staff-tool browser contract; retained before visual changes.
 - `tests/fixtures/staff-final-tools-box-labels-original-empty.json` — Original synthetic staff-tool browser contract; retained before visual changes.
 - `tests/fixtures/staff-final-tools-box-labels-original-failure.json` — Original synthetic staff-tool browser contract; retained before visual changes.

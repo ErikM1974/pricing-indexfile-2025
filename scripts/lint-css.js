@@ -233,7 +233,7 @@ const CSS_LINT_SCOPE = [
     'calculators/quick-quote/dtf-prints-prototype.css',
     'employee-bundles/css/streich-bros-bundle.css',
     'employee-bundles/css/wcttr-bundle.css',
-    'tools/custom-tees-calibrate.css',
+    'shared_components/css/staff-calibration.css',
 ];
 
 async function run() {

@@ -5174,6 +5174,35 @@
         "rawCssBytes": 113392,
         "localCssRequests": 5
       }
+    },
+    {
+      "source": "tools/custom-tees-calibrate.html",
+      "family": "staff-calibration",
+      "status": "pilot",
+      "route": "/tools/custom-tees-calibrate.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/staff-calibration.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-width-accessible-layout",
+        "original-coordinates-detector-and-save-payloads",
+        "keyboard-and-pointer-move-resize",
+        "style-photo-generation-guards",
+        "pending-save-delete-and-clipboard-failure",
+        "failed-load-clears-old-image-and-retries",
+        "successful-write-with-failed-refresh-remains-explicit"
+      ],
+      "test": "tests/e2e/css-unification-calibration.spec.js",
+      "maxCssBytes": 70083,
+      "measuredRawCssBytes": 69059,
+      "baseline": {
+        "commit": "9b6d76d6d77161818e73bd7caab56b0b02c342c9",
+        "rawCssBytes": 21871,
+        "localCssRequests": 2
+      }
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",

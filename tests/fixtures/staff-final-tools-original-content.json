@@ -1020,5 +1020,306 @@
     "tools/custom-tees-calibrate.html": "ad653d89ef3f13d5a4a0577484815af9b61350d7a510d6757af13991163075ad",
     "tools/custom-tees-calibrate.js": "a24dd90b6e655a28f5750d26242453ccbb7ec2f688fe3c894bebd1d59b8e9cbb"
   },
-  "changes": []
+  "changes": [
+    {
+      "file": "tools/custom-tees-calibrate.html",
+      "before": "    <link href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css\" rel=\"stylesheet\">",
+      "after": "    <link href=\"https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap\" rel=\"stylesheet\">\n    <link href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css\" rel=\"stylesheet\">",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.html",
+      "before": "    <link rel=\"stylesheet\" href=\"/tools/custom-tees-calibrate.css?v=2026.09.07.19\">",
+      "after": "    <link rel=\"stylesheet\" href=\"/shared_components/css/components.css?v=2026.09.10.3\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/staff-calibration.css?v=2026.09.10.5\">",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.html",
+      "before": "<body>",
+      "after": "<body data-ui=\"unified\" data-staff-tool=\"calibration\">\n    <a class=\"skip-link\" href=\"#cal-main\">Skip to calibration</a>",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.html",
+      "before": "            <p>Drag the green box onto the chest area once per style — every order preview uses your layout from then on. The box is the 16″×20″ print envelope (aspect locked). Saves to Caspio instantly, no deploy.</p>",
+      "after": "            <p>Set the 16″ × 20″ print area for each garment. Move or resize the green box, then save the layout for future order previews.</p>",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.html",
+      "before": "class=\"cal-link\" href=\"/staff-dashboard.html\"",
+      "after": "class=\"cal-link btn\" href=\"/staff-dashboard.html\"",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.html",
+      "before": "class=\"cal-link\" href=\"/custom-tees\"",
+      "after": "class=\"cal-link btn\" href=\"/custom-tees\"",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.html",
+      "before": "    <main class=\"cal-main\">",
+      "after": "    <main class=\"cal-main\" id=\"cal-main\">",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.html",
+      "before": "        <aside class=\"cal-styles\">",
+      "after": "        <aside class=\"cal-styles\" aria-label=\"Garment styles\">",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.html",
+      "before": "        <section class=\"cal-stage\">",
+      "after": "        <section class=\"cal-stage\" aria-label=\"Print area editor\">\n            <p class=\"cal-warning\" id=\"cal-warning\" role=\"status\" hidden></p>\n            <button type=\"button\" class=\"btn\" id=\"cal-retry\" hidden>Reload styles and saved layouts</button>",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.html",
+      "before": "<div class=\"cal-tabs\" role=\"tablist\">",
+      "after": "<div class=\"cal-tabs\" role=\"tablist\" aria-label=\"Garment view\">",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.html",
+      "before": "class=\"cal-tab is-active\" role=\"tab\">Front",
+      "after": "class=\"cal-tab btn is-active\" role=\"tab\" aria-selected=\"true\" aria-controls=\"cal-canvas-wrap\">Front",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.html",
+      "before": "class=\"cal-tab\" role=\"tab\">Back",
+      "after": "class=\"cal-tab btn\" role=\"tab\" aria-selected=\"false\" aria-controls=\"cal-canvas-wrap\" tabindex=\"-1\">Back",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.html",
+      "before": "class=\"cal-color\" title=\"Color photo to lay out on\"",
+      "after": "class=\"cal-color control\" aria-label=\"Garment color\" title=\"Color photo to lay out on\"",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.html",
+      "before": "<div class=\"cal-canvas-wrap\" id=\"cal-canvas-wrap\">",
+      "after": "<div class=\"cal-canvas-wrap\" id=\"cal-canvas-wrap\" role=\"tabpanel\" aria-labelledby=\"cal-tab-front\">",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.html",
+      "before": "<img id=\"cal-photo\" alt=\"Garment photo\" draggable=\"false\">",
+      "after": "<img id=\"cal-photo\" class=\"cal-photo\" alt=\"Garment photo\" draggable=\"false\" hidden>",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.html",
+      "before": "<div id=\"cal-box\" class=\"cal-box\" hidden>",
+      "after": "<div id=\"cal-box\" class=\"cal-box\" role=\"group\" aria-label=\"Print envelope\" aria-describedby=\"cal-keyboard-help\" tabindex=\"0\" hidden>",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.html",
+      "before": "<span class=\"cal-box-handle\" id=\"cal-box-handle\"><i class=\"fas fa-up-right-and-down-left-from-center\" aria-hidden=\"true\"></i></span>",
+      "after": "<button type=\"button\" class=\"cal-box-handle\" id=\"cal-box-handle\" aria-label=\"Resize print envelope\" aria-describedby=\"cal-keyboard-help\"><i class=\"fas fa-up-right-and-down-left-from-center\" aria-hidden=\"true\"></i></button>",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.html",
+      "before": "            <div class=\"cal-readout\" id=\"cal-readout\"></div>",
+      "after": "            <p class=\"cal-note\" id=\"cal-keyboard-help\">Arrow keys move the selected box. On its resize handle, arrow keys change its size. Hold Shift for larger steps.</p>\n            <fieldset class=\"cal-adjust\" id=\"cal-adjust\" disabled>\n                <legend>Adjust print area</legend>\n                <button type=\"button\" class=\"btn\" data-adjust=\"left\">← Left</button>\n                <button type=\"button\" class=\"btn\" data-adjust=\"right\">Right →</button>\n                <button type=\"button\" class=\"btn\" data-adjust=\"up\">↑ Up</button>\n                <button type=\"button\" class=\"btn\" data-adjust=\"down\">Down ↓</button>\n                <button type=\"button\" class=\"btn\" data-adjust=\"smaller\">− Smaller</button>\n                <button type=\"button\" class=\"btn\" data-adjust=\"larger\">+ Larger</button>\n            </fieldset>\n            <div class=\"cal-readout\" id=\"cal-readout\"></div>",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.html",
+      "before": "<p class=\"cal-note\" id=\"cal-status\">",
+      "after": "<p class=\"cal-note\" id=\"cal-status\" role=\"status\">",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.html",
+      "before": "id=\"cal-save\" class=\"cal-btn cal-btn-primary\"",
+      "after": "id=\"cal-save\" class=\"btn btn-primary\"",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.html",
+      "before": "id=\"cal-auto\" class=\"cal-btn\"",
+      "after": "id=\"cal-auto\" class=\"btn\"",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.html",
+      "before": "id=\"cal-delete\" class=\"cal-btn cal-btn-danger\"",
+      "after": "id=\"cal-delete\" class=\"btn btn-danger\"",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.html",
+      "before": "id=\"cal-copy\" class=\"cal-btn\"",
+      "after": "id=\"cal-copy\" class=\"btn\"",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.js",
+      "before": "        drag: null,",
+      "after": "        drag: null,\n        styleRequest: 0,\n        photoRequest: 0,\n        bootRequest: 0,\n        busy: false,\n        copyBusy: false,\n        warning: '',",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.js",
+      "before": "        $('style-list').innerHTML = S.styles.map((st) => {",
+      "after": "        if (!S.styles.length) { $('style-list').textContent = 'No styles are available for calibration.'; return; }\n        $('style-list').innerHTML = S.styles.map((st) => {",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.js",
+      "before": "data-style=\"${esc(st.style)}\">",
+      "after": "data-style=\"${esc(st.style)}\" aria-pressed=\"${!!(S.style && S.style.style === st.style)}\">",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.js",
+      "before": "            b.addEventListener('click', () => selectStyle(b.dataset.style));\n        });",
+      "after": "            b.addEventListener('click', () => selectStyle(b.dataset.style));\n        });\n        syncControls();",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.js",
+      "before": "        $('cal-status').textContent = `${S.style.style} · ${S.view} · ${S.color} — starting from ${src}.`;",
+      "after": "        $('cal-status').textContent = `${S.style.style} · ${S.view} · ${S.color} — starting from ${src}.`;\n        syncControls();",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.js",
+      "before": "        if (!S.img || !S.box) return;\n        e.preventDefault();",
+      "after": "        if (S.busy || !S.img || !S.box) return;\n        e.preventDefault();",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.js",
+      "before": "        if (!S.drag) return;",
+      "after": "        if (S.busy || !S.drag) return;",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.js",
+      "before": "        // soft clamp inside the image",
+      "after": "        clampBox();\n        renderBox();\n    }\n\n    function clampBox() {\n        // soft clamp inside the image",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.js",
+      "before": "        S.box.yFrac = Math.min(Math.max(S.box.yFrac, -0.1), 1.1 - hf);\n        renderBox();",
+      "after": "        S.box.yFrac = Math.min(Math.max(S.box.yFrac, -0.1), 1.1 - hf);",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.js",
+      "before": "    $('cal-color').addEventListener('change', () => { S.color = $('cal-color').value; loadPhoto(); });",
+      "after": "    $('cal-color').addEventListener('change', () => { if (S.busy) return; S.color = $('cal-color').value; loadPhoto(); });\n    $('cal-retry').addEventListener('click', boot);",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.js",
+      "before": "    $('cal-auto').addEventListener('click', () => {\n        const saved",
+      "after": "    $('cal-auto').addEventListener('click', () => {\n        if (S.busy || !S.img || !S.box) return;\n        const saved",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.js",
+      "before": "    document.addEventListener('pointerup', endDrag);",
+      "after": "    document.addEventListener('pointerup', endDrag);\n    document.addEventListener('pointercancel', endDrag);",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.js",
+      "before": "    // ── Boot: catalog + saved overrides ────────────────────────────────\n    async function boot() {\n        try {\n            const [styles, cal] = await Promise.all([\n                grab(`${API_BASE}/api/dtg/top-sellers/styles`),\n                // Best-effort: a 404 (route not deployed) or table-missing must\n                // not block the catalog — the tool still works in layout+copy mode.\n                grab(`${API_BASE}/api/dtg-calibration?refresh=1`).catch(() => ({ data: [], routeMissing: true })),\n            ]);\n            S.styles = (styles.records || styles.data || []);\n            S.overrides = (cal.data || []);\n            if (cal.routeMissing) {\n                $('cal-status').textContent = '⚠️ Calibration API not deployed on the proxy yet — layouts can\\'t save (use Copy JSON meanwhile).';\n            }\n            if (cal.tableMissing) {\n                $('cal-status').innerHTML = '⚠️ The Caspio table <strong>DTG_Calibration</strong> doesn\\'t exist yet — layouts can\\'t save until it\\'s created (use Copy JSON meanwhile). Column spec is in the proxy route file.';\n            }\n            renderStyleList();\n        } catch (e) {\n            $('style-list').innerHTML = `<div class=\"cal-loading\">Failed to load catalog: ${esc(e.message)} — refresh to retry.</div>`;\n        }\n    }\n\n",
+      "after": "    function syncControls() {\n        const ready = !!(S.style && S.img && S.box);\n        $('cal-save').disabled = S.busy || !ready || !!S.warning;\n        $('cal-delete').disabled = S.busy || !ready || !!S.warning;\n        $('cal-auto').disabled = S.busy || !ready;\n        $('cal-copy').disabled = S.busy || S.copyBusy || !ready;\n        $('cal-adjust').disabled = S.busy || !ready;\n        $('cal-color').disabled = S.busy || !S.details.length;\n        $('cal-color-only').disabled = S.busy || !ready;\n        for (const b of document.querySelectorAll('.style-item')) b.disabled = S.busy;\n        for (const id of ['cal-tab-front', 'cal-tab-back']) $(id).disabled = S.busy || !S.details.length;\n        $('cal-box-handle').disabled = S.busy || !ready;\n        document.querySelector('.cal-stage').setAttribute('aria-busy', String(S.busy));\n    }\n\n    function warning(message) {\n        S.warning = message;\n        $('cal-warning').textContent = message;\n        $('cal-warning').hidden = !message;\n        $('cal-retry').hidden = !message;\n        syncControls();\n    }\n\n    function clearPhoto(message) {\n        S.img = null; S.box = null; S.drag = null;\n        $('cal-photo').hidden = true;\n        $('cal-photo').removeAttribute('src');\n        $('cal-box').hidden = true;\n        $('cal-delete').hidden = true;\n        $('cal-readout').textContent = '';\n        $('cal-empty').hidden = false;\n        $('cal-empty').textContent = message;\n        syncControls();\n    }\n\n    async function boot() {\n        if (S.busy) return;\n        const request = ++S.bootRequest;\n        ++S.styleRequest; ++S.photoRequest;\n        S.style = null; S.details = []; S.color = null;\n        $('cal-color').replaceChildren();\n        clearPhoto('Pick a style to start');\n        $('cal-retry').disabled = true;\n        $('style-list').textContent = 'Loading catalog…';\n        try {\n            const [styles, cal] = await Promise.all([\n                grab(`${API_BASE}/api/dtg/top-sellers/styles`),\n                grab(`${API_BASE}/api/dtg-calibration?refresh=1`).catch(() => null),\n            ]);\n            if (request !== S.bootRequest) return;\n            const rows = styles.records || styles.data;\n            if (!Array.isArray(rows)) throw new Error('Unexpected catalog response');\n            S.styles = rows;\n            S.overrides = Array.isArray(cal?.data) ? cal.data : [];\n            warning(!cal || !Array.isArray(cal.data)\n                ? 'Saved layouts could not be loaded. Reload to retry; you can still adjust a layout and copy its JSON.'\n                : cal.tableMissing ? 'Saved layouts are unavailable. You can adjust a layout and copy its JSON until saving is available.' : '');\n            renderStyleList();\n            $('cal-status').textContent = '';\n        } catch (e) {\n            if (request !== S.bootRequest) return;\n            S.styles = []; S.overrides = [];\n            $('style-list').textContent = 'Failed to load catalog: ' + e.message;\n            warning('The garment catalog is unavailable. Reload to retry.');\n        } finally {\n            if (request === S.bootRequest) $('cal-retry').disabled = false;\n        }\n    }\n\n",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.js",
+      "before": "    async function selectStyle(styleNumber) {\n        const st = S.styles.find((s) => s.style === styleNumber);\n        if (!st) return;\n        S.style = st;\n        S.view = 'front';\n        renderStyleList();\n        $('cal-status').textContent = 'Loading photos…';\n        try {\n            const det = await grab(`${API_BASE}/api/product-details?styleNumber=${encodeURIComponent(styleNumber)}`);\n            S.details = Array.isArray(det) ? det : (det.data || det.records || []);\n        } catch (e) {\n            toast('Couldn\\'t load product photos: ' + e.message, 'error');\n            return;\n        }\n        // Color list: unique CATALOG_COLORs that have any front or back image\n        const seen = new Map();\n        S.details.forEach((r) => {\n            if (!seen.has(r.CATALOG_COLOR) && (r.FRONT_FLAT || r.FRONT_MODEL || r.PRODUCT_IMAGE || r.BACK_FLAT || r.BACK_MODEL)) {\n                seen.set(r.CATALOG_COLOR, r);\n            }\n        });\n        $('cal-color').innerHTML = [...seen.values()].map((r) =>\n            `<option value=\"${esc(r.CATALOG_COLOR)}\">${esc(r.COLOR_NAME || r.CATALOG_COLOR)}</option>`).join('');\n        S.color = $('cal-color').value || null;\n        setView('front');\n    }\n\n",
+      "after": "    async function selectStyle(styleNumber) {\n        if (S.busy) return;\n        const st = S.styles.find(s => s.style === styleNumber);\n        if (!st) return;\n        const request = ++S.styleRequest;\n        ++S.photoRequest;\n        S.style = st; S.view = 'front'; S.details = []; S.color = null;\n        $('cal-color').replaceChildren();\n        clearPhoto('Loading garment photos…');\n        renderStyleList();\n        $('cal-status').textContent = 'Loading photos…';\n        try {\n            const det = await grab(`${API_BASE}/api/product-details?styleNumber=${encodeURIComponent(styleNumber)}`);\n            if (request !== S.styleRequest) return;\n            const rows = Array.isArray(det) ? det : (det.data || det.records);\n            if (!Array.isArray(rows)) throw new Error('Unexpected product response');\n            S.details = rows;\n        } catch (e) {\n            if (request !== S.styleRequest) return;\n            clearPhoto('Product photos could not be loaded. Select the style again to retry.');\n            $('cal-status').textContent = 'Could not load product photos: ' + e.message;\n            return;\n        }\n        const seen = new Map();\n        S.details.forEach(r => {\n            if (!seen.has(r.CATALOG_COLOR) && (r.FRONT_FLAT || r.FRONT_MODEL || r.PRODUCT_IMAGE || r.BACK_FLAT || r.BACK_MODEL)) seen.set(r.CATALOG_COLOR, r);\n        });\n        $('cal-color').innerHTML = [...seen.values()].map(r =>\n            `<option value=\"${esc(r.CATALOG_COLOR)}\">${esc(r.COLOR_NAME || r.CATALOG_COLOR)}</option>`).join('');\n        S.color = $('cal-color').value || null;\n        setView('front');\n    }\n\n",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.js",
+      "before": "    function setView(v) {\n        S.view = v;\n        $('cal-tab-front').classList.toggle('is-active', v === 'front');\n        $('cal-tab-back').classList.toggle('is-active', v === 'back');\n        loadPhoto();\n    }\n\n",
+      "after": "    function setView(v) {\n        if (S.busy || !S.style) return;\n        S.view = v;\n        for (const name of ['front', 'back']) {\n            const tab = $('cal-tab-' + name), active = v === name;\n            tab.classList.toggle('is-active', active);\n            tab.setAttribute('aria-selected', String(active));\n            tab.tabIndex = active ? 0 : -1;\n        }\n        $('cal-canvas-wrap').setAttribute('aria-labelledby', 'cal-tab-' + v);\n        loadPhoto();\n    }\n\n",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.js",
+      "before": "    async function loadPhoto() {\n        const url = photoUrl();\n        const img = $('cal-photo');\n        $('cal-box').hidden = true;\n        if (!url) {\n            img.removeAttribute('src');\n            $('cal-empty').hidden = false;\n            $('cal-empty').textContent = 'No photo for this view/color in SanMar\\'s library.';\n            return;\n        }\n        $('cal-empty').hidden = true;\n        await new Promise((resolve) => {\n            img.onload = resolve;\n            img.onerror = resolve;\n            img.src = '/api/image-proxy?url=' + encodeURIComponent(url);\n        });\n        if (!img.naturalWidth) {\n            $('cal-empty').hidden = false;\n            $('cal-empty').textContent = 'Photo failed to load.';\n            return;\n        }\n        S.img = img;\n        initBox();\n    }\n\n",
+      "after": "    async function loadPhoto() {\n        if (S.busy) return;\n        const request = ++S.photoRequest, url = photoUrl();\n        clearPhoto(url ? 'Loading garment photo…' : 'No photo for this view/color in SanMar\\'s library.');\n        if (!url) { $('cal-status').textContent = 'Choose another view or color.'; return; }\n        const candidate = new Image();\n        const loaded = await new Promise(resolve => {\n            candidate.onload = () => resolve(true);\n            candidate.onerror = () => resolve(false);\n            candidate.src = '/api/image-proxy?url=' + encodeURIComponent(url);\n        });\n        if (request !== S.photoRequest) return;\n        if (!loaded || !candidate.naturalWidth) {\n            clearPhoto('Photo failed to load. Select the view or color again to retry.');\n            $('cal-status').textContent = 'Photo unavailable; no layout can be saved for this view.';\n            return;\n        }\n        const img = $('cal-photo');\n        img.src = candidate.src;\n        try { await img.decode(); } catch (_) { /* dimensions checked below */ }\n        if (request !== S.photoRequest) return;\n        if (!img.naturalWidth) { clearPhoto('Photo failed to load. Select the view again to retry.'); return; }\n        img.hidden = false;\n        img.alt = S.style.style + ' ' + S.color + ' ' + S.view + ' garment photo';\n        $('cal-empty').hidden = true;\n        S.img = img;\n        initBox();\n    }\n\n",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.js",
+      "before": "    async function save() {\n        if (!S.style || !S.box) return;\n        const rec = currentRecord();\n        $('cal-save').disabled = true;\n        try {\n            // SAME-ORIGIN on purpose (no API_BASE): the write goes to this app's\n            // session-gated forwarder so the SAML cookie rides along. Going\n            // straight to the proxy was unauthenticated — anyone could move the\n            // print box for every style. Reads stay on the proxy; the PUBLIC\n            // /custom-tees designer needs that GET.\n            const r = await fetch('/api/dtg-calibration', {\n                method: 'POST',\n                credentials: 'same-origin',\n                headers: { 'Content-Type': 'application/json' },\n                body: JSON.stringify(rec),\n            });\n            const j = await r.json();\n            if (!r.ok || !j.success) {\n                if (j.tableMissing) {\n                    await navigator.clipboard.writeText(JSON.stringify(rec, null, 2)).catch(() => {});\n                    toast('Caspio table DTG_Calibration doesn\\'t exist yet — JSON copied to clipboard instead.', 'error');\n                } else {\n                    toast('Save failed: ' + (j.error || r.status), 'error');\n                }\n                return;\n            }\n            toast(`Saved ${rec.StyleNumber} ${S.view}${rec.CatalogColor ? ' (' + rec.CatalogColor + ' only)' : ' (all colors)'} ✓`, 'ok');\n            const cal = await grab(`${API_BASE}/api/dtg-calibration?refresh=1`);\n            S.overrides = cal.data || [];\n            renderStyleList();\n            $('cal-delete').hidden = false;\n        } catch (e) {\n            toast('Save failed: ' + e.message, 'error');\n        } finally {\n            $('cal-save').disabled = false;\n        }\n    }\n\n    async function removeSaved() {\n        const row = savedRowForCurrent();\n        if (!row || !row.PK_ID) return;\n        try {\n            // SAME-ORIGIN — see the note on save(); this is the session-gated forwarder.\n            const r = await fetch(`/api/dtg-calibration/${row.PK_ID}`, { method: 'DELETE', credentials: 'same-origin' });\n            const j = await r.json();\n            if (!j.success) { toast('Delete failed', 'error'); return; }\n            toast('Saved layout removed — back to auto-detect.', 'ok');\n            const cal = await grab(`${API_BASE}/api/dtg-calibration?refresh=1`);\n            S.overrides = cal.data || [];\n            renderStyleList();\n            initBox();\n        } catch (e) {\n            toast('Delete failed: ' + e.message, 'error');\n        }\n    }\n\n",
+      "after": "    async function refreshSavedLayouts() {\n        const cal = await grab(`${API_BASE}/api/dtg-calibration?refresh=1`);\n        if (cal.tableMissing || !Array.isArray(cal.data)) throw new Error('Saved layouts are unavailable');\n        S.overrides = cal.data;\n        warning('');\n        renderStyleList();\n    }\n\n    async function save() {\n        if (S.busy || S.warning || !S.style || !S.img || !S.box) return;\n        const rec = currentRecord();\n        S.busy = true; S.drag = null; syncControls();\n        let saved = false;\n        try {\n            // Same-origin staff forwarder; payload geometry remains unchanged.\n            const r = await fetch('/api/dtg-calibration', {\n                method:'POST', credentials:'same-origin',\n                headers:{'Content-Type':'application/json'}, body:JSON.stringify(rec),\n            });\n            const j = await r.json();\n            if (!r.ok || !j.success) throw new Error(j.error || 'HTTP ' + r.status);\n            saved = true;\n            toast(`Saved ${rec.StyleNumber} ${rec.ViewName === 'flatBack' ? 'back' : 'front'}${rec.CatalogColor ? ' (' + rec.CatalogColor + ' only)' : ' (all colors)'} ✓`, 'ok');\n            await refreshSavedLayouts();\n            $('cal-delete').hidden = !savedRowForCurrent();\n        } catch (e) {\n            if (saved) {\n                S.overrides = []; renderStyleList(); $('cal-delete').hidden = true;\n                warning('Layout saved, but saved layouts could not be refreshed. Reload before saving again.');\n            } else {\n                $('cal-status').textContent = 'Save could not be confirmed: ' + e.message + '. Your adjustment is still here.';\n                toast('Save could not be confirmed. Your adjustment is still here.', 'error');\n            }\n        } finally { S.busy = false; syncControls(); }\n    }\n\n    async function removeSaved() {\n        if (S.busy || S.warning || !S.style || !S.img || !S.box) return;\n        const row = savedRowForCurrent();\n        if (!row || !row.PK_ID) return;\n        S.busy = true; S.drag = null; syncControls();\n        let removed = false;\n        try {\n            const r = await fetch('/api/dtg-calibration/' + encodeURIComponent(row.PK_ID), {method:'DELETE',credentials:'same-origin'});\n            const j = await r.json();\n            if (!r.ok || !j.success) throw new Error(j.error || 'HTTP ' + r.status);\n            removed = true;\n            toast('Saved layout removed — back to auto-detect.', 'ok');\n            await refreshSavedLayouts();\n            initBox();\n        } catch (e) {\n            if (removed) {\n                S.overrides = []; renderStyleList(); $('cal-delete').hidden = true;\n                warning('Saved layout removed, but layouts could not be refreshed. Reload to continue.');\n            } else {\n                $('cal-status').textContent = 'Removal could not be confirmed: ' + e.message;\n                toast('Removal could not be confirmed. Reload before trying again.', 'error');\n            }\n        } finally { S.busy = false; syncControls(); }\n    }\n\n    async function copyRecord() {\n        if (S.busy || S.copyBusy || !S.img || !S.box) return;\n        const record = currentRecord();\n        S.copyBusy = true; syncControls();\n        try {\n            await navigator.clipboard.writeText(JSON.stringify(record, null, 2));\n            toast('JSON copied.', 'ok');\n        } catch (_) {\n            toast('Could not copy JSON. Allow clipboard access and try again.', 'error');\n        } finally { S.copyBusy = false; syncControls(); }\n    }\n\n    function adjustBox(direction, amount = 0.01) {\n        if (S.busy || !S.img || !S.box) return;\n        if (direction === 'left') S.box.xFrac -= amount;\n        if (direction === 'right') S.box.xFrac += amount;\n        if (direction === 'up') S.box.yFrac -= amount;\n        if (direction === 'down') S.box.yFrac += amount;\n        if (direction === 'smaller') S.box.wFrac = Math.max(0.08, S.box.wFrac - amount);\n        if (direction === 'larger') S.box.wFrac += amount;\n        clampBox(); renderBox();\n    }\n\n",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.js",
+      "before": "    $('cal-copy').addEventListener('click', async () => {\n        if (!S.box) return;\n        await navigator.clipboard.writeText(JSON.stringify(currentRecord(), null, 2)).catch(() => {});\n        toast('JSON copied.', 'ok');\n    });\n\n",
+      "after": "    $('cal-copy').addEventListener('click', copyRecord);\n    for (const button of document.querySelectorAll('[data-adjust]')) button.addEventListener('click', () => adjustBox(button.dataset.adjust));\n    for (const tab of document.querySelectorAll('.cal-tab')) tab.addEventListener('keydown', e => {\n        if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key) || S.busy) return;\n        e.preventDefault();\n        const view = e.key === 'Home' ? 'front' : e.key === 'End' ? 'back' : S.view === 'front' ? 'back' : 'front';\n        setView(view); $('cal-tab-' + view).focus();\n    });\n    boxEl().addEventListener('keydown', e => {\n        const directions = {ArrowLeft:'left',ArrowRight:'right',ArrowUp:'up',ArrowDown:'down'};\n        if (!directions[e.key]) return;\n        e.preventDefault();\n        const scale = e.target === $('cal-box-handle');\n        adjustBox(scale ? (['ArrowLeft','ArrowUp'].includes(e.key) ? 'smaller' : 'larger') : directions[e.key], e.shiftKey ? 0.05 : 0.01);\n    });\n\n",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.html",
+      "before": "class=\"cal-color control\"",
+      "after": "class=\"cal-color field-input\"",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.js",
+      "before": "        $('cal-toasts').appendChild(el);",
+      "after": "        $('cal-toasts').replaceChildren(el);",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.js",
+      "before": "    function renderStyleList() {",
+      "after": "    function renderStyleList() {\n        const focusedStyle = document.activeElement?.matches('.style-item') ? document.activeElement.dataset.style : null;",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.js",
+      "before": "            b.addEventListener('click', () => selectStyle(b.dataset.style));\n        });\n        syncControls();",
+      "after": "            b.addEventListener('click', () => selectStyle(b.dataset.style));\n        });\n        syncControls();\n        if (focusedStyle) [...document.querySelectorAll('.style-item')].find(b => b.dataset.style === focusedStyle)?.focus();",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.html",
+      "before": "                <img id=\"cal-photo\" class=\"cal-photo\" alt=\"Garment photo\" draggable=\"false\" hidden>",
+      "after": "                <div class=\"cal-photo-frame\" id=\"cal-photo-frame\">\n                <img id=\"cal-photo\" class=\"cal-photo\" alt=\"Garment photo\" draggable=\"false\" hidden>",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.html",
+      "before": "                <div class=\"cal-empty\" id=\"cal-empty\">Pick a style on the left to start</div>",
+      "after": "                </div>\n                <div class=\"cal-empty\" id=\"cal-empty\">Pick a style on the left to start</div>",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.js",
+      "before": "        S.img = img;\n        initBox();",
+      "after": "        S.img = img;\n        $('cal-photo-frame').style.setProperty('--cal-image-ratio', String(img.naturalWidth / img.naturalHeight));\n        initBox();",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.js",
+      "before": "        const r = imgRectOnScreen();\n        const wrap = $('cal-canvas-wrap').getBoundingClientRect();\n        const hf = hFracFor(S.box.wFrac);\n        box.style.left = (r.left - wrap.left + S.box.xFrac * r.width) + 'px';\n        box.style.top = (r.top - wrap.top + S.box.yFrac * r.height) + 'px';\n        box.style.width = (S.box.wFrac * r.width) + 'px';\n        box.style.height = (hf * r.height) + 'px';",
+      "after": "        const hf = hFracFor(S.box.wFrac);\n        // Relative to the photo frame: screen and print share the same geometry.\n        box.style.left = (S.box.xFrac * 100) + '%';\n        box.style.top = (S.box.yFrac * 100) + '%';\n        box.style.width = (S.box.wFrac * 100) + '%';\n        box.style.height = (hf * 100) + '%';",
+      "count": 1
+    }
+  ],
+  "retiredStyles": [
+    {
+      "file": "tools/custom-tees-calibrate.css",
+      "css": "/* custom-tees-calibrate.css — staff print-box calibration tool (2026-06-10) */\n\n/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page\n   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;\n   every rule below uses var(). Raw hex is allowed ONLY in this block. */\n/* stylelint-disable color-no-hex */\n:root {\n    --custom-tees-calibrate-gray: #66735f;\n    --custom-tees-calibrate-gray-2: #8a8f7f;\n    --custom-tees-calibrate-green-tint: #c9ebd4;\n    --custom-tees-calibrate-green-dark: #136c34;\n}\n/* stylelint-enable color-no-hex */\n\n* { box-sizing: border-box; }\n\nbody {\n    margin: 0; font-family: 'Public Sans', Inter, Arial, sans-serif;\n    background: var(--store-paper); color: var(--store-ink);\n}\n\n.cal-head {\n    display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;\n    padding: 18px 22px; background: var(--store-green-950); color: var(--color-on-brand);\n}\n.cal-head h1 { margin: 0 0 6px; font-size: 19px; }\n.cal-head p { margin: 0; font-size: 13px; opacity: 0.85; max-width: 760px; }\n.cal-link { color: var(--custom-tees-calibrate-green-tint); font-size: 13px; white-space: nowrap; }\n\n.cal-main {\n    display: grid; grid-template-columns: 320px 1fr; gap: 18px;\n    padding: 18px 22px; align-items: start;\n}\n\n/* Style list */\n.cal-styles h2 { margin: 0 0 10px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--print-ink-soft); }\n.style-list { display: grid; gap: 6px; max-height: calc(100vh - 160px); overflow: auto; padding-right: 4px; }\n\n.style-item {\n    display: flex; align-items: center; gap: 10px; width: 100%;\n    padding: 8px; border: 1px solid var(--store-line); border-radius: 10px;\n    background: var(--color-surface); cursor: pointer; text-align: left; font: inherit;\n}\n.style-item img { width: 44px; height: 44px; object-fit: contain; background: var(--store-green-50); border-radius: 6px; }\n.style-item-name { flex: 1; font-weight: 700; font-size: 13px; }\n.style-item-name small { display: block; font-weight: 400; color: var(--custom-tees-calibrate-gray); font-size: 11.5px; }\n.style-item-state { font-size: 11px; color: var(--custom-tees-calibrate-gray-2); white-space: nowrap; }\n.style-item-state.is-saved { color: var(--green-700); font-weight: 700; }\n.style-item.is-active { border-color: var(--store-green-700); box-shadow: 0 0 0 2px rgb(47 125 59 / 18%); }\n.cal-loading { padding: 14px; color: var(--custom-tees-calibrate-gray); font-size: 13px; }\n\n/* Stage */\n.cal-stage { background: var(--color-surface); border: 1px solid var(--store-line); border-radius: 14px; padding: 14px; }\n.cal-toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }\n.cal-tabs { display: flex; border: 1px solid var(--store-line); border-radius: 999px; overflow: hidden; }\n.cal-tab { padding: 7px 18px; border: none; background: var(--color-surface); font: inherit; font-weight: 700; cursor: pointer; }\n.cal-tab.is-active { background: var(--store-green-950); color: var(--color-on-brand); }\n.cal-color { padding: 7px 10px; border: 1px solid var(--store-line); border-radius: 8px; font: inherit; }\n.cal-coloronly { font-size: 12.5px; color: var(--print-ink-soft); display: inline-flex; align-items: center; gap: 6px; }\n\n.cal-canvas-wrap {\n    position: relative; display: grid; place-items: center;\n    background: var(--store-green-50); border-radius: 10px; min-height: 420px; overflow: hidden;\n    touch-action: none;\n}\n#cal-photo { max-width: 100%; max-height: 72vh; display: block; user-select: none; }\n\n/* hidden attr must WIN over the display rule (author display beats the UA\n   hidden style otherwise) — and the overlay is informational, never a hit\n   target: without these two lines it invisibly swallowed every drag on the\n   calibration box. (Erik bug report 2026-06-10) */\n.cal-empty { position: absolute; inset: 0; display: grid; place-items: center; color: var(--custom-tees-calibrate-gray-2); font-size: 14px; pointer-events: none; }\n.cal-empty[hidden] { display: none; }\n\n.cal-box {\n    position: absolute; border: 2px dashed var(--green-600); border-radius: 4px;\n    background: rgb(22 163 74 / 8%); cursor: move;\n}\n\n.cal-box-label {\n    position: absolute; top: -22px; left: 0; font-size: 11px; font-weight: 700;\n    color: var(--green-700); white-space: nowrap;\n}\n\n.cal-box-handle {\n    position: absolute; right: -13px; bottom: -13px; width: 26px; height: 26px;\n    display: grid; place-items: center; background: var(--color-surface); color: var(--green-700);\n    border: 2px solid var(--green-600); border-radius: 50%; cursor: nwse-resize; font-size: 11px;\n    box-shadow: 0 2px 6px rgb(0 0 0 / 18%);\n}\n\n.cal-readout { margin: 10px 2px 0; font-size: 12px; color: var(--print-ink-soft); font-family: ui-monospace, Consolas, monospace; min-height: 16px; }\n\n.cal-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }\n\n.cal-btn {\n    display: inline-flex; align-items: center; gap: 7px;\n    padding: 9px 14px; border: 1px solid var(--store-line); border-radius: 9px;\n    background: var(--color-surface); font: inherit; font-weight: 600; cursor: pointer;\n}\n.cal-btn:hover { border-color: var(--store-green-700); }\n.cal-btn-primary { background: var(--green-700); border-color: var(--green-700); color: var(--color-on-brand); }\n.cal-btn-primary:hover { background: var(--custom-tees-calibrate-green-dark); }\n.cal-btn-primary:disabled { opacity: 0.6; cursor: wait; }\n.cal-btn-danger { color: var(--red-700); }\n.cal-btn-danger:hover { border-color: var(--red-700); }\n.cal-note { margin: 10px 2px 0; font-size: 12.5px; color: var(--custom-tees-calibrate-gray); }\n\n.cal-toasts { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); display: grid; gap: 8px; z-index: 50; }\n\n.cal-toast {\n    background: var(--store-green-950); color: var(--color-on-brand); padding: 10px 16px; border-radius: 10px;\n    font-size: 13px; box-shadow: 0 6px 18px rgb(0 0 0 / 25%);\n}\n.cal-toast.is-error { background: var(--print-red); }\n.cal-toast.is-ok { background: var(--green-700); }\n\n@media (width <= 900px) {\n    .cal-main { grid-template-columns: 1fr; }\n    .style-list { max-height: 300px; }\n}\n"
+    }
+  ]
 }
