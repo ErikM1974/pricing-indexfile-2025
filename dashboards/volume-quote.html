@@ -10,16 +10,16 @@
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- 2026 design tokens (must load before dash-shell.css) -->
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/dash-shell.css?v=2026.09.07.10">
-    <link rel="stylesheet" href="/dashboards/css/volume-quote.css?v=2026.09.07.10">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.10.2">
+    <link rel="stylesheet" href="/shared_components/css/staff-toolkit.css?v=2026.09.10.2">
 </head>
-<body>
+<body data-ui="unified" data-staff-tool="volume-quote">
+    <a class="skip-link" href="#staff-tool-main">Skip to content</a>
     <div class="dash-shell">
         <header class="dash-header">
             <div class="dash-header-left">
@@ -37,7 +37,7 @@
             </div>
         </header>
 
-        <main class="dash-content">
+        <main class="dash-content" id="staff-tool-main">
             <div class="dash-error-banner" role="alert">
                 <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                 <span class="dash-error-banner-message"></span>
@@ -58,38 +58,38 @@
                     <h2 class="dash-card-title"><span class="vq-step">1</span> Order</h2>
                 </div>
                 <div class="vq-form-grid">
-                    <label class="vq-field">
+                    <label class="field vq-field">
                         <span>Customer</span>
-                        <input type="text" id="vq-customer" placeholder="Braun Northwest Inc." autocomplete="off">
+                        <input class="field-input" type="text" id="vq-customer" placeholder="Braun Northwest Inc." autocomplete="off">
                     </label>
-                    <label class="vq-field">
+                    <label class="field vq-field">
                         <span>Sales rep</span>
-                        <input type="text" id="vq-rep" list="vq-rep-list" placeholder="Taneisha Clark" autocomplete="off">
+                        <input class="field-input" type="text" id="vq-rep" list="vq-rep-list" placeholder="Taneisha Clark" autocomplete="off">
                         <datalist id="vq-rep-list"></datalist>
                     </label>
-                    <label class="vq-field">
+                    <label class="field vq-field">
                         <span>Location</span>
-                        <select id="vq-location"></select>
+                        <select class="field-select" id="vq-location"></select>
                     </label>
-                    <label class="vq-field">
+                    <label class="field vq-field">
                         <span>Stitch count</span>
-                        <input type="number" id="vq-stitches" min="100" step="1" value="8000">
+                        <input class="field-input" type="number" id="vq-stitches" min="100" step="1" value="8000">
                     </label>
-                    <label class="vq-field">
+                    <label class="field vq-field">
                         <span>Design # (optional)</span>
-                        <input type="text" id="vq-design" placeholder="40514" autocomplete="off">
+                        <input class="field-input" type="text" id="vq-design" placeholder="40514" autocomplete="off">
                     </label>
                     <label class="vq-field vq-field--check">
                         <input type="checkbox" id="vq-digitized" checked>
                         <span>Logo already digitized (no setup fee)</span>
                     </label>
-                    <label class="vq-field">
+                    <label class="field vq-field">
                         <span>Price valid until</span>
-                        <input type="date" id="vq-valid-until">
+                        <input class="field-input" type="date" id="vq-valid-until">
                     </label>
-                    <label class="vq-field">
+                    <label class="field vq-field">
                         <span>Price holds at or above (pcs, one PO)</span>
-                        <input type="number" id="vq-hold-qty" min="1" step="1" placeholder="defaults to the order quantity">
+                        <input class="field-input" type="number" id="vq-hold-qty" min="1" step="1" placeholder="defaults to the order quantity">
                     </label>
                 </div>
             </section>
@@ -120,7 +120,7 @@
                     <div class="vq-lever">
                         <label for="vq-emb-price">Embroidery charge per piece</label>
                         <div class="vq-lever-row">
-                            <input type="number" id="vq-emb-price" min="0" step="0.25">
+                            <input class="field-input" type="number" id="vq-emb-price" min="0" step="0.25">
                             <span class="vq-lever-note" id="vq-emb-note">Standard 72+: loading</span>
                         </div>
                     </div>
@@ -150,7 +150,7 @@
                     <div class="dash-stat-card"><div class="dash-stat-value" id="st-gm">0%</div><div class="dash-stat-label">Gross margin at one-time price</div></div>
                 </div>
                 <div id="vq-warnings" class="vq-warnings"></div>
-                <div class="vq-table-wrap">
+                <div class="vq-table-wrap" role="region" aria-label="Standard and one-time prices" tabindex="0">
                     <table class="vq-table" id="vq-result">
                         <thead>
                             <tr>
@@ -176,7 +176,7 @@
                         <button type="button" class="dash-btn" id="vq-print"><i class="fas fa-print" aria-hidden="true"></i> Print memo (internal)</button>
                     </div>
                 </div>
-                <pre id="vq-memo" class="vq-memo">Add a style and a quantity to build the memo.</pre>
+                <pre id="vq-memo" class="vq-memo" role="region" aria-label="Internal approval memo" tabindex="0">Add a style and a quantity to build the memo.</pre>
             </section>
 
             <!-- 6. Customer quote — the only thing that leaves the building. No cost, no margin, no levers. -->
@@ -202,13 +202,13 @@
                         </div>
                     </header>
                     <div class="vq-cq-parties" id="vq-cq-parties"></div>
-                    <table class="vq-cq-table">
+                    <div class="vq-cq-table-wrap" role="region" aria-label="Customer quote prices" tabindex="0"><table class="vq-cq-table">
                         <thead>
                             <tr><th>Style</th><th>Description</th><th>Qty</th><th>S–XL</th><th>2XL</th><th>3XL</th><th>Est. total</th></tr>
                         </thead>
                         <tbody id="vq-cq-rows"></tbody>
                         <tfoot id="vq-cq-foot"></tfoot>
-                    </table>
+                    </table></div>
                     <div class="vq-cq-block" id="vq-cq-decoration"></div>
                     <div class="vq-cq-block">
                         <h4>Terms</h4>
@@ -228,6 +228,6 @@
     <script src="/shared_components/js/dash-page-helpers.js?v=2026.09.07.25"></script>
     <!-- STAFF_EMAIL_MAP: the saved quote's SalesRepEmail is the rep's real address (2026-09-05) -->
     <script src="/shared_components/js/staff-auth-helper.js?v=2026.09.06.37"></script>
-    <script src="/dashboards/js/volume-quote.js?v=2026.09.05.69"></script>
+    <script src="/dashboards/js/volume-quote.js?v=2026.09.10.2"></script>
 </body>
 </html>

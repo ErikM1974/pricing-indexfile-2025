@@ -12,31 +12,7 @@ Use native disclosure buttons inside table cells; aria-expanded on ordinary tabl
 
 
 
-### Webstore deployment and token migration (2026-09-07, archived): check each push exit code and remote SHA; avoid token-name collisions; dedupe after prefix fixes. Full entry in LESSONS_LEARNED_ARCHIVE.md.
-
-### Dashboards family (2026-09-07, archived): inspect both staff design systems before replacing their tokens. Full entry in LESSONS_LEARNED_ARCHIVE.md.
-
-### Dashboard/calculator CSS transforms (2026-09-07, archived): parse selectors and values separately, inspect semantic changes and verify generated asset versions. Full entry in LESSONS_LEARNED_ARCHIVE.md.
-
-## CSS tokenizers must recognize their own output (2026-09-07, archived)
-
-Never rewrite a variable declaration into a self-reference; dry-run reruns and check cyclic aliases. Full resolved migration record is in LESSONS_LEARNED_ARCHIVE.md.
-
-## Quote builder stylesheet migration (2026-09-07, archived)
-
-Preserve generated override precedence and exact palette matches; full resolved migration and corporate TLS notes are in LESSONS_LEARNED_ARCHIVE.md.
-
-## Worktree junction deletion incident (2026-09-07, archived)
-
-Never recursively delete a tree containing a junction to shared packages. Inspect link targets, remove only the link through a safe native operation, then verify before deleting the tree. Prefer a module lookup path over a shared node_modules junction. A widespread missing-package failure after cleanup means restore the locked install before debugging code; full resolved incident is in LESSONS_LEARNED_ARCHIVE.md.
-
-## Server split first-cut incident (2026-09-07, archived)
-
-Module moves change scope and relative paths; verify dependency bindings, route order and a real HTTP boot. Full resolved incident and prevention details are in LESSONS_LEARNED_ARCHIVE.md.
-
-## Proxy review authentication (2026-09-07, archived)
-
-Keep caller migrations before proxy gates and authenticate before special parsers. Full resolved incident and regression details are in LESSONS_LEARNED_ARCHIVE.md.
+Historical deployment, token, builder, junction, server split and proxy-auth migration notes are in LESSONS_LEARNED_ARCHIVE.md. Never recursively delete a worktree dependency junction.
 
 ## 2026-09-08 — CI was red for nine hours and nobody noticed, because every local gate was green
 
@@ -259,3 +235,15 @@ Problem/root cause: incomplete invoices looked empty, failed import logs were cl
 **Prevention:** Test catalog/custom round trips, row rebuilding, editing and loading after another order. Check narrow layouts, complete PDF values and multi-page headings; use the shared dialog lifecycle with native dialogs for keyboard focus and scroll restoration.
 
 **Personalization recovery follow-up:** Validate roster arrays before replacing current data; obsolete load/search/OCR/save responses must not change a newer view. Keep failed loads inert with visible retry, clear canceled OCR UI and preserve keyboard file access. Save success must match the API envelope; lock duplicate submissions and scope acknowledgments/navigation to the originating roster. Original native CSV and payload comparisons plus rejection/race tests prevent silent drift. Validate Excel groups/rows before replacing data; ignore obsolete files/views and imports preceding a save. Collect unsaved cells before adding a group; keep required-input errors inside native dialogs. Monogram ItemsJSON and save IDs/HTTP status must be validated before replacing names or clearing dirty state. Picker label clicks already dispatch native checkbox clicks; never toggle both. Return focus after Done/Escape, keep retry errors in place and preserve original proof fonts/colors when removing global print overrides.
+
+## Staff tools must capture saves and distinguish failed refreshes (2026-09-10)
+
+- Problem/root cause: late pricing/stock and image uploads could apply to a newer editor; product filtering hid failed loads, and unknown stored categories disappeared from the select.
+- Solution: bind async reads to the current record/selection, capture save payloads before awaiting, hold editing controls while saving, retain freeform stored categories and show explicit list retry with unknown counts. A failed refresh after a successful save is a load error; an uncertain write must not claim nothing changed.
+- Prevention: compare original price tables, successful payloads and PDF text; mock delayed reads/uploads and every write, test pending double-submit, preserve locked fields after failure, and verify vendor arrays against the builders. Inspect actual phone controls and every paper page; source comments naming tests are not evidence those tests exist.
+
+Staff-tool follow-up: distinguish successful blog writes from failed canonical reloads and retain published slug locks; previews must belong to the latest body text. Reversal ledgers need unique full tags, not generic replacements such as hidden. Normalize selector whitespace when consolidating duplicate CSS, and inspect PDF backgrounds/focus rings as well as extracted text.
+
+Portal follow-up: scope delayed ledgers/calculations to their customer and invalidate each loop after a view change. Hold pending financial actions and display feedback inside the active dialog. Printing closed details can omit lines; render a plain paper copy, preserve screen disclosure state and keep modal print flow block-based. Repeated monetary values can conceal missing columns in whole-document text checks: verify amounts per page and inspect freshly named PNGs tied to the PDF hash. Read UTF-8 fixtures explicitly in Windows Python.
+
+Mailing/Past Due follow-up: failed or incomplete lists must remain unknown through filtering; missing rep groups cannot imply all clear. Hold form and outreach controls during pending requests, keep uncertain-write wording honest, and fail closed in preview stubs. Compare native CSV/label markup and per-page money; carry omission warnings from the board into repeated printed headings. Canonical visibility comes from components.css, and native file buttons/shared UiDialog replace legacy label/overlay mechanics: update structural guards while retaining browser behavior checks.

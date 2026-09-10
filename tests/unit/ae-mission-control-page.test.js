@@ -67,7 +67,8 @@ describe('harness + attribution', () => {
         expect(out).toMatch(/in sync/);
     });
     test('Volume Quote writes the rep’s real email so Mission Control attributes the quote', () => {
-        expect(vq).toMatch(/SalesRepEmail: repEmailFor\(/);
+        expect(vq).toMatch(/repEmail: repEmailFor\(\$\('vq-rep'\)\.value\)/);
+        expect(vq).toMatch(/SalesRepEmail: savedFields\.repEmail/);
         expect(vq).toMatch(/function repEmailFor/);
         expect(vq).toMatch(/STAFF_EMAIL_MAP/);
         expect(vqHtml).toMatch(/staff-auth-helper\.js/);

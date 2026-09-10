@@ -17,10 +17,13 @@
 
     let products = [];
     let filterText = '';
+    let listReady = false;
+    let listRequestId = 0;
+    let saving = false;
 
     // Curated vendor codes. MIRROR of NON_SANMAR_VENDORS in
     // shared_components/js/quote-builder-utils.js — the two lists are locked by
-    // tests/unit/non-sanmar-vendor-drift.test.js. Duplicated rather than shared
+    // tests/unit/staff-toolkit-content.test.js. Duplicated rather than shared
     // because this dashboard does not load the (builder-only) utils bundle.
     // VendorCode is free text and GET /api/non-sanmar-products?vendor= filters on
     // EXACT uppercase equality, so free-typed spellings split vendor reporting
@@ -49,23 +52,28 @@
     });
 
     function boot() {
+        const requestId = ++listRequestId;
+        listReady = false; products = [];
+        ['stat-total', 'stat-active', 'stat-incomplete'].forEach(id => { $(id).textContent = '—'; });
         const root = $('content-root');
         root.classList.add('dash-loading'); root.textContent = 'Loading products…';
-        loadProducts().then(function () { DashPage.hideError(); }).catch(function (err) {
+        return loadProducts(requestId).then(function (current) { if (current) DashPage.hideError(); }).catch(function (err) {
+            if (requestId !== listRequestId) return;
             console.error('[product-manager] load failed:', err);
             DashPage.showError('Unable to load products (' + (err.message || 'request failed') + ').');
             root.classList.remove('dash-loading');
             root.innerHTML = '<p class="pm-empty" role="alert">Products unavailable (' + escapeHtml(err.message || 'request failed') + '). ' +
-                '<button type="button" class="pm-btn pm-btn-ghost" id="pmRetry">Retry</button></p>';
+                '<button type="button" class="btn pm-btn pm-btn-ghost btn-ghost" id="pmRetry">Retry</button></p>';
             const rb = $('pmRetry'); if (rb) rb.addEventListener('click', boot);
         });
     }
 
-    async function loadProducts() {
+    async function loadProducts(requestId) {
         const data = await DashPage.fetchJson('/api/non-sanmar-products?active=all&refresh=true');
-        products = (data && data.data) || [];
-        renderStats();
-        renderTable();
+        if (requestId !== listRequestId) return false;
+        if (!data || !Array.isArray(data.data)) throw new Error('Product list response incomplete');
+        products = data.data; listReady = true;
+        renderStats(); renderTable(); return true;
     }
 
     function renderStats() {
@@ -86,6 +94,7 @@
     }
 
     function renderTable() {
+        if (!listReady) return;
         const root = $('content-root');
         root.classList.remove('dash-loading');
         const rows = products.filter(matchesFilter);
@@ -98,7 +107,7 @@
         }
 
         root.innerHTML = `
-            <div class="pm-table-wrap">
+            <div class="pm-table-wrap" role="region" aria-label="Product catalog" tabindex="0">
             <table class="pm-table">
                 <thead>
                     <tr>
@@ -111,7 +120,7 @@
                         <tr data-id="${escapeHtml(String(p.ID_Product))}" class="${isActiveRow(p) ? '' : 'pm-row-inactive'}">
                             <td>${p.ImageURL
                                 ? `<img class="pm-thumb" src="${escapeHtml(p.ImageURL)}" alt="" loading="lazy">`
-                                : '<span class="pm-thumb pm-thumb-empty" title="No image" aria-label="No image"><i class="fas fa-image" aria-hidden="true"></i></span>'}</td>
+                                : '<span class="pm-thumb pm-thumb-empty" role="img" title="No image" aria-label="No image"><i class="fas fa-image" aria-hidden="true"></i></span>'}</td>
                             <td class="pm-style">${escapeHtml(p.StyleNumber)}</td>
                             <td>${escapeHtml(p.ProductName)}</td>
                             <td>${escapeHtml(p.Brand)}</td>
@@ -124,8 +133,8 @@
                                 ? '<span class="pm-chip pm-chip-live">Live</span>'
                                 : '<span class="pm-chip">Hidden</span>'}</td>
                             <td class="pm-actions">
-                                <button type="button" class="pm-btn pm-btn-ghost pm-edit" data-id="${escapeHtml(String(p.ID_Product))}" aria-label="Edit ${escapeHtml(p.StyleNumber)}"><i class="fas fa-pen" aria-hidden="true"></i> Edit</button>
-                                <a class="pm-btn pm-btn-ghost" href="/product.html?style=${encodeURIComponent(p.StyleNumber)}" target="_blank" rel="noopener" title="View in catalog" aria-label="View ${escapeHtml(p.StyleNumber)} in the catalog (new tab)"><i class="fas fa-eye" aria-hidden="true"></i></a>
+                                <button type="button" class="btn pm-btn pm-btn-ghost pm-edit btn-ghost" data-id="${escapeHtml(String(p.ID_Product))}" aria-label="Edit ${escapeHtml(p.StyleNumber)}"><i class="fas fa-pen" aria-hidden="true"></i> Edit</button>
+                                <a class="btn pm-btn pm-btn-ghost btn-ghost" href="/product.html?style=${encodeURIComponent(p.StyleNumber)}" target="_blank" rel="noopener" title="View in catalog" aria-label="View ${escapeHtml(p.StyleNumber)} in the catalog (new tab)"><i class="fas fa-eye" aria-hidden="true"></i></a>
                             </td>
                         </tr>`).join('')}
                 </tbody>
@@ -136,13 +145,22 @@
     /* ── Form ────────────────────────────────────────── */
 
     function openForm(product) {
+        if (saving) return;
         $('pmFormTitle').textContent = product ? `Edit ${product.StyleNumber}` : 'Add product';
         $('fId').value = product ? product.ID_Product : '';
         $('fStyle').value = product ? (product.StyleNumber || '') : '';
         $('fStyle').disabled = !!product;   // style number is the key — never edited
         $('fName').value = product ? (product.ProductName || '') : '';
         $('fBrand').value = product ? (product.Brand || '') : '';
-        $('fCategory').value = product && product.Category ? product.Category : 'Other';
+        const category = $('fCategory');
+        category.querySelectorAll('[data-stored-category]').forEach(option => option.remove());
+        const storedCategory = product && product.Category ? String(product.Category) : 'Other';
+        if (![...category.options].some(option => option.value === storedCategory)) {
+            const option = document.createElement('option');
+            option.value = storedCategory; option.textContent = storedCategory; option.dataset.storedCategory = 'true';
+            category.appendChild(option);
+        }
+        category.value = storedCategory;
         $('fCost').value = product && parseFloat(product.DefaultCost) > 0 ? parseFloat(product.DefaultCost) : '';
         $('fPricingMethod').value = product && String(product.PricingMethod || '').toLowerCase().includes('fix') ? 'FixedPrice' : 'Margin';
         $('fSell').value = product && parseFloat(product.DefaultSellPrice) > 0 ? parseFloat(product.DefaultSellPrice) : '';
@@ -233,10 +251,15 @@
 
     async function saveProduct(e) {
         e.preventDefault();
+        if (saving) return;
+        saving = true;
         DashPage.hideError();
         const saveBtn = $('pmSaveBtn');
         const original = saveBtn.innerHTML;
-        saveBtn.disabled = true;
+        const controls = [...document.querySelectorAll('#pmForm input, #pmForm select, #pmForm textarea, #pmForm button, #pmFormClose, #pmAddBtn, .pm-edit')];
+        const disabled = controls.map(control => control.disabled);
+        controls.forEach(control => { control.disabled = true; });
+        let saveAttempted = false;
         saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Saving…';
         try {
             const pricingMethod = $('fPricingMethod').value;
@@ -249,14 +272,9 @@
                 throw new Error('Fixed pricing needs a sell price.');
             }
 
-            // Image: uploaded file wins over pasted URL
-            let imageUrl = $('fImageUrl').value.trim();
+            // Capture the editor before the image upload can yield to another event.
+            const id = $('fId').value;
             const file = $('fImageFile').files && $('fImageFile').files[0];
-            if (file) {
-                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Uploading image…';
-                imageUrl = await uploadImage(file);
-                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Saving…';
-            }
 
             const payload = {
                 StyleNumber: $('fStyle').value.trim().toUpperCase(),
@@ -270,12 +288,18 @@
                 DefaultColors: $('fColors').value.trim(),
                 VendorCode: readVendorCode(),
                 VendorURL: $('fVendorUrl').value.trim(),
-                ImageURL: imageUrl,
+                ImageURL: $('fImageUrl').value.trim(),
                 Notes: $('fNotes').value.trim(),
                 IsActive: $('fActive').checked
             };
 
-            const id = $('fId').value;
+            // An uploaded file still takes precedence over the captured URL.
+            if (file) {
+                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Uploading image…';
+                payload.ImageURL = await uploadImage(file);
+                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Saving…';
+            }
+            saveAttempted = true;
             if (id) {
                 await DashPage.fetchJson(`/api/non-sanmar-products/${encodeURIComponent(id)}`, {
                     method: 'PUT',
@@ -291,12 +315,17 @@
             }
 
             closeForm();
-            await loadProducts();
+            // A failed refresh does not mean the completed product save failed.
+            await boot();
         } catch (err) {
             console.error('[product-manager] save failed:', err);
-            DashPage.showError(err.message || 'Save failed — nothing was changed. Try again or check the console.');
+            DashPage.showError(saveAttempted
+                ? 'Could not confirm the product save (' + (err.message || 'request failed') + '). Check the catalog before retrying.'
+                : (err.message || 'Unable to save this product. Check the fields and try again.'));
         } finally {
-            saveBtn.disabled = false;
+            saving = false;
+            controls.forEach((control, index) => { control.disabled = disabled[index]; });
+            if ($('pmFormCard').hidden) $('pmAddBtn').focus();
             saveBtn.innerHTML = original;
         }
     }

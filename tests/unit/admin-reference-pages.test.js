@@ -26,7 +26,7 @@ describe('admin + reference pages — shared hygiene', () => {
         if (html.includes('data-ui="unified"')) {
             expect(html).toMatch(/href="\/shared_components\/css\/components\.css\?v=/);
             expect(read('shared_components/css/components.css')).toMatch(/\[hidden\]\s*\{[^}]*display:\s*none;/);
-            const owner = ['access-admin', 'drive-access'].includes(name) ? 'shared_components/css/staff-admin-tools.css' : ['api-usage', 'table-usage-audit', 'bandit-integration'].includes(name) ? 'shared_components/css/staff-monitoring.css' : ['sanmar-ftp-integration', 'sanmar-shopworks-converter'].includes(name) ? 'shared_components/css/staff-import-tools.css' : `dashboards/css/${name}.css`;
+            const owner = name === 'contract-break-even' ? 'shared_components/css/staff-toolkit.css' : ['access-admin', 'drive-access'].includes(name) ? 'shared_components/css/staff-admin-tools.css' : ['api-usage', 'table-usage-audit', 'bandit-integration'].includes(name) ? 'shared_components/css/staff-monitoring.css' : ['sanmar-ftp-integration', 'sanmar-shopworks-converter'].includes(name) ? 'shared_components/css/staff-import-tools.css' : `dashboards/css/${name}.css`;
             expect(read(owner)).not.toMatch(/!important/);
         } else if (exists(`dashboards/css/${name}.css`)) {
             expect(read(`dashboards/css/${name}.css`)).toMatch(/^\[hidden\] \{ display: none !important; \}/m);

@@ -10,17 +10,16 @@
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- 2026 design tokens (must load before dash-shell.css) -->
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/dash-shell.css?v=2026.09.07.10">
-    <link rel="stylesheet" href="/shared_components/css/blog.css?v=2026.09.07.8">
-    <link rel="stylesheet" href="/dashboards/css/blog-editor.css?v=2026.09.07.10">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.10.2">
+    <link rel="stylesheet" href="/shared_components/css/staff-toolkit.css?v=2026.09.10.2">
 </head>
-<body>
+<body data-ui="unified" data-staff-tool="blog-editor">
+    <a class="skip-link" href="#staff-tool-main">Skip to content</a>
     <div class="dash-shell">
         <header class="dash-header">
             <div class="dash-header-left">
@@ -42,7 +41,7 @@
             </div>
         </header>
 
-        <main class="dash-content">
+        <main class="dash-content" id="staff-tool-main">
             <div class="dash-error-banner" role="alert">
                 <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                 <span class="dash-error-banner-message"></span>
@@ -53,7 +52,8 @@
             <section id="listView">
                 <div class="be-list-head">
                     <h2>Posts</h2>
-                    <button type="button" id="newPostBtn" class="be-btn be-btn--primary">
+                    <span id="postOpenState" class="be-save-state" role="status"></span>
+                    <button type="button" id="newPostBtn" class="btn be-btn be-btn--primary btn-primary">
                         <i class="fas fa-plus" aria-hidden="true"></i> New post
                     </button>
                 </div>
@@ -63,69 +63,70 @@
             <!-- ===== Editor ===== -->
             <section id="editorView" hidden>
                 <div class="be-editor-head">
-                    <button type="button" id="backToListBtn" class="be-btn be-btn--ghost">
+                    <button type="button" id="backToListBtn" class="btn be-btn be-btn--ghost btn-ghost">
                         <i class="fas fa-arrow-left" aria-hidden="true"></i> All posts
                     </button>
                     <div class="be-editor-actions">
                         <span id="saveState" class="be-save-state" role="status"></span>
-                        <button type="button" id="saveDraftBtn" class="be-btn">Save draft</button>
-                        <button type="button" id="publishBtn" class="be-btn be-btn--primary">
+                        <button type="button" id="saveDraftBtn" class="btn be-btn">Save draft</button>
+                        <button type="button" id="publishBtn" class="btn be-btn be-btn--primary btn-primary">
                             <i class="fas fa-bullhorn" aria-hidden="true"></i> Publish
                         </button>
-                        <button type="button" id="unpublishBtn" class="be-btn be-btn--warn" hidden>Unpublish</button>
-                        <a id="viewLiveLink" class="be-btn be-btn--ghost" target="_blank" rel="noopener" hidden>
+                        <button type="button" id="unpublishBtn" class="btn be-btn be-btn--warn btn-danger" hidden>Unpublish</button>
+                        <a id="viewLiveLink" class="btn be-btn be-btn--ghost btn-ghost" target="_blank" rel="noopener" hidden>
                             <i class="fas fa-up-right-from-square" aria-hidden="true"></i> View live
                         </a>
                     </div>
                 </div>
 
+                <div id="blogPrintMetadata" class="be-print-metadata"></div>
                 <div class="be-grid">
                     <div class="be-fields">
-                        <label class="be-label" for="fldTitle">Title</label>
-                        <input type="text" id="fldTitle" class="be-input" placeholder="e.g. Embroidery vs. Screen Printing: Which Is Right for Your Team?">
+                        <label class="field-label be-label" for="fldTitle">Title</label>
+                        <input type="text" id="fldTitle" class="field-input be-input" placeholder="e.g. Embroidery vs. Screen Printing: Which Is Right for Your Team?">
 
-                        <label class="be-label" for="fldSlug">URL slug <span class="be-hint" id="slugHint">/blog/…</span></label>
-                        <input type="text" id="fldSlug" class="be-input be-input--mono" placeholder="auto-generates from the title">
+                        <label class="field-label be-label" for="fldSlug">URL slug <span class="be-hint" id="slugHint">/blog/…</span></label>
+                        <input type="text" id="fldSlug" class="field-input be-input be-input--mono" placeholder="auto-generates from the title">
                         <p class="be-note" id="slugLockNote" hidden><i class="fas fa-lock" aria-hidden="true"></i> Slug is permanent once published (search engines index the URL).</p>
 
-                        <label class="be-label" for="fldMeta">Meta description <span class="be-hint"><span id="metaCount">0</span>/155 — this is the Google snippet</span></label>
-                        <textarea id="fldMeta" class="be-input" rows="2" maxlength="255" placeholder="One or two sentences that make someone click."></textarea>
+                        <label class="field-label be-label" for="fldMeta">Meta description <span class="be-hint"><span id="metaCount">0</span>/155 — this is the Google snippet</span></label>
+                        <textarea id="fldMeta" class="field-textarea be-input" rows="2" maxlength="255" placeholder="One or two sentences that make someone click."></textarea>
 
                         <div class="be-row">
                             <div>
-                                <label class="be-label" for="fldCategory">Category</label>
-                                <input type="text" id="fldCategory" class="be-input" list="beCategories" placeholder="Guides / News / Behind the Scenes">
+                                <label class="field-label be-label" for="fldCategory">Category</label>
+                                <input type="text" id="fldCategory" class="field-input be-input" list="beCategories" placeholder="Guides / News / Behind the Scenes">
                                 <datalist id="beCategories"></datalist>
                             </div>
                             <div>
-                                <label class="be-label" for="fldAuthor">Author</label>
-                                <input type="text" id="fldAuthor" class="be-input" placeholder="Northwest Custom Apparel">
+                                <label class="field-label be-label" for="fldAuthor">Author</label>
+                                <input type="text" id="fldAuthor" class="field-input be-input" placeholder="Northwest Custom Apparel">
                             </div>
                         </div>
 
-                        <span class="be-label" id="heroLabel">Hero image</span>
+                        <span class="field-label be-label" id="heroLabel">Hero image</span>
                         <div class="be-hero-row" role="group" aria-labelledby="heroLabel">
                             <img id="heroPreview" class="be-hero-preview" alt="Hero image preview" hidden>
                             <div class="be-hero-controls">
-                                <label class="be-btn be-file-btn" for="fldHeroFile" role="button" tabindex="0"><i class="fas fa-image" aria-hidden="true"></i> Upload image</label>
-                                <input type="file" id="fldHeroFile" accept="image/*" class="be-visually-hidden" aria-label="Upload hero image">
-                                <input type="text" id="fldHeroUrl" aria-label="Hero image URL" class="be-input be-input--mono" placeholder="…or paste an image URL">
+                                <button type="button" class="btn be-btn be-file-btn" data-file="fldHeroFile"><i class="fas fa-image" aria-hidden="true"></i> Upload image</button>
+                                <input type="file" id="fldHeroFile" accept="image/*" hidden aria-label="Upload hero image">
+                                <input type="text" id="fldHeroUrl" aria-label="Hero image URL" class="field-input be-input be-input--mono" placeholder="…or paste an image URL">
                             </div>
                         </div>
 
-                        <label class="be-label" for="fldBody">Post body <span class="be-hint">Markdown — use the toolbar; paste a YouTube/Vimeo link on its own line to embed it</span></label>
+                        <label class="field-label be-label" for="fldBody">Post body <span class="be-hint">Markdown — use the toolbar; paste a YouTube/Vimeo link on its own line to embed it</span></label>
                         <div class="be-toolbar" role="toolbar" aria-label="Formatting">
-                            <button type="button" data-md="bold" title="Bold" aria-label="Bold"><i class="fas fa-bold" aria-hidden="true"></i></button>
-                            <button type="button" data-md="italic" title="Italic" aria-label="Italic"><i class="fas fa-italic" aria-hidden="true"></i></button>
-                            <button type="button" data-md="h2" title="Section heading" aria-label="Section heading">H2</button>
-                            <button type="button" data-md="h3" title="Sub-heading" aria-label="Sub-heading">H3</button>
-                            <button type="button" data-md="ul" title="Bullet list" aria-label="Bullet list"><i class="fas fa-list-ul" aria-hidden="true"></i></button>
-                            <button type="button" data-md="link" title="Link" aria-label="Insert link"><i class="fas fa-link" aria-hidden="true"></i></button>
-                            <button type="button" data-md="quote" title="Quote" aria-label="Quote"><i class="fas fa-quote-left" aria-hidden="true"></i></button>
-                            <label class="be-toolbar-upload be-file-btn" for="fldBodyImage" title="Insert image" role="button" tabindex="0" aria-label="Insert image"><i class="fas fa-image" aria-hidden="true"></i></label>
-                            <input type="file" id="fldBodyImage" accept="image/*" class="be-visually-hidden" aria-label="Insert image into the post body">
+                            <button type="button" class="btn btn-ghost" data-md="bold" title="Bold" aria-label="Bold"><i class="fas fa-bold" aria-hidden="true"></i></button>
+                            <button type="button" class="btn btn-ghost" data-md="italic" title="Italic" aria-label="Italic"><i class="fas fa-italic" aria-hidden="true"></i></button>
+                            <button type="button" class="btn btn-ghost" data-md="h2" title="Section heading" aria-label="Section heading">H2</button>
+                            <button type="button" class="btn btn-ghost" data-md="h3" title="Sub-heading" aria-label="Sub-heading">H3</button>
+                            <button type="button" class="btn btn-ghost" data-md="ul" title="Bullet list" aria-label="Bullet list"><i class="fas fa-list-ul" aria-hidden="true"></i></button>
+                            <button type="button" class="btn btn-ghost" data-md="link" title="Link" aria-label="Insert link"><i class="fas fa-link" aria-hidden="true"></i></button>
+                            <button type="button" class="btn btn-ghost" data-md="quote" title="Quote" aria-label="Quote"><i class="fas fa-quote-left" aria-hidden="true"></i></button>
+                            <button type="button" class="btn be-toolbar-upload be-file-btn btn-ghost" data-file="fldBodyImage" title="Insert image" aria-label="Insert image"><i class="fas fa-image" aria-hidden="true"></i></button>
+                            <input type="file" id="fldBodyImage" accept="image/*" hidden aria-label="Insert image into the post body">
                         </div>
-                        <textarea id="fldBody" class="be-input be-body" rows="18" placeholder="Write like you're explaining it to a customer at the counter…"></textarea>
+                        <textarea id="fldBody" class="field-textarea be-input be-body" rows="18" placeholder="Write like you're explaining it to a customer at the counter…"></textarea>
                     </div>
 
                     <div class="be-preview-col">
@@ -135,7 +136,7 @@
                             <div class="be-google-url" id="gUrl">www.teamnwca.com/blog/…</div>
                             <div class="be-google-desc" id="gDesc">Meta description preview…</div>
                         </div>
-                        <div id="previewPane" class="blog-prose be-preview" aria-live="polite"></div>
+                        <div id="previewPane" class="blog-prose be-preview" role="region" aria-label="Post preview" tabindex="0" aria-live="polite"></div>
                     </div>
                 </div>
             </section>
@@ -145,6 +146,6 @@
     <script src="/config/app.config.js"></script>
     <script src="/shared_components/js/fetch-timeout.js?v=2026.09.06.26"></script>
     <script src="/shared_components/js/dash-page-helpers.js?v=2026.09.07.25"></script>
-    <script src="/dashboards/js/blog-editor.js?v=2026.09.05.69"></script>
+    <script src="/dashboards/js/blog-editor.js?v=2026.09.10.2"></script>
 </body>
 </html>

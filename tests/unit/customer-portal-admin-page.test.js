@@ -19,7 +19,7 @@ const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 
 const html = read('dashboards/customer-portal-admin.html').replace(/<!--[\s\S]*?-->/g, '');
 const js = read('dashboards/js/customer-portal-admin.js');
-const css = read('dashboards/css/customer-portal-admin.css');
+const css = read('shared_components/css/staff-toolkit.css');
 const server = serverSource();
 
 describe('customer portal admin — Rule 3 + hidden', () => {
@@ -31,11 +31,10 @@ describe('customer portal admin — Rule 3 + hidden', () => {
         expect(js).not.toMatch(/\.style\.display/);
         expect(js).not.toMatch(/onclick="/);
     });
-    test('[hidden] rule is declared before the display:flex overlay and inline-flex buttons', () => {
-        const idx = css.indexOf('[hidden] { display: none !important; }');
-        expect(idx).toBeGreaterThan(-1);
-        expect(css.indexOf('.cpa-modal-overlay {')).toBeGreaterThan(idx);
-        expect(css.indexOf('.cpa-btn {')).toBeGreaterThan(idx);
+    test('shared visibility layer controls the page overlays and buttons', () => {
+        expect(read('shared_components/css/components.css')).toMatch(/\[hidden\] \{\s*display: none;\s*\}/);
+        expect(css).toContain('.cpa-modal-overlay');
+        expect(html).toContain('/shared_components/css/components.css?');
     });
     test('panels, badge, modals and rep filters start hidden via the attribute', () => {
         expect(html).toMatch(/id="cpa-req-badge" hidden/);
@@ -91,15 +90,16 @@ describe('customer portal admin — accessible names', () => {
 
 describe('customer portal admin — modals and lookup', () => {
     test('both modals toggle with hidden, restore focus, and close on Esc', () => {
-        expect(js).toMatch(/lastFocus = document\.activeElement;\s*document\.getElementById\('cpa-modal'\)\.hidden = false;/);
-        expect(js).toMatch(/rwLastFocus = document\.activeElement;\s*document\.getElementById\('cpa-rewards-modal'\)\.hidden = false;/);
+        expect(js).toMatch(/UiDialog\.open\('cpa-modal', \{ focus: '#cpa-lookup', onDismiss: closeModal \}\)/);
+        expect(js).toMatch(/UiDialog\.open\('cpa-rewards-modal', \{ focus: '#cpa-rw-amount', onDismiss: closeRewardsModal \}\)/);
         expect(js).toMatch(/if \(lastFocus && lastFocus\.focus\) lastFocus\.focus\(\);/);
         expect(js).toMatch(/if \(rwLastFocus && rwLastFocus\.focus\) rwLastFocus\.focus\(\);/);
-        expect(js).toMatch(/if \(!document\.getElementById\('cpa-rewards-modal'\)\.hidden\) closeRewardsModal\(\);\s*else closeModal\(\);/);
+        expect((js.match(/UiDialog\.close\(m\)/g) || []).length).toBe(2);
+        expect(html.indexOf('/shared_components/js/ui-dialog.js')).toBeLessThan(html.indexOf('/dashboards/js/customer-portal-admin.js'));
     });
     test('the CRM lookup is a combobox with keyboard navigation', () => {
         expect(html).toMatch(/id="cpa-lookup"[^>]*role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="cpa-lookup-results"/);
-        expect(html).toMatch(/<label class="cpa-field-label" for="cpa-lookup">/);
+        expect(html).toMatch(/<label class="field-label cpa-field-label" for="cpa-lookup">/);
         expect(html).toMatch(/id="cpa-lookup-results" role="listbox"/);
         expect(html).not.toMatch(/<label class="cpa-field" id="cpa-lookup-field">/);
         expect(js).toMatch(/role="option" aria-selected="false" id="cpa-lookup-opt-' \+ i \+ '" tabindex="-1"/);
