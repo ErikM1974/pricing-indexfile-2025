@@ -21,7 +21,7 @@ function applyUserToUI(user) {
     const name = document.getElementById('userName');
     if (welcome && name && user.firstname) {
         name.textContent = user.firstname;
-        welcome.style.display = '';
+        welcome.hidden = false;
     }
 
     // Persist for other modules (CRM session handoff, gap reports, etc.)

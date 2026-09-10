@@ -1,0 +1,707 @@
+/* Records Admin: shared controls, readable quote rows and contained dialogs. */
+@page staff-records {
+    size: letter landscape;
+    margin: 0.35in;
+}
+
+@layer components.pages {
+    :where([data-ui="unified"][data-staff-tool="records"]) .records-skip {
+        position: absolute;
+        top: 0;
+        left: var(--space-4);
+        padding: var(--space-3);
+        background: var(--ui-surface);
+        transform: translateY(-120%);
+        z-index: 10;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .records-skip:focus {
+        transform: translateY(0);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .header {
+        background: var(--gray-900);
+        color: var(--color-on-brand);
+        border-top: 4px solid var(--amber-400);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .header-container {
+        max-width: 1640px;
+        padding: var(--space-5);
+        margin: auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .logo {
+        width: 170px;
+        height: auto;
+        filter: brightness(0) invert(1);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .breadcrumb {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-3);
+        align-items: center;
+        font-size: var(--font-size-md);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .breadcrumb a {
+        color: inherit;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"])
+        .header
+        :focus-visible {
+        outline-color: var(--amber-400);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .container {
+        max-width: 1640px;
+        margin: auto;
+        padding: var(--space-6) var(--space-5) var(--space-8);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .records-heading {
+        margin-bottom: var(--space-6);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .page-title {
+        margin: 0 0 var(--space-2);
+        font-size: clamp(1.45rem, 2.5vw, 2rem);
+        letter-spacing: -0.025em;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .page-description {
+        margin: 0;
+        color: var(--ui-muted);
+        max-width: 75ch;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .filters {
+        padding: var(--space-5);
+        background: var(--ui-surface);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-md);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .filters-grid {
+        display: grid;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .filter-group {
+        display: grid;
+        gap: var(--space-2);
+        min-width: 0;
+        align-content: start;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .filter-label {
+        font-size: var(--font-size-md);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .field-input {
+        width: 100%;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .filter-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+        margin-top: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"])
+        .filter-actions
+        [data-call="exportData"] {
+        margin-left: auto;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .records-feedback,
+    :where([data-ui="unified"][data-staff-tool="records"])
+        .records-dialog-feedback {
+        padding: var(--space-4);
+        margin: var(--space-4) 0;
+        background: var(--ui-surface);
+        border: 1px solid var(--ui-line);
+        border-left: 4px solid var(--ui-accent);
+        border-radius: var(--radius-sm);
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) [data-type="error"],
+    :where([data-ui="unified"][data-staff-tool="records"])
+        [data-type="load-error"] {
+        color: var(--red-700);
+        border-color: var(--red-700);
+        background: var(--red-50);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .table-container {
+        margin-top: var(--space-6);
+        background: var(--ui-surface);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-md);
+        overflow: hidden;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .table-header {
+        padding: var(--space-5);
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: var(--space-3);
+        border-bottom: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .table-title {
+        margin: 0;
+        font-size: var(--font-size-lg);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .pagination-info {
+        font-size: var(--font-size-md);
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .table-wrapper {
+        overflow: auto;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .records-table {
+        border-collapse: collapse;
+        width: 100%;
+        font-size: var(--font-size-md);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .records-table th {
+        text-align: left;
+        background: var(--gray-50);
+        padding: var(--space-3);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .records-table td {
+        padding: var(--space-3);
+        border-top: 1px solid var(--ui-line);
+        vertical-align: top;
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"])
+        .records-table
+        td:first-child {
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"])
+        .records-table
+        tbody
+        tr:hover {
+        background: var(--gray-50);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"])
+        .records-table
+        .records-muted {
+        color: var(--ui-muted);
+        display: inline-block;
+        margin-top: var(--space-1);
+        font-size: var(--font-size-md);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"])
+        .records-table
+        .status-select {
+        min-width: 125px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .quote-type {
+        display: inline-block;
+        padding: var(--space-1) var(--space-2);
+        background: var(--ui-tint);
+        color: var(--ui-ink);
+        border-radius: var(--radius-sm);
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .records-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-1);
+        min-width: 236px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"])
+        .records-actions
+        .btn {
+        min-width: 44px;
+        min-height: 44px;
+        padding: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"])
+        [data-tone="danger"] {
+        color: var(--red-700);
+        border-color: var(--red-200);
+        background: var(--red-50);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .pagination {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: flex-end;
+        gap: var(--space-2);
+        padding: var(--space-4);
+        border-top: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"])
+        .pagination
+        > .pagination-info {
+        margin-right: auto;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"])
+        .pagination
+        > div:has(.pagination-btn) {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"])
+        .pagination-btn.active {
+        background: var(--ui-accent);
+        color: var(--color-on-brand);
+        border-color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .records-empty {
+        text-align: center;
+        padding: var(--space-8);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .records-empty i {
+        display: block;
+        font-size: var(--font-size-xl);
+        margin-bottom: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) dialog {
+        width: min(920px, calc(100% - 32px));
+        max-height: calc(100dvh - 32px);
+        border: 1px solid var(--ui-line);
+        padding: 0;
+        border-radius: var(--radius-lg);
+        color: var(--ui-ink);
+        background: var(--ui-surface);
+        box-shadow: var(--shadow-md);
+        overflow: auto;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) dialog::backdrop {
+        background: rgb(17 24 39 / 65%);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .modal-content {
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-4);
+        padding: var(--space-5);
+        border-bottom: 1px solid var(--ui-line);
+        background: var(--gray-50);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .modal-header h2 {
+        font-size: var(--font-size-xl);
+        margin: 0;
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .close-btn {
+        flex-shrink: 0;
+        min-width: 44px;
+        font-size: var(--font-size-xl);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .modal-body {
+        padding: var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .modal-body h3 {
+        margin: 0 0 var(--space-3);
+        font-size: var(--font-size-lg);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .quote-info-grid,
+    :where([data-ui="unified"][data-staff-tool="records"]) .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .info-section p {
+        margin: var(--space-2) 0;
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .notes-section {
+        padding: var(--space-4);
+        margin: var(--space-5) 0;
+        background: var(--gray-50);
+        border-left: 3px solid var(--ui-line-strong);
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .items-section {
+        margin-top: var(--space-5);
+        overflow: auto;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .items-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"])
+        .items-table
+        :is(th, td) {
+        text-align: left;
+        padding: var(--space-3);
+        border-bottom: 1px solid var(--ui-line);
+        font-size: var(--font-size-md);
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .items-table th {
+        background: var(--gray-50);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .form-group {
+        display: grid;
+        gap: var(--space-2);
+        min-width: 0;
+        align-content: start;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .form-group label {
+        font-size: var(--font-size-md);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .full-width {
+        grid-column: 1 / -1;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="records"]) .modal-footer {
+        padding: var(--space-4) var(--space-5);
+        display: flex;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+        border-top: 1px solid var(--ui-line);
+    }
+
+    @media (width <= 1100px) {
+        :where([data-ui="unified"][data-staff-tool="records"]) .filters-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+    }
+
+    @media (width <= 850px) {
+        :where([data-ui="unified"][data-staff-tool="records"])
+            .header-container {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="records"]) .records-table,
+        :where([data-ui="unified"][data-staff-tool="records"])
+            .records-table
+            tbody {
+            display: block;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="records"])
+            .records-table
+            thead {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            clip-path: inset(50%);
+            white-space: nowrap;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="records"])
+            .records-table
+            tr {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            padding: var(--space-4);
+            gap: var(--space-3) var(--space-5);
+            border-bottom: 1px solid var(--ui-line);
+        }
+
+        :where([data-ui="unified"][data-staff-tool="records"])
+            .records-table
+            td {
+            display: block;
+            border: 0;
+            padding: 0;
+            min-width: 0;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="records"])
+            .records-table
+            td::before {
+            content: attr(data-label);
+            display: block;
+            font-size: var(--font-size-md);
+            font-weight: 600;
+            color: var(--ui-muted);
+            margin-bottom: var(--space-1);
+        }
+
+        :where([data-ui="unified"][data-staff-tool="records"])
+            .records-table
+            td[data-label="Actions"],
+        :where([data-ui="unified"][data-staff-tool="records"])
+            .records-table
+            .records-empty {
+            grid-column: 1 / -1;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="records"])
+            .records-actions {
+            max-width: none;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="records"])
+            .records-table
+            .status-select {
+            min-width: 0;
+        }
+    }
+
+    @media (width <= 540px) {
+        :where([data-ui="unified"][data-staff-tool="records"]) .container {
+            padding: var(--space-5) var(--space-3);
+        }
+
+        :where([data-ui="unified"][data-staff-tool="records"]) .filters {
+            padding: var(--space-4);
+        }
+
+        :where([data-ui="unified"][data-staff-tool="records"]) .filters-grid {
+            grid-template-columns: minmax(0, 1fr);
+            gap: var(--space-3);
+        }
+
+        :where([data-ui="unified"][data-staff-tool="records"])
+            .filter-group:first-child,
+        :where([data-ui="unified"][data-staff-tool="records"])
+            .filter-group:nth-child(5) {
+            grid-column: 1 / -1;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="records"])
+            .filter-actions
+            .btn {
+            flex: 1 1 42%;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="records"])
+            .filter-actions
+            [data-call="exportData"] {
+            margin-left: 0;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="records"])
+            .pagination
+            > .pagination-info {
+            flex-basis: 100%;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="records"]) .pagination {
+            justify-content: center;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="records"]) .quote-info-grid,
+        :where([data-ui="unified"][data-staff-tool="records"]) .form-grid {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        :where([data-ui="unified"][data-staff-tool="records"]) .modal-header,
+        :where([data-ui="unified"][data-staff-tool="records"]) .modal-body {
+            padding: var(--space-4);
+        }
+
+        :where([data-ui="unified"][data-staff-tool="records"]) dialog {
+            width: calc(100% - 16px);
+            max-height: calc(100dvh - 16px);
+        }
+
+        :where([data-ui="unified"][data-staff-tool="records"])
+            .modal-header
+            h2 {
+            font-size: var(--font-size-lg);
+        }
+
+        :where([data-ui="unified"][data-staff-tool="records"])
+            .items-table
+            :is(th, td) {
+            padding: var(--space-1);
+            font-size: var(--font-size-sm);
+        }
+    }
+
+    @media (width <= 540px) {
+        :where([data-ui="unified"][data-staff-tool="records"]) .items-table,
+        :where([data-ui="unified"][data-staff-tool="records"]) .items-table tbody { display: block; }
+        :where([data-ui="unified"][data-staff-tool="records"]) .items-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+        :where([data-ui="unified"][data-staff-tool="records"]) .items-table tbody tr { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); padding: var(--space-3) 0; border-top: 1px solid var(--ui-line); }
+        :where([data-ui="unified"][data-staff-tool="records"]) .items-table td { display: block; padding: 0; border: 0; font-size: var(--font-size-md); }
+        :where([data-ui="unified"][data-staff-tool="records"]) .items-table td::before { display: block; content: attr(data-label); margin-bottom: var(--space-1); color: var(--ui-muted); font-size: var(--font-size-sm); font-weight: 600; }
+        :where([data-ui="unified"][data-staff-tool="records"]) .items-table td[data-label="Product"] { grid-column: 1 / -1; }
+    }
+
+    @media print {
+        :where([data-ui="unified"][data-staff-tool="records"]) {
+            page: staff-records;
+            background: var(--color-on-brand);
+            color: var(--gray-900);
+        }
+
+        :where([data-ui="unified"][data-staff-tool="records"]) .header,
+        :where([data-ui="unified"][data-staff-tool="records"]) .filters,
+        :where([data-ui="unified"][data-staff-tool="records"]) .pagination,
+        :where([data-ui="unified"][data-staff-tool="records"])
+            .records-feedback,
+        :where([data-ui="unified"][data-staff-tool="records"]) .records-skip,
+        :where([data-ui="unified"][data-staff-tool="records"]) dialog {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="records"]) .container {
+            max-width: none;
+            padding: 0;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="records"]) .records-heading {
+            margin-bottom: 12px;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="records"]) .page-title {
+            font-size: 20px;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="records"])
+            .page-description {
+            font-size: 12px;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="records"])
+            .table-container {
+            border: 0;
+            overflow: visible;
+            margin-top: 12px;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="records"]) .table-header {
+            padding: 8px 0;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="records"]) .table-wrapper {
+            overflow: visible;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="records"]) .records-table {
+            display: table;
+            font-size: 10px;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="records"])
+            .records-table
+            thead {
+            display: table-header-group;
+            position: static;
+            width: auto;
+            height: auto;
+            overflow: visible;
+            clip-path: none;
+            white-space: normal;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="records"])
+            .records-table
+            tbody {
+            display: table-row-group;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="records"])
+            .records-table
+            tr {
+            display: table-row;
+            break-inside: avoid;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="records"])
+            .records-table
+            td {
+            display: table-cell;
+            font-size: 10px;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="records"])
+            .records-table
+            :is(th, td) {
+            padding: 7px 5px;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="records"])
+            .records-table
+            td::before {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="records"])
+            .records-table
+            .records-muted {
+            font-size: 10px;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="records"])
+            .records-table
+            :is(th:last-child, td:last-child) {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="records"])
+            .records-table
+            .status-select {
+            font-size: 10px;
+            min-height: 0;
+            padding: 0;
+            min-width: 0;
+            border: 0;
+            background: none;
+            appearance: none;
+        }
+    }
+}

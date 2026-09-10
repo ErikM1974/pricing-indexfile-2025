@@ -1,0 +1,10 @@
+{
+  "text": "STYLES\nFront\nBack\nSave for this color only\nPick a style on the left to start\nSave layout\nReset to auto-detect\nRemove saved layout\nCopy JSON",
+  "events": {
+    "errors": [],
+    "writes": [],
+    "unknown": [],
+    "missing": [],
+    "providers": []
+  }
+}

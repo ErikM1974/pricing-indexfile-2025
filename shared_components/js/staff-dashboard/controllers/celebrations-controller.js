@@ -11,6 +11,7 @@ import { escapeHtml } from '../core/dashboard-ui-utils.js';
 // Set when the roster fetch fails — every render branch shows a visible
 // "unavailable" state instead of quietly empty widgets (Rule #4).
 let rosterError = null;
+let rosterLoaded = false;
 
 const els = {
     teamBtn:      () => document.getElementById('teamBtn'),
@@ -62,6 +63,12 @@ function renderHeaderCounts() {
 function renderDropdown() {
     const bdayTarget = els.bdayList();
     const annivTarget = els.annivList();
+    if (!rosterLoaded) {
+        const loadingRow = '<li class="celebration-empty">Loading staff roster…</li>';
+        if (bdayTarget) bdayTarget.innerHTML = loadingRow;
+        if (annivTarget) annivTarget.innerHTML = loadingRow;
+        return;
+    }
     if (rosterError) {
         const failRow = '<li class="celebration-empty">Staff roster unavailable right now — reload to retry.</li>';
         if (bdayTarget) bdayTarget.innerHTML = failRow;
@@ -138,6 +145,10 @@ function getFilteredEmployees() {
 function renderDirectoryTable() {
     const tbody = els.modalTbody();
     if (!tbody) return;
+    if (!rosterLoaded) {
+        tbody.innerHTML = '<tr><td colspan="6" class="staff-table__empty">Loading staff roster…</td></tr>';
+        return;
+    }
     if (rosterError) {
         tbody.innerHTML = `<tr><td colspan="6" class="staff-table__empty">Couldn’t load the staff roster — reload the page to retry.</td></tr>`;
         return;
@@ -151,12 +162,12 @@ function renderDirectoryTable() {
         const statusBadge = `<span class="status-badge status-${escapeHtml(e.status)}">${escapeHtml(e.status)}</span>`;
         return `
             <tr>
-                <td>${escapeHtml(e.fullName)}</td>
-                <td>${escapeHtml(e.position)}</td>
-                <td>${escapeHtml(e.formattedStartDate)}</td>
-                <td class="num">${e.yearsOfService}</td>
-                <td>${escapeHtml(e.formattedBirthday)}</td>
-                <td>${statusBadge}</td>
+                <td data-label="Name">${escapeHtml(e.fullName)}</td>
+                <td data-label="Position">${escapeHtml(e.position)}</td>
+                <td data-label="Start Date">${escapeHtml(e.formattedStartDate)}</td>
+                <td class="num" data-label="Years">${e.yearsOfService}</td>
+                <td data-label="Birthday">${escapeHtml(e.formattedBirthday)}</td>
+                <td data-label="Status">${statusBadge}</td>
             </tr>
         `;
     }).join('');
@@ -166,14 +177,15 @@ function setFilter(name) {
     currentFilter = name;
     els.modalFilters().forEach((btn) => {
         btn.classList.toggle('active', btn.dataset.filter === name);
+        btn.setAttribute('aria-pressed', String(btn.dataset.filter === name));
     });
     renderDirectoryTable();
 }
 
 function openDirectory(filter = 'all') {
-    setFilter(filter);
     const search = els.modalSearch();
     if (search) search.value = '';
+    setFilter(filter);
     const modal = els.modal();
     if (modal && typeof modal.open === 'function') modal.open();
 }
@@ -188,6 +200,14 @@ export async function initCelebrations() {
     if (search) {
         search.addEventListener('input', renderDirectoryTable);
     }
+
+    // Escape dismisses celebrations without interfering with the open directory.
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && els.teamDropdown()?.classList.contains('is-open') && !els.modal()?.hasAttribute('open')) {
+            closeDropdown();
+            els.teamBtn()?.focus();
+        }
+    });
 
     // Outside-click closes the dropdown
     document.addEventListener('click', (e) => {
@@ -204,7 +224,10 @@ export async function initCelebrations() {
         rosterError = err;
         console.error('[celebrations] roster load failed:', err);
     }
+    rosterLoaded = true;
     renderHeaderCounts();
+    if (els.teamDropdown()?.classList.contains('is-open')) renderDropdown();
+    if (els.modal()?.hasAttribute('open')) renderDirectoryTable();
 }
 
 register('team:toggle-dropdown', () => toggleDropdown());

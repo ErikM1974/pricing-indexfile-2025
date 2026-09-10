@@ -6,23 +6,26 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Custom Tees — Print-Box Calibration (Staff) | NWCA</title>
     <link rel="icon" href="/favicon.png" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/tools/custom-tees-calibrate.css?v=2026.09.07.19">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.10.3">
+    <link rel="stylesheet" href="/shared_components/css/staff-calibration.css?v=2026.09.10.7">
 </head>
-<body>
+<body data-ui="unified" data-staff-tool="calibration">
+    <a class="skip-link" href="#cal-main">Skip to calibration</a>
     <header class="cal-head">
         <div>
             <h1><i class="fas fa-crosshairs" aria-hidden="true"></i> Custom Tees — Print-Box Calibration</h1>
-            <p>Drag the green box onto the chest area once per style — every order preview uses your layout from then on. The box is the 16″×20″ print envelope (aspect locked). Saves to Caspio instantly, no deploy.</p>
+            <p>Set the 16″ × 20″ print area for each garment. Move or resize the green box, then save the layout for future order previews.</p>
         </div>
-        <a class="cal-link" href="/staff-dashboard.html"><i class="fas fa-arrow-left" aria-hidden="true"></i> Dashboard</a>
-        <a class="cal-link" href="/custom-tees" target="_blank" rel="noopener"><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i> Open storefront</a>
+        <a class="cal-link btn" href="/staff-dashboard.html"><i class="fas fa-arrow-left" aria-hidden="true"></i> Dashboard</a>
+        <a class="cal-link btn" href="/custom-tees" target="_blank" rel="noopener"><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i> Open storefront</a>
     </header>
 
-    <main class="cal-main">
+    <main class="cal-main" id="cal-main">
         <!-- LEFT: style list -->
-        <aside class="cal-styles">
+        <aside class="cal-styles" aria-label="Garment styles">
             <h2>Styles</h2>
             <div id="style-list" class="style-list">
                 <div class="cal-loading"><i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Loading catalog…</div>
@@ -30,42 +33,56 @@
         </aside>
 
         <!-- RIGHT: the canvas -->
-        <section class="cal-stage">
+        <section class="cal-stage" aria-label="Print area editor">
+            <p class="cal-warning" id="cal-warning" role="status" hidden></p>
+            <button type="button" class="btn" id="cal-retry" hidden>Reload styles and saved layouts</button>
             <div class="cal-toolbar">
-                <div class="cal-tabs" role="tablist">
-                    <button type="button" id="cal-tab-front" class="cal-tab is-active" role="tab">Front</button>
-                    <button type="button" id="cal-tab-back" class="cal-tab" role="tab">Back</button>
+                <div class="cal-tabs" role="tablist" aria-label="Garment view">
+                    <button type="button" id="cal-tab-front" class="cal-tab btn is-active" role="tab" aria-selected="true" aria-controls="cal-canvas-wrap">Front</button>
+                    <button type="button" id="cal-tab-back" class="cal-tab btn" role="tab" aria-selected="false" aria-controls="cal-canvas-wrap" tabindex="-1">Back</button>
                 </div>
-                <select id="cal-color" class="cal-color" title="Color photo to lay out on"></select>
+                <select id="cal-color" class="cal-color field-input" aria-label="Garment color" title="Color photo to lay out on"></select>
                 <label class="cal-coloronly">
                     <input type="checkbox" id="cal-color-only"> Save for this color only
                 </label>
             </div>
 
-            <div class="cal-canvas-wrap" id="cal-canvas-wrap">
-                <img id="cal-photo" alt="Garment photo" draggable="false">
-                <div id="cal-box" class="cal-box" hidden>
+            <div class="cal-canvas-wrap" id="cal-canvas-wrap" role="tabpanel" aria-labelledby="cal-tab-front">
+                <div class="cal-photo-frame" id="cal-photo-frame">
+                <img id="cal-photo" class="cal-photo" alt="Garment photo" draggable="false" hidden>
+                <div id="cal-box" class="cal-box" role="group" aria-label="Print envelope" aria-describedby="cal-keyboard-help" tabindex="0" hidden>
                     <span class="cal-box-label">16″ × 20″ print envelope</span>
-                    <span class="cal-box-handle" id="cal-box-handle"><i class="fas fa-up-right-and-down-left-from-center" aria-hidden="true"></i></span>
+                    <button type="button" class="cal-box-handle" id="cal-box-handle" aria-label="Resize print envelope" aria-describedby="cal-keyboard-help"><i class="fas fa-up-right-and-down-left-from-center" aria-hidden="true"></i></button>
+                </div>
                 </div>
                 <div class="cal-empty" id="cal-empty">Pick a style on the left to start</div>
             </div>
 
+            <p class="cal-note" id="cal-keyboard-help">Arrow keys move the selected box. On its resize handle, arrow keys change its size. Hold Shift for larger steps.</p>
+            <fieldset class="cal-adjust" id="cal-adjust" disabled>
+                <legend>Adjust print area</legend>
+                <button type="button" class="btn" data-adjust="left">← Left</button>
+                <button type="button" class="btn" data-adjust="right">Right →</button>
+                <button type="button" class="btn" data-adjust="up">↑ Up</button>
+                <button type="button" class="btn" data-adjust="down">Down ↓</button>
+                <button type="button" class="btn" data-adjust="smaller">− Smaller</button>
+                <button type="button" class="btn" data-adjust="larger">+ Larger</button>
+            </fieldset>
             <div class="cal-readout" id="cal-readout"></div>
 
             <div class="cal-actions">
-                <button type="button" id="cal-save" class="cal-btn cal-btn-primary"><i class="fas fa-floppy-disk" aria-hidden="true"></i> Save layout</button>
-                <button type="button" id="cal-auto" class="cal-btn"><i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i> Reset to auto-detect</button>
-                <button type="button" id="cal-delete" class="cal-btn cal-btn-danger" hidden><i class="fas fa-trash-can" aria-hidden="true"></i> Remove saved layout</button>
-                <button type="button" id="cal-copy" class="cal-btn"><i class="fas fa-copy" aria-hidden="true"></i> Copy JSON</button>
+                <button type="button" id="cal-save" class="btn btn-primary"><i class="fas fa-floppy-disk" aria-hidden="true"></i> Save layout</button>
+                <button type="button" id="cal-auto" class="btn"><i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i> Reset to auto-detect</button>
+                <button type="button" id="cal-delete" class="btn btn-danger" hidden><i class="fas fa-trash-can" aria-hidden="true"></i> Remove saved layout</button>
+                <button type="button" id="cal-copy" class="btn"><i class="fas fa-copy" aria-hidden="true"></i> Copy JSON</button>
             </div>
-            <p class="cal-note" id="cal-status"></p>
+            <p class="cal-note" id="cal-status" role="status"></p>
         </section>
     </main>
 
     <div id="cal-toasts" class="cal-toasts" aria-live="polite"></div>
 
     <script src="/config/app.config.js"></script>
-    <script src="/tools/custom-tees-calibrate.js?v=2026.09.06.31"></script>
+    <script src="/tools/custom-tees-calibrate.js?v=2026.09.10.7"></script>
 </body>
 </html>

@@ -1,0 +1,10 @@
+{
+  "message": "Lookup failed: Synthetic shipment unavailable",
+  "events": {
+    "errors": [],
+    "writes": [],
+    "unknown": [],
+    "missing": [],
+    "providers": []
+  }
+}

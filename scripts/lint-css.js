@@ -165,7 +165,7 @@ const CSS_LINT_SCOPE = [
     'pages/css/3-day-tees.css',
     'pages/css/art-billing-reference.css',
     'pages/css/art-request-detail.css',
-    'pages/css/box-labels.css',
+    'shared_components/css/staff-box-labels.css',
     'pages/css/custom-caps.css',
     'pages/css/custom-tees.css',
     'pages/css/customer-invoice.css',
@@ -228,12 +228,11 @@ const CSS_LINT_SCOPE = [
     'shared_components/css/jds-submit-form.css',
     'shared_components/css/mockup-submit-form.css',
     // tail batch (2026-09-07): admin, production-shifts, price-audit-report, employee bundles, tools, vendor-portal css, dtf prototype css
-    'admin/css/universal-records-admin-injected.css',
-    'admin/css/universal-records-admin.css',
     'calculators/quick-quote/dtf-prints-prototype.css',
     'employee-bundles/css/streich-bros-bundle.css',
     'employee-bundles/css/wcttr-bundle.css',
-    'tools/custom-tees-calibrate.css',
+    'shared_components/css/staff-calibration.css',
+    'shared_components/css/staff-records.css',
 ];
 
 async function run() {
