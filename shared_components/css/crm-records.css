@@ -1,0 +1,1005 @@
+/* CRM records: lead activity and contact panels, inbox records and shipment queue. Canonical controls and lead atoms are shared. */
+@layer components.pages {
+    :where([data-ui="unified"][data-crm-record]) .lw-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        gap: var(--space-5);
+        flex-wrap: wrap;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-title {
+        font-size: var(--font-size-2xl);
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-sub {
+        margin-top: var(--space-2);
+        color: var(--ui-muted);
+        font-size: var(--font-size-md);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-head-controls {
+        display: flex;
+        gap: var(--space-3);
+        flex-wrap: wrap;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-head-controls .ld-control {
+        min-width: 170px;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-grid {
+        display: grid;
+        gap: var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-main {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--space-5);
+        align-items: start;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-rail {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: var(--space-5);
+        align-items: start;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-grid .dash-card {
+        min-width: 0;
+        margin: 0;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-note-input {
+        margin-top: var(--space-3);
+        resize: vertical;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-composer-actions,
+    :where([data-ui="unified"][data-crm-record]) .lw-head-actions,
+    :where([data-ui="unified"][data-crm-record]) .lw-head-chips,
+    :where([data-ui="unified"][data-crm-record]) .lw-chips,
+    :where([data-ui="unified"][data-crm-record]) .lw-quote-row,
+    :where([data-ui="unified"][data-crm-record]) .lw-outreach-actions,
+    :where([data-ui="unified"][data-crm-record]) .lw-quote-linked-actions {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+        margin-top: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-dropzone {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-2);
+        flex: 1 1 220px;
+        min-height: 44px;
+        padding: var(--space-3);
+        border: 1px dashed var(--ui-line);
+        border-radius: var(--radius-sm);
+        font-size: var(--font-size-sm);
+        color: var(--ui-muted);
+        cursor: pointer;
+        text-align: center;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-dropzone:hover,
+    :where([data-ui="unified"][data-crm-record]) .lw-dropzone.is-over {
+        background: var(--ui-tint);
+        border-color: var(--ui-accent);
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-upload-status {
+        margin-top: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-timeline-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-item {
+        display: flex;
+        gap: var(--space-3);
+        padding: var(--space-4) 0;
+        border-bottom: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-item:last-child {
+        border-bottom: 0;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-item-icon {
+        flex: 0 0 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 32px;
+        border-radius: 999px;
+        background: var(--gray-100);
+        color: var(--gray-700);
+        font-size: var(--font-size-sm);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-item--note .lw-item-icon,
+    :where([data-ui="unified"][data-crm-record]) .lw-item--email .lw-item-icon {
+        background: var(--sky-100);
+        color: var(--blue-800);
+    }
+
+    :where([data-ui="unified"][data-crm-record])
+        .lw-item--status
+        .lw-item-icon {
+        background: var(--amber-100);
+        color: var(--amber-800);
+    }
+
+    :where([data-ui="unified"][data-crm-record])
+        .lw-item--attachment
+        .lw-item-icon,
+    :where([data-ui="unified"][data-crm-record]) .lw-item--quote .lw-item-icon {
+        background: var(--brand-50);
+        color: var(--emerald-800);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-item-body {
+        flex: 1;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-item-meta {
+        color: var(--ui-muted);
+        font-size: var(--font-size-sm);
+        margin-bottom: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-item-text {
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        font-size: var(--font-size-md);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-item--system .lw-item-text,
+    :where([data-ui="unified"][data-crm-record]) .lw-item-origin .lw-item-text {
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-chip {
+        font-size: var(--font-size-sm);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-due-overdue,
+    :where([data-ui="unified"][data-crm-record]) .lw-quote-missing,
+    :where([data-ui="unified"][data-crm-record]) .inbox-late {
+        color: var(--red-700);
+        font-size: var(--font-size-sm);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-due-overdue {
+        margin-top: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-value-input,
+    :where([data-ui="unified"][data-crm-record]) .lw-quote-input,
+    :where([data-ui="unified"][data-crm-record]) .lw-note-input {
+        width: 100%;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-value-big,
+    :where([data-ui="unified"][data-crm-record]) .lw-quote-amount {
+        font-size: var(--font-size-xl);
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-value-big {
+        margin-bottom: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-intel {
+        margin-top: var(--space-4);
+        padding-top: var(--space-3);
+        border-top: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-intel-title {
+        font-size: var(--font-size-sm);
+        font-weight: 600;
+        color: var(--ui-muted);
+        margin-bottom: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-method-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--space-2);
+        margin: var(--space-3) 0;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-method-btn {
+        justify-content: center;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-quote-linked {
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+        padding: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-quote-linked-actions {
+        display: flex;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-quote-row .lw-quote-input {
+        flex: 1 1 160px;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-art-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+        display: flex;
+        align-items: start;
+        justify-content: center;
+        padding: var(--space-5) var(--space-4);
+        overflow-y: auto;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-art-modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgb(15 23 42 / 55%);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-art-modal-dialog {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        max-width: 880px;
+        margin: auto;
+        background: var(--ui-surface);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        padding: var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-art-modal-close {
+        position: absolute;
+        top: var(--space-2);
+        right: var(--space-2);
+        z-index: 2;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-kit-modal .ld-modal-body {
+        max-height: 78vh;
+        overflow-y: auto;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-kit-items {
+        display: grid;
+        gap: var(--space-2);
+        margin: var(--space-3) 0;
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+        padding: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-kit-item {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        font-size: var(--font-size-md);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-kit-item-label {
+        flex: 1;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-kit-qty {
+        width: 72px;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-fire-chip {
+        font-size: var(--font-size-sm);
+        font-weight: 600;
+        color: var(--amber-800);
+        background: var(--amber-100);
+        border-radius: 999px;
+        padding: var(--space-1) var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-outreach-btns {
+        display: grid;
+        gap: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-outreach-btn {
+        justify-content: flex-start;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-outreach-card {
+        margin-top: var(--space-3);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+        overflow: hidden;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-outreach-subject {
+        font-weight: 600;
+        font-size: var(--font-size-md);
+        padding: var(--space-3);
+        background: var(--ui-tint);
+        border-bottom: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-outreach-body {
+        padding: var(--space-3);
+        font-size: var(--font-size-md);
+        max-height: 300px;
+        overflow-y: auto;
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-outreach-body p {
+        margin: 0 0 var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-outreach-actions {
+        margin: 0;
+        padding: var(--space-3);
+        border-top: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-outreach-sent {
+        margin-top: var(--space-3);
+        font-size: var(--font-size-sm);
+        font-weight: 600;
+        color: var(--emerald-800);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-mt-6,
+    :where([data-ui="unified"][data-crm-record]) .lw-mt-8 {
+        margin-top: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-retry,
+    :where([data-ui="unified"][data-crm-record]) .inbox-retry {
+        margin-left: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .inbox-muted {
+        color: var(--ui-muted);
+        font-size: var(--font-size-sm);
+        font-weight: 400;
+        display: inline-block;
+        margin-left: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .inbox-tabs,
+    :where([data-ui="unified"][data-crm-record]) .inbox-chips {
+        display: flex;
+        gap: var(--space-2);
+        flex-wrap: wrap;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .inbox-tabs {
+        margin: var(--space-5) 0;
+    }
+
+    :where([data-ui="unified"][data-crm-record])
+        .inbox-tab[aria-selected="true"],
+    :where([data-ui="unified"][data-crm-record])
+        .inbox-chip[aria-pressed="true"] {
+        background: var(--ui-accent);
+        border-color: var(--ui-accent);
+        color: var(--color-on-brand);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .inbox-filterbar {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        flex-wrap: wrap;
+        margin-bottom: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .inbox-chips {
+        flex: 1 1 100%;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .inbox-search {
+        flex: 1 1 260px;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .inbox-select {
+        flex: 0 1 240px;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .inbox-table .col-summary {
+        min-width: 220px;
+        max-width: 400px;
+        white-space: normal;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .row--overdue td {
+        background: var(--red-50);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .col-company strong {
+        display: block;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .col-company .inbox-muted {
+        margin-left: 0;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .inbox-empty {
+        padding: var(--space-6);
+        text-align: center;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .inbox-badge,
+    :where([data-ui="unified"][data-crm-record]) .inbox-status {
+        display: inline-block;
+        border-radius: 999px;
+        padding: var(--space-1) var(--space-2);
+        font-size: var(--font-size-sm);
+        font-weight: 600;
+        white-space: nowrap;
+        background: var(--gray-100);
+        color: var(--gray-800);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .badge--drp,
+    :where([data-ui="unified"][data-crm-record]) .badge--qcc,
+    :where([data-ui="unified"][data-crm-record]) .badge--rst,
+    :where([data-ui="unified"][data-crm-record]) .badge--pto,
+    :where([data-ui="unified"][data-crm-record]) .badge--cca,
+    :where([data-ui="unified"][data-crm-record]) .status--new {
+        background: var(--sky-100);
+        color: var(--blue-800);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .badge--art,
+    :where([data-ui="unified"][data-crm-record]) .badge--spl,
+    :where([data-ui="unified"][data-crm-record]) .badge--tax,
+    :where([data-ui="unified"][data-crm-record]) .badge--inj,
+    :where([data-ui="unified"][data-crm-record]) .status--art,
+    :where([data-ui="unified"][data-crm-record]) .status--partial,
+    :where([data-ui="unified"][data-crm-record]) .status--overdue {
+        background: var(--red-50);
+        color: var(--red-800);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .badge--smp,
+    :where([data-ui="unified"][data-crm-record]) .badge--wsr,
+    :where([data-ui="unified"][data-crm-record]) .status--progress,
+    :where([data-ui="unified"][data-crm-record]) .status--out {
+        background: var(--amber-100);
+        color: var(--amber-800);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .badge--nam,
+    :where([data-ui="unified"][data-crm-record]) .badge--crd,
+    :where([data-ui="unified"][data-crm-record]) .badge--srq {
+        background: var(--color-ruth-tint);
+        color: var(--indigo-700);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .badge--aeo,
+    :where([data-ui="unified"][data-crm-record]) .badge--onb,
+    :where([data-ui="unified"][data-crm-record]) .badge--qrq,
+    :where([data-ui="unified"][data-crm-record]) .badge--ok,
+    :where([data-ui="unified"][data-crm-record]) .badge--check,
+    :where([data-ui="unified"][data-crm-record]) .status--done {
+        background: var(--brand-50);
+        color: var(--emerald-800);
+    }
+
+    :where([data-ui="unified"][data-crm-record])
+        .inbox-stat--overdue.is-hot
+        .dash-stat-value {
+        color: var(--red-700);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .dash-btn--danger {
+        border-color: var(--red-200);
+        color: var(--red-700);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .dash-btn--danger:hover {
+        background: var(--red-50);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .sample-group {
+        margin-bottom: var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .sample-group-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: var(--space-3);
+        flex-wrap: wrap;
+        padding: var(--space-3);
+        background: var(--gray-50);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .sample-group-head.is-overdue {
+        background: var(--red-50);
+        border-color: var(--red-200);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .inbox-modal-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        display: flex;
+        align-items: start;
+        justify-content: center;
+        padding: var(--space-5) var(--space-4);
+        background: rgb(15 23 42 / 55%);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .inbox-modal {
+        display: flex;
+        flex-direction: column;
+        background: var(--ui-surface);
+        color: var(--ui-ink);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        width: min(1100px, 100%);
+        max-height: calc(100dvh - 48px);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .inbox-modal-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: var(--space-3);
+        padding: var(--space-4) var(--space-5);
+        border-bottom: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .inbox-modal-head h2 {
+        margin: 0;
+        font-size: var(--font-size-xl);
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .copy-id {
+        color: inherit;
+        font-weight: 700;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .inbox-modal-actions {
+        display: flex;
+        gap: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .inbox-modal-body {
+        min-height: 0;
+        overflow-y: auto;
+        padding: var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .detail-actionbar {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: var(--space-3);
+        padding: var(--space-3);
+        background: var(--ui-tint);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+        margin-bottom: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .detail-actionbar label {
+        font-weight: 600;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .detail-actionbar select {
+        margin-left: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .detail-fields {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: var(--space-4);
+        margin-bottom: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .detail-field {
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .detail-field span {
+        display: block;
+        font-size: var(--font-size-sm);
+        color: var(--ui-muted);
+        margin-bottom: var(--space-1);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .detail-field strong {
+        font-size: var(--font-size-md);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .detail-checks {
+        display: flex;
+        gap: var(--space-2);
+        flex-wrap: wrap;
+        margin-bottom: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .detail-subhead {
+        margin: var(--space-5) 0 var(--space-3);
+        font-size: var(--font-size-lg);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .detail-note {
+        margin: 0 0 var(--space-3);
+        padding: var(--space-3);
+        background: var(--gray-50);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .sw-preview-body {
+        width: 100%;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .ms-actions,
+    :where([data-ui="unified"][data-crm-record]) .ms-ship-form {
+        display: flex;
+        gap: var(--space-2);
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .ms-ship-form .ms-tracking {
+        min-width: 180px;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .ms-track {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: var(--font-size-sm);
+        color: var(--gray-800);
+        background: var(--gray-100);
+        border-radius: var(--radius-sm);
+        padding: var(--space-1) var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) dialog.inbox-modal-overlay {
+        width: 100%;
+        height: 100%;
+        max-width: none;
+        max-height: none;
+        margin: 0;
+        border: 0;
+        background: transparent;
+    }
+
+    :where([data-ui="unified"][data-crm-record])
+        dialog.inbox-modal-overlay::backdrop {
+        background: rgb(15 23 42 / 55%);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .inbox-stat-btn {
+        text-align: left;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .lw-panel-art .btn {
+        display: flex;
+        margin-top: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .dash-error-banner.show {
+        position: static;
+        inset: auto;
+        max-width: none;
+        margin: 0 0 var(--space-5);
+    }
+
+    @media (width <= 1100px) {
+        :where([data-ui="unified"][data-crm-record]) .lw-rail {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (width <= 760px) {
+        :where([data-ui="unified"][data-crm-record]) .lw-main,
+        :where([data-ui="unified"][data-crm-record]) .lw-rail,
+        :where([data-ui="unified"][data-crm-record]) .detail-fields {
+            grid-template-columns: 1fr;
+        }
+
+        :where([data-ui="unified"][data-crm-record]) .lw-head-controls {
+            width: 100%;
+        }
+
+        :where([data-ui="unified"][data-crm-record])
+            .lw-head-controls
+            .ld-control {
+            flex: 1 1 180px;
+            min-width: 0;
+        }
+
+        :where([data-ui="unified"][data-crm-record]) .lw-title {
+            font-size: var(--font-size-xl);
+        }
+
+        :where([data-ui="unified"][data-crm-record]) .lw-grid,
+        :where([data-ui="unified"][data-crm-record]) .lw-main,
+        :where([data-ui="unified"][data-crm-record]) .lw-rail {
+            gap: var(--space-4);
+        }
+
+        :where([data-ui="unified"][data-crm-record]) .inbox-modal-overlay {
+            padding: var(--space-2);
+        }
+
+        :where([data-ui="unified"][data-crm-record]) .inbox-modal {
+            max-height: calc(100dvh - 16px);
+        }
+
+        :where([data-ui="unified"][data-crm-record]) .inbox-modal-head,
+        :where([data-ui="unified"][data-crm-record]) .inbox-modal-body {
+            padding: var(--space-4);
+        }
+
+        :where([data-ui="unified"][data-crm-record]) .inbox-modal-head {
+            align-items: start;
+        }
+
+        :where([data-ui="unified"][data-crm-record]) .inbox-modal-actions {
+            width: 100%;
+        }
+
+        :where([data-ui="unified"][data-crm-record]) .inbox-modal-actions .btn {
+            flex: 1;
+        }
+
+        :where([data-ui="unified"][data-crm-record]) .inbox-search,
+        :where([data-ui="unified"][data-crm-record]) .inbox-select {
+            flex-basis: 100%;
+            width: 100%;
+        }
+
+        :where([data-ui="unified"][data-crm-record]) .inbox-tab {
+            flex: 1 1 180px;
+        }
+    }
+
+    @media print {
+        @page {
+            size: letter landscape;
+            margin: 10mm;
+        }
+
+        :where([data-ui="unified"][data-crm-record]) .no-print,
+:where([data-ui="unified"][data-crm-record]) .inbox-tabs,
+:where([data-ui="unified"][data-crm-record]) .inbox-filterbar,
+:where([data-ui="unified"][data-crm-record]) .dash-error-banner,
+:where([data-ui="unified"][data-crm-record]) .lw-composer-card,
+:where([data-ui="unified"][data-crm-record]) .lw-head-actions,
+:where([data-ui="unified"][data-crm-record]) .lw-outreach-btns,
+:where([data-ui="unified"][data-crm-record]) .lw-outreach-actions,
+:where([data-ui="unified"][data-crm-record]) .lw-dropzone,
+:where([data-ui="unified"][data-crm-record]) .inbox-modal-actions,
+:where([data-ui="unified"][data-crm-record]) .ms-actions {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-crm-record]) .dash-header {
+            display: flex;
+            background: transparent;
+            color: var(--gray-900);
+            border: 0;
+            padding: 0 0 var(--space-4);
+        }
+
+        :where([data-ui="unified"][data-crm-record]) .dash-header-logo,
+:where([data-ui="unified"][data-crm-record]) .dash-header-right {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-crm-record]) .dash-content {
+            padding: 0;
+            max-width: none;
+        }
+
+        :where([data-ui="unified"][data-crm-record]) .lw-main {
+            display: block;
+        }
+
+        :where([data-ui="unified"][data-crm-record]) .lw-rail {
+            grid-template-columns: repeat(3,minmax(0,1fr));
+            gap: var(--space-3);
+        }
+
+        :where([data-ui="unified"][data-crm-record]) .lw-grid .dash-card {
+            box-shadow: none;
+            break-inside: avoid;
+            padding: var(--space-3);
+            font-size: 10pt;
+            margin-bottom: var(--space-3);
+        }
+
+        :where([data-ui="unified"][data-crm-record]) .lw-outreach-body {
+            max-height: none;
+            overflow: visible;
+        }
+
+        :where([data-ui="unified"][data-crm-record]) .table-wrap {
+            overflow: visible;
+            max-height: none;
+        }
+
+        :where([data-ui="unified"][data-crm-record]) .data-table {
+            font-size: 9pt;
+            width: 100%;
+        }
+
+        :where([data-ui="unified"][data-crm-record]) .data-table :is(th, td) {
+            padding: 6px;
+            white-space: normal;
+            overflow-wrap: anywhere;
+        }
+
+        :where([data-ui="unified"][data-crm-record]) .inbox-table .col-summary {
+            min-width: 0;
+            max-width: none;
+        }
+
+        :where([data-ui="unified"][data-crm-record]) .data-table tr {
+            break-inside: avoid;
+        }
+
+        :where([data-ui="unified"][data-crm-record]) .data-table thead {
+            display: table-header-group;
+        }
+
+        :where([data-ui="unified"][data-crm-record]) .data-table button {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-crm-record]) .dash-stat-grid {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+
+        :where([data-ui="unified"][data-crm-record]).inbox-modal-open
+            .dash-shell {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-crm-record]).inbox-modal-open
+            .inbox-modal-overlay {
+            position: static;
+            display: block;
+            padding: 0;
+            background: none;
+        }
+
+        :where([data-ui="unified"][data-crm-record]).inbox-modal-open
+            .inbox-modal {
+            display: block;
+            box-shadow: none;
+            max-height: none;
+            width: 100%;
+        }
+
+        :where([data-ui="unified"][data-crm-record]) .inbox-modal-body {
+            padding: var(--space-4) 0;
+            overflow: visible;
+        }
+
+        :where([data-ui="unified"][data-crm-record]) .inbox-modal-head {
+            padding: 0 0 var(--space-3);
+        }
+
+        :where([data-ui="unified"][data-crm-record]) .copy-id {
+            border: 0;
+            padding: 0;
+            min-height: 0;
+            background: transparent;
+        }
+
+        :where([data-ui="unified"][data-crm-record]) :focus-visible {
+            outline: 0;
+        }
+
+        :where([data-ui="unified"][data-crm-record]) .lw-grid {
+            display: block;
+        }
+
+        :where([data-ui="unified"][data-crm-record]) .lw-head {
+            padding: var(--space-3);
+            margin-bottom: var(--space-3);
+        }
+
+        :where([data-ui="unified"][data-crm-record]) .lw-head-controls {
+            display: flex;
+        }
+
+        :where([data-ui="unified"][data-crm-record]) .lw-head-controls .field-select {
+            border: 0;
+            padding: 0;
+            min-height: 0;
+            background: transparent;
+        }
+
+        :where([data-ui="unified"][data-crm-record]) .lw-item {
+            padding: var(--space-2) 0;
+        }
+
+        :where([data-ui="unified"][data-crm-record]) .lw-panel .btn {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-crm-record]) :is(.lw-method-grid,.ld-match-search,.lw-quote-row) {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-crm-record]) .lw-value-big + .lw-value-input {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-crm-record]) .lw-panel:has(.lw-outreach-btns):not(:has(.lw-outreach-card,.lw-outreach-sent)) {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-crm-record]) .detail-actionbar.no-print {
+            display: flex;
+            background: transparent;
+            border: 0;
+            padding: var(--space-2) 0;
+        }
+
+        :where([data-ui="unified"][data-crm-record]) .detail-actionbar button {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-crm-record]) .inbox-modal {
+            border: 0;
+            border-radius: 0;
+        }
+
+        :where([data-ui="unified"][data-crm-record]) .inbox-modal-overlay::backdrop {
+            display: none;
+            background: transparent;
+        }
+
+        :where([data-ui="unified"][data-crm-record]).inbox-modal-open
+            dialog.inbox-modal-overlay {
+            position: static;
+            display: block;
+            width: auto;
+            height: auto;
+        }
+    }
+}

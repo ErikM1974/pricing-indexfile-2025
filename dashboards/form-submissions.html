@@ -10,16 +10,17 @@
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- 2026 design tokens (must load before dash-shell.css) -->
+    <!-- Shared CRM primitives and scoped record layouts. -->
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/dash-shell.css?v=2026.09.07.10">
-    <link rel="stylesheet" href="/dashboards/css/form-submissions.css?v=2026.09.07.19">
-</head>
-<body>
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.09.20">
+    <link rel="stylesheet" href="/shared_components/css/crm-pipeline.css?v=2026.09.09.20">
+    <link rel="stylesheet" href="/shared_components/css/crm-records.css?v=2026.09.09.20">
+            </head>
+<body data-ui="unified" data-crm-workspace="records" data-crm-record="form-submissions">
+    <a class="skip-link" href="#main-content">Skip to main content</a>
     <div class="dash-shell">
         <header class="dash-header">
             <div class="dash-header-left">
@@ -41,11 +42,11 @@
             </div>
         </header>
 
-        <main class="dash-content">
+        <main class="dash-content" id="main-content" tabindex="-1">
             <div class="dash-error-banner" role="alert">
                 <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                 <span class="dash-error-banner-message"></span>
-                <button type="button" class="dash-error-banner-close" aria-label="Dismiss">
+                <button type="button" class="dash-error-banner-close btn" aria-label="Dismiss">
                     <i class="fas fa-times" aria-hidden="true"></i>
                 </button>
             </div>
@@ -71,10 +72,10 @@
             </div>
 
             <div class="inbox-tabs no-print" role="tablist" aria-label="Inbox views">
-                <button type="button" class="inbox-tab is-active" id="tab-submissions" data-view="submissions" role="tab" aria-selected="true" aria-controls="viewSubmissions">
+                <button type="button" class="inbox-tab is-active btn" id="tab-submissions" data-view="submissions" role="tab" aria-selected="true" aria-controls="viewSubmissions">
                     <i class="fas fa-inbox" aria-hidden="true"></i> All Submissions
                 </button>
-                <button type="button" class="inbox-tab" id="tab-samples" data-view="samples" role="tab" aria-selected="false" tabindex="-1" aria-controls="viewSamples">
+                <button type="button" class="inbox-tab btn" id="tab-samples" data-view="samples" role="tab" aria-selected="false" tabindex="-1" aria-controls="viewSamples">
                     <i class="fas fa-shirt" aria-hidden="true"></i> Samples Tracker
                 </button>
             </div>
@@ -83,18 +84,18 @@
             <section id="viewSubmissions" class="dash-card" role="tabpanel" aria-labelledby="tab-submissions">
                 <div class="inbox-filterbar no-print">
                     <div class="inbox-chips" id="formChips" role="group" aria-label="Filter by form">
-                        <button type="button" class="inbox-chip is-active" data-form="" aria-pressed="true">All</button>
-                        <button type="button" class="inbox-chip" data-form="quote-request,sample-request,manual-lead" aria-pressed="false">Leads</button>
-                        <button type="button" class="inbox-chip" data-form="garment-drop-off" aria-pressed="false">Drop-Offs</button>
-                        <button type="button" class="inbox-chip" data-form="artwork-request" aria-pressed="false">Artwork</button>
-                        <button type="button" class="inbox-chip" data-form="name-personalization" aria-pressed="false">Name Lists</button>
-                        <button type="button" class="inbox-chip" data-form="sample-checkout" aria-pressed="false">Samples</button>
-                        <button type="button" class="inbox-chip" data-form="ae-order-intake" aria-pressed="false">Order Intake</button>
-                        <button type="button" class="inbox-chip" data-form="final-qc-checklist" aria-pressed="false">Final QC</button>
-                        <button type="button" class="inbox-chip" data-form="spoilage-report" aria-pressed="false">Spoilage</button>
-                        <button type="button" class="inbox-chip" data-form="maintenance-log" aria-pressed="false">Maintenance</button>
+                        <button type="button" class="inbox-chip is-active btn" data-form="" aria-pressed="true">All</button>
+                        <button type="button" class="inbox-chip btn" data-form="quote-request,sample-request,manual-lead" aria-pressed="false">Leads</button>
+                        <button type="button" class="inbox-chip btn" data-form="garment-drop-off" aria-pressed="false">Drop-Offs</button>
+                        <button type="button" class="inbox-chip btn" data-form="artwork-request" aria-pressed="false">Artwork</button>
+                        <button type="button" class="inbox-chip btn" data-form="name-personalization" aria-pressed="false">Name Lists</button>
+                        <button type="button" class="inbox-chip btn" data-form="sample-checkout" aria-pressed="false">Samples</button>
+                        <button type="button" class="inbox-chip btn" data-form="ae-order-intake" aria-pressed="false">Order Intake</button>
+                        <button type="button" class="inbox-chip btn" data-form="final-qc-checklist" aria-pressed="false">Final QC</button>
+                        <button type="button" class="inbox-chip btn" data-form="spoilage-report" aria-pressed="false">Spoilage</button>
+                        <button type="button" class="inbox-chip btn" data-form="maintenance-log" aria-pressed="false">Maintenance</button>
                     </div>
-                    <select id="statusFilter" class="inbox-select" aria-label="Filter by status">
+                    <select id="statusFilter" class="inbox-select field-select" aria-label="Filter by status">
                         <option value="">Any status</option>
                         <option>New</option>
                         <option>In Progress</option>
@@ -105,7 +106,7 @@
                         <option>Returned</option>
                         <option>Archived</option>
                     </select>
-                    <input type="search" id="searchBox" class="inbox-search" placeholder="Search company / contact / ID…" aria-label="Search submissions">
+                    <input type="search" id="searchBox" class="inbox-search field-input" placeholder="Search company / contact / ID…" aria-label="Search submissions">
                 </div>
                 <div id="submissionsRoot" class="dash-loading" role="status">Loading submissions…</div>
             </section>
@@ -115,7 +116,7 @@
                 <div class="dash-card-header">
                     <h2 class="dash-card-title"><i class="fas fa-rotate-left" aria-hidden="true"></i> Checked-Out Samples</h2>
                     <span class="inbox-muted">75% of retail is charged for items not returned by the grace deadline.</span>
-                    <button type="button" id="inboxRefresh" class="dash-btn dash-btn--sm"><i class="fas fa-rotate" aria-hidden="true"></i> Refresh</button>
+                    <button type="button" id="inboxRefresh" class="dash-btn dash-btn--sm btn"><i class="fas fa-rotate" aria-hidden="true"></i> Refresh</button>
                 </div>
                 <div id="samplesRoot" class="dash-loading" role="status">Loading open samples…</div>
             </section>
@@ -123,23 +124,23 @@
     </div>
 
     <!-- Detail modal -->
-    <div class="inbox-modal-overlay" id="detailOverlay" hidden>
-        <div class="inbox-modal" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
-            <div class="inbox-modal-head no-print">
+    <dialog class="inbox-modal-overlay" id="detailOverlay" aria-labelledby="detailTitle" hidden>
+        <div class="inbox-modal">
+            <div class="inbox-modal-head">
                 <h2 id="detailTitle">Submission</h2>
                 <div class="inbox-modal-actions">
-                    <button type="button" id="printDetailBtn" class="dash-btn"><i class="fas fa-print" aria-hidden="true"></i> Print</button>
-                    <button type="button" id="closeDetailBtn" class="dash-btn" aria-label="Close"><i class="fas fa-times" aria-hidden="true"></i></button>
+                    <button type="button" id="printDetailBtn" class="dash-btn btn"><i class="fas fa-print" aria-hidden="true"></i> Print</button>
+                    <button type="button" id="closeDetailBtn" class="dash-btn btn" aria-label="Close"><i class="fas fa-times" aria-hidden="true"></i></button>
                 </div>
             </div>
             <div id="detailBody" class="inbox-modal-body"></div>
         </div>
-    </div>
+    </dialog>
 
     <!-- Load order matters: APP_CONFIG → fetch-timeout → DashPage → page controller -->
     <script src="/config/app.config.js"></script>
     <script src="/shared_components/js/fetch-timeout.js?v=2026.09.06.26"></script>
     <script src="/shared_components/js/dash-page-helpers.js?v=2026.09.07.25"></script>
-    <script src="/dashboards/js/form-submissions.js?v=2026.09.05.65"></script>
+    <script src="/dashboards/js/form-submissions.js?v=2026.09.09.20"></script>
 </body>
 </html>
