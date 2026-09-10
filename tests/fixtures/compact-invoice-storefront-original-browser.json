@@ -1,0 +1,295 @@
+{
+  "before": {
+    "title": "Invoice EMB0910-7401 - Northwest Custom Apparel",
+    "rows": [
+      [
+        "PC54",
+        "Navy",
+        "Core Cotton Tee — XL: 1, 2XL: 1",
+        "2",
+        "$30.50",
+        "$61.00"
+      ],
+      [
+        "SETUP",
+        "",
+        "Setup",
+        "1",
+        "$30.00",
+        "$30.00"
+      ]
+    ],
+    "fields": [
+      {
+        "id": "invoice-title",
+        "text": "PROFORMA",
+        "visible": true
+      },
+      {
+        "id": "invoice-order-number",
+        "text": "— (pending import)",
+        "visible": true
+      },
+      {
+        "id": "invoice-quote-id",
+        "text": "EMB0910-7401",
+        "visible": true
+      },
+      {
+        "id": "invoice-date",
+        "text": "September 10, 2026",
+        "visible": true
+      },
+      {
+        "id": "status-banner-detail",
+        "text": "",
+        "visible": false
+      },
+      {
+        "id": "bill-customer-name",
+        "text": "Fixture Store Buyer",
+        "visible": true
+      },
+      {
+        "id": "bill-contact-name",
+        "text": "Aspen Example",
+        "visible": true
+      },
+      {
+        "id": "bill-address-line1",
+        "text": "2 Billing Street",
+        "visible": true
+      },
+      {
+        "id": "bill-address-line2",
+        "text": "Suite 2",
+        "visible": true
+      },
+      {
+        "id": "bill-address-citystate",
+        "text": "Tacoma, WA 98401",
+        "visible": true
+      },
+      {
+        "id": "bill-email",
+        "text": "review@example.test",
+        "visible": true
+      },
+      {
+        "id": "bill-phone",
+        "text": "(253) 555-0142",
+        "visible": true
+      },
+      {
+        "id": "ship-recipient",
+        "text": "Fixture Store Buyer",
+        "visible": true
+      },
+      {
+        "id": "ship-line1",
+        "text": "1 Customer Lane",
+        "visible": true
+      },
+      {
+        "id": "ship-line2",
+        "text": "Unit 8",
+        "visible": true
+      },
+      {
+        "id": "ship-citystate",
+        "text": "Milton, WA 98354",
+        "visible": true
+      },
+      {
+        "id": "ship-method",
+        "text": "UPS Ground",
+        "visible": true
+      },
+      {
+        "id": "detail-po",
+        "text": "—",
+        "visible": true
+      },
+      {
+        "id": "detail-rep",
+        "text": "—",
+        "visible": true
+      },
+      {
+        "id": "detail-ship-date",
+        "text": "Sep 21, 2026",
+        "visible": true
+      },
+      {
+        "id": "detail-terms",
+        "text": "Net 30",
+        "visible": true
+      },
+      {
+        "id": "detail-method",
+        "text": "Embroidery",
+        "visible": true
+      },
+      {
+        "id": "total-subtotal",
+        "text": "$91.00",
+        "visible": true
+      },
+      {
+        "id": "total-discount",
+        "text": "-$5.00",
+        "visible": true
+      },
+      {
+        "id": "total-tax-rate",
+        "text": "(10.00%)",
+        "visible": true
+      },
+      {
+        "id": "total-tax",
+        "text": "$9.60",
+        "visible": true
+      },
+      {
+        "id": "total-shipping",
+        "text": "$10.00",
+        "visible": true
+      },
+      {
+        "id": "total-grand",
+        "text": "$105.60",
+        "visible": true
+      },
+      {
+        "id": "total-paid",
+        "text": "$0.00",
+        "visible": false
+      },
+      {
+        "id": "total-amount-due",
+        "text": "$105.60",
+        "visible": true
+      },
+      {
+        "id": "invoice-payment-terms-text",
+        "text": "Net 30",
+        "visible": true
+      },
+      {
+        "id": "footer-sync-info",
+        "text": "",
+        "visible": true
+      }
+    ],
+    "links": [
+      {
+        "href": "tel:2539225793",
+        "label": "(253) 922-5793",
+        "download": null
+      },
+      {
+        "href": "mailto:sales@nwcustomapparel.com",
+        "label": "sales@nwcustomapparel.com",
+        "download": null
+      },
+      {
+        "href": "/quote/EMB0910-7401",
+        "label": "← Back to full quote view",
+        "download": null
+      },
+      {
+        "href": "/__invoice-fixture/front.png",
+        "label": "📄",
+        "download": null
+      },
+      {
+        "href": "/__invoice-fixture/front.png",
+        "label": "⬇ Download",
+        "download": "front.png"
+      },
+      {
+        "href": "/__invoice-fixture/back.pdf",
+        "label": "📄",
+        "download": null
+      },
+      {
+        "href": "/__invoice-fixture/back.pdf",
+        "label": "⬇ Download",
+        "download": "back.pdf"
+      },
+      {
+        "href": "/__invoice-fixture/mockup.png",
+        "label": "🖼",
+        "download": null
+      },
+      {
+        "href": "/__invoice-fixture/mockup.png",
+        "label": "⬇ Download",
+        "download": "EMB0910-7401-front-Navy.png"
+      },
+      {
+        "href": "mailto:ar@nwcustomapparel.com",
+        "label": "ar@nwcustomapparel.com",
+        "download": null
+      },
+      {
+        "href": "https://nwcustomapparel.com",
+        "label": "nwcustomapparel.com",
+        "download": null
+      }
+    ],
+    "toolbar": [
+      {
+        "id": "btn-print",
+        "text": "🖨 Print / Save as PDF",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "btn-refresh",
+        "text": "🔄 Refresh from ShopWorks",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "btn-shipstation",
+        "text": "🚢 Send to ShipStation",
+        "visible": false,
+        "disabled": false
+      }
+    ],
+    "paper": "Northwest Custom Apparel\n2025 Freeman Road East · Milton, WA 98354\n(253) 922-5793 · sales@nwcustomapparel.com\nPROFORMA\nOrder #\n— (pending import)\nQuote #\nEMB0910-7401\nInvoice Date\nSeptember 10, 2026\nBILL TO\nFixture Store Buyer\nAspen Example\n2 Billing Street\nSuite 2\nTacoma, WA 98401\nreview@example.test\n(253) 555-0142\nSHIP TO\nFixture Store Buyer\n1 Customer Lane\nUnit 8\nMilton, WA 98354\nUPS Ground\nPO NUMBER\n—\nSALES REP\n—\nREQ SHIP DATE\nSep 21, 2026\nTERMS\nNet 30\nDECORATION\nEmbroidery\nITEM\tCOLOR\tDESCRIPTION\tQTY\tUNIT PRICE\tTOTAL\nPC54\tNavy\tCore Cotton Tee — XL: 1, 2XL: 1\t2\t$30.50\t$61.00\nSETUP\t\tSetup\t1\t$30.00\t$30.00\nCUSTOMER ARTWORK & MOCKUPS\nCUSTOMER ARTWORK (ORIGINAL FILES)\nFront artwork\nfront.png\n⬇ Download\n📄\nBack artwork\nback.pdf\n⬇ Download\nAPPROVED MOCKUPS\nFront — Navy\n⬇ Download\nSubtotal\n$91.00\nDiscount\n-$5.00\nSales Tax (10.00%)\n$9.60\nShipping\n$10.00\nTotal\n$105.60\nAMOUNT DUE\n$105.60\nPAYMENT INFORMATION\nPayment due Net 30 from invoice date. Pay by check (Northwest Custom Apparel, 2025 Freeman Road East, Milton WA 98354) or ACH/credit card — contact ar@nwcustomapparel.com for routing. Past-due balances accrue 1.5% monthly finance charge.\nThank you for your business · Northwest Custom Apparel · nwcustomapparel.com"
+  },
+  "views": [
+    {
+      "width": 1440,
+      "scrollWidth": 1440
+    },
+    {
+      "width": 768,
+      "scrollWidth": 768
+    },
+    {
+      "width": 390,
+      "scrollWidth": 390
+    },
+    {
+      "width": 320,
+      "scrollWidth": 355
+    }
+  ],
+  "paper": "Northwest Custom Apparel\n2025 Freeman Road East · Milton, WA 98354\n(253) 922-5793 · sales@nwcustomapparel.com\nPROFORMA\nOrder #\n— (pending import)\nQuote #\nEMB0910-7401\nInvoice Date\nSeptember 10, 2026\n⚡\nRUSH ORDER\nBILL TO\nFixture Store Buyer\nAspen Example\n2 Billing Street\nSuite 2\nTacoma, WA 98401\nreview@example.test\n(253) 555-0142\nSHIP TO\nFixture Store Buyer\n1 Customer Lane\nUnit 8\nMilton, WA 98354\nUPS Ground\nPO NUMBER\n—\nSALES REP\n—\nREQ SHIP DATE\nSep 21, 2026\nTERMS\nNet 30\nDECORATION\nEmbroidery\nITEM\tCOLOR\tDESCRIPTION\tQTY\tUNIT PRICE\tTOTAL\nPC54\tNavy\tCore Cotton Tee — XL: 1, 2XL: 1\t2\t$30.50\t$61.00\nSETUP\t\tSetup\t1\t$30.00\t$30.00\nSubtotal\n$91.00\nDiscount\n-$5.00\nSales Tax (10.00%)\n$9.60\nShipping\n$10.00\nTotal\n$105.60\nAMOUNT DUE\n$105.60\nPAYMENT INFORMATION\nPayment due Net 30 from invoice date. Pay by check (Northwest Custom Apparel, 2025 Freeman Road East, Milton WA 98354) or ACH/credit card — contact ar@nwcustomapparel.com for routing. Past-due balances accrue 1.5% monthly finance charge.\nThank you for your business · Northwest Custom Apparel · nwcustomapparel.com",
+  "events": {
+    "errors": [],
+    "writes": [],
+    "unknown": [],
+    "missing": [],
+    "reads": [
+      {
+        "path": "/api/quote-sessions/EMB0910-7401/full",
+        "query": ""
+      }
+    ],
+    "actions": []
+  }
+}

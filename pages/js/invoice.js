@@ -138,6 +138,10 @@
     constructor() {
       this.quoteId = this.parseQuoteId();
       this.fullData = null;
+      this.isStaff = false;
+      this.syncing = false;
+      this.shipAction = false;
+      this.shipSending = false;
     }
 
     parseQuoteId() {
@@ -147,30 +151,21 @@
     }
 
     async init() {
-      if (!this.quoteId) {
-        return this.showError('No quote ID provided in URL.');
-      }
+      if (!this.quoteId) return this.showError('No quote ID provided in URL.');
+      const identity = this.resolveStaffIdentity();
       try {
         await this.loadFullData();
         this.render();
         this.wireToolbar();
-        $('loading').style.display = 'none';
-        // Staff gate (Erik 2026-05-22): the toolbar holds internal-ops buttons
-        // (Refresh from ShopWorks, Send to ShipStation). Customers landing on
-        // /invoice/X via a share link should see a clean invoice only — they
-        // can still Ctrl+P natively. Staff identified by ?staff=true URL flag
-        // OR nwca_user_email sessionStorage (set by staff-dashboard login).
-        // Hydrate the legacy keys from the SAML session first (fresh tab = empty sessionStorage).
-        if (typeof StaffAuthHelper !== 'undefined' && StaffAuthHelper.ready) await StaffAuthHelper.ready();
-        const isStaff = new URLSearchParams(window.location.search).get('staff') === 'true'
-          || !!sessionStorage.getItem('nwca_user_email')
-          || !!sessionStorage.getItem('nwca_user_name');
-        if (isStaff) {
-          $('toolbar').style.display = 'flex';
-        }
-        $('invoice').style.display = 'block';
+        $('loading').hidden = true;
+        $('invoice').hidden = false;
+        $('invoice-public-actions').hidden = false;
         document.title = `Invoice ${this.headerOrderNumber()} - Northwest Custom Apparel`;
-        // Auto-sync if stale (and we have a Processed quote)
+        identity.then(isStaff => {
+          this.isStaff = isStaff;
+          $('toolbar').hidden = !isStaff;
+          this.updateShipStationButton();
+        });
         this.maybeAutoSync();
       } catch (err) {
         console.error('[invoice] load failed:', err);
@@ -178,21 +173,39 @@
       }
     }
 
+    async resolveStaffIdentity() {
+      try {
+        const response = await fetch('/api/crm-session/me', { credentials: 'same-origin' });
+        const me = response.ok ? await response.json() : null;
+        return !!(me && me.authenticated !== false && (me.name || me.email));
+      } catch (_) { return false; }
+    }
+
+    shareTokenParam() {
+      const token = new URLSearchParams(window.location.search).get('k');
+      return token ? '?k=' + encodeURIComponent(token) : '';
+    }
+
     showError(msg) {
-      $('loading').style.display = 'none';
-      $('toolbar').style.display = 'none';
-      $('invoice').style.display = 'none';
+      $('loading').hidden = true;
+      $('toolbar').hidden = true;
+      $('invoice').hidden = true;
+      $('invoice-public-actions').hidden = true;
       $('error-message').textContent = msg;
-      $('error').style.display = 'block';
+      $('error').hidden = false;
     }
 
     async loadFullData() {
-      const resp = await fetch(`/api/quote-sessions/${encodeURIComponent(this.quoteId)}/full`);
+      const resp = await fetch(`/api/quote-sessions/${encodeURIComponent(this.quoteId)}/full${this.shareTokenParam()}`);
       if (!resp.ok) {
         if (resp.status === 404) throw new Error(`Quote ${this.quoteId} was not found.`);
         throw new Error(`Server returned ${resp.status} when loading quote.`);
       }
-      this.fullData = await resp.json();
+      const fresh = await resp.json();
+      this.fullData = fresh;
+      // Cached storefront projections belong to the current response only.
+      delete this._sfCustomer;
+      delete this._sfSettings;
     }
 
     // Pick the order number to show in the header / page title.
@@ -287,7 +300,7 @@
             ? '— Order deleted in ShopWorks on ' + fmtDate(ts) + '. This record will be purged after 30 days.'
             : '— Order was deleted in ShopWorks. This record will be purged after 30 days.';
         }
-        banner.style.display = 'flex';
+        banner.hidden = false;
         return;
       }
 
@@ -307,13 +320,13 @@
           order.Notes.some(n => /rush/i.test(n?.Note || n?.Notes || '')));
 
       if (!rushFlag) {
-        banner.style.display = 'none';
+        banner.hidden = true;
         return;
       }
       banner.classList.remove('invoice-status-banner--cancelled');
       if (icon) icon.textContent = '⚡';
       if (text) text.textContent = 'RUSH ORDER';
-      banner.style.display = 'flex';
+      banner.hidden = false;
 
       if (detail) {
         if (dropDead) {
@@ -359,9 +372,7 @@
         orig?.info?.name ||
         data.sessionRaw?.CustomerName ||
         '';
-      if (contact && contact !== customer) {
-        $('bill-contact-name').textContent = contact;
-      }
+      $('bill-contact-name').textContent = contact && contact !== customer ? contact : '';
 
       // Billing street address. Storefront: the checkout's billing block
       // (same per-field billing||shipping fallback the ShopWorks push uses,
@@ -396,14 +407,14 @@
         [billCity, billState].filter(Boolean).join(', ') +
         (billZip ? ' ' + billZip : '');
 
-      if (billAddr1) $('bill-address-line1').textContent = billAddr1;
-      else $('bill-address-line1').style.display = 'none';
+      $('bill-address-line1').textContent = billAddr1;
+      $('bill-address-line1').hidden = !billAddr1;
 
-      if (billAddr2) $('bill-address-line2').textContent = billAddr2;
-      else $('bill-address-line2').style.display = 'none';
+      $('bill-address-line2').textContent = billAddr2;
+      $('bill-address-line2').hidden = !billAddr2;
 
-      if (billCityState.trim()) $('bill-address-citystate').textContent = billCityState.trim();
-      else $('bill-address-citystate').style.display = 'none';
+      $('bill-address-citystate').textContent = billCityState.trim();
+      $('bill-address-citystate').hidden = !billCityState.trim();
 
       // Email / phone — quote-specific contact info takes priority over
       // the company-record values (rep may have keyed a different contact).
@@ -413,7 +424,7 @@
         data.sessionRaw?.CustomerEmail ||
         billing?.email ||
         '';
-      if (email) $('bill-email').textContent = email;
+      $('bill-email').textContent = email;
 
       // Phone priority:
       //   1. ShopWorks order.ContactPhone — set at order placement, most
@@ -431,7 +442,7 @@
         billing?.phone ||
         ''
       );
-      if (phone) $('bill-phone').textContent = phone;
+      $('bill-phone').textContent = phone;
     }
 
     renderShipTo(data, order, orig, pushed) {
@@ -496,11 +507,11 @@
 
       $('ship-recipient').textContent = recipient;
       $('ship-line1').textContent     = line1;
-      if (!line1) $('ship-line1').style.display = 'none';
+      $('ship-line1').hidden = !line1;
       $('ship-line2').textContent     = line2;
-      if (!line2) $('ship-line2').style.display = 'none';
+      $('ship-line2').hidden = !line2;
       $('ship-citystate').textContent = cityState;
-      if (!cityState.trim()) $('ship-citystate').style.display = 'none';
+      $('ship-citystate').hidden = !cityState.trim();
 
       $('ship-method').textContent = method || (isPickup ? 'Customer Pickup' : '');
     }
@@ -781,11 +792,11 @@
       if (opts.isGroupChild)  tr.classList.add('invoice-item-row--group-child');
 
       // Item / Style — children show the size suffix only (parent shows base PN).
-      tr.appendChild(el('td', { class: 'col-style', text: row.style || '—' }));
+      tr.appendChild(el('td', { class: 'col-style', 'data-label': 'Item', text: row.style || '—' }));
       // Color
-      tr.appendChild(el('td', { class: 'col-color', text: row.color || '' }));
+      tr.appendChild(el('td', { class: 'col-color', 'data-label': 'Color', text: row.color || '' }));
       // Description (with optional locations chip beneath)
-      const descCell = el('td', { class: 'col-desc' });
+      const descCell = el('td', { class: 'col-desc', 'data-label': 'Description' });
       if (row.desc) descCell.appendChild(document.createTextNode(row.desc));
       if (row.locations) {
         descCell.appendChild(el('div', {
@@ -795,11 +806,11 @@
       }
       tr.appendChild(descCell);
       // Qty
-      tr.appendChild(el('td', { class: 'col-qty', text: row.qty ? String(row.qty) : '—' }));
+      tr.appendChild(el('td', { class: 'col-qty', 'data-label': 'Qty', text: row.qty ? String(row.qty) : '—' }));
       // Unit (parent of a group shows blank since per-size unit prices vary)
-      tr.appendChild(el('td', { class: 'col-unit', text: row.unit ? fmtMoney(row.unit) : (opts.isGroupParent ? 'varies' : '—') }));
+      tr.appendChild(el('td', { class: 'col-unit', 'data-label': 'Unit Price', text: row.unit ? fmtMoney(row.unit) : (opts.isGroupParent ? 'varies' : '—') }));
       // Total
-      tr.appendChild(el('td', { class: 'col-total', text: row.total ? fmtMoney(row.total) : '—' }));
+      tr.appendChild(el('td', { class: 'col-total', 'data-label': 'Total', text: row.total ? fmtMoney(row.total) : '—' }));
       return tr;
     }
 
@@ -897,6 +908,8 @@
      * Defensive: malformed JSON must never break the rest of the page.
      */
     renderCustomerArtwork(data) {
+      // A refresh may remove artwork; never leave the previous response's files visible.
+      document.getElementById('customer-artwork-section')?.remove();
       try {
         const raw = data?.sessionRaw?.OrderSettingsJSON;
         if (!raw) return;
@@ -931,8 +944,8 @@
           const label = escapeHTML(logo.label);
           const thumb = isImageName(logo.fileName)
             ? `<img src="${url}" alt="${label}" loading="lazy"
-                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-               <div class="cust-art-thumb-icon" style="display:none;">📄</div>`
+                    data-art-fallback>
+               <div class="cust-art-thumb-icon" hidden>📄</div>`
             : `<div class="cust-art-thumb-icon">📄</div>`;
           return `
             <div class="cust-art-card">
@@ -959,8 +972,8 @@
             <div class="cust-art-card">
               <a class="cust-art-thumb" href="${url}" target="_blank" rel="noopener" title="Open full size in a new tab">
                 <img src="${url}" alt="${label}" loading="lazy"
-                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                <div class="cust-art-thumb-icon" style="display:none;">🖼</div>
+                     data-art-fallback>
+                <div class="cust-art-thumb-icon" hidden>🖼</div>
               </a>
               <div class="cust-art-meta">
                 <div class="cust-art-label">${label}</div>
@@ -1001,6 +1014,12 @@
           }
         }
         section.innerHTML = html;
+        section.querySelectorAll('img[data-art-fallback]').forEach(image => {
+          image.addEventListener('error', () => {
+            image.hidden = true;
+            if (image.nextElementSibling) image.nextElementSibling.hidden = false;
+          });
+        });
       } catch (err) {
         // Never let artwork rendering break the rest of the invoice.
         console.warn('[invoice] customer artwork render failed:', err);
@@ -1044,15 +1063,11 @@
       $('total-amount-due').textContent = fmtMoney(amountDue);
 
       // Discount row — only when there's a discount (P1-7)
-      if (discount > 0) {
-          $('total-discount').textContent = '-' + fmtMoney(discount);
-          if ($('discount-row')) $('discount-row').style.display = '';
-      } else if ($('discount-row')) {
-          $('discount-row').style.display = 'none';
-      }
+      $('total-discount').textContent = discount > 0 ? '-' + fmtMoney(discount) : fmtMoney(0);
+      $('discount-row').hidden = !(discount > 0);
 
       // Hide shipping row if zero
-      if (!shipping) $('shipping-row').style.display = 'none';
+      $('shipping-row').hidden = !shipping;
 
       // Compute tax rate (when both subtotal and tax > 0). Three-state
       // display per audit fix M5:
@@ -1065,28 +1080,27 @@
       const taxBase = subtotalNet + shipping;
       const rateEl = $('total-tax-rate');
       const isExempt = !!(data.billingContact && data.billingContact.isTaxExempt);
+      rateEl.classList.remove('invoice-tax-exempt');
       if (tax > 0 && taxBase > 0) {
         rateEl.textContent = `(${((tax / taxBase) * 100).toFixed(2)}%)`;
       } else if (isExempt && subtotal > 0) {
         const cert = data.billingContact?.taxExemptNumber;
         rateEl.textContent = cert ? `(Tax Exempt · Cert # ${cert})` : '(Tax Exempt)';
-        rateEl.style.color = '#166534';  // forest green to match exempt status
+        rateEl.classList.add('invoice-tax-exempt');  // forest green to match exempt status
       } else if (subtotal > 0 && tax === 0) {
         // Wholesale/resale (permit on file) is a different zero-tax reason than
         // shipping out of state — saying "Out of State" on a Milton wholesaler's
         // invoice reads as an error. (audit 2026-06-10)
         const isWholesale = data.sessionRaw?.IsWholesale === 'Yes' || data.sessionRaw?.IsWholesale === true;
         rateEl.textContent = isWholesale ? '(Wholesale / Resale — No Tax)' : '(0% — Out of State)';
-        if (isWholesale) rateEl.style.color = '#166534';
+        if (isWholesale) rateEl.classList.add('invoice-tax-exempt');
       } else {
         rateEl.textContent = '';
       }
 
       // Payments — only show when > 0 (most invoices: zero payments).
-      if (payments > 0) {
-        $('paid-row').style.display = 'flex';
-        $('total-paid').textContent = '-' + fmtMoney(payments);
-      }
+      $('paid-row').hidden = !(payments > 0);
+      $('total-paid').textContent = payments > 0 ? '-' + fmtMoney(payments) : fmtMoney(0);
 
       // Wire payment terms into the footer payment block.
       const termsText =
@@ -1130,10 +1144,11 @@
     // ---------- toolbar ----------
 
     wireToolbar() {
-      $('btn-print').addEventListener('click', () => window.print());
+      $('invoice-public-actions').append($('btn-back-to-quote'), $('btn-print'));
+      $('btn-print').addEventListener('click', () => { if (!this.syncing) window.print(); });
       $('btn-refresh').addEventListener('click', () => this.syncNow(true));
       const back = $('btn-back-to-quote');
-      if (back) back.setAttribute('href', `/quote/${encodeURIComponent(this.quoteId)}`);
+      if (back) back.setAttribute('href', `/quote/${encodeURIComponent(this.quoteId)}${this.shareTokenParam()}`);
       // Wire the ShipStation button — initial visibility decided by
       // updateShipStationButton() which runs after each render.
       const ssBtn = $('btn-shipstation');
@@ -1152,166 +1167,99 @@
      *   • "📦 Shipped — UPS 1Z..." (disabled, link) — label bought + tracking
      */
     updateShipStationButton() {
-      const btn = $('btn-shipstation');
-      if (!btn) return;
-      const data = this.fullData || {};
-      const ss = data.shipStation;
-      const order = data.shopWorks?.snapshot?.order;
+      const btn = $('btn-shipstation'), tracking = $('shipstation-tracking');
+      const data = this.fullData || {}, ss = data.shipStation, order = data.shopWorks?.snapshot?.order;
       const pushedShip = (data.shopWorks?.snapshot?.pushed?.ShippingAddresses || [])[0];
       const method = (pushedShip?.ShipMethod || data.originalSubmission?.ship?.method || '').toString();
-      const methodLower = method.toLowerCase();
-
-      // Hide for pickup orders entirely (no label needed)
-      if (methodLower.includes('pickup') || methodLower.includes('willcall')) {
-        btn.style.display = 'none';
-        return;
-      }
-
-      // Hide until we have a ShopWorks snapshot (pre-import — no items to push yet)
-      if (!order && !data.originalSubmission) {
-        btn.style.display = 'none';
-        return;
-      }
-
-      // Production-complete gate (Erik 2026-05-22): SW sts_Produced=1 means
-      // the order has been decorated. Before that, shipping is premature —
-      // blanks may not even be at NWCA (sts_Received=0). Skip when terminal
-      // state (already shipped or already in ShipStation) so those displays
-      // still work — once you're past the gate, you're past it.
-      const isShipped = ss && ss.status === 'shipped' && ss.trackingNumber;
-      const isInShipStation = ss && ss.orderId;
-      const swProduced = Number(order?.sts_Produced);
-      if (!isShipped && !isInShipStation && swProduced !== 1) {
-        btn.style.display = 'inline-flex';
-        btn.disabled = true;
-        btn.innerHTML = '🕐 Waiting for production';
-        btn.title = `Order isn't decorated yet in ShopWorks (sts_Produced=${order?.sts_Produced ?? 'unknown'}). This button enables once production marks the order complete.`;
-        btn.style.background = '#f3f4f6';
-        btn.style.color = '#9ca3af';
-        btn.style.borderColor = '#e5e7eb';
-        return;
-      }
-
-      // UPS orders normally use WorldShip, but reps can override to USPS at
-      // send time (small packages, 2-3 shirts). Keep button clickable — modal
-      // handles the override picker.
-      if (methodLower.startsWith('ups')) {
-        btn.style.display = 'inline-flex';
-        btn.disabled = false;
-        btn.innerHTML = '🚢 Override → USPS via ShipStation';
-        btn.title = `Order is currently ${method}. Click to override to a USPS service and route via ShipStation (otherwise use WorldShip for UPS).`;
-        btn.style.background = '#fef3c7';
-        btn.style.color = '#92400e';
-        btn.style.borderColor = '#fde68a';
-        return;
-      }
-      if (methodLower.startsWith('fedex')) {
-        btn.style.display = 'inline-flex';
-        btn.disabled = false;
-        btn.innerHTML = '🚢 Override → USPS via ShipStation';
-        btn.title = `Order is currently ${method}. Click to override to a USPS service and route via ShipStation.`;
-        btn.style.background = '#fef3c7';
-        btn.style.color = '#92400e';
-        btn.style.borderColor = '#fde68a';
-        return;
-      }
-
-      btn.style.display = 'inline-flex';
-
-      // Already shipped — show tracking with carrier
+      const lower = method.toLowerCase();
+      btn.classList.remove('invoice-ship-override');
+      tracking.hidden = true;
+      btn.hidden = !this.isStaff;
+      if (!this.isStaff) return;
+      // A terminal shipment always wins over the original carrier/method choice.
       if (ss && ss.status === 'shipped' && ss.trackingNumber) {
-        btn.disabled = false;
-        btn.innerHTML = `📦 Shipped · <a href="${escapeHTML(ss.trackingURL || '#')}" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">${escapeHTML(ss.trackingNumber)}</a>`;
-        btn.title = `Carrier: ${ss.trackingCarrier || 'unknown'} · Click tracking# to track`;
-        btn.style.background = '#dcfce7';
-        btn.style.color = '#166534';
-        btn.style.borderColor = '#bbf7d0';
+        btn.hidden = true;
+        tracking.textContent = String(ss.trackingNumber);
+        let href = '#';
+        try { const url = new URL(ss.trackingURL || '#', location.origin); if (/^https?:$/.test(url.protocol)) href = url.href; } catch (_) { /* no usable tracking destination */ }
+        tracking.href = href;
+        tracking.title = `Shipped · Carrier: ${ss.trackingCarrier || 'unknown'}`;
+        tracking.hidden = false;
         return;
       }
-
-      // Already sent to ShipStation — awaiting label
+      if (ss && ss.status === 'shipped') {
+        btn.disabled = true;
+        btn.textContent = '✓ Shipped';
+        btn.title = 'This order has already shipped. Tracking is not available yet.';
+        return;
+      }
       if (ss && ss.orderId) {
         btn.disabled = true;
-        btn.innerHTML = `✓ In ShipStation #${escapeHTML(String(ss.orderId))}`;
+        btn.textContent = `✓ In ShipStation #${ss.orderId}`;
         btn.title = 'Already pushed. Warehouse buys the label in ShipStation UI; tracking will appear here once shipped.';
-        btn.style.background = '#f3f4f6';
-        btn.style.color = '#4b5563';
-        btn.style.borderColor = '#d1d5db';
         return;
       }
-
-      // Default state — ready to send
+      if (lower.includes('pickup') || lower.includes('willcall') || (!order && !data.originalSubmission)) { btn.hidden = true; return; }
+      if (this.shipSending || this.syncing) {
+        btn.disabled = true;
+        btn.textContent = this.shipSending ? 'Sending…' : 'Refreshing…';
+        return;
+      }
+      if (Number(order?.sts_Produced) !== 1) {
+        btn.disabled = true;
+        btn.textContent = '🕐 Waiting for production';
+        btn.title = `Order isn't decorated yet in ShopWorks (sts_Produced=${order?.sts_Produced ?? 'unknown'}). This button enables once production marks the order complete.`;
+        return;
+      }
       btn.disabled = false;
-      btn.innerHTML = '🚢 Send to ShipStation';
-      btn.title = 'Push this order to ShipStation. Warehouse will rate + buy the label there.';
-      btn.style.background = '';
-      btn.style.color = '';
-      btn.style.borderColor = '';
+      if (lower.startsWith('ups') || lower.startsWith('fedex')) {
+        btn.textContent = '🚢 Override → USPS via ShipStation';
+        btn.title = `Order is currently ${method}. Click to override to a USPS service and route via ShipStation.`;
+        btn.classList.add('invoice-ship-override');
+      } else {
+        btn.textContent = '🚢 Send to ShipStation';
+        btn.title = 'Push this order to ShipStation. Warehouse will rate + buy the label there.';
+      }
     }
 
     async sendToShipStation() {
-      const btn = $('btn-shipstation');
-      const data = this.fullData || {};
+      const data = this.fullData || {}, order = data.shopWorks?.snapshot?.order;
       const pushedShip = (data.shopWorks?.snapshot?.pushed?.ShippingAddresses || [])[0];
       const currentMethod = (pushedShip?.ShipMethod || data.originalSubmission?.ship?.method || '').toString();
       const currentLower = currentMethod.toLowerCase();
-      const isNonUSPS =
-        currentLower.startsWith('ups') ||
-        currentLower.startsWith('fedex') ||
+      if (!this.isStaff || this.syncing || this.shipAction || data.shipStation?.orderId || data.shipStation?.status === 'shipped' || Number(order?.sts_Produced) !== 1 || /pickup|willcall/.test(currentLower)) return;
+      const isNonUSPS = currentLower.startsWith('ups') || currentLower.startsWith('fedex') ||
         (currentMethod && !currentLower.includes('usps') && !currentLower.includes('priority') && !currentLower.includes('mail'));
-
-      // For UPS / FedEx / unknown methods, open a method-override modal.
-      // For USPS-flavored methods, no override needed — go straight to send.
-      let overrideMethod = null;
-      if (isNonUSPS) {
-        overrideMethod = await this.openShipStationOverrideModal(currentMethod);
-        if (overrideMethod === null) return; // user cancelled
-      } else {
-        if (!confirm(
-          `Send order ${this.quoteId} to ShipStation?\n\n` +
-          'Warehouse will rate + buy the label in ShipStation. ' +
-          'Tracking will appear back on this invoice automatically.'
-        )) return;
-      }
-
-      btn.disabled = true;
-      btn.innerHTML = 'Sending…';
-
+      this.shipAction = true;
       try {
+        let overrideMethod = null;
+        if (isNonUSPS) {
+          overrideMethod = await this.openShipStationOverrideModal(currentMethod);
+          if (overrideMethod === null) return;
+        } else if (!(await this.openShipStationConfirm())) return;
+        this.shipSending = true;
+        $('btn-refresh').disabled = true;
+        this.updateShipStationButton();
         const resp = await fetch(
           `/api/quote-sessions/${encodeURIComponent(this.quoteId)}/send-to-shipstation`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(overrideMethod ? { overrideShipMethod: overrideMethod } : {}),
-          }
+          { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(overrideMethod ? { overrideShipMethod: overrideMethod } : {}) }
         );
         const result = await resp.json();
-
-        if (result.skipped) {
-          ToastNotifications.info(`Skipped: ${result.message || result.reason}`);
-          this.updateShipStationButton();
-          return;
-        }
-        if (!resp.ok || !result.success) {
-          throw new Error(result.error || `HTTP ${resp.status}`);
-        }
-
-        // Optimistic local update so the button flips state immediately
+        if (result.skipped) { window.ToastNotifications.info(`Skipped: ${result.message || result.reason}`); return; }
+        if (!resp.ok || !result.success) throw new Error(result.error || `HTTP ${resp.status}`);
         if (!this.fullData.shipStation) this.fullData.shipStation = {};
         this.fullData.shipStation.orderId = result.shipstationOrderId;
         this.fullData.shipStation.status = result.status || 'awaiting_shipment';
         this.fullData.shipStation.lastSynced = result.lastSynced;
-        this.updateShipStationButton();
-
-        if (result.alreadySent) {
-          ToastNotifications.success(`Already in ShipStation as #${result.shipstationOrderId}. No duplicate created.`);
-        } else {
-          ToastNotifications.success(`✓ Sent to ShipStation as #${result.shipstationOrderId}. The warehouse can now buy a label.`);
-        }
+        if (result.alreadySent) window.ToastNotifications.success(`Already in ShipStation as #${result.shipstationOrderId}. No duplicate created.`);
+        else window.ToastNotifications.success(`✓ Sent to ShipStation as #${result.shipstationOrderId}. The warehouse can now buy a label.`);
       } catch (err) {
         console.error('[invoice] sendToShipStation failed:', err);
-        ToastNotifications.error('Failed to send to ShipStation:\n\n' + err.message);
+        window.ToastNotifications.error('Failed to send to ShipStation:\n\n' + err.message);
+      } finally {
+        this.shipSending = false;
+        this.shipAction = false;
+        $('btn-refresh').disabled = this.syncing;
         this.updateShipStationButton();
       }
     }
@@ -1324,94 +1272,54 @@
      * to ship via USPS via ShipStation instead.
      */
     openShipStationOverrideModal(currentMethod) {
-      return new Promise((resolve) => {
-        // Remove any prior instance
-        const prev = document.getElementById('shipstation-override-modal');
-        if (prev) prev.remove();
+      return this.openShipmentDialog('shipstation-override-modal',
+        `<h2 id="ss-modal-title">Send to ShipStation</h2>
+         <p>This order was created with shipping method <strong>${escapeHTML(currentMethod || '(none)')}</strong>.
+         ShipStation in NWCA's setup only supports USPS — to route this order there, choose a USPS service below.
+         Otherwise, ${currentMethod && currentMethod.toLowerCase().startsWith('ups') ? 'use WorldShip' : "use the carrier's own tool"} instead.</p>
+         <fieldset><legend>Override to USPS service:</legend>
+          <label class="ss-override-opt"><input type="radio" name="ss-override" value="Priority Mail" checked><span><span class="ss-service-name">Priority Mail</span><span class="ss-service-note">2–3 business days · Recommended for 2-3 shirts</span></span></label>
+          <label class="ss-override-opt"><input type="radio" name="ss-override" value="USPS First Class"><span><span class="ss-service-name">USPS First Class</span><span class="ss-service-note">3–5 days · Lightest packages (under 1 lb)</span></span></label>
+          <label class="ss-override-opt"><input type="radio" name="ss-override" value="USPS Ground"><span><span class="ss-service-name">USPS Ground Advantage</span><span class="ss-service-note">2–5 days · Cheaper than Priority for heavier boxes</span></span></label>
+         </fieldset>
+         <div class="dialog-actions"><button type="button" class="btn" id="ss-modal-cancel">Cancel</button><button type="button" class="btn btn-primary" id="ss-modal-confirm">Override &amp; Send to ShipStation</button></div>`,
+        modal => modal.querySelector('input[name="ss-override"]:checked')?.value || 'Priority Mail');
+    }
 
-        const modal = el('div', { id: 'shipstation-override-modal' }, null);
-        Object.assign(modal.style, {
-          position: 'fixed', inset: '0', background: 'rgba(15, 23, 42, 0.55)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          zIndex: '9999', padding: '20px',
-        });
+    openShipStationConfirm() {
+      return this.openShipmentDialog('shipstation-confirm-modal',
+        `<h2 id="ss-modal-title">Send to ShipStation</h2>
+         <p>Send order ${escapeHTML(this.quoteId)} to ShipStation?</p>
+         <p>Warehouse will rate + buy the label in ShipStation. Tracking will appear back on this invoice automatically.</p>
+         <div class="dialog-actions"><button type="button" class="btn" id="ss-modal-cancel">Cancel</button><button type="button" class="btn btn-primary" id="ss-modal-confirm">Send to ShipStation</button></div>`,
+        () => true);
+    }
 
-        const card = el('div', null, null);
-        Object.assign(card.style, {
-          background: '#fff', borderRadius: '8px', padding: '24px 28px',
-          maxWidth: '480px', width: '100%', boxShadow: '0 20px 50px rgba(0,0,0,.25)',
-          fontFamily: 'Inter, -apple-system, sans-serif',
-        });
-
-        card.innerHTML = `
-          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-            <span style="font-size:22px">🚢</span>
-            <h2 style="margin:0; font-size:18px; color:#1f2937">Send to ShipStation</h2>
-          </div>
-          <p style="margin:0 0 16px; color:#4b5563; font-size:13.5px; line-height:1.5">
-            This order was created with shipping method
-            <strong style="color:#b45309">${escapeHTML(currentMethod || '(none)')}</strong>.
-            ShipStation in NWCA's setup only supports USPS — to route this order
-            there, choose a USPS service below.
-            Otherwise, ${currentMethod && currentMethod.toLowerCase().startsWith('ups') ? 'use WorldShip' : 'use the carrier\'s own tool'}
-            instead.
-          </p>
-          <div style="margin-bottom:18px">
-            <div style="font-size:12px; font-weight:600; color:#6b7280; text-transform:uppercase; letter-spacing:.06em; margin-bottom:8px">
-              Override to USPS service:
-            </div>
-            <label class="ss-override-opt" style="display:flex; align-items:flex-start; gap:8px; padding:10px 12px; border:1px solid #d1d5db; border-radius:4px; margin-bottom:6px; cursor:pointer">
-              <input type="radio" name="ss-override" value="Priority Mail" checked style="margin-top:3px">
-              <div>
-                <div style="font-weight:600; color:#1f2937">Priority Mail</div>
-                <div style="font-size:12px; color:#6b7280">2–3 business days · Recommended for 2-3 shirts</div>
-              </div>
-            </label>
-            <label class="ss-override-opt" style="display:flex; align-items:flex-start; gap:8px; padding:10px 12px; border:1px solid #d1d5db; border-radius:4px; margin-bottom:6px; cursor:pointer">
-              <input type="radio" name="ss-override" value="USPS First Class" style="margin-top:3px">
-              <div>
-                <div style="font-weight:600; color:#1f2937">USPS First Class</div>
-                <div style="font-size:12px; color:#6b7280">3–5 days · Lightest packages (under 1 lb)</div>
-              </div>
-            </label>
-            <label class="ss-override-opt" style="display:flex; align-items:flex-start; gap:8px; padding:10px 12px; border:1px solid #d1d5db; border-radius:4px; margin-bottom:6px; cursor:pointer">
-              <input type="radio" name="ss-override" value="USPS Ground" style="margin-top:3px">
-              <div>
-                <div style="font-weight:600; color:#1f2937">USPS Ground Advantage</div>
-                <div style="font-size:12px; color:#6b7280">2–5 days · Cheaper than Priority for heavier boxes</div>
-              </div>
-            </label>
-          </div>
-          <div style="display:flex; gap:10px; justify-content:flex-end">
-            <button type="button" id="ss-modal-cancel" style="padding:8px 16px; border:1px solid #d1d5db; background:#fff; color:#4b5563; border-radius:4px; font-weight:500; cursor:pointer">
-              Cancel
-            </button>
-            <button type="button" id="ss-modal-confirm" style="padding:8px 18px; border:none; background:#14532d; color:#fff; border-radius:4px; font-weight:600; cursor:pointer">
-              Override & Send to ShipStation
-            </button>
-          </div>
-        `;
-        modal.appendChild(card);
+    openShipmentDialog(id, content, chosen) {
+      return new Promise(resolve => {
+        const returnFocus = document.activeElement;
+        const modal = el('dialog', { id, class: 'ui-dialog invoice-ship-dialog', 'aria-labelledby': 'ss-modal-title' });
+        modal.innerHTML = content;
         document.body.appendChild(modal);
-
-        const cleanup = (val) => {
+        let finished = false;
+        const cleanup = value => {
+          if (finished) return;
+          finished = true;
+          if (window.UiDialog) window.UiDialog.close(modal);
+          modal.close();
           modal.remove();
-          resolve(val);
+          if (returnFocus?.isConnected && !returnFocus.disabled) returnFocus.focus({ preventScroll: true });
+          resolve(value);
         };
-
-        modal.addEventListener('click', (e) => {
-          if (e.target === modal) cleanup(null); // backdrop click cancels
+        modal.querySelector('#ss-modal-cancel').addEventListener('click', () => cleanup(null));
+        modal.querySelector('#ss-modal-confirm').addEventListener('click', () => cleanup(chosen(modal)));
+        modal.addEventListener('cancel', event => { event.preventDefault(); cleanup(null); });
+        modal.addEventListener('click', event => {
+          const bounds = modal.getBoundingClientRect();
+          if (event.target === modal && (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom)) cleanup(null);
         });
-        card.querySelector('#ss-modal-cancel').addEventListener('click', () => cleanup(null));
-        card.querySelector('#ss-modal-confirm').addEventListener('click', () => {
-          const picked = card.querySelector('input[name="ss-override"]:checked')?.value || 'Priority Mail';
-          cleanup(picked);
-        });
-        // Esc cancels
-        const keyHandler = (e) => {
-          if (e.key === 'Escape') { document.removeEventListener('keydown', keyHandler); cleanup(null); }
-        };
-        document.addEventListener('keydown', keyHandler);
+        modal.showModal();
+        if (window.UiDialog) window.UiDialog.open(modal, { onDismiss: () => cleanup(null), focus: '#ss-modal-cancel' });
       });
     }
 
@@ -1434,41 +1342,41 @@
       }
     }
 
-    async syncNow(showSpinner) {
-      const btn = $('btn-refresh');
-      if (showSpinner) {
-        btn.disabled = true;
-        btn.textContent = 'Syncing…';
-      }
+    async syncNow(_showSpinner) {
+      if (this.syncing || this.shipAction) return;
+      this.syncing = true;
+      $('btn-refresh').disabled = true;
+      $('btn-refresh').textContent = 'Syncing…';
+      $('btn-print').disabled = true;
+      $('invoice-sync-error').hidden = true;
+      this.updateShipStationButton();
       try {
         const resp = await fetch(
-          `/api/quote-sessions/${encodeURIComponent(this.quoteId)}/sync-from-shopworks`,
-          { method: 'POST' },
+          `/api/quote-sessions/${encodeURIComponent(this.quoteId)}/sync-from-shopworks${this.shareTokenParam()}`,
+          { method: 'POST' }
         );
         if (!resp.ok) throw new Error(`Sync failed (${resp.status})`);
-        const result = await resp.json();
-        // Soft-delete: the row was flipped to Status='Cancelled_in_ShopWorks'.
-        // Reload fresh data so the CANCELLED banner appears in place — no
-        // redirect (the page is still a useful audit record for 30 days
-        // before the bulk-sync cron purges it).
+        await resp.json();
         await this.loadFullData();
         this.render();
       } catch (err) {
         console.error('[invoice] sync failed:', err);
-        if (showSpinner) {
-          ToastNotifications.error('Sync failed. Try again in a moment, or open the order in ShopWorks.');
-        }
+        $('invoice-sync-error').textContent = 'Sync failed. Displaying the last loaded invoice. Try again in a moment, or open the order in ShopWorks.';
+        $('invoice-sync-error').hidden = false;
+        window.ToastNotifications.error('Sync failed. Try again in a moment, or open the order in ShopWorks.');
       } finally {
-        if (showSpinner) {
-          btn.disabled = false;
-          btn.innerHTML = '🔄 Refresh from ShopWorks';
-        }
+        this.syncing = false;
+        $('btn-refresh').disabled = false;
+        $('btn-refresh').textContent = '🔄 Refresh from ShopWorks';
+        $('btn-print').disabled = false;
+        this.updateShipStationButton();
       }
     }
   }
 
   // boot
   document.addEventListener('DOMContentLoaded', () => {
+    $('btn-invoice-retry').addEventListener('click', () => window.location.reload());
     const page = new InvoicePage();
     window.invoicePage = page;
     page.init();

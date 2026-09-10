@@ -1,0 +1,493 @@
+{
+  "fields": [
+    {
+      "id": "gsf-company",
+      "name": "",
+      "type": "text",
+      "value": "Cedar Example Construction",
+      "checked": false
+    },
+    {
+      "id": "gsf-cust-num",
+      "name": "",
+      "type": "text",
+      "value": "90210",
+      "checked": false
+    },
+    {
+      "id": "gsf-customer-id",
+      "name": "",
+      "type": "hidden",
+      "value": "90210",
+      "checked": false
+    },
+    {
+      "id": "gsf-contact-name",
+      "name": "",
+      "type": "text",
+      "value": "River Sample",
+      "checked": false
+    },
+    {
+      "id": "gsf-contact-email",
+      "name": "",
+      "type": "email",
+      "value": "review@example.test",
+      "checked": false
+    },
+    {
+      "id": "gsf-sales-rep",
+      "name": "",
+      "type": "text",
+      "value": "Example Rep",
+      "checked": false
+    },
+    {
+      "id": "gsf-due-date",
+      "name": "",
+      "type": "date",
+      "value": "2026-09-21",
+      "checked": false
+    },
+    {
+      "id": "gsf-design-num",
+      "name": "",
+      "type": "text",
+      "value": "44012",
+      "checked": false
+    },
+    {
+      "id": "gsf-order-num",
+      "name": "",
+      "type": "text",
+      "value": "740123",
+      "checked": false
+    },
+    {
+      "id": "gsf-prelim",
+      "name": "",
+      "type": "select-one",
+      "value": ""
+    },
+    {
+      "id": "gsf-artwork-status",
+      "name": "",
+      "type": "select-one",
+      "value": ""
+    },
+    {
+      "id": "gsf-approval-status",
+      "name": "",
+      "type": "select-one",
+      "value": ""
+    },
+    {
+      "id": "",
+      "name": "",
+      "type": "checkbox",
+      "value": "Screen Print",
+      "checked": false
+    },
+    {
+      "id": "",
+      "name": "",
+      "type": "checkbox",
+      "value": "DTG",
+      "checked": false
+    },
+    {
+      "id": "",
+      "name": "",
+      "type": "checkbox",
+      "value": "Embroidery",
+      "checked": true
+    },
+    {
+      "id": "",
+      "name": "",
+      "type": "checkbox",
+      "value": "Transfer",
+      "checked": false
+    },
+    {
+      "id": "",
+      "name": "",
+      "type": "checkbox",
+      "value": "Sticker",
+      "checked": false
+    },
+    {
+      "id": "",
+      "name": "",
+      "type": "checkbox",
+      "value": "Banner",
+      "checked": false
+    },
+    {
+      "id": "",
+      "name": "",
+      "type": "checkbox",
+      "value": "JDS Product",
+      "checked": false
+    },
+    {
+      "id": "",
+      "name": "",
+      "type": "checkbox",
+      "value": "Laser Leatherette Patch",
+      "checked": false
+    },
+    {
+      "id": "",
+      "name": "",
+      "type": "checkbox",
+      "value": "Not sure — Steve to advise",
+      "checked": false
+    },
+    {
+      "id": "gsf-patch-material",
+      "name": "",
+      "type": "select-one",
+      "value": ""
+    },
+    {
+      "id": "gsf-patch-shape",
+      "name": "",
+      "type": "select-one",
+      "value": ""
+    },
+    {
+      "id": "gsf-patch-material-other",
+      "name": "",
+      "type": "text",
+      "value": "",
+      "checked": false
+    },
+    {
+      "id": "gsf-patch-width",
+      "name": "",
+      "type": "number",
+      "value": "",
+      "checked": false
+    },
+    {
+      "id": "gsf-patch-height",
+      "name": "",
+      "type": "number",
+      "value": "",
+      "checked": false
+    },
+    {
+      "id": "gsf-patch-edge",
+      "name": "",
+      "type": "select-one",
+      "value": ""
+    },
+    {
+      "id": "gsf-patch-attach",
+      "name": "",
+      "type": "select-one",
+      "value": ""
+    },
+    {
+      "id": "gsf-style-0",
+      "name": "",
+      "type": "text",
+      "value": "",
+      "checked": false
+    },
+    {
+      "id": "gsf-color-0",
+      "name": "",
+      "type": "select-one",
+      "value": ""
+    },
+    {
+      "id": "gsf-loc-place-0",
+      "name": "",
+      "type": "select-one",
+      "value": "Full Front"
+    },
+    {
+      "id": "gsf-loc-w-0",
+      "name": "",
+      "type": "number",
+      "value": "",
+      "checked": false
+    },
+    {
+      "id": "gsf-loc-h-0",
+      "name": "",
+      "type": "number",
+      "value": "",
+      "checked": false
+    },
+    {
+      "id": "gsf-loc-n-0",
+      "name": "",
+      "type": "text",
+      "value": "",
+      "checked": false
+    },
+    {
+      "id": "gsf-loc-place-1",
+      "name": "",
+      "type": "select-one",
+      "value": "Full Back"
+    },
+    {
+      "id": "gsf-loc-w-1",
+      "name": "",
+      "type": "number",
+      "value": "",
+      "checked": false
+    },
+    {
+      "id": "gsf-loc-h-1",
+      "name": "",
+      "type": "number",
+      "value": "",
+      "checked": false
+    },
+    {
+      "id": "gsf-loc-n-1",
+      "name": "",
+      "type": "text",
+      "value": "",
+      "checked": false
+    },
+    {
+      "id": "gsf-color-mode",
+      "name": "",
+      "type": "select-one",
+      "value": ""
+    },
+    {
+      "id": "gsf-underbase",
+      "name": "",
+      "type": "select-one",
+      "value": ""
+    },
+    {
+      "id": "gsf-pms",
+      "name": "",
+      "type": "text",
+      "value": "",
+      "checked": false
+    },
+    {
+      "id": "gsf-thread",
+      "name": "",
+      "type": "text",
+      "value": "",
+      "checked": false
+    },
+    {
+      "id": "gsf-exact-text",
+      "name": "",
+      "type": "textarea",
+      "value": ""
+    },
+    {
+      "id": "gsf-no-text",
+      "name": "",
+      "type": "checkbox",
+      "value": "on",
+      "checked": false
+    },
+    {
+      "id": "gsf-prev-order",
+      "name": "",
+      "type": "text",
+      "value": "",
+      "checked": false
+    },
+    {
+      "id": "gsf-prev-design",
+      "name": "",
+      "type": "text",
+      "value": "",
+      "checked": false
+    },
+    {
+      "id": "gsf-keep-same",
+      "name": "",
+      "type": "text",
+      "value": "",
+      "checked": false
+    },
+    {
+      "id": "gsf-change",
+      "name": "",
+      "type": "text",
+      "value": "",
+      "checked": false
+    },
+    {
+      "id": "gsf-file-type",
+      "name": "",
+      "type": "select-one",
+      "value": ""
+    },
+    {
+      "id": "gsf-file-input",
+      "name": "",
+      "type": "file",
+      "value": "",
+      "checked": false
+    },
+    {
+      "id": "gsf-notes",
+      "name": "",
+      "type": "textarea",
+      "value": "Carried over from quote EMB0910-7401 · WO 740123. Customer art + approved mockups attached from the order."
+    },
+    {
+      "id": "",
+      "name": "",
+      "type": "checkbox",
+      "value": "on",
+      "checked": false
+    },
+    {
+      "id": "",
+      "name": "",
+      "type": "checkbox",
+      "value": "on",
+      "checked": false
+    },
+    {
+      "id": "",
+      "name": "",
+      "type": "checkbox",
+      "value": "on",
+      "checked": false
+    },
+    {
+      "id": "",
+      "name": "",
+      "type": "checkbox",
+      "value": "on",
+      "checked": false
+    },
+    {
+      "id": "",
+      "name": "",
+      "type": "checkbox",
+      "value": "on",
+      "checked": false
+    },
+    {
+      "id": "",
+      "name": "",
+      "type": "checkbox",
+      "value": "on",
+      "checked": false
+    },
+    {
+      "id": "",
+      "name": "",
+      "type": "checkbox",
+      "value": "on",
+      "checked": false
+    },
+    {
+      "id": "",
+      "name": "",
+      "type": "checkbox",
+      "value": "on",
+      "checked": false
+    },
+    {
+      "id": "",
+      "name": "",
+      "type": "checkbox",
+      "value": "on",
+      "checked": false
+    },
+    {
+      "id": "",
+      "name": "",
+      "type": "checkbox",
+      "value": "on",
+      "checked": false
+    },
+    {
+      "id": "",
+      "name": "",
+      "type": "checkbox",
+      "value": "on",
+      "checked": false
+    },
+    {
+      "id": "",
+      "name": "",
+      "type": "checkbox",
+      "value": "on",
+      "checked": false
+    },
+    {
+      "id": "",
+      "name": "",
+      "type": "checkbox",
+      "value": "on",
+      "checked": false
+    }
+  ],
+  "styles": [
+    "/shared_components/css/garment-submit-form.css?v=2026.06.26.1"
+  ],
+  "views": [
+    {
+      "width": 1440,
+      "scrollWidth": 1440
+    },
+    {
+      "width": 768,
+      "scrollWidth": 768
+    },
+    {
+      "width": 390,
+      "scrollWidth": 390
+    },
+    {
+      "width": 320,
+      "scrollWidth": 320
+    }
+  ],
+  "events": {
+    "errors": [],
+    "writes": [],
+    "unknown": [],
+    "missing": [],
+    "reads": [
+      {
+        "path": "/api/public/quote/EMB0910-7401",
+        "query": ""
+      },
+      {
+        "path": "/api/quote-sessions/EMB0910-7401/full",
+        "query": ""
+      }
+    ],
+    "actions": [
+      {
+        "operation": "art-reference",
+        "path": "/api/files/import-from-url",
+        "body": "{\"url\":\"/__invoice-fixture/front.png\",\"fileName\":\"front.png\"}"
+      },
+      {
+        "operation": "art-reference",
+        "path": "/api/files/import-from-url",
+        "body": "{\"url\":\"/__invoice-fixture/back.pdf\",\"fileName\":\"back.pdf\"}"
+      },
+      {
+        "operation": "art-reference",
+        "path": "/api/files/import-from-url",
+        "body": "{\"url\":\"/__invoice-fixture/mockup.png\",\"fileName\":\"EMB0910-7401-front.png\"}"
+      }
+    ],
+    "beacons": [],
+    "lazy": []
+  }
+}

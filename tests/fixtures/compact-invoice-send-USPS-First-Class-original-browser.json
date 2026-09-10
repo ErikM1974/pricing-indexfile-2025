@@ -1,0 +1,277 @@
+{
+  "before": {
+    "title": "Invoice #740123 - Northwest Custom Apparel",
+    "rows": [
+      [
+        "PC90H",
+        "Navy",
+        "Core fleece hoodieLeft chest",
+        "13",
+        "varies",
+        "$538.00"
+      ],
+      [
+        "↳ —",
+        "",
+        "Core fleece hoodie — S: 2, M: 3, L: 3, XL: 2",
+        "10",
+        "$40.00",
+        "$400.00"
+      ],
+      [
+        "↳ 2XL",
+        "",
+        "Core fleece hoodie — 2XL: 2",
+        "2",
+        "$45.00",
+        "$90.00"
+      ],
+      [
+        "↳ 3XL",
+        "",
+        "Core fleece hoodie — 3XL: 1",
+        "1",
+        "$48.00",
+        "$48.00"
+      ],
+      [
+        "SETUP",
+        "",
+        "Embroidery setupLeft chest",
+        "1",
+        "$115.00",
+        "$115.00"
+      ]
+    ],
+    "fields": [
+      {
+        "id": "invoice-title",
+        "text": "INVOICE",
+        "visible": true
+      },
+      {
+        "id": "invoice-order-number",
+        "text": "WO 740123",
+        "visible": true
+      },
+      {
+        "id": "invoice-quote-id",
+        "text": "EMB0910-7401",
+        "visible": true
+      },
+      {
+        "id": "invoice-date",
+        "text": "September 10, 2026",
+        "visible": true
+      },
+      {
+        "id": "status-banner-detail",
+        "text": "",
+        "visible": false
+      },
+      {
+        "id": "bill-customer-name",
+        "text": "Cedar Example Construction",
+        "visible": true
+      },
+      {
+        "id": "bill-contact-name",
+        "text": "River Sample",
+        "visible": true
+      },
+      {
+        "id": "bill-address-line1",
+        "text": "123 Example Street",
+        "visible": true
+      },
+      {
+        "id": "bill-address-line2",
+        "text": "Suite 2",
+        "visible": true
+      },
+      {
+        "id": "bill-address-citystate",
+        "text": "Milton, WA 98354",
+        "visible": true
+      },
+      {
+        "id": "bill-email",
+        "text": "review@example.test",
+        "visible": true
+      },
+      {
+        "id": "bill-phone",
+        "text": "(253) 555-0142",
+        "visible": true
+      },
+      {
+        "id": "ship-recipient",
+        "text": "Cedar Example Receiving",
+        "visible": true
+      },
+      {
+        "id": "ship-line1",
+        "text": "456 Sample Ave",
+        "visible": true
+      },
+      {
+        "id": "ship-line2",
+        "text": "Dock 2",
+        "visible": true
+      },
+      {
+        "id": "ship-citystate",
+        "text": "Milton, WA 98354",
+        "visible": true
+      },
+      {
+        "id": "ship-method",
+        "text": "UPS Ground",
+        "visible": true
+      },
+      {
+        "id": "detail-po",
+        "text": "PO-SYNTHETIC",
+        "visible": true
+      },
+      {
+        "id": "detail-rep",
+        "text": "Example Rep",
+        "visible": true
+      },
+      {
+        "id": "detail-ship-date",
+        "text": "Sep 21, 2026",
+        "visible": true
+      },
+      {
+        "id": "detail-terms",
+        "text": "Net 30",
+        "visible": true
+      },
+      {
+        "id": "detail-method",
+        "text": "Embroidery",
+        "visible": true
+      },
+      {
+        "id": "total-subtotal",
+        "text": "$653.00",
+        "visible": true
+      },
+      {
+        "id": "total-discount",
+        "text": "$0.00",
+        "visible": false
+      },
+      {
+        "id": "total-tax-rate",
+        "text": "(10.00%)",
+        "visible": true
+      },
+      {
+        "id": "total-tax",
+        "text": "$66.30",
+        "visible": true
+      },
+      {
+        "id": "total-shipping",
+        "text": "$10.00",
+        "visible": true
+      },
+      {
+        "id": "total-grand",
+        "text": "$729.30",
+        "visible": true
+      },
+      {
+        "id": "total-paid",
+        "text": "-$200.00",
+        "visible": true
+      },
+      {
+        "id": "total-amount-due",
+        "text": "$529.30",
+        "visible": true
+      },
+      {
+        "id": "invoice-payment-terms-text",
+        "text": "Net 30",
+        "visible": true
+      },
+      {
+        "id": "footer-sync-info",
+        "text": "ShopWorks WO #740123 · Synced just now",
+        "visible": true
+      }
+    ],
+    "links": [
+      {
+        "href": "tel:2539225793",
+        "label": "(253) 922-5793",
+        "download": null
+      },
+      {
+        "href": "mailto:sales@nwcustomapparel.com",
+        "label": "sales@nwcustomapparel.com",
+        "download": null
+      },
+      {
+        "href": "/quote/EMB0910-7401",
+        "label": "← Back to full quote view",
+        "download": null
+      },
+      {
+        "href": "mailto:ar@nwcustomapparel.com",
+        "label": "ar@nwcustomapparel.com",
+        "download": null
+      },
+      {
+        "href": "https://nwcustomapparel.com",
+        "label": "nwcustomapparel.com",
+        "download": null
+      }
+    ],
+    "toolbar": [
+      {
+        "id": "btn-print",
+        "text": "🖨 Print / Save as PDF",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "btn-refresh",
+        "text": "🔄 Refresh from ShopWorks",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "btn-shipstation",
+        "text": "🚢 Override → USPS via ShipStation",
+        "visible": true,
+        "disabled": false
+      }
+    ],
+    "paper": "Northwest Custom Apparel\n2025 Freeman Road East · Milton, WA 98354\n(253) 922-5793 · sales@nwcustomapparel.com\nINVOICE\nOrder #\nWO 740123\nQuote #\nEMB0910-7401\nInvoice Date\nSeptember 10, 2026\nBILL TO\nCedar Example Construction\nRiver Sample\n123 Example Street\nSuite 2\nMilton, WA 98354\nreview@example.test\n(253) 555-0142\nSHIP TO\nCedar Example Receiving\n456 Sample Ave\nDock 2\nMilton, WA 98354\nUPS Ground\nPO NUMBER\nPO-SYNTHETIC\nSALES REP\nExample Rep\nREQ SHIP DATE\nSep 21, 2026\nTERMS\nNet 30\nDECORATION\nEmbroidery\nITEM\tCOLOR\tDESCRIPTION\tQTY\tUNIT PRICE\tTOTAL\nPC90H\tNavy\tCore fleece hoodieLeft chest\t13\tvaries\t$538.00\n↳ —\t\tCore fleece hoodie — S: 2, M: 3, L: 3, XL: 2\t10\t$40.00\t$400.00\n↳ 2XL\t\tCore fleece hoodie — 2XL: 2\t2\t$45.00\t$90.00\n↳ 3XL\t\tCore fleece hoodie — 3XL: 1\t1\t$48.00\t$48.00\nSETUP\t\tEmbroidery setupLeft chest\t1\t$115.00\t$115.00\nSubtotal\n$653.00\nSales Tax (10.00%)\n$66.30\nShipping\n$10.00\nTotal\n$729.30\nPayments Received\n-$200.00\nAMOUNT DUE\n$529.30\nPAYMENT INFORMATION\nPayment due Net 30 from invoice date. Pay by check (Northwest Custom Apparel, 2025 Freeman Road East, Milton WA 98354) or ACH/credit card — contact ar@nwcustomapparel.com for routing. Past-due balances accrue 1.5% monthly finance charge.\nThank you for your business · Northwest Custom Apparel · nwcustomapparel.com\nShopWorks WO #740123 · Synced just now"
+  },
+  "events": {
+    "errors": [],
+    "writes": [],
+    "unknown": [],
+    "missing": [],
+    "reads": [
+      {
+        "path": "/api/quote-sessions/EMB0910-7401/full",
+        "query": ""
+      }
+    ],
+    "actions": [
+      {
+        "path": "/api/quote-sessions/EMB0910-7401/send-to-shipstation",
+        "query": "",
+        "method": "POST",
+        "body": "{\"overrideShipMethod\":\"USPS First Class\"}"
+      }
+    ]
+  }
+}

@@ -1,5 +1,11 @@
 # Active Files Registry
 
+- `shared_components/css/employee-bundles.css` — shared Streich Bros./WCTTR wrapper, typography, instructions and navigation over tokens/components/hosted-workspace. Retires `employee-bundles/css/streich-bros-bundle.css` and `employee-bundles/css/wcttr-bundle.css`; original CSS is retained in the source fixture. Provider records remain externally owned.
+
+- Employee bundle browser contracts: tests/e2e/css-unification-employee-bundles.spec.js and tests/e2e/helpers/employee-bundles-browser.js; original four-width, provider-state and paper captures in tests/fixtures/employee-bundles-{streich-bros-bundle,wcttr-bundle}-original-browser.json. Synthetic provider responses; all business traffic blocked.
+
+- `tests/fixtures/employee-bundles-original-content.json` and `tests/unit/employee-bundles-content.test.js` — immutable Streich Bros./WCTTR source, provider and content contracts before CSS migration.
+
 - `shared_components/css/staff-home.css` — Scoped dark/green Staff Dashboard owner over shared controls; nine legacy staff-dashboard sheets remain only for historical UI harnesses.
 
 - Added shared_components/css/staff-box-labels.css: repack-station layout and keyboard controls; shared vendor-box-labels.css owns paper. Retired pages/css/box-labels.css; original preserved in the final-tools fixture.
@@ -378,3 +384,20 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - tests/e2e/css-unification-calibration.spec.js and tests/fixtures/staff-final-tools-calibration-synthetic.json — synthetic print-envelope geometry, layout save/delete/copy and failed-photo baselines. No actual calibration writes or clipboard edits.
 
 - tests/e2e/css-unification-records-admin.spec.js and tests/fixtures/staff-final-tools-records-synthetic.json — synthetic administrator records table, filters, pagination, detail, CSV and failure baselines. No real quote writes.
+
+- `tests/fixtures/customer-documents-original-content.json` and `tests/unit/customer-documents-content.test.js` — frozen three-page customer invoice/quote content and transitive local source contracts before visual changes. Shared runtime dependencies are captured; no migration credit yet.
+
+- tests/e2e/helpers/customer-invoice-browser.js — fail-closed synthetic invoice data, original-source restoration and PDF isolation.
+- tests/e2e/css-unification-customer-invoice.spec.js — original/current invoice contracts, four-width accessibility, auth/error and complete PDF checks.
+- tests/fixtures/customer-invoice-{normal,paid,empty,long,escaped,preview}-original-browser.json — immutable original customer invoice values and paper contracts.
+
+- shared_components/css/customer-documents.css — shared customer document shell and responsive/print portal invoice; replaces retired pages/css/customer-invoice.css.
+
+- tests/e2e/helpers/compact-invoice-browser.js — fail-closed synthetic original/current invoice data, staff/share-token and sync/ShipStation capture. No live business requests.
+
+- tests/e2e/css-unification-compact-invoice.spec.js — synthetic invoice source/financial/status/access and print contracts, exact sync/ShipStation payloads.
+- tests/fixtures/compact-invoice-*-original-browser.json — original invoice data, toolbar, share-link and workflow evidence (generated only in baseline mode).
+- tests/e2e/helpers/quote-view-browser.js — synthetic Quote View source/data, deferred responses and blocked business actions; original/current customer/staff workflow contracts.
+- tests/e2e/css-unification-quote-view.spec.js — original/current Quote View value and request locks, four-width accessibility/print and recovery, pending-action and native-dialog keyboard checks.
+- tests/fixtures/quote-view-*-original-browser.json — frozen original browser contracts; baseline capture refuses to overwrite existing evidence.
+- pages/invoice.html, pages/js/invoice.js and pages/css/invoice.css — reviewed compact invoice: shared customer document shell, responsive line items, canonical hidden/print state, verified staff controls, retained share token and guarded native shipment dialogs. Original source restoration in customer-documents-original-content.json;50 synthetic browser cases.

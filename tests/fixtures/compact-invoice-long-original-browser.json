@@ -1,0 +1,473 @@
+{
+  "before": {
+    "title": "Invoice #740123 - Northwest Custom Apparel",
+    "rows": [
+      [
+        "SAMPLE-01",
+        "Navy",
+        "Synthetic detailed garment description, crew workwear with an extended name — XL: 1Left chest",
+        "1",
+        "$23.50",
+        "$23.50"
+      ],
+      [
+        "SAMPLE-02",
+        "Navy",
+        "Synthetic detailed garment description, crew workwear with an extended name — XL: 2Left chest",
+        "2",
+        "$23.50",
+        "$47.00"
+      ],
+      [
+        "SAMPLE-03",
+        "Navy",
+        "Synthetic detailed garment description, crew workwear with an extended name — XL: 3Left chest",
+        "3",
+        "$23.50",
+        "$70.50"
+      ],
+      [
+        "SAMPLE-04",
+        "Navy",
+        "Synthetic detailed garment description, crew workwear with an extended name — XL: 4Left chest",
+        "4",
+        "$23.50",
+        "$94.00"
+      ],
+      [
+        "SAMPLE-05",
+        "Navy",
+        "Synthetic detailed garment description, crew workwear with an extended name — XL: 5Left chest",
+        "5",
+        "$23.50",
+        "$117.50"
+      ],
+      [
+        "SAMPLE-06",
+        "Navy",
+        "Synthetic detailed garment description, crew workwear with an extended name — XL: 6Left chest",
+        "6",
+        "$23.50",
+        "$141.00"
+      ],
+      [
+        "SAMPLE-07",
+        "Navy",
+        "Synthetic detailed garment description, crew workwear with an extended name — XL: 7Left chest",
+        "7",
+        "$23.50",
+        "$164.50"
+      ],
+      [
+        "SAMPLE-08",
+        "Navy",
+        "Synthetic detailed garment description, crew workwear with an extended name — XL: 8Left chest",
+        "8",
+        "$23.50",
+        "$188.00"
+      ],
+      [
+        "SAMPLE-09",
+        "Navy",
+        "Synthetic detailed garment description, crew workwear with an extended name — XL: 9Left chest",
+        "9",
+        "$23.50",
+        "$211.50"
+      ],
+      [
+        "SAMPLE-10",
+        "Navy",
+        "Synthetic detailed garment description, crew workwear with an extended name — XL: 10Left chest",
+        "10",
+        "$23.50",
+        "$235.00"
+      ],
+      [
+        "SAMPLE-11",
+        "Navy",
+        "Synthetic detailed garment description, crew workwear with an extended name — XL: 11Left chest",
+        "11",
+        "$23.50",
+        "$258.50"
+      ],
+      [
+        "SAMPLE-12",
+        "Navy",
+        "Synthetic detailed garment description, crew workwear with an extended name — XL: 12Left chest",
+        "12",
+        "$23.50",
+        "$282.00"
+      ],
+      [
+        "SAMPLE-13",
+        "Navy",
+        "Synthetic detailed garment description, crew workwear with an extended name — XL: 13Left chest",
+        "13",
+        "$23.50",
+        "$305.50"
+      ],
+      [
+        "SAMPLE-14",
+        "Navy",
+        "Synthetic detailed garment description, crew workwear with an extended name — XL: 14Left chest",
+        "14",
+        "$23.50",
+        "$329.00"
+      ],
+      [
+        "SAMPLE-15",
+        "Navy",
+        "Synthetic detailed garment description, crew workwear with an extended name — XL: 15Left chest",
+        "15",
+        "$23.50",
+        "$352.50"
+      ],
+      [
+        "SAMPLE-16",
+        "Navy",
+        "Synthetic detailed garment description, crew workwear with an extended name — XL: 16Left chest",
+        "16",
+        "$23.50",
+        "$376.00"
+      ],
+      [
+        "SAMPLE-17",
+        "Navy",
+        "Synthetic detailed garment description, crew workwear with an extended name — XL: 17Left chest",
+        "17",
+        "$23.50",
+        "$399.50"
+      ],
+      [
+        "SAMPLE-18",
+        "Navy",
+        "Synthetic detailed garment description, crew workwear with an extended name — XL: 18Left chest",
+        "18",
+        "$23.50",
+        "$423.00"
+      ],
+      [
+        "SAMPLE-19",
+        "Navy",
+        "Synthetic detailed garment description, crew workwear with an extended name — XL: 19Left chest",
+        "19",
+        "$23.50",
+        "$446.50"
+      ],
+      [
+        "SAMPLE-20",
+        "Navy",
+        "Synthetic detailed garment description, crew workwear with an extended name — XL: 20Left chest",
+        "20",
+        "$23.50",
+        "$470.00"
+      ],
+      [
+        "SAMPLE-21",
+        "Navy",
+        "Synthetic detailed garment description, crew workwear with an extended name — XL: 21Left chest",
+        "21",
+        "$23.50",
+        "$493.50"
+      ],
+      [
+        "SAMPLE-22",
+        "Navy",
+        "Synthetic detailed garment description, crew workwear with an extended name — XL: 22Left chest",
+        "22",
+        "$23.50",
+        "$517.00"
+      ],
+      [
+        "SAMPLE-23",
+        "Navy",
+        "Synthetic detailed garment description, crew workwear with an extended name — XL: 23Left chest",
+        "23",
+        "$23.50",
+        "$540.50"
+      ],
+      [
+        "SAMPLE-24",
+        "Navy",
+        "Synthetic detailed garment description, crew workwear with an extended name — XL: 24Left chest",
+        "24",
+        "$23.50",
+        "$564.00"
+      ],
+      [
+        "SAMPLE-25",
+        "Navy",
+        "Synthetic detailed garment description, crew workwear with an extended name — XL: 25Left chest",
+        "25",
+        "$23.50",
+        "$587.50"
+      ],
+      [
+        "SAMPLE-26",
+        "Navy",
+        "Synthetic detailed garment description, crew workwear with an extended name — XL: 26Left chest",
+        "26",
+        "$23.50",
+        "$611.00"
+      ],
+      [
+        "SAMPLE-27",
+        "Navy",
+        "Synthetic detailed garment description, crew workwear with an extended name — XL: 27Left chest",
+        "27",
+        "$23.50",
+        "$634.50"
+      ],
+      [
+        "SAMPLE-28",
+        "Navy",
+        "Synthetic detailed garment description, crew workwear with an extended name — XL: 28Left chest",
+        "28",
+        "$23.50",
+        "$658.00"
+      ]
+    ],
+    "fields": [
+      {
+        "id": "invoice-title",
+        "text": "INVOICE",
+        "visible": true
+      },
+      {
+        "id": "invoice-order-number",
+        "text": "WO 740123",
+        "visible": true
+      },
+      {
+        "id": "invoice-quote-id",
+        "text": "EMB0910-7401",
+        "visible": true
+      },
+      {
+        "id": "invoice-date",
+        "text": "September 10, 2026",
+        "visible": true
+      },
+      {
+        "id": "status-banner-detail",
+        "text": "",
+        "visible": false
+      },
+      {
+        "id": "bill-customer-name",
+        "text": "Cedar Example Construction",
+        "visible": true
+      },
+      {
+        "id": "bill-contact-name",
+        "text": "River Sample",
+        "visible": true
+      },
+      {
+        "id": "bill-address-line1",
+        "text": "123 Example Street",
+        "visible": true
+      },
+      {
+        "id": "bill-address-line2",
+        "text": "Suite 2",
+        "visible": true
+      },
+      {
+        "id": "bill-address-citystate",
+        "text": "Milton, WA 98354",
+        "visible": true
+      },
+      {
+        "id": "bill-email",
+        "text": "review@example.test",
+        "visible": true
+      },
+      {
+        "id": "bill-phone",
+        "text": "(253) 555-0142",
+        "visible": true
+      },
+      {
+        "id": "ship-recipient",
+        "text": "Cedar Example Receiving",
+        "visible": true
+      },
+      {
+        "id": "ship-line1",
+        "text": "456 Sample Ave",
+        "visible": true
+      },
+      {
+        "id": "ship-line2",
+        "text": "Dock 2",
+        "visible": true
+      },
+      {
+        "id": "ship-citystate",
+        "text": "Milton, WA 98354",
+        "visible": true
+      },
+      {
+        "id": "ship-method",
+        "text": "USPS Priority Mail",
+        "visible": true
+      },
+      {
+        "id": "detail-po",
+        "text": "PO-SYNTHETIC",
+        "visible": true
+      },
+      {
+        "id": "detail-rep",
+        "text": "Example Rep",
+        "visible": true
+      },
+      {
+        "id": "detail-ship-date",
+        "text": "Sep 21, 2026",
+        "visible": true
+      },
+      {
+        "id": "detail-terms",
+        "text": "Net 30",
+        "visible": true
+      },
+      {
+        "id": "detail-method",
+        "text": "Embroidery",
+        "visible": true
+      },
+      {
+        "id": "total-subtotal",
+        "text": "$653.00",
+        "visible": true
+      },
+      {
+        "id": "total-discount",
+        "text": "$0.00",
+        "visible": false
+      },
+      {
+        "id": "total-tax-rate",
+        "text": "(10.00%)",
+        "visible": true
+      },
+      {
+        "id": "total-tax",
+        "text": "$66.30",
+        "visible": true
+      },
+      {
+        "id": "total-shipping",
+        "text": "$10.00",
+        "visible": true
+      },
+      {
+        "id": "total-grand",
+        "text": "$729.30",
+        "visible": true
+      },
+      {
+        "id": "total-paid",
+        "text": "-$200.00",
+        "visible": true
+      },
+      {
+        "id": "total-amount-due",
+        "text": "$529.30",
+        "visible": true
+      },
+      {
+        "id": "invoice-payment-terms-text",
+        "text": "Net 30",
+        "visible": true
+      },
+      {
+        "id": "footer-sync-info",
+        "text": "ShopWorks WO #740123 · Synced just now",
+        "visible": true
+      }
+    ],
+    "links": [
+      {
+        "href": "tel:2539225793",
+        "label": "(253) 922-5793",
+        "download": null
+      },
+      {
+        "href": "mailto:sales@nwcustomapparel.com",
+        "label": "sales@nwcustomapparel.com",
+        "download": null
+      },
+      {
+        "href": "/quote/EMB0910-7401",
+        "label": "← Back to full quote view",
+        "download": null
+      },
+      {
+        "href": "mailto:ar@nwcustomapparel.com",
+        "label": "ar@nwcustomapparel.com",
+        "download": null
+      },
+      {
+        "href": "https://nwcustomapparel.com",
+        "label": "nwcustomapparel.com",
+        "download": null
+      }
+    ],
+    "toolbar": [
+      {
+        "id": "btn-print",
+        "text": "🖨 Print / Save as PDF",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "btn-refresh",
+        "text": "🔄 Refresh from ShopWorks",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "btn-shipstation",
+        "text": "🚢 Send to ShipStation",
+        "visible": true,
+        "disabled": false
+      }
+    ],
+    "paper": "Northwest Custom Apparel\n2025 Freeman Road East · Milton, WA 98354\n(253) 922-5793 · sales@nwcustomapparel.com\nINVOICE\nOrder #\nWO 740123\nQuote #\nEMB0910-7401\nInvoice Date\nSeptember 10, 2026\nBILL TO\nCedar Example Construction\nRiver Sample\n123 Example Street\nSuite 2\nMilton, WA 98354\nreview@example.test\n(253) 555-0142\nSHIP TO\nCedar Example Receiving\n456 Sample Ave\nDock 2\nMilton, WA 98354\nUSPS Priority Mail\nPO NUMBER\nPO-SYNTHETIC\nSALES REP\nExample Rep\nREQ SHIP DATE\nSep 21, 2026\nTERMS\nNet 30\nDECORATION\nEmbroidery\nITEM\tCOLOR\tDESCRIPTION\tQTY\tUNIT PRICE\tTOTAL\nSAMPLE-01\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 1Left chest\t1\t$23.50\t$23.50\nSAMPLE-02\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 2Left chest\t2\t$23.50\t$47.00\nSAMPLE-03\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 3Left chest\t3\t$23.50\t$70.50\nSAMPLE-04\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 4Left chest\t4\t$23.50\t$94.00\nSAMPLE-05\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 5Left chest\t5\t$23.50\t$117.50\nSAMPLE-06\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 6Left chest\t6\t$23.50\t$141.00\nSAMPLE-07\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 7Left chest\t7\t$23.50\t$164.50\nSAMPLE-08\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 8Left chest\t8\t$23.50\t$188.00\nSAMPLE-09\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 9Left chest\t9\t$23.50\t$211.50\nSAMPLE-10\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 10Left chest\t10\t$23.50\t$235.00\nSAMPLE-11\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 11Left chest\t11\t$23.50\t$258.50\nSAMPLE-12\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 12Left chest\t12\t$23.50\t$282.00\nSAMPLE-13\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 13Left chest\t13\t$23.50\t$305.50\nSAMPLE-14\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 14Left chest\t14\t$23.50\t$329.00\nSAMPLE-15\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 15Left chest\t15\t$23.50\t$352.50\nSAMPLE-16\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 16Left chest\t16\t$23.50\t$376.00\nSAMPLE-17\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 17Left chest\t17\t$23.50\t$399.50\nSAMPLE-18\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 18Left chest\t18\t$23.50\t$423.00\nSAMPLE-19\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 19Left chest\t19\t$23.50\t$446.50\nSAMPLE-20\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 20Left chest\t20\t$23.50\t$470.00\nSAMPLE-21\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 21Left chest\t21\t$23.50\t$493.50\nSAMPLE-22\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 22Left chest\t22\t$23.50\t$517.00\nSAMPLE-23\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 23Left chest\t23\t$23.50\t$540.50\nSAMPLE-24\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 24Left chest\t24\t$23.50\t$564.00\nSAMPLE-25\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 25Left chest\t25\t$23.50\t$587.50\nSAMPLE-26\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 26Left chest\t26\t$23.50\t$611.00\nSAMPLE-27\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 27Left chest\t27\t$23.50\t$634.50\nSAMPLE-28\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 28Left chest\t28\t$23.50\t$658.00\nSubtotal\n$653.00\nSales Tax (10.00%)\n$66.30\nShipping\n$10.00\nTotal\n$729.30\nPayments Received\n-$200.00\nAMOUNT DUE\n$529.30\nPAYMENT INFORMATION\nPayment due Net 30 from invoice date. Pay by check (Northwest Custom Apparel, 2025 Freeman Road East, Milton WA 98354) or ACH/credit card — contact ar@nwcustomapparel.com for routing. Past-due balances accrue 1.5% monthly finance charge.\nThank you for your business · Northwest Custom Apparel · nwcustomapparel.com\nShopWorks WO #740123 · Synced just now"
+  },
+  "views": [
+    {
+      "width": 1440,
+      "scrollWidth": 1440
+    },
+    {
+      "width": 768,
+      "scrollWidth": 768
+    },
+    {
+      "width": 390,
+      "scrollWidth": 390
+    },
+    {
+      "width": 320,
+      "scrollWidth": 376
+    }
+  ],
+  "paper": "Northwest Custom Apparel\n2025 Freeman Road East · Milton, WA 98354\n(253) 922-5793 · sales@nwcustomapparel.com\nINVOICE\nOrder #\nWO 740123\nQuote #\nEMB0910-7401\nInvoice Date\nSeptember 10, 2026\n⚡\nRUSH ORDER\nBILL TO\nCedar Example Construction\nRiver Sample\n123 Example Street\nSuite 2\nMilton, WA 98354\nreview@example.test\n(253) 555-0142\nSHIP TO\nCedar Example Receiving\n456 Sample Ave\nDock 2\nMilton, WA 98354\nUSPS Priority Mail\nPO NUMBER\nPO-SYNTHETIC\nSALES REP\nExample Rep\nREQ SHIP DATE\nSep 21, 2026\nTERMS\nNet 30\nDECORATION\nEmbroidery\nITEM\tCOLOR\tDESCRIPTION\tQTY\tUNIT PRICE\tTOTAL\nSAMPLE-01\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 1Left chest\t1\t$23.50\t$23.50\nSAMPLE-02\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 2Left chest\t2\t$23.50\t$47.00\nSAMPLE-03\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 3Left chest\t3\t$23.50\t$70.50\nSAMPLE-04\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 4Left chest\t4\t$23.50\t$94.00\nSAMPLE-05\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 5Left chest\t5\t$23.50\t$117.50\nSAMPLE-06\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 6Left chest\t6\t$23.50\t$141.00\nSAMPLE-07\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 7Left chest\t7\t$23.50\t$164.50\nSAMPLE-08\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 8Left chest\t8\t$23.50\t$188.00\nSAMPLE-09\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 9Left chest\t9\t$23.50\t$211.50\nSAMPLE-10\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 10Left chest\t10\t$23.50\t$235.00\nSAMPLE-11\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 11Left chest\t11\t$23.50\t$258.50\nSAMPLE-12\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 12Left chest\t12\t$23.50\t$282.00\nSAMPLE-13\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 13Left chest\t13\t$23.50\t$305.50\nSAMPLE-14\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 14Left chest\t14\t$23.50\t$329.00\nSAMPLE-15\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 15Left chest\t15\t$23.50\t$352.50\nSAMPLE-16\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 16Left chest\t16\t$23.50\t$376.00\nSAMPLE-17\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 17Left chest\t17\t$23.50\t$399.50\nSAMPLE-18\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 18Left chest\t18\t$23.50\t$423.00\nSAMPLE-19\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 19Left chest\t19\t$23.50\t$446.50\nSAMPLE-20\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 20Left chest\t20\t$23.50\t$470.00\nSAMPLE-21\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 21Left chest\t21\t$23.50\t$493.50\nSAMPLE-22\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 22Left chest\t22\t$23.50\t$517.00\nSAMPLE-23\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 23Left chest\t23\t$23.50\t$540.50\nSAMPLE-24\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 24Left chest\t24\t$23.50\t$564.00\nSAMPLE-25\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 25Left chest\t25\t$23.50\t$587.50\nSAMPLE-26\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 26Left chest\t26\t$23.50\t$611.00\nSAMPLE-27\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 27Left chest\t27\t$23.50\t$634.50\nSAMPLE-28\tNavy\tSynthetic detailed garment description, crew workwear with an extended name — XL: 28Left chest\t28\t$23.50\t$658.00\nSubtotal\n$653.00\nSales Tax (10.00%)\n$66.30\nShipping\n$10.00\nTotal\n$729.30\nPayments Received\n-$200.00\nAMOUNT DUE\n$529.30\nPAYMENT INFORMATION\nPayment due Net 30 from invoice date. Pay by check (Northwest Custom Apparel, 2025 Freeman Road East, Milton WA 98354) or ACH/credit card — contact ar@nwcustomapparel.com for routing. Past-due balances accrue 1.5% monthly finance charge.\nThank you for your business · Northwest Custom Apparel · nwcustomapparel.com\nShopWorks WO #740123 · Synced just now",
+  "events": {
+    "errors": [],
+    "writes": [],
+    "unknown": [],
+    "missing": [],
+    "reads": [
+      {
+        "path": "/api/quote-sessions/EMB0910-7401/full",
+        "query": ""
+      }
+    ],
+    "actions": []
+  }
+}
