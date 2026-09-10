@@ -1,5 +1,11 @@
 # CSS unification — design direction and implementation plan
 
+## VERIFIED LIVE — v2026.09.10.7 / Heroku 2100
+
+Four staff tools are live at 1143ffdee13fac81a03dcba969dfb3f97082697a: Calibration, Universal Records Admin, Box Labels and Staff Dashboard. **180/225 pages reviewed; 45 pending.** Exact source 8546e9dd passed all four CI jobs (34525732554), including actual CSS and live pricing. Release main CI34527459945 and develop CI34527648619 also green; their browser job skips are expected. Actual Heroku slug/health and 34 asset/access rollout checks passed. main/develop/tag match. Never rerun completed release helpers or deploy .7 again.
+
+The employee bundle pair is reviewed and backed up at ea622bf4 (12 browser cases,915 guard checks,2 complete paper pages), but not deployed: candidate182/225,43pending. Customer documents are the active next branch codex/customer-documents in the isolated training-final-worktree, starting from that pair. Original source baseline captures24 files/14scripts and all24 source locks passed; no document UI edits yet. Continue original synthetic workflow and complete PDF baselines before edits, then full app gates before the next release. Do not overwrite primary .7 cache-version mappings on integration. node_modules is a junction; never recursively delete it or copy.env. All business writes/allocating reads stay mocked.
+
 ## ACTIVE — four staff tools release candidate v2026.09.10.7
 
 All four reviewed tools are integrated and have passed the complete local sweep: Calibration, Universal Records Admin, Box Labels and Staff Dashboard. Candidate **180/225 pages; 45 pending**. Live remains .4 / Heroku2099 /031e03aa,176/225 until exact-source CI and verified rollout.
