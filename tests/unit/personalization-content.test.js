@@ -5,7 +5,13 @@ const root = path.resolve(__dirname, '../..'), norm = s => s.replace(/\s+/g, ' '
 const hash = s => crypto.createHash('sha256').update(s).digest('hex');
 
 test.each(original.pages)('$file retains original labels, names, destinations and field values', record => {
-    const d = new JSDOM(fs.readFileSync(path.join(root, record.file), 'utf8')).window.document;
+    let html = fs.readFileSync(path.join(root, record.file), 'utf8');
+    // Reverse the explicitly recorded proof-encoding repair before comparing original content.
+    for (const change of original.changes.filter(c => c.file === record.file).reverse()) {
+        expect(html.split(change.after).length - 1).toBe(change.count);
+        html = html.split(change.after).join(change.before);
+    }
+    const d = new JSDOM(html).window.document;
     d.querySelectorAll('.skip-link').forEach(n => n.remove());
     expect(d.title).toBe(record.title); expect(hash(norm(d.body.textContent))).toBe(record.bodyTextSha);
     expect([...d.querySelectorAll('[id]')].map(n => n.id).filter(id => id !== 'personalization-main').sort()).toEqual([...record.ids].sort());
@@ -14,6 +20,13 @@ test.each(original.pages)('$file retains original labels, names, destinations an
 });
 
 test.each(Object.keys(original.hashes).filter(f => !f.endsWith('.html')))('%s preserves service, QA and controller logic outside recorded UI edits', file => {
+    const retired = original.retiredStyles.find(r => r.file === file);
+    if (retired) {
+        expect(hash(retired.css)).toBe(original.hashes[file]);
+        expect(retired.sha256).toBe(original.hashes[file]);
+        expect(fs.existsSync(path.join(root, file))).toBe(false);
+        return;
+    }
     let s = fs.readFileSync(path.join(root, file), 'utf8').replace(/\r\n/g, '\n');
     for (const change of original.changes.filter(c => c.file === file).reverse()) {
         expect(change.after).not.toBe(''); expect(s.split(change.after).length - 1).toBe(change.count);
