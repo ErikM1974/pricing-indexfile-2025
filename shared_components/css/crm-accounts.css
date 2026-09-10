@@ -1,0 +1,2205 @@
+/* Account workspaces: canonical primitives plus shared account, detail and reconciliation layouts. */
+@layer components.pages {
+    :where([data-ui="unified"][data-crm-workspace]) {
+        --ui-accent: var(--gray-800);
+        --ui-accent-hover: var(--gray-900);
+        --ui-tint: var(--slate-100);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .dash-header {
+        padding: var(--space-4) max(var(--space-4), calc((100% - 1400px) / 2));
+        background: var(--gray-900);
+        color: var(--color-on-brand);
+        border-top-color: var(--amber-500);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .dash-header :is(h1, a) {
+        color: inherit;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .dash-header .btn {
+        background: var(--ui-surface);
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .dash-header .dash-back-link {
+        border-color: var(--slate-600);
+        background: transparent;
+        color: var(--color-on-brand);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .dash-header-logo {
+        filter: brightness(0) invert(1);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .dash-content {
+        max-width: 1440px;
+        margin: 0 auto;
+        padding: var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .dash-card {
+        margin-bottom: var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) :is(.table-wrap, .ld-board) {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .data-table {
+        table-layout: auto;
+        font-variant-numeric: tabular-nums;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .data-table :is(th, td) {
+        white-space: nowrap;
+        overflow-wrap: normal;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .data-table th {
+        background: var(--gray-50);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .data-table tbody tr:hover {
+        background: var(--ui-tint);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .data-table a {
+        text-decoration: underline;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) :is(.modal-overlay, .ld-overlay) {
+        position: fixed;
+        inset: 0;
+        background: rgb(0 0 0 / 45%);
+        z-index: 80;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .modal-overlay {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .modal-overlay.active {
+        display: flex;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) :is(.modal-header, .modal-footer) {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: var(--space-3);
+        padding: var(--space-4) var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .modal-header {
+        border-bottom: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .modal-header h2 {
+        margin: 0;
+        font-size: var(--font-size-xl);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .modal-footer {
+        border-top: 1px solid var(--ui-line);
+        justify-content: flex-end;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace])
+        :is(.modal-body, .reconcile-modal-body, .gap-report-modal-body, .account-detail-modal-body) {
+        min-height: 0;
+        overflow: auto;
+        padding: var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace])
+        :is(
+            .confirm-modal,
+            .modal-content,
+            .reconcile-modal,
+            .gap-report-modal,
+            .account-detail-modal,
+            .crm-modal
+        ) {
+        display: flex;
+        flex-direction: column;
+        width: min(100%, 1000px);
+        max-height: calc(100dvh - 32px);
+        background: var(--ui-surface);
+        color: var(--ui-ink);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace])
+        :is(.confirm-modal, .modal-content--narrow, .assign-modal-content) {
+        max-width: 520px;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .modal-subtitle {
+        margin: var(--space-2) 0 0;
+        font-size: var(--font-size-md);
+        color: var(--ui-muted);
+    }
+
+    @media (width <= 640px) {
+        :where([data-ui="unified"][data-crm-workspace]) .dash-content {
+            padding: var(--space-4);
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) .dash-header {
+            padding: var(--space-4);
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) .dash-header-left {
+            flex: 1 1 100%;
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) .dash-header-title {
+            font-size: var(--font-size-xl);
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) .dash-header-right {
+            width: 100%;
+            gap: var(--space-2);
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) .dash-header-right .btn {
+            flex: 1 1 auto;
+        }
+
+        :where([data-ui="unified"][data-crm-workspace])
+            :is(
+                .dash-card,
+                .modal-body,
+                .reconcile-modal-body,
+                .gap-report-modal-body,
+                .account-detail-modal-body
+            ) {
+            padding: var(--space-4);
+        }
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .crm-page,
+    :where([data-ui="unified"][data-crm-workspace]) .house-page {
+        min-height: 100vh;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .header-stats {
+        display: flex;
+        gap: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .header-stat {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-width: 64px;
+        min-height: 44px;
+        border: 1px solid var(--slate-600);
+        border-radius: var(--radius-sm);
+        color: inherit;
+        background: transparent;
+        font: inherit;
+        cursor: pointer;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .header-stat-value {
+        font-size: var(--font-size-lg);
+        font-weight: 700;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .header-stat-label {
+        font-size: var(--font-size-sm);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .header-stat[aria-pressed="true"] {
+        background: var(--gray-700);
+        border-color: var(--amber-400);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .header-stat.at-risk .header-stat-value {
+        color: var(--amber-300);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .user-welcome {
+        display: flex;
+        gap: var(--space-2);
+        font-size: var(--font-size-md);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .crm-layout,
+    :where([data-ui="unified"][data-crm-workspace]) .crm-layout--single {
+        display: block;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .stats-grid,
+    :where([data-ui="unified"][data-crm-workspace]) .tier-breakdown-grid {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: var(--space-3);
+        margin-bottom: var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .tier-breakdown-grid {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        margin-bottom: 0;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .stat-card,
+    :where([data-ui="unified"][data-crm-workspace]) .tier-card {
+        font: inherit;
+        color: inherit;
+        width: 100%;
+        display: block;
+        text-align: left;
+        padding: var(--space-4);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-card);
+        background: var(--ui-surface);
+        cursor: pointer;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .stat-card > span,
+    :where([data-ui="unified"][data-crm-workspace]) .tier-card > span {
+        display: block;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .stat-card:hover,
+    :where([data-ui="unified"][data-crm-workspace]) .tier-card:hover {
+        border-color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .stat-card[aria-pressed="true"],
+    :where([data-ui="unified"][data-crm-workspace]) .tier-card[aria-pressed="true"] {
+        background: var(--ui-tint);
+        outline: 2px solid var(--ui-accent);
+        outline-offset: -2px;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .stat-card.total {
+        border-top: 3px solid var(--amber-500);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .stat-value,
+    :where([data-ui="unified"][data-crm-workspace]) .tier-revenue {
+        font: 600 clamp(1.25rem, 1.9vw, 1.8rem)/1.35 var(--font-mono);
+        font-variant-numeric: tabular-nums;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .stat-label,
+    :where([data-ui="unified"][data-crm-workspace]) .tier-name,
+    :where([data-ui="unified"][data-crm-workspace]) .tier-count,
+    :where([data-ui="unified"][data-crm-workspace]) .total-label {
+        font-size: var(--font-size-sm);
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .tier-name {
+        font-weight: 700;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .stat-label,
+    :where([data-ui="unified"][data-crm-workspace]) .tier-count {
+        margin-top: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .tier-revenue {
+        margin-top: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .tier-card.gold {
+        border-top: 3px solid var(--amber-500);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .tier-card.silver {
+        border-top: 3px solid var(--gray-400);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .tier-card.bronze {
+        border-top: 3px solid var(--amber-800);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .tier-card.win-back {
+        border-top: 3px solid var(--brand-600);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .sales-breakdown-section,
+    :where([data-ui="unified"][data-crm-workspace]) .filters-section,
+    :where([data-ui="unified"][data-crm-workspace]) .accounts-section {
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-card);
+        background: var(--ui-surface);
+        margin-bottom: var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .sales-breakdown-section {
+        padding: var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .section-title {
+        margin: 0 0 var(--space-3);
+        font-size: var(--font-size-lg);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .sales-total {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-3);
+        margin-block: var(--space-3);
+        padding: var(--space-4);
+        background: var(--ui-tint);
+        border-radius: var(--radius-sm);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .total-value {
+        font: 600 clamp(1.5rem, 3vw, 2rem)/1.3 var(--font-mono);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .bonus-line {
+        display: flex;
+        justify-content: space-between;
+        gap: var(--space-2);
+        margin-top: var(--space-2);
+        font-size: var(--font-size-sm);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .bonus-value {
+        font-weight: 700;
+        color: var(--brand-700);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .crm-archive-hint,
+    :where([data-ui="unified"][data-crm-workspace]) .crm-recon-line,
+    :where([data-ui="unified"][data-crm-workspace]) .house-data-subline,
+    :where([data-ui="unified"][data-crm-workspace]) .sync-status {
+        color: var(--ui-muted);
+        font-size: var(--font-size-sm);
+        margin: var(--space-3) 0;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .crm-archive-hint.is-warning,
+    :where([data-ui="unified"][data-crm-workspace]) .sync-status.error {
+        color: var(--color-warning-ink);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .crm-recon-line {
+        text-align: right;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .filters-section {
+        display: flex;
+        align-items: flex-end;
+        gap: var(--space-3);
+        flex-wrap: wrap;
+        padding: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .filter-group {
+        display: flex;
+        flex: 1 1 130px;
+        min-width: 0;
+        flex-direction: column;
+        gap: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .filter-group.search-group {
+        flex: 2 1 230px;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .filter-group label,
+    :where([data-ui="unified"][data-crm-workspace]) .form-group label {
+        font-size: var(--font-size-sm);
+        font-weight: 600;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .product-toggles {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .product-toggle {
+        min-height: 44px;
+        padding: var(--space-2) var(--space-3);
+        font: inherit;
+        border: 1px solid var(--ui-line-strong);
+        border-radius: var(--radius-sm);
+        background: var(--ui-surface);
+        color: inherit;
+        cursor: pointer;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .product-toggle[aria-pressed="true"] {
+        background: var(--ui-tint);
+        border-color: var(--ui-accent);
+        box-shadow: inset 0 0 0 1px var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .accounts-section {
+        position: relative;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .accounts-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: var(--space-3);
+        padding: var(--space-4);
+        border-bottom: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .accounts-header h2 {
+        margin: 0;
+        font-size: var(--font-size-lg);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .accounts-meta,
+    :where([data-ui="unified"][data-crm-workspace]) .sync-controls,
+    :where([data-ui="unified"][data-crm-workspace]) .modal-header-actions {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .accounts-count {
+        color: var(--ui-muted);
+        font-size: var(--font-size-md);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .accounts-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: var(--space-4);
+        padding: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .account-card {
+        position: relative;
+        min-width: 0;
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-card);
+        background: var(--ui-surface);
+        overflow: hidden;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .account-card[role="button"] {
+        cursor: pointer;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .account-card:hover {
+        border-color: var(--ui-line-strong);
+        box-shadow: var(--shadow-sm);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .account-card-content {
+        padding: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .card-header {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-2);
+        margin-bottom: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .company-name {
+        font-size: var(--font-size-lg);
+        font-weight: 600;
+        overflow-wrap: anywhere;
+        margin: 0 0 var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .card-badges,
+    :where([data-ui="unified"][data-crm-workspace]) .account-detail-badges {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .tier-badge,
+    :where([data-ui="unified"][data-crm-workspace]) .status-badge,
+    :where([data-ui="unified"][data-crm-workspace]) .health-score,
+    :where([data-ui="unified"][data-crm-workspace]) .trend-badge,
+    :where([data-ui="unified"][data-crm-workspace]) .current-assignee {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-1);
+        padding: var(--space-1) var(--space-2);
+        border-radius: var(--radius-sm);
+        font-size: var(--font-size-sm);
+        font-weight: 600;
+        color: var(--ui-muted);
+        background: var(--ui-tint);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .tier-badge.gold,
+    :where([data-ui="unified"][data-crm-workspace]) .tier-badge.bronze,
+    :where([data-ui="unified"][data-crm-workspace]) .status-badge.overdue,
+    :where([data-ui="unified"][data-crm-workspace]) .health-score.warning {
+        color: var(--color-warning-ink);
+        background: var(--color-warning-bg);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .tier-badge.win-back,
+    :where([data-ui="unified"][data-crm-workspace]) .health-score.good,
+    :where([data-ui="unified"][data-crm-workspace]) .trend-badge.growing {
+        color: var(--brand-700);
+        background: var(--color-success-bg);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .status-badge.at-risk,
+    :where([data-ui="unified"][data-crm-workspace]) .health-score.danger,
+    :where([data-ui="unified"][data-crm-workspace]) .trend-badge.declining {
+        color: var(--color-danger-ink);
+        background: var(--color-danger-bg);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .priority-bar {
+        height: 3px;
+        background: var(--gray-400);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .priority-bar.priority-a {
+        background: var(--color-danger);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .priority-bar.priority-b {
+        background: var(--amber-500);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .priority-bar.priority-c {
+        background: var(--amber-700);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .contact-info,
+    :where([data-ui="unified"][data-crm-workspace]) .account-meta {
+        color: var(--ui-muted);
+        font-size: var(--font-size-md);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .contact-links,
+    :where([data-ui="unified"][data-crm-workspace]) .account-details {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-3);
+        margin-top: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .contact-links a {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-1);
+        min-height: 32px;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .account-details {
+        border-top: 1px solid var(--ui-line);
+        padding-top: var(--space-3);
+        font-size: var(--font-size-sm);
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .account-meta {
+        margin-block: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .detail-item {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-1);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .account-notes {
+        font-size: var(--font-size-md);
+        line-height: 1.6;
+        padding: var(--space-3);
+        background: var(--gray-50);
+        border-radius: var(--radius-sm);
+        margin-top: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .account-notes-label {
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .ytd-sales-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+        border-top: 1px solid var(--ui-line);
+        padding-top: var(--space-3);
+        margin-top: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .ytd-sales {
+        color: var(--brand-700);
+        font-size: var(--font-size-md);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .order-count {
+        color: var(--ui-muted);
+        font-size: var(--font-size-sm);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .assign-buttons {
+        display: flex;
+        gap: var(--space-2);
+        padding: var(--space-3) var(--space-4);
+        border-top: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .assign-buttons .btn {
+        flex: 1;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .error-banner {
+        display: none;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: var(--space-3);
+        padding: var(--space-4);
+        margin-bottom: var(--space-4);
+        border: 1px solid var(--color-danger);
+        border-radius: var(--radius-card);
+        background: var(--color-danger-bg);
+        color: var(--color-danger-ink);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .error-banner.show {
+        display: flex;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .error-banner-message {
+        flex: 1 1 200px;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .loading-spinner {
+        display: inline-block;
+        width: 24px;
+        height: 24px;
+        border: 3px solid var(--ui-line);
+        border-top-color: var(--ui-accent);
+        border-radius: var(--radius-pill);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .loading-overlay {
+        display: none;
+        position: absolute;
+        inset: 0;
+        align-items: center;
+        justify-content: center;
+        background: var(--ui-surface);
+        z-index: 5;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .loading-overlay.show {
+        display: flex;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .empty-state,
+    :where([data-ui="unified"][data-crm-workspace]) .reconcile-loading,
+    :where([data-ui="unified"][data-crm-workspace]) .reconcile-empty,
+    :where([data-ui="unified"][data-crm-workspace]) .gap-report-loading,
+    :where([data-ui="unified"][data-crm-workspace]) .gap-report-empty {
+        text-align: center;
+        padding: var(--space-6);
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .empty-state i,
+    :where([data-ui="unified"][data-crm-workspace]) .reconcile-empty i,
+    :where([data-ui="unified"][data-crm-workspace]) .gap-report-empty i {
+        font-size: var(--font-size-2xl);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .celebration-toast {
+        position: fixed;
+        right: var(--space-4);
+        bottom: var(--space-4);
+        max-width: calc(100% - 32px);
+        padding: var(--space-4);
+        border-radius: var(--radius-card);
+        background: var(--brand-700);
+        color: var(--color-on-brand);
+        opacity: 0;
+        pointer-events: none;
+        z-index: 100;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .celebration-toast.show {
+        opacity: 1;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+    }
+
+    @media (width <= 1100px) {
+        :where([data-ui="unified"][data-crm-workspace]) .stats-grid {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) .accounts-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (width <= 760px) {
+        :where([data-ui="unified"][data-crm-workspace]) .tier-breakdown-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) .tier-card:last-child {
+            grid-column: 1/-1;
+        }
+    }
+
+    @media (width <= 640px) {
+        :where([data-ui="unified"][data-crm-workspace]) .accounts-grid {
+            grid-template-columns: 1fr;
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) .stats-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) .stat-card.total {
+            grid-column: 1/-1;
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) .sales-breakdown-section {
+            padding: var(--space-4);
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) .filters-section {
+            align-items: stretch;
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) .filter-group {
+            flex-basis: calc(50% - 12px);
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) .filter-group.search-group {
+            flex-basis: 100%;
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) .sync-controls {
+            width: 100%;
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) .sync-controls .btn {
+            flex: 1;
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) .accounts-meta {
+            width: 100%;
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) .assign-buttons {
+            flex-wrap: wrap;
+        }
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .reconcile-summary {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .reconcile-summary-stat {
+        flex: 1;
+        padding: 1rem;
+        background: var(--gray-50);
+        border-radius: var(--radius-sm);
+        text-align: center;
+        border: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .reconcile-summary-stat .stat-value {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .reconcile-summary-stat .stat-label {
+        font-size: var(--font-size-sm);
+        color: var(--ui-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .reconcile-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.875rem;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .reconcile-table thead {
+        background: var(--gray-50);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .reconcile-table th {
+        padding: 0.75rem 1rem;
+        text-align: left;
+        font-weight: 600;
+        color: var(--ui-muted);
+        border-bottom: 1px solid var(--ui-line);
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .reconcile-table td {
+        padding: 0.75rem 1rem;
+        color: var(--ui-ink);
+        border-bottom: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .reconcile-table tbody tr:hover {
+        background: rgb(59 130 246 / 10%);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .reconcile-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .reconcile-table .company-name {
+        font-weight: 500;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .reconcile-table .unknown-company {
+        color: var(--color-warning-ink);
+        font-style: italic;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .reconcile-table .rep-name {
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .reconcile-table .order-count,
+    :where([data-ui="unified"][data-crm-workspace]) .reconcile-table .sales-amount {
+        text-align: right;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .reconcile-table .sales-amount {
+        color: var(--brand-700);
+        font-weight: 500;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .reconcile-table .last-order {
+        color: var(--ui-muted);
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .sw-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: var(--radius-sm);
+        font-size: 0.8125rem;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .sw-status i {
+        font-size: var(--font-size-sm);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .sw-match {
+        background: rgb(16 185 129 / 15%);
+        color: var(--brand-700);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .sw-mismatch {
+        background: rgb(245 158 11 / 15%);
+        color: var(--amber-400);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .sw-not-found {
+        background: rgb(239 68 68 / 15%);
+        color: var(--color-danger-ink);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .reconcile-table .tier-name {
+        color: var(--ui-muted);
+        font-size: 0.8125rem;
+        max-width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .reconcile-table .customer-id {
+        font-size: var(--font-size-sm);
+        color: var(--ui-muted);
+        margin-top: 0.125rem;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .reconcile-table .expand-col {
+        width: 30px;
+        text-align: center;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .reconcile-table .expand-toggle {
+        cursor: pointer;
+        color: var(--ui-muted);
+        transition: color 0.2s ease;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .reconcile-table .customer-row {
+        cursor: pointer;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .reconcile-table .customer-row:hover {
+        background: rgb(255 255 255 / 2%);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .reconcile-table .customer-row:hover .expand-toggle {
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .order-details-row {
+        background: var(--gray-50);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .order-details-row td {
+        padding: 0;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .order-list {
+        padding: 12px 20px 12px 50px;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .order-list-header {
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: var(--ui-muted);
+        font-size: 0.8rem;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .order-item {
+        display: flex;
+        gap: 20px;
+        padding: 6px 0;
+        border-bottom: 1px solid var(--ui-line);
+        font-size: 0.85rem;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .order-item:last-child {
+        border-bottom: none;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .order-number {
+        font-family: monospace;
+        font-weight: 600;
+        color: var(--ui-accent);
+        min-width: 80px;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .order-amount {
+        color: var(--brand-700);
+        min-width: 80px;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .order-date {
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .order-rep {
+        color: var(--ui-muted);
+        font-size: 0.8rem;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .assign-customer-info {
+        background: var(--gray-50);
+        padding: 1rem;
+        border-radius: var(--radius-sm);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .assign-customer-info .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.375rem 0;
+        border-bottom: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .assign-customer-info .info-row:last-child {
+        border-bottom: none;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .assign-customer-info .info-label {
+        color: var(--ui-muted);
+        font-size: 0.875rem;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .assign-customer-info .info-value {
+        color: var(--ui-ink);
+        font-weight: 500;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .assign-rep-buttons {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .tier-select-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .tier-select-group label {
+        color: var(--ui-muted);
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .sync-checkbox-group input[type="checkbox"] {
+        width: 1.125rem;
+        height: 1.125rem;
+        accent-color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .sync-checkbox-group label {
+        color: var(--ui-muted);
+        font-size: 0.875rem;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-report-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: rgb(59 130 246 / 20%);
+        color: var(--color-info-ink);
+        border: 1px solid rgb(59 130 246 / 30%);
+        border-radius: var(--radius-sm);
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-report-btn:hover {
+        background: rgb(59 130 246 / 30%);
+        border-color: rgb(59 130 246 / 50%);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .sync-status-item {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .sync-status-item .rep-name {
+        color: var(--ui-muted);
+        font-weight: 500;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .sync-status-item .sync-time {
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .sync-status-item .status-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 18px;
+        height: 18px;
+        border-radius: var(--radius-pill);
+        font-size: 10px;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .sync-status-item .status-badge.fresh {
+        background: rgb(34 197 94 / 20%);
+        color: var(--green-500);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .sync-status-item .status-badge.stale {
+        background: rgb(251 191 36 / 20%);
+        color: var(--amber-400);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .sync-status-item .status-badge.critical {
+        background: rgb(239 68 68 / 20%);
+        color: var(--red-500);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-report-modal {
+        background: var(--ui-surface);
+        border-radius: var(--radius-sm);
+        width: 100%;
+        max-width: 1200px;
+        max-height: 85vh;
+        display: flex;
+        flex-direction: column;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-report-modal .modal-header .modal-title h2 i {
+        color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-report-modal-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1.5rem;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-report-loading {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem;
+        gap: 1rem;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-report-summary {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-stat {
+        flex: 1;
+        padding: 1rem;
+        background: var(--gray-50);
+        border-radius: var(--radius-sm);
+        text-align: center;
+        border: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-stat-value {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-stat-label {
+        font-size: var(--font-size-sm);
+        color: var(--ui-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-report-empty {
+        text-align: center;
+        padding: 3rem;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-report-empty i {
+        font-size: 3rem;
+        color: var(--brand-700);
+        margin-bottom: 1rem;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-report-empty h3 {
+        margin: 0 0 0.5rem;
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-report-empty p {
+        margin: 0;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-rep-section {
+        margin-bottom: 1rem;
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+        overflow: hidden;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-rep-header:hover {
+        background: rgb(59 130 246 / 10%);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-rep-info {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-rep-avatar {
+        width: 36px;
+        height: 36px;
+        background: var(--ui-accent);
+        color: var(--color-on-brand);
+        border-radius: var(--radius-pill);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-rep-name {
+        font-weight: 600;
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-rep-stats {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-conflict-count {
+        font-weight: 500;
+        color: var(--color-warning-ink);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-conflict-amount {
+        font-weight: 600;
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-rep-conflicts {
+        padding: 1rem;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-conflict-group {
+        margin-bottom: 1.5rem;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-conflict-group:last-child {
+        margin-bottom: 0;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-group-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 0.75rem;
+        border-radius: var(--radius-sm);
+        margin-bottom: 0.75rem;
+        font-weight: 500;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-group-header.outbound {
+        background: rgb(245 158 11 / 10%);
+        color: var(--color-warning-ink);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-group-header.inbound {
+        background: rgb(59 130 246 / 10%);
+        color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-group-hint {
+        font-size: var(--font-size-sm);
+        font-weight: 400;
+        color: var(--ui-muted);
+        margin-left: auto;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-conflicts-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.8125rem;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-conflicts-table th {
+        padding: 0.5rem 0.75rem;
+        text-align: left;
+        font-weight: 600;
+        color: var(--ui-muted);
+        font-size: var(--font-size-sm);
+        text-transform: uppercase;
+        border-bottom: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-conflicts-table td {
+        padding: 0.75rem;
+        color: var(--ui-ink);
+        border-bottom: 1px solid var(--ui-line);
+        vertical-align: top;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-conflict-row {
+        cursor: pointer;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-conflict-row:hover {
+        background: rgb(255 255 255 / 2%);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-company {
+        font-weight: 500;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-customer-id {
+        font-size: var(--font-size-sm);
+        color: var(--ui-muted);
+        margin-top: 2px;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-owner,
+    :where([data-ui="unified"][data-crm-workspace]) .gap-writers {
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-amount {
+        font-weight: 600;
+        color: var(--brand-700);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-fix {
+        font-size: var(--font-size-sm);
+        color: var(--ui-muted);
+        line-height: 1.4;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-fix em {
+        color: var(--ui-muted);
+        font-style: normal;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-orders-row {
+        background: var(--gray-50);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-orders-row td {
+        padding: 0;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-order-list {
+        padding: 12px 20px 12px 50px;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-order-list-header {
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: var(--ui-muted);
+        font-size: var(--font-size-sm);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-order-item {
+        display: flex;
+        gap: 16px;
+        padding: 6px 0;
+        border-bottom: 1px solid var(--ui-line);
+        font-size: 0.8rem;
+        align-items: center;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-order-item:last-child {
+        border-bottom: none;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-order-number {
+        font-family: monospace;
+        font-weight: 600;
+        color: var(--ui-accent);
+        min-width: 70px;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-order-amount {
+        color: var(--brand-700);
+        min-width: 70px;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-order-date {
+        color: var(--ui-muted);
+        min-width: 90px;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-order-writer {
+        color: var(--ui-muted);
+        font-size: var(--font-size-sm);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-report-footer {
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--ui-line);
+        font-size: 0.8rem;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-report-footer i {
+        margin-right: 0.5rem;
+        color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-conflicts-table .expand-col {
+        width: 30px;
+        text-align: center;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-conflicts-table .expand-toggle {
+        cursor: pointer;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-conflicts-table .expand-toggle:hover {
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .sw-todo-count {
+        display: inline-block;
+        min-width: 18px;
+        padding: 0 5px;
+        margin-left: 4px;
+        border-radius: var(--radius-sm);
+        background: var(--color-warning-ink);
+        color: var(--gray-800);
+        font-size: 11px;
+        font-weight: 700;
+        text-align: center;
+        line-height: 18px;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .sw-todo-section {
+        color: var(--ui-ink);
+        font-size: 14px;
+        margin: 18px 0 8px;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .sw-todo-section--warn {
+        color: var(--color-warning-ink);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .sw-todo-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .sw-todo-table th {
+        text-align: left;
+        color: var(--ui-muted);
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 6px 10px;
+        border-bottom: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .sw-todo-table td {
+        padding: 8px 10px;
+        border-bottom: 1px solid var(--ui-line);
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .sw-todo-table td strong {
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .sw-todo-dismiss {
+        font-size: 11px;
+        padding: 4px 10px;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .account-detail-section:last-child {
+        margin-bottom: 0;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .account-detail-section-title {
+        font-size: var(--font-size-sm);
+        font-weight: 600;
+        color: var(--ui-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin: 0 0 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .account-detail-section-title i {
+        color: var(--ui-accent);
+        font-size: 0.875rem;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .health-gauge {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .health-gauge-bar {
+        flex: 1;
+        height: 8px;
+        background: var(--ui-line);
+        border-radius: var(--radius-sm);
+        overflow: hidden;
+        max-width: 150px;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .health-gauge-fill.good {
+        background: var(--brand-700);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .health-gauge-fill.warning {
+        background: var(--color-warning-ink);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .health-gauge-fill.danger {
+        background: var(--color-danger-ink);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .health-gauge-value {
+        font-weight: 700;
+        font-size: 1.125rem;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .health-gauge-value.good {
+        color: var(--brand-700);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .health-gauge-value.warning {
+        color: var(--color-warning-ink);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .health-gauge-value.danger {
+        color: var(--color-danger-ink);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .contact-detail-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .contact-detail-item i {
+        color: var(--ui-muted);
+        width: 18px;
+        flex-shrink: 0;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .contact-detail-item a:hover {
+        text-decoration: underline;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .data-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.75rem;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .data-grid-item {
+        text-align: center;
+        padding: 0.75rem;
+        background: var(--ui-surface);
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .data-grid-value {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: var(--ui-ink);
+        margin-bottom: 0.25rem;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .data-grid-value.positive {
+        color: var(--brand-700);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .data-grid-value.negative {
+        color: var(--color-danger-ink);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .data-grid-value.currency {
+        color: var(--brand-700);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .data-grid-label {
+        font-size: var(--font-size-sm);
+        color: var(--ui-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .yoy-comparison {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .yoy-card {
+        background: var(--ui-surface);
+        border-radius: var(--radius-sm);
+        padding: 1rem;
+        border: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .yoy-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .yoy-card-year {
+        font-size: var(--font-size-sm);
+        font-weight: 600;
+        color: var(--ui-muted);
+        text-transform: uppercase;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .yoy-card-growth {
+        font-size: var(--font-size-sm);
+        font-weight: 600;
+        padding: 0.125rem 0.5rem;
+        border-radius: var(--radius-sm);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .yoy-card-growth.positive {
+        background: var(--color-success-bg);
+        color: var(--brand-700);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .yoy-card-growth.negative {
+        background: var(--color-danger-bg);
+        color: var(--color-danger-ink);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .yoy-card-values {
+        display: flex;
+        gap: 1rem;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .yoy-stat {
+        flex: 1;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .yoy-stat-value {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .yoy-stat-label {
+        font-size: var(--font-size-sm);
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .top-products-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .top-product-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.5rem 0.75rem;
+        background: var(--ui-surface);
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .top-product-rank {
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--ui-accent);
+        color: var(--color-on-brand);
+        border-radius: var(--radius-pill);
+        font-size: var(--font-size-sm);
+        font-weight: 700;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .top-product-name {
+        flex: 1;
+        font-size: 0.9375rem;
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .checkmark-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 0.5rem;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .checkmark-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 0.75rem;
+        background: var(--ui-surface);
+        border-radius: var(--radius-sm);
+        font-size: 0.8125rem;
+        color: var(--ui-muted);
+        border: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .checkmark-item.active {
+        background: var(--color-success-bg);
+        color: var(--brand-700);
+        border-color: rgb(16 185 129 / 30%);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .checkmark-item i {
+        font-size: 0.875rem;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .checkmark-item.active i {
+        color: var(--brand-700);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .month-box {
+        aspect-ratio: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--ui-surface);
+        border-radius: var(--radius-sm);
+        font-size: var(--font-size-sm);
+        font-weight: 600;
+        color: var(--ui-muted);
+        border: 1px solid var(--ui-line);
+        text-transform: uppercase;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .month-box.active {
+        background: var(--color-success-bg);
+        color: var(--brand-700);
+        border-color: rgb(16 185 129 / 30%);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .month-box.primary {
+        background: var(--color-warning-bg);
+        color: var(--color-warning-ink);
+        border-color: var(--amber-500);
+        box-shadow: var(--shadow-sm);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .notes-content {
+        font-size: 0.9375rem;
+        color: var(--ui-muted);
+        line-height: 1.6;
+        white-space: pre-wrap;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .follow-up-info {
+        display: flex;
+        gap: 1rem;
+        margin-top: 0.75rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .follow-up-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .follow-up-item i {
+        color: var(--color-warning-ink);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .follow-up-item.won-back i {
+        color: var(--brand-700);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .section-empty {
+        color: var(--ui-muted);
+        font-size: 0.875rem;
+        font-style: italic;
+        text-align: center;
+        padding: 1rem 0;
+    }
+
+    @media (width <= 768px) {
+        :where([data-ui="unified"][data-crm-workspace]) .contact-detail-grid {
+            grid-template-columns: 1fr;
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) .data-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) .yoy-comparison {
+            grid-template-columns: 1fr;
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) .checkmark-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) .monthly-activity-grid {
+            grid-template-columns: repeat(6, 1fr);
+        }
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .order-type-primary {
+        margin: 0 0 0.75rem;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .health-gauge-fill {
+        height: 100%;
+        border-radius: var(--radius-sm);
+        transition: width 0.3s ease;
+        width: var(--fill, 0%);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .data-grid,
+    :where([data-ui="unified"][data-crm-workspace]) .contact-detail-grid,
+    :where([data-ui="unified"][data-crm-workspace]) .yoy-comparison,
+    :where([data-ui="unified"][data-crm-workspace]) .checkmark-grid {
+        grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .contact-detail-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9375rem;
+        color: var(--ui-muted);
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .contact-detail-item a {
+        color: var(--ui-accent);
+        text-decoration: none;
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .monthly-activity-grid {
+        display: grid;
+        gap: 0.375rem;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .account-detail-section {
+        background: var(--gray-50);
+        padding: 1rem 1.25rem;
+        margin-bottom: 1rem;
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-card);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .reconcile-table-wrapper {
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+        overflow: auto;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .gap-rep-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background: var(--gray-50);
+        cursor: pointer;
+        transition: background 0.2s;
+        width: 100%;
+        font: inherit;
+        color: inherit;
+        text-align: left;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .sync-checkbox-group {
+        padding: 0.75rem;
+        background: rgb(59 130 246 / 10%);
+        border-radius: var(--radius-sm);
+        display: flex;
+        align-items: flex-start;
+        gap: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .sync-checkbox-group input {
+        width: 20px;
+        height: 20px;
+        flex: none;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .btn-assign-rep.selected {
+        background: var(--ui-tint);
+        border-color: var(--ui-accent);
+    }
+
+    @media (width <= 640px) {
+        :where([data-ui="unified"][data-crm-workspace]) .monthly-activity-grid {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) .gap-rep-header,
+        :where([data-ui="unified"][data-crm-workspace]) .gap-rep-info,
+        :where([data-ui="unified"][data-crm-workspace]) .gap-rep-stats {
+            flex-wrap: wrap;
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) .gap-order-item,
+        :where([data-ui="unified"][data-crm-workspace]) .order-item {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-2);
+        }
+    }
+
+    @media print {
+        /* Printed CRM identity and compact account records. */
+        :where([data-ui="unified"][data-crm-workspace]) .dash-header h1 {
+            font-size: 18px;
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) .dash-header-right {
+            color: var(--ui-ink);
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) .header-stat {
+            color: var(--ui-ink);
+            border: 1px solid var(--ui-line);
+            padding: 4px 8px;
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) .header-stat.at-risk {
+            color: var(--color-danger-ink);
+            background: var(--color-danger-bg);
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) .header-stat-value {
+            font-size: 16px;
+        }
+
+        :where([data-ui="unified"][data-crm-workspace])
+            :is(.header-stat-label, .account-card, .tier-card, .stat-card) {
+            font-size: 11px;
+        }
+
+        :where([data-ui="unified"][data-crm-workspace])
+            :is(
+                .accounts-header,
+                .account-card-content,
+                .account-main,
+                .account-footer,
+                .account-sales,
+                .tier-card,
+                .stat-card,
+                .sales-total
+            ) {
+            padding: 8px;
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) .account-open {
+            font-size: 12px;
+            min-height: 0;
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) .account-card h3 {
+            font-size: 12px;
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) .tier-card {
+            min-height: 0;
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) .accounts-section {
+            break-inside: auto;
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) {
+            background: var(--color-surface);
+            font-size: 11px;
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) .dash-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            background: var(--color-surface);
+            color: var(--ui-ink);
+            border: 0;
+            padding: 0 0 12px;
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) .dash-header-logo {
+            height: 28px;
+            filter: none;
+        }
+
+        :where([data-ui="unified"][data-crm-workspace])
+            :is(
+                .dash-header-right > a,
+                .dash-header-right > .user-welcome,
+                .skip-link,
+                .filters-section,
+                .ld-toolbar,
+                .ld-view-toggle,
+                .sc-controls-card,
+                .sc-rep-filter,
+                .uq-tabs,
+                .uq-input,
+                .assign-buttons,
+                .sync-controls,
+                .accounts-meta .btn,
+                .modal-overlay,
+                .ld-overlay,
+                .ld-drawer,
+                .ld-modal,
+                .celebration-toast,
+                .error-banner,
+                .dash-error-banner
+            ) {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) .dash-content {
+            width: 100%;
+            max-width: none;
+            padding: 0;
+        }
+
+        :where([data-ui="unified"][data-crm-workspace])
+            :is(.dash-card, .accounts-section, .sales-breakdown-section) {
+            padding: 10px;
+            margin: 10px 0;
+            box-shadow: none;
+        }
+
+        :where([data-ui="unified"][data-crm-workspace])
+            :is(.table-wrap, .ld-table-scroll, .sc-table-scroll, .uq-table-scroll) {
+            overflow: visible;
+            max-height: none;
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) .data-table {
+            min-width: 0;
+            width: 100%;
+            font-size: 10px;
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) .data-table :is(th, td) {
+            padding: 6px;
+            white-space: normal;
+            overflow-wrap: anywhere;
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) .data-table thead {
+            display: table-header-group;
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) .data-table tr {
+            break-inside: avoid;
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) .accounts-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            padding: 8px;
+            gap: 10px;
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) .account-card {
+            break-inside: avoid;
+            box-shadow: none;
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) .ld-board {
+            display: block;
+            overflow: visible;
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) .ld-col {
+            min-height: 0;
+            margin-bottom: 12px;
+            break-inside: avoid;
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) .tier-breakdown-grid {
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+        }
+
+        :where([data-ui="unified"][data-crm-workspace]) :is(.stat-value, .tier-revenue, .dash-stat-value) {
+            font-size: 18px;
+        }:where([data-ui="unified"][data-crm-workspace]) .header-stat.at-risk .header-stat-value { color:var(--color-danger-ink); }
+:where([data-ui="unified"][data-crm-workspace$="-crm"]) .accounts-section { break-before:page; }
+    }
+
+    @page {
+        size: letter landscape;
+        margin: 12mm;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) dialog.modal-overlay {
+        width: 100%;
+        height: 100%;
+        max-width: none;
+        max-height: none;
+        margin: 0;
+        border: 0;
+        background: transparent;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) dialog.modal-overlay::backdrop {
+        background: rgb(0 0 0 / 45%);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .account-open {
+        border: 0;
+        padding: 0;
+        min-height: 32px;
+        text-align: left;
+        color: inherit;
+        background: transparent;
+        font: inherit;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .account-open:hover {
+        text-decoration: underline;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .sales-breakdown-section .section-title i,
+    :where([data-ui="unified"][data-crm-workspace]) .accounts-header h2 i {
+        margin-right: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .tier-card {
+        align-content: start;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .filter-group:has(.product-toggles) {
+        flex-basis: 240px;
+    }
+
+    :where([data-ui="unified"][data-crm-workspace]) .crm-modal-error {
+        padding: var(--space-3);
+        border: 1px solid var(--color-danger);
+        border-radius: var(--radius-sm);
+        background: var(--color-danger-bg);
+        color: var(--color-danger-ink);
+    }
+}

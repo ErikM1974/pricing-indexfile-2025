@@ -13,7 +13,7 @@
 (function () {
     'use strict';
 
-    var state = { since: '', until: '', repFilter: '', data: null };
+    var state = { since: '', until: '', repFilter: '', data: null, loadSeq: 0 };
 
     function esc(v) {
         return String(v == null ? '' : v)
@@ -84,24 +84,46 @@
         load();
     }
 
+    function completeScorecard(body) {
+        function finite(value) { return typeof value === 'number' && Number.isFinite(value); }
+        function count(value) { return finite(value) && Number.isInteger(value) && value >= 0; }
+        var t = body && body.totals;
+        return !!(body && body.success === true && t && count(t.leadsClosed) && count(t.repsWithCloses) && finite(t.attributedSales) &&
+            Array.isArray(body.reps) && body.reps.every(function (r) { return r && typeof r.rep === 'string' && count(r.leadsClosed) && finite(r.attributedSales) && finite(r.lifetimeSales); }) &&
+            Array.isArray(body.leads) && body.leads.every(function (l) { return l && typeof l.rep === 'string' && finite(l.attributed) && finite(l.lifetime); }));
+    }
+
+    function clearScorecard() {
+        state.data = null;
+        ['stat-closed', 'stat-sales', 'stat-reps', 'stat-range'].forEach(function (id) { document.getElementById(id).textContent = '—'; });
+        document.getElementById('leads-count').textContent = '';
+        document.getElementById('leads-tbody').innerHTML = '<tr><td colspan="6" class="sc-empty">—</td></tr>';
+    }
+
     function load() {
+        var seq = ++state.loadSeq;
+        clearScorecard();
         DashPage.hideError();
         document.getElementById('rep-tbody').innerHTML = '<tr><td colspan="4" class="sc-empty dash-loading">Loading…</td></tr>';
         var params = new URLSearchParams();
         if (state.since) params.set('since', state.since);
         if (state.until) params.set('until', state.until);
-        fetch('/api/crm-proxy/lead-scorecard?' + params.toString()).then(function (resp) {
+        fetch('/api/crm-proxy/lead-scorecard?' + params.toString(), { signal: AbortSignal.timeout(20000) }).then(function (resp) {
             return resp.json().catch(function () { return {}; }).then(function (b) {
                 if (!resp.ok) throw new Error((b && b.error) || ('HTTP ' + resp.status));
                 return b;
             });
         }).then(function (body) {
+            if (seq !== state.loadSeq) return;
+            if (!completeScorecard(body)) throw new Error('The scorecard response is incomplete. Please retry.');
             state.data = body;
             render();
         }).catch(function (err) {
+            if (seq !== state.loadSeq) return;
+            clearScorecard();
             console.error('[scorecard] load failed:', err);
             DashPage.showError('Unable to load the scorecard (' + err.message + ').');
-            document.getElementById('rep-tbody').innerHTML = '<tr><td colspan="4" class="sc-empty"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Unavailable. <button type="button" id="sc-retry" class="sc-btn sc-retry"><i class="fas fa-rotate" aria-hidden="true"></i> Retry</button></td></tr>';
+            document.getElementById('rep-tbody').innerHTML = '<tr><td colspan="4" class="sc-empty"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Unavailable. <button type="button" id="sc-retry" class="sc-btn sc-retry btn"><i class="fas fa-rotate" aria-hidden="true"></i> Retry</button></td></tr>';
             document.getElementById('leads-tbody').innerHTML = '<tr><td colspan="6" class="sc-empty">—</td></tr>';
             document.getElementById('leads-count').textContent = '';
         });
@@ -140,6 +162,7 @@
             return '<option value="' + esc(r.rep) + '">' + esc(r.rep) + '</option>';
         }).join('');
         sel.value = cur; if (sel.value !== cur) sel.value = '';
+        state.repFilter = sel.value;
         renderLeads();
     }
 
