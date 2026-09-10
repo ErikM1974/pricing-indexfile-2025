@@ -401,3 +401,9 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - tests/e2e/css-unification-quote-view.spec.js — original/current Quote View value and request locks, four-width accessibility/print and recovery, pending-action and native-dialog keyboard checks.
 - tests/fixtures/quote-view-*-original-browser.json — frozen original browser contracts; baseline capture refuses to overwrite existing evidence.
 - pages/invoice.html, pages/js/invoice.js and pages/css/invoice.css — reviewed compact invoice: shared customer document shell, responsive line items, canonical hidden/print state, verified staff controls, retained share token and guarded native shipment dialogs. Original source restoration in customer-documents-original-content.json;50 synthetic browser cases.
+
+- tests/fixtures/customer-job-status-original-content.json and tests/unit/customer-job-status-content.test.js — frozen customer Order Status/vendor Job Portal content and local-source contracts before visual changes; no migration credit yet.
+
+- tests/e2e/helpers/customer-job-status-browser.js — synthetic Order Status/Job Portal data, source replay and fail-closed business-action interception for CSS browser review.
+
+- tests/e2e/css-unification-customer-job-status.spec.js — original/current Order Status and vendor Job Portal data, credential, error, filter, navigation, note-body, four-width, accessibility and paper contracts.

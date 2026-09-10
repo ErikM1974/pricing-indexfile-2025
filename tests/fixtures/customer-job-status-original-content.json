@@ -1,0 +1,147 @@
+{
+  "base": "ed70f0a83878fc392884ce6c115fcebb9b4908f7",
+  "pages": [
+    {
+      "file": "pages/order-status.html",
+      "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <meta name=\"robots\" content=\"noindex\">\n    <title>Order Status — Custom T-Shirts | Northwest Custom Apparel</title>\n    <link rel=\"icon\" href=\"/favicon.png\" type=\"image/png\">\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    <link href=\"https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap\" rel=\"stylesheet\">\n    <link href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css\" rel=\"stylesheet\">\n    <!-- Absolute /pages/... paths — this page serves at the clean URL /order-status,\n         where relative paths would break. -->\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link rel=\"stylesheet\" href=\"/pages/css/custom-tees.css?v=2026.09.07.20\">\n    <link rel=\"stylesheet\" href=\"/pages/css/order-status.css?v=2026.09.07.14\">\n</head>\n<body class=\"status-body\">\n    <header class=\"site-head\">\n        <div class=\"site-head-inner\">\n            <a class=\"brand\" href=\"/\">\n                <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\" alt=\"Northwest Custom Apparel\" class=\"brand-logo\">\n                <span class=\"brand-text\">\n                    <strong>Northwest Custom Apparel</strong>\n                    <em>Custom T-Shirts · Full-Color DTG</em>\n                </span>\n            </a>\n            <div class=\"head-contact\">\n                <a href=\"tel:253-922-5793\"><i class=\"fas fa-phone\" aria-hidden=\"true\"></i> 253-922-5793</a>\n            </div>\n        </div>\n    </header>\n\n    <main class=\"status-main\">\n        <!-- Loading state -->\n        <section id=\"st-loading\" class=\"status-card\">\n            <div class=\"status-spin\"><i class=\"fas fa-circle-notch fa-spin\" aria-hidden=\"true\"></i></div>\n            <h1>Looking up your order…</h1>\n            <p>One moment while we fetch the latest status.</p>\n        </section>\n\n        <!-- Order state -->\n        <section id=\"st-order\" class=\"status-card\" hidden>\n            <p class=\"status-kicker\">Order status</p>\n            <h1>Order <span id=\"st-order-num\">—</span></h1>\n            <p class=\"status-style\" id=\"st-style\"></p>\n            <p class=\"status-promise\" id=\"st-promise\" hidden></p>\n\n            <div class=\"status-tracking\" id=\"st-tracking\" hidden></div>\n\n            <div class=\"status-timeline\" id=\"st-timeline\"></div>\n\n            <div class=\"status-pickup\" id=\"st-pickup\" hidden>\n                <i class=\"fas fa-store\" aria-hidden=\"true\"></i>\n                <div>\n                    <strong>Pickup — Northwest Custom Apparel</strong>\n                    <span>2025 Freeman Rd E, Milton, WA 98354<br>We’ll call you the moment your order is ready.</span>\n                </div>\n            </div>\n\n            <div class=\"status-mockups\" id=\"st-mockups\"></div>\n\n            <h2 class=\"status-h2\">Order summary</h2>\n            <div class=\"status-table-wrap\">\n                <table class=\"status-table\">\n                    <thead><tr><th>Color</th><th>Size</th><th>Qty</th><th>Each</th></tr></thead>\n                    <tbody id=\"st-items\"></tbody>\n                </table>\n            </div>\n            <div class=\"status-summary\" id=\"st-summary\"></div>\n\n            <p class=\"status-questions\" id=\"st-questions\"></p>\n        </section>\n\n        <!-- Not found / error state -->\n        <section id=\"st-error\" class=\"status-card\" hidden>\n            <div class=\"status-check is-amber\"><i class=\"fas fa-triangle-exclamation\" aria-hidden=\"true\"></i></div>\n            <h1>We couldn’t find that order</h1>\n            <p id=\"st-error-msg\">The link may be incomplete — try opening it again from your confirmation email. Or call us and we’ll look it up for you.</p>\n            <p class=\"status-phone\"><a href=\"tel:253-922-5793\"><i class=\"fas fa-phone\" aria-hidden=\"true\"></i> 253-922-5793</a></p>\n        </section>\n    </main>\n\n    <footer class=\"site-foot\">\n        <p>© Northwest Custom Apparel · 2025 Freeman Rd E, Milton, WA 98354 · <a href=\"tel:253-922-5793\">253-922-5793</a> · <a href=\"mailto:sales@nwcustomapparel.com\">sales@nwcustomapparel.com</a></p>\n    </footer>\n\n    <script src=\"/pages/js/order-status.js?v=2026.09.06.1\"></script>\n</body>\n</html>\n",
+      "title": "Order Status — Custom T-Shirts | Northwest Custom Apparel",
+      "bodyText": "Northwest Custom Apparel Custom T-Shirts · Full-Color DTG 253-922-5793 Looking up your order… One moment while we fetch the latest status. Order status Order — Pickup — Northwest Custom Apparel 2025 Freeman Rd E, Milton, WA 98354We’ll call you the moment your order is ready. Order summary ColorSizeQtyEach We couldn’t find that order The link may be incomplete — try opening it again from your confirmation email. Or call us and we’ll look it up for you. 253-922-5793 © Northwest Custom Apparel · 2025 Freeman Rd E, Milton, WA 98354 · 253-922-5793 · sales@nwcustomapparel.com",
+      "bodyTextSha": "e51bd9bca8b29a59f726713b8a46a2b9ee18e84ae9c7899095ac8fe2f63a9787",
+      "ids": [
+        "st-loading",
+        "st-order",
+        "st-order-num",
+        "st-style",
+        "st-promise",
+        "st-tracking",
+        "st-timeline",
+        "st-pickup",
+        "st-mockups",
+        "st-items",
+        "st-summary",
+        "st-questions",
+        "st-error",
+        "st-error-msg"
+      ],
+      "links": [
+        {
+          "href": "/",
+          "label": "Northwest Custom Apparel Custom T-Shirts · Full-Color DTG"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "label": "sales@nwcustomapparel.com"
+        }
+      ],
+      "fields": [],
+      "styles": [
+        "https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap",
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
+        "/shared_components/css/tokens.css?v=2026.09.08.2",
+        "/pages/css/custom-tees.css?v=2026.09.07.20",
+        "/pages/css/order-status.css?v=2026.09.07.14"
+      ],
+      "scripts": [
+        "/pages/js/order-status.js?v=2026.09.06.1"
+      ],
+      "cssBytes": 74280
+    },
+    {
+      "file": "pages/vendor-portal.html",
+      "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n  <meta name=\"robots\" content=\"noindex, nofollow\">\n  <title>Job Portal — Northwest Custom Apparel</title>\n  <link rel=\"icon\" href=\"/favicon.png\">\n  <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n  <link rel=\"stylesheet\" href=\"/shared_components/vendor/fontawesome/css/all.min.css?v=2026.07.08.8\">\n  <link rel=\"stylesheet\" href=\"/pages/css/vendor-portal.css?v=2026.09.07.19\">\n</head>\n<body>\n  <header class=\"vp-header\">\n    <div class=\"vp-header-inner\">\n      <img class=\"vp-logo\" src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png\" alt=\"Northwest Custom Apparel\">\n      <div class=\"vp-header-title\">\n        <h1 id=\"vp-vendor-name\">Job Portal</h1>\n        <span class=\"vp-header-sub\">Screen-print jobs from Northwest Custom Apparel</span>\n      </div>\n      <div class=\"vp-header-user\">\n        <span id=\"vp-user-chip\" class=\"vp-user-chip\"><i class=\"fas fa-user\" aria-hidden=\"true\"></i> <span id=\"vp-user-email\"></span></span>\n        <a class=\"vp-btn vp-btn--ghost\" href=\"/auth/vendor/logout\"><i class=\"fas fa-sign-out-alt\" aria-hidden=\"true\"></i> Sign out</a>\n      </div>\n    </div>\n  </header>\n\n  <main class=\"vp-container\">\n    <!-- Error banner (API failures are always VISIBLE — never silent) -->\n    <div id=\"vp-error\" class=\"vp-error\" role=\"alert\" hidden>\n      <i class=\"fas fa-exclamation-triangle\" aria-hidden=\"true\"></i>\n      <span id=\"vp-error-text\">Unable to load jobs. Please refresh.</span>\n      <button type=\"button\" class=\"vp-btn vp-btn--ghost vp-btn--sm\" id=\"vp-error-retry\" hidden><i class=\"fas fa-rotate-right\" aria-hidden=\"true\"></i> Retry</button>\n    </div>\n\n    <!-- ── LIST VIEW ─────────────────────────────────────────── -->\n    <section id=\"vp-list-view\">\n      <div class=\"vp-toolbar\">\n        <div class=\"vp-filters\" id=\"vp-filters\" role=\"group\" aria-label=\"Filter jobs\">\n          <button type=\"button\" class=\"vp-chip vp-chip--active\" data-filter=\"active\" aria-pressed=\"true\">Active <span class=\"vp-chip-count\" data-count=\"active\"></span></button>\n          <button type=\"button\" class=\"vp-chip\" data-filter=\"completed\" aria-pressed=\"false\">Completed <span class=\"vp-chip-count\" data-count=\"completed\"></span></button>\n          <button type=\"button\" class=\"vp-chip\" data-filter=\"all\" aria-pressed=\"false\">All <span class=\"vp-chip-count\" data-count=\"all\"></span></button>\n        </div>\n        <div class=\"vp-search\">\n          <label for=\"vp-search\" class=\"vp-sr\">Search jobs</label>\n          <i class=\"fas fa-search\" aria-hidden=\"true\"></i>\n          <input type=\"search\" id=\"vp-search\" placeholder=\"Search company, design #, job #\" autocomplete=\"off\">\n        </div>\n      </div>\n\n      <div id=\"vp-loading\" class=\"vp-loading\" role=\"status\"><i class=\"fas fa-spinner fa-spin\" aria-hidden=\"true\"></i> Loading jobs…</div>\n      <div id=\"vp-empty\" class=\"vp-empty\" role=\"status\" hidden>\n        <i class=\"fas fa-inbox\" aria-hidden=\"true\"></i>\n        <p id=\"vp-empty-text\">No jobs here right now.</p>\n      </div>\n      <div id=\"vp-job-grid\" class=\"vp-job-grid\"></div>\n    </section>\n\n    <!-- ── DETAIL VIEW ───────────────────────────────────────── -->\n    <section id=\"vp-detail-view\" hidden>\n      <button type=\"button\" class=\"vp-btn vp-btn--ghost vp-back\" id=\"vp-back-btn\"><i class=\"fas fa-arrow-left\" aria-hidden=\"true\"></i> All jobs</button>\n\n      <div id=\"vp-detail-loading\" class=\"vp-loading\" role=\"status\"><i class=\"fas fa-spinner fa-spin\" aria-hidden=\"true\"></i> Loading job…</div>\n\n      <div id=\"vp-detail-main\" hidden>\n        <div class=\"vp-detail-header\">\n          <div>\n            <div class=\"vp-detail-id\" id=\"vp-d-id\"></div>\n            <h2 class=\"vp-detail-company\" id=\"vp-d-company\" tabindex=\"-1\"></h2>\n            <div class=\"vp-detail-sub\" id=\"vp-d-sub\"></div>\n          </div>\n          <div class=\"vp-detail-badges\" id=\"vp-d-badges\"></div>\n        </div>\n\n        <div class=\"vp-grid\">\n          <div class=\"vp-col\">\n            <div class=\"vp-card\">\n              <div class=\"vp-card-header\"><h3><i class=\"fas fa-clipboard-list\" aria-hidden=\"true\"></i> Work Order</h3></div>\n              <div class=\"vp-card-body\">\n                <dl class=\"vp-meta\" id=\"vp-d-meta\"></dl>\n                <div class=\"vp-instructions\" id=\"vp-d-instructions\" hidden></div>\n              </div>\n            </div>\n\n            <div class=\"vp-card\">\n              <div class=\"vp-card-header\"><h3><i class=\"fas fa-layer-group\" aria-hidden=\"true\"></i> Print Lines</h3></div>\n              <div class=\"vp-card-body\">\n                <div class=\"vp-table-scroll\">\n                  <table class=\"vp-table\" id=\"vp-d-lines-table\">\n                    <thead>\n                      <tr><th>Qty</th><th>Size</th><th>W×H (in)</th><th>Presses</th><th>Notes</th></tr>\n                    </thead>\n                    <tbody id=\"vp-d-lines\"></tbody>\n                  </table>\n                </div>\n                <div class=\"vp-empty-panel\" id=\"vp-d-lines-empty\" hidden>No print lines on this job.</div>\n              </div>\n            </div>\n\n            <div class=\"vp-card\">\n              <div class=\"vp-card-header\"><h3><i class=\"fas fa-download\" aria-hidden=\"true\"></i> Artwork &amp; Working Files</h3></div>\n              <div class=\"vp-card-body\">\n                <div id=\"vp-d-files\" class=\"vp-files\"></div>\n                <div class=\"vp-empty-panel\" id=\"vp-d-files-empty\" hidden>No files attached yet.</div>\n              </div>\n            </div>\n          </div>\n\n          <div class=\"vp-col\">\n            <div class=\"vp-card\">\n              <div class=\"vp-card-header\"><h3><i class=\"fas fa-image\" aria-hidden=\"true\"></i> Mockup</h3></div>\n              <div class=\"vp-card-body\" id=\"vp-d-mockup\">\n                <div class=\"vp-empty-panel\">No mockup attached.</div>\n              </div>\n            </div>\n\n            <div class=\"vp-card\">\n              <div class=\"vp-card-header\"><h3><i class=\"fas fa-comments\" aria-hidden=\"true\"></i> Activity &amp; Messages</h3></div>\n              <div class=\"vp-card-body\">\n                <div class=\"vp-comment-form\">\n                  <label for=\"vp-comment-input\" class=\"vp-sr\">Message for NWCA</label>\n                  <textarea id=\"vp-comment-input\" rows=\"2\" maxlength=\"2000\" placeholder=\"Question or update for NWCA? Post it here…\" aria-describedby=\"vp-comment-hint\"></textarea>\n                  <button type=\"button\" class=\"vp-btn vp-btn--primary\" id=\"vp-comment-btn\" disabled><i class=\"fas fa-paper-plane\" aria-hidden=\"true\"></i> Post</button>\n                </div>\n                <div class=\"vp-comment-hint\" id=\"vp-comment-hint\">Ctrl+Enter posts. NWCA sees your note on the job.</div>\n                <div class=\"vp-comment-status\" id=\"vp-comment-status\" role=\"status\" hidden></div>\n                <div class=\"vp-timeline\" id=\"vp-d-notes\"></div>\n              </div>\n            </div>\n          </div>\n        </div>\n      </div>\n    </section>\n  </main>\n\n  <footer class=\"vp-footer\">\n    Northwest Custom Apparel &middot; Milton, WA &middot; (253) 922-5793\n  </footer>\n\n  <script src=\"/shared_components/js/caspio-date-utils.js?v=2026.09.06.46\"></script>\n  <script src=\"/pages/js/vendor-portal.js?v=2026.09.05.29\"></script>\n</body>\n</html>\n",
+      "title": "Job Portal — Northwest Custom Apparel",
+      "bodyText": "Job Portal Screen-print jobs from Northwest Custom Apparel Sign out Unable to load jobs. Please refresh. Retry Active Completed All Search jobs Loading jobs… No jobs here right now. All jobs Loading job… Work Order Print Lines QtySizeW×H (in)PressesNotes No print lines on this job. Artwork & Working Files No files attached yet. Mockup No mockup attached. Activity & Messages Message for NWCA Post Ctrl+Enter posts. NWCA sees your note on the job. Northwest Custom Apparel · Milton, WA · (253) 922-5793",
+      "bodyTextSha": "aba2a4817973b26fc69e1f356f2de8e52251b5c181be7d8ac082fd4cf9d930fa",
+      "ids": [
+        "vp-vendor-name",
+        "vp-user-chip",
+        "vp-user-email",
+        "vp-error",
+        "vp-error-text",
+        "vp-error-retry",
+        "vp-list-view",
+        "vp-filters",
+        "vp-search",
+        "vp-loading",
+        "vp-empty",
+        "vp-empty-text",
+        "vp-job-grid",
+        "vp-detail-view",
+        "vp-back-btn",
+        "vp-detail-loading",
+        "vp-detail-main",
+        "vp-d-id",
+        "vp-d-company",
+        "vp-d-sub",
+        "vp-d-badges",
+        "vp-d-meta",
+        "vp-d-instructions",
+        "vp-d-lines-table",
+        "vp-d-lines",
+        "vp-d-lines-empty",
+        "vp-d-files",
+        "vp-d-files-empty",
+        "vp-d-mockup",
+        "vp-comment-input",
+        "vp-comment-btn",
+        "vp-comment-hint",
+        "vp-comment-status",
+        "vp-d-notes"
+      ],
+      "links": [
+        {
+          "href": "/auth/vendor/logout",
+          "label": "Sign out"
+        }
+      ],
+      "fields": [
+        {
+          "id": "vp-search",
+          "type": "search",
+          "value": ""
+        },
+        {
+          "id": "vp-comment-input",
+          "type": "textarea",
+          "value": ""
+        }
+      ],
+      "styles": [
+        "/shared_components/css/tokens.css?v=2026.09.08.2",
+        "/shared_components/vendor/fontawesome/css/all.min.css?v=2026.07.08.8",
+        "/pages/css/vendor-portal.css?v=2026.09.07.19"
+      ],
+      "scripts": [
+        "/shared_components/js/caspio-date-utils.js?v=2026.09.06.46",
+        "/pages/js/vendor-portal.js?v=2026.09.05.29"
+      ],
+      "cssBytes": 126103
+    }
+  ],
+  "hashes": {
+    "pages/css/custom-tees.css": "6a9fabb18dd612fef0bf5ce54adc6c3f63e20f470e9a189b4d0144517a7a8c14",
+    "pages/css/order-status.css": "a7f7ee19447c0875289bdd83f705b24146de72f87492026ba417702ecdd3b045",
+    "pages/css/vendor-portal.css": "1f71d999abe7b944f7cd2aaefc7220c67e643c8d090d7f3e75ea405dcb2f3833",
+    "pages/js/order-status.js": "62563f1b176bdecb3344ad79403ea9716b5b3a3a298507b601eb741c374a4132",
+    "pages/js/vendor-portal.js": "c58a9248c4b2a121191bf6ad2c94351121c667902dd7a90e009cdb00f6be0fef",
+    "pages/order-status.html": "48e33db60789dd393daa2355796b1a5fa708f58d1e4e0508611d3b2f251c81bd",
+    "pages/vendor-portal.html": "cd816bc3c54ffa4fb4ecf13e098700a03bc0f7ce1a4a54227c621d422eca59af",
+    "shared_components/css/tokens.css": "2b3ab556bb9eaf40765a5c84683777cb64d50a6c42d1b4e82bc6beff33a127b6",
+    "shared_components/js/caspio-date-utils.js": "631fad8e38f78d2f7a6d1f424b145ccc3f4bf0f0bf58e61d89e3a1851605474e",
+    "shared_components/vendor/fontawesome/css/all.min.css": "e5e202e3c899507992952533f57b634722b69b34241d271963559d31aa33ef81"
+  },
+  "changes": [],
+  "retiredStyles": []
+}

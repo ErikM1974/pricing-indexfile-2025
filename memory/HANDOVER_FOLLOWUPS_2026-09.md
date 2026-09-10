@@ -1,5 +1,17 @@
 # Handover follow-ups — 2026-09-07
 
+## NEXT — customer Order Status and vendor Job Portal source baseline
+
+Isolated branch codex/customer-job-status starts at reviewed ed70f0a8; the frozen five-page batch is separately integrated at primary c1d7cfb0 under full release gates. No code from this next batch belongs in that release. Live remains .7/Heroku2100,180/225; reviewed candidate185/225,40pending.
+
+- [x] Capture both original HTML/controller/style graphs and immutable hashes before application edits.
+- [ ] Order Status: capture every timeline state, shipping/pickup, promise labels, token/missing/404/429/500/network, escaped content, item/fee/tax/total values, tracking/mail links and complete paper. Preserve server-stamped promise and exact id/t URL credential.
+- [ ] Vendor Job Portal: capture verified vendor identity, expired session, job list filters/search/counts, active/completed/cancelled/past-due/rush, hash deep links/back/focus, detail/artwork/download links, empty/escaped/failure/retry and original note POST body. Intercept all writes before loading.
+- [ ] After original browser/paper review, adopt shared Public Sans/controls and scoped layouts, useful mobile cards and named regions. Keep customer Order Status read-only and vendor notes behind existing verified identity; repair only demonstrated UI failures with precise reversible mappings.
+- [ ] Four widths, keyboard/axe, delayed/error/retry/duplicate cases and every PDF page before migration credit. Preserve shared custom-tees CSS for the unreviewed Custom Tees consumer and CaspioDate helper semantics. Full app/exact CI before another deploy.
+
+The source snapshot alone is not reviewed migration credit. No live business writes, emails, imports, logout or device printing. Never rerun consumed helpers, copy .env or recursively delete node_modules (junction).
+
 ## REVIEWED — five-page employee and customer document batch ready for integration
 
 Quote View passed all 62 browser cases (3.4 minutes) and all 1,002 checks in nine source/ownership/money/legacy suites on its final source. Its 83 mapped edits combine with 26 portal and 72 compact Invoice edits: 181 total mappings restore all 24 original document source hashes. Fourteen financial/payload methods remain byte-identical. The 39 original browser fixtures and 13 original PDF pages remain immutable at85eba439.
