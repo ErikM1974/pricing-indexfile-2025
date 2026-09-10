@@ -942,6 +942,67 @@
             padding: 8px 0;
         }
     }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        .ocr-drop-zone:focus-visible {
+        outline: 2px solid var(--ui-accent);
+        outline-offset: 3px;
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        :is(.ocr-garment-chip, .ocr-pdf-chip, .roster-load-state) {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: var(--space-3);
+        margin-top: var(--space-3);
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        .ocr-garment-chip {
+        border: 1px solid var(--ui-line);
+        padding: var(--space-3);
+        border-radius: var(--radius-sm);
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        .ocr-garment-chip
+        .field-input {
+        flex: 1 1 150px;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        .ocr-entries-preview {
+        overflow: auto;
+        margin-top: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        :is(.ocr-entries-label, .ocr-garments-label, .ocr-pdf-meta) {
+        font-size: var(--font-size-sm);
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        .ocr-entries-preview
+        .roster-table
+        th {
+        min-width: 110px;
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        .modal-header {
+        flex-wrap: nowrap;
+        align-items: flex-start;
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        .modal-title {
+        flex: 1;
+        min-width: 0;
+    }
 }
 
 /* Roster entry uses the same workspace controls and spacing as its dashboard. */

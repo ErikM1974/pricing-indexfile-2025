@@ -979,6 +979,168 @@
       "before": "                if (sections > 1) table.append(make('caption', 'Columns ' + (section + 1) + ' of ' + sections + ' — row numbers and names match across tables'));\n                const head = make('thead'), headings = make('tr');",
       "after": "                const head = make('thead'), headings = make('tr');\n                if (sections > 1) {\n                    const sectionRow = make('tr');\n                    const sectionTitle = make('th', 'Columns ' + (section + 1) + ' of ' + sections + ' — row numbers and names match across tables');\n                    sectionTitle.colSpan = columns.length + 1;\n                    sectionRow.append(sectionTitle); head.append(sectionRow);\n                }",
       "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "    async loadRoster(id) {\n        if (!Number.isInteger(id) || id <= 0) {\n            this.showToast('Invalid roster ID', 'error');\n            return;\n        }\n        // Dedupe: don't fire a second fetch for the same roster if one is already in flight\n        if (this._loadingRosterId === id) return;\n        this._loadingRosterId = id;\n\n        try {\n            const result = await this.service.getRoster(id);\n            if (!result.success || !result.roster) {\n                this.showToast('Roster not found', 'error');\n                return;\n            }\n\n            const r = result.roster;\n            this.currentRosterId = r.ID_Roster;\n\n            // Populate form fields\n            document.getElementById('rosterName').value = r.RosterName || '';\n            document.getElementById('companyName').value = r.CompanyName || '';\n            document.getElementById('orderNumber').value = r.OrderNumber || '';\n            document.getElementById('contactName').value = r.ContactName || '';\n            document.getElementById('contactEmail').value = r.ContactEmail || '';\n            document.getElementById('salesRep').value = r.SalesRep || '';\n            document.getElementById('rosterNotes').value = r.Notes || '';\n\n            // Parse JSON fields + migrate legacy shapes to v2\n            try { this.groups = JSON.parse(r.GroupsJSON || '[]'); } catch { this.groups = []; }\n            try { this.rows = JSON.parse(r.RosterJSON || '[]'); } catch { this.rows = []; }\n\n            this.groups = this.groups.map(migrateLegacyGroup);\n            this.rows = this.rows.map(row => {\n                const g = this.groups.find(gg => gg.id === row.groupId);\n                return g ? migrateLegacyRow(row, g) : row;\n            });\n\n            this.activeGroupId = this.groups.length > 0 ? this.groups[0].id : null;\n            this.isDirty = false;\n\n            this.updateStatusBadge(r.Status || 'Draft');\n            this.updateBreadcrumb(r.RosterName);\n            this.renderTabs();\n            this.loadGroupConfig();\n            this.renderTable();\n            this.updateUI();\n            this.showToast('Roster loaded', 'success');\n        } catch (err) {\n            this.showToast('Failed to load roster: ' + err.message, 'error');\n        } finally {\n            this._loadingRosterId = null;\n        }\n    }\n\n",
+      "after": "    setRosterLoadState(state, id, message = '') {\n        this.rosterLoadState = state;\n        document.querySelector('.roster-paper')?.remove();\n        let banner = document.querySelector('.roster-load-state');\n        if (!banner) {\n            banner = document.createElement('div');\n            banner.className = 'roster-load-state alert';\n            document.querySelector('.page-header').after(banner);\n        }\n        banner.replaceChildren();\n        banner.hidden = state === 'ready';\n        banner.className = 'roster-load-state alert ' + (state === 'error' ? 'alert-error' : 'alert-info');\n        banner.setAttribute('role', state === 'error' ? 'alert' : 'status');\n        document.querySelector('main').setAttribute('aria-busy', String(state === 'loading'));\n        document.querySelectorAll('#rosterInfoCard,#tableCard,#groupConfig,#sizeBreakdownCard,.tab-bar,.import-toolbar,.action-bar').forEach(n => { n.inert = state !== 'ready'; });\n        if (state === 'ready') return;\n        const text = document.createElement('span');\n        text.textContent = state === 'loading' ? 'Loading roster…' : 'Unable to load roster. ' + message;\n        banner.append(text);\n        if (state === 'error') {\n            const retry = document.createElement('button');\n            retry.type = 'button'; retry.className = 'btn btn-outline'; retry.textContent = 'Retry load';\n            retry.addEventListener('click', () => this.loadRoster(id));\n            banner.append(retry);\n        }\n    }\n\n    async loadRoster(id) {\n        if (!Number.isInteger(id) || id <= 0) {\n            this.showToast('Invalid roster ID', 'error');\n            return;\n        }\n        if (this._loadingRosterId === id) return;\n        const sequence = this._rosterLoadSeq = (this._rosterLoadSeq || 0) + 1;\n        this._loadingRosterId = id;\n        this._returnToDashboardAfterSave = false;\n        this.setRosterLoadState('loading', id);\n        try {\n            const result = await this.service.getRoster(id);\n            if (sequence !== this._rosterLoadSeq) return;\n            if (!result.success || !result.roster || Number(result.roster.ID_Roster) !== id) throw new Error('The requested roster was not returned.');\n            const r = result.roster;\n            // Validate and migrate locally before replacing any currently displayed data.\n            let groups = JSON.parse(r.GroupsJSON || '[]');\n            let rows = JSON.parse(r.RosterJSON || '[]');\n            const record = value => value && typeof value === 'object' && !Array.isArray(value);\n            if (!Array.isArray(groups) || !Array.isArray(rows) || !groups.every(record) || !rows.every(record)) throw new Error('Roster data is incomplete.');\n            groups = groups.map(migrateLegacyGroup);\n            if (groups.some(g => !Array.isArray(g.garments) || !g.garments.every(record) || !Array.isArray(g.personColumns) || !g.personColumns.every(k => PERSON_COLUMN_DEFS[k]) || !Array.isArray(g.customColumns) || !g.customColumns.every(record))) throw new Error('Roster columns are incomplete.');\n            rows = rows.map(row => {\n                const group = groups.find(g => g.id === row.groupId);\n                if (!group) throw new Error('A roster row is missing its group.');\n                return migrateLegacyRow(row, group);\n            });\n            this.currentRosterId = r.ID_Roster;\n            document.getElementById('rosterName').value = r.RosterName || '';\n            document.getElementById('companyName').value = r.CompanyName || '';\n            document.getElementById('orderNumber').value = r.OrderNumber || '';\n            document.getElementById('contactName').value = r.ContactName || '';\n            document.getElementById('contactEmail').value = r.ContactEmail || '';\n            document.getElementById('salesRep').value = r.SalesRep || '';\n            document.getElementById('rosterNotes').value = r.Notes || '';\n            this.groups = groups;\n            this.rows = rows;\n            this.activeGroupId = groups.length > 0 ? groups[0].id : null;\n            this.isDirty = false;\n            this.updateStatusBadge(r.Status || 'Draft');\n            this.updateBreadcrumb(r.RosterName);\n            this.renderTabs();\n            this.loadGroupConfig();\n            this.renderTable();\n            this.updateUI();\n            this.setRosterLoadState('ready', id);\n            this.showToast('Roster loaded', 'success');\n        } catch (err) {\n            if (sequence !== this._rosterLoadSeq) return;\n            this.setRosterLoadState('error', id, err.message);\n        } finally {\n            if (sequence === this._rosterLoadSeq) this._loadingRosterId = null;\n        }\n    }\n\n",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "    async save(status) {\n",
+      "after": "    async save(status) {\n        if (this.rosterLoadState && this.rosterLoadState !== 'ready') return;\n",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "    renderPaper() {\n",
+      "after": "    renderPaper() {\n        if (this.rosterLoadState && this.rosterLoadState !== 'ready') return;\n",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "    exportExcel() {\n",
+      "after": "    exportExcel() {\n        if (this.rosterLoadState && this.rosterLoadState !== 'ready') return;\n",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "        if (this.isDirty && !confirm('Discard unsaved changes?')) return;\n",
+      "after": "        if (this.isDirty && !confirm('Discard unsaved changes?')) return;\n        this._rosterLoadSeq = (this._rosterLoadSeq || 0) + 1;\n        this._loadingRosterId = null;\n        this.setRosterLoadState('ready');\n",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "        document.getElementById('searchGoBtn').addEventListener('click', () => this.doSearch());",
+      "after": "        document.getElementById('searchGoBtn').addEventListener('click', () => this.doSearch());\n        document.getElementById('searchInput').addEventListener('input', () => {\n            this._rosterSearchSeq = (this._rosterSearchSeq || 0) + 1;\n            const results = document.getElementById('searchResults');\n            results.removeAttribute('role');\n            results.textContent = document.getElementById('searchInput').value.trim() ? 'Press Search to find matching rosters.' : '';\n        });",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "        panel.hidden = !panel.hidden;\n        if (!panel.hidden)",
+      "after": "        panel.hidden = !panel.hidden;\n        if (panel.hidden) this._rosterSearchSeq = (this._rosterSearchSeq || 0) + 1;\n        if (!panel.hidden)",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "    async doSearch() {\n        const query",
+      "after": "    async doSearch() {\n        const sequence = this._rosterSearchSeq = (this._rosterSearchSeq || 0) + 1;\n        const query",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "        const results = document.getElementById('searchResults');\n        results.innerHTML = '<div",
+      "after": "        const results = document.getElementById('searchResults');\n        const current = () => sequence === this._rosterSearchSeq && !document.getElementById('searchPanel').hidden && query === document.getElementById('searchInput').value.trim();\n        results.removeAttribute('role');\n        results.innerHTML = '<div",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "            // Merge and deduplicate\n            const allRosters",
+      "after": "            if (!current()) return;\n            for (const response of [byCompany, byName]) {\n                if (!response || response.success === false || !Array.isArray(response.rosters)) throw new Error('The roster list was not returned.');\n            }\n            // Merge and deduplicate\n            const allRosters",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "            results.innerHTML = `<p class=\"roster-error\">Search failed: ${this.escapeHtml(err.message)}</p>`;",
+      "after": "            if (!current()) return;\n            results.setAttribute('role', 'alert');\n            results.innerHTML = `<p class=\"roster-error\">Search failed: ${this.escapeHtml(err.message)}</p>`;\n            const retry = document.createElement('button');\n            retry.type = 'button'; retry.className = 'btn btn-outline'; retry.textContent = 'Retry search';\n            retry.addEventListener('click', () => this.doSearch()); results.append(retry);",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "        dropZone.addEventListener('click', () => fileInput.click());",
+      "after": "        dropZone.addEventListener('click', () => fileInput.click());\n        dropZone.addEventListener('keydown', event => {\n            if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); fileInput.click(); }\n        });",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "class=\"ocr-garment-label\"",
+      "after": "class=\"ocr-garment-label field-input\" aria-label=\"Detected garment label\"",
+      "count": 2
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "class=\"ocr-garment-remove\"",
+      "after": "class=\"ocr-garment-remove btn btn-danger\"",
+      "count": 2
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "            results.innerHTML = html;\n            results.hidden = false;",
+      "after": "            results.innerHTML = html;\n            const tableRegion = results.querySelector('.ocr-entries-preview');\n            tableRegion.tabIndex = 0; tableRegion.setAttribute('role', 'region'); tableRegion.setAttribute('aria-label', 'Recognized names preview');\n            results.hidden = false;",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "    async processOcrFile(file) {\n",
+      "after": "    async processOcrFile(file) {\n        if (this.rosterLoadState && this.rosterLoadState !== 'ready') return;\n        const sequence = this._ocrSeq = (this._ocrSeq || 0) + 1;\n        const rosterSequence = this._rosterLoadSeq;\n        const current = () => sequence === this._ocrSeq && rosterSequence === this._rosterLoadSeq && document.getElementById('ocrModal').open;\n        this._ocrEntries = null;\n        this._ocrGarments = null;\n",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "            reader.onload = e => {\n",
+      "after": "            reader.onload = e => {\n                if (!current()) return;\n",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "            const result = await this.service.ocrImage(file);\n",
+      "after": "            const result = await this.service.ocrImage(file);\n            if (!current()) return;\n",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "            if (!result.parsed || !result.entries || result.entries.length === 0) {",
+      "after": "            if (result.parsed && !Array.isArray(result.entries)) throw new Error('The recognized entries were not returned.');\n            if (!result.parsed || !result.entries || result.entries.length === 0) {",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "        } catch (err) {\n            processing.hidden = true;",
+      "after": "        } catch (err) {\n            if (!current()) return;\n            processing.hidden = true;",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "    handleOcrImport() {\n",
+      "after": "    handleOcrImport() {\n        if (!document.getElementById('ocrModal').open || document.getElementById('ocrImportBtn').hidden) return;\n",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "    closeModal(id) {\n",
+      "after": "    closeModal(id) {\n        if (id === 'ocrModal') {\n            this._ocrSeq = (this._ocrSeq || 0) + 1;\n            document.getElementById('ocrProcessing').hidden = true;\n            document.getElementById('ocrImportBtn').hidden = true;\n            document.getElementById('ocrPreview').hidden = true;\n            document.getElementById('ocrResults').replaceChildren();\n        }\n",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "    async save(status) {\n        if (this.rosterLoadState && this.rosterLoadState !== 'ready') return;\n        const data = this.getRosterData();\n        if (!data.RosterName) {\n            this.showToast('Roster name is required', 'error');\n            document.getElementById('rosterName').focus();\n            return;\n        }\n\n        data.Status = status;\n        data.CreatedBy = data.CreatedBy || (sessionStorage.getItem('nwca_user_name') || 'Staff');\n\n        try {\n            let result;\n            if (this.currentRosterId) {\n                result = await this.service.updateRoster(this.currentRosterId, data);\n                this.showToast('Roster saved successfully', 'success');\n            } else {\n                result = await this.service.createRoster(data);\n                if (result.roster && result.roster.ID_Roster) {\n                    this.currentRosterId = result.roster.ID_Roster;\n                    // Update URL without reload\n                    const url = new URL(window.location);\n                    url.searchParams.set('load', this.currentRosterId);\n                    window.history.replaceState({}, '', url);\n                }\n                this.showToast('Roster created successfully', 'success');\n            }\n\n            this.isDirty = false;\n            this.updateStatusBadge(status);\n            this.updateBreadcrumb(data.RosterName);\n\n            // If the caller asked to return to dashboard after save, do it now\n            if (this._returnToDashboardAfterSave) {\n                this._returnToDashboardAfterSave = false;\n                // Brief delay so the toast is visible before navigating\n                setTimeout(() => { window.location.href = '/dashboards/names-numbers-dashboard.html'; }, 600);\n            }\n        } catch (err) {\n            this.showToast('Save failed: ' + err.message, 'error');\n        }\n    }\n\n",
+      "after": "    async save(status) {\n        if ((this.rosterLoadState && this.rosterLoadState !== 'ready') || this._saving) return;\n        const returnAfterSave = this._returnToDashboardAfterSave;\n        this._returnToDashboardAfterSave = false;\n        const data = this.getRosterData();\n        if (!data.RosterName) {\n            this.showToast('Roster name is required', 'error');\n            document.getElementById('rosterName').focus();\n            return;\n        }\n        data.Status = status;\n        data.CreatedBy = data.CreatedBy || (sessionStorage.getItem('nwca_user_name') || 'Staff');\n        const existingId = this.currentRosterId;\n        const sequence = this._rosterLoadSeq;\n        this.setRosterSaveBusy(true);\n        try {\n            const result = existingId\n                ? await this.service.updateRoster(existingId, data)\n                : await this.service.createRoster(data);\n            if (!result || result.success !== true) throw new Error(result?.error || 'The save was not confirmed.');\n            if (sequence !== this._rosterLoadSeq) return;\n            if (!existingId) {\n                const id = Number(result.roster?.ID_Roster);\n                if (!Number.isInteger(id) || id <= 0) throw new Error('The new roster ID was not returned. Check the roster list before trying again.');\n                this.currentRosterId = result.roster.ID_Roster;\n                const url = new URL(window.location);\n                url.searchParams.set('load', this.currentRosterId);\n                window.history.replaceState({}, '', url);\n            }\n            this.showToast(existingId ? 'Roster saved successfully' : 'Roster created successfully', 'success');\n            this.isDirty = false;\n            this.updateStatusBadge(status);\n            this.updateBreadcrumb(data.RosterName);\n            if (returnAfterSave) {\n                setTimeout(() => {\n                    if (sequence === this._rosterLoadSeq) window.location.href = '/dashboards/names-numbers-dashboard.html';\n                }, 600);\n            }\n        } catch (err) {\n            if (sequence === this._rosterLoadSeq) this.showToast('Save failed: ' + err.message, 'error');\n        } finally {\n            this.setRosterSaveBusy(false);\n        }\n    }\n\n",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "    setRosterLoadState(state, id, message = '') {",
+      "after": "    updateRosterAvailability() {\n        const blocked = Boolean(this._saving || (this.rosterLoadState && this.rosterLoadState !== 'ready'));\n        document.querySelectorAll('#rosterInfoCard,#tableCard,#groupConfig,#sizeBreakdownCard,.tab-bar,.import-toolbar,.action-bar').forEach(n => { n.inert = blocked; });\n    }\n\n    setRosterSaveBusy(busy) {\n        this._saving = busy;\n        for (const id of ['saveDraftBtn', 'saveSubmitBtn', 'saveAndReturnBtn']) document.getElementById(id).disabled = busy;\n        document.querySelector('.action-bar').setAttribute('aria-busy', String(busy));\n        this.updateRosterAvailability();\n    }\n\n    setRosterLoadState(state, id, message = '') {",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "        document.querySelector('main').setAttribute('aria-busy', String(state === 'loading'));\n        document.querySelectorAll('#rosterInfoCard,#tableCard,#groupConfig,#sizeBreakdownCard,.tab-bar,.import-toolbar,.action-bar').forEach(n => { n.inert = state !== 'ready'; });",
+      "after": "        document.querySelector('main').setAttribute('aria-busy', String(state === 'loading'));\n        this.updateRosterAvailability();",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "        const sequence = this._rosterLoadSeq;\n        this.setRosterSaveBusy(true);",
+      "after": "        const sequence = this._rosterLoadSeq;\n        const focusBeforeSave = document.activeElement;\n        this.setRosterSaveBusy(true);",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "            this.setRosterSaveBusy(false);\n",
+      "after": "            this.setRosterSaveBusy(false);\n            if (sequence === this._rosterLoadSeq && document.activeElement === document.body && focusBeforeSave?.isConnected && !focusBeforeSave.closest('[inert]')) focusBeforeSave.focus();\n",
+      "count": 1
     }
   ]
 }

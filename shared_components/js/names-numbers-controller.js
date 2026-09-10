@@ -147,6 +147,12 @@ class NamesNumbersController {
 
         // Search
         document.getElementById('searchGoBtn').addEventListener('click', () => this.doSearch());
+        document.getElementById('searchInput').addEventListener('input', () => {
+            this._rosterSearchSeq = (this._rosterSearchSeq || 0) + 1;
+            const results = document.getElementById('searchResults');
+            results.removeAttribute('role');
+            results.textContent = document.getElementById('searchInput').value.trim() ? 'Press Search to find matching rosters.' : '';
+        });
         document.getElementById('searchCloseBtn').addEventListener('click', () => this.toggleSearch());
         document.getElementById('searchInput').addEventListener('keydown', e => {
             if (e.key === 'Enter') this.doSearch();
@@ -929,6 +935,9 @@ class NamesNumbersController {
         const fileInput = document.getElementById('ocrFileInput');
 
         dropZone.addEventListener('click', () => fileInput.click());
+        dropZone.addEventListener('keydown', event => {
+            if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); fileInput.click(); }
+        });
 
         dropZone.addEventListener('dragover', e => {
             e.preventDefault();
@@ -950,6 +959,12 @@ class NamesNumbersController {
     }
 
     async processOcrFile(file) {
+        if (this.rosterLoadState && this.rosterLoadState !== 'ready') return;
+        const sequence = this._ocrSeq = (this._ocrSeq || 0) + 1;
+        const rosterSequence = this._rosterLoadSeq;
+        const current = () => sequence === this._ocrSeq && rosterSequence === this._rosterLoadSeq && document.getElementById('ocrModal').open;
+        this._ocrEntries = null;
+        this._ocrGarments = null;
         const preview = document.getElementById('ocrPreview');
         const processing = document.getElementById('ocrProcessing');
         const results = document.getElementById('ocrResults');
@@ -964,6 +979,7 @@ class NamesNumbersController {
         } else {
             const reader = new FileReader();
             reader.onload = e => {
+                if (!current()) return;
                 preview.innerHTML = `<img src="${e.target.result}" alt="Uploaded roster">`;
                 preview.hidden = false;
             };
@@ -977,6 +993,7 @@ class NamesNumbersController {
 
         try {
             const result = await this.service.ocrImage(file);
+            if (!current()) return;
 
             processing.hidden = true;
 
@@ -986,6 +1003,7 @@ class NamesNumbersController {
                 return;
             }
 
+            if (result.parsed && !Array.isArray(result.entries)) throw new Error('The recognized entries were not returned.');
             if (!result.parsed || !result.entries || result.entries.length === 0) {
                 results.innerHTML = `<p>No structured data extracted. Raw text:</p><pre class="roster-raw-text">${this.escapeHtml(result.rawText || 'No text found')}</pre>`;
                 results.hidden = false;
@@ -1016,9 +1034,9 @@ class NamesNumbersController {
                 <div class="ocr-garments-label">Detected garments (edit labels or remove unused before importing):</div>
                 <div id="ocrGarmentsList">${detectedGarments.map((g, i) => `
                     <div class="ocr-garment-chip" data-idx="${i}">
-                        <input type="text" class="ocr-garment-label" value="${this.escapeAttr(g.label)}" placeholder="Garment label">
+                        <input type="text" class="ocr-garment-label field-input" aria-label="Detected garment label" value="${this.escapeAttr(g.label)}" placeholder="Garment label">
                         <label><input type="checkbox" class="ocr-garment-backPrint" ${g.hasBackPrint ? 'checked' : ''}> Back Print</label>
-                        <button type="button" class="ocr-garment-remove" ${detectedGarments.length === 1 ? 'disabled' : ''} title="Remove"><i class="fas fa-times" aria-hidden="true"></i></button>
+                        <button type="button" class="ocr-garment-remove btn btn-danger" ${detectedGarments.length === 1 ? 'disabled' : ''} title="Remove"><i class="fas fa-times" aria-hidden="true"></i></button>
                     </div>
                 `).join('')}</div>
             </div>`;
@@ -1048,6 +1066,8 @@ class NamesNumbersController {
             html += '</tbody></table></div>';
 
             results.innerHTML = html;
+            const tableRegion = results.querySelector('.ocr-entries-preview');
+            tableRegion.tabIndex = 0; tableRegion.setAttribute('role', 'region'); tableRegion.setAttribute('aria-label', 'Recognized names preview');
             results.hidden = false;
             importBtn.hidden = false;
 
@@ -1074,6 +1094,7 @@ class NamesNumbersController {
                 });
             });
         } catch (err) {
+            if (!current()) return;
             processing.hidden = true;
             results.innerHTML = `<p class="roster-error">Error: ${this.escapeHtml(err.message)}</p>`;
             results.hidden = false;
@@ -1094,9 +1115,9 @@ class NamesNumbersController {
         if (list) {
             list.innerHTML = garments.map((g, i) => `
                 <div class="ocr-garment-chip" data-idx="${i}">
-                    <input type="text" class="ocr-garment-label" value="${this.escapeAttr(g.label)}" placeholder="Garment label">
+                    <input type="text" class="ocr-garment-label field-input" aria-label="Detected garment label" value="${this.escapeAttr(g.label)}" placeholder="Garment label">
                     <label><input type="checkbox" class="ocr-garment-backPrint" ${g.hasBackPrint ? 'checked' : ''}> Back Print</label>
-                    <button type="button" class="ocr-garment-remove" ${garments.length === 1 ? 'disabled' : ''} title="Remove"><i class="fas fa-times" aria-hidden="true"></i></button>
+                    <button type="button" class="ocr-garment-remove btn btn-danger" ${garments.length === 1 ? 'disabled' : ''} title="Remove"><i class="fas fa-times" aria-hidden="true"></i></button>
                 </div>
             `).join('');
             list.querySelectorAll('.ocr-garment-label').forEach(input => {
@@ -1123,6 +1144,7 @@ class NamesNumbersController {
     }
 
     handleOcrImport() {
+        if (!document.getElementById('ocrModal').open || document.getElementById('ocrImportBtn').hidden) return;
         if (!this._ocrEntries || this._ocrEntries.length === 0) return;
 
         const detected = this._ocrGarments || [{ label: 'Garment', hasBackPrint: false }];
@@ -1243,45 +1265,88 @@ class NamesNumbersController {
     }
 
     async save(status) {
+        if ((this.rosterLoadState && this.rosterLoadState !== 'ready') || this._saving) return;
+        const returnAfterSave = this._returnToDashboardAfterSave;
+        this._returnToDashboardAfterSave = false;
         const data = this.getRosterData();
         if (!data.RosterName) {
             this.showToast('Roster name is required', 'error');
             document.getElementById('rosterName').focus();
             return;
         }
-
         data.Status = status;
         data.CreatedBy = data.CreatedBy || (sessionStorage.getItem('nwca_user_name') || 'Staff');
-
+        const existingId = this.currentRosterId;
+        const sequence = this._rosterLoadSeq;
+        const focusBeforeSave = document.activeElement;
+        this.setRosterSaveBusy(true);
         try {
-            let result;
-            if (this.currentRosterId) {
-                result = await this.service.updateRoster(this.currentRosterId, data);
-                this.showToast('Roster saved successfully', 'success');
-            } else {
-                result = await this.service.createRoster(data);
-                if (result.roster && result.roster.ID_Roster) {
-                    this.currentRosterId = result.roster.ID_Roster;
-                    // Update URL without reload
-                    const url = new URL(window.location);
-                    url.searchParams.set('load', this.currentRosterId);
-                    window.history.replaceState({}, '', url);
-                }
-                this.showToast('Roster created successfully', 'success');
+            const result = existingId
+                ? await this.service.updateRoster(existingId, data)
+                : await this.service.createRoster(data);
+            if (!result || result.success !== true) throw new Error(result?.error || 'The save was not confirmed.');
+            if (sequence !== this._rosterLoadSeq) return;
+            if (!existingId) {
+                const id = Number(result.roster?.ID_Roster);
+                if (!Number.isInteger(id) || id <= 0) throw new Error('The new roster ID was not returned. Check the roster list before trying again.');
+                this.currentRosterId = result.roster.ID_Roster;
+                const url = new URL(window.location);
+                url.searchParams.set('load', this.currentRosterId);
+                window.history.replaceState({}, '', url);
             }
-
+            this.showToast(existingId ? 'Roster saved successfully' : 'Roster created successfully', 'success');
             this.isDirty = false;
             this.updateStatusBadge(status);
             this.updateBreadcrumb(data.RosterName);
-
-            // If the caller asked to return to dashboard after save, do it now
-            if (this._returnToDashboardAfterSave) {
-                this._returnToDashboardAfterSave = false;
-                // Brief delay so the toast is visible before navigating
-                setTimeout(() => { window.location.href = '/dashboards/names-numbers-dashboard.html'; }, 600);
+            if (returnAfterSave) {
+                setTimeout(() => {
+                    if (sequence === this._rosterLoadSeq) window.location.href = '/dashboards/names-numbers-dashboard.html';
+                }, 600);
             }
         } catch (err) {
-            this.showToast('Save failed: ' + err.message, 'error');
+            if (sequence === this._rosterLoadSeq) this.showToast('Save failed: ' + err.message, 'error');
+        } finally {
+            this.setRosterSaveBusy(false);
+            if (sequence === this._rosterLoadSeq && document.activeElement === document.body && focusBeforeSave?.isConnected && !focusBeforeSave.closest('[inert]')) focusBeforeSave.focus();
+        }
+    }
+
+    updateRosterAvailability() {
+        const blocked = Boolean(this._saving || (this.rosterLoadState && this.rosterLoadState !== 'ready'));
+        document.querySelectorAll('#rosterInfoCard,#tableCard,#groupConfig,#sizeBreakdownCard,.tab-bar,.import-toolbar,.action-bar').forEach(n => { n.inert = blocked; });
+    }
+
+    setRosterSaveBusy(busy) {
+        this._saving = busy;
+        for (const id of ['saveDraftBtn', 'saveSubmitBtn', 'saveAndReturnBtn']) document.getElementById(id).disabled = busy;
+        document.querySelector('.action-bar').setAttribute('aria-busy', String(busy));
+        this.updateRosterAvailability();
+    }
+
+    setRosterLoadState(state, id, message = '') {
+        this.rosterLoadState = state;
+        document.querySelector('.roster-paper')?.remove();
+        let banner = document.querySelector('.roster-load-state');
+        if (!banner) {
+            banner = document.createElement('div');
+            banner.className = 'roster-load-state alert';
+            document.querySelector('.page-header').after(banner);
+        }
+        banner.replaceChildren();
+        banner.hidden = state === 'ready';
+        banner.className = 'roster-load-state alert ' + (state === 'error' ? 'alert-error' : 'alert-info');
+        banner.setAttribute('role', state === 'error' ? 'alert' : 'status');
+        document.querySelector('main').setAttribute('aria-busy', String(state === 'loading'));
+        this.updateRosterAvailability();
+        if (state === 'ready') return;
+        const text = document.createElement('span');
+        text.textContent = state === 'loading' ? 'Loading roster…' : 'Unable to load roster. ' + message;
+        banner.append(text);
+        if (state === 'error') {
+            const retry = document.createElement('button');
+            retry.type = 'button'; retry.className = 'btn btn-outline'; retry.textContent = 'Retry load';
+            retry.addEventListener('click', () => this.loadRoster(id));
+            banner.append(retry);
         }
     }
 
@@ -1290,21 +1355,29 @@ class NamesNumbersController {
             this.showToast('Invalid roster ID', 'error');
             return;
         }
-        // Dedupe: don't fire a second fetch for the same roster if one is already in flight
         if (this._loadingRosterId === id) return;
+        const sequence = this._rosterLoadSeq = (this._rosterLoadSeq || 0) + 1;
         this._loadingRosterId = id;
-
+        this._returnToDashboardAfterSave = false;
+        this.setRosterLoadState('loading', id);
         try {
             const result = await this.service.getRoster(id);
-            if (!result.success || !result.roster) {
-                this.showToast('Roster not found', 'error');
-                return;
-            }
-
+            if (sequence !== this._rosterLoadSeq) return;
+            if (!result.success || !result.roster || Number(result.roster.ID_Roster) !== id) throw new Error('The requested roster was not returned.');
             const r = result.roster;
+            // Validate and migrate locally before replacing any currently displayed data.
+            let groups = JSON.parse(r.GroupsJSON || '[]');
+            let rows = JSON.parse(r.RosterJSON || '[]');
+            const record = value => value && typeof value === 'object' && !Array.isArray(value);
+            if (!Array.isArray(groups) || !Array.isArray(rows) || !groups.every(record) || !rows.every(record)) throw new Error('Roster data is incomplete.');
+            groups = groups.map(migrateLegacyGroup);
+            if (groups.some(g => !Array.isArray(g.garments) || !g.garments.every(record) || !Array.isArray(g.personColumns) || !g.personColumns.every(k => PERSON_COLUMN_DEFS[k]) || !Array.isArray(g.customColumns) || !g.customColumns.every(record))) throw new Error('Roster columns are incomplete.');
+            rows = rows.map(row => {
+                const group = groups.find(g => g.id === row.groupId);
+                if (!group) throw new Error('A roster row is missing its group.');
+                return migrateLegacyRow(row, group);
+            });
             this.currentRosterId = r.ID_Roster;
-
-            // Populate form fields
             document.getElementById('rosterName').value = r.RosterName || '';
             document.getElementById('companyName').value = r.CompanyName || '';
             document.getElementById('orderNumber').value = r.OrderNumber || '';
@@ -1312,31 +1385,23 @@ class NamesNumbersController {
             document.getElementById('contactEmail').value = r.ContactEmail || '';
             document.getElementById('salesRep').value = r.SalesRep || '';
             document.getElementById('rosterNotes').value = r.Notes || '';
-
-            // Parse JSON fields + migrate legacy shapes to v2
-            try { this.groups = JSON.parse(r.GroupsJSON || '[]'); } catch { this.groups = []; }
-            try { this.rows = JSON.parse(r.RosterJSON || '[]'); } catch { this.rows = []; }
-
-            this.groups = this.groups.map(migrateLegacyGroup);
-            this.rows = this.rows.map(row => {
-                const g = this.groups.find(gg => gg.id === row.groupId);
-                return g ? migrateLegacyRow(row, g) : row;
-            });
-
-            this.activeGroupId = this.groups.length > 0 ? this.groups[0].id : null;
+            this.groups = groups;
+            this.rows = rows;
+            this.activeGroupId = groups.length > 0 ? groups[0].id : null;
             this.isDirty = false;
-
             this.updateStatusBadge(r.Status || 'Draft');
             this.updateBreadcrumb(r.RosterName);
             this.renderTabs();
             this.loadGroupConfig();
             this.renderTable();
             this.updateUI();
+            this.setRosterLoadState('ready', id);
             this.showToast('Roster loaded', 'success');
         } catch (err) {
-            this.showToast('Failed to load roster: ' + err.message, 'error');
+            if (sequence !== this._rosterLoadSeq) return;
+            this.setRosterLoadState('error', id, err.message);
         } finally {
-            this._loadingRosterId = null;
+            if (sequence === this._rosterLoadSeq) this._loadingRosterId = null;
         }
     }
 
@@ -1347,16 +1412,20 @@ class NamesNumbersController {
     toggleSearch() {
         const panel = document.getElementById('searchPanel');
         panel.hidden = !panel.hidden;
+        if (panel.hidden) this._rosterSearchSeq = (this._rosterSearchSeq || 0) + 1;
         if (!panel.hidden) {
             document.getElementById('searchInput').focus();
         }
     }
 
     async doSearch() {
+        const sequence = this._rosterSearchSeq = (this._rosterSearchSeq || 0) + 1;
         const query = document.getElementById('searchInput').value.trim();
         if (!query) return;
 
         const results = document.getElementById('searchResults');
+        const current = () => sequence === this._rosterSearchSeq && !document.getElementById('searchPanel').hidden && query === document.getElementById('searchInput').value.trim();
+        results.removeAttribute('role');
         results.innerHTML = '<div class="ocr-processing"><div class="spinner"></div> Searching...</div>';
 
         try {
@@ -1366,6 +1435,10 @@ class NamesNumbersController {
                 this.service.listRosters({ rosterName: query })
             ]);
 
+            if (!current()) return;
+            for (const response of [byCompany, byName]) {
+                if (!response || response.success === false || !Array.isArray(response.rosters)) throw new Error('The roster list was not returned.');
+            }
             // Merge and deduplicate
             const allRosters = [...(byCompany.rosters || []), ...(byName.rosters || [])];
             const seen = new Set();
@@ -1401,7 +1474,12 @@ class NamesNumbersController {
                 this.toggleSearch();
             }));
         } catch (err) {
+            if (!current()) return;
+            results.setAttribute('role', 'alert');
             results.innerHTML = `<p class="roster-error">Search failed: ${this.escapeHtml(err.message)}</p>`;
+            const retry = document.createElement('button');
+            retry.type = 'button'; retry.className = 'btn btn-outline'; retry.textContent = 'Retry search';
+            retry.addEventListener('click', () => this.doSearch()); results.append(retry);
         }
     }
 
@@ -1410,6 +1488,7 @@ class NamesNumbersController {
     // ============================================
 
     renderPaper() {
+        if (this.rosterLoadState && this.rosterLoadState !== 'ready') return;
         this.collectTableData();
         const make = (tag, text, className) => {
             const element = document.createElement(tag);
@@ -1481,6 +1560,7 @@ class NamesNumbersController {
     }
 
     exportExcel() {
+        if (this.rosterLoadState && this.rosterLoadState !== 'ready') return;
         this.collectTableData();
 
         const esc = v => `"${String(v == null ? '' : v).replace(/"/g, '""')}"`;
@@ -1558,6 +1638,9 @@ class NamesNumbersController {
 
     resetAll() {
         if (this.isDirty && !confirm('Discard unsaved changes?')) return;
+        this._rosterLoadSeq = (this._rosterLoadSeq || 0) + 1;
+        this._loadingRosterId = null;
+        this.setRosterLoadState('ready');
         this.groups = [];
         this.rows = [];
         this.activeGroupId = null;
@@ -1588,6 +1671,13 @@ class NamesNumbersController {
     }
 
     closeModal(id) {
+        if (id === 'ocrModal') {
+            this._ocrSeq = (this._ocrSeq || 0) + 1;
+            document.getElementById('ocrProcessing').hidden = true;
+            document.getElementById('ocrImportBtn').hidden = true;
+            document.getElementById('ocrPreview').hidden = true;
+            document.getElementById('ocrResults').replaceChildren();
+        }
         const dialog = document.getElementById(id);
         dialog.close();
         window.UiDialog.close(dialog);

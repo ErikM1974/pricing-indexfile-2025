@@ -268,7 +268,7 @@ Williams, 3, M" aria-label="Paste names, quantities and sizes, one per line" cla
                 <button type="button" class="modal-close btn btn-outline" id="ocrModalClose" aria-label="Close Upload Image or PDF for OCR">×</button>
             </div>
             <div class="modal-body">
-                <div class="ocr-drop-zone" id="ocrDropZone">
+                <div class="ocr-drop-zone" id="ocrDropZone" role="button" tabindex="0" aria-label="Choose image or PDF">
                     <i class="fas fa-cloud-upload-alt" aria-hidden="true"></i>
                     <p><strong>Drag &amp; drop an image or PDF here</strong></p>
                     <p>or click to browse (JPEG, PNG, GIF, WebP, or PDF)</p>
@@ -328,6 +328,7 @@ Williams, 3, M" aria-label="Paste names, quantities and sizes, one per line" cla
     <!-- Scripts -->
     <script src="/shared_components/js/names-numbers-service.js?v=2026.09.06.31"></script>
     <script src="/shared_components/js/ui-dialog.js?v=2026.09.09.21"></script><script src="/shared_components/js/names-numbers-controller.js?v=2026.09.09.21"></script>
+
 
 
 
