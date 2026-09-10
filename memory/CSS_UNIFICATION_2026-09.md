@@ -1,5 +1,13 @@
 # CSS unification — design direction and implementation plan
 
+## ACTIVE — four staff tools release candidate v2026.09.10.7
+
+All four reviewed tools are integrated and have passed the complete local sweep: Calibration, Universal Records Admin, Box Labels and Staff Dashboard. Candidate **180/225 pages; 45 pending**. Live remains .4 / Heroku2099 /031e03aa,176/225 until exact-source CI and verified rollout.
+
+- Local verification: 237 unit suites /5,574 passed/four existing skips;88 DOM,four accessibility unit,84 quote parity;957 mocked browser checks;16 remaining e2e/three optional screenshot skips/all five calculator surfaces;423 built assets,267 CSS sheets clean,zero lint warnings/types clean,485 routes/24 modules/no undefined names,boot HTTP200,production audit zero.
+- Four-tool evidence:74 focused browser cases,11 visually reviewed paper pages,49 original SHA256 sources and 270 reversible changes after cache versioning. Four old page owners retired. The dashboard keeps fixed dark/green branding and all destinations; its old nine CSS sheets remain only for three historical harnesses.
+- Next: push exact Deploy source, require all four CI jobs with actual CSS browser and live money/calculator steps, then one release merge/tag/Heroku push and actual-slug/asset/access verification. Keep any next-family work on a separate branch. Completed one-shot helpers must never run again; node_modules is a junction and must never be recursively deleted. All test writes are synthetic.
+
 ## NEXT batch — all four staff tools reviewed; integrate and release
 
 Live remains v2026.09.10.4 / Heroku 2099 / 031e03aa8ec68ac0951fe95a47871637c0c8e25a: **176/225 reviewed pages, 49 pending**. The four reviewed drafts (Calibration, Records Admin, Box Labels, Staff Dashboard) bring the candidate to **180/225, 45 pending**, but are not yet deployed. Standing authorization continues; no permission questions or shutdown request.

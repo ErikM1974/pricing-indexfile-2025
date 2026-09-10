@@ -2592,6 +2592,54 @@
       "before": "    input.setAttribute('aria-expanded', 'false');",
       "after": "    input.setAttribute('aria-expanded', 'false');\n    input.removeAttribute('aria-activedescendant');",
       "count": 1
+    },
+    {
+      "file": "admin/universal-records-admin.html",
+      "before": "/shared_components/css/staff-records.css?v=2026.09.10.5",
+      "after": "/shared_components/css/staff-records.css?v=2026.09.10.7",
+      "count": 1
+    },
+    {
+      "file": "admin/universal-records-admin.html",
+      "before": "/admin/js/universal-records-admin.js?v=2026.09.10.5",
+      "after": "/admin/js/universal-records-admin.js?v=2026.09.10.7",
+      "count": 1
+    },
+    {
+      "file": "pages/box-labels.html",
+      "before": "/shared_components/css/staff-box-labels.css?v=2026.09.10.5",
+      "after": "/shared_components/css/staff-box-labels.css?v=2026.09.10.7",
+      "count": 1
+    },
+    {
+      "file": "pages/box-labels.html",
+      "before": "/pages/js/box-labels.js?v=2026.09.10.5",
+      "after": "/pages/js/box-labels.js?v=2026.09.10.7",
+      "count": 1
+    },
+    {
+      "file": "staff-dashboard-v3/index.html",
+      "before": "/shared_components/css/staff-home.css?v=2026.09.10.6",
+      "after": "/shared_components/css/staff-home.css?v=2026.09.10.7",
+      "count": 1
+    },
+    {
+      "file": "staff-dashboard-v3/index.html",
+      "before": "/shared_components/js/staff-dashboard/core/dashboard-app.js?v=2026.09.04.8",
+      "after": "/shared_components/js/staff-dashboard/core/dashboard-app.js?v=2026.09.10.7",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.html",
+      "before": "/shared_components/css/staff-calibration.css?v=2026.09.10.5",
+      "after": "/shared_components/css/staff-calibration.css?v=2026.09.10.7",
+      "count": 1
+    },
+    {
+      "file": "tools/custom-tees-calibrate.html",
+      "before": "/tools/custom-tees-calibrate.js?v=2026.09.06.31",
+      "after": "/tools/custom-tees-calibrate.js?v=2026.09.10.7",
+      "count": 1
     }
   ],
   "retiredStyles": [
