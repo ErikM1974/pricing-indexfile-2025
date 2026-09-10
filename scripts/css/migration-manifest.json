@@ -5356,6 +5356,49 @@
         "localCssRequests": 2
       },
       "providerOwnership": "Caspio employee records, approvals, export and sign-in remain provider-owned. Only the host page and containment are migrated."
+    },
+    {
+      "source": "pages/customer-invoice.html",
+      "family": "customer-documents",
+      "status": "reviewed",
+      "route": "/portal/invoice/:orderNo",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/customer-documents.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "customer",
+        "staff-preview",
+        "paid",
+        "unpaid",
+        "empty",
+        "long-invoice",
+        "escaped-content",
+        "invalid-invoice",
+        "expired-session",
+        "missing-invoice",
+        "failed-load",
+        "pending-load",
+        "retry",
+        "keyboard",
+        "four-widths",
+        "print",
+        "pdf-success",
+        "pdf-failure",
+        "pdf-retry",
+        "pdf-library-missing",
+        "scrolled-phone-pdf"
+      ],
+      "test": "tests/e2e/css-unification-customer-invoice.spec.js",
+      "maxCssBytes": 73242,
+      "measuredRawCssBytes": 72218,
+      "baseline": {
+        "commit": "64b95d2d",
+        "rawCssBytes": 19995,
+        "localCssRequests": 2
+      }
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",

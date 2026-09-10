@@ -58,10 +58,7 @@ Quote-operation access rollout (2026-09-07) is archived in LESSONS_LEARNED_ARCHI
 - Solution: measure committed LF source bytes. Resolve production bundles from the production manifest and compare executable bytes excluding only the source-map filename.
 - Prevention: keep exact source-asset/live-SHA checks and do not increase budgets or claim missing deployment from a local bundle filename alone.
 
-## Server authentication migrations must preserve every caller boundary (2026-09-08)
-- Problem/root cause: transfer/Supacolor routers were open; separate notes, image downloads, vision extraction and two scheduler jobs used different call paths. The app's smaller global parser would also reject previously valid screenshots.
-- Solution: staff-session relays keep the credential server-side, authenticate before the 10 MB screenshot parser, allowlist paths/queries and preserve binary downloads. Vendor sessions retain ownership checks; public customer mockups do not request staff transfers.
-- Prevention: test actual mounts/page gates, allowed and denied identities, large/malformed requests, vendor notes and customer rendering. Deploy browser relays first, then backend gates and authenticated cron callers; never infer identity from Origin.
+Transfer/Supacolor authentication migration (2026-09-08) is archived in LESSONS_LEARNED_ARCHIVE.md. Keep staff/vendor/customer boundaries and auth-before-large-parser checks; never infer identity from Origin.
 
 ## Art-family themes and dialogs need runtime state coverage (2026-09-08)
 - Problem/root cause: department-scoped layout vanished in customer mode, guessed palette names had no definition, tablists mixed navigation links with tabs, and selection/toast opacity reduced text contrast. Icon-only controls also depended on an unloaded font.
@@ -253,3 +250,8 @@ Box-label follow-up (2026-09-10): a failed/new lookup must clear old printable d
 - Problem/root cause: a wide provider table expanded the whole phone page; shared controls were duplicated by Bootstrap and two local sheets, and failed embeds left blank space.
 - Solution: share the wrapper owner and canonical controls, give the provider a labelled keyboard-scroll region plus an always-available direct destination, and keep provider markup/approval behavior externally owned. Remove focus outlines only on paper.
 - Prevention: original source/provider locks, wide DOM and iframe fixtures, delayed/failed/login/empty states, narrow-screen axe and every PDF page. Allow exact static font/icon CSS reads before rejecting other fetches in axe-aware mock handlers; use declared tokens such as radius-pill.
+
+### Customer invoice PDF exports need their own geometry and failure cleanup (2026-09-10)
+- Problem/root cause: PDF action was enabled before loading and failed silently; resized capture viewports clipped exports, scrolled phone captures were blank, and html2pdf kept an invisible blocking overlay after rendering failed.
+- Solution: enable after successful render, offer visible load/PDF retry, use an independent paper clone with explicit canvas scrollX/scrollY zero, and remove only the failed worker’s overlay. Keep financial values and date-only parsing unchanged.
+- Prevention: record original fields/amounts/links, test actual desktop and scrolled-phone downloads, raster ink/logo checks, real library failure/retry and every rendered PDF page. A successful download event is not proof that the invoice is visible. CSS scale tokens are not uniform multiples: space-8 is64px, not32px; validate every variable against the actual token file.

@@ -390,3 +390,5 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - tests/e2e/helpers/customer-invoice-browser.js — fail-closed synthetic invoice data, original-source restoration and PDF isolation.
 - tests/e2e/css-unification-customer-invoice.spec.js — original/current invoice contracts, four-width accessibility, auth/error and complete PDF checks.
 - tests/fixtures/customer-invoice-{normal,paid,empty,long,escaped,preview}-original-browser.json — immutable original customer invoice values and paper contracts.
+
+- shared_components/css/customer-documents.css — shared customer document shell and responsive/print portal invoice; replaces retired pages/css/customer-invoice.css.

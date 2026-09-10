@@ -391,6 +391,168 @@
     "shared_components/js/toast-notifications.js": "f893a986b204e6d1890f43bcd7eef7e9391169b980fc6284d4b38e0576a4c34e",
     "shared_components/js/work-order-picker.js": "47fd14872b2bed46d8fcfa86078c42e42e5598509ede38b48808c035eec1988f"
   },
-  "changes": [],
-  "retiredStyles": []
+  "changes": [
+    {
+      "file": "pages/customer-invoice.html",
+      "before": "  <link rel=\"stylesheet\" href=\"/pages/css/customer-invoice.css?v=2026.09.07.19\">",
+      "after": "  <link rel=\"stylesheet\" href=\"/shared_components/css/components.css?v=2026.09.10.8\">\n  <link rel=\"stylesheet\" href=\"/shared_components/css/customer-documents.css?v=2026.09.10.8\">\n  <link rel=\"stylesheet\" href=\"https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap\">",
+      "count": 1
+    },
+    {
+      "file": "pages/customer-invoice.html",
+      "before": "<body>\n  <h1 class=\"sr-only\">Invoice</h1>\n  <div class=\"ci-toolbar\" id=\"ci-toolbar\">",
+      "after": "<body data-ui=\"unified\" data-customer-document=\"portal-invoice\">\n  <a class=\"skip-link\" href=\"#ci-main\">Skip to invoice</a>\n  <header class=\"document-header\">\n    <div><p class=\"document-eyebrow\">Northwest Custom Apparel</p><h1 class=\"document-title\">Invoice</h1></div>\n  <div class=\"document-actions ci-toolbar\" id=\"ci-toolbar\">",
+      "count": 1
+    },
+    {
+      "file": "pages/customer-invoice.html",
+      "before": "class=\"ci-back\"",
+      "after": "class=\"page-nav-link ci-back\"",
+      "count": 1
+    },
+    {
+      "file": "pages/customer-invoice.html",
+      "before": "class=\"ci-btn\" type=\"button\"",
+      "after": "class=\"btn btn-primary ci-btn\" type=\"button\" disabled",
+      "count": 1
+    },
+    {
+      "file": "pages/customer-invoice.html",
+      "before": "  </div>\n  <main>",
+      "after": "  </div>\n  </header>\n  <main class=\"document-main\" id=\"ci-main\" tabindex=\"-1\">\n  <p class=\"document-error\" id=\"ci-download-error\" role=\"alert\" hidden></p>",
+      "count": 1
+    },
+    {
+      "file": "pages/customer-invoice.html",
+      "before": "id=\"ci-loading\">",
+      "after": "id=\"ci-loading\" role=\"status\">",
+      "count": 1
+    },
+    {
+      "file": "pages/customer-invoice.html",
+      "before": "Back to portal</a>.</div>",
+      "after": "Back to portal</a>. <button class=\"btn\" id=\"ci-retry\" type=\"button\">Try again</button></div>",
+      "count": 1
+    },
+    {
+      "file": "pages/customer-invoice.html",
+      "before": "/pages/js/customer-invoice.js?v=2026.09.06.1",
+      "after": "/pages/js/customer-invoice.js?v=2026.09.10.8",
+      "count": 1
+    },
+    {
+      "file": "pages/js/customer-invoice.js",
+      "before": "  if (!/^\\d+$/.test(orderNo)) { fail(); return; }",
+      "after": "  document.getElementById('ci-retry').addEventListener('click', function () { location.reload(); });\n\n  if (!/^\\d+$/.test(orderNo)) { fail(); return; }",
+      "count": 1
+    },
+    {
+      "file": "pages/js/customer-invoice.js",
+      "before": "'<td class=\"num\">' + esc(it.quantity)",
+      "after": "'<td class=\"num\" data-label=\"Qty\">' + esc(it.quantity)",
+      "count": 1
+    },
+    {
+      "file": "pages/js/customer-invoice.js",
+      "before": "'<td><div class=\"ci-item-part\">'",
+      "after": "'<td data-label=\"Item\"><div class=\"ci-item-part\">'",
+      "count": 1
+    },
+    {
+      "file": "pages/js/customer-invoice.js",
+      "before": "'<td class=\"num\">' + (it.unitPrice",
+      "after": "'<td class=\"num\" data-label=\"Unit Price\">' + (it.unitPrice",
+      "count": 1
+    },
+    {
+      "file": "pages/js/customer-invoice.js",
+      "before": "'<td class=\"num\">' + (it.lineTotal",
+      "after": "'<td class=\"num\" data-label=\"Total\">' + (it.lineTotal",
+      "count": 1
+    },
+    {
+      "file": "pages/js/customer-invoice.js",
+      "before": "'<div class=\"ci-inv-title\">Invoice: ' + esc(d.invoiceNumber) + '</div>'",
+      "after": "'<h2 class=\"ci-inv-title\">Invoice: ' + esc(d.invoiceNumber) + '</h2>'",
+      "count": 1
+    },
+    {
+      "file": "pages/js/customer-invoice.js",
+      "before": "<div style=\"grid-column:1/-1\">",
+      "after": "<div class=\"ci-design\">",
+      "count": 1
+    },
+    {
+      "file": "pages/js/customer-invoice.js",
+      "before": "'<table class=\"ci-table\"><thead><tr><th class=\"num\">Qty</th><th>Item</th><th class=\"num\">Unit Price</th><th class=\"num\">Total</th></tr></thead><tbody>' + rows + '</tbody></table>' +",
+      "after": "'<table class=\"ci-table\" aria-label=\"Invoice line items\"><thead><tr><th scope=\"col\" class=\"num\">Qty</th><th scope=\"col\">Item</th><th scope=\"col\" class=\"num\">Unit Price</th><th scope=\"col\" class=\"num\">Total</th></tr></thead><tbody>' + rows + '</tbody></table>' +\n      (rows ? '' : '<p class=\"ci-empty\">No line items on this invoice.</p>') +",
+      "count": 1
+    },
+    {
+      "file": "pages/js/customer-invoice.js",
+      "before": "    document.getElementById('ci-download').addEventListener('click', function () {\n      var btn = this, old = btn.textContent;",
+      "after": "    document.getElementById('ci-download').disabled = false;\n    document.getElementById('ci-download').addEventListener('click', function () {\n      if (this.disabled) return;\n      var btn = this, old = btn.textContent;\n      var error = document.getElementById('ci-download-error');\n      error.hidden = true;",
+      "count": 1
+    },
+    {
+      "file": "pages/js/customer-invoice.js",
+      "before": "        html2canvas: { scale: 2, useCORS: true },",
+      "after": "        html2canvas: { scale: 2, useCORS: true, windowWidth: 816 },\n        pagebreak: { mode: ['css', 'legacy'], avoid: ['tr', '.ci-head', '.ci-parties', '.ci-meta-grid', '.ci-totals', '.ci-foot'] },",
+      "count": 1
+    },
+    {
+      "file": "pages/js/customer-invoice.js",
+      "before": "      if (typeof html2pdf === 'undefined') { window.print(); done(); return; }\n      html2pdf().set(opt).from(paper).save().then(done).catch(done);",
+      "after": "      var failed = function () {\n        error.textContent = \"Couldn't prepare the PDF. Please try Download PDF again.\";\n        error.hidden = false;\n        done();\n      };\n      try {\n        if (typeof html2pdf === 'undefined') {\n          error.textContent = 'PDF download is unavailable. Choose Save as PDF in the print dialog.';\n          error.hidden = false;\n          window.print(); done(); return;\n        }\n        // Export an independent paper layout, including when the live page is on a phone.\n        var exportPaper = paper.cloneNode(true);\n        exportPaper.removeAttribute('id');\n        exportPaper.classList.add('ci-export');\n        html2pdf().set(opt).from(exportPaper).save().then(done).catch(failed);\n      } catch (_) { failed(); }",
+      "count": 1
+    },
+    {
+      "file": "pages/js/customer-invoice.js",
+      "before": "html2canvas: { scale: 2, useCORS: true, windowWidth: 816 }",
+      "after": "html2canvas: { scale: 2, useCORS: true }",
+      "count": 1
+    },
+    {
+      "file": "pages/js/customer-invoice.js",
+      "before": "html2canvas: { scale: 2, useCORS: true }",
+      "after": "html2canvas: { scale: 2, useCORS: true, scrollX: 0, scrollY: 0 }",
+      "count": 1
+    },
+    {
+      "file": "pages/js/customer-invoice.js",
+      "before": "typeof html2pdf",
+      "after": "typeof window.html2pdf",
+      "count": 1
+    },
+    {
+      "file": "pages/js/customer-invoice.js",
+      "before": "html2pdf().set(opt)",
+      "after": "window.html2pdf().set(opt)",
+      "count": 1
+    },
+    {
+      "file": "pages/js/customer-invoice.js",
+      "before": "      var error = document.getElementById('ci-download-error');",
+      "after": "      var error = document.getElementById('ci-download-error');\n      var pdfWorker;",
+      "count": 1
+    },
+    {
+      "file": "pages/js/customer-invoice.js",
+      "before": "      var failed = function () {",
+      "after": "      var failed = function () {\n        // html2pdf leaves its invisible interaction-blocking overlay on render failure.\n        if (pdfWorker && pdfWorker.prop && pdfWorker.prop.overlay) pdfWorker.prop.overlay.remove();",
+      "count": 1
+    },
+    {
+      "file": "pages/js/customer-invoice.js",
+      "before": "        window.html2pdf().set(opt).from(exportPaper).save().then(done).catch(failed);",
+      "after": "        pdfWorker = window.html2pdf().set(opt).from(exportPaper);\n        pdfWorker.save().then(done).catch(failed);",
+      "count": 1
+    }
+  ],
+  "retiredStyles": [
+    {
+      "file": "pages/css/customer-invoice.css",
+      "css": "/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its\n   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;\n   raw hex is allowed ONLY in this block. */\n/* stylelint-disable color-no-hex */\n:root {\n    --customer-invoice-gray: #888;\n    --customer-invoice-gray-2: #666;\n --nw-dark:var(--brand-800); --nw-med:var(--brand-mid); }\n/* stylelint-enable color-no-hex */\n* { box-sizing: border-box; }\n\nbody { margin:0; background:var(--store-paper-deep); color:var(--print-ink); padding:0 0 30px;\n  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; }\n\n.ci-toolbar { display:flex; justify-content:space-between; align-items:center; max-width:800px; margin:0 auto; padding:14px 18px; }\n.ci-back { color:var(--nw-med); text-decoration:none; font-size:14px; }\n.ci-btn { background:var(--nw-med); color:var(--color-surface); border:none; border-radius:8px; padding:9px 18px; font-size:14px; font-weight:600; cursor:pointer; box-shadow:0 3px 10px rgb(58 124 82 / 25%); }\n.ci-btn:hover { background:var(--nw-dark); }\n.ci-btn:disabled { opacity:.6; cursor:default; }\n.ci-status { max-width:800px; margin:40px auto; text-align:center; color:var(--customer-invoice-gray); }\n.ci-status a { color:var(--nw-med); }\n\n.ci-paper { max-width:800px; margin:0 auto; background:var(--color-surface); padding:26px 30px; box-shadow:0 2px 16px rgb(0 0 0 / 8%); }\n.ci-head { display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2.5px solid var(--nw-dark); padding-bottom:10px; }\n.ci-head-left { max-width:56%; }\n.ci-logo { max-width:175px; height:auto; }\n.ci-from { font-size:10.5px; color:var(--print-ink-soft); line-height:1.45; margin-top:5px; }\n.ci-head-right { text-align:right; }\n.ci-inv-title { font-size:19px; font-weight:700; color:var(--nw-dark); margin:0 0 3px; }\n.ci-inv-meta { font-size:11px; color:var(--print-ink-soft); line-height:1.5; }\n\n.ci-parties { margin:12px 0 4px; font-size:12px; }\n.ci-party h3 { font-size:10px; text-transform:uppercase; letter-spacing:.5px; color:var(--print-line); margin:0 0 3px; }\n.ci-party p { margin:1px 0; }\n\n.ci-meta-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:6px 12px; margin:10px 0 4px; padding:9px 12px; background:var(--gray-100); border-radius:7px; font-size:11.5px; }\n.ci-meta-grid .k { color:var(--print-line); text-transform:uppercase; font-size:9.5px; letter-spacing:.5px; }\n.ci-meta-grid .v { color:var(--print-ink); font-weight:600; }\n\n.ci-table { width:100%; border-collapse:collapse; margin-top:10px; font-size:11.5px; }\n.ci-table th { background:var(--nw-dark); color:var(--color-surface); text-align:left; padding:6px 9px; font-weight:600; }\n.ci-table th.num, .ci-table td.num { text-align:right; }\n.ci-table td { padding:5px 9px; border-bottom:1px solid var(--brand-100); vertical-align:top; }\n.ci-item-part { font-weight:600; }\n.ci-item-sizes { color:var(--customer-invoice-gray); font-size:10.5px; margin-top:1px; }\n\n.ci-totals { margin-top:12px; display:flex; justify-content:flex-end; }\n.ci-totals table { font-size:12px; min-width:240px; }\n.ci-totals td { padding:3px 8px; }\n.ci-totals td.lbl { color:var(--customer-invoice-gray-2); text-align:right; }\n.ci-totals td.amt { text-align:right; font-variant-numeric:tabular-nums; min-width:90px; }\n.ci-totals tr.grand td { font-weight:700; font-size:14px; color:var(--nw-dark); border-top:2px solid var(--nw-dark); }\n.ci-totals tr.bal td { font-weight:700; color:var(--color-ae); }\n.ci-totals tr.bal.paid td { color:var(--nw-dark); }\n\n.ci-foot { margin-top:16px; text-align:center; color:var(--gray-400); font-size:10.5px; border-top:1px solid var(--brand-100); padding-top:9px; }\n\n@media print { body { background:var(--color-surface); } .ci-toolbar { display:none; } .ci-paper { box-shadow:none; margin:0; max-width:100%; padding:0; } }\n\n@media (width <=640px) { .ci-paper { padding:20px 16px; } .ci-meta-grid { grid-template-columns:repeat(2,1fr); } }\n\n/* 2026-09-05 review: the hidden attribute must beat any display rule */\n/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */\n[hidden] { display: none !important; }\n\n/* 2026-09-06 review */\n.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }\n"
+    }
+  ]
 }

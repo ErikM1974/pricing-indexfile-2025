@@ -4230,3 +4230,9 @@ CI setup follow-up (2026-09-09): a Google Chrome apt index checksum mismatch blo
 - Solution: deploy credentials in proxy jobs/callbacks first; gate app operations with staff/shared-secret checks and authenticate loopback writes.
 - Customer refresh/vendor reads preserve existing share-token/legacy links, but resolve only that quote's work order; overrides require staff/trusted sync. Compare token byte lengths before timingSafeEqual.
 - Prevention: quote-sync-access.test.js exercises actual route chains, rejected callers, customer scope and internal forwarding; never probe live bulk mutations to test a gate.
+
+
+## Server authentication migrations must preserve every caller boundary (2026-09-08)
+- Problem/root cause: transfer/Supacolor routers were open; separate notes, image downloads, vision extraction and two scheduler jobs used different call paths. The app's smaller global parser would also reject previously valid screenshots.
+- Solution: staff-session relays keep the credential server-side, authenticate before the 10 MB screenshot parser, allowlist paths/queries and preserve binary downloads. Vendor sessions retain ownership checks; public customer mockups do not request staff transfers.
+- Prevention: test actual mounts/page gates, allowed and denied identities, large/malformed requests, vendor notes and customer rendering. Deploy browser relays first, then backend gates and authenticated cron callers; never infer identity from Origin.

@@ -168,7 +168,7 @@ const CSS_LINT_SCOPE = [
     'shared_components/css/staff-box-labels.css',
     'pages/css/custom-caps.css',
     'pages/css/custom-tees.css',
-    'pages/css/customer-invoice.css',
+    'shared_components/css/customer-documents.css',
     'pages/css/customer-login.css',
     'shared_components/css/access-shell.css',
     'shared_components/css/catalog-discovery.css',

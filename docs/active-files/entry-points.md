@@ -390,7 +390,7 @@
 | `/lib/cors-allowlist.js` | CORS EXACT-match origin allowlist (roadmap 1.2) — kills endsWith look-alike + *.herokuapp.com wildcard; env-extensible via CORS_ALLOWED_ORIGINS; dev localhost gated out of production | server.js CORS middleware; tests/unit/cors-origin-allowlist.test.js | ✅ Active |
 | `/pages/customer-invoice.html` | ShopWorks-style invoice page at `/portal/invoice/:orderNo` (session-gated) — on-screen + Download PDF (html2pdf) | customer-invoice.js/.css | ✅ Active |
 | `/pages/js/customer-invoice.js` | Fetches `/api/portal/invoice/:orderNo` (ownership-checked), renders the invoice (header/line-items/sizes/totals), wires html2pdf download | server.js GET /api/portal/invoice | ✅ Active |
-| `/pages/css/customer-invoice.css` | Invoice paper styling (print-friendly) | — | ✅ Active |
+| `/shared_components/css/customer-documents.css` | Invoice paper styling (print-friendly) | — | ✅ Active |
 | `/pages/customer-product.html` | Portal product-detail page at `/portal/product/:style` (session-gated) — specs, all colors, order-history size matrix, traffic-light availability, re-order (Phase B, 2026-07-01). **2026-09-05 review:** site logo + `/favicon.png`, header brand is a div (the product name is the `<h1>`), header back-link, `hidden` panels, Retry on a failed load, zero inline code | customer-product.js/.css, customer-portal.css, app-config.js | ✅ Active |
 | `/pages/js/customer-product.js` | Fetches `/api/portal/product/:style` (+ preview mirror), renders specs/swatch gallery/size matrix/availability/re-order; POSTs `/api/portal/reorder-request` | server.js GET /api/portal/product | ✅ Active |
 | `/pages/css/customer-product.css` | Product-detail page styling (layers on customer-portal.css tokens) | customer-portal.css | ✅ Active |

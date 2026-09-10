@@ -57,6 +57,7 @@ describe('customer portal + customer invoice', () => {
         expect(html).toMatch(/id="ci-error" role="alert" hidden>/);
         expect(html).toMatch(/id="ci-paper" hidden>/);
         expect(js).not.toMatch(/\.style\.display/);
-        expect(read('pages/css/customer-invoice.css')).toMatch(/\[hidden\] \{ display: none !important; \}/);
+        expect(html).toContain('data-ui="unified"');
+        expect(read('shared_components/css/components.css')).toMatch(/\[hidden\]\s*\{\s*display:\s*none;/);
     });
 });
