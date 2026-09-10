@@ -1,3 +1,17 @@
+## v2026.09.10.2 (2026.09.10)
+
+- Capture original staff toolkit sources and preservation contracts
+- Record verified personalization release and staff toolkit continuation
+- Draft shared staff toolkit frame and preserve contract pricing workflows
+- Draft unified volume quoting with preserved prices and reliable async states
+- Draft unified product catalog with stable editing and upload recovery
+- Draft unified blog editor with current previews and preserved publishing
+- Draft unified portal administration with guarded rewards and complete reports
+- Complete staff toolkit styling and preserve mailing and past-due workflows
+- Integrate reviewed staff toolkit CSS and workflow preservation
+- Keep toolkit source and attribution guards portable across checkouts
+- Deploy v2026.09.10.2: unify staff tools and preserve complete reports
+
 ## v2026.09.10.1 (2026.09.10)
 
 - Plan personalization workflow CSS review with immutable original contracts
