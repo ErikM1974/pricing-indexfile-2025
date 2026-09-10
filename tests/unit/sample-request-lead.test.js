@@ -35,7 +35,7 @@ describe('the sample-request form id is in every app-side vocabulary site', () =
         expect(literal(inbox, 'STATUS_CHOICES')['sample-request']).toEqual(['New', 'Contacted', 'Quoted', 'Won', 'Lost', 'Archived']);
         expect(inbox).toMatch(/'sample-request': \{ label: 'Sample Request', icon: 'fa-shirt', cls: 'badge--srq' \}/);
         expect(read('dashboards/form-submissions.html')).toMatch(/data-form="quote-request,sample-request,manual-lead"/);
-        expect(read('dashboards/css/form-submissions.css')).toMatch(/\.badge--srq \{/);
+        expect(read('shared_components/css/crm-records.css')).toMatch(/\.badge--srq \{/);
     });
     test('every lead form the Inbox can show has its pipeline there, identical to leads-common', () => {
         const a = literal(leadsCommon, 'STATUS_CHOICES'); const b = literal(inbox, 'STATUS_CHOICES');

@@ -63,14 +63,19 @@
     function load() {
         DashPage.hideError();
         var tbody = document.getElementById('ms-tbody');
+        state.rows = [];
+        document.getElementById('ms-count').textContent = 'Loading…';
         tbody.innerHTML = '<tr><td colspan="6" class="ld-empty dash-loading">Loading…</td></tr>';
         var seq = ++state.loadSeq;
         msFetch('?status=' + encodeURIComponent(state.status)).then(function (body) {
             if (seq !== state.loadSeq) return;
-            state.rows = body.shipments || [];
+            if (!body || !Array.isArray(body.shipments)) throw new Error('Incomplete shipments response');
+            state.rows = body.shipments;
             render();
         }).catch(function (err) {
             if (seq !== state.loadSeq) return;
+            state.rows = [];
+            document.getElementById('ms-count').textContent = 'Unavailable';
             console.error('[marketing-shipments] load failed:', err);
             DashPage.showError('Could not load the queue (' + err.message + '). Refresh to retry.');
             tbody.innerHTML = '<tr><td colspan="6" class="ld-empty"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Queue unavailable.</td></tr>';
@@ -94,8 +99,8 @@
             var actions = shipped
                 ? (s.Tracking_Number ? '<span class="ms-track">' + esc(s.Carrier || '') + ' ' + esc(s.Tracking_Number) + '</span>' : '<span class="ld-muted">shipped</span>')
                 : '<div class="ms-actions" data-id="' + esc(s.Shipment_ID) + '">' +
-                  (s.Status === 'Requested' ? '<button type="button" class="lw-chip ms-pack">Mark packed</button>' : '') +
-                  '<button type="button" class="ld-btn ms-ship">Mark shipped…</button></div>';
+                  (s.Status === 'Requested' ? '<button type="button" class="lw-chip ms-pack btn">Mark packed</button>' : '') +
+                  '<button type="button" class="ld-btn ms-ship btn">Mark shipped…</button></div>';
             return '<tr data-id="' + esc(s.Shipment_ID) + '">' +
                 '<td class="ld-when">' + fmtWhen(s.Created_At) + '<div class="ld-muted">' + esc(s.Shipment_ID) + '</div></td>' +
                 '<td>' + esc(s.Recipient_Name || '—') + '<div class="ld-muted">' + esc(s.Company || '') + '</div>' + (leadLink ? '<div>' + leadLink + '</div>' : '') + '</td>' +
@@ -119,10 +124,10 @@
         var id = container.getAttribute('data-id');
         container.innerHTML =
             '<div class="ms-ship-form">' +
-            '<select class="ms-carrier ld-select"><option>USPS</option><option>UPS</option><option>FedEx</option><option>Other</option></select>' +
-            '<input type="text" class="ms-tracking ld-select" placeholder="Tracking #" autocomplete="off">' +
-            '<button type="button" class="ld-btn ld-btn--primary ms-ship-go">Ship</button>' +
-            '<button type="button" class="lw-chip ms-ship-cancel">Cancel</button>' +
+            '<select class="ms-carrier ld-select field-select" aria-label="Shipping carrier"><option>USPS</option><option>UPS</option><option>FedEx</option><option>Other</option></select>' +
+            '<input type="text" class="ms-tracking ld-select field-input" aria-label="Tracking number" placeholder="Tracking #" autocomplete="off">' +
+            '<button type="button" class="ld-btn ld-btn--primary ms-ship-go btn">Ship</button>' +
+            '<button type="button" class="lw-chip ms-ship-cancel btn">Cancel</button>' +
             '</div>';
         container.querySelector('.ms-tracking').focus();
         container.querySelector('.ms-ship-cancel').addEventListener('click', load);
