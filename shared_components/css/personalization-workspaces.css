@@ -320,6 +320,15 @@
     }
 
     @media print {
+        :where([data-ui="unified"][data-personalization]) {
+            background: var(--color-surface);
+        }
+
+        :where([data-ui="unified"][data-personalization="monogram-dashboard"])
+            .card-header {
+            display: none;
+        }
+
         @page {
             size: letter landscape;
             margin: 10mm;
