@@ -512,3 +512,16 @@ Six pages: House Accounts, Nika CRM, Taneisha CRM, Leads, Lead Scorecard and Unq
 Account CSS graphs123,166LFbytes versus54,563/59,002/59,002; pipeline97,911 versus176,101/161,043/161,142. This consolidates ownership; account payloads increased while pipeline payloads decreased. Full CSS scope278clean in isolated tree. Runtime census:155reviewed migrations locally/70pending/79excluded, but LIVE REMAINS149/76 on.18 until.19 is deployed and verified. Lessons250lines after archiving three resolved references. No real writes/uploads/emails/notifications; every API, including mutating GET reconcile, was intercepted.
 
 Next: integrate this exact reviewed SHA into clean develop, preserve the .18 live checkpoint, run all full application gates, then require actual browser/money/calculator steps in exact-source CI before one deployment. Verify release/running slug, both raw/versioned and registered hashed assets, prior staff/public access and four retired-sheet404 responses. Backend unchanged.
+
+## Lead detail and Forms Inbox — next family plan, 2026-09-09
+
+Isolated branch codex/lead-details starts at reviewed CRM source d44f7551fc1d3a251c12599314f8c23b94fadea4. Candidate v2026.09.09.20; primary .19 full gates are running independently on integration8ed0ea00a871dc047f71b66c52a8c766516a8561. LIVE remains.18/2094/149reviewed/76pending. This two-page plan adds no reviewed/live credit and no application edits yet.
+
+- [x] Save original HTML contracts, stylesheet graphs and controller/helper hashes for dashboards/lead.html and dashboards/form-submissions.html.
+- [ ] Capture original synthetic lead activity/rail and Forms Inbox tables/detail dialogs at four widths, original print output and export contracts; all API calls and mutations mocked.
+- [ ] Migrate both pages to canonical controls/tokens/Public Sans and scoped CRM layouts. Preserve contact/status vocabulary, money values, attachments, quotes, sample returns and outreach payloads; no real sends, writes or uploads.
+- [ ] Treat dynamically loaded garment-submit-form.css/JS and quote-view consumers as a separate boundary. Do not restyle a shared runtime form without covering every consumer. The previous CRM source lock intentionally excludes these lead-detail files; supersede that boundary with explicit recorded changes and new preservation evidence when this family is reviewed.
+- [ ] Cover loading/malformed/empty/error/retry, tab/focus/keyboard, authorized action failures, stale responses, original content and full print. Update test previews/consumers before retiring leads.css/lead-workspace.css/form-submissions.css; retain any still-used owner.
+- [ ] Register reviewed owners, lifecycle and evidence; integrate the exact reviewed SHA only after .19 is verified live. Run full gates and actual exact-source CI before the next single rollout.
+
+Original evidence is private under the task artifact directory: lead-details-original-baseline.json and lead-details-original-* source copies. Do not recapture originals after editing. node_modules remains a junction into primary; never recursively delete it and never copy.env.
