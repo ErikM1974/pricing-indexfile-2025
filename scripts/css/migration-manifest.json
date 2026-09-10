@@ -5008,6 +5008,40 @@
         "rawCssBytes": 27702,
         "localCssRequests": 2
       }
+    },
+    {
+      "source": "dashboards/production-shifts.html",
+      "family": "staff-workspace",
+      "status": "pilot",
+      "route": "/dashboards/production-shifts.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/staff-schedules.css"
+      ],
+      "dynamicStyles": [],
+      "dynamicTokens": [
+        "--ps-avatar-size",
+        "--ps-avatar-hue",
+        "--ps-left",
+        "--ps-width"
+      ],
+      "states": [
+        "four-original-department-and-ten-employee-contracts",
+        "original-segment-math-and-policy-content",
+        "four-width-accessibility-and-keyboard-scroll",
+        "detail-focus-containment-escape-and-return",
+        "missing-runtime-recovery",
+        "one-page-original-and-current-department-schedules"
+      ],
+      "test": "tests/e2e/css-unification-staff-workspaces.spec.js",
+      "maxCssBytes": 129465,
+      "measuredRawCssBytes": 128441,
+      "baseline": {
+        "commit": "0f151e3899b8517092b1864babd8ea7f579fc95b",
+        "rawCssBytes": 62983,
+        "localCssRequests": 2
+      }
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",

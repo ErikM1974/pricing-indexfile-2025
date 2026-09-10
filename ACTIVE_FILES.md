@@ -293,3 +293,7 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 
 - Retired dashboards/css/DrainPro-Bundle.css after consumer audit and six browser checks. Original 11787 LF bytes / 7 flags preserved in staff-workspaces-original-content.json; staff-workspaces.css owns the current layout.
 - Added tests/fixtures/staff-workspaces-shifts-original-browser.json: original department tables, timeline text, every employee detail, segment math, four widths and four printed schedule captures.
+
+- Added shared_components/css/staff-schedules.css: scoped production schedule draft with canonical tokens/controls and preserved timeline/print geometry. Old production-shifts/styles.css retained until complete browser/paper/consumer review.
+
+- Retired dashboards/production-shifts/styles.css after original/current data, six browser scenarios and four one-page current paper reviews. Replaced its explicit lint entry with staff-schedules.css; updated the production page guard and active-owner documentation. Original 45452 LF bytes / 71 flags preserved in the source fixture.

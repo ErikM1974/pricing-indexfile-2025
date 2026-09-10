@@ -15,14 +15,14 @@ const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 describe('production shifts', () => {
     const html = read('dashboards/production-shifts.html');
     const jsx = read('dashboards/production-shifts/app.jsx');
-    const css = read('dashboards/production-shifts/styles.css');
+    const css = read('shared_components/css/staff-schedules.css');
     test('production React builds with integrity, versions bumped', () => {
         expect(html).toMatch(/react@18\.3\.1\/umd\/react\.production\.min\.js" integrity="sha384-/);
         expect(html).toMatch(/react-dom@18\.3\.1\/umd\/react-dom\.production\.min\.js" integrity="sha384-/);
         expect(html).not.toMatch(/\.development\.js/);
         // versioned, not pinned to a date: the deploy cache-bust rewrites ?v= on every changed asset
         expect(html).toMatch(/app\.jsx\?v=2026\.\d{2}\.\d{2}\.\d+/);
-        expect(html).toMatch(/styles\.css\?v=2026\.\d{2}\.\d{2}\.\d+/);
+        expect(html).toMatch(/staff-schedules\.css\?v=2026\.\d{2}\.\d{2}\.\d+/);
     });
     test('keyboard paths + pressed state', () => {
         expect(jsx).toMatch(/className="td-name-wrap row-btn"\s+aria-pressed=\{isSel\}/);

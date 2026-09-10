@@ -9,12 +9,19 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-<link rel="stylesheet" href="/dashboards/production-shifts/styles.css?v=2026.09.07.18">
+<link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.10.3">
+<link rel="stylesheet" href="/shared_components/css/staff-schedules.css?v=2026.09.10.3">
 </head>
-<body>
+<body data-ui="unified" data-staff-schedule="shifts" data-department="floor">
+<a class="skip-link" href="#schedule-main">Skip to schedule</a>
+<section class="ps-load-state" id="schedule-load-state" role="status">
+<p><strong>Production Shifts</strong></p>
+<p>The schedule has not loaded. Reload the page to try again.</p>
+<a class="btn" href="/dashboards/production-shifts.html">Reload schedule</a>
+</section>
 
 <div id="root"></div>
 
@@ -23,7 +30,7 @@
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
 
 <script src="/dashboards/production-shifts/data.js?v=2026.07.30.1"></script>
-<script type="text/babel" src="/dashboards/production-shifts/app.jsx?v=2026.09.05.51"></script>
+<script type="text/babel" src="/dashboards/production-shifts/app.jsx?v=2026.09.10.3"></script>
 
 </body>
 </html>

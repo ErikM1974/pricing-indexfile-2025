@@ -27,9 +27,8 @@ function Avatar({ name, size = 32 }) {
     <div
       className="avatar"
       style={{
-        width: size, height: size, fontSize: size * 0.4,
-        background: `oklch(0.93 0.03 ${h})`,
-        color: `oklch(0.35 0.09 ${h})`,
+        '--ps-avatar-size': size + 'px',
+        '--ps-avatar-hue': h,
       }}
     >{initials}</div>
   );
@@ -70,14 +69,14 @@ function Header() {
         </div>
       </div>
       <div className="topbar-right">
-        <a href="#workrules" className="btn-ghost">
+        <a href="#workrules" className="btn schedule-rule-link">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
             <path d="M14 2v6h6M9 13h6M9 17h6"/>
           </svg>
           Work rules
         </a>
-        <a href="#rules" className="btn-ghost">
+        <a href="#rules" className="btn schedule-rule-link">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="12" cy="12" r="9"/>
             <path d="M12 8v4M12 16h.01"/>
@@ -149,7 +148,7 @@ function MasterTable({ employees, onSelect, selectedId }) {
             <span className="legend-item"><span className="legend-sw legend-break" />Rest break (paid, no punch)</span>
             <span className="legend-item"><span className="legend-sw legend-lunch" />Lunch (unpaid, punch out &amp; in)</span>
           </div>
-          <button type="button" className="btn-primary master-print" onClick={() => window.print()}>
+          <button type="button" className="btn btn-primary master-print" onClick={() => window.print()}>
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
               <path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
               <rect x="6" y="14" width="12" height="8" rx="1"/>
@@ -158,7 +157,7 @@ function MasterTable({ employees, onSelect, selectedId }) {
           </button>
         </div>
       </div>
-      <div className="master-scroll">
+      <div className="master-scroll" role="region" aria-label="Master production schedule" tabIndex="0">
         <table className="master-table">
           <thead>
             <tr>
@@ -236,7 +235,7 @@ function Timeline({ employees, onSelect, selectedId }) {
         </div>
       </div>
 
-      <div className="timeline-scroll">
+      <div className="timeline-scroll" role="region" aria-label="Production shift timeline" tabIndex="0">
         <div className="timeline-grid">
           {/* hour axis */}
           <div className="tl-axis-label" />
@@ -246,7 +245,7 @@ function Timeline({ employees, onSelect, selectedId }) {
               const p = pct(h * 60);
               const label = h === 12 ? "12p" : h < 12 ? `${h}a` : `${h - 12}p`;
               return (
-                <div key={h} className="tl-tick" style={{ left: `${p}%` }}>
+                <div key={h} className="tl-tick" style={{ '--ps-left': `${p}%` }}>
                   <span className="tl-tick-label">{label}</span>
                 </div>
               );
@@ -273,11 +272,11 @@ function Timeline({ employees, onSelect, selectedId }) {
                 </button>
                 <div className={`tl-row ${isSelected ? "selected" : ""}`} aria-hidden="true">
                   {Array.from({ length: TL_HOURS }).map((_, i) => (
-                    <div key={i} className="tl-gridline" style={{ left: `${pct((TL_START / 60 + 1 + i) * 60)}%` }} />
+                    <div key={i} className="tl-gridline" style={{ '--ps-left': `${pct((TL_START / 60 + 1 + i) * 60)}%` }} />
                   ))}
                   <div
                     className="tl-envelope"
-                    style={{ left: `${pct(shiftStart)}%`, width: `${pct(shiftEnd) - pct(shiftStart)}%` }}
+                    style={{ '--ps-left': `${pct(shiftStart)}%`, '--ps-width': `${pct(shiftEnd) - pct(shiftStart)}%` }}
                   />
                   {segs.map((s, i) => {
                     const w = pct(s.end) - pct(s.start);
@@ -287,7 +286,7 @@ function Timeline({ employees, onSelect, selectedId }) {
                       <div
                         key={i}
                         className={`tl-seg tl-seg-${s.type}`}
-                        style={{ left: `${pct(s.start)}%`, width: `${w}%` }}
+                        style={{ '--ps-left': `${pct(s.start)}%`, '--ps-width': `${w}%` }}
                         title={`${label || "Working"} · ${tip}`}
                         onClick={() => onSelect(emp.id)}
                       >
@@ -295,10 +294,10 @@ function Timeline({ employees, onSelect, selectedId }) {
                       </div>
                     );
                   })}
-                  <div className="tl-cap tl-cap-start" style={{ left: `${pct(shiftStart)}%` }}>
+                  <div className="tl-cap tl-cap-start" style={{ '--ps-left': `${pct(shiftStart)}%` }}>
                     <span className="cap-time">{minToTime(shiftStart)}</span>
                   </div>
-                  <div className="tl-cap tl-cap-end" style={{ left: `${pct(shiftEnd)}%` }}>
+                  <div className="tl-cap tl-cap-end" style={{ '--ps-left': `${pct(shiftEnd)}%` }}>
                     <span className="cap-time">{minToTime(shiftEnd)}</span>
                   </div>
                 </div>
@@ -375,7 +374,7 @@ function DeptChips({ dept, setDept, employees }) {
         <button
           type="button"
           key={d}
-          className={`chip ${dept === d ? "chip-active" : ""}`}
+          className={`btn chip ${dept === d ? "chip-active" : ""}`}
           aria-pressed={dept === d}
           onClick={() => setDept(d)}
         >
@@ -394,11 +393,24 @@ function DetailPanel({ emp, onClose }) {
   // Dialog behaviour: remember the trigger, move focus to Close, Esc closes, focus returns on unmount.
   useEffect(() => {
     returnRef.current = document.activeElement;
+    const screen = document.querySelector('.ps-screen');
+    const previousInert = screen ? screen.inert : false;
+    const previousScrollLock = document.body.classList.contains('ps-detail-open');
+    if (screen) screen.inert = true;
+    document.body.classList.add('ps-detail-open');
     if (closeRef.current) closeRef.current.focus();
-    const onKey = (e) => { if (e.key === "Escape") onClose(); };
+    const onKey = (e) => {
+      if (e.key === "Escape") onClose();
+      if (e.key === "Tab") {
+        e.preventDefault();
+        if (closeRef.current) closeRef.current.focus();
+      }
+    };
     document.addEventListener("keydown", onKey);
     return () => {
       document.removeEventListener("keydown", onKey);
+      if (screen) screen.inert = previousInert;
+      if (!previousScrollLock) document.body.classList.remove('ps-detail-open');
       const back = returnRef.current;
       if (back && document.body.contains(back) && typeof back.focus === "function") back.focus();
     };
@@ -408,7 +420,7 @@ function DetailPanel({ emp, onClose }) {
 
   return (
     <aside className="detail-panel" role="dialog" aria-modal="true" aria-labelledby="detail-name">
-      <button type="button" ref={closeRef} className="detail-close" onClick={onClose} aria-label="Close shift details">
+      <button type="button" ref={closeRef} className="btn detail-close" onClick={onClose} aria-label="Close shift details">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
           <path d="M6 6l12 12M18 6L6 18"/>
         </svg>
@@ -731,6 +743,10 @@ function LaborRules() {
 
 // ---------------- App ----------------
 function App() {
+  useEffect(() => {
+    const fallback = document.getElementById('schedule-load-state');
+    if (fallback) fallback.hidden = true;
+  }, []);
   const all = window.NWCA_SCHEDULE;
   const [dept, setDept] = useState("All");
   const [selectedId, setSelectedId] = useState(null);
@@ -753,6 +769,7 @@ function App() {
 
   return (
     <div className="app">
+      <div className="ps-screen">
       <Breadcrumb />
       <Header />
 
@@ -774,11 +791,12 @@ function App() {
         <div className="print-meta">
           <div className="print-meta-row"><span>Printed</span><strong>{new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</strong></div>
           <div className="print-meta-row"><span>Team size</span><strong>{all.length} employees</strong></div>
+          <div className="print-meta-row"><span>Showing</span><strong>{employees.length} · {dept}</strong></div>
           <div className="print-meta-row"><span>Compliance</span><strong>WAC 296-126-092</strong></div>
         </div>
       </div>
 
-      <main className="main">
+      <main className="main" id="schedule-main">
         <div className="notices">
           <div className="notice notice-law">
             <span className="notice-icon">
@@ -889,6 +907,7 @@ function App() {
           <span>Reference: WAC 296-126-092 / RCW 49.12</span>
         </footer>
       </main>
+      </div>
 
       {selected && (
         <DetailPanel emp={selected} onClose={closeDetail} />

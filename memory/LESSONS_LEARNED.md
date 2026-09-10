@@ -34,18 +34,6 @@ live-engine specs back on in CI, add `CRM_API_SECRET` under Settings → Secrets
 
 CI setup follow-up (2026-09-09): a Google Chrome apt index checksum mismatch blocked Playwright before tests on two runners. CI uses bundled Chromium; disable only the unrelated Google Chrome source on the disposable runner and keep Ubuntu repositories/checksum verification intact. Require the actual browser steps to pass on the new exact commit.
 
-## Runtime and dependency audit (2026-09-08, archived)
-
-Match production/CI runtimes, audit the resolved tree and verify actual live-pricing CI steps. Full incident in LESSONS_LEARNED_ARCHIVE.md.
-
-## Tooling upgrades and visual verification (2026-09-07, archived)
-
-Keep version choices tied to measured checks and compare screenshots only after readiness. Full entry in LESSONS_LEARNED_ARCHIVE.md.
-
-## DTF browser readiness (2026-09-07, archived)
-
-Wait for functional initialization before typing; retain failed and successful save coverage. Full entry in LESSONS_LEARNED_ARCHIVE.md.
-
 ## Calculator prerequisite failures must stop pricing (2026-09-07)
 - Problem: color/size failures were swallowed; the next pricing stage could hide the error or reuse another style's size data.
 - Root cause: empty error branches and catch blocks inside prerequisite loaders.
@@ -250,3 +238,6 @@ Mailing/Past Due follow-up: failed or incomplete lists must remain unknown throu
 
 ### Drain-Pro tab ownership (2026-09-10)
 - Problem/root cause: switchTab relied on the browser global event, so a direct call could fail or clear both panels. Solution: resolve the target by tab ID before changing state; explicit selected/hidden semantics and arrow/Home/End navigation. Prevention: synthetic click, keyboard, direct-call and invalid-target browser checks; provider URLs stay unchanged.
+
+### Production schedule controls and paper (2026-09-10)
+- Problem/root cause: mobile rule cards kept a 240px minimum, header ghost links lost contrast on navy, detail dialogs did not contain focus, and 44px screen buttons expanded paper rows. Solution: bounded responsive grids, shared solid controls, inert/focus/scroll restoration and separate print row heights. Prevention: original/current ten-employee and four-department comparisons, four-width axe/scroll checks, modal keyboard tests and one-page PDF locks. Preserve data.js and policy prose; CSS case changes are presentation only.

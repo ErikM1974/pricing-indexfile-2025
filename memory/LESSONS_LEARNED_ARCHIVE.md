@@ -4183,3 +4183,17 @@ Module moves change scope and relative paths; verify dependency bindings, route 
 ## Proxy review authentication (2026-09-07, archived)
 
 Keep caller migrations before proxy gates and authenticate before special parsers. Full resolved incident and regression details are in LESSONS_LEARNED_ARCHIVE.md.
+
+## Archived short index notes (2026-09-10)
+
+## Runtime and dependency audit (2026-09-08, archived)
+
+Match production/CI runtimes, audit the resolved tree and verify actual live-pricing CI steps. Full incident in LESSONS_LEARNED_ARCHIVE.md.
+
+## Tooling upgrades and visual verification (2026-09-07, archived)
+
+Keep version choices tied to measured checks and compare screenshots only after readiness. Full entry in LESSONS_LEARNED_ARCHIVE.md.
+
+## DTF browser readiness (2026-09-07, archived)
+
+Wait for functional initialization before typing; retain failed and successful save coverage. Full entry in LESSONS_LEARNED_ARCHIVE.md.
