@@ -19,6 +19,13 @@
 (function () {
     'use strict';
 
+    document.querySelectorAll('.pa-scroll').forEach(function (region, index) {
+        var section = region.closest('section');
+        var heading = section && section.querySelector('h2,h3');
+        var caption = region.querySelector('caption');
+        region.setAttribute('aria-label', (caption || heading ? (caption || heading).textContent.trim() : 'Pricing analysis') + ' — table ' + (index + 1));
+    });
+
     var links = Array.prototype.slice.call(document.querySelectorAll('.pa-nav-link'));
     if (!links.length) return;
 
@@ -49,8 +56,12 @@
             current = sections[sections.length - 1];
         }
         if (current === active) return;
-        if (active) active.link.classList.remove('is-active');
+        if (active) {
+            active.link.classList.remove('is-active');
+            active.link.removeAttribute('aria-current');
+        }
         current.link.classList.add('is-active');
+        current.link.setAttribute('aria-current', 'location');
         active = current;
     }
 

@@ -5,13 +5,20 @@
         document.querySelectorAll('.data-table').forEach(table => {
             const headers = table.querySelectorAll('th');
             headers.forEach((th, idx) => {
-                th.style.cursor = 'pointer';
-                th.addEventListener('click', () => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'report-sort';
+                button.setAttribute('aria-label', 'Sort by ' + th.textContent.trim());
+                while (th.firstChild) button.appendChild(th.firstChild);
+                th.appendChild(button);
+                button.addEventListener('click', () => {
                     const tbody = table.querySelector('tbody');
                     const rows = Array.from(tbody.querySelectorAll('tr'));
                     const isNum = th.classList.contains('num');
                     const dir = th.dataset.sortDir === 'asc' ? 'desc' : 'asc';
                     th.dataset.sortDir = dir;
+                    headers.forEach(header => header.removeAttribute('aria-sort'));
+                    th.setAttribute('aria-sort', dir === 'asc' ? 'ascending' : 'descending');
                     rows.sort((a, b) => {
                         let aVal = a.children[idx]?.textContent?.trim() || '';
                         let bVal = b.children[idx]?.textContent?.trim() || '';

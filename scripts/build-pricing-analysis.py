@@ -12,7 +12,7 @@ only gates *.html, so a JSON dropped under /dashboards would be readable by anyo
 
     python scripts/build-pricing-analysis.py
 
-Bump CSS_VER whenever pricing-analysis.css changes.
+Bump CSS_VER whenever shared pricing-reports.css changes.
 """
 import json
 import os
@@ -26,8 +26,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(ROOT, 'memory', 'pricing-analysis-data.json')
 OUT = os.path.join(ROOT, 'dashboards', 'pricing-analysis.html')
 
-CSS_VER = '2026.09.07.10'
-JS_VER = '2026.09.05.74'
+CSS_VER = '2026.09.09.18'
+JS_VER = '2026.09.09.18'
 TIERS = ['1-7', '8-23', '24-47', '48-71', '72+']
 BANDS = ['<$4', '$4-8', '$8-15', '$15-25', '$25+']
 BAND_LABEL = {
@@ -66,7 +66,7 @@ def cls_for(v):
 def table(headers, rows, foot=None, cap=None, align=None):
     """headers: list[str]; rows: list[list[str]]; align: list of 'l'|'r'."""
     align = align or (['l'] + ['r'] * (len(headers) - 1))
-    out = ['<div class="pa-scroll"><table class="pa-table">']
+    out = ['<div class="pa-scroll table-scroll" tabindex="0" role="region" aria-label="Pricing analysis table"><table class="pa-table data-table">']
     if cap:
         out.append('<caption>%s</caption>' % cap)
     out.append('<thead><tr>' + ''.join(
@@ -98,7 +98,7 @@ def bar(share, tone='theme'):
     """A proportion bar. share is 0..1. Width is the encoding; the number sits beside it."""
     w = max(0.0, min(1.0, float(share))) * 100
     return ('<span class="pa-bar pa-bar--%s"><span class="pa-bar-fill" '
-            'style="width:%.1f%%"></span></span>' % (tone, w))
+            'style="--report-share:%.1f%%"></span></span>' % (tone, w))
 
 
 # ============================================================== section builders
@@ -1384,14 +1384,15 @@ def build():
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <link rel="stylesheet" href="/shared_components/css/art-hub.css">
-    <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/pricing-analysis.css?v=%s">
+    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.09.18">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.09.18">
+    <link rel="stylesheet" href="/shared_components/css/pricing-reports.css?v=%s">
 </head>
-<body>
+<body data-ui="unified" data-pricing-report="analysis">
+    <a class="skip-link" href="#pricing-report-main">Skip to pricing report</a>
     <div class="dash-shell">
         <header class="dash-header">
             <div class="dash-header-left">
@@ -1403,13 +1404,13 @@ def build():
             </div>
             <div class="dash-header-right">
                 <span class="pa-lock" title="Admin only"><i class="fas fa-user-shield" aria-hidden="true"></i> Admin</span>
-                <a href="/staff-dashboard.html" class="dash-back-link"><i class="fas fa-arrow-left" aria-hidden="true"></i> Dashboard</a>
+                <a href="/staff-dashboard.html" class="dash-back-link btn btn-secondary"><i class="fas fa-arrow-left" aria-hidden="true"></i> Dashboard</a>
             </div>
         </header>
 
         <nav class="pa-nav" aria-label="Sections">%s</nav>
 
-        <main class="dash-content">
+        <main class="dash-content" id="pricing-report-main" tabindex="-1">
 %s
 %s
 %s

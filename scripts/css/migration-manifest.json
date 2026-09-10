@@ -4207,6 +4207,99 @@
         "rawCssBytes": 21628,
         "localCssRequests": 2
       }
+    },
+    {
+      "source": "dashboards/reports/price-audit-report.html",
+      "family": "pricing-reports",
+      "status": "pilot",
+      "route": "/dashboards/reports/price-audit-report.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/pricing-reports.css"
+      ],
+      "dynamicStyles": [],
+      "dynamicTokens": [],
+      "states": [
+        "four-widths-keyboard-and-accessibility",
+        "all-42-original-table-output-hashes",
+        "keyboard-numeric-and-text-sort",
+        "current-section-navigation",
+        "staff-session-hydration-and-anonymous-gate",
+        "failed-malformed-partial-empty-and-retry",
+        "explicit-zero-and-legacy-session-totals",
+        "complete-landscape-report-print"
+      ],
+      "test": "tests/e2e/css-unification-pricing-reports.spec.js",
+      "maxCssBytes": 86615,
+      "measuredRawCssBytes": 85591,
+      "baseline": {
+        "commit": "98e17e0d5f999cb45df77f285cf0af16cdf69ebf",
+        "rawCssBytes": 23434,
+        "localCssRequests": 2
+      }
+    },
+    {
+      "source": "pages/quote-audit.html",
+      "family": "pricing-reports",
+      "status": "pilot",
+      "route": "/pages/quote-audit.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/pricing-reports.css"
+      ],
+      "dynamicStyles": [],
+      "dynamicTokens": [],
+      "states": [
+        "four-widths-keyboard-and-accessibility",
+        "all-42-original-table-output-hashes",
+        "keyboard-numeric-and-text-sort",
+        "current-section-navigation",
+        "staff-session-hydration-and-anonymous-gate",
+        "failed-malformed-partial-empty-and-retry",
+        "explicit-zero-and-legacy-session-totals",
+        "complete-landscape-report-print"
+      ],
+      "test": "tests/e2e/css-unification-pricing-reports.spec.js",
+      "maxCssBytes": 86615,
+      "measuredRawCssBytes": 85591,
+      "baseline": {
+        "commit": "98e17e0d5f999cb45df77f285cf0af16cdf69ebf",
+        "rawCssBytes": 25979,
+        "localCssRequests": 2
+      }
+    },
+    {
+      "source": "dashboards/pricing-analysis.html",
+      "family": "pricing-reports",
+      "status": "pilot",
+      "route": "/dashboards/pricing-analysis.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/pricing-reports.css"
+      ],
+      "dynamicStyles": [],
+      "dynamicTokens": [],
+      "states": [
+        "four-widths-keyboard-and-accessibility",
+        "all-42-original-table-output-hashes",
+        "keyboard-numeric-and-text-sort",
+        "current-section-navigation",
+        "staff-session-hydration-and-anonymous-gate",
+        "failed-malformed-partial-empty-and-retry",
+        "explicit-zero-and-legacy-session-totals",
+        "complete-landscape-report-print"
+      ],
+      "test": "tests/e2e/css-unification-pricing-reports.spec.js",
+      "maxCssBytes": 86615,
+      "measuredRawCssBytes": 85591,
+      "baseline": {
+        "commit": "98e17e0d5f999cb45df77f285cf0af16cdf69ebf",
+        "rawCssBytes": 168092,
+        "localCssRequests": 4
+      }
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",

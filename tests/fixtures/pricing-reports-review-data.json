@@ -1,0 +1,23 @@
+{
+  "fixed": "2026-09-09T20:00:00Z",
+  "quote": {
+    "session": {
+      "QuoteID": "EMB-CSS-REVIEW",
+      "CustomerName": "Example Buyer",
+      "CompanyName": "Synthetic Review Outfitters",
+      "SalesRepName": "Review Staff",
+      "OrderNumber": "12345006",
+      "CreatedAt": "2026-09-09T19:00:00Z",
+      "PaidToDate": 250,
+      "BalanceAmount": 746,
+      "DigitizingCodes": "DD2",
+      "Carrier": "Example Carrier",
+      "TrackingNumber": "SYNTHETIC123",
+      "SubtotalAmount": 996,
+      "SWSubtotal": 900,
+      "PriceAuditJSON": "{\"flag\":\"REVIEW\",\"swSubtotal\":900,\"ourSubtotal\":996,\"products\":[{\"style\":\"PC54\",\"color\":\"BrillOrng\",\"qty\":24,\"swUnit\":20,\"ourUnit\":22,\"flag\":\"REVIEW\"},{\"style\":\"ST350\",\"color\":\"Navy\",\"qty\":12,\"swUnit\":25,\"ourUnit\":27,\"flag\":\"MISMATCH\"},{\"style\":\"AL\",\"color\":\"\",\"qty\":24,\"swUnit\":5,\"ourUnit\":6,\"flag\":\"REVIEW\",\"isService\":true}]}",
+      "ImportNotes": "[\"Synthetic: verify artwork placement\",\"Original supplier tier retained\"]"
+    },
+    "items": []
+  }
+}

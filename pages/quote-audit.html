@@ -1,6 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<!DOCTYPE html><html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
@@ -8,38 +6,39 @@
     <link rel="icon" href="/favicon.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/pages/css/quote-audit.css?v=2026.09.07.19">
-</head>
-<body>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+
+
+<link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.09.18"><link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.09.18"><link rel="stylesheet" href="/shared_components/css/pricing-reports.css?v=2026.09.09.18"></head>
+<body data-ui="unified" data-pricing-report="quote"><a class="skip-link" href="#pricing-report-main">Skip to pricing report</a>
     <!-- Staff Auth Gate -->
-    <main>
-    <div id="auth-gate" class="auth-gate" style="display: none;">
+    <main id="pricing-report-main" tabindex="-1">
+    <div id="auth-gate" class="auth-gate" hidden="">
         <div class="auth-gate-card">
             <i class="fas fa-lock" aria-hidden="true"></i>
-            <h2>Staff Login Required</h2>
+            <h1>Staff Login Required</h1>
             <p>You must be logged in via the staff dashboard to view pricing audits.</p>
             <a href="/staff-dashboard.html" class="btn btn-primary">Go to Staff Dashboard</a>
         </div>
     </div>
 
     <!-- Loading State -->
-    <div id="loading-state" class="loading-state">
+    <div id="loading-state" class="loading-state" role="status">
         <div class="loading-spinner"></div>
         <p>Loading audit data...</p>
     </div>
 
     <!-- Error State -->
-    <div id="error-state" class="error-state" style="display: none;">
+    <div id="error-state" class="error-state" hidden="" role="alert">
         <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
-        <h2 id="error-title">Error</h2>
+        <h1 id="error-title">Error</h1>
         <p id="error-message">Something went wrong.</p>
+        <div class="report-recovery"><button type="button" class="btn btn-primary" id="qa-retry-btn">Retry audit</button><a class="btn btn-secondary" href="/dashboards/quote-management.html">Back to Quotes</a></div>
     </div>
 
     <!-- Audit Content -->
-    <div id="audit-content" class="audit-container" style="display: none;">
+    <div id="audit-content" class="audit-container" hidden="">
         <!-- Header Bar -->
         <header class="audit-page-header">
             <div class="header-left">
@@ -53,39 +52,39 @@
 
         <!-- Context Row -->
         <section class="audit-context">
-            <div class="context-field" id="ctx-customer" style="display: none;">
+            <div class="context-field" id="ctx-customer" hidden="">
                 <span class="ctx-label">Customer</span>
                 <span class="ctx-value" id="ctx-customer-value"></span>
             </div>
-            <div class="context-field" id="ctx-company" style="display: none;">
+            <div class="context-field" id="ctx-company" hidden="">
                 <span class="ctx-label">Company</span>
                 <span class="ctx-value" id="ctx-company-value"></span>
             </div>
-            <div class="context-field" id="ctx-sales-rep" style="display: none;">
+            <div class="context-field" id="ctx-sales-rep" hidden="">
                 <span class="ctx-label">Sales Rep</span>
                 <span class="ctx-value" id="ctx-sales-rep-value"></span>
             </div>
-            <div class="context-field" id="ctx-order" style="display: none;">
+            <div class="context-field" id="ctx-order" hidden="">
                 <span class="ctx-label">Order #</span>
                 <span class="ctx-value" id="ctx-order-value"></span>
             </div>
-            <div class="context-field" id="ctx-created" style="display: none;">
+            <div class="context-field" id="ctx-created" hidden="">
                 <span class="ctx-label">Created</span>
                 <span class="ctx-value" id="ctx-created-value"></span>
             </div>
-            <div class="context-field" id="ctx-paid" style="display: none;">
+            <div class="context-field" id="ctx-paid" hidden="">
                 <span class="ctx-label">Paid to Date</span>
                 <span class="ctx-value" id="ctx-paid-value"></span>
             </div>
-            <div class="context-field" id="ctx-balance" style="display: none;">
+            <div class="context-field" id="ctx-balance" hidden="">
                 <span class="ctx-label">Balance</span>
                 <span class="ctx-value" id="ctx-balance-value"></span>
             </div>
-            <div class="context-field" id="ctx-digitizing" style="display: none;">
+            <div class="context-field" id="ctx-digitizing" hidden="">
                 <span class="ctx-label">Digitizing</span>
                 <span class="ctx-value" id="ctx-digitizing-value"></span>
             </div>
-            <div class="context-field" id="ctx-tracking" style="display: none;">
+            <div class="context-field" id="ctx-tracking" hidden="">
                 <span class="ctx-label">Tracking</span>
                 <span class="ctx-value" id="ctx-tracking-value"></span>
             </div>
@@ -100,8 +99,8 @@
         <!-- Per-Product Table -->
         <section class="audit-products-section">
             <h3>Per-Product Breakdown</h3>
-            <div class="table-wrapper">
-                <table class="audit-table" id="audit-products-table">
+            <div class="table-wrapper table-scroll" tabindex="0" role="region" aria-label="Per-Product Breakdown table 1">
+                <table class="audit-table data-table" id="audit-products-table">
                     <thead>
                         <tr>
                             <th>Style</th>
@@ -122,7 +121,7 @@
         </section>
 
         <!-- Import Notes (parser warnings) -->
-        <section class="audit-import-notes" id="import-notes-section" style="display: none;">
+        <section class="audit-import-notes" id="import-notes-section" hidden="">
             <h3>Import Notes</h3>
             <ul id="import-notes-list" class="import-notes-list"></ul>
         </section>
@@ -135,7 +134,7 @@
             <button class="btn btn-secondary" id="qa-print-btn" type="button">
                 <i class="fas fa-print" aria-hidden="true"></i> Print Audit
             </button>
-            <a href="/dashboards/quote-management.html" class="btn btn-outline">
+            <a href="/dashboards/quote-management.html" class="btn btn-secondary">
                 <i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Quotes
             </a>
         </section>
@@ -143,6 +142,7 @@
     </main>
 
     <script src="/shared_components/js/staff-auth-helper.js?v=2026.09.06.37"></script>
-    <script src="/pages/js/quote-audit.js?v=2026.09.06.33"></script>
-</body>
-</html>
+    <script src="/pages/js/quote-audit.js?v=2026.09.09.18"></script>
+
+
+</body></html>
