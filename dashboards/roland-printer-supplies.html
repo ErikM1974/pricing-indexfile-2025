@@ -10,16 +10,16 @@
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- 2026 design tokens (must load before dash-shell.css) -->
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/dash-shell.css?v=2026.09.07.10">
-    <link rel="stylesheet" href="/dashboards/css/roland-printer-supplies.css?v=2026.09.07.10">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.10.2">
+    <link rel="stylesheet" href="/shared_components/css/staff-toolkit.css?v=2026.09.10.2">
 </head>
-<body>
+<body data-ui="unified" data-staff-tool="roland-printer-supplies">
+    <a class="skip-link" href="#staff-tool-main">Skip to content</a>
     <div class="dash-shell">
         <header class="dash-header">
             <div class="dash-header-left">
@@ -37,7 +37,7 @@
             </div>
         </header>
 
-        <main class="dash-content">
+        <main class="dash-content" id="staff-tool-main">
             <!-- Intro + printable PDF order form -->
             <div class="dash-card">
                 <div class="dash-card-header">

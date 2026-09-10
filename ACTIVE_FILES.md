@@ -261,3 +261,8 @@ Personalization lifecycle review: both personalization dashboards, pages/names-n
 Staff toolkit source capture: tests/fixtures/staff-toolkit-original-content.json now preserves eight original dashboard HTML contracts and31 source hashes. Scope: blog editor, contract break-even, customer portal administration, Jim mailing list, past-due orders, product manager, Roland supplies and volume quote. Every captured source matches production .20/ddfc5395 exactly. No application edits or migration credit yet. Next: synthetic four-width original browser/print captures, then one maintained family layout. GET quote-sequence allocates a number and must be mocked alongside every save/upload/send/reward action.
 
 Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the eight original HTML contracts and31 source hashes; only explicitly mapped UI edits and proven stylesheet retirements may differ.
+
+### Staff toolkit draft — 2026-09-10
+
+- `shared_components/css/staff-toolkit.css` — scoped draft layout owner for contract comparison and Roland Supplies, using canonical components. Old page sheets retained pending all-consumer review.
+- `tests/e2e/css-unification-staff-toolkit.spec.js`, `tests/e2e/fixtures/staff-toolkit-data.js`, `tests/fixtures/staff-toolkit-original-browser.json`, `tests/fixtures/staff-toolkit-volume-original-workflow.json` — mocked browser, original calculation/payload and provider-boundary evidence.

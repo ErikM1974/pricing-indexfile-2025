@@ -865,5 +865,84 @@
     "shared_components/js/staff-auth-helper.js": "b858bb5e30a775c949aaab2e4f0bbb4796e06c02a76f3bb8d8a9c97985f5addd",
     "dashboards/js/volume-quote.js": "d6d3d994543cd7eb34229532f6b9b8189ac11f36345d171b54edc5dbd0b76c2b"
   },
-  "changes": []
+  "changes": [
+    {
+      "file": "dashboards/contract-break-even.html",
+      "before": "family=Inter:wght@400;500;600;700",
+      "after": "family=Public+Sans:wght@400;500;600;700",
+      "count": 1
+    },
+    {
+      "file": "dashboards/contract-break-even.html",
+      "before": "    <link rel=\"stylesheet\" href=\"/shared_components/css/art-hub.css?v=2026.09.07.19\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/dash-shell.css?v=2026.09.07.10\">\n    <link rel=\"stylesheet\" href=\"/dashboards/css/contract-break-even.css?v=2026.09.07.10\">",
+      "after": "    <link rel=\"stylesheet\" href=\"/shared_components/css/components.css?v=2026.09.10.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/staff-toolkit.css?v=2026.09.10.2\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/contract-break-even.html",
+      "before": "<body>",
+      "after": "<body data-ui=\"unified\" data-staff-tool=\"contract-break-even\">\n    <a class=\"skip-link\" href=\"#staff-tool-main\">Skip to content</a>",
+      "count": 1
+    },
+    {
+      "file": "dashboards/contract-break-even.html",
+      "before": "<main class=\"dash-content\">",
+      "after": "<main class=\"dash-content\" id=\"staff-tool-main\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/contract-break-even.html",
+      "before": "<script src=\"/dashboards/js/contract-break-even.js?v=2026.09.05.72\"></script>",
+      "after": "<script src=\"/dashboards/js/contract-break-even.js?v=2026.09.10.2\"></script>",
+      "count": 1
+    },
+    {
+      "file": "dashboards/roland-printer-supplies.html",
+      "before": "family=Inter:wght@400;500;600;700",
+      "after": "family=Public+Sans:wght@400;500;600;700",
+      "count": 1
+    },
+    {
+      "file": "dashboards/roland-printer-supplies.html",
+      "before": "    <link rel=\"stylesheet\" href=\"/shared_components/css/art-hub.css?v=2026.09.07.19\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/dash-shell.css?v=2026.09.07.10\">\n    <link rel=\"stylesheet\" href=\"/dashboards/css/roland-printer-supplies.css?v=2026.09.07.10\">",
+      "after": "    <link rel=\"stylesheet\" href=\"/shared_components/css/components.css?v=2026.09.10.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/staff-toolkit.css?v=2026.09.10.2\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/roland-printer-supplies.html",
+      "before": "<body>",
+      "after": "<body data-ui=\"unified\" data-staff-tool=\"roland-printer-supplies\">\n    <a class=\"skip-link\" href=\"#staff-tool-main\">Skip to content</a>",
+      "count": 1
+    },
+    {
+      "file": "dashboards/roland-printer-supplies.html",
+      "before": "<main class=\"dash-content\">",
+      "after": "<main class=\"dash-content\" id=\"staff-tool-main\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/contract-break-even.js",
+      "before": "<div class=\"cbe-table-wrap\"><table",
+      "after": "<div class=\"cbe-table-wrap\" role=\"region\" aria-label=\"Contract price comparison\" tabindex=\"0\"><table",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/contract-break-even.js",
+      "before": "    document.addEventListener('DOMContentLoaded', () => {\n        wire();\n        load().then(render).catch((err) => {\n            console.error('[contract-break-even] load failed:', err);\n            DashPage.showError('Unable to load the cost model or the contract card: ' + err.message + '. Nothing is shown rather than a wrong cost.');\n            $('cbe-assumptions').textContent = 'Not loaded.';\n        });\n    });",
+      "after": "    let loading = false;\n    let ready = false;\n    document.addEventListener('DOMContentLoaded', () => { wire(); refresh(); });\n\n    async function refresh() {\n        if (loading) return;\n        loading = true; ready = false;\n        DashPage.hideError();\n        document.querySelectorAll('[data-case], [data-view], #cbe-print').forEach(b => { b.disabled = true; });\n        $('cbe-assumptions').setAttribute('aria-busy', 'true');\n        $('cbe-assumptions').textContent = 'Loading…';\n        $('cbe-tables').replaceChildren();\n        $('cbe-case-note').textContent = '';\n        try {\n            await load(); render(); ready = true;\n        } catch (err) {\n            console.error('[contract-break-even] load failed:', err);\n            DashPage.showError('Unable to load the cost model or the contract card: ' + err.message + '. Nothing is shown rather than a wrong cost.');\n            $('cbe-assumptions').textContent = 'Cost comparison unavailable. ';\n            const retry = document.createElement('button');\n            retry.type = 'button'; retry.className = 'dash-btn no-print'; retry.textContent = 'Retry';\n            retry.addEventListener('click', refresh); $('cbe-assumptions').appendChild(retry);\n        } finally {\n            loading = false; $('cbe-assumptions').setAttribute('aria-busy', 'false');\n            document.querySelectorAll('[data-case], [data-view], #cbe-print').forEach(b => { b.disabled = !ready; });\n        }\n    }",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/contract-break-even.js",
+      "before": "$('cbe-print').addEventListener('click', () => window.print());",
+      "after": "$('cbe-print').addEventListener('click', () => { if (ready && !loading) window.print(); });",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/contract-break-even.js",
+      "before": "        state.card = card;",
+      "after": "        for (const product of PRODUCTS) {\n            const rates = card[product.key].perThousandRates || card[product.key].ratesPerThousand;\n            if (!rates || TIERS.some(t => rates[t.label] === null || rates[t.label] === '' || !Number.isFinite(Number(rates[t.label])) || Number(rates[t.label]) < 0)) {\n                throw new Error('Contract rates incomplete for ' + product.title);\n            }\n        }\n        state.card = card;",
+      "count": 1
+    }
+  ]
 }

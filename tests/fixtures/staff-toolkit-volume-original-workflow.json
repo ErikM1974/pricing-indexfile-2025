@@ -1,0 +1,88 @@
+{
+  "tables": [
+    {
+      "id": "vq-result",
+      "rows": [
+        [
+          "Style",
+          "Qty",
+          "Case cost",
+          "Standard 72+S-XL / 2XL / 3XL",
+          "One-timeS-XL / 2XL / 3XL",
+          "Garment $ margin / pc",
+          "GM %",
+          "Order $ standard / one-time"
+        ],
+        [
+          "PC54Synthetic Cotton Tee",
+          "500",
+          "$5.25",
+          "$17.50$19.50 / —",
+          "$17.50$19.50 / —",
+          "$3.96std $3.96",
+          "25.7%",
+          "$8,750 / $8,750"
+        ],
+        [
+          "Total",
+          "500",
+          "",
+          "",
+          "",
+          "",
+          "25.7%",
+          "$8,750 / $8,750"
+        ]
+      ]
+    },
+    {
+      "id": "",
+      "rows": [
+        [
+          "Style",
+          "Description",
+          "Qty",
+          "S–XL",
+          "2XL",
+          "3XL",
+          "Est. total"
+        ],
+        [
+          "PC54",
+          "Synthetic Cotton TeeLeft Chest embroidery included",
+          "500",
+          "$17.50",
+          "$19.50",
+          "—",
+          "$8,750.00"
+        ],
+        [
+          "Estimated total (S–XL pricing, before tax and freight)",
+          "500",
+          "",
+          "",
+          "",
+          "$8,750.00"
+        ]
+      ]
+    }
+  ],
+  "memo": "ONE-TIME VOLUME PRICE — APPROVAL MEMO (INTERNAL — do not send to the customer)\nNorthwest Custom Apparel · September 9, 2026 · not saved yet\n\nCustomer:     Synthetic Cedar Outfitters\nSales rep:    Review Staff\nApproved by:  Erik Mickelson\nOrder:        500 pieces, Left Chest embroidery, 8,000 stitches\n\nWHY THIS PRICE IS OFFERED ONCE\n1. Quantity. 500 pieces on a single PO is 6.9x the top published tier (72+). One setup, one thread change, one continuous run.\n2. Logo size. 8,000 stitches is 100% of the 8,000-stitch base our embroidery charge is built on. At 500 stitches/min that is 16.0 minutes of sewing per head.\n3. Production cost, WORST CASE. Priced as if the job runs on the 4-head machine with 1.0 min handling per piece and 15% slack for thread breaks, rehoops and downtime: 5.8 min/pc, 48.3 machine hours, decoration cost about $7.76 per piece against $8.00 charged. Typical run from our production logs would be 2.0 min/pc ($2.75/pc). Gross margin on the order at the worst case: 25.7%.\n4. Setup. Logo is already digitized; no setup fee.\n\nSTANDARD (72+) vs ONE-TIME PRICE, per piece\n  PC54         500 pcs   standard   $17.50   one-time   $17.50   (2XL $19.50)\n  Order value: standard $8,750 · one-time $8,750 · difference $0\n  Levers: embroidery $8.00/pc (standard $8.00), garment markup denominator 0.57 (standard 0.57)\n\nTERMS\n- Valid until 2026-10-09. Price holds only at 500 or more pieces on ONE purchase order, this design, this location.\n- This is a one-time price for this order, not a new price list. Reorders below 500 pieces return to the standard tiers.\n- Garment prices are S-XL; 2XL/3XL carry the standard upcharges. Sales tax and freight are extra. Subject to SanMar stock at time of order.",
+  "writes": [
+    {
+      "path": "/api/quote-sequence/VQ",
+      "method": "GET",
+      "body": null
+    },
+    {
+      "path": "/api/quote_sessions",
+      "method": "POST",
+      "body": "{\"QuoteID\":\"VQ-2026-901\",\"SessionID\":\"volume_quote_1788984000000\",\"CustomerName\":\"Synthetic Cedar Outfitters\",\"CompanyName\":\"Synthetic Cedar Outfitters\",\"CustomerEmail\":\"\",\"SalesRepName\":\"Review Staff\",\"SalesRepEmail\":\"sales@nwcustomapparel.com\",\"TotalQuantity\":500,\"SubtotalAmount\":8750,\"LTMFeeTotal\":0,\"TotalAmount\":8750,\"Status\":\"Open\",\"CreatedAt_Quote\":\"2026-09-09T20:00:00\",\"ExpiresAt\":\"2026-10-09T23:59:59\",\"PrintLocation\":\"Left Chest\",\"StitchCount\":8000,\"DigitizingFee\":0,\"Notes\":\"VOLUME QUOTE — one-time price approved by Erik Mickelson. Holds at 500+ pcs on one PO, Left Chest, 8,000 stitches, valid until 2026-10-09. Standard price applies below that quantity.\"}"
+    },
+    {
+      "path": "/api/quote_items",
+      "method": "POST",
+      "body": "{\"QuoteID\":\"VQ-2026-901\",\"LineNumber\":1,\"StyleNumber\":\"PC54\",\"ProductName\":\"Synthetic Cotton Tee\",\"Color\":\"\",\"ColorCode\":\"\",\"EmbellishmentType\":\"embroidery\",\"PrintLocation\":\"LC\",\"PrintLocationName\":\"Left Chest\",\"Quantity\":500,\"HasLTM\":\"No\",\"BaseUnitPrice\":17.5,\"LTMPerUnit\":0,\"FinalUnitPrice\":17.5,\"LineTotal\":8750,\"SizeBreakdown\":\"{\\\"upcharges\\\":{\\\"2XL\\\":19.5,\\\"3XL\\\":null},\\\"standard\\\":17.5}\",\"PricingTier\":\"Volume (one-time)\",\"ImageURL\":\"\",\"AddedAt\":\"2026-09-09T20:00:00\",\"LogoSpecs\":\"{\\\"vq\\\":{\\\"emb\\\":8,\\\"std\\\":8,\\\"denom\\\":0.57,\\\"hrs\\\":48.3,\\\"gm\\\":0.257,\\\"given\\\":0}}\"}"
+    }
+  ]
+}
