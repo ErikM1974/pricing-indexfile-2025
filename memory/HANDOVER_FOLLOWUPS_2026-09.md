@@ -1,5 +1,16 @@
 # Handover follow-ups — 2026-09-07
 
+## ACTIVE — six staff workspaces released; final staff tools underway
+
+Frontend v2026.09.10.4 / Heroku2099 /031e03aa8ec68ac0951fe95a47871637c0c8e25a is LIVE. The actual running slug and version match; 76 rollout checks passed: 27 source assets, 19 built assets, 21 unchanged page/API access boundaries, six retired stylesheets returning404 and three public forms returning200. Two ESM bundle filenames differ from the Windows build; their deployed compiled bodies match after source-map-reference/line-ending normalization, and every mapped source matches this commit. Use the deployed asset manifest for bundle paths.
+
+**176 of 225 application pages reviewed and live;49 pending.** Drain-Pro, Production Shifts, Payroll, Mission Control, Company Numbers and Quote Management are now included. Another79 sources remain excluded by the established inventory. Backend remains v2026.09.08.1 / Heroku1130 /d06aee3e4d25c5e1410241ea8007cdc8339aa3fa. Application-wide CSS work is not finished; shared runtime, generated documents and provider UI also remain separate tracks.
+
+- Release evidence: local236unit suites/5,521tests/four existing skips;88DOM,4accessibility-unit,84quote-parity,883mocked browser cases resolved by full881pass+two harness repairs+46affected rerun,16remaininge2e/three optional skips/allfivecalculator surfaces. Build431assets,lint/typesclean,485routes/24modules/zero undefined names,boot200,audit0. Exact source06b3b5cdac0bb8b3ee590c22f49d543c2f2219a8 passed allfourCI jobs in34511709902, including actualCSS andlivepricingsteps. Release mainCI34514115295 passed; its e2e skip is expected. One Heroku push.
+- Six-workspace source record:61original hashes/314reversible mappings/70focused scenarios/45reviewed current paper pages. Retiredsixowners/177,104LFbytes/103flags. Review/release/checkpoint artifacts use staff-workspaces-* under the private artifact directory.
+- NEXT isolated branch codex/staff-final-tools, reviewed calibration checkpoint 1fba722c06e7e354d83216c64387ebb0239633d3:49original source hashes/49changes,22browser cases,279latest source/owner checks,one visually verified paper page. Calibration is NOT deployed and counts only as candidate177/225,48pending. Three remaining pages in that batch: Staff Dashboard, Universal Records Admin, Box Labels. Original19browser cases/contracts are committed; complete records mutation contracts and box-label paper review next.
+- The next branch is based on9b6d76d6 and does not yet contain this release's harness imports/native-dialog assertion or CI timing follow-up. Preserve its calibration ledger when integrating later. Never merge an advancing next branch into a frozen release. node_modules is a junction; never recursively delete it or copy.env. Standing autonomous edit/deploy authorization continues; all test writes and allocating GETs remain mocked.
+
 ## ACTIVE — staff workspaces release candidate v2026.09.10.4
 
 Six reviewed pages are integrated on develop from exact reviewed source 5d46c9c5: Drain-Pro, Production Shifts, Payroll, Mission Control, Company Numbers and Quote Management. All required local checks now pass. Live remains v2026.09.10.2 / Heroku 2098 / df7bebed: 170/225 pages. Candidate is 176/225 with 49 pending, only credited after verified rollout.
