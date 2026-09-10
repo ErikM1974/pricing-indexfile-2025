@@ -9,16 +9,16 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- 2026 design tokens (must load before dash-shell.css) -->
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/dash-shell.css?v=2026.09.07.10">
-    <link rel="stylesheet" href="/dashboards/css/jim-mailing-list.css?v=2026.09.07.10">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.10.2">
+    <link rel="stylesheet" href="/shared_components/css/staff-toolkit.css?v=2026.09.10.2">
 </head>
-<body>
+<body data-ui="unified" data-staff-tool="jim-mailing-list">
+    <a class="skip-link" href="#staff-tool-main">Skip to content</a>
     <div class="dash-shell">
         <header class="dash-header">
             <div class="dash-header-left">
@@ -35,7 +35,7 @@
             </div>
         </header>
 
-        <main class="dash-content">
+        <main class="dash-content" id="staff-tool-main">
             <!-- Visible error (Erik's #1 rule — never a silent failure) -->
             <div class="dash-error-banner" role="alert">
                 <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
@@ -68,24 +68,24 @@
                     Then you just check it and press <strong>Save</strong>.
                 </p>
 
-                <label for="jml-ai-text" class="jml-ai-label">Paste what you copied here</label>
-                <textarea id="jml-ai-text" rows="4" placeholder="Paste the company name, address, phone, email…"></textarea>
+                <label for="jml-ai-text" class="field-label jml-ai-label">Paste what you copied here</label>
+                <textarea id="jml-ai-text" rows="4" placeholder="Paste the company name, address, phone, email…" class="field-textarea"></textarea>
 
                 <div class="jml-ai-image-row">
-                    <label class="jml-ai-imgbtn" for="jml-ai-file" role="button" tabindex="0">
+                    <button type="button" class="btn btn-secondary jml-ai-imgbtn">
                         <i class="fas fa-image" aria-hidden="true"></i> Choose a screenshot
-                    </label>
-                    <input type="file" id="jml-ai-file" accept="image/*" class="jml-visually-hidden" aria-label="Choose a screenshot">
+                    </button>
+                    <input type="file" id="jml-ai-file" accept="image/*" hidden aria-label="Choose a screenshot">
                     <span class="jml-ai-orpaste">…or press <kbd>Ctrl</kbd> + <kbd>V</kbd> to paste a screenshot</span>
                 </div>
                 <div id="jml-ai-thumb-wrap" class="jml-ai-thumb-wrap" hidden>
                     <img id="jml-ai-thumb" alt="Your screenshot" class="jml-ai-thumb">
-                    <button type="button" id="jml-ai-thumb-clear" class="jml-ai-thumb-clear" aria-label="Remove screenshot">
+                    <button type="button" id="jml-ai-thumb-clear" class="btn btn-danger jml-ai-thumb-clear" aria-label="Remove screenshot">
                         <i class="fas fa-times" aria-hidden="true"></i> Remove
                     </button>
                 </div>
 
-                <button type="button" class="jml-btn jml-btn-ai" id="jml-ai-go">
+                <button type="button" class="btn btn-primary jml-btn jml-btn-ai" id="jml-ai-go">
                     <i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i>
                     <span id="jml-ai-go-text">Read it &amp; fill in the form</span>
                 </button>
@@ -100,79 +100,79 @@
 
                 <form id="jml-form" novalidate>
                     <div class="jml-field">
-                        <label for="jml-company">Company name</label>
-                        <input type="text" id="jml-company" autocomplete="off" required>
+                        <label for="jml-company" class="field-label">Company name</label>
+                        <input type="text" id="jml-company" autocomplete="off" required class="field-input">
                         <span class="jml-hint">This is the only box you have to fill in.</span>
                     </div>
 
                     <div class="jml-row">
                         <div class="jml-field jml-grow">
-                            <label for="jml-first">First name <span class="jml-opt">(optional)</span></label>
-                            <input type="text" id="jml-first" autocomplete="off">
+                            <label for="jml-first" class="field-label">First name <span class="jml-opt">(optional)</span></label>
+                            <input type="text" id="jml-first" autocomplete="off" class="field-input">
                         </div>
                         <div class="jml-field jml-grow">
-                            <label for="jml-last">Last name <span class="jml-opt">(optional)</span></label>
-                            <input type="text" id="jml-last" autocomplete="off">
+                            <label for="jml-last" class="field-label">Last name <span class="jml-opt">(optional)</span></label>
+                            <input type="text" id="jml-last" autocomplete="off" class="field-input">
                         </div>
                     </div>
 
                     <div class="jml-field">
-                        <label for="jml-address">Street address <span class="jml-opt">(optional)</span></label>
-                        <input type="text" id="jml-address" autocomplete="off">
+                        <label for="jml-address" class="field-label">Street address <span class="jml-opt">(optional)</span></label>
+                        <input type="text" id="jml-address" autocomplete="off" class="field-input">
                     </div>
 
                     <div class="jml-row">
                         <div class="jml-field jml-grow">
-                            <label for="jml-city">City <span class="jml-opt">(optional)</span></label>
-                            <input type="text" id="jml-city" autocomplete="off">
+                            <label for="jml-city" class="field-label">City <span class="jml-opt">(optional)</span></label>
+                            <input type="text" id="jml-city" autocomplete="off" class="field-input">
                         </div>
                         <div class="jml-field jml-state">
-                            <label for="jml-state">State</label>
-                            <input type="text" id="jml-state" autocomplete="off">
+                            <label for="jml-state" class="field-label">State</label>
+                            <input type="text" id="jml-state" autocomplete="off" class="field-input">
                         </div>
                         <div class="jml-field jml-zip">
-                            <label for="jml-zip">ZIP</label>
-                            <input type="text" id="jml-zip" autocomplete="off" inputmode="numeric">
+                            <label for="jml-zip" class="field-label">ZIP</label>
+                            <input type="text" id="jml-zip" autocomplete="off" inputmode="numeric" class="field-input">
                         </div>
                     </div>
 
                     <div class="jml-row">
                         <div class="jml-field jml-grow">
-                            <label for="jml-phone">Phone <span class="jml-opt">(optional)</span></label>
-                            <input type="tel" id="jml-phone" autocomplete="off">
+                            <label for="jml-phone" class="field-label">Phone <span class="jml-opt">(optional)</span></label>
+                            <input type="tel" id="jml-phone" autocomplete="off" class="field-input">
                         </div>
                         <div class="jml-field jml-grow">
-                            <label for="jml-email">Email <span class="jml-opt">(optional)</span></label>
-                            <input type="email" id="jml-email" autocomplete="off">
+                            <label for="jml-email" class="field-label">Email <span class="jml-opt">(optional)</span></label>
+                            <input type="email" id="jml-email" autocomplete="off" class="field-input">
                         </div>
                     </div>
 
                     <div class="jml-field">
-                        <label for="jml-website">Website <span class="jml-opt">(optional)</span></label>
-                        <input type="text" id="jml-website" autocomplete="off" inputmode="url">
+                        <label for="jml-website" class="field-label">Website <span class="jml-opt">(optional)</span></label>
+                        <input type="text" id="jml-website" autocomplete="off" inputmode="url" class="field-input">
                     </div>
 
                     <div class="jml-row">
                         <div class="jml-field jml-grow">
-                            <label for="jml-source">Where did you find them? <span class="jml-opt">(optional)</span></label>
-                            <input type="text" id="jml-source" autocomplete="off" placeholder="e.g. Milton Times magazine">
+                            <label for="jml-source" class="field-label">Where did you find them? <span class="jml-opt">(optional)</span></label>
+                            <input type="text" id="jml-source" autocomplete="off" placeholder="e.g. Milton Times magazine" class="field-input">
                         </div>
                         <div class="jml-field jml-grow">
-                            <label for="jml-category">List / group <span class="jml-opt">(optional)</span></label>
-                            <input type="text" id="jml-category" autocomplete="off" placeholder="e.g. Fire Dept Prospect">
+                            <label for="jml-category" class="field-label">List / group <span class="jml-opt">(optional)</span></label>
+                            <input type="text" id="jml-category" autocomplete="off" placeholder="e.g. Fire Dept Prospect" class="field-input">
                         </div>
                     </div>
 
                     <div class="jml-field">
-                        <label for="jml-notes">Notes <span class="jml-opt">(optional)</span></label>
-                        <textarea id="jml-notes" rows="3"></textarea>
+                        <label for="jml-notes" class="field-label">Notes <span class="jml-opt">(optional)</span></label>
+                        <textarea id="jml-notes" rows="3" class="field-textarea"></textarea>
                     </div>
 
                     <div class="jml-form-actions">
-                        <button type="submit" class="jml-btn jml-btn-save" id="jml-save">
+                        <button type="submit" class="btn btn-primary jml-btn jml-btn-save" id="jml-save">
                             <i class="fas fa-check" aria-hidden="true"></i> <span id="jml-save-text">Save company</span>
                         </button>
-                        <button type="button" class="jml-btn jml-btn-cancel" id="jml-cancel" hidden>
+                        <button type="button" class="btn btn-secondary jml-btn jml-btn-cancel" id="jml-cancel" hidden>
                             Cancel
                         </button>
                     </div>
@@ -182,25 +182,25 @@
             <!-- THE LIST -->
             <section class="jml-list-section">
                 <div class="jml-viewtoggle" role="group" aria-label="Which companies to show">
-                    <button type="button" class="jml-viewbtn" id="jml-view-mine" data-view="mine" aria-pressed="false">Your companies <span class="jml-view-n" id="jml-mine-count"></span></button>
-                    <button type="button" class="jml-viewbtn" id="jml-view-all" data-view="all" aria-pressed="false">All companies <span class="jml-view-n" id="jml-all-count"></span></button>
+                    <button type="button" class="btn btn-secondary jml-viewbtn" id="jml-view-mine" data-view="mine" aria-pressed="false">Your companies <span class="jml-view-n" id="jml-mine-count"></span></button>
+                    <button type="button" class="btn btn-secondary jml-viewbtn" id="jml-view-all" data-view="all" aria-pressed="false">All companies <span class="jml-view-n" id="jml-all-count"></span></button>
                 </div>
                 <div class="jml-list-head">
                     <h2 class="jml-list-title"><span id="jml-list-title-text">Your companies</span> <span class="jml-count" id="jml-count" role="status"></span></h2>
                     <div class="jml-search-wrap">
                         <i class="fas fa-search" aria-hidden="true"></i>
-                        <input type="search" id="jml-search" placeholder="Search" aria-label="Search the list">
+                        <input type="search" id="jml-search" placeholder="Search" aria-label="Search the list" class="field-input">
                     </div>
                 </div>
                 <div class="jml-list-actions" id="jml-list-actions" hidden>
-                    <button type="button" class="jml-tool-btn" id="jml-export"><i class="fas fa-file-csv" aria-hidden="true"></i> Download for Mailchimp</button>
-                    <button type="button" class="jml-tool-btn" id="jml-labels"><i class="fas fa-print" aria-hidden="true"></i> Print mailing labels</button>
+                    <button type="button" class="btn btn-secondary jml-tool-btn" id="jml-export"><i class="fas fa-file-csv" aria-hidden="true"></i> Download for Mailchimp</button>
+                    <button type="button" class="btn btn-secondary jml-tool-btn" id="jml-labels"><i class="fas fa-print" aria-hidden="true"></i> Print mailing labels</button>
                     <span class="jml-tool-hint">exports whatever you're filtered to</span>
                 </div>
                 <div class="jml-filterbar" id="jml-filterbar" hidden>
                     <div id="jml-chips" class="jml-chips" role="group" aria-label="Filter by group"></div>
                     <label class="jml-sort">Sort:
-                        <select id="jml-sort">
+                        <select id="jml-sort" class="field-select">
                             <option value="company">Company A–Z</option>
                             <option value="city">City</option>
                             <option value="last">Last name</option>
@@ -221,11 +221,11 @@
                     </p>
                     <p class="jml-mc-scope" id="jml-mc-scope"></p>
                     <div class="jml-mc-actions">
-                        <button type="button" class="jml-tool-btn" id="jml-mc-test"><i class="fas fa-plug" aria-hidden="true"></i> Test connection</button>
-                        <button type="button" class="jml-tool-btn" id="jml-mc-check"><i class="fas fa-chart-line" aria-hidden="true"></i> Check engagement</button>
-                        <button type="button" class="jml-tool-btn" id="jml-mc-sync"><i class="fas fa-cloud-arrow-up" aria-hidden="true"></i> Sync this group</button>
-                        <button type="button" class="jml-tool-btn jml-mc-engaged-btn" id="jml-mc-sync-engaged" hidden><i class="fas fa-star" aria-hidden="true"></i> Sync engaged only</button>
-                        <button type="button" class="jml-tool-btn" id="jml-mc-refresh"><i class="fas fa-rotate" aria-hidden="true"></i> Refresh email activity</button>
+                        <button type="button" class="btn btn-secondary jml-tool-btn" id="jml-mc-test"><i class="fas fa-plug" aria-hidden="true"></i> Test connection</button>
+                        <button type="button" class="btn btn-secondary jml-tool-btn" id="jml-mc-check"><i class="fas fa-chart-line" aria-hidden="true"></i> Check engagement</button>
+                        <button type="button" class="btn btn-secondary jml-tool-btn" id="jml-mc-sync"><i class="fas fa-cloud-arrow-up" aria-hidden="true"></i> Sync this group</button>
+                        <button type="button" class="btn btn-secondary jml-tool-btn jml-mc-engaged-btn" id="jml-mc-sync-engaged" hidden><i class="fas fa-star" aria-hidden="true"></i> Sync engaged only</button>
+                        <button type="button" class="btn btn-secondary jml-tool-btn" id="jml-mc-refresh"><i class="fas fa-rotate" aria-hidden="true"></i> Refresh email activity</button>
                     </div>
                     <p class="jml-mc-status" id="jml-mc-status" role="status" aria-live="polite" hidden></p>
                 </div>
@@ -236,6 +236,6 @@
     <script src="/config/app.config.js"></script>
     <script src="/shared_components/js/fetch-timeout.js?v=2026.09.06.26"></script>
     <script src="/shared_components/js/dash-page-helpers.js?v=2026.09.07.25"></script>
-    <script src="/dashboards/js/jim-mailing-list.js?v=2026.09.05.67"></script>
+    <script src="/dashboards/js/jim-mailing-list.js?v=2026.09.10.2"></script>
 </body>
 </html>

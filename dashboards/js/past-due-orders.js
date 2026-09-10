@@ -86,14 +86,16 @@
         // — e.g. the 30-day list under a 60-day heading. Lock the controls until it lands.
         // (Options are left intact so the chosen rep survives the reload.)
         loading = true;
+        setStats(null);
         setPrintEnabled(false);
         try {
             var url = ENDPOINT + '?days=' + encodeURIComponent(selectedDays()) + (force ? '&refresh=1' : '');
             var resp = await fetch(url, { credentials: 'same-origin' });
             if (!resp.ok) throw new Error('HTTP ' + resp.status + ' ' + (resp.statusText || ''));
             var data = await resp.json();
-            if (data.error) throw new Error(data.details || data.error);
+            if (data && data.error) throw new Error(data.details || data.error);
             if (seq !== loadSeq) return false;   // superseded — leave the newer load's state alone
+            if (!validDueData(data)) throw new Error('Incomplete past-due response');
             DashPage.hideError();
             lastData = data;
             lastLoadedAt = Date.now();
@@ -116,6 +118,24 @@
         } finally {
             if (seq === loadSeq) loading = false;
         }
+    }
+
+    // The company endpoint supplies both complete lists and matching per-rep groups.
+    // Missing groups cannot be allowed to turn a nonempty board into an all-clear.
+    function validDueData(d) {
+        if (!d || !Array.isArray(d.late) || !Array.isArray(d.atRisk) || !Array.isArray(d.reps)
+            || !d.byRep || !d.counts || typeof d.today !== 'string'
+            || !Number.isFinite(d.lookbackDays) || !Number.isFinite(d.ordersScanned)) return false;
+        if (['late', 'atRisk', 'dueSoonOnTrack'].some(function (key) { return !Number.isFinite(d.counts[key]) || d.counts[key] < 0; })) return false;
+        if (d.reps.some(function (rep) { return typeof rep !== 'string' || !d.byRep[rep] || !Array.isArray(d.byRep[rep].late) || !Array.isArray(d.byRep[rep].atRisk); })) return false;
+        return ['late', 'atRisk'].every(function (kind) {
+            var grouped = [];
+            d.reps.forEach(function (rep) { grouped = grouped.concat(d.byRep[rep][kind]); });
+            var all = d[kind].concat(grouped);
+            if (all.some(function (row) { return !row || row.idOrder == null || typeof row.company !== 'string' || !Number.isFinite(row.daysUntilDue) || !Number.isFinite(Number(row.subtotal)); })) return false;
+            var ids = function (rows) { return rows.map(function (row) { return String(row.idOrder); }).sort(); };
+            return JSON.stringify(ids(grouped)) === JSON.stringify(ids(d[kind]));
+        });
     }
 
     function sumValue(rows) {
@@ -196,17 +216,17 @@
                 + '<span class="pdo-rep-count">' + esc(counts.join(' · ')) + '</span>'
                 + (total ? '<span class="pdo-rep-total">' + money(total) + '</span>' : '')
                 + '</h3>'
-                + table(g.late.concat(g.atRisk))
+                + table(g.late.concat(g.atRisk), rep)
                 + '</section>';
         });
         root.innerHTML = html;
     }
 
-    function table(rows) {
+    function table(rows, rep) {
         if (!rows.length) return '';
         // "Late · Due in": half the rows are at-risk and read "in 4d" — under a header that
         // said only LATE that looked wrong (2026-09-04).
-        var h = '<div class="pdo-scroll"><table class="pdo-table"><thead><tr>'
+        var h = '<div class="pdo-scroll" role="region" aria-label="' + esc(rep) + ' orders" tabindex="0"><table class="pdo-table"><thead><tr>'
             + '<th>WO</th><th>Customer</th><th>Due</th><th class="pdo-num">Late · Due in</th>'
             + '<th class="pdo-num">Value</th><th>Blanks</th><th>Type</th></tr></thead><tbody>';
         rows.sort(function (a, b) { return a.daysUntilDue - b.daysUntilDue; });
@@ -414,6 +434,10 @@
               + '<div class="pdo-ps-sub">' + parts.join(' &middot; ') + '</div>'
               + '<div class="pdo-ps-note">' + note + '</div>'
             : '<div class="pdo-ps-repname pdo-ps-repname--cont">' + esc(rep) + '</div>';
+        var omitted = [];
+        if (d.lateTruncated) omitted.push(esc(d.lateTruncated) + ' more past-due orders');
+        if (d.atRiskTruncated) omitted.push(esc(d.atRiskTruncated) + ' more at-risk orders');
+        if (omitted.length) banner += '<div class="pdo-ps-note">Incomplete company-wide list: ' + omitted.join(' and ') + ' were not returned.</div>';
 
         var sorted = rows.slice().sort(function (a, b) { return a.daysUntilDue - b.daysUntilDue; });
         var total = sorted.reduce(function (sum, o) { return sum + (Number(o.subtotal) || 0); }, 0);

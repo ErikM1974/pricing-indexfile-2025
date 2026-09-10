@@ -16,7 +16,7 @@ const noComments = (s) => s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*
 describe('blog editor', () => {
     const html = read('dashboards/blog-editor.html').replace(/<!--[\s\S]*?-->/g, '');
     const js = read('dashboards/js/blog-editor.js');
-    const css = read('dashboards/css/blog-editor.css');
+    const css = read('shared_components/css/staff-toolkit.css');
     test('error banner actually shows messages; retry; honest preview; named controls', () => {
         expect(html).toMatch(/<span class="dash-error-banner-message"><\/span>/);
         expect(html).not.toMatch(/dash-error-text/);
@@ -26,13 +26,14 @@ describe('blog editor', () => {
         expect(js).toMatch(/Preview unavailable \(/);
         expect(js).toMatch(/if \(!r\.ok\) throw new Error\('HTTP ' \+ r\.status\); return r\.json\(\);/);
         expect(html).toMatch(/data-md="bold" title="Bold" aria-label="Bold"/);
-        expect(html).toMatch(/for="fldHeroFile" role="button" tabindex="0"/);
-        expect(html).toMatch(/for="fldBodyImage" title="Insert image" role="button" tabindex="0" aria-label="Insert image"/);
+        const document = new (require('jsdom').JSDOM)(html).window.document;
+        expect(document.querySelector('button[data-file="fldHeroFile"]').type).toBe('button');
+        expect(document.querySelector('button[data-file="fldBodyImage"]').getAttribute('aria-label')).toBe('Insert image');
         expect(js).toMatch(/document\.querySelectorAll\('\.be-file-btn'\)\.forEach/);
-        expect(html).toMatch(/<span class="be-label" id="heroLabel">Hero image<\/span>/);
+        expect(html).toMatch(/<span class="field-label be-label" id="heroLabel">Hero image<\/span>/);
         expect(html).not.toMatch(/<label class="be-label">Hero image<\/label>/);
         expect(html).not.toMatch(BARE);
-        expect(css).toMatch(/^\[hidden\] \{ display: none !important; \}/m);
+        expect(read('shared_components/css/components.css')).toMatch(/\[hidden\] \{\s*display: none;\s*\}/);
         expect(html).toMatch(/blog-editor\.js\?v=\d{4}\.\d{2}\.\d{2}\.\d+/);
     });
 });

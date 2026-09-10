@@ -4748,6 +4748,238 @@
         "rawCssBytes": 167534,
         "localCssRequests": 3
       }
+    },
+    {
+      "source": "dashboards/blog-editor.html",
+      "family": "staff-toolkit",
+      "status": "pilot",
+      "route": "/dashboards/blog-editor.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/staff-toolkit.css"
+      ],
+      "dynamicStyles": [],
+      "dynamicTokens": [],
+      "states": [
+        "four-width-original-data-and-accessibility",
+        "keyboard-controls-and-table-scrolling",
+        "loading-malformed-failure-retry",
+        "obsolete-response-and-pending-action-protection",
+        "original-successful-request-and-export-contracts",
+        "short-and-long-paper-review"
+      ],
+      "test": "tests/e2e/css-unification-staff-toolkit.spec.js",
+      "maxCssBytes": 185684,
+      "measuredRawCssBytes": 184660,
+      "baseline": {
+        "commit": "ddfc539528ccafd5c6adf12f94513a9a4bcbde0b",
+        "rawCssBytes": 177552,
+        "localCssRequests": 0
+      }
+    },
+    {
+      "source": "dashboards/contract-break-even.html",
+      "family": "staff-toolkit",
+      "status": "pilot",
+      "route": "/dashboards/contract-break-even.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/staff-toolkit.css"
+      ],
+      "dynamicStyles": [],
+      "dynamicTokens": [],
+      "states": [
+        "four-width-original-data-and-accessibility",
+        "keyboard-controls-and-table-scrolling",
+        "loading-malformed-failure-retry",
+        "obsolete-response-and-pending-action-protection",
+        "original-successful-request-and-export-contracts",
+        "short-and-long-paper-review"
+      ],
+      "test": "tests/e2e/css-unification-staff-toolkit.spec.js",
+      "maxCssBytes": 185684,
+      "measuredRawCssBytes": 184660,
+      "baseline": {
+        "commit": "ddfc539528ccafd5c6adf12f94513a9a4bcbde0b",
+        "rawCssBytes": 166499,
+        "localCssRequests": 0
+      }
+    },
+    {
+      "source": "dashboards/customer-portal-admin.html",
+      "family": "staff-toolkit",
+      "status": "pilot",
+      "route": "/dashboards/customer-portal-admin.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/staff-toolkit.css"
+      ],
+      "dynamicStyles": [],
+      "dynamicTokens": [],
+      "states": [
+        "four-width-original-data-and-accessibility",
+        "keyboard-controls-and-table-scrolling",
+        "loading-malformed-failure-retry",
+        "obsolete-response-and-pending-action-protection",
+        "original-successful-request-and-export-contracts",
+        "short-and-long-paper-review"
+      ],
+      "test": "tests/e2e/css-unification-staff-toolkit.spec.js",
+      "maxCssBytes": 185684,
+      "measuredRawCssBytes": 184660,
+      "baseline": {
+        "commit": "ddfc539528ccafd5c6adf12f94513a9a4bcbde0b",
+        "rawCssBytes": 180975,
+        "localCssRequests": 0
+      }
+    },
+    {
+      "source": "dashboards/jim-mailing-list.html",
+      "family": "staff-toolkit",
+      "status": "pilot",
+      "route": "/dashboards/jim-mailing-list.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/staff-toolkit.css"
+      ],
+      "dynamicStyles": [],
+      "dynamicTokens": [],
+      "states": [
+        "four-width-original-data-and-accessibility",
+        "keyboard-controls-and-table-scrolling",
+        "loading-malformed-failure-retry",
+        "obsolete-response-and-pending-action-protection",
+        "original-successful-request-and-export-contracts",
+        "short-and-long-paper-review"
+      ],
+      "test": "tests/e2e/css-unification-staff-toolkit.spec.js",
+      "maxCssBytes": 185684,
+      "measuredRawCssBytes": 184660,
+      "baseline": {
+        "commit": "ddfc539528ccafd5c6adf12f94513a9a4bcbde0b",
+        "rawCssBytes": 183334,
+        "localCssRequests": 0
+      }
+    },
+    {
+      "source": "dashboards/past-due-orders.html",
+      "family": "staff-toolkit",
+      "status": "pilot",
+      "route": "/dashboards/past-due-orders.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/staff-toolkit.css"
+      ],
+      "dynamicStyles": [],
+      "dynamicTokens": [],
+      "states": [
+        "four-width-original-data-and-accessibility",
+        "keyboard-controls-and-table-scrolling",
+        "loading-malformed-failure-retry",
+        "obsolete-response-and-pending-action-protection",
+        "original-successful-request-and-export-contracts",
+        "short-and-long-paper-review"
+      ],
+      "test": "tests/e2e/css-unification-staff-toolkit.spec.js",
+      "maxCssBytes": 185684,
+      "measuredRawCssBytes": 184660,
+      "baseline": {
+        "commit": "ddfc539528ccafd5c6adf12f94513a9a4bcbde0b",
+        "rawCssBytes": 179048,
+        "localCssRequests": 0
+      }
+    },
+    {
+      "source": "dashboards/product-manager.html",
+      "family": "staff-toolkit",
+      "status": "pilot",
+      "route": "/dashboards/product-manager.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/staff-toolkit.css"
+      ],
+      "dynamicStyles": [],
+      "dynamicTokens": [],
+      "states": [
+        "four-width-original-data-and-accessibility",
+        "keyboard-controls-and-table-scrolling",
+        "loading-malformed-failure-retry",
+        "obsolete-response-and-pending-action-protection",
+        "original-successful-request-and-export-contracts",
+        "short-and-long-paper-review"
+      ],
+      "test": "tests/e2e/css-unification-staff-toolkit.spec.js",
+      "maxCssBytes": 185684,
+      "measuredRawCssBytes": 184660,
+      "baseline": {
+        "commit": "ddfc539528ccafd5c6adf12f94513a9a4bcbde0b",
+        "rawCssBytes": 168137,
+        "localCssRequests": 0
+      }
+    },
+    {
+      "source": "dashboards/roland-printer-supplies.html",
+      "family": "staff-toolkit",
+      "status": "pilot",
+      "route": "/dashboards/roland-printer-supplies.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/staff-toolkit.css"
+      ],
+      "dynamicStyles": [],
+      "dynamicTokens": [],
+      "states": [
+        "four-width-original-data-and-accessibility",
+        "keyboard-controls-and-table-scrolling",
+        "loading-malformed-failure-retry",
+        "obsolete-response-and-pending-action-protection",
+        "original-successful-request-and-export-contracts",
+        "short-and-long-paper-review"
+      ],
+      "test": "tests/e2e/css-unification-staff-toolkit.spec.js",
+      "maxCssBytes": 185684,
+      "measuredRawCssBytes": 184660,
+      "baseline": {
+        "commit": "ddfc539528ccafd5c6adf12f94513a9a4bcbde0b",
+        "rawCssBytes": 164993,
+        "localCssRequests": 0
+      }
+    },
+    {
+      "source": "dashboards/volume-quote.html",
+      "family": "staff-toolkit",
+      "status": "pilot",
+      "route": "/dashboards/volume-quote.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/staff-toolkit.css"
+      ],
+      "dynamicStyles": [],
+      "dynamicTokens": [],
+      "states": [
+        "four-width-original-data-and-accessibility",
+        "keyboard-controls-and-table-scrolling",
+        "loading-malformed-failure-retry",
+        "obsolete-response-and-pending-action-protection",
+        "original-successful-request-and-export-contracts",
+        "short-and-long-paper-review"
+      ],
+      "test": "tests/e2e/css-unification-staff-toolkit.spec.js",
+      "maxCssBytes": 185684,
+      "measuredRawCssBytes": 184660,
+      "baseline": {
+        "commit": "ddfc539528ccafd5c6adf12f94513a9a4bcbde0b",
+        "rawCssBytes": 173304,
+        "localCssRequests": 0
+      }
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",

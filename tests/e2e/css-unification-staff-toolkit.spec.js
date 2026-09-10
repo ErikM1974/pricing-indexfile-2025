@@ -4,6 +4,69 @@ const fs = require('node:fs'), path = require('node:path');
 const data = require('./fixtures/staff-toolkit-data');
 const baseline = require('../fixtures/staff-toolkit-original-browser.json');
 const source = require('../fixtures/staff-toolkit-original-content.json');
+
+test('CSS staff toolkit: mailing list supports four widths, large controls and its staff preview', async ({ page }) => {
+    const events = await open(page, 'jim-mailing-list'); await expect(page.locator('.jml-entry')).toHaveCount(3);
+    await page.locator('#jml-view-all').click();
+    for (const width of [1440, 768, 390, 320]) {
+        await page.setViewportSize({ width, height: 1000 });
+        expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+        await axe(page); await page.screenshot({ path: path.join(output, 'staff-toolkit-mailing-' + width + '.png'), fullPage: true });
+    }
+    expect(await page.locator('#jml-save').evaluate(n => n.getBoundingClientRect().height)).toBeGreaterThanOrEqual(52);
+    expect(await page.locator('#jml-company').evaluate(n => parseFloat(getComputedStyle(n).fontSize))).toBeGreaterThanOrEqual(18);
+    const chooser = page.waitForEvent('filechooser'); await page.locator('.jml-ai-imgbtn').focus(); await page.keyboard.press('Enter'); await chooser;
+    await page.locator('.jml-mc-summary').click(); await axe(page);
+    clean(events);
+});
+
+test('CSS staff toolkit: mailing list preserves original fields, CSV, label dimensions and successful request bodies', async ({ page }) => {
+    const events = await open(page, 'jim-mailing-list', { respondWrite: mailingWrite });
+    expect(await mailingWorkflow(page, events, false)).toEqual(require('../fixtures/staff-toolkit-mailing-original-workflow.json'));
+});
+
+for (const problem of ['http', 'malformed']) test('CSS staff toolkit: mailing ' + problem + ' list failure remains unknown through filtering and retries', async ({ page }) => {
+    let failed = true;
+    const events = await open(page, 'jim-mailing-list', { respond: async u => {
+        if (u.pathname === '/api/crm-proxy/jim-mailing-list' && failed) return problem === 'http' ? { status: 503, json: { error: 'Synthetic outage' } } : { json: {} };
+    } });
+    await expect(page.getByRole('button', { name: 'Try again', exact: true })).toBeVisible();
+    await page.locator('#jml-view-all').click(); await page.locator('#jml-search').fill('Cedar');
+    await expect(page.getByRole('button', { name: 'Try again', exact: true })).toBeVisible();
+    await expect(page.locator('#jml-all-count')).toHaveText('(—)');
+    await expect(page.locator('#jml-export')).toBeDisabled(); await expect(page.locator('#jml-mc-sync')).toBeDisabled();
+    await page.setViewportSize({ width: 320, height: 900 }); await axe(page);
+    failed = false; await page.getByRole('button', { name: 'Try again', exact: true }).click();
+    await expect(page.locator('.jml-entry')).toHaveCount(1); await expect(page.locator('#jml-all-count')).toHaveText('(3)');
+    await expect(page.locator('#jml-export')).toBeEnabled(); clean(events);
+});
+
+test('CSS staff toolkit: mailing pending save holds its draft and rejects duplicate submissions', async ({ page }) => {
+    let release; const gate = new Promise(resolve => { release = resolve; });
+    const events = await open(page, 'jim-mailing-list', { respondWrite: async req => { await gate; return mailingWrite(req); } });
+    await expect(page.locator('.jml-entry')).toHaveCount(3);
+    await page.locator('[data-act="edit"][data-id="99401"]').click(); await page.locator('#jml-notes').fill('Synthetic captured note.');
+    await page.locator('#jml-save').click();
+    try {
+        await expect(page.locator('#jml-company')).toBeDisabled(); await expect(page.locator('#jml-cancel')).toBeDisabled();
+        await expect(page.locator('#jml-ai-go')).toBeDisabled();
+        await page.locator('#jml-form').evaluate(n => { n.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })); n.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })); });
+        expect(events.writes).toHaveLength(1);
+    } finally { release(); }
+    await expect(page.locator('#jml-ok')).toContainText('Saved your changes'); await expect(page.locator('#jml-company')).toBeEnabled();
+    expect(JSON.parse(events.writes[0].body).Notes).toBe('Synthetic captured note.');
+    expect(events.writes[0].path).toBe('/api/crm-proxy/jim-mailing-list/99401');
+    expect(events.errors).toEqual([]); expect(events.unknown).toEqual([]);
+});
+
+test('CSS staff toolkit: mailing uncertain save retains draft and does not claim nothing changed', async ({ page }) => {
+    const events = await open(page, 'jim-mailing-list');
+    await expect(page.locator('.jml-entry')).toHaveCount(3); await page.locator('#jml-company').fill('Synthetic uncertain save');
+    await page.locator('#jml-save').click(); await expect(page.locator('.dash-error-banner')).toContainText('Check the list before trying again');
+    await expect(page.locator('#jml-company')).toHaveValue('Synthetic uncertain save');
+    await expect(page.locator('#jml-company')).toBeEnabled(); expect(events.writes).toHaveLength(1);
+});
+
 const root = path.resolve(__dirname, '../..'), output = path.join(__dirname, 'screenshots/css-unification');
 fs.mkdirSync(output, { recursive: true });
 test.use({ reducedMotion: 'reduce', timezoneId: 'America/Los_Angeles' });
@@ -31,6 +94,8 @@ async function open(page, tool, state = {}) {
         if (p.startsWith('/api/') || ['fetch', 'xhr'].includes(req.resourceType())) { events.unknown.push(req.url()); return route.fulfill({ status: 503, json: { error: 'Unmapped synthetic API' } }); }
         if (['127.0.0.1', 'localhost'].includes(u.hostname)) {
             const file = path.resolve(root, '.' + p);
+            const retired = state.original && (source.retiredStyles || []).find(r => '/' + r.file === p);
+            if (retired) return route.fulfill({ contentType: 'text/css', body: retired.css });
             if (!file.startsWith(root + path.sep) || !fs.existsSync(file) || !fs.statSync(file).isFile()) { events.missing.push(p); return route.fulfill({ status: 404 }); }
             let body = fs.readFileSync(file);
             if (state.original && source.hashes[p.slice(1)]) {
@@ -45,12 +110,181 @@ async function open(page, tool, state = {}) {
         if (['image', 'font'].includes(req.resourceType())) return route.continue();
         events.unknown.push(req.url()); return route.abort();
     });
-    await page.goto('/dashboards/' + tool + '.html');
+    await page.goto(state.pagePath || '/dashboards/' + tool + '.html');
     await page.evaluate(() => document.fonts.ready);
     return events;
 }
 
 function clean(events) { expect(events.errors).toEqual([]); expect(events.unknown).toEqual([]); expect(events.missing).toEqual([]); expect(events.writes).toEqual([]); }
+
+test('CSS staff toolkit: past due preserves original windows, amounts, links and rep print sheets', async ({ page }) => {
+    const events = await open(page, 'past-due-orders');
+    expect(await pastDueWorkflow(page, false)).toEqual(require('../fixtures/staff-toolkit-pastdue-original-workflow.json'));
+    await expect(page.locator('.pdo-nopo-link').first()).toHaveAttribute('href', '/calculators/purchasingform.html');
+    clean(events);
+});
+test('CSS staff toolkit: past due keeps all table columns at four widths with keyboard scrolling', async ({ page }) => {
+    const events = await open(page, 'past-due-orders'); await expect(page.locator('.pdo-table')).toHaveCount(2);
+    for (const width of [1440, 768, 390, 320]) {
+        await page.setViewportSize({ width, height: 1000 });
+        expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+        await axe(page); await page.screenshot({ path: path.join(output, 'staff-toolkit-pastdue-' + width + '.png'), fullPage: true });
+    }
+    const region = page.getByRole('region', { name: 'Nika Lao orders' }); await region.focus(); await page.keyboard.press('ArrowRight');
+    await expect.poll(() => region.evaluate(n => n.scrollLeft)).toBeGreaterThan(0); clean(events);
+});
+for (const problem of ['http', 'malformed', 'missing-rep']) test('CSS staff toolkit: past due ' + problem + ' failure cannot appear all clear or print stale data', async ({ page }) => {
+    let failed = false;
+    const events = await open(page, 'past-due-orders', { respond: async u => {
+        if (u.pathname !== '/api/crm-proxy/ae-dashboard/due-dates-all' || !failed) return;
+        if (problem === 'http') return { status: 503, json: { error: 'Synthetic outage' } };
+        if (problem === 'malformed') return { json: {} };
+        return { json: { ...data.due, byRep: {} } };
+    } });
+    await expect(page.locator('.pdo-table')).toHaveCount(2); failed = true; await page.locator('#pdo-refresh').click();
+    await expect(page.locator('#content-root')).toHaveClass('pdo-failed'); await expect(page.locator('#stat-late')).toHaveText('—');
+    await expect(page.locator('#pdo-print')).toBeDisabled(); await expect(page.locator('.pdo-none')).toHaveCount(0);
+    await page.evaluate(() => window.dispatchEvent(new Event('beforeprint'))); await expect(page.locator('#pdo-print-sheet')).toHaveCount(0);
+    failed = false; await page.locator('#pdo-refresh').click(); await expect(page.locator('.pdo-table')).toHaveCount(2);
+    await expect(page.locator('#pdo-print')).toBeEnabled(); clean(events);
+});
+test('CSS staff toolkit: past due latest window owns its response and pending printing stays locked', async ({ page }) => {
+    let release, requested = false; const gate = new Promise(resolve => { release = resolve; });
+    const events = await open(page, 'past-due-orders', { respond: async u => {
+        if (u.pathname === '/api/crm-proxy/ae-dashboard/due-dates-all' && u.searchParams.get('days') === '60') { requested = true; await gate; return { json: { ...data.due, lookbackDays: 60 } }; }
+    } });
+    await expect(page.locator('.pdo-table')).toHaveCount(2); await page.locator('#pdo-days').selectOption('60');
+    try {
+        await expect.poll(() => requested).toBe(true); await expect(page.locator('#pdo-print')).toBeDisabled();
+        await expect(page.locator('#stat-late')).toHaveText('—'); await page.locator('#pdo-days').selectOption('90');
+        await expect(page.locator('#pdo-asof')).toContainText('90-day window');
+    } finally { release(); }
+    await expect(page.locator('#pdo-asof')).toContainText('90-day window'); clean(events);
+});
+
+
+async function pastDueWorkflow(page, originalView) {
+    const windows = [];
+    for (const days of ['30', '60', '90']) {
+        await page.locator('#pdo-days').selectOption(days); await expect(page.locator('#pdo-asof')).toContainText(days + '-day window');
+        await expect(page.locator('.pdo-table')).toHaveCount(2);
+        windows.push({ days, tables: await tables(page), stats: await page.locator('.dash-stat-card').allTextContents(), asof: await page.locator('#pdo-asof').textContent() });
+    }
+    const reports = [];
+    for (const who of ['', 'Nika Lao']) {
+        await page.locator('#pdo-print-who').selectOption(who); await page.locator('#pdo-print').click();
+        await expect(page.locator('#pdo-print-sheet')).toHaveCount(1);
+        reports.push({ who, tables: await tables(page) });
+        await page.pdf({ path: path.join(output, 'staff-toolkit-pastdue-' + (originalView ? 'original-' : '') + (who ? 'nika' : 'all') + '.pdf'), preferCSSPageSize: true, printBackground: true });
+        await page.evaluate(() => window.dispatchEvent(new Event('afterprint')));
+    }
+    return { windows, reports };
+}
+function longPastDue() {
+    const d = JSON.parse(JSON.stringify(data.due));
+    const late = Array.from({ length: 44 }, (_, i) => ({ ...d.late[0], idOrder: 199501 + i, company: 'Synthetic Long Company ' + String(i + 1).padStart(2, '0'), dueDate: '2026-09-07', subtotal: 1420 + i, vendors: [], placedDate: '2026-08-28' }));
+    const risk = Array.from({ length: 12 }, (_, i) => ({ ...d.atRisk[0], idOrder: 299501 + i, company: 'Synthetic Risk Company ' + String(i + 1).padStart(2, '0'), subtotal: 560 + i }));
+    d.late = [...late, d.late[1]]; d.atRisk = risk; d.byRep['Nika Lao'] = { late, atRisk: risk }; d.counts = { ...d.counts, late: d.late.length, atRisk: risk.length }; d.lateTruncated = 7;
+    return d;
+}
+test('CSS staff toolkit: original past due captures all windows and rep print sheets', async ({ page }) => {
+    const events = await open(page, 'past-due-orders', { original: true });
+    const result = await pastDueWorkflow(page, true);
+    fs.writeFileSync(path.join(output, 'staff-toolkit-pastdue-original-workflow.json'), JSON.stringify(result, null, 2) + '\n'); clean(events);
+});
+for (const originalView of [true, false]) test('CSS staff toolkit: ' + (originalView ? 'original ' : '') + 'past due long rep report keeps every order and repeated context', async ({ page }) => {
+    const d = longPastDue();
+    const events = await open(page, 'past-due-orders', { original: originalView, respond: async u => u.pathname === '/api/crm-proxy/ae-dashboard/due-dates-all' ? { json: d } : undefined });
+    await expect(page.locator('.pdo-table tbody tr')).toHaveCount(57);
+    await page.locator('#pdo-print').click(); await expect(page.locator('#pdo-print-sheet')).toHaveCount(1);
+    await page.pdf({ path: path.join(output, 'staff-toolkit-pastdue-' + (originalView ? 'original-' : '') + 'long.pdf'), preferCSSPageSize: true, printBackground: true });
+    await page.evaluate(() => window.dispatchEvent(new Event('afterprint'))); clean(events);
+});
+
+
+test('CSS staff toolkit: mailing preview uses the shared owner and cannot forward unknown requests', async ({ page }) => {
+    const events = await open(page, 'jim-mailing-list', { pagePath: '/tests/ui/test-jim-mailing-list.html' });
+    await expect(page.locator('.jml-entry')).toHaveCount(2);
+    await expect(page.locator('body')).toHaveAttribute('data-staff-tool', 'jim-mailing-list');
+    await page.locator('#jml-view-all').click(); await expect(page.locator('.jml-entry')).toHaveCount(3);
+    await page.setViewportSize({ width: 320, height: 1000 }); await axe(page);
+    const results = await page.evaluate(async () => {
+        const responses = [];
+        for (const url of ['/api/not-in-preview', 'https://example.test/blocked']) {
+            const r = await fetch(url, { method: 'POST', body: 'synthetic-only' }); responses.push({ status: r.status, body: await r.json() });
+        }
+        return responses;
+    });
+    expect(results.every(r => r.status === 503 && /no fixture/.test(r.body.error))).toBe(true);
+    clean(events);
+});
+
+for (const operation of ['extract', 'sync']) test('CSS staff toolkit: mailing pending ' + operation + ' holds its inputs and rejects duplicates', async ({ page }) => {
+    let release; const gate = new Promise(resolve => { release = resolve; });
+    const events = await open(page, 'jim-mailing-list', { respondWrite: async req => { await gate; return mailingWrite(req); } });
+    await expect(page.locator('.jml-entry')).toHaveCount(3); await page.locator('#jml-view-all').click();
+    page.on('dialog', d => d.accept());
+    if (operation === 'extract') {
+        await page.locator('#jml-ai-text').fill('Synthetic Maple Workshop'); await page.locator('#jml-ai-go').click();
+    } else { await page.locator('.jml-mc-summary').click(); await page.locator('#jml-mc-sync').click(); }
+    try {
+        await expect(page.locator('#jml-company')).toBeDisabled(); await expect(page.locator('#jml-view-mine')).toBeDisabled();
+        await page.locator(operation === 'extract' ? '#jml-ai-go' : '#jml-mc-sync').evaluate(n => n.dispatchEvent(new MouseEvent('click', { bubbles: true })));
+        expect(events.writes).toHaveLength(1);
+    } finally { release(); }
+    await expect(page.locator('#jml-company')).toBeEnabled();
+    if (operation === 'extract') await expect(page.locator('#jml-company')).toHaveValue('Synthetic Maple Workshop');
+    else await expect(page.locator('#jml-mc-status')).toContainText('Synced 2');
+    expect(events.errors).toEqual([]); expect(events.unknown).toEqual([]);
+});
+
+
+function mailingWrite(req) {
+    const p = new URL(req.url()).pathname, b = JSON.parse(req.postData() || '{}');
+    if (p.endsWith('/extract')) return { json: { fields: { company: 'Synthetic Maple Workshop', first_name: 'Alex', last_name: 'Example', address: '456 Sample Avenue', city: 'Fife', state: 'WA', zip: '98424', phone: '253-555-0199', email: 'maple@example.test', category: 'Construction Prospect', notes: 'Synthetic extraction only.' } } };
+    if (p.endsWith('/engagement')) return { json: { checked: b.emails.length, inMailchimp: b.emails.length, opened: 1, byEmail: Object.fromEntries(b.emails.map((e, i) => [e, { inMailchimp: true, opened: i === 0, rating: 4 }])) } };
+    if (p.endsWith('/sync')) return { json: { attempted: b.members.length, audience: 'Synthetic Prospects', created: 0, updated: b.members.length, errors: 0 } };
+    if (p.endsWith('/record-sends')) return { json: { updated: 0, campaigns: 1 } };
+    return { json: { success: true, PK_ID: 99404, ...b } };
+}
+
+async function mailingWorkflow(page, events, originalView) {
+    await expect(page.locator('.jml-entry')).toHaveCount(3);
+    await page.locator('#jml-view-all').click();
+    const cards = await page.locator('.jml-entry').allTextContents();
+    await page.evaluate(() => { window.open = () => ({ document: { write: html => { window.__labelsHtml = html; }, close() {} } }); });
+    await page.locator('#jml-labels').click(); const labels = await page.evaluate(() => window.__labelsHtml);
+    const downloadPromise = page.waitForEvent('download'); await page.locator('#jml-export').click();
+    const download = await downloadPromise, csv = fs.readFileSync(await download.path(), 'utf8');
+    await page.locator('[data-act="edit"][data-id="99401"]').click();
+    const fields = await page.locator('#jml-form input, #jml-form textarea').evaluateAll(nodes => nodes.map(n => ({ id: n.id, value: n.value })));
+    await page.locator('#jml-notes').fill('Synthetic reviewed note.'); await page.locator('#jml-save').click();
+    await expect(page.locator('#jml-ok')).toContainText('Saved your changes'); await expect(page.locator('.jml-entry')).toHaveCount(3);
+    await page.locator('[data-statusfor="99401"]').selectOption('Mailed'); await expect(page.locator('#jml-ok')).toContainText('Marked Synthetic Cedar');
+    page.on('dialog', dialog => dialog.accept());
+    await page.locator('[data-act="delete"][data-id="99403"]').click(); await expect(page.locator('#jml-ok')).toContainText('Removed Synthetic Pine');
+    await expect(page.locator('.jml-entry')).toHaveCount(3);
+    await page.locator('#jml-ai-text').fill('Synthetic Maple Workshop, Alex Example, 456 Sample Avenue, Fife WA 98424.');
+    await page.locator('#jml-ai-go').click(); await expect(page.locator('#jml-company')).toHaveValue('Synthetic Maple Workshop');
+    await page.locator('#jml-save').click(); await expect(page.locator('#jml-ok')).toContainText('Added Synthetic Maple');
+    await expect(page.locator('.jml-entry')).toHaveCount(3);
+    await page.locator('.jml-mc-summary').click(); await page.locator('#jml-mc-test').click(); await expect(page.locator('#jml-mc-status')).toContainText('Connected');
+    await page.locator('#jml-mc-check').click(); await expect(page.locator('#jml-mc-status')).toContainText('have opened');
+    await page.locator('#jml-mc-sync-engaged').click(); await expect(page.locator('#jml-mc-status')).toContainText('Synced 1');
+    await page.locator('#jml-mc-sync').click(); await expect(page.locator('#jml-mc-status')).toContainText('Synced 2');
+    await page.locator('#jml-mc-refresh').click(); await expect(page.locator('#jml-mc-status')).toContainText('Updated 0');
+    const result = { cards, fields, csv, filename: download.suggestedFilename(), labels, writes: events.writes };
+    expect(events.errors).toEqual([]); expect(events.unknown).toEqual([]); expect(events.missing).toEqual([]);
+    await page.setContent(labels); await expect(page.locator('.lbl')).toHaveCount(3);
+    await page.pdf({ path: path.join(output, 'staff-toolkit-mailing-' + (originalView ? 'original-' : '') + 'labels.pdf'), preferCSSPageSize: true, printBackground: true });
+    return result;
+}
+
+test('CSS staff toolkit: original mailing list captures fields, CSV, label geometry and synthetic writes', async ({ page }) => {
+    const events = await open(page, 'jim-mailing-list', { original: true, respondWrite: mailingWrite });
+    const result = await mailingWorkflow(page, events, true);
+    fs.writeFileSync(path.join(output, 'staff-toolkit-mailing-original-workflow.json'), JSON.stringify(result, null, 2) + '\n');
+});
 async function tables(page) { return page.locator('table').evaluateAll(ts => ts.map(t => ({ id: t.id, rows: [...t.rows].map(r => [...r.cells].map(c => c.textContent.replace(/\s+/g, ' ').trim())) }))); }
 async function axe(page, provider = false) { let builder = new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']); if (provider) builder = builder.exclude('.rps-form-wrap'); expect((await builder.analyze()).violations).toEqual([]); }
 

@@ -19,7 +19,7 @@ const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 const html = read('dashboards/past-due-orders.html');
 const doc = new DOMParser().parseFromString(html, 'text/html');
 const js = read('dashboards/js/past-due-orders.js');
-const css = read('dashboards/css/past-due-orders.css');
+const css = read('shared_components/css/staff-toolkit.css');
 
 describe('Rule 3 + shell ids', () => {
     test('no inline code', () => {

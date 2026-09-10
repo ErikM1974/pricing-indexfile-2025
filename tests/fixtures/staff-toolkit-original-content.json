@@ -830,6 +830,171 @@
         "dashboards/js/volume-quote.js"
       ],
       "cssBytes": 173304
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>TEST — Jim's Mailing List</title>\n    <link rel=\"stylesheet\" href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap\">\n    <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/art-hub.css\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/dash-shell.css\">\n    <link rel=\"stylesheet\" href=\"/dashboards/css/jim-mailing-list.css?v=2026.09.07.10\">\n</head>\n<body>\n    <div class=\"dash-shell\">\n        <header class=\"dash-header\">\n            <div class=\"dash-header-left\">\n                <h1 class=\"dash-header-title\">Jim's Mailing List — TEST HARNESS (stubbed data)</h1>\n            </div>\n        </header>\n\n        <main class=\"dash-content\">\n            <div class=\"dash-error-banner\" role=\"alert\">\n                <i class=\"fas fa-exclamation-triangle\"></i>\n                <span class=\"dash-error-banner-message\"></span>\n                <button class=\"dash-error-banner-close\" aria-label=\"Dismiss\"><i class=\"fas fa-times\"></i></button>\n            </div>\n\n            <div class=\"jml-ok\" id=\"jml-ok\" role=\"status\" aria-live=\"polite\" hidden>\n                <i class=\"fas fa-check-circle\"></i> <span id=\"jml-ok-text\">Saved!</span>\n            </div>\n\n            <div class=\"jml-welcome\" id=\"jml-welcome\" hidden>\n                <img class=\"jml-portrait\" id=\"jml-portrait\" src=\"https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9463872\" alt=\"Jim\">\n                <span class=\"jml-greeting\" id=\"jml-greeting\"></span>\n            </div>\n            <p class=\"jml-intro\">\n                Type in a company below and press <strong>Save</strong>. It gets added to your list.\n                You can change or remove any company anytime.\n            </p>\n\n            <section class=\"jml-card jml-ai-card\">\n                <h2 class=\"jml-ai-title\"><i class=\"fas fa-wand-magic-sparkles\" aria-hidden=\"true\"></i> Let Claude fill it in for you</h2>\n                <p class=\"jml-ai-help\">\n                    Found a company online? <strong>Copy the text</strong> and paste it below — or <strong>paste a screenshot</strong>.\n                    Claude reads it and fills in the form. Then check it and press <strong>Save</strong>.\n                </p>\n                <label for=\"jml-ai-text\" class=\"jml-ai-label\">Paste what you copied here</label>\n                <textarea id=\"jml-ai-text\" rows=\"4\" placeholder=\"Paste the company name, address, phone, email…\"></textarea>\n                <div class=\"jml-ai-image-row\">\n                    <label class=\"jml-ai-imgbtn\"><i class=\"fas fa-image\" aria-hidden=\"true\"></i> Choose a screenshot\n                        <input type=\"file\" id=\"jml-ai-file\" accept=\"image/*\" hidden></label>\n                    <span class=\"jml-ai-orpaste\">…or press <kbd>Ctrl</kbd> + <kbd>V</kbd> to paste a screenshot</span>\n                </div>\n                <div id=\"jml-ai-thumb-wrap\" class=\"jml-ai-thumb-wrap\" hidden>\n                    <img id=\"jml-ai-thumb\" alt=\"Your screenshot\" class=\"jml-ai-thumb\">\n                    <button type=\"button\" id=\"jml-ai-thumb-clear\" class=\"jml-ai-thumb-clear\" aria-label=\"Remove screenshot\"><i class=\"fas fa-times\" aria-hidden=\"true\"></i> Remove</button>\n                </div>\n                <button type=\"button\" class=\"jml-btn jml-btn-ai\" id=\"jml-ai-go\">\n                    <i class=\"fas fa-wand-magic-sparkles\" aria-hidden=\"true\"></i> <span id=\"jml-ai-go-text\">Read it &amp; fill in the form</span>\n                </button>\n                <p class=\"jml-ai-status\" id=\"jml-ai-status\" role=\"status\" aria-live=\"polite\" hidden></p>\n            </section>\n\n            <section class=\"jml-card jml-form-card\">\n                <h2 class=\"jml-form-title\" id=\"jml-form-title\">\n                    <i class=\"fas fa-plus-circle\" aria-hidden=\"true\"></i> Add a company\n                </h2>\n                <form id=\"jml-form\" novalidate>\n                    <div class=\"jml-field\">\n                        <label for=\"jml-company\">Company name</label>\n                        <input type=\"text\" id=\"jml-company\" autocomplete=\"off\" required>\n                        <span class=\"jml-hint\">This is the only box you have to fill in.</span>\n                    </div>\n                    <div class=\"jml-row\">\n                        <div class=\"jml-field jml-grow\">\n                            <label for=\"jml-first\">First name <span class=\"jml-opt\">(optional)</span></label>\n                            <input type=\"text\" id=\"jml-first\" autocomplete=\"off\">\n                        </div>\n                        <div class=\"jml-field jml-grow\">\n                            <label for=\"jml-last\">Last name <span class=\"jml-opt\">(optional)</span></label>\n                            <input type=\"text\" id=\"jml-last\" autocomplete=\"off\">\n                        </div>\n                    </div>\n                    <div class=\"jml-field\">\n                        <label for=\"jml-address\">Street address <span class=\"jml-opt\">(optional)</span></label>\n                        <input type=\"text\" id=\"jml-address\" autocomplete=\"off\">\n                    </div>\n                    <div class=\"jml-row\">\n                        <div class=\"jml-field jml-grow\">\n                            <label for=\"jml-city\">City <span class=\"jml-opt\">(optional)</span></label>\n                            <input type=\"text\" id=\"jml-city\" autocomplete=\"off\">\n                        </div>\n                        <div class=\"jml-field jml-state\">\n                            <label for=\"jml-state\">State</label>\n                            <input type=\"text\" id=\"jml-state\" autocomplete=\"off\">\n                        </div>\n                        <div class=\"jml-field jml-zip\">\n                            <label for=\"jml-zip\">ZIP</label>\n                            <input type=\"text\" id=\"jml-zip\" autocomplete=\"off\" inputmode=\"numeric\">\n                        </div>\n                    </div>\n                    <div class=\"jml-row\">\n                        <div class=\"jml-field jml-grow\">\n                            <label for=\"jml-phone\">Phone <span class=\"jml-opt\">(optional)</span></label>\n                            <input type=\"tel\" id=\"jml-phone\" autocomplete=\"off\">\n                        </div>\n                        <div class=\"jml-field jml-grow\">\n                            <label for=\"jml-email\">Email <span class=\"jml-opt\">(optional)</span></label>\n                            <input type=\"email\" id=\"jml-email\" autocomplete=\"off\">\n                        </div>\n                    </div>\n                    <div class=\"jml-field\">\n                        <label for=\"jml-website\">Website <span class=\"jml-opt\">(optional)</span></label>\n                        <input type=\"text\" id=\"jml-website\" autocomplete=\"off\" inputmode=\"url\">\n                    </div>\n                    <div class=\"jml-row\">\n                        <div class=\"jml-field jml-grow\">\n                            <label for=\"jml-source\">Where did you find them? <span class=\"jml-opt\">(optional)</span></label>\n                            <input type=\"text\" id=\"jml-source\" autocomplete=\"off\" placeholder=\"e.g. Milton Times magazine\">\n                        </div>\n                        <div class=\"jml-field jml-grow\">\n                            <label for=\"jml-category\">List / group <span class=\"jml-opt\">(optional)</span></label>\n                            <input type=\"text\" id=\"jml-category\" autocomplete=\"off\" placeholder=\"e.g. Fire Dept Prospect\">\n                        </div>\n                    </div>\n                    <div class=\"jml-field\">\n                        <label for=\"jml-notes\">Notes <span class=\"jml-opt\">(optional)</span></label>\n                        <textarea id=\"jml-notes\" rows=\"3\"></textarea>\n                    </div>\n                    <div class=\"jml-form-actions\">\n                        <button type=\"submit\" class=\"jml-btn jml-btn-save\" id=\"jml-save\">\n                            <i class=\"fas fa-check\" aria-hidden=\"true\"></i> <span id=\"jml-save-text\">Save company</span>\n                        </button>\n                        <button type=\"button\" class=\"jml-btn jml-btn-cancel\" id=\"jml-cancel\" hidden>Cancel</button>\n                    </div>\n                </form>\n            </section>\n\n            <section class=\"jml-list-section\">\n                <div class=\"jml-viewtoggle\" role=\"group\" aria-label=\"Which companies to show\">\n                    <button type=\"button\" class=\"jml-viewbtn\" id=\"jml-view-mine\" data-view=\"mine\">Your companies <span class=\"jml-view-n\" id=\"jml-mine-count\"></span></button>\n                    <button type=\"button\" class=\"jml-viewbtn\" id=\"jml-view-all\" data-view=\"all\">All companies <span class=\"jml-view-n\" id=\"jml-all-count\"></span></button>\n                </div>\n                <div class=\"jml-list-head\">\n                    <h2 class=\"jml-list-title\"><span id=\"jml-list-title-text\">Your companies</span> <span class=\"jml-count\" id=\"jml-count\"></span></h2>\n                    <div class=\"jml-search-wrap\">\n                        <i class=\"fas fa-search\" aria-hidden=\"true\"></i>\n                        <input type=\"search\" id=\"jml-search\" placeholder=\"Search\" aria-label=\"Search the list\">\n                    </div>\n                </div>\n                <div class=\"jml-list-actions\" id=\"jml-list-actions\" hidden>\n                    <button type=\"button\" class=\"jml-tool-btn\" id=\"jml-export\"><i class=\"fas fa-file-csv\" aria-hidden=\"true\"></i> Download for Mailchimp</button>\n                    <button type=\"button\" class=\"jml-tool-btn\" id=\"jml-labels\"><i class=\"fas fa-print\" aria-hidden=\"true\"></i> Print mailing labels</button>\n                    <span class=\"jml-tool-hint\">exports whatever you're filtered to</span>\n                </div>\n                <div class=\"jml-filterbar\" id=\"jml-filterbar\" hidden>\n                    <div id=\"jml-chips\" class=\"jml-chips\" role=\"group\" aria-label=\"Filter by group\"></div>\n                    <label class=\"jml-sort\">Sort:\n                        <select id=\"jml-sort\">\n                            <option value=\"company\">Company A–Z</option>\n                            <option value=\"city\">City</option>\n                            <option value=\"last\">Last name</option>\n                            <option value=\"recent\">Recently added</option>\n                        </select>\n                    </label>\n                </div>\n                <div id=\"jml-list\" class=\"jml-list\"></div>\n            </section>\n\n            <details class=\"jml-mc-details\">\n                <summary class=\"jml-mc-summary\"><i class=\"fas fa-paper-plane\" aria-hidden=\"true\"></i> Mailchimp — staff only (sync &amp; email tracking)</summary>\n                <div class=\"jml-mc-body\">\n                    <p class=\"jml-mc-help\">Adds <strong>only the group you're filtered to</strong> (with an email), tagged by segment.</p>\n                    <p class=\"jml-mc-scope\" id=\"jml-mc-scope\"></p>\n                    <div class=\"jml-mc-actions\">\n                        <button type=\"button\" class=\"jml-tool-btn\" id=\"jml-mc-test\"><i class=\"fas fa-plug\" aria-hidden=\"true\"></i> Test connection</button>\n                        <button type=\"button\" class=\"jml-tool-btn\" id=\"jml-mc-check\"><i class=\"fas fa-chart-line\" aria-hidden=\"true\"></i> Check engagement</button>\n                        <button type=\"button\" class=\"jml-tool-btn\" id=\"jml-mc-sync\"><i class=\"fas fa-cloud-arrow-up\" aria-hidden=\"true\"></i> Sync this group</button>\n                        <button type=\"button\" class=\"jml-tool-btn jml-mc-engaged-btn\" id=\"jml-mc-sync-engaged\" hidden><i class=\"fas fa-star\" aria-hidden=\"true\"></i> Sync engaged only</button>\n                        <button type=\"button\" class=\"jml-tool-btn\" id=\"jml-mc-refresh\"><i class=\"fas fa-rotate\" aria-hidden=\"true\"></i> Refresh email activity</button>\n                    </div>\n                    <p class=\"jml-mc-status\" id=\"jml-mc-status\" role=\"status\" aria-live=\"polite\" hidden></p>\n                </div>\n            </details>\n        </main>\n    </div>\n\n    <script src=\"/config/app.config.js\"></script>\n    <script src=\"/shared_components/js/fetch-timeout.js\"></script>\n    <script src=\"/shared_components/js/dash-page-helpers.js\"></script>\n    <script src=\"/tests/ui/test-jim-mailing-list-stub.js\"></script>\n    <script src=\"/dashboards/js/jim-mailing-list.js?v=2026.09.05.67\"></script>\n</body>\n</html>\n",
+      "title": "TEST — Jim's Mailing List",
+      "bodyText": "Jim's Mailing List — TEST HARNESS (stubbed data) Saved! Type in a company below and press Save. It gets added to your list. You can change or remove any company anytime. Let Claude fill it in for you Found a company online? Copy the text and paste it below — or paste a screenshot. Claude reads it and fills in the form. Then check it and press Save. Paste what you copied here Choose a screenshot …or press Ctrl + V to paste a screenshot Remove Read it & fill in the form Add a company Company name This is the only box you have to fill in. First name (optional) Last name (optional) Street address (optional) City (optional) State ZIP Phone (optional) Email (optional) Website (optional) Where did you find them? (optional) List / group (optional) Notes (optional) Save company Cancel Your companies All companies Your companies Download for Mailchimp Print mailing labels exports whatever you're filtered to Sort: Company A–Z City Last name Recently added Mailchimp — staff only (sync & email tracking) Adds only the group you're filtered to (with an email), tagged by segment. Test connection Check engagement Sync this group Sync engaged only Refresh email activity",
+      "bodyTextSha": "58be0691e88cb3a89e263b4de036621484f045ccd3fbb1a601b84b3556fdc9fa",
+      "ids": [
+        "jml-ok",
+        "jml-ok-text",
+        "jml-welcome",
+        "jml-portrait",
+        "jml-greeting",
+        "jml-ai-text",
+        "jml-ai-file",
+        "jml-ai-thumb-wrap",
+        "jml-ai-thumb",
+        "jml-ai-thumb-clear",
+        "jml-ai-go",
+        "jml-ai-go-text",
+        "jml-ai-status",
+        "jml-form-title",
+        "jml-form",
+        "jml-company",
+        "jml-first",
+        "jml-last",
+        "jml-address",
+        "jml-city",
+        "jml-state",
+        "jml-zip",
+        "jml-phone",
+        "jml-email",
+        "jml-website",
+        "jml-source",
+        "jml-category",
+        "jml-notes",
+        "jml-save",
+        "jml-save-text",
+        "jml-cancel",
+        "jml-view-mine",
+        "jml-mine-count",
+        "jml-view-all",
+        "jml-all-count",
+        "jml-list-title-text",
+        "jml-count",
+        "jml-search",
+        "jml-list-actions",
+        "jml-export",
+        "jml-labels",
+        "jml-filterbar",
+        "jml-chips",
+        "jml-sort",
+        "jml-list",
+        "jml-mc-scope",
+        "jml-mc-test",
+        "jml-mc-check",
+        "jml-mc-sync",
+        "jml-mc-sync-engaged",
+        "jml-mc-refresh",
+        "jml-mc-status"
+      ],
+      "links": [],
+      "fields": [
+        {
+          "id": "jml-ai-text",
+          "type": "textarea",
+          "value": ""
+        },
+        {
+          "id": "jml-ai-file",
+          "type": "file",
+          "value": ""
+        },
+        {
+          "id": "jml-company",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "jml-first",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "jml-last",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "jml-address",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "jml-city",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "jml-state",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "jml-zip",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "jml-phone",
+          "type": "tel",
+          "value": ""
+        },
+        {
+          "id": "jml-email",
+          "type": "email",
+          "value": ""
+        },
+        {
+          "id": "jml-website",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "jml-source",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "jml-category",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "jml-notes",
+          "type": "textarea",
+          "value": ""
+        },
+        {
+          "id": "jml-search",
+          "type": "search",
+          "value": ""
+        },
+        {
+          "id": "jml-sort",
+          "type": "select-one",
+          "value": "company"
+        }
+      ],
+      "styles": [
+        "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
+        "/shared_components/css/tokens.css?v=2026.09.08.2",
+        "/shared_components/css/art-hub.css",
+        "/shared_components/css/dash-shell.css",
+        "/dashboards/css/jim-mailing-list.css?v=2026.09.07.10"
+      ],
+      "scripts": [
+        "/config/app.config.js",
+        "/shared_components/js/fetch-timeout.js",
+        "/shared_components/js/dash-page-helpers.js",
+        "/tests/ui/test-jim-mailing-list-stub.js",
+        "/dashboards/js/jim-mailing-list.js?v=2026.09.05.67"
+      ],
+      "cssBytes": 183334
     }
   ],
   "hashes": {
@@ -863,7 +1028,9 @@
     "dashboards/volume-quote.html": "4ad271e25c1233336acf986d67a4da9d06ff30cc969279700d2bd41bdf800cad",
     "dashboards/css/volume-quote.css": "7a18308086e58cf9f44c8e8b8740568cdf22fd65cf3f0c1c834d1f8912c42e65",
     "shared_components/js/staff-auth-helper.js": "b858bb5e30a775c949aaab2e4f0bbb4796e06c02a76f3bb8d8a9c97985f5addd",
-    "dashboards/js/volume-quote.js": "d6d3d994543cd7eb34229532f6b9b8189ac11f36345d171b54edc5dbd0b76c2b"
+    "dashboards/js/volume-quote.js": "d6d3d994543cd7eb34229532f6b9b8189ac11f36345d171b54edc5dbd0b76c2b",
+    "tests/ui/test-jim-mailing-list.html": "997ba8b677632a54e64efa9dce08209bdb25b54d2fa0e716ef531554daaffab1",
+    "tests/ui/test-jim-mailing-list-stub.js": "2f0535ab8d3e462902246135f3b09d42707e0a31dda387d46137aeef86242880"
   },
   "changes": [
     {
@@ -2251,6 +2418,958 @@
       "before": "    window.addEventListener('afterprint', function () { printDetails.forEach(function (entry) { entry.node.open = entry.open; }); printDetails = []; });",
       "after": "    window.addEventListener('afterprint', function () { document.getElementById('cpa-rw-accrual-print').innerHTML = ''; });",
       "count": 1
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "family=Inter:wght@400;500;600;700",
+      "after": "family=Public+Sans:wght@400;500;600;700",
+      "count": 1
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "    <link rel=\"stylesheet\" href=\"/shared_components/css/art-hub.css?v=2026.09.07.19\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/dash-shell.css?v=2026.09.07.10\">\n    <link rel=\"stylesheet\" href=\"/dashboards/css/jim-mailing-list.css?v=2026.09.07.10\">",
+      "after": "    <link rel=\"stylesheet\" href=\"/shared_components/css/components.css?v=2026.09.10.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/staff-toolkit.css?v=2026.09.10.2\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "<body>",
+      "after": "<body data-ui=\"unified\" data-staff-tool=\"jim-mailing-list\">\n    <a class=\"skip-link\" href=\"#staff-tool-main\">Skip to content</a>",
+      "count": 1
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "<main class=\"dash-content\">",
+      "after": "<main class=\"dash-content\" id=\"staff-tool-main\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "/dashboards/js/jim-mailing-list.js?v=2026.09.05.67",
+      "after": "/dashboards/js/jim-mailing-list.js?v=2026.09.10.2",
+      "count": 1
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "<textarea id=\"jml-ai-text\" rows=\"4\" placeholder=\"Paste the company name, address, phone, email…\">",
+      "after": "<textarea id=\"jml-ai-text\" rows=\"4\" placeholder=\"Paste the company name, address, phone, email…\" class=\"field-textarea\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "<input type=\"file\" id=\"jml-ai-file\" accept=\"image/*\" class=\"jml-visually-hidden\" aria-label=\"Choose a screenshot\">",
+      "after": "<input type=\"file\" id=\"jml-ai-file\" accept=\"image/*\" hidden aria-label=\"Choose a screenshot\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "<input type=\"text\" id=\"jml-company\" autocomplete=\"off\" required>",
+      "after": "<input type=\"text\" id=\"jml-company\" autocomplete=\"off\" required class=\"field-input\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "<input type=\"text\" id=\"jml-first\" autocomplete=\"off\">",
+      "after": "<input type=\"text\" id=\"jml-first\" autocomplete=\"off\" class=\"field-input\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "<input type=\"text\" id=\"jml-last\" autocomplete=\"off\">",
+      "after": "<input type=\"text\" id=\"jml-last\" autocomplete=\"off\" class=\"field-input\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "<input type=\"text\" id=\"jml-address\" autocomplete=\"off\">",
+      "after": "<input type=\"text\" id=\"jml-address\" autocomplete=\"off\" class=\"field-input\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "<input type=\"text\" id=\"jml-city\" autocomplete=\"off\">",
+      "after": "<input type=\"text\" id=\"jml-city\" autocomplete=\"off\" class=\"field-input\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "<input type=\"text\" id=\"jml-state\" autocomplete=\"off\">",
+      "after": "<input type=\"text\" id=\"jml-state\" autocomplete=\"off\" class=\"field-input\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "<input type=\"text\" id=\"jml-zip\" autocomplete=\"off\" inputmode=\"numeric\">",
+      "after": "<input type=\"text\" id=\"jml-zip\" autocomplete=\"off\" inputmode=\"numeric\" class=\"field-input\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "<input type=\"tel\" id=\"jml-phone\" autocomplete=\"off\">",
+      "after": "<input type=\"tel\" id=\"jml-phone\" autocomplete=\"off\" class=\"field-input\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "<input type=\"email\" id=\"jml-email\" autocomplete=\"off\">",
+      "after": "<input type=\"email\" id=\"jml-email\" autocomplete=\"off\" class=\"field-input\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "<input type=\"text\" id=\"jml-website\" autocomplete=\"off\" inputmode=\"url\">",
+      "after": "<input type=\"text\" id=\"jml-website\" autocomplete=\"off\" inputmode=\"url\" class=\"field-input\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "<input type=\"text\" id=\"jml-source\" autocomplete=\"off\" placeholder=\"e.g. Milton Times magazine\">",
+      "after": "<input type=\"text\" id=\"jml-source\" autocomplete=\"off\" placeholder=\"e.g. Milton Times magazine\" class=\"field-input\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "<input type=\"text\" id=\"jml-category\" autocomplete=\"off\" placeholder=\"e.g. Fire Dept Prospect\">",
+      "after": "<input type=\"text\" id=\"jml-category\" autocomplete=\"off\" placeholder=\"e.g. Fire Dept Prospect\" class=\"field-input\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "<textarea id=\"jml-notes\" rows=\"3\">",
+      "after": "<textarea id=\"jml-notes\" rows=\"3\" class=\"field-textarea\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "<input type=\"search\" id=\"jml-search\" placeholder=\"Search\" aria-label=\"Search the list\">",
+      "after": "<input type=\"search\" id=\"jml-search\" placeholder=\"Search\" aria-label=\"Search the list\" class=\"field-input\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "<select id=\"jml-sort\">",
+      "after": "<select id=\"jml-sort\" class=\"field-select\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "<label class=\"jml-ai-imgbtn\" for=\"jml-ai-file\" role=\"button\" tabindex=\"0\">\n                        <i class=\"fas fa-image\" aria-hidden=\"true\"></i> Choose a screenshot\n                    </label>",
+      "after": "<button type=\"button\" class=\"jml-ai-imgbtn\">\n                        <i class=\"fas fa-image\" aria-hidden=\"true\"></i> Choose a screenshot\n                    </button>",
+      "count": 1
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "<label for=\"jml-ai-text\" class=\"jml-ai-label\">",
+      "after": "<label for=\"jml-ai-text\" class=\"field-label jml-ai-label\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "<label for=\"jml-company\">",
+      "after": "<label for=\"jml-company\" class=\"field-label\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "<label for=\"jml-first\">",
+      "after": "<label for=\"jml-first\" class=\"field-label\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "<label for=\"jml-last\">",
+      "after": "<label for=\"jml-last\" class=\"field-label\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "<label for=\"jml-address\">",
+      "after": "<label for=\"jml-address\" class=\"field-label\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "<label for=\"jml-city\">",
+      "after": "<label for=\"jml-city\" class=\"field-label\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "<label for=\"jml-state\">",
+      "after": "<label for=\"jml-state\" class=\"field-label\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "<label for=\"jml-zip\">",
+      "after": "<label for=\"jml-zip\" class=\"field-label\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "<label for=\"jml-phone\">",
+      "after": "<label for=\"jml-phone\" class=\"field-label\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "<label for=\"jml-email\">",
+      "after": "<label for=\"jml-email\" class=\"field-label\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "<label for=\"jml-website\">",
+      "after": "<label for=\"jml-website\" class=\"field-label\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "<label for=\"jml-source\">",
+      "after": "<label for=\"jml-source\" class=\"field-label\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "<label for=\"jml-category\">",
+      "after": "<label for=\"jml-category\" class=\"field-label\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "<label for=\"jml-notes\">",
+      "after": "<label for=\"jml-notes\" class=\"field-label\">",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "family=Inter:wght@400;500;600;700",
+      "after": "family=Public+Sans:wght@400;500;600;700",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "    <link rel=\"stylesheet\" href=\"/shared_components/css/art-hub.css\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/dash-shell.css\">\n    <link rel=\"stylesheet\" href=\"/dashboards/css/jim-mailing-list.css?v=2026.09.07.10\">",
+      "after": "    <link rel=\"stylesheet\" href=\"/shared_components/css/components.css?v=2026.09.10.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/staff-toolkit.css?v=2026.09.10.2\">",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "<body>",
+      "after": "<body data-ui=\"unified\" data-staff-tool=\"jim-mailing-list\">\n    <a class=\"skip-link\" href=\"#staff-tool-main\">Skip to content</a>",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "<main class=\"dash-content\">",
+      "after": "<main class=\"dash-content\" id=\"staff-tool-main\">",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "/dashboards/js/jim-mailing-list.js?v=2026.09.05.67",
+      "after": "/dashboards/js/jim-mailing-list.js?v=2026.09.10.2",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "<textarea id=\"jml-ai-text\" rows=\"4\" placeholder=\"Paste the company name, address, phone, email…\">",
+      "after": "<textarea id=\"jml-ai-text\" rows=\"4\" placeholder=\"Paste the company name, address, phone, email…\" class=\"field-textarea\">",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "<input type=\"file\" id=\"jml-ai-file\" accept=\"image/*\" hidden>",
+      "after": "<input type=\"file\" id=\"jml-ai-file\" accept=\"image/*\" hidden>",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "<input type=\"text\" id=\"jml-company\" autocomplete=\"off\" required>",
+      "after": "<input type=\"text\" id=\"jml-company\" autocomplete=\"off\" required class=\"field-input\">",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "<input type=\"text\" id=\"jml-first\" autocomplete=\"off\">",
+      "after": "<input type=\"text\" id=\"jml-first\" autocomplete=\"off\" class=\"field-input\">",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "<input type=\"text\" id=\"jml-last\" autocomplete=\"off\">",
+      "after": "<input type=\"text\" id=\"jml-last\" autocomplete=\"off\" class=\"field-input\">",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "<input type=\"text\" id=\"jml-address\" autocomplete=\"off\">",
+      "after": "<input type=\"text\" id=\"jml-address\" autocomplete=\"off\" class=\"field-input\">",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "<input type=\"text\" id=\"jml-city\" autocomplete=\"off\">",
+      "after": "<input type=\"text\" id=\"jml-city\" autocomplete=\"off\" class=\"field-input\">",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "<input type=\"text\" id=\"jml-state\" autocomplete=\"off\">",
+      "after": "<input type=\"text\" id=\"jml-state\" autocomplete=\"off\" class=\"field-input\">",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "<input type=\"text\" id=\"jml-zip\" autocomplete=\"off\" inputmode=\"numeric\">",
+      "after": "<input type=\"text\" id=\"jml-zip\" autocomplete=\"off\" inputmode=\"numeric\" class=\"field-input\">",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "<input type=\"tel\" id=\"jml-phone\" autocomplete=\"off\">",
+      "after": "<input type=\"tel\" id=\"jml-phone\" autocomplete=\"off\" class=\"field-input\">",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "<input type=\"email\" id=\"jml-email\" autocomplete=\"off\">",
+      "after": "<input type=\"email\" id=\"jml-email\" autocomplete=\"off\" class=\"field-input\">",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "<input type=\"text\" id=\"jml-website\" autocomplete=\"off\" inputmode=\"url\">",
+      "after": "<input type=\"text\" id=\"jml-website\" autocomplete=\"off\" inputmode=\"url\" class=\"field-input\">",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "<input type=\"text\" id=\"jml-source\" autocomplete=\"off\" placeholder=\"e.g. Milton Times magazine\">",
+      "after": "<input type=\"text\" id=\"jml-source\" autocomplete=\"off\" placeholder=\"e.g. Milton Times magazine\" class=\"field-input\">",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "<input type=\"text\" id=\"jml-category\" autocomplete=\"off\" placeholder=\"e.g. Fire Dept Prospect\">",
+      "after": "<input type=\"text\" id=\"jml-category\" autocomplete=\"off\" placeholder=\"e.g. Fire Dept Prospect\" class=\"field-input\">",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "<textarea id=\"jml-notes\" rows=\"3\">",
+      "after": "<textarea id=\"jml-notes\" rows=\"3\" class=\"field-textarea\">",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "<input type=\"search\" id=\"jml-search\" placeholder=\"Search\" aria-label=\"Search the list\">",
+      "after": "<input type=\"search\" id=\"jml-search\" placeholder=\"Search\" aria-label=\"Search the list\" class=\"field-input\">",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "<select id=\"jml-sort\">",
+      "after": "<select id=\"jml-sort\" class=\"field-select\">",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "<label class=\"jml-ai-imgbtn\"><i class=\"fas fa-image\" aria-hidden=\"true\"></i> Choose a screenshot\n                        <input type=\"file\" id=\"jml-ai-file\" accept=\"image/*\" hidden></label>",
+      "after": "<button type=\"button\" class=\"jml-ai-imgbtn\"><i class=\"fas fa-image\" aria-hidden=\"true\"></i> Choose a screenshot\n                        <input type=\"file\" id=\"jml-ai-file\" accept=\"image/*\" hidden></button>",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "<label for=\"jml-ai-text\" class=\"jml-ai-label\">",
+      "after": "<label for=\"jml-ai-text\" class=\"field-label jml-ai-label\">",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "<label for=\"jml-company\">",
+      "after": "<label for=\"jml-company\" class=\"field-label\">",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "<label for=\"jml-first\">",
+      "after": "<label for=\"jml-first\" class=\"field-label\">",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "<label for=\"jml-last\">",
+      "after": "<label for=\"jml-last\" class=\"field-label\">",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "<label for=\"jml-address\">",
+      "after": "<label for=\"jml-address\" class=\"field-label\">",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "<label for=\"jml-city\">",
+      "after": "<label for=\"jml-city\" class=\"field-label\">",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "<label for=\"jml-state\">",
+      "after": "<label for=\"jml-state\" class=\"field-label\">",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "<label for=\"jml-zip\">",
+      "after": "<label for=\"jml-zip\" class=\"field-label\">",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "<label for=\"jml-phone\">",
+      "after": "<label for=\"jml-phone\" class=\"field-label\">",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "<label for=\"jml-email\">",
+      "after": "<label for=\"jml-email\" class=\"field-label\">",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "<label for=\"jml-website\">",
+      "after": "<label for=\"jml-website\" class=\"field-label\">",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "<label for=\"jml-source\">",
+      "after": "<label for=\"jml-source\" class=\"field-label\">",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "<label for=\"jml-category\">",
+      "after": "<label for=\"jml-category\" class=\"field-label\">",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "<label for=\"jml-notes\">",
+      "after": "<label for=\"jml-notes\" class=\"field-label\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "class=\"jml-ai-imgbtn\"",
+      "after": "class=\"btn btn-secondary jml-ai-imgbtn\"",
+      "count": 1
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "class=\"jml-ai-thumb-clear\"",
+      "after": "class=\"btn btn-danger jml-ai-thumb-clear\"",
+      "count": 1
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "class=\"jml-btn jml-btn-ai\"",
+      "after": "class=\"btn btn-primary jml-btn jml-btn-ai\"",
+      "count": 1
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "class=\"jml-btn jml-btn-save\"",
+      "after": "class=\"btn btn-primary jml-btn jml-btn-save\"",
+      "count": 1
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "class=\"jml-btn jml-btn-cancel\"",
+      "after": "class=\"btn btn-secondary jml-btn jml-btn-cancel\"",
+      "count": 1
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "class=\"jml-viewbtn\"",
+      "after": "class=\"btn btn-secondary jml-viewbtn\"",
+      "count": 2
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "class=\"jml-tool-btn\"",
+      "after": "class=\"btn btn-secondary jml-tool-btn\"",
+      "count": 6
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "class=\"jml-tool-btn jml-mc-engaged-btn\"",
+      "after": "class=\"btn btn-secondary jml-tool-btn jml-mc-engaged-btn\"",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "class=\"jml-ai-imgbtn\"",
+      "after": "class=\"btn btn-secondary jml-ai-imgbtn\"",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "class=\"jml-ai-thumb-clear\"",
+      "after": "class=\"btn btn-danger jml-ai-thumb-clear\"",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "class=\"jml-btn jml-btn-ai\"",
+      "after": "class=\"btn btn-primary jml-btn jml-btn-ai\"",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "class=\"jml-btn jml-btn-save\"",
+      "after": "class=\"btn btn-primary jml-btn jml-btn-save\"",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "class=\"jml-btn jml-btn-cancel\"",
+      "after": "class=\"btn btn-secondary jml-btn jml-btn-cancel\"",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "class=\"jml-viewbtn\"",
+      "after": "class=\"btn btn-secondary jml-viewbtn\"",
+      "count": 2
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "class=\"jml-tool-btn\"",
+      "after": "class=\"btn btn-secondary jml-tool-btn\"",
+      "count": 6
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "class=\"jml-tool-btn jml-mc-engaged-btn\"",
+      "after": "class=\"btn btn-secondary jml-tool-btn jml-mc-engaged-btn\"",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/jim-mailing-list.js",
+      "before": "class=\"jml-linkbtn\"",
+      "after": "class=\"btn btn-secondary jml-linkbtn\"",
+      "count": 3
+    },
+    {
+      "file": "dashboards/js/jim-mailing-list.js",
+      "before": "class=\"jml-showmore\"",
+      "after": "class=\"btn btn-secondary jml-showmore\"",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/jim-mailing-list.js",
+      "before": "class=\"jml-mini-btn jml-edit\"",
+      "after": "class=\"btn btn-secondary jml-mini-btn jml-edit\"",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/jim-mailing-list.js",
+      "before": "class=\"jml-mini-btn jml-delete\"",
+      "after": "class=\"btn btn-danger jml-mini-btn jml-delete\"",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/jim-mailing-list.js",
+      "before": "<select class=\"jml-status\"",
+      "after": "<select class=\"field-select jml-status\"",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/jim-mailing-list.js",
+      "before": "        if (imgLabel) imgLabel.addEventListener('keydown', function (e) {\n            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el('jml-ai-file').click(); }\n        });\n",
+      "after": "        if (imgLabel) imgLabel.addEventListener('click', function () { if (!el('jml-ai-file').disabled) el('jml-ai-file').click(); });\n",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list-stub.js",
+      "before": "    var realFetch = window.fetch ? window.fetch.bind(window) : null;",
+      "after": "    // This preview never forwards an unstubbed request to a real service.",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list-stub.js",
+      "before": "return realFetch ? realFetch(url, options) : json(404, { error: 'not stubbed' });",
+      "after": "return json(503, { error: 'This preview has no fixture for that request.' });",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/jim-mailing-list.js",
+      "before": "        entries: [],       // rows from the API",
+      "after": "        entries: [],       // rows from the API\n        loaded: false,\n        loadId: 0,\n        busy: false,\n        heldControls: new Map(),",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/jim-mailing-list.js",
+      "before": "    function el(id) { return document.getElementById(id); }",
+      "after": "    function holdPage() {\n        state.busy = true;\n        document.querySelectorAll('input, textarea, select, button').forEach(function (node) {\n            if (!state.heldControls.has(node)) state.heldControls.set(node, node.disabled);\n            node.disabled = true;\n        });\n        el('jml-form').setAttribute('aria-busy', 'true');\n    }\n    function releasePage() {\n        state.busy = false;\n        state.heldControls.forEach(function (disabled, node) { node.disabled = disabled; });\n        state.heldControls.clear();\n        el('jml-form').setAttribute('aria-busy', 'false');\n        updateListControls();\n    }\n    function updateListControls() {\n        ['jml-export', 'jml-labels', 'jml-mc-check', 'jml-mc-sync', 'jml-mc-sync-engaged'].forEach(function (id) { el(id).disabled = state.busy || !state.loaded; });\n    }\n    function el(id) { return document.getElementById(id); }",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/jim-mailing-list.js",
+      "before": "    function load() {\n        DashPage.hideError();\n        el('jml-list').innerHTML = '<div class=\"jml-loading\">Loading your list…</div>';\n        jsonFetch(API)\n            .then(function (data) {\n                state.entries = (data.entries || []).slice();\n                render();\n            })\n            .catch(function (err) {\n                el('jml-list').innerHTML = '<div class=\"jml-empty\" role=\"alert\">Your list could not load (' + esc(err.message || 'request failed') + '). ' +\n                    '<button type=\"button\" class=\"btn btn-secondary jml-linkbtn\" data-act=\"retry\">Try again</button></div>';\n                DashPage.showError('Could not load the mailing list: ' + err.message + ' — press Refresh or try again.');\n            });\n    }\n\n",
+      "after": "    function load() {\n        var loadId = ++state.loadId;\n        state.loaded = false;\n        state.entries = [];\n        DashPage.hideError();\n        ['jml-mine-count', 'jml-all-count'].forEach(function (id) { el(id).textContent = '(—)'; });\n        el('jml-count').textContent = '';\n        el('jml-list').setAttribute('aria-busy', 'true');\n        el('jml-mc-scope').textContent = 'The list is unavailable until loading completes.';\n        updateListControls();\n        el('jml-list').innerHTML = '<div class=\"jml-loading\" role=\"status\">Loading your list…</div>';\n        return jsonFetch(API)\n            .then(function (data) {\n                if (loadId !== state.loadId) return;\n                if (!data || !Array.isArray(data.entries) || data.entries.some(function (row) { return !row || row.PK_ID == null || typeof row.Company !== 'string'; })) throw new Error('Incomplete list response');\n                state.entries = data.entries.slice();\n                state.loaded = true;\n                el('jml-list').setAttribute('aria-busy', 'false');\n                render();\n            })\n            .catch(function (err) {\n                if (loadId !== state.loadId) return;\n                el('jml-list').setAttribute('aria-busy', 'false');\n                el('jml-list').innerHTML = '<div class=\"jml-empty\" role=\"alert\">Your list could not load (' + esc(err.message || 'request failed') + '). ' +\n                    '<button type=\"button\" class=\"btn btn-secondary jml-linkbtn\" data-act=\"retry\">Try again</button></div>';\n                DashPage.showError('Could not load the mailing list: ' + err.message + ' — press Try again.');\n            });\n    }\n\n",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/jim-mailing-list.js",
+      "before": "    function render() {\n        var total",
+      "after": "    function render() {\n        updateListControls();\n        if (!state.loaded) return;\n        var total",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/jim-mailing-list.js",
+      "before": "        el('jml-list').innerHTML = html;",
+      "after": "        el('jml-list').innerHTML = html;\n        if (state.busy) holdPage();",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/jim-mailing-list.js",
+      "before": "class=\"jml-chip'",
+      "after": "class=\"btn btn-secondary jml-chip'",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/jim-mailing-list.js",
+      "before": "        e.preventDefault();\n        DashPage.hideError();",
+      "after": "        e.preventDefault();\n        if (state.busy) return;\n        DashPage.hideError();",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/jim-mailing-list.js",
+      "before": "        var save = el('jml-save');\n        save.disabled = true;\n\n        var req = editing",
+      "after": "        holdPage();\n\n        var req = editing",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/jim-mailing-list.js",
+      "before": "            resetForm();\n            showOk((editing",
+      "after": "            releasePage();\n            resetForm();\n            showOk((editing",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/jim-mailing-list.js",
+      "before": "            save.disabled = false;\n            DashPage.showError('Could not save: ' + err.message + ' — nothing was changed, please try again.');",
+      "after": "            releasePage();\n            DashPage.showError('Could not confirm the save: ' + err.message + ' — Check the list before trying again. Your form is preserved.');",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/jim-mailing-list.js",
+      "before": "    function startEdit(id) {\n",
+      "after": "    function startEdit(id) {\n        if (state.busy || !state.loaded) return;\n",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/jim-mailing-list.js",
+      "before": "    function cancelEdit() { resetForm(); }",
+      "after": "    function cancelEdit() { if (!state.busy) resetForm(); }",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/jim-mailing-list.js",
+      "before": "    function onListClick(e) {\n",
+      "after": "    function onListClick(e) {\n        if (state.busy) return;\n",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/jim-mailing-list.js",
+      "before": "    function onListChange(e) {\n",
+      "after": "    function onListChange(e) {\n        if (state.busy || !state.loaded) return;\n",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/jim-mailing-list.js",
+      "before": "        sel.disabled = true;\n        jsonFetch",
+      "after": "        holdPage();\n        jsonFetch",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/jim-mailing-list.js",
+      "before": "                sel.disabled = false;\n                showOk",
+      "after": "                releasePage();\n                showOk",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/jim-mailing-list.js",
+      "before": "                sel.disabled = false;\n                sel.value",
+      "after": "                releasePage();\n                sel.value",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/jim-mailing-list.js",
+      "before": "    function remove(id) {\n",
+      "after": "    function remove(id) {\n        if (state.busy || !state.loaded) return;\n",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/jim-mailing-list.js",
+      "before": "        jsonFetch(API + '/' + encodeURIComponent(id), { method: 'DELETE' })",
+      "after": "        holdPage();\n        jsonFetch(API + '/' + encodeURIComponent(id), { method: 'DELETE' })",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/jim-mailing-list.js",
+      "before": "                if (state.editingId != null && String(state.editingId) === String(id)) resetForm();",
+      "after": "                releasePage();\n                if (state.editingId != null && String(state.editingId) === String(id)) resetForm();",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/jim-mailing-list.js",
+      "before": "                DashPage.showError('Could not remove ' + row.Company + ': ' + err.message + ' — it is still on your list.');",
+      "after": "                releasePage();\n                DashPage.showError('Could not confirm removal of ' + row.Company + ': ' + err.message + ' — check the list before trying again.');",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/jim-mailing-list.js",
+      "before": "    function runAiExtract() {\n",
+      "after": "    function runAiExtract() {\n        if (state.busy) return;\n",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/jim-mailing-list.js",
+      "before": "        var btn = el('jml-ai-go');\n        btn.disabled = true;\n        setAiStatus('Reading… this takes a few seconds.', false);",
+      "after": "        holdPage();\n        setAiStatus('Reading… this takes a few seconds.', false);",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/jim-mailing-list.js",
+      "before": "            btn.disabled = false;\n            var f = data.fields || {};",
+      "after": "            releasePage();\n            var f = data.fields || {};",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/jim-mailing-list.js",
+      "before": "            btn.disabled = false;\n            setAiStatus('', false);",
+      "after": "            releasePage();\n            setAiStatus('', false);",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/jim-mailing-list.js",
+      "before": "    function stageImage(file) {\n",
+      "after": "    function stageImage(file) {\n        if (state.busy) return;\n",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/jim-mailing-list.js",
+      "before": "    function clearAiImage() {\n",
+      "after": "    function clearAiImage() {\n        if (state.busy) return;\n",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/jim-mailing-list.js",
+      "before": "    function exportMailchimp() {\n",
+      "after": "    function exportMailchimp() {\n        if (state.busy || !state.loaded) return;\n",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/jim-mailing-list.js",
+      "before": "    function printLabels() {\n",
+      "after": "    function printLabels() {\n        if (state.busy || !state.loaded) return;\n",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/jim-mailing-list.js",
+      "before": "    function mcCheckEngagement() {\n",
+      "after": "    function mcCheckEngagement() {\n        if (state.busy || !state.loaded) return;\n",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/jim-mailing-list.js",
+      "before": "    function doSync(rows, whatLabel) {\n",
+      "after": "    function doSync(rows, whatLabel) {\n        if (state.busy || !state.loaded) return;\n",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/jim-mailing-list.js",
+      "before": "    function mcTest() {\n        var b = el('jml-mc-test'); b.disabled = true;\n        setMcStatus('Checking the connection…', 'ok');\n        jsonFetch(API + '/mailchimp/status').then(function (d) {\n            b.disabled = false;\n            if (d.ok) setMcStatus('✓ Connected. Audience “' + (d.audience && d.audience.name) + '” has ' + (d.audience && d.audience.members) + ' contact(s) in Mailchimp.', 'ok');\n            else setMcStatus('Not connected: ' + (d.error || 'unknown') + (d.audiences ? ' — audiences found: ' + d.audiences.join(', ') : ''), 'err');\n        }).catch(function (err) { b.disabled = false; setMcStatus('Could not reach the server: ' + err.message, 'err'); });\n    }",
+      "after": "    function mcTest() {\n        if (state.busy) return;\n        holdPage();\n        var b = el('jml-mc-test'); b.disabled = true;\n        setMcStatus('Checking the connection…', 'ok');\n        jsonFetch(API + '/mailchimp/status').then(function (d) {\n            b.disabled = false;\n            if (d.ok) setMcStatus('✓ Connected. Audience “' + (d.audience && d.audience.name) + '” has ' + (d.audience && d.audience.members) + ' contact(s) in Mailchimp.', 'ok');\n            else setMcStatus('Not connected: ' + (d.error || 'unknown') + (d.audiences ? ' — audiences found: ' + d.audiences.join(', ') : ''), 'err');\n        }).catch(function (err) { b.disabled = false; setMcStatus('Could not reach the server: ' + err.message, 'err'); }).finally(releasePage);\n    }",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/jim-mailing-list.js",
+      "before": "    function mcCheckEngagement() {\n        if (state.busy || !state.loaded) return;\n        var rows = currentRows().filter(hasEmail);\n        if (!rows.length) { setMcStatus('No companies with an email in ' + syncScopeLabel() + ' to check.', 'warn'); return; }\n        var emails = rows.map(function (r) { return r.Email; });\n        var b = el('jml-mc-check'); b.disabled = true;\n        setMcStatus('Checking Mailchimp for ' + emails.length + ' emails… (the first check can take a minute)', 'ok');\n        jsonFetch(API + '/mailchimp/engagement', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ emails: emails }) }).then(function (d) {\n            b.disabled = false;\n            if (d.building) { setMcStatus(d.message || 'Reading your Mailchimp history (first time only) — click “Check engagement” again in about a minute.', 'warn'); return; }\n            if (d.error) { setMcStatus(d.error, 'err'); return; }\n            state.engagement = {};\n            Object.keys(d.byEmail || {}).forEach(function (k) { state.engagement[k.toLowerCase()] = d.byEmail[k]; });\n            el('jml-mc-sync-engaged').hidden = false;\n            el('jml-mc-sync-engaged').textContent = '';\n            el('jml-mc-sync-engaged').appendChild(document.createTextNode(' Sync engaged only (' + d.opened + ')'));\n            var i = document.createElement('i'); i.className = 'fas fa-star'; i.setAttribute('aria-hidden', 'true');\n            el('jml-mc-sync-engaged').insertBefore(i, el('jml-mc-sync-engaged').firstChild);\n            setMcStatus('Of ' + d.checked + ' with an email in ' + syncScopeLabel() + ': ' + d.inMailchimp + ' are in Mailchimp, and ' + d.opened + ' have opened your emails. Use “Sync engaged only” to add just the ' + d.opened + ' openers.', d.opened ? 'ok' : 'warn');\n        }).catch(function (err) { b.disabled = false; setMcStatus('Engagement check failed: ' + err.message, 'err'); });\n    }\n\n    // Sync a set of rows (with an email) to Mailchimp, tagged by segment.",
+      "after": "    function mcCheckEngagement() {\n        if (state.busy || !state.loaded) return;\n        var rows = currentRows().filter(hasEmail);\n        if (!rows.length) { setMcStatus('No companies with an email in ' + syncScopeLabel() + ' to check.', 'warn'); return; }\n        var emails = rows.map(function (r) { return r.Email; });\n        holdPage();\n        var b = el('jml-mc-check'); b.disabled = true;\n        setMcStatus('Checking Mailchimp for ' + emails.length + ' emails… (the first check can take a minute)', 'ok');\n        jsonFetch(API + '/mailchimp/engagement', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ emails: emails }) }).then(function (d) {\n            b.disabled = false;\n            if (d.building) { setMcStatus(d.message || 'Reading your Mailchimp history (first time only) — click “Check engagement” again in about a minute.', 'warn'); return; }\n            if (d.error) { setMcStatus(d.error, 'err'); return; }\n            state.engagement = {};\n            Object.keys(d.byEmail || {}).forEach(function (k) { state.engagement[k.toLowerCase()] = d.byEmail[k]; });\n            el('jml-mc-sync-engaged').hidden = false;\n            el('jml-mc-sync-engaged').textContent = '';\n            el('jml-mc-sync-engaged').appendChild(document.createTextNode(' Sync engaged only (' + d.opened + ')'));\n            var i = document.createElement('i'); i.className = 'fas fa-star'; i.setAttribute('aria-hidden', 'true');\n            el('jml-mc-sync-engaged').insertBefore(i, el('jml-mc-sync-engaged').firstChild);\n            setMcStatus('Of ' + d.checked + ' with an email in ' + syncScopeLabel() + ': ' + d.inMailchimp + ' are in Mailchimp, and ' + d.opened + ' have opened your emails. Use “Sync engaged only” to add just the ' + d.opened + ' openers.', d.opened ? 'ok' : 'warn');\n        }).catch(function (err) { b.disabled = false; setMcStatus('Engagement check failed: ' + err.message, 'err'); }).finally(releasePage);\n    }\n\n    // Sync a set of rows (with an email) to Mailchimp, tagged by segment.",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/jim-mailing-list.js",
+      "before": "    function doSync(rows, whatLabel) {\n        if (state.busy || !state.loaded) return;\n        if (!rows.length) { setMcStatus('No ' + whatLabel + ' to sync in ' + syncScopeLabel() + '.', 'warn'); return; }\n        if (!window.confirm('Add ' + rows.length + ' ' + whatLabel + ' from ' + syncScopeLabel() + ' to your Mailchimp audience, tagged by group?\\n\\n⚠ This adds ' + rows.length + ' to your Mailchimp contact count. They go in NON-subscribed — not emailed until you subscribe them.')) return;\n        var members = rows.map(memberFromRow);\n        var b1 = el('jml-mc-sync'), b2 = el('jml-mc-sync-engaged');\n        b1.disabled = true; if (b2) b2.disabled = true;\n        setMcStatus('Syncing ' + members.length + ' to Mailchimp…', 'ok');\n        jsonFetch(API + '/mailchimp/sync', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ members: members }) }).then(function (d) {\n            b1.disabled = false; if (b2) b2.disabled = false;\n            if (d.error) { setMcStatus('Sync failed: ' + d.error, 'err'); return; }\n            var msg = '✓ Synced ' + d.attempted + ' to “' + d.audience + '” (' + d.created + ' new, ' + d.updated + ' updated).';\n            if (d.errors) msg += ' ' + d.errors + ' had a problem.';\n            setMcStatus(msg, d.errors ? 'warn' : 'ok');\n        }).catch(function (err) { b1.disabled = false; if (b2) b2.disabled = false; setMcStatus('Sync failed: ' + err.message, 'err'); });\n    }",
+      "after": "    function doSync(rows, whatLabel) {\n        if (state.busy || !state.loaded) return;\n        if (!rows.length) { setMcStatus('No ' + whatLabel + ' to sync in ' + syncScopeLabel() + '.', 'warn'); return; }\n        if (!window.confirm('Add ' + rows.length + ' ' + whatLabel + ' from ' + syncScopeLabel() + ' to your Mailchimp audience, tagged by group?\\n\\n⚠ This adds ' + rows.length + ' to your Mailchimp contact count. They go in NON-subscribed — not emailed until you subscribe them.')) return;\n        var members = rows.map(memberFromRow);\n        holdPage();\n        var b1 = el('jml-mc-sync'), b2 = el('jml-mc-sync-engaged');\n        b1.disabled = true; if (b2) b2.disabled = true;\n        setMcStatus('Syncing ' + members.length + ' to Mailchimp…', 'ok');\n        jsonFetch(API + '/mailchimp/sync', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ members: members }) }).then(function (d) {\n            b1.disabled = false; if (b2) b2.disabled = false;\n            if (d.error) { setMcStatus('Sync failed: ' + d.error, 'err'); return; }\n            var msg = '✓ Synced ' + d.attempted + ' to “' + d.audience + '” (' + d.created + ' new, ' + d.updated + ' updated).';\n            if (d.errors) msg += ' ' + d.errors + ' had a problem.';\n            setMcStatus(msg, d.errors ? 'warn' : 'ok');\n        }).catch(function (err) { b1.disabled = false; if (b2) b2.disabled = false; setMcStatus('Sync failed: ' + err.message, 'err'); }).finally(releasePage);\n    }",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/jim-mailing-list.js",
+      "before": "    function mcRefresh() {\n        var b = el('jml-mc-refresh'); b.disabled = true;\n        setMcStatus('Checking Mailchimp for who has been emailed…', 'ok');\n        jsonFetch(API + '/mailchimp/record-sends', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' }).then(function (d) {\n            b.disabled = false;\n            if (d.error) { setMcStatus(d.error, 'err'); return; }\n            setMcStatus('✓ ' + (d.message || ('Updated ' + d.updated + ' prospect(s) from ' + d.campaigns + ' campaign(s).')), 'ok');\n            if (d.updated) load();\n        }).catch(function (err) { b.disabled = false; setMcStatus(err.message, 'err'); });\n    }\n\n    // ── AI capture (paste text / screenshot → Claude fills the form) ───────",
+      "after": "    function mcRefresh() {\n        if (state.busy) return;\n        holdPage();\n        var b = el('jml-mc-refresh'); b.disabled = true;\n        setMcStatus('Checking Mailchimp for who has been emailed…', 'ok');\n        jsonFetch(API + '/mailchimp/record-sends', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' }).then(function (d) {\n            b.disabled = false;\n            if (d.error) { setMcStatus(d.error, 'err'); return; }\n            setMcStatus('✓ ' + (d.message || ('Updated ' + d.updated + ' prospect(s) from ' + d.campaigns + ' campaign(s).')), 'ok');\n            if (d.updated) load();\n        }).catch(function (err) { b.disabled = false; setMcStatus(err.message, 'err'); }).finally(releasePage);\n    }\n\n    // ── AI capture (paste text / screenshot → Claude fills the form) ───────",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/jim-mailing-list.js",
+      "before": "        setAiStatus('Getting the screenshot ready…', false);\n        fileToDownscaledDataUrl",
+      "after": "        holdPage();\n        setAiStatus('Getting the screenshot ready…', false);\n        fileToDownscaledDataUrl",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/jim-mailing-list.js",
+      "before": "            .then(function (dataUrl) {\n                state.aiImage",
+      "after": "            .then(function (dataUrl) {\n                releasePage();\n                state.aiImage",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/jim-mailing-list.js",
+      "before": "                clearAiImage();\n                DashPage.showError('That screenshot",
+      "after": "                releasePage();\n                clearAiImage();\n                DashPage.showError('That screenshot",
+      "count": 1
+    },
+    {
+      "file": "dashboards/past-due-orders.html",
+      "before": "family=Inter:wght@400;500;600;700",
+      "after": "family=Public+Sans:wght@400;500;600;700",
+      "count": 1
+    },
+    {
+      "file": "dashboards/past-due-orders.html",
+      "before": "    <link rel=\"stylesheet\" href=\"/shared_components/css/art-hub.css?v=2026.09.07.19\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/dash-shell.css?v=2026.09.07.10\">\n    <link rel=\"stylesheet\" href=\"/dashboards/css/past-due-orders.css?v=2026.09.07.19\">",
+      "after": "    <link rel=\"stylesheet\" href=\"/shared_components/css/components.css?v=2026.09.10.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/staff-toolkit.css?v=2026.09.10.2\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/past-due-orders.html",
+      "before": "<body>",
+      "after": "<body data-ui=\"unified\" data-staff-tool=\"past-due-orders\">\n    <a class=\"skip-link\" href=\"#staff-tool-main\">Skip to content</a>",
+      "count": 1
+    },
+    {
+      "file": "dashboards/past-due-orders.html",
+      "before": "<main class=\"dash-content\">",
+      "after": "<main class=\"dash-content\" id=\"staff-tool-main\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/past-due-orders.html",
+      "before": "/dashboards/js/past-due-orders.js?v=2026.09.06.27",
+      "after": "/dashboards/js/past-due-orders.js?v=2026.09.10.2",
+      "count": 1
+    },
+    {
+      "file": "dashboards/past-due-orders.html",
+      "before": "<select id=\"pdo-days\">",
+      "after": "<select id=\"pdo-days\" class=\"field-select\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/past-due-orders.html",
+      "before": "<select id=\"pdo-print-who\" disabled>",
+      "after": "<select id=\"pdo-print-who\" class=\"field-select\" disabled>",
+      "count": 1
+    },
+    {
+      "file": "dashboards/past-due-orders.html",
+      "before": "<button id=\"pdo-refresh\" class=\"dash-back-link\" type=\"button\">",
+      "after": "<button id=\"pdo-refresh\" class=\"btn btn-secondary dash-back-link\" type=\"button\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/past-due-orders.html",
+      "before": "<button id=\"pdo-print\" class=\"dash-back-link\" type=\"button\" disabled>",
+      "after": "<button id=\"pdo-print\" class=\"btn btn-secondary dash-back-link\" type=\"button\" disabled>",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/past-due-orders.js",
+      "before": "+ table(g.late.concat(g.atRisk))",
+      "after": "+ table(g.late.concat(g.atRisk), rep)",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/past-due-orders.js",
+      "before": "function table(rows) {",
+      "after": "function table(rows, rep) {",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/past-due-orders.js",
+      "before": "<div class=\"pdo-scroll\"><table",
+      "after": "<div class=\"pdo-scroll\" role=\"region\" aria-label=\"' + esc(rep) + ' orders\" tabindex=\"0\"><table",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/past-due-orders.js",
+      "before": "        loading = true;\n        setPrintEnabled(false);",
+      "after": "        loading = true;\n        setStats(null);\n        setPrintEnabled(false);",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/past-due-orders.js",
+      "before": "            if (data.error) throw new Error(data.details || data.error);\n            if (seq !== loadSeq) return false;",
+      "after": "            if (data && data.error) throw new Error(data.details || data.error);\n            if (seq !== loadSeq) return false;",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/past-due-orders.js",
+      "before": "            DashPage.hideError();\n            lastData = data;",
+      "after": "            if (!validDueData(data)) throw new Error('Incomplete past-due response');\n            DashPage.hideError();\n            lastData = data;",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/past-due-orders.js",
+      "before": "    function sumValue(rows) {",
+      "after": "    // The company endpoint supplies both complete lists and matching per-rep groups.\n    // Missing groups cannot be allowed to turn a nonempty board into an all-clear.\n    function validDueData(d) {\n        if (!d || !Array.isArray(d.late) || !Array.isArray(d.atRisk) || !Array.isArray(d.reps)\n            || !d.byRep || !d.counts || typeof d.today !== 'string'\n            || !Number.isFinite(d.lookbackDays) || !Number.isFinite(d.ordersScanned)) return false;\n        if (['late', 'atRisk', 'dueSoonOnTrack'].some(function (key) { return !Number.isFinite(d.counts[key]) || d.counts[key] < 0; })) return false;\n        if (d.reps.some(function (rep) { return typeof rep !== 'string' || !d.byRep[rep] || !Array.isArray(d.byRep[rep].late) || !Array.isArray(d.byRep[rep].atRisk); })) return false;\n        return ['late', 'atRisk'].every(function (kind) {\n            var grouped = [];\n            d.reps.forEach(function (rep) { grouped = grouped.concat(d.byRep[rep][kind]); });\n            var all = d[kind].concat(grouped);\n            if (all.some(function (row) { return !row || row.idOrder == null || typeof row.company !== 'string' || !Number.isFinite(row.daysUntilDue) || !Number.isFinite(Number(row.subtotal)); })) return false;\n            var ids = function (rows) { return rows.map(function (row) { return String(row.idOrder); }).sort(); };\n            return JSON.stringify(ids(grouped)) === JSON.stringify(ids(d[kind]));\n        });\n    }\n\n    function sumValue(rows) {",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/past-due-orders.js",
+      "before": "            : '<div class=\"pdo-ps-repname pdo-ps-repname--cont\">' + esc(rep) + '</div>';",
+      "after": "            : '<div class=\"pdo-ps-repname pdo-ps-repname--cont\">' + esc(rep) + '</div>';\n        var omitted = [];\n        if (d.lateTruncated) omitted.push(esc(d.lateTruncated) + ' more past-due orders');\n        if (d.atRiskTruncated) omitted.push(esc(d.atRiskTruncated) + ' more at-risk orders');\n        if (omitted.length) banner += '<div class=\"pdo-ps-note\">Incomplete company-wide list: ' + omitted.join(' and ') + ' were not returned.</div>';",
+      "count": 1
+    }
+  ],
+  "retiredStyles": [
+    {
+      "file": "dashboards/css/blog-editor.css",
+      "css": "/* blog-editor.css — dashboards/blog-editor.html (rides art-hub tokens + dash-shell) */\n\n/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page\n   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;\n   every rule below uses var(). Raw hex is allowed ONLY in this block. */\n/* stylelint-disable color-no-hex */\n:root {\n    --blog-editor-gray: #6b726b;\n    --blog-editor-blue: #1a0dab;\n    --blog-editor-green-dark: #006621;\n}\n/* stylelint-enable color-no-hex */\n\n.be-list-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }\n.be-list-head h2 { margin: 0; }\n\n.be-btn {\n    display: inline-flex;\n    align-items: center;\n    gap: 7px;\n    border: 1px solid var(--gray-300);\n    background: var(--color-surface);\n    color: var(--print-ink);\n    border-radius: 8px;\n    padding: 8px 14px;\n    font: inherit;\n    font-size: 0.88rem;\n    font-weight: 600;\n    cursor: pointer;\n    text-decoration: none;\n}\n.be-btn:hover { border-color: var(--print-green); color: var(--brand-800); }\n.be-btn--primary { background: var(--print-green); border-color: var(--print-green); color: var(--color-on-brand); }\n.be-btn--primary:hover { background: var(--brand-800); color: var(--color-on-brand); }\n.be-btn--warn { border-color: var(--amber-700); color: var(--amber-700); }\n.be-btn--ghost { border-color: transparent; background: transparent; }\n\n.be-list { display: flex; flex-direction: column; gap: 8px; }\n.be-empty { color: var(--blog-editor-gray); }\n\n.be-list-row {\n    display: grid;\n    grid-template-columns: 92px 1fr auto;\n    gap: 14px;\n    align-items: center;\n    text-align: left;\n    background: var(--color-surface);\n    border: 1px solid var(--gray-200);\n    border-radius: 10px;\n    padding: 12px 16px;\n    font: inherit;\n    cursor: pointer;\n}\n.be-list-row:hover { border-color: var(--print-green); }\n.be-list-status { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; border-radius: 999px; padding: 3px 10px; text-align: center; }\n.be-list-status.is-live { background: var(--store-green-100); color: var(--store-green-900); }\n.be-list-status.is-draft { background: var(--amber-100); color: var(--amber-800); }\n.be-list-title { font-weight: 600; }\n.be-list-meta { font-size: 0.78rem; color: var(--blog-editor-gray); }\n\n.be-editor-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }\n.be-editor-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }\n.be-save-state { font-size: 0.82rem; color: var(--blog-editor-gray); margin-right: 4px; }\n\n.be-grid { display: grid; grid-template-columns: minmax(380px, 1fr) minmax(340px, 1fr); gap: 22px; align-items: start; }\n\n.be-label { display: block; font-size: 0.78rem; font-weight: 700; margin: 14px 0 4px; color: var(--store-ink-soft); }\n.be-hint { font-weight: 400; color: var(--store-ink-faint); }\n.be-note { font-size: 0.75rem; color: var(--print-gold); margin: 4px 0 0; }\n\n.be-input {\n    width: 100%;\n    box-sizing: border-box;\n    border: 1px solid var(--gray-300);\n    border-radius: 8px;\n    padding: 9px 11px;\n    font: inherit;\n    font-size: 0.92rem;\n    background: var(--color-surface);\n}\n.be-input:focus { outline: 2px solid rgb(46 111 64 / 20%); border-color: var(--print-green); }\n.be-input:disabled { background: var(--store-paper-deep); color: var(--store-ink-faint); }\n.be-input--mono { font-family: 'JetBrains Mono', monospace; font-size: 0.84rem; }\n.be-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }\n\n.be-hero-row { display: flex; gap: 12px; align-items: flex-start; }\n.be-hero-preview { width: 130px; aspect-ratio: 16/9; object-fit: cover; border-radius: 8px; border: 1px solid var(--gray-200); }\n.be-hero-controls { flex: 1; display: flex; flex-direction: column; gap: 8px; }\n\n.be-toolbar {\n    display: flex;\n    gap: 4px;\n    border: 1px solid var(--gray-300);\n    border-bottom: none;\n    border-radius: 8px 8px 0 0;\n    background: var(--store-paper);\n    padding: 6px 8px;\n}\n\n.be-toolbar button, .be-toolbar-upload {\n    border: none;\n    background: transparent;\n    border-radius: 6px;\n    padding: 5px 9px;\n    font: inherit;\n    font-size: 0.82rem;\n    font-weight: 700;\n    color: var(--store-ink-soft);\n    cursor: pointer;\n}\n.be-toolbar button:hover, .be-toolbar-upload:hover { background: var(--store-green-100); color: var(--store-green-900); }\n.be-body { border-radius: 0 0 8px 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.86rem; line-height: 1.6; resize: vertical; }\n\n.be-preview-col { position: sticky; top: 14px; }\n.be-preview-head { font-size: 0.78rem; font-weight: 700; color: var(--store-ink-soft); margin-bottom: 8px; }\n\n.be-preview {\n    background: var(--color-surface);\n    border: 1px solid var(--gray-200);\n    border-radius: 10px;\n    padding: 20px 22px;\n    max-height: 68vh;\n    overflow-y: auto;\n}\n\n/* Google-snippet preview */\n.be-google {\n    background: var(--color-surface);\n    border: 1px solid var(--gray-200);\n    border-radius: 10px;\n    padding: 12px 16px;\n    margin-bottom: 12px;\n    font-family: arial, sans-serif;\n}\n.be-google-title { color: var(--blog-editor-blue); font-size: 1.05rem; line-height: 1.3; }\n.be-google-url { color: var(--blog-editor-green-dark); font-size: 0.8rem; margin: 2px 0; }\n.be-google-desc { color: var(--print-ink-soft); font-size: 0.82rem; line-height: 1.45; }\n\n@media (width <= 980px) {\n    .be-grid { grid-template-columns: 1fr; }\n    .be-preview-col { position: static; }\n}\n\n/* 2026-09-05 review */\n/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */\n[hidden] { display: none !important; }\n.be-visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }\n.be-file-btn:focus-visible, .be-toolbar button:focus-visible, .be-btn:focus-visible, .be-list-row:focus-visible { outline: 2px solid var(--print-green); outline-offset: 2px; }\n.be-preview-fail { color: var(--red-700); font-size: 14px; }\n"
+    },
+    {
+      "file": "dashboards/css/contract-break-even.css",
+      "css": "/* ==========================================================================\n   contract-break-even.css — page-specific styles for dashboards/contract-break-even.html\n\n   Shell classes come from shared_components/css/dash-shell.css; tokens from\n   shared_components/css/art-hub.css. Only page-specific styles here — never\n   redefine tokens, never hardcode colors/shadows/radii.\n   ========================================================================== */\n\n.cbe-intro { color: var(--gray-600); max-width: 78ch; margin: 0 0 1rem; }\n.cbe-intro strong { color: var(--gray-900); }\n\n.cbe-controls { display: flex; flex-wrap: wrap; gap: 1rem 1.5rem; align-items: center; }\n.cbe-toggle { display: inline-flex; gap: .4rem; }\n.cbe-actions { margin-left: auto; }\n\n.cbe-assumptions { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: .6rem 1rem; font-size: .85rem; }\n.cbe-assumptions div { padding: .5rem .7rem; background: var(--surface-inset); border-radius: var(--radius-md); }\n.cbe-assumptions b { font-family: 'JetBrains Mono', monospace; color: var(--gray-900); }\n.cbe-assumptions small { display: block; color: var(--gray-500); }\n.cbe-note { font-size: .82rem; color: var(--gray-500); margin: .8rem 0 0; max-width: 80ch; }\n.cbe-warn { color: var(--state-warning); }\n\n.cbe-product { margin-top: 1rem; }\n.cbe-product .dash-card-header { align-items: baseline; }\n.cbe-sub { font-size: .8rem; color: var(--gray-500); }\n.cbe-table-wrap { overflow-x: auto; }\n.cbe-table { width: 100%; border-collapse: collapse; font-size: .86rem; }\n.cbe-table th, .cbe-table td { padding: .45rem .6rem; text-align: right; border-bottom: 1px solid var(--gray-200); white-space: nowrap; font-variant-numeric: tabular-nums; }\n.cbe-table th { font-weight: 600; color: var(--gray-600); background: var(--surface-inset); font-size: .76rem; letter-spacing: .03em; text-transform: uppercase; }\n.cbe-table th:first-child, .cbe-table td:first-child { text-align: left; font-weight: 600; color: var(--gray-800); }\n.cbe-table td.num { font-family: 'JetBrains Mono', monospace; }\n.cbe-table td.loss { color: var(--state-danger); background: var(--state-danger-bg); }\n.cbe-table td.thin { color: var(--state-warning); background: var(--state-warning-bg); }\n.cbe-table td.card { color: var(--gray-500); font-size: .78rem; }\n.cbe-table tfoot td { font-weight: 600; background: var(--surface-inset); }\n.cbe-legend { display: flex; gap: 1.2rem; font-size: .78rem; color: var(--gray-500); margin-top: .6rem; }\n.cbe-legend .sw { display: inline-block; width: .9em; height: .9em; border-radius: 3px; vertical-align: -1px; margin-right: .3em; }\n.cbe-legend .sw.loss { background: var(--state-danger-bg); border: 1px solid var(--state-danger); }\n.cbe-legend .sw.thin { background: var(--state-warning-bg); border: 1px solid var(--state-warning); }\n\n.cbe-howto { font-size: .85rem; color: var(--gray-700); max-width: 90ch; padding-left: 1.2rem; }\n.cbe-howto li { margin-bottom: .45rem; }\n.cbe-howto code { font-family: 'JetBrains Mono', monospace; font-size: .85em; }\n\n@media print {\n    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */\n    .dash-header, .cbe-controls, .dash-error-banner { display: none !important; }\n    .dash-shell, .dash-content { padding: 0; margin: 0; }\n    .dash-card { border: 0; box-shadow: none; padding: 0 0 .6rem; break-inside: avoid; }\n    .cbe-table td.loss, .cbe-table td.thin, .cbe-table th, .cbe-table tfoot td { -webkit-print-color-adjust: exact; print-color-adjust: exact; }\n    .cbe-table { font-size: .78rem; }\n}\n\n/* 2026-09-05 review */\n/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */\n[hidden] { display: none !important; }\n"
+    },
+    {
+      "file": "dashboards/css/customer-portal-admin.css",
+      "css": "/* stylelint-disable no-duplicate-selectors -- legacy sheet: rules were appended over time; merging them would reorder the cascade (2026-09-07) */\n\n/* ==========================================================================\n   customer-portal-admin.css — page-specific styles for\n   dashboards/customer-portal-admin.html\n\n   Shell classes (.dash-header, .dash-stat-card, .dash-card, etc.) come from\n   shared_components/css/dash-shell.css. Tokens (--gray-*, --shadow-*,\n   --radius-*) come from shared_components/css/art-hub.css. Brand greens are\n   local page vars (not in the token palette). NEVER redefine tokens.\n   ========================================================================== */\n\n/* `hidden` must beat the display rules below (.cpa-modal-overlay is display:flex, .cpa-btn inline-flex). */\n/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */\n[hidden] { display: none !important; }\n\n/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its\n   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;\n   raw hex is allowed ONLY in this block. */\n/* stylelint-disable color-no-hex */\n:root {\n    --customer-portal-admin-red-tint: #f3c5c2;\n    --customer-portal-admin-red-tint-2: #f3c5cf;\n    --customer-portal-admin-orange: #8a5300;\n    --customer-portal-admin-orange-2: #f6d9a8;\n    --customer-portal-admin-cyan: #1b4f8a;\n    --customer-portal-admin-cyan-tint: #c3d9f0;\n    --customer-portal-admin-yellow: #f0d79a;\n    --customer-portal-admin-yellow-dark: #6b4e00;\n    --customer-portal-admin-green-2: #bfe0c9;\n  --cpa-green: var(--brand-mid);\n  --cpa-green-dark: var(--brand-800);\n  --cpa-green-soft: var(--brand-100);\n}\n/* stylelint-enable color-no-hex */\n\n.cpa-intro {\n  color: var(--gray-600);\n  font-size: .95rem;\n  line-height: 1.5;\n  margin: 0 0 1.25rem;\n  max-width: 760px;\n}\n\n/* ---- Controls row (filter + add) ---- */\n.cpa-controls {\n  display: flex;\n  gap: 12px;\n  align-items: center;\n  margin: 0 0 1rem;\n  flex-wrap: wrap;\n}\n\n.cpa-search-wrap {\n  position: relative;\n  flex: 1;\n  min-width: 240px;\n}\n\n.cpa-search-wrap > i {\n  position: absolute;\n  left: 13px;\n  top: 50%;\n  transform: translateY(-50%);\n  color: var(--gray-400);\n  font-size: .85rem;\n}\n\n.cpa-search-wrap input {\n  width: 100%;\n  padding: 10px 14px 10px 36px;\n  border: 1px solid var(--gray-300);\n  border-radius: var(--radius-md);\n  font-size: .92rem;\n  font-family: inherit;\n  background: var(--color-surface);\n  transition: border-color .15s, box-shadow .15s;\n}\n\n.cpa-search-wrap input:focus {\n  outline: none;\n  border-color: var(--cpa-green);\n  box-shadow: 0 0 0 3px rgb(58 124 82 / 12%);\n}\n\n/* ---- Buttons ---- */\n.cpa-btn {\n  display: inline-flex;\n  align-items: center;\n  gap: 7px;\n  border: 1px solid transparent;\n  border-radius: var(--radius-md);\n  padding: 10px 16px;\n  font-size: .9rem;\n  font-weight: 600;\n  font-family: inherit;\n  cursor: pointer;\n  white-space: nowrap;\n  transition: background .15s, border-color .15s, color .15s, opacity .15s;\n}\n.cpa-btn:disabled { opacity: .55; cursor: default; }\n.cpa-btn-primary { background: var(--cpa-green); color: var(--color-on-brand); }\n.cpa-btn-primary:hover:not(:disabled) { background: var(--cpa-green-dark); }\n.cpa-btn-ghost { background: var(--color-surface); color: var(--gray-700); border-color: var(--gray-300); }\n.cpa-btn-ghost:hover:not(:disabled) { background: var(--gray-50); }\n.cpa-btn-ghost.cpa-btn-active { background: var(--cpa-green-soft); color: var(--cpa-green-dark); border-color: var(--cpa-green); }\n.cpa-btn-sm { padding: 6px 11px; font-size: .82rem; border-radius: var(--radius-sm); }\n\n.cpa-btn-icon {\n  background: transparent;\n  border: 1px solid var(--gray-200);\n  color: var(--gray-600);\n  border-radius: var(--radius-sm);\n  padding: 6px 9px;\n  cursor: pointer;\n  font-size: .82rem;\n  transition: background .15s, color .15s, border-color .15s;\n}\n.cpa-btn-icon:hover { background: var(--gray-50); color: var(--cpa-green-dark); border-color: var(--gray-300); }\n.cpa-btn-icon.cpa-danger:hover { background: var(--red-50); color: var(--red-700); border-color: var(--customer-portal-admin-red-tint); }\n\n.cpa-count { color: var(--gray-500); font-size: .85rem; font-weight: 500; }\n\n/* ---- Table ---- */\n.cpa-table { width: 100%; border-collapse: collapse; font-size: .9rem; }\n\n.cpa-table th {\n  text-align: left;\n  font-size: .72rem;\n  text-transform: uppercase;\n  letter-spacing: .04em;\n  color: var(--gray-500);\n  font-weight: 600;\n  padding: 8px 12px;\n  border-bottom: 2px solid var(--gray-200);\n  white-space: nowrap;\n}\n\n.cpa-table td {\n  padding: 11px 12px;\n  border-bottom: 1px solid var(--gray-100);\n  vertical-align: middle;\n  color: var(--gray-800);\n}\n.cpa-table tr:hover td { background: var(--gray-50); }\n.cpa-company { font-weight: 600; color: var(--gray-900); }\n.cpa-email { color: var(--gray-600); font-size: .85rem; }\n.cpa-cid { font-family: 'JetBrains Mono', monospace; font-size: .82rem; color: var(--gray-500); }\n.cpa-rep { color: var(--gray-700); font-size: .85rem; white-space: nowrap; }\n.cpa-rep-none { color: var(--gray-300); }\n.cpa-lastlogin { font-size: .83rem; color: var(--gray-500); white-space: nowrap; }\n.cpa-lastlogin.cpa-never { color: var(--gray-400); font-style: italic; }\n\n.cpa-badge {\n  display: inline-flex;\n  align-items: center;\n  gap: 5px;\n  font-size: .76rem;\n  font-weight: 600;\n  padding: 3px 10px;\n  border-radius: 999px;\n  white-space: nowrap;\n}\n.cpa-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentcolor; }\n.cpa-badge--enabled { background: var(--cpa-green-soft); color: var(--cpa-green-dark); }\n.cpa-badge--disabled { background: var(--gray-100); color: var(--gray-500); }\n\n.cpa-actions { display: flex; gap: 6px; justify-content: flex-end; flex-wrap: wrap; }\n\n.cpa-empty { text-align: center; color: var(--gray-500); padding: 2.5rem 1rem; }\n.cpa-empty i { font-size: 2rem; color: var(--gray-300); display: block; margin-bottom: .6rem; }\n\n/* ---- Modal ---- */\n.cpa-modal-overlay {\n  position: fixed;\n  inset: 0;\n  background: rgb(17 24 39 / 50%);\n  display: flex;\n  align-items: flex-start;\n  justify-content: center;\n  padding: 5vh 16px;\n  z-index: 1000;\n  overflow-y: auto;\n}\n\n.cpa-modal {\n  background: var(--color-surface);\n  border-radius: var(--radius-lg);\n  box-shadow: var(--shadow-lg);\n  width: 100%;\n  max-width: 520px;\n}\n\n.cpa-modal-head {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  padding: 18px 22px;\n  border-bottom: 1px solid var(--gray-200);\n}\n.cpa-modal-head h3 { margin: 0; font-size: 1.15rem; color: var(--cpa-green-dark); }\n.cpa-modal-close { background: none; border: none; color: var(--gray-400); cursor: pointer; font-size: 1.1rem; padding: 4px; }\n.cpa-modal-close:hover { color: var(--gray-700); }\n.cpa-modal-body { padding: 20px 22px; }\n\n.cpa-modal-foot {\n  display: flex;\n  justify-content: flex-end;\n  gap: 10px;\n  padding: 16px 22px;\n  border-top: 1px solid var(--gray-200);\n}\n\n.cpa-field { display: block; margin-bottom: 14px; }\n.cpa-field-label { display: block; font-size: .82rem; font-weight: 600; color: var(--gray-700); margin-bottom: 5px; }\n.cpa-field-label small { font-weight: 400; color: var(--gray-400); }\n\n.cpa-field input {\n  width: 100%;\n  padding: 10px 12px;\n  border: 1px solid var(--gray-300);\n  border-radius: var(--radius-md);\n  font-size: .92rem;\n  font-family: inherit;\n}\n.cpa-field input:focus { outline: none; border-color: var(--cpa-green); box-shadow: 0 0 0 3px rgb(58 124 82 / 12%); }\n.cpa-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }\n.cpa-search-inline { min-width: 0; }\n.cpa-search-inline input { padding-left: 36px; }\n\n.cpa-lookup-results { margin-top: 8px; max-height: 230px; overflow-y: auto; }\n\n.cpa-lookup-item {\n  padding: 9px 12px;\n  border: 1px solid var(--gray-200);\n  border-radius: var(--radius-md);\n  margin-bottom: 6px;\n  cursor: pointer;\n  transition: border-color .12s, background .12s;\n}\n.cpa-lookup-item:hover { border-color: var(--cpa-green); background: var(--cpa-green-soft); }\n.cpa-lookup-item .li-co { font-weight: 600; color: var(--gray-900); font-size: .9rem; }\n.cpa-lookup-item .li-meta { font-size: .8rem; color: var(--gray-500); margin-top: 2px; }\n.cpa-lookup-hint { font-size: .82rem; color: var(--gray-400); padding: 6px 2px; }\n\n.cpa-divider { text-align: center; margin: 16px 0; position: relative; }\n.cpa-divider::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: var(--gray-200); }\n.cpa-divider span { position: relative; background: var(--color-surface); padding: 0 12px; font-size: .78rem; color: var(--gray-400); text-transform: uppercase; letter-spacing: .04em; }\n\n.cpa-checkline { display: flex; align-items: center; gap: 8px; font-size: .88rem; color: var(--gray-700); cursor: pointer; }\n.cpa-checkline input { width: 16px; height: 16px; accent-color: var(--cpa-green); }\n.cpa-modal-error { color: var(--red-700); font-size: .85rem; margin-top: 10px; min-height: 1em; }\n\n/* ---- Toast ---- */\n.cpa-toast {\n  position: fixed;\n  bottom: 24px;\n  left: 50%;\n  transform: translateX(-50%) translateY(20px);\n  background: var(--cpa-green-dark);\n  color: var(--color-on-brand);\n  padding: 12px 20px;\n  border-radius: var(--radius-md);\n  box-shadow: var(--shadow-lg);\n  font-size: .9rem;\n  font-weight: 500;\n  opacity: 0;\n  pointer-events: none;\n  transition: opacity .25s, transform .25s;\n  z-index: 1100;\n  max-width: 90vw;\n}\n.cpa-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }\n.cpa-toast.cpa-toast-error { background: var(--red-700); }\n\n@media (width <= 640px) {\n  .cpa-field-row { grid-template-columns: 1fr; }\n  .cpa-table th.cpa-hide-sm, .cpa-table td.cpa-hide-sm { display: none; }\n  .cpa-actions { justify-content: flex-start; }\n}\n\n/* ── Tabs + Re-order Requests view ── */\n.cpa-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--gray-200); margin: 0 0 1.25rem; }\n\n.cpa-tab {\n  background: none; border: none; border-bottom: 2px solid transparent; margin-bottom: -1px;\n  padding: 10px 16px; font-size: .92rem; font-weight: 600; color: var(--gray-500);\n  cursor: pointer; font-family: inherit; display: inline-flex; align-items: center; gap: 7px;\n  transition: color .15s, border-color .15s;\n}\n.cpa-tab:hover { color: var(--cpa-green-dark); }\n.cpa-tab-active { color: var(--cpa-green-dark); border-bottom-color: var(--cpa-green); }\n\n.cpa-tab-badge {\n  background: var(--red-700); color: var(--color-on-brand); font-size: .68rem; font-weight: 700;\n  min-width: 17px; height: 17px; padding: 0 5px; border-radius: 999px;\n  display: inline-flex; align-items: center; justify-content: center;\n}\n\n.cpa-select {\n  padding: 9px 12px; border: 1px solid var(--gray-300); border-radius: var(--radius-md);\n  font-size: .9rem; font-family: inherit; background: var(--color-surface); color: var(--gray-700); cursor: pointer;\n}\n.cpa-select:focus { outline: none; border-color: var(--cpa-green); box-shadow: 0 0 0 3px rgb(58 124 82 / 12%); }\n\n.cpa-req-prod { font-weight: 600; color: var(--gray-900); font-size: .9rem; }\n.cpa-req-sub { font-size: .82rem; color: var(--gray-500); margin-top: 1px; }\n.cpa-req-note { font-size: .82rem; color: var(--gray-600); font-style: italic; margin-top: 3px; }\n\n.cpa-status-select {\n  padding: 5px 8px; border: 1px solid var(--gray-300); border-radius: var(--radius-sm);\n  font-size: .82rem; font-weight: 600; font-family: inherit; cursor: pointer;\n}\n.cpa-status-select:focus { outline: none; border-color: var(--cpa-green); box-shadow: 0 0 0 3px rgb(58 124 82 / 12%); }\n.cpa-status-new { background: var(--red-50); color: var(--color-ae); border-color: var(--customer-portal-admin-red-tint-2); }\n.cpa-status-in-progress { background: var(--store-rush-soft); color: var(--customer-portal-admin-orange); border-color: var(--customer-portal-admin-orange-2); }\n.cpa-status-quoted { background: var(--color-floor-tint); color: var(--customer-portal-admin-cyan); border-color: var(--customer-portal-admin-cyan-tint); }\n.cpa-status-closed { background: var(--gray-100); color: var(--gray-500); border-color: var(--gray-200); }\n\n/* ── Reward dollars modal (Phase 5) ── */\n.cpa-rw-balance { font-size: .95rem; color: var(--gray-700); margin-bottom: 16px; padding: 10px 14px; background: var(--cpa-green-soft); border-radius: var(--radius-md); }\n.cpa-rw-balance strong { color: var(--cpa-green-dark); font-size: 1.15rem; }\n.cpa-rw-select { width: 100%; }\n.cpa-rw-save-btn { width: 100%; justify-content: center; margin-top: 2px; }\n.cpa-rw-ledger-head { font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; color: var(--gray-500); font-weight: 600; margin: 20px 0 8px; }\n.cpa-rw-ledger { max-height: 240px; overflow-y: auto; }\n.cpa-rw-entry { display: flex; align-items: center; gap: 12px; padding: 8px 2px; border-bottom: 1px solid var(--gray-100); }\n.cpa-rw-amt { font-weight: 700; font-size: .9rem; min-width: 74px; }\n.cpa-rw-amt.pos { color: var(--cpa-green-dark); }\n.cpa-rw-amt.neg { color: var(--red-700); }\n.cpa-rw-mid { flex: 1; font-size: .88rem; color: var(--gray-800); }\n.cpa-rw-meta { font-size: .76rem; color: var(--gray-400); margin-top: 1px; }\n.cpa-rw-when { font-size: .78rem; color: var(--gray-400); white-space: nowrap; }\n.cpa-rw-empty { color: var(--gray-400); font-size: .85rem; padding: 12px 2px; }\n\n/* Earned-rewards accrual (2026-09-01) */\n.cpa-rw-accrual { font-size: .86rem; }\n.cpa-rw-acc-hint { margin-top: 8px; line-height: 1.5; }\n.cpa-rw-acc-hint code, .cpa-rw-notconf code { background: rgb(0 0 0 / 6%); padding: 0 4px; border-radius: 3px; font-size: .95em; }\n.cpa-rw-acc-window { font-weight: 400; text-transform: none; letter-spacing: 0; color: var(--gray-400); }\n.cpa-rw-acc-sum { padding: 10px 12px; background: var(--cpa-green-soft); border-radius: var(--radius-md); margin-bottom: 10px; color: var(--gray-700); line-height: 1.5; }\n.cpa-rw-acc-sum .pos { color: var(--cpa-green-dark); }\n.cpa-rw-acc-sum .neg { color: var(--red-700); }\n.cpa-rw-acc-table { width: 100%; border-collapse: collapse; font-size: .82rem; }\n.cpa-rw-acc-table th { text-align: left; font-weight: 600; color: var(--gray-500); padding: 6px; border-bottom: 1px solid var(--gray-200); font-size: .72rem; text-transform: uppercase; letter-spacing: .04em; }\n.cpa-rw-acc-table td { padding: 6px; border-bottom: 1px solid var(--gray-100); vertical-align: top; }\n.cpa-rw-acc-table .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }\n.cpa-rw-acc-table td.pos { color: var(--cpa-green-dark); font-weight: 700; }\n.cpa-rw-acc-table summary { cursor: pointer; list-style: none; font-weight: 600; }\n.cpa-rw-acc-table summary::-webkit-details-marker { display: none; }\n.cpa-rw-acc-lines { margin-top: 4px; font-size: .76rem; color: var(--gray-500); line-height: 1.5; font-weight: 400; }\n.cpa-rw-acc-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 10px; }\n.cpa-rw-notconf { padding: 10px 12px; background: var(--store-rush-soft); border: 1px solid var(--customer-portal-admin-yellow); border-radius: var(--radius-md); color: var(--customer-portal-admin-yellow-dark); line-height: 1.55; }\n\n/* Rewards column (2026-09-02): balance chip opens the rewards modal; header button sorts by balance. */\n.cpa-rw-cell { white-space: nowrap; }\n.cpa-rw-chip { font: inherit; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--cpa-green-dark); background: var(--cpa-green-soft); border: 1px solid var(--customer-portal-admin-green-2); border-radius: 999px; padding: 3px 10px; cursor: pointer; }\n.cpa-rw-chip:hover { background: var(--store-green-100); }\n.cpa-th-sort { font: inherit; font-weight: inherit; text-transform: inherit; letter-spacing: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }\n.cpa-th-sort i { opacity: .45; font-size: .85em; }\n.cpa-th-sort--on, .cpa-th-sort--on i { color: var(--cpa-green-dark); opacity: 1; }\n\n/* Page theme (2026-09-03, dashboard Workspaces): the customer family's navy, matching\n   Leads, My Accounts and Customer Portals. Only the dash-shell theme hooks. */\n:root { --dash-theme: var(--gray-800); --dash-theme-dark: var(--gray-900); --dash-theme-bg: var(--slate-100); }\n\n/* Phone (≤640px) — 2026-09-05 staff-dashboard sweep: the page measured wider than the\n   viewport at 375px and panned sideways. */\n@media (width <= 640px) {\n    #cpa-filter, .cpa-search-wrap input { width: 100%; max-width: 100%; box-sizing: border-box; }\n}\n\n/* 2026-09-05 review: table wrapper + right-aligned head (were inline style=), visible focus,\n   keyboard-navigable lookup results, pressed-state \"My customers\". */\n.cpa-table-scroll { overflow-x: auto; }\n.cpa-th-right { text-align: right; }\n\n.cpa-btn:focus-visible, .cpa-btn-icon:focus-visible, .cpa-tab:focus-visible, .cpa-rw-chip:focus-visible,\n.cpa-th-sort:focus-visible, .cpa-modal-close:focus-visible, .cpa-lookup-item:focus-visible, .dash-error-banner-close:focus-visible {\n  outline: 3px solid var(--cpa-green); outline-offset: 2px;\n}\n.cpa-lookup-item.is-active { border-color: var(--cpa-green); background: var(--cpa-green-soft); }\n.cpa-btn-ghost[aria-pressed=\"true\"] { background: var(--cpa-green-soft); color: var(--cpa-green-dark); border-color: var(--cpa-green); }\n.cpa-empty .cpa-btn { margin-top: 12px; }\n.cpa-lastlogin.cpa-today { color: var(--cpa-green-dark); font-weight: 600; }\n\n@media (width <= 640px) {\n  .cpa-tabs { flex-wrap: wrap; }\n  .cpa-tab { padding: 8px 10px; font-size: .86rem; }\n  .dash-stat-grid { grid-template-columns: 1fr 1fr; }\n  .dash-stat-card--accent { grid-column: 1 / -1; }\n  .cpa-controls .cpa-btn { flex: 1 1 auto; justify-content: center; }\n  .cpa-modal-overlay { padding: 2vh 8px; }\n  .cpa-modal-body, .cpa-modal-head, .cpa-modal-foot { padding-left: 14px; padding-right: 14px; }\n}\n"
+    },
+    {
+      "file": "dashboards/css/jim-mailing-list.css",
+      "css": "/* jim-mailing-list.css — the owner's (\"Jim's\") manual prospect list.\n   Deliberately oversized & high-contrast: the primary user is 83 and slow on the\n   computer. Big type, big targets (>=52px), one column, plain language. All colors\n   come from art-hub.css tokens; --art-theme is the single per-page knob (NWCA green). */\n\n/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its\n   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;\n   raw hex is allowed ONLY in this block. */\n/* stylelint-disable color-no-hex */\n:root {\n    --jim-mailing-list-green-dark: #007a00;\n --art-theme: var(--color-dash-theme); }\n/* stylelint-enable color-no-hex */\n\n/* Comfortable reading width, centered. */\n.jml-welcome,\n.jml-intro,\n.jml-form-card,\n.jml-list-section { max-width: 880px; margin-left: auto; margin-right: auto; }\n\n/* ---- welcome header (portrait + greeting) ---- */\n.jml-welcome { display: flex; align-items: center; gap: var(--space-4); margin-bottom: var(--space-4); }\n\n.jml-portrait {\n    width: 64px; height: 64px; border-radius: 50%; object-fit: cover;\n    border: 3px solid var(--art-theme); box-shadow: var(--shadow-sm); flex: 0 0 auto;\n}\n.jml-greeting { font-size: 24px; font-weight: 700; color: var(--gray-900); margin: 0; }\n\n/* ---- view toggle (Your companies / All companies) ---- */\n.jml-viewtoggle { display: flex; gap: var(--space-2); margin-bottom: var(--space-5); flex-wrap: wrap; }\n\n.jml-viewbtn {\n    font-family: inherit; font-size: 18px; font-weight: 600;\n    min-height: 52px; padding: 0 var(--space-6);\n    border: 2px solid var(--gray-300); border-radius: var(--radius-pill);\n    background: var(--surface-card); color: var(--gray-700);\n    cursor: pointer; display: inline-flex; align-items: center; gap: var(--space-2);\n}\n.jml-viewbtn:hover { border-color: var(--art-theme); color: var(--art-theme); }\n.jml-viewbtn.is-active { background: var(--art-theme); border-color: var(--art-theme); color: var(--color-on-brand); }\n.jml-view-n { font-size: 15px; font-weight: 600; opacity: .9; }\n\n/* ---- Mailchimp: collapsed staff strip at the bottom ---- */\n.jml-mc-details {\n    max-width: 880px; margin: var(--space-6) auto 0;\n    border: 1px solid var(--gray-200); border-radius: var(--radius-lg); background: var(--surface-card);\n}\n\n.jml-mc-summary {\n    list-style: none; cursor: pointer; padding: var(--space-4) var(--space-5);\n    font-size: 16px; font-weight: 600; color: var(--gray-600);\n    display: flex; align-items: center; gap: var(--space-2);\n}\n.jml-mc-summary::-webkit-details-marker { display: none; }\n.jml-mc-summary::after { content: '▾'; margin-left: auto; color: var(--gray-400); font-size: 18px; }\n.jml-mc-details[open] .jml-mc-summary::after { content: '▴'; }\n.jml-mc-summary i { color: var(--art-theme); }\n.jml-mc-summary:hover { color: var(--gray-800); }\n.jml-mc-body { padding: 0 var(--space-5) var(--space-5); }\n.jml-mc-scope { font-size: 15px; color: var(--gray-600); font-weight: 600; margin: 0 0 var(--space-3); }\n.jml-mc-scope:empty { display: none; }\n.jml-mc-engaged-btn { border-color: var(--art-theme); color: var(--art-theme); }\n.jml-mc-engaged-btn i { color: var(--state-warning); }\n.jml-mc-engaged-btn:hover { background: var(--art-theme-light, var(--brand-100)); }\n\n/* ---- intro line ---- */\n.jml-intro {\n    font-size: 20px;\n    line-height: 1.55;\n    color: var(--gray-700);\n    background: var(--art-theme-light, var(--brand-100));\n    border: 1px solid color-mix(in srgb, var(--art-theme) 25%, transparent);\n    border-radius: var(--radius-lg);\n    padding: var(--space-5) var(--space-6);\n    margin-bottom: var(--space-6);\n}\n.jml-intro strong { color: var(--gray-900); }\n\n/* ---- green \"saved!\" confirmation ---- */\n.jml-ok {\n    max-width: 880px;\n    margin: 0 auto var(--space-5);\n    display: flex;\n    align-items: center;\n    gap: var(--space-3);\n    font-size: 19px;\n    font-weight: 600;\n    color: var(--state-success);\n    background: var(--state-success-bg);\n    border: 1px solid color-mix(in srgb, var(--state-success) 35%, transparent);\n    border-radius: var(--radius-md);\n    padding: var(--space-4) var(--space-5);\n}\n.jml-ok i { font-size: 22px; }\n\n/* ---- cards ---- */\n.jml-card,\n.jml-list-section {\n    background: var(--surface-card);\n    border: 1px solid var(--gray-200);\n    border-radius: var(--radius-lg);\n    box-shadow: var(--shadow-md);\n    padding: var(--space-8);\n    margin-bottom: var(--space-8);\n}\n\n.jml-form-title,\n.jml-list-title {\n    font-size: 26px;\n    font-weight: 700;\n    color: var(--gray-900);\n    margin: 0 0 var(--space-6);\n    display: flex;\n    align-items: center;\n    gap: var(--space-3);\n}\n.jml-form-title i { color: var(--art-theme); }\n\n/* ---- AI capture card ---- */\n.jml-ai-card { border: 2px solid color-mix(in srgb, var(--art-theme) 45%, transparent); }\n\n.jml-ai-title {\n    font-size: 24px;\n    font-weight: 700;\n    color: var(--gray-900);\n    margin: 0 0 var(--space-3);\n    display: flex;\n    align-items: center;\n    gap: var(--space-3);\n}\n.jml-ai-title i { color: var(--art-theme); }\n.jml-ai-help { font-size: 18px; line-height: 1.55; color: var(--gray-700); margin: 0 0 var(--space-5); }\n.jml-ai-help strong { color: var(--gray-900); }\n.jml-ai-label { font-size: 18px; font-weight: 600; color: var(--gray-800); display: block; margin-bottom: var(--space-2); }\n\n.jml-ai-card textarea {\n    font-family: inherit;\n    font-size: 19px;\n    color: var(--gray-900);\n    background: var(--surface-card);\n    border: 2px solid var(--gray-300);\n    border-radius: var(--radius-md);\n    padding: 14px 16px;\n    width: 100%;\n    box-sizing: border-box;\n    min-height: 96px;\n    resize: vertical;\n    line-height: 1.5;\n}\n.jml-ai-card textarea:focus { outline: none; border-color: var(--art-theme); box-shadow: var(--shadow-glow-theme); }\n\n.jml-ai-image-row { display: flex; align-items: center; gap: var(--space-4); flex-wrap: wrap; margin-top: var(--space-4); }\n\n.jml-ai-imgbtn {\n    display: inline-flex;\n    align-items: center;\n    gap: var(--space-2);\n    font-size: 17px;\n    font-weight: 600;\n    min-height: 48px;\n    padding: 0 var(--space-5);\n    border-radius: var(--radius-md);\n    border: 2px solid var(--gray-300);\n    background: var(--surface-card);\n    color: var(--gray-700);\n    cursor: pointer;\n}\n.jml-ai-imgbtn:hover { background: var(--surface-inset); border-color: var(--art-theme); color: var(--art-theme); }\n.jml-ai-orpaste { font-size: 15px; color: var(--gray-500); }\n\n.jml-ai-orpaste kbd {\n    font-family: inherit; font-size: 13px; background: var(--surface-inset);\n    border: 1px solid var(--gray-300); border-radius: var(--radius-sm); padding: 1px 6px;\n}\n\n.jml-ai-thumb-wrap { display: flex; align-items: flex-start; gap: var(--space-3); margin-top: var(--space-4); }\n\n.jml-ai-thumb {\n    max-width: 220px; max-height: 160px; border-radius: var(--radius-md);\n    border: 1px solid var(--gray-300); box-shadow: var(--shadow-sm);\n}\n\n.jml-ai-thumb-clear {\n    font-family: inherit; font-size: 15px; font-weight: 600;\n    min-height: 40px; padding: 0 var(--space-4); cursor: pointer;\n    border: 2px solid color-mix(in srgb, var(--state-danger) 35%, var(--gray-300));\n    border-radius: var(--radius-md); background: var(--surface-card); color: var(--state-danger);\n    display: inline-flex; align-items: center; gap: var(--space-2);\n}\n.jml-ai-thumb-clear:hover { background: var(--state-danger-bg); border-color: var(--state-danger); }\n\n.jml-btn-ai {\n    margin-top: var(--space-5);\n    background: var(--art-theme);\n    color: var(--color-on-brand);\n    width: 100%;\n}\n.jml-btn-ai:hover { background: var(--art-theme-hover, var(--jim-mailing-list-green-dark)); }\n.jml-btn-ai:disabled { opacity: .6; cursor: default; }\n\n.jml-ai-status {\n    margin: var(--space-4) 0 0;\n    font-size: 17px;\n    font-weight: 600;\n    color: var(--state-success);\n    padding: var(--space-3) var(--space-4);\n    background: var(--state-success-bg);\n    border-radius: var(--radius-md);\n}\n.jml-ai-status.is-warn { color: var(--state-warning); background: var(--state-warning-bg); }\n\n/* ---- form fields ---- */\n.jml-field { margin-bottom: var(--space-5); display: flex; flex-direction: column; }\n\n.jml-field label {\n    font-size: 18px;\n    font-weight: 600;\n    color: var(--gray-800);\n    margin-bottom: var(--space-2);\n}\n.jml-opt { font-weight: 400; color: var(--gray-500); font-size: 16px; }\n.jml-hint { font-size: 15px; color: var(--gray-500); margin-top: var(--space-2); }\n\n.jml-field input,\n.jml-field textarea {\n    font-family: inherit;\n    font-size: 19px;\n    color: var(--gray-900);\n    background: var(--surface-card);\n    border: 2px solid var(--gray-300);\n    border-radius: var(--radius-md);\n    padding: 14px 16px;\n    min-height: 54px;\n    width: 100%;\n    box-sizing: border-box;\n    transition: border-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out);\n}\n.jml-field textarea { min-height: 90px; resize: vertical; line-height: 1.5; }\n\n.jml-field input:focus,\n.jml-field textarea:focus,\n.jml-search-wrap input:focus {\n    outline: none;\n    border-color: var(--art-theme);\n    box-shadow: var(--shadow-glow-theme);\n}\n\n/* address + phone/email side-by-side on wide screens, stacked on phones */\n.jml-row { display: flex; gap: var(--space-4); }\n.jml-row .jml-field { flex: 1 1 0; }\n.jml-grow { flex: 1 1 0; }\n.jml-state { flex: 0 0 110px; }\n.jml-zip { flex: 0 0 130px; }\n\n/* ---- buttons ---- */\n.jml-btn {\n    font-family: inherit;\n    font-size: 19px;\n    font-weight: 600;\n    min-height: 56px;\n    padding: 0 var(--space-6);\n    border-radius: var(--radius-md);\n    border: 2px solid transparent;\n    cursor: pointer;\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    gap: var(--space-2);\n    transition: background var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);\n}\n.jml-btn:active { transform: translateY(1px); }\n\n.jml-form-actions { display: flex; gap: var(--space-4); margin-top: var(--space-6); flex-wrap: wrap; }\n\n.jml-btn-save {\n    background: var(--art-theme);\n    color: var(--color-on-brand);\n    flex: 1 1 auto;\n    min-width: 220px;\n}\n.jml-btn-save:hover { background: var(--art-theme-hover, var(--jim-mailing-list-green-dark)); }\n\n.jml-btn-cancel {\n    background: var(--surface-card);\n    color: var(--gray-700);\n    border-color: var(--gray-300);\n}\n.jml-btn-cancel:hover { background: var(--surface-inset); }\n\n/* ---- list header + search ---- */\n.jml-list-head {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: var(--space-4);\n    flex-wrap: wrap;\n    margin-bottom: var(--space-6);\n}\n.jml-list-title { margin: 0; }\n.jml-count { font-size: 18px; font-weight: 500; color: var(--gray-500); }\n\n.jml-search-wrap { position: relative; flex: 0 0 300px; max-width: 100%; }\n\n.jml-search-wrap i {\n    position: absolute; left: 16px; top: 50%; transform: translateY(-50%);\n    color: var(--gray-400); font-size: 17px; pointer-events: none;\n}\n\n.jml-search-wrap input {\n    font-family: inherit;\n    font-size: 18px;\n    width: 100%;\n    box-sizing: border-box;\n    min-height: 52px;\n    padding: 12px 16px 12px 44px;\n    border: 2px solid var(--gray-300);\n    border-radius: var(--radius-pill);\n    background: var(--surface-card);\n    color: var(--gray-900);\n}\n\n/* ---- filter bar (segment chips + sort) ---- */\n.jml-filterbar { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); flex-wrap: wrap; margin-bottom: var(--space-5); }\n.jml-chips { display: flex; flex-wrap: wrap; gap: var(--space-2); flex: 1 1 auto; }\n\n.jml-chip {\n    font-family: inherit; font-size: 15px; font-weight: 600;\n    min-height: 40px; padding: 0 var(--space-4);\n    border: 2px solid var(--gray-300); border-radius: var(--radius-pill);\n    background: var(--surface-card); color: var(--gray-700);\n    cursor: pointer; display: inline-flex; align-items: center; gap: var(--space-2);\n}\n.jml-chip:hover { border-color: var(--art-theme); color: var(--art-theme); }\n.jml-chip.is-active { background: var(--art-theme); border-color: var(--art-theme); color: var(--color-on-brand); }\n.jml-chip-n { font-size: 13px; font-weight: 600; background: color-mix(in srgb, currentcolor 16%, transparent); border-radius: var(--radius-pill); padding: 1px 8px; }\n.jml-chip.is-active .jml-chip-n { background: rgb(255 255 255 / 28%); }\n\n.jml-sort { font-size: 16px; color: var(--gray-600); display: inline-flex; align-items: center; gap: var(--space-2); flex: 0 0 auto; }\n\n.jml-sort select {\n    font-family: inherit; font-size: 16px; min-height: 44px; padding: 0 var(--space-3);\n    border: 2px solid var(--gray-300); border-radius: var(--radius-md);\n    background: var(--surface-card); color: var(--gray-900); cursor: pointer;\n}\n.jml-sort select:focus { outline: none; border-color: var(--art-theme); box-shadow: var(--shadow-glow-theme); }\n\n/* ---- show more / inline link button ---- */\n.jml-showmore {\n    font-family: inherit; font-size: 18px; font-weight: 600;\n    width: 100%; min-height: 54px; margin-top: var(--space-2);\n    border: 2px dashed var(--gray-300); border-radius: var(--radius-lg);\n    background: var(--surface-inset); color: var(--gray-700); cursor: pointer;\n}\n.jml-showmore:hover { border-color: var(--art-theme); color: var(--art-theme); }\n\n.jml-linkbtn {\n    font-family: inherit; font-size: inherit; font-weight: 600;\n    background: none; border: none; color: var(--art-theme); cursor: pointer; text-decoration: underline; padding: 0;\n}\n\n/* ---- list actions (export / print labels) ---- */\n.jml-list-actions { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; margin-bottom: var(--space-4); }\n\n.jml-tool-btn {\n    font-family: inherit; font-size: 16px; font-weight: 600;\n    min-height: 46px; padding: 0 var(--space-5);\n    border: 2px solid var(--gray-300); border-radius: var(--radius-md);\n    background: var(--surface-card); color: var(--gray-700);\n    cursor: pointer; display: inline-flex; align-items: center; gap: var(--space-2);\n}\n.jml-tool-btn:hover { border-color: var(--art-theme); color: var(--art-theme); }\n.jml-tool-hint { font-size: 14px; color: var(--gray-500); }\n\n/* ---- per-card outreach status ---- */\n.jml-entry-status { margin-top: var(--space-3); display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }\n.jml-status-label { font-size: 15px; color: var(--gray-500); font-weight: 600; }\n\n.jml-status {\n    font-family: inherit; font-size: 15px; font-weight: 600; min-height: 40px;\n    padding: 0 var(--space-3); border: 2px solid var(--gray-300); border-radius: var(--radius-md);\n    background: var(--surface-card); color: var(--gray-800); cursor: pointer;\n}\n.jml-status:focus { outline: none; border-color: var(--art-theme); box-shadow: var(--shadow-glow-theme); }\n.jml-status:disabled { opacity: .6; }\n.jml-lastmailed { font-size: 14px; color: var(--gray-500); }\n\n/* status tints on the card's left edge */\n.jml-entry.is-mailed { border-left: 5px solid var(--state-info); }\n.jml-entry.is-responded { border-left: 5px solid var(--state-warning); }\n.jml-entry.is-customer { border-left: 5px solid var(--state-success); }\n.jml-entry.is-donotmail { border-left: 5px solid var(--gray-400); }\n\n/* ---- Mailchimp card ---- */\n.jml-mc-title { font-size: 22px; font-weight: 700; color: var(--gray-900); margin: 0 0 var(--space-3); display: flex; align-items: center; gap: var(--space-3); }\n.jml-mc-title i { color: var(--art-theme); }\n.jml-mc-help { font-size: 16px; line-height: 1.5; color: var(--gray-600); margin: 0 0 var(--space-4); }\n.jml-mc-help strong { color: var(--gray-900); }\n.jml-mc-actions { display: flex; gap: var(--space-3); flex-wrap: wrap; }\n.jml-mc-status { margin: var(--space-4) 0 0; font-size: 16px; font-weight: 600; padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); }\n.jml-mc-status.is-ok { color: var(--state-success); background: var(--state-success-bg); }\n.jml-mc-status.is-warn { color: var(--state-warning); background: var(--state-warning-bg); }\n.jml-mc-status.is-err { color: var(--state-danger); background: var(--state-danger-bg); }\n\n/* ---- entries ---- */\n.jml-list { display: flex; flex-direction: column; gap: var(--space-4); }\n\n.jml-entry {\n    border: 1px solid var(--gray-200);\n    border-radius: var(--radius-lg);\n    padding: var(--space-5) var(--space-6);\n    background: var(--surface-elevated);\n    display: flex;\n    gap: var(--space-4);\n    align-items: flex-start;\n    justify-content: space-between;\n    flex-wrap: wrap;\n}\n.jml-entry-main { flex: 1 1 320px; min-width: 0; }\n.jml-entry-name { font-size: 22px; font-weight: 700; color: var(--gray-900); margin: 0 0 var(--space-2); }\n.jml-entry-line { font-size: 17px; color: var(--gray-700); line-height: 1.5; }\n.jml-entry-line i { color: var(--gray-400); width: 22px; text-align: center; margin-right: var(--space-1); }\n.jml-entry-line a { color: var(--state-info); text-decoration: none; }\n.jml-entry-line a:hover { text-decoration: underline; }\n.jml-entry-notes { margin-top: var(--space-2); font-size: 16px; color: var(--gray-600); font-style: italic; }\n.jml-entry-source { display: inline-block; margin-top: var(--space-2); font-size: 15px; color: var(--gray-500); }\n\n.jml-entry-cat {\n    display: inline-block;\n    margin-top: var(--space-2);\n    margin-right: var(--space-3);\n    font-size: 14px;\n    font-weight: 600;\n    color: var(--art-theme);\n    background: var(--art-theme-light, var(--brand-100));\n    border: 1px solid color-mix(in srgb, var(--art-theme) 30%, transparent);\n    border-radius: var(--radius-pill);\n    padding: 3px 12px;\n}\n.jml-entry-cat i { margin-right: 4px; }\n\n.jml-entry-actions { display: flex; gap: var(--space-3); flex: 0 0 auto; }\n\n.jml-mini-btn {\n    font-family: inherit;\n    font-size: 17px;\n    font-weight: 600;\n    min-height: 48px;\n    padding: 0 var(--space-5);\n    border-radius: var(--radius-md);\n    border: 2px solid var(--gray-300);\n    background: var(--surface-card);\n    color: var(--gray-700);\n    cursor: pointer;\n    display: inline-flex;\n    align-items: center;\n    gap: var(--space-2);\n    transition: background var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);\n}\n.jml-mini-btn:hover { background: var(--surface-inset); }\n.jml-edit:hover { border-color: var(--art-theme); color: var(--art-theme); }\n.jml-delete { color: var(--state-danger); border-color: color-mix(in srgb, var(--state-danger) 35%, var(--gray-300)); }\n.jml-delete:hover { background: var(--state-danger-bg); border-color: var(--state-danger); }\n\n/* ---- empty / loading states ---- */\n.jml-empty, .jml-loading {\n    text-align: center;\n    padding: var(--space-8) var(--space-6);\n    font-size: 19px;\n    color: var(--gray-500);\n}\n.jml-empty i { font-size: 40px; color: var(--gray-300); display: block; margin-bottom: var(--space-4); }\n\n/* ---- highlight the form while editing ---- */\n.jml-form-card.is-editing { border-color: var(--art-theme); box-shadow: var(--shadow-glow-theme), var(--shadow-md); }\n\n/* ---- phones ---- */\n@media (width <= 640px) {\n    .jml-card, .jml-list-section { padding: var(--space-5); }\n    .jml-row { flex-direction: column; gap: 0; }\n    .jml-state, .jml-zip { flex: 1 1 auto; }\n    .jml-search-wrap { flex: 1 1 100%; }\n    .jml-btn-save { min-width: 0; width: 100%; }\n    .jml-entry-actions { width: 100%; }\n    .jml-mini-btn { flex: 1 1 0; justify-content: center; }\n}\n\n/* 2026-09-05 review — the flex wrappers (.jml-welcome, .jml-ai-thumb-wrap, .jml-filterbar, .jml-list-actions)\n   BEAT the UA [hidden] rule, so the empty screenshot placeholder + Remove button showed on every load. */\n/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */\n[hidden] { display: none !important; }\n.jml-visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }\n.jml-viewbtn:focus-visible, .jml-chip:focus-visible, .jml-btn:focus-visible, .jml-tool-btn:focus-visible, .jml-linkbtn:focus-visible, .jml-ai-imgbtn:focus-visible { outline: 2px solid var(--art-theme); outline-offset: 2px; }\n"
+    },
+    {
+      "file": "dashboards/css/past-due-orders.css",
+      "css": "/* stylelint-disable no-duplicate-selectors -- legacy sheet: rules were appended over time; merging them would reorder the cascade (2026-09-07) */\n\n/* ==========================================================================\n   past-due-orders.css — page-specific styles for dashboards/past-due-orders.html\n\n   Shell classes (.dash-header, .dash-back-link, .dash-stat-card, .dash-card…)\n   come from shared_components/css/dash-shell.css. Design tokens (--surface-*,\n   --gray-*, --shadow-*, --radius-*, --state-*) come from\n   shared_components/css/art-hub.css.\n\n   Only page-specific styles here. Never redefine a token, never hardcode a\n   colour/shadow/radius that a token already covers.\n   ========================================================================== */\n\n/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page\n   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;\n   every rule below uses var(). Raw hex is allowed ONLY in this block. */\n/* stylelint-disable color-no-hex */\n:root {\n    --past-due-orders-gray-dark: #000;\n    --past-due-orders-gray-dark-2: #333;\n    --past-due-orders-gray: #666;\n    --past-due-orders-green-dark: #0a6b2a;\n}\n/* stylelint-enable color-no-hex */\n\n/* Header controls -------------------------------------------------------- */\n\n/* These labels sit ON the green header, not on the page surface — --gray-600 is a\n   dark grey that all but disappears against it. White at 88% reads clearly while\n   staying subordinate to the solid-white control text beside it. */\n.pdo-window {\n    display: inline-flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 0.85rem;\n    color: rgb(255 255 255 / 88%);\n}\n\n.pdo-window select {\n    font: inherit;\n    padding: 4px 8px;\n    border: 1px solid var(--gray-300);\n    border-radius: var(--radius-sm);\n    background: var(--surface-card, var(--color-surface));\n    color: var(--gray-800);\n}\n\n/* Rep options carry their counts (\"Nika Lao (14 past due · 9 at risk)\"), which is long\n   enough to push the Dashboard link off the header without a ceiling. */\n.pdo-printfor select {\n    max-width: 15rem;\n}\n\n/* Both print controls sit disabled until a load succeeds — they have to LOOK inert,\n   or a click that deliberately does nothing reads as a broken button. The button half\n   of this now lives on .dash-back-link:disabled in dash-shell.css. */\n.pdo-printfor select:disabled {\n    opacity: 0.6;\n    cursor: not-allowed;\n}\n\n.pdo-asof {\n    font-size: 0.8rem;\n    color: var(--gray-500);\n}\n\n/* Per-rep grouping ------------------------------------------------------- */\n.pdo-rep {\n    margin-bottom: 28px;\n}\n\n.pdo-rep-name {\n    display: flex;\n    align-items: baseline;\n    gap: 12px;\n    margin: 0 0 8px;\n    font-size: 1rem;\n    font-weight: 700;\n    color: var(--gray-800);\n}\n\n.pdo-rep-count {\n    font-size: 0.8rem;\n    font-weight: 500;\n    color: var(--gray-500);\n}\n\n/* Table ------------------------------------------------------------------ */\n\n/* Wide content scrolls inside its own container so the page body never does. */\n.pdo-scroll {\n    overflow-x: auto;\n}\n\n.pdo-table {\n    width: 100%;\n    border-collapse: collapse;\n    font-size: 0.85rem;\n}\n\n.pdo-table th {\n    text-align: left;\n    padding: 6px 10px;\n    border-bottom: 2px solid var(--gray-200);\n    font-size: 0.72rem;\n    text-transform: uppercase;\n    letter-spacing: 0.03em;\n    color: var(--gray-500);\n    white-space: nowrap;\n}\n\n.pdo-table td {\n    padding: 7px 10px;\n    border-bottom: 1px solid var(--gray-100);\n    color: var(--gray-800);\n    vertical-align: top;\n}\n\n.pdo-table tbody tr:hover {\n    background: var(--gray-50);\n}\n\n.pdo-num {\n    text-align: right;\n    white-space: nowrap;\n}\n\n.pdo-wo {\n    font-family: 'JetBrains Mono', ui-monospace, monospace;\n    white-space: nowrap;\n}\n\n/* A past-due row must not rely on colour alone — the weight carries it in\n   greyscale and for anyone who can't distinguish the red. */\n.pdo-late .pdo-wo,\n.pdo-late td:nth-child(2) {\n    font-weight: 700;\n}\n\n.pdo-badge {\n    display: inline-block;\n    padding: 1px 7px;\n    border-radius: var(--radius-sm);\n    background: var(--state-danger-bg, var(--red-100));\n    color: var(--state-danger-fg, var(--red-800));\n    font-weight: 700;\n    font-size: 0.78rem;\n    white-space: nowrap;\n}\n\n.pdo-risk {\n    color: var(--gray-600);\n}\n\n/* The single most actionable cell on the page: more than half of past-due\n   orders are waiting on blanks nobody has ordered yet. */\n.pdo-nopo {\n    font-weight: 700;\n    color: var(--state-danger-fg, var(--red-800));\n}\n\n/* States ----------------------------------------------------------------- */\n.pdo-none {\n    padding: 18px;\n    color: var(--gray-600);\n}\n\n.pdo-none i {\n    color: var(--state-success-fg, var(--green-700));\n    margin-right: 6px;\n}\n\n.pdo-trunc,\n.pdo-failed {\n    padding: 12px 14px;\n    margin-bottom: 14px;\n    border-radius: var(--radius-md);\n    background: var(--state-warning-bg, var(--amber-100));\n    color: var(--state-warning-fg, var(--amber-800));\n    font-size: 0.85rem;\n}\n\n/* Printed rep sheets ------------------------------------------------------ */\n\n/* Erik prints these at 8am and hands each rep their page. The sheet is built into\n   #pdo-print-sheet by the controller and everything else on the page is hidden —\n   the same isolation the SanMar inbound sheets use (sanmar-inbound.css:291), and\n   the reason the printout no longer carries the stat tiles or the header controls. */\n#pdo-print-sheet {\n    display: none;\n}\n\n@media print {\n    body.pdo-printing > *:not(#pdo-print-sheet) {\n        /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */\n        display: none !important;\n    }\n\n    body.pdo-printing #pdo-print-sheet {\n        /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */\n        display: block !important;\n    }\n\n    @page {\n        size: letter portrait;\n        margin: 0.5in;\n    }\n\n    /* Last-resort fallback: a keyboard print that could NOT build a sheet (no data loaded\n       yet) still lands here. The controller's beforeprint handler covers the normal case;\n       without these the board would print as the raw 4-page blob the sheets replaced,\n       which would be a regression on the old behaviour rather than an improvement. */\n    body:not(.pdo-printing) .dash-header-right,\n    body:not(.pdo-printing) .dash-error-banner,\n    body:not(.pdo-printing) .dash-stat-grid {\n        /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */\n        display: none !important;\n    }\n\n    body:not(.pdo-printing) .pdo-rep {\n        break-inside: avoid;\n    }\n\n    body:not(.pdo-printing) .pdo-table tbody tr {\n        break-inside: avoid;\n    }\n\n    body:not(.pdo-printing) .pdo-badge {\n        /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */\n        background: var(--past-due-orders-gray-dark) !important;\n        /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */\n        color: var(--color-on-brand) !important;\n        -webkit-print-color-adjust: exact;\n        print-color-adjust: exact;\n    }\n\n    body:not(.pdo-printing) .pdo-nopo {\n        /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */\n        color: var(--past-due-orders-gray-dark) !important;\n        font-weight: 900;\n    }\n}\n\n/* Sheet body. Fixed px sizes, not tokens: this is paper, where a rem that follows\n   the browser's font setting would change how many rows land on a page. */\n#pdo-print-sheet {\n    color: var(--print-ink);\n    font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;\n    font-size: 9.5px;\n    line-height: 1.3;\n}\n\n/* One rep per PAGE. The first section never breaks, so a run doesn't lead with a\n   blank sheet — and a single-rep print is exactly one page. */\n.pdo-ps-brk {\n    break-before: page;\n}\n\n/* table-layout: fixed is what stops the wrapping. Without it the browser sized\n   columns to content and split dates across two lines (\"2026-\" / \"07-31\"). */\n.pdo-ps-tbl {\n    width: 100%;\n    table-layout: fixed;\n    border-collapse: collapse;\n    margin-bottom: 14px;\n}\n\n/* Reprints the rep's name and the column headers at the top of every physical page\n   the table spills onto. This is the fix for the orphan page that belonged to nobody. */\n.pdo-ps-tbl thead {\n    display: table-header-group;\n}\n\n.pdo-ps-tbl tbody tr {\n    break-inside: avoid;\n}\n\n/* Header rows ------------------------------------------------------------- */\n.pdo-ps-banner th {\n    text-align: left;\n    padding: 0 0 5px;\n    border-bottom: 2px solid var(--print-green);\n    font-weight: 400;\n}\n\n.pdo-ps-brand {\n    font-size: 10px;\n    font-weight: 800;\n    color: var(--print-green);\n    letter-spacing: 0.02em;\n}\n\n.pdo-ps-repname {\n    font-size: 19px;\n    font-weight: 800;\n    color: var(--print-ink);\n    line-height: 1.15;\n    margin-top: 1px;\n}\n\n/* The continued/second-section banner — smaller, because the full brand block has\n   already appeared above it on the same sheet. */\n.pdo-ps-repname--cont {\n    font-size: 12px;\n    color: var(--gray-700);\n}\n\n.pdo-ps-sub {\n    font-size: 10px;\n    color: var(--gray-700);\n    margin-top: 2px;\n}\n\n/* The scope disclaimer. Small, but it is the difference between \"your past-due list\" and\n   \"your past-due list for the last 30 days\" — a rep who reads the first will close an\n   older order out of their head. */\n.pdo-ps-note {\n    font-size: 8.5px;\n    color: var(--past-due-orders-gray);\n    margin-top: 2px;\n}\n\n.pdo-ps-sect th {\n    text-align: left;\n    padding: 9px 0 3px;\n    font-size: 10.5px;\n    font-weight: 800;\n    color: var(--print-green);\n    text-transform: uppercase;\n    letter-spacing: 0.04em;\n}\n\n.pdo-ps-sect-n {\n    float: right;\n    font-weight: 600;\n    text-transform: none;\n    letter-spacing: 0;\n    color: var(--print-ink-soft);\n}\n\n.pdo-ps-cols th {\n    text-align: left;\n    padding: 3px 5px;\n    border-top: 1px solid var(--print-green);\n    border-bottom: 1px solid var(--print-green);\n    font-size: 8.5px;\n    font-weight: 700;\n    text-transform: uppercase;\n    letter-spacing: 0.03em;\n    color: var(--past-due-orders-gray-dark-2);\n}\n\n/* `.pdo-ps-cols th` outranks the bare alignment classes, so the numeric headers need\n   to be named here or they sit left of the figures they label. */\n.pdo-ps-cols th.pdo-ps-c   { text-align: center; }\n.pdo-ps-cols th.pdo-ps-val { text-align: right; }\n\n/* Column widths sum to 100% of the 7.5in text block, sized so that no ordinary value\n   wraps: \"Asphalt Patch Systems Inc.\", \"Custom Embroidery\", \"ordered, not in\" and a\n   6-figure WO all fit on one line. Customer keeps the slack — a genuinely long name\n   is the only cell allowed to run to two lines.\n\n   These live on <col>, not on the <th>: under table-layout:fixed the browser reads\n   column widths from the first row, which is the full-width banner. */\n.pdo-ps-w-wo    { width: 8%; }\n.pdo-ps-w-cust  { width: 26%; }\n.pdo-ps-w-type  { width: 14.5%; }\n.pdo-ps-w-date  { width: 8.5%; }\n.pdo-ps-w-late  { width: 7%; }\n.pdo-ps-w-val   { width: 9.5%; }\n.pdo-ps-w-blank { width: 18%; }\n\n/* Body rows --------------------------------------------------------------- */\n.pdo-ps-tbl td {\n    padding: 3.5px 5px;\n    border-bottom: 1px solid var(--store-line);\n    vertical-align: top;\n    overflow-wrap: break-word;\n}\n\n.pdo-ps-wo {\n    font-family: 'JetBrains Mono', ui-monospace, monospace;\n    font-weight: 700;\n    white-space: nowrap;\n}\n\n.pdo-ps-cust {\n    font-weight: 700;\n}\n\n.pdo-ps-nowrap { white-space: nowrap; }\n.pdo-ps-c      { text-align: center; white-space: nowrap; }\n\n.pdo-ps-val {\n    text-align: right;\n    white-space: nowrap;\n    font-variant-numeric: tabular-nums;\n}\n\n/* The date the rep is here to change — the one cell the whole sheet exists for. */\n.pdo-ps-due {\n    font-weight: 800;\n}\n\n/* At-risk rows are context, not the job. Greyed so the past-due list stays dominant. */\n.pdo-ps-risk td {\n    color: var(--print-ink-soft);\n}\n\n.pdo-ps-risk .pdo-ps-cust,\n.pdo-ps-risk .pdo-ps-wo {\n    font-weight: 600;\n}\n\n.pdo-ps-vendor {\n    display: block;\n    font-size: 8.5px;\n    color: var(--print-ink-soft);\n}\n\n.pdo-ps-tot td {\n    border-top: 1.5px solid var(--print-green);\n    border-bottom: none;\n    padding-top: 4px;\n    font-weight: 800;\n    color: var(--past-due-orders-gray-dark-2);\n}\n\n/* Mono laser: it drops backgrounds unless told otherwise, so a tinted badge would\n   print as an unreadable grey smudge and \"no PO raised\" would lose its red entirely.\n   Both are forced to black — weight and reverse carry the signal in greyscale. */\n.pdo-ps-badge {\n    display: inline-block;\n    padding: 0 5px;\n    border-radius: 2px;\n    background: var(--past-due-orders-gray-dark);\n    color: var(--color-on-brand);\n    font-weight: 800;\n    white-space: nowrap;\n    -webkit-print-color-adjust: exact;\n    print-color-adjust: exact;\n}\n\n.pdo-ps-nopo {\n    font-weight: 900;\n    color: var(--past-due-orders-gray-dark);\n}\n\n/* ==========================================================================\n   2026-09-04 review additions\n   ========================================================================== */\n\n/* Stat tiles: dollar value under the count. */\n.pdo-stat-sub {\n    margin-top: 4px;\n    font-size: 0.78rem;\n    color: var(--gray-500);\n    min-height: 1.1em;\n}\n\n/* Board summary (\"52 orders on the board · 4 reps · as of …\"). */\n.pdo-asof #pdo-summary { color: var(--gray-700); font-weight: 600; }\n\n/* Rep heading → the rep's account page. */\n.pdo-rep-link {\n    color: inherit;\n    text-decoration: none;\n    border-bottom: 1px dashed var(--gray-300);\n}\n.pdo-rep-link:hover { color: var(--nw-green, var(--past-due-orders-green-dark)); border-bottom-color: currentcolor; }\n.pdo-rep-link i { font-size: 0.7em; opacity: 0.6; margin-left: 2px; }\n\n.pdo-rep-total {\n    margin-left: auto;\n    font-family: 'JetBrains Mono', ui-monospace, monospace;\n    font-size: 0.85rem;\n    font-weight: 600;\n    color: var(--gray-700);\n}\n\n/* \"no PO raised\" → Purchase Request form. Keeps the danger colour and adds the affordance. */\n.pdo-nopo-link { color: inherit; text-decoration: none; border-bottom: 1px dashed currentcolor; white-space: nowrap; }\n.pdo-nopo-link:hover { text-decoration: none; opacity: 0.8; }\n.pdo-nopo-link i { font-size: 0.85em; margin-left: 3px; }\n\n/* Vendor to chase, under the blanks status (the printed sheet always had it). */\n.pdo-vendor { display: block; font-size: 0.75rem; color: var(--gray-500); }\n\n.pdo-partial {\n    display: inline-block; margin-left: 6px; padding: 0 6px; border-radius: var(--radius-sm);\n    font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em;\n    background: var(--state-warning-bg, var(--amber-100)); color: var(--state-warning-fg, var(--amber-800));\n}\n\n.pdo-dash { color: var(--gray-300); }\n\n/* Phones: the header control row was 781px wide at 375px and scrolled the whole page\n   sideways. Wrap the controls onto their own full-width rows. */\n@media (width <= 760px) {\n    .dash-header-right {\n        width: 100%;\n        flex-wrap: wrap;\n        gap: 8px;\n    }\n    .pdo-window { flex: 1 1 100%; justify-content: space-between; }\n    .pdo-window select { flex: 1; max-width: none; }\n    .pdo-printfor select { max-width: none; }\n    .dash-header-right .dash-back-link { flex: 1 1 auto; justify-content: center; }\n    .pdo-rep-name { flex-wrap: wrap; }\n}\n"
+    },
+    {
+      "file": "dashboards/css/product-manager.css",
+      "css": "/* ==========================================================================\n   product-manager.css — page-specific styles for dashboards/product-manager.html\n\n   Shell classes (.dash-header, .dash-back-link, .dash-stat-card, etc.) come\n   from shared_components/css/dash-shell.css. Design tokens (--surface-*,\n   --gray-*, --shadow-*, --radius-*, --state-*) come from\n   shared_components/css/art-hub.css.\n\n   Only page-specific styles here — never redefine tokens or hardcode\n   colors/shadows/radii.\n   ========================================================================== */\n\n.pm-subtitle {\n    font-size: 0.75em;\n    font-weight: 500;\n    color: var(--gray-500);\n    margin-left: 8px;\n}\n\n.pm-header-actions { display: flex; gap: 10px; align-items: center; }\n\n.pm-filter {\n    font: inherit; font-size: 13.5px;\n    padding: 7px 12px;\n    border: 1px solid var(--gray-300);\n    border-radius: var(--radius-md);\n    min-width: 240px;\n}\n\n.pm-help {\n    font-size: 13px;\n    color: var(--gray-600);\n    background: var(--gray-50);\n    border: 1px solid var(--gray-200);\n    border-radius: var(--radius-md);\n    padding: 10px 14px;\n    margin: 0 0 14px;\n}\n\n/* Buttons */\n.pm-btn {\n    display: inline-flex; align-items: center; gap: 6px;\n    font: inherit; font-size: 13px; font-weight: 600;\n    padding: 7px 14px;\n    border-radius: var(--radius-md);\n    border: 1px solid var(--gray-300);\n    background: var(--surface-card, var(--color-surface));\n    color: var(--gray-700);\n    cursor: pointer;\n    text-decoration: none;\n}\n.pm-btn:hover { border-color: var(--gray-400); }\n\n.pm-btn-primary {\n    background: var(--state-success, var(--store-green-700));\n    border-color: var(--state-success, var(--store-green-700));\n    color: var(--color-on-brand);\n}\n.pm-btn-primary:hover:not(:disabled) { filter: brightness(1.08); }\n.pm-btn-primary:disabled { opacity: 0.65; cursor: wait; }\n.pm-btn-ghost { background: transparent; }\n\n/* Table */\n.pm-table-wrap { overflow-x: auto; }\n.pm-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }\n\n.pm-table th {\n    text-align: left; font-size: 11px; font-weight: 700;\n    letter-spacing: 0.06em; text-transform: uppercase;\n    color: var(--gray-500);\n    padding: 8px 10px;\n    border-bottom: 1px solid var(--gray-200);\n}\n\n.pm-table td {\n    padding: 8px 10px;\n    border-bottom: 1px solid var(--gray-100);\n    vertical-align: middle;\n}\n.pm-num { text-align: right; }\n.pm-style { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; font-weight: 600; }\n.pm-row-inactive td { opacity: 0.55; }\n.pm-warn-text { color: var(--state-warning, var(--amber-700)); font-weight: 600; }\n\n.pm-thumb {\n    width: 44px; height: 44px;\n    object-fit: contain;\n    border: 1px solid var(--gray-200);\n    border-radius: var(--radius-sm);\n    background: var(--gray-50);\n    display: inline-flex; align-items: center; justify-content: center;\n    color: var(--gray-300);\n}\n.pm-thumb-empty { font-size: 16px; }\n\n.pm-chip {\n    display: inline-block;\n    font-size: 11px; font-weight: 700;\n    padding: 2px 10px;\n    border-radius: 999px;\n    background: var(--gray-100);\n    color: var(--gray-600);\n}\n.pm-chip-live { background: var(--state-success-bg, var(--store-green-100)); color: var(--state-success, var(--store-green-700)); }\n\n.pm-actions { white-space: nowrap; text-align: right; }\n.pm-empty { color: var(--gray-500); font-size: 14px; padding: 18px 4px; }\n\n/* Form */\n.pm-form-card { margin-top: 16px; }\n\n.pm-grid {\n    display: grid;\n    grid-template-columns: 1fr 1fr;\n    gap: 14px 18px;\n}\n.pm-span-2 { grid-column: span 2; }\n.pm-field { display: flex; flex-direction: column; gap: 4px; }\n.pm-field label { font-size: 12.5px; font-weight: 700; color: var(--gray-600); }\n.pm-field small { font-size: 11.5px; color: var(--gray-500); }\n.pm-req { color: var(--state-danger, var(--red-700)); }\n\n.pm-field input[type=\"text\"],\n.pm-field input[type=\"number\"],\n.pm-field input[type=\"url\"],\n.pm-field select,\n.pm-field textarea {\n    font: inherit; font-size: 14px;\n    padding: 8px 11px;\n    border: 1px solid var(--gray-300);\n    border-radius: var(--radius-md);\n    width: 100%;\n}\n.pm-field input:disabled { background: var(--gray-100); color: var(--gray-500); }\n\n.pm-image-row { display: flex; gap: 14px; align-items: flex-start; }\n\n.pm-image-preview {\n    width: 84px; height: 84px;\n    object-fit: contain;\n    border: 1px solid var(--gray-200);\n    border-radius: var(--radius-md);\n    background: var(--gray-50);\n    flex: none;\n}\n.pm-image-controls { display: flex; flex-direction: column; gap: 6px; flex: 1; }\n\n.pm-form-actions {\n    display: flex; align-items: center; gap: 18px;\n    margin-top: 18px;\n    padding-top: 14px;\n    border-top: 1px solid var(--gray-200);\n}\n\n.pm-active-toggle {\n    display: flex; align-items: center; gap: 8px;\n    font-size: 13.5px; font-weight: 600; color: var(--gray-700);\n    cursor: pointer;\n}\n.pm-active-toggle input { width: 16px; height: 16px; accent-color: var(--state-success, var(--store-green-700)); }\n\n@media (width <= 720px) {\n    .pm-grid { grid-template-columns: 1fr; }\n    .pm-span-2 { grid-column: span 1; }\n    .pm-header-actions { flex-wrap: wrap; }\n}\n\n/* 2026-09-05 review */\n/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */\n[hidden] { display: none !important; }\n"
+    },
+    {
+      "file": "dashboards/css/roland-printer-supplies.css",
+      "css": "/* ==========================================================================\n   roland-printer-supplies.css — page-specific styles for\n   dashboards/roland-printer-supplies.html\n\n   Shell classes (.dash-header, .dash-card, .dash-btn, etc.) come from\n   shared_components/css/dash-shell.css. Design tokens (--surface-*, --gray-*,\n   --shadow-*, --radius-*, --state-*, --space-*, --dash-theme-*) come from\n   shared_components/css/art-hub.css + dash-shell.css.\n\n   Only page-specific styles live here. NEVER redefine tokens. NEVER hardcode\n   colors/shadows/radii — use var(--token-name) so the page inherits the\n   2026 design system.\n   ========================================================================== */\n\n.rps-title-icon {\n    color: var(--dash-theme);\n    margin-right: 8px;\n}\n\n.rps-intro {\n    margin: 0 0 var(--space-5);\n    color: var(--gray-700);\n    font-size: 0.95rem;\n    line-height: 1.6;\n}\n\n.rps-intro strong {\n    color: var(--gray-900);\n}\n\n/* ---------- Printable PDF callout ---------- */\n.rps-pdf-callout {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: var(--space-4);\n    flex-wrap: wrap;\n    padding: var(--space-4) var(--space-5);\n    background: var(--dash-theme-bg);\n    border: 1px solid var(--gray-200);\n    border-radius: var(--radius-md);\n}\n\n.rps-pdf-callout-text {\n    display: flex;\n    align-items: center;\n    gap: var(--space-4);\n}\n\n.rps-pdf-icon {\n    font-size: 2rem;\n    color: var(--state-danger);\n    flex-shrink: 0;\n}\n\n.rps-pdf-title {\n    font-weight: 600;\n    color: var(--gray-900);\n    font-size: 0.95rem;\n}\n\n.rps-pdf-sub {\n    margin-top: 2px;\n    color: var(--gray-600);\n    font-size: 0.85rem;\n}\n\n.rps-pdf-btn {\n    white-space: nowrap;\n}\n\n/* ---------- JotForm embed wrapper ---------- */\n\n/* min-height reserves space so the page doesn't jump while the form loads.\n   The JotForm jsform embed injects a self-resizing iframe at this location. */\n.rps-form-wrap {\n    min-height: 600px;\n}\n\n.rps-form-wrap iframe {\n    max-width: 100%;\n    border: 0;\n}\n\n/* ---------- Responsive ---------- */\n@media (width <= 560px) {\n    .rps-pdf-callout {\n        flex-direction: column;\n        align-items: stretch;\n    }\n\n    .rps-pdf-btn {\n        justify-content: center;\n    }\n}\n"
+    },
+    {
+      "file": "dashboards/css/volume-quote.css",
+      "css": "/* ==========================================================================\n   volume-quote.css — page-specific styles for dashboards/volume-quote.html\n\n   Shell classes (.dash-header, .dash-back-link, .dash-stat-card, etc.) come\n   from shared_components/css/dash-shell.css. Design tokens (--surface-*,\n   --gray-*, --shadow-*, --radius-*, --state-*) come from\n   shared_components/css/art-hub.css.\n\n   Only page-specific styles here. NEVER redefine tokens. NEVER hardcode\n   colors/shadows/radii — use var(--token-name).\n   ========================================================================== */\n\n.vq-intro { color: var(--gray-600); margin: 0 0 1rem; max-width: 70ch; }\n\n.vq-step {\n    display: inline-flex; align-items: center; justify-content: center;\n    width: 1.6em; height: 1.6em; margin-right: .4em;\n    border-radius: var(--radius-pill); background: var(--gray-800); color: var(--surface-card);\n    font-size: .8em; font-weight: 600;\n}\n\n/* ── form ─────────────────────────────────────────────────────────────── */\n.vq-form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: .9rem; }\n.vq-field { display: flex; flex-direction: column; gap: .3rem; font-size: .85rem; color: var(--gray-600); }\n\n.vq-field input, .vq-field select, .vq-lever input[type=\"number\"], .vq-line input {\n    font: inherit; padding: .5rem .6rem; border: 1px solid var(--gray-300);\n    border-radius: var(--radius-md); background: var(--surface-card); color: var(--gray-900);\n}\n.vq-field input:focus, .vq-field select:focus, .vq-line input:focus, .vq-lever input:focus { outline: 2px solid var(--state-info); outline-offset: 1px; }\n.vq-field--check { flex-direction: row; align-items: center; gap: .5rem; align-self: end; padding-bottom: .5rem; }\n.vq-field--check input { width: 1.1rem; height: 1.1rem; }\n\n/* ── garment lines ─────────────────────────────────────────────────────── */\n.vq-lines-head, .vq-line {\n    display: grid; grid-template-columns: 120px 90px 1.6fr 1.2fr 1fr 40px;\n    gap: .6rem; align-items: center;\n}\n.vq-lines-head { font-size: .75rem; text-transform: uppercase; letter-spacing: .04em; color: var(--gray-500); padding: 0 0 .4rem; border-bottom: 1px solid var(--gray-200); }\n.vq-line { padding: .5rem 0; border-bottom: 1px solid var(--gray-100); font-size: .9rem; }\n.vq-line-title { color: var(--gray-800); }\n.vq-line-title small { display: block; color: var(--gray-500); }\n.vq-line-cost { font-family: 'JetBrains Mono', monospace; font-size: .85rem; }\n.vq-line-cost small { color: var(--gray-500); }\n.vq-line-stock { font-size: .8rem; color: var(--gray-600); }\n.vq-line-status { font-size: .8rem; color: var(--gray-500); }\n.vq-line-status--error { color: var(--state-danger); }\n.vq-line-remove { border: 0; background: transparent; color: var(--gray-400); cursor: pointer; font-size: 1rem; }\n.vq-line-remove:hover { color: var(--state-danger); }\n.vq-hint { font-size: .8rem; color: var(--gray-500); margin: .8rem 0 0; max-width: 80ch; }\n\n/* ── levers ────────────────────────────────────────────────────────────── */\n.vq-levers { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; }\n.vq-lever label { display: block; font-size: .85rem; color: var(--gray-600); margin-bottom: .35rem; }\n.vq-lever-row { display: flex; align-items: center; gap: .75rem; }\n.vq-lever input[type=\"number\"] { width: 110px; font-family: 'JetBrains Mono', monospace; }\n.vq-lever input[type=\"range\"] { flex: 1 1 140px; }\n.vq-lever output { font-family: 'JetBrains Mono', monospace; font-weight: 600; min-width: 3ch; }\n.vq-lever-note { font-size: .8rem; color: var(--gray-500); }\n\n/* ── result ────────────────────────────────────────────────────────────── */\n.vq-stats { margin-bottom: 1rem; }\n.vq-warnings:empty { display: none; }\n\n.vq-warning {\n    padding: .6rem .8rem; margin-bottom: .6rem; border-radius: var(--radius-md);\n    background: var(--state-warning-bg); color: var(--state-warning); font-size: .85rem;\n}\n.vq-warning--danger { background: var(--state-danger-bg); color: var(--state-danger); }\n.vq-table-wrap { overflow-x: auto; }\n.vq-table { width: 100%; border-collapse: collapse; font-size: .88rem; }\n.vq-table th, .vq-table td { padding: .55rem .6rem; text-align: right; border-bottom: 1px solid var(--gray-200); white-space: nowrap; }\n.vq-table th:first-child, .vq-table td:first-child { text-align: left; }\n.vq-table th { font-weight: 600; color: var(--gray-600); background: var(--surface-inset); }\n.vq-table th small { font-weight: 400; color: var(--gray-500); }\n.vq-table td.vq-num { font-family: 'JetBrains Mono', monospace; }\n.vq-table td.vq-vol { font-weight: 600; color: var(--gray-900); }\n.vq-table tfoot td { font-weight: 600; background: var(--surface-inset); }\n.vq-gm-low { color: var(--state-danger); }\n\n/* ── memo ──────────────────────────────────────────────────────────────── */\n.vq-memo-actions { display: flex; gap: .5rem; }\n\n.vq-memo {\n    white-space: pre-wrap; font-family: 'JetBrains Mono', monospace; font-size: .82rem; line-height: 1.5;\n    background: var(--surface-inset); border: 1px solid var(--gray-200); border-radius: var(--radius-md);\n    padding: 1rem; margin: 0; color: var(--gray-800);\n}\n\n@media (width <= 720px) {\n    .vq-lines-head { display: none; }\n    .vq-line { grid-template-columns: 1fr 1fr; }\n}\n\n/* ── customer quote sheet ──────────────────────────────────────────────── */\n.vq-save-status { font-size: .8rem; color: var(--gray-600); align-self: center; }\n.vq-save-status--ok { color: var(--state-success); }\n.vq-save-status--error { color: var(--state-danger); }\n\n.vq-cq {\n    background: var(--surface-card); border: 1px solid var(--gray-200); border-radius: var(--radius-md);\n    padding: 1.5rem 1.75rem; margin-top: .75rem; color: var(--gray-900); font-size: .9rem; max-width: 860px;\n}\n.vq-cq-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; border-bottom: 3px solid var(--nwca-green, var(--brand-800)); padding-bottom: .9rem; margin-bottom: 1rem; }\n.vq-cq-logo { height: 52px; width: auto; }\n.vq-cq-title { text-align: right; }\n.vq-cq-title h3 { margin: 0 0 .25rem; font-size: 1.25rem; color: var(--nwca-green, var(--brand-800)); letter-spacing: .02em; }\n.vq-cq-meta { font-size: .8rem; color: var(--gray-600); line-height: 1.5; }\n.vq-cq-meta strong { color: var(--gray-900); font-family: 'JetBrains Mono', monospace; }\n.vq-cq-parties { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; font-size: .85rem; }\n.vq-cq-parties h4, .vq-cq-block h4 { margin: 0 0 .25rem; font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--gray-500); }\n.vq-cq-table { width: 100%; border-collapse: collapse; margin: .5rem 0 1rem; font-size: .85rem; }\n.vq-cq-table th, .vq-cq-table td { padding: .5rem .55rem; border-bottom: 1px solid var(--gray-200); text-align: right; }\n.vq-cq-table th:nth-child(-n+2), .vq-cq-table td:nth-child(-n+2) { text-align: left; }\n.vq-cq-table th { background: var(--surface-inset); color: var(--gray-700); font-weight: 600; }\n.vq-cq-table td.vq-num { font-family: 'JetBrains Mono', monospace; }\n.vq-cq-table tfoot td { font-weight: 600; background: var(--surface-inset); }\n.vq-cq-table td small { color: var(--gray-500); }\n.vq-cq-block { margin: .75rem 0; font-size: .85rem; }\n.vq-cq-block ul { margin: .25rem 0 0; padding-left: 1.1rem; }\n.vq-cq-block li { margin-bottom: .2rem; }\n.vq-cq-foot { margin-top: 1.25rem; padding-top: .75rem; border-top: 1px solid var(--gray-200); font-size: .75rem; color: var(--gray-500); text-align: center; }\n.vq-cq-empty { color: var(--gray-500); font-style: italic; }\n\n@media print {\n    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */\n    .dash-header, .vq-intro, .dash-error-banner, .vq-memo-actions, .vq-cq-hint, .dash-card-header { display: none !important; }\n    .dash-shell, .dash-content { padding: 0; margin: 0; }\n\n    /* Two print modes, set on <body> by the button that was clicked. */\n    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */\n    body.vq-mode-memo .dash-card:not(.vq-print-keep) { display: none !important; }\n    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */\n    body.vq-mode-customer .dash-card:not(.vq-print-customer-keep) { display: none !important; }\n    .dash-card { border: 0; box-shadow: none; padding: 0; }\n    .vq-memo { border: 0; background: transparent; padding: 0; font-size: 11pt; }\n    .vq-cq { border: 0; margin: 0; padding: 0; max-width: none; font-size: 11pt; }\n    .vq-cq-head { -webkit-print-color-adjust: exact; print-color-adjust: exact; }\n    .vq-cq-table th, .vq-cq-table tfoot td { -webkit-print-color-adjust: exact; print-color-adjust: exact; }\n}\n\n/* Phone (≤640px) — 2026-09-05 staff-dashboard sweep: the page measured wider than the\n   viewport at 375px and panned sideways. */\n@media (width <= 640px) {\n    /* .vq-table already sits in .vq-table-wrap; the customer-quote table did not. */\n    .vq-cq-table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }\n}\n\n@media (width <= 640px) {\n    /* Line rows are a 6-column grid sized for a desk; on a phone let the cells wrap. */\n    .vq-lines-head { display: none; }\n    .vq-line { display: flex; flex-wrap: wrap; gap: .4rem .6rem; }\n    .vq-line > * { min-width: 0; }\n    .vq-line-info { flex: 1 1 100%; }\n}\n\n/* 2026-09-05 review */\n/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */\n[hidden] { display: none !important; }\n"
     }
   ]
 }

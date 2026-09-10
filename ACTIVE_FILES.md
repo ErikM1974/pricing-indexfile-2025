@@ -275,3 +275,9 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - Staff toolkit review: added tests/e2e/fixtures/staff-toolkit-portal-data.js for synthetic customer lookup, rewards ledger/accrual and mocked write acknowledgments; no real customer or financial operations are used.
 
 - Staff toolkit draft: Portal Admin now uses the shared owner and existing ui-dialog.js lifecycle, guarded customer/reward reads and pending actions, and complete rewards printing. Added tests/fixtures/staff-toolkit-portal-original-workflow.json for exact original tables/invite/ledger/accrual/request bodies. Legacy portal CSS remains pending consumer audit; all business actions are mocked in review.
+
+- tests/fixtures/staff-toolkit-mailing-original-workflow.json — immutable synthetic mailing-list edit/export/labels/request contract. Preview HTML/stub now share the staff toolkit owner; unknown preview requests fail closed.
+
+- tests/fixtures/staff-toolkit-pastdue-original-workflow.json — immutable synthetic 30/60/90-day board and per-rep print contract for staff toolkit review.
+
+- Staff toolkit family: retired dashboards/css/{blog-editor,contract-break-even,customer-portal-admin,jim-mailing-list,past-due-orders,product-manager,roland-printer-supplies,volume-quote}.css after auditing all HTML/JS consumers (including the Jim preview). Shared owner shared_components/css/staff-toolkit.css is registered and linted; original CSS retained only inside the immutable test fixture. art-hub.css, dash-shell.css and blog.css retain other consumers.
