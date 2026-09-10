@@ -1118,3 +1118,7 @@ Next: integrate this exact reviewed SHA into clean develop, preserve the .18 liv
 ## CRM release checks complete — v2026.09.09.19
 
 Full integrated source passed build/lint/types,485routes/24modules,231unit suites/5359tests/four existing skips,88DOM,four accessibility unit,84quote parity,654mocked browser,16remaining browser/three optional screenshot skips,all five calculators,279CSS clean,boot200 and production audit zero.31focused CRM scenarios;299source/CSS/historical checks. Six base PDFs/eight pages/640original data words, plus two complete board-print pages.17source hashes preserved outside88UI/recovery mappings. Four old sheets/seven flags retired. Live remains149/76 until exact-source CI and verified.19 rollout raises it to155/70.
+
+## CRM release record — v2026.09.09.19
+
+Exact-source CI 34433719156 passed all four jobs on 37fe944b6ceb2bbdb4361a37aaefaaee61d0a53d, including actual live money/calculator parity and654mocked browser checks. Six CRM workspaces share canonical account/pipeline owners.31focused scenarios,299source/CSS/historical checks,17original source hashes/88mapped edits, complete base and board print. Four old sheets/seven flags retired;485routes unchanged. Count becomes155reviewed/70pending only after verified rollout.

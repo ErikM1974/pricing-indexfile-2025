@@ -1,3 +1,12 @@
+## v2026.09.09.19 (2026.09.09)
+
+- Plan shared CRM account and lead pipeline layouts
+- Save CSS shutdown checkpoint: reports tested and CRM baseline captured
+- Record verified pricing report release and CRM draft progress
+- Unify six CRM workspaces with shared styles and resilient accessible views
+- Integrate reviewed CRM workspaces and preserve the verified pricing release
+- Deploy v2026.09.09.19: unify CRM account and lead workspaces
+
 ## v2026.09.09.18 (2026.09.09)
 
 - Plan generated pricing reports and audit CSS review
