@@ -46,7 +46,7 @@ async function open(page,state={}){
    return route.fulfill({status:state.actionStatus||200,json:body});
   }
   if(!['GET','HEAD'].includes(method)||p.startsWith('/api/quote-sequence/')||u.searchParams.get('autoAdd')==='true'){events.writes.push({url:req.url(),method});return route.fulfill({status:503});}
-  if(p==='/api/crm-session/me')return route.fulfill({status:state.staff===false?401:200,json:state.staff===false?{authenticated:false}:{authenticated:true,name:'Review Staff',email:'staff@example.test',role:'admin'}});
+  if(p==='/api/crm-session/me'){if(state.identityHold)await state.identityHold;return route.fulfill({status:state.staff===false?401:200,json:state.staff===false?{authenticated:false}:{authenticated:true,name:'Review Staff',email:'staff@example.test',role:'admin'}});}
   if(p==='/api/public/quote/'+f.id){events.reads.push({path:p,query:u.search});if(state.arrive)state.arrive();if(state.hold)await state.hold;return route.fulfill({status:state.status||200,json:state.status?{error:'Synthetic quote load failure'}:{session:f.session,items:f.items}});}
   if(p==='/api/quote-sessions/'+f.id+'/full'){events.reads.push({path:p,query:u.search});return route.fulfill({status:state.fullStatus||200,json:state.fullStatus?{error:'Synthetic order load failure'}:f.full});}
   if(p==='/api/quote-change-log/'+f.id)return route.fulfill({json:{records:[]}});

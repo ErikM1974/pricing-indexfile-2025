@@ -1,6 +1,16 @@
 # Handover follow-ups — 2026-09-07
 
-## ACTIVE — Quote View original contracts captured; implementation next
+## REVIEWED — five-page employee and customer document batch ready for integration
+
+Quote View passed all 62 browser cases (3.4 minutes) and all 1,002 checks in nine source/ownership/money/legacy suites on its final source. Its 83 mapped edits combine with 26 portal and 72 compact Invoice edits: 181 total mappings restore all 24 original document source hashes. Fourteen financial/payload methods remain byte-identical. The 39 original browser fixtures and 13 original PDF pages remain immutable at85eba439.
+
+The reviewed page uses shared Public Sans, customer-document controls, labelled mobile size/quantity/money rows and native named dialogs with keyboard focus return. All eight staff controls have canonical button classes and tested 44px touch targets. Share tokens, verified server identity, calendar business dates, visible refresh warnings and duplicate-action prevention have dedicated coverage. All business writes and allocating reads were intercepted; no live acceptance, checkout, email, import or print action was submitted.
+
+Seven final PDFs / 11 pages were visually reviewed: open1, mixed1, ShopWorks2, contract1, long3, sizeless1, paid2. All sizes, saved amounts, tax, payments, terms and rows remain present. Quote View CSS falls from74,068 to56,766 LF bytes, 13 important flags to zero; its four-sheet graph falls from159,871 to129,067 bytes. Shared quote-print and garment-submit-form sources remain original for their other consumers.
+
+Candidate185/225 reviewed,40pending: employee pair ea622bf4, Customer Portal Invoice4ad65b0f, compact Invoice990d9fbf and this reviewed Quote View. Live remains v2026.09.10.7 / Heroku2100 /1143ffde,180/225 reviewed45pending. Next: commit/back up the exact Quote View state, integrate the frozen five-page batch with primary402fef9b preserving all .7 cache mappings and release history, run full local and exact-source CI gates, then deploy and verify live assets/access. Continue the remaining40 pages after release. Do not rerun consumed helpers; no recursive deletion of the node_modules junction or copying of .env.
+
+## ORIGINAL BASELINE — Quote View contracts captured at85eba439
 
 Thirty-nine original browser contracts are frozen before Quote View application edits:19 data modes plus caller/share-token/load/error/acceptance/payment/product/copy/print, three exact ShopWorks push bodies, manual sync/link/ShipStation and the actual lazy garment art form. First seven cases passed;21 initial cases stopped on a harness assertion counting a hidden SanMar loading placeholder. Corrected to visible loading, all21 passed; ten additional operations and the real art-form case passed. The harness only exposes the existing QuoteViewPage instance; original constructor/workflow methods remain unchanged.
 
@@ -10,7 +20,7 @@ Seven original PDFs/13 pages visually inspected: open/mixed/contract/sizeless on
 - Shared quote-print.css is also consumed by DTF builder; remove its link only from Quote View and keep that shared sheet/source unchanged until its other consumer migrates. GarmentSubmitForm remains an independently pending shared runtime: real lazy open, prefilled fields and all three file-import bodies are captured and intercepted. Do not modify that form or its other consumers during this page layout pass.
 - Design: shared customer-document Public Sans/header/buttons, clear white quote sheet, three customer/order fact groups, labeled narrow-screen product/size/money rows, compact fulfillment and financial sections, complete Letter paper and native named dialogs with focus/keyboard recovery. Use tokens/components/customer-documents plus a scoped page owner; remove competing quote-view/print/toast styles from this consumer. Keep exact labels, customer terms, saved monetary transformations and successful request bodies in the24-source hash ledger.
 - Next: implement Quote View scoped layout plus demonstrated token/identity/business-date/error/interaction fixes; add original/current value comparisons and expanded loading/failure/retry/pending/duplicate/keyboard/axe/paper checks. Re-review the actual lazy form wrapper. Then integrate the exact reviewed employee pair + portal invoice + compact invoice + Quote View batch, preserving primary402fef9b/.7 cache mappings, and run full app/exact-source CI gates before release.
-- Compact Invoice990d9fbf is reviewed/backed up (50browser/1,002guards/13ownedfiles/eight current paper pages). Candidate184/225,41pending; live.7/Heroku2100/1143ffde remains180/225,45pending. Quote View source is still original and has no migration credit. Never rerun completed or failed one-shot helpers; baseline JSON writes refuse overwrites. node_modules is a junction; no recursive deletion or.env copying.
+- Compact Invoice990d9fbf is reviewed/backed up (50browser/1,002guards/13ownedfiles/eight current paper pages). Candidate184/225,41pending; live.7/Heroku2100/1143ffde remains180/225,45pending. This original-baseline snapshot predates the active mapped UI draft above; Quote View has no migration credit yet. Never rerun completed or failed one-shot helpers; baseline JSON writes refuse overwrites. node_modules is a junction; no recursive deletion or.env copying.
 
 ## REVIEWED — compact Invoice reviewed; Quote View baseline next
 

@@ -36,10 +36,12 @@ describe('quote-view', () => {
         expect(js).toMatch(/this\.apiBaseUrl = \(window\.APP_CONFIG && window\.APP_CONFIG\.API && window\.APP_CONFIG\.API\.BASE_URL\) \|\| '';/);
         expect(js).not.toMatch(/onclick=/);
         expect(js).toMatch(/e\.target\.closest\('\[data-qv-close-modal\]'\)/);
-        expect(js).toMatch(/<td class="style-col clickable" data-qv-group="\$\{groupIndex\}" role="button" tabindex="0"/);
-        expect(js).toMatch(/<button type="button" class="product-modal-close" data-qv-close-modal aria-label="Close">/);
+        expect(js).toMatch(/<button type="button" class="qv-product-detail style-with-image" data-qv-group="\$\{groupIndex\}"/);
+        expect(js).toMatch(/<button type="button" class="product-modal-close btn" data-qv-close-modal aria-label="Close">/);
         expect(js).not.toMatch(BARE);
-        expect(read('pages/css/quote-view.css')).toMatch(/\[hidden\] \{ display: none !important; \}/);
+        expect(html).toContain('data-ui="unified"');
+        expect(html).toContain('/shared_components/css/components.css');
+        expect(js).not.toMatch(/\.style\.display|onerror=/);
     });
 });
 

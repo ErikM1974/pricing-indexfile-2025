@@ -76,11 +76,10 @@ describe('StaffAuthHelper.ready()', () => {
 });
 
 describe('pages that read identity at init await the hydration', () => {
-    // Compact invoice verifies the current server response directly. Its real-browser
-    // delayed/anonymous/forged-storage controls are locked in css-unification-compact-invoice.spec.js.
+    // Compact invoice and Quote View verify the current server response directly.
+    // Their browser suites cover anonymous and forged-storage controls.
     test.each([
         ['dashboards/js/rep-crm.js', /StaffAuthHelper\.ready\(\) : Promise\.resolve\(\)\)\s*\.then\(\(\) => this\.displayWelcomeMessage\(\)\)/],
-        ['pages/js/quote-view.js', /await StaffAuthHelper\.ready\(\);\s*\n\s*this\.isStaff =/],
         ['pages/js/quote-audit.js', /await StaffAuthHelper\.ready\(\);\s*\n\s*if \(typeof StaffAuthHelper === 'undefined' \|\| !StaffAuthHelper\.isLoggedIn\(\)\)/],
         ['pages/js/transfer-detail.js', /StaffAuthHelper\.ready\(\) : Promise\.resolve\(\)\)\.then\(loadUser\)/],
     ])('%s', (file, re) => {
@@ -88,7 +87,7 @@ describe('pages that read identity at init await the hydration', () => {
     });
     test.each([
         'dashboards/nika-crm.html', 'dashboards/taneisha-crm.html', 'pages/art-request-detail.html',
-        'pages/mockup-detail.html', 'pages/transfer-detail.html', 'dashboards/art-hub-steve.html', 'pages/quote-view.html', 'pages/quote-audit.html',
+        'pages/mockup-detail.html', 'pages/transfer-detail.html', 'dashboards/art-hub-steve.html', 'pages/quote-audit.html',
     ])('%s loads the helper', (file) => {
         expect(read(file)).toMatch(/staff-auth-helper\.js/);
     });

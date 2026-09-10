@@ -49,9 +49,8 @@ Quote-operation access rollout (2026-09-07) is archived in LESSONS_LEARNED_ARCHI
 - Solution: require every entered row/positive size to have current pricing; invalidate on edits, discard old responses, copy size maps, and use the same guard for Save and Print. Pending manual rows throw a visible error instead of falling back to AI data.
 - Prevention: controlled pending/failure/out-of-order tests plus browser assertions on actual readiness and posted money. Keep Save independent of customer/Push completeness; unused blank rows are allowed. EMB/SCP already recalculate before save; DTF computes from state.
 
-## Dialog text must stay readable during entrance motion (2026-09-08)
-- Problem/root cause: whole-dialog and toast opacity animations briefly blended text into its background; CI and the full local suite sampled low-contrast frames that focused runs missed.
-- Solution/prevention: animate position/scale only, and pause real preview/toast entry and dismissal animations mid-frame during the browser contrast check. Do not hide the failure with a fixed delay or weaken the accessibility assertion.
+## Dialog entrance contrast (2026-09-08, archived)
+Whole-dialog opacity blended text into its background; animate position/scale only and sample mid-animation. Full resolved entry in LESSONS_LEARNED_ARCHIVE.md.
 
 Transfer/Supacolor authentication migration (2026-09-08) is archived in LESSONS_LEARNED_ARCHIVE.md. Keep staff/vendor/customer boundaries and auth-before-large-parser checks; never infer identity from Origin.
 
@@ -255,3 +254,10 @@ Box-label follow-up (2026-09-10): a failed/new lookup must clear old printable d
 - Problem/root cause: share links lost k, URL/storage flags exposed staff controls, one-way hiding and cached storefront blobs kept stale addresses/art, carrier overrides preceded terminal shipment state, and print display rules forced RUSH onto every invoice.
 - Solution: verify server identity, preserve quote tokens, reset optional fields/caches per full load, separate tracking links from send controls, guard pending actions and terminal shipments, use shared hidden state and named native dialogs with explicit trigger-focus restoration.
 - Prevention: original source/money/payload locks, fresh-versus-refreshed fixtures, delayed/failure/retry/duplicate cases, actual rush/cancelled paper, radio-group keyboard order and visual service-label review. Native showModal moves focus before shared helpers can capture the trigger; capture the trigger beforehand.
+
+### Quote documents need calendar dates, server identity and complete paper (2026-09-10)
+- Problem/root cause: invoice links dropped quote tokens, stale storage exposed staff controls, UTC parsing shifted requested calendar dates, and failed supplemental/sync reads left silent stale information. Wide tables hid money/sizes on phones and whole-table print avoidance created empty paper.
+- Solution: retain k through navigation, verify current server identity, format only calendar business dates locally, retain refresh warnings through print/retry, use labelled mobile cells, row-level paper pagination and native named dialogs with explicit focus return. Pending financial actions reject duplicates and expose errors inside the active dialog.
+- Prevention: freeze original values, request bodies and source hashes; compare rendered totals (the renderer replaces initial placeholder IDs), all four widths/axe, delayed/error/retry/keyboard paths, actual lazy art imports and every PDF page. Keep shared builder-print and garment-form owners unchanged until their other consumers migrate.
+
+Control-class follow-up: regex word boundaries treat hyphens as separators, so sw-action-btn falsely matches a check for the canonical btn class. Compare whitespace-delimited class tokens, assert real rendered target sizes, and inspect staff toolbars as well as public actions.

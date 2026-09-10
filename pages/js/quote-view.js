@@ -95,11 +95,7 @@ class QuoteViewPage {
             const cell = e.target.closest('[data-qv-group]');
             if (cell) this.openProductModal(Number(cell.dataset.qvGroup));
         });
-        document.addEventListener('keydown', (e) => {
-            if (e.key !== 'Enter' && e.key !== ' ') return;
-            const cell = e.target && e.target.closest && e.target.closest('[data-qv-group]');
-            if (cell) { e.preventDefault(); this.openProductModal(Number(cell.dataset.qvGroup)); }
-        });
+
 
         this.init();
     }
@@ -128,11 +124,18 @@ class QuoteViewPage {
         // (ShopWorks sync, push internals) on a customer's quote with no auth.
         // A bookmarked / new-tab open has no sessionStorage yet — let the helper ask the
         // SAML session first, or staff saw the customer view of their own quote (2026-09-05).
-        if (typeof StaffAuthHelper !== 'undefined' && StaffAuthHelper.ready) await StaffAuthHelper.ready();
-        this.isStaff = (typeof StaffAuthHelper !== 'undefined' && StaffAuthHelper.isLoggedIn());
+        this.isStaff = false;
+        try {
+            const response = await fetch('/api/crm-session/me', { credentials: 'same-origin' });
+            const me = response.ok ? await response.json() : null;
+            this.isStaff = !!(me && me.authenticated !== false && (me.name || me.email));
+        } catch (_) { /* Staff controls stay hidden without a verified session. */ }
+        document.getElementById('sw-actions-row').hidden = !this.isStaff;
+        document.getElementById('quote-retry').addEventListener('click', () => window.location.reload());
 
         // Load quote data
         await this.loadQuote();
+        if (!this.quoteData) return;
 
         // Customer-view beacon (2026-06-10): record that the customer opened this
         // quote so reps see "Viewed" on it. Staff browsers are excluded two ways:
@@ -162,7 +165,7 @@ class QuoteViewPage {
         // Wire the "Open as Invoice" link to the matching /invoice/:quoteId URL.
         const invLink = document.getElementById('open-invoice-link');
         if (invLink && this.quoteId) {
-            invLink.href = `/invoice/${encodeURIComponent(this.quoteId)}`;
+            invLink.href = `/invoice/${encodeURIComponent(this.quoteId)}${this.shareTokenParam()}`;
         }
 
         // ShopWorks sync strip (Erik 2026-05-21).
@@ -324,14 +327,14 @@ class QuoteViewPage {
         const salesRep = this.quoteData.SalesRepName || this.quoteData.SalesRep || '';
         if (salesRep) {
             document.getElementById('sales-rep').textContent = salesRep;
-            document.getElementById('sales-rep-row').style.display = 'flex';
+            document.getElementById('sales-rep-row').hidden = false;
         }
 
         // PO Number (if available)
         const poNumber = this.quoteData.PurchaseOrderNumber || '';
         if (poNumber) {
             document.getElementById('po-number-display').textContent = poNumber;
-            document.getElementById('po-number-row').style.display = 'block';
+            document.getElementById('po-number-row').hidden = false;
         }
 
         // Phase 8 (2026-05-14): CEMB quotes get a layout swap —
@@ -355,7 +358,7 @@ class QuoteViewPage {
                     document.getElementById('customer-billing-address').textContent = billAddr;
                     const billCityLine = [billCity, billState].filter(Boolean).join(', ') + (billZip ? ' ' + billZip : '');
                     document.getElementById('customer-billing-city-state').textContent = billCityLine;
-                    billBlock.style.display = 'block';
+                    billBlock.hidden = false;
                 }
             }
         }
@@ -389,12 +392,12 @@ class QuoteViewPage {
                 if (isCEMBPickup) {
                     // Show only "Customer Pickup" italic — no address, no Via row
                     document.getElementById('ship-to-address').innerHTML =
-                        '<em style="color: #64748b;">Customer Pickup</em>';
+                        '<em class="qv-muted">Customer Pickup</em>';
                     document.getElementById('ship-to-city-state').textContent = '';
                     // Method row stays empty (the "Customer Pickup" line already conveys it)
                 } else if (isCEMBSameAsBilling) {
                     document.getElementById('ship-to-address').innerHTML =
-                        '<em style="color: #64748b;">Same as billing</em>';
+                        '<em class="qv-muted">Same as billing</em>';
                     document.getElementById('ship-to-city-state').textContent = '';
                     document.getElementById('ship-to-method').textContent = 'Via: ' + shipMethod;
                 } else {
@@ -424,18 +427,18 @@ class QuoteViewPage {
                             const link = this.getTrackingLink(c, tn);
                             const carrierLabel = c ? ' (' + this.escapeHtml(c) + ')' : '';
                             if (link) {
-                                return `<a href="${this.escapeHtml(link)}" target="_blank" rel="noopener" style="color:#4f46e5; text-decoration:underline;">${this.escapeHtml(tn)}</a>${carrierLabel}`;
+                                return `<a href="${this.escapeHtml(link)}" target="_blank" rel="noopener" class="qv-tracking-link">${this.escapeHtml(tn)}</a>${carrierLabel}`;
                             }
                             return `${this.escapeHtml(tn)}${carrierLabel}`;
                         }).filter(f => f);
                         if (fragments.length) {
                             trackingEl.innerHTML = 'Tracking: ' + fragments.join('<br>Tracking: ');
-                            trackingEl.style.display = 'block';
+                            trackingEl.hidden = false;
                         }
                     }
                 }
 
-                shipCard.style.display = 'block';
+                shipCard.hidden = false;
             }
         }
 
@@ -443,33 +446,33 @@ class QuoteViewPage {
         const orderNumber = this.quoteData.OrderNumber || '';
         if (orderNumber) {
             document.getElementById('order-number').textContent = orderNumber;
-            document.getElementById('order-number-row').style.display = 'flex';
+            document.getElementById('order-number-row').hidden = false;
         }
 
         // Req Ship Date (if available)
         const reqShipDate = this.quoteData.ReqShipDate || '';
         if (reqShipDate) {
-            document.getElementById('req-ship-date').textContent = this.formatDate(reqShipDate);
-            document.getElementById('req-ship-date-row').style.display = 'flex';
+            document.getElementById('req-ship-date').textContent = this.formatBusinessDate(reqShipDate);
+            document.getElementById('req-ship-date-row').hidden = false;
         }
 
         // Drop Dead Date (if available)
         const dropDeadDate = this.quoteData.DropDeadDate || '';
         if (dropDeadDate) {
-            document.getElementById('drop-dead-date').textContent = this.formatDate(dropDeadDate);
-            document.getElementById('drop-dead-date-row').style.display = 'flex';
+            document.getElementById('drop-dead-date').textContent = this.formatBusinessDate(dropDeadDate);
+            document.getElementById('drop-dead-date-row').hidden = false;
         }
 
         // Customer Number (if available)
         if (this.quoteData.CustomerNumber) {
             document.getElementById('customer-number-display').textContent = this.quoteData.CustomerNumber;
-            document.getElementById('customer-number-row').style.display = 'flex';
+            document.getElementById('customer-number-row').hidden = false;
         }
 
         // Payment Terms (if available)
         if (this.quoteData.PaymentTerms) {
             document.getElementById('payment-terms').textContent = this.quoteData.PaymentTerms;
-            document.getElementById('payment-terms-row').style.display = 'flex';
+            document.getElementById('payment-terms-row').hidden = false;
         }
 
         // Revision info (if quote has been revised)
@@ -477,14 +480,14 @@ class QuoteViewPage {
             const revisionRow = document.getElementById('revision-row');
             if (revisionRow) {
                 document.getElementById('revised-date').textContent = this.formatDate(this.quoteData.RevisedAt);
-                revisionRow.style.display = 'flex';
+                revisionRow.hidden = false;
             }
         }
 
         // Check expiration — a paid storefront order is DONE, not expired,
         // once its 30-day quote window lapses.
         if (this.isExpired() && !this._storefrontPaidInfo()) {
-            document.getElementById('expired-banner').style.display = 'flex';
+            document.getElementById('expired-banner').hidden = false;
             document.getElementById('accept-quote-btn').disabled = true;
             document.getElementById('accept-quote-btn').title = 'Quote has expired';
         }
@@ -499,7 +502,7 @@ class QuoteViewPage {
         // order they already paid for at checkout.
         if (this._storefrontPaidInfo()) {
             const acceptBtn = document.getElementById('accept-quote-btn');
-            if (acceptBtn) acceptBtn.style.display = 'none';
+            if (acceptBtn) acceptBtn.hidden = true;
         }
 
         // Render DTF specs section if applicable
@@ -608,7 +611,7 @@ class QuoteViewPage {
         if (specsTitle) specsTitle.textContent = 'Transfer Specifications';
 
         // Show the section and populate it (with fallback for missing location data)
-        specsSection.style.display = 'block';
+        specsSection.hidden = false;
         if (!locationCodes && !locationNames) {
             specsContainer.innerHTML = '<div class="dtf-location-item">• Transfer locations not specified</div>';
         } else {
@@ -702,7 +705,7 @@ class QuoteViewPage {
         const isDark = notes.isDarkGarment;
         const hasSafety = notes.hasSafetyStripes;
         if (isDark || hasSafety) {
-            html += '<div class="dtf-location-item" style="margin-top: 8px; font-size: 12px; color: #666;">';
+            html += '<div class="dtf-location-item qv-spec-note">';
             if (isDark) html += '• Dark garment (includes underbase)';
             if (hasSafety) html += '• Safety stripes included';
             html += '</div>';
@@ -715,7 +718,7 @@ class QuoteViewPage {
         if (specsTitle) specsTitle.textContent = 'Screen Print Specifications';
 
         // Show the section with fallback message if no location data
-        specsSection.style.display = 'block';
+        specsSection.hidden = false;
         if (!html) {
             specsContainer.innerHTML = '<div class="dtf-location-item">• Print locations not specified</div>';
         } else {
@@ -750,18 +753,17 @@ class QuoteViewPage {
             const label = document.createElement('strong');
             label.textContent = 'Customer notes (typed at checkout):';
             const body = document.createElement('div');
-            body.style.whiteSpace = 'pre-wrap';   // keep the customer's line breaks/tabs
-            body.style.marginTop = '4px';
+            body.classList.add('qv-note-body');
             body.textContent = cn;
             content.innerHTML = '';
             content.appendChild(label);
             content.appendChild(body);
-            section.style.display = 'block';
+            section.hidden = false;
             return;
         }
 
         content.textContent = rawNotes;
-        section.style.display = 'block';
+        section.hidden = false;
     }
 
     /**
@@ -779,10 +781,10 @@ class QuoteViewPage {
             if (Array.isArray(designs) && designs.length > 0) {
                 const designHtml = designs.map(d => this.escapeHtml(d)).join('<br>');
                 const block = document.createElement('div');
-                block.style.marginTop = '12px';
+                block.classList.add('qv-design-note');
                 block.innerHTML = `<strong>Design References:</strong><br>${designHtml}`;
                 content.appendChild(block);
-                section.style.display = 'block';
+                section.hidden = false;
             }
         }
 
@@ -790,20 +792,20 @@ class QuoteViewPage {
         const digCodes = this.quoteData?.DigitizingCodes;
         if (digCodes) {
             const block = document.createElement('div');
-            block.style.marginTop = '8px';
+            block.classList.add('qv-design-detail');
             block.innerHTML = `<strong>Digitizing:</strong> ${this.escapeHtml(digCodes)}`;
             content.appendChild(block);
-            section.style.display = 'block';
+            section.hidden = false;
         }
 
         // Order Notes (from ShopWorks Note section)
         const orderNotes = this.quoteData?.OrderNotes;
         if (orderNotes) {
             const block = document.createElement('div');
-            block.style.cssText = 'margin-top: 12px; padding-top: 8px; border-top: 1px solid #e5e7eb;';
+            block.classList.add('qv-design-divider');
             block.innerHTML = `<strong>Order Notes:</strong><br>${this.escapeHtml(orderNotes).replace(/\n/g, '<br>')}`;
             content.appendChild(block);
-            section.style.display = 'block';
+            section.hidden = false;
         }
     }
 
@@ -940,7 +942,7 @@ class QuoteViewPage {
 
         // Build compact table HTML (no Description column)
         html += `
-            <div class="product-table-wrapper">
+            <div class="product-table-wrapper" role="region" aria-label="Quoted items, sizes and prices">
                 <table class="product-table compact">
                     <thead>
                         <tr>
@@ -995,10 +997,9 @@ class QuoteViewPage {
 
         // Add product detail modal container
         html += `
-            <div id="product-modal" class="product-modal hidden">
-                <div class="product-modal-backdrop" data-qv-close-modal></div>
+            <dialog id="product-modal" class="ui-dialog qv-dialog product-modal" aria-label="Product details">
                 <div class="product-modal-content">
-                    <button type="button" class="product-modal-close" data-qv-close-modal aria-label="Close">&times;</button>
+                    <button type="button" class="product-modal-close btn" data-qv-close-modal aria-label="Close">&times;</button>
                     <div class="product-modal-body">
                         <img id="modal-product-image" class="product-modal-image" src="" alt="">
                         <div class="product-modal-details">
@@ -1008,10 +1009,22 @@ class QuoteViewPage {
                         </div>
                     </div>
                 </div>
-            </div>
+            </dialog>
         `;
 
         container.innerHTML = html;
+        const table = container.querySelector('.product-table');
+        const headings = [...table.querySelectorAll('th')].map(th => {
+            th.scope = 'col';
+            return th.textContent.trim();
+        });
+        table.querySelectorAll('tbody tr').forEach(row => {
+            let column = 0;
+            [...row.cells].forEach(cell => {
+                cell.dataset.label = column === 1 && (row.classList.contains('customer-supplied-row') || cell.classList.contains('fee-desc')) ? 'Description' : (headings[column] || '');
+                column += cell.colSpan;
+            });
+        });
 
         // Store reference for modal access
         window.quoteViewPage = this;
@@ -1029,10 +1042,10 @@ class QuoteViewPage {
                 if (imgElement) {
                     imgElement.src = imageUrl;
                     imgElement.onload = function() {
-                        this.style.opacity = '1';
+                        this.classList.add('is-loaded');
                     };
                     imgElement.onerror = function() {
-                        this.style.display = 'none';
+                        this.hidden = true;
                     };
                 }
             }
@@ -1120,14 +1133,14 @@ class QuoteViewPage {
             const garmentDesign = this.quoteData?.GarmentDesignNumber;
             const capDesign = this.quoteData?.CapDesignNumber;
             if (garmentDesign) {
-                html += `<div class="emb-detail" style="display:flex;align-items:center;gap:8px;">
-                    <span id="qv-garment-thumb" style="display:none;"></span>
+                html += `<div class="emb-detail qv-design-reference">
+                    <span id="qv-garment-thumb" hidden></span>
                     <span><span class="emb-label">Garment Design:</span> <span class="emb-value">#${this.escapeHtml(garmentDesign)}</span></span>
                 </div>`;
             }
             if (capDesign && capDesign !== garmentDesign) {
-                html += `<div class="emb-detail" style="display:flex;align-items:center;gap:8px;">
-                    <span id="qv-cap-thumb" style="display:none;"></span>
+                html += `<div class="emb-detail qv-design-reference">
+                    <span id="qv-cap-thumb" hidden></span>
                     <span><span class="emb-label">Cap Design:</span> <span class="emb-value">#${this.escapeHtml(capDesign)}</span></span>
                 </div>`;
             }
@@ -1238,9 +1251,7 @@ class QuoteViewPage {
             const isCap = styleMeta.isCap;
             const isFee = !!styleMeta.isFee;
             // Tints: slate for fees (HW, LTM), blue for caps, amber for garments/back
-            const bg     = isFee ? '#f1f5f9' : (isCap ? '#eff6ff' : '#fffbeb');
-            const ink    = isFee ? '#334155' : (isCap ? '#1e40af' : '#92400e');
-            const subInk = isFee ? '#64748b' : (isCap ? '#3b82f6' : '#b45309');
+            const categoryClass = isFee ? 'qv-service-fee' : (isCap ? 'qv-service-cap' : 'qv-service-garment');
 
             // Trim redundant location prefix on DTG location rows:
             // "Left Chest DTG print" → "DTG print" once the label column
@@ -1257,13 +1268,13 @@ class QuoteViewPage {
             else if (DTG_LOCATION_SKUS.has(styleNumber)) sizeColPlaceholder = 'DTG print';
 
             html += `
-                <tr class="customer-supplied-row" style="background: ${bg};">
-                    <td class="style-col" style="font-weight: 600; color: ${ink};">
+                <tr class="customer-supplied-row ${categoryClass}">
+                    <td class="style-col qv-service-label">
                         <div>${this.escapeHtml(displayLabel)}</div>
-                        <div style="font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 10px; font-weight: 500; color: ${subInk}; opacity: 0.75; margin-top: 2px; letter-spacing: 0.03em;">${this.escapeHtml(displaySku)}</div>
+                        <div class="qv-service-sku">${this.escapeHtml(displaySku)}</div>
                     </td>
-                    <td class="color-col" style="font-size: 11px;">${this.escapeHtml(description)}</td>
-                    ${this.hideSizeColumns ? '' : `<td class="size-col" colspan="6" style="text-align: center; color: #94a3b8; font-size: 10px; font-style: italic;">
+                    <td class="color-col qv-item-description">${this.escapeHtml(description)}</td>
+                    ${this.hideSizeColumns ? '' : `<td class="size-col qv-service-size" colspan="6">
                         ${this.escapeHtml(sizeColPlaceholder)}
                     </td>`}
                     <td class="qty-col">${qty}</td>
@@ -1522,8 +1533,7 @@ class QuoteViewPage {
         modalStyle.textContent = group.styleNumber;
         modalColor.textContent = group.color;
 
-        modal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
+        this.openDialog(modal, () => this.closeProductModal());
     }
 
     /**
@@ -1531,8 +1541,7 @@ class QuoteViewPage {
      */
     closeProductModal() {
         const modal = document.getElementById('product-modal');
-        modal.classList.add('hidden');
-        document.body.style.overflow = '';
+        this.closeDialog(modal);
     }
 
     /**
@@ -1694,11 +1703,11 @@ class QuoteViewPage {
         let styleCell;
         if (isFirstRow) {
             styleCell = `
-                <td class="style-col clickable" data-qv-group="${groupIndex}" role="button" tabindex="0" aria-label="Show product details">
-                    <div class="style-with-image">
+                <td class="style-col clickable">
+                    <button type="button" class="qv-product-detail style-with-image" data-qv-group="${groupIndex}" aria-label="Show product details">
                         <img id="product-image-${groupIndex}" class="product-thumb" src="${QV_PLACEHOLDER_IMG}" alt="${this.escapeHtml(row.style)}">
                         <span>${this.escapeHtml(row.style)} - ${this.escapeHtml(row.description || '')}</span>
-                    </div>
+                    </button>
                 </td>
             `;
         } else {
@@ -1964,7 +1973,7 @@ class QuoteViewPage {
     showAcceptedState() {
         // Show accepted banner
         const acceptedBanner = document.getElementById('accepted-banner');
-        acceptedBanner.style.display = 'flex';
+        acceptedBanner.hidden = false;
 
         // Parse acceptance info from Notes JSON (since Caspio doesn't have AcceptedAt field)
         let acceptedDate = '';
@@ -1985,7 +1994,7 @@ class QuoteViewPage {
         acceptedInfo.textContent = `Accepted on ${acceptedDate}${acceptedBy ? ` by ${acceptedBy}` : ''}${acceptedDm ? ` · ${acceptedDm}` : ''}`;
 
         // Hide accept button
-        document.getElementById('accept-quote-btn').style.display = 'none';
+        document.getElementById('accept-quote-btn').hidden = true;
     }
 
     // ====================================================================
@@ -2000,21 +2009,28 @@ class QuoteViewPage {
     // ====================================================================
 
     async setupShopWorksSyncStrip() {
+        if (this._fullPending) return;
+        this._fullPending = true;
+        const retry = document.getElementById('quote-data-retry');
+        retry.disabled = true;
         // Fetch the merged /full endpoint which includes the parsed
         // ShopWorks_Snapshot. Used for the sync pill + (Phase 4b+) all
         // the ShopWorks-mirrored sections.
         try {
             const r = await fetch(`/api/quote-sessions/${this.quoteId}/full${this.shareTokenParam()}`);
             if (!r.ok) {
-                // 404 or 500 — the page already rendered from /api/public/quote
-                // so this is non-fatal. Hide the strip and move on.
-                return;
+                throw new Error('HTTP ' + r.status);
             }
             this.fullData = await r.json();
         } catch (e) {
             console.warn('[QuoteView/sync] /full fetch failed:', e.message);
+            this.showDataWarning('Current order details could not be loaded. Showing the saved quote; order status and adjustments may be out of date.');
             return;
+        } finally {
+            this._fullPending = false;
+            retry.disabled = false;
         }
+        this.showDataWarning('');
 
         // Render the strip from initial data.
         this.renderSyncStrip(this.fullData);
@@ -2027,18 +2043,23 @@ class QuoteViewPage {
 
         // Wire the manual Refresh button.
         const btn = document.getElementById('sw-sync-refresh-btn');
-        if (btn) {
+        if (btn && !this._syncStripWired) {
+            this._syncStripWired = true;
             btn.addEventListener('click', () => this.syncFromShopWorks({ manual: true }));
         }
 
         // Manual ShopWorks Order # entry (workaround for /v1/getorderno gap)
-        this._setupManualWoStrip();
+        if (!this._manualStripWired) {
+            this._manualStripWired = true;
+            this._setupManualWoStrip();
+        }
+        this._toggleManualWoStrip();
 
         // Auto-sync in the background if data is stale (> 30 min since last
         // pull) AND the quote has been processed (in MO somewhere).
         const sw = this.fullData?.shopWorks;
         const status = this.fullData?.status || '';
-        if ((status === 'Processed' || status === 'Processed - ShopWorks Failed')) {
+        if (this.isStaff && (status === 'Processed' || status === 'Processed - ShopWorks Failed')) {
             const lastSynced = sw?.lastSynced ? new Date(sw.lastSynced) : null;
             const minutesStale = lastSynced ? (Date.now() - lastSynced.getTime()) / 60000 : Infinity;
             if (minutesStale > 30) {
@@ -2097,9 +2118,9 @@ class QuoteViewPage {
         }
 
         const palette = {
-            info:     { bg: '#eff6ff', border: '#3b82f6', color: '#1e40af', icon: '✏', headline: 'This order was edited in ShopWorks' },
-            warning:  { bg: '#fffbeb', border: '#f59e0b', color: '#92400e', icon: '⚠', headline: 'This order has changes that need review' },
-            critical: { bg: '#fef2f2', border: '#dc2626', color: '#991b1b', icon: '🚨', headline: 'CRITICAL — ShopWorks made changes' },
+            info:     { icon: '✏', headline: 'This order was edited in ShopWorks' },
+            warning:  { icon: '⚠', headline: 'This order has changes that need review' },
+            critical: { icon: '🚨', headline: 'CRITICAL — ShopWorks made changes' },
         }[maxSev];
 
         const top3 = records.slice(0, 3);
@@ -2109,31 +2130,29 @@ class QuoteViewPage {
         const banner = document.createElement('div');
         banner.id = 'sw-change-banner';
         banner.className = 'sw-change-banner';
-        banner.style.cssText =
-            `margin:8px 0;padding:12px 16px;border:1px solid ${palette.border};` +
-            `background:${palette.bg};color:${palette.color};border-radius:6px;font-size:14px;line-height:1.5;`;
+        banner.classList.add('qv-change-' + maxSev);
 
         const ids = records.map(r => r.PK_ID).filter(Boolean);
         const summaryRows = top3.map(r => `<li>${this.escapeHtml(this._humanizeChange(r))}</li>`).join('');
         const detailsRows = hasMore
-            ? records.map(r => `<li style="margin-bottom:4px;"><span style="opacity:0.7;font-size:12px;">${this._formatRelativeTime(r.ChangedAt)}</span> &middot; ${this.escapeHtml(this._humanizeChange(r))}</li>`).join('')
+            ? records.map(r => `<li class="qv-change-item"><span class="qv-change-time">${this._formatRelativeTime(r.ChangedAt)}</span> &middot; ${this.escapeHtml(this._humanizeChange(r))}</li>`).join('')
             : '';
 
         banner.innerHTML = `
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
-                <strong style="font-size:15px;">${palette.icon} ${palette.headline} &middot; ${records.length} change${records.length === 1 ? '' : 's'} (most recent ${this.escapeHtml(newestAgo)})</strong>
+            <div class="qv-change-heading">
+                <strong class="qv-change-title">${palette.icon} ${palette.headline} &middot; ${records.length} change${records.length === 1 ? '' : 's'} (most recent ${this.escapeHtml(newestAgo)})</strong>
                 <div>
                     <button type="button" id="sw-change-banner-ack" data-change-ids="${ids.join(',')}"
-                            style="background:${palette.color};color:#fff;border:0;padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;font-weight:600;">
+                            class="btn btn-primary">
                         Mark all as seen
                     </button>
                 </div>
             </div>
-            <ul style="margin:8px 0 0 0;padding-left:20px;">${summaryRows}</ul>
+            <ul class="qv-change-list">${summaryRows}</ul>
             ${hasMore ? `
-                <details style="margin-top:8px;">
-                    <summary style="cursor:pointer;font-size:13px;font-weight:600;opacity:0.85;">View full history (${records.length})</summary>
-                    <ul style="margin:8px 0 0 0;padding-left:20px;">${detailsRows}</ul>
+                <details class="qv-change-details">
+                    <summary class="qv-change-summary">View full history (${records.length})</summary>
+                    <ul class="qv-change-list">${detailsRows}</ul>
                 </details>
             ` : ''}
         `;
@@ -2166,14 +2185,13 @@ class QuoteViewPage {
             // Fade out the banner
             const banner = document.getElementById('sw-change-banner');
             if (banner) {
-                banner.style.transition = 'opacity 0.3s';
-                banner.style.opacity = '0';
+                banner.classList.add('is-dismissed');
                 setTimeout(() => banner.remove(), 320);
             }
         } catch (e) {
             console.error('[change-log] acknowledge failed:', e);
             if (btn) { btn.disabled = false; btn.textContent = 'Mark all as seen'; }
-            ToastNotifications.error('Failed to acknowledge changes: ' + e.message);
+            window.ToastNotifications.error('Failed to acknowledge changes: ' + e.message);
         }
     }
 
@@ -2238,6 +2256,9 @@ class QuoteViewPage {
     }
 
     async syncFromShopWorks({ manual = false, shopWorksOrderNumber = null } = {}) {
+        if (!this.isStaff || this._syncPending) return;
+        this._syncPending = true;
+        document.getElementById('quote-data-retry').disabled = true;
         const btn = document.getElementById('sw-sync-refresh-btn');
         const pillText = document.getElementById('sw-sync-pill-text');
         const pillIcon = document.getElementById('sw-sync-pill-icon');
@@ -2269,7 +2290,7 @@ class QuoteViewPage {
             // so the new "CANCELLED IN SHOPWORKS" banner renders in place.
             if (result.deleted) {
                 if (manual) {
-                    ToastNotifications.info(`Order ${this.quoteId} was deleted in ShopWorks. This quote is now marked Cancelled and will be retained for 30 days.`);
+                    window.ToastNotifications.info(`Order ${this.quoteId} was deleted in ShopWorks. This quote is now marked Cancelled and will be retained for 30 days.`);
                 }
                 window.location.reload();
                 return;
@@ -2285,6 +2306,7 @@ class QuoteViewPage {
                     snapshot: result.snapshot || null,
                 },
             };
+            this.showDataWarning('');
             this.renderSyncStrip(this.fullData);
             this._toggleManualWoStrip();
 
@@ -2301,11 +2323,14 @@ class QuoteViewPage {
             }
         } catch (e) {
             console.warn('[QuoteView/sync] sync failed:', e.message);
+            this.showDataWarning('ShopWorks could not be refreshed. Showing the last loaded details; amounts and order status may be out of date.', true);
             if (manual && pillText) {
                 pillText.textContent = 'Sync failed — try again';
                 if (pillIcon) pillIcon.textContent = '⚠';
             }
         } finally {
+            this._syncPending = false;
+            document.getElementById('quote-data-retry').disabled = false;
             if (btn) {
                 btn.disabled = false;
                 btn.classList.remove('sw-sync-refresh-btn--loading');
@@ -2332,18 +2357,18 @@ class QuoteViewPage {
                     ? ' — Order deleted in ShopWorks on ' + this.formatDate(ts) + '. This record will be purged after 30 days.'
                     : ' — Order was deleted in ShopWorks. This record will be purged after 30 days.';
             }
-            cancelledBanner.style.display = 'flex';
-            strip.style.display = 'none';
+            cancelledBanner.hidden = false;
+            strip.hidden = true;
             return;
         }
-        if (cancelledBanner) cancelledBanner.style.display = 'none';
+        if (cancelledBanner) cancelledBanner.hidden = true;
 
         // Hide the strip on legacy quotes (never pushed, no sync info available).
         if (!isProcessed && !sw) {
-            strip.style.display = 'none';
+            strip.hidden = true;
             return;
         }
-        strip.style.display = 'flex';
+        strip.hidden = false;
 
         const pill = document.getElementById('sw-sync-pill');
         const pillText = document.getElementById('sw-sync-pill-text');
@@ -2399,7 +2424,7 @@ class QuoteViewPage {
             const raw = (input.value || '').trim();
             const n = Number(raw);
             if (!Number.isInteger(n) || n <= 0 || n > 9999999) {
-                ToastNotifications.error('Please enter a valid ShopWorks Order # (numeric, e.g. 141899)');
+                window.ToastNotifications.error('Please enter a valid ShopWorks Order # (numeric, e.g. 141899)');
                 input.focus();
                 return;
             }
@@ -2430,7 +2455,7 @@ class QuoteViewPage {
         const status = this.fullData?.status || '';
         const isProcessed = status === 'Processed' || status === 'Processed - ShopWorks Failed';
         const hasWoNumber = !!(sw?.orderNumber);
-        strip.style.display = (this.isStaff && isProcessed && !hasWoNumber) ? 'block' : 'none';
+        strip.hidden = ((this.isStaff && isProcessed && !hasWoNumber) ? 'block' : 'none') === 'none';
     }
 
     _formatRelativeTime(isoOrDate) {
@@ -2481,14 +2506,14 @@ class QuoteViewPage {
         if (order.CustomerPurchaseOrder) {
             this._overrideField('po-number-display', order.CustomerPurchaseOrder);
             const poRow = document.getElementById('po-number-row');
-            if (poRow) poRow.style.display = 'block';
+            if (poRow) poRow.hidden = false;
         }
 
         // Order # (ShopWorks WO#) — reveal the conditional row
         if (order.id_Order) {
             this._overrideField('order-number', String(order.id_Order));
             const row = document.getElementById('order-number-row');
-            if (row) row.style.display = 'flex';
+            if (row) row.hidden = false;
 
             // A3 (2026-05-22): also append the WO# inline to the hero header
             // so the first thing on the page reads "Quote #OF-0050 · WO #141918".
@@ -2504,28 +2529,28 @@ class QuoteViewPage {
         if (order.CustomerServiceRep) {
             this._overrideField('sales-rep', order.CustomerServiceRep);
             const row = document.getElementById('sales-rep-row');
-            if (row) row.style.display = 'flex';
+            if (row) row.hidden = false;
         }
 
         // Date fields (ShopWorks uses ISO dates or "MM/DD/YYYY" format)
         if (order.date_RequestedToShip) {
             this._overrideField('req-ship-date', this.formatShopWorksDate(order.date_RequestedToShip));
             const row = document.getElementById('req-ship-date-row');
-            if (row) row.style.display = 'flex';
+            if (row) row.hidden = false;
         }
         // Drop Dead Date — ShopWorks field name varies; try several
         const dropDead = order.date_DropDead || order.date_OrderDropDead || order.DropDeadDate;
         if (dropDead) {
             this._overrideField('drop-dead-date', this.formatShopWorksDate(dropDead));
             const row = document.getElementById('drop-dead-date-row');
-            if (row) row.style.display = 'flex';
+            if (row) row.hidden = false;
         }
 
         // Customer Number — id_Customer from ShopWorks
         if (order.id_Customer) {
             this._overrideField('customer-number-display', String(order.id_Customer));
             const row = document.getElementById('customer-number-row');
-            if (row) row.style.display = 'flex';
+            if (row) row.hidden = false;
         }
 
         // Mark fields visually as "from ShopWorks" so reps know what they're
@@ -2717,7 +2742,7 @@ class QuoteViewPage {
         }
 
         if (events.length === 0) {
-            section.style.display = 'none';
+            section.hidden = true;
             return;
         }
 
@@ -2740,7 +2765,7 @@ class QuoteViewPage {
         if (meta) {
             meta.textContent = `${events.length} event${events.length === 1 ? '' : 's'}`;
         }
-        section.style.display = 'block';
+        section.hidden = false;
     }
 
     _updateShipStationButton(order, snapshot) {
@@ -2749,7 +2774,7 @@ class QuoteViewPage {
 
         // Staff-only — customers viewing share links don't see this internal
         // ops button (same staff-check pattern as the rest of the page).
-        if (!this.isStaff) { btn.style.display = 'none'; return; }
+        if (!this.isStaff) { btn.hidden = true; return; }
 
         const ss = this.fullData?.shipStation;
         const pushedShip = (this.fullData?.shopWorks?.snapshot?.pushed?.ShippingAddresses || [])[0];
@@ -2758,27 +2783,27 @@ class QuoteViewPage {
 
         // Hide for pickup — no label needed
         if (methodLower.includes('pickup') || methodLower.includes('willcall')) {
-            btn.style.display = 'none';
+            btn.hidden = true;
             return;
         }
-        if (!order) { btn.style.display = 'none'; return; }
+        if (!order) { btn.hidden = true; return; }
 
-        const isShipped = ss && ss.status === 'shipped' && ss.trackingNumber;
+        const isShipped = ss && ss.status === 'shipped';
         const isInShipStation = ss && ss.orderId;
         const swProduced = Number(order?.sts_Produced);
 
         // Production-complete gate — see invoice.js for the rationale.
         if (!isShipped && !isInShipStation && swProduced !== 1) {
-            btn.style.display = 'inline-flex';
+            btn.hidden = false;
             btn.disabled = true;
             btn.innerHTML = '<span class="sw-action-icon">🕐</span> Waiting for production';
             btn.title = `Order isn't decorated yet (sts_Produced=${order?.sts_Produced ?? 'unknown'}). Enables when production marks complete.`;
             return;
         }
-        btn.style.display = 'inline-flex';
+        btn.hidden = false;
         if (isShipped) {
             btn.disabled = true;
-            btn.innerHTML = `<span class="sw-action-icon">📦</span> Shipped · ${this.escapeHtml(ss.trackingNumber)}`;
+            btn.innerHTML = `<span class="sw-action-icon">📦</span> Shipped · ${this.escapeHtml(ss.trackingNumber || 'Tracking pending')}`;
             btn.title = `Carrier: ${ss.trackingCarrier || 'unknown'}`;
             return;
         }
@@ -2819,7 +2844,7 @@ class QuoteViewPage {
             );
         } catch (err) {
             console.error('[quote-view] sendToShipStation failed:', err);
-            ToastNotifications.error(`Failed to send to ShipStation: ${err.message}`);
+            window.ToastNotifications.error(`Failed to send to ShipStation: ${err.message}`);
             btn.disabled = false;
             btn.innerHTML = originalHtml;
         }
@@ -2950,7 +2975,7 @@ class QuoteViewPage {
                     let sib = tr.nextElementSibling;
                     while (sib && sib.classList.contains('extended-row')) {
                         const next = sib.nextElementSibling;
-                        sib.style.display = 'none';
+                        sib.hidden = true;
                         sib.classList.add('sw-collapsed');
                         sib = next;
                     }
@@ -2997,11 +3022,11 @@ class QuoteViewPage {
         const banner = document.createElement('div');
         banner.id = 'sw-zero-price-warning';
         banner.className = 'sw-zero-price-warning';
-        banner.style.cssText = 'margin:8px 0;padding:10px 14px;border:1px solid #f59e0b;background:#fffbeb;color:#92400e;border-radius:6px;font-size:14px;line-height:1.4;';
+        banner.classList.add('qv-price-warning');
         banner.innerHTML = `
             <strong>⚠ ShopWorks shows $0 on ${zeroLines.length} line${zeroLines.length === 1 ? '' : 's'}</strong> —
             verify before invoicing.<br>
-            <span style="font-size:13px;opacity:0.85;">${this.escapeHtml(items)}</span>
+            <span class="qv-warning-detail">${this.escapeHtml(items)}</span>
         `;
 
         // Insert directly after the sync strip so it sits in the same
@@ -3027,6 +3052,9 @@ class QuoteViewPage {
         const list = document.createElement('div');
         list.id = 'sw-payments-list';
         list.className = 'sw-payments-list';
+        list.tabIndex = 0;
+        list.setAttribute('role', 'region');
+        list.setAttribute('aria-label', 'Payment history');
         list.innerHTML = `
             <h3 class="sw-payments-list-head">Payment History (${payments.length})</h3>
             <table class="sw-payments-table">
@@ -3120,7 +3148,7 @@ class QuoteViewPage {
             || this.fullData?.shopWorks?.orderNumber
             || this.quoteData?.ShopWorks_Order_Number;
         if (!woId) return; // not imported into ShopWorks yet → no WO# to look up
-        section.style.display = '';
+        section.hidden = false;
         body.innerHTML = '<span class="sw-vendor-loading">Checking SanMar…</span>';
         try {
             const r = await fetch(`/api/quote-sessions/${encodeURIComponent(this.quoteId)}/vendor-shipment?woId=${encodeURIComponent(woId)}${this.shareTokenParam('&')}`);
@@ -3186,7 +3214,7 @@ class QuoteViewPage {
 
         const original = this.fullData?.originalSubmission;
         if (!original) {
-            section.style.display = 'none';
+            section.hidden = true;
             return;
         }
 
@@ -3290,7 +3318,7 @@ class QuoteViewPage {
             ${lineItemsHtml}
         `;
 
-        section.style.display = 'block';
+        section.hidden = false;
     }
 
     _setupQuickActions() {
@@ -3322,7 +3350,7 @@ class QuoteViewPage {
                         copyBtn.classList.remove('sw-action-btn--success');
                     }, 1800);
                 } catch (e) {
-                    ToastNotifications.error('Copy failed — your browser blocked clipboard access. URL: ' + window.location.href);
+                    window.ToastNotifications.error('Copy failed — your browser blocked clipboard access. URL: ' + window.location.href);
                 }
             });
         }
@@ -3358,7 +3386,7 @@ class QuoteViewPage {
         }
         const stsClose = document.getElementById('sts-modal-close');
         const stsBackdrop = document.getElementById('sts-modal-backdrop');
-        const closeSts = () => { const m = document.getElementById('sts-modal'); if (m) m.style.display = 'none'; };
+        const closeSts = () => this.closeDialog(document.getElementById('sts-modal'));
         if (stsClose) stsClose.addEventListener('click', closeSts);
         if (stsBackdrop) stsBackdrop.addEventListener('click', closeSts);
     }
@@ -3373,13 +3401,16 @@ class QuoteViewPage {
         const btn = document.getElementById('sw-action-send-steve');
         if (!btn) return;
         const hasOrder = !!(this.isStaff && order && order.id_Order);
-        btn.style.display = hasOrder ? '' : 'none';
+        btn.hidden = (hasOrder ? '' : 'none') === 'none';
     }
 
     async _openSendToSteve() {
+        if (!this.isStaff || this._stevePending) return;
+        this._stevePending = true;
         const order = this._currentSnapshot && this._currentSnapshot.order;
         if (!order || !order.id_Order) {
-            ToastNotifications.error("This order isn't in ShopWorks yet. Sync the ShopWorks order first, then Send to Steve.");
+            window.ToastNotifications.error("This order isn't in ShopWorks yet. Sync the ShopWorks order first, then Send to Steve.");
+            this._stevePending = false;
             return;
         }
         const btn = document.getElementById('sw-action-send-steve');
@@ -3390,20 +3421,22 @@ class QuoteViewPage {
             if (typeof GarmentSubmitForm === 'undefined') throw new Error('art form bundle failed to load');
             const prefill = this._buildSteveArtPrefill();
             const modal = document.getElementById('sts-modal');
-            GarmentSubmitForm.init('sts-form-mount', {
+            window.GarmentSubmitForm.init('sts-form-mount', {
                 prefill: prefill,
                 onSubmitted: (designId) => {
-                    if (modal) modal.style.display = 'none';
-                    ToastNotifications.error(designId
+                    this.closeDialog(modal);
+                    window.ToastNotifications.error(designId
                         ? ('Sent to Steve — art request #' + designId + ' created.')
                         : 'Sent to Steve.');
                 }
             });
-            if (modal) modal.style.display = 'flex';
+            this.openDialog(modal, () => this.closeDialog(modal), '#sts-modal-close');
+            modal._qvReturnFocus = btn;
         } catch (err) {
             console.error('[quote-view] Send to Steve failed:', err);
-            ToastNotifications.error("Couldn't open Steve's form: " + (err && err.message ? err.message : 'unknown error'));
+            window.ToastNotifications.error("Couldn't open Steve's form: " + (err && err.message ? err.message : 'unknown error'));
         } finally {
+            this._stevePending = false;
             if (btn) { btn.disabled = false; btn.innerHTML = orig; }
         }
     }
@@ -3566,8 +3599,7 @@ class QuoteViewPage {
             // Don't overwrite the WO# pill — append a subtle indicator
             const ts = document.getElementById('sw-sync-timestamp');
             if (ts) {
-                ts.style.color = '#b45309';
-                ts.style.fontWeight = '600';
+                ts.classList.add('qv-sync-stale');
                 ts.title = 'Data is more than 24 hours old. Click Refresh for the latest from ShopWorks.';
             }
         }
@@ -3579,7 +3611,7 @@ class QuoteViewPage {
         // Bail if the order header has no financial data at all.
         const subtotal = Number(order.cur_SubTotal);
         if (!Number.isFinite(subtotal)) {
-            section.style.display = 'none';
+            section.hidden = true;
             return;
         }
 
@@ -3623,7 +3655,7 @@ class QuoteViewPage {
             }
         }
 
-        section.style.display = 'block';
+        section.hidden = false;
     }
 
     _renderBillingBlock(order) {
@@ -3655,7 +3687,7 @@ class QuoteViewPage {
             const line = [city, state].filter(Boolean).join(', ') + (zip ? ' ' + zip : '');
             cityStateEl.textContent = line.trim();
         }
-        block.style.display = 'block';
+        block.hidden = false;
     }
 
     _overrideField(elementId, value) {
@@ -3687,7 +3719,7 @@ class QuoteViewPage {
 
         // If no design at all (no pushed, no primary id_Design, no name) → hide.
         if (allPushedDesigns.length === 0 && !idDesign && !order.DesignName) {
-            section.style.display = 'none';
+            section.hidden = true;
             return;
         }
 
@@ -3792,7 +3824,7 @@ class QuoteViewPage {
         // push, which have no pushed Locations[].ImageURL art).
         this._loadDesignPanelThumbnails();
 
-        section.style.display = 'block';
+        section.hidden = false;
     }
 
     // One <td> per design row. ShopWorks design ids can carry a version
@@ -3927,9 +3959,8 @@ class QuoteViewPage {
                 const name = this.escapeHtml(logo.fileName);
                 const label = this.escapeHtml(logo.label);
                 const thumb = isImageName(logo.fileName)
-                    ? `<img src="${url}" alt="${label}" loading="lazy"
-                            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                       <div class="cust-art-thumb-icon" style="display:none;"><i class="fas fa-file" aria-hidden="true"></i></div>`
+                    ? `<img src="${url}" alt="${label}" loading="lazy">
+                       <div class="cust-art-thumb-icon" hidden><i class="fas fa-file" aria-hidden="true"></i></div>`
                     : `<div class="cust-art-thumb-icon"><i class="fas fa-file" aria-hidden="true"></i></div>`;
                 return `
                     <div class="cust-art-card">
@@ -3959,9 +3990,8 @@ class QuoteViewPage {
                 return `
                     <div class="cust-art-card">
                         <a class="cust-art-thumb" href="${url}" target="_blank" rel="noopener" title="Open full size in a new tab">
-                            <img src="${url}" alt="${label}" loading="lazy"
-                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                            <div class="cust-art-thumb-icon" style="display:none;"><i class="fas fa-file-image" aria-hidden="true"></i></div>
+                            <img src="${url}" alt="${label}" loading="lazy">
+                            <div class="cust-art-thumb-icon" hidden><i class="fas fa-file-image" aria-hidden="true"></i></div>
                         </a>
                         <div class="cust-art-meta">
                             <div class="cust-art-label">${label}</div>
@@ -4005,6 +4035,15 @@ class QuoteViewPage {
                 }
             }
             section.innerHTML = html;
+            section.querySelectorAll('.cust-art-thumb img').forEach(image => {
+                const fallback = () => {
+                    image.hidden = true;
+                    const placeholder = image.nextElementSibling;
+                    if (placeholder) { placeholder.hidden = false; placeholder.textContent = 'Preview unavailable — open the original file'; }
+                };
+                image.addEventListener('error', fallback);
+                if (image.complete && !image.naturalWidth) fallback();
+            });
         } catch (err) {
             // Never let artwork rendering break the rest of the quote page.
             console.warn('[quote-view] customer artwork render failed:', err);
@@ -4121,7 +4160,7 @@ class QuoteViewPage {
         }).join('');
 
         grid.innerHTML = cells;
-        section.style.display = 'block';
+        section.hidden = false;
     }
 
     _isStatusYes(raw) {
@@ -4148,7 +4187,7 @@ class QuoteViewPage {
         // the ShopWorks PDF's Notes To Production block (1 line per fact).
         const original = this.fullData?.originalSubmission;
         if (!original) {
-            section.style.display = 'none';
+            section.hidden = true;
             return;
         }
 
@@ -4194,18 +4233,18 @@ class QuoteViewPage {
         }
 
         if (lines.length === 0) {
-            section.style.display = 'none';
+            section.hidden = true;
             return;
         }
 
         list.innerHTML = lines.map(line => `<li>${this.escapeHtml(line)}</li>`).join('');
 
         if (footer) {
-            footer.style.display = 'block';
+            footer.hidden = false;
             footer.textContent = 'Notes as submitted. ShopWorks operators may have added more notes — open the order in ShopWorks to see the current full list.';
         }
 
-        section.style.display = 'block';
+        section.hidden = false;
     }
 
     _renderShippingPanel(order) {
@@ -4296,12 +4335,12 @@ class QuoteViewPage {
         }
 
         document.getElementById('sw-shipping-line1').textContent = addr1;
-        document.getElementById('sw-shipping-line1').style.display = addr1 ? 'block' : 'none';
+        document.getElementById('sw-shipping-line1').hidden = (addr1 ? 'block' : 'none') === 'none';
         document.getElementById('sw-shipping-line2').textContent = addr2;
-        document.getElementById('sw-shipping-line2').style.display = addr2 ? 'block' : 'none';
+        document.getElementById('sw-shipping-line2').hidden = (addr2 ? 'block' : 'none') === 'none';
         const cityLine = [city, state].filter(Boolean).join(', ') + (zip ? ' ' + zip : '');
         document.getElementById('sw-shipping-citystate').textContent = cityLine.trim();
-        document.getElementById('sw-shipping-citystate').style.display = cityLine.trim() ? 'block' : 'none';
+        document.getElementById('sw-shipping-citystate').hidden = (cityLine.trim() ? 'block' : 'none') === 'none';
         document.getElementById('sw-shipping-country').textContent = country;
 
         // Method label (UPS Ground / Customer Pickup / Priority Mail / etc.)
@@ -4318,9 +4357,9 @@ class QuoteViewPage {
         // If absolutely nothing useful to show (no submission data either),
         // hide the section.
         if (!recipient || recipient === '—') {
-            section.style.display = 'none';
+            section.hidden = true;
         } else {
-            section.style.display = 'block';
+            section.hidden = false;
         }
     }
 
@@ -4342,32 +4381,63 @@ class QuoteViewPage {
         // Success close
         document.getElementById('success-close').addEventListener('click', () => this.closeSuccessModal());
 
-        // Close modal on backdrop click
-        document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
-            backdrop.addEventListener('click', () => {
-                this.closeAcceptModal();
-                this.closeSuccessModal();
-            });
+        document.getElementById('accept-form').addEventListener('submit', event => {
+            event.preventDefault();
+            this.acceptQuote();
         });
+        document.getElementById('quote-data-retry').addEventListener('click', () => {
+            if (this._syncWarning) this.syncFromShopWorks({ manual: true });
+            else this.setupShopWorksSyncStrip();
+        });
+    }
 
-        // Close modal on Escape key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                this.closeAcceptModal();
-                this.closeSuccessModal();
-            }
-        });
+    openDialog(modal, dismiss, focus) {
+        if (!modal || modal.open) return;
+        const returnFocus = document.activeElement;
+        modal.hidden = false;
+        modal.showModal();
+        modal._qvReturnFocus = returnFocus;
+        modal._qvDismiss = dismiss;
+        if (!modal._qvWired) {
+            modal._qvWired = true;
+            modal.addEventListener('cancel', event => { event.preventDefault(); modal._qvDismiss(); });
+            modal.addEventListener('click', event => {
+                const bounds = modal.getBoundingClientRect();
+                if (event.target === modal && (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom)) modal._qvDismiss();
+            });
+        }
+        window.UiDialog.open(modal, { onDismiss: dismiss, focus });
+    }
+
+    closeDialog(modal) {
+        if (!modal || !modal.open) return;
+        window.UiDialog.close(modal);
+        modal.close();
+        const returnFocus = modal._qvReturnFocus;
+        if (returnFocus?.isConnected && !returnFocus.disabled) returnFocus.focus({ preventScroll: true });
+    }
+
+    showAcceptanceError(message) {
+        const error = document.getElementById('accept-error');
+        error.textContent = message;
+        error.hidden = !message;
+    }
+
+    showDataWarning(message, sync = false) {
+        this._syncWarning = sync;
+        document.getElementById('quote-data-warning-text').textContent = message;
+        document.getElementById('quote-data-warning').hidden = !message;
     }
 
     // Modal Methods
     openAcceptModal() {
         if (this.isExpired()) {
-            ToastNotifications.error('This quote has expired. Please contact us for updated pricing.');
+            window.ToastNotifications.error('This quote has expired. Please contact us for updated pricing.');
             return;
         }
 
         if (this.quoteData.Status === 'Accepted') {
-            ToastNotifications.error('This quote has already been accepted.');
+            window.ToastNotifications.error('This quote has already been accepted.');
             return;
         }
 
@@ -4383,18 +4453,23 @@ class QuoteViewPage {
             nameInput.value = this.quoteData.CustomerName;
         }
 
-        document.getElementById('accept-modal').style.display = 'flex';
+        this.showAcceptanceError('');
+        this.openDialog(document.getElementById('accept-modal'), () => this.closeAcceptModal(), '#accept-name');
     }
 
-    closeAcceptModal() {
-        document.getElementById('accept-modal').style.display = 'none';
+    closeAcceptModal(force = false) {
+        if (this._acceptPending && !force) return;
+        this.closeDialog(document.getElementById('accept-modal'));
     }
 
     closeSuccessModal() {
-        document.getElementById('success-modal').style.display = 'none';
+        this.closeDialog(document.getElementById('success-modal'));
+        document.getElementById('deposit-pay-btn')?.focus({ preventScroll: true });
     }
 
     async acceptQuote() {
+        if (this._acceptPending || this.quoteData?.Status === 'Accepted') return;
+        this.showAcceptanceError('');
         const nameInput = document.getElementById('accept-name');
         const emailInput = document.getElementById('accept-email');
         const acceptBtn = document.getElementById('modal-accept');
@@ -4407,13 +4482,13 @@ class QuoteViewPage {
         // Validation
         if (!name) {
             nameInput.focus();
-            ToastNotifications.error('Please enter your name');
+            this.showAcceptanceError('Please enter your name');
             return;
         }
 
         if (!email || !this.isValidEmail(email)) {
             emailInput.focus();
-            ToastNotifications.error('Please enter a valid email address');
+            this.showAcceptanceError('Please enter a valid email address');
             return;
         }
 
@@ -4423,14 +4498,17 @@ class QuoteViewPage {
         const dmInput = document.querySelector('input[name="deliveryMethod"]:checked');
         const deliveryMethod = dmInput ? dmInput.value : null;
         if (!deliveryMethod) {
-            ToastNotifications.error('Please choose pickup or shipping so we know how to get your order to you.');
+            this.showAcceptanceError('Please choose pickup or shipping so we know how to get your order to you.');
             return;
         }
 
         // Show loading state
+        this._acceptPending = true;
         acceptBtn.disabled = true;
-        btnText.style.display = 'none';
-        btnLoading.style.display = 'inline';
+        document.getElementById('modal-cancel').disabled = true;
+        document.getElementById('modal-close').disabled = true;
+        btnText.hidden = true;
+        btnLoading.hidden = false;
 
         try {
             const response = await fetch(`/api/public/quote/${this.quoteId}/accept${this.shareTokenParam()}`, {
@@ -4448,7 +4526,7 @@ class QuoteViewPage {
             }
 
             // Success
-            this.closeAcceptModal();
+            this.closeAcceptModal(true);
 
             // Update quote data - store in Notes JSON to match server storage.
             // _depositNotes() parses safely (plain-text Notes from the EMB
@@ -4487,16 +4565,19 @@ class QuoteViewPage {
                         ? 'Pickup order — our team will send your online payment link shortly.'
                         : 'Thank you for accepting this quote. Our team will confirm shipping and send your online payment link.');
             }
-            document.getElementById('success-modal').style.display = 'flex';
+            this.openDialog(document.getElementById('success-modal'), () => this.closeSuccessModal(), '#success-close');
 
         } catch (error) {
             console.error('Error accepting quote:', error);
-            ToastNotifications.error('We couldn\'t record your acceptance just now. Please try again in a moment, or call us at (253) 922-5793 and we\'ll finish it for you.');
+            this.showAcceptanceError('We couldn\'t record your acceptance just now. Please try again in a moment, or call us at (253) 922-5793 and we\'ll finish it for you.');
         } finally {
             // Reset button state
+            this._acceptPending = false;
             acceptBtn.disabled = false;
-            btnText.style.display = 'inline';
-            btnLoading.style.display = 'none';
+            document.getElementById('modal-cancel').disabled = false;
+            document.getElementById('modal-close').disabled = false;
+            btnText.hidden = false;
+            btnLoading.hidden = true;
         }
     }
 
@@ -4536,7 +4617,7 @@ class QuoteViewPage {
         const returned = urlParams ? urlParams.get('deposit') : null;
 
         if (!dep || !dep.enabled || this.quoteData.Status !== 'Accepted') {
-            panel.style.display = 'none';
+            panel.hidden = true;
             return;
         }
 
@@ -4574,7 +4655,7 @@ class QuoteViewPage {
                     ${balanceLine}
                     <p class="deposit-note">${paidNote}</p>
                 </div>`;
-            panel.style.display = '';
+            panel.hidden = false;
             return;
         }
 
@@ -4595,12 +4676,14 @@ class QuoteViewPage {
                 <button type="button" class="btn btn-primary deposit-pay-btn" id="deposit-pay-btn">${btnLabel}</button>
                 <p class="deposit-note">${note}</p>
             </div>`;
-        panel.style.display = '';
+        panel.hidden = false;
         const btn = document.getElementById('deposit-pay-btn');
         if (btn) btn.addEventListener('click', () => this.startDepositCheckout(btn));
     }
 
     async startDepositCheckout(btn) {
+        if (this._checkoutPending) return;
+        this._checkoutPending = true;
         btn.disabled = true;
         const original = btn.textContent;
         btn.textContent = 'Opening secure checkout…';
@@ -4615,7 +4698,8 @@ class QuoteViewPage {
             window.location.href = data.url;
         } catch (e) {
             console.error('[quote-view] deposit checkout failed:', e);
-            ToastNotifications.error((e.message || 'Could not start checkout.') + ' Please try again, or call (253) 922-5793 and we\'ll take it by phone.');
+            window.ToastNotifications.error((e.message || 'Could not start checkout.') + ' Please try again, or call (253) 922-5793 and we\'ll take it by phone.');
+            this._checkoutPending = false;
             btn.disabled = false;
             btn.textContent = original;
         }
@@ -4630,12 +4714,12 @@ class QuoteViewPage {
         const depositPaid = payments.find((p) => p && p.kind === 'deposit');
         const state = document.getElementById('qv-deposit-state');
         const form = document.getElementById('qv-deposit-form');
-        strip.style.display = '';
+        strip.hidden = false;
 
         if (depositPaid) {
             state.textContent = `Paid ${this.formatCurrency(Number(depositPaid.amount) || 0)}${depositPaid.at ? ' on ' + this.formatDate(depositPaid.at) : ''}`;
             state.className = 'qv-deposit-strip-state is-paid';
-            form.style.display = 'none';
+            form.hidden = true;
             return;
         }
         // Storefront orders paid via Stripe hosted checkout (samples, tees,
@@ -4647,13 +4731,13 @@ class QuoteViewPage {
                 ? `Paid ${this.formatCurrency(sfPaid.amount)} online at checkout`
                 : 'Paid online at checkout';
             state.className = 'qv-deposit-strip-state is-paid';
-            form.style.display = 'none';
+            form.hidden = true;
             return;
         }
         if (this.quoteData.Status !== 'Accepted') {
             state.textContent = 'Waiting for customer acceptance';
             state.className = 'qv-deposit-strip-state';
-            form.style.display = 'none';
+            form.hidden = true;
             return;
         }
         if (dep && dep.enabled) {
@@ -4668,7 +4752,7 @@ class QuoteViewPage {
             state.textContent = 'Not enabled';
             state.className = 'qv-deposit-strip-state';
         }
-        form.style.display = '';
+        form.hidden = false;
 
         // Wire once — setupDepositStrip re-runs after enable/update.
         if (!this._depositStripWired) {
@@ -4701,13 +4785,15 @@ class QuoteViewPage {
     }
 
     async enableDeposit() {
+        if (!this.isStaff || this._depositPending) return;
         const btn = document.getElementById('qv-deposit-enable-btn');
         const shipping = parseFloat(document.getElementById('qv-deposit-shipping').value);
         const taxRatePct = parseFloat(document.getElementById('qv-deposit-taxrate').value);
         if (!Number.isFinite(shipping) || !Number.isFinite(taxRatePct)) {
-            ToastNotifications.error('Enter shipping dollars (0 for pickup) and the confirmed tax rate % (0 for out-of-state).');
+            window.ToastNotifications.error('Enter shipping dollars (0 for pickup) and the confirmed tax rate % (0 for out-of-state).');
             return;
         }
+        this._depositPending = true;
         btn.disabled = true;
         try {
             const resp = await fetch(`/api/quotes/${encodeURIComponent(this.quoteId)}/enable-deposit`, {
@@ -4725,11 +4811,12 @@ class QuoteViewPage {
             this.renderDepositPanel(null);
             let copied = false;
             try { await navigator.clipboard.writeText(data.payUrl); copied = true; } catch (_) { /* clipboard blocked */ }
-            ToastNotifications.error(`Deposit enabled: ${this.formatCurrency(data.deposit.depositAmount)} of ${this.formatCurrency(data.deposit.grandTotal)}.` +
+            window.ToastNotifications.success(`Deposit enabled: ${this.formatCurrency(data.deposit.depositAmount)} of ${this.formatCurrency(data.deposit.grandTotal)}.` +
                 (copied ? ' Pay link copied to clipboard.' : ' Share the quote link with the customer.'));
         } catch (e) {
-            ToastNotifications.error('Enable deposit failed: ' + (e.message || 'unknown error'));
+            window.ToastNotifications.error('Enable deposit failed: ' + (e.message || 'unknown error'));
         } finally {
+            this._depositPending = false;
             btn.disabled = false;
         }
     }
@@ -4737,7 +4824,7 @@ class QuoteViewPage {
     // PDF Generation
     // Phase 11 (2026-05-14): switched from jsPDF (600 LOC of brittle
     // coordinate-positioning code) to native browser print-to-PDF.
-    // HTML/CSS print stylesheet (quote-print.css) drives the invoice
+    // This page's scoped stylesheet drives the native print
     // layout. Vector text, selectable, smaller files, 5x easier to
     // maintain. User picks "Save as PDF" in Chrome's print dialog.
     downloadPdf() {
@@ -4789,6 +4876,14 @@ class QuoteViewPage {
             month: 'long',
             day: 'numeric'
         });
+    }
+    // Calendar-only delivery dates must not shift into the previous local day.
+    formatBusinessDate(value) {
+        if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+            const [year, month, day] = value.split('-').map(Number);
+            return new Date(year, month - 1, day).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+        }
+        return this.formatDate(value);
     }
 
     // ShopWorks/ManageOrders CALENDAR dates (req-ship, drop-dead, order ship date)
@@ -4869,29 +4964,36 @@ class QuoteViewPage {
         // cross-origin since the Box surface was session-gated — rewrite to
         // same-origin so the staff cookie rides along (shared box-url.js;
         // same normalization the inbound sheet does at ingest).
-        if (typeof boxUrl === 'function') imageUrl = boxUrl(imageUrl);
+        if (typeof window.boxUrl === 'function') imageUrl = window.boxUrl(imageUrl);
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'qv-design-zoom';
+        button.setAttribute('aria-label', 'Enlarge design preview');
         const img = document.createElement('img');
         img.src = imageUrl;
         img.alt = 'Design preview';
-        img.className = 'quote-view-design-thumb';
-        img.style.width = `${size}px`;
-        img.style.height = `${size}px`;
-        img.style.objectFit = 'cover';
-        img.style.borderRadius = '6px';
-        img.style.border = '1px solid #e5e7eb';
-        img.style.cursor = 'pointer';
-        img.onerror = () => { span.style.display = 'none'; };
-        img.onclick = () => {
-            // Open full-size in overlay
-            const overlay = document.createElement('div');
-            overlay.className = 'thumb-modal-overlay';
-            overlay.innerHTML = `<img src="${this.escapeHtml(imageUrl)}" style="max-width:90vw;max-height:90vh;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.3);">`;
-            overlay.onclick = () => overlay.remove();
+        img.className = size === 44 ? 'quote-view-design-thumb qv-thumb-small' : 'quote-view-design-thumb';
+        img.onerror = () => { span.hidden = true; };
+        button.appendChild(img);
+        button.addEventListener('click', () => {
+            const overlay = document.createElement('dialog');
+            overlay.className = 'ui-dialog qv-dialog qv-art-preview';
+            overlay.setAttribute('aria-label', 'Design preview');
+            const close = document.createElement('button');
+            close.className = 'btn';
+            close.type = 'button';
+            close.textContent = 'Close preview';
+            const preview = document.createElement('img');
+            preview.src = imageUrl;
+            preview.alt = 'Full size design preview';
+            overlay.append(close, preview);
+            const dismiss = () => { this.closeDialog(overlay); overlay.remove(); };
+            close.addEventListener('click', dismiss);
             document.body.appendChild(overlay);
-        };
-        span.innerHTML = '';
-        span.appendChild(img);
-        span.style.display = 'inline-block';
+            this.openDialog(overlay, dismiss);
+        });
+        span.replaceChildren(button);
+        span.hidden = false;
     }
 
     getTrackingLink(carrier, trackingNumber) {
@@ -4988,14 +5090,14 @@ class QuoteViewPage {
 
     // UI State Methods
     showContent() {
-        document.getElementById('loading-state').style.display = 'none';
-        document.getElementById('quote-content').style.display = 'block';
+        document.getElementById('loading-state').hidden = true;
+        document.getElementById('quote-content').hidden = false;
     }
 
     showError(message) {
-        document.getElementById('loading-state').style.display = 'none';
+        document.getElementById('loading-state').hidden = true;
         document.getElementById('error-message').textContent = message;
-        document.getElementById('error-state').style.display = 'flex';
+        document.getElementById('error-state').hidden = false;
     }
 
     /**
@@ -5139,7 +5241,7 @@ class QuoteViewPage {
         if (!btn) return;
 
         // Show the button
-        btn.style.display = '';
+        btn.hidden = false;
 
         // If already pushed, show the pushed state
         if (this.quoteData && this.quoteData.PushedToShopWorks) {
@@ -5182,7 +5284,7 @@ class QuoteViewPage {
         const originalText = label.textContent;
         label.textContent = 'Pushing...';
         btn.disabled = true;
-        btn.style.opacity = '0.6';
+        btn.classList.add('is-pending');
 
         try {
             // Same-origin (2026-08-26 lockdown) — push is a STAFF action; the
@@ -5218,7 +5320,7 @@ class QuoteViewPage {
             console.error('[QuoteView] Push error:', error);
             label.textContent = originalText;
             btn.disabled = false;
-            btn.style.opacity = '1';
+            btn.classList.remove('is-pending');
             this.showPushToast(`Push failed: ${error.message}`, 'error');
         }
     }
@@ -5234,41 +5336,16 @@ class QuoteViewPage {
         const dateStr = timestamp ? this.formatDate(timestamp) : '';
         label.textContent = dateStr ? `Pushed ${dateStr}` : 'Pushed';
         btn.disabled = true;
-        btn.style.opacity = '0.6';
-        btn.style.background = '#28a745';
-        btn.style.color = '#fff';
-        btn.style.borderColor = '#28a745';
+        btn.classList.remove('is-pending');
+        btn.classList.add('qv-push-complete');
     }
 
     /**
      * Show a toast notification for push results
      */
     showPushToast(message, type = 'info') {
-        // Remove existing toast
-        const existing = document.getElementById('push-toast');
-        if (existing) existing.remove();
-
-        const toast = document.createElement('div');
-        toast.id = 'push-toast';
-        toast.style.cssText = `
-            position: fixed; bottom: 20px; right: 20px; z-index: 10000;
-            padding: 14px 24px; border-radius: 8px; font-size: 14px;
-            color: #fff; max-width: 400px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            animation: slideInRight 0.3s ease-out;
-        `;
-
-        if (type === 'success') toast.style.background = '#28a745';
-        else if (type === 'error') toast.style.background = '#dc3545';
-        else toast.style.background = '#17a2b8';
-
-        toast.textContent = message;
-        document.body.appendChild(toast);
-
-        setTimeout(() => {
-            toast.style.transition = 'opacity 0.3s';
-            toast.style.opacity = '0';
-            setTimeout(() => toast.remove(), 300);
-        }, 5000);
+        const show = window.ToastNotifications[type] || window.ToastNotifications.info;
+        show.call(window.ToastNotifications, message);
     }
 }
 
