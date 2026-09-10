@@ -2633,6 +2633,18 @@
       "before": "/shared_components/js/sanmar-invoice-viewer.js?v=2026.09.10.3",
       "after": "/shared_components/js/sanmar-invoice-viewer.js?v=2026.09.10.4",
       "count": 1
+    },
+    {
+      "file": "dashboards/purchasing-portal.html",
+      "before": "/dashboards/js/purchasing-portal.js?v=2026.09.10.3",
+      "after": "/dashboards/js/purchasing-portal.js?v=2026.09.10.4",
+      "count": 1
+    },
+    {
+      "file": "tests/ui/test-purchasing-portal.html",
+      "before": "/dashboards/js/purchasing-portal.js?v=2026.09.10.3",
+      "after": "/dashboards/js/purchasing-portal.js?v=2026.09.10.4",
+      "count": 1
     }
   ],
   "retiredStyles": [
