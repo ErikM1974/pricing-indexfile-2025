@@ -5,7 +5,8 @@ const fixture = require('../fixtures/lead-records-review-data.json');
 const original = require('../fixtures/lead-records-original-content.json');
 const root = path.resolve(__dirname, '../..'), output = path.join(__dirname, 'screenshots/css-unification');
 const hash = s => crypto.createHash('sha256').update(s).digest('hex'), norm = s => s.replace(/\s+/g, ' ').trim().toLowerCase();
-fs.mkdirSync(output, { recursive: true }); test.use({ reducedMotion: 'reduce' }); test.describe.configure({ mode: 'parallel' });
+// Original timestamp captures use the business's Pacific time zone on every runner.
+fs.mkdirSync(output, { recursive: true }); test.use({ reducedMotion: 'reduce', timezoneId: 'America/Los_Angeles' }); test.describe.configure({ mode: 'parallel' });
 
 async function open(page, tool, state = {}) {
     const { lead, forms, items, activities, shipments } = fixture;

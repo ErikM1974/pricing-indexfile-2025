@@ -1139,3 +1139,7 @@ Local census becomes158 reviewed migrations/67pending/79excluded; LIVE REMAINS.1
 ## CRM release checks complete — v2026.09.09.20
 
 Full integrated source passed build/lint/types,485routes/24modules,232unit suites/5383tests/four existing skips,88DOM,four accessibility unit,84quote parity,679mocked browser,16remaining browser/three optional screenshot skips,all five calculators,276CSS clean,boot200 and production audit zero.25 focused record scenarios;275 source/CSS/historical checks. Five PDF outputs/seven pages include populated lead orders and full Inbox detail.17 original source hashes preserved through93 UI/recovery mappings, HTML contracts and four explicit stylesheet retirements/four flags. Live remains155/70 until exact-source CI and verified.20 rollout raises it to158/67.
+
+## Lead records CI portability repair
+
+Exact-source CI34439501966 on637361ee failed three of679mocked browser comparisons because the original captures use Pacific timestamps and Linux defaults to UTC (11:00a versus6:00p).676browser cases passed; unit/lint/types passed; live parity was not run after the browser failure. Application implementation is unchanged. The lead-record spec now explicitly sets America/Los_Angeles; all25focused cases pass with process TZ=UTC. Prior full local checks remain applicable to unchanged application bytes, and the new exact-source CI must run all679browser cases and actual live money/calculator parity before release.
