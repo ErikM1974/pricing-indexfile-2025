@@ -3,6 +3,53 @@ const fs = require('node:fs'), path = require('node:path');
 const { open } = require('./helpers/staff-workspaces-browser');
 const fixtures = require('../fixtures/staff-workspaces-ae-synthetic.json');
 const output = path.join(__dirname, 'screenshots/css-unification');
+test('CSS staff workspaces: Mission Control original invoice and inbound print surfaces', async ({ page }) => {
+    const state = aeState(), events = await open(page, 'ae-mission-control', state), dialogs = [], papers = [];
+    await expect(page.locator('.aemc-inv-btn').first()).toBeVisible();
+    await page.locator('.aemc-inv-btn').first().click();
+    await expect(page.locator('#smiv-body .smiv-inv').first()).toBeVisible();
+    for (const width of [1440, 768, 390, 320]) {
+        await page.setViewportSize({ width, height: 1000 });
+        dialogs.push({ name: 'invoice', width, text: await page.locator('#smiv-modal').innerText() });
+        await page.locator('#smiv-modal').screenshot({ path: path.join(output, 'staff-workspaces-ae-original-invoice-' + width + '.png') });
+    }
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await page.locator('#smiv-print').click();
+    await expect(page.locator('#smiv-print-sheet')).toHaveCount(1);
+    papers.push({ name: 'invoice', text: await page.locator('#smiv-print-sheet').textContent() });
+    await page.pdf({ path: path.join(output, 'staff-workspaces-ae-original-invoice.pdf'), preferCSSPageSize: true, printBackground: true });
+    await page.evaluate(() => window.dispatchEvent(new Event('afterprint')));
+    await page.locator('#smiv-close').click();
+    await page.locator('#aemc-inbound-open').click();
+    await expect(page.locator('.sit-modal')).toBeVisible();
+    await page.waitForLoadState('networkidle');
+    for (const width of [1440, 768, 390, 320]) {
+        await page.setViewportSize({ width, height: 1000 });
+        dialogs.push({ name: 'inbound', width, text: await page.locator('.sit-modal').innerText() });
+        await page.locator('.sit-modal').screenshot({ path: path.join(output, 'staff-workspaces-ae-original-inbound-' + width + '.png') });
+    }
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await page.locator('#sit-print').click();
+    const profiles = await page.locator('#sit-printmenu [data-print]').evaluateAll(ns => ns.map(n => ({ type: n.dataset.print, rep: n.dataset.rep || '', text: n.textContent.trim() })));
+    await page.locator('#sit-print').click();
+    for (let i = 0; i < profiles.length; i++) {
+        await page.locator('#sit-print').click();
+        await page.locator('#sit-printmenu [data-print]').nth(i).click();
+        await expect(page.locator('#sit-print-sheet')).toHaveCount(1);
+        await expect(page.locator('body')).toHaveClass(/sit-printing/);
+        papers.push({ ...profiles[i], text: await page.locator('#sit-print-sheet').textContent() });
+        await page.pdf({ path: path.join(output, 'staff-workspaces-ae-original-report-' + i + '.pdf'), preferCSSPageSize: true, printBackground: true });
+        await page.evaluate(() => window.dispatchEvent(new Event('afterprint')));
+    }
+    await page.locator('#sit-labels').click();
+    await expect(page.locator('body')).toHaveClass(/sit-label-printing/);
+    papers.push({ name: 'box-labels', text: await page.locator('#sit-label-sheet').textContent() });
+    await page.pdf({ path: path.join(output, 'staff-workspaces-ae-original-box-labels.pdf'), preferCSSPageSize: true, printBackground: true });
+    await page.evaluate(() => window.dispatchEvent(new Event('afterprint')));
+    await page.locator('#sit-close').click();
+    fs.writeFileSync(path.join(output, 'staff-workspaces-ae-original-documents.json'), JSON.stringify({ dialogs, profiles, papers, events }, null, 2) + '\n');
+    for (const kind of ['errors', 'unknown', 'missing', 'writes']) expect(events[kind], kind).toEqual([]);
+});
 test('CSS staff workspaces: Mission Control original kit and outreach forms use intercepted actions', async ({ page }) => {
     const state = aeState(), events = await open(page, 'ae-mission-control', state), dialogs = [];
     await expect(page.locator('#kpi-ytd')).not.toHaveText('—');
@@ -51,6 +98,8 @@ function aeState(scenario = 'admin', original = true) {
     state.respond = async (req, url) => {
         if (req.method() !== 'GET' || !['localhost', '127.0.0.1', 'caspio-pricing-proxy-ab30a049961a.herokuapp.com'].includes(url.hostname)) return null;
         if (!url.pathname.startsWith('/api/')) return null;
+        if (url.pathname === '/api/thumbnails/by-designs') return { json: { thumbnails: {} } };
+        if (url.pathname === '/api/sanmar-orders/daily-inbound') return { json: { days: [{ date: '2026-09-10', orders: 3, boxes: 5, pieces: 120, cost: 500 }] } };
         const parameters = new URLSearchParams();
         if (url.searchParams.has('hydrate')) parameters.set('hydrate', url.searchParams.get('hydrate'));
         if (url.searchParams.has('viewAs')) parameters.set('viewAs', url.searchParams.get('viewAs'));
