@@ -361,11 +361,13 @@
         font-size: 0.8em;
         font-weight: 600;
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-form-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
         gap: 0.9rem;
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"])
         .vq-field--check {
         flex-direction: row;
@@ -374,11 +376,13 @@
         align-self: end;
         padding-bottom: 0.5rem;
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"])
         .vq-field--check
         input {
         width: 1.1rem;
         height: 1.1rem;
+        accent-color: var(--ui-accent);
     }
 
     :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-lines-head,
@@ -388,6 +392,7 @@
         gap: 0.6rem;
         align-items: center;
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-lines-head {
         font-size: 0.75rem;
         text-transform: uppercase;
@@ -396,53 +401,64 @@
         padding: 0 0 0.4rem;
         border-bottom: 1px solid var(--gray-200);
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-line {
         padding: 0.5rem 0;
         border-bottom: 1px solid var(--gray-100);
         font-size: 0.9rem;
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-line-title {
         color: var(--gray-800);
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"])
         .vq-line-title
         small {
         display: block;
         color: var(--ui-muted);
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-line-cost {
         font-family: "JetBrains Mono", monospace;
         font-size: 0.85rem;
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"])
         .vq-line-cost
         small {
         color: var(--ui-muted);
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-line-stock {
         font-size: 0.8rem;
         color: var(--ui-muted);
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"])
         .vq-line-status {
         font-size: 0.8rem;
         color: var(--ui-muted);
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"])
         .vq-line-status--error {
         color: var(--color-danger-ink);
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-hint {
         font-size: 0.8rem;
         color: var(--ui-muted);
         margin: 0.8rem 0 0;
         max-width: 80ch;
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-levers {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
         gap: 1rem;
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"])
         .vq-lever
         label {
@@ -451,22 +467,27 @@
         color: var(--ui-muted);
         margin-bottom: 0.35rem;
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-lever-row {
         display: flex;
         align-items: center;
         gap: 0.75rem;
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"])
         .vq-lever
         input[type="number"] {
         width: 110px;
         font-family: "JetBrains Mono", monospace;
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"])
         .vq-lever
         input[type="range"] {
         flex: 1 1 140px;
+        accent-color: var(--ui-accent);
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"])
         .vq-lever
         output {
@@ -474,14 +495,17 @@
         font-weight: 600;
         min-width: 3ch;
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-lever-note {
         font-size: 0.8rem;
         color: var(--ui-muted);
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-stats {
         margin-bottom: 1rem;
         grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr));
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"])
         .vq-warnings:empty {
         display: none;
@@ -495,19 +519,23 @@
         color: var(--color-warning-ink);
         font-size: 0.85rem;
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"])
         .vq-warning--danger {
         background: var(--color-danger-bg);
         color: var(--color-danger-ink);
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-table-wrap {
         overflow-x: auto;
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-table {
         width: 100%;
         border-collapse: collapse;
         font-size: 0.88rem;
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-table th,
     :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-table td {
         padding: 0.55rem 0.6rem;
@@ -515,6 +543,7 @@
         border-bottom: 1px solid var(--gray-200);
         white-space: nowrap;
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"])
         .vq-table
         th:first-child,
@@ -523,11 +552,13 @@
         td:first-child {
         text-align: left;
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-table th {
         font-weight: 600;
         color: var(--ui-muted);
         background: var(--ui-tint);
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"])
         .vq-table
         th
@@ -535,17 +566,20 @@
         font-weight: 400;
         color: var(--ui-muted);
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"])
         .vq-table
         td.vq-num {
         font-family: "JetBrains Mono", monospace;
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"])
         .vq-table
         td.vq-vol {
         font-weight: 600;
         color: var(--ui-ink);
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"])
         .vq-table
         tfoot
@@ -553,9 +587,11 @@
         font-weight: 600;
         background: var(--ui-tint);
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-gm-low {
         color: var(--color-danger-ink);
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"])
         .vq-memo-actions {
         display: flex;
@@ -577,16 +613,19 @@
         max-height: min(38rem, 70vh);
         overflow: auto;
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"])
         .vq-save-status {
         font-size: 0.8rem;
         color: var(--ui-muted);
         align-self: center;
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"])
         .vq-save-status--ok {
         color: var(--color-brand-deep);
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"])
         .vq-save-status--error {
         color: var(--color-danger-ink);
@@ -602,6 +641,7 @@
         font-size: 0.9rem;
         max-width: 860px;
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-cq-head {
         display: flex;
         justify-content: space-between;
@@ -611,13 +651,16 @@
         padding-bottom: 0.9rem;
         margin-bottom: 1rem;
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-cq-logo {
         height: 52px;
         width: auto;
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-cq-title {
         text-align: right;
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"])
         .vq-cq-title
         h3 {
@@ -626,17 +669,20 @@
         color: var(--ui-accent);
         letter-spacing: 0.02em;
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-cq-meta {
         font-size: 0.8rem;
         color: var(--ui-muted);
         line-height: 1.5;
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"])
         .vq-cq-meta
         strong {
         color: var(--ui-ink);
         font-family: "JetBrains Mono", monospace;
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-cq-parties {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -644,6 +690,7 @@
         margin-bottom: 1rem;
         font-size: 0.85rem;
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"])
         .vq-cq-parties
         h4,
@@ -656,6 +703,7 @@
         letter-spacing: 0.06em;
         color: var(--ui-muted);
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-cq-table {
         width: 100%;
         border-collapse: collapse;
@@ -663,6 +711,7 @@
         font-size: 0.85rem;
         min-width: 620px;
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-cq-table th,
     :where([data-ui="unified"][data-staff-tool="volume-quote"])
         .vq-cq-table
@@ -671,6 +720,7 @@
         border-bottom: 1px solid var(--gray-200);
         text-align: right;
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"])
         .vq-cq-table
         th:nth-child(-n + 2),
@@ -679,6 +729,7 @@
         td:nth-child(-n + 2) {
         text-align: left;
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"])
         .vq-cq-table
         th {
@@ -686,11 +737,13 @@
         color: var(--gray-700);
         font-weight: 600;
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"])
         .vq-cq-table
         td.vq-num {
         font-family: "JetBrains Mono", monospace;
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"])
         .vq-cq-table
         tfoot
@@ -698,27 +751,32 @@
         font-weight: 600;
         background: var(--ui-tint);
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"])
         .vq-cq-table
         td
         small {
         color: var(--ui-muted);
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-cq-block {
         margin: 0.75rem 0;
         font-size: 0.85rem;
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"])
         .vq-cq-block
         ul {
         margin: 0.25rem 0 0;
         padding-left: 1.1rem;
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"])
         .vq-cq-block
         li {
         margin-bottom: 0.2rem;
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-cq-foot {
         margin-top: 1.25rem;
         padding-top: 0.75rem;
@@ -727,41 +785,35 @@
         color: var(--ui-muted);
         text-align: center;
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-cq-empty {
         color: var(--ui-muted);
         font-style: italic;
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-line-field {
         min-width: 0;
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"])
         .vq-input-label {
         display: none;
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"])
         :is(.vq-memo-actions, .vq-lever-row, .vq-cq-head) {
         flex-wrap: wrap;
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"])
         .vq-cq-table-wrap {
         max-width: 100%;
         overflow-x: auto;
     }
+
     :where([data-ui="unified"][data-staff-tool="volume-quote"])
         .vq-line-remove {
         min-width: var(--ui-control-height);
-    }
-
-    :where([data-ui="unified"][data-staff-tool="volume-quote"])
-        .vq-field--check
-        input {
-        accent-color: var(--ui-accent);
-    }
-
-    :where([data-ui="unified"][data-staff-tool="volume-quote"])
-        .vq-lever
-        input[type="range"] {
-        accent-color: var(--ui-accent);
     }
 
     @media (width <= 720px) {
@@ -769,24 +821,29 @@
             .vq-lines-head {
             display: none;
         }
+
         :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-line {
             display: flex;
             flex-wrap: wrap;
             gap: 0.4rem 0.6rem;
         }
+
         :where([data-ui="unified"][data-staff-tool="volume-quote"])
             .vq-line
             > * {
             min-width: 0;
         }
+
         :where([data-ui="unified"][data-staff-tool="volume-quote"])
             .vq-line-info {
             flex: 1 1 100%;
         }
+
         :where([data-ui="unified"][data-staff-tool="volume-quote"])
             .vq-line-field {
             flex: 1 1 100px;
         }
+
         :where([data-ui="unified"][data-staff-tool="volume-quote"])
             .vq-input-label {
             display: block;
@@ -794,6 +851,7 @@
             margin-bottom: var(--space-2);
             color: var(--ui-muted);
         }
+
         :where([data-ui="unified"][data-staff-tool="volume-quote"])
             .vq-cq-parties {
             grid-template-columns: minmax(0, 1fr);
@@ -804,11 +862,13 @@
         :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-stats {
             grid-template-columns: repeat(2, minmax(0, 1fr));
         }
+
         :where([data-ui="unified"][data-staff-tool="volume-quote"])
             .vq-stats
             .dash-stat-card {
             padding: var(--space-3);
         }
+
         :where([data-ui="unified"][data-staff-tool="volume-quote"])
             .vq-stats
             .dash-stat-value {
@@ -829,28 +889,33 @@
             .dash-card-header {
             display: none;
         }
+
         :where([data-ui="unified"][data-staff-tool="volume-quote"]) .dash-shell,
         :where([data-ui="unified"][data-staff-tool="volume-quote"])
             .dash-content {
             padding: 0;
             margin: 0;
         }
+
         :where([data-ui="unified"][data-staff-tool="volume-quote"]).vq-mode-memo
             .dash-card:not(.vq-print-keep) {
             display: none;
         }
+
         :where(
                 [data-ui="unified"][data-staff-tool="volume-quote"]
             ).vq-mode-customer
             .dash-card:not(.vq-print-customer-keep) {
             display: none;
         }
+
         :where([data-ui="unified"][data-staff-tool="volume-quote"]) .dash-card {
             border: 0;
             box-shadow: none;
             padding: 0;
             break-inside: auto;
         }
+
         :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-memo {
             border: 0;
             background: transparent;
@@ -859,6 +924,7 @@
             max-height: none;
             overflow: visible;
         }
+
         :where([data-ui="unified"][data-staff-tool="volume-quote"]) .vq-cq {
             border: 0;
             margin: 0;
@@ -866,11 +932,13 @@
             max-width: none;
             font-size: 11pt;
         }
+
         :where([data-ui="unified"][data-staff-tool="volume-quote"])
             .vq-cq-head {
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
         }
+
         :where([data-ui="unified"][data-staff-tool="volume-quote"])
             .vq-cq-table
             th,
@@ -881,19 +949,24 @@
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
         }
+
         :where([data-ui="unified"][data-staff-tool="volume-quote"]) {
             --ui-canvas: var(--color-surface);
+
             page: staff-toolkit-volume;
         }
+
         :where([data-ui="unified"][data-staff-tool="volume-quote"])
             .vq-cq-table-wrap {
             overflow: visible;
         }
+
         :where([data-ui="unified"][data-staff-tool="volume-quote"])
             .vq-cq-table {
             min-width: 0;
             font-size: 9pt;
         }
+
         :where([data-ui="unified"][data-staff-tool="volume-quote"])
             .vq-cq-table
             tr {
@@ -907,6 +980,7 @@
     size: letter landscape;
     margin: 12mm;
 }
+
 @layer components.pages {
     :where([data-ui="unified"][data-staff-tool="product-manager"])
         .pm-subtitle {
@@ -936,6 +1010,7 @@
         padding: 10px 14px;
         margin: 0 0 14px;
     }
+
     :where([data-ui="unified"][data-staff-tool="product-manager"])
         .pm-table-wrap {
         overflow-x: auto;
@@ -943,6 +1018,7 @@
         border: 1px solid var(--ui-line);
         border-radius: var(--radius-sm);
     }
+
     :where([data-ui="unified"][data-staff-tool="product-manager"]) .pm-table {
         width: 100%;
         border-collapse: collapse;
@@ -971,19 +1047,23 @@
         border-bottom: 1px solid var(--gray-100);
         vertical-align: middle;
     }
+
     :where([data-ui="unified"][data-staff-tool="product-manager"]) .pm-num {
         text-align: right;
     }
+
     :where([data-ui="unified"][data-staff-tool="product-manager"]) .pm-style {
         font-family: "JetBrains Mono", monospace;
         font-size: 12.5px;
         font-weight: 600;
     }
+
     :where([data-ui="unified"][data-staff-tool="product-manager"])
         .pm-row-inactive
         td {
         color: var(--ui-muted);
     }
+
     :where([data-ui="unified"][data-staff-tool="product-manager"])
         .pm-warn-text {
         color: var(--color-warning-ink);
@@ -1002,6 +1082,7 @@
         justify-content: center;
         color: var(--ui-muted);
     }
+
     :where([data-ui="unified"][data-staff-tool="product-manager"])
         .pm-thumb-empty {
         font-size: 16px;
@@ -1016,6 +1097,7 @@
         background: var(--gray-100);
         color: var(--ui-muted);
     }
+
     :where([data-ui="unified"][data-staff-tool="product-manager"])
         .pm-chip-live {
         background: var(--color-success-bg);
@@ -1026,11 +1108,13 @@
         white-space: nowrap;
         text-align: right;
     }
+
     :where([data-ui="unified"][data-staff-tool="product-manager"]) .pm-empty {
         color: var(--ui-muted);
         font-size: 14px;
         padding: 18px 4px;
     }
+
     :where([data-ui="unified"][data-staff-tool="product-manager"])
         .pm-form-card {
         margin-top: 16px;
@@ -1041,18 +1125,22 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 14px 18px;
     }
+
     :where([data-ui="unified"][data-staff-tool="product-manager"]) .pm-span-2 {
         grid-column: span 2;
     }
+
     :where([data-ui="unified"][data-staff-tool="product-manager"])
         .pm-field
         small {
         font-size: 11.5px;
         color: var(--ui-muted);
     }
+
     :where([data-ui="unified"][data-staff-tool="product-manager"]) .pm-req {
         color: var(--color-danger-ink);
     }
+
     :where([data-ui="unified"][data-staff-tool="product-manager"])
         .pm-field
         input:disabled {
@@ -1078,6 +1166,7 @@
         background: var(--gray-50);
         flex: none;
     }
+
     :where([data-ui="unified"][data-staff-tool="product-manager"])
         .pm-image-controls {
         display: flex;
@@ -1108,6 +1197,7 @@
         color: var(--gray-700);
         cursor: pointer;
     }
+
     :where([data-ui="unified"][data-staff-tool="product-manager"])
         .pm-active-toggle
         input {
@@ -1131,10 +1221,12 @@
             .pm-grid {
             grid-template-columns: 1fr;
         }
+
         :where([data-ui="unified"][data-staff-tool="product-manager"])
             .pm-span-2 {
             grid-column: span 1;
         }
+
         :where([data-ui="unified"][data-staff-tool="product-manager"])
             .pm-header-actions {
             flex-wrap: wrap;
@@ -1144,24 +1236,529 @@
     @media print {
         :where([data-ui="unified"][data-staff-tool="product-manager"]) {
             --ui-canvas: var(--color-surface);
+
             page: staff-toolkit-products;
         }
+
         :where([data-ui="unified"][data-staff-tool="product-manager"])
             :is(.pm-header-actions, .pm-actions, .pm-form-actions) {
             display: none;
         }
+
         :where([data-ui="unified"][data-staff-tool="product-manager"])
             .pm-table-wrap {
             overflow: visible;
         }
+
         :where([data-ui="unified"][data-staff-tool="product-manager"])
             .pm-table {
             min-width: 0;
             font-size: 9pt;
         }
+
         :where([data-ui="unified"][data-staff-tool="product-manager"])
             .pm-table
             tr {
+            break-inside: avoid;
+        }
+    }
+}
+
+@page staff-toolkit-blog {
+    size: letter;
+    margin: 12mm;
+}
+
+@layer components.pages {
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-list-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 14px;
+        gap: var(--space-3);
+        flex-wrap: wrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"])
+        .be-list-head
+        h2 {
+        margin: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-empty {
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-list-row {
+        display: grid;
+        grid-template-columns: 92px minmax(0, 1fr) auto;
+        gap: 14px;
+        align-items: center;
+        text-align: left;
+        background: var(--color-surface);
+        border: 1px solid var(--gray-200);
+        border-radius: 10px;
+        padding: 12px 16px;
+        font: inherit;
+        cursor: pointer;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"])
+        .be-list-row:hover {
+        border-color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-list-status {
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        border-radius: 999px;
+        padding: 3px 10px;
+        text-align: center;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"])
+        .be-list-status.is-live {
+        background: var(--color-success-bg);
+        color: var(--color-brand-deep);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"])
+        .be-list-status.is-draft {
+        background: var(--color-warning-bg);
+        color: var(--color-warning-ink);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-list-title {
+        font-weight: 600;
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-list-meta {
+        font-size: 0.78rem;
+        color: var(--ui-muted);
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-editor-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 14px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"])
+        .be-editor-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-save-state {
+        font-size: 0.82rem;
+        color: var(--ui-muted);
+        margin-right: 4px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 22px;
+        align-items: start;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-hint {
+        font-weight: 400;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-note {
+        font-size: 0.75rem;
+        color: var(--color-warning-ink);
+        margin: 4px 0 0;
+        line-height: 1.6;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-input--mono {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.84rem;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-row {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-hero-row {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"])
+        .be-hero-preview {
+        width: 130px;
+        aspect-ratio: 16/9;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 1px solid var(--gray-200);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"])
+        .be-hero-controls {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-toolbar {
+        display: flex;
+        gap: 4px;
+        border: 1px solid var(--gray-300);
+        border-bottom: none;
+        border-radius: 8px 8px 0 0;
+        background: var(--ui-tint);
+        padding: 6px 8px;
+        flex-wrap: wrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-body {
+        border-radius: 0 0 8px 8px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.86rem;
+        line-height: 1.6;
+        resize: vertical;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-preview-col {
+        position: sticky;
+        top: 14px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"])
+        .be-preview-head {
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: var(--ui-ink);
+        margin-bottom: 8px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-preview {
+        background: var(--color-surface);
+        border: 1px solid var(--gray-200);
+        border-radius: 10px;
+        padding: 20px 22px;
+        max-height: min(42rem, 70vh);
+        overflow-y: auto;
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-google {
+        background: var(--color-surface);
+        border: 1px solid var(--gray-200);
+        border-radius: 10px;
+        padding: 12px 16px;
+        margin-bottom: 12px;
+        font-family: arial, sans-serif;
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"])
+        .be-google-title {
+        color: var(--blue-800);
+        font-size: 1.05rem;
+        line-height: 1.3;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-google-url {
+        color: var(--color-brand-deep);
+        font-size: 0.8rem;
+        margin: 2px 0;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-google-desc {
+        color: var(--ui-muted);
+        font-size: 0.82rem;
+        line-height: 1.45;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"])
+        .be-file-btn:focus-visible,
+    :where([data-ui="unified"][data-staff-tool="blog-editor"])
+        .be-toolbar
+        button:focus-visible,
+    :where([data-ui="unified"][data-staff-tool="blog-editor"])
+        .be-btn:focus-visible,
+    :where([data-ui="unified"][data-staff-tool="blog-editor"])
+        .be-list-row:focus-visible {
+        outline: 2px solid var(--ui-accent);
+        outline-offset: 2px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"])
+        .be-preview-fail {
+        color: var(--color-danger-ink);
+        font-size: 14px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .blog-prose {
+        font-size: 1.05rem;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .blog-prose h2 {
+        font-family: var(--ui-font);
+        font-size: 1.5rem;
+        margin: 34px 0 10px;
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .blog-prose h3 {
+        font-size: 1.2rem;
+        margin: 26px 0 8px;
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .blog-prose p {
+        margin: 0 0 16px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .blog-prose a {
+        color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"])
+        .blog-prose
+        a:hover {
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .blog-prose img {
+        max-width: 100%;
+        border-radius: var(--radius-sm);
+        display: block;
+        margin: 18px auto;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .blog-prose ul,
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .blog-prose ol {
+        padding-left: 24px;
+        margin: 0 0 16px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .blog-prose li {
+        margin-bottom: 6px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"])
+        .blog-prose
+        blockquote {
+        margin: 20px 0;
+        padding: 10px 18px;
+        border-left: 4px solid var(--ui-accent);
+        background: var(--ui-tint);
+        border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"])
+        .blog-prose
+        table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 18px 0;
+        font-size: 0.92rem;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .blog-prose th,
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .blog-prose td {
+        border: 1px solid var(--ui-line);
+        padding: 8px 10px;
+        text-align: left;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .blog-prose th {
+        background: var(--ui-tint);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"])
+        .blog-prose
+        code {
+        background: var(--ui-tint);
+        border-radius: 4px;
+        padding: 1px 5px;
+        font-size: 0.9em;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .blog-prose pre {
+        background: var(--ui-tint);
+        border-radius: var(--radius-sm);
+        padding: 14px;
+        overflow-x: auto;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .blog-video {
+        position: relative;
+        aspect-ratio: 16 / 9;
+        margin: 22px 0;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"])
+        .blog-video
+        iframe {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        border: 0;
+        border-radius: var(--radius-sm);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-label {
+        margin-block: var(--space-4) var(--space-1);
+        display: block;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"]) .blog-prose h1 {
+        font-size: var(--font-size-2xl);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="blog-editor"])
+        .be-print-metadata {
+        display: none;
+    }
+
+    @media (width <= 980px) {
+        :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-grid {
+            grid-template-columns: 1fr;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="blog-editor"])
+            .be-preview-col {
+            position: static;
+        }
+    }
+
+    @media (width <= 640px) {
+        :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-row {
+            grid-template-columns: 1fr;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="blog-editor"])
+            .be-list-row {
+            grid-template-columns: 1fr;
+            gap: var(--space-2);
+        }
+
+        :where([data-ui="unified"][data-staff-tool="blog-editor"])
+            .be-list-status {
+            justify-self: start;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-preview {
+            padding: var(--space-4);
+        }
+    }
+
+    @media print {
+        :where([data-ui="unified"][data-staff-tool="blog-editor"]) {
+            --ui-canvas: var(--color-surface);
+
+            page: staff-toolkit-blog;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="blog-editor"])
+            :is(.be-editor-head, .be-toolbar, .be-file-btn, #newPostBtn) {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-grid {
+            display: block;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="blog-editor"])
+            .be-preview-col {
+            position: static;
+            break-before: auto;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-preview {
+            max-height: none;
+            overflow: visible;
+            padding: 0;
+            border: 0;
+            border-radius: 0;
+            outline: none;
+            box-shadow: none;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-fields {
+            break-after: page;
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="blog-editor"])
+            .be-list-row {
+            break-inside: avoid;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="blog-editor"])
+            .be-print-metadata {
+            display: block;
+            overflow-wrap: anywhere;
+            margin-bottom: 16pt;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="blog-editor"])
+            .be-print-metadata
+            h1 {
+            font-size: 20pt;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="blog-editor"])
+            .be-print-metadata
+            dt {
+            font-weight: 700;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="blog-editor"])
+            .be-print-metadata
+            dd {
+            margin: 0 0 8pt;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="blog-editor"])
+            .be-preview-head,
+        :where([data-ui="unified"][data-staff-tool="blog-editor"]) .be-google {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="blog-editor"])
+            .blog-prose
+            pre {
+            white-space: pre-wrap;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="blog-editor"])
+            .blog-prose
+            tr {
+            break-inside: avoid;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="blog-editor"]) .blog-video {
             break-inside: avoid;
         }
     }

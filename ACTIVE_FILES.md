@@ -270,3 +270,5 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - Staff toolkit draft expanded to Volume Quote: canonical fields, row retries, request ownership, snapshot saves and separate customer/internal print modes. Original payload/PDF content preserved; all legacy page styles remain pending retirement review.
 
 - Staff toolkit draft: Product Manager now shares the staff owner and preserves legacy categories/vendor codes with guarded uploads/saves. Added tests/fixtures/staff-toolkit-product-original-workflow.json for original edit fields and save payload; added the missing vendor mirror check to tests/unit/staff-toolkit-content.test.js. Legacy product CSS remains pending retirement review.
+
+- Staff toolkit draft: Blog Editor now uses canonical controls, current-request preview/edit handling, guarded saves/uploads and complete article-proof printing. Added tests/fixtures/staff-toolkit-blog-original-workflow.json for original draft payloads, preview HTML and permanent published URLs; retained legacy blog/editor styles pending consumer audit.

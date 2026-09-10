@@ -430,3 +430,184 @@ test('CSS staff toolkit: product upload and save failures retain editable values
     await expect(page.locator('#pmSaveBtn')).toBeEnabled(); await expect(page.locator('#fStyle')).toBeDisabled(); expect(events.writes).toHaveLength(3);
     await axe(page); expect(events.errors).toEqual([]); expect(events.unknown).toEqual([]);
 });
+
+function blogReviewState(posts = data.posts.map(p => ({ ...p }))) {
+    return {
+        respond: async u => u.pathname === '/api/crm-proxy/blog-posts' ? { json: { posts } } :
+            u.pathname.startsWith('/api/crm-proxy/blog-posts/') ? { json: { post: posts.find(p => u.pathname.endsWith('/' + p.slug)) } } : undefined,
+        respondWrite: async req => {
+            const p = new URL(req.url()).pathname, body = JSON.parse(req.postData() || '{}');
+            if (p === '/api/blog-preview') return { json: { html: require('../../lib/blog').renderMarkdown(body.markdown) } };
+            if (p.startsWith('/api/crm-proxy/blog-posts')) {
+                let post = posts.find(pst => p.endsWith('/' + pst.slug));
+                if (post) Object.assign(post, body); else { post = { ...body }; posts.push(post); }
+                if (post.status === 'Published') post.publishedAt = data.fixed;
+                return { json: { success: true } };
+            }
+            return { status: 503, json: { error: 'Unmapped synthetic blog write' } };
+        }
+    };
+}
+const blogWrites = events => events.writes.filter(w => w.path !== '/api/blog-preview');
+async function blogFields(page) { return page.locator('#editorView input,#editorView textarea').evaluateAll(ns => ns.map(n => ({ id: n.id, value: n.value, disabled: n.disabled }))); }
+
+test('CSS staff toolkit: original blog workflow preserves draft payloads and permanent published URLs', async ({ page }) => {
+    const state = blogReviewState(), events = await open(page, 'blog-editor', { ...state, original: true });
+    await page.locator('[data-slug="synthetic-team-guide-0"]').click(); await expect(page.locator('#previewPane')).toContainText('Synthetic team guide');
+    const fields = await blogFields(page), preview = await page.locator('#previewPane').innerHTML();
+    for (const width of [1440, 768, 390, 320]) { await page.setViewportSize({ width, height: 1000 }); await page.screenshot({ path: path.join(output, 'staff-toolkit-blog-original-editor-' + width + '.png'), fullPage: true }); }
+    await page.locator('#fldTitle').fill('Synthetic updated team guide'); await page.locator('#saveDraftBtn').click();
+    await expect(page.locator('#saveState')).toHaveText('Draft'); await page.locator('#backToListBtn').click();
+    await page.locator('[data-slug="synthetic-team-guide-1"]').click(); await expect(page.locator('#fldSlug')).toBeDisabled();
+    const published = await blogFields(page);
+    fs.writeFileSync(path.join(output, 'staff-toolkit-blog-original-workflow.json'), JSON.stringify({ fields, preview, published, writes: blogWrites(events) }, null, 2) + '\n');
+    expect(events.errors).toEqual([]); expect(events.unknown).toEqual([]); expect(events.missing).toEqual([]);
+});
+
+test('CSS staff toolkit: blog list and editor preserve original fields, previews and saves at four widths', async ({ page }) => {
+    const events = await open(page, 'blog-editor', blogReviewState()), original = require('../fixtures/staff-toolkit-blog-original-workflow.json');
+    await expect(page.locator('.be-list-row')).toHaveCount(2);
+    for (const width of [1440, 768, 390, 320]) {
+        await page.setViewportSize({ width, height: 1000 }); expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width); await axe(page);
+        await page.screenshot({ path: path.join(output, 'staff-toolkit-blog-list-' + width + '.png'), fullPage: true });
+    }
+    await page.locator('[data-slug="synthetic-team-guide-0"]').click(); await expect(page.locator('#fldTitle')).toBeFocused();
+    await expect(page.locator('#previewPane')).toContainText('Synthetic team guide');
+    expect(await blogFields(page)).toEqual(original.fields); expect(await page.locator('#previewPane').innerHTML()).toBe(original.preview);
+    for (const width of [1440, 768, 390, 320]) {
+        await page.setViewportSize({ width, height: 1000 }); expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width); await axe(page);
+        await page.screenshot({ path: path.join(output, 'staff-toolkit-blog-editor-' + width + '.png'), fullPage: true });
+    }
+    await page.setViewportSize({ width: 1440, height: 1000 }); await page.pdf({ path: path.join(output, 'staff-toolkit-blog-editor.pdf'), printBackground: true, preferCSSPageSize: true });
+    await page.locator('#fldTitle').fill('Synthetic updated team guide'); await page.locator('#saveDraftBtn').click();
+    await expect(page.locator('#saveState')).toHaveText('Draft'); expect(blogWrites(events)).toEqual(original.writes);
+    await page.locator('#backToListBtn').click(); await page.locator('[data-slug="synthetic-team-guide-1"]').click();
+    await expect(page.locator('#fldSlug')).toBeDisabled(); expect(await blogFields(page)).toEqual(original.published);
+    expect(events.errors).toEqual([]); expect(events.unknown).toEqual([]); expect(events.missing).toEqual([]);
+});
+
+test('CSS staff toolkit: blog native image controls and formatting work with the keyboard', async ({ page }) => {
+    const events = await open(page, 'blog-editor', blogReviewState());
+    await page.locator('#newPostBtn').click(); await page.locator('#fldTitle').fill('Synthetic keyboard review');
+    await expect(page.locator('#fldSlug')).toHaveValue('synthetic-keyboard-review');
+    await page.getByRole('button', { name: 'Bold', exact: true }).focus(); await page.keyboard.press('Enter'); await expect(page.locator('#fldBody')).toHaveValue('**bold text**');
+    const chooser = page.waitForEvent('filechooser'); await page.getByRole('button', { name: 'Upload image', exact: true }).focus(); await page.keyboard.press('Enter');
+    expect((await chooser).isMultiple()).toBe(false);
+    expect(blogWrites(events)).toEqual([]); expect(events.errors).toEqual([]); expect(events.unknown).toEqual([]);
+});
+
+test('CSS staff toolkit: blog preview ignores an older render after the text changes', async ({ page }) => {
+    let release, started; const gate = new Promise(r => { release = r; }), requested = new Promise(r => { started = r; });
+    const state = blogReviewState(), normal = state.respondWrite;
+    state.respondWrite = async req => {
+        if (new URL(req.url()).pathname === '/api/blog-preview' && JSON.parse(req.postData()).markdown === 'First pending paragraph') { started(); await gate; }
+        return normal(req);
+    };
+    const events = await open(page, 'blog-editor', state); await page.locator('#newPostBtn').click();
+    await page.locator('#fldBody').fill('First pending paragraph'); await requested;
+    try {
+        await page.locator('#fldBody').fill('Latest paragraph'); await expect(page.locator('#previewPane')).toContainText('Latest paragraph');
+    } finally { release(); }
+    await expect(page.locator('#previewPane')).toContainText('Latest paragraph'); await page.waitForTimeout(100);
+    await expect(page.locator('#previewPane')).not.toContainText('First pending paragraph'); expect(blogWrites(events)).toEqual([]); expect(events.errors).toEqual([]);
+});
+
+test('CSS staff toolkit: a late blog read cannot replace a newly started post', async ({ page }) => {
+    let release, started; const gate = new Promise(r => { release = r; }), requested = new Promise(r => { started = r; });
+    const state = blogReviewState(), normal = state.respond;
+    state.respond = async u => { if (u.pathname.endsWith('/synthetic-team-guide-0')) { started(); await gate; } return normal(u); };
+    const events = await open(page, 'blog-editor', state);
+    await page.locator('[data-slug="synthetic-team-guide-0"]').click(); await requested;
+    try { await page.locator('#newPostBtn').click(); await page.locator('#fldTitle').fill('Newest unsaved draft'); } finally { release(); }
+    await page.waitForTimeout(100); await expect(page.locator('#fldTitle')).toHaveValue('Newest unsaved draft');
+    await expect(page.locator('#fldSlug')).toHaveValue('newest-unsaved-draft'); expect(blogWrites(events)).toEqual([]); expect(events.errors).toEqual([]);
+});
+
+test('CSS staff toolkit: blog save holds the editor and rejects duplicate publish requests', async ({ page }) => {
+    let release, started; const gate = new Promise(r => { release = r; }), requested = new Promise(r => { started = r; });
+    const state = blogReviewState(), normal = state.respondWrite;
+    state.respondWrite = async req => { if (new URL(req.url()).pathname.startsWith('/api/crm-proxy/blog-posts')) { started(); await gate; } return normal(req); };
+    const events = await open(page, 'blog-editor', state);
+    await page.locator('[data-slug="synthetic-team-guide-0"]').click(); await page.locator('#publishBtn').click(); await requested;
+    try {
+        await expect(page.locator('#fldTitle')).toBeDisabled(); await expect(page.locator('#backToListBtn')).toBeDisabled(); await expect(page.locator('#saveDraftBtn')).toBeDisabled();
+        await page.locator('#publishBtn').evaluate(btn => btn.dispatchEvent(new MouseEvent('click', { bubbles: true }))); expect(blogWrites(events)).toHaveLength(1);
+    } finally { release(); }
+    await expect(page.locator('#saveState')).toHaveText('Published'); await expect(page.locator('#fldTitle')).toBeEnabled(); await expect(page.locator('#fldSlug')).toBeDisabled();
+    expect(blogWrites(events)).toHaveLength(1); expect(JSON.parse(blogWrites(events)[0].body).status).toBe('Published'); expect(events.errors).toEqual([]);
+});
+
+test('CSS staff toolkit: blog list and editor reject incomplete replies with usable retry', async ({ page }) => {
+    let malformedList = true, malformedPost = true;
+    const state = blogReviewState(), normal = state.respond;
+    state.respond = async u => {
+        if (u.pathname === '/api/crm-proxy/blog-posts' && malformedList) return { json: {} };
+        if (u.pathname.endsWith('/synthetic-team-guide-0') && malformedPost) return { json: { post: {} } };
+        return normal(u);
+    };
+    const events = await open(page, 'blog-editor', state); await expect(page.locator('#postListRetry')).toBeVisible();
+    malformedList = false; await page.locator('#postListRetry').click(); await expect(page.locator('.be-list-row')).toHaveCount(2);
+    await page.locator('[data-slug="synthetic-team-guide-0"]').click(); await expect(page.locator('.dash-error-banner')).toContainText('Could not open');
+    await expect(page.locator('#editorView')).toBeHidden(); malformedPost = false; await page.locator('[data-slug="synthetic-team-guide-0"]').click();
+    await expect(page.locator('#fldTitle')).toHaveValue(data.posts[0].title); await expect(page.locator('.dash-error-banner')).toBeHidden();
+    expect(blogWrites(events)).toEqual([]); expect(events.errors).toEqual([]);
+});
+
+test('CSS staff toolkit: saved blog content remains saved when the canonical reload fails', async ({ page }) => {
+    let saved = false;
+    const state = blogReviewState(), read = state.respond, write = state.respondWrite;
+    state.respond = async u => saved && u.pathname.startsWith('/api/crm-proxy/blog-posts/') ? { status: 503, json: { error: 'Synthetic refresh unavailable' } } : read(u);
+    state.respondWrite = async req => { const r = await write(req); if (new URL(req.url()).pathname.startsWith('/api/crm-proxy/blog-posts')) saved = true; return r; };
+    const events = await open(page, 'blog-editor', state); await page.locator('[data-slug="synthetic-team-guide-0"]').click();
+    await page.locator('#publishBtn').click(); await expect(page.locator('.dash-error-banner')).toContainText('Saved, but could not reload');
+    await expect(page.locator('#fldTitle')).toHaveValue(data.posts[0].title); await expect(page.locator('#fldSlug')).toBeDisabled();
+    await expect(page.locator('#saveState')).toContainText('Published'); expect(blogWrites(events)).toHaveLength(1); expect(events.errors).toEqual([]);
+});
+
+test('CSS staff toolkit: blog image upload holds the post and preserves its original upload contract', async ({ page }) => {
+    let release, started; const gate = new Promise(r => { release = r; }), requested = new Promise(r => { started = r; });
+    const state = blogReviewState(), normal = state.respondWrite;
+    state.respondWrite = async req => {
+        if (new URL(req.url()).pathname === '/api/image-uploads') { started(); await gate; return { json: { image: { url: '/favicon.png' } } }; }
+        return normal(req);
+    };
+    const events = await open(page, 'blog-editor', state); await page.locator('[data-slug="synthetic-team-guide-0"]').click();
+    await page.locator('#fldHeroFile').setInputFiles({ name: 'synthetic.png', mimeType: 'image/png', buffer: Buffer.from('synthetic image') }); await requested;
+    try { await expect(page.locator('#publishBtn')).toBeDisabled(); await expect(page.locator('#fldTitle')).toBeDisabled(); await expect(page.locator('#backToListBtn')).toBeDisabled(); } finally { release(); }
+    await expect(page.locator('#fldHeroUrl')).toHaveValue('/favicon.png'); await expect(page.locator('#heroPreview')).toBeVisible(); await expect(page.locator('#publishBtn')).toBeEnabled();
+    const writes = blogWrites(events); expect(writes).toHaveLength(1); expect(writes[0].body).toContain('name="description"'); expect(writes[0].body).toContain('Blog image — ' + data.posts[0].title);
+    expect(events.errors).toEqual([]); expect(events.unknown).toEqual([]);
+});
+
+test('CSS staff toolkit: blog failures keep the draft and recover preview, upload and save separately', async ({ page }) => {
+    let mode = 'preview-fail'; const state = blogReviewState(), normal = state.respondWrite;
+    state.respondWrite = async req => {
+        const p = new URL(req.url()).pathname;
+        if (p === '/api/blog-preview' && mode === 'preview-fail') return { json: {} };
+        if (p === '/api/image-uploads') return { status: 503, json: { error: 'Synthetic upload unavailable' } };
+        if (p.startsWith('/api/crm-proxy/blog-posts')) return { status: 503, json: { error: 'Synthetic save unavailable' } };
+        return normal(req);
+    };
+    const events = await open(page, 'blog-editor', state); await page.locator('[data-slug="synthetic-team-guide-0"]').click();
+    await expect(page.locator('#previewPane')).toContainText('Preview unavailable'); await expect(page.locator('#fldBody')).toHaveValue(data.posts[0].bodyMarkdown);
+    mode = 'ready'; await page.locator('#fldBody').fill('Recovered synthetic preview'); await expect(page.locator('#previewPane')).toHaveText('Recovered synthetic preview');
+    await page.locator('#fldHeroFile').setInputFiles({ name: 'synthetic.png', mimeType: 'image/png', buffer: Buffer.from('synthetic image') });
+    await expect(page.locator('.dash-error-banner')).toContainText('Image upload failed'); await expect(page.locator('#fldTitle')).toBeEnabled();
+    await page.locator('#saveDraftBtn').click(); await expect(page.locator('.dash-error-banner')).toContainText('Could not confirm the save');
+    await expect(page.locator('#fldBody')).toHaveValue('Recovered synthetic preview'); await expect(page.locator('#saveDraftBtn')).toBeEnabled();
+    await axe(page); expect(blogWrites(events).map(w => w.path)).toEqual(['/api/image-uploads', '/api/crm-proxy/blog-posts/synthetic-team-guide-0']);
+    expect(events.errors).toEqual([]); expect(events.unknown).toEqual([]);
+});
+
+test('CSS staff toolkit: long blog preview stays scrollable and prints every section', async ({ page }) => {
+    const posts = data.posts.map(p => ({ ...p }));
+    posts[0].bodyMarkdown = Array.from({ length: 24 }, (_, i) => '## Review section ' + (i + 1) + '\n\nSynthetic paragraph ' + (i + 1) + ': choose comfortable apparel, preserve the artwork, check the sizes and confirm every quantity before production.').join('\n\n') +
+        '\n\n| Style | Quantity | Note |\n| --- | --- | --- |\n| REVIEW-TEE | 48 | Final review row |\n\n> Synthetic closing quotation.\n\n~~~text\nSyntheticCodeLine_End\n~~~\n\n[Review link](/pages/contact.html)';
+    const events = await open(page, 'blog-editor', blogReviewState(posts)); await page.locator('[data-slug="synthetic-team-guide-0"]').click();
+    await expect(page.locator('#previewPane h2')).toHaveCount(24); await page.setViewportSize({ width: 320, height: 800 });
+    const pane = page.getByRole('region', { name: 'Post preview' }); await pane.focus(); await page.keyboard.press('End'); await expect.poll(() => pane.evaluate(n => n.scrollTop)).toBeGreaterThan(0);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320); await axe(page);
+    await page.setViewportSize({ width: 1440, height: 1000 }); await page.pdf({ path: path.join(output, 'staff-toolkit-blog-long.pdf'), printBackground: true, preferCSSPageSize: true });
+    fs.writeFileSync(path.join(output, 'staff-toolkit-blog-long-expected.json'), JSON.stringify({ post: posts[0], renderedText: await pane.innerText() }, null, 2) + '\n');
+    await expect(page.locator('#fldBody')).toHaveValue(posts[0].bodyMarkdown); expect(blogWrites(events)).toEqual([]); expect(events.errors).toEqual([]); expect(events.unknown).toEqual([]);
+});

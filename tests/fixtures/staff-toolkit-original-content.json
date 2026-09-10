@@ -1489,6 +1489,270 @@
       "before": "tests/unit/non-sanmar-vendor-drift.test.js",
       "after": "tests/unit/staff-toolkit-content.test.js",
       "count": 1
+    },
+    {
+      "file": "dashboards/blog-editor.html",
+      "before": "family=Inter:wght@400;500;600;700",
+      "after": "family=Public+Sans:wght@400;500;600;700",
+      "count": 1
+    },
+    {
+      "file": "dashboards/blog-editor.html",
+      "before": "    <link rel=\"stylesheet\" href=\"/shared_components/css/art-hub.css?v=2026.09.07.19\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/dash-shell.css?v=2026.09.07.10\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/blog.css?v=2026.09.07.8\">\n    <link rel=\"stylesheet\" href=\"/dashboards/css/blog-editor.css?v=2026.09.07.10\">",
+      "after": "    <link rel=\"stylesheet\" href=\"/shared_components/css/components.css?v=2026.09.10.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/staff-toolkit.css?v=2026.09.10.2\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/blog-editor.html",
+      "before": "<body>",
+      "after": "<body data-ui=\"unified\" data-staff-tool=\"blog-editor\">\n    <a class=\"skip-link\" href=\"#staff-tool-main\">Skip to content</a>",
+      "count": 1
+    },
+    {
+      "file": "dashboards/blog-editor.html",
+      "before": "<main class=\"dash-content\">",
+      "after": "<main class=\"dash-content\" id=\"staff-tool-main\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/blog-editor.html",
+      "before": "<script src=\"/dashboards/js/blog-editor.js?v=2026.09.05.69\"></script>",
+      "after": "<script src=\"/dashboards/js/blog-editor.js?v=2026.09.10.2\"></script>",
+      "count": 1
+    },
+    {
+      "file": "dashboards/blog-editor.html",
+      "before": "<input type=\"text\" id=\"fldTitle\" class=\"be-input\" placeholder=\"e.g. Embroidery vs. Screen Printing: Which Is Right for Your Team?\">",
+      "after": "<input type=\"text\" id=\"fldTitle\" class=\"field-input be-input\" placeholder=\"e.g. Embroidery vs. Screen Printing: Which Is Right for Your Team?\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/blog-editor.html",
+      "before": "<input type=\"text\" id=\"fldSlug\" class=\"be-input be-input--mono\" placeholder=\"auto-generates from the title\">",
+      "after": "<input type=\"text\" id=\"fldSlug\" class=\"field-input be-input be-input--mono\" placeholder=\"auto-generates from the title\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/blog-editor.html",
+      "before": "<textarea id=\"fldMeta\" class=\"be-input\" rows=\"2\" maxlength=\"255\" placeholder=\"One or two sentences that make someone click.\">",
+      "after": "<textarea id=\"fldMeta\" class=\"field-textarea be-input\" rows=\"2\" maxlength=\"255\" placeholder=\"One or two sentences that make someone click.\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/blog-editor.html",
+      "before": "<input type=\"text\" id=\"fldCategory\" class=\"be-input\" list=\"beCategories\" placeholder=\"Guides / News / Behind the Scenes\">",
+      "after": "<input type=\"text\" id=\"fldCategory\" class=\"field-input be-input\" list=\"beCategories\" placeholder=\"Guides / News / Behind the Scenes\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/blog-editor.html",
+      "before": "<input type=\"text\" id=\"fldAuthor\" class=\"be-input\" placeholder=\"Northwest Custom Apparel\">",
+      "after": "<input type=\"text\" id=\"fldAuthor\" class=\"field-input be-input\" placeholder=\"Northwest Custom Apparel\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/blog-editor.html",
+      "before": "<input type=\"text\" id=\"fldHeroUrl\" aria-label=\"Hero image URL\" class=\"be-input be-input--mono\" placeholder=\"…or paste an image URL\">",
+      "after": "<input type=\"text\" id=\"fldHeroUrl\" aria-label=\"Hero image URL\" class=\"field-input be-input be-input--mono\" placeholder=\"…or paste an image URL\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/blog-editor.html",
+      "before": "<textarea id=\"fldBody\" class=\"be-input be-body\" rows=\"18\" placeholder=\"Write like you're explaining it to a customer at the counter…\">",
+      "after": "<textarea id=\"fldBody\" class=\"field-textarea be-input be-body\" rows=\"18\" placeholder=\"Write like you're explaining it to a customer at the counter…\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/blog-editor.html",
+      "before": "class=\"be-label\"",
+      "after": "class=\"field-label be-label\"",
+      "count": 7
+    },
+    {
+      "file": "dashboards/blog-editor.html",
+      "before": "<label class=\"be-btn be-file-btn\" for=\"fldHeroFile\" role=\"button\" tabindex=\"0\"><i class=\"fas fa-image\" aria-hidden=\"true\"></i> Upload image</label>",
+      "after": "<button type=\"button\" class=\"be-btn be-file-btn\" data-file=\"fldHeroFile\"><i class=\"fas fa-image\" aria-hidden=\"true\"></i> Upload image</button>",
+      "count": 1
+    },
+    {
+      "file": "dashboards/blog-editor.html",
+      "before": "<label class=\"be-toolbar-upload be-file-btn\" for=\"fldBodyImage\" title=\"Insert image\" role=\"button\" tabindex=\"0\" aria-label=\"Insert image\"><i class=\"fas fa-image\" aria-hidden=\"true\"></i></label>",
+      "after": "<button type=\"button\" class=\"be-toolbar-upload be-file-btn\" data-file=\"fldBodyImage\" title=\"Insert image\" aria-label=\"Insert image\"><i class=\"fas fa-image\" aria-hidden=\"true\"></i></button>",
+      "count": 1
+    },
+    {
+      "file": "dashboards/blog-editor.html",
+      "before": "<input type=\"file\" id=\"fldHeroFile\" accept=\"image/*\" class=\"be-visually-hidden\" aria-label=\"Upload hero image\">",
+      "after": "<input type=\"file\" id=\"fldHeroFile\" accept=\"image/*\" hidden aria-label=\"Upload hero image\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/blog-editor.html",
+      "before": "<input type=\"file\" id=\"fldBodyImage\" accept=\"image/*\" class=\"be-visually-hidden\" aria-label=\"Insert image into the post body\">",
+      "after": "<input type=\"file\" id=\"fldBodyImage\" accept=\"image/*\" hidden aria-label=\"Insert image into the post body\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/blog-editor.html",
+      "before": "class=\"be-btn be-btn--primary\"",
+      "after": "class=\"btn be-btn be-btn--primary btn-primary\"",
+      "count": 2
+    },
+    {
+      "file": "dashboards/blog-editor.html",
+      "before": "class=\"be-btn be-btn--ghost\"",
+      "after": "class=\"btn be-btn be-btn--ghost btn-ghost\"",
+      "count": 2
+    },
+    {
+      "file": "dashboards/blog-editor.html",
+      "before": "class=\"be-btn\"",
+      "after": "class=\"btn be-btn\"",
+      "count": 1
+    },
+    {
+      "file": "dashboards/blog-editor.html",
+      "before": "class=\"be-btn be-btn--warn\"",
+      "after": "class=\"btn be-btn be-btn--warn btn-danger\"",
+      "count": 1
+    },
+    {
+      "file": "dashboards/blog-editor.html",
+      "before": "class=\"be-btn be-file-btn\"",
+      "after": "class=\"btn be-btn be-file-btn\"",
+      "count": 1
+    },
+    {
+      "file": "dashboards/blog-editor.html",
+      "before": "class=\"be-toolbar-upload be-file-btn\"",
+      "after": "class=\"btn be-toolbar-upload be-file-btn btn-ghost\"",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/blog-editor.js",
+      "before": "class=\"be-btn\"",
+      "after": "class=\"btn be-btn\"",
+      "count": 1
+    },
+    {
+      "file": "dashboards/blog-editor.html",
+      "before": "<button type=\"button\" data-md=",
+      "after": "<button type=\"button\" class=\"btn btn-ghost\" data-md=",
+      "count": 7
+    },
+    {
+      "file": "dashboards/blog-editor.html",
+      "before": "class=\"blog-prose be-preview\" aria-live=\"polite\"",
+      "after": "class=\"blog-prose be-preview\" role=\"region\" aria-label=\"Post preview\" tabindex=\"0\" aria-live=\"polite\"",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/blog-editor.js",
+      "before": "        // The two upload controls are <label for=file> — make Enter/Space open the picker\n        document.querySelectorAll('.be-file-btn').forEach(function (lab) {\n            lab.addEventListener('keydown', function (e) {\n                if (e.key !== 'Enter' && e.key !== ' ') return;\n                e.preventDefault();\n                var input = document.getElementById(lab.getAttribute('for'));\n                if (input) input.click();\n            });\n        });\n",
+      "after": "        // Native buttons keep mouse and keyboard file selection equivalent.\n        document.querySelectorAll('.be-file-btn').forEach(function (button) {\n            button.addEventListener('click', function () {\n                var input = document.getElementById(button.dataset.file);\n                if (input && !input.disabled) input.click();\n            });\n        });\n",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/blog-editor.js",
+      "before": "        publishedEver: false,",
+      "after": "        publishedEver: false,\n        busy: false,\n        viewId: 0,\n        listId: 0,\n        previewId: 0,",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/blog-editor.js",
+      "before": "    function loadList() {\n        var root = document.getElementById('postList');\n        root.classList.add('dash-loading');\n        root.textContent = 'Loading posts…';\n        api('?status=all').then(function (body) {\n            DashPage.hideError();\n            state.posts = body.posts || [];\n            renderList();\n        }).catch(function (err) {\n            console.error('[blog-editor] list failed:', err);\n            DashPage.showError('Unable to load posts (' + err.message + ').');\n            root.classList.remove('dash-loading');\n            root.innerHTML = '<p class=\"be-empty\" role=\"alert\">Posts unavailable (' + esc(err.message) + '). ' +\n                '<button type=\"button\" class=\"btn be-btn\" id=\"postListRetry\">Retry</button></p>';\n            var rb = document.getElementById('postListRetry'); if (rb) rb.addEventListener('click', loadList);\n        });\n    }\n\n",
+      "after": "    function loadList() {\n        var requestId = ++state.listId;\n        state.posts = [];\n        var root = document.getElementById('postList');\n        root.classList.add('dash-loading');\n        root.textContent = 'Loading posts…';\n        api('?status=all').then(function (body) {\n            if (requestId !== state.listId) return;\n            if (!Array.isArray(body.posts) || !body.posts.every(function (p) { return p && typeof p.slug === 'string' && typeof p.title === 'string'; })) throw new Error('Post list response incomplete');\n            DashPage.hideError();\n            state.posts = body.posts;\n            renderList();\n        }).catch(function (err) {\n            if (requestId !== state.listId) return;\n            console.error('[blog-editor] list failed:', err);\n            DashPage.showError('Unable to load posts (' + err.message + ').');\n            root.classList.remove('dash-loading');\n            root.innerHTML = '<p class=\"be-empty\" role=\"alert\">Posts unavailable (' + esc(err.message) + '). ' +\n                '<button type=\"button\" class=\"btn be-btn\" id=\"postListRetry\">Retry</button></p>';\n            var rb = document.getElementById('postListRetry'); if (rb) rb.addEventListener('click', loadList);\n        });\n    }\n\n",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/blog-editor.js",
+      "before": "    function openPost(slug) {\n        api('/' + encodeURIComponent(slug)).then(function (body) {\n            state.current = body.post;\n            state.publishedEver = !!body.post.publishedAt;\n            fillEditor(body.post);\n            showEditor(true);\n        }).catch(function (err) {\n            DashPage.showError('Could not open that post: ' + err.message);\n        });\n    }\n\n",
+      "after": "    function validPost(post) {\n        if (!post || typeof post.slug !== 'string' || !post.slug || typeof post.title !== 'string' ||\n            typeof post.bodyMarkdown !== 'string' || !['Draft', 'Published'].includes(post.status)) throw new Error('Post response incomplete');\n        return post;\n    }\n\n    function openPost(slug) {\n        if (state.busy) return;\n        var viewId = ++state.viewId;\n        document.getElementById('postOpenState').textContent = 'Opening post…';\n        api('/' + encodeURIComponent(slug)).then(function (body) {\n            if (viewId !== state.viewId) return;\n            var post = validPost(body.post);\n            if (post.slug !== slug) throw new Error('Post response does not match the selection');\n            state.current = post;\n            state.publishedEver = !!post.publishedAt;\n            DashPage.hideError();\n            fillEditor(post);\n            showEditor(true);\n        }).catch(function (err) {\n            if (viewId === state.viewId) DashPage.showError('Could not open that post: ' + err.message);\n        }).finally(function () {\n            if (viewId === state.viewId) document.getElementById('postOpenState').textContent = '';\n        });\n    }\n\n    function holdEditor() {\n        state.busy = true;\n        var controls = [...document.querySelectorAll('#editorView input, #editorView textarea, #editorView button, #newPostBtn, .be-list-row')];\n        var disabled = controls.map(function (control) { return control.disabled; });\n        controls.forEach(function (control) { control.disabled = true; });\n        return function () {\n            state.busy = false;\n            controls.forEach(function (control, index) { control.disabled = disabled[index]; });\n            document.getElementById('fldSlug').disabled = !!state.current && state.publishedEver;\n        };\n    }\n\n",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/blog-editor.js",
+      "before": "        document.getElementById('newPostBtn').addEventListener('click', function () {",
+      "after": "        document.getElementById('newPostBtn').addEventListener('click', function () {\n            if (state.busy) return;\n            ++state.viewId;\n            document.getElementById('postOpenState').textContent = '';\n            DashPage.hideError();",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/blog-editor.js",
+      "before": "        document.getElementById('backToListBtn').addEventListener('click', function () {",
+      "after": "        document.getElementById('backToListBtn').addEventListener('click', function () {\n            if (state.busy) return;",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/blog-editor.js",
+      "before": "    function showEditor(on) {",
+      "after": "    function showEditor(on) {\n        if (!on) ++state.viewId;",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/blog-editor.js",
+      "before": "            markDirty();\n            if (previewTimer) clearTimeout(previewTimer);",
+      "after": "            markDirty();\n            ++state.previewId;\n            document.getElementById('previewPane').textContent = 'Updating preview…';\n            if (previewTimer) clearTimeout(previewTimer);",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/blog-editor.js",
+      "before": "    function save(status) {\n        var data = collect();\n        data.status = status;\n        if (!data.title) { DashPage.showError('Give the post a title before saving.'); return; }\n        if (!/^[a-z0-9](?:[a-z0-9-]{1,78}[a-z0-9])?$/.test(data.slug) || data.slug.length < 3) {\n            DashPage.showError('The slug needs 3–80 lowercase letters/numbers/dashes (it becomes the URL).');\n            return;\n        }\n        if (status === 'Published' && !data.metaDescription) {\n            DashPage.showError('Write the meta description before publishing — it\\'s the Google snippet.');\n            return;\n        }\n\n        setSaveState('Saving…');\n        var req = state.current\n            ? api('/' + encodeURIComponent(state.current.slug), { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })\n            : api('', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });\n\n        req.then(function () {\n            state.dirty = false;\n            setSaveState(status === 'Published' ? '✓ Published' : '✓ Draft saved');\n            // reload the canonical copy (stamps, lock state)\n            return api('/' + encodeURIComponent(data.slug)).then(function (body) {\n                state.current = body.post;\n                state.publishedEver = !!body.post.publishedAt;\n                fillEditor(body.post);\n            });\n        }).catch(function (err) {\n            console.error('[blog-editor] save failed:', err);\n            setSaveState('');\n            DashPage.showError('NOT saved: ' + err.message);\n        });\n    }\n\n",
+      "after": "    function save(status) {\n        if (state.busy) return;\n        var data = collect();\n        data.status = status;\n        if (!data.title) { DashPage.showError('Give the post a title before saving.'); return; }\n        if (!/^[a-z0-9](?:[a-z0-9-]{1,78}[a-z0-9])?$/.test(data.slug) || data.slug.length < 3) {\n            DashPage.showError('The slug needs 3–80 lowercase letters/numbers/dashes (it becomes the URL).');\n            return;\n        }\n        if (status === 'Published' && !data.metaDescription) {\n            DashPage.showError('Write the meta description before publishing — it\\'s the Google snippet.');\n            return;\n        }\n\n        DashPage.hideError();\n        var release = holdEditor(), writeCompleted = false;\n        setSaveState('Saving…');\n        var req = state.current\n            ? api('/' + encodeURIComponent(state.current.slug), { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })\n            : api('', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });\n\n        req.then(function () {\n            writeCompleted = true;\n            state.current = Object.assign({}, state.current || {}, data);\n            state.publishedEver = state.publishedEver || status === 'Published';\n            state.dirty = false;\n            setSaveState(status === 'Published' ? '✓ Published' : '✓ Draft saved');\n            // reload the canonical copy (stamps, lock state)\n            return api('/' + encodeURIComponent(data.slug)).then(function (body) {\n                var post = validPost(body.post);\n                if (post.slug !== data.slug) throw new Error('Saved post response does not match');\n                state.current = post;\n                state.publishedEver = !!post.publishedAt;\n                fillEditor(post);\n            });\n        }).catch(function (err) {\n            console.error('[blog-editor] save failed:', err);\n            if (writeCompleted) {\n                DashPage.showError('Saved, but could not reload the post (' + err.message + '). Reopen it from All posts to check the saved copy.');\n            } else {\n                setSaveState('Save not confirmed');\n                DashPage.showError('Could not confirm the save (' + err.message + '). Check All posts before retrying. Your draft is retained here.');\n            }\n        }).finally(release);\n    }\n\n",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/blog-editor.js",
+      "before": "    function refreshPreview() {\n        fetch('/api/blog-preview', {\n            method: 'POST',\n            headers: { 'Content-Type': 'application/json' },\n            body: JSON.stringify({ markdown: document.getElementById('fldBody').value }),\n        }).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).then(function (body) {\n            document.getElementById('previewPane').innerHTML = body.html || '';\n        }).catch(function (err) {\n            // A stale preview would lie about what publishes — say it failed instead (Erik's #1 rule).\n            console.error('[blog-editor] preview failed:', err);\n            document.getElementById('previewPane').innerHTML = '<p class=\"be-preview-fail\">Preview unavailable (' + esc(err.message || 'request failed') + ') — keep writing, it retries on the next keystroke.</p>';\n        });\n    }\n\n",
+      "after": "    function refreshPreview() {\n        var requestId = ++state.previewId, viewId = state.viewId;\n        var markdown = document.getElementById('fldBody').value, pane = document.getElementById('previewPane');\n        function current() { return requestId === state.previewId && viewId === state.viewId && markdown === document.getElementById('fldBody').value; }\n        pane.textContent = 'Updating preview…';\n        fetch('/api/blog-preview', {\n            method: 'POST',\n            headers: { 'Content-Type': 'application/json' },\n            body: JSON.stringify({ markdown: markdown }),\n        }).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).then(function (body) {\n            if (!current()) return;\n            if (typeof body.html !== 'string') throw new Error('Preview response incomplete');\n            pane.innerHTML = body.html;\n        }).catch(function (err) {\n            if (!current()) return;\n            console.error('[blog-editor] preview failed:', err);\n            pane.innerHTML = '<p class=\"be-preview-fail\" role=\"alert\">Preview unavailable (' + esc(err.message || 'request failed') + ') — keep writing, it retries on the next keystroke.</p>';\n        });\n    }\n\n",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/blog-editor.js",
+      "before": "    function uploadImage(input, done) {\n        var file",
+      "after": "    function uploadImage(input, done) {\n        if (state.busy) return;\n        var file",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/blog-editor.js",
+      "before": "        setSaveState('Uploading image…');",
+      "after": "        DashPage.hideError();\n        var viewId = state.viewId, release = holdEditor();\n        setSaveState('Uploading image…');",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/blog-editor.js",
+      "before": "            .then(function (b) {\n                var url",
+      "after": "            .then(function (b) {\n                if (viewId !== state.viewId) return;\n                var url",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/blog-editor.js",
+      "before": "            .catch(function (err) {\n                console.error('[blog-editor] upload failed:', err);",
+      "after": "            .catch(function (err) {\n                if (viewId !== state.viewId) return;\n                console.error('[blog-editor] upload failed:', err);",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/blog-editor.js",
+      "before": "            .finally(function () { input.value = ''; });",
+      "after": "            .finally(function () { if (viewId === state.viewId) input.value = ''; release(); });",
+      "count": 1
+    },
+    {
+      "file": "dashboards/blog-editor.html",
+      "before": "                    <h2>Posts</h2>",
+      "after": "                    <h2>Posts</h2>\n                    <span id=\"postOpenState\" class=\"be-save-state\" role=\"status\"></span>",
+      "count": 1
+    },
+    {
+      "file": "dashboards/blog-editor.html",
+      "before": "                <div class=\"be-grid\">",
+      "after": "                <div id=\"blogPrintMetadata\" class=\"be-print-metadata\"></div>\n                <div class=\"be-grid\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/blog-editor.js",
+      "before": "        window.addEventListener('beforeunload', function (e) {",
+      "after": "        window.addEventListener('beforeprint', function () {\n            var post = collect();\n            var fields = [['URL slug', post.slug], ['Category', post.category], ['Author', post.author], ['Meta description', post.metaDescription], ['Hero image URL', post.heroImageUrl]];\n            document.getElementById('blogPrintMetadata').innerHTML = '<h1>' + esc(post.title || 'Untitled post') + '</h1>' +\n                '<p>' + esc(document.getElementById('saveState').textContent) + '</p><dl>' +\n                fields.filter(function (field) { return field[1]; }).map(function (field) {\n                    return '<dt>' + esc(field[0]) + '</dt><dd>' + esc(field[1]) + '</dd>';\n                }).join('') + '</dl>';\n        });\n\n        window.addEventListener('beforeunload', function (e) {",
+      "count": 1
     }
   ]
 }
