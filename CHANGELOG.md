@@ -1,3 +1,16 @@
+## v2026.09.10.7 (2026.09.10)
+
+- Preserve four final staff tools before CSS review
+- Capture original behavior of the final four staff tools
+- Unify calibration workspace and preserve photo-relative print geometry
+- Record verified staff workspace rollout and next calibration checkpoint
+- Preserve Records Admin mutation and export contracts before migration
+- Unify Records Admin layouts and preserve quote action contracts
+- Unify box-label station and preserve packing and print ownership
+- Unify Staff Dashboard and preserve workspace and keyboard contracts
+- Integrate four reviewed staff tools with primary release checks
+- Deploy v2026.09.10.7: unify four staff tools and preserve their data and print workflows
+
 ## v2026.09.10.4 (2026.09.10)
 
 - Preserve six remaining staff-workspace sources before CSS review

@@ -1300,3 +1300,7 @@ Reviewed application draft remains287cf762 (Drain-Pro, production shifts, payrol
 ## Staff workspace release record — v2026.09.10.4
 
 Exact-source CI 34511709902 passed all four jobs on 06b3b5cdac0bb8b3ee590c22f49d543c2f2219a8, including the actual unified CSS browser sweep and live money/calculator parity. Six pages share canonical controls and scoped owners. The release has 61 original hashes, 314 reversible changes, 70 focused staff scenarios and 45 reviewed paper pages. Six legacy owners / 177,104 LF bytes / 103 flags retired; 485 routes unchanged. Count becomes 176 reviewed / 49 pending only after verified rollout. The four final staff tools remain separate on codex/staff-final-tools and are excluded from this release.
+
+## Four staff tools release record — v2026.09.10.7
+
+Exact-source CI 34525732554 passed all four jobs on 8546e9ddbeb3b24e8b09734f75ec5362941aef4b, including actual957-case CSS sweep and live money/calculator parity. Calibration, Records Admin, Box Labels and Staff Dashboard share canonical controls and scoped styles.49 original sources/270 reversible mappings/74 focused browser scenarios/11 reviewed paper pages. Four legacy page sheets retired; the dashboard legacy sheets remain for historical harnesses. Count becomes180/225,45pending only after verified rollout. The employee-bundle branch is separate and excluded from this release.
