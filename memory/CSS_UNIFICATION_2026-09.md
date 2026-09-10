@@ -1102,3 +1102,7 @@ Reviewed pricing reports: price-audit-report, quote-audit and generated pricing-
 ## Pricing report release checks complete — v2026.09.09.18
 
 Full integrated source passed build/lint/types,485routes/24modules,230unit suites/5328tests/four existing skips,88DOM,four accessibility unit,84quote parity,623mocked browser,16remaining browser/three optional screenshot skips,all five calculators,281CSS clean,boot200 and production audit zero.19focused cases;42table hashes/363rows; three PDFs/32landscape pages/10,146checked original data words. Six original script/generator/data hashes preserved outside33mapped changes. Three legacy sheets/18flags retired, new owner zero. Stored audit zero totals remain authoritative; missing audit data cannot masquerade as zero/OK. Private financial JSON unchanged and unserved. Live remains146/79 until verified149/76 after exact-source CI and rollout.
+
+## Pricing reports release record — v2026.09.09.18
+
+Exact-source CI 34428559307 passed all four jobs on 0b4eabe6e009638a360f6cf12438e7759cba0b73, including actual money/calculator parity and623mocked browser checks. Three pricing reports share controls, table layouts and honest incomplete/error states.19focused cases,42original table hashes/363rows, three PDFs/32pages/10,146checked data words. Six source hashes preserved outside33mapped changes. Three old sheets/18flags retired.485routes unchanged. Count becomes149reviewed/76pending only after verified rollout.

@@ -1,3 +1,12 @@
+## v2026.09.09.18 (2026.09.09)
+
+- Plan generated pricing reports and audit CSS review
+- Unify pricing reports with preserved comparisons and accessible recovery
+- Record verified product detail release and pricing report checkpoint
+- Integrate reviewed pricing reports and accessible comparison controls
+- Save CSS shutdown checkpoint: reports tested and CRM baseline captured
+- Deploy v2026.09.09.18: unify pricing reports and preserve complete comparisons
+
 ## v2026.09.09.17 (2026.09.09)
 
 - Plan product detail and catalog color CSS review
