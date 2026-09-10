@@ -1,0 +1,10 @@
+{
+  "text": "STYLES\nPC54\nSynthetic cotton tee\nauto\nPC61\nSynthetic cotton tee\nauto\nFront\nBack\nSave for this color only\nPick a style on the left to start\nSave layout\nReset to auto-detect\nRemove saved layout\nCopy JSON\n\n⚠️ Calibration API not deployed on the proxy yet — layouts can't save (use Copy JSON meanwhile).",
+  "events": {
+    "errors": [],
+    "writes": [],
+    "unknown": [],
+    "missing": [],
+    "providers": []
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "styles": [
+    {
+      "style": "PC54",
+      "product_title": "Synthetic cotton tee",
+      "main_image_url": "https://example.test/PC54.svg"
+    },
+    {
+      "style": "PC61",
+      "product_title": "Synthetic cotton tee",
+      "main_image_url": "https://example.test/PC61.svg"
+    }
+  ],
+  "details": {
+    "PC54": [
+      {
+        "STYLE": "PC54",
+        "CATALOG_COLOR": "Black",
+        "COLOR_NAME": "Black",
+        "FRONT_FLAT": "https://example.test/PC54-Black-front.svg",
+        "BACK_FLAT": "https://example.test/PC54-Black-back.svg"
+      },
+      {
+        "STYLE": "PC54",
+        "CATALOG_COLOR": "Navy",
+        "COLOR_NAME": "Navy",
+        "FRONT_FLAT": "https://example.test/PC54-Navy-front.svg",
+        "BACK_FLAT": "https://example.test/PC54-Navy-back.svg"
+      }
+    ],
+    "PC61": [
+      {
+        "STYLE": "PC61",
+        "CATALOG_COLOR": "Black",
+        "COLOR_NAME": "Black",
+        "FRONT_FLAT": "https://example.test/PC61-Black-front.svg",
+        "BACK_FLAT": "https://example.test/PC61-Black-back.svg"
+      },
+      {
+        "STYLE": "PC61",
+        "CATALOG_COLOR": "Navy",
+        "COLOR_NAME": "Navy",
+        "FRONT_FLAT": "https://example.test/PC61-Navy-front.svg",
+        "BACK_FLAT": "https://example.test/PC61-Navy-back.svg"
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "PK_ID": 4501,
+      "StyleNumber": "PC54",
+      "ViewName": "flatFront",
+      "CatalogColor": "",
+      "XFrac": 0.28,
+      "YFrac": 0.22,
+      "WFrac": 0.38
+    }
+  ]
+}

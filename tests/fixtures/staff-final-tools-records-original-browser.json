@@ -1,0 +1,2010 @@
+{
+  "states": [
+    {
+      "name": "initial",
+      "data": {
+        "count": "Showing 1-50 of 52 records",
+        "pagination": "Page 1 of 2",
+        "rows": [
+          [
+            "DTG0910-8001",
+            "DTG",
+            "Cedar Customer 1 records1@example.test",
+            "Synthetic Workshop 1",
+            "$120.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "RICH0910-8002",
+            "Richardson",
+            "Cedar Customer 2 records2@example.test",
+            "Synthetic Workshop 2",
+            "$132.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "EMB0910-8003",
+            "Embroidery",
+            "Cedar Customer 3 records3@example.test",
+            "Synthetic Workshop 3",
+            "$145.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "EMBC0910-8004",
+            "Cust. Emb.",
+            "Cedar Customer 4 records4@example.test",
+            "Synthetic Workshop 4",
+            "$157.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "LT0910-8005",
+            "Laser",
+            "Cedar Customer 5 records5@example.test",
+            "Synthetic Workshop 5",
+            "$170.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "PATCH0910-8006",
+            "Patch",
+            "Cedar Customer 6 records6@example.test",
+            "Synthetic Workshop 6",
+            "$182.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "SPC0910-8007",
+            "Screen Print",
+            "Cedar Customer 7 records7@example.test",
+            "Synthetic Workshop 7",
+            "$195.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "SSC0910-8008",
+            "Safety",
+            "Cedar Customer 8 records8@example.test",
+            "Synthetic Workshop 8",
+            "$207.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "WEB0910-8009",
+            "Webstore",
+            "Cedar Customer 9 records9@example.test",
+            "Synthetic Workshop 9",
+            "$220.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "DTG0910-8010",
+            "DTG",
+            "Cedar Customer 10 records10@example.test",
+            "Synthetic Workshop 10",
+            "$232.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "RICH0910-8011",
+            "Richardson",
+            "Cedar Customer 11 records11@example.test",
+            "Synthetic Workshop 11",
+            "$245.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "EMB0910-8012",
+            "Embroidery",
+            "Cedar Customer 12 records12@example.test",
+            "Synthetic Workshop 12",
+            "$257.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "EMBC0910-8013",
+            "Cust. Emb.",
+            "Cedar Customer 13 records13@example.test",
+            "Synthetic Workshop 13",
+            "$270.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "LT0910-8014",
+            "Laser",
+            "Cedar Customer 14 records14@example.test",
+            "Synthetic Workshop 14",
+            "$282.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "PATCH0910-8015",
+            "Patch",
+            "Cedar Customer 15 records15@example.test",
+            "Synthetic Workshop 15",
+            "$295.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "SPC0910-8016",
+            "Screen Print",
+            "Cedar Customer 16 records16@example.test",
+            "Synthetic Workshop 16",
+            "$307.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "SSC0910-8017",
+            "Safety",
+            "Cedar Customer 17 records17@example.test",
+            "Synthetic Workshop 17",
+            "$320.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "WEB0910-8018",
+            "Webstore",
+            "Cedar Customer 18 records18@example.test",
+            "Synthetic Workshop 18",
+            "$332.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "DTG0910-8019",
+            "DTG",
+            "Cedar Customer 19 records19@example.test",
+            "Synthetic Workshop 19",
+            "$345.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "RICH0910-8020",
+            "Richardson",
+            "Cedar Customer 20 records20@example.test",
+            "Synthetic Workshop 20",
+            "$357.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "EMB0910-8021",
+            "Embroidery",
+            "Cedar Customer 21 records21@example.test",
+            "Synthetic Workshop 21",
+            "$370.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "EMBC0910-8022",
+            "Cust. Emb.",
+            "Cedar Customer 22 records22@example.test",
+            "Synthetic Workshop 22",
+            "$382.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "LT0910-8023",
+            "Laser",
+            "Cedar Customer 23 records23@example.test",
+            "Synthetic Workshop 23",
+            "$395.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "PATCH0910-8024",
+            "Patch",
+            "Cedar Customer 24 records24@example.test",
+            "Synthetic Workshop 24",
+            "$407.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "SPC0910-8025",
+            "Screen Print",
+            "Cedar Customer 25 records25@example.test",
+            "Synthetic Workshop 25",
+            "$420.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "SSC0910-8026",
+            "Safety",
+            "Cedar Customer 26 records26@example.test",
+            "Synthetic Workshop 26",
+            "$432.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "WEB0910-8027",
+            "Webstore",
+            "Cedar Customer 27 records27@example.test",
+            "Synthetic Workshop 27",
+            "$445.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "DTG0910-8028",
+            "DTG",
+            "Cedar Customer 28 records28@example.test",
+            "Synthetic Workshop 28",
+            "$457.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "RICH0910-8029",
+            "Richardson",
+            "Cedar Customer 29 records29@example.test",
+            "Synthetic Workshop 29",
+            "$470.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "EMB0910-8030",
+            "Embroidery",
+            "Cedar Customer 30 records30@example.test",
+            "Synthetic Workshop 30",
+            "$482.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "EMBC0910-8031",
+            "Cust. Emb.",
+            "Cedar Customer 31 records31@example.test",
+            "Synthetic Workshop 31",
+            "$495.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "LT0910-8032",
+            "Laser",
+            "Cedar Customer 32 records32@example.test",
+            "Synthetic Workshop 32",
+            "$507.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "PATCH0910-8033",
+            "Patch",
+            "Cedar Customer 33 records33@example.test",
+            "Synthetic Workshop 33",
+            "$520.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "SPC0910-8034",
+            "Screen Print",
+            "Cedar Customer 34 records34@example.test",
+            "Synthetic Workshop 34",
+            "$532.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "SSC0910-8035",
+            "Safety",
+            "Cedar Customer 35 records35@example.test",
+            "Synthetic Workshop 35",
+            "$545.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "WEB0910-8036",
+            "Webstore",
+            "Cedar Customer 36 records36@example.test",
+            "Synthetic Workshop 36",
+            "$557.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "DTG0910-8037",
+            "DTG",
+            "Cedar Customer 37 records37@example.test",
+            "Synthetic Workshop 37",
+            "$570.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "RICH0910-8038",
+            "Richardson",
+            "Cedar Customer 38 records38@example.test",
+            "Synthetic Workshop 38",
+            "$582.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "EMB0910-8039",
+            "Embroidery",
+            "Cedar Customer 39 records39@example.test",
+            "Synthetic Workshop 39",
+            "$595.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "EMBC0910-8040",
+            "Cust. Emb.",
+            "Cedar Customer 40 records40@example.test",
+            "Synthetic Workshop 40",
+            "$607.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "LT0910-8041",
+            "Laser",
+            "Cedar Customer 41 records41@example.test",
+            "Synthetic Workshop 41",
+            "$620.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "PATCH0910-8042",
+            "Patch",
+            "Cedar Customer 42 records42@example.test",
+            "Synthetic Workshop 42",
+            "$632.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "SPC0910-8043",
+            "Screen Print",
+            "Cedar Customer 43 records43@example.test",
+            "Synthetic Workshop 43",
+            "$645.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "SSC0910-8044",
+            "Safety",
+            "Cedar Customer 44 records44@example.test",
+            "Synthetic Workshop 44",
+            "$657.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "WEB0910-8045",
+            "Webstore",
+            "Cedar Customer 45 records45@example.test",
+            "Synthetic Workshop 45",
+            "$670.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "DTG0910-8046",
+            "DTG",
+            "Cedar Customer 46 records46@example.test",
+            "Synthetic Workshop 46",
+            "$682.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "RICH0910-8047",
+            "Richardson",
+            "Cedar Customer 47 records47@example.test",
+            "Synthetic Workshop 47",
+            "$695.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "EMB0910-8048",
+            "Embroidery",
+            "Cedar Customer 48 records48@example.test",
+            "Synthetic Workshop 48",
+            "$707.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "EMBC0910-8049",
+            "Cust. Emb.",
+            "Cedar Customer 49 records49@example.test",
+            "Synthetic Workshop 49",
+            "$720.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "LT0910-8050",
+            "Laser",
+            "Cedar Customer 50 records50@example.test",
+            "Synthetic Workshop 50",
+            "$732.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ]
+        ],
+        "statuses": [
+          {
+            "quote": "DTG0910-8001",
+            "pk": "880001",
+            "value": "Open"
+          },
+          {
+            "quote": "RICH0910-8002",
+            "pk": "880002",
+            "value": "Sent"
+          },
+          {
+            "quote": "EMB0910-8003",
+            "pk": "880003",
+            "value": "Converted"
+          },
+          {
+            "quote": "EMBC0910-8004",
+            "pk": "880004",
+            "value": "Expired"
+          },
+          {
+            "quote": "LT0910-8005",
+            "pk": "880005",
+            "value": "Open"
+          },
+          {
+            "quote": "PATCH0910-8006",
+            "pk": "880006",
+            "value": "Sent"
+          },
+          {
+            "quote": "SPC0910-8007",
+            "pk": "880007",
+            "value": "Converted"
+          },
+          {
+            "quote": "SSC0910-8008",
+            "pk": "880008",
+            "value": "Expired"
+          },
+          {
+            "quote": "WEB0910-8009",
+            "pk": "880009",
+            "value": "Open"
+          },
+          {
+            "quote": "DTG0910-8010",
+            "pk": "880010",
+            "value": "Sent"
+          },
+          {
+            "quote": "RICH0910-8011",
+            "pk": "880011",
+            "value": "Converted"
+          },
+          {
+            "quote": "EMB0910-8012",
+            "pk": "880012",
+            "value": "Expired"
+          },
+          {
+            "quote": "EMBC0910-8013",
+            "pk": "880013",
+            "value": "Open"
+          },
+          {
+            "quote": "LT0910-8014",
+            "pk": "880014",
+            "value": "Sent"
+          },
+          {
+            "quote": "PATCH0910-8015",
+            "pk": "880015",
+            "value": "Converted"
+          },
+          {
+            "quote": "SPC0910-8016",
+            "pk": "880016",
+            "value": "Expired"
+          },
+          {
+            "quote": "SSC0910-8017",
+            "pk": "880017",
+            "value": "Open"
+          },
+          {
+            "quote": "WEB0910-8018",
+            "pk": "880018",
+            "value": "Sent"
+          },
+          {
+            "quote": "DTG0910-8019",
+            "pk": "880019",
+            "value": "Converted"
+          },
+          {
+            "quote": "RICH0910-8020",
+            "pk": "880020",
+            "value": "Expired"
+          },
+          {
+            "quote": "EMB0910-8021",
+            "pk": "880021",
+            "value": "Open"
+          },
+          {
+            "quote": "EMBC0910-8022",
+            "pk": "880022",
+            "value": "Sent"
+          },
+          {
+            "quote": "LT0910-8023",
+            "pk": "880023",
+            "value": "Converted"
+          },
+          {
+            "quote": "PATCH0910-8024",
+            "pk": "880024",
+            "value": "Expired"
+          },
+          {
+            "quote": "SPC0910-8025",
+            "pk": "880025",
+            "value": "Open"
+          },
+          {
+            "quote": "SSC0910-8026",
+            "pk": "880026",
+            "value": "Sent"
+          },
+          {
+            "quote": "WEB0910-8027",
+            "pk": "880027",
+            "value": "Converted"
+          },
+          {
+            "quote": "DTG0910-8028",
+            "pk": "880028",
+            "value": "Expired"
+          },
+          {
+            "quote": "RICH0910-8029",
+            "pk": "880029",
+            "value": "Open"
+          },
+          {
+            "quote": "EMB0910-8030",
+            "pk": "880030",
+            "value": "Sent"
+          },
+          {
+            "quote": "EMBC0910-8031",
+            "pk": "880031",
+            "value": "Converted"
+          },
+          {
+            "quote": "LT0910-8032",
+            "pk": "880032",
+            "value": "Expired"
+          },
+          {
+            "quote": "PATCH0910-8033",
+            "pk": "880033",
+            "value": "Open"
+          },
+          {
+            "quote": "SPC0910-8034",
+            "pk": "880034",
+            "value": "Sent"
+          },
+          {
+            "quote": "SSC0910-8035",
+            "pk": "880035",
+            "value": "Converted"
+          },
+          {
+            "quote": "WEB0910-8036",
+            "pk": "880036",
+            "value": "Expired"
+          },
+          {
+            "quote": "DTG0910-8037",
+            "pk": "880037",
+            "value": "Open"
+          },
+          {
+            "quote": "RICH0910-8038",
+            "pk": "880038",
+            "value": "Sent"
+          },
+          {
+            "quote": "EMB0910-8039",
+            "pk": "880039",
+            "value": "Converted"
+          },
+          {
+            "quote": "EMBC0910-8040",
+            "pk": "880040",
+            "value": "Expired"
+          },
+          {
+            "quote": "LT0910-8041",
+            "pk": "880041",
+            "value": "Open"
+          },
+          {
+            "quote": "PATCH0910-8042",
+            "pk": "880042",
+            "value": "Sent"
+          },
+          {
+            "quote": "SPC0910-8043",
+            "pk": "880043",
+            "value": "Converted"
+          },
+          {
+            "quote": "SSC0910-8044",
+            "pk": "880044",
+            "value": "Expired"
+          },
+          {
+            "quote": "WEB0910-8045",
+            "pk": "880045",
+            "value": "Open"
+          },
+          {
+            "quote": "DTG0910-8046",
+            "pk": "880046",
+            "value": "Sent"
+          },
+          {
+            "quote": "RICH0910-8047",
+            "pk": "880047",
+            "value": "Converted"
+          },
+          {
+            "quote": "EMB0910-8048",
+            "pk": "880048",
+            "value": "Expired"
+          },
+          {
+            "quote": "EMBC0910-8049",
+            "pk": "880049",
+            "value": "Open"
+          },
+          {
+            "quote": "LT0910-8050",
+            "pk": "880050",
+            "value": "Sent"
+          }
+        ],
+        "filters": [
+          {
+            "id": "quoteTypeFilter",
+            "value": ""
+          },
+          {
+            "id": "statusFilter",
+            "value": ""
+          },
+          {
+            "id": "dateFromFilter",
+            "value": "2026-08-11"
+          },
+          {
+            "id": "dateToFilter",
+            "value": "2026-09-10"
+          },
+          {
+            "id": "customerFilter",
+            "value": ""
+          },
+          {
+            "id": "minAmountFilter",
+            "value": ""
+          }
+        ]
+      }
+    },
+    {
+      "name": "page-two",
+      "data": {
+        "count": "Showing 51-52 of 52 records",
+        "pagination": "Page 2 of 2",
+        "rows": [
+          [
+            "PATCH0910-8051",
+            "Patch",
+            "Cedar Customer 51 records51@example.test",
+            "Synthetic Workshop 51",
+            "$745.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "SPC0910-8052",
+            "Screen Print",
+            "Cedar Customer 52 records52@example.test",
+            "Synthetic Workshop 52",
+            "$757.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ]
+        ],
+        "statuses": [
+          {
+            "quote": "PATCH0910-8051",
+            "pk": "880051",
+            "value": "Converted"
+          },
+          {
+            "quote": "SPC0910-8052",
+            "pk": "880052",
+            "value": "Expired"
+          }
+        ],
+        "filters": [
+          {
+            "id": "quoteTypeFilter",
+            "value": ""
+          },
+          {
+            "id": "statusFilter",
+            "value": ""
+          },
+          {
+            "id": "dateFromFilter",
+            "value": "2026-08-11"
+          },
+          {
+            "id": "dateToFilter",
+            "value": "2026-09-10"
+          },
+          {
+            "id": "customerFilter",
+            "value": ""
+          },
+          {
+            "id": "minAmountFilter",
+            "value": ""
+          }
+        ]
+      }
+    },
+    {
+      "name": "embroidery",
+      "data": {
+        "count": "Showing 1-12 of 12 records",
+        "pagination": "Page 1 of 1",
+        "rows": [
+          [
+            "EMB0910-8003",
+            "Embroidery",
+            "Cedar Customer 3 records3@example.test",
+            "Synthetic Workshop 3",
+            "$145.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "EMBC0910-8004",
+            "Cust. Emb.",
+            "Cedar Customer 4 records4@example.test",
+            "Synthetic Workshop 4",
+            "$157.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "EMB0910-8012",
+            "Embroidery",
+            "Cedar Customer 12 records12@example.test",
+            "Synthetic Workshop 12",
+            "$257.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "EMBC0910-8013",
+            "Cust. Emb.",
+            "Cedar Customer 13 records13@example.test",
+            "Synthetic Workshop 13",
+            "$270.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "EMB0910-8021",
+            "Embroidery",
+            "Cedar Customer 21 records21@example.test",
+            "Synthetic Workshop 21",
+            "$370.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "EMBC0910-8022",
+            "Cust. Emb.",
+            "Cedar Customer 22 records22@example.test",
+            "Synthetic Workshop 22",
+            "$382.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "EMB0910-8030",
+            "Embroidery",
+            "Cedar Customer 30 records30@example.test",
+            "Synthetic Workshop 30",
+            "$482.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "EMBC0910-8031",
+            "Cust. Emb.",
+            "Cedar Customer 31 records31@example.test",
+            "Synthetic Workshop 31",
+            "$495.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "EMB0910-8039",
+            "Embroidery",
+            "Cedar Customer 39 records39@example.test",
+            "Synthetic Workshop 39",
+            "$595.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "EMBC0910-8040",
+            "Cust. Emb.",
+            "Cedar Customer 40 records40@example.test",
+            "Synthetic Workshop 40",
+            "$607.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "EMB0910-8048",
+            "Embroidery",
+            "Cedar Customer 48 records48@example.test",
+            "Synthetic Workshop 48",
+            "$707.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "EMBC0910-8049",
+            "Cust. Emb.",
+            "Cedar Customer 49 records49@example.test",
+            "Synthetic Workshop 49",
+            "$720.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ]
+        ],
+        "statuses": [
+          {
+            "quote": "EMB0910-8003",
+            "pk": "880003",
+            "value": "Converted"
+          },
+          {
+            "quote": "EMBC0910-8004",
+            "pk": "880004",
+            "value": "Expired"
+          },
+          {
+            "quote": "EMB0910-8012",
+            "pk": "880012",
+            "value": "Expired"
+          },
+          {
+            "quote": "EMBC0910-8013",
+            "pk": "880013",
+            "value": "Open"
+          },
+          {
+            "quote": "EMB0910-8021",
+            "pk": "880021",
+            "value": "Open"
+          },
+          {
+            "quote": "EMBC0910-8022",
+            "pk": "880022",
+            "value": "Sent"
+          },
+          {
+            "quote": "EMB0910-8030",
+            "pk": "880030",
+            "value": "Sent"
+          },
+          {
+            "quote": "EMBC0910-8031",
+            "pk": "880031",
+            "value": "Converted"
+          },
+          {
+            "quote": "EMB0910-8039",
+            "pk": "880039",
+            "value": "Converted"
+          },
+          {
+            "quote": "EMBC0910-8040",
+            "pk": "880040",
+            "value": "Expired"
+          },
+          {
+            "quote": "EMB0910-8048",
+            "pk": "880048",
+            "value": "Expired"
+          },
+          {
+            "quote": "EMBC0910-8049",
+            "pk": "880049",
+            "value": "Open"
+          }
+        ],
+        "filters": [
+          {
+            "id": "quoteTypeFilter",
+            "value": "EMB"
+          },
+          {
+            "id": "statusFilter",
+            "value": ""
+          },
+          {
+            "id": "dateFromFilter",
+            "value": "2026-08-11"
+          },
+          {
+            "id": "dateToFilter",
+            "value": "2026-09-10"
+          },
+          {
+            "id": "customerFilter",
+            "value": ""
+          },
+          {
+            "id": "minAmountFilter",
+            "value": ""
+          }
+        ]
+      }
+    },
+    {
+      "name": "open-embroidery",
+      "data": {
+        "count": "Showing 1-3 of 3 records",
+        "pagination": "Page 1 of 1",
+        "rows": [
+          [
+            "EMBC0910-8013",
+            "Cust. Emb.",
+            "Cedar Customer 13 records13@example.test",
+            "Synthetic Workshop 13",
+            "$270.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "EMB0910-8021",
+            "Embroidery",
+            "Cedar Customer 21 records21@example.test",
+            "Synthetic Workshop 21",
+            "$370.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "EMBC0910-8049",
+            "Cust. Emb.",
+            "Cedar Customer 49 records49@example.test",
+            "Synthetic Workshop 49",
+            "$720.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ]
+        ],
+        "statuses": [
+          {
+            "quote": "EMBC0910-8013",
+            "pk": "880013",
+            "value": "Open"
+          },
+          {
+            "quote": "EMB0910-8021",
+            "pk": "880021",
+            "value": "Open"
+          },
+          {
+            "quote": "EMBC0910-8049",
+            "pk": "880049",
+            "value": "Open"
+          }
+        ],
+        "filters": [
+          {
+            "id": "quoteTypeFilter",
+            "value": "EMB"
+          },
+          {
+            "id": "statusFilter",
+            "value": "Open"
+          },
+          {
+            "id": "dateFromFilter",
+            "value": "2026-08-11"
+          },
+          {
+            "id": "dateToFilter",
+            "value": "2026-09-10"
+          },
+          {
+            "id": "customerFilter",
+            "value": ""
+          },
+          {
+            "id": "minAmountFilter",
+            "value": ""
+          }
+        ]
+      }
+    },
+    {
+      "name": "all-time",
+      "data": {
+        "count": "Showing 1-50 of 53 records",
+        "pagination": "Page 1 of 2",
+        "rows": [
+          [
+            "DTG0910-8001",
+            "DTG",
+            "Cedar Customer 1 records1@example.test",
+            "Synthetic Workshop 1",
+            "$120.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "RICH0910-8002",
+            "Richardson",
+            "Cedar Customer 2 records2@example.test",
+            "Synthetic Workshop 2",
+            "$132.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "EMB0910-8003",
+            "Embroidery",
+            "Cedar Customer 3 records3@example.test",
+            "Synthetic Workshop 3",
+            "$145.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "EMBC0910-8004",
+            "Cust. Emb.",
+            "Cedar Customer 4 records4@example.test",
+            "Synthetic Workshop 4",
+            "$157.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "LT0910-8005",
+            "Laser",
+            "Cedar Customer 5 records5@example.test",
+            "Synthetic Workshop 5",
+            "$170.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "PATCH0910-8006",
+            "Patch",
+            "Cedar Customer 6 records6@example.test",
+            "Synthetic Workshop 6",
+            "$182.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "SPC0910-8007",
+            "Screen Print",
+            "Cedar Customer 7 records7@example.test",
+            "Synthetic Workshop 7",
+            "$195.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "SSC0910-8008",
+            "Safety",
+            "Cedar Customer 8 records8@example.test",
+            "Synthetic Workshop 8",
+            "$207.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "WEB0910-8009",
+            "Webstore",
+            "Cedar Customer 9 records9@example.test",
+            "Synthetic Workshop 9",
+            "$220.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "DTG0910-8010",
+            "DTG",
+            "Cedar Customer 10 records10@example.test",
+            "Synthetic Workshop 10",
+            "$232.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "RICH0910-8011",
+            "Richardson",
+            "Cedar Customer 11 records11@example.test",
+            "Synthetic Workshop 11",
+            "$245.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "EMB0910-8012",
+            "Embroidery",
+            "Cedar Customer 12 records12@example.test",
+            "Synthetic Workshop 12",
+            "$257.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "EMBC0910-8013",
+            "Cust. Emb.",
+            "Cedar Customer 13 records13@example.test",
+            "Synthetic Workshop 13",
+            "$270.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "LT0910-8014",
+            "Laser",
+            "Cedar Customer 14 records14@example.test",
+            "Synthetic Workshop 14",
+            "$282.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "PATCH0910-8015",
+            "Patch",
+            "Cedar Customer 15 records15@example.test",
+            "Synthetic Workshop 15",
+            "$295.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "SPC0910-8016",
+            "Screen Print",
+            "Cedar Customer 16 records16@example.test",
+            "Synthetic Workshop 16",
+            "$307.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "SSC0910-8017",
+            "Safety",
+            "Cedar Customer 17 records17@example.test",
+            "Synthetic Workshop 17",
+            "$320.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "WEB0910-8018",
+            "Webstore",
+            "Cedar Customer 18 records18@example.test",
+            "Synthetic Workshop 18",
+            "$332.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "DTG0910-8019",
+            "DTG",
+            "Cedar Customer 19 records19@example.test",
+            "Synthetic Workshop 19",
+            "$345.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "RICH0910-8020",
+            "Richardson",
+            "Cedar Customer 20 records20@example.test",
+            "Synthetic Workshop 20",
+            "$357.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "EMB0910-8021",
+            "Embroidery",
+            "Cedar Customer 21 records21@example.test",
+            "Synthetic Workshop 21",
+            "$370.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "EMBC0910-8022",
+            "Cust. Emb.",
+            "Cedar Customer 22 records22@example.test",
+            "Synthetic Workshop 22",
+            "$382.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "LT0910-8023",
+            "Laser",
+            "Cedar Customer 23 records23@example.test",
+            "Synthetic Workshop 23",
+            "$395.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "PATCH0910-8024",
+            "Patch",
+            "Cedar Customer 24 records24@example.test",
+            "Synthetic Workshop 24",
+            "$407.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "SPC0910-8025",
+            "Screen Print",
+            "Cedar Customer 25 records25@example.test",
+            "Synthetic Workshop 25",
+            "$420.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "SSC0910-8026",
+            "Safety",
+            "Cedar Customer 26 records26@example.test",
+            "Synthetic Workshop 26",
+            "$432.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "WEB0910-8027",
+            "Webstore",
+            "Cedar Customer 27 records27@example.test",
+            "Synthetic Workshop 27",
+            "$445.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "DTG0910-8028",
+            "DTG",
+            "Cedar Customer 28 records28@example.test",
+            "Synthetic Workshop 28",
+            "$457.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "RICH0910-8029",
+            "Richardson",
+            "Cedar Customer 29 records29@example.test",
+            "Synthetic Workshop 29",
+            "$470.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "EMB0910-8030",
+            "Embroidery",
+            "Cedar Customer 30 records30@example.test",
+            "Synthetic Workshop 30",
+            "$482.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "EMBC0910-8031",
+            "Cust. Emb.",
+            "Cedar Customer 31 records31@example.test",
+            "Synthetic Workshop 31",
+            "$495.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "LT0910-8032",
+            "Laser",
+            "Cedar Customer 32 records32@example.test",
+            "Synthetic Workshop 32",
+            "$507.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "PATCH0910-8033",
+            "Patch",
+            "Cedar Customer 33 records33@example.test",
+            "Synthetic Workshop 33",
+            "$520.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "SPC0910-8034",
+            "Screen Print",
+            "Cedar Customer 34 records34@example.test",
+            "Synthetic Workshop 34",
+            "$532.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "SSC0910-8035",
+            "Safety",
+            "Cedar Customer 35 records35@example.test",
+            "Synthetic Workshop 35",
+            "$545.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "WEB0910-8036",
+            "Webstore",
+            "Cedar Customer 36 records36@example.test",
+            "Synthetic Workshop 36",
+            "$557.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "DTG0910-8037",
+            "DTG",
+            "Cedar Customer 37 records37@example.test",
+            "Synthetic Workshop 37",
+            "$570.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "RICH0910-8038",
+            "Richardson",
+            "Cedar Customer 38 records38@example.test",
+            "Synthetic Workshop 38",
+            "$582.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "EMB0910-8039",
+            "Embroidery",
+            "Cedar Customer 39 records39@example.test",
+            "Synthetic Workshop 39",
+            "$595.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "EMBC0910-8040",
+            "Cust. Emb.",
+            "Cedar Customer 40 records40@example.test",
+            "Synthetic Workshop 40",
+            "$607.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "LT0910-8041",
+            "Laser",
+            "Cedar Customer 41 records41@example.test",
+            "Synthetic Workshop 41",
+            "$620.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "PATCH0910-8042",
+            "Patch",
+            "Cedar Customer 42 records42@example.test",
+            "Synthetic Workshop 42",
+            "$632.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "SPC0910-8043",
+            "Screen Print",
+            "Cedar Customer 43 records43@example.test",
+            "Synthetic Workshop 43",
+            "$645.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "SSC0910-8044",
+            "Safety",
+            "Cedar Customer 44 records44@example.test",
+            "Synthetic Workshop 44",
+            "$657.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "WEB0910-8045",
+            "Webstore",
+            "Cedar Customer 45 records45@example.test",
+            "Synthetic Workshop 45",
+            "$670.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "DTG0910-8046",
+            "DTG",
+            "Cedar Customer 46 records46@example.test",
+            "Synthetic Workshop 46",
+            "$682.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "RICH0910-8047",
+            "Richardson",
+            "Cedar Customer 47 records47@example.test",
+            "Synthetic Workshop 47",
+            "$695.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "EMB0910-8048",
+            "Embroidery",
+            "Cedar Customer 48 records48@example.test",
+            "Synthetic Workshop 48",
+            "$707.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "EMBC0910-8049",
+            "Cust. Emb.",
+            "Cedar Customer 49 records49@example.test",
+            "Synthetic Workshop 49",
+            "$720.00",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ],
+          [
+            "LT0910-8050",
+            "Laser",
+            "Cedar Customer 50 records50@example.test",
+            "Synthetic Workshop 50",
+            "$732.50",
+            "Open Sent Converted Expired Cancelled",
+            "9/9/2026 11:00:00 AM",
+            ""
+          ]
+        ],
+        "statuses": [
+          {
+            "quote": "DTG0910-8001",
+            "pk": "880001",
+            "value": "Open"
+          },
+          {
+            "quote": "RICH0910-8002",
+            "pk": "880002",
+            "value": "Sent"
+          },
+          {
+            "quote": "EMB0910-8003",
+            "pk": "880003",
+            "value": "Converted"
+          },
+          {
+            "quote": "EMBC0910-8004",
+            "pk": "880004",
+            "value": "Expired"
+          },
+          {
+            "quote": "LT0910-8005",
+            "pk": "880005",
+            "value": "Open"
+          },
+          {
+            "quote": "PATCH0910-8006",
+            "pk": "880006",
+            "value": "Sent"
+          },
+          {
+            "quote": "SPC0910-8007",
+            "pk": "880007",
+            "value": "Converted"
+          },
+          {
+            "quote": "SSC0910-8008",
+            "pk": "880008",
+            "value": "Expired"
+          },
+          {
+            "quote": "WEB0910-8009",
+            "pk": "880009",
+            "value": "Open"
+          },
+          {
+            "quote": "DTG0910-8010",
+            "pk": "880010",
+            "value": "Sent"
+          },
+          {
+            "quote": "RICH0910-8011",
+            "pk": "880011",
+            "value": "Converted"
+          },
+          {
+            "quote": "EMB0910-8012",
+            "pk": "880012",
+            "value": "Expired"
+          },
+          {
+            "quote": "EMBC0910-8013",
+            "pk": "880013",
+            "value": "Open"
+          },
+          {
+            "quote": "LT0910-8014",
+            "pk": "880014",
+            "value": "Sent"
+          },
+          {
+            "quote": "PATCH0910-8015",
+            "pk": "880015",
+            "value": "Converted"
+          },
+          {
+            "quote": "SPC0910-8016",
+            "pk": "880016",
+            "value": "Expired"
+          },
+          {
+            "quote": "SSC0910-8017",
+            "pk": "880017",
+            "value": "Open"
+          },
+          {
+            "quote": "WEB0910-8018",
+            "pk": "880018",
+            "value": "Sent"
+          },
+          {
+            "quote": "DTG0910-8019",
+            "pk": "880019",
+            "value": "Converted"
+          },
+          {
+            "quote": "RICH0910-8020",
+            "pk": "880020",
+            "value": "Expired"
+          },
+          {
+            "quote": "EMB0910-8021",
+            "pk": "880021",
+            "value": "Open"
+          },
+          {
+            "quote": "EMBC0910-8022",
+            "pk": "880022",
+            "value": "Sent"
+          },
+          {
+            "quote": "LT0910-8023",
+            "pk": "880023",
+            "value": "Converted"
+          },
+          {
+            "quote": "PATCH0910-8024",
+            "pk": "880024",
+            "value": "Expired"
+          },
+          {
+            "quote": "SPC0910-8025",
+            "pk": "880025",
+            "value": "Open"
+          },
+          {
+            "quote": "SSC0910-8026",
+            "pk": "880026",
+            "value": "Sent"
+          },
+          {
+            "quote": "WEB0910-8027",
+            "pk": "880027",
+            "value": "Converted"
+          },
+          {
+            "quote": "DTG0910-8028",
+            "pk": "880028",
+            "value": "Expired"
+          },
+          {
+            "quote": "RICH0910-8029",
+            "pk": "880029",
+            "value": "Open"
+          },
+          {
+            "quote": "EMB0910-8030",
+            "pk": "880030",
+            "value": "Sent"
+          },
+          {
+            "quote": "EMBC0910-8031",
+            "pk": "880031",
+            "value": "Converted"
+          },
+          {
+            "quote": "LT0910-8032",
+            "pk": "880032",
+            "value": "Expired"
+          },
+          {
+            "quote": "PATCH0910-8033",
+            "pk": "880033",
+            "value": "Open"
+          },
+          {
+            "quote": "SPC0910-8034",
+            "pk": "880034",
+            "value": "Sent"
+          },
+          {
+            "quote": "SSC0910-8035",
+            "pk": "880035",
+            "value": "Converted"
+          },
+          {
+            "quote": "WEB0910-8036",
+            "pk": "880036",
+            "value": "Expired"
+          },
+          {
+            "quote": "DTG0910-8037",
+            "pk": "880037",
+            "value": "Open"
+          },
+          {
+            "quote": "RICH0910-8038",
+            "pk": "880038",
+            "value": "Sent"
+          },
+          {
+            "quote": "EMB0910-8039",
+            "pk": "880039",
+            "value": "Converted"
+          },
+          {
+            "quote": "EMBC0910-8040",
+            "pk": "880040",
+            "value": "Expired"
+          },
+          {
+            "quote": "LT0910-8041",
+            "pk": "880041",
+            "value": "Open"
+          },
+          {
+            "quote": "PATCH0910-8042",
+            "pk": "880042",
+            "value": "Sent"
+          },
+          {
+            "quote": "SPC0910-8043",
+            "pk": "880043",
+            "value": "Converted"
+          },
+          {
+            "quote": "SSC0910-8044",
+            "pk": "880044",
+            "value": "Expired"
+          },
+          {
+            "quote": "WEB0910-8045",
+            "pk": "880045",
+            "value": "Open"
+          },
+          {
+            "quote": "DTG0910-8046",
+            "pk": "880046",
+            "value": "Sent"
+          },
+          {
+            "quote": "RICH0910-8047",
+            "pk": "880047",
+            "value": "Converted"
+          },
+          {
+            "quote": "EMB0910-8048",
+            "pk": "880048",
+            "value": "Expired"
+          },
+          {
+            "quote": "EMBC0910-8049",
+            "pk": "880049",
+            "value": "Open"
+          },
+          {
+            "quote": "LT0910-8050",
+            "pk": "880050",
+            "value": "Sent"
+          }
+        ],
+        "filters": [
+          {
+            "id": "quoteTypeFilter",
+            "value": ""
+          },
+          {
+            "id": "statusFilter",
+            "value": ""
+          },
+          {
+            "id": "dateFromFilter",
+            "value": ""
+          },
+          {
+            "id": "dateToFilter",
+            "value": ""
+          },
+          {
+            "id": "customerFilter",
+            "value": ""
+          },
+          {
+            "id": "minAmountFilter",
+            "value": ""
+          }
+        ]
+      }
+    },
+    {
+      "name": "search-old",
+      "data": {
+        "count": "Showing 1-1 of 1 records",
+        "pagination": "Page 1 of 1",
+        "rows": [
+          [
+            "EMB0301-8991",
+            "Embroidery",
+            "Archived Customer records1@example.test",
+            "Synthetic Workshop 1",
+            "$120.00",
+            "Open Sent Converted Expired Cancelled",
+            "3/1/2026 10:00:00 AM",
+            ""
+          ]
+        ],
+        "statuses": [
+          {
+            "quote": "EMB0301-8991",
+            "pk": "880091",
+            "value": "Open"
+          }
+        ],
+        "filters": [
+          {
+            "id": "quoteTypeFilter",
+            "value": ""
+          },
+          {
+            "id": "statusFilter",
+            "value": ""
+          },
+          {
+            "id": "dateFromFilter",
+            "value": ""
+          },
+          {
+            "id": "dateToFilter",
+            "value": ""
+          },
+          {
+            "id": "customerFilter",
+            "value": "Archived"
+          },
+          {
+            "id": "minAmountFilter",
+            "value": ""
+          }
+        ]
+      }
+    }
+  ],
+  "csv": "Quote ID,Type,Customer Name,Customer Email,Company Name,Total Amount,Status,Created Date,Notes\nDTG0910-8001,DTG,\"Cedar Customer 1\",records1@example.test,\"Synthetic Workshop 1\",120,Open,9/9/2026,\"Synthetic proof note\nSecond line\"\nRICH0910-8002,Richardson,\"Cedar Customer 2\",records2@example.test,\"Synthetic Workshop 2\",132.5,Sent,9/9/2026,\"\"\nEMB0910-8003,Embroidery,\"Cedar Customer 3\",records3@example.test,\"Synthetic Workshop 3\",145,Converted,9/9/2026,\"\"\nEMBC0910-8004,Cust. Emb.,\"Cedar Customer 4\",records4@example.test,\"Synthetic Workshop 4\",157.5,Expired,9/9/2026,\"\"\nLT0910-8005,Laser,\"Cedar Customer 5\",records5@example.test,\"Synthetic Workshop 5\",170,Open,9/9/2026,\"\"\nPATCH0910-8006,Patch,\"Cedar Customer 6\",records6@example.test,\"Synthetic Workshop 6\",182.5,Sent,9/9/2026,\"\"\nSPC0910-8007,Screen Print,\"Cedar Customer 7\",records7@example.test,\"Synthetic Workshop 7\",195,Converted,9/9/2026,\"\"\nSSC0910-8008,Safety,\"Cedar Customer 8\",records8@example.test,\"Synthetic Workshop 8\",207.5,Expired,9/9/2026,\"\"\nWEB0910-8009,Webstore,\"Cedar Customer 9\",records9@example.test,\"Synthetic Workshop 9\",220,Open,9/9/2026,\"\"\nDTG0910-8010,DTG,\"Cedar Customer 10\",records10@example.test,\"Synthetic Workshop 10\",232.5,Sent,9/9/2026,\"\"\nRICH0910-8011,Richardson,\"Cedar Customer 11\",records11@example.test,\"Synthetic Workshop 11\",245,Converted,9/9/2026,\"\"\nEMB0910-8012,Embroidery,\"Cedar Customer 12\",records12@example.test,\"Synthetic Workshop 12\",257.5,Expired,9/9/2026,\"\"\nEMBC0910-8013,Cust. Emb.,\"Cedar Customer 13\",records13@example.test,\"Synthetic Workshop 13\",270,Open,9/9/2026,\"\"\nLT0910-8014,Laser,\"Cedar Customer 14\",records14@example.test,\"Synthetic Workshop 14\",282.5,Sent,9/9/2026,\"\"\nPATCH0910-8015,Patch,\"Cedar Customer 15\",records15@example.test,\"Synthetic Workshop 15\",295,Converted,9/9/2026,\"\"\nSPC0910-8016,Screen Print,\"Cedar Customer 16\",records16@example.test,\"Synthetic Workshop 16\",307.5,Expired,9/9/2026,\"\"\nSSC0910-8017,Safety,\"Cedar Customer 17\",records17@example.test,\"Synthetic Workshop 17\",320,Open,9/9/2026,\"\"\nWEB0910-8018,Webstore,\"Cedar Customer 18\",records18@example.test,\"Synthetic Workshop 18\",332.5,Sent,9/9/2026,\"\"\nDTG0910-8019,DTG,\"Cedar Customer 19\",records19@example.test,\"Synthetic Workshop 19\",345,Converted,9/9/2026,\"\"\nRICH0910-8020,Richardson,\"Cedar Customer 20\",records20@example.test,\"Synthetic Workshop 20\",357.5,Expired,9/9/2026,\"\"\nEMB0910-8021,Embroidery,\"Cedar Customer 21\",records21@example.test,\"Synthetic Workshop 21\",370,Open,9/9/2026,\"\"\nEMBC0910-8022,Cust. Emb.,\"Cedar Customer 22\",records22@example.test,\"Synthetic Workshop 22\",382.5,Sent,9/9/2026,\"\"\nLT0910-8023,Laser,\"Cedar Customer 23\",records23@example.test,\"Synthetic Workshop 23\",395,Converted,9/9/2026,\"\"\nPATCH0910-8024,Patch,\"Cedar Customer 24\",records24@example.test,\"Synthetic Workshop 24\",407.5,Expired,9/9/2026,\"\"\nSPC0910-8025,Screen Print,\"Cedar Customer 25\",records25@example.test,\"Synthetic Workshop 25\",420,Open,9/9/2026,\"\"\nSSC0910-8026,Safety,\"Cedar Customer 26\",records26@example.test,\"Synthetic Workshop 26\",432.5,Sent,9/9/2026,\"\"\nWEB0910-8027,Webstore,\"Cedar Customer 27\",records27@example.test,\"Synthetic Workshop 27\",445,Converted,9/9/2026,\"\"\nDTG0910-8028,DTG,\"Cedar Customer 28\",records28@example.test,\"Synthetic Workshop 28\",457.5,Expired,9/9/2026,\"\"\nRICH0910-8029,Richardson,\"Cedar Customer 29\",records29@example.test,\"Synthetic Workshop 29\",470,Open,9/9/2026,\"\"\nEMB0910-8030,Embroidery,\"Cedar Customer 30\",records30@example.test,\"Synthetic Workshop 30\",482.5,Sent,9/9/2026,\"\"\nEMBC0910-8031,Cust. Emb.,\"Cedar Customer 31\",records31@example.test,\"Synthetic Workshop 31\",495,Converted,9/9/2026,\"\"\nLT0910-8032,Laser,\"Cedar Customer 32\",records32@example.test,\"Synthetic Workshop 32\",507.5,Expired,9/9/2026,\"\"\nPATCH0910-8033,Patch,\"Cedar Customer 33\",records33@example.test,\"Synthetic Workshop 33\",520,Open,9/9/2026,\"\"\nSPC0910-8034,Screen Print,\"Cedar Customer 34\",records34@example.test,\"Synthetic Workshop 34\",532.5,Sent,9/9/2026,\"\"\nSSC0910-8035,Safety,\"Cedar Customer 35\",records35@example.test,\"Synthetic Workshop 35\",545,Converted,9/9/2026,\"\"\nWEB0910-8036,Webstore,\"Cedar Customer 36\",records36@example.test,\"Synthetic Workshop 36\",557.5,Expired,9/9/2026,\"\"\nDTG0910-8037,DTG,\"Cedar Customer 37\",records37@example.test,\"Synthetic Workshop 37\",570,Open,9/9/2026,\"\"\nRICH0910-8038,Richardson,\"Cedar Customer 38\",records38@example.test,\"Synthetic Workshop 38\",582.5,Sent,9/9/2026,\"\"\nEMB0910-8039,Embroidery,\"Cedar Customer 39\",records39@example.test,\"Synthetic Workshop 39\",595,Converted,9/9/2026,\"\"\nEMBC0910-8040,Cust. Emb.,\"Cedar Customer 40\",records40@example.test,\"Synthetic Workshop 40\",607.5,Expired,9/9/2026,\"\"\nLT0910-8041,Laser,\"Cedar Customer 41\",records41@example.test,\"Synthetic Workshop 41\",620,Open,9/9/2026,\"\"\nPATCH0910-8042,Patch,\"Cedar Customer 42\",records42@example.test,\"Synthetic Workshop 42\",632.5,Sent,9/9/2026,\"\"\nSPC0910-8043,Screen Print,\"Cedar Customer 43\",records43@example.test,\"Synthetic Workshop 43\",645,Converted,9/9/2026,\"\"\nSSC0910-8044,Safety,\"Cedar Customer 44\",records44@example.test,\"Synthetic Workshop 44\",657.5,Expired,9/9/2026,\"\"\nWEB0910-8045,Webstore,\"Cedar Customer 45\",records45@example.test,\"Synthetic Workshop 45\",670,Open,9/9/2026,\"\"\nDTG0910-8046,DTG,\"Cedar Customer 46\",records46@example.test,\"Synthetic Workshop 46\",682.5,Sent,9/9/2026,\"\"\nRICH0910-8047,Richardson,\"Cedar Customer 47\",records47@example.test,\"Synthetic Workshop 47\",695,Converted,9/9/2026,\"\"\nEMB0910-8048,Embroidery,\"Cedar Customer 48\",records48@example.test,\"Synthetic Workshop 48\",707.5,Expired,9/9/2026,\"\"\nEMBC0910-8049,Cust. Emb.,\"Cedar Customer 49\",records49@example.test,\"Synthetic Workshop 49\",720,Open,9/9/2026,\"\"\nLT0910-8050,Laser,\"Cedar Customer 50\",records50@example.test,\"Synthetic Workshop 50\",732.5,Sent,9/9/2026,\"\"\nPATCH0910-8051,Patch,\"Cedar Customer 51\",records51@example.test,\"Synthetic Workshop 51\",745,Converted,9/9/2026,\"\"\nSPC0910-8052,Screen Print,\"Cedar Customer 52\",records52@example.test,\"Synthetic Workshop 52\",757.5,Expired,9/9/2026,\"\"\nEMB0301-8991,Embroidery,\"Archived Customer\",records1@example.test,\"Synthetic Workshop 1\",120,Open,3/1/2026,\"Synthetic proof note\nSecond line\"",
+  "csvName": "quote_records_2026-09-10.csv",
+  "detail": "Quote Details - DTG0910-8001\n×\nCustomer Information\n\nName: Cedar Customer 1\n\nEmail: records1@example.test\n\nCompany: Synthetic Workshop 1\n\nPhone: N/A\n\nQuote Information\n\nStatus: OPEN\n\nCreated: 9/9/2026\n\nExpires: 10/1/2026\n\nTotal: $120.00\n\nNotes\n\nSynthetic proof note\nSecond line\n\nQuote Items\nItem\tProduct\tQuantity\tUnit Price\tTotal\n1\tSynthetic cotton tee\nPC54\t12\t$10.00\t$120.00\nExport\nDuplicate\nClose",
+  "reads": [
+    "/api/quote_sessions",
+    "/api/quote_items?quoteID=DTG0910-8001"
+  ],
+  "events": {
+    "errors": [],
+    "writes": [],
+    "unknown": [],
+    "missing": [],
+    "providers": []
+  }
+}

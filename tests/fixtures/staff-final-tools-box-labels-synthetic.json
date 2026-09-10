@@ -1,0 +1,428 @@
+{
+  "orders": [
+    {
+      "sanmarPO": "882211",
+      "workOrder": "55123",
+      "company": "Sample Workshop 6",
+      "salesRep": "Aster Sample",
+      "boxes": 3,
+      "piecesShipped": 96,
+      "received": false,
+      "cost": 384,
+      "piecesOrdered": 96,
+      "method": "Embroidery",
+      "designNumber": "99001",
+      "designName": "Synthetic stitch sample",
+      "dueDate": "2026-09-16",
+      "dateOrdered": "2026-09-08",
+      "contactName": "Cedar Example",
+      "customerPO": "SYNTHETIC-0",
+      "terms": "Net 30",
+      "boxDetailAvailable": true,
+      "lines": [
+        {
+          "style": "PC54",
+          "title": "Synthetic cotton tee",
+          "color": "Black",
+          "size": "S",
+          "qty": 4,
+          "qtyOrdered": 12,
+          "qtyShipped": 12,
+          "status": "Shipped",
+          "lineCost": 48
+        },
+        {
+          "style": "PC54",
+          "title": "Synthetic cotton tee",
+          "color": "Black",
+          "size": "M",
+          "qty": 8,
+          "qtyOrdered": 24,
+          "qtyShipped": 24,
+          "status": "Shipped",
+          "lineCost": 96
+        },
+        {
+          "style": "PC54",
+          "title": "Synthetic cotton tee",
+          "color": "Black",
+          "size": "L",
+          "qty": 12,
+          "qtyOrdered": 36,
+          "qtyShipped": 36,
+          "status": "Shipped",
+          "lineCost": 144
+        },
+        {
+          "style": "PC54",
+          "title": "Synthetic cotton tee",
+          "color": "Black",
+          "size": "XL",
+          "qty": 8,
+          "qtyOrdered": 24,
+          "qtyShipped": 24,
+          "status": "Shipped",
+          "lineCost": 96
+        }
+      ],
+      "boxDetail": [
+        {
+          "boxNumber": 1,
+          "pieces": 32,
+          "items": [
+            {
+              "style": "PC54",
+              "title": "Synthetic cotton tee",
+              "color": "Black",
+              "size": "S",
+              "qty": 4
+            },
+            {
+              "style": "PC54",
+              "title": "Synthetic cotton tee",
+              "color": "Black",
+              "size": "M",
+              "qty": 8
+            },
+            {
+              "style": "PC54",
+              "title": "Synthetic cotton tee",
+              "color": "Black",
+              "size": "L",
+              "qty": 12
+            },
+            {
+              "style": "PC54",
+              "title": "Synthetic cotton tee",
+              "color": "Black",
+              "size": "XL",
+              "qty": 8
+            }
+          ],
+          "trackingNumber": "SYNTHETIC-0-1",
+          "carrier": "UPS"
+        },
+        {
+          "boxNumber": 2,
+          "pieces": 32,
+          "items": [
+            {
+              "style": "PC54",
+              "title": "Synthetic cotton tee",
+              "color": "Black",
+              "size": "S",
+              "qty": 4
+            },
+            {
+              "style": "PC54",
+              "title": "Synthetic cotton tee",
+              "color": "Black",
+              "size": "M",
+              "qty": 8
+            },
+            {
+              "style": "PC54",
+              "title": "Synthetic cotton tee",
+              "color": "Black",
+              "size": "L",
+              "qty": 12
+            },
+            {
+              "style": "PC54",
+              "title": "Synthetic cotton tee",
+              "color": "Black",
+              "size": "XL",
+              "qty": 8
+            }
+          ],
+          "trackingNumber": "SYNTHETIC-0-2",
+          "carrier": "UPS"
+        },
+        {
+          "boxNumber": 3,
+          "pieces": 32,
+          "items": [
+            {
+              "style": "PC54",
+              "title": "Synthetic cotton tee",
+              "color": "Black",
+              "size": "S",
+              "qty": 4
+            },
+            {
+              "style": "PC54",
+              "title": "Synthetic cotton tee",
+              "color": "Black",
+              "size": "M",
+              "qty": 8
+            },
+            {
+              "style": "PC54",
+              "title": "Synthetic cotton tee",
+              "color": "Black",
+              "size": "L",
+              "qty": 12
+            },
+            {
+              "style": "PC54",
+              "title": "Synthetic cotton tee",
+              "color": "Black",
+              "size": "XL",
+              "qty": 8
+            }
+          ],
+          "trackingNumber": "SYNTHETIC-0-3",
+          "carrier": "UPS"
+        }
+      ]
+    },
+    {
+      "sanmarPO": "882244",
+      "workOrder": "55140",
+      "company": "Sample Workshop 15",
+      "salesRep": "Cedar Sample",
+      "boxes": 5,
+      "piecesShipped": 180,
+      "received": false,
+      "cost": 900,
+      "piecesOrdered": 192,
+      "method": "DTG",
+      "designNumber": "99002",
+      "designName": "Synthetic stitch sample",
+      "dueDate": "2026-09-16",
+      "dateOrdered": "2026-09-08",
+      "contactName": "Cedar Example",
+      "customerPO": "SYNTHETIC-1",
+      "terms": "Net 30",
+      "boxDetailAvailable": true,
+      "lines": [
+        {
+          "style": "PC61",
+          "title": "Synthetic cotton tee",
+          "color": "Navy",
+          "size": "S",
+          "qty": 6,
+          "qtyOrdered": 42,
+          "qtyShipped": 30,
+          "status": "Shipped",
+          "lineCost": 150
+        },
+        {
+          "style": "PC61",
+          "title": "Synthetic cotton tee",
+          "color": "Navy",
+          "size": "M",
+          "qty": 8,
+          "qtyOrdered": 40,
+          "qtyShipped": 40,
+          "status": "Shipped",
+          "lineCost": 200
+        },
+        {
+          "style": "PC61",
+          "title": "Synthetic cotton tee",
+          "color": "Navy",
+          "size": "L",
+          "qty": 10,
+          "qtyOrdered": 50,
+          "qtyShipped": 50,
+          "status": "Shipped",
+          "lineCost": 250
+        },
+        {
+          "style": "PC61",
+          "title": "Synthetic cotton tee",
+          "color": "Navy",
+          "size": "XL",
+          "qty": 12,
+          "qtyOrdered": 60,
+          "qtyShipped": 60,
+          "status": "Shipped",
+          "lineCost": 300
+        }
+      ],
+      "boxDetail": [
+        {
+          "boxNumber": 1,
+          "pieces": 36,
+          "items": [
+            {
+              "style": "PC61",
+              "title": "Synthetic cotton tee",
+              "color": "Navy",
+              "size": "S",
+              "qty": 6
+            },
+            {
+              "style": "PC61",
+              "title": "Synthetic cotton tee",
+              "color": "Navy",
+              "size": "M",
+              "qty": 8
+            },
+            {
+              "style": "PC61",
+              "title": "Synthetic cotton tee",
+              "color": "Navy",
+              "size": "L",
+              "qty": 10
+            },
+            {
+              "style": "PC61",
+              "title": "Synthetic cotton tee",
+              "color": "Navy",
+              "size": "XL",
+              "qty": 12
+            }
+          ],
+          "trackingNumber": "SYNTHETIC-1-1",
+          "carrier": "UPS"
+        },
+        {
+          "boxNumber": 2,
+          "pieces": 36,
+          "items": [
+            {
+              "style": "PC61",
+              "title": "Synthetic cotton tee",
+              "color": "Navy",
+              "size": "S",
+              "qty": 6
+            },
+            {
+              "style": "PC61",
+              "title": "Synthetic cotton tee",
+              "color": "Navy",
+              "size": "M",
+              "qty": 8
+            },
+            {
+              "style": "PC61",
+              "title": "Synthetic cotton tee",
+              "color": "Navy",
+              "size": "L",
+              "qty": 10
+            },
+            {
+              "style": "PC61",
+              "title": "Synthetic cotton tee",
+              "color": "Navy",
+              "size": "XL",
+              "qty": 12
+            }
+          ],
+          "trackingNumber": "SYNTHETIC-1-2",
+          "carrier": "UPS"
+        },
+        {
+          "boxNumber": 3,
+          "pieces": 36,
+          "items": [
+            {
+              "style": "PC61",
+              "title": "Synthetic cotton tee",
+              "color": "Navy",
+              "size": "S",
+              "qty": 6
+            },
+            {
+              "style": "PC61",
+              "title": "Synthetic cotton tee",
+              "color": "Navy",
+              "size": "M",
+              "qty": 8
+            },
+            {
+              "style": "PC61",
+              "title": "Synthetic cotton tee",
+              "color": "Navy",
+              "size": "L",
+              "qty": 10
+            },
+            {
+              "style": "PC61",
+              "title": "Synthetic cotton tee",
+              "color": "Navy",
+              "size": "XL",
+              "qty": 12
+            }
+          ],
+          "trackingNumber": "SYNTHETIC-1-3",
+          "carrier": "UPS"
+        },
+        {
+          "boxNumber": 4,
+          "pieces": 36,
+          "items": [
+            {
+              "style": "PC61",
+              "title": "Synthetic cotton tee",
+              "color": "Navy",
+              "size": "S",
+              "qty": 6
+            },
+            {
+              "style": "PC61",
+              "title": "Synthetic cotton tee",
+              "color": "Navy",
+              "size": "M",
+              "qty": 8
+            },
+            {
+              "style": "PC61",
+              "title": "Synthetic cotton tee",
+              "color": "Navy",
+              "size": "L",
+              "qty": 10
+            },
+            {
+              "style": "PC61",
+              "title": "Synthetic cotton tee",
+              "color": "Navy",
+              "size": "XL",
+              "qty": 12
+            }
+          ],
+          "trackingNumber": "SYNTHETIC-1-4",
+          "carrier": "UPS"
+        },
+        {
+          "boxNumber": 5,
+          "pieces": 36,
+          "items": [
+            {
+              "style": "PC61",
+              "title": "Synthetic cotton tee",
+              "color": "Navy",
+              "size": "S",
+              "qty": 6
+            },
+            {
+              "style": "PC61",
+              "title": "Synthetic cotton tee",
+              "color": "Navy",
+              "size": "M",
+              "qty": 8
+            },
+            {
+              "style": "PC61",
+              "title": "Synthetic cotton tee",
+              "color": "Navy",
+              "size": "L",
+              "qty": 10
+            },
+            {
+              "style": "PC61",
+              "title": "Synthetic cotton tee",
+              "color": "Navy",
+              "size": "XL",
+              "qty": 12
+            }
+          ],
+          "trackingNumber": "SYNTHETIC-1-5",
+          "carrier": "UPS"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,2044 @@
+{
+  "states": [
+    {
+      "name": "initial",
+      "data": {
+        "totals": [
+          "276",
+          "276",
+          "288"
+        ],
+        "warning": true,
+        "groups": [
+          {
+            "po": "882211",
+            "title": "Sample Workshop 6 WO# 55123 · PO 882211 · Embroidery · Due 2026-09-16 · Rep Aster Sample",
+            "flags": ""
+          },
+          {
+            "po": "882244",
+            "title": "Sample Workshop 15 WO# 55140 · PO 882244 · DTG · Due 2026-09-16 · Rep Cedar Sample",
+            "flags": ""
+          }
+        ],
+        "boxes": [
+          {
+            "key": "882211#1",
+            "verified": false,
+            "items": [
+              {
+                "style": "PC54 S",
+                "color": "Black",
+                "quantity": "4 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 M",
+                "color": "Black",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 L",
+                "color": "Black",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 XL",
+                "color": "Black",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          },
+          {
+            "key": "882211#2",
+            "verified": false,
+            "items": [
+              {
+                "style": "PC54 S",
+                "color": "Black",
+                "quantity": "4 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 M",
+                "color": "Black",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 L",
+                "color": "Black",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 XL",
+                "color": "Black",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          },
+          {
+            "key": "882211#3",
+            "verified": false,
+            "items": [
+              {
+                "style": "PC54 S",
+                "color": "Black",
+                "quantity": "4 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 M",
+                "color": "Black",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 L",
+                "color": "Black",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 XL",
+                "color": "Black",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          },
+          {
+            "key": "882244#1",
+            "verified": false,
+            "items": [
+              {
+                "style": "PC61 S",
+                "color": "Navy",
+                "quantity": "6 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 M",
+                "color": "Navy",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 L",
+                "color": "Navy",
+                "quantity": "10 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 XL",
+                "color": "Navy",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          },
+          {
+            "key": "882244#2",
+            "verified": false,
+            "items": [
+              {
+                "style": "PC61 S",
+                "color": "Navy",
+                "quantity": "6 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 M",
+                "color": "Navy",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 L",
+                "color": "Navy",
+                "quantity": "10 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 XL",
+                "color": "Navy",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          },
+          {
+            "key": "882244#3",
+            "verified": false,
+            "items": [
+              {
+                "style": "PC61 S",
+                "color": "Navy",
+                "quantity": "6 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 M",
+                "color": "Navy",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 L",
+                "color": "Navy",
+                "quantity": "10 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 XL",
+                "color": "Navy",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          },
+          {
+            "key": "882244#4",
+            "verified": false,
+            "items": [
+              {
+                "style": "PC61 S",
+                "color": "Navy",
+                "quantity": "6 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 M",
+                "color": "Navy",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 L",
+                "color": "Navy",
+                "quantity": "10 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 XL",
+                "color": "Navy",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          },
+          {
+            "key": "882244#5",
+            "verified": false,
+            "items": [
+              {
+                "style": "PC61 S",
+                "color": "Navy",
+                "quantity": "6 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 M",
+                "color": "Navy",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 L",
+                "color": "Navy",
+                "quantity": "10 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 XL",
+                "color": "Navy",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          }
+        ],
+        "references": [
+          [
+            "Style",
+            "Color",
+            "Size",
+            "Ord",
+            "Shp"
+          ],
+          [
+            "PC54",
+            "Black",
+            "S",
+            "12",
+            "12"
+          ],
+          [
+            "PC54",
+            "Black",
+            "M",
+            "24",
+            "24"
+          ],
+          [
+            "PC54",
+            "Black",
+            "L",
+            "36",
+            "36"
+          ],
+          [
+            "PC54",
+            "Black",
+            "XL",
+            "24",
+            "24"
+          ],
+          [
+            "Style",
+            "Color",
+            "Size",
+            "Ord",
+            "Shp"
+          ],
+          [
+            "PC61",
+            "Navy",
+            "S",
+            "42",
+            "30"
+          ],
+          [
+            "PC61",
+            "Navy",
+            "M",
+            "40",
+            "40"
+          ],
+          [
+            "PC61",
+            "Navy",
+            "L",
+            "50",
+            "50"
+          ],
+          [
+            "PC61",
+            "Navy",
+            "XL",
+            "60",
+            "60"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "verified",
+      "data": {
+        "totals": [
+          "276",
+          "276",
+          "288"
+        ],
+        "warning": true,
+        "groups": [
+          {
+            "po": "882211",
+            "title": "Sample Workshop 6 WO# 55123 · PO 882211 · Embroidery · Due 2026-09-16 · Rep Aster Sample",
+            "flags": ""
+          },
+          {
+            "po": "882244",
+            "title": "Sample Workshop 15 WO# 55140 · PO 882244 · DTG · Due 2026-09-16 · Rep Cedar Sample",
+            "flags": ""
+          }
+        ],
+        "boxes": [
+          {
+            "key": "882211#1",
+            "verified": true,
+            "items": [
+              {
+                "style": "PC54 S",
+                "color": "Black",
+                "quantity": "4 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 M",
+                "color": "Black",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 L",
+                "color": "Black",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 XL",
+                "color": "Black",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          },
+          {
+            "key": "882211#2",
+            "verified": false,
+            "items": [
+              {
+                "style": "PC54 S",
+                "color": "Black",
+                "quantity": "4 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 M",
+                "color": "Black",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 L",
+                "color": "Black",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 XL",
+                "color": "Black",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          },
+          {
+            "key": "882211#3",
+            "verified": false,
+            "items": [
+              {
+                "style": "PC54 S",
+                "color": "Black",
+                "quantity": "4 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 M",
+                "color": "Black",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 L",
+                "color": "Black",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 XL",
+                "color": "Black",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          },
+          {
+            "key": "882244#1",
+            "verified": false,
+            "items": [
+              {
+                "style": "PC61 S",
+                "color": "Navy",
+                "quantity": "6 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 M",
+                "color": "Navy",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 L",
+                "color": "Navy",
+                "quantity": "10 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 XL",
+                "color": "Navy",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          },
+          {
+            "key": "882244#2",
+            "verified": false,
+            "items": [
+              {
+                "style": "PC61 S",
+                "color": "Navy",
+                "quantity": "6 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 M",
+                "color": "Navy",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 L",
+                "color": "Navy",
+                "quantity": "10 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 XL",
+                "color": "Navy",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          },
+          {
+            "key": "882244#3",
+            "verified": false,
+            "items": [
+              {
+                "style": "PC61 S",
+                "color": "Navy",
+                "quantity": "6 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 M",
+                "color": "Navy",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 L",
+                "color": "Navy",
+                "quantity": "10 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 XL",
+                "color": "Navy",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          },
+          {
+            "key": "882244#4",
+            "verified": false,
+            "items": [
+              {
+                "style": "PC61 S",
+                "color": "Navy",
+                "quantity": "6 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 M",
+                "color": "Navy",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 L",
+                "color": "Navy",
+                "quantity": "10 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 XL",
+                "color": "Navy",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          },
+          {
+            "key": "882244#5",
+            "verified": false,
+            "items": [
+              {
+                "style": "PC61 S",
+                "color": "Navy",
+                "quantity": "6 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 M",
+                "color": "Navy",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 L",
+                "color": "Navy",
+                "quantity": "10 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 XL",
+                "color": "Navy",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          }
+        ],
+        "references": [
+          [
+            "Style",
+            "Color",
+            "Size",
+            "Ord",
+            "Shp"
+          ],
+          [
+            "PC54",
+            "Black",
+            "S",
+            "12",
+            "12"
+          ],
+          [
+            "PC54",
+            "Black",
+            "M",
+            "24",
+            "24"
+          ],
+          [
+            "PC54",
+            "Black",
+            "L",
+            "36",
+            "36"
+          ],
+          [
+            "PC54",
+            "Black",
+            "XL",
+            "24",
+            "24"
+          ],
+          [
+            "Style",
+            "Color",
+            "Size",
+            "Ord",
+            "Shp"
+          ],
+          [
+            "PC61",
+            "Navy",
+            "S",
+            "42",
+            "30"
+          ],
+          [
+            "PC61",
+            "Navy",
+            "M",
+            "40",
+            "40"
+          ],
+          [
+            "PC61",
+            "Navy",
+            "L",
+            "50",
+            "50"
+          ],
+          [
+            "PC61",
+            "Navy",
+            "XL",
+            "60",
+            "60"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "split",
+      "data": {
+        "totals": [
+          "276",
+          "276",
+          "288"
+        ],
+        "warning": true,
+        "groups": [
+          {
+            "po": "882211",
+            "title": "Sample Workshop 6 WO# 55123 · PO 882211 · Embroidery · Due 2026-09-16 · Rep Aster Sample",
+            "flags": ""
+          },
+          {
+            "po": "882244",
+            "title": "Sample Workshop 15 WO# 55140 · PO 882244 · DTG · Due 2026-09-16 · Rep Cedar Sample",
+            "flags": ""
+          }
+        ],
+        "boxes": [
+          {
+            "key": "882211#1",
+            "verified": true,
+            "items": [
+              {
+                "style": "PC54 S",
+                "color": "Black",
+                "quantity": "2 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 M",
+                "color": "Black",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 L",
+                "color": "Black",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 XL",
+                "color": "Black",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          },
+          {
+            "key": "882211#2",
+            "verified": false,
+            "items": [
+              {
+                "style": "PC54 S",
+                "color": "Black",
+                "quantity": "6 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 M",
+                "color": "Black",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 L",
+                "color": "Black",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 XL",
+                "color": "Black",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          },
+          {
+            "key": "882211#3",
+            "verified": false,
+            "items": [
+              {
+                "style": "PC54 S",
+                "color": "Black",
+                "quantity": "4 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 M",
+                "color": "Black",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 L",
+                "color": "Black",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 XL",
+                "color": "Black",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          },
+          {
+            "key": "882244#1",
+            "verified": false,
+            "items": [
+              {
+                "style": "PC61 S",
+                "color": "Navy",
+                "quantity": "6 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 M",
+                "color": "Navy",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 L",
+                "color": "Navy",
+                "quantity": "10 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 XL",
+                "color": "Navy",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          },
+          {
+            "key": "882244#2",
+            "verified": false,
+            "items": [
+              {
+                "style": "PC61 S",
+                "color": "Navy",
+                "quantity": "6 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 M",
+                "color": "Navy",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 L",
+                "color": "Navy",
+                "quantity": "10 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 XL",
+                "color": "Navy",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          },
+          {
+            "key": "882244#3",
+            "verified": false,
+            "items": [
+              {
+                "style": "PC61 S",
+                "color": "Navy",
+                "quantity": "6 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 M",
+                "color": "Navy",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 L",
+                "color": "Navy",
+                "quantity": "10 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 XL",
+                "color": "Navy",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          },
+          {
+            "key": "882244#4",
+            "verified": false,
+            "items": [
+              {
+                "style": "PC61 S",
+                "color": "Navy",
+                "quantity": "6 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 M",
+                "color": "Navy",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 L",
+                "color": "Navy",
+                "quantity": "10 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 XL",
+                "color": "Navy",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          },
+          {
+            "key": "882244#5",
+            "verified": false,
+            "items": [
+              {
+                "style": "PC61 S",
+                "color": "Navy",
+                "quantity": "6 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 M",
+                "color": "Navy",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 L",
+                "color": "Navy",
+                "quantity": "10 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 XL",
+                "color": "Navy",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          }
+        ],
+        "references": [
+          [
+            "Style",
+            "Color",
+            "Size",
+            "Ord",
+            "Shp"
+          ],
+          [
+            "PC54",
+            "Black",
+            "S",
+            "12",
+            "12"
+          ],
+          [
+            "PC54",
+            "Black",
+            "M",
+            "24",
+            "24"
+          ],
+          [
+            "PC54",
+            "Black",
+            "L",
+            "36",
+            "36"
+          ],
+          [
+            "PC54",
+            "Black",
+            "XL",
+            "24",
+            "24"
+          ],
+          [
+            "Style",
+            "Color",
+            "Size",
+            "Ord",
+            "Shp"
+          ],
+          [
+            "PC61",
+            "Navy",
+            "S",
+            "42",
+            "30"
+          ],
+          [
+            "PC61",
+            "Navy",
+            "M",
+            "40",
+            "40"
+          ],
+          [
+            "PC61",
+            "Navy",
+            "L",
+            "50",
+            "50"
+          ],
+          [
+            "PC61",
+            "Navy",
+            "XL",
+            "60",
+            "60"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "added",
+      "data": {
+        "totals": [
+          "276",
+          "276",
+          "288"
+        ],
+        "warning": true,
+        "groups": [
+          {
+            "po": "882211",
+            "title": "Sample Workshop 6 WO# 55123 · PO 882211 · Embroidery · Due 2026-09-16 · Rep Aster Sample",
+            "flags": ""
+          },
+          {
+            "po": "882244",
+            "title": "Sample Workshop 15 WO# 55140 · PO 882244 · DTG · Due 2026-09-16 · Rep Cedar Sample",
+            "flags": ""
+          }
+        ],
+        "boxes": [
+          {
+            "key": "882211#1",
+            "verified": true,
+            "items": [
+              {
+                "style": "PC54 S",
+                "color": "Black",
+                "quantity": "2 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 M",
+                "color": "Black",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 L",
+                "color": "Black",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 XL",
+                "color": "Black",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          },
+          {
+            "key": "882211#2",
+            "verified": false,
+            "items": [
+              {
+                "style": "PC54 S",
+                "color": "Black",
+                "quantity": "6 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 M",
+                "color": "Black",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 L",
+                "color": "Black",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 XL",
+                "color": "Black",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          },
+          {
+            "key": "882211#3",
+            "verified": false,
+            "items": [
+              {
+                "style": "PC54 S",
+                "color": "Black",
+                "quantity": "4 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 M",
+                "color": "Black",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 L",
+                "color": "Black",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 XL",
+                "color": "Black",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          },
+          {
+            "key": "882211#custom1789063200000",
+            "verified": false,
+            "items": []
+          },
+          {
+            "key": "882244#1",
+            "verified": false,
+            "items": [
+              {
+                "style": "PC61 S",
+                "color": "Navy",
+                "quantity": "6 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 M",
+                "color": "Navy",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 L",
+                "color": "Navy",
+                "quantity": "10 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 XL",
+                "color": "Navy",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          },
+          {
+            "key": "882244#2",
+            "verified": false,
+            "items": [
+              {
+                "style": "PC61 S",
+                "color": "Navy",
+                "quantity": "6 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 M",
+                "color": "Navy",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 L",
+                "color": "Navy",
+                "quantity": "10 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 XL",
+                "color": "Navy",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          },
+          {
+            "key": "882244#3",
+            "verified": false,
+            "items": [
+              {
+                "style": "PC61 S",
+                "color": "Navy",
+                "quantity": "6 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 M",
+                "color": "Navy",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 L",
+                "color": "Navy",
+                "quantity": "10 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 XL",
+                "color": "Navy",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          },
+          {
+            "key": "882244#4",
+            "verified": false,
+            "items": [
+              {
+                "style": "PC61 S",
+                "color": "Navy",
+                "quantity": "6 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 M",
+                "color": "Navy",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 L",
+                "color": "Navy",
+                "quantity": "10 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 XL",
+                "color": "Navy",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          },
+          {
+            "key": "882244#5",
+            "verified": false,
+            "items": [
+              {
+                "style": "PC61 S",
+                "color": "Navy",
+                "quantity": "6 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 M",
+                "color": "Navy",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 L",
+                "color": "Navy",
+                "quantity": "10 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 XL",
+                "color": "Navy",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          }
+        ],
+        "references": [
+          [
+            "Style",
+            "Color",
+            "Size",
+            "Ord",
+            "Shp"
+          ],
+          [
+            "PC54",
+            "Black",
+            "S",
+            "12",
+            "12"
+          ],
+          [
+            "PC54",
+            "Black",
+            "M",
+            "24",
+            "24"
+          ],
+          [
+            "PC54",
+            "Black",
+            "L",
+            "36",
+            "36"
+          ],
+          [
+            "PC54",
+            "Black",
+            "XL",
+            "24",
+            "24"
+          ],
+          [
+            "Style",
+            "Color",
+            "Size",
+            "Ord",
+            "Shp"
+          ],
+          [
+            "PC61",
+            "Navy",
+            "S",
+            "42",
+            "30"
+          ],
+          [
+            "PC61",
+            "Navy",
+            "M",
+            "40",
+            "40"
+          ],
+          [
+            "PC61",
+            "Navy",
+            "L",
+            "50",
+            "50"
+          ],
+          [
+            "PC61",
+            "Navy",
+            "XL",
+            "60",
+            "60"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "restored",
+      "data": {
+        "totals": [
+          "276",
+          "276",
+          "288"
+        ],
+        "warning": true,
+        "groups": [
+          {
+            "po": "882211",
+            "title": "Sample Workshop 6 WO# 55123 · PO 882211 · Embroidery · Due 2026-09-16 · Rep Aster Sample",
+            "flags": ""
+          },
+          {
+            "po": "882244",
+            "title": "Sample Workshop 15 WO# 55140 · PO 882244 · DTG · Due 2026-09-16 · Rep Cedar Sample",
+            "flags": ""
+          }
+        ],
+        "boxes": [
+          {
+            "key": "882211#1",
+            "verified": true,
+            "items": [
+              {
+                "style": "PC54 S",
+                "color": "Black",
+                "quantity": "2 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 M",
+                "color": "Black",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 L",
+                "color": "Black",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 XL",
+                "color": "Black",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          },
+          {
+            "key": "882211#2",
+            "verified": false,
+            "items": [
+              {
+                "style": "PC54 S",
+                "color": "Black",
+                "quantity": "6 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 M",
+                "color": "Black",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 L",
+                "color": "Black",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 XL",
+                "color": "Black",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          },
+          {
+            "key": "882211#3",
+            "verified": false,
+            "items": [
+              {
+                "style": "PC54 S",
+                "color": "Black",
+                "quantity": "4 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 M",
+                "color": "Black",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 L",
+                "color": "Black",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 XL",
+                "color": "Black",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          },
+          {
+            "key": "882244#1",
+            "verified": false,
+            "items": [
+              {
+                "style": "PC61 S",
+                "color": "Navy",
+                "quantity": "6 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 M",
+                "color": "Navy",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 L",
+                "color": "Navy",
+                "quantity": "10 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 XL",
+                "color": "Navy",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          },
+          {
+            "key": "882244#2",
+            "verified": false,
+            "items": [
+              {
+                "style": "PC61 S",
+                "color": "Navy",
+                "quantity": "6 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 M",
+                "color": "Navy",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 L",
+                "color": "Navy",
+                "quantity": "10 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 XL",
+                "color": "Navy",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          },
+          {
+            "key": "882244#3",
+            "verified": false,
+            "items": [
+              {
+                "style": "PC61 S",
+                "color": "Navy",
+                "quantity": "6 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 M",
+                "color": "Navy",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 L",
+                "color": "Navy",
+                "quantity": "10 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 XL",
+                "color": "Navy",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          },
+          {
+            "key": "882244#4",
+            "verified": false,
+            "items": [
+              {
+                "style": "PC61 S",
+                "color": "Navy",
+                "quantity": "6 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 M",
+                "color": "Navy",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 L",
+                "color": "Navy",
+                "quantity": "10 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 XL",
+                "color": "Navy",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          },
+          {
+            "key": "882244#5",
+            "verified": false,
+            "items": [
+              {
+                "style": "PC61 S",
+                "color": "Navy",
+                "quantity": "6 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 M",
+                "color": "Navy",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 L",
+                "color": "Navy",
+                "quantity": "10 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 XL",
+                "color": "Navy",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          }
+        ],
+        "references": [
+          [
+            "Style",
+            "Color",
+            "Size",
+            "Ord",
+            "Shp"
+          ],
+          [
+            "PC54",
+            "Black",
+            "S",
+            "12",
+            "12"
+          ],
+          [
+            "PC54",
+            "Black",
+            "M",
+            "24",
+            "24"
+          ],
+          [
+            "PC54",
+            "Black",
+            "L",
+            "36",
+            "36"
+          ],
+          [
+            "PC54",
+            "Black",
+            "XL",
+            "24",
+            "24"
+          ],
+          [
+            "Style",
+            "Color",
+            "Size",
+            "Ord",
+            "Shp"
+          ],
+          [
+            "PC61",
+            "Navy",
+            "S",
+            "42",
+            "30"
+          ],
+          [
+            "PC61",
+            "Navy",
+            "M",
+            "40",
+            "40"
+          ],
+          [
+            "PC61",
+            "Navy",
+            "L",
+            "50",
+            "50"
+          ],
+          [
+            "PC61",
+            "Navy",
+            "XL",
+            "60",
+            "60"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "reset",
+      "data": {
+        "totals": [
+          "276",
+          "276",
+          "288"
+        ],
+        "warning": true,
+        "groups": [
+          {
+            "po": "882211",
+            "title": "Sample Workshop 6 WO# 55123 · PO 882211 · Embroidery · Due 2026-09-16 · Rep Aster Sample",
+            "flags": ""
+          },
+          {
+            "po": "882244",
+            "title": "Sample Workshop 15 WO# 55140 · PO 882244 · DTG · Due 2026-09-16 · Rep Cedar Sample",
+            "flags": ""
+          }
+        ],
+        "boxes": [
+          {
+            "key": "882211#1",
+            "verified": false,
+            "items": [
+              {
+                "style": "PC54 S",
+                "color": "Black",
+                "quantity": "4 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 M",
+                "color": "Black",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 L",
+                "color": "Black",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 XL",
+                "color": "Black",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          },
+          {
+            "key": "882211#2",
+            "verified": false,
+            "items": [
+              {
+                "style": "PC54 S",
+                "color": "Black",
+                "quantity": "4 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 M",
+                "color": "Black",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 L",
+                "color": "Black",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 XL",
+                "color": "Black",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          },
+          {
+            "key": "882211#3",
+            "verified": false,
+            "items": [
+              {
+                "style": "PC54 S",
+                "color": "Black",
+                "quantity": "4 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 M",
+                "color": "Black",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 L",
+                "color": "Black",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC54 XL",
+                "color": "Black",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          },
+          {
+            "key": "882244#1",
+            "verified": false,
+            "items": [
+              {
+                "style": "PC61 S",
+                "color": "Navy",
+                "quantity": "6 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 M",
+                "color": "Navy",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 L",
+                "color": "Navy",
+                "quantity": "10 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 XL",
+                "color": "Navy",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          },
+          {
+            "key": "882244#2",
+            "verified": false,
+            "items": [
+              {
+                "style": "PC61 S",
+                "color": "Navy",
+                "quantity": "6 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 M",
+                "color": "Navy",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 L",
+                "color": "Navy",
+                "quantity": "10 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 XL",
+                "color": "Navy",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          },
+          {
+            "key": "882244#3",
+            "verified": false,
+            "items": [
+              {
+                "style": "PC61 S",
+                "color": "Navy",
+                "quantity": "6 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 M",
+                "color": "Navy",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 L",
+                "color": "Navy",
+                "quantity": "10 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 XL",
+                "color": "Navy",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          },
+          {
+            "key": "882244#4",
+            "verified": false,
+            "items": [
+              {
+                "style": "PC61 S",
+                "color": "Navy",
+                "quantity": "6 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 M",
+                "color": "Navy",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 L",
+                "color": "Navy",
+                "quantity": "10 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 XL",
+                "color": "Navy",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          },
+          {
+            "key": "882244#5",
+            "verified": false,
+            "items": [
+              {
+                "style": "PC61 S",
+                "color": "Navy",
+                "quantity": "6 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 M",
+                "color": "Navy",
+                "quantity": "8 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 L",
+                "color": "Navy",
+                "quantity": "10 pcs",
+                "description": "Synthetic cotton tee"
+              },
+              {
+                "style": "PC61 XL",
+                "color": "Navy",
+                "quantity": "12 pcs",
+                "description": "Synthetic cotton tee"
+              }
+            ]
+          }
+        ],
+        "references": [
+          [
+            "Style",
+            "Color",
+            "Size",
+            "Ord",
+            "Shp"
+          ],
+          [
+            "PC54",
+            "Black",
+            "S",
+            "12",
+            "12"
+          ],
+          [
+            "PC54",
+            "Black",
+            "M",
+            "24",
+            "24"
+          ],
+          [
+            "PC54",
+            "Black",
+            "L",
+            "36",
+            "36"
+          ],
+          [
+            "PC54",
+            "Black",
+            "XL",
+            "24",
+            "24"
+          ],
+          [
+            "Style",
+            "Color",
+            "Size",
+            "Ord",
+            "Shp"
+          ],
+          [
+            "PC61",
+            "Navy",
+            "S",
+            "42",
+            "30"
+          ],
+          [
+            "PC61",
+            "Navy",
+            "M",
+            "40",
+            "40"
+          ],
+          [
+            "PC61",
+            "Navy",
+            "L",
+            "50",
+            "50"
+          ],
+          [
+            "PC61",
+            "Navy",
+            "XL",
+            "60",
+            "60"
+          ]
+        ]
+      }
+    }
+  ],
+  "paper": "\n      \n        ORDER TYPEEMBROIDERY\n        Scan → reprint labels\n        \n          WORK ORDER\n          #55123\n          Due: 9-16-26\n          \n          DROP DEAD DATE\n        \n      \n      Sample Workshop 6\n      \n      \n        Cedar Example\n        REP: ASOrdered: 9-8-26\n      \n      Cust PO: SYNTHETIC-0\n      \n        DESIGN #99001Synthetic stitch sample\n        BOX1 of 3\n      \n      \n        \n          SHIP METHOD — circle one\n          PICKUPSHIPOther ______\n          Terms: Net 30\n        \n        No artwork on file\n      \n      StyleDescriptionColorSMLXLTotPC54Synthetic cotton teeBlack4812832TOTAL4812832\n      SanMar PO 882211  ·  UPS SYNTHETIC-0-1  ·  Repacked by Cedar Example  ·  Received by __________Printed 9-10-26\n    \n      \n        ORDER TYPEEMBROIDERY\n        Scan → reprint labels\n        \n          WORK ORDER\n          #55123\n          Due: 9-16-26\n          \n          DROP DEAD DATE\n        \n      \n      Sample Workshop 6\n      \n      \n        Cedar Example\n        REP: ASOrdered: 9-8-26\n      \n      Cust PO: SYNTHETIC-0\n      \n        DESIGN #99001Synthetic stitch sample\n        BOX2 of 3\n      \n      \n        \n          SHIP METHOD — circle one\n          PICKUPSHIPOther ______\n          Terms: Net 30\n        \n        No artwork on file\n      \n      StyleDescriptionColorSMLXLTotPC54Synthetic cotton teeBlack4812832TOTAL4812832\n      SanMar PO 882211  ·  UPS SYNTHETIC-0-2  ·  Repacked by Cedar Example  ·  Received by __________Printed 9-10-26\n    \n      \n        ORDER TYPEEMBROIDERY\n        Scan → reprint labels\n        \n          WORK ORDER\n          #55123\n          Due: 9-16-26\n          \n          DROP DEAD DATE\n        \n      \n      Sample Workshop 6\n      \n      \n        Cedar Example\n        REP: ASOrdered: 9-8-26\n      \n      Cust PO: SYNTHETIC-0\n      \n        DESIGN #99001Synthetic stitch sample\n        BOX3 of 3\n      \n      \n        \n          SHIP METHOD — circle one\n          PICKUPSHIPOther ______\n          Terms: Net 30\n        \n        No artwork on file\n      \n      StyleDescriptionColorSMLXLTotPC54Synthetic cotton teeBlack4812832TOTAL4812832\n      SanMar PO 882211  ·  UPS SYNTHETIC-0-3  ·  Repacked by Cedar Example  ·  Received by __________Printed 9-10-26\n    \n      \n        ORDER TYPEDTG\n        Scan → reprint labels\n        \n          WORK ORDER\n          #55140\n          Due: 9-16-26\n          \n          DROP DEAD DATE\n        \n      \n      Sample Workshop 15\n      \n      \n        Cedar Example\n        REP: CSOrdered: 9-8-26\n      \n      Cust PO: SYNTHETIC-1\n      \n        DESIGN #99002Synthetic stitch sample\n        BOX1 of 5\n      \n      \n        \n          SHIP METHOD — circle one\n          PICKUPSHIPOther ______\n          Terms: Net 30\n        \n        No artwork on file\n      \n      StyleDescriptionColorSMLXLTotPC61Synthetic cotton teeNavy68101236TOTAL68101236\n      SanMar PO 882244  ·  UPS SYNTHETIC-1-1  ·  Repacked by Cedar Example  ·  Received by __________Printed 9-10-26\n    \n      \n        ORDER TYPEDTG\n        Scan → reprint labels\n        \n          WORK ORDER\n          #55140\n          Due: 9-16-26\n          \n          DROP DEAD DATE\n        \n      \n      Sample Workshop 15\n      \n      \n        Cedar Example\n        REP: CSOrdered: 9-8-26\n      \n      Cust PO: SYNTHETIC-1\n      \n        DESIGN #99002Synthetic stitch sample\n        BOX2 of 5\n      \n      \n        \n          SHIP METHOD — circle one\n          PICKUPSHIPOther ______\n          Terms: Net 30\n        \n        No artwork on file\n      \n      StyleDescriptionColorSMLXLTotPC61Synthetic cotton teeNavy68101236TOTAL68101236\n      SanMar PO 882244  ·  UPS SYNTHETIC-1-2  ·  Repacked by Cedar Example  ·  Received by __________Printed 9-10-26\n    \n      \n        ORDER TYPEDTG\n        Scan → reprint labels\n        \n          WORK ORDER\n          #55140\n          Due: 9-16-26\n          \n          DROP DEAD DATE\n        \n      \n      Sample Workshop 15\n      \n      \n        Cedar Example\n        REP: CSOrdered: 9-8-26\n      \n      Cust PO: SYNTHETIC-1\n      \n        DESIGN #99002Synthetic stitch sample\n        BOX3 of 5\n      \n      \n        \n          SHIP METHOD — circle one\n          PICKUPSHIPOther ______\n          Terms: Net 30\n        \n        No artwork on file\n      \n      StyleDescriptionColorSMLXLTotPC61Synthetic cotton teeNavy68101236TOTAL68101236\n      SanMar PO 882244  ·  UPS SYNTHETIC-1-3  ·  Repacked by Cedar Example  ·  Received by __________Printed 9-10-26\n    \n      \n        ORDER TYPEDTG\n        Scan → reprint labels\n        \n          WORK ORDER\n          #55140\n          Due: 9-16-26\n          \n          DROP DEAD DATE\n        \n      \n      Sample Workshop 15\n      \n      \n        Cedar Example\n        REP: CSOrdered: 9-8-26\n      \n      Cust PO: SYNTHETIC-1\n      \n        DESIGN #99002Synthetic stitch sample\n        BOX4 of 5\n      \n      \n        \n          SHIP METHOD — circle one\n          PICKUPSHIPOther ______\n          Terms: Net 30\n        \n        No artwork on file\n      \n      StyleDescriptionColorSMLXLTotPC61Synthetic cotton teeNavy68101236TOTAL68101236\n      SanMar PO 882244  ·  UPS SYNTHETIC-1-4  ·  Repacked by Cedar Example  ·  Received by __________Printed 9-10-26\n    \n      \n        ORDER TYPEDTG\n        Scan → reprint labels\n        \n          WORK ORDER\n          #55140\n          Due: 9-16-26\n          \n          DROP DEAD DATE\n        \n      \n      Sample Workshop 15\n      \n      \n        Cedar Example\n        REP: CSOrdered: 9-8-26\n      \n      Cust PO: SYNTHETIC-1\n      \n        DESIGN #99002Synthetic stitch sample\n        BOX5 of 5\n      \n      \n        \n          SHIP METHOD — circle one\n          PICKUPSHIPOther ______\n          Terms: Net 30\n        \n        No artwork on file\n      \n      StyleDescriptionColorSMLXLTotPC61Synthetic cotton teeNavy68101236TOTAL68101236\n      SanMar PO 882244  ·  UPS SYNTHETIC-1-5  ·  Repacked by Cedar Example  ·  Received by __________Printed 9-10-26\n    ",
+  "reads": [
+    "/api/sanmar-orders/label-data/882211?type=po",
+    "/api/sanmar-orders/label-data/882211?type=po",
+    "/api/sanmar-orders/label-data/882211?type=po&refresh=1"
+  ],
+  "events": {
+    "errors": [],
+    "writes": [],
+    "unknown": [],
+    "missing": [],
+    "providers": []
+  }
+}

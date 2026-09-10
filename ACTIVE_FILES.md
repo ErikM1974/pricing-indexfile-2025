@@ -1,5 +1,28 @@
 # Active Files Registry
 
+- `tests/fixtures/staff-final-tools-box-labels-original-browser.json` — Original synthetic staff-tool browser contract; retained before visual changes.
+- `tests/fixtures/staff-final-tools-box-labels-original-empty.json` — Original synthetic staff-tool browser contract; retained before visual changes.
+- `tests/fixtures/staff-final-tools-box-labels-original-failure.json` — Original synthetic staff-tool browser contract; retained before visual changes.
+- `tests/fixtures/staff-final-tools-box-labels-original-preprint-failure.json` — Original synthetic staff-tool browser contract; retained before visual changes.
+- `tests/fixtures/staff-final-tools-calibration-original-browser.json` — Original synthetic staff-tool browser contract; retained before visual changes.
+- `tests/fixtures/staff-final-tools-calibration-original-empty.json` — Original synthetic staff-tool browser contract; retained before visual changes.
+- `tests/fixtures/staff-final-tools-calibration-original-failure.json` — Original synthetic staff-tool browser contract; retained before visual changes.
+- `tests/fixtures/staff-final-tools-calibration-original-missing-api.json` — Original synthetic staff-tool browser contract; retained before visual changes.
+- `tests/fixtures/staff-final-tools-dashboard-original-anonymous.json` — Original synthetic staff-tool browser contract; retained before visual changes.
+- `tests/fixtures/staff-final-tools-dashboard-original-art.json` — Original synthetic staff-tool browser contract; retained before visual changes.
+- `tests/fixtures/staff-final-tools-dashboard-original-browser.json` — Original synthetic staff-tool browser contract; retained before visual changes.
+- `tests/fixtures/staff-final-tools-dashboard-original-empty.json` — Original synthetic staff-tool browser contract; retained before visual changes.
+- `tests/fixtures/staff-final-tools-dashboard-original-failure.json` — Original synthetic staff-tool browser contract; retained before visual changes.
+- `tests/fixtures/staff-final-tools-dashboard-original-production.json` — Original synthetic staff-tool browser contract; retained before visual changes.
+- `tests/fixtures/staff-final-tools-dashboard-original-sales.json` — Original synthetic staff-tool browser contract; retained before visual changes.
+- `tests/fixtures/staff-final-tools-dashboard-original-staff.json` — Original synthetic staff-tool browser contract; retained before visual changes.
+- `tests/fixtures/staff-final-tools-records-original-browser.json` — Original synthetic staff-tool browser contract; retained before visual changes.
+- `tests/fixtures/staff-final-tools-records-original-empty.json` — Original synthetic staff-tool browser contract; retained before visual changes.
+- `tests/fixtures/staff-final-tools-records-original-failure.json` — Original synthetic staff-tool browser contract; retained before visual changes.
+
+- `tests/e2e/css-unification-staff-home.spec.js` — Fail-closed original staff dashboard workspaces, role discovery, directory, search, pins and quote-launcher baselines.
+- `tests/fixtures/staff-final-tools-dashboard-synthetic.json` — Fictional dashboard roster and work sample for isolated browser review.
+
 - `tests/fixtures/staff-workspaces-quotes-original-documents.json` — Original Quote Management inbound calendar/report/box-label output with synthetic costs and per-box details.
 
 - `shared_components/css/staff-quote-management.css` — Scoped Quote Management table/cards and native local dialogs; retires `dashboards/css/quote-management.css`, reuses vendor-inbound/vendor-box-labels.
@@ -339,3 +362,9 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - Added shared_components/css/staff-mission-control.css for the Mission Control draft: canonical staff typography/controls and a scoped layout, native kit/outreach/drawer dialogs, existing vendor-invoice.css reuse. Legacy AE stylesheet retained until consumer and screen/paper review. No release credit yet.
 
 - tests/fixtures/staff-final-tools-original-content.json — four final staff-tool HTML contracts and transitive local JS/CSS hashes, verified against frozen candidate 9b6d76d6 (not deployed yet). tests/unit/staff-final-tools-content.test.js preserves original content outside explicit future UI mappings. Planning/baseline only; no migration credit.
+
+- tests/e2e/helpers/staff-final-tools-browser.js — fail-closed original/current final staff-tool browser loader. tests/e2e/css-unification-box-labels.spec.js and tests/fixtures/staff-final-tools-box-labels-synthetic.json — synthetic carton allocation, repack draft, error and paper fixtures; source-baseline work only.
+
+- tests/e2e/css-unification-calibration.spec.js and tests/fixtures/staff-final-tools-calibration-synthetic.json — synthetic print-envelope geometry, layout save/delete/copy and failed-photo baselines. No actual calibration writes or clipboard edits.
+
+- tests/e2e/css-unification-records-admin.spec.js and tests/fixtures/staff-final-tools-records-synthetic.json — synthetic administrator records table, filters, pagination, detail, CSV and failure baselines. No real quote writes.
