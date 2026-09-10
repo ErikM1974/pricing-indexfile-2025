@@ -1,5 +1,13 @@
 # CSS unification — design direction and implementation plan
 
+## ACTIVE — five-page release candidate v2026.09.10.9
+
+The frozen reviewed batch ed70f0a83878fc392884ce6c115fcebb9b4908f7 is integrated at c1d7cfb09adc3ce9ba1127ecaf543d07d34ea86b. All local checks passed:239 unit suites/5,604 passed/four existing skips,88 DOM,four accessibility unit,84 quote parity,1,104 mocked CSS browser checks,16 remaining e2e/three optional screenshot skips/all five calculator surfaces,423 built assets,266 CSS sheets,zero lint warnings/undefined names,types/routes485/24modules clean,boot HTTP200 and production audit zero.
+
+Candidate185/225 reviewed,40pending; live remains .7/Heroku2100/1143ffde at180/225 until rollout verification. The employee pair and three customer documents have147 focused browser cases and33 reviewed current paper pages. All28 distinct original source hashes restore through217 mappings after cache versioning. Three retired sheets and161 important flags removed. All business actions were synthetic; no real orders, payments, emails, imports or printing.
+
+Next: push this exact Deploy source, require all four CI jobs with actual CSS and live money/calculator steps, then one release merge/tag/push and actual-slug/asset/access verification. Continue remaining40 pages on a separate branch. Do not rerun consumed helpers or recursively delete the node_modules junction.
+
 ## REVIEWED — five-page employee and customer document batch ready for integration
 
 Quote View passed all 62 browser cases (3.4 minutes) and all 1,002 checks in nine source/ownership/money/legacy suites on its final source. Its 83 mapped edits combine with 26 portal and 72 compact Invoice edits: 181 total mappings restore all 24 original document source hashes. Fourteen financial/payload methods remain byte-identical. The 39 original browser fixtures and 13 original PDF pages remain immutable at85eba439.

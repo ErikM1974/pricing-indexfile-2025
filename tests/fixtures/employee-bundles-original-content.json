@@ -223,6 +223,18 @@
       "before": "            <div class=\"hosted-embed\"",
       "after": "            <p class=\"bundle-scroll-hint\">Scroll the employee list sideways to see every column.</p>\n            <div class=\"hosted-embed\"",
       "count": 1
+    },
+    {
+      "file": "employee-bundles/streich-bros-bundle.html",
+      "before": "/shared_components/css/employee-bundles.css?v=2026.09.10.7",
+      "after": "/shared_components/css/employee-bundles.css?v=2026.09.10.9",
+      "count": 1
+    },
+    {
+      "file": "employee-bundles/wcttr-bundle.html",
+      "before": "/shared_components/css/employee-bundles.css?v=2026.09.10.7",
+      "after": "/shared_components/css/employee-bundles.css?v=2026.09.10.9",
+      "count": 1
     }
   ],
   "retiredStyles": [
