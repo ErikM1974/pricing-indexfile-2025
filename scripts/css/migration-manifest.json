@@ -5294,6 +5294,68 @@
         "rawCssBytes": 246827,
         "localCssRequests": 10
       }
+    },
+    {
+      "source": "employee-bundles/streich-bros-bundle.html",
+      "family": "employee-bundles",
+      "status": "pilot",
+      "route": "/employee-bundles/streich-bros-bundle.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/hosted-workspace.css",
+        "shared_components/css/employee-bundles.css"
+      ],
+      "dynamicStyles": [],
+      "dynamicTokens": [],
+      "states": [
+        "four-width-content-links-and-keyboard-scrolling",
+        "exact-synthetic-provider-script-boundary",
+        "provider-login-empty-and-failure",
+        "delayed-provider-visible-direct-exit",
+        "phone-iframe-containment",
+        "complete-one-page-landscape-print-and-screen-restoration"
+      ],
+      "test": "tests/e2e/css-unification-employee-bundles.spec.js",
+      "maxCssBytes": 71699,
+      "measuredRawCssBytes": 70675,
+      "baseline": {
+        "commit": "a878f826466ece08c506c76d1633ae3c4e39b8d9",
+        "rawCssBytes": 20343,
+        "localCssRequests": 2
+      },
+      "providerOwnership": "Caspio employee records, approvals, export and sign-in remain provider-owned. Only the host page and containment are migrated."
+    },
+    {
+      "source": "employee-bundles/wcttr-bundle.html",
+      "family": "employee-bundles",
+      "status": "pilot",
+      "route": "/employee-bundles/wcttr-bundle.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/hosted-workspace.css",
+        "shared_components/css/employee-bundles.css"
+      ],
+      "dynamicStyles": [],
+      "dynamicTokens": [],
+      "states": [
+        "four-width-content-links-and-keyboard-scrolling",
+        "exact-synthetic-provider-script-boundary",
+        "provider-login-empty-and-failure",
+        "delayed-provider-visible-direct-exit",
+        "phone-iframe-containment",
+        "complete-one-page-landscape-print-and-screen-restoration"
+      ],
+      "test": "tests/e2e/css-unification-employee-bundles.spec.js",
+      "maxCssBytes": 71699,
+      "measuredRawCssBytes": 70675,
+      "baseline": {
+        "commit": "a878f826466ece08c506c76d1633ae3c4e39b8d9",
+        "rawCssBytes": 20114,
+        "localCssRequests": 2
+      },
+      "providerOwnership": "Caspio employee records, approvals, export and sign-in remain provider-owned. Only the host page and containment are migrated."
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",

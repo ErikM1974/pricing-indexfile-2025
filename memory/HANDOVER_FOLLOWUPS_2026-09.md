@@ -1,5 +1,15 @@
 # Handover follow-ups — 2026-09-07
 
+## NEXT — employee bundle pair reviewed; additional customer families follow
+
+Streich Bros. and WCTTR now share Public Sans, canonical navigation controls and one scoped employee-bundles.css owner over tokens/components/hosted-workspace. Customer logos and blue/yellow versus graphite/orange identities remain. Exact Caspio providers, approval instructions, mail-merge steps, employee data and related destinations preserved. Provider controls/approvals/export/sign-in remain externally owned, outside wrapper certification.
+
+- Twelve browser cases passed after eight original baselines:1440/768/390/320 layouts/axe, keyboard horizontal scrolling, provider login/empty/failure/loading, narrow iframe containment and complete paper. Original phone tables expanded the page to944px at a320px viewport; new wrappers remain320px and show a sideways-scroll hint. A direct provider link remains available if loading fails. All network writes and allocating reads blocked; synthetic employee data only.
+- Each complete sample prints on one landscape Letter sheet versus three originally. Both current pages and six original pages visually inspected; every original instruction, employee/size/approval and related company retained. Current paper hashes37bb5d62dcc9 and914848858add; screenshots captured with hashed filenames. Print focus outlines removed locally.
+- Five original hashes/26 reversible mappings; two old sheets retired/10053 LF bytes/two important flags. New direct shared graph70675 LF bytes/four sheets: shared ownership increases this small pair’s direct CSS bytes while eliminating duplicated Bootstrap/page rules. New owner has no important flags, raw colors or scale redefinitions. Five source/owner/hygiene suites passed 915 checks.
+- Separate branch codex/employee-bundle-workspaces; source/browser baseline420b24d3 backed up. Candidate182/225 reviewed,43pending including this pair and the four-tool release candidate. Live remains .4/2099/031e03aa,176/225. Primary .7source8546e9dd is in exact-source CI34525732554,three jobs passed/browser sweep running. Do not include this advancing branch in that release.
+- Next: commit/back up the reviewed pair, then continue the next related customer surfaces in isolation. Integrate the next batch only after .7 is verified live. Never overlap local browser suites or rerun completed one-shot helpers. node_modules is a junction; never recursively delete or copy.env.
+
 ## NEXT isolated batch — Streich Bros. and WCTTR employee bundles
 
 Source baseline only on codex/employee-bundle-workspaces. Both hosted label workspaces retain their exact Caspio providers, customer logos, approval instruction, three mail-merge steps and related bundle destinations. Five original local source hashes captured; no application edits or migration credit yet.

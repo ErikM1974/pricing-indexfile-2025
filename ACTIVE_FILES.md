@@ -1,5 +1,7 @@
 # Active Files Registry
 
+- `shared_components/css/employee-bundles.css` — shared Streich Bros./WCTTR wrapper, typography, instructions and navigation over tokens/components/hosted-workspace. Retires `employee-bundles/css/streich-bros-bundle.css` and `employee-bundles/css/wcttr-bundle.css`; original CSS is retained in the source fixture. Provider records remain externally owned.
+
 - Employee bundle browser contracts: tests/e2e/css-unification-employee-bundles.spec.js and tests/e2e/helpers/employee-bundles-browser.js; original four-width, provider-state and paper captures in tests/fixtures/employee-bundles-{streich-bros-bundle,wcttr-bundle}-original-browser.json. Synthetic provider responses; all business traffic blocked.
 
 - `tests/fixtures/employee-bundles-original-content.json` and `tests/unit/employee-bundles-content.test.js` — immutable Streich Bros./WCTTR source, provider and content contracts before CSS migration.

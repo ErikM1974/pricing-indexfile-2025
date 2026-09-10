@@ -229,8 +229,7 @@ const CSS_LINT_SCOPE = [
     'shared_components/css/mockup-submit-form.css',
     // tail batch (2026-09-07): admin, production-shifts, price-audit-report, employee bundles, tools, vendor-portal css, dtf prototype css
     'calculators/quick-quote/dtf-prints-prototype.css',
-    'employee-bundles/css/streich-bros-bundle.css',
-    'employee-bundles/css/wcttr-bundle.css',
+    'shared_components/css/employee-bundles.css',
     'shared_components/css/staff-calibration.css',
     'shared_components/css/staff-records.css',
 ];

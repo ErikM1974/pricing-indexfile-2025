@@ -32,11 +32,7 @@ Historical deployment, token, builder, junction, server split and proxy-auth mig
 
 Exact-source CI must pass its actual browser/parity jobs, including credentials when required; local green is not CI green. Resolved runner/secret incidents are in LESSONS_LEARNED_ARCHIVE.md.
 
-## Quote operations need caller and quote scope checks (2026-09-07)
-- Problem/root cause: bulk sync, tracking writes and change-log operations trusted their expected caller without authenticating it.
-- Solution: deploy credentials in proxy jobs/callbacks first; gate app operations with staff/shared-secret checks and authenticate loopback writes.
-- Customer refresh/vendor reads preserve existing share-token/legacy links, but resolve only that quote's work order; overrides require staff/trusted sync. Compare token byte lengths before timingSafeEqual.
-- Prevention: quote-sync-access.test.js exercises actual route chains, rejected callers, customer scope and internal forwarding; never probe live bulk mutations to test a gate.
+Quote-operation access rollout (2026-09-07) is archived in LESSONS_LEARNED_ARCHIVE.md; caller/quote scope and live-mutation boundaries remain enforced by quote-sync-access.test.js.
 
 ## Scoped CSS migration must replace every competing entry point (2026-09-08)
 - Problem/root cause: legacy unlayered sheets outrank layered components; print-form date helpers attach to the whole field, including its label.
@@ -252,3 +248,8 @@ Box-label follow-up (2026-09-10): a failed/new lookup must clear old printable d
 - Problem/root cause: a display rule defeated Everything's hidden rows; welcome cleared inline display but retained hidden; Directory rendered an old search before clearing it, and a pending roster looked empty.
 - Solution: one scoped layout plus canonical hidden state, explicit welcome visibility, clear-before-filter ordering, and render open roster views when the read settles. Keep a separate library link outside summary, focusable directory scrolling and a real active descendant for palette selection.
 - Prevention: preserve original roles/links/values, distinguish loading/empty/failure, exercise reload/pins/disclosures and keyboard search at four widths. Historical UI fixtures still consume the legacy dashboard sheets; remove production links without breaking those fixtures.
+
+### Hosted employee lists need a bounded page and usable fallback (2026-09-10)
+- Problem/root cause: a wide provider table expanded the whole phone page; shared controls were duplicated by Bootstrap and two local sheets, and failed embeds left blank space.
+- Solution: share the wrapper owner and canonical controls, give the provider a labelled keyboard-scroll region plus an always-available direct destination, and keep provider markup/approval behavior externally owned. Remove focus outlines only on paper.
+- Prevention: original source/provider locks, wide DOM and iframe fixtures, delayed/failed/login/empty states, narrow-screen axe and every PDF page. Allow exact static font/icon CSS reads before rejecting other fetches in axe-aware mock handlers; use declared tokens such as radius-pill.

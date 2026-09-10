@@ -18,8 +18,10 @@ async function open(page,file,state={}){
    if(state.arrive)state.arrive();
    if(state.hold)await state.hold;
    if(state.mode==='failed')return route.abort('failed');
+   if(state.mode==='iframe')return route.fulfill({contentType:'application/javascript',body:'(function(){const f=document.createElement("iframe");f.title="Employee list";f.width="1100";f.height="320";f.srcdoc='+JSON.stringify('<html lang="en"><title>Employee list</title><main>'+provider('report')+'</main></html>')+';document.currentScript.parentElement.appendChild(f);})();'});
    return route.fulfill({contentType:'application/javascript',body:'document.write('+JSON.stringify(provider(state.mode))+');'});
   }
+  if((u.hostname==='fonts.googleapis.com'&&p==='/css2')||(u.hostname==='cdnjs.cloudflare.com'&&/^\/ajax\/libs\/font-awesome\/(6\.0\.0|6\.4\.0)\/css\/all.min.css$/.test(p))||(u.hostname==='cdn.jsdelivr.net'&&['/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css','/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js'].includes(p)))return route.continue();
   if(p.startsWith('/api/')||['fetch','xhr'].includes(req.resourceType())){events.unknown.push(req.url());return route.fulfill({status:503});}
   if(['localhost','127.0.0.1'].includes(u.hostname)){
    const f=path.resolve(root,'.'+decodeURIComponent(p)),retired=state.original&&source.retiredStyles.find(r=>r.file===p.slice(1));
@@ -33,7 +35,6 @@ async function open(page,file,state={}){
    }
    return route.fulfill({contentType:{'.html':'text/html','.css':'text/css','.js':'application/javascript','.png':'image/png','.svg':'image/svg+xml','.woff2':'font/woff2'}[path.extname(f)]||'application/octet-stream',body});
   }
-  if((u.hostname==='fonts.googleapis.com'&&p==='/css2')||(u.hostname==='cdnjs.cloudflare.com'&&/^\/ajax\/libs\/font-awesome\/(6\.0\.0|6\.4\.0)\/css\/all.min.css$/.test(p))||(u.hostname==='cdn.jsdelivr.net'&&['/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css','/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js'].includes(p)))return route.continue();
   if(['font','image'].includes(req.resourceType()))return route.continue();
   events.unknown.push(req.url());return route.abort();
  });

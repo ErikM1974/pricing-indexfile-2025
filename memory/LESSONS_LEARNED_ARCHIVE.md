@@ -1,4 +1,4 @@
-﻿# LESSONS LEARNED â€” ARCHIVE
+# LESSONS LEARNED â€” ARCHIVE
 
 Resolved entries aged out of `LESSONS_LEARNED.md` (300-line cap). Newest first. No limit here.
 
@@ -4224,3 +4224,9 @@ CI setup follow-up (2026-09-09): a Google Chrome apt index checksum mismatch blo
 - Root cause: empty error branches and catch blocks inside prerequisite loaders.
 - Solution: propagate errors to the product loader's existing error UI; clear size data before requesting it.
 - Prevention: calculator-api-errors.test.js covers HTTP, transport, malformed/empty responses and successful API data.
+
+## Quote operations need caller and quote scope checks (2026-09-07)
+- Problem/root cause: bulk sync, tracking writes and change-log operations trusted their expected caller without authenticating it.
+- Solution: deploy credentials in proxy jobs/callbacks first; gate app operations with staff/shared-secret checks and authenticate loopback writes.
+- Customer refresh/vendor reads preserve existing share-token/legacy links, but resolve only that quote's work order; overrides require staff/trusted sync. Compare token byte lengths before timingSafeEqual.
+- Prevention: quote-sync-access.test.js exercises actual route chains, rejected callers, customer scope and internal forwarding; never probe live bulk mutations to test a gate.

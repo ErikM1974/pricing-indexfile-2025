@@ -67,6 +67,172 @@
     "employee-bundles/wcttr-bundle.html": "8e46d3e25a8c10275198c03fa6364bd4660ae4d513de334ca72ded46ff86f020",
     "employee-bundles/css/wcttr-bundle.css": "e37c7764e194432f5fba8dcab9ed69492dacf0e52522de044799ccd637b8ee2f"
   },
-  "changes": [],
-  "retiredStyles": []
+  "changes": [
+    {
+      "file": "employee-bundles/streich-bros-bundle.html",
+      "before": "    <link href=\"https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css\" rel=\"stylesheet\">\n    <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css\">\n    <!-- Streich Bros Brand Typography -->\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    <link href=\"https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700;900&family=Roboto+Slab:wght@400;600;700&display=swap\" rel=\"stylesheet\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link rel=\"stylesheet\" href=\"/employee-bundles/css/streich-bros-bundle.css?v=2026.09.07.18\">",
+      "after": "    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    <link href=\"https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap\" rel=\"stylesheet\">\n    <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/components.css?v=2026.09.10.6\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/hosted-workspace.css?v=2026.09.09.10\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/employee-bundles.css?v=2026.09.10.7\">",
+      "count": 1
+    },
+    {
+      "file": "employee-bundles/streich-bros-bundle.html",
+      "before": "<body>\n    <div class=\"header\">\n        <div class=\"container text-center\">\n            <div class=\"logo-container\">\n                <img src=\"https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9172150\" alt=\"Streich Bros. Logo\">\n            </div>\n            <h1>Employee Bundle Program</h1>\n            <p>Manage team apparel sizes and orders</p>\n        </div>\n    </div>\n\n    <main class=\"container\">",
+      "after": "<body data-ui=\"unified\" data-employee-bundle=\"streich\" data-hosted-workspace=\"employee-bundles\">\n    <a class=\"skip-link\" href=\"#bundle-main\">Skip to employee list</a>\n    <header class=\"bundle-header\">\n        <div class=\"bundle-header-inner\">\n            <div class=\"logo-container\">\n                <img src=\"https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9172150\" alt=\"Streich Bros. Logo\">\n            </div>\n            <div>\n                <h1 class=\"bundle-title\">Employee Bundle Program</h1>\n                <p>Manage team apparel sizes and orders</p>\n            </div>\n        </div>\n    </header>\n\n    <main class=\"bundle-main\" id=\"bundle-main\" tabindex=\"-1\">",
+      "count": 1
+    },
+    {
+      "file": "employee-bundles/streich-bros-bundle.html",
+      "before": "<div class=\"content-section\">",
+      "after": "<div class=\"content-section card hosted-card\">",
+      "count": 1
+    },
+    {
+      "file": "employee-bundles/streich-bros-bundle.html",
+      "before": "            <div class=\"instructions-box\">\n                <h5 class=\"mb-3\"><i class=\"fas fa-print\" aria-hidden=\"true\"></i> How to Print Labels</h5>\n\n                <div class=\"instruction-step\">\n                    <div class=\"step-number\">1</div>\n                    <div class=\"step-content\">Download all the names and sizes into Excel</div>\n                </div>\n\n                <div class=\"instruction-step\">\n                    <div class=\"step-number\">2</div>\n                    <div class=\"step-content\">Import them into Microsoft Word using the mail merge</div>\n                </div>\n\n                <div class=\"instruction-step\">\n                    <div class=\"step-number\">3</div>\n                    <div class=\"step-content\">Print them on the Avery 5960 labels</div>\n                </div>\n            </div>\n\n",
+      "after": "            <div class=\"instructions-box\">\n                <h3><i class=\"fas fa-print\" aria-hidden=\"true\"></i> How to Print Labels</h3>\n                <ol class=\"instructions-list\">\n                    <li class=\"instruction-step\"><span class=\"step-number\" aria-hidden=\"true\">1</span><span class=\"step-content\">Download all the names and sizes into Excel</span></li>\n                    <li class=\"instruction-step\"><span class=\"step-number\" aria-hidden=\"true\">2</span><span class=\"step-content\">Import them into Microsoft Word using the mail merge</span></li>\n                    <li class=\"instruction-step\"><span class=\"step-number\" aria-hidden=\"true\">3</span><span class=\"step-content\">Print them on the Avery 5960 labels</span></li>\n                </ol>\n            </div>\n\n",
+      "count": 1
+    },
+    {
+      "file": "employee-bundles/streich-bros-bundle.html",
+      "before": "            <div class=\"caspio-container\">\n                <script type=\"text/javascript\" src=\"https://c3eku948.caspio.com/dp/a0e15000905016abc7b946ad8b6f/emb\"></script>\n            </div>",
+      "after": "            <p class=\"hosted-help\">If the employee list does not load, <a href=\"https://c3eku948.caspio.com/dp/a0e15000905016abc7b946ad8b6f\" target=\"_blank\" rel=\"noopener\">open it in a new tab</a>.</p>\n            <div class=\"hosted-embed\" role=\"region\" aria-label=\"Streich Bros. employee list\" tabindex=\"0\">\n                <script type=\"text/javascript\" src=\"https://c3eku948.caspio.com/dp/a0e15000905016abc7b946ad8b6f/emb\"></script>\n            </div>\n            <p class=\"hosted-print-link\">Employee list: https://c3eku948.caspio.com/dp/a0e15000905016abc7b946ad8b6f</p>",
+      "count": 1
+    },
+    {
+      "file": "employee-bundles/streich-bros-bundle.html",
+      "before": "<div class=\"company-bundles\">",
+      "after": "<div class=\"company-bundles\" role=\"navigation\" aria-label=\"Employee bundle programs\">",
+      "count": 1
+    },
+    {
+      "file": "employee-bundles/streich-bros-bundle.html",
+      "before": "<h3 class=\"bundles-title\">",
+      "after": "<h2 class=\"bundles-title\">",
+      "count": 1
+    },
+    {
+      "file": "employee-bundles/streich-bros-bundle.html",
+      "before": "                EMPLOYEE BUNDLES\n            </h3>",
+      "after": "                EMPLOYEE BUNDLES\n            </h2>",
+      "count": 1
+    },
+    {
+      "file": "employee-bundles/streich-bros-bundle.html",
+      "before": "<div class=\"bundle-card active\">",
+      "after": "<div class=\"bundle-card active\" aria-current=\"page\">",
+      "count": 1
+    },
+    {
+      "file": "employee-bundles/streich-bros-bundle.html",
+      "before": "    <script src=\"https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js\"></script>",
+      "after": "    <!-- Hosted employee records retain their own provider scripts. -->",
+      "count": 1
+    },
+    {
+      "file": "employee-bundles/wcttr-bundle.html",
+      "before": "    <link href=\"https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css\" rel=\"stylesheet\">\n    <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css\">\n    <!-- WCTTR Brand Typography -->\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    <link href=\"https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Oxanium:wght@400;500;600;700&display=swap\" rel=\"stylesheet\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link rel=\"stylesheet\" href=\"/employee-bundles/css/wcttr-bundle.css?v=2026.09.07.19\">",
+      "after": "    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    <link href=\"https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap\" rel=\"stylesheet\">\n    <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/components.css?v=2026.09.10.6\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/hosted-workspace.css?v=2026.09.09.10\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/employee-bundles.css?v=2026.09.10.7\">",
+      "count": 1
+    },
+    {
+      "file": "employee-bundles/wcttr-bundle.html",
+      "before": "<body>\n    <div class=\"header\">\n        <div class=\"container text-center\">\n            <div class=\"logo-container\">\n                <img src=\"https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9172189\" alt=\"WCTTR Logo\">\n            </div>\n            <h1>Employee Bundle Program</h1>\n            <p>Manage team apparel sizes and orders</p>\n        </div>\n    </div>\n\n    <main class=\"container\">",
+      "after": "<body data-ui=\"unified\" data-employee-bundle=\"wcttr\" data-hosted-workspace=\"employee-bundles\">\n    <a class=\"skip-link\" href=\"#bundle-main\">Skip to employee list</a>\n    <header class=\"bundle-header\">\n        <div class=\"bundle-header-inner\">\n            <div class=\"logo-container\">\n                <img src=\"https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9172189\" alt=\"WCTTR Logo\">\n            </div>\n            <div>\n                <h1 class=\"bundle-title\">Employee Bundle Program</h1>\n                <p>Manage team apparel sizes and orders</p>\n            </div>\n        </div>\n    </header>\n\n    <main class=\"bundle-main\" id=\"bundle-main\" tabindex=\"-1\">",
+      "count": 1
+    },
+    {
+      "file": "employee-bundles/wcttr-bundle.html",
+      "before": "<div class=\"content-section\">",
+      "after": "<div class=\"content-section card hosted-card\">",
+      "count": 1
+    },
+    {
+      "file": "employee-bundles/wcttr-bundle.html",
+      "before": "            <div class=\"instructions-box\">\n                <h5 class=\"mb-3\"><i class=\"fas fa-print\" aria-hidden=\"true\"></i> How to Print Labels</h5>\n\n                <div class=\"instruction-step\">\n                    <div class=\"step-number\">1</div>\n                    <div class=\"step-content\">Download all the names and sizes into Excel</div>\n                </div>\n\n                <div class=\"instruction-step\">\n                    <div class=\"step-number\">2</div>\n                    <div class=\"step-content\">Import them into Microsoft Word using the mail merge</div>\n                </div>\n\n                <div class=\"instruction-step\">\n                    <div class=\"step-number\">3</div>\n                    <div class=\"step-content\">Print them on the Avery 5960 labels</div>\n                </div>\n            </div>\n\n",
+      "after": "            <div class=\"instructions-box\">\n                <h3><i class=\"fas fa-print\" aria-hidden=\"true\"></i> How to Print Labels</h3>\n                <ol class=\"instructions-list\">\n                    <li class=\"instruction-step\"><span class=\"step-number\" aria-hidden=\"true\">1</span><span class=\"step-content\">Download all the names and sizes into Excel</span></li>\n                    <li class=\"instruction-step\"><span class=\"step-number\" aria-hidden=\"true\">2</span><span class=\"step-content\">Import them into Microsoft Word using the mail merge</span></li>\n                    <li class=\"instruction-step\"><span class=\"step-number\" aria-hidden=\"true\">3</span><span class=\"step-content\">Print them on the Avery 5960 labels</span></li>\n                </ol>\n            </div>\n\n",
+      "count": 1
+    },
+    {
+      "file": "employee-bundles/wcttr-bundle.html",
+      "before": "            <div class=\"caspio-container\">\n                <script type=\"text/javascript\" src=\"https://c3eku948.caspio.com/dp/a0e15000b7a0a9eb7b964e188ae3/emb\"></script>\n            </div>",
+      "after": "            <p class=\"hosted-help\">If the employee list does not load, <a href=\"https://c3eku948.caspio.com/dp/a0e15000b7a0a9eb7b964e188ae3\" target=\"_blank\" rel=\"noopener\">open it in a new tab</a>.</p>\n            <div class=\"hosted-embed\" role=\"region\" aria-label=\"WCTTR employee list\" tabindex=\"0\">\n                <script type=\"text/javascript\" src=\"https://c3eku948.caspio.com/dp/a0e15000b7a0a9eb7b964e188ae3/emb\"></script>\n            </div>\n            <p class=\"hosted-print-link\">Employee list: https://c3eku948.caspio.com/dp/a0e15000b7a0a9eb7b964e188ae3</p>",
+      "count": 1
+    },
+    {
+      "file": "employee-bundles/wcttr-bundle.html",
+      "before": "<div class=\"company-bundles\">",
+      "after": "<div class=\"company-bundles\" role=\"navigation\" aria-label=\"Employee bundle programs\">",
+      "count": 1
+    },
+    {
+      "file": "employee-bundles/wcttr-bundle.html",
+      "before": "<h3 class=\"bundles-title\">",
+      "after": "<h2 class=\"bundles-title\">",
+      "count": 1
+    },
+    {
+      "file": "employee-bundles/wcttr-bundle.html",
+      "before": "                EMPLOYEE BUNDLES\n            </h3>",
+      "after": "                EMPLOYEE BUNDLES\n            </h2>",
+      "count": 1
+    },
+    {
+      "file": "employee-bundles/wcttr-bundle.html",
+      "before": "<div class=\"bundle-card active\">",
+      "after": "<div class=\"bundle-card active\" aria-current=\"page\">",
+      "count": 1
+    },
+    {
+      "file": "employee-bundles/wcttr-bundle.html",
+      "before": "    <script src=\"https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js\"></script>",
+      "after": "    <!-- Hosted employee records retain their own provider scripts. -->",
+      "count": 1
+    },
+    {
+      "file": "employee-bundles/streich-bros-bundle.html",
+      "before": "class=\"bundle-card text-decoration-none\"",
+      "after": "class=\"bundle-card page-nav-link\"",
+      "count": 2
+    },
+    {
+      "file": "employee-bundles/streich-bros-bundle.html",
+      "before": "class=\"bundle-card active\"",
+      "after": "class=\"bundle-card active page-nav-link\"",
+      "count": 1
+    },
+    {
+      "file": "employee-bundles/streich-bros-bundle.html",
+      "before": "            <div class=\"hosted-embed\"",
+      "after": "            <p class=\"bundle-scroll-hint\">Scroll the employee list sideways to see every column.</p>\n            <div class=\"hosted-embed\"",
+      "count": 1
+    },
+    {
+      "file": "employee-bundles/wcttr-bundle.html",
+      "before": "class=\"bundle-card text-decoration-none\"",
+      "after": "class=\"bundle-card page-nav-link\"",
+      "count": 2
+    },
+    {
+      "file": "employee-bundles/wcttr-bundle.html",
+      "before": "class=\"bundle-card active\"",
+      "after": "class=\"bundle-card active page-nav-link\"",
+      "count": 1
+    },
+    {
+      "file": "employee-bundles/wcttr-bundle.html",
+      "before": "            <div class=\"hosted-embed\"",
+      "after": "            <p class=\"bundle-scroll-hint\">Scroll the employee list sideways to see every column.</p>\n            <div class=\"hosted-embed\"",
+      "count": 1
+    }
+  ],
+  "retiredStyles": [
+    {
+      "file": "employee-bundles/css/streich-bros-bundle.css",
+      "css": "/* streich-bros-bundle.css — extracted 2026-09-06 from the inline \\3c style> in employee-bundles/streich-bros-bundle.html (Rule 3). */\n\n/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its\n   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;\n   raw hex is allowed ONLY in this block. */\n/* stylelint-disable color-no-hex */\n:root {\n    --streich-bros-bundle-blue: #2c2997;\n    --streich-bros-bundle-yellow: #ffdd2d;\n    --streich-bros-bundle-red: #dc3e32;\n    --streich-bros-bundle-blue-2: #1f1d6b;\n    --primary-color: var(--streich-bros-bundle-blue);\n    --secondary-color: var(--streich-bros-bundle-yellow);\n    --accent-color: var(--streich-bros-bundle-red);\n    --dark-text: var(--gray-700);\n    --light-text: var(--print-line);\n}\n/* stylelint-enable color-no-hex */\n\nbody {\n    font-family: Roboto, sans-serif;\n    background-color: var(--gray-100);\n    color: var(--dark-text);\n}\n\n.header {\n    background-color: var(--primary-color);\n    color: white;\n    padding: 2rem 0;\n    margin-bottom: 2rem;\n}\n\n.logo-container {\n    background: white;\n    padding: 1rem;\n    border-radius: 8px;\n    margin-bottom: 1.5rem;\n    display: inline-block;\n}\n\n.logo-container img {\n    max-width: 100%;\n    height: auto;\n    max-height: 120px;\n}\n\n.header h1 {\n    font-family: 'Roboto Slab', serif;\n    font-weight: 700;\n    margin-bottom: 0.5rem;\n    letter-spacing: 0.5px;\n}\n\n.header p {\n    opacity: 0.95;\n    margin-bottom: 0;\n    font-weight: 300;\n}\n\n.content-section {\n    background: white;\n    border-radius: 8px;\n    padding: 2rem;\n    margin-bottom: 1.5rem;\n    box-shadow: 0 2px 4px rgb(0 0 0 / 10%);\n}\n\n.section-title {\n    color: var(--primary-color);\n    font-weight: 600;\n    font-family: 'Roboto Slab', serif;\n    margin-bottom: 1.5rem;\n    padding-bottom: 0.5rem;\n    border-bottom: 2px solid var(--brand-100);\n}\n\n.important-note {\n    background-color: var(--store-rush-soft);\n    border-left: 4px solid var(--secondary-color);\n    padding: 1rem 1.5rem;\n    margin-bottom: 1.5rem;\n    border-radius: 4px;\n}\n\n.important-note i {\n    color: var(--secondary-color);\n    margin-right: 0.5rem;\n}\n\n.instructions-box {\n    background-color: var(--gray-50);\n    border-left: 4px solid var(--primary-color);\n    padding: 1.5rem;\n    border-radius: 4px;\n}\n\n.instruction-step {\n    display: flex;\n    align-items: start;\n    margin-bottom: 1rem;\n}\n\n.instruction-step:last-child {\n    margin-bottom: 0;\n}\n\n.step-number {\n    background-color: var(--primary-color);\n    color: white;\n    width: 32px;\n    height: 32px;\n    border-radius: 50%;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    font-weight: 900;\n    margin-right: 1rem;\n    flex-shrink: 0;\n}\n\n.step-content {\n    flex: 1;\n    padding-top: 4px;\n    font-weight: 400;\n}\n\n.company-bundles {\n    background: white;\n    border-radius: 8px;\n    padding: 2rem;\n    margin-top: 2rem;\n    box-shadow: 0 2px 4px rgb(0 0 0 / 10%);\n}\n\n.bundles-title {\n    font-family: 'Roboto Slab', serif;\n    font-weight: 600;\n    margin-bottom: 1.5rem;\n    display: flex;\n    align-items: center;\n    color: var(--dark-text);\n    letter-spacing: 0.5px;\n}\n\n.bundles-title i {\n    margin-right: 0.5rem;\n    color: var(--primary-color);\n}\n\n.bundles-grid {\n    display: grid;\n    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));\n    gap: 1rem;\n}\n\n.bundle-card {\n    border: 2px dashed var(--store-line);\n    border-radius: 8px;\n    padding: 1.5rem 1rem;\n    text-align: center;\n    cursor: pointer;\n    transition: all 0.3s ease;\n    background: white;\n}\n\n.bundle-card:hover {\n    border-color: var(--primary-color);\n    background-color: var(--color-ruth-tint);\n    transform: translateY(-2px);\n    box-shadow: 0 4px 8px rgb(44 41 151 / 15%);\n}\n\n.bundle-card.active {\n    background-color: var(--primary-color);\n    color: white;\n    border-color: var(--primary-color);\n    border-style: solid;\n    box-shadow: 0 4px 12px rgb(44 41 151 / 25%);\n}\n\n.bundle-card.active:hover {\n    background-color: var(--streich-bros-bundle-blue-2);\n}\n\n.bundle-card i {\n    font-size: 2rem;\n    margin-bottom: 0.5rem;\n    opacity: 0.7;\n}\n\n.bundle-card.active i {\n    opacity: 1;\n}\n\n.bundle-name {\n    font-weight: 600;\n    margin-bottom: 0.25rem;\n    letter-spacing: 0.3px;\n}\n\n.bundle-status {\n    font-size: 0.85rem;\n    opacity: 0.7;\n}\n\n.instructions-box h5 {\n    color: var(--primary-color);\n    font-family: 'Roboto Slab', serif;\n    font-weight: 600;\n    letter-spacing: 0.3px;\n}\n\n.caspio-container {\n    margin-top: 1.5rem;\n    min-height: 400px;\n}\n\n.footer-logo {\n    text-align: center;\n    padding: 2rem 0;\n}\n\n.footer-logo img {\n    max-width: 300px;\n    height: auto;\n    opacity: 0.7;\n    transition: opacity 0.3s ease;\n}\n\n.footer-logo img:hover {\n    opacity: 0.9;\n}\n\n@media (width <= 768px) {\n    .bundles-grid {\n        grid-template-columns: repeat(2, 1fr);\n    }\n\n    .header h1 {\n        font-size: 1.75rem;\n    }\n}\n\n/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */\n[hidden] { display: none !important; }\n"
+    },
+    {
+      "file": "employee-bundles/css/wcttr-bundle.css",
+      "css": "/* wcttr-bundle.css — extracted 2026-09-06 from the inline \\3c style> in employee-bundles/wcttr-bundle.html (Rule 3). */\n\n/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its\n   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;\n   raw hex is allowed ONLY in this block. */\n/* stylelint-disable color-no-hex */\n:root {\n    --wcttr-bundle-orange: #f97316;\n    --primary-color: var(--gray-800);\n    --secondary-color: var(--wcttr-bundle-orange);\n    --accent-color: var(--red-500);\n    --dark-text: var(--gray-700);\n    --light-text: var(--gray-400);\n}\n/* stylelint-enable color-no-hex */\n\nbody {\n    font-family: Lato, sans-serif;\n    background-color: var(--gray-100);\n    color: var(--dark-text);\n}\n\n.header {\n    background-color: var(--primary-color);\n    color: white;\n    padding: 2rem 0;\n    margin-bottom: 2rem;\n}\n\n.logo-container {\n    background: white;\n    padding: 1rem;\n    border-radius: 8px;\n    margin-bottom: 1.5rem;\n    display: inline-block;\n}\n\n.logo-container img {\n    max-width: 100%;\n    height: auto;\n    max-height: 120px;\n}\n\n.header h1 {\n    font-family: Oxanium, sans-serif;\n    font-weight: 700;\n    margin-bottom: 0.5rem;\n    letter-spacing: 0.5px;\n}\n\n.header p {\n    opacity: 0.95;\n    margin-bottom: 0;\n    font-weight: 300;\n}\n\n.content-section {\n    background: white;\n    border-radius: 8px;\n    padding: 2rem;\n    margin-bottom: 1.5rem;\n    box-shadow: 0 2px 4px rgb(0 0 0 / 10%);\n}\n\n.section-title {\n    color: var(--primary-color);\n    font-weight: 700;\n    font-family: Oxanium, sans-serif;\n    margin-bottom: 1.5rem;\n    padding-bottom: 0.5rem;\n    border-bottom: 2px solid var(--brand-100);\n}\n\n.important-note {\n    background-color: var(--red-50);\n    border-left: 4px solid var(--secondary-color);\n    padding: 1rem 1.5rem;\n    margin-bottom: 1.5rem;\n    border-radius: 4px;\n}\n\n.important-note i {\n    color: var(--secondary-color);\n    margin-right: 0.5rem;\n}\n\n.instructions-box {\n    background-color: var(--gray-50);\n    border-left: 4px solid var(--primary-color);\n    padding: 1.5rem;\n    border-radius: 4px;\n}\n\n.instruction-step {\n    display: flex;\n    align-items: start;\n    margin-bottom: 1rem;\n}\n\n.instruction-step:last-child {\n    margin-bottom: 0;\n}\n\n.step-number {\n    background-color: var(--primary-color);\n    color: white;\n    width: 32px;\n    height: 32px;\n    border-radius: 50%;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    font-weight: 900;\n    margin-right: 1rem;\n    flex-shrink: 0;\n}\n\n.step-content {\n    flex: 1;\n    padding-top: 4px;\n    font-weight: 400;\n}\n\n.company-bundles {\n    background: white;\n    border-radius: 8px;\n    padding: 2rem;\n    margin-top: 2rem;\n    box-shadow: 0 2px 4px rgb(0 0 0 / 10%);\n}\n\n.bundles-title {\n    font-family: Oxanium, sans-serif;\n    font-weight: 700;\n    margin-bottom: 1.5rem;\n    display: flex;\n    align-items: center;\n    color: var(--dark-text);\n    letter-spacing: 0.5px;\n}\n\n.bundles-title i {\n    margin-right: 0.5rem;\n    color: var(--primary-color);\n}\n\n.bundles-grid {\n    display: grid;\n    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));\n    gap: 1rem;\n}\n\n.bundle-card {\n    border: 2px dashed var(--store-line);\n    border-radius: 8px;\n    padding: 1.5rem 1rem;\n    text-align: center;\n    cursor: pointer;\n    transition: all 0.3s ease;\n    background: white;\n}\n\n.bundle-card:hover {\n    border-color: var(--primary-color);\n    background-color: var(--gray-50);\n    transform: translateY(-2px);\n    box-shadow: 0 4px 8px rgb(31 41 55 / 15%);\n}\n\n.bundle-card.active {\n    background-color: var(--primary-color);\n    color: white;\n    border-color: var(--primary-color);\n    border-style: solid;\n    box-shadow: 0 4px 12px rgb(31 41 55 / 25%);\n}\n\n.bundle-card.active:hover {\n    background-color: var(--gray-900);\n}\n\n.bundle-card i {\n    font-size: 2rem;\n    margin-bottom: 0.5rem;\n    opacity: 0.7;\n}\n\n.bundle-card.active i {\n    opacity: 1;\n}\n\n.bundle-name {\n    font-weight: 700;\n    margin-bottom: 0.25rem;\n    letter-spacing: 0.3px;\n}\n\n.bundle-status {\n    font-size: 0.85rem;\n    opacity: 0.7;\n}\n\n.instructions-box h5 {\n    color: var(--primary-color);\n    font-family: Oxanium, sans-serif;\n    font-weight: 700;\n    letter-spacing: 0.3px;\n}\n\n.caspio-container {\n    margin-top: 1.5rem;\n    min-height: 400px;\n}\n\n.footer-logo {\n    text-align: center;\n    padding: 2rem 0;\n}\n\n.footer-logo img {\n    max-width: 300px;\n    height: auto;\n    opacity: 0.7;\n    transition: opacity 0.3s ease;\n}\n\n.footer-logo img:hover {\n    opacity: 0.9;\n}\n\n@media (width <= 768px) {\n    .bundles-grid {\n        grid-template-columns: repeat(2, 1fr);\n    }\n\n    .header h1 {\n        font-size: 1.75rem;\n    }\n}\n\n/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */\n[hidden] { display: none !important; }\n"
+    }
+  ]
 }

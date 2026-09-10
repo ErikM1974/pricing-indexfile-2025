@@ -44,3 +44,23 @@ for(const record of source.pages){
   await page.screenshot({path:path.join(output,'employee-bundles-'+name+'-'+mode+'-'+state+'-320.png'),fullPage:true});check(events,record);
  });
 }
+if(!capture)for(const record of source.pages){
+ const name=path.basename(record.file,'.html');
+ test('CSS employee bundles: '+name+' keeps the exit visible while the provider is loading',async({page})=>{
+  let release,arrive;
+  const hold=new Promise(resolve=>{release=resolve;}),arrived=new Promise(resolve=>{arrive=resolve;});
+  await page.setViewportSize({width:320,height:1050});
+  const opening=open(page,record.file,{hold,arrive});
+  await arrived;
+  try{await expect(page.locator('.hosted-help a')).toBeVisible();await expect(page.locator('.bundle-scroll-hint')).toBeVisible();expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);}finally{release();}
+  const events=await opening;await expect(page.locator('tbody tr')).toHaveCount(rows.length);check(events,record);
+ });
+ test('CSS employee bundles: '+name+' contains a provider iframe on phones',async({page})=>{
+  await page.setViewportSize({width:320,height:1050});
+  const events=await open(page,record.file,{mode:'iframe'});
+  await expect(page.frameLocator('iframe').locator('tbody tr')).toHaveCount(rows.length);
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
+  const frame=await page.locator('iframe').boundingBox();expect(frame.x+frame.width).toBeLessThanOrEqual(320);
+  await page.screenshot({path:path.join(output,'employee-bundles-'+name+'-current-iframe-320.png'),fullPage:true});check(events,record);
+ });
+}
