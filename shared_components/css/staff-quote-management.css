@@ -1,0 +1,1131 @@
+/* Quote Management: one scoped owner for staff table, phone cards and local dialogs. */
+@layer components.pages {
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .dashboard-header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--space-4);
+        padding: var(--space-4) var(--space-5);
+        background: var(--gray-900);
+        color: var(--color-on-brand);
+        border-top: 3px solid var(--amber-400);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .dashboard-header
+        .logo {
+        width: auto;
+        height: 44px;
+        filter: brightness(0) invert(1);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .dashboard-header
+        h1 {
+        margin: 0;
+        font-size: var(--font-size-xl);
+        color: inherit;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .header-actions {
+        display: flex;
+        flex: 1 1 auto;
+        justify-content: flex-end;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .user-info {
+        padding: var(--space-2);
+        font-size: var(--font-size-md);
+        color: var(--gray-200);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        :is(
+            .btn-header,
+            .btn-search,
+            .btn-bulk-delete,
+            .btn-cancel,
+            .btn-confirm,
+            .btn-confirm-delete,
+            .pagination button,
+            .qm-tab,
+            .status-dropdown
+        ) {
+        min-height: 44px;
+        border: 1px solid var(--ui-line-strong);
+        border-radius: var(--radius-sm);
+        padding: var(--space-2) var(--space-3);
+        font: inherit;
+        cursor: pointer;
+        text-decoration: none;
+        background: var(--ui-surface);
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .btn-header {
+        display: inline-flex;
+        gap: var(--space-2);
+        align-items: center;
+        font-size: var(--font-size-md);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        :is(.btn-search, .btn-confirm) {
+        background: var(--ui-accent);
+        border-color: var(--ui-accent);
+        color: var(--color-on-brand);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        :is(.btn-bulk-delete, .btn-confirm-delete) {
+        background: var(--red-700);
+        border-color: var(--red-700);
+        color: var(--color-on-brand);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        :is(button, input, select, a):focus-visible {
+        outline: 3px solid var(--ui-accent);
+        outline-offset: 3px;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .dashboard-header
+        :focus-visible {
+        outline-color: var(--amber-400);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        button:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .dashboard-container {
+        max-width: 1800px;
+        padding: var(--space-5);
+        margin: 0 auto;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        :is(.filters-section, .stat-card, .quotes-table-section) {
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-md);
+        background: var(--ui-surface);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .filters-section {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: end;
+        gap: var(--space-4);
+        padding: var(--space-4);
+        margin-bottom: var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .filter-group {
+        display: grid;
+        gap: var(--space-2);
+        flex: 1 1 12rem;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .filter-group:has(input) {
+        flex: 3 1 20rem;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .filter-group
+        label {
+        font-size: var(--font-size-md);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        :is(.filter-group input, .filter-group select, .qm-modal-field input) {
+        width: 100%;
+        min-width: 0;
+        min-height: 44px;
+        border: 1px solid var(--ui-line-strong);
+        border-radius: var(--radius-sm);
+        padding: var(--space-2) var(--space-3);
+        font: inherit;
+        background: var(--ui-surface);
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .stats-section {
+        display: grid;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: var(--space-3);
+        margin-bottom: var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .stat-card {
+        text-align: left;
+        padding: var(--space-4);
+        min-width: 0;
+        color: var(--ui-ink);
+        font: inherit;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        button.stat-card {
+        cursor: pointer;
+        border-top: 3px solid var(--brand-700);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        button.stat-card:is(:hover, .is-active) {
+        background: var(--brand-50);
+        border-color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        button.stat-card.is-active {
+        box-shadow: inset 0 0 0 1px var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        :is(.stat-card.cancelled, .stat-card.failed) {
+        border-top-color: var(--red-700);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .stat-card.expiring {
+        border-top-color: var(--amber-700);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .stat-value {
+        font-size: clamp(1.25rem, 1.7vw, 1.75rem);
+        font-family: var(--font-mono);
+        font-weight: 650;
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .stat-label {
+        font-size: var(--font-size-md);
+        font-weight: 600;
+        margin-top: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        :is(
+            .stat-sub,
+            .table-count,
+            .qm-updated,
+            .qm-tab-count,
+            .customer-email,
+            .salesperson-cell,
+            .date-cell,
+            .date-relative,
+            .page-info,
+            .milestone-na,
+            .inbound-na,
+            .inbound-pending
+        ) {
+        font-size: var(--font-size-md);
+        line-height: 1.5;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .stat-sub {
+        margin-top: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .stat-card.total {
+        background: var(--gray-900);
+        color: var(--color-on-brand);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .stat-card.total
+        .stat-sub {
+        color: var(--gray-200);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .table-header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-3);
+        padding: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .table-header
+        h2 {
+        font-size: var(--font-size-lg);
+        margin: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .table-actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .qm-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+        padding: 0 var(--space-4) var(--space-3);
+        border-bottom: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .qm-tab {
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .qm-tab--active {
+        border-color: var(--ui-accent);
+        color: var(--brand-800);
+        background: var(--brand-50);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .qm-notice {
+        padding: var(--space-3) var(--space-4);
+        color: var(--sky-900);
+        background: var(--sky-100);
+        font-size: var(--font-size-md);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .quotes-table-scroll {
+        overflow-x: auto;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .quotes-table {
+        border-collapse: collapse;
+        width: 100%;
+        min-width: 1500px;
+        font-size: var(--font-size-md);
+        text-align: left;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .quotes-table
+        th {
+        text-align: left;
+        font-weight: 600;
+        color: var(--ui-muted);
+        background: var(--gray-50);
+        padding: var(--space-3);
+        border-bottom: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .quotes-table
+        td {
+        padding: var(--space-3);
+        border-bottom: 1px solid var(--ui-line);
+        vertical-align: middle;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .quotes-table
+        tbody
+        tr:hover {
+        background: var(--gray-50);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        :is(.quote-id, .customer-name) {
+        font-weight: 600;
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .customer-email {
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .sw-ref {
+        color: var(--brand-800);
+        font-size: var(--font-size-md);
+        margin-top: var(--space-1);
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .quote-amount {
+        font-family: var(--font-mono);
+        font-weight: 600;
+        white-space: nowrap;
+        text-align: right;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .quotes-table
+        .th-right {
+        text-align: right;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .quote-row--cancelled {
+        background: var(--red-50);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .quote-row--cancelled
+        .quote-id {
+        text-decoration: line-through;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .status-badge {
+        display: inline-flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--space-1);
+        padding: var(--space-1) var(--space-2);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+        font-size: var(--font-size-md);
+        line-height: 1.4;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        :is(
+            .status-processed,
+            .status-payment-confirmed,
+            .status-accepted,
+            .deposit-chip--paid
+        ) {
+        color: var(--brand-800);
+        background: var(--brand-50);
+        border-color: var(--brand-100);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        :is(.status-cancelled, .status-charged-no-sw) {
+        color: var(--red-800);
+        background: var(--red-50);
+        border-color: var(--red-200);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        :is(.status-failed, .status-pending-payment) {
+        color: var(--amber-800);
+        background: var(--amber-100);
+        border-color: var(--amber-300);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .status-dropdown {
+        max-width: 100%;
+        font-size: var(--font-size-md);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .status-badge.deposit-chip {
+        margin-top: var(--space-1);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .deposit-chip--live {
+        color: var(--sky-900);
+        background: var(--sky-100);
+        border-color: var(--sky-700);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .milestone-pills {
+        display: flex;
+        gap: var(--space-1);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        :is(.milestone-pill, .inbound-pill) {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        min-width: 28px;
+        min-height: 28px;
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+        background: var(--gray-50);
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        a.inbound-pill {
+        width: 44px;
+        height: 44px;
+        text-decoration: none;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        :is(.milestone-pill--done, .inbound-shipped) {
+        background: var(--brand-50);
+        color: var(--brand-800);
+        border-color: var(--brand-100);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        :is(.milestone-pill--partial, .inbound-partial, .inbound-confirmed) {
+        background: var(--amber-100);
+        color: var(--amber-800);
+        border-color: var(--amber-300);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .inbound-canceled {
+        color: var(--red-800);
+        background: var(--red-50);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .inbound-alert {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-1);
+        border-radius: var(--radius-sm);
+        padding: var(--space-1);
+        margin-top: var(--space-1);
+        font-size: var(--font-size-md);
+        color: var(--red-800);
+        background: var(--red-50);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .due-date {
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .due-soon {
+        color: var(--amber-800);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        :is(.due-overdue, .qm-purge, .warning-text) {
+        color: var(--red-800);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .quotes-table
+        td.actions-cell {
+        white-space: normal;
+        min-width: 160px;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .action-btn {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        min-width: 44px;
+        min-height: 44px;
+        margin: 2px;
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+        background: var(--ui-surface);
+        color: var(--ui-accent);
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .action-btn:hover:not(:disabled) {
+        background: var(--brand-50);
+        border-color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .action-delete {
+        color: var(--red-800);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .action-emoji {
+        font-size: var(--font-size-lg);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .action-btn--locked {
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        :is(.action-btn--shipped, .action-btn--sent) {
+        background: var(--brand-50);
+        color: var(--brand-800);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .action-btn--waiting {
+        background: var(--amber-100);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .checkbox-col
+        input {
+        width: 20px;
+        height: 20px;
+        accent-color: var(--ui-accent);
+        cursor: pointer;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: var(--space-3);
+        padding: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        :is(.empty-state, .loading-overlay) {
+        text-align: center;
+        padding: var(--space-7) var(--space-4);
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .empty-state
+        h3 {
+        color: var(--ui-ink);
+        font-size: var(--font-size-lg);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .empty-state
+        > i {
+        font-size: var(--font-size-2xl);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .loading-spinner {
+        width: 36px;
+        height: 36px;
+        border: 3px solid var(--ui-line);
+        border-top-color: var(--ui-accent);
+        border-radius: 50%;
+        margin: 0 auto;
+        animation: qm-spin 1s linear infinite;
+    }
+
+    @keyframes qm-spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        dialog.qm-dialog {
+        position: fixed;
+        inset: 0;
+        width: min(34rem, calc(100% - 2rem));
+        max-height: calc(100dvh - 2rem);
+        overflow: auto;
+        margin: auto;
+        padding: 0;
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-md);
+        background: var(--ui-surface);
+        color: var(--ui-ink);
+        font: inherit;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        dialog.qm-dialog::backdrop {
+        background: rgb(15 23 42 / 65%);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .qm-dialog
+        .modal-content {
+        padding: var(--space-5);
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .qm-dialog
+        h3 {
+        margin: 0 0 var(--space-3);
+        font-size: var(--font-size-xl);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .qm-dialog
+        p {
+        line-height: 1.6;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+        gap: var(--space-3);
+        margin-top: var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .qm-modal-field {
+        display: grid;
+        gap: var(--space-2);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .qm-toasts {
+        position: fixed;
+        bottom: var(--space-4);
+        right: var(--space-4);
+        z-index: var(--z-toast);
+        width: min(30rem, calc(100% - 2rem));
+        display: grid;
+        gap: var(--space-2);
+        pointer-events: none;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .qm-toast {
+        padding: var(--space-3) var(--space-4);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+        box-shadow: var(--shadow-sm);
+        background: var(--gray-900);
+        color: var(--color-on-brand);
+        font-size: var(--font-size-md);
+        line-height: 1.5;
+        overflow-wrap: anywhere;
+        white-space: pre-line;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .qm-toast--error {
+        background: var(--red-800);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="quote-management"])
+        .qm-toast--success {
+        background: var(--brand-800);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .loading-spinner {
+            animation: none;
+        }
+    }
+
+    @media (width <= 1200px) {
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .stats-section {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+    }
+
+    @media (width <= 950px) {
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .dashboard-container {
+            padding: var(--space-3);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .header-actions {
+            justify-content: flex-start;
+            flex-basis: 100%;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .quotes-table {
+            min-width: 0;
+            display: block;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .quotes-table
+            thead {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            clip-path: inset(50%);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .quotes-table
+            tbody {
+            display: grid;
+            gap: var(--space-3);
+            padding: var(--space-3);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .quotes-table
+            tr {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: var(--space-3);
+            border: 1px solid var(--ui-line);
+            border-radius: var(--radius-md);
+            padding: var(--space-3);
+            min-width: 0;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .quotes-table
+            td {
+            display: block;
+            border: 0;
+            padding: 0;
+            min-width: 0;
+            text-align: left;
+            overflow-wrap: anywhere;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .quotes-table
+            td::before {
+            content: attr(data-label);
+            display: block;
+            font-weight: 600;
+            font-size: var(--font-size-md);
+            color: var(--ui-muted);
+            margin-bottom: var(--space-1);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .quotes-table
+            td:nth-child(1) {
+            grid-column: 2;
+            grid-row: 1;
+            text-align: right;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .quotes-table
+            td:nth-child(2) {
+            grid-column: 1;
+            grid-row: 1;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .quotes-table
+            td:is(:nth-child(3), :nth-child(7), :nth-child(8), :nth-child(12)) {
+            grid-column: 1/-1;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .quotes-table
+            td:nth-child(6) {
+            grid-column: 1;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .quotes-table
+            td.actions-cell {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-1);
+            min-width: 0;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .quotes-table
+            td.actions-cell::before {
+            flex-basis: 100%;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .action-btn {
+            margin: 0;
+        }
+    }
+
+    @media (width <= 520px) {
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .dashboard-header {
+            padding: var(--space-3);
+            gap: var(--space-3);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .dashboard-header
+            .logo {
+            height: 36px;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .dashboard-header
+            h1 {
+            font-size: var(--font-size-lg);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .header-actions {
+            display: grid;
+            grid-template-columns: 1fr;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .user-info {
+            padding: 0;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .btn-header {
+            justify-content: center;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .stats-section {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .table-actions {
+            align-items: flex-start;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .qm-tab {
+            flex: 1 1 auto;
+            padding: var(--space-2);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .qm-tabs {
+            padding: 0 var(--space-3) var(--space-3);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .btn-search {
+            width: 100%;
+        }
+    }
+
+    @media print {
+        @page quote-management {
+            size: letter landscape;
+            margin: 0.4in;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"]) {
+            page: quote-management;
+            background: var(--color-surface);
+            color: var(--print-ink);
+            font-size: 10pt;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .dashboard-header {
+            background: var(--color-surface);
+            color: var(--print-ink);
+            border: 0;
+            padding: 0 0 var(--space-3);
+            border-bottom: 2px solid var(--gray-800);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .dashboard-header
+            .logo {
+            filter: none;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            :is(
+                .skip-link,
+                .header-actions,
+                .filters-section,
+                .qm-tabs,
+                .table-actions .btn-bulk-delete,
+                .qm-toasts,
+                dialog.qm-dialog
+            ) {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .dashboard-container {
+            padding: var(--space-3) 0;
+            max-width: none;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .stats-section {
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+            gap: var(--space-2);
+            margin-bottom: var(--space-3);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .stat-card {
+            padding: var(--space-2);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .stat-value {
+            font-size: 12pt;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .quotes-table-section {
+            border: 0;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .quotes-table-scroll {
+            overflow: visible;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .quotes-table {
+            min-width: 0;
+            width: 100%;
+            font-size: 9pt;
+            display: table;
+            table-layout: fixed;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .quotes-table
+            thead {
+            display: table-header-group;
+            position: static;
+            width: auto;
+            height: auto;
+            clip-path: none;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .quotes-table
+            tbody {
+            display: table-row-group;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .quotes-table
+            tr {
+            display: table-row;
+            break-inside: avoid;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .quotes-table
+            :is(th, td) {
+            display: table-cell;
+            padding: var(--space-1);
+            overflow-wrap: anywhere;
+            white-space: normal;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .quotes-table
+            :is(th, td):is(:nth-child(1), :nth-child(12)) {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .quotes-table
+            td::before {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .quotes-table
+            :is(th, td):nth-child(3) {
+            width: 16%;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .quotes-table
+            :is(th, td):nth-child(7) {
+            width: 17%;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .status-dropdown {
+            font: inherit;
+            min-height: 0;
+            padding: var(--space-1);
+            border: 0;
+            appearance: none;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            :is(
+                .status-badge,
+                .date-cell,
+                .date-relative,
+                .customer-email,
+                .salesperson-cell,
+                .sw-ref,
+                .inbound-alert
+            ) {
+            font-size: 9pt;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .quote-id {
+            overflow-wrap: normal;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .milestone-pills {
+            flex-wrap: wrap;
+            gap: 2px;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            :is(.milestone-pill, .inbound-pill) {
+            min-width: 18px;
+            min-height: 18px;
+            width: 18px;
+            height: 18px;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .pagination
+            button {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            .pagination {
+            padding: var(--space-2);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="quote-management"])
+            :focus {
+            outline: none;
+        }
+    }
+}

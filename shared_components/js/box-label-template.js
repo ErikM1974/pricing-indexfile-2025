@@ -168,14 +168,17 @@
     sheet.innerHTML = labelsHtml;
     document.body.appendChild(sheet);
     document.body.classList.add('sit-label-printing');
+    let cleanupTimer;
     const cleanup = () => {
-      document.body.classList.remove('sit-label-printing');
-      const s = document.getElementById('sit-label-sheet'); if (s) s.remove();
+      clearTimeout(cleanupTimer);
+      if (document.getElementById('sit-label-sheet') === sheet) document.body.classList.remove('sit-label-printing');
+      sheet.remove();
       window.removeEventListener('afterprint', cleanup);
     };
     window.addEventListener('afterprint', cleanup);
+    cleanupTimer = setTimeout(cleanup, 1500);
     window.print();
-    setTimeout(() => { if (document.body.classList.contains('sit-label-printing')) cleanup(); }, 1500);
+    // Each cleanup owns only its captured sheet.
   }
 
   window.BoxLabelTemplate = { renderLabel, printSheet, rushText, followOnText, METHOD_DARK, buildMatrix };

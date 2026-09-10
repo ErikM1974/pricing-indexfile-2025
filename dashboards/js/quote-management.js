@@ -35,6 +35,8 @@ let currentUserRole = null;      // 'admin' etc. from /api/crm-session/me
 let loadedWindow = null;         // '7' | '30' | '90' | 'all' — what the server was asked for
 let loadedAt = 0;
 let loading = false;
+let loadGeneration = 0;
+let loadError = null;
 let tileFilter = '';             // '' | active | accepted | expiring | cancelled | failed
 let searchWidened = false;       // a search found nothing in the window → page pulled All Time
 const REFRESH_INTERVAL_MS = 5 * 60 * 1000;
@@ -123,11 +125,22 @@ function setupEventListeners() {
     });
     // Modal keyboard: Escape closes, Enter confirms.
     document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') { closeDeleteModal(); closeModal(null); }
+        // Native cancel events dismiss only the active dialog.
         if (e.key === 'Enter' && !document.getElementById('qm-modal').hidden && e.target.id === 'qm-modal-input') {
             document.getElementById('qm-modal-confirm').click();
         }
     });
+    document.getElementById('qm-modal').addEventListener('cancel', function (e) { e.preventDefault(); closeModal(null); });
+    document.getElementById('delete-modal').addEventListener('cancel', function (e) { e.preventDefault(); closeDeleteModal(); });
+    document.querySelectorAll('dialog.qm-dialog').forEach(modal => modal.addEventListener('keydown', function (e) {
+        if (e.key !== 'Tab') return;
+        const controls = Array.from(modal.querySelectorAll('button,input,select,a[href],[tabindex]')).filter(n => !n.disabled && n.tabIndex >= 0 && n.getClientRects().length);
+        const first = controls[0] || modal, last = controls[controls.length - 1] || modal;
+        if ((!e.shiftKey && document.activeElement === last) || (e.shiftKey && document.activeElement === first) || !controls.length) {
+            e.preventDefault();
+            (e.shiftKey ? last : first).focus();
+        }
+    }));
     initTabs();
 }
 
@@ -142,6 +155,7 @@ function onDelegatedClick(e) {
             case 'refresh-inbound': return refreshInboundLive();
             case 'inbound-today': return typeof openInboundTodayModal === 'function' ? openInboundTodayModal() : showToast('The inbound calendar did not load — refresh the page.', 'error');
             case 'search': tileFilter = ''; searchWidened = false; return applyFilters();
+            case 'retry-quotes': return loadQuotes();
             case 'tab': return switchTab(actionEl.dataset.tab);
             case 'bulk-delete': return bulkDelete();
             case 'prev-page': return prevPage();
@@ -207,28 +221,44 @@ function paintTiles() {
 
 // ── Generic modal (replaces alert/confirm/prompt). Resolves the input value (or true) on confirm, null on cancel. ──
 let modalResolve = null;
+const dialogReturnFocus = new WeakMap();
+function showQmDialog(modal) {
+    dialogReturnFocus.set(modal, document.activeElement);
+    modal.hidden = false;
+    if (!modal.open) modal.showModal();
+}
+function hideQmDialog(modal) {
+    if (!modal.open) return;
+    modal.close();
+    modal.hidden = true;
+    const target = dialogReturnFocus.get(modal);
+    if (target?.isConnected) target.focus({ preventScroll: true });
+    else document.getElementById('filter-search')?.focus({ preventScroll: true });
+}
 function openModal({ title, message, input, inputLabel, value, confirmLabel, danger } = {}) {
     const modal = document.getElementById('qm-modal');
+    if (modal.open) return Promise.resolve(null);
     document.getElementById('qm-modal-title').textContent = title || '';
     document.getElementById('qm-modal-message').textContent = message || '';
     const field = document.getElementById('qm-modal-field');
     const inputEl = document.getElementById('qm-modal-input');
     field.hidden = !input;
     document.getElementById('qm-modal-input-label').textContent = inputLabel || '';
+    inputEl.setAttribute('aria-label', inputLabel || title || 'Value');
     inputEl.value = value || '';
     inputEl.readOnly = input === 'readonly';
     const confirm = document.getElementById('qm-modal-confirm');
     confirm.textContent = confirmLabel || 'OK';
     confirm.classList.toggle('btn-confirm-delete', !!danger);
     confirm.classList.toggle('btn-confirm', !danger);
-    modal.hidden = false;
+    showQmDialog(modal);
     if (input) { inputEl.focus(); if (input === 'readonly') inputEl.select(); } else confirm.focus();
     return new Promise((resolve) => { modalResolve = resolve; });
 }
 function closeModal(result) {
     const modal = document.getElementById('qm-modal');
-    if (modal.hidden) return;
-    modal.hidden = true;
+    if (!modal.open) return;
+    hideQmDialog(modal);
     const r = modalResolve; modalResolve = null;
     if (r) r(result === null ? null : (document.getElementById('qm-modal-field').hidden ? true : result));
 }
@@ -246,8 +276,9 @@ function ymdDaysAgo(days) {
 // opts.silent: the 5-minute tick — no spinner, keep the page position.
 // opts.all: a search found nothing in the window → widen to All Time once.
 async function loadQuotes(opts = {}) {
-    if (loading) return;
+    const generation = ++loadGeneration;
     loading = true;
+    loadError = null;
     const windowSel = opts.all ? 'all' : (document.getElementById('filter-date').value || '30');
     if (!opts.silent) showLoading(true);
 
@@ -259,13 +290,19 @@ async function loadQuotes(opts = {}) {
         }
 
         const data = await response.json();
-        allQuotes = data.Result || data || [];
+        if (generation !== loadGeneration) return;
+        const rows = Array.isArray(data) ? data : data?.Result;
+        if (!Array.isArray(rows)) throw new Error('Quote response is missing its records');
+        allQuotes = rows;
+        inboundStatusMap.clear();
         loadedWindow = windowSel;
         loadedAt = Date.now();
         if (!opts.all) searchWidened = false;
 
-        // Apply initial filters
+        // Apply the controls as they stand when this window finishes loading.
+        loading = false;
         applyFilters();
+        if (generation !== loadGeneration) return;
         stampLoaded();
 
         // One batched SanMar inbound-status lookup for all loaded WOs
@@ -273,14 +310,26 @@ async function loadQuotes(opts = {}) {
         fetchInboundStatuses();
 
     } catch (error) {
+        if (generation !== loadGeneration) return;
         console.error('[QuoteManagement] Error loading quotes:', error);
         // Never leave the previous list looking current.
         allQuotes = [];
-        showError('Failed to load quotes. Please try refreshing.');
+        filteredQuotes = [];
+        baseFilteredQuotes = [];
+        loadedWindow = null;
+        loadedAt = 0;
+        loadError = 'Failed to load quotes. Please try refreshing.';
+        document.getElementById('quotes-tbody').replaceChildren();
+        selectedQuotes.clear();
+        updateCheckboxSelection();
+        document.querySelectorAll('.stat-value').forEach(el => { el.textContent = '—'; });
+        document.querySelectorAll('.qm-tab-count').forEach(el => { el.textContent = ''; });
+        document.getElementById('table-count').textContent = 'Unavailable';
+        showError(loadError);
         const stamp = document.getElementById('qm-updated');
         if (stamp) stamp.textContent = `Load failed ${clockTime()}`;
     } finally {
-        loading = false;
+        if (generation === loadGeneration) loading = false;
     }
 }
 
@@ -416,6 +465,8 @@ async function refreshInboundLive() {
 }
 
 function applyFilters() {
+    if (loadError) { showError(loadError); return; }
+    if (loading) return;
     // Get filter values
     const statusFilter = document.getElementById('filter-status').value;
     const dateFilter = document.getElementById('filter-date').value;
@@ -756,6 +807,7 @@ function renderInboundIndicator(quote) {
 // ONE batched call for all loaded work orders we haven't checked yet.
 // SYNCED data via the proxy (no per-row SOAP). Non-fatal on failure.
 async function fetchInboundStatuses({ force = false } = {}) {
+    const generation = loadGeneration;
     const allWo = [...new Set((allQuotes || []).map(getWoId).filter(Boolean).map(String))];
     // Normal load: only fetch WOs we haven't checked. force=true (after a
     // manual sync): re-fetch ALL and bust the proxy's synced-status cache.
@@ -764,14 +816,17 @@ async function fetchInboundStatuses({ force = false } = {}) {
     try {
         const resp = await fetch(`${API_BASE}/api/sanmar-orders/batch-status?woIds=${encodeURIComponent(woIds.join(','))}${force ? '&refresh=true' : ''}`);
         if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-        const data = await resp.json().catch(() => ({}));
-        woIds.forEach(wo => inboundStatusMap.set(wo, (data && data[wo]) ? data[wo] : null));
+        const data = await resp.json();
+        if (generation !== loadGeneration || loadError) return;
+        if (!data || typeof data !== 'object' || Array.isArray(data) || data.error) throw new Error('Inbound status response is incomplete');
+        woIds.forEach(wo => inboundStatusMap.set(wo, data[wo] || null));
         renderTable(); // re-render so indicators appear
     } catch (err) {
         // Never leave the pending spinner spinning forever (Erik #1 rule —
         // show a real state, not a fake "still checking"). Mark the WOs we
         // tried as unavailable so their pills flip to a neutral label; a
         // manual sync (force=true) re-fetches them.
+        if (generation !== loadGeneration || loadError) return;
         console.error('[QuoteManagement] Inbound batch-status failed:', err);
         woIds.forEach(wo => inboundStatusMap.set(wo, 'unavailable'));
         renderTable();
@@ -968,7 +1023,7 @@ function renderShipStationButton(quote) {
                 </span>`;
     }
     // ready
-    return `<button type="button" class="action-btn action-btn--ready" data-action="shipstation"
+    return `<button type="button" class="action-btn action-btn--ready" data-action="shipstation" ${shipstationInFlight.has(quote.QuoteID) ? 'disabled' : ''}
                     data-quote-id="${escapeHtml(quote.QuoteID)}" data-pk-id="${quote.PK_ID}"
                     title="Send to ShipStation. Warehouse will rate + buy the label there."
                     aria-label="Send ${escapeHtml(quote.QuoteID)} to ShipStation">
@@ -977,13 +1032,18 @@ function renderShipStationButton(quote) {
 }
 
 // Click handler — POST to send-to-shipstation, then refresh
+const shipstationInFlight = new Set();
 async function sendToShipStation(quoteId, pkId) {
+    if (shipstationInFlight.has(quoteId)) return;
+    shipstationInFlight.add(quoteId);
+    try {
     const ok = await openModal({
         title: 'Send to ShipStation',
         message: `Send ${quoteId} to ShipStation? The warehouse will rate and buy the label there.`,
         confirmLabel: 'Send',
     });
     if (!ok) return;
+    setActionBusy('shipstation', quoteId, true);
     try {
         const resp = await fetch(`/api/quote-sessions/${encodeURIComponent(quoteId)}/send-to-shipstation`, {
             method: 'POST',
@@ -1000,6 +1060,10 @@ async function sendToShipStation(quoteId, pkId) {
     } catch (err) {
         console.error('[QuoteManagement] sendToShipStation failed:', err);
         showToast(`Failed to send ${quoteId} to ShipStation: ${err.message}`, 'error');
+    }
+    } finally {
+        shipstationInFlight.delete(quoteId);
+        setActionBusy('shipstation', quoteId, false);
     }
 }
 
@@ -1077,6 +1141,8 @@ function updateStats() {
 }
 
 function renderTable() {
+    if (loadError) { showError(loadError); return; }
+    if (loading) return;
     const tbody = document.getElementById('quotes-tbody');
     const tableEl = document.getElementById('quotes-table');
     const emptyEl = document.getElementById('table-empty');
@@ -1086,6 +1152,9 @@ function renderTable() {
     showLoading(false);
 
     if (filteredQuotes.length === 0) {
+        tbody.replaceChildren();
+        selectedQuotes.clear();
+        updateCheckboxSelection();
         tableEl.hidden = true;
         emptyEl.innerHTML = `
             <i class="fas fa-file-invoice" aria-hidden="true"></i>
@@ -1103,6 +1172,7 @@ function renderTable() {
     const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
     const endIdx = Math.min(startIdx + ITEMS_PER_PAGE, filteredQuotes.length);
     const pageQuotes = filteredQuotes.slice(startIdx, endIdx);
+    const selectedPks = new Set(Array.from(selectedQuotes, item => String(item.pkId)));
 
     // Update count
     countEl.textContent = `${filteredQuotes.length} quote${filteredQuotes.length !== 1 ? 's' : ''}`;
@@ -1218,6 +1288,7 @@ function renderTable() {
                            data-quote-id="${qid}"
                            data-status="${escapeHtml(quote.Status || 'Open')}"
                            aria-label="Select ${qid}"
+                           ${userCanDelete && selectedPks.has(String(quote.PK_ID)) ? 'checked' : ''}
                            ${userCanDelete ? '' : 'disabled title="You can only delete your own quotes"'}>
                 </td>
                 <td>
@@ -1291,6 +1362,14 @@ function renderTable() {
             </tr>
         `;
     }).join('');
+
+    updateCheckboxSelection();
+
+    // Labels follow the table headings for responsive quote cards and paper.
+    const labels = Array.from(tableEl.querySelectorAll('thead th'), th => th.textContent.trim());
+    tbody.querySelectorAll('tr').forEach(row => Array.from(row.cells).forEach((cell, i) => {
+        cell.dataset.label = labels[i] || 'Select';
+    }));
 
     // Show table
     tableEl.hidden = false;
@@ -1568,7 +1647,7 @@ function ensureEmailJs() {
 function renderResendEmailButton(quote) {
     const email = String(quote.CustomerEmail || '').trim();
     if (!email) return '';
-    return `<button type="button" class="action-btn" data-action="resend" data-pk-id="${quote.PK_ID}" title="Resend quote email to ${escapeHtml(email)}" aria-label="Resend ${escapeHtml(quote.QuoteID)} to ${escapeHtml(email)}">
+    return `<button type="button" class="action-btn" data-action="resend" data-pk-id="${quote.PK_ID}" ${resendInFlight.has(quote.QuoteID) ? 'disabled' : ''} title="Resend quote email to ${escapeHtml(email)}" aria-label="Resend ${escapeHtml(quote.QuoteID)} to ${escapeHtml(email)}">
                 <i class="fas fa-paper-plane" aria-hidden="true"></i>
             </button>`;
 }
@@ -1576,6 +1655,11 @@ function renderResendEmailButton(quote) {
 // Confirm (prompt pre-filled with the on-file address, editable) → send.
 // Keyed by PK_ID like deleteQuote so no email ever rides in an attribute.
 const resendInFlight = new Set();
+function setActionBusy(action, key, busy) {
+    document.querySelectorAll('[data-action="' + action + '"]').forEach(button => {
+        if (String(button.dataset.pkId) === String(key) || button.dataset.quoteId === String(key)) button.disabled = busy;
+    });
+}
 async function resendQuoteEmail(pkId) {
     const quote = findQuoteByPk(pkId);
     if (!quote) {
@@ -1584,6 +1668,8 @@ async function resendQuoteEmail(pkId) {
     }
     const quoteId = quote.QuoteID;
     if (resendInFlight.has(quoteId)) return; // double-click guard
+    resendInFlight.add(quoteId);
+    try {
     if (!ensureEmailJs()) {
         // Erik's #1 rule — a visible failure, never a silent no-op.
         showToast('Email service is unavailable (EmailJS SDK did not load). Check your connection, refresh the page, and try again.', 'error');
@@ -1609,9 +1695,9 @@ async function resendQuoteEmail(pkId) {
     // teamnwca.com origin, NOT window.location.origin (this dashboard can
     // be open on the Heroku domain, which customers shouldn't see).
     const siteOrigin = (window.APP_CONFIG && window.APP_CONFIG.SITE_ORIGIN) || 'https://www.teamnwca.com';
+    setActionBusy('resend', pkId, true);
     const quoteUrl = `${siteOrigin}/quote/${quoteId}${await shareTokenFor(quoteId)}`;
 
-    resendInFlight.add(quoteId);
     showToast('Sending email…');
     try {
         // Params mirror quote-builder-utils.js emailQuote() exactly, so the
@@ -1630,8 +1716,10 @@ async function resendQuoteEmail(pkId) {
         // Erik's #1 rule — surface the failure, never fail silently.
         console.error('[QuoteManagement] resendQuoteEmail failed:', err);
         showToast(`Failed to resend quote email for ${quoteId}: ${(err && (err.text || err.message)) || err}`, 'error');
+    }
     } finally {
         resendInFlight.delete(quoteId);
+        setActionBusy('resend', pkId, false);
     }
 }
 
@@ -1656,6 +1744,7 @@ function showError(message) {
         <i class="fas fa-exclamation-triangle qm-error-icon" aria-hidden="true"></i>
         <h3>Error Loading Quotes</h3>
         <p>${escapeHtml(message)}</p>
+        <button type="button" class="btn-search" data-action="retry-quotes">Retry loading quotes</button>
     `;
     document.getElementById('table-empty').hidden = false;
 }
@@ -1712,6 +1801,7 @@ function escapeJsAttr(str) {
 let selectedQuotes = new Set();
 let pendingDeleteData = [];
 let pendingDeleteType = null; // 'single' or 'bulk'
+let deleteBusy = false;
 
 // Toggle select all checkbox
 function toggleSelectAll() {
@@ -1896,30 +1986,37 @@ function bulkDelete() {
 
 // Show delete confirmation modal
 function showDeleteModal(title, message, data, type) {
+    if (deleteBusy || document.getElementById('delete-modal').open) return;
     pendingDeleteData = data;
     pendingDeleteType = type;
 
     document.getElementById('delete-modal-title').textContent = title;
     document.getElementById('delete-modal-message').innerHTML = message;
-    document.getElementById('delete-modal').hidden = false;
+    showQmDialog(document.getElementById('delete-modal'));
     document.querySelector('#delete-modal .btn-confirm-delete').focus();
 }
 
 // Close delete modal
 function closeDeleteModal() {
-    document.getElementById('delete-modal').hidden = true;
+    if (deleteBusy) return;
+    hideQmDialog(document.getElementById('delete-modal'));
     pendingDeleteData = [];
     pendingDeleteType = null;
 }
 
 // Confirm and execute delete
 async function confirmDelete() {
+    if (deleteBusy) return;
     if (pendingDeleteData.length === 0) {
         closeDeleteModal();
         return;
     }
 
-    const confirmBtn = document.querySelector('.btn-confirm-delete');
+    const items = pendingDeleteData.slice();
+    deleteBusy = true;
+    const confirmBtn = document.querySelector('#delete-modal .btn-confirm-delete');
+    const cancelBtn = document.querySelector('#delete-modal [data-action="delete-cancel"]');
+    cancelBtn.disabled = true;
     confirmBtn.disabled = true;
     confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Deleting...';
 
@@ -1927,7 +2024,7 @@ async function confirmDelete() {
     let failCount = 0;
     const errorMessages = new Set();
 
-    for (const item of pendingDeleteData) {
+    for (const item of items) {
         try {
             const result = await deleteQuoteAPI(item.pkId);
             if (result && result.ok) {
@@ -1944,7 +2041,9 @@ async function confirmDelete() {
         }
     }
 
-    // Reset button state
+    // Reset controls only after the captured batch has finished.
+    deleteBusy = false;
+    cancelBtn.disabled = false;
     confirmBtn.disabled = false;
     confirmBtn.innerHTML = 'Delete';
 
@@ -1981,12 +2080,12 @@ async function deleteQuoteAPI(pkId) {
         credentials: 'same-origin',
     });
     try {
-        let response = await doDelete();
-        // Session expired (MemoryStore cleared on dyno restart) — try to
-        // re-establish once, then retry.
+        const response = await doDelete();
+        // Staff SAML login must be renewed by the user; the retired Caspio
+        // session initializer cannot restore this session. Never retry a delete
+        // through an undefined helper or imply that the record was removed.
         if (response.status === 401) {
-            await establishCrmSession();
-            response = await doDelete();
+            return { ok: false, status: 401, message: 'Your staff session expired. Sign in from the Staff Dashboard and try again.' };
         }
         if (!response.ok) {
             let message = `HTTP ${response.status}`;
@@ -2009,9 +2108,4 @@ document.addEventListener('click', function(e) {
     }
 });
 
-// Close modal on Escape key
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        closeDeleteModal();
-    }
-});
+// Escape dismissal is owned by the native dialog cancel listeners.

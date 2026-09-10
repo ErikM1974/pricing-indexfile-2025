@@ -1,0 +1,95 @@
+{
+  "base": "0f151e3899b8517092b1864babd8ea7f579fc95b",
+  "views": [
+    {
+      "width": 1440,
+      "tab": "labels",
+      "scrollWidth": 1440,
+      "title": "Drain-Pro Employee Bundle | Northwest Custom Apparel",
+      "text": "Drain-Pro Box Labels\nImportant:\nAccount Executives must mark each employee name as 'Approved' in the table below to ensure the customer's spreadsheet matches this data.\nHow to Print Labels\n1\nDownload all the names and sizes into Excel\n2\nImport them into Microsoft Word using the mail merge\n3\nPrint them on the Avery 5960 labels",
+      "links": [
+        "/staff-dashboard.html"
+      ]
+    },
+    {
+      "width": 1440,
+      "tab": "employees",
+      "scrollWidth": 1440,
+      "title": "Drain-Pro Employee Bundle | Northwest Custom Apparel",
+      "text": "Bundle Details",
+      "links": [
+        "/staff-dashboard.html"
+      ]
+    },
+    {
+      "width": 768,
+      "tab": "labels",
+      "scrollWidth": 768,
+      "title": "Drain-Pro Employee Bundle | Northwest Custom Apparel",
+      "text": "Drain-Pro Box Labels\nImportant:\nAccount Executives must mark each employee name as 'Approved' in the table below to ensure the customer's spreadsheet matches this data.\nHow to Print Labels\n1\nDownload all the names and sizes into Excel\n2\nImport them into Microsoft Word using the mail merge\n3\nPrint them on the Avery 5960 labels",
+      "links": [
+        "/staff-dashboard.html"
+      ]
+    },
+    {
+      "width": 768,
+      "tab": "employees",
+      "scrollWidth": 768,
+      "title": "Drain-Pro Employee Bundle | Northwest Custom Apparel",
+      "text": "Bundle Details",
+      "links": [
+        "/staff-dashboard.html"
+      ]
+    },
+    {
+      "width": 390,
+      "tab": "labels",
+      "scrollWidth": 466,
+      "title": "Drain-Pro Employee Bundle | Northwest Custom Apparel",
+      "text": "Drain-Pro Box Labels\nImportant:\nAccount Executives must mark each employee name as 'Approved' in the table below to ensure the customer's spreadsheet matches this data.\nHow to Print Labels\n1\nDownload all the names and sizes into Excel\n2\nImport them into Microsoft Word using the mail merge\n3\nPrint them on the Avery 5960 labels",
+      "links": [
+        "/staff-dashboard.html"
+      ]
+    },
+    {
+      "width": 390,
+      "tab": "employees",
+      "scrollWidth": 466,
+      "title": "Drain-Pro Employee Bundle | Northwest Custom Apparel",
+      "text": "Bundle Details",
+      "links": [
+        "/staff-dashboard.html"
+      ]
+    },
+    {
+      "width": 320,
+      "tab": "labels",
+      "scrollWidth": 466,
+      "title": "Drain-Pro Employee Bundle | Northwest Custom Apparel",
+      "text": "Drain-Pro Box Labels\nImportant:\nAccount Executives must mark each employee name as 'Approved' in the table below to ensure the customer's spreadsheet matches this data.\nHow to Print Labels\n1\nDownload all the names and sizes into Excel\n2\nImport them into Microsoft Word using the mail merge\n3\nPrint them on the Avery 5960 labels",
+      "links": [
+        "/staff-dashboard.html"
+      ]
+    },
+    {
+      "width": 320,
+      "tab": "employees",
+      "scrollWidth": 466,
+      "title": "Drain-Pro Employee Bundle | Northwest Custom Apparel",
+      "text": "Bundle Details",
+      "links": [
+        "/staff-dashboard.html"
+      ]
+    }
+  ],
+  "events": {
+    "errors": [],
+    "writes": [],
+    "unknown": [],
+    "missing": [],
+    "providers": [
+      "/dp/a0e15000848e0baf43604a908d78/emb",
+      "/dp/a0e15000da6b6fa1d16145b4ab86/emb"
+    ]
+  }
+}

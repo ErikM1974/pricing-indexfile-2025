@@ -459,3 +459,5 @@
 - `shared_components/js/training-manual.js` — chapter/hash navigation, biography disclosure and print-state restoration.
 
 - `shared_components/js/staff-reference.js` — staff reference print and fragment focus, shared by commission/bonus/SEO/forms/data-entry guides.
+
+Production schedule follow-up (2026-09-10): the historical tail-batch production-shifts/styles.css entry above is retired. shared_components/css/staff-schedules.css owns the reviewed schedule; all legacy bytes remain in tests/fixtures/staff-workspaces-original-content.json.

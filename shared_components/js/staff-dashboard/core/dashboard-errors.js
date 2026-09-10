@@ -121,4 +121,10 @@ register('dashboard-error:retry', (el) => {
     }
 });
 
+/** Announce actual widget results, including in-card Retry and range changes. */
+export function reportWidgetResult(key, result, ok = result !== false && result != null) {
+    document.dispatchEvent(new CustomEvent('dashboard:widget-loaded', { detail: { key, ok, at: Date.now() } }));
+    return result;
+}
+
 export const ERROR_AREA_KEYS = Object.freeze(Object.keys(ERROR_AREAS));

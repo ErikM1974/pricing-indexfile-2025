@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark" data-accent="green" data-density="comfy">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,36 +10,24 @@
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
     <!--
-        Company Numbers (2026-09-03). The eight live report widgets that used to
-        sit under the staff dashboard's tool grid, moved here UNCHANGED — same
-        markup, same controllers, same stylesheet chain — because nobody used
-        them on the front page. Opened from the dashboard's goal chip and from
-        Admin → Analysis. Admin-only by default (ADMIN_DEFAULT_PAGES in
-        lib/page-access.js); widen with a Staff_Page_Access row, no deploy.
-
-        The stylesheet chain is the dashboard's own (@layer tokens → base →
-        components → utilities, then the unlayered theme + patch), NOT the
-        art-hub/dash-shell chain the other /dashboards pages use — the widgets
-        are styled for the dark dashboard and would need a redesign on a light
-        shell. company-numbers.css only strips the sidebar column and adds the
-        back link.
+        Company Numbers: eight live report widgets using shared dashboard controllers.
+        Shared tokens and components own the visual language; staff-company-numbers.css
+        owns this reporting layout, responsive states and printable report.
+        Opened from the dashboard's goal chip and Admin > Analysis. Admin-only by
+        default (ADMIN_DEFAULT_PAGES in lib/page-access.js); Staff_Page_Access can widen it.
     -->
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/tokens.css?v=2026.09.07.3">
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/base.css?v=2026.09.07.10">
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/components.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/utilities.css?v=2026.09.07.10">
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-theme.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-patch-2.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/dashboards/css/company-numbers.css?v=2026.09.07.19">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.10.3">
+    <link rel="stylesheet" href="/shared_components/css/staff-company-numbers.css?v=2026.09.10.3">
 </head>
-<body>
+<body data-ui="unified" data-staff-workspace="company-numbers">
+    <a class="skip-link" href="#company-numbers-main">Skip to Company Numbers</a>
     <div class="dashboard-container cn-shell">
-        <main class="main-content">
+        <main class="main-content" id="company-numbers-main">
 
             <header class="top-header">
                 <div class="header-left">
@@ -259,6 +247,6 @@
     <!-- APP ENTRY (ES module). Bundled by scripts/build.js (ENTRY_BUNDLES) into one
          hashed file with its whole module graph, so production makes ONE cached
          request instead of the entry + 20 no-store source modules (2026-09-04). -->
-    <script type="module" src="/dashboards/js/company-numbers.js?v=2026.09.04.11"></script>
+    <script type="module" src="/dashboards/js/company-numbers.js?v=2026.09.10.3"></script>
 </body>
 </html>

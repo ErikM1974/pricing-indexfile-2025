@@ -1,0 +1,663 @@
+{
+  "dialogs": [
+    {
+      "name": "invoice",
+      "width": 1440,
+      "text": " SanMar Invoice — WO #142449\n Print / Save PDF\nSanMar Corporation\nInvoice — Northwest Custom Apparel · WO #142449 · Sample Workshop 11\nInvoice INV-88-PO\n2026-09-08\nUnpaid\nPO #\nSYNTHETIC-PO\nORDER DATE\n2026-09-06\nTERMS\nNET 30\nDUE DATE\n2026-10-08\nSHIP VIA\nUPS GROUND\nSHIP TO\nNorthwest Custom Apparel, Sample City, WA\nSTYLE\tDESCRIPTION\tCOLOR\tSIZE\tQTY\tUNIT\tEXT\nPC54\tPort & Company Core Cotton Tee\tNavy\tL\t48\t$3.42\t$164.16\nSubtotal\n$164.16\nShipping & handling\n$12.10\nSales tax\n$0.00\nTotal\n$176.26"
+    },
+    {
+      "name": "invoice",
+      "width": 768,
+      "text": " SanMar Invoice — WO #142449\n Print / Save PDF\nSanMar Corporation\nInvoice — Northwest Custom Apparel · WO #142449 · Sample Workshop 11\nInvoice INV-88-PO\n2026-09-08\nUnpaid\nPO #\nSYNTHETIC-PO\nORDER DATE\n2026-09-06\nTERMS\nNET 30\nDUE DATE\n2026-10-08\nSHIP VIA\nUPS GROUND\nSHIP TO\nNorthwest Custom Apparel, Sample City, WA\nSTYLE\tDESCRIPTION\tCOLOR\tSIZE\tQTY\tUNIT\tEXT\nPC54\tPort & Company Core Cotton Tee\tNavy\tL\t48\t$3.42\t$164.16\nSubtotal\n$164.16\nShipping & handling\n$12.10\nSales tax\n$0.00\nTotal\n$176.26"
+    },
+    {
+      "name": "invoice",
+      "width": 390,
+      "text": " SanMar Invoice — WO #142449\n Print / Save PDF\nSanMar Corporation\nInvoice — Northwest Custom Apparel · WO #142449 · Sample Workshop 11\nInvoice INV-88-PO\n2026-09-08\nUnpaid\nPO #\nSYNTHETIC-PO\nORDER DATE\n2026-09-06\nTERMS\nNET 30\nDUE DATE\n2026-10-08\nSHIP VIA\nUPS GROUND\nSHIP TO\nNorthwest Custom Apparel, Sample City, WA\nSTYLE\tDESCRIPTION\tCOLOR\tSIZE\tQTY\tUNIT\tEXT\nPC54\tPort & Company Core Cotton Tee\tNavy\tL\t48\t$3.42\t$164.16\nSubtotal\n$164.16\nShipping & handling\n$12.10\nSales tax\n$0.00\nTotal\n$176.26"
+    },
+    {
+      "name": "invoice",
+      "width": 320,
+      "text": " SanMar Invoice — WO #142449\n Print / Save PDF\nSanMar Corporation\nInvoice — Northwest Custom Apparel · WO #142449 · Sample Workshop 11\nInvoice INV-88-PO\n2026-09-08\nUnpaid\nPO #\nSYNTHETIC-PO\nORDER DATE\n2026-09-06\nTERMS\nNET 30\nDUE DATE\n2026-10-08\nSHIP VIA\nUPS GROUND\nSHIP TO\nNorthwest Custom Apparel, Sample City, WA\nSTYLE\tDESCRIPTION\tCOLOR\tSIZE\tQTY\tUNIT\tEXT\nPC54\tPort & Company Core Cotton Tee\tNavy\tL\t48\t$3.42\t$164.16\nSubtotal\n$164.16\nShipping & handling\n$12.10\nSales tax\n$0.00\nTotal\n$176.26"
+    },
+    {
+      "name": "inbound",
+      "width": 1440,
+      "text": " SanMar Inbound\nThursday, September 10, 2026 · Today\nToday\n Box Labels\n Print for… \n Refresh\n×\n2\nPURCHASE ORDERS\n2\nWORK ORDERS\n8\nBOXES\n276\nPIECES ARRIVING\n$1,284\nBLANKS COST\n✓ 1\nALREADY RECEIVED\n🎨\nSample Workshop 6\nEmbroidery\nWO #55123\nDue 9-16-26\nDesign 99001 · Synthetic stitch sample\nContact Cedar Example\nRep AS\nCust PO SYNTHETIC-0\nTerms Net 30\nOrdered 9-8-26\nSanMar PO 882211\n📦 3 boxes\n🧵 96 pcs\n💵 $384.00\n📦 Box 1\n🚚 UPS SYNTHETIC-0-1\n32 pcs\n🏷 Label\nSTYLE\tDESCRIPTION\tCOLOR\tSIZE\tQTY\tCOST\nPC54\tSynthetic cotton tee\tBlack\tS\t4\t—\nPC54\tSynthetic cotton tee\tBlack\tM\t8\t—\nPC54\tSynthetic cotton tee\tBlack\tL\t12\t—\nPC54\tSynthetic cotton tee\tBlack\tXL\t8\t—\n📦 Box 2\n🚚 UPS SYNTHETIC-0-2\n32 pcs\n🏷 Label\nSTYLE\tDESCRIPTION\tCOLOR\tSIZE\tQTY\tCOST\nPC54\tSynthetic cotton tee\tBlack\tS\t4\t—\nPC54\tSynthetic cotton tee\tBlack\tM\t8\t—\nPC54\tSynthetic cotton tee\tBlack\tL\t12\t—\nPC54\tSynthetic cotton tee\tBlack\tXL\t8\t—\n📦 Box 3\n🚚 UPS SYNTHETIC-0-3\n32 pcs\n🏷 Label\nSTYLE\tDESCRIPTION\tCOLOR\tSIZE\tQTY\tCOST\nPC54\tSynthetic cotton tee\tBlack\tS\t4\t—\nPC54\tSynthetic cotton tee\tBlack\tM\t8\t—\nPC54\tSynthetic cotton tee\tBlack\tL\t12\t—\nPC54\tSynthetic cotton tee\tBlack\tXL\t8\t—\n🎨\nSample Workshop 15\nDTG\nWO #55140\nDue 9-16-26\nDesign 99002 · Synthetic stitch sample\nContact Cedar Example\nRep CS\nCust PO SYNTHETIC-1\nTerms Net 30\nOrdered 9-8-26\nSanMar PO 882244\n📦 5 boxes\n🧵 180 pcs\n💵 $900.00\n📦 Box 1\n🚚 UPS SYNTHETIC-1-1\n36 pcs\n🏷 Label\nSTYLE\tDESCRIPTION\tCOLOR\tSIZE\tQTY\tCOST\nPC61\tSynthetic cotton tee\tNavy\tS\t6\t—\nPC61\tSynthetic cotton tee\tNavy\tM\t8\t—\nPC61\tSynthetic cotton tee\tNavy\tL\t10\t—\nPC61\tSynthetic cotton tee\tNavy\tXL\t12\t—\n📦 Box 2\n🚚 UPS SYNTHETIC-1-2\n36 pcs\n🏷 Label\nSTYLE\tDESCRIPTION\tCOLOR\tSIZE\tQTY\tCOST\nPC61\tSynthetic cotton tee\tNavy\tS\t6\t—\nPC61\tSynthetic cotton tee\tNavy\tM\t8\t—\nPC61\tSynthetic cotton tee\tNavy\tL\t10\t—\nPC61\tSynthetic cotton tee\tNavy\tXL\t12\t—\n📦 Box 3\n🚚 UPS SYNTHETIC-1-3\n36 pcs\n🏷 Label\nSTYLE\tDESCRIPTION\tCOLOR\tSIZE\tQTY\tCOST\nPC61\tSynthetic cotton tee\tNavy\tS\t6\t—\nPC61\tSynthetic cotton tee\tNavy\tM\t8\t—\nPC61\tSynthetic cotton tee\tNavy\tL\t10\t—\nPC61\tSynthetic cotton tee\tNavy\tXL\t12\t—\n📦 Box 4\n🚚 UPS SYNTHETIC-1-4\n36 pcs\n🏷 Label\nSTYLE\tDESCRIPTION\tCOLOR\tSIZE\tQTY\tCOST\nPC61\tSynthetic cotton tee\tNavy\tS\t6\t—\nPC61\tSynthetic cotton tee\tNavy\tM\t8\t—\nPC61\tSynthetic cotton tee\tNavy\tL\t10\t—\nPC61\tSynthetic cotton tee\tNavy\tXL\t12\t—\n📦 Box 5\n🚚 UPS SYNTHETIC-1-5\n36 pcs\n🏷 Label\nSTYLE\tDESCRIPTION\tCOLOR\tSIZE\tQTY\tCOST\nPC61\tSynthetic cotton tee\tNavy\tS\t6\t—\nPC61\tSynthetic cotton tee\tNavy\tM\t8\t—\nPC61\tSynthetic cotton tee\tNavy\tL\t10\t—\nPC61\tSynthetic cotton tee\tNavy\tXL\t12\t—\n🎨\nunmatched\nDTG\n✓ Received\nWO no WO\nSanMar PO 882250\n📦 1 box\n🧵 24 pcs\nDesign 99003\n\n💵 Blank cost = SanMar wholesale (CASE_PRICE × qty) — what we pay SanMar. Final invoiced amounts can vary slightly and land ~1–2 weeks after arrival."
+    },
+    {
+      "name": "inbound",
+      "width": 768,
+      "text": " SanMar Inbound\nThursday, September 10, 2026 · Today\nToday\n Box Labels\n Print for… \n Refresh\n×\n2\nPURCHASE ORDERS\n2\nWORK ORDERS\n8\nBOXES\n276\nPIECES ARRIVING\n$1,284\nBLANKS COST\n✓ 1\nALREADY RECEIVED\n🎨\nSample Workshop 6\nEmbroidery\nWO #55123\nDue 9-16-26\nDesign 99001 · Synthetic stitch sample\nContact Cedar Example\nRep AS\nCust PO SYNTHETIC-0\nTerms Net 30\nOrdered 9-8-26\nSanMar PO 882211\n📦 3 boxes\n🧵 96 pcs\n💵 $384.00\n📦 Box 1\n🚚 UPS SYNTHETIC-0-1\n32 pcs\n🏷 Label\nSTYLE\tDESCRIPTION\tCOLOR\tSIZE\tQTY\tCOST\nPC54\tSynthetic cotton tee\tBlack\tS\t4\t—\nPC54\tSynthetic cotton tee\tBlack\tM\t8\t—\nPC54\tSynthetic cotton tee\tBlack\tL\t12\t—\nPC54\tSynthetic cotton tee\tBlack\tXL\t8\t—\n📦 Box 2\n🚚 UPS SYNTHETIC-0-2\n32 pcs\n🏷 Label\nSTYLE\tDESCRIPTION\tCOLOR\tSIZE\tQTY\tCOST\nPC54\tSynthetic cotton tee\tBlack\tS\t4\t—\nPC54\tSynthetic cotton tee\tBlack\tM\t8\t—\nPC54\tSynthetic cotton tee\tBlack\tL\t12\t—\nPC54\tSynthetic cotton tee\tBlack\tXL\t8\t—\n📦 Box 3\n🚚 UPS SYNTHETIC-0-3\n32 pcs\n🏷 Label\nSTYLE\tDESCRIPTION\tCOLOR\tSIZE\tQTY\tCOST\nPC54\tSynthetic cotton tee\tBlack\tS\t4\t—\nPC54\tSynthetic cotton tee\tBlack\tM\t8\t—\nPC54\tSynthetic cotton tee\tBlack\tL\t12\t—\nPC54\tSynthetic cotton tee\tBlack\tXL\t8\t—\n🎨\nSample Workshop 15\nDTG\nWO #55140\nDue 9-16-26\nDesign 99002 · Synthetic stitch sample\nContact Cedar Example\nRep CS\nCust PO SYNTHETIC-1\nTerms Net 30\nOrdered 9-8-26\nSanMar PO 882244\n📦 5 boxes\n🧵 180 pcs\n💵 $900.00\n📦 Box 1\n🚚 UPS SYNTHETIC-1-1\n36 pcs\n🏷 Label\nSTYLE\tDESCRIPTION\tCOLOR\tSIZE\tQTY\tCOST\nPC61\tSynthetic cotton tee\tNavy\tS\t6\t—\nPC61\tSynthetic cotton tee\tNavy\tM\t8\t—\nPC61\tSynthetic cotton tee\tNavy\tL\t10\t—\nPC61\tSynthetic cotton tee\tNavy\tXL\t12\t—\n📦 Box 2\n🚚 UPS SYNTHETIC-1-2\n36 pcs\n🏷 Label\nSTYLE\tDESCRIPTION\tCOLOR\tSIZE\tQTY\tCOST\nPC61\tSynthetic cotton tee\tNavy\tS\t6\t—\nPC61\tSynthetic cotton tee\tNavy\tM\t8\t—\nPC61\tSynthetic cotton tee\tNavy\tL\t10\t—\nPC61\tSynthetic cotton tee\tNavy\tXL\t12\t—\n📦 Box 3\n🚚 UPS SYNTHETIC-1-3\n36 pcs\n🏷 Label\nSTYLE\tDESCRIPTION\tCOLOR\tSIZE\tQTY\tCOST\nPC61\tSynthetic cotton tee\tNavy\tS\t6\t—\nPC61\tSynthetic cotton tee\tNavy\tM\t8\t—\nPC61\tSynthetic cotton tee\tNavy\tL\t10\t—\nPC61\tSynthetic cotton tee\tNavy\tXL\t12\t—\n📦 Box 4\n🚚 UPS SYNTHETIC-1-4\n36 pcs\n🏷 Label\nSTYLE\tDESCRIPTION\tCOLOR\tSIZE\tQTY\tCOST\nPC61\tSynthetic cotton tee\tNavy\tS\t6\t—\nPC61\tSynthetic cotton tee\tNavy\tM\t8\t—\nPC61\tSynthetic cotton tee\tNavy\tL\t10\t—\nPC61\tSynthetic cotton tee\tNavy\tXL\t12\t—\n📦 Box 5\n🚚 UPS SYNTHETIC-1-5\n36 pcs\n🏷 Label\nSTYLE\tDESCRIPTION\tCOLOR\tSIZE\tQTY\tCOST\nPC61\tSynthetic cotton tee\tNavy\tS\t6\t—\nPC61\tSynthetic cotton tee\tNavy\tM\t8\t—\nPC61\tSynthetic cotton tee\tNavy\tL\t10\t—\nPC61\tSynthetic cotton tee\tNavy\tXL\t12\t—\n🎨\nunmatched\nDTG\n✓ Received\nWO no WO\nSanMar PO 882250\n📦 1 box\n🧵 24 pcs\nDesign 99003\n\n💵 Blank cost = SanMar wholesale (CASE_PRICE × qty) — what we pay SanMar. Final invoiced amounts can vary slightly and land ~1–2 weeks after arrival."
+    },
+    {
+      "name": "inbound",
+      "width": 390,
+      "text": " SanMar Inbound\nThursday, September 10, 2026 · Today\nToday\n Box Labels\n Print for… \n Refresh\n×\n2\nPURCHASE ORDERS\n2\nWORK ORDERS\n8\nBOXES\n276\nPIECES ARRIVING\n$1,284\nBLANKS COST\n✓ 1\nALREADY RECEIVED\n🎨\nSample Workshop 6\nEmbroidery\nWO #55123\nDue 9-16-26\nDesign 99001 · Synthetic stitch sample\nContact Cedar Example\nRep AS\nCust PO SYNTHETIC-0\nTerms Net 30\nOrdered 9-8-26\nSanMar PO 882211\n📦 3 boxes\n🧵 96 pcs\n💵 $384.00\n📦 Box 1\n🚚 UPS SYNTHETIC-0-1\n32 pcs\n🏷 Label\nSTYLE\tDESCRIPTION\tCOLOR\tSIZE\tQTY\tCOST\nPC54\tSynthetic cotton tee\tBlack\tS\t4\t—\nPC54\tSynthetic cotton tee\tBlack\tM\t8\t—\nPC54\tSynthetic cotton tee\tBlack\tL\t12\t—\nPC54\tSynthetic cotton tee\tBlack\tXL\t8\t—\n📦 Box 2\n🚚 UPS SYNTHETIC-0-2\n32 pcs\n🏷 Label\nSTYLE\tDESCRIPTION\tCOLOR\tSIZE\tQTY\tCOST\nPC54\tSynthetic cotton tee\tBlack\tS\t4\t—\nPC54\tSynthetic cotton tee\tBlack\tM\t8\t—\nPC54\tSynthetic cotton tee\tBlack\tL\t12\t—\nPC54\tSynthetic cotton tee\tBlack\tXL\t8\t—\n📦 Box 3\n🚚 UPS SYNTHETIC-0-3\n32 pcs\n🏷 Label\nSTYLE\tDESCRIPTION\tCOLOR\tSIZE\tQTY\tCOST\nPC54\tSynthetic cotton tee\tBlack\tS\t4\t—\nPC54\tSynthetic cotton tee\tBlack\tM\t8\t—\nPC54\tSynthetic cotton tee\tBlack\tL\t12\t—\nPC54\tSynthetic cotton tee\tBlack\tXL\t8\t—\n🎨\nSample Workshop 15\nDTG\nWO #55140\nDue 9-16-26\nDesign 99002 · Synthetic stitch sample\nContact Cedar Example\nRep CS\nCust PO SYNTHETIC-1\nTerms Net 30\nOrdered 9-8-26\nSanMar PO 882244\n📦 5 boxes\n🧵 180 pcs\n💵 $900.00\n📦 Box 1\n🚚 UPS SYNTHETIC-1-1\n36 pcs\n🏷 Label\nSTYLE\tDESCRIPTION\tCOLOR\tSIZE\tQTY\tCOST\nPC61\tSynthetic cotton tee\tNavy\tS\t6\t—\nPC61\tSynthetic cotton tee\tNavy\tM\t8\t—\nPC61\tSynthetic cotton tee\tNavy\tL\t10\t—\nPC61\tSynthetic cotton tee\tNavy\tXL\t12\t—\n📦 Box 2\n🚚 UPS SYNTHETIC-1-2\n36 pcs\n🏷 Label\nSTYLE\tDESCRIPTION\tCOLOR\tSIZE\tQTY\tCOST\nPC61\tSynthetic cotton tee\tNavy\tS\t6\t—\nPC61\tSynthetic cotton tee\tNavy\tM\t8\t—\nPC61\tSynthetic cotton tee\tNavy\tL\t10\t—\nPC61\tSynthetic cotton tee\tNavy\tXL\t12\t—\n📦 Box 3\n🚚 UPS SYNTHETIC-1-3\n36 pcs\n🏷 Label\nSTYLE\tDESCRIPTION\tCOLOR\tSIZE\tQTY\tCOST\nPC61\tSynthetic cotton tee\tNavy\tS\t6\t—\nPC61\tSynthetic cotton tee\tNavy\tM\t8\t—\nPC61\tSynthetic cotton tee\tNavy\tL\t10\t—\nPC61\tSynthetic cotton tee\tNavy\tXL\t12\t—\n📦 Box 4\n🚚 UPS SYNTHETIC-1-4\n36 pcs\n🏷 Label\nSTYLE\tDESCRIPTION\tCOLOR\tSIZE\tQTY\tCOST\nPC61\tSynthetic cotton tee\tNavy\tS\t6\t—\nPC61\tSynthetic cotton tee\tNavy\tM\t8\t—\nPC61\tSynthetic cotton tee\tNavy\tL\t10\t—\nPC61\tSynthetic cotton tee\tNavy\tXL\t12\t—\n📦 Box 5\n🚚 UPS SYNTHETIC-1-5\n36 pcs\n🏷 Label\nSTYLE\tDESCRIPTION\tCOLOR\tSIZE\tQTY\tCOST\nPC61\tSynthetic cotton tee\tNavy\tS\t6\t—\nPC61\tSynthetic cotton tee\tNavy\tM\t8\t—\nPC61\tSynthetic cotton tee\tNavy\tL\t10\t—\nPC61\tSynthetic cotton tee\tNavy\tXL\t12\t—\n🎨\nunmatched\nDTG\n✓ Received\nWO no WO\nSanMar PO 882250\n📦 1 box\n🧵 24 pcs\nDesign 99003\n\n💵 Blank cost = SanMar wholesale (CASE_PRICE × qty) — what we pay SanMar. Final invoiced amounts can vary slightly and land ~1–2 weeks after arrival."
+    },
+    {
+      "name": "inbound",
+      "width": 320,
+      "text": " SanMar Inbound\nThursday, September 10, 2026 · Today\nToday\n Box Labels\n Print for… \n Refresh\n×\n2\nPURCHASE ORDERS\n2\nWORK ORDERS\n8\nBOXES\n276\nPIECES ARRIVING\n$1,284\nBLANKS COST\n✓ 1\nALREADY RECEIVED\n🎨\nSample Workshop 6\nEmbroidery\nWO #55123\nDue 9-16-26\nDesign 99001 · Synthetic stitch sample\nContact Cedar Example\nRep AS\nCust PO SYNTHETIC-0\nTerms Net 30\nOrdered 9-8-26\nSanMar PO 882211\n📦 3 boxes\n🧵 96 pcs\n💵 $384.00\n📦 Box 1\n🚚 UPS SYNTHETIC-0-1\n32 pcs\n🏷 Label\nSTYLE\tDESCRIPTION\tCOLOR\tSIZE\tQTY\tCOST\nPC54\tSynthetic cotton tee\tBlack\tS\t4\t—\nPC54\tSynthetic cotton tee\tBlack\tM\t8\t—\nPC54\tSynthetic cotton tee\tBlack\tL\t12\t—\nPC54\tSynthetic cotton tee\tBlack\tXL\t8\t—\n📦 Box 2\n🚚 UPS SYNTHETIC-0-2\n32 pcs\n🏷 Label\nSTYLE\tDESCRIPTION\tCOLOR\tSIZE\tQTY\tCOST\nPC54\tSynthetic cotton tee\tBlack\tS\t4\t—\nPC54\tSynthetic cotton tee\tBlack\tM\t8\t—\nPC54\tSynthetic cotton tee\tBlack\tL\t12\t—\nPC54\tSynthetic cotton tee\tBlack\tXL\t8\t—\n📦 Box 3\n🚚 UPS SYNTHETIC-0-3\n32 pcs\n🏷 Label\nSTYLE\tDESCRIPTION\tCOLOR\tSIZE\tQTY\tCOST\nPC54\tSynthetic cotton tee\tBlack\tS\t4\t—\nPC54\tSynthetic cotton tee\tBlack\tM\t8\t—\nPC54\tSynthetic cotton tee\tBlack\tL\t12\t—\nPC54\tSynthetic cotton tee\tBlack\tXL\t8\t—\n🎨\nSample Workshop 15\nDTG\nWO #55140\nDue 9-16-26\nDesign 99002 · Synthetic stitch sample\nContact Cedar Example\nRep CS\nCust PO SYNTHETIC-1\nTerms Net 30\nOrdered 9-8-26\nSanMar PO 882244\n📦 5 boxes\n🧵 180 pcs\n💵 $900.00\n📦 Box 1\n🚚 UPS SYNTHETIC-1-1\n36 pcs\n🏷 Label\nSTYLE\tDESCRIPTION\tCOLOR\tSIZE\tQTY\tCOST\nPC61\tSynthetic cotton tee\tNavy\tS\t6\t—\nPC61\tSynthetic cotton tee\tNavy\tM\t8\t—\nPC61\tSynthetic cotton tee\tNavy\tL\t10\t—\nPC61\tSynthetic cotton tee\tNavy\tXL\t12\t—\n📦 Box 2\n🚚 UPS SYNTHETIC-1-2\n36 pcs\n🏷 Label\nSTYLE\tDESCRIPTION\tCOLOR\tSIZE\tQTY\tCOST\nPC61\tSynthetic cotton tee\tNavy\tS\t6\t—\nPC61\tSynthetic cotton tee\tNavy\tM\t8\t—\nPC61\tSynthetic cotton tee\tNavy\tL\t10\t—\nPC61\tSynthetic cotton tee\tNavy\tXL\t12\t—\n📦 Box 3\n🚚 UPS SYNTHETIC-1-3\n36 pcs\n🏷 Label\nSTYLE\tDESCRIPTION\tCOLOR\tSIZE\tQTY\tCOST\nPC61\tSynthetic cotton tee\tNavy\tS\t6\t—\nPC61\tSynthetic cotton tee\tNavy\tM\t8\t—\nPC61\tSynthetic cotton tee\tNavy\tL\t10\t—\nPC61\tSynthetic cotton tee\tNavy\tXL\t12\t—\n📦 Box 4\n🚚 UPS SYNTHETIC-1-4\n36 pcs\n🏷 Label\nSTYLE\tDESCRIPTION\tCOLOR\tSIZE\tQTY\tCOST\nPC61\tSynthetic cotton tee\tNavy\tS\t6\t—\nPC61\tSynthetic cotton tee\tNavy\tM\t8\t—\nPC61\tSynthetic cotton tee\tNavy\tL\t10\t—\nPC61\tSynthetic cotton tee\tNavy\tXL\t12\t—\n📦 Box 5\n🚚 UPS SYNTHETIC-1-5\n36 pcs\n🏷 Label\nSTYLE\tDESCRIPTION\tCOLOR\tSIZE\tQTY\tCOST\nPC61\tSynthetic cotton tee\tNavy\tS\t6\t—\nPC61\tSynthetic cotton tee\tNavy\tM\t8\t—\nPC61\tSynthetic cotton tee\tNavy\tL\t10\t—\nPC61\tSynthetic cotton tee\tNavy\tXL\t12\t—\n🎨\nunmatched\nDTG\n✓ Received\nWO no WO\nSanMar PO 882250\n📦 1 box\n🧵 24 pcs\nDesign 99003\n\n💵 Blank cost = SanMar wholesale (CASE_PRICE × qty) — what we pay SanMar. Final invoiced amounts can vary slightly and land ~1–2 weeks after arrival."
+    }
+  ],
+  "profiles": [
+    {
+      "type": "full",
+      "rep": "",
+      "text": "Full report — all reps"
+    },
+    {
+      "type": "ae",
+      "rep": "Aster Sample",
+      "text": "AS\n        Aster Sample · 1 PO"
+    },
+    {
+      "type": "ae",
+      "rep": "Cedar Sample",
+      "text": "CS\n        Cedar Sample · 1 PO"
+    },
+    {
+      "type": "allAe",
+      "rep": "",
+      "text": "All AE sheets — one per page"
+    },
+    {
+      "type": "receiving",
+      "rep": "",
+      "text": "Receiving checklist · Mikalah"
+    },
+    {
+      "type": "production",
+      "rep": "",
+      "text": "Production plan · Ruthie · by due date"
+    },
+    {
+      "type": "purchasing",
+      "rep": "",
+      "text": "Purchasing / PO reconcile · Bradley"
+    }
+  ],
+  "papers": [
+    {
+      "name": "invoice",
+      "text": "SanMar CorporationInvoice — Northwest Custom Apparel · WO #142449 · Sample Workshop 11Invoice INV-88-PO2026-09-08UnpaidPO #SYNTHETIC-POOrder date2026-09-06TermsNET 30Due date2026-10-08Ship viaUPS GROUNDShip toNorthwest Custom Apparel, Sample City, WAStyleDescriptionColorSizeQtyUnitExtPC54Port & Company Core Cotton TeeNavyL48$3.42$164.16Subtotal$164.16Shipping & handling$12.10Sales tax$0.00Total$176.26"
+    },
+    {
+      "type": "full",
+      "rep": "",
+      "text": "\n      Northwest Custom Apparel\n      Daily Inbound Report — SanMar Blanks\n      \n      Arriving Thursday, September 10, 2026  ·  2 POs · 2 work orders · 8 boxes · 276 pieces · $1,284 blanks cost\n      Full day, all reps. Arrival = SanMar ship date + ground-transit estimate to Milton, WA. Blank cost = SanMar wholesale (CASE_PRICE × qty).\n      \n    \n      \n        NO ART\n        \n          Sample Workshop 15   SanMar PO #882244 · WO #55140 · DTG\n            5 box(es) · 180 pcs · $900.00\n          Due 9-16-26 · Design 99002 Synthetic stitch sample · Contact Cedar Example · Rep CS · Cust PO SYNTHETIC-1 · Terms Net 30 · Ordered 9-8-26\n          \n          \n          \n          \n        \n      \n      \n        Box 1 · UPS SYNTHETIC-1-1 · 36 pcs\n        \n          StyleDescriptionColorSizeQtyCost\n          PC61Synthetic cotton teeNavyS6—PC61Synthetic cotton teeNavyM8—PC61Synthetic cotton teeNavyL10—PC61Synthetic cotton teeNavyXL12—\n        \n        Box 2 · UPS SYNTHETIC-1-2 · 36 pcs\n        \n          StyleDescriptionColorSizeQtyCost\n          PC61Synthetic cotton teeNavyS6—PC61Synthetic cotton teeNavyM8—PC61Synthetic cotton teeNavyL10—PC61Synthetic cotton teeNavyXL12—\n        \n        Box 3 · UPS SYNTHETIC-1-3 · 36 pcs\n        \n          StyleDescriptionColorSizeQtyCost\n          PC61Synthetic cotton teeNavyS6—PC61Synthetic cotton teeNavyM8—PC61Synthetic cotton teeNavyL10—PC61Synthetic cotton teeNavyXL12—\n        \n        Box 4 · UPS SYNTHETIC-1-4 · 36 pcs\n        \n          StyleDescriptionColorSizeQtyCost\n          PC61Synthetic cotton teeNavyS6—PC61Synthetic cotton teeNavyM8—PC61Synthetic cotton teeNavyL10—PC61Synthetic cotton teeNavyXL12—\n        \n        Box 5 · UPS SYNTHETIC-1-5 · 36 pcs\n        \n          StyleDescriptionColorSizeQtyCost\n          PC61Synthetic cotton teeNavyS6—PC61Synthetic cotton teeNavyM8—PC61Synthetic cotton teeNavyL10—PC61Synthetic cotton teeNavyXL12—\n        \n    \n      \n        NO ART\n        \n          Sample Workshop 6   SanMar PO #882211 · WO #55123 · Embroidery\n            3 box(es) · 96 pcs · $384.00\n          Due 9-16-26 · Design 99001 Synthetic stitch sample · Contact Cedar Example · Rep AS · Cust PO SYNTHETIC-0 · Terms Net 30 · Ordered 9-8-26\n          \n          \n          \n          \n        \n      \n      \n        Box 1 · UPS SYNTHETIC-0-1 · 32 pcs\n        \n          StyleDescriptionColorSizeQtyCost\n          PC54Synthetic cotton teeBlackS4—PC54Synthetic cotton teeBlackM8—PC54Synthetic cotton teeBlackL12—PC54Synthetic cotton teeBlackXL8—\n        \n        Box 2 · UPS SYNTHETIC-0-2 · 32 pcs\n        \n          StyleDescriptionColorSizeQtyCost\n          PC54Synthetic cotton teeBlackS4—PC54Synthetic cotton teeBlackM8—PC54Synthetic cotton teeBlackL12—PC54Synthetic cotton teeBlackXL8—\n        \n        Box 3 · UPS SYNTHETIC-0-3 · 32 pcs\n        \n          StyleDescriptionColorSizeQtyCost\n          PC54Synthetic cotton teeBlackS4—PC54Synthetic cotton teeBlackM8—PC54Synthetic cotton teeBlackL12—PC54Synthetic cotton teeBlackXL8—\n        \n    "
+    },
+    {
+      "type": "ae",
+      "rep": "Aster Sample",
+      "text": "\n      Northwest Custom Apparel\n      Your inbound — SanMar blanks\n      Aster Sample (AS)\n      Arriving Thursday, September 10, 2026  ·  1 of your PO · 3 boxes · 96 pieces\n      Your customers' blanks landing today — a good moment to let them know their order is moving. A row marked DROP-SHIP went straight to the customer and is NOT arriving here.\n      \n    \n      \n        NO ART\n        \n          Sample Workshop 6   SanMar PO #882211 · WO #55123 · Embroidery\n            3 box(es) · 96 pcs\n          Due 9-16-26 · Design 99001 Synthetic stitch sample · Contact Cedar Example · Rep AS · Cust PO SYNTHETIC-0 · Ordered 9-8-26\n          \n          \n          \n          \n        \n      \n      \n        Box 1 · UPS SYNTHETIC-0-1 · 32 pcs\n        \n          StyleDescriptionColorSizeQty\n          PC54Synthetic cotton teeBlackS4PC54Synthetic cotton teeBlackM8PC54Synthetic cotton teeBlackL12PC54Synthetic cotton teeBlackXL8\n        \n        Box 2 · UPS SYNTHETIC-0-2 · 32 pcs\n        \n          StyleDescriptionColorSizeQty\n          PC54Synthetic cotton teeBlackS4PC54Synthetic cotton teeBlackM8PC54Synthetic cotton teeBlackL12PC54Synthetic cotton teeBlackXL8\n        \n        Box 3 · UPS SYNTHETIC-0-3 · 32 pcs\n        \n          StyleDescriptionColorSizeQty\n          PC54Synthetic cotton teeBlackS4PC54Synthetic cotton teeBlackM8PC54Synthetic cotton teeBlackL12PC54Synthetic cotton teeBlackXL8\n        \n    "
+    },
+    {
+      "type": "ae",
+      "rep": "Cedar Sample",
+      "text": "\n      Northwest Custom Apparel\n      Your inbound — SanMar blanks\n      Cedar Sample (CS)\n      Arriving Thursday, September 10, 2026  ·  1 of your PO · 5 boxes · 180 pieces\n      Your customers' blanks landing today — a good moment to let them know their order is moving. A row marked DROP-SHIP went straight to the customer and is NOT arriving here.\n      \n    \n      \n        NO ART\n        \n          Sample Workshop 15   SanMar PO #882244 · WO #55140 · DTG\n            5 box(es) · 180 pcs\n          Due 9-16-26 · Design 99002 Synthetic stitch sample · Contact Cedar Example · Rep CS · Cust PO SYNTHETIC-1 · Ordered 9-8-26\n          \n          \n          \n          \n        \n      \n      \n        Box 1 · UPS SYNTHETIC-1-1 · 36 pcs\n        \n          StyleDescriptionColorSizeQty\n          PC61Synthetic cotton teeNavyS6PC61Synthetic cotton teeNavyM8PC61Synthetic cotton teeNavyL10PC61Synthetic cotton teeNavyXL12\n        \n        Box 2 · UPS SYNTHETIC-1-2 · 36 pcs\n        \n          StyleDescriptionColorSizeQty\n          PC61Synthetic cotton teeNavyS6PC61Synthetic cotton teeNavyM8PC61Synthetic cotton teeNavyL10PC61Synthetic cotton teeNavyXL12\n        \n        Box 3 · UPS SYNTHETIC-1-3 · 36 pcs\n        \n          StyleDescriptionColorSizeQty\n          PC61Synthetic cotton teeNavyS6PC61Synthetic cotton teeNavyM8PC61Synthetic cotton teeNavyL10PC61Synthetic cotton teeNavyXL12\n        \n        Box 4 · UPS SYNTHETIC-1-4 · 36 pcs\n        \n          StyleDescriptionColorSizeQty\n          PC61Synthetic cotton teeNavyS6PC61Synthetic cotton teeNavyM8PC61Synthetic cotton teeNavyL10PC61Synthetic cotton teeNavyXL12\n        \n        Box 5 · UPS SYNTHETIC-1-5 · 36 pcs\n        \n          StyleDescriptionColorSizeQty\n          PC61Synthetic cotton teeNavyS6PC61Synthetic cotton teeNavyM8PC61Synthetic cotton teeNavyL10PC61Synthetic cotton teeNavyXL12\n        \n    "
+    },
+    {
+      "type": "allAe",
+      "rep": "",
+      "text": "\n      Northwest Custom Apparel\n      Your inbound — SanMar blanks\n      Aster Sample (AS)\n      Arriving Thursday, September 10, 2026  ·  1 of your PO · 3 boxes · 96 pieces\n      Your customers' blanks landing today — a good moment to let them know their order is moving. A row marked DROP-SHIP went straight to the customer and is NOT arriving here.\n      \n    \n      \n        NO ART\n        \n          Sample Workshop 6   SanMar PO #882211 · WO #55123 · Embroidery\n            3 box(es) · 96 pcs\n          Due 9-16-26 · Design 99001 Synthetic stitch sample · Contact Cedar Example · Rep AS · Cust PO SYNTHETIC-0 · Ordered 9-8-26\n          \n          \n          \n          \n        \n      \n      \n        Box 1 · UPS SYNTHETIC-0-1 · 32 pcs\n        \n          StyleDescriptionColorSizeQty\n          PC54Synthetic cotton teeBlackS4PC54Synthetic cotton teeBlackM8PC54Synthetic cotton teeBlackL12PC54Synthetic cotton teeBlackXL8\n        \n        Box 2 · UPS SYNTHETIC-0-2 · 32 pcs\n        \n          StyleDescriptionColorSizeQty\n          PC54Synthetic cotton teeBlackS4PC54Synthetic cotton teeBlackM8PC54Synthetic cotton teeBlackL12PC54Synthetic cotton teeBlackXL8\n        \n        Box 3 · UPS SYNTHETIC-0-3 · 32 pcs\n        \n          StyleDescriptionColorSizeQty\n          PC54Synthetic cotton teeBlackS4PC54Synthetic cotton teeBlackM8PC54Synthetic cotton teeBlackL12PC54Synthetic cotton teeBlackXL8\n        \n    \n      Northwest Custom Apparel\n      Your inbound — SanMar blanks\n      Cedar Sample (CS)\n      Arriving Thursday, September 10, 2026  ·  1 of your PO · 5 boxes · 180 pieces\n      Your customers' blanks landing today — a good moment to let them know their order is moving. A row marked DROP-SHIP went straight to the customer and is NOT arriving here.\n      \n    \n      \n        NO ART\n        \n          Sample Workshop 15   SanMar PO #882244 · WO #55140 · DTG\n            5 box(es) · 180 pcs\n          Due 9-16-26 · Design 99002 Synthetic stitch sample · Contact Cedar Example · Rep CS · Cust PO SYNTHETIC-1 · Ordered 9-8-26\n          \n          \n          \n          \n        \n      \n      \n        Box 1 · UPS SYNTHETIC-1-1 · 36 pcs\n        \n          StyleDescriptionColorSizeQty\n          PC61Synthetic cotton teeNavyS6PC61Synthetic cotton teeNavyM8PC61Synthetic cotton teeNavyL10PC61Synthetic cotton teeNavyXL12\n        \n        Box 2 · UPS SYNTHETIC-1-2 · 36 pcs\n        \n          StyleDescriptionColorSizeQty\n          PC61Synthetic cotton teeNavyS6PC61Synthetic cotton teeNavyM8PC61Synthetic cotton teeNavyL10PC61Synthetic cotton teeNavyXL12\n        \n        Box 3 · UPS SYNTHETIC-1-3 · 36 pcs\n        \n          StyleDescriptionColorSizeQty\n          PC61Synthetic cotton teeNavyS6PC61Synthetic cotton teeNavyM8PC61Synthetic cotton teeNavyL10PC61Synthetic cotton teeNavyXL12\n        \n        Box 4 · UPS SYNTHETIC-1-4 · 36 pcs\n        \n          StyleDescriptionColorSizeQty\n          PC61Synthetic cotton teeNavyS6PC61Synthetic cotton teeNavyM8PC61Synthetic cotton teeNavyL10PC61Synthetic cotton teeNavyXL12\n        \n        Box 5 · UPS SYNTHETIC-1-5 · 36 pcs\n        \n          StyleDescriptionColorSizeQty\n          PC61Synthetic cotton teeNavyS6PC61Synthetic cotton teeNavyM8PC61Synthetic cotton teeNavyL10PC61Synthetic cotton teeNavyXL12\n        \n    "
+    },
+    {
+      "type": "receiving",
+      "rep": "",
+      "text": "\n      Northwest Custom Apparel\n      Receiving checklist — SanMar inbound\n      Receiving · Mikalah\n      Arriving Thursday, September 10, 2026  ·  2 orders · 8 boxes · 276 pieces to check in\n      Tick each box as it is scanned in. The full size breakdown prints on each box’s receiving label.\n      \n    \n      ✓CompanyWOSanMar POBoxCarrier / trackingPcsType\n      \n        \n        Sample Workshop 15\n        #55140\n        882244\n        1 of 5\n        UPS SYNTHETIC-1-1\n        36\n        DTG\n      \n        \n        Sample Workshop 15\n        #55140\n        882244\n        2 of 5\n        UPS SYNTHETIC-1-2\n        36\n        DTG\n      \n        \n        Sample Workshop 15\n        #55140\n        882244\n        3 of 5\n        UPS SYNTHETIC-1-3\n        36\n        DTG\n      \n        \n        Sample Workshop 15\n        #55140\n        882244\n        4 of 5\n        UPS SYNTHETIC-1-4\n        36\n        DTG\n      \n        \n        Sample Workshop 15\n        #55140\n        882244\n        5 of 5\n        UPS SYNTHETIC-1-5\n        36\n        DTG\n      \n        \n        Sample Workshop 6\n        #55123\n        882211\n        1 of 3\n        UPS SYNTHETIC-0-1\n        32\n        Embroidery\n      \n        \n        Sample Workshop 6\n        #55123\n        882211\n        2 of 3\n        UPS SYNTHETIC-0-2\n        32\n        Embroidery\n      \n        \n        Sample Workshop 6\n        #55123\n        882211\n        3 of 3\n        UPS SYNTHETIC-0-3\n        32\n        Embroidery\n      "
+    },
+    {
+      "type": "production",
+      "rep": "",
+      "text": "\n      Northwest Custom Apparel\n      Production plan — SanMar inbound\n      Production · Ruthie\n      Arriving Thursday, September 10, 2026  ·  2 orders · 276 pieces · grouped by method, soonest due first\n      Blanks arriving today, ready to schedule. Bold due dates land within a week.\n      \n    Embroidery 1 order · 96 pcs\n        DueCompanyWODesignPcsRep\n        9-16-26\n        Sample Workshop 6\n        #55123\n        99001 · Synthetic stitch sample\n        96\n        AS\n      DTG 1 order · 180 pcs\n        DueCompanyWODesignPcsRep\n        9-16-26\n        Sample Workshop 15\n        #55140\n        99002 · Synthetic stitch sample\n        180\n        CS\n      "
+    },
+    {
+      "type": "purchasing",
+      "rep": "",
+      "text": "\n      Northwest Custom Apparel\n      Purchasing — SanMar PO reconcile\n      Purchasing · Bradley\n      Arriving Thursday, September 10, 2026  ·  2 POs · 8 boxes · 276 pieces · $1,284 blanks cost\n      Ordered vs shipped — ✗ marks a short ship. BACKORDER / HOLD / URGENT and DROP-SHIP are called out beside the company. Cost = SanMar wholesale (CASE_PRICE × qty).\n      \n    \n      SanMar POWOCompanyRepOrdShipTermsCost\n      \n        882211\n        #55123\n        Sample Workshop 6 \n        AS\n        96\n        96\n        Net 30\n        $384.00\n      \n        882244\n        #55140\n        Sample Workshop 15 \n        CS\n        180\n        180\n        Net 30\n        $900.00\n      \n        TOTAL · 2 POs$1,284.00"
+    },
+    {
+      "name": "box-labels",
+      "text": "\n      \n        ORDER TYPEEMBROIDERY\n        \n        \n          WORK ORDER\n          #55123\n          Due: 9-16-26\n          \n          DROP DEAD DATE\n        \n      \n      Sample Workshop 6\n      \n      \n        Cedar Example\n        REP: ASOrdered: 9-8-26\n      \n      Cust PO: SYNTHETIC-0\n      \n        DESIGN #99001Synthetic stitch sample\n        BOX1 of 3\n      \n      \n        \n          SHIP METHOD — circle one\n          PICKUPSHIPOther ______\n          Terms: Net 30\n        \n        No artwork on file\n      \n      StyleDescriptionColorSMLXLTotPC54Synthetic cotton teeBlack4812832TOTAL4812832\n      SanMar PO 882211  ·  UPS SYNTHETIC-0-1  ·  Received by __________Printed 9-10-26\n    \n      \n        ORDER TYPEEMBROIDERY\n        \n        \n          WORK ORDER\n          #55123\n          Due: 9-16-26\n          \n          DROP DEAD DATE\n        \n      \n      Sample Workshop 6\n      \n      \n        Cedar Example\n        REP: ASOrdered: 9-8-26\n      \n      Cust PO: SYNTHETIC-0\n      \n        DESIGN #99001Synthetic stitch sample\n        BOX2 of 3\n      \n      \n        \n          SHIP METHOD — circle one\n          PICKUPSHIPOther ______\n          Terms: Net 30\n        \n        No artwork on file\n      \n      StyleDescriptionColorSMLXLTotPC54Synthetic cotton teeBlack4812832TOTAL4812832\n      SanMar PO 882211  ·  UPS SYNTHETIC-0-2  ·  Received by __________Printed 9-10-26\n    \n      \n        ORDER TYPEEMBROIDERY\n        \n        \n          WORK ORDER\n          #55123\n          Due: 9-16-26\n          \n          DROP DEAD DATE\n        \n      \n      Sample Workshop 6\n      \n      \n        Cedar Example\n        REP: ASOrdered: 9-8-26\n      \n      Cust PO: SYNTHETIC-0\n      \n        DESIGN #99001Synthetic stitch sample\n        BOX3 of 3\n      \n      \n        \n          SHIP METHOD — circle one\n          PICKUPSHIPOther ______\n          Terms: Net 30\n        \n        No artwork on file\n      \n      StyleDescriptionColorSMLXLTotPC54Synthetic cotton teeBlack4812832TOTAL4812832\n      SanMar PO 882211  ·  UPS SYNTHETIC-0-3  ·  Received by __________Printed 9-10-26\n    \n      \n        ORDER TYPEDTG\n        \n        \n          WORK ORDER\n          #55140\n          Due: 9-16-26\n          \n          DROP DEAD DATE\n        \n      \n      Sample Workshop 15\n      \n      \n        Cedar Example\n        REP: CSOrdered: 9-8-26\n      \n      Cust PO: SYNTHETIC-1\n      \n        DESIGN #99002Synthetic stitch sample\n        BOX1 of 5\n      \n      \n        \n          SHIP METHOD — circle one\n          PICKUPSHIPOther ______\n          Terms: Net 30\n        \n        No artwork on file\n      \n      StyleDescriptionColorSMLXLTotPC61Synthetic cotton teeNavy68101236TOTAL68101236\n      SanMar PO 882244  ·  UPS SYNTHETIC-1-1  ·  Received by __________Printed 9-10-26\n    \n      \n        ORDER TYPEDTG\n        \n        \n          WORK ORDER\n          #55140\n          Due: 9-16-26\n          \n          DROP DEAD DATE\n        \n      \n      Sample Workshop 15\n      \n      \n        Cedar Example\n        REP: CSOrdered: 9-8-26\n      \n      Cust PO: SYNTHETIC-1\n      \n        DESIGN #99002Synthetic stitch sample\n        BOX2 of 5\n      \n      \n        \n          SHIP METHOD — circle one\n          PICKUPSHIPOther ______\n          Terms: Net 30\n        \n        No artwork on file\n      \n      StyleDescriptionColorSMLXLTotPC61Synthetic cotton teeNavy68101236TOTAL68101236\n      SanMar PO 882244  ·  UPS SYNTHETIC-1-2  ·  Received by __________Printed 9-10-26\n    \n      \n        ORDER TYPEDTG\n        \n        \n          WORK ORDER\n          #55140\n          Due: 9-16-26\n          \n          DROP DEAD DATE\n        \n      \n      Sample Workshop 15\n      \n      \n        Cedar Example\n        REP: CSOrdered: 9-8-26\n      \n      Cust PO: SYNTHETIC-1\n      \n        DESIGN #99002Synthetic stitch sample\n        BOX3 of 5\n      \n      \n        \n          SHIP METHOD — circle one\n          PICKUPSHIPOther ______\n          Terms: Net 30\n        \n        No artwork on file\n      \n      StyleDescriptionColorSMLXLTotPC61Synthetic cotton teeNavy68101236TOTAL68101236\n      SanMar PO 882244  ·  UPS SYNTHETIC-1-3  ·  Received by __________Printed 9-10-26\n    \n      \n        ORDER TYPEDTG\n        \n        \n          WORK ORDER\n          #55140\n          Due: 9-16-26\n          \n          DROP DEAD DATE\n        \n      \n      Sample Workshop 15\n      \n      \n        Cedar Example\n        REP: CSOrdered: 9-8-26\n      \n      Cust PO: SYNTHETIC-1\n      \n        DESIGN #99002Synthetic stitch sample\n        BOX4 of 5\n      \n      \n        \n          SHIP METHOD — circle one\n          PICKUPSHIPOther ______\n          Terms: Net 30\n        \n        No artwork on file\n      \n      StyleDescriptionColorSMLXLTotPC61Synthetic cotton teeNavy68101236TOTAL68101236\n      SanMar PO 882244  ·  UPS SYNTHETIC-1-4  ·  Received by __________Printed 9-10-26\n    \n      \n        ORDER TYPEDTG\n        \n        \n          WORK ORDER\n          #55140\n          Due: 9-16-26\n          \n          DROP DEAD DATE\n        \n      \n      Sample Workshop 15\n      \n      \n        Cedar Example\n        REP: CSOrdered: 9-8-26\n      \n      Cust PO: SYNTHETIC-1\n      \n        DESIGN #99002Synthetic stitch sample\n        BOX5 of 5\n      \n      \n        \n          SHIP METHOD — circle one\n          PICKUPSHIPOther ______\n          Terms: Net 30\n        \n        No artwork on file\n      \n      StyleDescriptionColorSMLXLTotPC61Synthetic cotton teeNavy68101236TOTAL68101236\n      SanMar PO 882244  ·  UPS SYNTHETIC-1-5  ·  Received by __________Printed 9-10-26\n    "
+    }
+  ],
+  "paperInputs": [
+    {
+      "sanmarPO": "882211",
+      "workOrder": "55123",
+      "company": "Sample Workshop 6",
+      "salesRep": "Aster Sample",
+      "boxes": 3,
+      "piecesShipped": 96,
+      "received": false,
+      "cost": 384,
+      "piecesOrdered": 96,
+      "method": "Embroidery",
+      "designNumber": "99001",
+      "designName": "Synthetic stitch sample",
+      "dueDate": "2026-09-16",
+      "dateOrdered": "2026-09-08",
+      "contactName": "Cedar Example",
+      "customerPO": "SYNTHETIC-0",
+      "terms": "Net 30",
+      "boxDetailAvailable": true,
+      "lines": [
+        {
+          "style": "PC54",
+          "title": "Synthetic cotton tee",
+          "color": "Black",
+          "size": "S",
+          "qty": 4,
+          "qtyOrdered": 12,
+          "qtyShipped": 12,
+          "status": "Shipped",
+          "lineCost": 48
+        },
+        {
+          "style": "PC54",
+          "title": "Synthetic cotton tee",
+          "color": "Black",
+          "size": "M",
+          "qty": 8,
+          "qtyOrdered": 24,
+          "qtyShipped": 24,
+          "status": "Shipped",
+          "lineCost": 96
+        },
+        {
+          "style": "PC54",
+          "title": "Synthetic cotton tee",
+          "color": "Black",
+          "size": "L",
+          "qty": 12,
+          "qtyOrdered": 36,
+          "qtyShipped": 36,
+          "status": "Shipped",
+          "lineCost": 144
+        },
+        {
+          "style": "PC54",
+          "title": "Synthetic cotton tee",
+          "color": "Black",
+          "size": "XL",
+          "qty": 8,
+          "qtyOrdered": 24,
+          "qtyShipped": 24,
+          "status": "Shipped",
+          "lineCost": 96
+        }
+      ],
+      "boxDetail": [
+        {
+          "boxNumber": 1,
+          "pieces": 32,
+          "items": [
+            {
+              "style": "PC54",
+              "title": "Synthetic cotton tee",
+              "color": "Black",
+              "size": "S",
+              "qty": 4
+            },
+            {
+              "style": "PC54",
+              "title": "Synthetic cotton tee",
+              "color": "Black",
+              "size": "M",
+              "qty": 8
+            },
+            {
+              "style": "PC54",
+              "title": "Synthetic cotton tee",
+              "color": "Black",
+              "size": "L",
+              "qty": 12
+            },
+            {
+              "style": "PC54",
+              "title": "Synthetic cotton tee",
+              "color": "Black",
+              "size": "XL",
+              "qty": 8
+            }
+          ],
+          "trackingNumber": "SYNTHETIC-0-1",
+          "carrier": "UPS"
+        },
+        {
+          "boxNumber": 2,
+          "pieces": 32,
+          "items": [
+            {
+              "style": "PC54",
+              "title": "Synthetic cotton tee",
+              "color": "Black",
+              "size": "S",
+              "qty": 4
+            },
+            {
+              "style": "PC54",
+              "title": "Synthetic cotton tee",
+              "color": "Black",
+              "size": "M",
+              "qty": 8
+            },
+            {
+              "style": "PC54",
+              "title": "Synthetic cotton tee",
+              "color": "Black",
+              "size": "L",
+              "qty": 12
+            },
+            {
+              "style": "PC54",
+              "title": "Synthetic cotton tee",
+              "color": "Black",
+              "size": "XL",
+              "qty": 8
+            }
+          ],
+          "trackingNumber": "SYNTHETIC-0-2",
+          "carrier": "UPS"
+        },
+        {
+          "boxNumber": 3,
+          "pieces": 32,
+          "items": [
+            {
+              "style": "PC54",
+              "title": "Synthetic cotton tee",
+              "color": "Black",
+              "size": "S",
+              "qty": 4
+            },
+            {
+              "style": "PC54",
+              "title": "Synthetic cotton tee",
+              "color": "Black",
+              "size": "M",
+              "qty": 8
+            },
+            {
+              "style": "PC54",
+              "title": "Synthetic cotton tee",
+              "color": "Black",
+              "size": "L",
+              "qty": 12
+            },
+            {
+              "style": "PC54",
+              "title": "Synthetic cotton tee",
+              "color": "Black",
+              "size": "XL",
+              "qty": 8
+            }
+          ],
+          "trackingNumber": "SYNTHETIC-0-3",
+          "carrier": "UPS"
+        }
+      ]
+    },
+    {
+      "sanmarPO": "882244",
+      "workOrder": "55140",
+      "company": "Sample Workshop 15",
+      "salesRep": "Cedar Sample",
+      "boxes": 5,
+      "piecesShipped": 180,
+      "received": false,
+      "cost": 900,
+      "piecesOrdered": 180,
+      "method": "DTG",
+      "designNumber": "99002",
+      "designName": "Synthetic stitch sample",
+      "dueDate": "2026-09-16",
+      "dateOrdered": "2026-09-08",
+      "contactName": "Cedar Example",
+      "customerPO": "SYNTHETIC-1",
+      "terms": "Net 30",
+      "boxDetailAvailable": true,
+      "lines": [
+        {
+          "style": "PC61",
+          "title": "Synthetic cotton tee",
+          "color": "Navy",
+          "size": "S",
+          "qty": 6,
+          "qtyOrdered": 30,
+          "qtyShipped": 30,
+          "status": "Shipped",
+          "lineCost": 150
+        },
+        {
+          "style": "PC61",
+          "title": "Synthetic cotton tee",
+          "color": "Navy",
+          "size": "M",
+          "qty": 8,
+          "qtyOrdered": 40,
+          "qtyShipped": 40,
+          "status": "Shipped",
+          "lineCost": 200
+        },
+        {
+          "style": "PC61",
+          "title": "Synthetic cotton tee",
+          "color": "Navy",
+          "size": "L",
+          "qty": 10,
+          "qtyOrdered": 50,
+          "qtyShipped": 50,
+          "status": "Shipped",
+          "lineCost": 250
+        },
+        {
+          "style": "PC61",
+          "title": "Synthetic cotton tee",
+          "color": "Navy",
+          "size": "XL",
+          "qty": 12,
+          "qtyOrdered": 60,
+          "qtyShipped": 60,
+          "status": "Shipped",
+          "lineCost": 300
+        }
+      ],
+      "boxDetail": [
+        {
+          "boxNumber": 1,
+          "pieces": 36,
+          "items": [
+            {
+              "style": "PC61",
+              "title": "Synthetic cotton tee",
+              "color": "Navy",
+              "size": "S",
+              "qty": 6
+            },
+            {
+              "style": "PC61",
+              "title": "Synthetic cotton tee",
+              "color": "Navy",
+              "size": "M",
+              "qty": 8
+            },
+            {
+              "style": "PC61",
+              "title": "Synthetic cotton tee",
+              "color": "Navy",
+              "size": "L",
+              "qty": 10
+            },
+            {
+              "style": "PC61",
+              "title": "Synthetic cotton tee",
+              "color": "Navy",
+              "size": "XL",
+              "qty": 12
+            }
+          ],
+          "trackingNumber": "SYNTHETIC-1-1",
+          "carrier": "UPS"
+        },
+        {
+          "boxNumber": 2,
+          "pieces": 36,
+          "items": [
+            {
+              "style": "PC61",
+              "title": "Synthetic cotton tee",
+              "color": "Navy",
+              "size": "S",
+              "qty": 6
+            },
+            {
+              "style": "PC61",
+              "title": "Synthetic cotton tee",
+              "color": "Navy",
+              "size": "M",
+              "qty": 8
+            },
+            {
+              "style": "PC61",
+              "title": "Synthetic cotton tee",
+              "color": "Navy",
+              "size": "L",
+              "qty": 10
+            },
+            {
+              "style": "PC61",
+              "title": "Synthetic cotton tee",
+              "color": "Navy",
+              "size": "XL",
+              "qty": 12
+            }
+          ],
+          "trackingNumber": "SYNTHETIC-1-2",
+          "carrier": "UPS"
+        },
+        {
+          "boxNumber": 3,
+          "pieces": 36,
+          "items": [
+            {
+              "style": "PC61",
+              "title": "Synthetic cotton tee",
+              "color": "Navy",
+              "size": "S",
+              "qty": 6
+            },
+            {
+              "style": "PC61",
+              "title": "Synthetic cotton tee",
+              "color": "Navy",
+              "size": "M",
+              "qty": 8
+            },
+            {
+              "style": "PC61",
+              "title": "Synthetic cotton tee",
+              "color": "Navy",
+              "size": "L",
+              "qty": 10
+            },
+            {
+              "style": "PC61",
+              "title": "Synthetic cotton tee",
+              "color": "Navy",
+              "size": "XL",
+              "qty": 12
+            }
+          ],
+          "trackingNumber": "SYNTHETIC-1-3",
+          "carrier": "UPS"
+        },
+        {
+          "boxNumber": 4,
+          "pieces": 36,
+          "items": [
+            {
+              "style": "PC61",
+              "title": "Synthetic cotton tee",
+              "color": "Navy",
+              "size": "S",
+              "qty": 6
+            },
+            {
+              "style": "PC61",
+              "title": "Synthetic cotton tee",
+              "color": "Navy",
+              "size": "M",
+              "qty": 8
+            },
+            {
+              "style": "PC61",
+              "title": "Synthetic cotton tee",
+              "color": "Navy",
+              "size": "L",
+              "qty": 10
+            },
+            {
+              "style": "PC61",
+              "title": "Synthetic cotton tee",
+              "color": "Navy",
+              "size": "XL",
+              "qty": 12
+            }
+          ],
+          "trackingNumber": "SYNTHETIC-1-4",
+          "carrier": "UPS"
+        },
+        {
+          "boxNumber": 5,
+          "pieces": 36,
+          "items": [
+            {
+              "style": "PC61",
+              "title": "Synthetic cotton tee",
+              "color": "Navy",
+              "size": "S",
+              "qty": 6
+            },
+            {
+              "style": "PC61",
+              "title": "Synthetic cotton tee",
+              "color": "Navy",
+              "size": "M",
+              "qty": 8
+            },
+            {
+              "style": "PC61",
+              "title": "Synthetic cotton tee",
+              "color": "Navy",
+              "size": "L",
+              "qty": 10
+            },
+            {
+              "style": "PC61",
+              "title": "Synthetic cotton tee",
+              "color": "Navy",
+              "size": "XL",
+              "qty": 12
+            }
+          ],
+          "trackingNumber": "SYNTHETIC-1-5",
+          "carrier": "UPS"
+        }
+      ]
+    },
+    {
+      "sanmarPO": "882250",
+      "workOrder": "",
+      "company": "",
+      "salesRep": "",
+      "boxes": 1,
+      "piecesShipped": 24,
+      "received": true,
+      "cost": 96,
+      "piecesOrdered": 24,
+      "method": "DTG",
+      "designNumber": "99003",
+      "designName": "Synthetic stitch sample",
+      "dueDate": "2026-09-16",
+      "dateOrdered": "2026-09-08",
+      "contactName": "Cedar Example",
+      "customerPO": "SYNTHETIC-2",
+      "terms": "Net 30",
+      "boxDetailAvailable": true,
+      "lines": [
+        {
+          "style": "PC61",
+          "title": "Synthetic cotton tee",
+          "color": "Navy",
+          "size": "S",
+          "qty": 6,
+          "qtyOrdered": 6,
+          "qtyShipped": 6,
+          "status": "Shipped",
+          "lineCost": 24
+        },
+        {
+          "style": "PC61",
+          "title": "Synthetic cotton tee",
+          "color": "Navy",
+          "size": "M",
+          "qty": 6,
+          "qtyOrdered": 6,
+          "qtyShipped": 6,
+          "status": "Shipped",
+          "lineCost": 24
+        },
+        {
+          "style": "PC61",
+          "title": "Synthetic cotton tee",
+          "color": "Navy",
+          "size": "L",
+          "qty": 6,
+          "qtyOrdered": 6,
+          "qtyShipped": 6,
+          "status": "Shipped",
+          "lineCost": 24
+        },
+        {
+          "style": "PC61",
+          "title": "Synthetic cotton tee",
+          "color": "Navy",
+          "size": "XL",
+          "qty": 6,
+          "qtyOrdered": 6,
+          "qtyShipped": 6,
+          "status": "Shipped",
+          "lineCost": 24
+        }
+      ],
+      "boxDetail": [
+        {
+          "boxNumber": 1,
+          "pieces": 24,
+          "items": [
+            {
+              "style": "PC61",
+              "title": "Synthetic cotton tee",
+              "color": "Navy",
+              "size": "S",
+              "qty": 6
+            },
+            {
+              "style": "PC61",
+              "title": "Synthetic cotton tee",
+              "color": "Navy",
+              "size": "M",
+              "qty": 6
+            },
+            {
+              "style": "PC61",
+              "title": "Synthetic cotton tee",
+              "color": "Navy",
+              "size": "L",
+              "qty": 6
+            },
+            {
+              "style": "PC61",
+              "title": "Synthetic cotton tee",
+              "color": "Navy",
+              "size": "XL",
+              "qty": 6
+            }
+          ],
+          "trackingNumber": "SYNTHETIC-2-1",
+          "carrier": "UPS"
+        }
+      ]
+    }
+  ],
+  "events": {
+    "errors": [],
+    "writes": [],
+    "unknown": [],
+    "missing": [],
+    "providers": []
+  }
+}

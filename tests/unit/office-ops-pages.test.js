@@ -40,7 +40,9 @@ describe('sanmar inbound calendar modal', () => {
         expect(js).not.toMatch(/\.style\.display/);
         expect(js).toMatch(/modalEl\.setAttribute\('role', 'dialog'\);/);
         expect(js).toMatch(/returnFocus = document\.activeElement;/);
-        expect(js).toMatch(/if \(e\.key !== 'Escape' \|\| !modalEl \|\| modalEl\.hidden\) return;/);
+        expect(js).toContain("if (e.key !== 'Escape' || !modalEl || modalEl.hidden || modalEl.tagName === 'DIALOG') return;");
+        expect(js).toContain("modalEl.addEventListener('cancel'");
+        expect(js).toContain('if (!modalEl.open) modalEl.showModal();');
         expect(js).toMatch(/data-onerror="sit-logo"/);
         expect(js).toMatch(/<th class="sit-r">/);
         expect(css).toMatch(/\.sit-modal\[hidden\] \{ display: none; \}/);

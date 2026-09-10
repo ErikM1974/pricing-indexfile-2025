@@ -1,0 +1,3217 @@
+/* Mission Control: one scoped owner; shared controls, header primitives and invoice presentation are canonical. */
+@layer components.pages {
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-greeting-row {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: var(--space-3);
+        margin-bottom: var(--space-4);
+        flex-wrap: wrap;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-greeting {
+        font-size: clamp(1.125rem, 2vw, 1.5rem);
+        line-height: 1.4;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-updated {
+        font-size: var(--font-size-md);
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bonus-hero {
+        position: relative;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--space-5);
+        padding: var(--space-6);
+        margin-bottom: var(--space-5);
+        border-radius: var(--radius-md);
+        background: var(--store-green-950);
+        color: var(--color-on-brand);
+        box-shadow: none;
+        overflow: hidden;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bonus-hero
+        > * {
+        position: relative;
+        z-index: 1;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-fallback {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        padding: var(--space-3) var(--space-4);
+        margin-bottom: var(--space-4);
+        border: 1px solid var(--amber-600);
+        border-left-width: 4px;
+        border-radius: var(--radius-md);
+        background: var(--amber-100);
+        color: var(--gray-800);
+        font-size: 0.88rem;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-fallback
+        i {
+        color: var(--amber-600);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-dial {
+        flex: 0 1 260px;
+        display: flex;
+        align-items: center;
+        gap: var(--space-4);
+        padding-right: var(--space-4);
+        border-right: 1px solid var(--brand-700);
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-dial
+        svg {
+        width: 112px;
+        height: 112px;
+        flex: 0 0 auto;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-dial-track {
+        fill: none;
+        stroke: rgb(0 0 0 / 28%);
+        stroke-width: 11;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-dial-tick {
+        fill: none;
+        stroke: var(--amber-400);
+        stroke-width: 11;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-dial-arc {
+        fill: none;
+        stroke: var(--color-surface);
+        stroke-width: 11;
+        stroke-linecap: round;
+        transition: stroke-dasharray 420ms
+            var(--ease-out, cubic-bezier(0.2, 0.8, 0.2, 1));
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-dial-pct {
+        font-family: var(--font-mono);
+        font-size: 24px;
+        font-weight: 700;
+        fill: var(--color-surface);
+        font-variant-numeric: tabular-nums;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-dial-cap {
+        font-size: 9.5px;
+        font-weight: 700;
+        letter-spacing: normal;
+        fill: rgb(255 255 255 / 75%);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-earned {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-earned-cap {
+        font-size: var(--font-size-md);
+        font-weight: 500;
+        color: var(--brand-100);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-earned-amt {
+        font-family: var(--font-mono);
+        font-size: 24px;
+        font-weight: 700;
+        line-height: 1.1;
+        font-variant-numeric: tabular-nums;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-ladder {
+        flex: 1 1 0;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-eyebrow {
+        font-size: var(--font-size-md);
+        font-weight: 600;
+        color: var(--brand-100);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-next {
+        font-size: clamp(1.125rem, 1.6vw, 1.5rem);
+        font-weight: 700;
+        line-height: 1.35;
+        margin-top: var(--space-2);
+        max-width: 64ch;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-scenarios {
+        display: flex;
+        gap: 9px;
+        margin-top: 15px;
+        flex-wrap: wrap;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-sc {
+        flex: 1 1 150px;
+        border-radius: 10px;
+        padding: 10px 13px;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-sc--now {
+        background: rgb(255 255 255 / 94%);
+        color: var(--store-green-950);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-sc--pace,
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-sc--goal {
+        background: rgb(0 0 0 / 26%);
+        border: 1px solid rgb(255 255 255 / 24%);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-sc-eyebrow {
+        font-size: var(--font-size-md);
+        font-weight: 800;
+        letter-spacing: normal;
+        text-transform: none;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-sc--now
+        .aemc-bh-sc-eyebrow {
+        color: var(--store-green-700);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-sc--pace
+        .aemc-bh-sc-eyebrow {
+        color: var(--amber-300);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-sc--goal
+        .aemc-bh-sc-eyebrow {
+        color: var(--brand-100);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-sc-amt {
+        font-family: var(--font-mono);
+        font-size: 1.35rem;
+        font-weight: 700;
+        margin-top: 3px;
+        font-variant-numeric: tabular-nums;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-sc-sub {
+        font-size: var(--font-size-md);
+        margin-top: 2px;
+        color: rgb(255 255 255 / 80%);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-sc--now
+        .aemc-bh-sc-sub {
+        color: var(--store-ink-soft);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-startcap {
+        position: relative;
+        height: 16px;
+        margin-top: 15px;
+        font-size: var(--font-size-md);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-startcap
+        span {
+        position: absolute;
+        transform: translateX(-100%);
+        padding-right: 8px;
+        color: var(--amber-300);
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-ends {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 12px;
+        margin-top: 6px;
+        font-size: var(--font-size-md);
+        color: rgb(255 255 255 / 78%);
+        font-variant-numeric: tabular-nums;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-ends
+        strong {
+        color: var(--color-on-brand);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        [id="aemc-bh-goalmax"] {
+        color: var(--color-on-brand);
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-endcap {
+        position: absolute;
+        right: 0;
+        top: -6px;
+        bottom: -6px;
+        width: 3px;
+        border-radius: 2px;
+        background: rgb(255 255 255 / 75%);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-cta {
+        flex: 0 1 210px;
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-go {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 11px 14px;
+        border-radius: 9px;
+        background: var(--color-surface);
+        color: var(--print-green-dark);
+        font-size: var(--font-size-md);
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-go:hover {
+        background: var(--brand-100);
+        color: var(--store-green-950);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-pace {
+        display: inline-flex;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 9px 12px;
+        border-radius: 9px;
+        font-size: var(--font-size-md);
+        font-weight: 600;
+        line-height: 1.4;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-pace.is-onpace {
+        background: rgb(255 255 255 / 92%);
+        color: var(--brand-700);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-pace.is-behind {
+        background: rgb(0 0 0 / 30%);
+        color: var(--color-on-brand);
+        border: 1px solid rgb(255 255 255 / 50%);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-track {
+        height: 12px;
+        margin-top: 2px;
+        border-radius: 999px;
+        background: rgb(0 0 0 / 30%);
+        box-shadow: inset 0 1px 2px rgb(0 0 0 / 25%);
+        position: relative;
+        overflow: visible;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-marks {
+        position: absolute;
+        inset: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-mark {
+        position: absolute;
+        top: -6px;
+        bottom: -6px;
+        width: 3px;
+        border-radius: 2px;
+        background: var(--amber-400);
+        transform: translateX(-1px);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-mark.is-hit {
+        background: var(--color-surface);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-explain {
+        border: 1px solid rgb(255 255 255 / 35%);
+        background: transparent;
+        color: var(--color-on-brand);
+        font: inherit;
+        font-size: var(--font-size-md);
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: var(--radius-pill, 999px);
+        cursor: pointer;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-explain:hover {
+        background: rgb(255 255 255 / 16%);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-how {
+        flex: 1 1 100%;
+        margin-top: var(--space-3);
+        padding-top: var(--space-3);
+        border-top: 1px solid rgb(255 255 255 / 28%);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-how-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-how
+        h4 {
+        margin: 0 0 4px;
+        font-size: var(--font-size-md);
+        font-weight: 700;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-how
+        p {
+        margin: 0;
+        font-size: var(--font-size-md);
+        line-height: 1.5;
+        color: rgb(255 255 255 / 92%);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-how-foot {
+        margin: var(--space-3) 0 0;
+        font-size: var(--font-size-md);
+        line-height: 1.5;
+        color: rgb(255 255 255 / 90%);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-how-foot
+        a {
+        color: var(--color-on-brand);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-chip {
+        display: inline-flex;
+        align-items: baseline;
+        gap: 6px;
+        padding: 5px 10px;
+        border-radius: var(--radius-pill, 999px);
+        background: rgb(255 255 255 / 16%);
+        border: 1px solid rgb(255 255 255 / 26%);
+        font-size: var(--font-size-md);
+        line-height: 1.2;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-chip.is-on {
+        background: rgb(255 255 255 / 92%);
+        color: var(--brand-700);
+        border-color: transparent;
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-chip
+        strong {
+        font-size: 0.95rem;
+        font-variant-numeric: tabular-nums;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-chip-rate {
+        color: rgb(255 255 255 / 82%);
+        font-size: var(--font-size-md);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-chip.is-on
+        .aemc-bh-chip-rate {
+        color: rgb(26 82 33 / 82%);
+    }
+
+    @media (width <= 1100px) {
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .aemc-bh-cta {
+            flex: 1 1 100%;
+            flex-direction: row;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .aemc-bh-cta
+            > * {
+            flex: 1;
+            justify-content: center;
+        }
+    }
+
+    @media (width <= 640px) {
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .aemc-bonus-hero {
+            padding: var(--space-4);
+            gap: var(--space-3);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .aemc-bh-dial {
+            flex: 1 1 100%;
+            border-right: 0;
+            padding-right: 0;
+            justify-content: center;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .aemc-bh-ladder {
+            flex: 1 1 100%;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .aemc-bh-next {
+            font-size: 1.15rem;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .aemc-bh-scenarios {
+            gap: 7px;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .aemc-bh-sc {
+            flex: 1 1 100%;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .aemc-bh-cta {
+            flex-direction: column;
+        }
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-viewas {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: var(--space-1);
+        background: var(--ui-surface);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+        padding: var(--space-1);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-viewas-label {
+        font-size: var(--font-size-md);
+        color: var(--ui-muted);
+        padding: 0 4px;
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-viewas-btn {
+        min-height: var(--ui-control-height);
+        border: 0;
+        background: transparent;
+        color: var(--ui-muted);
+        font: inherit;
+        font-size: var(--font-size-md);
+        font-weight: 600;
+        padding: var(--space-2) var(--space-3);
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-viewas-btn:hover {
+        background: var(--ui-tint);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-viewas-btn.is-active {
+        background: var(--ui-accent);
+        color: var(--color-on-brand);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-actions {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        flex-wrap: wrap;
+        margin-bottom: var(--space-4);
+        padding: var(--space-3);
+        background: var(--ui-surface);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-actions-label {
+        font-size: var(--font-size-md);
+        font-weight: 600;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-actions-sep {
+        width: 1px;
+        align-self: stretch;
+        background: var(--gray-200);
+        margin: 0 var(--space-1);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-badge {
+        display: inline-block;
+        min-width: 18px;
+        padding: 0 5px;
+        border-radius: 9px;
+        background: var(--red-600);
+        color: var(--color-on-brand);
+        font-size: var(--font-size-md);
+        font-weight: 700;
+        text-align: center;
+        line-height: 18px;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-queue-card {
+        margin-bottom: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-queue-count {
+        font-size: var(--font-size-md);
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-queue {
+        display: grid;
+        gap: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-queue-section-title {
+        font-size: var(--font-size-md);
+        font-weight: 700;
+        letter-spacing: normal;
+        text-transform: none;
+        color: var(--ui-muted);
+        margin: 0 0 var(--space-1);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-queue-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 6px;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-queue-item {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        padding: 8px 12px;
+        border-left: 4px solid var(--gray-300);
+        background: var(--gray-50);
+        border-radius: var(--radius-sm);
+        flex-wrap: wrap;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-queue-item--overdue {
+        border-left-color: var(--red-600);
+        background: var(--red-50);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-queue-item--today {
+        border-left-color: var(--brand-700);
+        background: var(--brand-50);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-queue-item--new {
+        border-left-color: var(--blue-800);
+        background: var(--color-ruth-tint);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-queue-item--quote {
+        border-left-color: var(--amber-700);
+        background: var(--store-paper);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-queue-item--art {
+        border-left-color: var(--color-ruth-light);
+        background: var(--color-ruth-tint);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-queue-item--kit {
+        border-left-color: var(--brand-700);
+        background: var(--color-bradley-tint);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-queue-main {
+        font-weight: 600;
+        color: var(--gray-900);
+        text-decoration: none;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-queue-main:hover {
+        text-decoration: underline;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-queue-meta {
+        font-size: var(--font-size-md);
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-queue-actions {
+        margin-left: auto;
+        display: inline-flex;
+        gap: 6px;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-queue-empty {
+        padding: var(--space-4);
+        text-align: center;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-queue-empty
+        i {
+        color: var(--brand-700);
+        margin-right: 6px;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-mini-btn {
+        border: 1px solid var(--gray-300);
+        background: var(--ui-surface);
+        color: var(--gray-600);
+        font: inherit;
+        font-size: var(--font-size-md);
+        padding: 3px 8px;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-mini-btn:hover {
+        background: var(--ui-tint);
+        color: var(--gray-900);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-panels {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--space-4);
+        margin-bottom: var(--space-4);
+    }
+
+    @media (width <= 900px) {
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .aemc-panels {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-viewall {
+        font-size: var(--font-size-md);
+        font-weight: 600;
+        color: var(--ui-accent);
+        text-decoration: none;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-viewall:hover {
+        text-decoration: underline;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-sub {
+        font-size: var(--font-size-md);
+        font-weight: 400;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-rows {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-row {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        padding: 8px 4px;
+        border-bottom: 1px solid var(--gray-100);
+        flex-wrap: wrap;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-row:last-child {
+        border-bottom: none;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-row-main {
+        font-weight: 600;
+        color: var(--gray-900);
+        text-decoration: none;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        a.aemc-row-main:hover {
+        text-decoration: underline;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-row-meta {
+        font-size: var(--font-size-md);
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-row-right {
+        margin-left: auto;
+        text-align: right;
+        font-size: var(--font-size-md);
+        color: var(--gray-600);
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-money {
+        font-family: var(--font-mono);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-status {
+        display: inline-block;
+        font-size: var(--font-size-md);
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: var(--gray-50);
+        color: var(--gray-600);
+        border: 1px solid var(--gray-200);
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-empty {
+        padding: var(--space-3);
+        color: var(--ui-muted);
+        font-size: var(--font-size-md);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-panel-error {
+        padding: var(--space-3);
+        color: var(--red-700);
+        background: var(--red-50);
+        border-radius: var(--radius-sm);
+        font-size: var(--font-size-md);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bonus-card {
+        margin-bottom: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bonus-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-4);
+    }
+
+    @media (width <= 700px) {
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .aemc-bonus-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bonus-total {
+        font-size: 1.25rem;
+        font-weight: 700;
+        font-family: var(--font-mono);
+        color: var(--gray-900);
+        margin: 4px 0 6px;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bonus-when {
+        font-size: var(--font-size-md);
+        color: var(--ui-muted);
+        margin-bottom: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-status--paid {
+        background: var(--brand-50);
+        color: var(--brand-800);
+        border-color: var(--brand-100);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-status--pending {
+        background: var(--store-paper);
+        color: var(--amber-700);
+        border-color: var(--amber-200);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bonus-foot {
+        margin: var(--space-3) 0 0;
+        font-size: var(--font-size-md);
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-purch-card {
+        margin-bottom: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-purch-chip {
+        display: inline-block;
+        font-size: var(--font-size-md);
+        font-weight: 700;
+        padding: 2px 10px;
+        border-radius: 999px;
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-purch--sent {
+        background: var(--gray-50);
+        color: var(--gray-600);
+        border: 1px solid var(--gray-300);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-purch--ordered {
+        background: var(--color-ruth-tint);
+        color: var(--blue-800);
+        border: 1px solid var(--blue-200);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-purch--partial {
+        background: var(--store-paper);
+        color: var(--amber-700);
+        border: 1px solid var(--amber-200);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-purch--received {
+        background: var(--brand-50);
+        color: var(--brand-800);
+        border: 1px solid var(--brand-100);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-purch--invoiced {
+        background: var(--brand-50);
+        color: var(--brand-800);
+        border: 1px solid var(--brand-100);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-purch--shipped {
+        background: var(--brand-700);
+        color: var(--color-on-brand);
+        border: 1px solid var(--brand-700);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-due-card {
+        margin-bottom: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-due-card
+        .aemc-queue-section-title {
+        margin-top: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-due-flag {
+        display: inline-block;
+        font-size: var(--font-size-md);
+        font-weight: 700;
+        padding: 2px 10px;
+        border-radius: 999px;
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-due-flag--late {
+        background: var(--red-50);
+        color: var(--red-800);
+        border: 1px solid var(--red-200);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-due-flag--risk {
+        background: var(--store-paper);
+        color: var(--amber-700);
+        border: 1px solid var(--amber-200);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-growth-card {
+        margin-bottom: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-growth-hint {
+        margin-bottom: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-growth-reason {
+        display: inline-block;
+        font-size: var(--font-size-md);
+        padding: 2px 8px;
+        border-radius: 999px;
+        white-space: normal;
+        max-width: 100%;
+        line-height: 1.5;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-growth-reason--rhythm {
+        background: var(--store-paper);
+        color: var(--amber-700);
+        border: 1px solid var(--amber-200);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-growth-reason--season {
+        background: var(--color-ruth-tint);
+        color: var(--blue-800);
+        border: 1px solid var(--blue-200);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-growth-total {
+        font-weight: 700;
+        color: var(--gray-900);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-dq-card {
+        margin-bottom: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-dq-card
+        .aemc-queue-section-title {
+        margin-top: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-dq-chip {
+        display: inline-block;
+        font-size: var(--font-size-md);
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 999px;
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-dq-chip--err {
+        background: var(--red-50);
+        color: var(--red-800);
+        border: 1px solid var(--red-200);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-dq-chip--warn {
+        background: var(--store-paper);
+        color: var(--amber-700);
+        border: 1px solid var(--amber-200);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-row--collapsed {
+        display: none;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-rows.is-expanded
+        .aemc-row--collapsed {
+        display: flex;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-more-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: var(--space-2);
+        padding: 5px 12px;
+        border: 1px solid var(--gray-200);
+        border-radius: 999px;
+        background: var(--gray-50);
+        color: var(--ui-accent);
+        font: inherit;
+        font-size: var(--font-size-md);
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-more-toggle:hover {
+        background: var(--ui-tint);
+        border-color: var(--gray-300);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-more-toggle
+        i {
+        font-size: var(--font-size-md);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-collapsible
+        > .dash-card-header {
+        cursor: pointer;
+        user-select: none;
+        justify-content: flex-start;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-collapsible
+        > .dash-card-header
+        > .dash-card-title {
+        margin-right: auto;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-collapse-caret {
+        color: var(--ui-muted);
+        font-size: var(--font-size-md);
+        flex-shrink: 0;
+        transition: transform 0.2s ease;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-collapsible
+        > .dash-card-header:hover
+        .aemc-collapse-caret {
+        color: var(--gray-600);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .dash-card.is-collapsed
+        .aemc-collapse-caret {
+        transform: rotate(180deg);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .dash-card.is-collapsed
+        > *:not(.dash-card-header) {
+        display: none;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .dash-card.is-collapsed
+        > .dash-card-header {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-inbound-card {
+        margin-bottom: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-inbound {
+        font-size: 0.9rem;
+        color: var(--gray-600);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgb(15 23 42 / 45%);
+        z-index: 90;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-modal {
+        position: fixed;
+        inset: 0;
+        margin: auto;
+        transform: none;
+        width: min(640px, calc(100vw - 32px));
+        max-height: calc(100dvh - 32px);
+        padding: 0;
+        overflow: auto;
+        background: var(--ui-surface);
+        color: var(--ui-ink);
+        border: 1px solid var(--ui-line-strong);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-md);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-modal-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-3);
+        padding: var(--space-4) var(--space-5);
+        border-bottom: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-modal-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--gray-900);
+        margin: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-modal-close {
+        border: none;
+        background: transparent;
+        color: var(--ui-muted);
+        font-size: 1rem;
+        cursor: pointer;
+        padding: 6px;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-modal-close:hover {
+        color: var(--gray-900);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-modal-body {
+        padding: var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-modal-actions {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: var(--space-3);
+        margin-top: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-hint {
+        font-size: var(--font-size-md);
+        color: var(--ui-muted);
+        margin: 0 0 var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-muted {
+        color: var(--ui-muted);
+        font-size: var(--font-size-md);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-field {
+        margin-bottom: var(--space-2);
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-field-label {
+        display: block;
+        font-size: var(--font-size-md);
+        font-weight: 600;
+        color: var(--gray-600);
+        margin-bottom: 4px;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-field
+        input,
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-field
+        textarea {
+        width: 100%;
+        min-width: 0;
+        min-height: var(--ui-control-height);
+        border: 1px solid var(--ui-line-strong);
+        border-radius: var(--radius-sm);
+        background: var(--ui-surface);
+        color: var(--ui-ink);
+        font: inherit;
+        padding: var(--space-2) var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-grid2 {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-grid3 {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr;
+        gap: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-kit-items {
+        display: grid;
+        gap: 6px;
+        margin-bottom: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-kit-item {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        padding: 6px 10px;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-sm);
+        background: var(--gray-50);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-kit-item-label {
+        flex: 1;
+        font-size: 0.88rem;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-kit-qty {
+        width: 60px;
+        font: inherit;
+        font-size: var(--font-size-md);
+        padding: 4px 6px;
+        border: 1px solid var(--gray-300);
+        border-radius: var(--radius-sm);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-outreach-lead {
+        font-weight: 600;
+        margin-bottom: var(--space-2);
+        color: var(--gray-900);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-outreach-btns {
+        display: flex;
+        gap: var(--space-2);
+        flex-wrap: wrap;
+        margin-bottom: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-outreach-subject {
+        font-weight: 700;
+        margin-bottom: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-outreach-body {
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-sm);
+        padding: var(--space-3);
+        background: var(--gray-50);
+        font-size: 0.88rem;
+        max-height: 280px;
+        overflow: auto;
+        margin-bottom: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-outreach-sent {
+        color: var(--brand-700);
+        font-weight: 600;
+        padding: var(--space-2) 0;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-toasts {
+        position: fixed;
+        right: 16px;
+        bottom: 16px;
+        display: grid;
+        gap: 8px;
+        z-index: 120;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-toast {
+        background: var(--gray-900);
+        color: var(--color-on-brand);
+        padding: 10px 14px;
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-md);
+        font-size: var(--font-size-md);
+        max-width: 320px;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-spine {
+        margin-bottom: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-spine-kpis {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-kpi {
+        min-width: 0;
+        background: var(--ui-surface);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+        padding: var(--space-4);
+        box-shadow: none;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-kpi--accent {
+        border-top: 3px solid var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-kpi-value {
+        font-family: var(--ui-font);
+        font-size: var(--font-size-2xl);
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+        color: var(--ui-ink);
+        line-height: 1.2;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-kpi-label {
+        font-size: var(--font-size-md);
+        font-weight: 500;
+        color: var(--ui-muted);
+        margin-top: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-kpi-note {
+        text-transform: none;
+        letter-spacing: normal;
+        font-weight: 500;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-spark {
+        margin-top: var(--space-2);
+        color: var(--ui-accent);
+        line-height: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-streak--hot {
+        color: var(--store-rush-deep);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-sticky {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        background: var(--ui-canvas);
+        margin-inline: 0;
+        padding-inline: 0;
+        border-bottom: 1px solid var(--ui-line-strong);
+        margin-bottom: var(--space-5);
+        max-width: 100%;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-panel,
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .dash-card {
+        scroll-margin-top: 92px;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-condensed {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        padding: var(--space-2) 0 0;
+        font-size: var(--font-size-md);
+        color: var(--gray-700);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-condensed-amount {
+        font-family: var(--font-mono);
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+        color: var(--print-green-dark);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-condensed-next {
+        color: var(--ui-muted);
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-condensed-track {
+        flex: 0 0 120px;
+        height: 6px;
+        border-radius: var(--radius-pill);
+        background: var(--gray-200);
+        overflow: hidden;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-condensed-fill {
+        display: block;
+        height: 100%;
+        background: var(--ui-accent);
+        transition: width var(--motion-base) var(--ease-out);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+        align-items: center;
+        padding: var(--space-2) 0;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-tabs::-webkit-scrollbar {
+        display: none;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-tab {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-2);
+        font: inherit;
+        font-size: var(--font-size-md);
+        font-weight: 600;
+        min-height: var(--ui-control-height);
+        padding: var(--space-3) var(--space-4);
+        border: 0;
+        border-bottom: 3px solid transparent;
+        border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+        background: transparent;
+        color: var(--ui-muted);
+        cursor: pointer;
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-tab:hover {
+        background: var(--gray-200);
+        color: var(--gray-800);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-tab[aria-selected="true"] {
+        background: var(--ui-surface);
+        color: var(--ui-accent);
+        border-bottom-color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-tab:focus-visible {
+        outline: 2px solid var(--ui-accent);
+        outline-offset: 2px;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-tab
+        i {
+        font-size: 0.85em;
+        opacity: 0.8;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-tab-badge {
+        font-family: var(--font-mono);
+        font-size: var(--font-size-md);
+        font-weight: 700;
+        background: var(--red-600);
+        color: var(--color-on-brand);
+        border-radius: var(--radius-pill);
+        padding: 1px 7px;
+        min-width: 18px;
+        text-align: center;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-tab[aria-selected="true"]
+        .mc-tab-badge {
+        background: var(--ui-accent);
+        color: var(--color-on-brand);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-tab-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--amber-500);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-panel {
+        animation: fadeIn var(--motion-base) var(--ease-out);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-panel:focus {
+        outline: none;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-panel:focus-visible {
+        outline: 2px solid var(--ui-accent);
+        outline-offset: 4px;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-diff {
+        display: flex;
+        align-items: baseline;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+        font-size: var(--font-size-md);
+        color: var(--gray-600);
+        margin: 0 0 var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-diff-since {
+        font-weight: 600;
+        color: var(--gray-700);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-diff-up {
+        color: var(--print-green);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-onething {
+        border: 1px solid var(--gray-200);
+        border-left: 4px solid var(--ui-accent);
+        border-radius: var(--radius-lg);
+        background: var(--ui-surface);
+        box-shadow: var(--shadow-md);
+        padding: var(--space-4) var(--space-5);
+        margin-bottom: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-ot-eyebrow {
+        font-size: var(--font-size-md);
+        font-weight: 700;
+        letter-spacing: normal;
+        text-transform: none;
+        color: var(--store-green-700);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-ot-title {
+        font-size: 1.12rem;
+        font-weight: 700;
+        color: var(--gray-900);
+        margin: var(--space-2) 0 4px;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-ot-why {
+        font-size: 0.9rem;
+        color: var(--gray-600);
+        line-height: 1.5;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-ot-worth {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        margin-top: var(--space-2);
+        font-size: var(--font-size-md);
+        font-weight: 700;
+        color: var(--print-green-dark);
+        background: var(--brand-100);
+        border-radius: var(--radius-pill);
+        padding: 3px 11px;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-ot-worth--urgent {
+        color: var(--store-rush-deeper);
+        background: var(--amber-100);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-ot-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+        margin-top: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-onething-skipped {
+        font-size: var(--font-size-md);
+        color: var(--ui-muted);
+        margin: calc(-1 * var(--space-2)) 0 var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-onething-skipped
+        button {
+        font: inherit;
+        background: none;
+        border: none;
+        padding: 0;
+        color: var(--store-green-700);
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: underline;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-kicker-track {
+        height: 12px;
+        border-radius: var(--radius-pill);
+        background: var(--gray-200);
+        overflow: hidden;
+        margin: var(--space-3) 0 var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-kicker-fill {
+        display: block;
+        height: 100%;
+        border-radius: var(--radius-pill);
+        background: linear-gradient(
+            90deg,
+            var(--store-green-700),
+            var(--ui-accent)
+        );
+        transition: width 420ms var(--ease-out);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-kicker-line {
+        font-size: 0.9rem;
+        color: var(--gray-700);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-kicker-tiers {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+        margin-top: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-kicker-tier {
+        font-size: var(--font-size-md);
+        font-weight: 600;
+        color: var(--gray-600);
+        background: var(--gray-50);
+        border-radius: var(--radius-pill);
+        padding: 3px 10px;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-kicker-tier.is-hit {
+        color: var(--print-green-dark);
+        background: var(--brand-100);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-records {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-record {
+        background: var(--gray-50);
+        border-radius: var(--radius-lg);
+        padding: var(--space-3) var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-record-value {
+        font-family: var(--font-mono);
+        font-size: 1.25rem;
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+        color: var(--gray-900);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-record-label {
+        font-size: var(--font-size-md);
+        font-weight: 600;
+        color: var(--ui-muted);
+        text-transform: none;
+        letter-spacing: normal;
+        margin-top: 2px;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-record-when {
+        font-size: var(--font-size-md);
+        color: var(--ui-muted);
+        margin-top: 2px;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-photo-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-photo {
+        display: block;
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        background: var(--gray-50);
+        border: 1px solid var(--gray-200);
+        text-decoration: none;
+        transition:
+            transform var(--motion-fast) var(--ease-out),
+            box-shadow var(--motion-fast) var(--ease-out);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-photo:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-photo
+        img {
+        display: block;
+        width: 100%;
+        aspect-ratio: 1;
+        object-fit: cover;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-photo-cap {
+        font-size: var(--font-size-md);
+        color: var(--gray-600);
+        padding: 6px 8px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-skel {
+        display: grid;
+        gap: 10px;
+        padding: var(--space-2) 0;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .mc-panel {
+            animation: none;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .mc-tab,
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .mc-photo {
+            transition: none;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .mc-photo:hover {
+            transform: none;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .aemc-bh-fill,
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .mc-kicker-fill,
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .mc-condensed-fill,
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .mc-bh-pace-mark {
+            transition: none;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .skeleton-line,
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .skeleton-header {
+            animation: none;
+            background: var(--gray-200);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="mission-control"]) *,
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            *::before,
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            *::after {
+            animation-duration: 0.01ms;
+            transition-duration: 0.01ms;
+        }
+    }
+
+    @media (width <= 900px) {
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .mc-spine-kpis {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .mc-spine-kpis
+            > .mc-kpi:last-child {
+            grid-column: 1 / -1;
+        }
+    }
+
+    @media (width <= 640px) {
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .mc-kpi-value {
+            font-size: 1.25rem;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .mc-condensed-next {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .aemc-field
+            input,
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .aemc-field
+            textarea,
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .aemc-field
+            select {
+            font-size: 16px;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .aemc-mini-btn,
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .aemc-more-toggle {
+            min-height: 44px;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .aemc-row-right {
+            margin-left: 0;
+            text-align: left;
+            white-space: normal;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .mc-records {
+            grid-template-columns: 1fr;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .dash-header-right {
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            row-gap: var(--space-2);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .aemc-dq-chip {
+            white-space: normal;
+            max-width: 100%;
+        }
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-bh-pace-mark {
+        position: absolute;
+        top: -9px;
+        width: 0;
+        height: 0;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-top: 7px solid var(--color-surface);
+        transform: translateX(-5px);
+        filter: drop-shadow(0 1px 1px rgb(0 0 0 / 30%));
+        transition: left var(--motion-base) var(--ease-out);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-bh-pace-mark.is-behind {
+        border-top-color: var(--amber-300);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-menu {
+        position: relative;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-menu
+        > summary {
+        list-style: none;
+        cursor: pointer;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-menu
+        > summary::-webkit-details-marker {
+        display: none;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-menu
+        > summary::marker {
+        content: "";
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-menu
+        > summary::after {
+        content: "▾";
+        font-size: 0.7em;
+        margin-left: 2px;
+        opacity: 0.7;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-menu[open]
+        > summary::after {
+        content: "▴";
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-menu-panel {
+        position: absolute;
+        top: calc(100% + 4px);
+        left: 0;
+        z-index: 30;
+        min-width: 220px;
+        display: grid;
+        padding: var(--space-2);
+        gap: 2px;
+        background: var(--ui-surface);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-md);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-menu-panel
+        a {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 10px;
+        min-height: 40px;
+        border-radius: var(--radius-sm);
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--gray-700);
+        text-decoration: none;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-menu-panel
+        a:hover {
+        background: var(--ui-tint);
+        color: var(--gray-900);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-menu-panel
+        a:focus-visible {
+        outline: 2px solid var(--ui-accent);
+        outline-offset: -2px;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-menu-panel
+        a
+        i {
+        width: 1em;
+        text-align: center;
+        color: var(--ui-muted);
+    }
+
+    @media (width <= 640px) {
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .mc-menu-panel {
+            left: auto;
+            right: 0;
+            min-width: 200px;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .mc-menu-panel
+            a {
+            min-height: 44px;
+        }
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-calls {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-call {
+        padding: 12px 4px;
+        border-bottom: 1px solid var(--gray-100);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-call:last-child {
+        border-bottom: none;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-call-head {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-call-co {
+        font-weight: 600;
+        color: var(--gray-900);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-call-chip {
+        display: inline-block;
+        font-size: var(--font-size-md);
+        padding: 2px 8px;
+        border-radius: 999px;
+        white-space: nowrap;
+        border: 1px solid var(--gray-200);
+        background: var(--gray-50);
+        color: var(--gray-600);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-call-chip--near {
+        background: var(--color-dash-theme-bg);
+        color: var(--print-green);
+        border-color: var(--brand-100);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-call-chip--back {
+        background: var(--color-ruth-tint);
+        color: var(--blue-800);
+        border-color: var(--blue-200);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-call-chip--new {
+        background: var(--store-paper);
+        color: var(--amber-700);
+        border-color: var(--amber-200);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-call-chip--due {
+        background: var(--red-50);
+        color: var(--red-700);
+        border-color: var(--red-200);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-call-chip--done {
+        background: var(--slate-100);
+        color: var(--gray-600);
+        border-color: var(--gray-300);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-call-conf {
+        margin-left: auto;
+        font-size: var(--font-size-md);
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-call-conf--strong {
+        color: var(--print-green);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-call-conf--fair {
+        color: var(--amber-700);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-call-conf--long-shot {
+        color: var(--ui-muted);
+        font-weight: 500;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-call-why {
+        font-size: var(--font-size-md);
+        color: var(--gray-600);
+        margin: 4px 0 6px;
+        line-height: 1.45;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-call-foot {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-call-worth {
+        margin-left: auto;
+        font-size: var(--font-size-md);
+        color: var(--gray-600);
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-call-tel,
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-call-mail {
+        font-family: var(--font-mono);
+        font-size: var(--font-size-md);
+        color: var(--brand-700);
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-call-tel:hover,
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-call-mail:hover {
+        text-decoration: underline;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-call-nophone {
+        font-size: var(--font-size-md);
+        color: var(--amber-700);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-call--done {
+        background: var(--gray-50);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-call-saved {
+        font-size: var(--font-size-md);
+        color: var(--print-green);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-call-saved--local {
+        color: var(--amber-700);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-call-strip {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: wrap;
+        margin-top: 8px;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-call-strip-sep {
+        font-size: var(--font-size-md);
+        color: var(--ui-muted);
+        margin-left: 4px;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-call-btn,
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-call-fu,
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-call-retry {
+        font-size: var(--font-size-md);
+        padding: 5px 10px;
+        border-radius: 6px;
+        border: 1px solid var(--gray-200);
+        background: var(--color-surface);
+        color: var(--gray-700);
+        cursor: pointer;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-call-btn:hover,
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-call-fu:hover,
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-call-retry:hover {
+        border-color: var(--gray-400);
+        background: var(--gray-50);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-call-btn.is-on {
+        border-color: var(--print-green);
+        color: var(--print-green);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-loadmore {
+        display: block;
+        width: 100%;
+        margin-top: 10px;
+        padding: 9px;
+        font-size: var(--font-size-md);
+        border: 1px dashed var(--gray-300);
+        border-radius: 8px;
+        background: var(--gray-50);
+        color: var(--gray-600);
+        cursor: pointer;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-loadmore:hover:not(:disabled) {
+        border-color: var(--gray-400);
+        color: var(--gray-800);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-loadmore:disabled {
+        cursor: progress;
+        opacity: 0.7;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-calls-pointer {
+        margin-top: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-calls-print {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font: inherit;
+    }
+
+    @media (width <= 640px) {
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .aemc-call-conf {
+            margin-left: 0;
+            width: 100%;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .aemc-call-worth {
+            margin-left: 0;
+        }
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-grid {
+        display: grid;
+        gap: 14px;
+        margin-bottom: 14px;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-grid--2-1 {
+        grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-grid--3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-chapters {
+        display: flex;
+        gap: 7px;
+        flex-wrap: wrap;
+        align-items: center;
+        margin-bottom: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-chapters-label {
+        font-size: var(--font-size-md);
+        font-weight: 700;
+        letter-spacing: normal;
+        text-transform: none;
+        color: var(--ui-muted);
+        margin-right: 4px;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: var(--font-size-md);
+        font-weight: 600;
+        text-decoration: none;
+        color: var(--gray-600);
+        background: var(--gray-50);
+        border: 1px solid var(--gray-200);
+        padding: 6px 12px;
+        border-radius: 999px;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-chip:hover {
+        border-color: var(--gray-400);
+        color: var(--gray-800);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-chip.is-fire {
+        color: var(--red-800);
+        background: var(--red-50);
+        border-color: var(--red-200);
+        font-weight: 700;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-chip.is-art {
+        color: var(--violet-600);
+        background: var(--color-ruth-tint);
+        border-color: var(--color-ruth-tint);
+        font-weight: 700;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-chip-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        [id="mc-fires"],
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        [id="mc-artwork"],
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        [id="mc-missing"],
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        [id="mc-inbound"],
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        [id="mc-purch"] {
+        scroll-margin-top: 90px;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-capped {
+        display: flex;
+        flex-direction: column;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-capped
+        .dash-card-header {
+        margin-bottom: 11px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-capped
+        .dash-card-title {
+        font-size: 0.92rem;
+        font-weight: 700;
+        color: var(--gray-800);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-capped
+        > div:not(.dash-card-header) {
+        flex: 1;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-rows {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-rows
+        .aemc-row {
+        padding: 8px 0;
+        border-bottom: 1px solid var(--gray-100);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-rows
+        .aemc-row:last-child {
+        border-bottom: none;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-count-pill {
+        margin-left: auto;
+        font-family: var(--font-mono);
+        font-size: var(--font-size-md);
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: var(--gray-50);
+        color: var(--gray-600);
+        border: 1px solid var(--gray-200);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-count-pill--fire {
+        color: var(--red-800);
+        background: var(--red-50);
+        border-color: var(--red-200);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-count-pill--art {
+        color: var(--violet-600);
+        background: var(--color-ruth-tint);
+        border-color: var(--color-ruth-tint);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-count-pill--ok {
+        color: var(--brand-800);
+        background: var(--brand-50);
+        border-color: var(--brand-100);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-count-pill:empty {
+        display: none;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-ic-fire {
+        color: var(--red-600);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-ic-art {
+        color: var(--color-ruth-light);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-ic-dq {
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-ic-streak {
+        color: var(--amber-500);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-viewall-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        width: 100%;
+        margin-top: 12px;
+        padding: 9px 12px;
+        font: inherit;
+        font-size: var(--font-size-md);
+        font-weight: 700;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--gray-200);
+        background: var(--gray-50);
+        color: var(--gray-700);
+        text-decoration: none;
+        cursor: pointer;
+        min-height: 44px;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-viewall-btn:hover {
+        border-color: var(--gray-400);
+        color: var(--gray-900);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-row-meta.is-warm {
+        color: var(--amber-700);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-row-meta.is-old {
+        color: var(--red-800);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-clock {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-clock-svg {
+        width: 104px;
+        height: 104px;
+        flex: 0 0 104px;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-clock-n {
+        font-family: var(--font-mono);
+        font-size: 23px;
+        font-weight: 700;
+        fill: var(--gray-900);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-clock-l {
+        font-size: 10px;
+        font-weight: 600;
+        fill: var(--gray-500);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-clock-key {
+        display: flex;
+        flex-direction: column;
+        gap: 9px;
+        min-width: 0;
+        font-size: var(--font-size-md);
+        color: var(--gray-600);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-clock-key
+        b {
+        font-family: var(--font-mono);
+        font-size: 0.92rem;
+        color: var(--gray-900);
+        margin-right: 4px;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"]) .mc-sw {
+        display: inline-block;
+        width: 9px;
+        height: 9px;
+        border-radius: 2px;
+        margin-right: 8px;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-drawer-scrim {
+        position: fixed;
+        inset: 0;
+        background: rgb(15 23 42 / 45%);
+        z-index: 90;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-drawer {
+        position: fixed;
+        inset: 0 0 0 auto;
+        margin: 0;
+        width: min(640px, 100vw);
+        height: 100dvh;
+        max-height: 100dvh;
+        max-width: 100vw;
+        padding: 0;
+        border: 0;
+        border-left: 1px solid var(--ui-line);
+        background: var(--ui-surface);
+        color: var(--ui-ink);
+        display: flex;
+        flex-direction: column;
+        box-shadow: var(--shadow-md);
+    }
+
+    @keyframes mcSlideIn {
+        from {
+            transform: translateX(28px);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-drawer-head {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-drawer-title {
+        margin: 0;
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--gray-900);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-drawer-sum {
+        margin: 2px 0 0;
+        font-size: var(--font-size-md);
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-drawer-close {
+        margin-left: auto;
+        width: 36px;
+        height: 36px;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-md);
+        background: var(--ui-surface);
+        color: var(--gray-600);
+        cursor: pointer;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-drawer-close:hover {
+        background: var(--gray-50);
+        color: var(--gray-900);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-drawer-body {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        padding: 16px 20px;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-drawer-foot {
+        padding: 14px 20px;
+        border-top: 1px solid var(--gray-200);
+        background: var(--gray-50);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-drawer-foot
+        .aemc-hint {
+        margin: 0 0 8px;
+    }
+
+    @media (width <= 900px) {
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .mc-grid--2-1,
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .mc-grid--3 {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (width <= 640px) {
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .mc-drawer {
+            width: 100vw;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .mc-clock {
+            gap: 10px;
+        }
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-stat--warn {
+        border-top: 3px solid var(--amber-600);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-stat--warn
+        .dash-stat-value {
+        color: var(--amber-700);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-fill {
+        height: 12px;
+        border-radius: 999px;
+        background: linear-gradient(
+            90deg,
+            var(--brand-400),
+            var(--color-surface)
+        );
+        transition: width 420ms var(--ease-out, cubic-bezier(0.2, 0.8, 0.2, 1));
+        width: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-sw--late {
+        background: var(--red-600);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-sw--risk {
+        background: var(--amber-500);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-sw--ok {
+        background: var(--brand-500);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-chip.is-fire
+        .mc-chip-dot {
+        background: var(--red-600);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-chip.is-art
+        .mc-chip-dot {
+        background: var(--color-ruth-light);
+    }
+
+    :where(
+        [data-ui="unified"][data-staff-workspace="mission-control"]
+    ).is-modal-open {
+        overflow: hidden;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-fill,
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-kicker-fill,
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-condensed-fill {
+        width: var(--w, 0%);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-mark,
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-bh-pace-mark,
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-bh-startcap
+        span {
+        left: var(--x, 0%);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-reload {
+        margin-left: 6px;
+        padding: 2px 10px;
+        border: 1px solid currentcolor;
+        border-radius: 6px;
+        background: transparent;
+        color: inherit;
+        cursor: pointer;
+        font: inherit;
+        font-size: var(--font-size-md);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-reload:focus-visible {
+        outline: 2px solid currentcolor;
+        outline-offset: 2px;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"]) {
+        --mc-gutter: var(--space-5);
+
+        margin: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .dash-header {
+        background: var(--gray-900);
+        color: var(--color-on-brand);
+        border-top-color: var(--amber-400);
+        padding: var(--space-4) max(var(--space-5), calc((100% - 1400px) / 2));
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .dash-header-title {
+        font-size: var(--font-size-xl);
+        color: inherit;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .dash-header-logo {
+        filter: brightness(0) invert(1);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .dash-header
+        .dash-back-link {
+        background: transparent;
+        color: var(--color-on-brand);
+        border-color: var(--gray-400);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .dash-content {
+        max-width: 1440px;
+        padding: var(--space-6) var(--space-5);
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .dash-card {
+        min-width: 0;
+        box-shadow: none;
+        border-radius: var(--radius-md);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .dash-card-title {
+        font-size: var(--font-size-base);
+        line-height: 1.4;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-modal::backdrop,
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-drawer::backdrop {
+        background: rgb(0 0 0 / 48%);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-modal-close,
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-drawer-close {
+        min-width: var(--ui-control-height);
+        min-height: var(--ui-control-height);
+        flex-shrink: 0;
+        border: 1px solid var(--ui-line-strong);
+        border-radius: var(--radius-sm);
+        background: var(--ui-surface);
+        color: var(--ui-ink);
+        font: inherit;
+        cursor: pointer;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-row-main,
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-row-meta,
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-onething-head,
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-outreach-lead {
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"]) button,
+    :where([data-ui="unified"][data-staff-workspace="mission-control"]) summary,
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-mini-btn,
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-viewall,
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-chip,
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .mc-menu-action {
+        min-height: var(--ui-control-height);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        button:focus-visible,
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        a:focus-visible,
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        summary:focus-visible {
+        outline: 3px solid var(--ui-accent);
+        outline-offset: 3px;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-modal
+        input:focus-visible,
+    :where([data-ui="unified"][data-staff-workspace="mission-control"])
+        .aemc-modal
+        textarea:focus-visible {
+        outline: 2px solid var(--ui-accent);
+        outline-offset: 2px;
+    }
+
+    @media (width <= 760px) {
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .dash-content {
+            padding: var(--space-4);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .dash-header {
+            padding: var(--space-4);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .dash-header-left,
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .dash-header-right {
+            width: 100%;
+            min-width: 0;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .dash-header-right {
+            gap: var(--space-2);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .aemc-viewas {
+            flex-basis: 100%;
+            width: 100%;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .aemc-viewas-btn {
+            flex: 1;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .mc-tabs {
+            gap: var(--space-1);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .mc-tab {
+            flex: 1 1 28%;
+            padding-inline: var(--space-2);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .mc-sticky {
+            position: static;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .aemc-grid3 {
+            grid-template-columns: 1fr;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .aemc-grid2 {
+            grid-template-columns: 1fr;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .aemc-modal-body {
+            padding: var(--space-4);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .mc-grid--2-1,
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .mc-grid--3 {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .aemc-bh-dial,
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .aemc-bh-ladder,
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .aemc-bh-cta {
+            flex: 1 1 100%;
+            min-width: 0;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .aemc-bh-dial {
+            border: 0;
+            padding: 0;
+            justify-content: flex-start;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .aemc-bh-cta {
+            flex-direction: column;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .aemc-bonus-hero {
+            padding: var(--space-4);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .aemc-bh-scenarios {
+            gap: var(--space-2);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .aemc-modal {
+            width: calc(100vw - 24px);
+            max-height: calc(100dvh - 24px);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .mc-drawer-head,
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .mc-drawer-body,
+        :where([data-ui="unified"][data-staff-workspace="mission-control"])
+            .mc-drawer-foot {
+            padding: var(--space-4);
+        }
+    }
+}

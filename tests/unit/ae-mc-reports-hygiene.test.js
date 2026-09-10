@@ -15,7 +15,7 @@ const BARE = /<i class="(?:fa[sr]|fa-solid|fa-regular) [^"]*"><\/i>/;
 describe('ae mission control hygiene', () => {
     const html = read('dashboards/ae-mission-control.html').replace(/<!--[\s\S]*?-->/g, '');
     const js = read('dashboards/js/ae-mission-control.js');
-    const css = read('dashboards/css/ae-mission-control.css');
+    const css = read('shared_components/css/staff-mission-control.css');
     test('custom properties, reload control, icons, banner', () => {
         expect(js).not.toMatch(/\.style\.(width|left|overflow)/);
         expect(js).not.toMatch(/style="(?!--)/);
@@ -24,8 +24,18 @@ describe('ae mission control hygiene', () => {
         expect(js).toMatch(/class="aemc-reload" data-reload="1">Reload to retry<\/button>/);
         expect(js).toMatch(/e\.target\.closest\('\[data-reload\]'\)/);
         expect(js).toMatch(/document\.body\.classList\.add\('is-modal-open'\);/);
-        expect(css).toMatch(/\.aemc-bh-fill, \.mc-kicker-fill, \.mc-condensed-fill \{ width: var\(--w, 0%\); \}/);
-        expect(css).toMatch(/\.aemc-bh-mark, \.mc-bh-pace-mark, \.aemc-bh-startcap span \{ left: var\(--x, 0%\); \}/);
+        const ast = require('postcss').parse(css);
+        const propertyFor = (selector, property) => {
+            let value;
+            ast.walkRules(rule => {
+                if (rule.selectors.some(s => s.replace(/^:where\([^)]*\)\s*/, '').replace(/\s+/g, ' ').trim() === selector)) {
+                    rule.walkDecls(property, d => { value = d.value; });
+                }
+            });
+            return value;
+        };
+        for (const selector of ['.aemc-bh-fill', '.mc-kicker-fill', '.mc-condensed-fill']) expect(propertyFor(selector, 'width')).toBe('var(--w, 0%)');
+        for (const selector of ['.aemc-bh-mark', '.mc-bh-pace-mark', '.aemc-bh-startcap span']) expect(propertyFor(selector, 'left')).toBe('var(--x, 0%)');
         expect(js).not.toMatch(BARE);
         expect(html).not.toMatch(BARE);
         expect(html).toMatch(/<button type="button" class="dash-error-banner-close" aria-label="Dismiss">/);

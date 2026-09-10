@@ -199,15 +199,16 @@
         Array.prototype.forEach.call(documents, function (inv) { sheet.appendChild(inv.cloneNode(true)); });
         document.body.appendChild(sheet);
         document.body.classList.add('smiv-printing');
+        var cleanupTimer;
         var cleanup = function () {
-            document.body.classList.remove('smiv-printing');
-            var s = document.getElementById('smiv-print-sheet');
-            if (s) s.remove();
+            clearTimeout(cleanupTimer);
+            if (document.getElementById('smiv-print-sheet') === sheet) document.body.classList.remove('smiv-printing');
+            sheet.remove();
             window.removeEventListener('afterprint', cleanup);
         };
         window.addEventListener('afterprint', cleanup);
+        cleanupTimer = setTimeout(cleanup, 1500);
         window.print();
-        setTimeout(function () { if (document.body.classList.contains('smiv-printing')) cleanup(); }, 1500);
     }
 
     window.SanMarInvoiceViewer = { open: open, close: close };

@@ -1,0 +1,2241 @@
+{
+  "text": "Quote Management\nCedar\n Sync from ShopWorks\n Refresh Inbound\n SanMar Inbound Calendar\n Dashboard\nSTATUS\nAll Statuses\nOpen\nAwaiting Payment\nPayment Received\nCharged · No SW Order\nProcessed (in ShopWorks)\nPush Failed\nAccepted\nLost\nExpired\nCancelled (ShopWorks)\nDATE RANGE\nLast 7 Days\nLast 30 Days\nLast 90 Days\nAll Time\nSEARCH\n Search\n25\nACTIVE QUOTES\n1\nACCEPTED\n10\nEXPIRING SOON\n1\nCANCELLED\n2\nPUSH FAILED\n$19,767.50\nPIPELINE VALUE\nactive + accepted · lost, expired and cancelled excluded\nQuotes\nDelete Selected (\n0\n)\n31 quotes\n33 in last 30 days · loaded 11:00 AM\nActive (31)\nCompleted (2)\nAll (33)\n\tQUOTE ID\tCUSTOMER\tSALESPERSON\tITEMS\tAMOUNT\tSTATUS\tPROGRESS\tINBOUND\tDUE\tCREATED\tACTIONS\n\tEMB0910-3001\t\nSynthetic customer 1\nworkshop1@example.test\n\tCedar\t12\t$110.00\t\nOpen\nAccepted\nLost\nExpired\nDEPOSIT PAID · BAL $55.00\t—\t—\t\nSep 8\n2d overdue\n\t\nSep 10\nExpires in 4 days\n\t\n \n \n \n \n \n \n\n\tDTF0910-3002\t\nSynthetic customer 2\nworkshop2@example.test\n\tAster\t13\t$137.50\t\nOpen\nAccepted\nLost\nExpired\nPAYMENT LINK LIVE\t—\t—\t\nSep 12\nin 2d\n\t\nSep 10\n\t\n \n \n \n \n \n \n\n\tDTG0910-3003 \nSW #890002\t\nSynthetic customer 3\nworkshop3@example.test\n\tCedar\t14\t$1,100.00\t\nIN SHOPWORKS #890002\nPAID IN FULL\t\n\t\n \nBackorder\t\nSep 12\nin 2d\n\t\nSep 10\n\t\n \n \n \n \n \n \n🚢\n \n\n\tEMBC0910-3005\t\nSynthetic customer 5\nworkshop5@example.test\n\tCedar\t16\t$220.00\t\nPUSH FAILED\t—\t—\t\nSep 12\nin 2d\n\t\nSep 10\n\t\n \n \n \n \n \n \n\n\t3DT0910-3006\t\nSynthetic customer 6\nworkshop6@example.test\n\tAster\t17\t$247.50\t\nAWAITING PAYMENT\t—\t—\t\nSep 12\nin 2d\n\t\nSep 10\n\t\n \n \n \n \n \n\n\tSAM0910-3007\t\nSynthetic customer 7\nworkshop7@example.test\n\tCedar\t18\t$275.00\t\nPAYMENT RECEIVED\t—\t—\t\nSep 8\n2d overdue\n\t\nSep 10\n\t\n \n \n \n \n \n\n\tCAP0910-3008\t\nSynthetic customer 8\nworkshop8@example.test\n\tAster\t19\t$302.50\t\nCHARGED · NO SW ORDER\t—\t—\t\nSep 12\nin 2d\n\t\nSep 10\n\t\n \n \n \n \n \n\n\tOF0910-3009\t\nSynthetic customer 9\nworkshop9@example.test\n\tCedar\t20\t$330.00\t\nCANCELLED (SW)\t—\t—\t\nSep 12\nin 2d\n\t\nSep 10\nPurges in 29 days\n\t\n \n \n \n \n \n\n\tSPC0910-3010\t\nSynthetic customer 10\nworkshop10@example.test\n\tAster\t21\t$357.50\t\nOpen\nAccepted\nLost\nExpired\n\t—\t—\t\nSep 8\n2d overdue\n\t\nSep 10\n\t\n \n \n \n \n \n \n\n\tSSC0910-3011\t\nSynthetic customer 11\nworkshop11@example.test\n\tCedar\t22\t$385.00\t\nOpen\nAccepted\nLost\nExpired\n\t—\t—\t\nSep 12\nin 2d\n\t\nSep 10\n\t\n \n \n \n \n \n \n\n\tEMB0910-3012\t\nSynthetic customer 12\nworkshop12@example.test\n\tAster\t23\t$412.50\t\nIN SHOPWORKS\t—\t—\t\nSep 12\nin 2d\n\t\nSep 10\n\t\n \n \n \n \n \n \n\n\tDTG0910-3014 \nSW #890013\t\nSynthetic customer 14\nworkshop14@example.test\n\tAster\t25\t$1,650.00\t\nIN SHOPWORKS #890013\t\n\t\n\t\nSep 12\nin 2d\n\t\nSep 10\n\t\n \n \n \n \n \n \n✓\n \n\n\tDTF0910-3015 \nSW #890014\t\nSynthetic customer 15\nworkshop15@example.test\n\tCedar\t26\t$1,700.00\t\nIN SHOPWORKS #890014\t\n\t\n\t\nSep 12\nin 2d\n\t\nSep 10\n\t\n \n \n \n \n \n \n📦\n \n\n\tEMB0910-3016\t\nSynthetic customer 16\nworkshop16@example.test\n\tAster\t27\t$522.50\t\nOpen\nAccepted\nLost\nExpired\n\t—\t—\t\nSep 8\n2d overdue\n\t\nSep 10\n\t\n \n \n \n \n \n \n\n\tEMB0910-3017\t\nSynthetic customer 17\nworkshop17@example.test\n\tCedar\t28\t$550.00\t\nOpen\nAccepted\nLost\nExpired\n\t—\t—\t\nSep 12\nin 2d\n\t\nSep 10\nExpires in 4 days\n\t\n \n \n \n \n \n \n\n\tEMB0910-3018\t\nSynthetic customer 18\nworkshop18@example.test\n\tAster\t29\t$577.50\t\nOpen\nAccepted\nLost\nExpired\n\t—\t—\t\nSep 12\nin 2d\n\t\nSep 10\n\t\n \n \n \n \n \n \n\n\tEMB0910-3019\t\nSynthetic customer 19\nworkshop19@example.test\n\tCedar\t30\t$605.00\t\nOpen\nAccepted\nLost\nExpired\n\t—\t—\t\nSep 8\n2d overdue\n\t\nSep 10\nExpires in 4 days\n\t\n \n \n \n \n \n \n\n\tEMB0910-3020\t\nSynthetic customer 20\nworkshop20@example.test\n\tAster\t31\t$632.50\t\nOpen\nAccepted\nLost\nExpired\n\t—\t—\t\nSep 12\nin 2d\n\t\nSep 10\n\t\n \n \n \n \n \n \n\n\tEMB0910-3021\t\nSynthetic customer 21\nworkshop21@example.test\n\tCedar\t32\t$660.00\t\nOpen\nAccepted\nLost\nExpired\n\t—\t—\t\nSep 12\nin 2d\n\t\nSep 10\nExpires in 4 days\n\t\n \n \n \n \n \n \n\n\tEMB0910-3022\t\nSynthetic customer 22\nworkshop22@example.test\n\tAster\t33\t$687.50\t\nOpen\nAccepted\nLost\nExpired\n\t—\t—\t\nSep 8\n2d overdue\n\t\nSep 10\n\t\n \n \n \n \n \n \n\n\tEMB0910-3023\t\nSynthetic customer 23\nworkshop23@example.test\n\tCedar\t34\t$715.00\t\nOpen\nAccepted\nLost\nExpired\n\t—\t—\t\nSep 12\nin 2d\n\t\nSep 10\nExpires in 4 days\n\t\n \n \n \n \n \n \n\n\tEMB0910-3024\t\nSynthetic customer 24\nworkshop24@example.test\n\tAster\t35\t$742.50\t\nOpen\nAccepted\nLost\nExpired\n\t—\t—\t\nSep 12\nin 2d\n\t\nSep 10\n\t\n \n \n \n \n \n \n\n\tEMB0910-3025\t\nSynthetic customer 25\nworkshop25@example.test\n\tCedar\t36\t$770.00\t\nOpen\nAccepted\nLost\nExpired\n\t—\t—\t\nSep 8\n2d overdue\n\t\nSep 10\nExpires in 4 days\n\t\n \n \n \n \n \n \n\n\tEMB0910-3026\t\nSynthetic customer 26\nworkshop26@example.test\n\tAster\t37\t$797.50\t\nOpen\nAccepted\nLost\nExpired\n\t—\t—\t\nSep 12\nin 2d\n\t\nAug 20\n\t\n \n \n \n \n \n \n\n\tEMB0910-3027\t\nSynthetic customer 27\nworkshop27@example.test\n\tCedar\t38\t$825.00\t\nOpen\nAccepted\nLost\nExpired\n\t—\t—\t\nSep 12\nin 2d\n\t\nAug 20\nExpires in 4 days\n\t\n \n \n \n \n \n \n Previous\nPage 1 of 2\nNext ",
+  "data": {
+    "stats": [
+      "25",
+      "1",
+      "10",
+      "1",
+      "2",
+      "$19,767.50"
+    ],
+    "counts": [
+      "(31)",
+      "(2)",
+      "(33)"
+    ],
+    "window": "30",
+    "tableCount": "31 quotes",
+    "rows": [
+      {
+        "id": "EMB0910-3001",
+        "cells": [
+          "",
+          "EMB0910-3001",
+          "Synthetic customer 1 workshop1@example.test",
+          "Cedar",
+          "12",
+          "$110.00",
+          "Open Accepted Lost Expired Deposit paid · bal $55.00",
+          "—",
+          "—",
+          "Sep 82d overdue",
+          "Sep 10 Expires in 4 days",
+          ""
+        ],
+        "controls": [
+          {
+            "action": "checkbox",
+            "label": "Select EMB0910-3001",
+            "value": "on",
+            "disabled": false
+          },
+          {
+            "action": "select-one",
+            "label": "Status of EMB0910-3001",
+            "value": "Open",
+            "disabled": false
+          },
+          {
+            "action": "edit",
+            "label": "Edit EMB0910-3001",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "view",
+            "label": "View EMB0910-3001",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "copy-link",
+            "label": "Copy the customer link for EMB0910-3001",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "duplicate",
+            "label": "Duplicate EMB0910-3001",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "resend",
+            "label": "Resend EMB0910-3001 to workshop1@example.test",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "audit",
+            "label": "Pricing audit for EMB0910-3001",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "delete",
+            "label": "Delete EMB0910-3001",
+            "value": "",
+            "disabled": false
+          }
+        ],
+        "links": [],
+        "titles": [
+          "Cedar Example — From the quote (ShopWorks not yet synced)",
+          "From quote total (ShopWorks not yet synced)",
+          "Set automatically when the customer accepts the quote — not manually selectable",
+          "Set automatically when the quote passes its expiration date — not manually selectable",
+          "Deposit paid online via Stripe — $55.00 of $110.00. Balance due after proof approval.",
+          "ShopWorks not yet synced",
+          "Not in ShopWorks yet",
+          "Requested ship date (from ShopWorks)",
+          "Edit Quote",
+          "View Quote",
+          "Copy Link",
+          "Start a new quote pre-filled from this one",
+          "Resend quote email to workshop1@example.test",
+          "Pricing Audit",
+          "Delete Quote"
+        ]
+      },
+      {
+        "id": "DTF0910-3002",
+        "cells": [
+          "",
+          "DTF0910-3002",
+          "Synthetic customer 2 workshop2@example.test",
+          "Aster",
+          "13",
+          "$137.50",
+          "Open Accepted Lost Expired Payment link live",
+          "—",
+          "—",
+          "Sep 12in 2d",
+          "Sep 10",
+          ""
+        ],
+        "controls": [
+          {
+            "action": "checkbox",
+            "label": "Select DTF0910-3002",
+            "value": "on",
+            "disabled": true
+          },
+          {
+            "action": "select-one",
+            "label": "Status of DTF0910-3002",
+            "value": "Accepted",
+            "disabled": false
+          },
+          {
+            "action": "edit",
+            "label": "Edit DTF0910-3002",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "view",
+            "label": "View DTF0910-3002",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "copy-link",
+            "label": "Copy the customer link for DTF0910-3002",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "duplicate",
+            "label": "Duplicate DTF0910-3002",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "resend",
+            "label": "Resend DTF0910-3002 to workshop2@example.test",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "audit",
+            "label": "Pricing audit for DTF0910-3002",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "button",
+            "label": "Only the quote owner or Erik can delete this quote",
+            "value": "",
+            "disabled": true
+          }
+        ],
+        "links": [],
+        "titles": [
+          "You can only delete your own quotes",
+          "Aster Example — From the quote (ShopWorks not yet synced)",
+          "From quote total (ShopWorks not yet synced)",
+          "Set automatically when the customer accepts the quote — not manually selectable",
+          "Set automatically when the quote passes its expiration date — not manually selectable",
+          "Pay link is live on the quote page — $137.50 (full order total). Waiting on the customer.",
+          "ShopWorks not yet synced",
+          "Not in ShopWorks yet",
+          "Requested ship date (from ShopWorks)",
+          "Edit Quote",
+          "View Quote",
+          "Copy Link",
+          "Start a new quote pre-filled from this one",
+          "Resend quote email to workshop2@example.test",
+          "Pricing Audit",
+          "Only the quote owner or Erik can delete this quote"
+        ]
+      },
+      {
+        "id": "DTG0910-3003",
+        "cells": [
+          "",
+          "DTG0910-3003 SW #890002",
+          "Synthetic customer 3 workshop3@example.test",
+          "Cedar",
+          "14",
+          "$1,100.00",
+          "In ShopWorks #890002 Paid in full",
+          "",
+          "Backorder",
+          "Sep 12in 2d",
+          "Sep 10",
+          "🚢"
+        ],
+        "controls": [
+          {
+            "action": "checkbox",
+            "label": "Select DTG0910-3003",
+            "value": "on",
+            "disabled": false
+          },
+          {
+            "action": "button",
+            "label": "In ShopWorks — edit there. Changes here would not sync back.",
+            "value": "",
+            "disabled": true
+          },
+          {
+            "action": "view",
+            "label": "View DTG0910-3003",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "copy-link",
+            "label": "Copy the customer link for DTG0910-3003",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "duplicate",
+            "label": "Duplicate DTG0910-3003",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "resend",
+            "label": "Resend DTG0910-3003 to workshop3@example.test",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "audit",
+            "label": "Pricing audit for DTG0910-3003",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "shipstation",
+            "label": "Send DTG0910-3003 to ShipStation",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "delete",
+            "label": "Delete DTG0910-3003",
+            "value": "",
+            "disabled": false
+          }
+        ],
+        "links": [
+          "https://example.test/tracking/inbound/870003"
+        ],
+        "titles": [
+          "In ShopWorks — order #890002",
+          "Cedar Example — From ShopWorks (Customer Service Rep on WO #890002)",
+          "From ShopWorks invoice total (WO #890002)",
+          "Order successfully pushed to ShopWorks (WO #890002). System-managed state — syncs hourly.",
+          "Paid in full online via Stripe (deposit + balance).",
+          "Purchase Received: Partial",
+          "Produced: Yes",
+          "Shipped: No",
+          "Invoiced: No",
+          "Paid: No",
+          "Inbound blanks · SanMar PO SYNTHETIC-PO-870003 · Shipped · SYNTHETIC-INBOUND-870003",
+          "SanMar BACKORDER · Synthetic delayed navy blanks",
+          "Requested ship date (from ShopWorks)",
+          "In ShopWorks — edit there. Changes here would not sync back.",
+          "View Quote",
+          "Copy Link",
+          "Start a new quote pre-filled from this one",
+          "Resend quote email to workshop3@example.test",
+          "Pricing Audit",
+          "Send to ShipStation. Warehouse will rate + buy the label there.",
+          "Delete Quote"
+        ]
+      },
+      {
+        "id": "EMBC0910-3005",
+        "cells": [
+          "",
+          "EMBC0910-3005",
+          "Synthetic customer 5 workshop5@example.test",
+          "Cedar",
+          "16",
+          "$220.00",
+          "Push Failed",
+          "—",
+          "—",
+          "Sep 12in 2d",
+          "Sep 10",
+          ""
+        ],
+        "controls": [
+          {
+            "action": "checkbox",
+            "label": "Select EMBC0910-3005",
+            "value": "on",
+            "disabled": false
+          },
+          {
+            "action": "edit",
+            "label": "Edit EMBC0910-3005",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "view",
+            "label": "View EMBC0910-3005",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "copy-link",
+            "label": "Copy the customer link for EMBC0910-3005",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "duplicate",
+            "label": "Duplicate EMBC0910-3005",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "resend",
+            "label": "Resend EMBC0910-3005 to workshop5@example.test",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "audit",
+            "label": "Pricing audit for EMBC0910-3005",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "delete",
+            "label": "Delete EMBC0910-3005",
+            "value": "",
+            "disabled": false
+          }
+        ],
+        "links": [],
+        "titles": [
+          "Cedar Example — From the quote (ShopWorks not yet synced)",
+          "From quote total (ShopWorks not yet synced)",
+          "Push to ShopWorks failed. Open the quote and click Refresh to retry, or contact dev to inspect the proxy logs.",
+          "ShopWorks not yet synced",
+          "Not in ShopWorks yet",
+          "Requested ship date (from ShopWorks)",
+          "Edit Quote",
+          "View Quote",
+          "Copy Link",
+          "Start a new quote pre-filled from this one",
+          "Resend quote email to workshop5@example.test",
+          "Pricing Audit",
+          "Delete Quote"
+        ]
+      },
+      {
+        "id": "3DT0910-3006",
+        "cells": [
+          "",
+          "3DT0910-3006",
+          "Synthetic customer 6 workshop6@example.test",
+          "Aster",
+          "17",
+          "$247.50",
+          "Awaiting Payment",
+          "—",
+          "—",
+          "Sep 12in 2d",
+          "Sep 10",
+          ""
+        ],
+        "controls": [
+          {
+            "action": "checkbox",
+            "label": "Select 3DT0910-3006",
+            "value": "on",
+            "disabled": true
+          },
+          {
+            "action": "button",
+            "label": "In ShopWorks — edit there. Changes here would not sync back.",
+            "value": "",
+            "disabled": true
+          },
+          {
+            "action": "view",
+            "label": "View 3DT0910-3006",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "copy-link",
+            "label": "Copy the customer link for 3DT0910-3006",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "resend",
+            "label": "Resend 3DT0910-3006 to workshop6@example.test",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "audit",
+            "label": "Pricing audit for 3DT0910-3006",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "button",
+            "label": "Only the quote owner or Erik can delete this quote",
+            "value": "",
+            "disabled": true
+          }
+        ],
+        "links": [],
+        "titles": [
+          "You can only delete your own quotes",
+          "Aster Example — From the quote (ShopWorks not yet synced)",
+          "From quote total (ShopWorks not yet synced)",
+          "3-Day Tees order — credit card is processed in ShopWorks. Status updates once the order is completed there.",
+          "ShopWorks not yet synced",
+          "Not in ShopWorks yet",
+          "Requested ship date (from ShopWorks)",
+          "In ShopWorks — edit there. Changes here would not sync back.",
+          "View Quote",
+          "Copy Link",
+          "Resend quote email to workshop6@example.test",
+          "Pricing Audit",
+          "Only the quote owner or Erik can delete this quote"
+        ]
+      },
+      {
+        "id": "SAM0910-3007",
+        "cells": [
+          "",
+          "SAM0910-3007",
+          "Synthetic customer 7 workshop7@example.test",
+          "Cedar",
+          "18",
+          "$275.00",
+          "Payment Received",
+          "—",
+          "—",
+          "Sep 82d overdue",
+          "Sep 10",
+          ""
+        ],
+        "controls": [
+          {
+            "action": "checkbox",
+            "label": "Select SAM0910-3007",
+            "value": "on",
+            "disabled": false
+          },
+          {
+            "action": "button",
+            "label": "In ShopWorks — edit there. Changes here would not sync back.",
+            "value": "",
+            "disabled": true
+          },
+          {
+            "action": "view",
+            "label": "View SAM0910-3007",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "copy-link",
+            "label": "Copy the customer link for SAM0910-3007",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "resend",
+            "label": "Resend SAM0910-3007 to workshop7@example.test",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "audit",
+            "label": "Pricing audit for SAM0910-3007",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "delete",
+            "label": "Delete SAM0910-3007",
+            "value": "",
+            "disabled": false
+          }
+        ],
+        "links": [],
+        "titles": [
+          "Cedar Example — From the quote (ShopWorks not yet synced)",
+          "From quote total (ShopWorks not yet synced)",
+          "3-Day Tees order — payment received, ShopWorks order hasn't been created yet. Should advance to In ShopWorks shortly.",
+          "ShopWorks not yet synced",
+          "Not in ShopWorks yet",
+          "Requested ship date (from ShopWorks)",
+          "In ShopWorks — edit there. Changes here would not sync back.",
+          "View Quote",
+          "Copy Link",
+          "Resend quote email to workshop7@example.test",
+          "Pricing Audit",
+          "Delete Quote"
+        ]
+      },
+      {
+        "id": "CAP0910-3008",
+        "cells": [
+          "",
+          "CAP0910-3008",
+          "Synthetic customer 8 workshop8@example.test",
+          "Aster",
+          "19",
+          "$302.50",
+          "Charged · No SW Order",
+          "—",
+          "—",
+          "Sep 12in 2d",
+          "Sep 10",
+          ""
+        ],
+        "controls": [
+          {
+            "action": "checkbox",
+            "label": "Select CAP0910-3008",
+            "value": "on",
+            "disabled": true
+          },
+          {
+            "action": "button",
+            "label": "In ShopWorks — edit there. Changes here would not sync back.",
+            "value": "",
+            "disabled": true
+          },
+          {
+            "action": "view",
+            "label": "View CAP0910-3008",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "copy-link",
+            "label": "Copy the customer link for CAP0910-3008",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "resend",
+            "label": "Resend CAP0910-3008 to workshop8@example.test",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "audit",
+            "label": "Pricing audit for CAP0910-3008",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "button",
+            "label": "Only the quote owner or Erik can delete this quote",
+            "value": "",
+            "disabled": true
+          }
+        ],
+        "links": [],
+        "titles": [
+          "You can only delete your own quotes",
+          "Aster Example — From the quote (ShopWorks not yet synced)",
+          "From quote total (ShopWorks not yet synced)",
+          "URGENT — payment was processed but the order didn't land in ShopWorks. Customer has been charged. Manually enter the order in ShopWorks, then mark this quote as Processed.",
+          "ShopWorks not yet synced",
+          "Not in ShopWorks yet",
+          "Requested ship date (from ShopWorks)",
+          "In ShopWorks — edit there. Changes here would not sync back.",
+          "View Quote",
+          "Copy Link",
+          "Resend quote email to workshop8@example.test",
+          "Pricing Audit",
+          "Only the quote owner or Erik can delete this quote"
+        ]
+      },
+      {
+        "id": "OF0910-3009",
+        "cells": [
+          "",
+          "OF0910-3009",
+          "Synthetic customer 9 workshop9@example.test",
+          "Cedar",
+          "20",
+          "$330.00",
+          "Cancelled (SW)",
+          "—",
+          "—",
+          "Sep 12in 2d",
+          "Sep 10 Purges in 29 days",
+          ""
+        ],
+        "controls": [
+          {
+            "action": "checkbox",
+            "label": "Select OF0910-3009",
+            "value": "on",
+            "disabled": false
+          },
+          {
+            "action": "button",
+            "label": "In ShopWorks — edit there. Changes here would not sync back.",
+            "value": "",
+            "disabled": true
+          },
+          {
+            "action": "view",
+            "label": "View OF0910-3009",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "copy-link",
+            "label": "Copy the customer link for OF0910-3009",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "resend",
+            "label": "Resend OF0910-3009 to workshop9@example.test",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "audit",
+            "label": "Pricing audit for OF0910-3009",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "delete",
+            "label": "Delete OF0910-3009",
+            "value": "",
+            "disabled": false
+          }
+        ],
+        "links": [],
+        "titles": [
+          "Cedar Example — From the quote (ShopWorks not yet synced)",
+          "From quote total (ShopWorks not yet synced)",
+          "Order was deleted in ShopWorks. Will be permanently purged after 30 days.",
+          "ShopWorks not yet synced",
+          "Not in ShopWorks yet",
+          "Requested ship date (from ShopWorks)",
+          "In ShopWorks — edit there. Changes here would not sync back.",
+          "View Quote",
+          "Copy Link",
+          "Resend quote email to workshop9@example.test",
+          "Pricing Audit",
+          "Delete Quote"
+        ]
+      },
+      {
+        "id": "SPC0910-3010",
+        "cells": [
+          "",
+          "SPC0910-3010",
+          "Synthetic customer 10 workshop10@example.test",
+          "Aster",
+          "21",
+          "$357.50",
+          "Open Accepted Lost Expired",
+          "—",
+          "—",
+          "Sep 82d overdue",
+          "Sep 10",
+          ""
+        ],
+        "controls": [
+          {
+            "action": "checkbox",
+            "label": "Select SPC0910-3010",
+            "value": "on",
+            "disabled": true
+          },
+          {
+            "action": "select-one",
+            "label": "Status of SPC0910-3010",
+            "value": "Expired",
+            "disabled": false
+          },
+          {
+            "action": "edit",
+            "label": "Edit SPC0910-3010",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "view",
+            "label": "View SPC0910-3010",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "copy-link",
+            "label": "Copy the customer link for SPC0910-3010",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "duplicate",
+            "label": "Duplicate SPC0910-3010",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "resend",
+            "label": "Resend SPC0910-3010 to workshop10@example.test",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "audit",
+            "label": "Pricing audit for SPC0910-3010",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "button",
+            "label": "Only the quote owner or Erik can delete this quote",
+            "value": "",
+            "disabled": true
+          }
+        ],
+        "links": [],
+        "titles": [
+          "You can only delete your own quotes",
+          "Aster Example — From the quote (ShopWorks not yet synced)",
+          "From quote total (ShopWorks not yet synced)",
+          "Set automatically when the customer accepts the quote — not manually selectable",
+          "Set automatically when the quote passes its expiration date — not manually selectable",
+          "ShopWorks not yet synced",
+          "Not in ShopWorks yet",
+          "Requested ship date (from ShopWorks)",
+          "Edit Quote",
+          "View Quote",
+          "Copy Link",
+          "Start a new quote pre-filled from this one",
+          "Resend quote email to workshop10@example.test",
+          "Pricing Audit",
+          "Only the quote owner or Erik can delete this quote"
+        ]
+      },
+      {
+        "id": "SSC0910-3011",
+        "cells": [
+          "",
+          "SSC0910-3011",
+          "Synthetic customer 11 workshop11@example.test",
+          "Cedar",
+          "22",
+          "$385.00",
+          "Open Accepted Lost Expired",
+          "—",
+          "—",
+          "Sep 12in 2d",
+          "Sep 10",
+          ""
+        ],
+        "controls": [
+          {
+            "action": "checkbox",
+            "label": "Select SSC0910-3011",
+            "value": "on",
+            "disabled": false
+          },
+          {
+            "action": "select-one",
+            "label": "Status of SSC0910-3011",
+            "value": "Lost",
+            "disabled": false
+          },
+          {
+            "action": "edit",
+            "label": "Edit SSC0910-3011",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "view",
+            "label": "View SSC0910-3011",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "copy-link",
+            "label": "Copy the customer link for SSC0910-3011",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "duplicate",
+            "label": "Duplicate SSC0910-3011",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "resend",
+            "label": "Resend SSC0910-3011 to workshop11@example.test",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "audit",
+            "label": "Pricing audit for SSC0910-3011",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "delete",
+            "label": "Delete SSC0910-3011",
+            "value": "",
+            "disabled": false
+          }
+        ],
+        "links": [],
+        "titles": [
+          "Cedar Example — From the quote (ShopWorks not yet synced)",
+          "From quote total (ShopWorks not yet synced)",
+          "Set automatically when the customer accepts the quote — not manually selectable",
+          "Set automatically when the quote passes its expiration date — not manually selectable",
+          "ShopWorks not yet synced",
+          "Not in ShopWorks yet",
+          "Requested ship date (from ShopWorks)",
+          "Edit Quote",
+          "View Quote",
+          "Copy Link",
+          "Start a new quote pre-filled from this one",
+          "Resend quote email to workshop11@example.test",
+          "Pricing Audit",
+          "Delete Quote"
+        ]
+      },
+      {
+        "id": "EMB0910-3012",
+        "cells": [
+          "",
+          "EMB0910-3012",
+          "Synthetic customer 12 workshop12@example.test",
+          "Aster",
+          "23",
+          "$412.50",
+          "In ShopWorks",
+          "—",
+          "—",
+          "Sep 12in 2d",
+          "Sep 10",
+          ""
+        ],
+        "controls": [
+          {
+            "action": "checkbox",
+            "label": "Select EMB0910-3012",
+            "value": "on",
+            "disabled": true
+          },
+          {
+            "action": "button",
+            "label": "In ShopWorks — edit there. Changes here would not sync back.",
+            "value": "",
+            "disabled": true
+          },
+          {
+            "action": "view",
+            "label": "View EMB0910-3012",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "copy-link",
+            "label": "Copy the customer link for EMB0910-3012",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "duplicate",
+            "label": "Duplicate EMB0910-3012",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "resend",
+            "label": "Resend EMB0910-3012 to workshop12@example.test",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "audit",
+            "label": "Pricing audit for EMB0910-3012",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "button",
+            "label": "Only the quote owner or Erik can delete this quote",
+            "value": "",
+            "disabled": true
+          }
+        ],
+        "links": [],
+        "titles": [
+          "You can only delete your own quotes",
+          "Aster Example — From the quote (ShopWorks not yet synced)",
+          "From quote total (ShopWorks not yet synced)",
+          "Pushed to ShopWorks — locked. Status syncs from ShopWorks hourly.",
+          "ShopWorks not yet synced",
+          "Not in ShopWorks yet",
+          "Requested ship date (from ShopWorks)",
+          "In ShopWorks — edit there. Changes here would not sync back.",
+          "View Quote",
+          "Copy Link",
+          "Start a new quote pre-filled from this one",
+          "Resend quote email to workshop12@example.test",
+          "Pricing Audit",
+          "Only the quote owner or Erik can delete this quote"
+        ]
+      },
+      {
+        "id": "DTG0910-3014",
+        "cells": [
+          "",
+          "DTG0910-3014 SW #890013",
+          "Synthetic customer 14 workshop14@example.test",
+          "Aster",
+          "25",
+          "$1,650.00",
+          "In ShopWorks #890013",
+          "",
+          "",
+          "Sep 12in 2d",
+          "Sep 10",
+          "✓"
+        ],
+        "controls": [
+          {
+            "action": "checkbox",
+            "label": "Select DTG0910-3014",
+            "value": "on",
+            "disabled": true
+          },
+          {
+            "action": "button",
+            "label": "In ShopWorks — edit there. Changes here would not sync back.",
+            "value": "",
+            "disabled": true
+          },
+          {
+            "action": "view",
+            "label": "View DTG0910-3014",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "copy-link",
+            "label": "Copy the customer link for DTG0910-3014",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "duplicate",
+            "label": "Duplicate DTG0910-3014",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "resend",
+            "label": "Resend DTG0910-3014 to workshop14@example.test",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "audit",
+            "label": "Pricing audit for DTG0910-3014",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "button",
+            "label": "In ShipStation #990013. Warehouse will buy the label in ShipStation; tracking will appear here once shipped.",
+            "value": "",
+            "disabled": true
+          },
+          {
+            "action": "button",
+            "label": "Only the quote owner or Erik can delete this quote",
+            "value": "",
+            "disabled": true
+          }
+        ],
+        "links": [
+          "https://example.test/tracking/inbound/870014"
+        ],
+        "titles": [
+          "You can only delete your own quotes",
+          "In ShopWorks — order #890013",
+          "Aster Example — From ShopWorks (Customer Service Rep on WO #890013)",
+          "From ShopWorks invoice total (WO #890013)",
+          "Order successfully pushed to ShopWorks (WO #890013). System-managed state — syncs hourly.",
+          "Purchase Received: Yes",
+          "Produced: Yes",
+          "Shipped: No",
+          "Invoiced: No",
+          "Paid: No",
+          "Inbound blanks · SanMar PO SYNTHETIC-PO-870014 · Shipped · SYNTHETIC-INBOUND-870014",
+          "Requested ship date (from ShopWorks)",
+          "In ShopWorks — edit there. Changes here would not sync back.",
+          "View Quote",
+          "Copy Link",
+          "Start a new quote pre-filled from this one",
+          "Resend quote email to workshop14@example.test",
+          "Pricing Audit",
+          "In ShipStation #990013. Warehouse will buy the label in ShipStation; tracking will appear here once shipped.",
+          "Only the quote owner or Erik can delete this quote"
+        ]
+      },
+      {
+        "id": "DTF0910-3015",
+        "cells": [
+          "",
+          "DTF0910-3015 SW #890014",
+          "Synthetic customer 15 workshop15@example.test",
+          "Cedar",
+          "26",
+          "$1,700.00",
+          "In ShopWorks #890014",
+          "",
+          "",
+          "Sep 12in 2d",
+          "Sep 10",
+          "📦"
+        ],
+        "controls": [
+          {
+            "action": "checkbox",
+            "label": "Select DTF0910-3015",
+            "value": "on",
+            "disabled": false
+          },
+          {
+            "action": "button",
+            "label": "In ShopWorks — edit there. Changes here would not sync back.",
+            "value": "",
+            "disabled": true
+          },
+          {
+            "action": "view",
+            "label": "View DTF0910-3015",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "copy-link",
+            "label": "Copy the customer link for DTF0910-3015",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "duplicate",
+            "label": "Duplicate DTF0910-3015",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "resend",
+            "label": "Resend DTF0910-3015 to workshop15@example.test",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "audit",
+            "label": "Pricing audit for DTF0910-3015",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "delete",
+            "label": "Delete DTF0910-3015",
+            "value": "",
+            "disabled": false
+          }
+        ],
+        "links": [
+          "https://example.test/tracking/inbound/870015",
+          "https://example.test/tracking/14"
+        ],
+        "titles": [
+          "In ShopWorks — order #890014",
+          "Cedar Example — From ShopWorks (Customer Service Rep on WO #890014)",
+          "From ShopWorks invoice total (WO #890014)",
+          "Order successfully pushed to ShopWorks (WO #890014). System-managed state — syncs hourly.",
+          "Purchase Received: Yes",
+          "Produced: Yes",
+          "Shipped: No",
+          "Invoiced: No",
+          "Paid: No",
+          "Inbound blanks · SanMar PO SYNTHETIC-PO-870015 · Shipped · SYNTHETIC-INBOUND-870015",
+          "Requested ship date (from ShopWorks)",
+          "In ShopWorks — edit there. Changes here would not sync back.",
+          "View Quote",
+          "Copy Link",
+          "Start a new quote pre-filled from this one",
+          "Resend quote email to workshop15@example.test",
+          "Pricing Audit",
+          "Shipped via UPS · Tracking: SYNTHETIC-TRACKING-14",
+          "Delete Quote"
+        ]
+      },
+      {
+        "id": "EMB0910-3016",
+        "cells": [
+          "",
+          "EMB0910-3016",
+          "Synthetic customer 16 workshop16@example.test",
+          "Aster",
+          "27",
+          "$522.50",
+          "Open Accepted Lost Expired",
+          "—",
+          "—",
+          "Sep 82d overdue",
+          "Sep 10",
+          ""
+        ],
+        "controls": [
+          {
+            "action": "checkbox",
+            "label": "Select EMB0910-3016",
+            "value": "on",
+            "disabled": true
+          },
+          {
+            "action": "select-one",
+            "label": "Status of EMB0910-3016",
+            "value": "Open",
+            "disabled": false
+          },
+          {
+            "action": "edit",
+            "label": "Edit EMB0910-3016",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "view",
+            "label": "View EMB0910-3016",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "copy-link",
+            "label": "Copy the customer link for EMB0910-3016",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "duplicate",
+            "label": "Duplicate EMB0910-3016",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "resend",
+            "label": "Resend EMB0910-3016 to workshop16@example.test",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "audit",
+            "label": "Pricing audit for EMB0910-3016",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "button",
+            "label": "Only the quote owner or Erik can delete this quote",
+            "value": "",
+            "disabled": true
+          }
+        ],
+        "links": [],
+        "titles": [
+          "You can only delete your own quotes",
+          "Aster Example — From the quote (ShopWorks not yet synced)",
+          "From quote total (ShopWorks not yet synced)",
+          "Set automatically when the customer accepts the quote — not manually selectable",
+          "Set automatically when the quote passes its expiration date — not manually selectable",
+          "ShopWorks not yet synced",
+          "Not in ShopWorks yet",
+          "Requested ship date (from ShopWorks)",
+          "Edit Quote",
+          "View Quote",
+          "Copy Link",
+          "Start a new quote pre-filled from this one",
+          "Resend quote email to workshop16@example.test",
+          "Pricing Audit",
+          "Only the quote owner or Erik can delete this quote"
+        ]
+      },
+      {
+        "id": "EMB0910-3017",
+        "cells": [
+          "",
+          "EMB0910-3017",
+          "Synthetic customer 17 workshop17@example.test",
+          "Cedar",
+          "28",
+          "$550.00",
+          "Open Accepted Lost Expired",
+          "—",
+          "—",
+          "Sep 12in 2d",
+          "Sep 10 Expires in 4 days",
+          ""
+        ],
+        "controls": [
+          {
+            "action": "checkbox",
+            "label": "Select EMB0910-3017",
+            "value": "on",
+            "disabled": false
+          },
+          {
+            "action": "select-one",
+            "label": "Status of EMB0910-3017",
+            "value": "Open",
+            "disabled": false
+          },
+          {
+            "action": "edit",
+            "label": "Edit EMB0910-3017",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "view",
+            "label": "View EMB0910-3017",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "copy-link",
+            "label": "Copy the customer link for EMB0910-3017",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "duplicate",
+            "label": "Duplicate EMB0910-3017",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "resend",
+            "label": "Resend EMB0910-3017 to workshop17@example.test",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "audit",
+            "label": "Pricing audit for EMB0910-3017",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "delete",
+            "label": "Delete EMB0910-3017",
+            "value": "",
+            "disabled": false
+          }
+        ],
+        "links": [],
+        "titles": [
+          "Cedar Example — From the quote (ShopWorks not yet synced)",
+          "From quote total (ShopWorks not yet synced)",
+          "Set automatically when the customer accepts the quote — not manually selectable",
+          "Set automatically when the quote passes its expiration date — not manually selectable",
+          "ShopWorks not yet synced",
+          "Not in ShopWorks yet",
+          "Requested ship date (from ShopWorks)",
+          "Edit Quote",
+          "View Quote",
+          "Copy Link",
+          "Start a new quote pre-filled from this one",
+          "Resend quote email to workshop17@example.test",
+          "Pricing Audit",
+          "Delete Quote"
+        ]
+      },
+      {
+        "id": "EMB0910-3018",
+        "cells": [
+          "",
+          "EMB0910-3018",
+          "Synthetic customer 18 workshop18@example.test",
+          "Aster",
+          "29",
+          "$577.50",
+          "Open Accepted Lost Expired",
+          "—",
+          "—",
+          "Sep 12in 2d",
+          "Sep 10",
+          ""
+        ],
+        "controls": [
+          {
+            "action": "checkbox",
+            "label": "Select EMB0910-3018",
+            "value": "on",
+            "disabled": true
+          },
+          {
+            "action": "select-one",
+            "label": "Status of EMB0910-3018",
+            "value": "Open",
+            "disabled": false
+          },
+          {
+            "action": "edit",
+            "label": "Edit EMB0910-3018",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "view",
+            "label": "View EMB0910-3018",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "copy-link",
+            "label": "Copy the customer link for EMB0910-3018",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "duplicate",
+            "label": "Duplicate EMB0910-3018",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "resend",
+            "label": "Resend EMB0910-3018 to workshop18@example.test",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "audit",
+            "label": "Pricing audit for EMB0910-3018",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "button",
+            "label": "Only the quote owner or Erik can delete this quote",
+            "value": "",
+            "disabled": true
+          }
+        ],
+        "links": [],
+        "titles": [
+          "You can only delete your own quotes",
+          "Aster Example — From the quote (ShopWorks not yet synced)",
+          "From quote total (ShopWorks not yet synced)",
+          "Set automatically when the customer accepts the quote — not manually selectable",
+          "Set automatically when the quote passes its expiration date — not manually selectable",
+          "ShopWorks not yet synced",
+          "Not in ShopWorks yet",
+          "Requested ship date (from ShopWorks)",
+          "Edit Quote",
+          "View Quote",
+          "Copy Link",
+          "Start a new quote pre-filled from this one",
+          "Resend quote email to workshop18@example.test",
+          "Pricing Audit",
+          "Only the quote owner or Erik can delete this quote"
+        ]
+      },
+      {
+        "id": "EMB0910-3019",
+        "cells": [
+          "",
+          "EMB0910-3019",
+          "Synthetic customer 19 workshop19@example.test",
+          "Cedar",
+          "30",
+          "$605.00",
+          "Open Accepted Lost Expired",
+          "—",
+          "—",
+          "Sep 82d overdue",
+          "Sep 10 Expires in 4 days",
+          ""
+        ],
+        "controls": [
+          {
+            "action": "checkbox",
+            "label": "Select EMB0910-3019",
+            "value": "on",
+            "disabled": false
+          },
+          {
+            "action": "select-one",
+            "label": "Status of EMB0910-3019",
+            "value": "Open",
+            "disabled": false
+          },
+          {
+            "action": "edit",
+            "label": "Edit EMB0910-3019",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "view",
+            "label": "View EMB0910-3019",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "copy-link",
+            "label": "Copy the customer link for EMB0910-3019",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "duplicate",
+            "label": "Duplicate EMB0910-3019",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "resend",
+            "label": "Resend EMB0910-3019 to workshop19@example.test",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "audit",
+            "label": "Pricing audit for EMB0910-3019",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "delete",
+            "label": "Delete EMB0910-3019",
+            "value": "",
+            "disabled": false
+          }
+        ],
+        "links": [],
+        "titles": [
+          "Cedar Example — From the quote (ShopWorks not yet synced)",
+          "From quote total (ShopWorks not yet synced)",
+          "Set automatically when the customer accepts the quote — not manually selectable",
+          "Set automatically when the quote passes its expiration date — not manually selectable",
+          "ShopWorks not yet synced",
+          "Not in ShopWorks yet",
+          "Requested ship date (from ShopWorks)",
+          "Edit Quote",
+          "View Quote",
+          "Copy Link",
+          "Start a new quote pre-filled from this one",
+          "Resend quote email to workshop19@example.test",
+          "Pricing Audit",
+          "Delete Quote"
+        ]
+      },
+      {
+        "id": "EMB0910-3020",
+        "cells": [
+          "",
+          "EMB0910-3020",
+          "Synthetic customer 20 workshop20@example.test",
+          "Aster",
+          "31",
+          "$632.50",
+          "Open Accepted Lost Expired",
+          "—",
+          "—",
+          "Sep 12in 2d",
+          "Sep 10",
+          ""
+        ],
+        "controls": [
+          {
+            "action": "checkbox",
+            "label": "Select EMB0910-3020",
+            "value": "on",
+            "disabled": true
+          },
+          {
+            "action": "select-one",
+            "label": "Status of EMB0910-3020",
+            "value": "Open",
+            "disabled": false
+          },
+          {
+            "action": "edit",
+            "label": "Edit EMB0910-3020",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "view",
+            "label": "View EMB0910-3020",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "copy-link",
+            "label": "Copy the customer link for EMB0910-3020",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "duplicate",
+            "label": "Duplicate EMB0910-3020",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "resend",
+            "label": "Resend EMB0910-3020 to workshop20@example.test",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "audit",
+            "label": "Pricing audit for EMB0910-3020",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "button",
+            "label": "Only the quote owner or Erik can delete this quote",
+            "value": "",
+            "disabled": true
+          }
+        ],
+        "links": [],
+        "titles": [
+          "You can only delete your own quotes",
+          "Aster Example — From the quote (ShopWorks not yet synced)",
+          "From quote total (ShopWorks not yet synced)",
+          "Set automatically when the customer accepts the quote — not manually selectable",
+          "Set automatically when the quote passes its expiration date — not manually selectable",
+          "ShopWorks not yet synced",
+          "Not in ShopWorks yet",
+          "Requested ship date (from ShopWorks)",
+          "Edit Quote",
+          "View Quote",
+          "Copy Link",
+          "Start a new quote pre-filled from this one",
+          "Resend quote email to workshop20@example.test",
+          "Pricing Audit",
+          "Only the quote owner or Erik can delete this quote"
+        ]
+      },
+      {
+        "id": "EMB0910-3021",
+        "cells": [
+          "",
+          "EMB0910-3021",
+          "Synthetic customer 21 workshop21@example.test",
+          "Cedar",
+          "32",
+          "$660.00",
+          "Open Accepted Lost Expired",
+          "—",
+          "—",
+          "Sep 12in 2d",
+          "Sep 10 Expires in 4 days",
+          ""
+        ],
+        "controls": [
+          {
+            "action": "checkbox",
+            "label": "Select EMB0910-3021",
+            "value": "on",
+            "disabled": false
+          },
+          {
+            "action": "select-one",
+            "label": "Status of EMB0910-3021",
+            "value": "Open",
+            "disabled": false
+          },
+          {
+            "action": "edit",
+            "label": "Edit EMB0910-3021",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "view",
+            "label": "View EMB0910-3021",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "copy-link",
+            "label": "Copy the customer link for EMB0910-3021",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "duplicate",
+            "label": "Duplicate EMB0910-3021",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "resend",
+            "label": "Resend EMB0910-3021 to workshop21@example.test",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "audit",
+            "label": "Pricing audit for EMB0910-3021",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "delete",
+            "label": "Delete EMB0910-3021",
+            "value": "",
+            "disabled": false
+          }
+        ],
+        "links": [],
+        "titles": [
+          "Cedar Example — From the quote (ShopWorks not yet synced)",
+          "From quote total (ShopWorks not yet synced)",
+          "Set automatically when the customer accepts the quote — not manually selectable",
+          "Set automatically when the quote passes its expiration date — not manually selectable",
+          "ShopWorks not yet synced",
+          "Not in ShopWorks yet",
+          "Requested ship date (from ShopWorks)",
+          "Edit Quote",
+          "View Quote",
+          "Copy Link",
+          "Start a new quote pre-filled from this one",
+          "Resend quote email to workshop21@example.test",
+          "Pricing Audit",
+          "Delete Quote"
+        ]
+      },
+      {
+        "id": "EMB0910-3022",
+        "cells": [
+          "",
+          "EMB0910-3022",
+          "Synthetic customer 22 workshop22@example.test",
+          "Aster",
+          "33",
+          "$687.50",
+          "Open Accepted Lost Expired",
+          "—",
+          "—",
+          "Sep 82d overdue",
+          "Sep 10",
+          ""
+        ],
+        "controls": [
+          {
+            "action": "checkbox",
+            "label": "Select EMB0910-3022",
+            "value": "on",
+            "disabled": true
+          },
+          {
+            "action": "select-one",
+            "label": "Status of EMB0910-3022",
+            "value": "Open",
+            "disabled": false
+          },
+          {
+            "action": "edit",
+            "label": "Edit EMB0910-3022",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "view",
+            "label": "View EMB0910-3022",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "copy-link",
+            "label": "Copy the customer link for EMB0910-3022",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "duplicate",
+            "label": "Duplicate EMB0910-3022",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "resend",
+            "label": "Resend EMB0910-3022 to workshop22@example.test",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "audit",
+            "label": "Pricing audit for EMB0910-3022",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "button",
+            "label": "Only the quote owner or Erik can delete this quote",
+            "value": "",
+            "disabled": true
+          }
+        ],
+        "links": [],
+        "titles": [
+          "You can only delete your own quotes",
+          "Aster Example — From the quote (ShopWorks not yet synced)",
+          "From quote total (ShopWorks not yet synced)",
+          "Set automatically when the customer accepts the quote — not manually selectable",
+          "Set automatically when the quote passes its expiration date — not manually selectable",
+          "ShopWorks not yet synced",
+          "Not in ShopWorks yet",
+          "Requested ship date (from ShopWorks)",
+          "Edit Quote",
+          "View Quote",
+          "Copy Link",
+          "Start a new quote pre-filled from this one",
+          "Resend quote email to workshop22@example.test",
+          "Pricing Audit",
+          "Only the quote owner or Erik can delete this quote"
+        ]
+      },
+      {
+        "id": "EMB0910-3023",
+        "cells": [
+          "",
+          "EMB0910-3023",
+          "Synthetic customer 23 workshop23@example.test",
+          "Cedar",
+          "34",
+          "$715.00",
+          "Open Accepted Lost Expired",
+          "—",
+          "—",
+          "Sep 12in 2d",
+          "Sep 10 Expires in 4 days",
+          ""
+        ],
+        "controls": [
+          {
+            "action": "checkbox",
+            "label": "Select EMB0910-3023",
+            "value": "on",
+            "disabled": false
+          },
+          {
+            "action": "select-one",
+            "label": "Status of EMB0910-3023",
+            "value": "Open",
+            "disabled": false
+          },
+          {
+            "action": "edit",
+            "label": "Edit EMB0910-3023",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "view",
+            "label": "View EMB0910-3023",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "copy-link",
+            "label": "Copy the customer link for EMB0910-3023",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "duplicate",
+            "label": "Duplicate EMB0910-3023",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "resend",
+            "label": "Resend EMB0910-3023 to workshop23@example.test",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "audit",
+            "label": "Pricing audit for EMB0910-3023",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "delete",
+            "label": "Delete EMB0910-3023",
+            "value": "",
+            "disabled": false
+          }
+        ],
+        "links": [],
+        "titles": [
+          "Cedar Example — From the quote (ShopWorks not yet synced)",
+          "From quote total (ShopWorks not yet synced)",
+          "Set automatically when the customer accepts the quote — not manually selectable",
+          "Set automatically when the quote passes its expiration date — not manually selectable",
+          "ShopWorks not yet synced",
+          "Not in ShopWorks yet",
+          "Requested ship date (from ShopWorks)",
+          "Edit Quote",
+          "View Quote",
+          "Copy Link",
+          "Start a new quote pre-filled from this one",
+          "Resend quote email to workshop23@example.test",
+          "Pricing Audit",
+          "Delete Quote"
+        ]
+      },
+      {
+        "id": "EMB0910-3024",
+        "cells": [
+          "",
+          "EMB0910-3024",
+          "Synthetic customer 24 workshop24@example.test",
+          "Aster",
+          "35",
+          "$742.50",
+          "Open Accepted Lost Expired",
+          "—",
+          "—",
+          "Sep 12in 2d",
+          "Sep 10",
+          ""
+        ],
+        "controls": [
+          {
+            "action": "checkbox",
+            "label": "Select EMB0910-3024",
+            "value": "on",
+            "disabled": true
+          },
+          {
+            "action": "select-one",
+            "label": "Status of EMB0910-3024",
+            "value": "Open",
+            "disabled": false
+          },
+          {
+            "action": "edit",
+            "label": "Edit EMB0910-3024",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "view",
+            "label": "View EMB0910-3024",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "copy-link",
+            "label": "Copy the customer link for EMB0910-3024",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "duplicate",
+            "label": "Duplicate EMB0910-3024",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "resend",
+            "label": "Resend EMB0910-3024 to workshop24@example.test",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "audit",
+            "label": "Pricing audit for EMB0910-3024",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "button",
+            "label": "Only the quote owner or Erik can delete this quote",
+            "value": "",
+            "disabled": true
+          }
+        ],
+        "links": [],
+        "titles": [
+          "You can only delete your own quotes",
+          "Aster Example — From the quote (ShopWorks not yet synced)",
+          "From quote total (ShopWorks not yet synced)",
+          "Set automatically when the customer accepts the quote — not manually selectable",
+          "Set automatically when the quote passes its expiration date — not manually selectable",
+          "ShopWorks not yet synced",
+          "Not in ShopWorks yet",
+          "Requested ship date (from ShopWorks)",
+          "Edit Quote",
+          "View Quote",
+          "Copy Link",
+          "Start a new quote pre-filled from this one",
+          "Resend quote email to workshop24@example.test",
+          "Pricing Audit",
+          "Only the quote owner or Erik can delete this quote"
+        ]
+      },
+      {
+        "id": "EMB0910-3025",
+        "cells": [
+          "",
+          "EMB0910-3025",
+          "Synthetic customer 25 workshop25@example.test",
+          "Cedar",
+          "36",
+          "$770.00",
+          "Open Accepted Lost Expired",
+          "—",
+          "—",
+          "Sep 82d overdue",
+          "Sep 10 Expires in 4 days",
+          ""
+        ],
+        "controls": [
+          {
+            "action": "checkbox",
+            "label": "Select EMB0910-3025",
+            "value": "on",
+            "disabled": false
+          },
+          {
+            "action": "select-one",
+            "label": "Status of EMB0910-3025",
+            "value": "Open",
+            "disabled": false
+          },
+          {
+            "action": "edit",
+            "label": "Edit EMB0910-3025",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "view",
+            "label": "View EMB0910-3025",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "copy-link",
+            "label": "Copy the customer link for EMB0910-3025",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "duplicate",
+            "label": "Duplicate EMB0910-3025",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "resend",
+            "label": "Resend EMB0910-3025 to workshop25@example.test",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "audit",
+            "label": "Pricing audit for EMB0910-3025",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "delete",
+            "label": "Delete EMB0910-3025",
+            "value": "",
+            "disabled": false
+          }
+        ],
+        "links": [],
+        "titles": [
+          "Cedar Example — From the quote (ShopWorks not yet synced)",
+          "From quote total (ShopWorks not yet synced)",
+          "Set automatically when the customer accepts the quote — not manually selectable",
+          "Set automatically when the quote passes its expiration date — not manually selectable",
+          "ShopWorks not yet synced",
+          "Not in ShopWorks yet",
+          "Requested ship date (from ShopWorks)",
+          "Edit Quote",
+          "View Quote",
+          "Copy Link",
+          "Start a new quote pre-filled from this one",
+          "Resend quote email to workshop25@example.test",
+          "Pricing Audit",
+          "Delete Quote"
+        ]
+      },
+      {
+        "id": "EMB0910-3026",
+        "cells": [
+          "",
+          "EMB0910-3026",
+          "Synthetic customer 26 workshop26@example.test",
+          "Aster",
+          "37",
+          "$797.50",
+          "Open Accepted Lost Expired",
+          "—",
+          "—",
+          "Sep 12in 2d",
+          "Aug 20",
+          ""
+        ],
+        "controls": [
+          {
+            "action": "checkbox",
+            "label": "Select EMB0910-3026",
+            "value": "on",
+            "disabled": true
+          },
+          {
+            "action": "select-one",
+            "label": "Status of EMB0910-3026",
+            "value": "Open",
+            "disabled": false
+          },
+          {
+            "action": "edit",
+            "label": "Edit EMB0910-3026",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "view",
+            "label": "View EMB0910-3026",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "copy-link",
+            "label": "Copy the customer link for EMB0910-3026",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "duplicate",
+            "label": "Duplicate EMB0910-3026",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "resend",
+            "label": "Resend EMB0910-3026 to workshop26@example.test",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "audit",
+            "label": "Pricing audit for EMB0910-3026",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "button",
+            "label": "Only the quote owner or Erik can delete this quote",
+            "value": "",
+            "disabled": true
+          }
+        ],
+        "links": [],
+        "titles": [
+          "You can only delete your own quotes",
+          "Aster Example — From the quote (ShopWorks not yet synced)",
+          "From quote total (ShopWorks not yet synced)",
+          "Set automatically when the customer accepts the quote — not manually selectable",
+          "Set automatically when the quote passes its expiration date — not manually selectable",
+          "ShopWorks not yet synced",
+          "Not in ShopWorks yet",
+          "Requested ship date (from ShopWorks)",
+          "Edit Quote",
+          "View Quote",
+          "Copy Link",
+          "Start a new quote pre-filled from this one",
+          "Resend quote email to workshop26@example.test",
+          "Pricing Audit",
+          "Only the quote owner or Erik can delete this quote"
+        ]
+      },
+      {
+        "id": "EMB0910-3027",
+        "cells": [
+          "",
+          "EMB0910-3027",
+          "Synthetic customer 27 workshop27@example.test",
+          "Cedar",
+          "38",
+          "$825.00",
+          "Open Accepted Lost Expired",
+          "—",
+          "—",
+          "Sep 12in 2d",
+          "Aug 20 Expires in 4 days",
+          ""
+        ],
+        "controls": [
+          {
+            "action": "checkbox",
+            "label": "Select EMB0910-3027",
+            "value": "on",
+            "disabled": false
+          },
+          {
+            "action": "select-one",
+            "label": "Status of EMB0910-3027",
+            "value": "Open",
+            "disabled": false
+          },
+          {
+            "action": "edit",
+            "label": "Edit EMB0910-3027",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "view",
+            "label": "View EMB0910-3027",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "copy-link",
+            "label": "Copy the customer link for EMB0910-3027",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "duplicate",
+            "label": "Duplicate EMB0910-3027",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "resend",
+            "label": "Resend EMB0910-3027 to workshop27@example.test",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "audit",
+            "label": "Pricing audit for EMB0910-3027",
+            "value": "",
+            "disabled": false
+          },
+          {
+            "action": "delete",
+            "label": "Delete EMB0910-3027",
+            "value": "",
+            "disabled": false
+          }
+        ],
+        "links": [],
+        "titles": [
+          "Cedar Example — From the quote (ShopWorks not yet synced)",
+          "From quote total (ShopWorks not yet synced)",
+          "Set automatically when the customer accepts the quote — not manually selectable",
+          "Set automatically when the quote passes its expiration date — not manually selectable",
+          "ShopWorks not yet synced",
+          "Not in ShopWorks yet",
+          "Requested ship date (from ShopWorks)",
+          "Edit Quote",
+          "View Quote",
+          "Copy Link",
+          "Start a new quote pre-filled from this one",
+          "Resend quote email to workshop27@example.test",
+          "Pricing Audit",
+          "Delete Quote"
+        ]
+      }
+    ]
+  },
+  "events": {
+    "errors": [],
+    "writes": [],
+    "unknown": [],
+    "missing": [],
+    "providers": []
+  }
+}

@@ -20,6 +20,7 @@
 import { endpoints } from '../core/dashboard-endpoints.js';
 import { dashboardFetchJson } from '../core/dashboard-fetch.js';
 import { events } from '../core/dashboard-events.js';
+import { reportWidgetResult } from '../core/dashboard-errors.js';
 import { escapeHtml, formatMoney, formatShortDate, formatRelativeTime } from '../core/dashboard-ui-utils.js';
 
 /* ── Shared helpers ─────────────────────────────────── */
@@ -99,9 +100,11 @@ async function loadOrdersInbox(forceRefresh = false) {
         console.error('[OrdersInbox] load failed:', err);
         errorCard('ordersInboxAlerts', 'Couldn’t load the orders inbox',
             'quote_sessions is unavailable right now. Retry from the refresh button.');
+        paidList.replaceChildren();
+        acceptedList.replaceChildren();
         paidList.setAttribute('aria-busy', 'false');
         acceptedList.setAttribute('aria-busy', 'false');
-        return;
+        return reportWidgetResult('inbox', false);
     }
     const sessions = Array.isArray(rows) ? rows : (rows?.data || []);
 
@@ -166,6 +169,7 @@ async function loadOrdersInbox(forceRefresh = false) {
         : emptyRow('No accepted-but-unpaid quotes right now.');
     paidList.setAttribute('aria-busy', 'false');
     acceptedList.setAttribute('aria-busy', 'false');
+    return reportWidgetResult('inbox', true);
 }
 
 let inboxRegistered = false;
@@ -209,8 +213,12 @@ async function loadMoneyCollected() {
     } catch (err) {
         console.error('[MoneyCollected] load failed:', err);
         list.innerHTML = emptyRow('Payments ledger unavailable right now.');
+        for (const id of ['payToday', 'payWeek', 'payMonth']) {
+            const value = document.getElementById(id);
+            if (value) value.textContent = '—';
+        }
         list.setAttribute('aria-busy', 'false');
-        return;
+        return reportWidgetResult('payments', false);
     }
     const entries = (data && (data.entries || data.data)) || [];
 
@@ -254,6 +262,7 @@ async function loadMoneyCollected() {
         }).join('')
         : emptyRow('No online payments recorded yet.');
     list.setAttribute('aria-busy', 'false');
+    return reportWidgetResult('payments', true);
 }
 
 export function initMoneyCollected() {
@@ -295,9 +304,10 @@ async function loadSamplePipeline() {
             'ManageOrders is unavailable right now — the call list will populate when it recovers.');
         list.innerHTML = '';
         list.setAttribute('aria-busy', 'false');
-        return;
+        return reportWidgetResult('samples', false);
     }
 
+    document.getElementById('samplePipelineAlerts')?.replaceChildren();
     const cutoff30 = ymdDaysAgo(30);
     const samples = [];
     const orderedSince = new Map(); // customerKey → latest non-sample order date
@@ -355,6 +365,7 @@ async function loadSamplePipeline() {
         }).join('')
         : emptyRow('Nobody waiting — every sampled customer has since ordered (or no samples in 30 days).');
     list.setAttribute('aria-busy', 'false');
+    return reportWidgetResult('samples', true);
 }
 
 export function initSamplePipeline() {

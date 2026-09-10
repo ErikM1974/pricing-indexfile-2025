@@ -1,0 +1,1138 @@
+{
+  "base": "0f151e3899b8517092b1864babd8ea7f579fc95b",
+  "departments": [
+    {
+      "dept": "All",
+      "tables": [
+        [
+          [
+            "Employee",
+            "Role",
+            "Clock in",
+            "10 min Break 1",
+            "Lunch",
+            "10 min Break 2",
+            "Clock out",
+            "Paid"
+          ],
+          [
+            "KCKanha Chhorn",
+            "Embroidery Supervisor",
+            "8:00 AM",
+            "9:00 AM",
+            "11:30 AM – 12:00 PM30 min",
+            "12:30 PM",
+            "2:00 PM",
+            "5.5 hrs"
+          ],
+          [
+            "SMSreynai Meang",
+            "Embroidery Operator",
+            "8:00 AM",
+            "9:45 AM",
+            "11:00 AM – 11:30 AM30 min",
+            "2:00 PM",
+            "4:30 PM",
+            "8 hrs"
+          ],
+          [
+            "SSSavy Som",
+            "Embroidery Operator",
+            "8:00 AM",
+            "10:00 AM",
+            "11:00 AM – 11:30 AM30 min",
+            "2:15 PM",
+            "4:30 PM",
+            "8 hrs"
+          ],
+          [
+            "SSSorphorn Sorm",
+            "Embroidery Operator",
+            "8:00 AM",
+            "10:15 AM",
+            "11:30 AM – 12:00 PM30 min",
+            "2:30 PM",
+            "4:30 PM",
+            "8 hrs"
+          ],
+          [
+            "BBBrian Beardsley",
+            "DTG Supervisor",
+            "8:00 AM",
+            "9:30 AM",
+            "12:30 PM – 1:00 PM30 min",
+            "2:15 PM",
+            "4:15 PM",
+            "7.75 hrs"
+          ],
+          [
+            "JHJoseph Hallowell",
+            "DTG Operator",
+            "8:00 AM",
+            "10:30 AM",
+            "11:15 AM – 11:45 AM30 min",
+            "2:45 PM",
+            "4:15 PM",
+            "7.75 hrs"
+          ],
+          [
+            "STSothea Tann",
+            "Embroidery Trimmer",
+            "8:00 AM",
+            "10:45 AM",
+            "11:30 AM – 12:00 PM30 min",
+            "2:45 PM",
+            "4:30 PM",
+            "8 hrs"
+          ],
+          [
+            "RNRuthie Nhoung",
+            "Production Manager",
+            "8:00 AM",
+            "10:30 AM",
+            "12:30 PM – 1:00 PM30 min",
+            "3:30 PM",
+            "4:30 PM",
+            "8 hrs"
+          ],
+          [
+            "MHMikalah Hede",
+            "Shipping / Receiving",
+            "8:00 AM",
+            "10:15 AM",
+            "1:00 PM – 2:00 PM60 min",
+            "3:30 PM",
+            "5:00 PM",
+            "8 hrs"
+          ],
+          [
+            "THTheavy Hoeu",
+            "Embroidery Operator",
+            "8:00 AM",
+            "10:00 AM",
+            "11:45 AM – 12:15 PM30 min",
+            "3:00 PM",
+            "4:30 PM",
+            "8 hrs"
+          ]
+        ]
+      ],
+      "timeline": "Daily timeline\n\nColor-coded view of every shift, break, and lunch. Click a row for details.\n\nWorking\nRest break (paid)\nLunch (unpaid)\n8a\n9a\n10a\n11a\n12p\n1p\n2p\n3p\n4p\n5p\nKC\nKanha\nEmbroidery Supervisor\nLUNCH\n8:00 AM\n2:00 PM\nSM\nSreynai\nEmbroidery Operator\nLUNCH\n8:00 AM\n4:30 PM\nSS\nSavy\nEmbroidery Operator\nLUNCH\n8:00 AM\n4:30 PM\nSS\nSorphorn\nEmbroidery Operator\nLUNCH\n8:00 AM\n4:30 PM\nBB\nBrian\nDTG Supervisor\nLUNCH\n8:00 AM\n4:15 PM\nJH\nJoseph\nDTG Operator\nLUNCH\n8:00 AM\n4:15 PM\nST\nSothea\nEmbroidery Trimmer\nLUNCH\n8:00 AM\n4:30 PM\nRN\nRuthie\nProduction Manager\nLUNCH\n8:00 AM\n4:30 PM\nMH\nMikalah\nShipping / Receiving\nLUNCH\n8:00 AM\n5:00 PM\nTH\nTheavy\nEmbroidery Operator\nLUNCH\n8:00 AM\n4:30 PM"
+    },
+    {
+      "dept": "Embroidery",
+      "tables": [
+        [
+          [
+            "Employee",
+            "Role",
+            "Clock in",
+            "10 min Break 1",
+            "Lunch",
+            "10 min Break 2",
+            "Clock out",
+            "Paid"
+          ],
+          [
+            "KCKanha Chhorn",
+            "Embroidery Supervisor",
+            "8:00 AM",
+            "9:00 AM",
+            "11:30 AM – 12:00 PM30 min",
+            "12:30 PM",
+            "2:00 PM",
+            "5.5 hrs"
+          ],
+          [
+            "SMSreynai Meang",
+            "Embroidery Operator",
+            "8:00 AM",
+            "9:45 AM",
+            "11:00 AM – 11:30 AM30 min",
+            "2:00 PM",
+            "4:30 PM",
+            "8 hrs"
+          ],
+          [
+            "SSSavy Som",
+            "Embroidery Operator",
+            "8:00 AM",
+            "10:00 AM",
+            "11:00 AM – 11:30 AM30 min",
+            "2:15 PM",
+            "4:30 PM",
+            "8 hrs"
+          ],
+          [
+            "SSSorphorn Sorm",
+            "Embroidery Operator",
+            "8:00 AM",
+            "10:15 AM",
+            "11:30 AM – 12:00 PM30 min",
+            "2:30 PM",
+            "4:30 PM",
+            "8 hrs"
+          ],
+          [
+            "STSothea Tann",
+            "Embroidery Trimmer",
+            "8:00 AM",
+            "10:45 AM",
+            "11:30 AM – 12:00 PM30 min",
+            "2:45 PM",
+            "4:30 PM",
+            "8 hrs"
+          ],
+          [
+            "THTheavy Hoeu",
+            "Embroidery Operator",
+            "8:00 AM",
+            "10:00 AM",
+            "11:45 AM – 12:15 PM30 min",
+            "3:00 PM",
+            "4:30 PM",
+            "8 hrs"
+          ]
+        ]
+      ],
+      "timeline": "Daily timeline\n\nColor-coded view of every shift, break, and lunch. Click a row for details.\n\nWorking\nRest break (paid)\nLunch (unpaid)\n8a\n9a\n10a\n11a\n12p\n1p\n2p\n3p\n4p\n5p\nKC\nKanha\nEmbroidery Supervisor\nLUNCH\n8:00 AM\n2:00 PM\nSM\nSreynai\nEmbroidery Operator\nLUNCH\n8:00 AM\n4:30 PM\nSS\nSavy\nEmbroidery Operator\nLUNCH\n8:00 AM\n4:30 PM\nSS\nSorphorn\nEmbroidery Operator\nLUNCH\n8:00 AM\n4:30 PM\nST\nSothea\nEmbroidery Trimmer\nLUNCH\n8:00 AM\n4:30 PM\nTH\nTheavy\nEmbroidery Operator\nLUNCH\n8:00 AM\n4:30 PM"
+    },
+    {
+      "dept": "DTG",
+      "tables": [
+        [
+          [
+            "Employee",
+            "Role",
+            "Clock in",
+            "10 min Break 1",
+            "Lunch",
+            "10 min Break 2",
+            "Clock out",
+            "Paid"
+          ],
+          [
+            "BBBrian Beardsley",
+            "DTG Supervisor",
+            "8:00 AM",
+            "9:30 AM",
+            "12:30 PM – 1:00 PM30 min",
+            "2:15 PM",
+            "4:15 PM",
+            "7.75 hrs"
+          ],
+          [
+            "JHJoseph Hallowell",
+            "DTG Operator",
+            "8:00 AM",
+            "10:30 AM",
+            "11:15 AM – 11:45 AM30 min",
+            "2:45 PM",
+            "4:15 PM",
+            "7.75 hrs"
+          ]
+        ]
+      ],
+      "timeline": "Daily timeline\n\nColor-coded view of every shift, break, and lunch. Click a row for details.\n\nWorking\nRest break (paid)\nLunch (unpaid)\n8a\n9a\n10a\n11a\n12p\n1p\n2p\n3p\n4p\n5p\nBB\nBrian\nDTG Supervisor\nLUNCH\n8:00 AM\n4:15 PM\nJH\nJoseph\nDTG Operator\nLUNCH\n8:00 AM\n4:15 PM"
+    },
+    {
+      "dept": "Ruthie/Mikalah",
+      "tables": [
+        [
+          [
+            "Employee",
+            "Role",
+            "Clock in",
+            "10 min Break 1",
+            "Lunch",
+            "10 min Break 2",
+            "Clock out",
+            "Paid"
+          ],
+          [
+            "RNRuthie Nhoung",
+            "Production Manager",
+            "8:00 AM",
+            "10:30 AM",
+            "12:30 PM – 1:00 PM30 min",
+            "3:30 PM",
+            "4:30 PM",
+            "8 hrs"
+          ],
+          [
+            "MHMikalah Hede",
+            "Shipping / Receiving",
+            "8:00 AM",
+            "10:15 AM",
+            "1:00 PM – 2:00 PM60 min",
+            "3:30 PM",
+            "5:00 PM",
+            "8 hrs"
+          ]
+        ]
+      ],
+      "timeline": "Daily timeline\n\nColor-coded view of every shift, break, and lunch. Click a row for details.\n\nWorking\nRest break (paid)\nLunch (unpaid)\n8a\n9a\n10a\n11a\n12p\n1p\n2p\n3p\n4p\n5p\nRN\nRuthie\nProduction Manager\nLUNCH\n8:00 AM\n4:30 PM\nMH\nMikalah\nShipping / Receiving\nLUNCH\n8:00 AM\n5:00 PM"
+    }
+  ],
+  "views": [
+    {
+      "width": 1440,
+      "scrollWidth": 1440,
+      "title": "Production Shifts — NW Custom Apparel",
+      "main": "REQUIRED BY WA LAW\nTaking a lunch is required when an employee works more than 5 hours in a shift.\nSee rules\nSCHEDULE CHANGES\nAny change to your scheduled hours goes through Ruthie with at least 2 weeks' notice.\nWORKSTATION POLICY\nAll shifts, breaks, and lunches start and end at your workstation — not at the time clock.\nNEED TO SKIP A LUNCH?\nVoluntary Meal Period Waiver\nDownload, fill out, sign with a witness, and return the form to Bradley in his office.\nDownload PDF\nPlease note: Working through lunch is a privilege we may extend on a case-by-case basis — it's not guaranteed. Any waiver must be reviewed and approved by management before it takes effect. Until then, every employee is required to take a full 30-minute lunch.\n10\nProduction team\nactive employees\n8:00 AM\nEarliest start\nWhole team\n5:00 PM\nLatest finish\nMikalah\nFILTER\nAll\n10\nEmbroidery\n6\nDTG\n2\nRuthie/Mikalah\n2\nMaster schedule\n\nEvery shift, break, and lunch at a glance. Click a row for details.\n\nClock in / out\nRest break (paid, no punch)\nLunch (unpaid, punch out & in)\nPrint Shift Schedule\nEMPLOYEE\tROLE\tCLOCK IN\t10 MIN BREAK 1\tLUNCH\t10 MIN BREAK 2\tCLOCK OUT\tPAID\n\nKC\nKanha Chhorn\n\tEmbroidery Supervisor\t8:00 AM\t9:00 AM\t\n11:30 AM – 12:00 PM\n30 min\n\t12:30 PM\t2:00 PM\t5.5 hrs\n\nSM\nSreynai Meang\n\tEmbroidery Operator\t8:00 AM\t9:45 AM\t\n11:00 AM – 11:30 AM\n30 min\n\t2:00 PM\t4:30 PM\t8 hrs\n\nSS\nSavy Som\n\tEmbroidery Operator\t8:00 AM\t10:00 AM\t\n11:00 AM – 11:30 AM\n30 min\n\t2:15 PM\t4:30 PM\t8 hrs\n\nSS\nSorphorn Sorm\n\tEmbroidery Operator\t8:00 AM\t10:15 AM\t\n11:30 AM – 12:00 PM\n30 min\n\t2:30 PM\t4:30 PM\t8 hrs\n\nBB\nBrian Beardsley\n\tDTG Supervisor\t8:00 AM\t9:30 AM\t\n12:30 PM – 1:00 PM\n30 min\n\t2:15 PM\t4:15 PM\t7.75 hrs\n\nJH\nJoseph Hallowell\n\tDTG Operator\t8:00 AM\t10:30 AM\t\n11:15 AM – 11:45 AM\n30 min\n\t2:45 PM\t4:15 PM\t7.75 hrs\n\nST\nSothea Tann\n\tEmbroidery Trimmer\t8:00 AM\t10:45 AM\t\n11:30 AM – 12:00 PM\n30 min\n\t2:45 PM\t4:30 PM\t8 hrs\n\nRN\nRuthie Nhoung\n\tProduction Manager\t8:00 AM\t10:30 AM\t\n12:30 PM – 1:00 PM\n30 min\n\t3:30 PM\t4:30 PM\t8 hrs\n\nMH\nMikalah Hede\n\tShipping / Receiving\t8:00 AM\t10:15 AM\t\n1:00 PM – 2:00 PM\n60 min\n\t3:30 PM\t5:00 PM\t8 hrs\n\nTH\nTheavy Hoeu\n\tEmbroidery Operator\t8:00 AM\t10:00 AM\t\n11:45 AM – 12:15 PM\n30 min\n\t3:00 PM\t4:30 PM\t8 hrs\nDaily timeline\n\nColor-coded view of every shift, break, and lunch. Click a row for details.\n\nWorking\nRest break (paid)\nLunch (unpaid)\n8a\n9a\n10a\n11a\n12p\n1p\n2p\n3p\n4p\n5p\nKC\nKanha\nEmbroidery Supervisor\nLUNCH\n8:00 AM\n2:00 PM\nSM\nSreynai\nEmbroidery Operator\nLUNCH\n8:00 AM\n4:30 PM\nSS\nSavy\nEmbroidery Operator\nLUNCH\n8:00 AM\n4:30 PM\nSS\nSorphorn\nEmbroidery Operator\nLUNCH\n8:00 AM\n4:30 PM\nBB\nBrian\nDTG Supervisor\nLUNCH\n8:00 AM\n4:15 PM\nJH\nJoseph\nDTG Operator\nLUNCH\n8:00 AM\n4:15 PM\nST\nSothea\nEmbroidery Trimmer\nLUNCH\n8:00 AM\n4:30 PM\nRN\nRuthie\nProduction Manager\nLUNCH\n8:00 AM\n4:30 PM\nMH\nMikalah\nShipping / Receiving\nLUNCH\n8:00 AM\n5:00 PM\nTH\nTheavy\nEmbroidery Operator\nLUNCH\n8:00 AM\n4:30 PM\nINTERNAL POLICY\nWork rules & common questions\n\nPlain-language NWCA policy. These rules protect you, your coworkers, and the company — most of them mirror Washington labor law and a few exist for production coverage.\n\nTime clock & punches\nPunch your own clock. Asking a coworker to punch you in or out (buddy punching) is grounds for termination.\nPunching in early doesn't mean your shift starts early. You're on the clock starting at your scheduled time — not before.\nMissed a punch? Tell your supervisor the same day. Don't let it pile up.\nHIGHEST LEGAL RISK\nLunch — the big one\nWhen you punch out for lunch, leave your workstation. No exceptions.\nYou may not perform any work during an unpaid lunch. Even \"just finishing one thing\" creates a wage claim against the company. If something has to get done, don't punch out.\nLunch is the full 30 minutes. Returning at 12:25 instead of 12:30 doesn't satisfy state law and undermines the policy for everyone.\nNo verbal waivers. To skip a lunch, you must sign a written waiver and return it to Bradley Wright. A supervisor saying \"you can skip it\" is not legally valid in Washington.\nRest breaks — 10 min, paid\n10 minutes means 10 minutes. Returning late counts the same as being late from anywhere else.\nBreaks can't be combined with lunch to leave early. WA law requires them near the midpoint of each 4-hour work period.\nBreaks can't be skipped to make up for a late arrival or to leave early.\nSchedule changes\nAny change to your scheduled hours goes through Ruthie with at least 2 weeks' notice — start time, end time, lunch slot, or days off.\nDon't swap lunch slots with a coworker without Ruthie's approval. Lunch slots exist for production coverage, not preference.\nLast-minute changes will not be accommodated except for genuine emergencies. Standard requests need the full 2 weeks.\nAttendance patterns\nHabitual late arrivals or early departures will be addressed. Three or more occurrences in a month triggers a conversation with Ruthie.\nCalling out at the last minute should be the exception, not the rule — especially on Mondays and Fridays.\nFairness\nThe schedule is the schedule. Differences in lunch time or end time between employees reflect role, shift, and historical needs — they are not negotiable individually.\nConcerns about fairness or coverage go to Ruthie, not to coworkers. Don't try to work around the schedule informally.\nTHREE BIG \"NO\"S\nThe shortcuts that create real legal risk\n\nThese are the three workarounds we hold the line on. Each one creates direct exposure for the company — and indirectly, for you.\n\n1\n\"I'll just punch out and keep working to leave early.\"\nPunching out means stop working AND leave your workstation. The minute you keep working off the clock, you create an off-the-clock wage claim against the company. There's no in-between.\n2\n\"I'll take a 20-minute lunch so I can leave 10 minutes early.\"\nWA law requires the full 30 minutes. A short lunch doesn't satisfy the rule, and the missing minutes can't be banked or traded against your end time.\n3\n\"Brian or Ruthie said I could skip lunch today.\"\nSupervisors cannot grant verbal waivers. The only valid way to skip a lunch is a signed, written waiver kept on file — submit it to Bradley Wright.\nCOMPLIANCE REFERENCE\nWashington State meal & rest period rules\n\nPlain-language summary plus the verbatim regulation. Reference: WAC 296-126-092 / RCW 49.12.\n\nMeal periods\nRequired when an employee works more than 5 hours in a shift.\nMust be at least 30 minutes long.\nMust begin between the 2nd and 5th hour of the shift.\nPaid vs. unpaid\nMeal breaks may be unpaid only if the employee is free from all duties for the entire break.\nWorkers can be required to stay on the premises only if completely free from work duties.\nUnpaid meal breaks do not count as 'hours worked.'\nWaivers\nMeal breaks may be waived if both employee and employer agree, in writing.\nRest breaks CANNOT be waived.\nEmployees may revoke a waiver at any time.\nRest breaks\nAt least 10 minutes, paid, for every 4 hours worked.\nCannot work more than 3 hours without a rest break.\nScheduled as close to the midpoint of the work period as possible.\nMay be required to stay on the job site.\nCount as 'hours worked' for sick leave and overtime.\nVERBATIM STATUTE\nWAC 296-126-092 — Meal Periods · Rest Periods\nPlain-language summary based on the WA Department of Labor & Industries workers-rights page. Not legal advice. Confirm with your employment attorney before changing policy.\nNW Custom Apparel · Production team schedule\nReference: WAC 296-126-092 / RCW 49.12"
+    },
+    {
+      "width": 768,
+      "scrollWidth": 768,
+      "title": "Production Shifts — NW Custom Apparel",
+      "main": "REQUIRED BY WA LAW\nTaking a lunch is required when an employee works more than 5 hours in a shift.\nSee rules\nSCHEDULE CHANGES\nAny change to your scheduled hours goes through Ruthie with at least 2 weeks' notice.\nWORKSTATION POLICY\nAll shifts, breaks, and lunches start and end at your workstation — not at the time clock.\nNEED TO SKIP A LUNCH?\nVoluntary Meal Period Waiver\nDownload, fill out, sign with a witness, and return the form to Bradley in his office.\nDownload PDF\nPlease note: Working through lunch is a privilege we may extend on a case-by-case basis — it's not guaranteed. Any waiver must be reviewed and approved by management before it takes effect. Until then, every employee is required to take a full 30-minute lunch.\n10\nProduction team\nactive employees\n8:00 AM\nEarliest start\nWhole team\n5:00 PM\nLatest finish\nMikalah\nFILTER\nAll\n10\nEmbroidery\n6\nDTG\n2\nRuthie/Mikalah\n2\nMaster schedule\n\nEvery shift, break, and lunch at a glance. Click a row for details.\n\nClock in / out\nRest break (paid, no punch)\nLunch (unpaid, punch out & in)\nPrint Shift Schedule\nEMPLOYEE\tROLE\tCLOCK IN\t10 MIN BREAK 1\tLUNCH\t10 MIN BREAK 2\tCLOCK OUT\tPAID\n\nKC\nKanha Chhorn\n\tEmbroidery Supervisor\t8:00 AM\t9:00 AM\t\n11:30 AM – 12:00 PM\n30 min\n\t12:30 PM\t2:00 PM\t5.5 hrs\n\nSM\nSreynai Meang\n\tEmbroidery Operator\t8:00 AM\t9:45 AM\t\n11:00 AM – 11:30 AM\n30 min\n\t2:00 PM\t4:30 PM\t8 hrs\n\nSS\nSavy Som\n\tEmbroidery Operator\t8:00 AM\t10:00 AM\t\n11:00 AM – 11:30 AM\n30 min\n\t2:15 PM\t4:30 PM\t8 hrs\n\nSS\nSorphorn Sorm\n\tEmbroidery Operator\t8:00 AM\t10:15 AM\t\n11:30 AM – 12:00 PM\n30 min\n\t2:30 PM\t4:30 PM\t8 hrs\n\nBB\nBrian Beardsley\n\tDTG Supervisor\t8:00 AM\t9:30 AM\t\n12:30 PM – 1:00 PM\n30 min\n\t2:15 PM\t4:15 PM\t7.75 hrs\n\nJH\nJoseph Hallowell\n\tDTG Operator\t8:00 AM\t10:30 AM\t\n11:15 AM – 11:45 AM\n30 min\n\t2:45 PM\t4:15 PM\t7.75 hrs\n\nST\nSothea Tann\n\tEmbroidery Trimmer\t8:00 AM\t10:45 AM\t\n11:30 AM – 12:00 PM\n30 min\n\t2:45 PM\t4:30 PM\t8 hrs\n\nRN\nRuthie Nhoung\n\tProduction Manager\t8:00 AM\t10:30 AM\t\n12:30 PM – 1:00 PM\n30 min\n\t3:30 PM\t4:30 PM\t8 hrs\n\nMH\nMikalah Hede\n\tShipping / Receiving\t8:00 AM\t10:15 AM\t\n1:00 PM – 2:00 PM\n60 min\n\t3:30 PM\t5:00 PM\t8 hrs\n\nTH\nTheavy Hoeu\n\tEmbroidery Operator\t8:00 AM\t10:00 AM\t\n11:45 AM – 12:15 PM\n30 min\n\t3:00 PM\t4:30 PM\t8 hrs\nDaily timeline\n\nColor-coded view of every shift, break, and lunch. Click a row for details.\n\nWorking\nRest break (paid)\nLunch (unpaid)\n8a\n9a\n10a\n11a\n12p\n1p\n2p\n3p\n4p\n5p\nKC\nKanha\nEmbroidery Supervisor\nLUNCH\n8:00 AM\n2:00 PM\nSM\nSreynai\nEmbroidery Operator\nLUNCH\n8:00 AM\n4:30 PM\nSS\nSavy\nEmbroidery Operator\nLUNCH\n8:00 AM\n4:30 PM\nSS\nSorphorn\nEmbroidery Operator\nLUNCH\n8:00 AM\n4:30 PM\nBB\nBrian\nDTG Supervisor\nLUNCH\n8:00 AM\n4:15 PM\nJH\nJoseph\nDTG Operator\nLUNCH\n8:00 AM\n4:15 PM\nST\nSothea\nEmbroidery Trimmer\nLUNCH\n8:00 AM\n4:30 PM\nRN\nRuthie\nProduction Manager\nLUNCH\n8:00 AM\n4:30 PM\nMH\nMikalah\nShipping / Receiving\nLUNCH\n8:00 AM\n5:00 PM\nTH\nTheavy\nEmbroidery Operator\nLUNCH\n8:00 AM\n4:30 PM\nINTERNAL POLICY\nWork rules & common questions\n\nPlain-language NWCA policy. These rules protect you, your coworkers, and the company — most of them mirror Washington labor law and a few exist for production coverage.\n\nTime clock & punches\nPunch your own clock. Asking a coworker to punch you in or out (buddy punching) is grounds for termination.\nPunching in early doesn't mean your shift starts early. You're on the clock starting at your scheduled time — not before.\nMissed a punch? Tell your supervisor the same day. Don't let it pile up.\nHIGHEST LEGAL RISK\nLunch — the big one\nWhen you punch out for lunch, leave your workstation. No exceptions.\nYou may not perform any work during an unpaid lunch. Even \"just finishing one thing\" creates a wage claim against the company. If something has to get done, don't punch out.\nLunch is the full 30 minutes. Returning at 12:25 instead of 12:30 doesn't satisfy state law and undermines the policy for everyone.\nNo verbal waivers. To skip a lunch, you must sign a written waiver and return it to Bradley Wright. A supervisor saying \"you can skip it\" is not legally valid in Washington.\nRest breaks — 10 min, paid\n10 minutes means 10 minutes. Returning late counts the same as being late from anywhere else.\nBreaks can't be combined with lunch to leave early. WA law requires them near the midpoint of each 4-hour work period.\nBreaks can't be skipped to make up for a late arrival or to leave early.\nSchedule changes\nAny change to your scheduled hours goes through Ruthie with at least 2 weeks' notice — start time, end time, lunch slot, or days off.\nDon't swap lunch slots with a coworker without Ruthie's approval. Lunch slots exist for production coverage, not preference.\nLast-minute changes will not be accommodated except for genuine emergencies. Standard requests need the full 2 weeks.\nAttendance patterns\nHabitual late arrivals or early departures will be addressed. Three or more occurrences in a month triggers a conversation with Ruthie.\nCalling out at the last minute should be the exception, not the rule — especially on Mondays and Fridays.\nFairness\nThe schedule is the schedule. Differences in lunch time or end time between employees reflect role, shift, and historical needs — they are not negotiable individually.\nConcerns about fairness or coverage go to Ruthie, not to coworkers. Don't try to work around the schedule informally.\nTHREE BIG \"NO\"S\nThe shortcuts that create real legal risk\n\nThese are the three workarounds we hold the line on. Each one creates direct exposure for the company — and indirectly, for you.\n\n1\n\"I'll just punch out and keep working to leave early.\"\nPunching out means stop working AND leave your workstation. The minute you keep working off the clock, you create an off-the-clock wage claim against the company. There's no in-between.\n2\n\"I'll take a 20-minute lunch so I can leave 10 minutes early.\"\nWA law requires the full 30 minutes. A short lunch doesn't satisfy the rule, and the missing minutes can't be banked or traded against your end time.\n3\n\"Brian or Ruthie said I could skip lunch today.\"\nSupervisors cannot grant verbal waivers. The only valid way to skip a lunch is a signed, written waiver kept on file — submit it to Bradley Wright.\nCOMPLIANCE REFERENCE\nWashington State meal & rest period rules\n\nPlain-language summary plus the verbatim regulation. Reference: WAC 296-126-092 / RCW 49.12.\n\nMeal periods\nRequired when an employee works more than 5 hours in a shift.\nMust be at least 30 minutes long.\nMust begin between the 2nd and 5th hour of the shift.\nPaid vs. unpaid\nMeal breaks may be unpaid only if the employee is free from all duties for the entire break.\nWorkers can be required to stay on the premises only if completely free from work duties.\nUnpaid meal breaks do not count as 'hours worked.'\nWaivers\nMeal breaks may be waived if both employee and employer agree, in writing.\nRest breaks CANNOT be waived.\nEmployees may revoke a waiver at any time.\nRest breaks\nAt least 10 minutes, paid, for every 4 hours worked.\nCannot work more than 3 hours without a rest break.\nScheduled as close to the midpoint of the work period as possible.\nMay be required to stay on the job site.\nCount as 'hours worked' for sick leave and overtime.\nVERBATIM STATUTE\nWAC 296-126-092 — Meal Periods · Rest Periods\nPlain-language summary based on the WA Department of Labor & Industries workers-rights page. Not legal advice. Confirm with your employment attorney before changing policy.\nNW Custom Apparel · Production team schedule\nReference: WAC 296-126-092 / RCW 49.12"
+    },
+    {
+      "width": 390,
+      "scrollWidth": 390,
+      "title": "Production Shifts — NW Custom Apparel",
+      "main": "REQUIRED BY WA LAW\nTaking a lunch is required when an employee works more than 5 hours in a shift.\nSee rules\nSCHEDULE CHANGES\nAny change to your scheduled hours goes through Ruthie with at least 2 weeks' notice.\nWORKSTATION POLICY\nAll shifts, breaks, and lunches start and end at your workstation — not at the time clock.\nNEED TO SKIP A LUNCH?\nVoluntary Meal Period Waiver\nDownload, fill out, sign with a witness, and return the form to Bradley in his office.\nDownload PDF\nPlease note: Working through lunch is a privilege we may extend on a case-by-case basis — it's not guaranteed. Any waiver must be reviewed and approved by management before it takes effect. Until then, every employee is required to take a full 30-minute lunch.\n10\nProduction team\nactive employees\n8:00 AM\nEarliest start\nWhole team\n5:00 PM\nLatest finish\nMikalah\nFILTER\nAll\n10\nEmbroidery\n6\nDTG\n2\nRuthie/Mikalah\n2\nMaster schedule\n\nEvery shift, break, and lunch at a glance. Click a row for details.\n\nClock in / out\nRest break (paid, no punch)\nLunch (unpaid, punch out & in)\nPrint Shift Schedule\nEMPLOYEE\tROLE\tCLOCK IN\t10 MIN BREAK 1\tLUNCH\t10 MIN BREAK 2\tCLOCK OUT\tPAID\n\nKC\nKanha Chhorn\n\tEmbroidery Supervisor\t8:00 AM\t9:00 AM\t\n11:30 AM – 12:00 PM\n30 min\n\t12:30 PM\t2:00 PM\t5.5 hrs\n\nSM\nSreynai Meang\n\tEmbroidery Operator\t8:00 AM\t9:45 AM\t\n11:00 AM – 11:30 AM\n30 min\n\t2:00 PM\t4:30 PM\t8 hrs\n\nSS\nSavy Som\n\tEmbroidery Operator\t8:00 AM\t10:00 AM\t\n11:00 AM – 11:30 AM\n30 min\n\t2:15 PM\t4:30 PM\t8 hrs\n\nSS\nSorphorn Sorm\n\tEmbroidery Operator\t8:00 AM\t10:15 AM\t\n11:30 AM – 12:00 PM\n30 min\n\t2:30 PM\t4:30 PM\t8 hrs\n\nBB\nBrian Beardsley\n\tDTG Supervisor\t8:00 AM\t9:30 AM\t\n12:30 PM – 1:00 PM\n30 min\n\t2:15 PM\t4:15 PM\t7.75 hrs\n\nJH\nJoseph Hallowell\n\tDTG Operator\t8:00 AM\t10:30 AM\t\n11:15 AM – 11:45 AM\n30 min\n\t2:45 PM\t4:15 PM\t7.75 hrs\n\nST\nSothea Tann\n\tEmbroidery Trimmer\t8:00 AM\t10:45 AM\t\n11:30 AM – 12:00 PM\n30 min\n\t2:45 PM\t4:30 PM\t8 hrs\n\nRN\nRuthie Nhoung\n\tProduction Manager\t8:00 AM\t10:30 AM\t\n12:30 PM – 1:00 PM\n30 min\n\t3:30 PM\t4:30 PM\t8 hrs\n\nMH\nMikalah Hede\n\tShipping / Receiving\t8:00 AM\t10:15 AM\t\n1:00 PM – 2:00 PM\n60 min\n\t3:30 PM\t5:00 PM\t8 hrs\n\nTH\nTheavy Hoeu\n\tEmbroidery Operator\t8:00 AM\t10:00 AM\t\n11:45 AM – 12:15 PM\n30 min\n\t3:00 PM\t4:30 PM\t8 hrs\nDaily timeline\n\nColor-coded view of every shift, break, and lunch. Click a row for details.\n\nWorking\nRest break (paid)\nLunch (unpaid)\n8a\n9a\n10a\n11a\n12p\n1p\n2p\n3p\n4p\n5p\nKC\nKanha\nEmbroidery Supervisor\nLUNCH\n8:00 AM\n2:00 PM\nSM\nSreynai\nEmbroidery Operator\nLUNCH\n8:00 AM\n4:30 PM\nSS\nSavy\nEmbroidery Operator\nLUNCH\n8:00 AM\n4:30 PM\nSS\nSorphorn\nEmbroidery Operator\nLUNCH\n8:00 AM\n4:30 PM\nBB\nBrian\nDTG Supervisor\nLUNCH\n8:00 AM\n4:15 PM\nJH\nJoseph\nDTG Operator\nLUNCH\n8:00 AM\n4:15 PM\nST\nSothea\nEmbroidery Trimmer\nLUNCH\n8:00 AM\n4:30 PM\nRN\nRuthie\nProduction Manager\nLUNCH\n8:00 AM\n4:30 PM\nMH\nMikalah\nShipping / Receiving\nLUNCH\n8:00 AM\n5:00 PM\nTH\nTheavy\nEmbroidery Operator\nLUNCH\n8:00 AM\n4:30 PM\nINTERNAL POLICY\nWork rules & common questions\n\nPlain-language NWCA policy. These rules protect you, your coworkers, and the company — most of them mirror Washington labor law and a few exist for production coverage.\n\nTime clock & punches\nPunch your own clock. Asking a coworker to punch you in or out (buddy punching) is grounds for termination.\nPunching in early doesn't mean your shift starts early. You're on the clock starting at your scheduled time — not before.\nMissed a punch? Tell your supervisor the same day. Don't let it pile up.\nHIGHEST LEGAL RISK\nLunch — the big one\nWhen you punch out for lunch, leave your workstation. No exceptions.\nYou may not perform any work during an unpaid lunch. Even \"just finishing one thing\" creates a wage claim against the company. If something has to get done, don't punch out.\nLunch is the full 30 minutes. Returning at 12:25 instead of 12:30 doesn't satisfy state law and undermines the policy for everyone.\nNo verbal waivers. To skip a lunch, you must sign a written waiver and return it to Bradley Wright. A supervisor saying \"you can skip it\" is not legally valid in Washington.\nRest breaks — 10 min, paid\n10 minutes means 10 minutes. Returning late counts the same as being late from anywhere else.\nBreaks can't be combined with lunch to leave early. WA law requires them near the midpoint of each 4-hour work period.\nBreaks can't be skipped to make up for a late arrival or to leave early.\nSchedule changes\nAny change to your scheduled hours goes through Ruthie with at least 2 weeks' notice — start time, end time, lunch slot, or days off.\nDon't swap lunch slots with a coworker without Ruthie's approval. Lunch slots exist for production coverage, not preference.\nLast-minute changes will not be accommodated except for genuine emergencies. Standard requests need the full 2 weeks.\nAttendance patterns\nHabitual late arrivals or early departures will be addressed. Three or more occurrences in a month triggers a conversation with Ruthie.\nCalling out at the last minute should be the exception, not the rule — especially on Mondays and Fridays.\nFairness\nThe schedule is the schedule. Differences in lunch time or end time between employees reflect role, shift, and historical needs — they are not negotiable individually.\nConcerns about fairness or coverage go to Ruthie, not to coworkers. Don't try to work around the schedule informally.\nTHREE BIG \"NO\"S\nThe shortcuts that create real legal risk\n\nThese are the three workarounds we hold the line on. Each one creates direct exposure for the company — and indirectly, for you.\n\n1\n\"I'll just punch out and keep working to leave early.\"\nPunching out means stop working AND leave your workstation. The minute you keep working off the clock, you create an off-the-clock wage claim against the company. There's no in-between.\n2\n\"I'll take a 20-minute lunch so I can leave 10 minutes early.\"\nWA law requires the full 30 minutes. A short lunch doesn't satisfy the rule, and the missing minutes can't be banked or traded against your end time.\n3\n\"Brian or Ruthie said I could skip lunch today.\"\nSupervisors cannot grant verbal waivers. The only valid way to skip a lunch is a signed, written waiver kept on file — submit it to Bradley Wright.\nCOMPLIANCE REFERENCE\nWashington State meal & rest period rules\n\nPlain-language summary plus the verbatim regulation. Reference: WAC 296-126-092 / RCW 49.12.\n\nMeal periods\nRequired when an employee works more than 5 hours in a shift.\nMust be at least 30 minutes long.\nMust begin between the 2nd and 5th hour of the shift.\nPaid vs. unpaid\nMeal breaks may be unpaid only if the employee is free from all duties for the entire break.\nWorkers can be required to stay on the premises only if completely free from work duties.\nUnpaid meal breaks do not count as 'hours worked.'\nWaivers\nMeal breaks may be waived if both employee and employer agree, in writing.\nRest breaks CANNOT be waived.\nEmployees may revoke a waiver at any time.\nRest breaks\nAt least 10 minutes, paid, for every 4 hours worked.\nCannot work more than 3 hours without a rest break.\nScheduled as close to the midpoint of the work period as possible.\nMay be required to stay on the job site.\nCount as 'hours worked' for sick leave and overtime.\nVERBATIM STATUTE\nWAC 296-126-092 — Meal Periods · Rest Periods\nPlain-language summary based on the WA Department of Labor & Industries workers-rights page. Not legal advice. Confirm with your employment attorney before changing policy.\nNW Custom Apparel · Production team schedule\nReference: WAC 296-126-092 / RCW 49.12"
+    },
+    {
+      "width": 320,
+      "scrollWidth": 329,
+      "title": "Production Shifts — NW Custom Apparel",
+      "main": "REQUIRED BY WA LAW\nTaking a lunch is required when an employee works more than 5 hours in a shift.\nSee rules\nSCHEDULE CHANGES\nAny change to your scheduled hours goes through Ruthie with at least 2 weeks' notice.\nWORKSTATION POLICY\nAll shifts, breaks, and lunches start and end at your workstation — not at the time clock.\nNEED TO SKIP A LUNCH?\nVoluntary Meal Period Waiver\nDownload, fill out, sign with a witness, and return the form to Bradley in his office.\nDownload PDF\nPlease note: Working through lunch is a privilege we may extend on a case-by-case basis — it's not guaranteed. Any waiver must be reviewed and approved by management before it takes effect. Until then, every employee is required to take a full 30-minute lunch.\n10\nProduction team\nactive employees\n8:00 AM\nEarliest start\nWhole team\n5:00 PM\nLatest finish\nMikalah\nFILTER\nAll\n10\nEmbroidery\n6\nDTG\n2\nRuthie/Mikalah\n2\nMaster schedule\n\nEvery shift, break, and lunch at a glance. Click a row for details.\n\nClock in / out\nRest break (paid, no punch)\nLunch (unpaid, punch out & in)\nPrint Shift Schedule\nEMPLOYEE\tROLE\tCLOCK IN\t10 MIN BREAK 1\tLUNCH\t10 MIN BREAK 2\tCLOCK OUT\tPAID\n\nKC\nKanha Chhorn\n\tEmbroidery Supervisor\t8:00 AM\t9:00 AM\t\n11:30 AM – 12:00 PM\n30 min\n\t12:30 PM\t2:00 PM\t5.5 hrs\n\nSM\nSreynai Meang\n\tEmbroidery Operator\t8:00 AM\t9:45 AM\t\n11:00 AM – 11:30 AM\n30 min\n\t2:00 PM\t4:30 PM\t8 hrs\n\nSS\nSavy Som\n\tEmbroidery Operator\t8:00 AM\t10:00 AM\t\n11:00 AM – 11:30 AM\n30 min\n\t2:15 PM\t4:30 PM\t8 hrs\n\nSS\nSorphorn Sorm\n\tEmbroidery Operator\t8:00 AM\t10:15 AM\t\n11:30 AM – 12:00 PM\n30 min\n\t2:30 PM\t4:30 PM\t8 hrs\n\nBB\nBrian Beardsley\n\tDTG Supervisor\t8:00 AM\t9:30 AM\t\n12:30 PM – 1:00 PM\n30 min\n\t2:15 PM\t4:15 PM\t7.75 hrs\n\nJH\nJoseph Hallowell\n\tDTG Operator\t8:00 AM\t10:30 AM\t\n11:15 AM – 11:45 AM\n30 min\n\t2:45 PM\t4:15 PM\t7.75 hrs\n\nST\nSothea Tann\n\tEmbroidery Trimmer\t8:00 AM\t10:45 AM\t\n11:30 AM – 12:00 PM\n30 min\n\t2:45 PM\t4:30 PM\t8 hrs\n\nRN\nRuthie Nhoung\n\tProduction Manager\t8:00 AM\t10:30 AM\t\n12:30 PM – 1:00 PM\n30 min\n\t3:30 PM\t4:30 PM\t8 hrs\n\nMH\nMikalah Hede\n\tShipping / Receiving\t8:00 AM\t10:15 AM\t\n1:00 PM – 2:00 PM\n60 min\n\t3:30 PM\t5:00 PM\t8 hrs\n\nTH\nTheavy Hoeu\n\tEmbroidery Operator\t8:00 AM\t10:00 AM\t\n11:45 AM – 12:15 PM\n30 min\n\t3:00 PM\t4:30 PM\t8 hrs\nDaily timeline\n\nColor-coded view of every shift, break, and lunch. Click a row for details.\n\nWorking\nRest break (paid)\nLunch (unpaid)\n8a\n9a\n10a\n11a\n12p\n1p\n2p\n3p\n4p\n5p\nKC\nKanha\nEmbroidery Supervisor\nLUNCH\n8:00 AM\n2:00 PM\nSM\nSreynai\nEmbroidery Operator\nLUNCH\n8:00 AM\n4:30 PM\nSS\nSavy\nEmbroidery Operator\nLUNCH\n8:00 AM\n4:30 PM\nSS\nSorphorn\nEmbroidery Operator\nLUNCH\n8:00 AM\n4:30 PM\nBB\nBrian\nDTG Supervisor\nLUNCH\n8:00 AM\n4:15 PM\nJH\nJoseph\nDTG Operator\nLUNCH\n8:00 AM\n4:15 PM\nST\nSothea\nEmbroidery Trimmer\nLUNCH\n8:00 AM\n4:30 PM\nRN\nRuthie\nProduction Manager\nLUNCH\n8:00 AM\n4:30 PM\nMH\nMikalah\nShipping / Receiving\nLUNCH\n8:00 AM\n5:00 PM\nTH\nTheavy\nEmbroidery Operator\nLUNCH\n8:00 AM\n4:30 PM\nINTERNAL POLICY\nWork rules & common questions\n\nPlain-language NWCA policy. These rules protect you, your coworkers, and the company — most of them mirror Washington labor law and a few exist for production coverage.\n\nTime clock & punches\nPunch your own clock. Asking a coworker to punch you in or out (buddy punching) is grounds for termination.\nPunching in early doesn't mean your shift starts early. You're on the clock starting at your scheduled time — not before.\nMissed a punch? Tell your supervisor the same day. Don't let it pile up.\nHIGHEST LEGAL RISK\nLunch — the big one\nWhen you punch out for lunch, leave your workstation. No exceptions.\nYou may not perform any work during an unpaid lunch. Even \"just finishing one thing\" creates a wage claim against the company. If something has to get done, don't punch out.\nLunch is the full 30 minutes. Returning at 12:25 instead of 12:30 doesn't satisfy state law and undermines the policy for everyone.\nNo verbal waivers. To skip a lunch, you must sign a written waiver and return it to Bradley Wright. A supervisor saying \"you can skip it\" is not legally valid in Washington.\nRest breaks — 10 min, paid\n10 minutes means 10 minutes. Returning late counts the same as being late from anywhere else.\nBreaks can't be combined with lunch to leave early. WA law requires them near the midpoint of each 4-hour work period.\nBreaks can't be skipped to make up for a late arrival or to leave early.\nSchedule changes\nAny change to your scheduled hours goes through Ruthie with at least 2 weeks' notice — start time, end time, lunch slot, or days off.\nDon't swap lunch slots with a coworker without Ruthie's approval. Lunch slots exist for production coverage, not preference.\nLast-minute changes will not be accommodated except for genuine emergencies. Standard requests need the full 2 weeks.\nAttendance patterns\nHabitual late arrivals or early departures will be addressed. Three or more occurrences in a month triggers a conversation with Ruthie.\nCalling out at the last minute should be the exception, not the rule — especially on Mondays and Fridays.\nFairness\nThe schedule is the schedule. Differences in lunch time or end time between employees reflect role, shift, and historical needs — they are not negotiable individually.\nConcerns about fairness or coverage go to Ruthie, not to coworkers. Don't try to work around the schedule informally.\nTHREE BIG \"NO\"S\nThe shortcuts that create real legal risk\n\nThese are the three workarounds we hold the line on. Each one creates direct exposure for the company — and indirectly, for you.\n\n1\n\"I'll just punch out and keep working to leave early.\"\nPunching out means stop working AND leave your workstation. The minute you keep working off the clock, you create an off-the-clock wage claim against the company. There's no in-between.\n2\n\"I'll take a 20-minute lunch so I can leave 10 minutes early.\"\nWA law requires the full 30 minutes. A short lunch doesn't satisfy the rule, and the missing minutes can't be banked or traded against your end time.\n3\n\"Brian or Ruthie said I could skip lunch today.\"\nSupervisors cannot grant verbal waivers. The only valid way to skip a lunch is a signed, written waiver kept on file — submit it to Bradley Wright.\nCOMPLIANCE REFERENCE\nWashington State meal & rest period rules\n\nPlain-language summary plus the verbatim regulation. Reference: WAC 296-126-092 / RCW 49.12.\n\nMeal periods\nRequired when an employee works more than 5 hours in a shift.\nMust be at least 30 minutes long.\nMust begin between the 2nd and 5th hour of the shift.\nPaid vs. unpaid\nMeal breaks may be unpaid only if the employee is free from all duties for the entire break.\nWorkers can be required to stay on the premises only if completely free from work duties.\nUnpaid meal breaks do not count as 'hours worked.'\nWaivers\nMeal breaks may be waived if both employee and employer agree, in writing.\nRest breaks CANNOT be waived.\nEmployees may revoke a waiver at any time.\nRest breaks\nAt least 10 minutes, paid, for every 4 hours worked.\nCannot work more than 3 hours without a rest break.\nScheduled as close to the midpoint of the work period as possible.\nMay be required to stay on the job site.\nCount as 'hours worked' for sick leave and overtime.\nVERBATIM STATUTE\nWAC 296-126-092 — Meal Periods · Rest Periods\nPlain-language summary based on the WA Department of Labor & Industries workers-rights page. Not legal advice. Confirm with your employment attorney before changing policy.\nNW Custom Apparel · Production team schedule\nReference: WAC 296-126-092 / RCW 49.12"
+    }
+  ],
+  "details": [
+    {
+      "name": "Kanha Chhorn",
+      "text": "KC\nKanha Chhorn\nEmbroidery Supervisor · Embroidery\n5.5 paid hrs / day\n8:00 AM → 2:00 PM\nShift is 8:00 AM – 2:00 PM. Paid hours 5.5 (6.0 elapsed less the 30-min unpaid lunch).\n8:00 AM\nClock in\n9:00 AM – 9:10 AM\nRest break — 10 min, paid\n11:30 AM – 12:00 PM\nLunch — 30 min, unpaid\n12:30 PM – 12:40 PM\nRest break — 10 min, paid\n2:00 PM\nClock out"
+    },
+    {
+      "name": "Sreynai Meang",
+      "text": "SM\nSreynai Meang\nEmbroidery Operator · Embroidery\n8 paid hrs / day\n8:00 AM → 4:30 PM\nNo change — actual punches already match the posted shift.\n8:00 AM\nClock in\n9:45 AM – 9:55 AM\nRest break — 10 min, paid\n11:00 AM – 11:30 AM\nLunch — 30 min, unpaid\n2:00 PM – 2:10 PM\nRest break — 10 min, paid\n4:30 PM\nClock out"
+    },
+    {
+      "name": "Savy Som",
+      "text": "SS\nSavy Som\nEmbroidery Operator · Embroidery\n8 paid hrs / day\n8:00 AM → 4:30 PM\nTimes unchanged. Actual lunch averages 26 min — it must be the full 30.\n8:00 AM\nClock in\n10:00 AM – 10:10 AM\nRest break — 10 min, paid\n11:00 AM – 11:30 AM\nLunch — 30 min, unpaid\n2:15 PM – 2:25 PM\nRest break — 10 min, paid\n4:30 PM\nClock out"
+    },
+    {
+      "name": "Sorphorn Sorm",
+      "text": "SS\nSorphorn Sorm\nEmbroidery Operator · Embroidery\n8 paid hrs / day\n8:00 AM → 4:30 PM\nTimes unchanged. Actual lunch averages 27 min — it must be the full 30.\n8:00 AM\nClock in\n10:15 AM – 10:25 AM\nRest break — 10 min, paid\n11:30 AM – 12:00 PM\nLunch — 30 min, unpaid\n2:30 PM – 2:40 PM\nRest break — 10 min, paid\n4:30 PM\nClock out"
+    },
+    {
+      "name": "Brian Beardsley",
+      "text": "BB\nBrian Beardsley\nDTG Supervisor · DTG\n7.75 paid hrs / day\n8:00 AM → 4:15 PM\nLunch moved to 12:30 PM and clock-out to 4:15 PM to match actual punches. Actual lunch averages 21 min — it must be the full 30.\n8:00 AM\nClock in\n9:30 AM – 9:40 AM\nRest break — 10 min, paid\n12:30 PM – 1:00 PM\nLunch — 30 min, unpaid\n2:15 PM – 2:25 PM\nRest break — 10 min, paid\n4:15 PM\nClock out"
+    },
+    {
+      "name": "Joseph Hallowell",
+      "text": "JH\nJoseph Hallowell\nDTG Operator · DTG\n7.75 paid hrs / day\n8:00 AM → 4:15 PM\nLunch moved to 11:15 AM and clock-out to 4:15 PM to match actual punches.\n8:00 AM\nClock in\n10:30 AM – 10:40 AM\nRest break — 10 min, paid\n11:15 AM – 11:45 AM\nLunch — 30 min, unpaid\n2:45 PM – 2:55 PM\nRest break — 10 min, paid\n4:15 PM\nClock out"
+    },
+    {
+      "name": "Sothea Tann",
+      "text": "ST\nSothea Tann\nEmbroidery Trimmer · Embroidery\n8 paid hrs / day\n8:00 AM → 4:30 PM\nLunch moved to 11:30 AM to match actual punches; shift times unchanged. Actual lunch averages 28 min — it must be the full 30.\n8:00 AM\nClock in\n10:45 AM – 10:55 AM\nRest break — 10 min, paid\n11:30 AM – 12:00 PM\nLunch — 30 min, unpaid\n2:45 PM – 2:55 PM\nRest break — 10 min, paid\n4:30 PM\nClock out"
+    },
+    {
+      "name": "Ruthie Nhoung",
+      "text": "RN\nRuthie Nhoung\nProduction Manager · Ruthie/Mikalah\n8 paid hrs / day\n8:00 AM → 4:30 PM\nLunch set to 12:30 PM — her actual 2:00 PM punch falls 6 hrs into the shift, outside the WAC 2–5 hr meal window. Break 2 moved to 3:30 PM. Shift times unchanged.\n8:00 AM\nClock in\n10:30 AM – 10:40 AM\nRest break — 10 min, paid\n12:30 PM – 1:00 PM\nLunch — 30 min, unpaid\n3:30 PM – 3:40 PM\nRest break — 10 min, paid\n4:30 PM\nClock out"
+    },
+    {
+      "name": "Mikalah Hede",
+      "text": "MH\nMikalah Hede\nShipping / Receiving · Ruthie/Mikalah\n8 paid hrs / day\n8:00 AM → 5:00 PM\nLunch moved to 1:00 PM to match actual punches. Keeps her 60-min lunch, so 8:00 AM – 5:00 PM is 8.00 paid hrs.\n8:00 AM\nClock in\n10:15 AM – 10:25 AM\nRest break — 10 min, paid\n1:00 PM – 2:00 PM\nLunch — 60 min, unpaid\n3:30 PM – 3:40 PM\nRest break — 10 min, paid\n5:00 PM\nClock out"
+    },
+    {
+      "name": "Theavy Hoeu",
+      "text": "TH\nTheavy Hoeu\nEmbroidery Operator · Embroidery\n8 paid hrs / day\n8:00 AM → 4:30 PM\nShift moved to 8:00 AM – 4:30 PM with lunch at 11:45 AM. Paid hours 7.50 → 8.00, matching what she already works.\n8:00 AM\nClock in\n10:00 AM – 10:10 AM\nRest break — 10 min, paid\n11:45 AM – 12:15 PM\nLunch — 30 min, unpaid\n3:00 PM – 3:10 PM\nRest break — 10 min, paid\n4:30 PM\nClock out"
+    }
+  ],
+  "data": {
+    "schedule": [
+      {
+        "id": "kanha",
+        "name": "Kanha Chhorn",
+        "first": "Kanha",
+        "role": "Embroidery Supervisor",
+        "dept": "Embroidery",
+        "paidHrs": 5.5,
+        "note": "Shift is 8:00 AM – 2:00 PM. Paid hours 5.5 (6.0 elapsed less the 30-min unpaid lunch).",
+        "events": [
+          {
+            "type": "start",
+            "min": 480
+          },
+          {
+            "type": "break",
+            "min": 540,
+            "durMin": 10
+          },
+          {
+            "type": "lunch",
+            "min": 690,
+            "durMin": 30
+          },
+          {
+            "type": "break",
+            "min": 750,
+            "durMin": 10
+          },
+          {
+            "type": "end",
+            "min": 840
+          }
+        ]
+      },
+      {
+        "id": "sreynai",
+        "name": "Sreynai Meang",
+        "first": "Sreynai",
+        "role": "Embroidery Operator",
+        "dept": "Embroidery",
+        "paidHrs": 8,
+        "note": "No change — actual punches already match the posted shift.",
+        "events": [
+          {
+            "type": "start",
+            "min": 480
+          },
+          {
+            "type": "break",
+            "min": 585,
+            "durMin": 10
+          },
+          {
+            "type": "lunch",
+            "min": 660,
+            "durMin": 30
+          },
+          {
+            "type": "break",
+            "min": 840,
+            "durMin": 10
+          },
+          {
+            "type": "end",
+            "min": 990
+          }
+        ]
+      },
+      {
+        "id": "savy",
+        "name": "Savy Som",
+        "first": "Savy",
+        "role": "Embroidery Operator",
+        "dept": "Embroidery",
+        "paidHrs": 8,
+        "note": "Times unchanged. Actual lunch averages 26 min — it must be the full 30.",
+        "events": [
+          {
+            "type": "start",
+            "min": 480
+          },
+          {
+            "type": "break",
+            "min": 600,
+            "durMin": 10
+          },
+          {
+            "type": "lunch",
+            "min": 660,
+            "durMin": 30
+          },
+          {
+            "type": "break",
+            "min": 855,
+            "durMin": 10
+          },
+          {
+            "type": "end",
+            "min": 990
+          }
+        ]
+      },
+      {
+        "id": "sorphorn",
+        "name": "Sorphorn Sorm",
+        "first": "Sorphorn",
+        "role": "Embroidery Operator",
+        "dept": "Embroidery",
+        "paidHrs": 8,
+        "note": "Times unchanged. Actual lunch averages 27 min — it must be the full 30.",
+        "events": [
+          {
+            "type": "start",
+            "min": 480
+          },
+          {
+            "type": "break",
+            "min": 615,
+            "durMin": 10
+          },
+          {
+            "type": "lunch",
+            "min": 690,
+            "durMin": 30
+          },
+          {
+            "type": "break",
+            "min": 870,
+            "durMin": 10
+          },
+          {
+            "type": "end",
+            "min": 990
+          }
+        ]
+      },
+      {
+        "id": "brian",
+        "name": "Brian Beardsley",
+        "first": "Brian",
+        "role": "DTG Supervisor",
+        "dept": "DTG",
+        "paidHrs": 7.75,
+        "note": "Lunch moved to 12:30 PM and clock-out to 4:15 PM to match actual punches. Actual lunch averages 21 min — it must be the full 30.",
+        "events": [
+          {
+            "type": "start",
+            "min": 480
+          },
+          {
+            "type": "break",
+            "min": 570,
+            "durMin": 10
+          },
+          {
+            "type": "lunch",
+            "min": 750,
+            "durMin": 30
+          },
+          {
+            "type": "break",
+            "min": 855,
+            "durMin": 10
+          },
+          {
+            "type": "end",
+            "min": 975
+          }
+        ]
+      },
+      {
+        "id": "joseph",
+        "name": "Joseph Hallowell",
+        "first": "Joseph",
+        "role": "DTG Operator",
+        "dept": "DTG",
+        "paidHrs": 7.75,
+        "note": "Lunch moved to 11:15 AM and clock-out to 4:15 PM to match actual punches.",
+        "events": [
+          {
+            "type": "start",
+            "min": 480
+          },
+          {
+            "type": "break",
+            "min": 630,
+            "durMin": 10
+          },
+          {
+            "type": "lunch",
+            "min": 675,
+            "durMin": 30
+          },
+          {
+            "type": "break",
+            "min": 885,
+            "durMin": 10
+          },
+          {
+            "type": "end",
+            "min": 975
+          }
+        ]
+      },
+      {
+        "id": "sothea",
+        "name": "Sothea Tann",
+        "first": "Sothea",
+        "role": "Embroidery Trimmer",
+        "dept": "Embroidery",
+        "paidHrs": 8,
+        "note": "Lunch moved to 11:30 AM to match actual punches; shift times unchanged. Actual lunch averages 28 min — it must be the full 30.",
+        "events": [
+          {
+            "type": "start",
+            "min": 480
+          },
+          {
+            "type": "break",
+            "min": 645,
+            "durMin": 10
+          },
+          {
+            "type": "lunch",
+            "min": 690,
+            "durMin": 30
+          },
+          {
+            "type": "break",
+            "min": 885,
+            "durMin": 10
+          },
+          {
+            "type": "end",
+            "min": 990
+          }
+        ]
+      },
+      {
+        "id": "ruthie",
+        "name": "Ruthie Nhoung",
+        "first": "Ruthie",
+        "role": "Production Manager",
+        "dept": "Ruthie/Mikalah",
+        "paidHrs": 8,
+        "note": "Lunch set to 12:30 PM — her actual 2:00 PM punch falls 6 hrs into the shift, outside the WAC 2–5 hr meal window. Break 2 moved to 3:30 PM. Shift times unchanged.",
+        "events": [
+          {
+            "type": "start",
+            "min": 480
+          },
+          {
+            "type": "break",
+            "min": 630,
+            "durMin": 10
+          },
+          {
+            "type": "lunch",
+            "min": 750,
+            "durMin": 30
+          },
+          {
+            "type": "break",
+            "min": 930,
+            "durMin": 10
+          },
+          {
+            "type": "end",
+            "min": 990
+          }
+        ]
+      },
+      {
+        "id": "mikalah",
+        "name": "Mikalah Hede",
+        "first": "Mikalah",
+        "role": "Shipping / Receiving",
+        "dept": "Ruthie/Mikalah",
+        "paidHrs": 8,
+        "note": "Lunch moved to 1:00 PM to match actual punches. Keeps her 60-min lunch, so 8:00 AM – 5:00 PM is 8.00 paid hrs.",
+        "events": [
+          {
+            "type": "start",
+            "min": 480
+          },
+          {
+            "type": "break",
+            "min": 615,
+            "durMin": 10
+          },
+          {
+            "type": "lunch",
+            "min": 780,
+            "durMin": 60
+          },
+          {
+            "type": "break",
+            "min": 930,
+            "durMin": 10
+          },
+          {
+            "type": "end",
+            "min": 1020
+          }
+        ]
+      },
+      {
+        "id": "theavy",
+        "name": "Theavy Hoeu",
+        "first": "Theavy",
+        "role": "Embroidery Operator",
+        "dept": "Embroidery",
+        "paidHrs": 8,
+        "note": "Shift moved to 8:00 AM – 4:30 PM with lunch at 11:45 AM. Paid hours 7.50 → 8.00, matching what she already works.",
+        "events": [
+          {
+            "type": "start",
+            "min": 480
+          },
+          {
+            "type": "break",
+            "min": 600,
+            "durMin": 10
+          },
+          {
+            "type": "lunch",
+            "min": 705,
+            "durMin": 30
+          },
+          {
+            "type": "break",
+            "min": 900,
+            "durMin": 10
+          },
+          {
+            "type": "end",
+            "min": 990
+          }
+        ]
+      }
+    ],
+    "segments": [
+      {
+        "id": "kanha",
+        "segments": {
+          "segs": [
+            {
+              "type": "work",
+              "start": 480,
+              "end": 540
+            },
+            {
+              "type": "break",
+              "start": 540,
+              "end": 550
+            },
+            {
+              "type": "work",
+              "start": 550,
+              "end": 690
+            },
+            {
+              "type": "lunch",
+              "start": 690,
+              "end": 720
+            },
+            {
+              "type": "work",
+              "start": 720,
+              "end": 750
+            },
+            {
+              "type": "break",
+              "start": 750,
+              "end": 760
+            },
+            {
+              "type": "work",
+              "start": 760,
+              "end": 840
+            }
+          ],
+          "shiftStart": 480,
+          "shiftEnd": 840
+        }
+      },
+      {
+        "id": "sreynai",
+        "segments": {
+          "segs": [
+            {
+              "type": "work",
+              "start": 480,
+              "end": 585
+            },
+            {
+              "type": "break",
+              "start": 585,
+              "end": 595
+            },
+            {
+              "type": "work",
+              "start": 595,
+              "end": 660
+            },
+            {
+              "type": "lunch",
+              "start": 660,
+              "end": 690
+            },
+            {
+              "type": "work",
+              "start": 690,
+              "end": 840
+            },
+            {
+              "type": "break",
+              "start": 840,
+              "end": 850
+            },
+            {
+              "type": "work",
+              "start": 850,
+              "end": 990
+            }
+          ],
+          "shiftStart": 480,
+          "shiftEnd": 990
+        }
+      },
+      {
+        "id": "savy",
+        "segments": {
+          "segs": [
+            {
+              "type": "work",
+              "start": 480,
+              "end": 600
+            },
+            {
+              "type": "break",
+              "start": 600,
+              "end": 610
+            },
+            {
+              "type": "work",
+              "start": 610,
+              "end": 660
+            },
+            {
+              "type": "lunch",
+              "start": 660,
+              "end": 690
+            },
+            {
+              "type": "work",
+              "start": 690,
+              "end": 855
+            },
+            {
+              "type": "break",
+              "start": 855,
+              "end": 865
+            },
+            {
+              "type": "work",
+              "start": 865,
+              "end": 990
+            }
+          ],
+          "shiftStart": 480,
+          "shiftEnd": 990
+        }
+      },
+      {
+        "id": "sorphorn",
+        "segments": {
+          "segs": [
+            {
+              "type": "work",
+              "start": 480,
+              "end": 615
+            },
+            {
+              "type": "break",
+              "start": 615,
+              "end": 625
+            },
+            {
+              "type": "work",
+              "start": 625,
+              "end": 690
+            },
+            {
+              "type": "lunch",
+              "start": 690,
+              "end": 720
+            },
+            {
+              "type": "work",
+              "start": 720,
+              "end": 870
+            },
+            {
+              "type": "break",
+              "start": 870,
+              "end": 880
+            },
+            {
+              "type": "work",
+              "start": 880,
+              "end": 990
+            }
+          ],
+          "shiftStart": 480,
+          "shiftEnd": 990
+        }
+      },
+      {
+        "id": "brian",
+        "segments": {
+          "segs": [
+            {
+              "type": "work",
+              "start": 480,
+              "end": 570
+            },
+            {
+              "type": "break",
+              "start": 570,
+              "end": 580
+            },
+            {
+              "type": "work",
+              "start": 580,
+              "end": 750
+            },
+            {
+              "type": "lunch",
+              "start": 750,
+              "end": 780
+            },
+            {
+              "type": "work",
+              "start": 780,
+              "end": 855
+            },
+            {
+              "type": "break",
+              "start": 855,
+              "end": 865
+            },
+            {
+              "type": "work",
+              "start": 865,
+              "end": 975
+            }
+          ],
+          "shiftStart": 480,
+          "shiftEnd": 975
+        }
+      },
+      {
+        "id": "joseph",
+        "segments": {
+          "segs": [
+            {
+              "type": "work",
+              "start": 480,
+              "end": 630
+            },
+            {
+              "type": "break",
+              "start": 630,
+              "end": 640
+            },
+            {
+              "type": "work",
+              "start": 640,
+              "end": 675
+            },
+            {
+              "type": "lunch",
+              "start": 675,
+              "end": 705
+            },
+            {
+              "type": "work",
+              "start": 705,
+              "end": 885
+            },
+            {
+              "type": "break",
+              "start": 885,
+              "end": 895
+            },
+            {
+              "type": "work",
+              "start": 895,
+              "end": 975
+            }
+          ],
+          "shiftStart": 480,
+          "shiftEnd": 975
+        }
+      },
+      {
+        "id": "sothea",
+        "segments": {
+          "segs": [
+            {
+              "type": "work",
+              "start": 480,
+              "end": 645
+            },
+            {
+              "type": "break",
+              "start": 645,
+              "end": 655
+            },
+            {
+              "type": "work",
+              "start": 655,
+              "end": 690
+            },
+            {
+              "type": "lunch",
+              "start": 690,
+              "end": 720
+            },
+            {
+              "type": "work",
+              "start": 720,
+              "end": 885
+            },
+            {
+              "type": "break",
+              "start": 885,
+              "end": 895
+            },
+            {
+              "type": "work",
+              "start": 895,
+              "end": 990
+            }
+          ],
+          "shiftStart": 480,
+          "shiftEnd": 990
+        }
+      },
+      {
+        "id": "ruthie",
+        "segments": {
+          "segs": [
+            {
+              "type": "work",
+              "start": 480,
+              "end": 630
+            },
+            {
+              "type": "break",
+              "start": 630,
+              "end": 640
+            },
+            {
+              "type": "work",
+              "start": 640,
+              "end": 750
+            },
+            {
+              "type": "lunch",
+              "start": 750,
+              "end": 780
+            },
+            {
+              "type": "work",
+              "start": 780,
+              "end": 930
+            },
+            {
+              "type": "break",
+              "start": 930,
+              "end": 940
+            },
+            {
+              "type": "work",
+              "start": 940,
+              "end": 990
+            }
+          ],
+          "shiftStart": 480,
+          "shiftEnd": 990
+        }
+      },
+      {
+        "id": "mikalah",
+        "segments": {
+          "segs": [
+            {
+              "type": "work",
+              "start": 480,
+              "end": 615
+            },
+            {
+              "type": "break",
+              "start": 615,
+              "end": 625
+            },
+            {
+              "type": "work",
+              "start": 625,
+              "end": 780
+            },
+            {
+              "type": "lunch",
+              "start": 780,
+              "end": 840
+            },
+            {
+              "type": "work",
+              "start": 840,
+              "end": 930
+            },
+            {
+              "type": "break",
+              "start": 930,
+              "end": 940
+            },
+            {
+              "type": "work",
+              "start": 940,
+              "end": 1020
+            }
+          ],
+          "shiftStart": 480,
+          "shiftEnd": 1020
+        }
+      },
+      {
+        "id": "theavy",
+        "segments": {
+          "segs": [
+            {
+              "type": "work",
+              "start": 480,
+              "end": 600
+            },
+            {
+              "type": "break",
+              "start": 600,
+              "end": 610
+            },
+            {
+              "type": "work",
+              "start": 610,
+              "end": 705
+            },
+            {
+              "type": "lunch",
+              "start": 705,
+              "end": 735
+            },
+            {
+              "type": "work",
+              "start": 735,
+              "end": 900
+            },
+            {
+              "type": "break",
+              "start": 900,
+              "end": 910
+            },
+            {
+              "type": "work",
+              "start": 910,
+              "end": 990
+            }
+          ],
+          "shiftStart": 480,
+          "shiftEnd": 990
+        }
+      }
+    ]
+  },
+  "events": {
+    "errors": [],
+    "writes": [],
+    "unknown": [],
+    "missing": [],
+    "providers": []
+  }
+}

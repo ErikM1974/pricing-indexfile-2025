@@ -12,7 +12,7 @@
    ===================================================== */
 
 import { register } from '../core/dashboard-events.js';
-import { showApiError, clearApiError } from '../core/dashboard-errors.js';
+import { showApiError, clearApiError, reportWidgetResult } from '../core/dashboard-errors.js';
 import { escapeHtml, formatMoney } from '../core/dashboard-ui-utils.js';
 import { caspioArchiveService } from '../services/caspio-archive-service.js';
 import { fetchAnnualGoal, formatGoalCompact, fallbackWarning } from '../services/company-goal-service.js';
@@ -87,6 +87,7 @@ function renderTeam(payload, goalRes) {
     const dateRangeEl = document.getElementById('teamDateRange');
     if (!container) return;
 
+    if (dateRangeEl) dateRangeEl.textContent = '';
     if (!payload?.reps?.length) {
         container.innerHTML = `
             <div class="rep-empty">
@@ -192,8 +193,10 @@ async function loadTeam(refresh = false) {
         if (payload?.totalRevenue != null) {
             setYtdTotal(payload.totalRevenue, { source: 'archive', archivedThrough: payload.lastArchivedDate });
         }
-        return payload;
+        return reportWidgetResult('team', payload, goalRes?.source !== 'fallback');
     } catch (err) {
+        fillRevenueYtd(null);
+        document.getElementById('teamDateRange')?.replaceChildren();
         showApiError('metrics', err, {
             onRetry: () => loadTeam(true),
             detail: 'YTD per-rep archive is unreachable. The daily archive cron may have stalled.',
@@ -201,7 +204,7 @@ async function loadTeam(refresh = false) {
         // The dashboard has no team card since 2026-09-03 — the goal chip is the only
         // place this failure can show, so tell it.
         setYtdUnavailable();
-        return null;
+        return reportWidgetResult('team', null);
     }
 }
 

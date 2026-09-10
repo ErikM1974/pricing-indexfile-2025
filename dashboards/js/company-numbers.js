@@ -10,8 +10,8 @@
      Revenue refreshed, while the header claimed the whole page did.
    • Each card carries an "Updated h:mm" stamp (or "Failed h:mm") so the age
      of every number is visible; the header shows the last full tick.
-   • Production Turnaround is a static estimate — no tick, no stamp; its
-     footer prints how old the data is instead.
+   • Production Due is live, with the same result reporting and refresh tick.
+     Failed reads clear prior counts as well as the list.
 
    Relative imports: scripts/build.js bundles this entry with its module graph
    into ONE hashed file (ENTRY_BUNDLES), so production makes one cached
@@ -72,13 +72,23 @@ function setHeader(text) {
     if (el) el.textContent = text;
 }
 
-// A controller resolves after it has rendered EITHER its data or its visible
-// error (showApiError / errorCard). The stamp reads "Failed" only when the
-// promise rejects or resolves to false.
+function updateHeader(at) {
+    const failed = document.querySelector('.cn-stamp.is-failed');
+    const status = failed ? 'checked' : 'updated';
+    setHeader(status + ' ' + clock(at) + (failed ? ' · some reports unavailable' : '') + ' · refreshes every 5 min while this tab is open');
+}
+
+function recordResult(key, ok, at) {
+    stamp(key, ok, at);
+    if (lastTickAt && !ticking) updateHeader(lastTickAt);
+}
+
+// Controllers announce the result they actually rendered, including direct
+// Retry and range changes. A superseded request emits nothing. Rejections
+// escaping a controller still mark the card failed here.
 async function run(card, fn) {
     try {
-        const result = await fn();
-        stamp(card.key, result !== false);
+        await fn();
         return true;
     } catch (err) {
         console.error(`[company-numbers] ${card.key} failed:`, err);
@@ -98,7 +108,7 @@ async function tick(reason, force = false) {
     lastTickAt = started;
     ticking = false;
     if (btn) { btn.disabled = false; btn.classList.remove('is-busy'); }
-    setHeader(`updated ${clock(started)} · refreshes every 5 min while this tab is open`);
+    updateHeader(started);
     if (reason) console.debug('[company-numbers] tick:', reason);
 }
 
@@ -109,14 +119,20 @@ function bootstrap() {
     // Art aging stamps itself through this event (first load + manual Retry). Its
     // classic script usually finishes the first load before this module (still
     // fetching imports) is listening, so also read the result it left behind.
-    document.addEventListener('art-aging:loaded', (e) => stamp('art', !!e.detail?.ok, e.detail?.at));
+    document.addEventListener('art-aging:loaded', (e) => recordResult('art', !!e.detail?.ok, e.detail?.at));
+    document.addEventListener('dashboard:widget-loaded', (e) => recordResult(e.detail.key, !!e.detail.ok, e.detail.at));
     const last = window.ArtAgingWidget?.last;
     if (last) stamp('art', !!last.ok, last.at);
 
     const started = Date.now();
+    const btn = document.getElementById('cn-refresh-all');
+    ticking = true;
+    if (btn) btn.disabled = true;
     Promise.allSettled(CARDS.filter((c) => c.init).map((c) => run(c, c.init))).then(() => {
         lastTickAt = started;
-        setHeader(`updated ${clock(started)} · refreshes every 5 min while this tab is open`);
+        ticking = false;
+        if (btn) btn.disabled = false;
+        updateHeader(started);
     });
 
     // The tick only spends calls while somebody is looking.
