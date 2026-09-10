@@ -207,6 +207,10 @@ class NamesNumbersController {
         document.getElementById('ocrCancelBtn').addEventListener('click', () => this.closeModal('ocrModal'));
         document.getElementById('ocrImportBtn').addEventListener('click', () => this.handleOcrImport());
         this.initOcrDropZone();
+        for (const id of ['newGroupName', 'pasteTextarea']) {
+            const field = document.getElementById(id);
+            field.addEventListener('input', () => field.setCustomValidity(''));
+        }
 
         // Dirty tracking on roster info fields
         ['rosterName', 'companyName', 'orderNumber', 'contactName', 'contactEmail', 'salesRep', 'rosterNotes'].forEach(id => {
@@ -220,6 +224,7 @@ class NamesNumbersController {
     // ============================================
 
     addGroup(group) {
+        this.collectTableData();
         if (!group.id) group.id = randomId('group');
         if (!Array.isArray(group.garments) || group.garments.length === 0) {
             group.garments = [{
@@ -249,11 +254,10 @@ class NamesNumbersController {
     }
 
     addGroupFromModal() {
-        const name = document.getElementById('newGroupName').value.trim();
-        if (!name) {
-            this.showToast('Please enter a group name', 'error');
-            return;
-        }
+        const input = document.getElementById('newGroupName');
+        const name = input.value.trim();
+        input.setCustomValidity(name ? '' : 'Please enter a group name');
+        if (!input.reportValidity()) return;
         const style = document.getElementById('newGroupStyle').value.trim();
         const color = document.getElementById('newGroupColor').value.trim();
         this.addGroup({
@@ -827,42 +831,33 @@ class NamesNumbersController {
         const file = e.target.files[0];
         if (!file) return;
         e.target.value = '';
-
+        if (this._saving || (this.rosterLoadState && this.rosterLoadState !== 'ready')) return;
+        const sequence = this._excelSeq = (this._excelSeq || 0) + 1;
+        const rosterSequence = this._rosterLoadSeq;
+        const current = () => sequence === this._excelSeq && rosterSequence === this._rosterLoadSeq;
         this.showToast('Parsing Excel file...', '');
-
         try {
             const result = await this.service.parseExcel(file);
-
-            if (!result.success) {
-                this.showToast('Failed to parse Excel', 'error');
-                return;
-            }
-
-            // Clear existing data if this is a fresh roster
-            if (this.groups.length === 0 || confirm(`Replace current data with ${result.totalGroups} groups and ${result.totalRows} rows from Excel?`)) {
-                // Normalize to v2 shape (backend may still return legacy)
-                this.groups = (result.groups || []).map(migrateLegacyGroup);
-                this.rows = (result.rows || []).map(row => {
-                    const g = this.groups.find(gg => gg.id === row.groupId);
-                    return g ? migrateLegacyRow(row, g) : row;
-                });
-                this.activeGroupId = this.groups.length > 0 ? this.groups[0].id : null;
-
-                // Auto-fill roster name from filename
+            if (!current()) return;
+            if (!result.success) throw new Error(result.error || 'Failed to parse Excel');
+            const { groups, rows } = this.normalizeRosterContent(result.groups, result.rows);
+            if (this.groups.length === 0 || confirm('Replace current data with ' + groups.length + ' groups and ' + rows.length + ' rows from Excel?')) {
+                this.groups = groups;
+                this.rows = rows;
+                this.activeGroupId = groups.length > 0 ? groups[0].id : null;
                 if (!document.getElementById('rosterName').value) {
                     const name = file.name.replace(/\.(xlsx?|csv)$/i, '').replace(/[_-]/g, ' ');
                     document.getElementById('rosterName').value = name;
                 }
-
                 this.isDirty = true;
                 this.renderTabs();
                 this.loadGroupConfig();
                 this.renderTable();
                 this.updateUI();
-                this.showToast(`Imported ${result.totalGroups} groups, ${result.totalRows} rows`, 'success');
+                this.showToast('Imported ' + groups.length + ' groups, ' + rows.length + ' rows', 'success');
             }
         } catch (err) {
-            this.showToast('Error parsing Excel: ' + err.message, 'error');
+            if (current()) this.showToast('Error parsing Excel: ' + err.message, 'error');
         }
     }
 
@@ -871,11 +866,10 @@ class NamesNumbersController {
     // ============================================
 
     handlePasteImport() {
-        const text = document.getElementById('pasteTextarea').value.trim();
-        if (!text) {
-            this.showToast('Paste some names first', 'error');
-            return;
-        }
+        const textarea = document.getElementById('pasteTextarea');
+        const text = textarea.value.trim();
+        textarea.setCustomValidity(text ? '' : 'Paste some names first');
+        if (!textarea.reportValidity()) return;
 
         if (!this.activeGroupId) {
             this.addGroup({ name: 'Roster' });
@@ -1277,7 +1271,7 @@ class NamesNumbersController {
         data.Status = status;
         data.CreatedBy = data.CreatedBy || (sessionStorage.getItem('nwca_user_name') || 'Staff');
         const existingId = this.currentRosterId;
-        const sequence = this._rosterLoadSeq;
+        const sequence = this._rosterLoadSeq = (this._rosterLoadSeq || 0) + 1;
         const focusBeforeSave = document.activeElement;
         this.setRosterSaveBusy(true);
         try {
@@ -1309,6 +1303,19 @@ class NamesNumbersController {
             this.setRosterSaveBusy(false);
             if (sequence === this._rosterLoadSeq && document.activeElement === document.body && focusBeforeSave?.isConnected && !focusBeforeSave.closest('[inert]')) focusBeforeSave.focus();
         }
+    }
+
+    normalizeRosterContent(groups, rows) {
+        const record = value => value && typeof value === 'object' && !Array.isArray(value);
+        if (!Array.isArray(groups) || !Array.isArray(rows) || !groups.every(record) || !rows.every(record)) throw new Error('Roster data is incomplete.');
+        groups = groups.map(migrateLegacyGroup);
+        if (groups.some(g => !Array.isArray(g.garments) || !g.garments.every(record) || !Array.isArray(g.personColumns) || !g.personColumns.every(k => PERSON_COLUMN_DEFS[k]) || !Array.isArray(g.customColumns) || !g.customColumns.every(record))) throw new Error('Roster columns are incomplete.');
+        rows = rows.map(row => {
+            const group = groups.find(g => g.id === row.groupId);
+            if (!group) throw new Error('A roster row is missing its group.');
+            return migrateLegacyRow(row, group);
+        });
+        return { groups, rows };
     }
 
     updateRosterAvailability() {
@@ -1366,17 +1373,7 @@ class NamesNumbersController {
             if (!result.success || !result.roster || Number(result.roster.ID_Roster) !== id) throw new Error('The requested roster was not returned.');
             const r = result.roster;
             // Validate and migrate locally before replacing any currently displayed data.
-            let groups = JSON.parse(r.GroupsJSON || '[]');
-            let rows = JSON.parse(r.RosterJSON || '[]');
-            const record = value => value && typeof value === 'object' && !Array.isArray(value);
-            if (!Array.isArray(groups) || !Array.isArray(rows) || !groups.every(record) || !rows.every(record)) throw new Error('Roster data is incomplete.');
-            groups = groups.map(migrateLegacyGroup);
-            if (groups.some(g => !Array.isArray(g.garments) || !g.garments.every(record) || !Array.isArray(g.personColumns) || !g.personColumns.every(k => PERSON_COLUMN_DEFS[k]) || !Array.isArray(g.customColumns) || !g.customColumns.every(record))) throw new Error('Roster columns are incomplete.');
-            rows = rows.map(row => {
-                const group = groups.find(g => g.id === row.groupId);
-                if (!group) throw new Error('A roster row is missing its group.');
-                return migrateLegacyRow(row, group);
-            });
+            const { groups, rows } = this.normalizeRosterContent(JSON.parse(r.GroupsJSON || '[]'), JSON.parse(r.RosterJSON || '[]'));
             this.currentRosterId = r.ID_Roster;
             document.getElementById('rosterName').value = r.RosterName || '';
             document.getElementById('companyName').value = r.CompanyName || '';

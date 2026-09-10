@@ -1141,6 +1141,54 @@
       "before": "            this.setRosterSaveBusy(false);\n",
       "after": "            this.setRosterSaveBusy(false);\n            if (sequence === this._rosterLoadSeq && document.activeElement === document.body && focusBeforeSave?.isConnected && !focusBeforeSave.closest('[inert]')) focusBeforeSave.focus();\n",
       "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "            let groups = JSON.parse(r.GroupsJSON || '[]');\n            let rows = JSON.parse(r.RosterJSON || '[]');\n            const record = value => value && typeof value === 'object' && !Array.isArray(value);\n            if (!Array.isArray(groups) || !Array.isArray(rows) || !groups.every(record) || !rows.every(record)) throw new Error('Roster data is incomplete.');\n            groups = groups.map(migrateLegacyGroup);\n            if (groups.some(g => !Array.isArray(g.garments) || !g.garments.every(record) || !Array.isArray(g.personColumns) || !g.personColumns.every(k => PERSON_COLUMN_DEFS[k]) || !Array.isArray(g.customColumns) || !g.customColumns.every(record))) throw new Error('Roster columns are incomplete.');\n            rows = rows.map(row => {\n                const group = groups.find(g => g.id === row.groupId);\n                if (!group) throw new Error('A roster row is missing its group.');\n                return migrateLegacyRow(row, group);\n            });\n",
+      "after": "            const { groups, rows } = this.normalizeRosterContent(JSON.parse(r.GroupsJSON || '[]'), JSON.parse(r.RosterJSON || '[]'));\n",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "    updateRosterAvailability() {",
+      "after": "    normalizeRosterContent(groups, rows) {\n        const record = value => value && typeof value === 'object' && !Array.isArray(value);\n        if (!Array.isArray(groups) || !Array.isArray(rows) || !groups.every(record) || !rows.every(record)) throw new Error('Roster data is incomplete.');\n        groups = groups.map(migrateLegacyGroup);\n        if (groups.some(g => !Array.isArray(g.garments) || !g.garments.every(record) || !Array.isArray(g.personColumns) || !g.personColumns.every(k => PERSON_COLUMN_DEFS[k]) || !Array.isArray(g.customColumns) || !g.customColumns.every(record))) throw new Error('Roster columns are incomplete.');\n        rows = rows.map(row => {\n            const group = groups.find(g => g.id === row.groupId);\n            if (!group) throw new Error('A roster row is missing its group.');\n            return migrateLegacyRow(row, group);\n        });\n        return { groups, rows };\n    }\n\n    updateRosterAvailability() {",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "    async handleExcelUpload(e) {\n        const file = e.target.files[0];\n        if (!file) return;\n        e.target.value = '';\n\n        this.showToast('Parsing Excel file...', '');\n\n        try {\n            const result = await this.service.parseExcel(file);\n\n            if (!result.success) {\n                this.showToast('Failed to parse Excel', 'error');\n                return;\n            }\n\n            // Clear existing data if this is a fresh roster\n            if (this.groups.length === 0 || confirm(`Replace current data with ${result.totalGroups} groups and ${result.totalRows} rows from Excel?`)) {\n                // Normalize to v2 shape (backend may still return legacy)\n                this.groups = (result.groups || []).map(migrateLegacyGroup);\n                this.rows = (result.rows || []).map(row => {\n                    const g = this.groups.find(gg => gg.id === row.groupId);\n                    return g ? migrateLegacyRow(row, g) : row;\n                });\n                this.activeGroupId = this.groups.length > 0 ? this.groups[0].id : null;\n\n                // Auto-fill roster name from filename\n                if (!document.getElementById('rosterName').value) {\n                    const name = file.name.replace(/\\.(xlsx?|csv)$/i, '').replace(/[_-]/g, ' ');\n                    document.getElementById('rosterName').value = name;\n                }\n\n                this.isDirty = true;\n                this.renderTabs();\n                this.loadGroupConfig();\n                this.renderTable();\n                this.updateUI();\n                this.showToast(`Imported ${result.totalGroups} groups, ${result.totalRows} rows`, 'success');\n            }\n        } catch (err) {\n            this.showToast('Error parsing Excel: ' + err.message, 'error');\n        }\n    }\n\n",
+      "after": "    async handleExcelUpload(e) {\n        const file = e.target.files[0];\n        if (!file) return;\n        e.target.value = '';\n        if (this._saving || (this.rosterLoadState && this.rosterLoadState !== 'ready')) return;\n        const sequence = this._excelSeq = (this._excelSeq || 0) + 1;\n        const rosterSequence = this._rosterLoadSeq;\n        const current = () => sequence === this._excelSeq && rosterSequence === this._rosterLoadSeq;\n        this.showToast('Parsing Excel file...', '');\n        try {\n            const result = await this.service.parseExcel(file);\n            if (!current()) return;\n            if (!result.success) throw new Error(result.error || 'Failed to parse Excel');\n            const { groups, rows } = this.normalizeRosterContent(result.groups, result.rows);\n            if (this.groups.length === 0 || confirm('Replace current data with ' + groups.length + ' groups and ' + rows.length + ' rows from Excel?')) {\n                this.groups = groups;\n                this.rows = rows;\n                this.activeGroupId = groups.length > 0 ? groups[0].id : null;\n                if (!document.getElementById('rosterName').value) {\n                    const name = file.name.replace(/\\.(xlsx?|csv)$/i, '').replace(/[_-]/g, ' ');\n                    document.getElementById('rosterName').value = name;\n                }\n                this.isDirty = true;\n                this.renderTabs();\n                this.loadGroupConfig();\n                this.renderTable();\n                this.updateUI();\n                this.showToast('Imported ' + groups.length + ' groups, ' + rows.length + ' rows', 'success');\n            }\n        } catch (err) {\n            if (current()) this.showToast('Error parsing Excel: ' + err.message, 'error');\n        }\n    }\n\n",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "        const sequence = this._rosterLoadSeq;\n        const focusBeforeSave",
+      "after": "        const sequence = this._rosterLoadSeq = (this._rosterLoadSeq || 0) + 1;\n        const focusBeforeSave",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "    addGroup(group) {\n",
+      "after": "    addGroup(group) {\n        this.collectTableData();\n",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "        const name = document.getElementById('newGroupName').value.trim();\n        if (!name) {\n            this.showToast('Please enter a group name', 'error');\n            return;\n        }",
+      "after": "        const input = document.getElementById('newGroupName');\n        const name = input.value.trim();\n        input.setCustomValidity(name ? '' : 'Please enter a group name');\n        if (!input.reportValidity()) return;",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "        const text = document.getElementById('pasteTextarea').value.trim();\n        if (!text) {\n            this.showToast('Paste some names first', 'error');\n            return;\n        }",
+      "after": "        const textarea = document.getElementById('pasteTextarea');\n        const text = textarea.value.trim();\n        textarea.setCustomValidity(text ? '' : 'Paste some names first');\n        if (!textarea.reportValidity()) return;",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "        this.initOcrDropZone();\n",
+      "after": "        this.initOcrDropZone();\n        for (const id of ['newGroupName', 'pasteTextarea']) {\n            const field = document.getElementById(id);\n            field.addEventListener('input', () => field.setCustomValidity(''));\n        }\n",
+      "count": 1
     }
   ]
 }

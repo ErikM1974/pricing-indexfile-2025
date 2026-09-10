@@ -364,3 +364,87 @@ test('CSS personalization: failed save-and-return does not make the next ordinar
     state.writeResponse = { json: { success: true } }; await page.locator('#saveDraftBtn').click(); await expect(page.locator('#toast')).toContainText('Roster saved');
     await page.waitForTimeout(800); expect(new URL(page.url()).pathname).toBe('/pages/names-numbers.html'); clean(events, 2);
 });
+
+test('CSS personalization: incomplete Excel results keep the current roster and allow file retry', async ({ page }) => {
+    const state = { writeResponse: { json: { success: true, totalGroups: 1, totalRows: 2 } } }, events = await open(page, 'roster-form', state);
+    await expect(page.locator('#rosterName')).toHaveValue('Synthetic Cedar Varsity'); page.on('dialog', dialog => dialog.accept());
+    const file = { name: 'synthetic-roster.xlsx', mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', buffer: Buffer.from('synthetic workbook; parser is mocked') };
+    await page.locator('#excelFileInput').setInputFiles(file); await expect(page.locator('#toast')).toContainText('Error parsing Excel');
+    await expect(page.locator('#rosterTableBody tr')).toHaveCount(2);
+    state.writeResponse = { json: { success: true, totalGroups: 1, totalRows: 2, groups: data.groups, rows: data.rows } };
+    await page.locator('#excelFileInput').setInputFiles(file); await expect(page.locator('#toast')).toContainText('Imported 1 groups, 2 rows');
+    await expect(page.locator('#rosterTableBody input[data-key="number"]').first()).toHaveValue('07'); clean(events, 2);
+});
+
+for (const switchRoster of [false, true]) test('CSS personalization: an older Excel import cannot replace ' + (switchRoster ? 'another roster' : 'a newer file'), async ({ page }) => {
+    const state = {}, events = await open(page, 'roster-form', state); await expect(page.locator('#rosterName')).toHaveValue('Synthetic Cedar Varsity');
+    page.on('dialog', dialog => dialog.accept());
+    let release, count = 0;
+    state.respondWrite = async () => {
+        const first = ++count === 1;
+        if (first) await new Promise(resolve => { release = resolve; });
+        return { json: { success: true, totalGroups: 1, totalRows: 2, groups: [{ ...data.groups[0], name: first ? 'Older import' : 'Latest import' }], rows: data.rows } };
+    };
+    state.respond = async u => u.pathname === '/api/rosters/97003' ? { json: { success: true, roster: data.rosters[2] } } : undefined;
+    await page.locator('#excelFileInput').setInputFiles({ name: 'older.xlsx', mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', buffer: Buffer.from('synthetic') });
+    await expect.poll(() => Boolean(release)).toBe(true);
+    if (switchRoster) await page.evaluate(() => controller.loadRoster(97003));
+    else await page.locator('#excelFileInput').setInputFiles({ name: 'latest.xlsx', mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', buffer: Buffer.from('synthetic') });
+    const expected = switchRoster ? 'Varsity' : 'Latest import'; await expect(page.locator('.tab-btn').first()).toContainText(expected);
+    release(); await page.waitForTimeout(200);
+    await expect(page.locator('.tab-btn').first()).toContainText(expected); clean(events, switchRoster ? 1 : 2);
+});
+
+test('CSS personalization: adding a group preserves unsaved cells in the previous group', async ({ page }) => {
+    const events = await open(page, 'roster-form'); await expect(page.locator('#rosterName')).toHaveValue('Synthetic Cedar Varsity');
+    await page.locator('#rosterTableBody input[data-key="name"]').first().fill('Edited Example');
+    await page.locator('#addGroupBtn').click(); await page.locator('#newGroupName').fill('Coaches'); await page.locator('#newGroupStyle').fill('ST350'); await page.locator('#newGroupColor').fill('White'); await page.locator('#addGroupConfirmBtn').click();
+    await expect(page.locator('.tab-btn')).toHaveCount(2); await expect(page.locator('#rosterTableBody tr')).toHaveCount(5);
+    await page.locator('.tab-btn').first().click(); await expect(page.locator('#rosterTableBody input[data-key="name"]').first()).toHaveValue('Edited Example');
+    await expect(page.locator('#rosterTableBody input[data-key="number"]').first()).toHaveValue('07'); clean(events);
+});
+
+test('CSS personalization: required group and paste input errors stay inside their dialogs', async ({ page }) => {
+    const events = await open(page, 'roster-form'); await expect(page.locator('#rosterName')).toHaveValue('Synthetic Cedar Varsity');
+    for (const [opener, field, submit, message] of [['#addGroupBtn', '#newGroupName', '#addGroupConfirmBtn', 'Please enter a group name'], ['#pasteNamesBtn', '#pasteTextarea', '#pasteImportBtn', 'Paste some names first']]) {
+        await page.locator(opener).click(); await page.locator(submit).click(); await expect(page.locator(field)).toBeFocused();
+        expect(await page.locator(field).evaluate(n => n.validationMessage)).toBe(message);
+        await page.keyboard.press('Escape'); await expect(page.locator(opener)).toBeFocused();
+    }
+    clean(events);
+});
+
+test('CSS personalization: garment controls retain entered back lines across column changes', async ({ page }) => {
+    const events = await open(page, 'roster-form'); await expect(page.locator('#rosterName')).toHaveValue('Synthetic Cedar Varsity');
+    await page.locator('#toggleConfigBtn').click(); await page.locator('#addGarmentBtn').click(); await expect(page.locator('.garment-row')).toHaveCount(3);
+    await page.locator('.gf-label').last().fill('Jacket'); await page.locator('.gf-label').last().press('Tab');
+    await page.locator('.gf-backLines').last().check();
+    await page.locator('#rosterTableBody input[data-field="backLine1"]').first().fill('TEAM 2026');
+    await page.locator('.gf-qty').last().check();
+    await expect(page.locator('#rosterTableBody input[data-field="backLine1"]').first()).toHaveValue('TEAM 2026');
+    await page.setViewportSize({ width: 320, height: 1000 }); await axe(page); expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
+    page.once('dialog', dialog => dialog.accept()); await page.locator('.garment-delete-btn').last().click();
+    await expect(page.locator('.garment-row')).toHaveCount(2); await expect(page.locator('#rosterTableBody input[data-key="number"]').first()).toHaveValue('07'); clean(events);
+});
+
+test('CSS personalization: a confirmed new roster keeps its ID for subsequent saves', async ({ page }) => {
+    const state = { writeResponse: { json: { success: true, roster: { ID_Roster: 97009 } } } }, events = await open(page, 'roster-form', state);
+    await expect(page.locator('#rosterName')).toHaveValue('Synthetic Cedar Varsity'); await page.locator('#newRosterBtn').click();
+    await page.locator('#rosterName').fill('Synthetic new roster'); await page.locator('#saveDraftBtn').click();
+    await expect(page.locator('#toast')).toContainText('Roster created successfully'); expect(new URL(page.url()).searchParams.get('load')).toBe('97009');
+    await page.locator('#saveSubmitBtn').click(); await expect(page.locator('#statusBadge')).toHaveText('Submitted');
+    expect(events.writes.map(({ path, method }) => ({ path, method }))).toEqual([{ path: '/api/rosters', method: 'POST' }, { path: '/api/rosters/97009', method: 'PUT' }]); clean(events, 2);
+});
+
+test('CSS personalization: saving the current roster cancels an earlier pending Excel replacement', async ({ page }) => {
+    const state = {}, events = await open(page, 'roster-form', state); await expect(page.locator('#rosterName')).toHaveValue('Synthetic Cedar Varsity');
+    let release, dialogs = 0; page.on('dialog', dialog => { dialogs++; return dialog.accept(); });
+    state.respondWrite = async req => {
+        if (new URL(req.url()).pathname.endsWith('/parse-excel')) { await new Promise(resolve => { release = resolve; }); return { json: { success: true, groups: [{ ...data.groups[0], name: 'Earlier import' }], rows: data.rows, totalGroups: 1, totalRows: 2 } }; }
+        return { json: { success: true } };
+    };
+    await page.locator('#excelFileInput').setInputFiles({ name: 'earlier.xlsx', mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', buffer: Buffer.from('synthetic') });
+    await expect.poll(() => Boolean(release)).toBe(true); await page.locator('#saveDraftBtn').click(); await expect(page.locator('#toast')).toContainText('Roster saved');
+    release(); await page.waitForTimeout(200); await expect(page.locator('.tab-btn').first()).toContainText('Varsity');
+    expect(dialogs).toBe(0); expect(await page.evaluate(() => controller.isDirty)).toBe(false); clean(events, 2);
+});

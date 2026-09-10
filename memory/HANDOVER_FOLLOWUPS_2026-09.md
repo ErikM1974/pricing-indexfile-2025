@@ -13,12 +13,14 @@ Three pages: lead detail, Forms Inbox and Marketing Shipments. Four old sheets/4
 ### Current personalization draft
 
 - Isolated branch codex/personalization-workflows in the private training-final-worktree. Candidate v2026.09.09.21. Four consumers: monogram dashboard, names-and-numbers dashboard, names-and-numbers entry and monogram form. Three layout drafts are implemented; the monogram entry still needs visual migration. Its saved-style loading/editing bug is fixed and tested.
-- All32 focused browser scenarios pass together. All22 source/HTML checks pass, with105 reversible controller mappings. Twenty-one original hashes plus unchanged adopted ui-dialog.js retain source provenance. New CSS and both edited form controllers pass lint. New owner has no undefined tokens or important flags.
+- All40 focused browser scenarios pass together. All22 source/HTML checks pass, with113 reversible controller mappings. Twenty-one original hashes plus unchanged adopted ui-dialog.js retain source provenance. New CSS and both edited form controllers pass lint. New owner has no undefined tokens or important flags.
 - Dashboard loading/malformed/retry/race cases preserve current data. Roster entry uses canonical controls, collapsed settings, keyboard table scrolling, native dialogs and shared focus/scroll lifecycle. Four-width accessibility and complete input values are covered; leading-zero jersey/custom values survive settings, paste and import.
 - Roster load/search reject incomplete data, retain visible retry and ignore obsolete responses. Failed loads leave existing data inert and block save. OCR supports keyboard file selection, in-dialog error/review, four-width accessibility and current-file/dialog lifetimes. All API requests are mocked, including file processing and save requests.
 - Saves validate success responses, prevent duplicates, keep edits/status on rejection, restore focus and ignore obsolete acknowledgments/navigation. The backend source was inspected read-only: update returns success:true; create also returns roster.ID_Roster. No backend files changed.
 - A paired native browser comparison reconstructs the immutable original source and proves that the actual downloaded CSV and save payload still match byte-for-byte/structurally. Both baseline files are new export evidence; earlier original captures were not overwritten.
 - Two roster paper outputs/seven pages were visually reviewed: one normal page and a six-page wide example with all288 distinct custom values. Repeated table headings/identity columns prevent clipping. Existing active-group print scope and size-breakdown semantics are preserved. Dashboard print adds two reviewed one-page PDFs.
+
+Roster review is complete: Excel validation/lifetime, unsaved group fields, native dialog validation, garment controls and create/update IDs pass. Original paste logic was correct; its test needed to accept the native column-name prompt. All40 focused cases passed together;22 source checks/113 mappings and CSS/controller lint passed. Evidence: personalization-roster-complete.log and personalization-roster-final-source.log.
 
 ### Remaining work and resume steps
 
