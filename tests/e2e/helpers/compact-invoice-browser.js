@@ -35,13 +35,13 @@ async function open(page,state={}){
    return route.fulfill({status:state.sendStatus||200,json:state.sendResult||{success:!state.sendStatus,shipstationOrderId:55001,status:'awaiting_shipment',lastSynced:now}});
   }
   if(!['GET','HEAD'].includes(method)||p.startsWith('/api/quote-sequence/')||u.searchParams.get('autoAdd')==='true'){events.writes.push(req.url());return route.fulfill({status:503});}
-  if(p==='/api/crm-session/me')return route.fulfill({status:state.staff===false?401:200,json:state.staff===false?{authenticated:false}:{authenticated:true,name:'Review Staff',email:'staff@example.test',role:'admin'}});
+  if(p==='/api/crm-session/me'){if(state.identityArrive)state.identityArrive();if(state.identityHold)await state.identityHold;return route.fulfill({status:state.staff===false?401:200,json:state.staff===false?{authenticated:false}:{authenticated:true,name:'Review Staff',email:'staff@example.test',role:'admin'}});}
   if(p==='/api/quote-sessions/'+quoteId+'/full'){
    events.reads.push({path:p,query:u.search});if(state.arrive)state.arrive();if(state.hold)await state.hold;
    const denied=state.protected&&u.searchParams.get('k')!=='review token / only';
    return route.fulfill({status:denied?404:state.status||200,json:denied||state.status?{error:'Synthetic load failure'}:(state.afterSync&&events.reads.length>1?state.afterSync:state.initialData||data(state.mode))});
   }
-  if(p.startsWith('/__invoice-fixture/'))return route.fulfill({contentType:'image/svg+xml',body:'<svg xmlns="http://www.w3.org/2000/svg" width="240" height="160"><rect width="240" height="160" fill="#dbeafe"/><text x="20" y="80" font-family="Arial" font-size="20">Fixture artwork</text></svg>'});
+  if(p.startsWith('/__invoice-fixture/'))return route.fulfill(state.artworkFailure?{status:404}:{contentType:'image/svg+xml',body:'<svg xmlns="http://www.w3.org/2000/svg" width="240" height="160"><rect width="240" height="160" fill="#dbeafe"/><text x="20" y="80" font-family="Arial" font-size="20">Fixture artwork</text></svg>'});
   if(p==='/invoice/'+quoteId)return route.fulfill({contentType:'text/html',body:state.original?originalFile('pages/invoice.html'):fs.readFileSync(path.join(root,'pages/invoice.html'),'utf8')});
   if(u.hostname==='fonts.googleapis.com'&&p==='/css2')return route.continue();
   if(p.startsWith('/api/')||['fetch','xhr'].includes(req.resourceType())){events.unknown.push(req.url());return route.fulfill({status:503});}

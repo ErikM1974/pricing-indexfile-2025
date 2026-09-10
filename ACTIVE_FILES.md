@@ -397,3 +397,4 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 
 - tests/e2e/css-unification-compact-invoice.spec.js — synthetic invoice source/financial/status/access and print contracts, exact sync/ShipStation payloads.
 - tests/fixtures/compact-invoice-*-original-browser.json — original invoice data, toolbar, share-link and workflow evidence (generated only in baseline mode).
+- pages/invoice.html, pages/js/invoice.js and pages/css/invoice.css — reviewed compact invoice: shared customer document shell, responsive line items, canonical hidden/print state, verified staff controls, retained share token and guarded native shipment dialogs. Original source restoration in customer-documents-original-content.json;50 synthetic browser cases.

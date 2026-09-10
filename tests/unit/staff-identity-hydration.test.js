@@ -76,17 +76,18 @@ describe('StaffAuthHelper.ready()', () => {
 });
 
 describe('pages that read identity at init await the hydration', () => {
+    // Compact invoice verifies the current server response directly. Its real-browser
+    // delayed/anonymous/forged-storage controls are locked in css-unification-compact-invoice.spec.js.
     test.each([
         ['dashboards/js/rep-crm.js', /StaffAuthHelper\.ready\(\) : Promise\.resolve\(\)\)\s*\.then\(\(\) => this\.displayWelcomeMessage\(\)\)/],
         ['pages/js/quote-view.js', /await StaffAuthHelper\.ready\(\);\s*\n\s*this\.isStaff =/],
         ['pages/js/quote-audit.js', /await StaffAuthHelper\.ready\(\);\s*\n\s*if \(typeof StaffAuthHelper === 'undefined' \|\| !StaffAuthHelper\.isLoggedIn\(\)\)/],
-        ['pages/js/invoice.js', /await StaffAuthHelper\.ready\(\);\s*\n\s*const isStaff =/],
         ['pages/js/transfer-detail.js', /StaffAuthHelper\.ready\(\) : Promise\.resolve\(\)\)\.then\(loadUser\)/],
     ])('%s', (file, re) => {
         expect(read(file)).toMatch(re);
     });
     test.each([
-        'dashboards/nika-crm.html', 'dashboards/taneisha-crm.html', 'pages/invoice.html', 'pages/art-request-detail.html',
+        'dashboards/nika-crm.html', 'dashboards/taneisha-crm.html', 'pages/art-request-detail.html',
         'pages/mockup-detail.html', 'pages/transfer-detail.html', 'dashboards/art-hub-steve.html', 'pages/quote-view.html', 'pages/quote-audit.html',
     ])('%s loads the helper', (file) => {
         expect(read(file)).toMatch(/staff-auth-helper\.js/);

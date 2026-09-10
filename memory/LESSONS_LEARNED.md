@@ -53,11 +53,6 @@ Quote-operation access rollout (2026-09-07) is archived in LESSONS_LEARNED_ARCHI
 - Problem/root cause: whole-dialog and toast opacity animations briefly blended text into its background; CI and the full local suite sampled low-contrast frames that focused runs missed.
 - Solution/prevention: animate position/scale only, and pause real preview/toast entry and dismissal animations mid-frame during the browser contrast check. Do not hide the failure with a fixed delay or weaken the accessibility assertion.
 
-## Style/build checks must distinguish source from platform artifacts (2026-09-08)
-- Problem/root cause: a clean Windows checkout restored CRLF and inflated CSS budgets; esbuild linked-map hashes differed from Linux although executable code matched.
-- Solution: measure committed LF source bytes. Resolve production bundles from the production manifest and compare executable bytes excluding only the source-map filename.
-- Prevention: keep exact source-asset/live-SHA checks and do not increase budgets or claim missing deployment from a local bundle filename alone.
-
 Transfer/Supacolor authentication migration (2026-09-08) is archived in LESSONS_LEARNED_ARCHIVE.md. Keep staff/vendor/customer boundaries and auth-before-large-parser checks; never infer identity from Origin.
 
 ## Art-family themes and dialogs need runtime state coverage (2026-09-08)
@@ -255,3 +250,8 @@ Box-label follow-up (2026-09-10): a failed/new lookup must clear old printable d
 - Problem/root cause: PDF action was enabled before loading and failed silently; resized capture viewports clipped exports, scrolled phone captures were blank, and html2pdf kept an invisible blocking overlay after rendering failed.
 - Solution: enable after successful render, offer visible load/PDF retry, use an independent paper clone with explicit canvas scrollX/scrollY zero, and remove only the failed worker’s overlay. Keep financial values and date-only parsing unchanged.
 - Prevention: record original fields/amounts/links, test actual desktop and scrolled-phone downloads, raster ink/logo checks, real library failure/retry and every rendered PDF page. A successful download event is not proof that the invoice is visible. CSS scale tokens are not uniform multiples: space-8 is64px, not32px; validate every variable against the actual token file.
+
+### Compact invoice state must survive refresh and print (2026-09-10)
+- Problem/root cause: share links lost k, URL/storage flags exposed staff controls, one-way hiding and cached storefront blobs kept stale addresses/art, carrier overrides preceded terminal shipment state, and print display rules forced RUSH onto every invoice.
+- Solution: verify server identity, preserve quote tokens, reset optional fields/caches per full load, separate tracking links from send controls, guard pending actions and terminal shipments, use shared hidden state and named native dialogs with explicit trigger-focus restoration.
+- Prevention: original source/money/payload locks, fresh-versus-refreshed fixtures, delayed/failure/retry/duplicate cases, actual rush/cancelled paper, radio-group keyboard order and visual service-label review. Native showModal moves focus before shared helpers can capture the trigger; capture the trigger beforehand.
