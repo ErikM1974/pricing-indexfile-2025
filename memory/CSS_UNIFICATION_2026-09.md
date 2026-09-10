@@ -1,5 +1,15 @@
 # CSS unification — design direction and implementation plan
 
+## ACTIVE — staff workspaces release candidate v2026.09.10.4
+
+Six reviewed pages are integrated on develop from exact reviewed source 5d46c9c5: Drain-Pro, Production Shifts, Payroll, Mission Control, Company Numbers and Quote Management. All required local checks now pass. Live remains v2026.09.10.2 / Heroku 2098 / df7bebed: 170/225 pages. Candidate is 176/225 with 49 pending, only credited after verified rollout.
+
+- Local checks: 236 unit suites / 5,521 tests / four existing skips; 88 DOM, four accessibility unit and 84 quote-parity checks. Build 431 hashed assets; lint/types clean, 485 routes / 24 modules / zero undefined names, boot HTTP200 and production audit zero. Stylelint 268 local sheets (267 tracked plus preserved ignored staff-portal-final.css).
+- Mocked browser sweep ran all 883 cases: 881 passed and two test defects were repaired (old AE DIV expectation, missing reactPaths import). The complete affected 46-case suites then passed; application source unchanged. Remaining e2e: 16 passed / three optional screenshot skips, all five calculator surfaces. An interrupted local run used another suite's server; it was discarded and repeated with exclusive server ownership.
+- CI allowance is 30 minutes because the prior 813-case release used 19m53s; each browser install step is independently capped at five minutes. Exact-source CI must run and pass all four jobs, including actual mocked CSS and live money/calculator steps, before main/tag/Heroku.
+- This release preserves 61 original source hashes and 314 reversible mappings, retires six old CSS owners / 177,104 LF bytes / 103 flags, and has 70 focused staff scenarios plus 45 visually reviewed current paper pages. Shared runtime, generated documents and provider UI remain unfinished tracks.
+- The four final staff tools are separate on codex/staff-final-tools at 55adc1f2: 49 immutable sources, 19 original browser cases/contracts. No application edits or migration credit. Never merge that advancing branch into this release.
+
 ## ACTIVE — six staff workspace drafts reviewed, 2026-09-10
 
 All six pages in isolated training-final-worktree on codex/staff-workspaces are reviewed. Exact reviewed commit and backup status are in artifact active-css-resume-state.json. Next is integration and full release verification; no new deployment yet.

@@ -52,4 +52,4 @@ async function open(page, name, state = {}) {
     return events;
 }
 
-module.exports = { open, providerPaths };
+module.exports = { open, providerPaths, reactPaths };

@@ -7,7 +7,7 @@ const AxeBuilder = require('@axe-core/playwright').default;
 const output = path.join(__dirname, 'screenshots/css-unification');
 fs.mkdirSync(output, { recursive: true });
 test.use({ reducedMotion: 'reduce', timezoneId: 'America/Los_Angeles' });
-const { open, providerPaths } = require('./helpers/staff-workspaces-browser');
+const { open, providerPaths, reactPaths } = require('./helpers/staff-workspaces-browser');
 const payrollData = require('../fixtures/staff-workspaces-payroll-synthetic.json');
 test('CSS staff workspaces: payroll empty roster and periods show explicit guidance', async ({ page }) => {
     const events = await open(page, 'payroll', payrollState({ empty: true }));
