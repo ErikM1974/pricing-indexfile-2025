@@ -5,7 +5,7 @@ const root = path.resolve(__dirname, '../..'), norm = s => s.replace(/\s+/g, ' '
 const hash = s => crypto.createHash('sha256').update(s).digest('hex');
 
 test.each(original.pages)('$file preserves original labels, fields, links and identifiers', record => {
-    let html = fs.readFileSync(path.join(root, record.file), 'utf8');
+    let html = fs.readFileSync(path.join(root, record.file), 'utf8').replace(/\r\n/g, '\n');
     for (const change of original.changes.filter(c => c.file === record.file).reverse()) {
         expect(html.split(change.after).length - 1).toBe(change.count);
         html = html.split(change.after).join(change.before);
