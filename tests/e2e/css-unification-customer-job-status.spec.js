@@ -28,11 +28,11 @@ test.describe('CSS customer status: original data and browser contracts',()=>{
  for(const mode of ['missing','404','429','500','network'])test('Order Status error '+mode,async({page})=>{
   const e=await open(page,{missing:mode==='missing',status:/^\d+$/.test(mode)?Number(mode):undefined,networkError:mode==='network',original:capture});await expect(page.locator('#st-error')).toBeVisible();await expect(page.locator('#st-order')).toBeHidden();await evidence(page,'order-error-'+mode,e);
  });
- for(const mode of ['normal','empty','escaped'])test('Job Portal list '+mode,async({page})=>{
+ for(const mode of ['normal','empty','escaped','dated'])test('Job Portal list '+mode,async({page})=>{
   const e=await open(page,{page:'vendor',mode,original:capture});await expect(page.locator('#vp-loading')).toBeHidden();await expect(page.locator('#vp-vendor-name')).toHaveText('Example Screen Printing — Job Portal');await evidence(page,'vendor-list-'+mode,e,{paper:mode==='normal'});
  });
- for(const mode of ['normal','minimal','escaped','long','received','cancelled'])test('Job Portal detail '+mode,async({page})=>{
-  const e=await open(page,{page:'vendor',mode,deepLink:true,original:capture});await expect(page.locator('#vp-detail-main')).toBeVisible();await expect(page.locator('#vp-loading')).toBeHidden();await evidence(page,'vendor-detail-'+mode,e,{paper:['normal','long'].includes(mode)});
+ for(const mode of ['normal','minimal','escaped','long','received','cancelled','dated'])test('Job Portal detail '+mode,async({page})=>{
+  const e=await open(page,{page:'vendor',mode,deepLink:true,original:capture});await expect(page.locator('#vp-detail-main')).toBeVisible();await expect(page.locator('#vp-loading')).toBeHidden();if(mode==='dated')await expect(page.locator('#vp-d-meta')).toContainText('past due');await evidence(page,'vendor-detail-'+mode,e,{paper:['normal','long','dated'].includes(mode)});
  });
  for(const kind of ['list','detail'])for(const status of [401,404,429,500])test('Job Portal '+kind+' error '+status,async({page})=>{
   const state={page:'vendor',original:capture};state[kind+'Status']=status;if(kind==='detail')state.deepLink=true;

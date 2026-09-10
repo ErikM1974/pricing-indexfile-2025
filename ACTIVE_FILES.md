@@ -407,3 +407,79 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - tests/e2e/helpers/customer-job-status-browser.js — synthetic Order Status/Job Portal data, source replay and fail-closed business-action interception for CSS browser review.
 
 - tests/e2e/css-unification-customer-job-status.spec.js — original/current Order Status and vendor Job Portal data, credential, error, filter, navigation, note-body, four-width, accessibility and paper contracts.
+
+- tests/fixtures/customer-job-status-vendor-list-normal-original-browser.json — immutable synthetic original browser contract for customer/job status CSS migration.
+
+- tests/fixtures/customer-job-status-vendor-list-empty-original-browser.json — immutable synthetic original browser contract for customer/job status CSS migration.
+
+- tests/fixtures/customer-job-status-vendor-list-escaped-original-browser.json — immutable synthetic original browser contract for customer/job status CSS migration.
+
+- tests/fixtures/customer-job-status-vendor-detail-normal-original-browser.json — immutable synthetic original browser contract for customer/job status CSS migration.
+
+- tests/fixtures/customer-job-status-vendor-detail-minimal-original-browser.json — immutable synthetic original browser contract for customer/job status CSS migration.
+
+- tests/fixtures/customer-job-status-vendor-detail-escaped-original-browser.json — immutable synthetic original browser contract for customer/job status CSS migration.
+
+- tests/fixtures/customer-job-status-vendor-detail-long-original-browser.json — immutable synthetic original browser contract for customer/job status CSS migration.
+
+- tests/fixtures/customer-job-status-vendor-detail-received-original-browser.json — immutable synthetic original browser contract for customer/job status CSS migration.
+
+- tests/fixtures/customer-job-status-vendor-detail-cancelled-original-browser.json — immutable synthetic original browser contract for customer/job status CSS migration.
+
+- tests/fixtures/customer-job-status-vendor-list-error-401-original-browser.json — immutable synthetic original browser contract for customer/job status CSS migration.
+
+- tests/fixtures/customer-job-status-vendor-list-error-404-original-browser.json — immutable synthetic original browser contract for customer/job status CSS migration.
+
+- tests/fixtures/customer-job-status-vendor-list-error-429-original-browser.json — immutable synthetic original browser contract for customer/job status CSS migration.
+
+- tests/fixtures/customer-job-status-vendor-list-error-500-original-browser.json — immutable synthetic original browser contract for customer/job status CSS migration.
+
+- tests/fixtures/customer-job-status-vendor-detail-error-401-original-browser.json — immutable synthetic original browser contract for customer/job status CSS migration.
+
+- tests/fixtures/customer-job-status-vendor-detail-error-404-original-browser.json — immutable synthetic original browser contract for customer/job status CSS migration.
+
+- tests/fixtures/customer-job-status-vendor-detail-error-429-original-browser.json — immutable synthetic original browser contract for customer/job status CSS migration.
+
+- tests/fixtures/customer-job-status-vendor-detail-error-500-original-browser.json — immutable synthetic original browser contract for customer/job status CSS migration.
+
+- tests/fixtures/customer-job-status-vendor-search-back-original-browser.json — immutable synthetic original browser contract for customer/job status CSS migration.
+
+- tests/fixtures/customer-job-status-vendor-note-200-original-browser.json — immutable synthetic original browser contract for customer/job status CSS migration.
+
+- tests/fixtures/customer-job-status-vendor-note-500-original-browser.json — immutable synthetic original browser contract for customer/job status CSS migration.
+
+- tests/fixtures/customer-job-status-order-paid-original-browser.json — immutable synthetic original browser contract for customer/job status CSS migration.
+
+- tests/fixtures/customer-job-status-order-pending-payment-original-browser.json — immutable synthetic original browser contract for customer/job status CSS migration.
+
+- tests/fixtures/customer-job-status-order-in-production-original-browser.json — immutable synthetic original browser contract for customer/job status CSS migration.
+
+- tests/fixtures/customer-job-status-order-shipped-original-browser.json — immutable synthetic original browser contract for customer/job status CSS migration.
+
+- tests/fixtures/customer-job-status-order-pickup-ready-soon-original-browser.json — immutable synthetic original browser contract for customer/job status CSS migration.
+
+- tests/fixtures/customer-job-status-order-rush-original-browser.json — immutable synthetic original browser contract for customer/job status CSS migration.
+
+- tests/fixtures/customer-job-status-order-free-shipping-original-browser.json — immutable synthetic original browser contract for customer/job status CSS migration.
+
+- tests/fixtures/customer-job-status-order-no-fee-tax-original-browser.json — immutable synthetic original browser contract for customer/job status CSS migration.
+
+- tests/fixtures/customer-job-status-order-empty-original-browser.json — immutable synthetic original browser contract for customer/job status CSS migration.
+
+- tests/fixtures/customer-job-status-order-escaped-original-browser.json — immutable synthetic original browser contract for customer/job status CSS migration.
+
+- tests/fixtures/customer-job-status-order-long-original-browser.json — immutable synthetic original browser contract for customer/job status CSS migration.
+
+- tests/fixtures/customer-job-status-order-error-missing-original-browser.json — immutable synthetic original browser contract for customer/job status CSS migration.
+
+- tests/fixtures/customer-job-status-order-error-404-original-browser.json — immutable synthetic original browser contract for customer/job status CSS migration.
+
+- tests/fixtures/customer-job-status-order-error-429-original-browser.json — immutable synthetic original browser contract for customer/job status CSS migration.
+
+- tests/fixtures/customer-job-status-order-error-500-original-browser.json — immutable synthetic original browser contract for customer/job status CSS migration.
+
+- tests/fixtures/customer-job-status-order-error-network-original-browser.json — immutable synthetic original browser contract for customer/job status CSS migration.
+
+- tests/fixtures/customer-job-status-vendor-list-dated-original-browser.json — immutable synthetic original browser contract for customer/job status CSS migration.
+
+- tests/fixtures/customer-job-status-vendor-detail-dated-original-browser.json — immutable synthetic original browser contract for customer/job status CSS migration.

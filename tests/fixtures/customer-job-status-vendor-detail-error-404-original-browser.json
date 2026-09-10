@@ -1,0 +1,147 @@
+{
+  "views": [
+    {
+      "width": 1440,
+      "title": "Job Portal — Northwest Custom Apparel",
+      "text": "Example Screen Printing — Job Portal Screen-print jobs from Northwest Custom Apparel River Sample Sign out This job is no longer available to you — it may have been removed or reassigned. Go back to All jobs. All jobs Northwest Custom Apparel · Milton, WA · (253) 922-5793",
+      "ids": {
+        "vp-vendor-name": "Example Screen Printing — Job Portal",
+        "vp-user-email": "River Sample",
+        "vp-error-text": "This job is no longer available to you — it may have been removed or reassigned. Go back to All jobs.",
+        "vp-back-btn": "All jobs"
+      },
+      "links": [
+        {
+          "href": "/auth/vendor/logout",
+          "text": "Sign out",
+          "label": null
+        }
+      ],
+      "rows": [],
+      "overflow": false,
+      "axe": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#vp-user-email"
+            ],
+            [
+              "footer"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Job Portal — Northwest Custom Apparel",
+      "text": "Example Screen Printing — Job Portal Screen-print jobs from Northwest Custom Apparel River Sample Sign out This job is no longer available to you — it may have been removed or reassigned. Go back to All jobs. All jobs Northwest Custom Apparel · Milton, WA · (253) 922-5793",
+      "ids": {
+        "vp-vendor-name": "Example Screen Printing — Job Portal",
+        "vp-user-email": "River Sample",
+        "vp-error-text": "This job is no longer available to you — it may have been removed or reassigned. Go back to All jobs.",
+        "vp-back-btn": "All jobs"
+      },
+      "links": [
+        {
+          "href": "/auth/vendor/logout",
+          "text": "Sign out",
+          "label": null
+        }
+      ],
+      "rows": [],
+      "overflow": false,
+      "axe": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#vp-user-email"
+            ],
+            [
+              "footer"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Job Portal — Northwest Custom Apparel",
+      "text": "Example Screen Printing — Job Portal River Sample Sign out This job is no longer available to you — it may have been removed or reassigned. Go back to All jobs. All jobs Northwest Custom Apparel · Milton, WA · (253) 922-5793",
+      "ids": {
+        "vp-vendor-name": "Example Screen Printing — Job Portal",
+        "vp-user-email": "River Sample",
+        "vp-error-text": "This job is no longer available to you — it may have been removed or reassigned. Go back to All jobs.",
+        "vp-back-btn": "All jobs"
+      },
+      "links": [
+        {
+          "href": "/auth/vendor/logout",
+          "text": "Sign out",
+          "label": null
+        }
+      ],
+      "rows": [],
+      "overflow": false,
+      "axe": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#vp-user-email"
+            ],
+            [
+              "footer"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Job Portal — Northwest Custom Apparel",
+      "text": "Example Screen Printing — Job Portal River Sample Sign out This job is no longer available to you — it may have been removed or reassigned. Go back to All jobs. All jobs Northwest Custom Apparel · Milton, WA · (253) 922-5793",
+      "ids": {
+        "vp-vendor-name": "Example Screen Printing — Job Portal",
+        "vp-user-email": "River Sample",
+        "vp-error-text": "This job is no longer available to you — it may have been removed or reassigned. Go back to All jobs.",
+        "vp-back-btn": "All jobs"
+      },
+      "links": [
+        {
+          "href": "/auth/vendor/logout",
+          "text": "Sign out",
+          "label": null
+        }
+      ],
+      "rows": [],
+      "overflow": false,
+      "axe": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#vp-user-email"
+            ],
+            [
+              "footer"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "actions": [],
+  "reads": [
+    {
+      "path": "/api/vendor/jobs",
+      "query": ""
+    },
+    {
+      "path": "/api/vendor/jobs/LNP-7401",
+      "query": ""
+    }
+  ]
+}

@@ -1,5 +1,15 @@
 # Handover follow-ups — 2026-09-07
 
+## ORIGINAL REVIEW — Order Status and vendor Job Portal ready for layout work
+
+Thirty-eight original browser contracts are frozen before application edits:16 Order Status states (five timeline states, rush, shipping/pickup, fees/tax/total, empty/escaped/long and five credential/error cases),22 vendor list/detail/filter/search/history/message/error/Caspio-date cases. Four widths per case, actual original labels/links/rows/values and exact note POST body. First run20passed/16 Order Status cases stopped because axe re-fetches external icon CSS; permitting that exact public stylesheet GET fixed the harness. Fresh18-case recovery passed, including two full Caspio-timestamp cases. The original default vendor fixtures used bare date strings (displayed as a dash by the shared parser); dated cases separately verify actual requested/needed/estimated dates and overdue badges. No application source has changed.
+
+Seven original PDFs /16 pages visually reviewed:Order Status paid2,pickup2,long3;vendor list1,normal detail2,dated detail2,long detail4. Short orders print a footer alone on page2; pickup totals split across pages; long order prints a footer alone on page3. Vendor detail prints editing controls, a large mockup and split rows/messages; one long row loses dimensions/notes at the page boundary. Original phone vendor cards/details overflow at320/390px. Both pages have contrast failures; long Order Status cells expose an unnamed keyboard scroll region.
+
+- Next: retain every credential/link/value/status/promise/request body; shared Public Sans and canonical controls, scoped page owners, wrapping phone job cards and labelled item cells, named keyboard regions and complete Letter paper. Keep custom-tees.css and CaspioDate sources unchanged for other consumers. Audit note pending/keyboard duplicates and late job responses before fixing demonstrated failures with mapped tests. All10 original source hashes remain authoritative.
+- Primary five-page release candidate v2026.09.10.9 /source0b271bb2 has passed all full local gates and three CI jobs; CI34543191741 browser job is running. Root source is frozen; this branch remains excluded. Live remains .7/Heroku2100,180/225; reviewed candidate185/225,40pending. No new migration credit for these two pages yet.
+- Do not rerun consumed helpers or successful original captures. Preserve all38 original JSONs. All writes/allocating reads are synthetic, no emails/imports/logouts/device printing. node_modules is a junction: never recursively delete it or copy .env.
+
 ## NEXT — customer Order Status and vendor Job Portal source baseline
 
 Isolated branch codex/customer-job-status starts at reviewed ed70f0a8; the frozen five-page batch is separately integrated at primary c1d7cfb0 under full release gates. No code from this next batch belongs in that release. Live remains .7/Heroku2100,180/225; reviewed candidate185/225,40pending.

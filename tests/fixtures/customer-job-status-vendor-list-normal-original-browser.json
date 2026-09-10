@@ -1,0 +1,159 @@
+{
+  "views": [
+    {
+      "width": 1440,
+      "title": "Example Screen Printing | Job Portal — Northwest Custom Apparel",
+      "text": "Example Screen Printing — Job Portal Screen-print jobs from Northwest Custom Apparel River Sample Sign out Active 2 Completed 1 All 4 Search jobs LNP-7401 Cedar Example Construction Design 44012 Sep 8, 2026 Needed — 2 files Requested RUSH LNP-7404 Future Example Design 44012 Sep 8, 2026 Needed — 2 files In Production Northwest Custom Apparel · Milton, WA · (253) 922-5793",
+      "ids": {
+        "vp-vendor-name": "Example Screen Printing — Job Portal",
+        "vp-user-email": "River Sample",
+        "vp-filters": "Active 2 Completed 1 All 4",
+        "vp-search": "",
+        "vp-job-grid": "LNP-7401 Cedar Example Construction Design 44012 Sep 8, 2026 Needed — 2 files Requested RUSH LNP-7404 Future Example Design 44012 Sep 8, 2026 Needed — 2 files In Production"
+      },
+      "links": [
+        {
+          "href": "/auth/vendor/logout",
+          "text": "Sign out",
+          "label": null
+        }
+      ],
+      "rows": [],
+      "overflow": false,
+      "axe": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#vp-user-email"
+            ],
+            [
+              ".vp-badge--rush"
+            ],
+            [
+              "footer"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Example Screen Printing | Job Portal — Northwest Custom Apparel",
+      "text": "Example Screen Printing — Job Portal Screen-print jobs from Northwest Custom Apparel River Sample Sign out Active 2 Completed 1 All 4 Search jobs LNP-7401 Cedar Example Construction Design 44012 Sep 8, 2026 Needed — 2 files Requested RUSH LNP-7404 Future Example Design 44012 Sep 8, 2026 Needed — 2 files In Production Northwest Custom Apparel · Milton, WA · (253) 922-5793",
+      "ids": {
+        "vp-vendor-name": "Example Screen Printing — Job Portal",
+        "vp-user-email": "River Sample",
+        "vp-filters": "Active 2 Completed 1 All 4",
+        "vp-search": "",
+        "vp-job-grid": "LNP-7401 Cedar Example Construction Design 44012 Sep 8, 2026 Needed — 2 files Requested RUSH LNP-7404 Future Example Design 44012 Sep 8, 2026 Needed — 2 files In Production"
+      },
+      "links": [
+        {
+          "href": "/auth/vendor/logout",
+          "text": "Sign out",
+          "label": null
+        }
+      ],
+      "rows": [],
+      "overflow": false,
+      "axe": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#vp-user-email"
+            ],
+            [
+              ".vp-badge--rush"
+            ],
+            [
+              "footer"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Example Screen Printing | Job Portal — Northwest Custom Apparel",
+      "text": "Example Screen Printing — Job Portal River Sample Sign out Active 2 Completed 1 All 4 Search jobs LNP-7401 Cedar Example Construction Design 44012 Sep 8, 2026 Needed — 2 files Requested RUSH LNP-7404 Future Example Design 44012 Sep 8, 2026 Needed — 2 files In Production Northwest Custom Apparel · Milton, WA · (253) 922-5793",
+      "ids": {
+        "vp-vendor-name": "Example Screen Printing — Job Portal",
+        "vp-user-email": "River Sample",
+        "vp-filters": "Active 2 Completed 1 All 4",
+        "vp-search": "",
+        "vp-job-grid": "LNP-7401 Cedar Example Construction Design 44012 Sep 8, 2026 Needed — 2 files Requested RUSH LNP-7404 Future Example Design 44012 Sep 8, 2026 Needed — 2 files In Production"
+      },
+      "links": [
+        {
+          "href": "/auth/vendor/logout",
+          "text": "Sign out",
+          "label": null
+        }
+      ],
+      "rows": [],
+      "overflow": false,
+      "axe": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#vp-user-email"
+            ],
+            [
+              ".vp-badge--rush"
+            ],
+            [
+              "footer"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Example Screen Printing | Job Portal — Northwest Custom Apparel",
+      "text": "Example Screen Printing — Job Portal River Sample Sign out Active 2 Completed 1 All 4 Search jobs LNP-7401 Cedar Example Construction Design 44012 Sep 8, 2026 Needed — 2 files Requested RUSH LNP-7404 Future Example Design 44012 Sep 8, 2026 Needed — 2 files In Production Northwest Custom Apparel · Milton, WA · (253) 922-5793",
+      "ids": {
+        "vp-vendor-name": "Example Screen Printing — Job Portal",
+        "vp-user-email": "River Sample",
+        "vp-filters": "Active 2 Completed 1 All 4",
+        "vp-search": "",
+        "vp-job-grid": "LNP-7401 Cedar Example Construction Design 44012 Sep 8, 2026 Needed — 2 files Requested RUSH LNP-7404 Future Example Design 44012 Sep 8, 2026 Needed — 2 files In Production"
+      },
+      "links": [
+        {
+          "href": "/auth/vendor/logout",
+          "text": "Sign out",
+          "label": null
+        }
+      ],
+      "rows": [],
+      "overflow": true,
+      "axe": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#vp-user-email"
+            ],
+            [
+              ".vp-badge--rush"
+            ],
+            [
+              "footer"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "actions": [],
+  "reads": [
+    {
+      "path": "/api/vendor/jobs",
+      "query": ""
+    }
+  ]
+}

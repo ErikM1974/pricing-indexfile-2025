@@ -21,6 +21,7 @@ function vendor(mode='normal'){
  const detail={job:first,lines:[{quantity:24,transferSize:'Full front',widthIn:11,heightIn:12,pressCount:1,notes:'Adult XS–4XL'},{quantity:12,transferSize:'Left chest',widthIn:4,heightIn:3,pressCount:2,notes:'White underbase'}],files:[{fileName:'Approved mockup.png',fileType:'mockup',mime:'image/png',widthPx:1200,heightPx:800,thumbnailUrl:'/__job-fixture/mockup.png',fileUrl:'https://files.example.test/approved-mockup.png',notes:'Approved placement'},{fileName:'Cedar-Example-Print-Ready-Artwork-Long-Filename.ai',fileType:'artwork',mime:'application/postscript',widthIn:11,heightIn:12,fileUrl:'https://files.example.test/print-ready.ai'}],notes:[{authorName:'Example Rep',createdAt:'2026-09-08T12:00:00',text:'Please confirm receipt.',type:'comment'},{authorName:'River Sample (Example Screen Printing)',createdAt:'2026-09-09T12:00:00',text:'Files received. Checking placement.',type:'comment'},{authorName:'NWCA',createdAt:'2026-09-10T12:00:00',text:'Job requested',type:'status'}]};
  if(mode==='empty')jobs.length=0;
  if(mode==='minimal'){detail.lines=[];detail.files=[];detail.notes=[];Object.assign(first,{companyName:'',designNumber:'',shopworksPO:'',salesRepName:'',neededBy:'',estimatedShipDate:'',transferType:'',fabricTarget:'',colorCount:null,primaryColor:'',additionalColors:'',specialInstructions:'',fileNotes:''});}
+ if(mode==='dated')for(const job of jobs)for(const field of ['neededBy','estimatedShipDate'])if(job[field])job[field]+='T00:00:00';
  if(mode==='escaped'){first.companyName='<img src=x onerror=alert(1)> & Example';first.specialInstructions='<script>alert(1)</script> & preserve';detail.lines[0].notes='XS < M & 4XL';detail.notes[0].text='<img src=x> & literal note';}
  if(mode==='long'){detail.lines=Array.from({length:28},(_,i)=>({quantity:i+1,transferSize:'Large front print '+(i+1),widthIn:11.25,heightIn:12.5,pressCount:2,notes:'Synthetic production instructions, preserve every line and dimension.'}));}
  if(mode==='received')first.status='Received';
@@ -49,9 +50,11 @@ async function open(page,state={}){
    return route.fulfill({status:state.detailStatus||200,json:state.detailStatus?{error:'Synthetic detail unavailable',loginUrl:'/vendor/login?next=%2Fvendor'}:{...fixture.detail,job:selected}});
   }
   if(local&&['/order-status','/vendor'].includes(p)){const file=isVendor?'pages/vendor-portal.html':'pages/order-status.html';return route.fulfill({contentType:'text/html',body:state.original?originalFile(file):fs.readFileSync(path.join(root,file),'utf8')});}
-  if(local&&p==='/vendor/login')return route.fulfill({contentType:'text/html',body:'<!doctype html><title>Fixture sign in</title><main><h1>Vendor sign in</h1></main>'});
+  if(local&&p==='/vendor/login')return route.fulfill({contentType:'text/html',body:'<!doctype html><html lang="en"><head><title>Fixture sign in</title></head><body><main><h1>Vendor sign in</h1></main></body></html>'});
   if(p.startsWith('/__job-fixture/'))return route.fulfill(state.imageFailure?{status:404}:{contentType:'image/svg+xml',body:'<svg xmlns="http://www.w3.org/2000/svg" width="240" height="160"><rect width="240" height="160" fill="#edf2f7"/><text x="20" y="85" font-family="Arial" font-size="22">Example artwork</text></svg>'});
   if(u.hostname==='fonts.googleapis.com'&&p==='/css2')return route.continue();
+  // Axe re-fetches cross-origin CSS to inspect contrast. Allow this exact public stylesheet read.
+  if(u.hostname==='cdnjs.cloudflare.com'&&p==='/ajax/libs/font-awesome/6.4.0/css/all.min.css')return route.continue();
   if(p.startsWith('/api/')||['fetch','xhr'].includes(req.resourceType())){events.unknown.push(req.url());return route.fulfill({status:503});}
   if(local){
    const file=path.resolve(root,'.'+decodeURIComponent(p)),relative=p.slice(1),retired=state.original&&source.retiredStyles.some(r=>r.file===relative);

@@ -1,0 +1,463 @@
+{
+  "views": [
+    {
+      "width": 1440,
+      "title": "Order Status — Custom T-Shirts | Northwest Custom Apparel",
+      "text": "Northwest Custom Apparel CUSTOM T-SHIRTS · FULL-COLOR DTG 253-922-5793 ORDER STATUS Order OF0910-7401 <img src=x onerror=alert(1)> & Sample Placed Sep 8, 2026 Ships from Milton, WA: September <17> & 22 Order received Payment confirmed — you’re on the press schedule In production Full-color DTG printing in our Milton, WA shop Shipped UPS Ground from Milton, WA Delivery promise Promised: September <17> & 22 Navy · Front Navy · Back Order summary COLOR SIZE QTY EACH Navy <sample> & White 4XL / Extended 2 $20.00 Navy 3XL 1 $25.00 Shirts (3) $65.00 Small-batch fee $15.00 UPS Ground shipping $10.00 Sales tax $9.00 Total $99.00 Questions or changes? Call 253-922-5793 or email sales@nwcustomapparel.com — mention order OF0910-7401. © Northwest Custom Apparel · 2025 Freeman Rd E, Milton, WA 98354 · 253-922-5793 · sales@nwcustomapparel.com",
+      "ids": {
+        "st-order-num": "OF0910-7401",
+        "st-style": "<img src=x onerror=alert(1)> & Sample Placed Sep 8, 2026",
+        "st-promise": "Ships from Milton, WA: September <17> & 22",
+        "st-timeline": "Order received Payment confirmed — you’re on the press schedule In production Full-color DTG printing in our Milton, WA shop Shipped UPS Ground from Milton, WA Delivery promise Promised: September <17> & 22",
+        "st-mockups": "Navy · Front Navy · Back",
+        "st-items": "Navy <sample> & White 4XL / Extended 2 $20.00 Navy 3XL 1 $25.00",
+        "st-summary": "Shirts (3) $65.00 Small-batch fee $15.00 UPS Ground shipping $10.00 Sales tax $9.00 Total $99.00",
+        "st-questions": "Questions or changes? Call 253-922-5793 or email sales@nwcustomapparel.com — mention order OF0910-7401."
+      },
+      "links": [
+        {
+          "href": "/",
+          "text": "Northwest Custom Apparel CUSTOM T-SHIRTS · FULL-COLOR DTG",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com?subject=Order%20OF0910-7401%20%E2%80%94%20question%20or%20change",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        }
+      ],
+      "rows": [
+        [
+          "Navy <sample> & White",
+          "4XL / Extended",
+          "2",
+          "$20.00"
+        ],
+        [
+          "Navy",
+          "3XL",
+          "1",
+          "$25.00"
+        ]
+      ],
+      "overflow": false,
+      "axe": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "em"
+            ],
+            [
+              ".status-date"
+            ],
+            [
+              ".is-done > .status-step-body > small"
+            ],
+            [
+              ".is-current > .status-step-body > small"
+            ],
+            [
+              ".is-pending.status-step:nth-child(3) > .status-step-body > strong"
+            ],
+            [
+              ".is-pending.status-step:nth-child(3) > .status-step-body > small"
+            ],
+            [
+              ".is-pending.status-step:nth-child(4) > .status-step-body > strong"
+            ],
+            [
+              ".is-pending.status-step:nth-child(4) > .status-step-body > small"
+            ],
+            [
+              "figure:nth-child(1) > figcaption"
+            ],
+            [
+              "figure:nth-child(2) > figcaption"
+            ],
+            [
+              "th:nth-child(1)"
+            ],
+            [
+              "th:nth-child(2)"
+            ],
+            [
+              "th:nth-child(3)"
+            ],
+            [
+              "th:nth-child(4)"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Order Status — Custom T-Shirts | Northwest Custom Apparel",
+      "text": "Northwest Custom Apparel CUSTOM T-SHIRTS · FULL-COLOR DTG 253-922-5793 ORDER STATUS Order OF0910-7401 <img src=x onerror=alert(1)> & Sample Placed Sep 8, 2026 Ships from Milton, WA: September <17> & 22 Order received Payment confirmed — you’re on the press schedule In production Full-color DTG printing in our Milton, WA shop Shipped UPS Ground from Milton, WA Delivery promise Promised: September <17> & 22 Navy · Front Navy · Back Order summary COLOR SIZE QTY EACH Navy <sample> & White 4XL / Extended 2 $20.00 Navy 3XL 1 $25.00 Shirts (3) $65.00 Small-batch fee $15.00 UPS Ground shipping $10.00 Sales tax $9.00 Total $99.00 Questions or changes? Call 253-922-5793 or email sales@nwcustomapparel.com — mention order OF0910-7401. © Northwest Custom Apparel · 2025 Freeman Rd E, Milton, WA 98354 · 253-922-5793 · sales@nwcustomapparel.com",
+      "ids": {
+        "st-order-num": "OF0910-7401",
+        "st-style": "<img src=x onerror=alert(1)> & Sample Placed Sep 8, 2026",
+        "st-promise": "Ships from Milton, WA: September <17> & 22",
+        "st-timeline": "Order received Payment confirmed — you’re on the press schedule In production Full-color DTG printing in our Milton, WA shop Shipped UPS Ground from Milton, WA Delivery promise Promised: September <17> & 22",
+        "st-mockups": "Navy · Front Navy · Back",
+        "st-items": "Navy <sample> & White 4XL / Extended 2 $20.00 Navy 3XL 1 $25.00",
+        "st-summary": "Shirts (3) $65.00 Small-batch fee $15.00 UPS Ground shipping $10.00 Sales tax $9.00 Total $99.00",
+        "st-questions": "Questions or changes? Call 253-922-5793 or email sales@nwcustomapparel.com — mention order OF0910-7401."
+      },
+      "links": [
+        {
+          "href": "/",
+          "text": "Northwest Custom Apparel CUSTOM T-SHIRTS · FULL-COLOR DTG",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com?subject=Order%20OF0910-7401%20%E2%80%94%20question%20or%20change",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        }
+      ],
+      "rows": [
+        [
+          "Navy <sample> & White",
+          "4XL / Extended",
+          "2",
+          "$20.00"
+        ],
+        [
+          "Navy",
+          "3XL",
+          "1",
+          "$25.00"
+        ]
+      ],
+      "overflow": false,
+      "axe": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "em"
+            ],
+            [
+              ".status-date"
+            ],
+            [
+              ".is-done > .status-step-body > small"
+            ],
+            [
+              ".is-current > .status-step-body > small"
+            ],
+            [
+              ".is-pending.status-step:nth-child(3) > .status-step-body > strong"
+            ],
+            [
+              ".is-pending.status-step:nth-child(3) > .status-step-body > small"
+            ],
+            [
+              ".is-pending.status-step:nth-child(4) > .status-step-body > strong"
+            ],
+            [
+              ".is-pending.status-step:nth-child(4) > .status-step-body > small"
+            ],
+            [
+              "figure:nth-child(1) > figcaption"
+            ],
+            [
+              "figure:nth-child(2) > figcaption"
+            ],
+            [
+              "th:nth-child(1)"
+            ],
+            [
+              "th:nth-child(2)"
+            ],
+            [
+              "th:nth-child(3)"
+            ],
+            [
+              "th:nth-child(4)"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Order Status — Custom T-Shirts | Northwest Custom Apparel",
+      "text": "Northwest Custom Apparel CUSTOM T-SHIRTS · FULL-COLOR DTG 253-922-5793 ORDER STATUS Order OF0910-7401 <img src=x onerror=alert(1)> & Sample Placed Sep 8, 2026 Ships from Milton, WA: September <17> & 22 Order received Payment confirmed — you’re on the press schedule In production Full-color DTG printing in our Milton, WA shop Shipped UPS Ground from Milton, WA Delivery promise Promised: September <17> & 22 Navy · Front Navy · Back Order summary COLOR SIZE QTY EACH Navy <sample> & White 4XL / Extended 2 $20.00 Navy 3XL 1 $25.00 Shirts (3) $65.00 Small-batch fee $15.00 UPS Ground shipping $10.00 Sales tax $9.00 Total $99.00 Questions or changes? Call 253-922-5793 or email sales@nwcustomapparel.com — mention order OF0910-7401. © Northwest Custom Apparel · 2025 Freeman Rd E, Milton, WA 98354 · 253-922-5793 · sales@nwcustomapparel.com",
+      "ids": {
+        "st-order-num": "OF0910-7401",
+        "st-style": "<img src=x onerror=alert(1)> & Sample Placed Sep 8, 2026",
+        "st-promise": "Ships from Milton, WA: September <17> & 22",
+        "st-timeline": "Order received Payment confirmed — you’re on the press schedule In production Full-color DTG printing in our Milton, WA shop Shipped UPS Ground from Milton, WA Delivery promise Promised: September <17> & 22",
+        "st-mockups": "Navy · Front Navy · Back",
+        "st-items": "Navy <sample> & White 4XL / Extended 2 $20.00 Navy 3XL 1 $25.00",
+        "st-summary": "Shirts (3) $65.00 Small-batch fee $15.00 UPS Ground shipping $10.00 Sales tax $9.00 Total $99.00",
+        "st-questions": "Questions or changes? Call 253-922-5793 or email sales@nwcustomapparel.com — mention order OF0910-7401."
+      },
+      "links": [
+        {
+          "href": "/",
+          "text": "Northwest Custom Apparel CUSTOM T-SHIRTS · FULL-COLOR DTG",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com?subject=Order%20OF0910-7401%20%E2%80%94%20question%20or%20change",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        }
+      ],
+      "rows": [
+        [
+          "Navy <sample> & White",
+          "4XL / Extended",
+          "2",
+          "$20.00"
+        ],
+        [
+          "Navy",
+          "3XL",
+          "1",
+          "$25.00"
+        ]
+      ],
+      "overflow": false,
+      "axe": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "em"
+            ],
+            [
+              ".status-date"
+            ],
+            [
+              ".is-done > .status-step-body > small"
+            ],
+            [
+              ".is-current > .status-step-body > small"
+            ],
+            [
+              ".is-pending.status-step:nth-child(3) > .status-step-body > strong"
+            ],
+            [
+              ".is-pending.status-step:nth-child(3) > .status-step-body > small"
+            ],
+            [
+              ".is-pending.status-step:nth-child(4) > .status-step-body > strong"
+            ],
+            [
+              ".is-pending.status-step:nth-child(4) > .status-step-body > small"
+            ],
+            [
+              "figure:nth-child(1) > figcaption"
+            ],
+            [
+              "figure:nth-child(2) > figcaption"
+            ],
+            [
+              "th:nth-child(1)"
+            ],
+            [
+              "th:nth-child(2)"
+            ],
+            [
+              "th:nth-child(3)"
+            ],
+            [
+              "th:nth-child(4)"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Order Status — Custom T-Shirts | Northwest Custom Apparel",
+      "text": "Northwest Custom Apparel CUSTOM T-SHIRTS · FULL-COLOR DTG 253-922-5793 ORDER STATUS Order OF0910-7401 <img src=x onerror=alert(1)> & Sample Placed Sep 8, 2026 Ships from Milton, WA: September <17> & 22 Order received Payment confirmed — you’re on the press schedule In production Full-color DTG printing in our Milton, WA shop Shipped UPS Ground from Milton, WA Delivery promise Promised: September <17> & 22 Navy · Front Navy · Back Order summary COLOR SIZE QTY EACH Navy <sample> & White 4XL / Extended 2 $20.00 Navy 3XL 1 $25.00 Shirts (3) $65.00 Small-batch fee $15.00 UPS Ground shipping $10.00 Sales tax $9.00 Total $99.00 Questions or changes? Call 253-922-5793 or email sales@nwcustomapparel.com — mention order OF0910-7401. © Northwest Custom Apparel · 2025 Freeman Rd E, Milton, WA 98354 · 253-922-5793 · sales@nwcustomapparel.com",
+      "ids": {
+        "st-order-num": "OF0910-7401",
+        "st-style": "<img src=x onerror=alert(1)> & Sample Placed Sep 8, 2026",
+        "st-promise": "Ships from Milton, WA: September <17> & 22",
+        "st-timeline": "Order received Payment confirmed — you’re on the press schedule In production Full-color DTG printing in our Milton, WA shop Shipped UPS Ground from Milton, WA Delivery promise Promised: September <17> & 22",
+        "st-mockups": "Navy · Front Navy · Back",
+        "st-items": "Navy <sample> & White 4XL / Extended 2 $20.00 Navy 3XL 1 $25.00",
+        "st-summary": "Shirts (3) $65.00 Small-batch fee $15.00 UPS Ground shipping $10.00 Sales tax $9.00 Total $99.00",
+        "st-questions": "Questions or changes? Call 253-922-5793 or email sales@nwcustomapparel.com — mention order OF0910-7401."
+      },
+      "links": [
+        {
+          "href": "/",
+          "text": "Northwest Custom Apparel CUSTOM T-SHIRTS · FULL-COLOR DTG",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com?subject=Order%20OF0910-7401%20%E2%80%94%20question%20or%20change",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        }
+      ],
+      "rows": [
+        [
+          "Navy <sample> & White",
+          "4XL / Extended",
+          "2",
+          "$20.00"
+        ],
+        [
+          "Navy",
+          "3XL",
+          "1",
+          "$25.00"
+        ]
+      ],
+      "overflow": false,
+      "axe": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "em"
+            ],
+            [
+              ".status-date"
+            ],
+            [
+              ".is-done > .status-step-body > small"
+            ],
+            [
+              ".is-current > .status-step-body > small"
+            ],
+            [
+              ".is-pending.status-step:nth-child(3) > .status-step-body > strong"
+            ],
+            [
+              ".is-pending.status-step:nth-child(3) > .status-step-body > small"
+            ],
+            [
+              ".is-pending.status-step:nth-child(4) > .status-step-body > strong"
+            ],
+            [
+              ".is-pending.status-step:nth-child(4) > .status-step-body > small"
+            ],
+            [
+              "figure:nth-child(1) > figcaption"
+            ],
+            [
+              "figure:nth-child(2) > figcaption"
+            ],
+            [
+              "th:nth-child(1)"
+            ],
+            [
+              "th:nth-child(2)"
+            ],
+            [
+              "th:nth-child(3)"
+            ],
+            [
+              "th:nth-child(4)"
+            ]
+          ]
+        },
+        {
+          "id": "scrollable-region-focusable",
+          "nodes": [
+            [
+              ".status-table-wrap"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "actions": [],
+  "reads": [
+    {
+      "path": "/api/order-status/OF0910-7401",
+      "query": "?t=review%20token%20%2F%20only"
+    }
+  ]
+}
