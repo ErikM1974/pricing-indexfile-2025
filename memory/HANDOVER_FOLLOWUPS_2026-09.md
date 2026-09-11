@@ -859,3 +859,6 @@ Status .10/2102/44ccf020 is verified live with24 checks and all source/main/deve
 ## Customer Account/Product pair reviewed — 2026-09-10
 
 54 browser cases plus final paper/spacing checks passed;49 immutable originals,17 source hashes/97 maps,19 guards and23 current paper pages reviewed. Eight demonstrated workflow fixes and9 important flags removed. Candidate189/225,36pending; live .10/2102 remains187/225,38pending until full checks/CI/deploy verification. See customer-account-reviewed-record.json. Merge live44ccf020 before full validation; no real business actions sent.
+
+### Account release test timing correction — 2026-09-10
+The full local1,204-case CSS sweep completed1,203 passes and one confirmation-toast wait timeout under three-worker load. The real page retains the toast4.2 seconds; the test allowed only5 seconds including scheduling. No application or fixture source changed. The test now allows10 seconds but still requires the real timer to dismiss the toast. Five repeated failing-case runs passed under three-worker load; all affected account cases and the remaining local browser/pricing suites must pass before release. Exact-source CI must be rerun on this test correction; the earlier9eb6e2a2 run is not final-source evidence.

@@ -243,3 +243,6 @@ Box-label follow-up (2026-09-10): a failed/new lookup must clear old printable d
 - Prevention: freeze original values, request bodies and source hashes; compare rendered totals (the renderer replaces initial placeholder IDs), all four widths/axe, delayed/error/retry/keyboard paths, actual lazy art imports and every PDF page. Keep shared builder-print and garment-form owners unchanged until their other consumers migrate.
 
 Control-class follow-up: regex word boundaries treat hyphens as separators, so sw-action-btn falsely matches a check for the canonical btn class. Compare whitespace-delimited class tokens, assert real rendered target sizes, and inspect staff toolbars as well as public actions.
+
+### Confirmation timers need scheduling room in browser checks (2026-09-10)
+- Problem/root cause: a4.2-second UI toast occasionally exceeded a5-second test wait with three browsers active. Solution: allow10 seconds while still asserting the real dismissal; application timing stays unchanged. Prevention: compare immutable values after transient confirmation clears and repeat the failed case under the original worker load.
