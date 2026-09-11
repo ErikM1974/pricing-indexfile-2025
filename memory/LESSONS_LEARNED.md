@@ -246,3 +246,4 @@ Control-class follow-up: regex word boundaries treat hyphens as separators, so s
 
 ### Confirmation timers need scheduling room in browser checks (2026-09-10)
 - Problem/root cause: a4.2-second UI toast occasionally exceeded a5-second test wait with three browsers active. Solution: allow10 seconds while still asserting the real dismissal; application timing stays unchanged. Prevention: compare immutable values after transient confirmation clears and repeat the failed case under the original worker load.
+- Redirect follow-up: a product401 navigates to sign-in while the harness waits for fonts. Wait for the expected login document to load before page evaluation; catching a destroyed execution context or retrying the whole test hides the race.
