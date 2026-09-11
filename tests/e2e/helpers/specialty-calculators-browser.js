@@ -72,7 +72,8 @@ async function open(page, state = {}) {
         }
         if (state.richardson && ['/api/decorated-cap-prices','/api/pricing-bundle','/api/service-codes'].includes(filePath)) {
             events.mocked.push({path: filePath + url.search, method});
-            if (state.failed) return route.fulfill({status: 503});
+            if (state.failed || state.failedRead === (url.searchParams.get('method') || filePath)) return route.fulfill({status: 503});
+            if (state.incompleteRead === (url.searchParams.get('method') || filePath)) return route.fulfill({json: {}});
             const tierLabels = ['1-7','8-23','24-47','48-71','72+'];
             if (filePath === '/api/decorated-cap-prices') return route.fulfill({json: {prices: {'112': 24, '115': 24}}});
             if (filePath === '/api/service-codes') return route.fulfill({json: {data: [{ServiceCode: 'GRT-50', SellPrice: state.alternate ? 65 : 50}]}});

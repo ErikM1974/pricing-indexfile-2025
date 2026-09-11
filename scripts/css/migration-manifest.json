@@ -6434,6 +6434,39 @@
         "rawCssBytes": 89181,
         "localCssRequests": 3
       }
+    },
+    {
+      "source": "calculators/richardson-2025.html",
+      "family": "specialty-calculators",
+      "status": "reviewed",
+      "route": "/calculators/richardson-2025.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/specialty-pricing.css",
+        "calculators/richardson-2025-styles.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "1440-768-390-320",
+        "original-values-fields-navigation-and-five-request-contracts",
+        "72-native-price-quantity-decoration-and-design-states",
+        "eight-category-result-sets-and-quick-selection",
+        "keyboard-combobox-with-native-dialog-popup-and-focus-restoration",
+        "44-pixel-controls-and-visible-mobile-categories",
+        "stale-style-price-cleared-immediately",
+        "all-five-failed-and-incomplete-live-reads-warn-on-screen-and-paper",
+        "live-patch-puff-and-setup-labels",
+        "all-48-screens-and-12-complete-paper-documents-reviewed"
+      ],
+      "test": "tests/e2e/css-unification-specialty-richardson.spec.js",
+      "maxCssBytes": 82292,
+      "measuredRawCssBytes": 80250,
+      "baseline": {
+        "commit": "97cc05080d4689785bc0885b6a4223c0f1356cbf",
+        "rawCssBytes": 71413,
+        "localCssRequests": 4
+      }
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",

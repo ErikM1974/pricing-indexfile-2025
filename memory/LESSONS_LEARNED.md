@@ -5,6 +5,12 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## Richardson selections and policy labels must describe the current quote (2026-09-11)
+
+- Problem/root cause: typing a new style retained the old quote; suggestions required a mouse, delayed blur hid focused results, API failures silently used defaults, and fee captions stayed hardcoded. A new top-level CSS layer defeated canonical hidden utilities.
+- Solution: clear selection immediately, use native suggestion buttons inside a named combobox dialog popup, retain focus ownership, validate all five reads and persist fallback warnings through print, and render captions from loaded fees. Keep page styles inside components.pages and allow natural paper pagination.
+- Prevention: immutable 72-state financial/category contracts, independent exact financial method bodies, failed/incomplete reads, keyboard focus after the real delay, four widths, loaded branding checks and every paper page. Do not introduce a layer after utilities or accept broken-image captures as complete review.
+
 ## Specialty pricing references must remain usable in every state (2026-09-11)
 
 - Problem/root cause: legacy phone CSS hid every emblem price; closed chat actions and idle confirmation appeared prematurely. A delayed textarea-focus callback moved focus after keyboard navigation or panel close. Print omitted collapsed references.
@@ -90,10 +96,6 @@ Exercise state transitions and verify complete printed content. Full entry in LE
 Native storefront menu focus and paper migration (2026-09-09) is archived in LESSONS_LEARNED_ARCHIVE.md; existing keyboard/browser guards retain the contract.
 
 Staff reference failure-state findings (2026-09-09) are preserved in LESSONS_LEARNED_ARCHIVE.md.
-
-### Catalog discovery must distinguish failed data from absent products (2026-09-09)
-
-Problem: missing logos left unnamed tiles, failed product batches could appear as verified absent products, and intrinsic grid images overlapped card labels on paper. Root cause: image-only interaction, unchecked response shape, and print grid intrinsic sizing. Solution: named native links, validated batches with explicit retry preserving filters, server price labels retained verbatim, and contained images with separate label flow. Move shared navigation without duplicating it; preserve every curated style/category/brand description. Prevention: test keyboard, malformed/partial/empty/retry states and escaped server labels; assert image-to-body print geometry and compare every PDF text block. Browser review blocks all business writes and emails.
 
 ### Campaign inquiries must be received before confirming success (2026-09-09)
 

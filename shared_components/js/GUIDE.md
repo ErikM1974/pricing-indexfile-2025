@@ -288,3 +288,5 @@ Draft design family: shared_components/css/design-libraries.css owns local desig
 ### Specialty calculator presentation
 
 `specialty-calculator-ui.js` opts in only on `data-ui="unified" data-specialty-calculator`. It adds canonical controls and keyboard table regions to generated content, keeps the closed assistant inert, wraps dialog Tab focus, and temporarily opens reference details for print before restoring their prior state. Existing page controllers own every request, price and business action. Strict ESLint scope. The decal controller is byte-for-byte unchanged; the emblem controller changes only its delayed focus callback, which now respects a closed panel and focus already inside it. Reversible source guards preserve both originals and every financial/request path.
+
+Richardson factory-direct opts into specialty-calculator-ui.js: its existing hidden classes are mirrored to native hidden attributes. Pricing calculations stay in its original controller; only failed-read warnings, current selection and keyboard presentation changed.

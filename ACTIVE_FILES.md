@@ -1036,3 +1036,5 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - tests/fixtures/specialty-calculators-richardson-changed-style-original-browser.json — immutable synthetic Richardson calculator evidence.
 
 - tests/fixtures/specialty-calculators-richardson-tiers-categories-original-browser.json — immutable synthetic Richardson calculator evidence.
+
+- calculators/richardson-2025-styles.css — reviewed scoped Richardson owner using canonical specialty controls, responsive cap browsing and complete print output.

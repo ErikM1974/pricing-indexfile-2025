@@ -1,5 +1,13 @@
 # CSS unification — design direction and implementation plan
 
+## REVIEWED CHECKPOINT — Richardson factory direct, 2026-09-11
+
+Richardson now uses Public Sans, canonical controls and scoped shared specialty/page styles. All 25 focused browser checks pass: original text/fields/links/request contracts, 72 native price combinations, eight category result sets, keyboard selection and delayed focus, mobile targets, alternate policy labels, and all five failed/incomplete reads. All 48 screens and 12 one-page PDFs reviewed (18 screen sheets, three paper sheets). A transient CDN logo failure was caught visually; asset readiness is now asserted and the affected case was rerun successfully with original logos. All five financial method bodies remain byte-for-byte unchanged; 37 original source hashes and 43 reversible mappings pass. All 320 source, ownership, token, lint and runtime inventory checks passed across focused reruns; the runtime census passed alone in 15 seconds after timing out under concurrent load. Final 25 Richardson browser checks and four shared-control regressions pass on the final source.
+
+Candidate now 210/225 reviewed, 15 pending. Decal/emblem checkpoint 019ec200 and Richardson original checkpoint a599be98 are backed up. Live remains verified v2026.09.11.6 / Heroku2109 / 75ef80194384912f4c644e9b868898aa5d62de28, 207/225 reviewed and 18 pending. No specialty deployment yet. This status supersedes historical notes below.
+
+Next: capture and review Polar Camel originals, then unify that page; Safety Stripe Creator and customer-supplied screen printing follow. This reviewed Richardson checkpoint is saved and backed up separately from deployment. Do not copy .env, delete the dependency junction, or allow business requests/device printing through the synthetic harness. Full unit, CSS browser, e2e, pricing parity and actual exact-source CI are required before releasing the complete specialty batch.
+
 ## Richardson originals reviewed — 2026-09-11
 
 All13 original cases pass: twelve visual states plus72 native price/quantity/design combinations and all eight category result sets. All48 full-page screens and12 paper pages in12 documents reviewed (17 screen detail sheets, three paper sheets). Original source remains unchanged. Defects confirmed: failed pricing reads silently use defaults; changing a selected style can retain its old quote; autocomplete requires a mouse; mobile categories clip and desktop inputs stretch; paper loses brand/navigation and browsed caps. The API-altered patch fee computes correctly but its radio caption remains hardcoded. Preserve every successful financial result while correcting these presentation/state defects.

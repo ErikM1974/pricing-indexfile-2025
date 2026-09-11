@@ -22,6 +22,12 @@
             wrapper.setAttribute('aria-label', table.classList.contains('emblem-pricing-table') ? 'Emblem prices by size and quantity' : table.classList.contains('decal-cheat') ? 'Decal area by size' : 'Decal rates by total area');
             table.before(wrapper); wrapper.append(table);
         });
+        if (root.dataset.specialtyCalculator === 'richardson') {
+            for (const id of ['styleAutocomplete', 'pricePlaceholder', 'priceBreakdown', 'ltmNotice', 'setupNotice', 'clearCapSearch', 'noResultsMessage']) {
+                const node = root.querySelector('#' + id);
+                if (node) node.hidden = node.classList.contains('hidden');
+            }
+        }
         if (panel) {
             const open = panel.classList.contains('open');
             panel.inert = !open;
