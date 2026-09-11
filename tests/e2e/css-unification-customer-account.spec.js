@@ -1,5 +1,6 @@
 const {test,expect}=require('@playwright/test'),fs=require('node:fs'),path=require('node:path'),AxeBuilder=require('@axe-core/playwright').default;
 const {open,snapshot,check,tabs}=require('./helpers/customer-account-browser');
+test.use({timezoneId:'America/Los_Angeles',locale:'en-US'});
 const root=path.resolve(__dirname,'../..'),out=path.join(__dirname,'screenshots/css-unification'),capture=process.env.CAPTURE_CUSTOMER_ACCOUNT_ORIGINAL==='1',phase=capture?'original':'current',widths=[1440,768,390,320];
 async function evidence(page,name,events,{paper=false,compare=true}={}){
  const states=[];
