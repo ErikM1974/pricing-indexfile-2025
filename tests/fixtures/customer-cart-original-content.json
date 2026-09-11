@@ -1,0 +1,597 @@
+{
+  "base": "9eb6e2a2870c2547c89bd5e2e36a4851620b14de",
+  "pages": [
+    {
+      "file": "pages/quote-cart.html",
+      "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <meta name=\"description\" content=\"Your quote — live pricing for embroidery, screen print, DTG, and DTF from Northwest Custom Apparel in Milton, WA.\">\n    <meta name=\"robots\" content=\"noindex\">\n    <title>Your Quote | Northwest Custom Apparel</title>\n\n    <link rel=\"preconnect\" href=\"https://caspio-pricing-proxy-ab30a049961a.herokuapp.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n\n    <link rel=\"icon\" href=\"/favicon.png\" type=\"image/png\">\n\n    <link href=\"https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap\" rel=\"stylesheet\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/nwca-2026-core.css?v=2026.09.07.8\">\n    <link rel=\"stylesheet\" href=\"/pages/css/quote-cart.css?v=2026.09.07.8\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/embroidery-quote-pricing.css?v=2026.09.07.8\">\n</head>\n<body>\n    <a class=\"skip-link\" href=\"#main\">Skip to content</a>\n\n    <!-- Utility strip -->\n    <div class=\"util-strip\">\n        <div class=\"util-inner\">\n            <p class=\"util-fam\"><strong>Northwest Custom Apparel</strong> — family-owned in Milton, WA since 1977</p>\n            <div class=\"util-contact\">\n                <span class=\"util-hours\">Mon–Fri 8:30–5:00 PT</span>\n                <a href=\"tel:253-922-5793\">253-922-5793</a>\n                <a class=\"util-mail\" href=\"mailto:sales@nwcustomapparel.com\">sales@nwcustomapparel.com</a>\n                <a href=\"/staff-dashboard.html\" title=\"Staff Portal\">Staff</a>\n            </div>\n        </div>\n    </div>\n\n    <!-- Masthead -->\n    <header class=\"nav-bar\">\n        <div class=\"nav-bar-inner\">\n            <button class=\"mobile-menu-btn\" id=\"mobileMenuBtn\" type=\"button\" aria-label=\"Open menu\" aria-controls=\"sidebar\">\n                <svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\">\n                    <line x1=\"3\" y1=\"6\" x2=\"21\" y2=\"6\"></line>\n                    <line x1=\"3\" y1=\"12\" x2=\"21\" y2=\"12\"></line>\n                    <line x1=\"3\" y1=\"18\" x2=\"21\" y2=\"18\"></line>\n                </svg>\n            </button>\n\n            <a href=\"/\" class=\"brand\" title=\"Northwest Custom Apparel — Home\">\n                <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\"\n                     alt=\"Northwest Custom Apparel\" class=\"brand-logo\" width=\"160\" height=\"46\">\n            </a>\n\n            <ul class=\"nav-menu\">\n<li class=\"nav-item\">\n                    <a href=\"/catalog\" class=\"nav-link\">Products</a>\n                </li>\n<li class=\"nav-item\">\n                    <a href=\"/brands.html\" class=\"nav-link\">Brands</a>\n                </li>\n                <li class=\"nav-item nav-item--p1\">\n                    <a href=\"/catalog?topSellers=1\" class=\"nav-link\">Top Sellers</a>\n                </li>\n                <li class=\"nav-item nav-item--p1\">\n                    <a href=\"/pages/fall-catalog-2026.html\" class=\"nav-link\">Fall Catalog '26 <span class=\"flag-new\">New</span></a>\n                </li>\n                <li class=\"nav-item nav-item--p1\">\n                    <a href=\"/custom-tees\" class=\"nav-link\">Custom Tees <span class=\"flag-new\">New</span></a>\n                </li>\n                <li class=\"nav-item nav-item--p1\">\n                    <a href=\"/custom-caps\" class=\"nav-link\">Custom Hats <span class=\"flag-new\">New</span></a>\n                </li>\n                <li class=\"nav-item nav-item--p2\">\n                    <a href=\"/company-webstores\" class=\"nav-link\">Webstores</a>\n                </li>\n                <li class=\"nav-item nav-item--p2\">\n                    <a href=\"/blog\" class=\"nav-link\">Blog</a>\n                </li>\n                <li class=\"nav-item nav-item--p2\">\n                    <a href=\"/custom-stickers\" class=\"nav-link\">Stickers</a>\n                </li>\n                <li class=\"nav-item\">\n                    <a href=\"/pages/request-a-quote.html\" class=\"nav-link\">Get a Quote</a>\n                </li>\n            </ul>\n\n            <div class=\"nav-search\" role=\"search\">\n                <input type=\"text\"\n                       id=\"navSearchInput\"\n                       class=\"nav-search-input\"\n                       placeholder=\"Search styles — PC61, hoodies, caps…\"\n                       autocomplete=\"off\"\n                       aria-label=\"Search products\">\n                <button id=\"navSearchBtn\" class=\"nav-search-btn\" type=\"button\" aria-label=\"Search\">\n                    <svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\">\n                        <circle cx=\"11\" cy=\"11\" r=\"8\"></circle>\n                        <path d=\"m21 21-4.35-4.35\"></path>\n                    </svg>\n                </button>\n            </div>\n\n            <!-- Quote-cart badge (count wired by quote-cart-store.js; hidden at 0) -->\n            <a class=\"quote-badge\" href=\"/quote-cart\" data-quote-badge hidden aria-current=\"page\">\n                <svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\">\n                    <path d=\"M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2\"></path>\n                    <rect x=\"9\" y=\"3\" width=\"6\" height=\"4\" rx=\"1\"></rect>\n                    <path d=\"M9 12h6\"></path><path d=\"M9 16h6\"></path>\n                </svg>\n                <span class=\"quote-badge-label\">Quote</span>\n                <span class=\"quote-badge-count\" data-quote-badge-count>0</span>\n            </a>\n        </div>\n    </header>\n\n    <!-- Drawer (mobile menu + category browse) -->\n    <aside class=\"sidebar\" id=\"sidebar\" aria-label=\"Browse menu\">\n        <div class=\"drawer-head\">\n            <span class=\"drawer-head-title\">Browse NWCA</span>\n            <button class=\"drawer-close\" id=\"drawerClose\" type=\"button\" aria-label=\"Close menu\">\n                <svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" aria-hidden=\"true\">\n                    <line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"></line>\n                    <line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"></line>\n                </svg>\n            </button>\n        </div>\n        <nav class=\"drawer-links\" aria-label=\"Quick links\">\n            <a href=\"/\">Home</a>\n            <a href=\"/custom-tees\">Custom T-Shirts <span class=\"flag-new\">New</span></a>\n            <a href=\"/custom-caps\">Custom Hats <span class=\"flag-new\">New</span></a>\n            <a href=\"/catalog?topSellers=1\">Top Sellers &amp; Free Samples</a>\n            <a href=\"/brands.html\">Brands</a>\n            <a href=\"/company-webstores\">Custom Webstores</a>\n        \n            <a href=\"/catalog\">Catalog</a>\n            <a href=\"/pages/fall-catalog-2026.html\">Fall Catalog '26</a>\n            <a href=\"/custom-stickers\">Custom Stickers</a>\n            <a href=\"/custom-banners\">Vinyl Banners</a>\n            <a href=\"/blog\">Blog</a>\n            <a href=\"/pages/request-a-quote.html\">Get a Quote</a>\n        </nav>\n        <h3 class=\"drawer-subhead\">Shop by category</h3>\n        <ul class=\"category-list\">\n            <li class=\"category-item\"><a class=\"category-link\" href=\"/catalog?category=T-Shirts\">T-Shirts</a></li>\n            <li class=\"category-item\"><a class=\"category-link\" href=\"/catalog?category=Polos%2FKnits\">Polos &amp; Knits</a></li>\n            <li class=\"category-item\"><a class=\"category-link\" href=\"/catalog?category=Sweatshirts%2FFleece\">Sweatshirts &amp; Fleece</a></li>\n            <li class=\"category-item\"><a class=\"category-link\" href=\"/catalog?category=Caps\">Caps</a></li>\n            <li class=\"category-item\"><a class=\"category-link\" href=\"/catalog?category=Outerwear\">Outerwear</a></li>\n            <li class=\"category-item\"><a class=\"category-link\" href=\"/catalog?category=Workwear\">Workwear</a></li>\n            <li class=\"category-item\"><a class=\"category-link\" href=\"/catalog?category=Bags\">Bags</a></li>\n        </ul>\n        <div class=\"drawer-contact\">\n            Questions? A human answers.<br>\n            <a href=\"tel:253-922-5793\">253-922-5793</a><br>\n            <a href=\"mailto:sales@nwcustomapparel.com\">sales@nwcustomapparel.com</a><br>\n            2025 Freeman Rd E, Milton, WA 98354\n        </div>\n    </aside>\n    <div class=\"sidebar-overlay\" id=\"sidebarOverlay\"></div>\n\n    <main id=\"main\">\n        <!-- Page header -->\n        <header class=\"page-head\">\n            <div class=\"wrap\">\n                <nav class=\"crumbs\" aria-label=\"Breadcrumb\">\n                    <a href=\"/\">Home</a><span class=\"crumbs-sep\">/</span>\n                    <span aria-current=\"page\">Your quote</span>\n                </nav>\n                <div class=\"page-head-row\">\n                    <div>\n                        <h1 class=\"page-title\">Your quote</h1>\n                        <p class=\"page-sub\">Live prices straight from our pricing system — the same numbers our team quotes.</p>\n                        <p class=\"page-sub\">No payment now — a rep confirms tax, shipping, and your proof.</p>\n                    </div>\n                    <div class=\"page-actions\"><a class=\"btn btn-ghost\" href=\"/catalog\">Keep shopping</a></div>\n                </div>\n            </div>\n        </header>\n\n        <section class=\"qc-section\" aria-label=\"Quote contents\">\n            <div class=\"wrap\">\n                <div id=\"qcAlert\" aria-live=\"polite\"></div>\n\n                <!-- First-load skeleton -->\n                <div id=\"qcSkeleton\" aria-busy=\"true\" aria-label=\"Pricing your quote\" hidden>\n                    <div class=\"qc-layout\">\n                        <div>\n                            <div class=\"skeleton skeleton-title\"></div>\n                            <div class=\"skeleton skeleton-block\"></div>\n                            <div class=\"skeleton skeleton-text\"></div>\n                        </div>\n                        <div>\n                            <div class=\"skeleton skeleton-title\"></div>\n                            <div class=\"skeleton skeleton-block\"></div>\n                        </div>\n                    </div>\n                </div>\n\n                <!-- Empty state -->\n                <div id=\"qcEmpty\" hidden>\n                    <div class=\"empty-state\">\n                        <div class=\"empty-state-icon\" aria-hidden=\"true\">🧵</div>\n                        <h2 class=\"empty-state-title\">Your quote is empty</h2>\n                        <p class=\"empty-state-sub\">Pick a product, configure the decoration, and hit \"Add to quote\" — quantities pool within each decoration type for better pricing.</p>\n                        <p class=\"empty-state-sub\">Saved a quote earlier? Use the link we emailed you.</p>\n                        <a class=\"btn btn-primary\" href=\"/catalog\">Browse the catalog</a>\n                    </div>\n                </div>\n\n                <!-- Priced cart -->\n                <div class=\"qc-layout\" id=\"qcLayout\" hidden>\n                    <div class=\"qc-groups\" id=\"qcGroups\"></div>\n                    <aside class=\"qc-totals\" id=\"qcTotals\" aria-label=\"Quote summary\">\n                        <div id=\"qcTotalsBody\" aria-live=\"polite\"></div>\n                        <!-- Phase 3 save/share/email panel (web-quote-service.js) —\n                             separate container so reprice re-renders never wipe the form -->\n                        <div id=\"qcSavePanel\" class=\"qc-save-panel\" aria-live=\"polite\" hidden></div>\n                    </aside>\n                </div>\n            </div>\n        </section>\n\n        <!-- Toast stack (core primitive) -->\n        <div class=\"toast-stack\" id=\"toastStack\" aria-live=\"polite\"></div>\n    </main>\n\n    <footer class=\"site-footer\">\n        <div class=\"footer-inner\">\n            <div class=\"footer-brand\">\n                <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20White%20Text.png?ver=1\" alt=\"Northwest Custom Apparel\" width=\"180\" height=\"52\" loading=\"lazy\">\n                <p>Family-owned custom apparel decorator in Milton, Washington. Embroidery, screen printing, DTG, and DTF — done in-house since 1977.</p>\n                <span class=\"footer-est\">Est. 1977 · Milton, WA</span>\n            </div>\n            <div class=\"footer-col\">\n                <h3>Shop</h3>\n                <ul>\n                    <li><a href=\"/catalog?topSellers=1\">Top Sellers</a></li>\n                    <li><a href=\"/brands.html\">Brands</a></li>\n                    <li><a href=\"/custom-tees\">Custom T-Shirts</a></li>\n                    <li><a href=\"/custom-caps\">Custom Hats</a></li>\n                    <li><a href=\"/catalog?topSellers=1\">Free Sample Program</a></li>\n                </ul>\n            </div>\n            <div class=\"footer-col\">\n                <h3>Services</h3>\n                <ul>\n                    <li><a href=\"/golf-tournament-apparel?utm_source=quote-cart&amp;utm_campaign=golf-2026-q2&amp;utm_medium=footer\">Tournament Packages</a></li>\n                    <li><a href=\"/company-webstores\">Custom Webstores</a></li>\n                    <li><a href=\"/calculators/laser-tumbler-polarcamel.html\">Laser-Engraved Tumblers</a></li>\n                </ul>\n            </div>\n            <div class=\"footer-col\">\n                <h3>Contact</h3>\n                <address>\n                    2025 Freeman Rd E<br>\n                    Milton, WA 98354<br>\n                    <a href=\"tel:253-922-5793\">253-922-5793</a><br>\n                    <a href=\"mailto:sales@nwcustomapparel.com\">sales@nwcustomapparel.com</a><br>\n                    Mon–Fri 8:30–5:00 PT\n                </address>\n                <ul>\n                    <li><a href=\"/staff-dashboard.html\">Staff Portal</a></li>\n                </ul>\n            </div>\n        </div>\n        <div class=\"footer-bottom\">\n            <div class=\"footer-bottom-inner\">\n                <span>© 2026 Northwest Custom Apparel</span>\n                <span>Family-owned &amp; operated since 1977</span>\n            </div>\n        </div>\n    </footer>\n\n    <!-- Config + the SAME pricing authorities product.html loads for the engine\n         (EMB calculator class, SCP/DTF services, DTF location config) -->\n    <script src=\"/config/app.config.js?v=2026.09.03.11\" defer></script>\n    <script src=\"/shared_components/js/screenprint-pricing-service.js?v=2026.09.06.44\" defer></script>\n    <script src=\"/shared_components/js/dtf-pricing-service.js?v=2026.09.06.37\" defer></script>\n    <script src=\"/shared_components/js/embroidery-quote-pricing.js?v=2026.09.07.33\" defer></script>\n    <script src=\"/shared_components/js/dtf-quote-pricing.js?v=2026.09.06.37\" defer></script>\n    <script src=\"/shared_components/js/quote-cart-engine.js?v=2026.07.07.7\" defer></script>\n    <script src=\"/shared_components/js/quote-cart-store.js?v=2026.08.19.5\" defer></script>\n    <!-- Phase 3 save/share/email: EmailJS SDK (builders' stack) + WQ save service -->\n    <script src=\"https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js\" defer></script>\n    <script src=\"/shared_components/js/web-quote-service.js?v=2026.09.07.33\" defer></script>\n    <script src=\"/shared_components/js/delivery-promise.js?v=2026.09.06.31\" defer></script>\n    <script src=\"/pages/js/quote-cart-page.js?v=2026.09.06.5\" defer></script>\n</body>\n</html>\n",
+      "title": "Your Quote | Northwest Custom Apparel",
+      "bodyText": "Skip to content Northwest Custom Apparel — family-owned in Milton, WA since 1977 Mon–Fri 8:30–5:00 PT 253-922-5793 sales@nwcustomapparel.com Staff Products Brands Top Sellers Fall Catalog '26 New Custom Tees New Custom Hats New Webstores Blog Stickers Get a Quote Quote 0 Browse NWCA Home Custom T-Shirts New Custom Hats New Top Sellers & Free Samples Brands Custom Webstores Catalog Fall Catalog '26 Custom Stickers Vinyl Banners Blog Get a Quote Shop by category T-Shirts Polos & Knits Sweatshirts & Fleece Caps Outerwear Workwear Bags Questions? A human answers. 253-922-5793 sales@nwcustomapparel.com 2025 Freeman Rd E, Milton, WA 98354 Home/ Your quote Your quote Live prices straight from our pricing system — the same numbers our team quotes. No payment now — a rep confirms tax, shipping, and your proof. Keep shopping 🧵 Your quote is empty Pick a product, configure the decoration, and hit \"Add to quote\" — quantities pool within each decoration type for better pricing. Saved a quote earlier? Use the link we emailed you. Browse the catalog Family-owned custom apparel decorator in Milton, Washington. Embroidery, screen printing, DTG, and DTF — done in-house since 1977. Est. 1977 · Milton, WA Shop Top Sellers Brands Custom T-Shirts Custom Hats Free Sample Program Services Tournament Packages Custom Webstores Laser-Engraved Tumblers Contact 2025 Freeman Rd E Milton, WA 98354 253-922-5793 sales@nwcustomapparel.com Mon–Fri 8:30–5:00 PT Staff Portal © 2026 Northwest Custom Apparel Family-owned & operated since 1977",
+      "bodyTextSha": "d468e8b51adf29a9a33b9f6f72b67f27df55a5c75c425f4b28afc1e40ece79c2",
+      "ids": [
+        "mobileMenuBtn",
+        "navSearchInput",
+        "navSearchBtn",
+        "sidebar",
+        "drawerClose",
+        "sidebarOverlay",
+        "main",
+        "qcAlert",
+        "qcSkeleton",
+        "qcEmpty",
+        "qcLayout",
+        "qcGroups",
+        "qcTotals",
+        "qcTotalsBody",
+        "qcSavePanel",
+        "toastStack"
+      ],
+      "links": [
+        {
+          "href": "#main",
+          "label": "Skip to content"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "label": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Staff"
+        },
+        {
+          "href": "/",
+          "label": ""
+        },
+        {
+          "href": "/catalog",
+          "label": "Products"
+        },
+        {
+          "href": "/brands.html",
+          "label": "Brands"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "label": "Top Sellers"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "label": "Fall Catalog '26 New"
+        },
+        {
+          "href": "/custom-tees",
+          "label": "Custom Tees New"
+        },
+        {
+          "href": "/custom-caps",
+          "label": "Custom Hats New"
+        },
+        {
+          "href": "/company-webstores",
+          "label": "Webstores"
+        },
+        {
+          "href": "/blog",
+          "label": "Blog"
+        },
+        {
+          "href": "/custom-stickers",
+          "label": "Stickers"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "label": "Get a Quote"
+        },
+        {
+          "href": "/quote-cart",
+          "label": "Quote 0"
+        },
+        {
+          "href": "/",
+          "label": "Home"
+        },
+        {
+          "href": "/custom-tees",
+          "label": "Custom T-Shirts New"
+        },
+        {
+          "href": "/custom-caps",
+          "label": "Custom Hats New"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "label": "Top Sellers & Free Samples"
+        },
+        {
+          "href": "/brands.html",
+          "label": "Brands"
+        },
+        {
+          "href": "/company-webstores",
+          "label": "Custom Webstores"
+        },
+        {
+          "href": "/catalog",
+          "label": "Catalog"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "label": "Fall Catalog '26"
+        },
+        {
+          "href": "/custom-stickers",
+          "label": "Custom Stickers"
+        },
+        {
+          "href": "/custom-banners",
+          "label": "Vinyl Banners"
+        },
+        {
+          "href": "/blog",
+          "label": "Blog"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "label": "Get a Quote"
+        },
+        {
+          "href": "/catalog?category=T-Shirts",
+          "label": "T-Shirts"
+        },
+        {
+          "href": "/catalog?category=Polos%2FKnits",
+          "label": "Polos & Knits"
+        },
+        {
+          "href": "/catalog?category=Sweatshirts%2FFleece",
+          "label": "Sweatshirts & Fleece"
+        },
+        {
+          "href": "/catalog?category=Caps",
+          "label": "Caps"
+        },
+        {
+          "href": "/catalog?category=Outerwear",
+          "label": "Outerwear"
+        },
+        {
+          "href": "/catalog?category=Workwear",
+          "label": "Workwear"
+        },
+        {
+          "href": "/catalog?category=Bags",
+          "label": "Bags"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "label": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "label": "Home"
+        },
+        {
+          "href": "/catalog",
+          "label": "Keep shopping"
+        },
+        {
+          "href": "/catalog",
+          "label": "Browse the catalog"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "label": "Top Sellers"
+        },
+        {
+          "href": "/brands.html",
+          "label": "Brands"
+        },
+        {
+          "href": "/custom-tees",
+          "label": "Custom T-Shirts"
+        },
+        {
+          "href": "/custom-caps",
+          "label": "Custom Hats"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "label": "Free Sample Program"
+        },
+        {
+          "href": "/golf-tournament-apparel?utm_source=quote-cart&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "label": "Tournament Packages"
+        },
+        {
+          "href": "/company-webstores",
+          "label": "Custom Webstores"
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "label": "Laser-Engraved Tumblers"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "label": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Staff Portal"
+        }
+      ],
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "type": "text",
+          "value": ""
+        }
+      ],
+      "styles": [
+        "https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap",
+        "/shared_components/css/tokens.css?v=2026.09.08.2",
+        "/shared_components/css/nwca-2026-core.css?v=2026.09.07.8",
+        "/pages/css/quote-cart.css?v=2026.09.07.8",
+        "/shared_components/css/embroidery-quote-pricing.css?v=2026.09.07.8"
+      ],
+      "scripts": [
+        "/config/app.config.js?v=2026.09.03.11",
+        "/shared_components/js/screenprint-pricing-service.js?v=2026.09.06.44",
+        "/shared_components/js/dtf-pricing-service.js?v=2026.09.06.37",
+        "/shared_components/js/embroidery-quote-pricing.js?v=2026.09.07.33",
+        "/shared_components/js/dtf-quote-pricing.js?v=2026.09.06.37",
+        "/shared_components/js/quote-cart-engine.js?v=2026.07.07.7",
+        "/shared_components/js/quote-cart-store.js?v=2026.08.19.5",
+        "https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js",
+        "/shared_components/js/web-quote-service.js?v=2026.09.07.33",
+        "/shared_components/js/delivery-promise.js?v=2026.09.06.31",
+        "/pages/js/quote-cart-page.js?v=2026.09.06.5"
+      ],
+      "cssBytes": 73091
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <meta name=\"description\" content=\"Request free samples of our top-selling apparel — see and feel the quality before you order. Northwest Custom Apparel, Milton, WA.\">\n    <meta name=\"robots\" content=\"noindex\">\n    <title>Sample Cart | Northwest Custom Apparel</title>\n\n    <link rel=\"preconnect\" href=\"https://caspio-pricing-proxy-ab30a049961a.herokuapp.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n\n    <link rel=\"icon\" href=\"/favicon.png\" type=\"image/png\">\n\n    <link href=\"https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap\" rel=\"stylesheet\">\n    <!-- Font Awesome: the cart renderer + toasts use fa icons -->\n    <link href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css\" rel=\"stylesheet\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/nwca-2026-core.css?v=2026.09.07.8\">\n    <link rel=\"stylesheet\" href=\"/pages/css/sample-cart.css?v=2026.09.07.8\">\n</head>\n<body>\n    <a class=\"skip-link\" href=\"#main\">Skip to content</a>\n\n    <!-- Utility strip -->\n    <div class=\"util-strip\">\n        <div class=\"util-inner\">\n            <p class=\"util-fam\"><strong>Northwest Custom Apparel</strong> — family-owned in Milton, WA since 1977</p>\n            <div class=\"util-contact\">\n                <span class=\"util-hours\">Mon–Fri 8:30–5:00 PT</span>\n                <a href=\"tel:253-922-5793\">253-922-5793</a>\n                <a class=\"util-mail\" href=\"mailto:sales@nwcustomapparel.com\">sales@nwcustomapparel.com</a>\n                <a href=\"/staff-dashboard.html\" title=\"Staff Portal\">Staff</a>\n            </div>\n        </div>\n    </div>\n\n    <!-- Masthead -->\n    <header class=\"nav-bar\">\n        <div class=\"nav-bar-inner\">\n            <button class=\"mobile-menu-btn\" id=\"mobileMenuBtn\" type=\"button\" aria-label=\"Open menu\" aria-controls=\"sidebar\">\n                <svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\">\n                    <line x1=\"3\" y1=\"6\" x2=\"21\" y2=\"6\"></line>\n                    <line x1=\"3\" y1=\"12\" x2=\"21\" y2=\"12\"></line>\n                    <line x1=\"3\" y1=\"18\" x2=\"21\" y2=\"18\"></line>\n                </svg>\n            </button>\n\n            <a href=\"/\" class=\"brand\" title=\"Northwest Custom Apparel — Home\">\n                <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\"\n                     alt=\"Northwest Custom Apparel\" class=\"brand-logo\" width=\"160\" height=\"46\">\n            </a>\n\n            <ul class=\"nav-menu\">\n                <li class=\"nav-item\">\n                    <a href=\"/catalog\" class=\"nav-link\">Products</a>\n                </li>\n                <li class=\"nav-item\">\n                    <a href=\"/brands.html\" class=\"nav-link\">Brands</a>\n                </li>\n                <li class=\"nav-item\">\n                    <a href=\"/catalog?topSellers=1\" class=\"nav-link\">Top Sellers</a>\n                </li>\n                <li class=\"nav-item\">\n                    <a href=\"/custom-tees\" class=\"nav-link\">Custom Tees <span class=\"flag-new\">New</span></a>\n                </li>\n                <li class=\"nav-item\">\n                    <a href=\"/company-webstores\" class=\"nav-link\">Webstores</a>\n                </li>\n            </ul>\n\n            <div class=\"nav-search\" role=\"search\">\n                <input type=\"text\"\n                       id=\"navSearchInput\"\n                       class=\"nav-search-input\"\n                       placeholder=\"Search styles — PC61, hoodies, caps…\"\n                       autocomplete=\"off\"\n                       aria-label=\"Search products\">\n                <button id=\"navSearchBtn\" class=\"nav-search-btn\" type=\"button\" aria-label=\"Search\">\n                    <svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\">\n                        <circle cx=\"11\" cy=\"11\" r=\"8\"></circle>\n                        <path d=\"m21 21-4.35-4.35\"></path>\n                    </svg>\n                </button>\n            </div>\n\n            <!-- Samples badge (this IS the sample cart — count kept live by updateCartSummary's .cart-count-badge hook) -->\n            <a class=\"quote-badge sample-badge\" href=\"/pages/sample-cart.html\" aria-current=\"page\">\n                <svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\">\n                    <path d=\"M21 8v13H3V8\"></path>\n                    <path d=\"M1 3h22v5H1z\"></path>\n                    <path d=\"M10 12h4\"></path>\n                </svg>\n                <span class=\"quote-badge-label\">Samples</span>\n                <span class=\"quote-badge-count cart-count-badge\">0</span>\n            </a>\n        </div>\n    </header>\n\n    <!-- Drawer (mobile menu + category browse) -->\n    <aside class=\"sidebar\" id=\"sidebar\" aria-label=\"Browse menu\">\n        <div class=\"drawer-head\">\n            <span class=\"drawer-head-title\">Browse NWCA</span>\n            <button class=\"drawer-close\" id=\"drawerClose\" type=\"button\" aria-label=\"Close menu\">\n                <svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" aria-hidden=\"true\">\n                    <line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"></line>\n                    <line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"></line>\n                </svg>\n            </button>\n        </div>\n        <nav class=\"drawer-links\" aria-label=\"Quick links\">\n            <a href=\"/\">Home</a>\n            <a href=\"/custom-tees\">Custom T-Shirts <span class=\"flag-new\">New</span></a>\n            <a href=\"/catalog?topSellers=1\">Top Sellers &amp; Free Samples</a>\n            <a href=\"/brands.html\">Brands</a>\n            <a href=\"/company-webstores\">Custom Webstores</a>\n        </nav>\n        <div class=\"drawer-contact\">\n            Questions? A human answers.<br>\n            <a href=\"tel:253-922-5793\">253-922-5793</a><br>\n            <a href=\"mailto:sales@nwcustomapparel.com\">sales@nwcustomapparel.com</a><br>\n            2025 Freeman Rd E, Milton, WA 98354\n        </div>\n    </aside>\n    <div class=\"sidebar-overlay\" id=\"sidebarOverlay\"></div>\n\n    <main id=\"main\">\n        <!-- Page header -->\n        <header class=\"page-head\">\n            <div class=\"wrap sc-wrap\">\n                <nav class=\"crumbs\" aria-label=\"Breadcrumb\">\n                    <a href=\"/\">Home</a><span class=\"crumbs-sep\">/</span>\n                    <a href=\"/catalog?topSellers=1\">Top Sellers</a><span class=\"crumbs-sep\">/</span>\n                    <span aria-current=\"page\">Sample cart</span>\n                </nav>\n                <div class=\"page-head-row\">\n                    <div>\n                        <h1 class=\"page-title\">Your sample cart</h1>\n                        <p class=\"page-sub\">See and feel the quality before you order — free shipping on every sample.</p>\n                    </div>\n                    <div class=\"page-actions\"><a class=\"btn btn-ghost\" href=\"/catalog?topSellers=1\">Keep browsing</a></div>\n                </div>\n            </div>\n        </header>\n\n        <section class=\"sc-section\" aria-label=\"Sample cart\">\n            <div class=\"wrap sc-wrap\">\n                <div id=\"cartContainer\">\n                    <!-- Summary band -->\n                    <div class=\"cart-summary-bar\" id=\"cartSummaryBar\">\n                        <div class=\"summary-stats\">\n                            <div class=\"summary-item\">\n                                <div class=\"summary-label\">Items in cart</div>\n                                <div class=\"summary-value\" id=\"summaryItemCount\">0</div>\n                            </div>\n                            <div class=\"summary-item\">\n                                <div class=\"summary-label\">Total pieces</div>\n                                <div class=\"summary-value\" id=\"summaryTotalPieces\">0</div>\n                            </div>\n                            <div class=\"summary-item\">\n                                <div class=\"summary-label\">Estimated total</div>\n                                <div class=\"summary-value\" id=\"summaryTotalPrice\">$0.00</div>\n                            </div>\n                        </div>\n                        <!-- Unhidden by sample-checkout.js when the cart holds paid samples -->\n                        <p id=\"sampleCreditNote\" hidden>\n                            <i class=\"fas fa-gift\" aria-hidden=\"true\"></i>\n                            Paid samples check out securely online — the sample cost is <strong>credited toward your first decorated order</strong>. Free shipping, always.\n                        </p>\n                    </div>\n\n                    <!-- Cart items (rendered by sample-cart-page.js) -->\n                    <div class=\"cart-section\">\n                        <div id=\"cartItems\"></div>\n                    </div>\n\n                    <!-- Request form -->\n                    <div class=\"form-section\" id=\"contactForm\">\n                        <form id=\"sampleRequestForm\">\n                            <section class=\"form-block\">\n                                <h2>Contact information</h2>\n                                <div class=\"form-grid\">\n                                    <div class=\"form-group\">\n                                        <label for=\"fldFirstName\">First name <span class=\"required\">*</span></label>\n                                        <input type=\"text\" id=\"fldFirstName\" name=\"firstName\" autocomplete=\"given-name\" required>\n                                    </div>\n                                    <div class=\"form-group\">\n                                        <label for=\"fldLastName\">Last name <span class=\"required\">*</span></label>\n                                        <input type=\"text\" id=\"fldLastName\" name=\"lastName\" autocomplete=\"family-name\" required>\n                                    </div>\n                                    <div class=\"form-group\">\n                                        <label for=\"fldEmail\">Email <span class=\"required\">*</span></label>\n                                        <input type=\"email\" id=\"fldEmail\" name=\"email\" autocomplete=\"email\" required>\n                                    </div>\n                                    <div class=\"form-group\">\n                                        <label for=\"fldPhone\">Phone <span class=\"required\">*</span></label>\n                                        <input type=\"tel\" id=\"fldPhone\" name=\"phone\" autocomplete=\"tel\" required>\n                                    </div>\n                                    <div class=\"form-group\">\n                                        <label for=\"fldCompany\">Company</label>\n                                        <input type=\"text\" id=\"fldCompany\" name=\"company\" autocomplete=\"organization\">\n                                    </div>\n                                    <div class=\"form-group\">\n                                        <label for=\"salesRep\">Sales representative</label>\n                                        <select name=\"salesRep\" id=\"salesRep\">\n                                            <option value=\"House\" selected>House (no specific rep)</option>\n                                            <option value=\"Nika Lao\">Nika Lao</option>\n                                            <option value=\"Taneisha Clark\">Taneisha Clark</option>\n                                            <option value=\"Ruth Nhong\">Ruth Nhong</option>\n                                            <option value=\"Erik Mickelson\">Erik Mickelson</option>\n                                        </select>\n                                    </div>\n                                </div>\n                            </section>\n\n                            <section class=\"form-block\">\n                                <h2>Billing address</h2>\n                                <div class=\"form-grid\">\n                                    <div class=\"form-group span-2\">\n                                        <label for=\"billing-address1\">Street address <span class=\"required\">*</span></label>\n                                        <input type=\"text\" name=\"billing_address1\" id=\"billing-address1\" autocomplete=\"billing address-line1\" required placeholder=\"123 Main St\">\n                                    </div>\n                                    <div class=\"form-group\">\n                                        <label for=\"billing-address2\">Apt / Suite</label>\n                                        <input type=\"text\" name=\"billing_address2\" id=\"billing-address2\" autocomplete=\"billing address-line2\" placeholder=\"Apt 4B\">\n                                    </div>\n                                    <div class=\"form-group\">\n                                        <label for=\"billing-city\">City <span class=\"required\">*</span></label>\n                                        <input type=\"text\" name=\"billing_city\" id=\"billing-city\" autocomplete=\"billing address-level2\" required>\n                                    </div>\n                                    <div class=\"form-group\">\n                                        <label for=\"billing-state\">State <span class=\"required\">*</span></label>\n                                        <input type=\"text\" name=\"billing_state\" id=\"billing-state\" autocomplete=\"billing address-level1\" required placeholder=\"WA\" maxlength=\"2\" pattern=\"[A-Za-z]{2}\" class=\"input-upper\">\n                                    </div>\n                                    <div class=\"form-group\">\n                                        <label for=\"billing-zip\">ZIP code <span class=\"required\">*</span></label>\n                                        <input type=\"text\" name=\"billing_zip\" id=\"billing-zip\" autocomplete=\"billing postal-code\" required placeholder=\"98101\" pattern=\"\\d{5}\" maxlength=\"5\" inputmode=\"numeric\">\n                                    </div>\n                                </div>\n                            </section>\n\n                            <div class=\"same-as-billing-container\">\n                                <label class=\"checkbox-label\">\n                                    <input type=\"checkbox\" id=\"same-as-billing\" checked>\n                                    <span>Ship to the same address</span>\n                                </label>\n                            </div>\n\n                            <section id=\"shipping-section\" class=\"form-block shipping-address-section\" hidden>\n                                <h2>Shipping address</h2>\n                                <div class=\"form-grid\">\n                                    <div class=\"form-group span-2\">\n                                        <label for=\"shipping-address1\">Street address</label>\n                                        <input type=\"text\" name=\"shipping_address1\" id=\"shipping-address1\" autocomplete=\"shipping address-line1\" placeholder=\"123 Main St\">\n                                    </div>\n                                    <div class=\"form-group\">\n                                        <label for=\"shipping-address2\">Apt / Suite</label>\n                                        <input type=\"text\" name=\"shipping_address2\" id=\"shipping-address2\" autocomplete=\"shipping address-line2\" placeholder=\"Apt 4B\">\n                                    </div>\n                                    <div class=\"form-group\">\n                                        <label for=\"shipping-city\">City</label>\n                                        <input type=\"text\" name=\"shipping_city\" id=\"shipping-city\" autocomplete=\"shipping address-level2\">\n                                    </div>\n                                    <div class=\"form-group\">\n                                        <label for=\"shipping-state\">State</label>\n                                        <input type=\"text\" name=\"shipping_state\" id=\"shipping-state\" autocomplete=\"shipping address-level1\" placeholder=\"WA\" maxlength=\"2\" pattern=\"[A-Za-z]{2}\" class=\"input-upper\">\n                                    </div>\n                                    <div class=\"form-group\">\n                                        <label for=\"shipping-zip\">ZIP code</label>\n                                        <input type=\"text\" name=\"shipping_zip\" id=\"shipping-zip\" autocomplete=\"shipping postal-code\" placeholder=\"98101\" pattern=\"\\d{5}\" maxlength=\"5\" inputmode=\"numeric\">\n                                    </div>\n                                </div>\n                            </section>\n\n                            <input type=\"hidden\" name=\"shippingMethod\" value=\"UPS Ground\">\n\n                            <section class=\"form-block\">\n                                <h2>Anything else?</h2>\n                                <div class=\"form-grid\">\n                                    <div class=\"form-group span-2\">\n                                        <label for=\"fldNotes\">Additional notes</label>\n                                        <textarea id=\"fldNotes\" name=\"notes\" placeholder=\"Any specific requirements or questions…\"></textarea>\n                                    </div>\n                                    <div class=\"form-group span-2\">\n                                        <label for=\"logoUpload\">Upload logo / artwork <span class=\"label-soft\">(optional — AI, PDF, PNG, JPG)</span></label>\n                                        <input type=\"file\" id=\"logoUpload\" name=\"logoUpload\" accept=\".ai,.pdf,.png,.jpg,.jpeg,.eps,.psd,.svg\">\n                                        <small class=\"field-hint\">Samples ship blank — your artwork is saved for the quote that follows.</small>\n                                    </div>\n                                </div>\n                            </section>\n\n                            <div class=\"button-group\">\n                                <button type=\"submit\" class=\"btn btn-primary btn-lg\">\n                                    <i class=\"fas fa-paper-plane\" aria-hidden=\"true\"></i>\n                                    Submit sample request\n                                </button>\n                                <a href=\"/catalog?topSellers=1\" class=\"btn btn-ghost btn-lg\">Continue shopping</a>\n                            </div>\n                        </form>\n                    </div>\n                </div>\n\n                <!-- Success panel (free flow sets .show; Stripe return uses inline display) -->\n                <div class=\"success-message\" id=\"successMessage\">\n                    <i class=\"fas fa-check-circle\" aria-hidden=\"true\"></i>\n                    <h2>Sample request submitted!</h2>\n                    <p>Thank you for your request. We'll process your samples and be in touch shortly.</p>\n                    <p class=\"confirmation-line\"><strong>Confirmation ID:</strong> <span id=\"confirmationId\"></span></p>\n                    <div class=\"button-group center\">\n                        <a href=\"/catalog?topSellers=1\" class=\"btn btn-primary btn-lg\">Back to Top Sellers</a>\n                    </div>\n                </div>\n            </div>\n        </section>\n    </main>\n\n    <footer class=\"site-footer\">\n        <div class=\"footer-inner\">\n            <div class=\"footer-brand\">\n                <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20White%20Text.png?ver=1\" alt=\"Northwest Custom Apparel\" width=\"180\" height=\"52\" loading=\"lazy\">\n                <p>Family-owned custom apparel decorator in Milton, Washington. Embroidery, screen printing, DTG, and DTF — done in-house since 1977.</p>\n                <span class=\"footer-est\">Est. 1977 · Milton, WA</span>\n            </div>\n            <div class=\"footer-col\">\n                <h3>Shop</h3>\n                <ul>\n                    <li><a href=\"/catalog\">Product Catalog</a></li>\n                    <li><a href=\"/catalog?topSellers=1\">Top Sellers</a></li>\n                    <li><a href=\"/brands.html\">Brands</a></li>\n                    <li><a href=\"/custom-tees\">Custom T-Shirts</a></li>\n                    <li><a href=\"/catalog?topSellers=1\">Free Sample Program</a></li>\n                </ul>\n            </div>\n            <div class=\"footer-col\">\n                <h3>Services</h3>\n                <ul>\n                    <li><a href=\"/pages/golf-tournaments-2026.html?utm_source=sample-cart&amp;utm_campaign=golf-2026-q2&amp;utm_medium=footer\">Tournament Packages</a></li>\n                    <li><a href=\"/company-webstores\">Custom Webstores</a></li>\n                    <li><a href=\"/calculators/laser-tumbler-polarcamel.html\">Laser-Engraved Tumblers</a></li>\n                </ul>\n            </div>\n            <div class=\"footer-col\">\n                <h3>Contact</h3>\n                <address>\n                    2025 Freeman Rd E<br>\n                    Milton, WA 98354<br>\n                    <a href=\"tel:253-922-5793\">253-922-5793</a><br>\n                    <a href=\"mailto:sales@nwcustomapparel.com\">sales@nwcustomapparel.com</a><br>\n                    Mon–Fri 8:30–5:00 PT\n                </address>\n                <ul>\n                    <li><a href=\"/staff-dashboard.html\">Staff Portal</a></li>\n                </ul>\n            </div>\n        </div>\n        <div class=\"footer-bottom\">\n            <div class=\"footer-bottom-inner\">\n                <span>© 2026 Northwest Custom Apparel</span>\n                <span>Family-owned &amp; operated since 1977</span>\n            </div>\n        </div>\n    </footer>\n\n    <!-- API base for the Leads CRM write (APP_CONFIG.API.BASE_URL — never hardcode) -->\n    <script src=\"/config/app.config.js\"></script>\n    <!-- EmailJS (free-flow notification email) -->\n    <script src=\"https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js\"></script>\n    <!-- Sample program services -->\n    <script src=\"/shared_components/js/sample-order-service.js?v=2026.09.06.37\" defer></script>\n    <script src=\"/shared_components/js/sample-inventory-service.js?v=2026.09.07.33\" defer></script>\n    <!-- Paid-sample Stripe checkout (samples channel) -->\n    <script src=\"/pages/js/sample-checkout.js?v=2026.09.06.27\" defer></script>\n    <!-- Page controller (extracted from the legacy inline script, 2026 reskin) -->\n    <script src=\"/pages/js/sample-cart-page.js?v=2026.09.07.33\" defer></script>\n</body>\n</html>\n",
+      "title": "Sample Cart | Northwest Custom Apparel",
+      "bodyText": "Skip to content Northwest Custom Apparel — family-owned in Milton, WA since 1977 Mon–Fri 8:30–5:00 PT 253-922-5793 sales@nwcustomapparel.com Staff Products Brands Top Sellers Custom Tees New Webstores Samples 0 Browse NWCA Home Custom T-Shirts New Top Sellers & Free Samples Brands Custom Webstores Questions? A human answers. 253-922-5793 sales@nwcustomapparel.com 2025 Freeman Rd E, Milton, WA 98354 Home/ Top Sellers/ Sample cart Your sample cart See and feel the quality before you order — free shipping on every sample. Keep browsing Items in cart 0 Total pieces 0 Estimated total $0.00 Paid samples check out securely online — the sample cost is credited toward your first decorated order. Free shipping, always. Contact information First name * Last name * Email * Phone * Company Sales representative House (no specific rep) Nika Lao Taneisha Clark Ruth Nhong Erik Mickelson Billing address Street address * Apt / Suite City * State * ZIP code * Ship to the same address Shipping address Street address Apt / Suite City State ZIP code Anything else? Additional notes Upload logo / artwork (optional — AI, PDF, PNG, JPG) Samples ship blank — your artwork is saved for the quote that follows. Submit sample request Continue shopping Sample request submitted! Thank you for your request. We'll process your samples and be in touch shortly. Confirmation ID: Back to Top Sellers Family-owned custom apparel decorator in Milton, Washington. Embroidery, screen printing, DTG, and DTF — done in-house since 1977. Est. 1977 · Milton, WA Shop Product Catalog Top Sellers Brands Custom T-Shirts Free Sample Program Services Tournament Packages Custom Webstores Laser-Engraved Tumblers Contact 2025 Freeman Rd E Milton, WA 98354 253-922-5793 sales@nwcustomapparel.com Mon–Fri 8:30–5:00 PT Staff Portal © 2026 Northwest Custom Apparel Family-owned & operated since 1977",
+      "bodyTextSha": "3825741c4d41cad846559d4ebf2b5604e582e4062ed462dd9deec07c57f969b2",
+      "ids": [
+        "mobileMenuBtn",
+        "navSearchInput",
+        "navSearchBtn",
+        "sidebar",
+        "drawerClose",
+        "sidebarOverlay",
+        "main",
+        "cartContainer",
+        "cartSummaryBar",
+        "summaryItemCount",
+        "summaryTotalPieces",
+        "summaryTotalPrice",
+        "sampleCreditNote",
+        "cartItems",
+        "contactForm",
+        "sampleRequestForm",
+        "fldFirstName",
+        "fldLastName",
+        "fldEmail",
+        "fldPhone",
+        "fldCompany",
+        "salesRep",
+        "billing-address1",
+        "billing-address2",
+        "billing-city",
+        "billing-state",
+        "billing-zip",
+        "same-as-billing",
+        "shipping-section",
+        "shipping-address1",
+        "shipping-address2",
+        "shipping-city",
+        "shipping-state",
+        "shipping-zip",
+        "fldNotes",
+        "logoUpload",
+        "successMessage",
+        "confirmationId"
+      ],
+      "links": [
+        {
+          "href": "#main",
+          "label": "Skip to content"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "label": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Staff"
+        },
+        {
+          "href": "/",
+          "label": ""
+        },
+        {
+          "href": "/catalog",
+          "label": "Products"
+        },
+        {
+          "href": "/brands.html",
+          "label": "Brands"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "label": "Top Sellers"
+        },
+        {
+          "href": "/custom-tees",
+          "label": "Custom Tees New"
+        },
+        {
+          "href": "/company-webstores",
+          "label": "Webstores"
+        },
+        {
+          "href": "/pages/sample-cart.html",
+          "label": "Samples 0"
+        },
+        {
+          "href": "/",
+          "label": "Home"
+        },
+        {
+          "href": "/custom-tees",
+          "label": "Custom T-Shirts New"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "label": "Top Sellers & Free Samples"
+        },
+        {
+          "href": "/brands.html",
+          "label": "Brands"
+        },
+        {
+          "href": "/company-webstores",
+          "label": "Custom Webstores"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "label": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "label": "Home"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "label": "Top Sellers"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "label": "Keep browsing"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "label": "Continue shopping"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "label": "Back to Top Sellers"
+        },
+        {
+          "href": "/catalog",
+          "label": "Product Catalog"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "label": "Top Sellers"
+        },
+        {
+          "href": "/brands.html",
+          "label": "Brands"
+        },
+        {
+          "href": "/custom-tees",
+          "label": "Custom T-Shirts"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "label": "Free Sample Program"
+        },
+        {
+          "href": "/pages/golf-tournaments-2026.html?utm_source=sample-cart&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "label": "Tournament Packages"
+        },
+        {
+          "href": "/company-webstores",
+          "label": "Custom Webstores"
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "label": "Laser-Engraved Tumblers"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "label": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Staff Portal"
+        }
+      ],
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "fldFirstName",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "fldLastName",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "fldEmail",
+          "type": "email",
+          "value": ""
+        },
+        {
+          "id": "fldPhone",
+          "type": "tel",
+          "value": ""
+        },
+        {
+          "id": "fldCompany",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "salesRep",
+          "type": "select-one",
+          "value": "House"
+        },
+        {
+          "id": "billing-address1",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "billing-address2",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "billing-city",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "billing-state",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "billing-zip",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "same-as-billing",
+          "type": "checkbox",
+          "value": "on"
+        },
+        {
+          "id": "shipping-address1",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "shipping-address2",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "shipping-city",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "shipping-state",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "shipping-zip",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "",
+          "type": "hidden",
+          "value": "UPS Ground"
+        },
+        {
+          "id": "fldNotes",
+          "type": "textarea",
+          "value": ""
+        },
+        {
+          "id": "logoUpload",
+          "type": "file",
+          "value": ""
+        }
+      ],
+      "styles": [
+        "https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap",
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
+        "/shared_components/css/tokens.css?v=2026.09.08.2",
+        "/shared_components/css/nwca-2026-core.css?v=2026.09.07.8",
+        "/pages/css/sample-cart.css?v=2026.09.07.8"
+      ],
+      "scripts": [
+        "/config/app.config.js",
+        "https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js",
+        "/shared_components/js/sample-order-service.js?v=2026.09.06.37",
+        "/shared_components/js/sample-inventory-service.js?v=2026.09.07.33",
+        "/pages/js/sample-checkout.js?v=2026.09.06.27",
+        "/pages/js/sample-cart-page.js?v=2026.09.07.33"
+      ],
+      "cssBytes": 71646
+    }
+  ],
+  "hashes": {
+    "config/app.config.js": "fe83e4329ce3eee97e48dd68dab81d9d5eb6ec94511d9650e2c9ebbb1528d6ea",
+    "pages/css/quote-cart.css": "463ec81457d80e5f904790a9a6615f3e198512820993e5e9e40c18e63c5dd5ad",
+    "pages/css/sample-cart.css": "1e0ab342c2379b3d040ded04291ca0552bc61802c90198b71eba48e12aa942d2",
+    "pages/js/quote-cart-page.js": "3bc6b5d4f82d74d2dafb77b0f9977dc39668fe89a3f97ce82bf3f502097b2446",
+    "pages/js/sample-cart-page.js": "940a90f884b435ff07097eb7af685859992eb864a19fd59186b409e91c046c0c",
+    "pages/js/sample-checkout.js": "08f535ff78a301263ea3634dbbe05a81894542d8c560b4b7626b7b75262c7f3d",
+    "pages/quote-cart.html": "0e6a115d1d5d2deeb4404fd059144e2a901e72c50904b158ae4dccaab11934e8",
+    "pages/sample-cart.html": "e4e4c04c7ca793efe65a40991e936159c857c2080ab9f08eb4c943b7b2a34792",
+    "shared_components/css/embroidery-quote-pricing.css": "d7e48a93fa554e0bf44cf5617a803069c942221458c191390f01ebc85a6779fa",
+    "shared_components/css/nwca-2026-core.css": "9041ba4e915446a5eb0c219f489565b2503533be59f5ac73a26de12766526e1c",
+    "shared_components/css/tokens.css": "2b3ab556bb9eaf40765a5c84683777cb64d50a6c42d1b4e82bc6beff33a127b6",
+    "shared_components/js/delivery-promise.js": "8eceedfd17128aa68146bd6c095142824d2575dc4f1716292cfb37a0ed9a45cd",
+    "shared_components/js/dtf-pricing-service.js": "949255ae38db6f51d494f78f07ebc8f484e5288035fe1d13b3af7c6fea2391ab",
+    "shared_components/js/dtf-quote-pricing.js": "af8443797219945d0b7618158dcd6c55bdd19be2c6f300693cb6bfe56543d9fb",
+    "shared_components/js/embroidery-quote-pricing.js": "50a142670e991983b9a7ff09b20f05c59edd5cd72f19cb37d322f3bcb14c3fb3",
+    "shared_components/js/quote-cart-engine.js": "ae4d987c8a68b260c2acdc42e123883a12decc6b59c42359edb8c40ca348a7eb",
+    "shared_components/js/quote-cart-store.js": "593a33e72fe2dee151811b91aee4404c0a00db2d394ccf9ab27e7da2bc9ef7c0",
+    "shared_components/js/sample-inventory-service.js": "6a852360032e06636a921dad61e3e02d462156df90b1d0d367c6b883f2e828ba",
+    "shared_components/js/sample-order-service.js": "9e3c730a575a561e52c96176242012c46de06f75ee7e3840a0270ca6588c2929",
+    "shared_components/js/screenprint-pricing-service.js": "695a740f845263741fee5a9aa91816d9643a5dd24fa28cfc3850a9a2785300b7",
+    "shared_components/js/web-quote-service.js": "a1a3574255438cc8a262d79e04912d9aa324ab8d42dfbee878c72bc886a20aae"
+  },
+  "changes": [],
+  "retiredStyles": []
+}

@@ -585,3 +585,76 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - tests/fixtures/customer-account-product-batch-sent-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
 
 - tests/fixtures/customer-account-product-upgrade-sent-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-cart-original-content.json and tests/unit/customer-cart-content.test.js — immutable Sample Cart/Quote Cart HTML, full local source graph and financial/size/group guards before CSS migration.
+
+- tests/e2e/helpers/customer-cart-browser.js — synthetic carts browser routing and fixture engines; all business writes intercepted.
+- tests/e2e/css-unification-customer-cart.spec.js — original cart screen/paper contracts at four widths.
+
+- tests/fixtures/customer-cart-quote-EMB-original-browser.json — immutable synthetic original cart browser contract.
+
+- tests/fixtures/customer-cart-sample-empty-original-browser.json — immutable synthetic original cart browser contract.
+
+- tests/fixtures/customer-cart-sample-paid-original-browser.json — immutable synthetic original cart browser contract.
+
+- tests/fixtures/customer-cart-sample-mixed-original-browser.json — immutable synthetic original cart browser contract.
+
+- tests/fixtures/customer-cart-sample-legacy-original-browser.json — immutable synthetic original cart browser contract.
+
+- tests/fixtures/customer-cart-sample-low-original-browser.json — immutable synthetic original cart browser contract.
+
+- tests/fixtures/customer-cart-sample-out-original-browser.json — immutable synthetic original cart browser contract.
+
+- tests/fixtures/customer-cart-sample-missing-original-browser.json — immutable synthetic original cart browser contract.
+
+- tests/fixtures/customer-cart-sample-long-original-browser.json — immutable synthetic original cart browser contract.
+
+- tests/fixtures/customer-cart-sample-escaped-original-browser.json — immutable synthetic original cart browser contract.
+
+- tests/fixtures/customer-cart-quote-empty-original-browser.json — immutable synthetic original cart browser contract.
+
+- tests/fixtures/customer-cart-quote-CAP-original-browser.json — immutable synthetic original cart browser contract.
+
+- tests/fixtures/customer-cart-quote-DTG-original-browser.json — immutable synthetic original cart browser contract.
+
+- tests/fixtures/customer-cart-quote-SCP-original-browser.json — immutable synthetic original cart browser contract.
+
+- tests/fixtures/customer-cart-quote-DTF-original-browser.json — immutable synthetic original cart browser contract.
+
+- tests/fixtures/customer-cart-quote-mixed-original-browser.json — immutable synthetic original cart browser contract.
+
+- tests/fixtures/customer-cart-quote-failed-original-browser.json — immutable synthetic original cart browser contract.
+
+- tests/fixtures/customer-cart-quote-warning-original-browser.json — immutable synthetic original cart browser contract.
+
+- tests/fixtures/customer-cart-quote-missing-original-browser.json — immutable synthetic original cart browser contract.
+
+- tests/fixtures/customer-cart-quote-long-original-browser.json — immutable synthetic original cart browser contract.
+
+- tests/fixtures/customer-cart-quote-escaped-original-browser.json — immutable synthetic original cart browser contract.
+
+- tests/fixtures/customer-cart-sample-free-original-browser.json — immutable synthetic original cart browser contract.
+
+- tests/fixtures/customer-cart-sample-filled-shipping-original-browser.json — immutable synthetic original cart browser contract.
+
+- tests/fixtures/customer-cart-sample-free-sent-original-browser.json — immutable synthetic original cart browser contract.
+
+- tests/fixtures/customer-cart-sample-paid-pending-original-browser.json — immutable synthetic original cart browser contract.
+
+- tests/fixtures/customer-cart-sample-paid-failed-original-browser.json — immutable synthetic original cart browser contract.
+
+- tests/fixtures/customer-cart-sample-return-canceled-original-browser.json — immutable synthetic original cart browser contract.
+
+- tests/fixtures/customer-cart-sample-return-success-original-browser.json — immutable synthetic original cart browser contract.
+
+- tests/fixtures/customer-cart-sample-removed-original-browser.json — immutable synthetic original cart browser contract.
+
+- tests/fixtures/customer-cart-quote-filled-save-original-browser.json — immutable synthetic original cart browser contract.
+
+- tests/fixtures/customer-cart-quote-failed-group-removed-original-browser.json — immutable synthetic original cart browser contract.
+
+- tests/fixtures/customer-cart-quote-quantities-original-browser.json — immutable synthetic original cart browser contract.
+
+- tests/fixtures/customer-cart-quote-save-sent-original-browser.json — immutable synthetic original cart browser contract.
+
+- tests/fixtures/customer-cart-quote-save-failed-original-browser.json — immutable synthetic original cart browser contract.

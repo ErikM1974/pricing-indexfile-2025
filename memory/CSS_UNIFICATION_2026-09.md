@@ -1,5 +1,18 @@
 # CSS unification — design direction and implementation plan
 
+## NEXT — Sample Cart and Quote Cart original review
+
+This isolated branch starts at the prepared .11 source9eb6e2a2. Account pair bba4306d/da6c2373 is frozen separately:54 browser cases,23 paper pages and261 post-cache guards passed. Full local1204-case CSS/money checks run on primaryda6c2373; exact-source CI34565556223 is running. Live remains .10/2102/44ccf020 at187/225; account candidate189/225,36pending. No account release yet.
+
+- [x] Freeze both cart pages, full local styles/script graph and financial/size/group methods before editing application code.
+- [ ] Capture original empty/free/paid/mixed sample carts, stock states, long/escaped/legacy storage, form/address/attachments, canceled and confirmed payment returns, exact checkout/free-order/email/CRM request bodies. Intercept every business action and allocating read before load.
+- [ ] Capture quote cart method groups, sizes/pooling/tier nudges/fees and failed totals, size edits/removal/storage/reprice, save/share/email and delivery-promise states. Preserve all pricing authorities, group/size transformations and successful request payloads.
+- [ ] Review four widths1440/768/390/320, keyboard/axe, empty/errors/delays and every original PDF page. Shared nwca-2026-core remains original for the other storefront consumers.
+- [ ] Adopt shared controls/Public Sans and scoped cart/common storefront layout; externalize inline presentation and repair only demonstrated UI defects.
+- [ ] Compare original/current values and payloads, complete failure/retry/pending/paper checks before migration credit; full release gates before another deploy.
+
+The source comments reference two older cart-design memory files that are absent in both checkouts. Preserve the existing pooling and customer workflow documented in source; do not invent pricing changes. No real orders, Stripe checkout, emails, lead writes, logout or device printing. Do not rerun consumed helpers or delete the node_modules junction.
+
 ## RELEASE CANDIDATE — v2026.09.10.11 Customer Account and Product
 
 Reviewed pair bba4306d is integrated with live44ccf020 atda6c23738011d4f6d2e55aaf57dd3112d9083b1c. All241 unit suites/5,640 tests (four existing skips),88 DOM,four accessibility unit and84 quote parity checks pass;423-asset build, lint/types,485routes/24modules and boot pass. Full CSS and live pricing browser checks run on the unchanged primary integration checkout. This release checkout adds only nine cache references, their reversible mappings and these notes; all six application CSS/JS assets remain identical. Exact-source CI can run alongside local checks; both must pass before deployment.
@@ -1501,3 +1514,11 @@ Exact-source CI 34543191741 passed all four jobs on 0b271bb2ae12b083936a1add6c86
 ## Order Status and Job Portal release record — v2026.09.10.10
 
 Exact-source CI 34561449204 passed all four jobs on 0091eff76524acfc16ce3f5f401d3b8bbb057aa8, including actual CSS and live money/calculator parity. Full local gates passed on identical application assets atf03b9117f3213b033795fbd4f8346559ae0ca14c. Canonical controls/scoped layouts,46 focused browser cases,10 reviewed paper pages,10 original source hashes/74 reversible mappings. Three important flags removed; successful payloads, money and date rendering preserved. Counts become187/225 reviewed,38 pending after verified rollout. Separate Customer Account/Product originals atd3a5efff are excluded.
+
+## Customer carts — original baseline reviewed, September10,2026
+- [x] Preserve21 original source hashes and24 source/financial/group guards; no cart application edits.
+- [x] Capture32 synthetic browser cases at1440/768/390/320 into34 immutable contracts. All cases pass across29 completed cases plus three corrected fixture cases; corrections used the actual WQ sequence route and Enter/whole-matrix blur commit. All unknown writes fail closed.
+- [x] Visually review all40 original paper pages across11 PDFs, including long carts, entered shipping/note/logo, pricing failure, quote save and checkout confirmations. Evidence: customer-cart-original-review.json in the artifact directory.
+- [ ] Adopt existing storefront-shell/navigation and canonical buttons/fields; keep shared legacy core unchanged for its unreviewed consumers. Scoped cart owners, no new override stack.
+- [ ] Demonstrate and repair focus/storage/late-response faults; preserve exact successful request/email/checkout bodies and original financial transforms. Review current screens, axe/keyboard and complete paper before migration credit.
+Live remains.10/2102/44cc187/225. Account .11 is separately gated on source4e763b26/CI34567159048 and full local3297. Cart gets no migration credit; reviewed candidate remains189/225,36pending. No .env copies, real orders/payments/emails or device printing.

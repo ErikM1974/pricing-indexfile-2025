@@ -1,0 +1,1153 @@
+{
+  "name": "sample-long",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Sample Cart | Northwest Custom Apparel",
+      "text": "Home / Top Sellers / Sample cart Your sample cart See and feel the quality before you order — free shipping on every sample. Keep browsing ITEMS IN CART 12 TOTAL PIECES 30 ESTIMATED TOTAL $181.50 Paid samples check out securely online — the sample cost is credited toward your first decorated order. Free shipping, always. Example apparel with a long descriptive name for a customer team 1 Style: TEST1 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 2 Style: TEST2 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00 Example apparel with a long descriptive name for a customer team 3 Style: TEST3 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 4 Style: TEST4 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00 Example apparel with a long descriptive name for a customer team 5 Style: TEST5 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 6 Style: TEST6 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00 Example apparel with a long descriptive name for a customer team 7 Style: TEST7 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 8 Style: TEST8 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00 Example apparel with a long descriptive name for a customer team 9 Style: TEST9 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 10 Style: TEST10 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00 Example apparel with a long descriptive name for a customer team 11 Style: TEST11 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 12 Style: TEST12 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00 Contact information First name * Last name * Email * Phone * Company Sales representative House (no specific rep) Nika Lao Taneisha Clark Ruth Nhong Erik Mickelson Billing address Street address * Apt / Suite City * State * ZIP code * Ship to the same address Anything else? Additional notes Upload logo / artwork (optional — AI, PDF, PNG, JPG) Samples ship blank — your artwork is saved for the quote that follows. Continue to secure payment Continue shopping",
+      "ids": {
+        "summaryItemCount": "12",
+        "summaryTotalPieces": "30",
+        "summaryTotalPrice": "$181.50",
+        "sampleCreditNote": "Paid samples check out securely online — the sample cost is credited toward your first decorated order. Free shipping, always.",
+        "cartItems": "Example apparel with a long descriptive name for a customer team 1 Style: TEST1 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 2 Style: TEST2 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00 Example apparel with a long descriptive name for a customer team 3 Style: TEST3 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 4 Style: TEST4 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00 Example apparel with a long descriptive name for a customer team 5 Style: TEST5 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 6 Style: TEST6 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00 Example apparel with a long descriptive name for a customer team 7 Style: TEST7 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 8 Style: TEST8 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00 Example apparel with a long descriptive name for a customer team 9 Style: TEST9 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 10 Style: TEST10 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00 Example apparel with a long descriptive name for a customer team 11 Style: TEST11 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 12 Style: TEST12 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00",
+        "fldFirstName": "",
+        "fldLastName": "",
+        "fldEmail": "",
+        "fldPhone": "",
+        "fldCompany": "",
+        "salesRep": "House (no specific rep) Nika Lao Taneisha Clark Ruth Nhong Erik Mickelson",
+        "billing-address1": "",
+        "billing-address2": "",
+        "billing-city": "",
+        "billing-state": "",
+        "billing-zip": "",
+        "same-as-billing": "",
+        "fldNotes": "",
+        "logoUpload": ""
+      },
+      "links": [
+        {
+          "href": "#main",
+          "text": "Skip to content",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/catalog",
+          "text": "Products",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom Tees NEW",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Webstores",
+          "label": null
+        },
+        {
+          "href": "/pages/sample-cart.html",
+          "text": "Samples 12",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts NEW",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers & Free Samples",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Keep browsing",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Continue shopping",
+          "label": null
+        },
+        {
+          "href": "/catalog",
+          "text": "Product Catalog",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free Sample Program",
+          "label": null
+        },
+        {
+          "href": "/pages/golf-tournaments-2026.html?utm_source=sample-cart&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "text": "Tournament Packages",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores",
+          "label": null
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "Laser-Engraved Tumblers",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Portal",
+          "label": null
+        }
+      ],
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "name": "",
+          "value": ""
+        },
+        {
+          "id": "fldFirstName",
+          "name": "firstName",
+          "value": ""
+        },
+        {
+          "id": "fldLastName",
+          "name": "lastName",
+          "value": ""
+        },
+        {
+          "id": "fldEmail",
+          "name": "email",
+          "value": ""
+        },
+        {
+          "id": "fldPhone",
+          "name": "phone",
+          "value": ""
+        },
+        {
+          "id": "fldCompany",
+          "name": "company",
+          "value": ""
+        },
+        {
+          "id": "salesRep",
+          "name": "salesRep",
+          "value": "House"
+        },
+        {
+          "id": "billing-address1",
+          "name": "billing_address1",
+          "value": ""
+        },
+        {
+          "id": "billing-address2",
+          "name": "billing_address2",
+          "value": ""
+        },
+        {
+          "id": "billing-city",
+          "name": "billing_city",
+          "value": ""
+        },
+        {
+          "id": "billing-state",
+          "name": "billing_state",
+          "value": ""
+        },
+        {
+          "id": "billing-zip",
+          "name": "billing_zip",
+          "value": ""
+        },
+        {
+          "id": "same-as-billing",
+          "name": "",
+          "value": "on",
+          "checked": true
+        },
+        {
+          "id": "fldNotes",
+          "name": "notes",
+          "value": ""
+        },
+        {
+          "id": "logoUpload",
+          "name": "logoUpload",
+          "value": ""
+        }
+      ],
+      "engineCalls": [],
+      "emails": [],
+      "injection": false,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".summary-item:nth-child(1) > .summary-label"
+            ],
+            [
+              ".summary-item:nth-child(2) > .summary-label"
+            ],
+            [
+              ".summary-item:nth-child(3) > .summary-label"
+            ],
+            [
+              ".label-soft"
+            ],
+            [
+              "small"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Sample Cart | Northwest Custom Apparel",
+      "text": "Home / Top Sellers / Sample cart Your sample cart See and feel the quality before you order — free shipping on every sample. Keep browsing ITEMS IN CART 12 TOTAL PIECES 30 ESTIMATED TOTAL $181.50 Paid samples check out securely online — the sample cost is credited toward your first decorated order. Free shipping, always. Example apparel with a long descriptive name for a customer team 1 Style: TEST1 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 2 Style: TEST2 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00 Example apparel with a long descriptive name for a customer team 3 Style: TEST3 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 4 Style: TEST4 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00 Example apparel with a long descriptive name for a customer team 5 Style: TEST5 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 6 Style: TEST6 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00 Example apparel with a long descriptive name for a customer team 7 Style: TEST7 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 8 Style: TEST8 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00 Example apparel with a long descriptive name for a customer team 9 Style: TEST9 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 10 Style: TEST10 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00 Example apparel with a long descriptive name for a customer team 11 Style: TEST11 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 12 Style: TEST12 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00 Contact information First name * Last name * Email * Phone * Company Sales representative House (no specific rep) Nika Lao Taneisha Clark Ruth Nhong Erik Mickelson Billing address Street address * Apt / Suite City * State * ZIP code * Ship to the same address Anything else? Additional notes Upload logo / artwork (optional — AI, PDF, PNG, JPG) Samples ship blank — your artwork is saved for the quote that follows. Continue to secure payment Continue shopping",
+      "ids": {
+        "summaryItemCount": "12",
+        "summaryTotalPieces": "30",
+        "summaryTotalPrice": "$181.50",
+        "sampleCreditNote": "Paid samples check out securely online — the sample cost is credited toward your first decorated order. Free shipping, always.",
+        "cartItems": "Example apparel with a long descriptive name for a customer team 1 Style: TEST1 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 2 Style: TEST2 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00 Example apparel with a long descriptive name for a customer team 3 Style: TEST3 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 4 Style: TEST4 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00 Example apparel with a long descriptive name for a customer team 5 Style: TEST5 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 6 Style: TEST6 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00 Example apparel with a long descriptive name for a customer team 7 Style: TEST7 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 8 Style: TEST8 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00 Example apparel with a long descriptive name for a customer team 9 Style: TEST9 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 10 Style: TEST10 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00 Example apparel with a long descriptive name for a customer team 11 Style: TEST11 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 12 Style: TEST12 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00",
+        "fldFirstName": "",
+        "fldLastName": "",
+        "fldEmail": "",
+        "fldPhone": "",
+        "fldCompany": "",
+        "salesRep": "House (no specific rep) Nika Lao Taneisha Clark Ruth Nhong Erik Mickelson",
+        "billing-address1": "",
+        "billing-address2": "",
+        "billing-city": "",
+        "billing-state": "",
+        "billing-zip": "",
+        "same-as-billing": "",
+        "fldNotes": "",
+        "logoUpload": ""
+      },
+      "links": [
+        {
+          "href": "#main",
+          "text": "Skip to content",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/pages/sample-cart.html",
+          "text": "Samples 12",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts NEW",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers & Free Samples",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Keep browsing",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Continue shopping",
+          "label": null
+        },
+        {
+          "href": "/catalog",
+          "text": "Product Catalog",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free Sample Program",
+          "label": null
+        },
+        {
+          "href": "/pages/golf-tournaments-2026.html?utm_source=sample-cart&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "text": "Tournament Packages",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores",
+          "label": null
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "Laser-Engraved Tumblers",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Portal",
+          "label": null
+        }
+      ],
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "name": "",
+          "value": ""
+        },
+        {
+          "id": "fldFirstName",
+          "name": "firstName",
+          "value": ""
+        },
+        {
+          "id": "fldLastName",
+          "name": "lastName",
+          "value": ""
+        },
+        {
+          "id": "fldEmail",
+          "name": "email",
+          "value": ""
+        },
+        {
+          "id": "fldPhone",
+          "name": "phone",
+          "value": ""
+        },
+        {
+          "id": "fldCompany",
+          "name": "company",
+          "value": ""
+        },
+        {
+          "id": "salesRep",
+          "name": "salesRep",
+          "value": "House"
+        },
+        {
+          "id": "billing-address1",
+          "name": "billing_address1",
+          "value": ""
+        },
+        {
+          "id": "billing-address2",
+          "name": "billing_address2",
+          "value": ""
+        },
+        {
+          "id": "billing-city",
+          "name": "billing_city",
+          "value": ""
+        },
+        {
+          "id": "billing-state",
+          "name": "billing_state",
+          "value": ""
+        },
+        {
+          "id": "billing-zip",
+          "name": "billing_zip",
+          "value": ""
+        },
+        {
+          "id": "same-as-billing",
+          "name": "",
+          "value": "on",
+          "checked": true
+        },
+        {
+          "id": "fldNotes",
+          "name": "notes",
+          "value": ""
+        },
+        {
+          "id": "logoUpload",
+          "name": "logoUpload",
+          "value": ""
+        }
+      ],
+      "engineCalls": [],
+      "emails": [],
+      "injection": false,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".summary-item:nth-child(1) > .summary-label"
+            ],
+            [
+              ".summary-item:nth-child(2) > .summary-label"
+            ],
+            [
+              ".summary-item:nth-child(3) > .summary-label"
+            ],
+            [
+              ".label-soft"
+            ],
+            [
+              "small"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Sample Cart | Northwest Custom Apparel",
+      "text": "Home / Top Sellers / Sample cart Your sample cart See and feel the quality before you order — free shipping on every sample. Keep browsing ITEMS IN CART 12 TOTAL PIECES 30 ESTIMATED TOTAL $181.50 Paid samples check out securely online — the sample cost is credited toward your first decorated order. Free shipping, always. Example apparel with a long descriptive name for a customer team 1 Style: TEST1 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 2 Style: TEST2 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00 Example apparel with a long descriptive name for a customer team 3 Style: TEST3 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 4 Style: TEST4 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00 Example apparel with a long descriptive name for a customer team 5 Style: TEST5 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 6 Style: TEST6 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00 Example apparel with a long descriptive name for a customer team 7 Style: TEST7 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 8 Style: TEST8 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00 Example apparel with a long descriptive name for a customer team 9 Style: TEST9 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 10 Style: TEST10 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00 Example apparel with a long descriptive name for a customer team 11 Style: TEST11 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 12 Style: TEST12 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00 Contact information First name * Last name * Email * Phone * Company Sales representative House (no specific rep) Nika Lao Taneisha Clark Ruth Nhong Erik Mickelson Billing address Street address * Apt / Suite City * State * ZIP code * Ship to the same address Anything else? Additional notes Upload logo / artwork (optional — AI, PDF, PNG, JPG) Samples ship blank — your artwork is saved for the quote that follows. Continue to secure payment Continue shopping",
+      "ids": {
+        "summaryItemCount": "12",
+        "summaryTotalPieces": "30",
+        "summaryTotalPrice": "$181.50",
+        "sampleCreditNote": "Paid samples check out securely online — the sample cost is credited toward your first decorated order. Free shipping, always.",
+        "cartItems": "Example apparel with a long descriptive name for a customer team 1 Style: TEST1 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 2 Style: TEST2 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00 Example apparel with a long descriptive name for a customer team 3 Style: TEST3 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 4 Style: TEST4 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00 Example apparel with a long descriptive name for a customer team 5 Style: TEST5 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 6 Style: TEST6 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00 Example apparel with a long descriptive name for a customer team 7 Style: TEST7 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 8 Style: TEST8 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00 Example apparel with a long descriptive name for a customer team 9 Style: TEST9 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 10 Style: TEST10 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00 Example apparel with a long descriptive name for a customer team 11 Style: TEST11 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 12 Style: TEST12 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00",
+        "fldFirstName": "",
+        "fldLastName": "",
+        "fldEmail": "",
+        "fldPhone": "",
+        "fldCompany": "",
+        "salesRep": "House (no specific rep) Nika Lao Taneisha Clark Ruth Nhong Erik Mickelson",
+        "billing-address1": "",
+        "billing-address2": "",
+        "billing-city": "",
+        "billing-state": "",
+        "billing-zip": "",
+        "same-as-billing": "",
+        "fldNotes": "",
+        "logoUpload": ""
+      },
+      "links": [
+        {
+          "href": "#main",
+          "text": "Skip to content",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/pages/sample-cart.html",
+          "text": "12",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts NEW",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers & Free Samples",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Keep browsing",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Continue shopping",
+          "label": null
+        },
+        {
+          "href": "/catalog",
+          "text": "Product Catalog",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free Sample Program",
+          "label": null
+        },
+        {
+          "href": "/pages/golf-tournaments-2026.html?utm_source=sample-cart&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "text": "Tournament Packages",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores",
+          "label": null
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "Laser-Engraved Tumblers",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Portal",
+          "label": null
+        }
+      ],
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "name": "",
+          "value": ""
+        },
+        {
+          "id": "fldFirstName",
+          "name": "firstName",
+          "value": ""
+        },
+        {
+          "id": "fldLastName",
+          "name": "lastName",
+          "value": ""
+        },
+        {
+          "id": "fldEmail",
+          "name": "email",
+          "value": ""
+        },
+        {
+          "id": "fldPhone",
+          "name": "phone",
+          "value": ""
+        },
+        {
+          "id": "fldCompany",
+          "name": "company",
+          "value": ""
+        },
+        {
+          "id": "salesRep",
+          "name": "salesRep",
+          "value": "House"
+        },
+        {
+          "id": "billing-address1",
+          "name": "billing_address1",
+          "value": ""
+        },
+        {
+          "id": "billing-address2",
+          "name": "billing_address2",
+          "value": ""
+        },
+        {
+          "id": "billing-city",
+          "name": "billing_city",
+          "value": ""
+        },
+        {
+          "id": "billing-state",
+          "name": "billing_state",
+          "value": ""
+        },
+        {
+          "id": "billing-zip",
+          "name": "billing_zip",
+          "value": ""
+        },
+        {
+          "id": "same-as-billing",
+          "name": "",
+          "value": "on",
+          "checked": true
+        },
+        {
+          "id": "fldNotes",
+          "name": "notes",
+          "value": ""
+        },
+        {
+          "id": "logoUpload",
+          "name": "logoUpload",
+          "value": ""
+        }
+      ],
+      "engineCalls": [],
+      "emails": [],
+      "injection": false,
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".summary-item:nth-child(1) > .summary-label"
+            ],
+            [
+              ".summary-item:nth-child(2) > .summary-label"
+            ],
+            [
+              ".summary-item:nth-child(3) > .summary-label"
+            ],
+            [
+              ".label-soft"
+            ],
+            [
+              "small"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Sample Cart | Northwest Custom Apparel",
+      "text": "Home / Top Sellers / Sample cart Your sample cart See and feel the quality before you order — free shipping on every sample. Keep browsing ITEMS IN CART 12 TOTAL PIECES 30 ESTIMATED TOTAL $181.50 Paid samples check out securely online — the sample cost is credited toward your first decorated order. Free shipping, always. Example apparel with a long descriptive name for a customer team 1 Style: TEST1 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 2 Style: TEST2 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00 Example apparel with a long descriptive name for a customer team 3 Style: TEST3 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 4 Style: TEST4 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00 Example apparel with a long descriptive name for a customer team 5 Style: TEST5 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 6 Style: TEST6 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00 Example apparel with a long descriptive name for a customer team 7 Style: TEST7 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 8 Style: TEST8 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00 Example apparel with a long descriptive name for a customer team 9 Style: TEST9 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 10 Style: TEST10 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00 Example apparel with a long descriptive name for a customer team 11 Style: TEST11 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 12 Style: TEST12 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00 Contact information First name * Last name * Email * Phone * Company Sales representative House (no specific rep) Nika Lao Taneisha Clark Ruth Nhong Erik Mickelson Billing address Street address * Apt / Suite City * State * ZIP code * Ship to the same address Anything else? Additional notes Upload logo / artwork (optional — AI, PDF, PNG, JPG) Samples ship blank — your artwork is saved for the quote that follows. Continue to secure payment Continue shopping",
+      "ids": {
+        "summaryItemCount": "12",
+        "summaryTotalPieces": "30",
+        "summaryTotalPrice": "$181.50",
+        "sampleCreditNote": "Paid samples check out securely online — the sample cost is credited toward your first decorated order. Free shipping, always.",
+        "cartItems": "Example apparel with a long descriptive name for a customer team 1 Style: TEST1 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 2 Style: TEST2 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00 Example apparel with a long descriptive name for a customer team 3 Style: TEST3 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 4 Style: TEST4 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00 Example apparel with a long descriptive name for a customer team 5 Style: TEST5 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 6 Style: TEST6 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00 Example apparel with a long descriptive name for a customer team 7 Style: TEST7 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 8 Style: TEST8 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00 Example apparel with a long descriptive name for a customer team 9 Style: TEST9 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 10 Style: TEST10 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00 Example apparel with a long descriptive name for a customer team 11 Style: TEST11 Color: Brilliant Orange In Stock Sizes: M (1) $8.75 2XL (2) $10.75 3 items = $30.25 Example apparel with a long descriptive name for a customer team 12 Style: TEST12 Color: Navy In Stock Sizes: S (1) $0.00 XL (1) $0.00 2 items = $0.00",
+        "fldFirstName": "",
+        "fldLastName": "",
+        "fldEmail": "",
+        "fldPhone": "",
+        "fldCompany": "",
+        "salesRep": "House (no specific rep) Nika Lao Taneisha Clark Ruth Nhong Erik Mickelson",
+        "billing-address1": "",
+        "billing-address2": "",
+        "billing-city": "",
+        "billing-state": "",
+        "billing-zip": "",
+        "same-as-billing": "",
+        "fldNotes": "",
+        "logoUpload": ""
+      },
+      "links": [
+        {
+          "href": "#main",
+          "text": "Skip to content",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/pages/sample-cart.html",
+          "text": "12",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts NEW",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers & Free Samples",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Keep browsing",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Continue shopping",
+          "label": null
+        },
+        {
+          "href": "/catalog",
+          "text": "Product Catalog",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free Sample Program",
+          "label": null
+        },
+        {
+          "href": "/pages/golf-tournaments-2026.html?utm_source=sample-cart&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "text": "Tournament Packages",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores",
+          "label": null
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "Laser-Engraved Tumblers",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Portal",
+          "label": null
+        }
+      ],
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "name": "",
+          "value": ""
+        },
+        {
+          "id": "fldFirstName",
+          "name": "firstName",
+          "value": ""
+        },
+        {
+          "id": "fldLastName",
+          "name": "lastName",
+          "value": ""
+        },
+        {
+          "id": "fldEmail",
+          "name": "email",
+          "value": ""
+        },
+        {
+          "id": "fldPhone",
+          "name": "phone",
+          "value": ""
+        },
+        {
+          "id": "fldCompany",
+          "name": "company",
+          "value": ""
+        },
+        {
+          "id": "salesRep",
+          "name": "salesRep",
+          "value": "House"
+        },
+        {
+          "id": "billing-address1",
+          "name": "billing_address1",
+          "value": ""
+        },
+        {
+          "id": "billing-address2",
+          "name": "billing_address2",
+          "value": ""
+        },
+        {
+          "id": "billing-city",
+          "name": "billing_city",
+          "value": ""
+        },
+        {
+          "id": "billing-state",
+          "name": "billing_state",
+          "value": ""
+        },
+        {
+          "id": "billing-zip",
+          "name": "billing_zip",
+          "value": ""
+        },
+        {
+          "id": "same-as-billing",
+          "name": "",
+          "value": "on",
+          "checked": true
+        },
+        {
+          "id": "fldNotes",
+          "name": "notes",
+          "value": ""
+        },
+        {
+          "id": "logoUpload",
+          "name": "logoUpload",
+          "value": ""
+        }
+      ],
+      "engineCalls": [],
+      "emails": [],
+      "injection": false,
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".summary-item:nth-child(1) > .summary-label"
+            ],
+            [
+              ".summary-item:nth-child(2) > .summary-label"
+            ],
+            [
+              ".summary-item:nth-child(3) > .summary-label"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "reads": [
+    {
+      "path": "/api/sizes-by-style-color",
+      "query": "?styleNumber=TEST1&color=BrillOrng"
+    },
+    {
+      "path": "/api/sizes-by-style-color",
+      "query": "?styleNumber=TEST2&color=Navy"
+    },
+    {
+      "path": "/api/sizes-by-style-color",
+      "query": "?styleNumber=TEST3&color=BrillOrng"
+    },
+    {
+      "path": "/api/sizes-by-style-color",
+      "query": "?styleNumber=TEST4&color=Navy"
+    },
+    {
+      "path": "/api/sizes-by-style-color",
+      "query": "?styleNumber=TEST5&color=BrillOrng"
+    },
+    {
+      "path": "/api/sizes-by-style-color",
+      "query": "?styleNumber=TEST6&color=Navy"
+    },
+    {
+      "path": "/api/sizes-by-style-color",
+      "query": "?styleNumber=TEST7&color=BrillOrng"
+    },
+    {
+      "path": "/api/sizes-by-style-color",
+      "query": "?styleNumber=TEST8&color=Navy"
+    },
+    {
+      "path": "/api/sizes-by-style-color",
+      "query": "?styleNumber=TEST9&color=BrillOrng"
+    },
+    {
+      "path": "/api/sizes-by-style-color",
+      "query": "?styleNumber=TEST10&color=Navy"
+    },
+    {
+      "path": "/api/sizes-by-style-color",
+      "query": "?styleNumber=TEST11&color=BrillOrng"
+    },
+    {
+      "path": "/api/sizes-by-style-color",
+      "query": "?styleNumber=TEST12&color=Navy"
+    }
+  ],
+  "actions": [],
+  "dialogs": []
+}

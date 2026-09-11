@@ -1,0 +1,939 @@
+{
+  "name": "quote-empty",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Your Quote | Northwest Custom Apparel",
+      "text": "Home / Your quote Your quote Live prices straight from our pricing system — the same numbers our team quotes. No payment now — a rep confirms tax, shipping, and your proof. Keep shopping 🧵 Your quote is empty Pick a product, configure the decoration, and hit \"Add to quote\" — quantities pool within each decoration type for better pricing. Saved a quote earlier? Use the link we emailed you. Browse the catalog",
+      "ids": {
+        "qcAlert": "",
+        "qcEmpty": "🧵 Your quote is empty Pick a product, configure the decoration, and hit \"Add to quote\" — quantities pool within each decoration type for better pricing. Saved a quote earlier? Use the link we emailed you. Browse the catalog",
+        "toastStack": ""
+      },
+      "links": [
+        {
+          "href": "#main",
+          "text": "Skip to content",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/catalog",
+          "text": "Products",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "text": "Fall Catalog '26 NEW",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom Tees NEW",
+          "label": null
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats NEW",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Webstores",
+          "label": null
+        },
+        {
+          "href": "/blog",
+          "text": "Blog",
+          "label": null
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "Stickers",
+          "label": null
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "text": "Get a Quote",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts NEW",
+          "label": null
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats NEW",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers & Free Samples",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores",
+          "label": null
+        },
+        {
+          "href": "/catalog",
+          "text": "Catalog",
+          "label": null
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "text": "Fall Catalog '26",
+          "label": null
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "Custom Stickers",
+          "label": null
+        },
+        {
+          "href": "/custom-banners",
+          "text": "Vinyl Banners",
+          "label": null
+        },
+        {
+          "href": "/blog",
+          "text": "Blog",
+          "label": null
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "text": "Get a Quote",
+          "label": null
+        },
+        {
+          "href": "/catalog?category=T-Shirts",
+          "text": "T-Shirts",
+          "label": null
+        },
+        {
+          "href": "/catalog?category=Polos%2FKnits",
+          "text": "Polos & Knits",
+          "label": null
+        },
+        {
+          "href": "/catalog?category=Sweatshirts%2FFleece",
+          "text": "Sweatshirts & Fleece",
+          "label": null
+        },
+        {
+          "href": "/catalog?category=Caps",
+          "text": "Caps",
+          "label": null
+        },
+        {
+          "href": "/catalog?category=Outerwear",
+          "text": "Outerwear",
+          "label": null
+        },
+        {
+          "href": "/catalog?category=Workwear",
+          "text": "Workwear",
+          "label": null
+        },
+        {
+          "href": "/catalog?category=Bags",
+          "text": "Bags",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "/catalog",
+          "text": "Keep shopping",
+          "label": null
+        },
+        {
+          "href": "/catalog",
+          "text": "Browse the catalog",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts",
+          "label": null
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free Sample Program",
+          "label": null
+        },
+        {
+          "href": "/golf-tournament-apparel?utm_source=quote-cart&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "text": "Tournament Packages",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores",
+          "label": null
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "Laser-Engraved Tumblers",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Portal",
+          "label": null
+        }
+      ],
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "name": "",
+          "value": ""
+        }
+      ],
+      "engineCalls": [],
+      "emails": [],
+      "injection": false,
+      "overflow": true,
+      "violations": []
+    },
+    {
+      "width": 768,
+      "title": "Your Quote | Northwest Custom Apparel",
+      "text": "Home / Your quote Your quote Live prices straight from our pricing system — the same numbers our team quotes. No payment now — a rep confirms tax, shipping, and your proof. Keep shopping 🧵 Your quote is empty Pick a product, configure the decoration, and hit \"Add to quote\" — quantities pool within each decoration type for better pricing. Saved a quote earlier? Use the link we emailed you. Browse the catalog",
+      "ids": {
+        "qcAlert": "",
+        "qcEmpty": "🧵 Your quote is empty Pick a product, configure the decoration, and hit \"Add to quote\" — quantities pool within each decoration type for better pricing. Saved a quote earlier? Use the link we emailed you. Browse the catalog",
+        "toastStack": ""
+      },
+      "links": [
+        {
+          "href": "#main",
+          "text": "Skip to content",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts NEW",
+          "label": null
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats NEW",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers & Free Samples",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores",
+          "label": null
+        },
+        {
+          "href": "/catalog",
+          "text": "Catalog",
+          "label": null
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "text": "Fall Catalog '26",
+          "label": null
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "Custom Stickers",
+          "label": null
+        },
+        {
+          "href": "/custom-banners",
+          "text": "Vinyl Banners",
+          "label": null
+        },
+        {
+          "href": "/blog",
+          "text": "Blog",
+          "label": null
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "text": "Get a Quote",
+          "label": null
+        },
+        {
+          "href": "/catalog?category=T-Shirts",
+          "text": "T-Shirts",
+          "label": null
+        },
+        {
+          "href": "/catalog?category=Polos%2FKnits",
+          "text": "Polos & Knits",
+          "label": null
+        },
+        {
+          "href": "/catalog?category=Sweatshirts%2FFleece",
+          "text": "Sweatshirts & Fleece",
+          "label": null
+        },
+        {
+          "href": "/catalog?category=Caps",
+          "text": "Caps",
+          "label": null
+        },
+        {
+          "href": "/catalog?category=Outerwear",
+          "text": "Outerwear",
+          "label": null
+        },
+        {
+          "href": "/catalog?category=Workwear",
+          "text": "Workwear",
+          "label": null
+        },
+        {
+          "href": "/catalog?category=Bags",
+          "text": "Bags",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "/catalog",
+          "text": "Keep shopping",
+          "label": null
+        },
+        {
+          "href": "/catalog",
+          "text": "Browse the catalog",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts",
+          "label": null
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free Sample Program",
+          "label": null
+        },
+        {
+          "href": "/golf-tournament-apparel?utm_source=quote-cart&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "text": "Tournament Packages",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores",
+          "label": null
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "Laser-Engraved Tumblers",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Portal",
+          "label": null
+        }
+      ],
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "name": "",
+          "value": ""
+        }
+      ],
+      "engineCalls": [],
+      "emails": [],
+      "injection": false,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "width": 390,
+      "title": "Your Quote | Northwest Custom Apparel",
+      "text": "Home / Your quote Your quote Live prices straight from our pricing system — the same numbers our team quotes. No payment now — a rep confirms tax, shipping, and your proof. Keep shopping 🧵 Your quote is empty Pick a product, configure the decoration, and hit \"Add to quote\" — quantities pool within each decoration type for better pricing. Saved a quote earlier? Use the link we emailed you. Browse the catalog",
+      "ids": {
+        "qcAlert": "",
+        "qcEmpty": "🧵 Your quote is empty Pick a product, configure the decoration, and hit \"Add to quote\" — quantities pool within each decoration type for better pricing. Saved a quote earlier? Use the link we emailed you. Browse the catalog",
+        "toastStack": ""
+      },
+      "links": [
+        {
+          "href": "#main",
+          "text": "Skip to content",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts NEW",
+          "label": null
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats NEW",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers & Free Samples",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores",
+          "label": null
+        },
+        {
+          "href": "/catalog",
+          "text": "Catalog",
+          "label": null
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "text": "Fall Catalog '26",
+          "label": null
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "Custom Stickers",
+          "label": null
+        },
+        {
+          "href": "/custom-banners",
+          "text": "Vinyl Banners",
+          "label": null
+        },
+        {
+          "href": "/blog",
+          "text": "Blog",
+          "label": null
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "text": "Get a Quote",
+          "label": null
+        },
+        {
+          "href": "/catalog?category=T-Shirts",
+          "text": "T-Shirts",
+          "label": null
+        },
+        {
+          "href": "/catalog?category=Polos%2FKnits",
+          "text": "Polos & Knits",
+          "label": null
+        },
+        {
+          "href": "/catalog?category=Sweatshirts%2FFleece",
+          "text": "Sweatshirts & Fleece",
+          "label": null
+        },
+        {
+          "href": "/catalog?category=Caps",
+          "text": "Caps",
+          "label": null
+        },
+        {
+          "href": "/catalog?category=Outerwear",
+          "text": "Outerwear",
+          "label": null
+        },
+        {
+          "href": "/catalog?category=Workwear",
+          "text": "Workwear",
+          "label": null
+        },
+        {
+          "href": "/catalog?category=Bags",
+          "text": "Bags",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "/catalog",
+          "text": "Keep shopping",
+          "label": null
+        },
+        {
+          "href": "/catalog",
+          "text": "Browse the catalog",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts",
+          "label": null
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free Sample Program",
+          "label": null
+        },
+        {
+          "href": "/golf-tournament-apparel?utm_source=quote-cart&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "text": "Tournament Packages",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores",
+          "label": null
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "Laser-Engraved Tumblers",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Portal",
+          "label": null
+        }
+      ],
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "name": "",
+          "value": ""
+        }
+      ],
+      "engineCalls": [],
+      "emails": [],
+      "injection": false,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "width": 320,
+      "title": "Your Quote | Northwest Custom Apparel",
+      "text": "Home / Your quote Your quote Live prices straight from our pricing system — the same numbers our team quotes. No payment now — a rep confirms tax, shipping, and your proof. Keep shopping 🧵 Your quote is empty Pick a product, configure the decoration, and hit \"Add to quote\" — quantities pool within each decoration type for better pricing. Saved a quote earlier? Use the link we emailed you. Browse the catalog",
+      "ids": {
+        "qcAlert": "",
+        "qcEmpty": "🧵 Your quote is empty Pick a product, configure the decoration, and hit \"Add to quote\" — quantities pool within each decoration type for better pricing. Saved a quote earlier? Use the link we emailed you. Browse the catalog",
+        "toastStack": ""
+      },
+      "links": [
+        {
+          "href": "#main",
+          "text": "Skip to content",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts NEW",
+          "label": null
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats NEW",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers & Free Samples",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores",
+          "label": null
+        },
+        {
+          "href": "/catalog",
+          "text": "Catalog",
+          "label": null
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "text": "Fall Catalog '26",
+          "label": null
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "Custom Stickers",
+          "label": null
+        },
+        {
+          "href": "/custom-banners",
+          "text": "Vinyl Banners",
+          "label": null
+        },
+        {
+          "href": "/blog",
+          "text": "Blog",
+          "label": null
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "text": "Get a Quote",
+          "label": null
+        },
+        {
+          "href": "/catalog?category=T-Shirts",
+          "text": "T-Shirts",
+          "label": null
+        },
+        {
+          "href": "/catalog?category=Polos%2FKnits",
+          "text": "Polos & Knits",
+          "label": null
+        },
+        {
+          "href": "/catalog?category=Sweatshirts%2FFleece",
+          "text": "Sweatshirts & Fleece",
+          "label": null
+        },
+        {
+          "href": "/catalog?category=Caps",
+          "text": "Caps",
+          "label": null
+        },
+        {
+          "href": "/catalog?category=Outerwear",
+          "text": "Outerwear",
+          "label": null
+        },
+        {
+          "href": "/catalog?category=Workwear",
+          "text": "Workwear",
+          "label": null
+        },
+        {
+          "href": "/catalog?category=Bags",
+          "text": "Bags",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "/catalog",
+          "text": "Keep shopping",
+          "label": null
+        },
+        {
+          "href": "/catalog",
+          "text": "Browse the catalog",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts",
+          "label": null
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free Sample Program",
+          "label": null
+        },
+        {
+          "href": "/golf-tournament-apparel?utm_source=quote-cart&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "text": "Tournament Packages",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores",
+          "label": null
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "Laser-Engraved Tumblers",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Portal",
+          "label": null
+        }
+      ],
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "name": "",
+          "value": ""
+        }
+      ],
+      "engineCalls": [],
+      "emails": [],
+      "injection": false,
+      "overflow": true,
+      "violations": []
+    }
+  ],
+  "reads": [],
+  "actions": [],
+  "dialogs": []
+}

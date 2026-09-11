@@ -1,0 +1,1225 @@
+{
+  "name": "sample-filled-shipping",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Sample Cart | Northwest Custom Apparel",
+      "text": "Home / Top Sellers / Sample cart Your sample cart See and feel the quality before you order — free shipping on every sample. Keep browsing ITEMS IN CART 1 TOTAL PIECES 3 ESTIMATED TOTAL $0.00 Core Cotton Tee Style: PC54 Color: Brilliant Orange In Stock Sizes: M (1) $0.00 2XL (2) $0.00 3 items = $0.00 Contact information First name * Last name * Email * Phone * Company Sales representative House (no specific rep) Nika Lao Taneisha Clark Ruth Nhong Erik Mickelson Billing address Street address * Apt / Suite City * State * ZIP code * Ship to the same address Shipping address Street address Apt / Suite City State ZIP code Anything else? Additional notes Upload logo / artwork (optional — AI, PDF, PNG, JPG) Samples ship blank — your artwork is saved for the quote that follows. Submit sample request Continue shopping",
+      "ids": {
+        "summaryItemCount": "1",
+        "summaryTotalPieces": "3",
+        "summaryTotalPrice": "$0.00",
+        "cartItems": "Core Cotton Tee Style: PC54 Color: Brilliant Orange In Stock Sizes: M (1) $0.00 2XL (2) $0.00 3 items = $0.00",
+        "fldFirstName": "",
+        "fldLastName": "",
+        "fldEmail": "",
+        "fldPhone": "",
+        "fldCompany": "",
+        "salesRep": "House (no specific rep) Nika Lao Taneisha Clark Ruth Nhong Erik Mickelson",
+        "billing-address1": "",
+        "billing-address2": "",
+        "billing-city": "",
+        "billing-state": "",
+        "billing-zip": "",
+        "same-as-billing": "",
+        "shipping-address1": "",
+        "shipping-address2": "",
+        "shipping-city": "",
+        "shipping-state": "",
+        "shipping-zip": "",
+        "fldNotes": "",
+        "logoUpload": ""
+      },
+      "links": [
+        {
+          "href": "#main",
+          "text": "Skip to content",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/catalog",
+          "text": "Products",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom Tees NEW",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Webstores",
+          "label": null
+        },
+        {
+          "href": "/pages/sample-cart.html",
+          "text": "Samples 1",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts NEW",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers & Free Samples",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Keep browsing",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Continue shopping",
+          "label": null
+        },
+        {
+          "href": "/catalog",
+          "text": "Product Catalog",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free Sample Program",
+          "label": null
+        },
+        {
+          "href": "/pages/golf-tournaments-2026.html?utm_source=sample-cart&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "text": "Tournament Packages",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores",
+          "label": null
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "Laser-Engraved Tumblers",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Portal",
+          "label": null
+        }
+      ],
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "name": "",
+          "value": ""
+        },
+        {
+          "id": "fldFirstName",
+          "name": "firstName",
+          "value": "Casey"
+        },
+        {
+          "id": "fldLastName",
+          "name": "lastName",
+          "value": "Example"
+        },
+        {
+          "id": "fldEmail",
+          "name": "email",
+          "value": "customer@example.test"
+        },
+        {
+          "id": "fldPhone",
+          "name": "phone",
+          "value": "2535550142"
+        },
+        {
+          "id": "fldCompany",
+          "name": "company",
+          "value": "Example Team"
+        },
+        {
+          "id": "salesRep",
+          "name": "salesRep",
+          "value": "House"
+        },
+        {
+          "id": "billing-address1",
+          "name": "billing_address1",
+          "value": "100 Example Way"
+        },
+        {
+          "id": "billing-address2",
+          "name": "billing_address2",
+          "value": "Suite 5"
+        },
+        {
+          "id": "billing-city",
+          "name": "billing_city",
+          "value": "Milton"
+        },
+        {
+          "id": "billing-state",
+          "name": "billing_state",
+          "value": "wa"
+        },
+        {
+          "id": "billing-zip",
+          "name": "billing_zip",
+          "value": "98354"
+        },
+        {
+          "id": "same-as-billing",
+          "name": "",
+          "value": "on",
+          "checked": false
+        },
+        {
+          "id": "shipping-address1",
+          "name": "shipping_address1",
+          "value": "200 Sample Lane"
+        },
+        {
+          "id": "shipping-address2",
+          "name": "shipping_address2",
+          "value": "Unit 8"
+        },
+        {
+          "id": "shipping-city",
+          "name": "shipping_city",
+          "value": "Tacoma"
+        },
+        {
+          "id": "shipping-state",
+          "name": "shipping_state",
+          "value": "wa"
+        },
+        {
+          "id": "shipping-zip",
+          "name": "shipping_zip",
+          "value": "98402"
+        },
+        {
+          "id": "fldNotes",
+          "name": "notes",
+          "value": "Please send the listed sizes. Reference artwork stays blank on samples."
+        },
+        {
+          "id": "logoUpload",
+          "name": "logoUpload",
+          "value": "C:\\fakepath\\example-logo.svg"
+        }
+      ],
+      "engineCalls": [],
+      "emails": [],
+      "injection": false,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".summary-item:nth-child(1) > .summary-label"
+            ],
+            [
+              ".summary-item:nth-child(2) > .summary-label"
+            ],
+            [
+              ".summary-item:nth-child(3) > .summary-label"
+            ],
+            [
+              ".label-soft"
+            ],
+            [
+              "small"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Sample Cart | Northwest Custom Apparel",
+      "text": "Home / Top Sellers / Sample cart Your sample cart See and feel the quality before you order — free shipping on every sample. Keep browsing ITEMS IN CART 1 TOTAL PIECES 3 ESTIMATED TOTAL $0.00 Core Cotton Tee Style: PC54 Color: Brilliant Orange In Stock Sizes: M (1) $0.00 2XL (2) $0.00 3 items = $0.00 Contact information First name * Last name * Email * Phone * Company Sales representative House (no specific rep) Nika Lao Taneisha Clark Ruth Nhong Erik Mickelson Billing address Street address * Apt / Suite City * State * ZIP code * Ship to the same address Shipping address Street address Apt / Suite City State ZIP code Anything else? Additional notes Upload logo / artwork (optional — AI, PDF, PNG, JPG) Samples ship blank — your artwork is saved for the quote that follows. Submit sample request Continue shopping",
+      "ids": {
+        "summaryItemCount": "1",
+        "summaryTotalPieces": "3",
+        "summaryTotalPrice": "$0.00",
+        "cartItems": "Core Cotton Tee Style: PC54 Color: Brilliant Orange In Stock Sizes: M (1) $0.00 2XL (2) $0.00 3 items = $0.00",
+        "fldFirstName": "",
+        "fldLastName": "",
+        "fldEmail": "",
+        "fldPhone": "",
+        "fldCompany": "",
+        "salesRep": "House (no specific rep) Nika Lao Taneisha Clark Ruth Nhong Erik Mickelson",
+        "billing-address1": "",
+        "billing-address2": "",
+        "billing-city": "",
+        "billing-state": "",
+        "billing-zip": "",
+        "same-as-billing": "",
+        "shipping-address1": "",
+        "shipping-address2": "",
+        "shipping-city": "",
+        "shipping-state": "",
+        "shipping-zip": "",
+        "fldNotes": "",
+        "logoUpload": ""
+      },
+      "links": [
+        {
+          "href": "#main",
+          "text": "Skip to content",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/pages/sample-cart.html",
+          "text": "Samples 1",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts NEW",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers & Free Samples",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Keep browsing",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Continue shopping",
+          "label": null
+        },
+        {
+          "href": "/catalog",
+          "text": "Product Catalog",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free Sample Program",
+          "label": null
+        },
+        {
+          "href": "/pages/golf-tournaments-2026.html?utm_source=sample-cart&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "text": "Tournament Packages",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores",
+          "label": null
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "Laser-Engraved Tumblers",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Portal",
+          "label": null
+        }
+      ],
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "name": "",
+          "value": ""
+        },
+        {
+          "id": "fldFirstName",
+          "name": "firstName",
+          "value": "Casey"
+        },
+        {
+          "id": "fldLastName",
+          "name": "lastName",
+          "value": "Example"
+        },
+        {
+          "id": "fldEmail",
+          "name": "email",
+          "value": "customer@example.test"
+        },
+        {
+          "id": "fldPhone",
+          "name": "phone",
+          "value": "2535550142"
+        },
+        {
+          "id": "fldCompany",
+          "name": "company",
+          "value": "Example Team"
+        },
+        {
+          "id": "salesRep",
+          "name": "salesRep",
+          "value": "House"
+        },
+        {
+          "id": "billing-address1",
+          "name": "billing_address1",
+          "value": "100 Example Way"
+        },
+        {
+          "id": "billing-address2",
+          "name": "billing_address2",
+          "value": "Suite 5"
+        },
+        {
+          "id": "billing-city",
+          "name": "billing_city",
+          "value": "Milton"
+        },
+        {
+          "id": "billing-state",
+          "name": "billing_state",
+          "value": "wa"
+        },
+        {
+          "id": "billing-zip",
+          "name": "billing_zip",
+          "value": "98354"
+        },
+        {
+          "id": "same-as-billing",
+          "name": "",
+          "value": "on",
+          "checked": false
+        },
+        {
+          "id": "shipping-address1",
+          "name": "shipping_address1",
+          "value": "200 Sample Lane"
+        },
+        {
+          "id": "shipping-address2",
+          "name": "shipping_address2",
+          "value": "Unit 8"
+        },
+        {
+          "id": "shipping-city",
+          "name": "shipping_city",
+          "value": "Tacoma"
+        },
+        {
+          "id": "shipping-state",
+          "name": "shipping_state",
+          "value": "wa"
+        },
+        {
+          "id": "shipping-zip",
+          "name": "shipping_zip",
+          "value": "98402"
+        },
+        {
+          "id": "fldNotes",
+          "name": "notes",
+          "value": "Please send the listed sizes. Reference artwork stays blank on samples."
+        },
+        {
+          "id": "logoUpload",
+          "name": "logoUpload",
+          "value": "C:\\fakepath\\example-logo.svg"
+        }
+      ],
+      "engineCalls": [],
+      "emails": [],
+      "injection": false,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".summary-item:nth-child(1) > .summary-label"
+            ],
+            [
+              ".summary-item:nth-child(2) > .summary-label"
+            ],
+            [
+              ".summary-item:nth-child(3) > .summary-label"
+            ],
+            [
+              ".label-soft"
+            ],
+            [
+              "small"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Sample Cart | Northwest Custom Apparel",
+      "text": "Home / Top Sellers / Sample cart Your sample cart See and feel the quality before you order — free shipping on every sample. Keep browsing ITEMS IN CART 1 TOTAL PIECES 3 ESTIMATED TOTAL $0.00 Core Cotton Tee Style: PC54 Color: Brilliant Orange In Stock Sizes: M (1) $0.00 2XL (2) $0.00 3 items = $0.00 Contact information First name * Last name * Email * Phone * Company Sales representative House (no specific rep) Nika Lao Taneisha Clark Ruth Nhong Erik Mickelson Billing address Street address * Apt / Suite City * State * ZIP code * Ship to the same address Shipping address Street address Apt / Suite City State ZIP code Anything else? Additional notes Upload logo / artwork (optional — AI, PDF, PNG, JPG) Samples ship blank — your artwork is saved for the quote that follows. Submit sample request Continue shopping",
+      "ids": {
+        "summaryItemCount": "1",
+        "summaryTotalPieces": "3",
+        "summaryTotalPrice": "$0.00",
+        "cartItems": "Core Cotton Tee Style: PC54 Color: Brilliant Orange In Stock Sizes: M (1) $0.00 2XL (2) $0.00 3 items = $0.00",
+        "fldFirstName": "",
+        "fldLastName": "",
+        "fldEmail": "",
+        "fldPhone": "",
+        "fldCompany": "",
+        "salesRep": "House (no specific rep) Nika Lao Taneisha Clark Ruth Nhong Erik Mickelson",
+        "billing-address1": "",
+        "billing-address2": "",
+        "billing-city": "",
+        "billing-state": "",
+        "billing-zip": "",
+        "same-as-billing": "",
+        "shipping-address1": "",
+        "shipping-address2": "",
+        "shipping-city": "",
+        "shipping-state": "",
+        "shipping-zip": "",
+        "fldNotes": "",
+        "logoUpload": ""
+      },
+      "links": [
+        {
+          "href": "#main",
+          "text": "Skip to content",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/pages/sample-cart.html",
+          "text": "1",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts NEW",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers & Free Samples",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Keep browsing",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Continue shopping",
+          "label": null
+        },
+        {
+          "href": "/catalog",
+          "text": "Product Catalog",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free Sample Program",
+          "label": null
+        },
+        {
+          "href": "/pages/golf-tournaments-2026.html?utm_source=sample-cart&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "text": "Tournament Packages",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores",
+          "label": null
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "Laser-Engraved Tumblers",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Portal",
+          "label": null
+        }
+      ],
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "name": "",
+          "value": ""
+        },
+        {
+          "id": "fldFirstName",
+          "name": "firstName",
+          "value": "Casey"
+        },
+        {
+          "id": "fldLastName",
+          "name": "lastName",
+          "value": "Example"
+        },
+        {
+          "id": "fldEmail",
+          "name": "email",
+          "value": "customer@example.test"
+        },
+        {
+          "id": "fldPhone",
+          "name": "phone",
+          "value": "2535550142"
+        },
+        {
+          "id": "fldCompany",
+          "name": "company",
+          "value": "Example Team"
+        },
+        {
+          "id": "salesRep",
+          "name": "salesRep",
+          "value": "House"
+        },
+        {
+          "id": "billing-address1",
+          "name": "billing_address1",
+          "value": "100 Example Way"
+        },
+        {
+          "id": "billing-address2",
+          "name": "billing_address2",
+          "value": "Suite 5"
+        },
+        {
+          "id": "billing-city",
+          "name": "billing_city",
+          "value": "Milton"
+        },
+        {
+          "id": "billing-state",
+          "name": "billing_state",
+          "value": "wa"
+        },
+        {
+          "id": "billing-zip",
+          "name": "billing_zip",
+          "value": "98354"
+        },
+        {
+          "id": "same-as-billing",
+          "name": "",
+          "value": "on",
+          "checked": false
+        },
+        {
+          "id": "shipping-address1",
+          "name": "shipping_address1",
+          "value": "200 Sample Lane"
+        },
+        {
+          "id": "shipping-address2",
+          "name": "shipping_address2",
+          "value": "Unit 8"
+        },
+        {
+          "id": "shipping-city",
+          "name": "shipping_city",
+          "value": "Tacoma"
+        },
+        {
+          "id": "shipping-state",
+          "name": "shipping_state",
+          "value": "wa"
+        },
+        {
+          "id": "shipping-zip",
+          "name": "shipping_zip",
+          "value": "98402"
+        },
+        {
+          "id": "fldNotes",
+          "name": "notes",
+          "value": "Please send the listed sizes. Reference artwork stays blank on samples."
+        },
+        {
+          "id": "logoUpload",
+          "name": "logoUpload",
+          "value": "C:\\fakepath\\example-logo.svg"
+        }
+      ],
+      "engineCalls": [],
+      "emails": [],
+      "injection": false,
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".summary-item:nth-child(1) > .summary-label"
+            ],
+            [
+              ".summary-item:nth-child(2) > .summary-label"
+            ],
+            [
+              ".summary-item:nth-child(3) > .summary-label"
+            ],
+            [
+              ".label-soft"
+            ],
+            [
+              "small"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Sample Cart | Northwest Custom Apparel",
+      "text": "Home / Top Sellers / Sample cart Your sample cart See and feel the quality before you order — free shipping on every sample. Keep browsing ITEMS IN CART 1 TOTAL PIECES 3 ESTIMATED TOTAL $0.00 Core Cotton Tee Style: PC54 Color: Brilliant Orange In Stock Sizes: M (1) $0.00 2XL (2) $0.00 3 items = $0.00 Contact information First name * Last name * Email * Phone * Company Sales representative House (no specific rep) Nika Lao Taneisha Clark Ruth Nhong Erik Mickelson Billing address Street address * Apt / Suite City * State * ZIP code * Ship to the same address Shipping address Street address Apt / Suite City State ZIP code Anything else? Additional notes Upload logo / artwork (optional — AI, PDF, PNG, JPG) Samples ship blank — your artwork is saved for the quote that follows. Submit sample request Continue shopping",
+      "ids": {
+        "summaryItemCount": "1",
+        "summaryTotalPieces": "3",
+        "summaryTotalPrice": "$0.00",
+        "cartItems": "Core Cotton Tee Style: PC54 Color: Brilliant Orange In Stock Sizes: M (1) $0.00 2XL (2) $0.00 3 items = $0.00",
+        "fldFirstName": "",
+        "fldLastName": "",
+        "fldEmail": "",
+        "fldPhone": "",
+        "fldCompany": "",
+        "salesRep": "House (no specific rep) Nika Lao Taneisha Clark Ruth Nhong Erik Mickelson",
+        "billing-address1": "",
+        "billing-address2": "",
+        "billing-city": "",
+        "billing-state": "",
+        "billing-zip": "",
+        "same-as-billing": "",
+        "shipping-address1": "",
+        "shipping-address2": "",
+        "shipping-city": "",
+        "shipping-state": "",
+        "shipping-zip": "",
+        "fldNotes": "",
+        "logoUpload": ""
+      },
+      "links": [
+        {
+          "href": "#main",
+          "text": "Skip to content",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/pages/sample-cart.html",
+          "text": "1",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts NEW",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers & Free Samples",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Keep browsing",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Continue shopping",
+          "label": null
+        },
+        {
+          "href": "/catalog",
+          "text": "Product Catalog",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free Sample Program",
+          "label": null
+        },
+        {
+          "href": "/pages/golf-tournaments-2026.html?utm_source=sample-cart&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "text": "Tournament Packages",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores",
+          "label": null
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "Laser-Engraved Tumblers",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Portal",
+          "label": null
+        }
+      ],
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "name": "",
+          "value": ""
+        },
+        {
+          "id": "fldFirstName",
+          "name": "firstName",
+          "value": "Casey"
+        },
+        {
+          "id": "fldLastName",
+          "name": "lastName",
+          "value": "Example"
+        },
+        {
+          "id": "fldEmail",
+          "name": "email",
+          "value": "customer@example.test"
+        },
+        {
+          "id": "fldPhone",
+          "name": "phone",
+          "value": "2535550142"
+        },
+        {
+          "id": "fldCompany",
+          "name": "company",
+          "value": "Example Team"
+        },
+        {
+          "id": "salesRep",
+          "name": "salesRep",
+          "value": "House"
+        },
+        {
+          "id": "billing-address1",
+          "name": "billing_address1",
+          "value": "100 Example Way"
+        },
+        {
+          "id": "billing-address2",
+          "name": "billing_address2",
+          "value": "Suite 5"
+        },
+        {
+          "id": "billing-city",
+          "name": "billing_city",
+          "value": "Milton"
+        },
+        {
+          "id": "billing-state",
+          "name": "billing_state",
+          "value": "wa"
+        },
+        {
+          "id": "billing-zip",
+          "name": "billing_zip",
+          "value": "98354"
+        },
+        {
+          "id": "same-as-billing",
+          "name": "",
+          "value": "on",
+          "checked": false
+        },
+        {
+          "id": "shipping-address1",
+          "name": "shipping_address1",
+          "value": "200 Sample Lane"
+        },
+        {
+          "id": "shipping-address2",
+          "name": "shipping_address2",
+          "value": "Unit 8"
+        },
+        {
+          "id": "shipping-city",
+          "name": "shipping_city",
+          "value": "Tacoma"
+        },
+        {
+          "id": "shipping-state",
+          "name": "shipping_state",
+          "value": "wa"
+        },
+        {
+          "id": "shipping-zip",
+          "name": "shipping_zip",
+          "value": "98402"
+        },
+        {
+          "id": "fldNotes",
+          "name": "notes",
+          "value": "Please send the listed sizes. Reference artwork stays blank on samples."
+        },
+        {
+          "id": "logoUpload",
+          "name": "logoUpload",
+          "value": "C:\\fakepath\\example-logo.svg"
+        }
+      ],
+      "engineCalls": [],
+      "emails": [],
+      "injection": false,
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".summary-item:nth-child(1) > .summary-label"
+            ],
+            [
+              ".summary-item:nth-child(2) > .summary-label"
+            ],
+            [
+              ".summary-item:nth-child(3) > .summary-label"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "reads": [
+    {
+      "path": "/api/sizes-by-style-color",
+      "query": "?styleNumber=PC54&color=BrillOrng"
+    }
+  ],
+  "actions": [],
+  "dialogs": []
+}
