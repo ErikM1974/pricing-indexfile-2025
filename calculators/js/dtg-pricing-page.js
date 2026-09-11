@@ -947,7 +947,7 @@ function dtgInlineAlert(message) {
             const tier = tierByLabel(tierLabel);
             if (tier && tier.LTM_Fee > 0) {
                 // Show the input container, bounded by THIS tier's range
-                container.style.display = 'flex';
+                container.style.display = 'block';
                 container.classList.add('show');
                 const input = document.getElementById('dtg-ltm-quantity-input');
                 if (input) {

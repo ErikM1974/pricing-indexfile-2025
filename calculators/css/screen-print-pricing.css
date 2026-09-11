@@ -21,10 +21,13 @@
 :where([data-ui="unified"][data-core-calculator="sp"]) .sp-breakdown-note, :where([data-ui="unified"][data-core-calculator="sp"]) .sp-tiers-note, :where([data-ui="unified"][data-core-calculator="sp"]) .sp-ltm-included-note { color: var(--ui-muted); font-size: 13px; }
 :where([data-ui="unified"][data-core-calculator="sp"]) .sp-toggle-item.disabled { color: var(--ui-muted); background: var(--gray-50); cursor: not-allowed; }
 
-@media print { :where([data-ui="unified"][data-core-calculator="sp"]) .sp-additional-locations-section { margin-block: 12px; padding-block: 12px; } :where([data-ui="unified"][data-core-calculator="sp"]) .sp-price-amount-wrapper { gap: 8px; } :where([data-ui="unified"][data-core-calculator="sp"]) .sp-breakdown-section { break-inside: avoid; } :where([data-ui="unified"][data-core-calculator="sp"]) .sp-breakdown-item, :where([data-ui="unified"][data-core-calculator="sp"]) .sp-breakdown-note { font-size: 8pt; } }
-}
+@media print { :where([data-ui="unified"][data-core-calculator="sp"]) .sp-additional-locations-section { margin-block: 12px; padding-block: 12px; } :where([data-ui="unified"][data-core-calculator="sp"]) .sp-price-amount-wrapper { gap: 8px; } :where([data-ui="unified"][data-core-calculator="sp"]) .sp-breakdown-section { break-inside: avoid; } :where([data-ui="unified"][data-core-calculator="sp"]) .sp-breakdown-item, :where([data-ui="unified"][data-core-calculator="sp"]) .sp-breakdown-note { font-size: 8pt; }
 
-@layer components.pages {
+ :where([data-ui="unified"][data-core-calculator="sp"]) .sp-dark-garment-section-top { margin-block: 10px;
+} }
+
+:where([data-ui="unified"][data-core-calculator="sp"]) .color-swatch { background-image: var(--swatch, none); background-size: cover; background-position: center;
+}
 :where([data-ui="unified"][data-core-calculator="sp"]) .sp-location-slot { border: 1px solid var(--ui-line); border-radius: var(--radius-sm); margin-block: 12px; padding: 16px; display: flex; align-items: flex-end; flex-wrap: wrap; gap: 12px; }
 :where([data-ui="unified"][data-core-calculator="sp"]) .sp-location-slot-input-group { flex: 1; min-width: 130px; }
 :where([data-ui="unified"][data-core-calculator="sp"]) .sp-location-slot-input-group label { display: block; font-size: 14px; margin-bottom: 8px; }

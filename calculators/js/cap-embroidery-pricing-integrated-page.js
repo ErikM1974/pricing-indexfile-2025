@@ -508,7 +508,7 @@ function updateCapPricing() {
         // Get upcharge for this size
         const upcharge = window.currentSizeUpcharges?.[size] || 0;
 
-        let sizeDisplay = size;
+        let sizeDisplay = typeof size === 'string' ? size : size.size;
         if (upcharge > 0) {
             sizeDisplay += ` <span class="size-note">(+$${upcharge.toFixed(2)} upcharge)</span>`;
         }

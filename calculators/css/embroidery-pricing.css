@@ -2,8 +2,5 @@
 :where([data-ui="unified"][data-core-calculator="emb"]) .emb-note-link { font-weight: 600; }
 :where([data-ui="unified"][data-core-calculator="emb"]) .product-mismatch-overlay { position: fixed; inset: 0; z-index: 20; background: color-mix(in srgb, var(--gray-900) 60%, transparent); align-items: center; justify-content: center; padding: 24px; }
 :where([data-ui="unified"][data-core-calculator="emb"]) .product-mismatch-modal { background: var(--ui-surface); border-radius: var(--radius-md); padding: 28px; max-width: 540px; }
-}
-
-@layer components.pages {
 :where([data-ui="unified"][data-core-calculator="emb"]) .product-hero[style*="display: none"] ~ .calc-inventory-section { display: none; }
 }

@@ -6,7 +6,7 @@
     if (!root) return;
     const toggles = '.toggle-item, .dtf-toggle-item, .sp-toggle-item, .sp-dark-garment-toggle, .sp-safety-stripes-toggle';
     const tiers = '.tier-button, .dtf-tier-button, .sp-tier-button';
-    const legacyButtons = toggles + ', .color-swatch, .image-thumbnail, .search-result-item, #sp-additional-locations-header';
+    const legacyButtons = toggles + ', .color-swatch, .image-thumbnail, #sp-additional-locations-header';
     const tooltips = {
         'upcharge-info-icon': ['upcharge-tooltip', 'Size pricing'],
         'setup-fee-badge': ['setup-fee-tooltip', 'Art setup fee'],
@@ -26,7 +26,24 @@
     });
     root.addEventListener('focusout', e => { if (e.relatedTarget) inventoryFocus = null; });
     root.addEventListener('scroll', e => { if (inventoryFocus?.node === e.target) inventoryFocus.left = e.target.scrollLeft; }, true);
+    function searchParts() {
+        return { input: root.querySelector('#styleSearch'), panel: root.querySelector('.search-wrapper .search-results:last-child') };
+    }
+    function syncSearch() {
+        const { input, panel } = searchParts();
+        if (!input || !panel) return;
+        root.querySelectorAll('[id="core-search-results"]').forEach(n => { if (n !== panel) attr(n, 'id', 'searchResults'); });
+        attr(panel, 'id', 'core-search-results'); attr(panel, 'role', 'listbox'); attr(panel, 'aria-label', 'Product styles');
+        attr(input, 'aria-controls', panel.id); attr(input, 'aria-expanded', panel.classList.contains('active'));
+        const selected = input.getAttribute('aria-activedescendant');
+        panel.querySelectorAll('.search-result-item').forEach((n, i) => {
+            attr(n, 'id', 'core-search-option-' + i); attr(n, 'role', 'option'); attr(n, 'tabindex', '-1');
+            attr(n, 'aria-selected', panel.classList.contains('active') && n.id === selected);
+        });
+        if (!panel.classList.contains('active') || !panel.querySelector('.search-result-item')) input.removeAttribute('aria-activedescendant');
+    }
     function sync() {
+        syncSearch();
         root.querySelectorAll('input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"])').forEach(n => n.classList.add('field-input'));
         root.querySelectorAll('select').forEach(n => n.classList.add('field-select'));
         root.querySelectorAll('button, ' + toggles).forEach(n => { if (!n.matches('.color-swatch')) n.classList.add('btn'); });
@@ -79,7 +96,35 @@
         queueMicrotask(() => { queued = false; observer.disconnect(); sync(); observe(); });
     });
     function observe() { observer.observe(root, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'style'] }); }
+    root.addEventListener('input', e => { if (e.target.id === 'styleSearch') e.target.removeAttribute('aria-activedescendant'); });
     root.addEventListener('keydown', e => {
+        const { input, panel } = searchParts();
+        // Some existing input listeners close and blur before this event bubbles.
+        if (panel && e.key === 'Escape' && e.target.closest('.search-wrapper')) {
+            e.preventDefault(); e.stopPropagation(); panel.classList.remove('active'); syncSearch(); input.focus(); return;
+        }
+        if (panel?.classList.contains('active') && e.target.closest('.search-wrapper')) {
+            const options = [...panel.querySelectorAll('.search-result-item')];
+            const current = options.findIndex(n => n.id === input.getAttribute('aria-activedescendant'));
+            if (e.target === input && options.length && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+                e.preventDefault();
+                const index = current < 0 ? (e.key === 'ArrowDown' ? 0 : options.length - 1) : (current + (e.key === 'ArrowDown' ? 1 : -1) + options.length) % options.length;
+                attr(input, 'aria-activedescendant', options[index].id); syncSearch(); options[index].scrollIntoView({ block: 'nearest' }); return;
+            }
+            if (e.target === input && e.key === 'Enter' && current >= 0) {
+                e.preventDefault(); e.stopPropagation(); options[current].click(); return;
+            }
+        }
+        // Native arrow scrolling starts on a later animation frame. Inventory
+        // can replace this region before that frame; save the move immediately.
+        const region = e.target.matches('.core-table-scroll') ? e.target : null;
+        if (region && !e.ctrlKey && !e.metaKey && !e.altKey &&
+            (e.key === 'ArrowLeft' || e.key === 'ArrowRight') &&
+            region.scrollWidth > region.clientWidth) {
+            e.preventDefault();
+            region.scrollLeft += e.key === 'ArrowRight' ? 48 : -48;
+            if (inventoryFocus?.node === region) inventoryFocus.left = region.scrollLeft;
+        }
         const n = e.target.closest('[role="button"]');
         if ((e.key === 'Enter' || e.key === ' ') && n && n.tagName !== 'BUTTON' && !n.matches('[data-calc-inv-toggle]')) { e.preventDefault(); n.click(); }
         if (e.key === 'Escape') for (const [id, [panelId]] of Object.entries(tooltips)) {

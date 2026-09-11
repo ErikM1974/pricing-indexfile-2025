@@ -6113,6 +6113,169 @@
         "rawCssBytes": 28525,
         "localCssRequests": 2
       }
+    },
+    {
+      "source": "calculators/dtg-pricing.html",
+      "family": "core-calculators",
+      "status": "reviewed",
+      "route": "/calculators/dtg-pricing.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/core-calculators.css",
+        "calculators/css/dtg-pricing.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "1440-768-390-320",
+        "original-text-fields-links-prices-and-tiers",
+        "normal-manual-selected-options-and-pricing-failure",
+        "keyboard-colors-and-inventory",
+        "keyboard-scroll-survives-inventory-refresh",
+        "search-results-keyboard-selection-and-escape",
+        "visible-price-and-stock-failures",
+        "size-and-setup-help",
+        "all-letter-print-pages-reviewed"
+      ],
+      "test": "tests/e2e/css-unification-core-calculators.spec.js",
+      "maxCssBytes": 102528,
+      "measuredRawCssBytes": 100480,
+      "baseline": {
+        "commit": "caf0ddbe",
+        "rawCssBytes": 110478,
+        "localCssRequests": 10
+      }
+    },
+    {
+      "source": "calculators/dtf-pricing.html",
+      "family": "core-calculators",
+      "status": "reviewed",
+      "route": "/calculators/dtf-pricing.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/core-calculators.css",
+        "calculators/css/dtf-pricing.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "1440-768-390-320",
+        "original-text-fields-links-prices-and-tiers",
+        "normal-manual-selected-options-and-pricing-failure",
+        "keyboard-colors-and-inventory",
+        "keyboard-scroll-survives-inventory-refresh",
+        "search-results-keyboard-selection-and-escape",
+        "visible-price-and-stock-failures",
+        "size-and-setup-help",
+        "all-letter-print-pages-reviewed"
+      ],
+      "test": "tests/e2e/css-unification-core-calculators.spec.js",
+      "maxCssBytes": 101175,
+      "measuredRawCssBytes": 99127,
+      "baseline": {
+        "commit": "caf0ddbe",
+        "rawCssBytes": 272923,
+        "localCssRequests": 22
+      }
+    },
+    {
+      "source": "calculators/embroidery-pricing.html",
+      "family": "core-calculators",
+      "status": "reviewed",
+      "route": "/calculators/embroidery-pricing.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/core-calculators.css",
+        "calculators/css/embroidery-pricing.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "1440-768-390-320",
+        "original-text-fields-links-prices-and-tiers",
+        "normal-manual-selected-options-and-pricing-failure",
+        "keyboard-colors-and-inventory",
+        "keyboard-scroll-survives-inventory-refresh",
+        "search-results-keyboard-selection-and-escape",
+        "visible-price-and-stock-failures",
+        "size-and-setup-help",
+        "all-letter-print-pages-reviewed"
+      ],
+      "test": "tests/e2e/css-unification-core-calculators.spec.js",
+      "maxCssBytes": 98951,
+      "measuredRawCssBytes": 96903,
+      "baseline": {
+        "commit": "caf0ddbe",
+        "rawCssBytes": 90036,
+        "localCssRequests": 8
+      }
+    },
+    {
+      "source": "calculators/cap-embroidery-pricing-integrated.html",
+      "family": "core-calculators",
+      "status": "reviewed",
+      "route": "/calculators/cap-embroidery-pricing-integrated.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/core-calculators.css",
+        "calculators/css/cap-embroidery-pricing-integrated.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "1440-768-390-320",
+        "original-text-fields-links-prices-and-tiers",
+        "normal-manual-selected-options-and-pricing-failure",
+        "keyboard-colors-and-inventory",
+        "keyboard-scroll-survives-inventory-refresh",
+        "search-results-keyboard-selection-and-escape",
+        "visible-price-and-stock-failures",
+        "size-and-setup-help",
+        "all-letter-print-pages-reviewed"
+      ],
+      "test": "tests/e2e/css-unification-core-calculators.spec.js",
+      "maxCssBytes": 98818,
+      "measuredRawCssBytes": 96770,
+      "baseline": {
+        "commit": "caf0ddbe",
+        "rawCssBytes": 88753,
+        "localCssRequests": 7
+      }
+    },
+    {
+      "source": "calculators/screen-print-pricing.html",
+      "family": "core-calculators",
+      "status": "reviewed",
+      "route": "/calculators/screen-print-pricing.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/core-calculators.css",
+        "calculators/css/screen-print-pricing.css"
+      ],
+      "dynamicStyles": [],
+      "dynamicTokens": [
+        "--swatch"
+      ],
+      "states": [
+        "1440-768-390-320",
+        "original-text-fields-links-prices-and-tiers",
+        "normal-manual-selected-options-and-pricing-failure",
+        "keyboard-colors-and-inventory",
+        "keyboard-scroll-survives-inventory-refresh",
+        "search-results-keyboard-selection-and-escape",
+        "visible-price-and-stock-failures",
+        "size-and-setup-help",
+        "all-letter-print-pages-reviewed"
+      ],
+      "test": "tests/e2e/css-unification-core-calculators.spec.js",
+      "maxCssBytes": 103304,
+      "measuredRawCssBytes": 101256,
+      "baseline": {
+        "commit": "caf0ddbe",
+        "rawCssBytes": 281658,
+        "localCssRequests": 23
+      }
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",

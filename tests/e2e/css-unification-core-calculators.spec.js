@@ -18,7 +18,7 @@ function screenContract(value){
  }
  return v;
 }
-function contract(name,value){const file='tests/fixtures/core-calculators-'+name+'-original-browser.json',full=path.join(root,file);if(capture&&!fs.existsSync(full)){fs.writeFileSync(full,JSON.stringify(value,null,2)+'\n');fs.appendFileSync(path.join(root,'ACTIVE_FILES.md'),'\n- '+file+' — immutable original synthetic public calculator browser contract.\n');}else{const before=JSON.parse(fs.readFileSync(full,'utf8')),normalize=name.endsWith('-tier-values')?tierContract:screenContract;expect(normalize(value),name).toEqual(normalize(before));}}
+function contract(name,value){const file='tests/fixtures/core-calculators-'+name+'-original-browser.json',full=path.join(root,file);if(capture&&!fs.existsSync(full)){fs.writeFileSync(full,JSON.stringify(value,null,2)+'\n');fs.appendFileSync(path.join(root,'ACTIVE_FILES.md'),'\n- '+file+' — immutable original synthetic public calculator browser contract.\n');}else{const before=JSON.parse(fs.readFileSync(full,'utf8'));if(name==='cap-manual'){expect(value.states.every(s=>s.tables.every(t=>!t.includes('[object Object]')))).toBe(true);before.states.forEach(s=>s.tables=s.tables.map(t=>t.replace('[object Object]','OSFA')));}if(name==='sp-manual'){expect(value.states.every(s=>s.ids.productTitle==='Manual Pricing Mode')).toBe(true);before.states.forEach(s=>{expect(s.ids.productTitle).toBe('Loading...');s.ids.productTitle='Manual Pricing Mode';});}const normalize=name.endsWith('-tier-values')?tierContract:screenContract;expect(normalize(value),name).toEqual(normalize(before));}}
 async function settled(page,key,manual=false){
  if(key==='dtg'){await expect(page.locator('.tier-button[data-tier]')).toHaveCount(5);if(!manual)await expect(page.locator('.dtg-product-card')).toHaveCount(7);}
  else if(key==='dtf'){await expect(page.locator('#dtf-tier-buttons button')).toHaveCount(4);await expect.poll(()=>page.evaluate(()=>window.dtfCalculator?.currentData.garmentCost||0)).toBeGreaterThan(0);}
@@ -95,4 +95,45 @@ for(const key of ['emb','cap'])test('CSS core calculators: '+key+' keyboard reac
 
 test('CSS core calculators: failed screen print pricing remains visible after the former timeout',async({page})=>{
  await page.clock.install();const e=await start(page,'sp',{pricingFailed:true});await expect(page.locator('#sp-error-banner')).toBeVisible();await page.clock.fastForward(15000);await expect(page.locator('#sp-error-banner')).toBeVisible();await expect(page.locator('#sp-error-banner')).toHaveAttribute('role','alert');check(expect,e);
+});
+
+
+for(const key of ['dtg','dtf','emb','sp'])test('CSS core calculators: '+key+' retains keyboard scrolling through inventory refresh',async({page})=>{
+ const e=await start(page,key);await priced(page,key);await inventory(page);await page.setViewportSize({width:320,height:850});
+ const wrap=page.locator('.core-table-scroll').filter({has:page.locator('.calc-inv-table')});await wrap.focus();
+ await page.evaluate(()=>{window.__inventoryRefreshed=false;document.addEventListener('keydown',function refresh(event){if(event.key!=='ArrowRight')return;document.removeEventListener('keydown',refresh);setTimeout(()=>{window.loadCalculatorInventory('PC54','JetBlack','Jet Black','');window.__inventoryRefreshed=true;},10);});});
+ await wrap.press('ArrowRight');await expect.poll(()=>page.evaluate(()=>window.__inventoryRefreshed)).toBe(true);
+ await expect(wrap).toBeFocused();await expect.poll(()=>wrap.evaluate(n=>n.scrollLeft)).toBeGreaterThan(0);
+ await wrap.press('ArrowLeft');await expect.poll(()=>wrap.evaluate(n=>n.scrollLeft)).toBe(0);
+ const search=page.locator('#styleSearch');await search.focus();await page.evaluate(()=>window.loadCalculatorInventory('PC54','JetBlack','Jet Black',''));await expect(search).toBeFocused();check(expect,e);
+});
+
+
+for(const key of Object.keys(pages))test('CSS core calculators: '+key+' search results follow keyboard focus',async({page})=>{
+ const e=await start(page,key);const search=page.locator('#styleSearch'),style=key==='cap'?'C112':'PC54';
+ await search.fill(style);const result=page.locator('.search-result-item').first();await expect(result).toBeVisible();
+ await expect(search).toHaveAttribute('aria-expanded','true');const panel=page.locator('#'+await search.getAttribute('aria-controls'));await expect(panel).toContainText(style);
+ await search.press('ArrowDown');await expect(search).toBeFocused();await expect(result).toHaveAttribute('aria-selected','true');
+ for(const width of [1440,320]){await page.setViewportSize({width,height:900});expect((await snapshot(page)).overflow).toBe(false);expect((await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze()).violations.map(v=>v.id)).toEqual([]);await page.screenshot({path:path.join(out,'core-calculators-'+key+'-search-'+width+'.png')});}
+ await search.press('Escape');await expect(panel).toBeHidden();await expect(search).toBeFocused();await expect(search).toHaveAttribute('aria-expanded','false');
+ await search.fill('ZZZZ');await expect(page.locator('.search-results.active')).toContainText(/No .*found|No .*match/i);await search.press('Escape');
+ await search.fill(style);await expect(result).toBeVisible();await search.press('ArrowDown');await search.press('Enter');await expect(page).toHaveURL(new RegExp('StyleNumber='+style));await settled(page,key);check(expect,e);
+});
+test('CSS core calculators: dtf size guide opens with keyboard',async({page})=>{
+ const e=await start(page,'dtf');const button=page.getByRole('button',{name:'Size Guide',exact:true});await button.focus();await button.press('Enter');
+ await expect(page.locator('#collapseGuide')).toBeVisible();await expect(page.locator('#collapseGuide')).toContainText('Maximum size for full coverage designs');
+ await page.setViewportSize({width:320,height:900});expect((await snapshot(page)).overflow).toBe(false);await page.locator('#collapseGuide').scrollIntoViewIfNeeded();await page.screenshot({path:path.join(out,'core-calculators-dtf-size-guide.png')});
+ expect((await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze()).violations.map(v=>v.id)).toEqual([]);
+ await button.press('Enter');await expect(page.locator('#collapseGuide')).toBeHidden();check(expect,e);
+});
+
+for(const key of ['emb','cap','sp'])test('CSS core calculators: '+key+' thumbnails work with keyboard',async({page})=>{
+ const e=await start(page,key);const thumbnail=page.locator('.image-thumbnail').last();await thumbnail.focus();await thumbnail.press('Enter');await expect(thumbnail).toHaveAttribute('aria-pressed','true');await expect(thumbnail).toBeFocused();
+ await expect(page.locator('#productImage')).toBeVisible();expect(await page.locator('#productImage').evaluate(n=>n.complete&&n.naturalWidth>0)).toBe(true);check(expect,e);
+});
+test('CSS core calculators: screen print underbase help preserves selection',async({page})=>{
+ const e=await start(page,'sp'),toggle=page.locator('#sp-dark-garment-toggle'),button=page.locator('#sp-dark-info-icon');const before=await toggle.getAttribute('aria-pressed');
+ await button.focus();await button.press('Enter');await expect(button).toHaveAttribute('aria-expanded','true');await expect(toggle).toHaveAttribute('aria-pressed',before);
+ await page.setViewportSize({width:320,height:900});await expect(page.locator('#sp-dark-tooltip')).toBeVisible();expect((await snapshot(page)).overflow).toBe(false);await page.screenshot({path:path.join(out,'core-calculators-sp-underbase-help.png')});
+ expect((await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze()).violations.map(v=>v.id)).toEqual([]);await button.press('Escape');await expect(page.locator('#sp-dark-tooltip')).toBeHidden();await expect(button).toBeFocused();check(expect,e);
 });

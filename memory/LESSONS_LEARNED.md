@@ -5,11 +5,10 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
-
 ## Core calculator state and paper boundaries (2026-09-11)
 
-- Problem/root cause: DTG/DTF color handlers read an undeclared currentStyleNumber; inline presentation duplicated CSS; fixed print headers covered prices, and the Embroidery product wrapper also contained pricing/inventory. Screen Print errors disappeared after10 seconds without recovery.
-- Solution: use the displayed product style with CATALOG_COLOR, canonical scoped CSS and keyboard controls, complete table scroll regions, an independent product wrapper, static print headers and persistent dismissible pricing errors. Keep every financial function body and pricing service unchanged.
+- Problem/root cause: DTG/DTF color handlers read an undeclared currentStyleNumber; inline presentation duplicated CSS; fixed print headers covered prices, and the Embroidery product wrapper also contained pricing/inventory. Screen Print errors disappeared after10 seconds without recovery. Native arrow scroll began after an inventory refresh had replaced its region; search ARIA targeted an empty placeholder.
+- Solution: use the displayed product style with CATALOG_COLOR, canonical scoped CSS and keyboard controls, complete table scroll regions, an independent product wrapper, static print headers and persistent dismissible pricing errors. Save keyboard horizontal movement synchronously before refresh; bind search to actual results and preserve Escape focus. Keep every financial function body and pricing service unchanged.
 - Prevention: immutable original source/value contracts, exact financial function checks, every quantity/color/input path, keyboard focus after generated controls are replaced, failed inventory/pricing, and visual review of every paper page. Do not make whole long sections unbreakable.
 
 ## Calculator references need complete field and paper ownership (2026-09-11)
@@ -54,12 +53,8 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 An afterprint handler must clear its fallback timer and remove only its own captured sheet; otherwise an old timer can delete the next document. Use page (not always) for modern break-before/after so box labels and rep reports actually separate in Chromium. Native dialog errors belong inside the dialog; guard obsolete previews and keep pending sends from closing or accepting duplicate actions. Mark lazy tabs mounted only when their delayed loader actually runs. Render PDFs with nonzero synthetic costs and multi-box data, check per-page identifiers and totals, and inspect white paper backgrounds.
 
-## CRM UI recovery and print (2026-09-09)
-
-Use native disclosure buttons inside table cells; aria-expanded on ordinary table rows is invalid. Native dialogs must show operational errors inside their top layer and retain a usable retry. Guard delayed account/archive/quarter and category responses so a failed or newer view cannot regain stale figures. Search/view changes must preserve loading/error states. Test original card/table/detail/CSV hashes using exact page basenames (leads.html is also a suffix of unqualified-leads.html). Print must explicitly restore headings and summary counts hidden by generic shell rules.
-
-
-
+## CRM UI recovery and print (2026-09-09, archived)
+Full entry in LESSONS_LEARNED_ARCHIVE.md; preserve asynchronous view ownership and native dialog/table semantics.
 
 Historical deployment, token, builder, junction, server split and proxy-auth migration notes are in LESSONS_LEARNED_ARCHIVE.md. Never recursively delete a worktree dependency junction.
 

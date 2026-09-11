@@ -103,7 +103,7 @@ function setupSearch() {
                     <div class="search-no-results">
                         <i class="fas fa-info-circle" aria-hidden="true"></i>
                         Found ${capResults.length} cap item(s). Please use the 
-                        <a href="/pricing/cap-embroidery">Cap Embroidery Pricing</a> 
+                        <a href="/pricing/cap-embroidery">Cap Embroidery Pricing</a>
                         page for structured caps.
                     </div>
                 `;
@@ -120,7 +120,7 @@ function setupSearch() {
                         <div>
                             <i class="fas fa-info-circle" aria-hidden="true"></i>
                             Found ${capResults.length} cap item(s). Please use the 
-                            <a href="/pricing/cap-embroidery">Cap Embroidery Pricing</a> 
+                            <a href="/pricing/cap-embroidery">Cap Embroidery Pricing</a>
                             page for structured caps.
                         </div>
                     `;

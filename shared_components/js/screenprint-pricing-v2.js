@@ -200,7 +200,7 @@ class ScreenPrintPricing {
                     <div class="sp-dark-garment-toggle${this.state.isDarkGarment ? ' active' : ''}" id="sp-dark-garment-toggle">
                         <div class="sp-dark-garment-label">
                             <span>Printing on dark garment?</span>
-                            
+
                             <span class="sp-dark-garment-info">(White underbase required)</span>
                         </div>
                         <div class="sp-toggle-switch">
