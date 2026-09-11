@@ -1,5 +1,11 @@
 # CSS unification — design direction and implementation plan
 
+## RELEASE CANDIDATE — v2026.09.11.2 Custom Tees and Custom Caps
+
+The reviewed pair 296b30e5 is integrated at c4a1ea4c058f6cf1300e5605a64b0df5549f17ba. This release adds eight cache references for the six changed application assets and their reversible mappings. All 44 focused browser scenarios, 78 visually reviewed current paper pages and 387 source/pricing/ownership guards passed before preparation. All 14 original source hashes and 36 browser contracts remain unchanged through 50 mappings.
+
+Candidate193/225 reviewed,32pending; live remains .1/Heroku2104 at191/225,34pending. Require complete local application/browser/parity checks and all four actual exact-source CI jobs before deployment, then verify the running slug, source/compiled assets and access. No real orders, uploads, payments, messages or device printing.
+
 ## REVIEWED — Custom Tees and Custom Caps ready for release checks
 
 The pair now shares Public Sans, canonical controls and a scoped layout owner with222 previously duplicated rules. Forty-four browser scenarios pass at1440/768/390/320; the final22 affected print cases also pass. All78 current paper pages across22 documents were visually inspected, including complete long notes, front/back artwork, mixed sizes/colors, taxes, pickup, rush and checkout failure. No blank sheets remain; the contact footer moves beside the printed letterhead and returns after printing.

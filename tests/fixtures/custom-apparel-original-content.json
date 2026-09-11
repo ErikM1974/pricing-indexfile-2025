@@ -866,6 +866,62 @@
       "after": "id=\"tdt-canvas\" class=\"apparel-canvas\"",
       "count": 1,
       "reason": "Class owner for canvas presentation; geometry and controller ID remain unchanged."
+    },
+    {
+      "file": "pages/custom-caps.html",
+      "before": "/shared_components/css/custom-apparel-studio.css?v=2026.09.11.1",
+      "after": "/shared_components/css/custom-apparel-studio.css?v=2026.09.11.2",
+      "count": 1,
+      "reason": "Refetch the reviewed custom apparel asset at this release version."
+    },
+    {
+      "file": "pages/custom-caps.html",
+      "before": "/pages/css/custom-caps.css?v=2026.09.07.20",
+      "after": "/pages/css/custom-caps.css?v=2026.09.11.2",
+      "count": 1,
+      "reason": "Refetch the reviewed custom apparel asset at this release version."
+    },
+    {
+      "file": "pages/custom-caps.html",
+      "before": "/shared_components/js/custom-apparel-print.js?v=2026.09.11.1",
+      "after": "/shared_components/js/custom-apparel-print.js?v=2026.09.11.2",
+      "count": 1,
+      "reason": "Refetch the reviewed custom apparel asset at this release version."
+    },
+    {
+      "file": "pages/custom-caps.html",
+      "before": "/pages/js/custom-caps-app.js?v=2026.09.05.79",
+      "after": "/pages/js/custom-caps-app.js?v=2026.09.11.2",
+      "count": 1,
+      "reason": "Refetch the reviewed custom apparel asset at this release version."
+    },
+    {
+      "file": "pages/custom-tees.html",
+      "before": "/shared_components/css/custom-apparel-studio.css?v=2026.09.11.1",
+      "after": "/shared_components/css/custom-apparel-studio.css?v=2026.09.11.2",
+      "count": 1,
+      "reason": "Refetch the reviewed custom apparel asset at this release version."
+    },
+    {
+      "file": "pages/custom-tees.html",
+      "before": "/pages/css/custom-tees.css?v=2026.09.07.20",
+      "after": "/pages/css/custom-tees.css?v=2026.09.11.2",
+      "count": 1,
+      "reason": "Refetch the reviewed custom apparel asset at this release version."
+    },
+    {
+      "file": "pages/custom-tees.html",
+      "before": "/shared_components/js/custom-apparel-print.js?v=2026.09.11.1",
+      "after": "/shared_components/js/custom-apparel-print.js?v=2026.09.11.2",
+      "count": 1,
+      "reason": "Refetch the reviewed custom apparel asset at this release version."
+    },
+    {
+      "file": "pages/custom-tees.html",
+      "before": "/pages/js/custom-tees-app.js?v=2026.09.05.79",
+      "after": "/pages/js/custom-tees-app.js?v=2026.09.11.2",
+      "count": 1,
+      "reason": "Refetch the reviewed custom apparel asset at this release version."
     }
   ],
   "retiredStyles": []
