@@ -70,36 +70,7 @@
     // ============================================================
     // CHROME (masthead drawer + search) — same pattern as product-2026.js
     // ============================================================
-    function wireChrome() {
-        const sidebar = $('sidebar');
-        const overlay = $('sidebarOverlay');
-        const openBtn = $('mobileMenuBtn');
-        const closeBtn = $('drawerClose');
-
-        function setDrawer(open) {
-            if (!sidebar || !overlay) return;
-            sidebar.classList.toggle('show', open);
-            overlay.classList.toggle('show', open);
-            document.body.classList.toggle('drawer-open', open);
-        }
-        if (openBtn) openBtn.addEventListener('click', function () { setDrawer(true); });
-        if (closeBtn) closeBtn.addEventListener('click', function () { setDrawer(false); });
-        if (overlay) overlay.addEventListener('click', function () { setDrawer(false); });
-        document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape') setDrawer(false);
-        });
-
-        const input = $('navSearchInput');
-        const btn = $('navSearchBtn');
-        function goSearch() {
-            const term = (input && input.value || '').trim();
-            if (term) window.location.href = '/catalog?q=' + encodeURIComponent(term);
-        }
-        if (btn) btn.addEventListener('click', goSearch);
-        if (input) input.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter') goSearch();
-        });
-    }
+    // Masthead navigation is owned by storefront-navigation.js.
 
     // ============================================================
     // METHOD METADATA + GROUP-OPTION MAPS
@@ -251,7 +222,7 @@
                 wrap.innerHTML = sizes.map(function (sz) {
                     const q = Number(cur.sizes && cur.sizes[sz]) || 0;
                     return '<label class="qc-size-cell"><span>' + escapeHtml(sz) + '</span>'
-                        + '<input type="number" inputmode="numeric" min="0" max="9999" step="1"'
+                        + '<input class="field-input" type="number" inputmode="numeric" min="0" max="9999" step="1"'
                         + ' value="' + (q > 0 ? q : '') + '" placeholder="0"'
                         + ' data-act="size" data-id="' + escapeHtml(item.id) + '" data-size="' + escapeHtml(sz) + '"'
                         + ' aria-label="Quantity, size ' + escapeHtml(sz) + ', ' + escapeHtml(item.style) + '"></label>';
@@ -528,7 +499,7 @@
                 + '</div>'
                 + '<div class="qc-line-qty">'
                 + '<button class="qc-step" type="button" data-act="dec" data-id="' + escapeHtml(item.id) + '" aria-label="One fewer">&minus;</button>'
-                + '<input type="number" inputmode="numeric" min="1" max="9999" step="1" value="' + qty + '"'
+                + '<input class="field-input" type="number" inputmode="numeric" min="1" max="9999" step="1" value="' + qty + '"'
                 + ' data-act="qty" data-id="' + escapeHtml(item.id) + '" aria-label="Quantity for ' + escapeHtml(item.style) + '">'
                 + '<button class="qc-step" type="button" data-act="inc" data-id="' + escapeHtml(item.id) + '" aria-label="One more">+</button>'
                 + '</div>'
@@ -643,7 +614,7 @@
         }
 
         rows.push('<div class="qc-actions">');
-        rows.push('<button class="btn btn-cta" type="button" id="qcSaveBtn"'
+        rows.push('<button class="btn btn-primary" type="button" id="qcSaveBtn"'
             + (res.grandTotal == null ? ' disabled title="Fix or remove the unpriced group first"' : '')
             + '>Save &amp; email my quote</button>');
         rows.push('<a class="btn btn-ghost" id="qcEmailQuote" href="' + escapeHtml(buildMailto(res)) + '">Email instead</a>');
@@ -839,7 +810,7 @@
         rows.push('</fieldset>');
 
         rows.push('<div class="qc-save-actions">'
-            + '<button class="btn btn-cta" type="button" data-save-act="submit">'
+            + '<button class="btn btn-primary" type="button" data-save-act="submit">'
             + (saveState.phase === 'price-changed' ? 'Confirm new prices &amp; save' : 'Save my quote')
             + '</button>'
             + '<button class="btn btn-ghost" type="button" data-save-act="cancel">Cancel</button>'
@@ -895,6 +866,8 @@
     function renderSavePanel(cart) {
         const panel = $('qcSavePanel');
         if (!panel) return;
+        const trigger = $('qcSaveBtn');
+        if (trigger) trigger.disabled = saveState.phase === 'saving' || !state.priced || state.priced.grandTotal == null;
         panel.hidden = !saveState.open;
         if (!saveState.open) return;
         if (saveState.phase === 'saving') panel.innerHTML = savePanelSavingHtml();
@@ -918,6 +891,7 @@
     }
 
     function openSavePanel() {
+        if (saveState.phase === 'saving') return;
         saveState.open = true;
         saveState.phase = 'form';
         saveState.errorMsg = '';
@@ -937,6 +911,7 @@
     }
 
     async function doSave() {
+        if (saveState.phase === 'saving') return;
         readSaveFields();
         const f = saveState.fields;
         if (!f.name || !f.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email)) {
@@ -1062,7 +1037,12 @@
         if (!input) return;
         const gid = input.getAttribute('data-art-gid');
         const file = input.files && input.files[0];
-        if (!file) { delete saveState.files[gid]; return; }
+        if (!file) {
+            delete saveState.files[gid];
+            const picked = input.parentNode.querySelector('.qc-art-picked');
+            if (picked) picked.remove();
+            return;
+        }
         if (file.size > MAX_ART_BYTES) {
             alertInPanel('That file is over 20 MB — email it to sales@nwcustomapparel.com instead and we\'ll attach it.');
             input.value = '';
@@ -1076,6 +1056,13 @@
             return;
         }
         saveState.files[gid] = file;
+        let picked = input.parentNode.querySelector('.qc-art-picked');
+        if (!picked) {
+            picked = document.createElement('span');
+            picked.className = 'qc-art-picked';
+            input.after(picked);
+        }
+        picked.textContent = file.name;
     }
 
     function alertInPanel(msg) {
@@ -1133,7 +1120,7 @@
     // BOOT
     // ============================================================
     function init() {
-        wireChrome();
+        // Shared storefront navigation initializes independently.
 
         if (!window.QuoteCartStore || !window.QuoteCartEngine) {
             $('qcSkeleton').hidden = true;

@@ -1,5 +1,27 @@
 # CSS unification — design direction and implementation plan
 
+## RELEASE CANDIDATE — v2026.09.11.1 Sample and Quote Carts
+
+Reviewed source7498f6fc and verified account releaseefc4471f are integrated at77bc80d490118b1f674c5c7543abba3e9b6fbf79. Complete local gates are running on that unchanged checkout. This candidate adds only release cache references and their reversible mappings; the six application CSS/JS assets are unchanged. Require every local gate and all four exact-source CI jobs, including actual CSS and live money/calculator parity, before release.
+
+Cart review:40 distinct browser cases,39 visually reviewed current paper pages across13 documents,34 immutable browser contracts,21 original source hashes,24 source/financial guards and268 ownership checks. Four demonstrated markup/storage/pending-save faults repaired. Live remains .11/2103 with189/225 reviewed and36pending. This candidate brings191 reviewed,34pending after verified rollout. No real business writes or printing.
+
+## CURRENT — account release verified; carts ready for full gates
+
+Customer Account/Product is live as v2026.09.10.11, Heroku2103, efc4471f05b20a397bf275e63786e96dbbb60eeb. Exact source880bc6eb passed CI34569384599 with all four actual jobs. Actual deployed slug, health, six source assets, five compiled assets/source maps, two page shells, fourteen prior access contracts and four regression routes verified. Primary main/develop and origin are synchronized. Live189/225,36pending.
+
+Cart review7498f6fc is committed and backed up:191/225 reviewed candidate,34pending. Forty distinct browser cases and every current paper page (39 across13 documents) are reviewed;268 ownership/source guards pass. The latest account test corrections are now merged. Next: integrate this exact reviewed cart history, run complete local application/browser/live-pricing gates, prepare one cache version and require all four exact-source CI jobs before deployment. No cart deploy yet.
+
+## REVIEWED NEXT — Sample Cart and Quote Cart
+
+The cart pair is reviewed:40 distinct current browser cases pass (39-case full run plus the new checkout-error regression), with all affected paper refinements and the final stock-border cases passing. All39 current PDF pages across13 documents are visually reviewed, including complete long notes and chosen artwork filenames. Four widths1440/768/390/320, axe, exact successful checkout/free-request/quote/email payloads, five decoration groups, all quantities and withheld failed totals remain verified. All268 source/ownership checks pass:24 preserve original sources and financial/group/quantity functions; the rest enforce the shared CSS ownership manifest.
+
+Three readable style owners use the common application controls, Public Sans and existing storefront navigation. No page imports legacy nwca-2026-core; that shared file remains byte-identical for other consumers.89 reversible mappings retain21 immutable sources and34 original browser contracts from backed-up baseline7257164c. Four original defects were demonstrated and repaired: stored garment markup execution, checkout error markup execution, silent failed sample removal, and duplicate saves after reopening a pending form. Native-menu keyboard focus confines and returns correctly. Printed totals stay together, field labels stay with values, money remains unbroken, and headers/footer do not cover content.
+
+Reviewed candidate191/225,34pending. Account .11 exact-source CI34569384599 passed every actual job on880bc6eb; releaseefc4471f is on GitHub main/tag and Heroku upload44377 is in progress. Live remains .10/2102/44ccf020 until the actual slug and HTTP assets/access checks verify .11. The cart pair has not been deployed and still needs complete application/CI release gates after integrating the verified account release.
+
+Next: commit/back up this reviewed cart pair, merge the actual account release history, integrate the pair on develop, then run all unit/DOM/a11y/parity/build/stylelint/routes/boot/full CSS/live-money checks and exact-source CI before its separate deploy. Current full E2E CI took about28 minutes at1,204 CSS cases; the cart adds40 cases, so its job budget is40 minutes with the existing5-minute setup bounds retained. No real business writes, orders, emails, Stripe checkout, logout or device printing. Never rerun consumed helpers or delete the node_modules junction.
+
 ## RELEASE CANDIDATE — v2026.09.10.11 Customer Account and Product
 
 Reviewed pair bba4306d is integrated with live44ccf020 atda6c23738011d4f6d2e55aaf57dd3112d9083b1c. All241 unit suites/5,640 tests (four existing skips),88 DOM,four accessibility unit and84 quote parity checks pass;423-asset build, lint/types,485routes/24modules and boot pass. Full CSS and live pricing browser checks run on the unchanged primary integration checkout. This release checkout adds only nine cache references, their reversible mappings and these notes; all six application CSS/JS assets remain identical. Exact-source CI can run alongside local checks; both must pass before deployment.
@@ -1502,6 +1524,16 @@ Exact-source CI 34543191741 passed all four jobs on 0b271bb2ae12b083936a1add6c86
 
 Exact-source CI 34561449204 passed all four jobs on 0091eff76524acfc16ce3f5f401d3b8bbb057aa8, including actual CSS and live money/calculator parity. Full local gates passed on identical application assets atf03b9117f3213b033795fbd4f8346559ae0ca14c. Canonical controls/scoped layouts,46 focused browser cases,10 reviewed paper pages,10 original source hashes/74 reversible mappings. Three important flags removed; successful payloads, money and date rendering preserved. Counts become187/225 reviewed,38 pending after verified rollout. Separate Customer Account/Product originals atd3a5efff are excluded.
 
+## Customer carts — original baseline reviewed, September10,2026
+- [x] Preserve21 original source hashes and24 source/financial/group guards; no cart application edits.
+- [x] Capture32 synthetic browser cases at1440/768/390/320 into34 immutable contracts. All cases pass across29 completed cases plus three corrected fixture cases; corrections used the actual WQ sequence route and Enter/whole-matrix blur commit. All unknown writes fail closed.
+- [x] Visually review all40 original paper pages across11 PDFs, including long carts, entered shipping/note/logo, pricing failure, quote save and checkout confirmations. Evidence: customer-cart-original-review.json in the artifact directory.
+- [ ] Adopt existing storefront-shell/navigation and canonical buttons/fields; keep shared legacy core unchanged for its unreviewed consumers. Scoped cart owners, no new override stack.
+- [ ] Demonstrate and repair focus/storage/late-response faults; preserve exact successful request/email/checkout bodies and original financial transforms. Review current screens, axe/keyboard and complete paper before migration credit.
+Live remains.10/2102/44cc187/225. Account .11 is separately gated on source4e763b26/CI34567159048 and full local3297. Cart gets no migration credit; reviewed candidate remains189/225,36pending. No .env copies, real orders/payments/emails or device printing.
+
+Cart implementation started after7257164c original review: existing shell/native navigation and canonical fields/buttons replace legacy core on only these two pages. Their scoped owners and shared cart print rules are a draft; visual/behavior/axe/source checks and fault probes still required. No migration credit or deploy yet.
+
 ### Account release test timing correction — 2026-09-10
 The full local1,204-case CSS sweep completed1,203 passes and one confirmation-toast wait timeout under three-worker load. The real page retains the toast4.2 seconds; the test allowed only5 seconds including scheduling. No application or fixture source changed. The test now allows10 seconds but still requires the real timer to dismiss the toast. Five repeated failing-case runs passed under three-worker load; all affected account cases and the remaining local browser/pricing suites must pass before release. Exact-source CI must be rerun on this test correction; the earlier9eb6e2a2 run is not final-source evidence.
 
@@ -1511,3 +1543,5 @@ The exact-source run34567159048 passed1,203 CSS cases and failed only the produc
 ## Customer Account and Product release record — v2026.09.10.11
 
 Exact-source CI 34569384599 passed all four jobs on 880bc6ebb75ca891f07f342e56f96249b99f9811, including actual CSS and live money/calculator parity. Full local gates passed on identical application assets at da6c23738011d4f6d2e55aaf57dd3112d9083b1c. Shared controls and three scoped style owners;54 focused browser cases plus final paper refinements,23 visually reviewed current paper pages,17 immutable original source hashes and106 reversible mappings. Nine important flags removed. Original values, engine inputs and successful request payloads preserved; eight demonstrated focus, stale-response and storage faults repaired. Counts become189/225 reviewed,36 pending after verified rollout. Separate Sample Cart/Quote Cart original-capture work is excluded.
+
+Whole-app gate preparation: the first integrated unit run found the new common stylesheet had no cache version and a legacy test still demanded a page-local important hidden rule. The release cache step versions both imports; the guard now asserts the imported shared components hidden rule and absence of page important flags. All471 affected hygiene/header tests and268 source/ownership tests pass. Run the complete suite on this exact release source; the original failed integration run is not release evidence.

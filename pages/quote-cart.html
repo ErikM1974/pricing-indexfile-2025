@@ -13,13 +13,15 @@
 
     <link rel="icon" href="/favicon.png" type="image/png">
 
-    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/nwca-2026-core.css?v=2026.09.07.8">
-    <link rel="stylesheet" href="/pages/css/quote-cart.css?v=2026.09.07.8">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.09.7">
+    <link rel="stylesheet" href="/shared_components/css/storefront-shell.css?v=2026.09.09.7">
+    <link rel="stylesheet" href="/pages/css/quote-cart.css?v=2026.09.11.1">
+    <link rel="stylesheet" href="/pages/css/customer-cart.css?v=2026.09.11.1">
     <link rel="stylesheet" href="/shared_components/css/embroidery-quote-pricing.css?v=2026.09.07.8">
 </head>
-<body>
+<body data-ui="unified" data-storefront="cart" data-customer-cart="quote">
     <a class="skip-link" href="#main">Skip to content</a>
 
     <!-- Utility strip -->
@@ -38,7 +40,7 @@
     <!-- Masthead -->
     <header class="nav-bar">
         <div class="nav-bar-inner">
-            <button class="mobile-menu-btn" id="mobileMenuBtn" type="button" aria-label="Open menu" aria-controls="sidebar">
+            <button class="mobile-menu-btn" id="mobileMenuBtn" type="button" aria-expanded="false" aria-label="Open menu" aria-controls="sidebar">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                     <line x1="3" y1="6" x2="21" y2="6"></line>
                     <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -113,7 +115,7 @@
     </header>
 
     <!-- Drawer (mobile menu + category browse) -->
-    <aside class="sidebar" id="sidebar" aria-label="Browse menu">
+    <dialog class="sidebar" id="sidebar" aria-label="Browse menu">
         <div class="drawer-head">
             <span class="drawer-head-title">Browse NWCA</span>
             <button class="drawer-close" id="drawerClose" type="button" aria-label="Close menu">
@@ -154,8 +156,8 @@
             <a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a><br>
             2025 Freeman Rd E, Milton, WA 98354
         </div>
-    </aside>
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    </dialog>
+    <div class="sidebar-overlay" id="sidebarOverlay" hidden></div>
 
     <main id="main">
         <!-- Page header -->
@@ -210,7 +212,7 @@
                 <div class="qc-layout" id="qcLayout" hidden>
                     <div class="qc-groups" id="qcGroups"></div>
                     <aside class="qc-totals" id="qcTotals" aria-label="Quote summary">
-                        <div id="qcTotalsBody" aria-live="polite"></div>
+                        <div id="qcTotalsBody" class="qc-summary-content" aria-live="polite"></div>
                         <!-- Phase 3 save/share/email panel (web-quote-service.js) —
                              separate container so reprice re-renders never wipe the form -->
                         <div id="qcSavePanel" class="qc-save-panel" aria-live="polite" hidden></div>
@@ -283,6 +285,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js" defer></script>
     <script src="/shared_components/js/web-quote-service.js?v=2026.09.07.33" defer></script>
     <script src="/shared_components/js/delivery-promise.js?v=2026.09.06.31" defer></script>
-    <script src="/pages/js/quote-cart-page.js?v=2026.09.06.5" defer></script>
+    <script src="/shared_components/js/storefront-navigation.js?v=2026.09.09.7" defer></script>
+    <script src="/pages/js/quote-cart-page.js?v=2026.09.11.1" defer></script>
 </body>
 </html>

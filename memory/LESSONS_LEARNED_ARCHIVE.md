@@ -4282,3 +4282,21 @@ CI setup follow-up (2026-09-09): a Google Chrome apt index checksum mismatch blo
 - Problem/root cause: removed inline handlers left stale selected-link code; duplicate initializers ignored deep links; missing birthdays and UTC date parsing broke roster display. Generic card print rules forced long schedule sections onto new sheets.
 - Solution: real section links, native disclosure buttons, one navigation/print-state owner, optional-birthday handling and local calendar dates; retire the legacy card class from documents.
 - Prevention: exercise every chapter/day and back/forward history, preserve original lesson data, check temporary print expansion restores screen state, and inspect actual PDFs for blank pages and complete text.
+
+## Archived 2026-09-11 — resolved training and reference migrations
+
+### Training exercises: round lifecycle and saved progress (2026-09-08)
+
+Problem: restarting bound handlers again, speed rounds graded the first answer, and old timers changed a new mode; blocked/malformed localStorage prevented startup. Root cause: DOM/event lifetime and round lifetime were mixed, while persistence was assumed available. Solution: bind once, reset the same instance, grade the current question once, cancel interval/delayed work on mode changes, use a wall-clock deadline, and validate saved progress with visible read/write failures. Preserve unreadable storage rather than overwriting it. Prevention: complete/restart rounds, switch modes with work pending, and test denied/malformed/readable-but-unwritable storage in a real browser.
+
+### Reference search, disclosure and paper code need explicit contracts (2026-09-08)
+
+Problem: reference descriptions disappeared on phones, ODBC tables were click-only and retry reloaded the page; font ligatures changed copied SQL operators in PDFs. Root cause: legacy shell rules, non-native disclosure, assumed-valid schema and programming-font contextual glyph substitution. Solution: shared scoped reference layout with native details, escaped raw-text highlighting, schema validation and retry preserving search; print the complete catalogue and restore filters, and disable ligatures/contextual alternates for code. Prevention: lock original catalog literals/schema/prose, test roles and keyboard/filter/failure states, compare every PDF field name and technical paragraph, and inspect actual paper operators.
+
+### Guide and tracker migrations need their actual role and print state (2026-09-08)
+
+Problem: guide contents disappeared on phones, bootstrap spacing vanished on paper, and tracker filters/retry assumed mouse input and a valid snapshot. Root cause: legacy framework utilities and shared test login assumptions. Solution: native responsive disclosure, explicit number spacing, typed filter buttons, validated snapshot with visible retry preserving search, and full-content print that restores screen state. Prevention: keep original policy data immutable, test real anonymous/staff denial separately from a local admin viewing session, verify actual contrast on colored panels, and compare PDF content as well as row counts.
+
+### Policy readers and editors need separate state and print checks (2026-09-08)
+
+Problem: SAML staff lost comment controls, failed editor loads could save empty content, phone contents had a clipped secondary scroller, and chart search/printing concealed collapsed teams. Root cause: browser-storage-only identity, editor state assumed ready, stylesheet load-order overrides, and missing disclosure/print contracts. Solution: use resolved identity, gate saving and parent choices on successful setup, put mobile rules in the actual page owner, synchronize search expansion, and explicitly print complete teams/chapters. Preserve TipTap's existing normalization rather than forcing byte equality after visual editing. Prevention: test failed saves/posts with exact draft preservation, blocked storage, all chapter links, missing sanitizer/editor, actual content following dividers, and populated PDFs with collapsed screen states.

@@ -1,574 +1,666 @@
-/* quote-cart.css — customer quote-cart page (pages/quote-cart.html).
-   Built on nwca-2026-core.css primitives/tokens (NWCA-2026-GUIDE.md);
-   this layer only adds the cart layout: group cards, tier meter, line
-   rows + steppers, fee rows, amber nudge, totals panel. */
-
-.qc-section {
-    padding: 26px 0 60px;
-}
-
-/* Two-column layout: group cards + sticky summary rail */
-.qc-layout {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 340px;
-    gap: 26px;
-    align-items: start;
-}
-
-.qc-layout.is-repricing .qc-groups,
-.qc-layout.is-repricing .qc-totals {
-    opacity: 0.55;
-    pointer-events: none;
-    transition: opacity 0.15s ease;
-}
-
-/* ── Group cards ─────────────────────────────────────────────────── */
-.qc-groups {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    min-width: 0;
-}
-
-.qc-group {
-    background: var(--card);
-    border: 1px solid var(--line-strong);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-card);
-    padding: 18px 20px;
-}
-
-.qc-group-error {
-    border-color: var(--bad);
-}
-
-.qc-group-head {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 10px 12px;
-    margin-bottom: 12px;
-}
-
-.qc-group-ico {
-    flex: none;
-    width: 38px;
-    height: 38px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background: var(--green-50);
-    color: var(--green-900);
-}
-.qc-group-ico svg { width: 20px; height: 20px; }
-
-.qc-group-title {
-    font-family: var(--font-display);
-    font-size: 19px;
-    font-weight: 800;
-    color: var(--ink);
-    margin: 0;
-    line-height: 1.2;
-}
-
-.qc-group-sub {
-    display: block;
-    font-family: var(--font-body);
-    font-size: 12.5px;
-    font-weight: 700;
-    color: var(--ink-soft);
-}
-
-.qc-group-pool {
-    margin-left: auto;
-    font-size: 13px;
-    font-weight: 800;
-    color: var(--green-900);
-    white-space: nowrap;
-}
-
-/* ── Tier-progress meter ─────────────────────────────────────────── */
-.qc-meter { margin: 2px 0 14px; }
-
-.qc-meter-bar {
-    height: 8px;
-    border-radius: 999px;
-    background: var(--paper-deep);
-    border: 1px solid var(--line);
-    overflow: hidden;
-}
-
-.qc-meter-fill {
-    display: block;
-    height: 100%;
-    width: 0;
-    border-radius: 999px;
-    background: var(--green-700);
-    transition: width 0.25s ease;
-}
-
-.qc-meter-labels {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-    margin-top: 5px;
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--ink-soft);
-}
-
-/* ── Line rows ───────────────────────────────────────────────────── */
-.qc-lines {
-    border-top: 1px solid var(--line);
-}
-
-.qc-line {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto auto 36px;
-    gap: 8px 14px;
-    align-items: center;
-    padding: 11px 0;
-    border-bottom: 1px solid var(--line);
-}
-.qc-line-info { min-width: 0; }
-
-.qc-line-name {
-    display: block;
-    font-weight: 700;
-    font-size: 14px;
-    color: var(--ink);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.qc-line-meta {
-    display: block;
-    font-size: 12.5px;
-    font-weight: 600;
-    color: var(--ink-soft);
-}
-
-.qc-line-qty {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.qc-line-qty input {
-    width: 58px;
-    min-height: 38px;
-    text-align: center;
-    border: 1.5px solid var(--line-strong);
-    border-radius: var(--radius-sm);
-    background: var(--card);
-    color: var(--ink);
-    font-weight: 700;
-    font-size: 14px;
-    appearance: textfield;
-}
-
-.qc-line-qty input::-webkit-outer-spin-button,
-.qc-line-qty input::-webkit-inner-spin-button { appearance: none; margin: 0; }
-.qc-line-qty input:focus { outline: none; border-color: var(--green-700); }
-
-.qc-step {
-    width: 34px;
-    height: 38px;
-    border: 1.5px solid var(--line-strong);
-    border-radius: var(--radius-sm);
-    background: var(--card);
-    color: var(--ink);
-    font-size: 17px;
-    font-weight: 700;
-    cursor: pointer;
-}
-.qc-step:hover { border-color: var(--green-700); color: var(--green-700); }
-.qc-line-price { text-align: right; }
-
-/* Per-line size matrix (2026-08-19) — full-width row under the line; filled
-   async once the style's real size list arrives. When it shows, it replaces
-   the stepper as the quantity editor (total becomes the read-only pill). */
-.qc-line-sizes {
-    grid-column: 1 / -1;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px 10px;
-    padding: 2px 0 4px;
-}
-.qc-line-sizes[hidden] { display: none; }
-
-.qc-size-cell {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
-    font-size: 0.72rem;
-    font-weight: 600;
-    color: var(--ink-soft, var(--slate-500));
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-}
-
-.qc-size-cell input {
-    width: 52px;
-    height: 34px;
-    text-align: center;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    font: inherit;
-    font-weight: 600;
-    color: inherit;
-}
-
-.qc-size-cell input::-webkit-outer-spin-button,
-.qc-size-cell input::-webkit-inner-spin-button { appearance: none; margin: 0; }
-.qc-size-cell input:focus { outline: none; border-color: var(--green-700); }
-
-.qc-line-qty-total {
-    font-weight: 700;
-    font-size: 1rem;
-}
-
-.qc-line-qty-unit {
-    font-size: 0.75rem;
-    color: var(--ink-soft, var(--slate-500));
-    margin-left: 4px;
-}
-
-.qc-line-each {
-    display: block;
-    font-size: 12.5px;
-    font-weight: 700;
-    color: var(--ink-soft);
-    white-space: nowrap;
-}
-
-.qc-line-total {
-    display: block;
-    font-size: 15px;
-    font-weight: 800;
-    color: var(--ink);
-    white-space: nowrap;
-}
-
-.qc-remove {
-    width: 36px;
-    height: 36px;
-    border: none;
-    border-radius: var(--radius-sm);
-    background: none;
-    color: var(--ink-soft);
-    font-size: 18px;
-    line-height: 1;
-    cursor: pointer;
-}
-.qc-remove:hover { color: var(--bad); background: var(--bad-soft); }
-
-/* ── Service + fee rows ──────────────────────────────────────────── */
-.qc-svc, .qc-fees { border-bottom: 1px solid var(--line); padding: 6px 0; }
-
-.qc-svc-row, .qc-fee-row {
-    display: flex;
-    justify-content: space-between;
-    gap: 14px;
-    padding: 5px 0;
-    font-size: 13.5px;
-    font-weight: 600;
-    color: var(--ink);
-}
-.qc-fee-row em { font-style: normal; color: var(--ink-soft); font-weight: 600; }
-.qc-svc-row .num, .qc-fee-row .num { font-weight: 800; white-space: nowrap; }
-
-/* Honest small-batch line (baked LTM) */
-.qc-ltm-note {
-    margin: 10px 0 0;
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--ink);
-}
-
-/* Amber tier nudge */
-.qc-nudge {
-    margin-top: 12px;
-    padding: 11px 14px;
-    border: 1px solid var(--warn);
-    border-left-width: 4px;
-    border-radius: var(--radius-sm);
-    background: var(--warn-soft);
-    font-size: 13.5px;
-    font-weight: 700;
-    color: var(--ink);
-}
-
-/* Group footer */
-.qc-group-foot {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 14px;
-    margin-top: 12px;
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--ink-soft);
-}
-
-.qc-group-total {
-    font-family: var(--font-display);
-    font-size: 21px;
-    font-weight: 800;
-    color: var(--green-900);
-}
-.qc-group-retry { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
-
-/* Pooling info line between group cards */
-.qc-pool-note {
-    margin: 0;
-    padding: 0 6px;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--ink-soft);
-    text-align: center;
-}
-
-/* ── Totals panel ────────────────────────────────────────────────── */
-.qc-totals {
-    position: sticky;
-    top: 86px;
-    background: var(--card);
-    border: 1px solid var(--line-strong);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-card);
-    padding: 18px 20px;
-}
-
-.qc-totals-title {
-    font-family: var(--font-display);
-    font-size: 19px;
-    font-weight: 800;
-    margin: 0 0 10px;
-    color: var(--ink);
-}
-
-.qc-totals-row {
-    display: flex;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 6px 0;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--ink);
-    border-bottom: 1px solid var(--line);
-}
-.qc-totals-row .num { font-weight: 800; white-space: nowrap; }
-
-.qc-grand {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 12px;
-    padding: 12px 0 4px;
-    font-size: 15px;
-    font-weight: 800;
-    color: var(--ink);
-}
-
-.qc-grand span:last-child {
-    font-family: var(--font-display);
-    font-size: 28px;
-    font-weight: 800;
-    color: var(--green-900);
-}
-.qc-totals .alert { margin: 12px 0 0; }
-
-.qc-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 9px;
-    margin-top: 14px;
-}
-.qc-actions .btn { width: 100%; }
-.qc-actions .btn[disabled] { opacity: 0.55; cursor: not-allowed; }
-
-.qc-totals-foot {
-    margin: 12px 0 0;
-    font-size: 12.5px;
-    font-weight: 600;
-    color: var(--ink-soft);
-    line-height: 1.5;
-}
-
-/* ── Save / share / email panel (Phase 3) ─────────────────────────── */
-.qc-save-panel {
-    margin-top: 16px;
-    padding: 16px;
-    border: 1.5px solid var(--line-strong);
-    border-radius: 12px;
-    background: var(--surface, var(--color-surface));
-    animation: qcSaveIn 0.25s ease-out;
-}
-
-@keyframes qcSaveIn {
-    from { opacity: 0; transform: translateY(-6px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.qc-save-title {
-    margin: 0 0 12px;
-    font-family: var(--font-display);
-    font-size: 19px;
-    font-weight: 800;
-    color: var(--green-900);
-}
-.qc-save-panel .field { margin-bottom: 12px; }
-
-.qc-save-art {
-    margin: 4px 0 12px;
-    padding: 10px 12px 12px;
-    border: 1px dashed var(--line-strong);
-    border-radius: 10px;
-}
-
-.qc-save-art legend {
-    padding: 0 6px;
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--ink-soft);
-}
-
-.qc-art-row {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 8px;
-}
-
-.qc-art-label {
-    flex: 0 0 100%;
-    font-size: 12.5px;
-    font-weight: 700;
-    color: var(--ink);
-}
-.qc-art-row input[type='file'] { font-size: 12.5px; max-width: 100%; }
-
-.qc-art-picked {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--green-700);
-    overflow-wrap: anywhere;
-}
-
-.qc-save-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 9px;
-    margin-top: 12px;
-}
-.qc-save-actions .btn { width: 100%; }
-
-.qc-save-busy {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 14px 4px;
-    font-weight: 600;
-    color: var(--ink-soft);
-}
-
-.qc-spin {
-    width: 22px;
-    height: 22px;
-    flex: 0 0 22px;
-    border: 3px solid var(--line-strong);
-    border-top-color: var(--green-700);
-    border-radius: 50%;
-    animation: qcSpin 0.8s linear infinite;
-}
-
-@keyframes qcSpin { to { transform: rotate(360deg); } }
-.qc-share { margin: 4px 0 10px; }
-.qc-share-row { display: flex; gap: 8px; }
-.qc-share-row .field-input { flex: 1; min-width: 0; font-size: 13px; }
-
-.qc-share-open {
-    display: inline-block;
-    margin-top: 8px;
-    font-size: 13.5px;
-    font-weight: 700;
-    color: var(--green-700);
-}
-
-.qc-save-emailline {
-    margin: 10px 0 0;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--ink-soft);
-    line-height: 1.5;
-}
-.qc-save-panel .alert { margin: 0 0 12px; }
-
-/* ── Responsive ──────────────────────────────────────────────────── */
-@media (width <= 960px) {
-    .qc-layout { grid-template-columns: 1fr; }
-    .qc-totals { position: static; }
-}
-
-@media (width <= 560px) {
-    .qc-group { padding: 14px; }
-
-    .qc-line {
-        grid-template-columns: minmax(0, 1fr) auto;
-        grid-template-areas:
-            'info remove'
-            'qty price';
+/* quote cart layout. Shared controls, tokens and storefront shell own common UI. */
+@layer components.pages {
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-section {
+        padding: 26px 0 60px;
     }
-    .qc-line-info { grid-area: info; }
-    .qc-remove { grid-area: remove; justify-self: end; }
-    .qc-line-qty { grid-area: qty; }
-    .qc-line-price { grid-area: price; align-self: center; }
-}
 
-/* ============================================================================
-   Email capture (#18, 2026-07-05) — "Email me this quote" box under the
-   totals actions. Funnels into the existing Phase 3 save panel (email
-   pre-filled); reuses the .field-* primitives the save panel already uses.
-   ============================================================================ */
-.qc-capture {
-    margin-top: 14px;
-    padding-top: 14px;
-    border-top: 1px dashed var(--line, var(--slate-200));
-}
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 26px;
+        align-items: start;
+    }
 
-.qc-capture-row {
-    display: flex;
-    gap: 8px;
-    align-items: stretch;
-}
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-layout.is-repricing .qc-groups, :where([data-ui="unified"][data-customer-cart="quote"]) .qc-layout.is-repricing .qc-totals {
+        opacity: 0.55;
+        pointer-events: none;
+        transition: opacity 0.15s ease;
+    }
 
-.qc-capture-row .field-input {
-    flex: 1 1 auto;
-    min-width: 0;
-}
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-groups {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        min-width: 0;
+    }
 
-.qc-capture-row .btn {
-    flex: 0 0 auto;
-    white-space: nowrap;
-}
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-group {
+        background: var(--ui-surface);
+        border: 1px solid var(--ui-line-strong);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-sm);
+        padding: 18px 20px;
+    }
 
-.qc-capture-error {
-    margin: 6px 0 0;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--red-700);
-}
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-group-error {
+        border-color: var(--red-700);
+    }
 
-/* Delivery promise (BAW adoption #1, 2026-07-06) — per-group "est. ship by"
-   line under the group subtotal. Hidden until delivery-promise.js fills it. */
-.qc-delivery-promise {
-  margin: 6px 0 0;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--store-green-700);
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-group-head {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px 12px;
+        margin-bottom: 12px;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-group-ico {
+        flex: none;
+        width: 38px;
+        height: 38px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: var(--ui-tint);
+        color: var(--ui-accent-hover);
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-group-ico svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-group-title {
+        font-family: var(--ui-font);
+        font-size: 19px;
+        font-weight: 800;
+        color: var(--ui-ink);
+        margin: 0;
+        line-height: 1.2;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-group-sub {
+        display: block;
+        font-family: var(--ui-font);
+        font-size: 12.5px;
+        font-weight: 700;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-group-pool {
+        margin-left: auto;
+        font-size: 13px;
+        font-weight: 800;
+        color: var(--ui-accent-hover);
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-meter {
+        margin: 2px 0 14px;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-meter-bar {
+        height: 8px;
+        border-radius: 999px;
+        background: var(--ui-tint);
+        border: 1px solid var(--ui-line);
+        overflow: hidden;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-meter-fill {
+        display: block;
+        height: 100%;
+        width: 0;
+        border-radius: 999px;
+        background: var(--ui-accent);
+        transition: width 0.25s ease;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-meter-labels {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        margin-top: 5px;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-lines {
+        border-top: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-line {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto auto 36px;
+        gap: 8px 14px;
+        align-items: center;
+        padding: 11px 0;
+        border-bottom: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-line-info {
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-line-name {
+        display: block;
+        font-weight: 700;
+        font-size: 14px;
+        color: var(--ui-ink);
+        overflow: visible;
+        text-overflow: clip;
+        white-space: normal;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-line-meta {
+        display: block;
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-line-qty {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-line-qty input {
+        width: 58px;
+        min-height: 44px;
+        text-align: center;
+        appearance: textfield;
+        padding: 8px;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-line-qty input::-webkit-outer-spin-button, :where([data-ui="unified"][data-customer-cart="quote"]) .qc-line-qty input::-webkit-inner-spin-button {
+        appearance: none;
+        margin: 0;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-line-qty input:focus {
+        outline: none;
+        border-color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-step {
+        width: 44px;
+        height: 44px;
+        border: 1.5px solid var(--ui-line-strong);
+        border-radius: var(--radius-sm);
+        background: var(--ui-surface);
+        color: var(--ui-ink);
+        font-size: 17px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-step:hover {
+        border-color: var(--ui-accent);
+        color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-line-price {
+        text-align: right;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-line-sizes {
+        grid-column: 1 / -1;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 10px;
+        padding: 2px 0 4px;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-line-sizes[hidden] {
+        display: none;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-size-cell {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: var(--ui-muted, var(--slate-500));
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-size-cell input {
+        width: 52px;
+        text-align: center;
+        min-height: 44px;
+        padding: 8px;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-size-cell input::-webkit-outer-spin-button, :where([data-ui="unified"][data-customer-cart="quote"]) .qc-size-cell input::-webkit-inner-spin-button {
+        appearance: none;
+        margin: 0;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-size-cell input:focus {
+        outline: none;
+        border-color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-line-qty-total {
+        font-weight: 700;
+        font-size: 1rem;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-line-qty-unit {
+        font-size: 0.75rem;
+        color: var(--ui-muted, var(--slate-500));
+        margin-left: 4px;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-line-each {
+        display: block;
+        font-size: 12.5px;
+        font-weight: 700;
+        color: var(--ui-muted);
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-line-total {
+        display: block;
+        font-size: 15px;
+        font-weight: 800;
+        color: var(--ui-ink);
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-remove {
+        width: 44px;
+        height: 44px;
+        border: none;
+        border-radius: var(--radius-sm);
+        background: none;
+        color: var(--ui-muted);
+        font-size: 18px;
+        line-height: 1;
+        cursor: pointer;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-remove:hover {
+        color: var(--red-700);
+        background: var(--red-100);
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-svc, :where([data-ui="unified"][data-customer-cart="quote"]) .qc-fees {
+        border-bottom: 1px solid var(--ui-line);
+        padding: 6px 0;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-svc-row, :where([data-ui="unified"][data-customer-cart="quote"]) .qc-fee-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 5px 0;
+        font-size: 13.5px;
+        font-weight: 600;
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-fee-row em {
+        font-style: normal;
+        color: var(--ui-muted);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-svc-row .num, :where([data-ui="unified"][data-customer-cart="quote"]) .qc-fee-row .num {
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-ltm-note {
+        margin: 10px 0 0;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-nudge {
+        margin-top: 12px;
+        padding: 11px 14px;
+        border: 1px solid var(--amber-700);
+        border-left-width: 4px;
+        border-radius: var(--radius-sm);
+        background: var(--amber-100);
+        font-size: 13.5px;
+        font-weight: 700;
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-group-foot {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 14px;
+        margin-top: 12px;
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-group-total {
+        font-family: var(--ui-font);
+        font-size: 21px;
+        font-weight: 800;
+        color: var(--ui-accent-hover);
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-group-retry {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 12px;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-pool-note {
+        margin: 0;
+        padding: 0 6px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--ui-muted);
+        text-align: center;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-totals {
+        position: sticky;
+        top: 86px;
+        background: var(--ui-surface);
+        border: 1px solid var(--ui-line-strong);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-sm);
+        padding: 18px 20px;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-totals-title {
+        font-family: var(--ui-font);
+        font-size: 19px;
+        font-weight: 800;
+        margin: 0 0 10px;
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-totals-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 6px 0;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--ui-ink);
+        border-bottom: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-totals-row .num {
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-grand {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 12px;
+        padding: 12px 0 4px;
+        font-size: 15px;
+        font-weight: 800;
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-grand span:last-child {
+        font-family: var(--ui-font);
+        font-size: 28px;
+        font-weight: 800;
+        color: var(--ui-accent-hover);
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-totals .alert {
+        margin: 12px 0 0;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 9px;
+        margin-top: 14px;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-actions .btn {
+        width: 100%;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-actions .btn[disabled] {
+        opacity: 0.55;
+        cursor: not-allowed;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-totals-foot {
+        margin: 12px 0 0;
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--ui-muted);
+        line-height: 1.5;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-save-panel {
+        margin-top: 16px;
+        padding: 16px;
+        border: 1.5px solid var(--ui-line-strong);
+        border-radius: 12px;
+        background: var(--ui-surface, var(--color-surface));
+        animation: qcSaveIn 0.25s ease-out;
+    }
+
+    @keyframes qcSaveIn {
+        from {
+            opacity: 0;
+            transform: translateY(-6px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-save-title {
+        margin: 0 0 12px;
+        font-family: var(--ui-font);
+        font-size: 19px;
+        font-weight: 800;
+        color: var(--ui-accent-hover);
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-save-panel .field {
+        margin-bottom: 12px;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-save-art {
+        min-width: 0;
+        margin: 4px 0 12px;
+        padding: 10px 12px 12px;
+        border: 1px dashed var(--ui-line-strong);
+        border-radius: 10px;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-save-art legend {
+        padding: 0 6px;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-art-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-art-label {
+        flex: 0 0 100%;
+        font-size: 12.5px;
+        font-weight: 700;
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-art-row input[type='file'] {
+        font-size: 12.5px;
+        max-width: 100%;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-art-picked {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--ui-accent);
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-save-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 9px;
+        margin-top: 12px;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-save-actions .btn {
+        width: 100%;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-save-busy {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 4px;
+        font-weight: 600;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-spin {
+        width: 22px;
+        height: 22px;
+        flex: 0 0 22px;
+        border: 3px solid var(--ui-line-strong);
+        border-top-color: var(--ui-accent);
+        border-radius: 50%;
+        animation: qcSpin 0.8s linear infinite;
+    }
+
+    @keyframes qcSpin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-share {
+        margin: 4px 0 10px;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-share-row {
+        display: flex;
+        gap: 8px;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-share-row .field-input {
+        flex: 1;
+        min-width: 0;
+        font-size: 13px;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-share-open {
+        display: inline-block;
+        margin-top: 8px;
+        font-size: 13.5px;
+        font-weight: 700;
+        color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-save-emailline {
+        margin: 10px 0 0;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--ui-muted);
+        line-height: 1.5;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-save-panel .alert {
+        margin: 0 0 12px;
+    }
+
+    @media (width <= 960px) {
+        :where([data-ui="unified"][data-customer-cart="quote"]) .qc-layout {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        :where([data-ui="unified"][data-customer-cart="quote"]) .qc-totals {
+            position: static;
+        }
+    }
+
+    @media (width <= 560px) {
+        :where([data-ui="unified"][data-customer-cart="quote"]) .qc-group {
+            padding: 14px;
+        }
+
+        :where([data-ui="unified"][data-customer-cart="quote"]) .qc-line {
+            grid-template-columns: minmax(0, 1fr) auto;
+            grid-template-areas: 'info remove'
+            'qty price';
+        }
+
+        :where([data-ui="unified"][data-customer-cart="quote"]) .qc-line-info {
+            grid-area: info;
+        }
+
+        :where([data-ui="unified"][data-customer-cart="quote"]) .qc-remove {
+            grid-area: remove;
+            justify-self: end;
+            width: 44px;
+            height: 44px;
+        }
+
+        :where([data-ui="unified"][data-customer-cart="quote"]) .qc-line-qty {
+            grid-area: qty;
+        }
+
+        :where([data-ui="unified"][data-customer-cart="quote"]) .qc-line-price {
+            grid-area: price;
+            align-self: center;
+        }
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-capture {
+        margin-top: 14px;
+        padding-top: 14px;
+        border-top: 1px dashed var(--ui-line, var(--slate-200));
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-capture-row {
+        display: flex;
+        gap: 8px;
+        align-items: stretch;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-capture-row .field-input {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-capture-row .btn {
+        flex: 0 0 auto;
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-capture-error {
+        margin: 6px 0 0;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--red-700);
+    }
+
+    :where([data-ui="unified"][data-customer-cart="quote"]) .qc-delivery-promise {
+        margin: 6px 0 0;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--store-green-700);
+    }
 }

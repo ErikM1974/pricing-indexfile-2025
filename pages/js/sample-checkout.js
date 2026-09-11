@@ -46,10 +46,11 @@
             var anchor = document.getElementById('cartSummaryBar') || document.body.firstElementChild;
             anchor.parentNode.insertBefore(slot, anchor);
         }
-        slot.innerHTML = '<div class="checkout-validation-alert" style="' +
-            (kind === 'error' ? '' : 'border-color:#2d5f3f;') + 'margin:1rem 0;">' +
+        slot.innerHTML = '<div class="checkout-validation-alert sc-checkout-banner ' +
+            (kind === 'error' ? 'sc-checkout-error' : 'sc-checkout-info') + '">' +
             '<i class="fas ' + (kind === 'error' ? 'fa-exclamation-triangle' : 'fa-info-circle') + '" aria-hidden="true"></i>' +
             '<div class="alert-content">' + html + '</div></div>';
+        slot.setAttribute('role', kind === 'error' ? 'alert' : 'status');
         slot.scrollIntoView({ block: 'center' });
     }
 
@@ -95,7 +96,9 @@
             window.location.href = data.url;   // Stripe hosted checkout
         } catch (error) {
             console.error('[SampleCheckout] Failed to start checkout:', error);
-            banner('error', '<h3>Couldn’t start checkout</h3><p>' + String(error.message || error) + '</p>');
+            var errorText = document.createElement('span');
+            errorText.textContent = String(error.message || error);
+            banner('error', '<h3>Couldn’t start checkout</h3><p>' + errorText.innerHTML + '</p>');
             if (submitBtn) {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = original;
