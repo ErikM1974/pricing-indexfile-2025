@@ -243,3 +243,8 @@ Box-label follow-up (2026-09-10): a failed/new lookup must clear old printable d
 - Prevention: freeze original values, request bodies and source hashes; compare rendered totals (the renderer replaces initial placeholder IDs), all four widths/axe, delayed/error/retry/keyboard paths, actual lazy art imports and every PDF page. Keep shared builder-print and garment-form owners unchanged until their other consumers migrate.
 
 Control-class follow-up: regex word boundaries treat hyphens as separators, so sw-action-btn falsely matches a check for the canonical btn class. Compare whitespace-delimited class tokens, assert real rendered target sizes, and inspect staff toolbars as well as public actions.
+
+### Cart text, storage and pending saves need explicit boundaries (2026-09-10)
+- Problem/root cause: stored garment names and checkout errors rendered as HTML, failed removals threw without a visible message, and the save trigger reopened a form while its previous save was pending.
+- Solution: escape rendered text/attributes without changing payload values; retain the cart with a focused storage error; guard and disable pending save entry points.
+- Prevention: immutable pricing/payload contracts plus harmless stored-markup, quota-error/retry and delayed duplicate-save browser probes. Artwork fieldsets need min-width:0 on phones; printed fields need matching control specificity, complete text/file references and review of every PDF page.

@@ -592,6 +592,630 @@
     "shared_components/js/screenprint-pricing-service.js": "695a740f845263741fee5a9aa91816d9643a5dd24fa28cfc3850a9a2785300b7",
     "shared_components/js/web-quote-service.js": "a1a3574255438cc8a262d79e04912d9aa324ab8d42dfbee878c72bc886a20aae"
   },
-  "changes": [],
+  "changes": [
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<body>",
+      "after": "<body data-ui=\"unified\" data-storefront=\"cart\" data-customer-cart=\"sample\">",
+      "count": 1,
+      "reason": "Opt into canonical components and existing storefront shell."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap",
+      "after": "https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap",
+      "count": 1,
+      "reason": "Use the application UI font."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<link rel=\"stylesheet\" href=\"/shared_components/css/nwca-2026-core.css?v=2026.09.07.8\">",
+      "after": "<link rel=\"stylesheet\" href=\"/shared_components/css/components.css?v=2026.09.09.7\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/storefront-shell.css?v=2026.09.09.7\">\n    <link rel=\"stylesheet\" href=\"/pages/css/customer-cart.css\">",
+      "count": 1,
+      "reason": "Reuse shared controls and navigation; remove the legacy global core from these carts."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<aside class=\"sidebar\" id=\"sidebar\" aria-label=\"Browse menu\">",
+      "after": "<dialog class=\"sidebar\" id=\"sidebar\" aria-label=\"Browse menu\">",
+      "count": 1,
+      "reason": "Use the shared native mobile menu."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "    </aside>\n    <div class=\"sidebar-overlay\" id=\"sidebarOverlay\"></div>",
+      "after": "    </dialog>\n    <div class=\"sidebar-overlay\" id=\"sidebarOverlay\" hidden></div>",
+      "count": 1,
+      "reason": "Native backdrop replaces legacy overlay; preserve identifier."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<button class=\"mobile-menu-btn\" id=\"mobileMenuBtn\" type=\"button\" aria-label=\"Open menu\" aria-controls=\"sidebar\">",
+      "after": "<button class=\"mobile-menu-btn\" id=\"mobileMenuBtn\" type=\"button\" aria-expanded=\"false\" aria-label=\"Open menu\" aria-controls=\"sidebar\">",
+      "count": 1,
+      "reason": "Expose mobile menu state."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<script src=\"/pages/js/sample-cart-page.js",
+      "after": "<script src=\"/shared_components/js/storefront-navigation.js?v=2026.09.09.7\" defer></script>\n    <script src=\"/pages/js/sample-cart-page.js",
+      "count": 1,
+      "reason": "Reuse the existing menu focus, close and search controller."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<p id=\"sampleCreditNote\" hidden>",
+      "after": "<p id=\"sampleCreditNote\" class=\"sc-credit-note\" hidden>",
+      "count": 1,
+      "reason": "Give the credit note a class-scoped owner."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<input type=\"text\"\n                       id=\"navSearchInput\"\n                       class=\"nav-search-input\"\n                       placeholder=\"Search styles — PC61, hoodies, caps…\"\n                       autocomplete=\"off\"\n                       aria-label=\"Search products\">",
+      "after": "<input type=\"text\"\n                       id=\"navSearchInput\"\n                       class=\"field-input nav-search-input\"\n                       placeholder=\"Search styles — PC61, hoodies, caps…\"\n                       autocomplete=\"off\"\n                       aria-label=\"Search products\">",
+      "count": 1,
+      "reason": "Use canonical field-input control styling."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<label for=\"fldFirstName\">",
+      "after": "<label for=\"fldFirstName\" class=\"field-label\">",
+      "count": 1,
+      "reason": "Use canonical field-label control styling."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<input type=\"text\" id=\"fldFirstName\" name=\"firstName\" autocomplete=\"given-name\" required>",
+      "after": "<input type=\"text\" id=\"fldFirstName\" name=\"firstName\" autocomplete=\"given-name\" required class=\"field-input\">",
+      "count": 1,
+      "reason": "Use canonical field-input control styling."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<label for=\"fldLastName\">",
+      "after": "<label for=\"fldLastName\" class=\"field-label\">",
+      "count": 1,
+      "reason": "Use canonical field-label control styling."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<input type=\"text\" id=\"fldLastName\" name=\"lastName\" autocomplete=\"family-name\" required>",
+      "after": "<input type=\"text\" id=\"fldLastName\" name=\"lastName\" autocomplete=\"family-name\" required class=\"field-input\">",
+      "count": 1,
+      "reason": "Use canonical field-input control styling."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<label for=\"fldEmail\">",
+      "after": "<label for=\"fldEmail\" class=\"field-label\">",
+      "count": 1,
+      "reason": "Use canonical field-label control styling."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<input type=\"email\" id=\"fldEmail\" name=\"email\" autocomplete=\"email\" required>",
+      "after": "<input type=\"email\" id=\"fldEmail\" name=\"email\" autocomplete=\"email\" required class=\"field-input\">",
+      "count": 1,
+      "reason": "Use canonical field-input control styling."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<label for=\"fldPhone\">",
+      "after": "<label for=\"fldPhone\" class=\"field-label\">",
+      "count": 1,
+      "reason": "Use canonical field-label control styling."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<input type=\"tel\" id=\"fldPhone\" name=\"phone\" autocomplete=\"tel\" required>",
+      "after": "<input type=\"tel\" id=\"fldPhone\" name=\"phone\" autocomplete=\"tel\" required class=\"field-input\">",
+      "count": 1,
+      "reason": "Use canonical field-input control styling."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<label for=\"fldCompany\">",
+      "after": "<label for=\"fldCompany\" class=\"field-label\">",
+      "count": 1,
+      "reason": "Use canonical field-label control styling."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<input type=\"text\" id=\"fldCompany\" name=\"company\" autocomplete=\"organization\">",
+      "after": "<input type=\"text\" id=\"fldCompany\" name=\"company\" autocomplete=\"organization\" class=\"field-input\">",
+      "count": 1,
+      "reason": "Use canonical field-input control styling."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<label for=\"salesRep\">",
+      "after": "<label for=\"salesRep\" class=\"field-label\">",
+      "count": 1,
+      "reason": "Use canonical field-label control styling."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<select name=\"salesRep\" id=\"salesRep\">",
+      "after": "<select name=\"salesRep\" id=\"salesRep\" class=\"field-input\">",
+      "count": 1,
+      "reason": "Use canonical field-input control styling."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<label for=\"billing-address1\">",
+      "after": "<label for=\"billing-address1\" class=\"field-label\">",
+      "count": 1,
+      "reason": "Use canonical field-label control styling."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<input type=\"text\" name=\"billing_address1\" id=\"billing-address1\" autocomplete=\"billing address-line1\" required placeholder=\"123 Main St\">",
+      "after": "<input type=\"text\" name=\"billing_address1\" id=\"billing-address1\" autocomplete=\"billing address-line1\" required placeholder=\"123 Main St\" class=\"field-input\">",
+      "count": 1,
+      "reason": "Use canonical field-input control styling."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<label for=\"billing-address2\">",
+      "after": "<label for=\"billing-address2\" class=\"field-label\">",
+      "count": 1,
+      "reason": "Use canonical field-label control styling."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<input type=\"text\" name=\"billing_address2\" id=\"billing-address2\" autocomplete=\"billing address-line2\" placeholder=\"Apt 4B\">",
+      "after": "<input type=\"text\" name=\"billing_address2\" id=\"billing-address2\" autocomplete=\"billing address-line2\" placeholder=\"Apt 4B\" class=\"field-input\">",
+      "count": 1,
+      "reason": "Use canonical field-input control styling."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<label for=\"billing-city\">",
+      "after": "<label for=\"billing-city\" class=\"field-label\">",
+      "count": 1,
+      "reason": "Use canonical field-label control styling."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<input type=\"text\" name=\"billing_city\" id=\"billing-city\" autocomplete=\"billing address-level2\" required>",
+      "after": "<input type=\"text\" name=\"billing_city\" id=\"billing-city\" autocomplete=\"billing address-level2\" required class=\"field-input\">",
+      "count": 1,
+      "reason": "Use canonical field-input control styling."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<label for=\"billing-state\">",
+      "after": "<label for=\"billing-state\" class=\"field-label\">",
+      "count": 1,
+      "reason": "Use canonical field-label control styling."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<input type=\"text\" name=\"billing_state\" id=\"billing-state\" autocomplete=\"billing address-level1\" required placeholder=\"WA\" maxlength=\"2\" pattern=\"[A-Za-z]{2}\" class=\"input-upper\">",
+      "after": "<input type=\"text\" name=\"billing_state\" id=\"billing-state\" autocomplete=\"billing address-level1\" required placeholder=\"WA\" maxlength=\"2\" pattern=\"[A-Za-z]{2}\" class=\"field-input input-upper\">",
+      "count": 1,
+      "reason": "Use canonical field-input control styling."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<label for=\"billing-zip\">",
+      "after": "<label for=\"billing-zip\" class=\"field-label\">",
+      "count": 1,
+      "reason": "Use canonical field-label control styling."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<input type=\"text\" name=\"billing_zip\" id=\"billing-zip\" autocomplete=\"billing postal-code\" required placeholder=\"98101\" pattern=\"\\d{5}\" maxlength=\"5\" inputmode=\"numeric\">",
+      "after": "<input type=\"text\" name=\"billing_zip\" id=\"billing-zip\" autocomplete=\"billing postal-code\" required placeholder=\"98101\" pattern=\"\\d{5}\" maxlength=\"5\" inputmode=\"numeric\" class=\"field-input\">",
+      "count": 1,
+      "reason": "Use canonical field-input control styling."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<label for=\"shipping-address1\">",
+      "after": "<label for=\"shipping-address1\" class=\"field-label\">",
+      "count": 1,
+      "reason": "Use canonical field-label control styling."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<input type=\"text\" name=\"shipping_address1\" id=\"shipping-address1\" autocomplete=\"shipping address-line1\" placeholder=\"123 Main St\">",
+      "after": "<input type=\"text\" name=\"shipping_address1\" id=\"shipping-address1\" autocomplete=\"shipping address-line1\" placeholder=\"123 Main St\" class=\"field-input\">",
+      "count": 1,
+      "reason": "Use canonical field-input control styling."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<label for=\"shipping-address2\">",
+      "after": "<label for=\"shipping-address2\" class=\"field-label\">",
+      "count": 1,
+      "reason": "Use canonical field-label control styling."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<input type=\"text\" name=\"shipping_address2\" id=\"shipping-address2\" autocomplete=\"shipping address-line2\" placeholder=\"Apt 4B\">",
+      "after": "<input type=\"text\" name=\"shipping_address2\" id=\"shipping-address2\" autocomplete=\"shipping address-line2\" placeholder=\"Apt 4B\" class=\"field-input\">",
+      "count": 1,
+      "reason": "Use canonical field-input control styling."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<label for=\"shipping-city\">",
+      "after": "<label for=\"shipping-city\" class=\"field-label\">",
+      "count": 1,
+      "reason": "Use canonical field-label control styling."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<input type=\"text\" name=\"shipping_city\" id=\"shipping-city\" autocomplete=\"shipping address-level2\">",
+      "after": "<input type=\"text\" name=\"shipping_city\" id=\"shipping-city\" autocomplete=\"shipping address-level2\" class=\"field-input\">",
+      "count": 1,
+      "reason": "Use canonical field-input control styling."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<label for=\"shipping-state\">",
+      "after": "<label for=\"shipping-state\" class=\"field-label\">",
+      "count": 1,
+      "reason": "Use canonical field-label control styling."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<input type=\"text\" name=\"shipping_state\" id=\"shipping-state\" autocomplete=\"shipping address-level1\" placeholder=\"WA\" maxlength=\"2\" pattern=\"[A-Za-z]{2}\" class=\"input-upper\">",
+      "after": "<input type=\"text\" name=\"shipping_state\" id=\"shipping-state\" autocomplete=\"shipping address-level1\" placeholder=\"WA\" maxlength=\"2\" pattern=\"[A-Za-z]{2}\" class=\"field-input input-upper\">",
+      "count": 1,
+      "reason": "Use canonical field-input control styling."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<label for=\"shipping-zip\">",
+      "after": "<label for=\"shipping-zip\" class=\"field-label\">",
+      "count": 1,
+      "reason": "Use canonical field-label control styling."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<input type=\"text\" name=\"shipping_zip\" id=\"shipping-zip\" autocomplete=\"shipping postal-code\" placeholder=\"98101\" pattern=\"\\d{5}\" maxlength=\"5\" inputmode=\"numeric\">",
+      "after": "<input type=\"text\" name=\"shipping_zip\" id=\"shipping-zip\" autocomplete=\"shipping postal-code\" placeholder=\"98101\" pattern=\"\\d{5}\" maxlength=\"5\" inputmode=\"numeric\" class=\"field-input\">",
+      "count": 1,
+      "reason": "Use canonical field-input control styling."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<label for=\"fldNotes\">",
+      "after": "<label for=\"fldNotes\" class=\"field-label\">",
+      "count": 1,
+      "reason": "Use canonical field-label control styling."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<textarea id=\"fldNotes\" name=\"notes\" placeholder=\"Any specific requirements or questions…\">",
+      "after": "<textarea id=\"fldNotes\" name=\"notes\" placeholder=\"Any specific requirements or questions…\" class=\"field-textarea\">",
+      "count": 1,
+      "reason": "Use canonical field-textarea control styling."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<label for=\"logoUpload\">",
+      "after": "<label for=\"logoUpload\" class=\"field-label\">",
+      "count": 1,
+      "reason": "Use canonical field-label control styling."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<button type=\"submit\" class=\"btn btn-primary btn-lg\">",
+      "after": "<button type=\"submit\" class=\"btn btn-primary\">",
+      "count": 1,
+      "reason": "Let shared controls own button sizing."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<a href=\"/catalog?topSellers=1\" class=\"btn btn-ghost btn-lg\">",
+      "after": "<a href=\"/catalog?topSellers=1\" class=\"btn btn-ghost\">",
+      "count": 1,
+      "reason": "Let shared controls own button sizing."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<a href=\"/catalog?topSellers=1\" class=\"btn btn-primary btn-lg\">",
+      "after": "<a href=\"/catalog?topSellers=1\" class=\"btn btn-primary\">",
+      "count": 1,
+      "reason": "Let shared controls own button sizing."
+    },
+    {
+      "file": "pages/quote-cart.html",
+      "before": "<body>",
+      "after": "<body data-ui=\"unified\" data-storefront=\"cart\" data-customer-cart=\"quote\">",
+      "count": 1,
+      "reason": "Opt into canonical components and existing storefront shell."
+    },
+    {
+      "file": "pages/quote-cart.html",
+      "before": "https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap",
+      "after": "https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap",
+      "count": 1,
+      "reason": "Use the application UI font."
+    },
+    {
+      "file": "pages/quote-cart.html",
+      "before": "<link rel=\"stylesheet\" href=\"/shared_components/css/nwca-2026-core.css?v=2026.09.07.8\">",
+      "after": "<link rel=\"stylesheet\" href=\"/shared_components/css/components.css?v=2026.09.09.7\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/storefront-shell.css?v=2026.09.09.7\">\n    <link rel=\"stylesheet\" href=\"/pages/css/customer-cart.css\">",
+      "count": 1,
+      "reason": "Reuse shared controls and navigation; remove the legacy global core from these carts."
+    },
+    {
+      "file": "pages/quote-cart.html",
+      "before": "<aside class=\"sidebar\" id=\"sidebar\" aria-label=\"Browse menu\">",
+      "after": "<dialog class=\"sidebar\" id=\"sidebar\" aria-label=\"Browse menu\">",
+      "count": 1,
+      "reason": "Use the shared native mobile menu."
+    },
+    {
+      "file": "pages/quote-cart.html",
+      "before": "    </aside>\n    <div class=\"sidebar-overlay\" id=\"sidebarOverlay\"></div>",
+      "after": "    </dialog>\n    <div class=\"sidebar-overlay\" id=\"sidebarOverlay\" hidden></div>",
+      "count": 1,
+      "reason": "Native backdrop replaces legacy overlay; preserve identifier."
+    },
+    {
+      "file": "pages/quote-cart.html",
+      "before": "<button class=\"mobile-menu-btn\" id=\"mobileMenuBtn\" type=\"button\" aria-label=\"Open menu\" aria-controls=\"sidebar\">",
+      "after": "<button class=\"mobile-menu-btn\" id=\"mobileMenuBtn\" type=\"button\" aria-expanded=\"false\" aria-label=\"Open menu\" aria-controls=\"sidebar\">",
+      "count": 1,
+      "reason": "Expose mobile menu state."
+    },
+    {
+      "file": "pages/quote-cart.html",
+      "before": "<script src=\"/pages/js/quote-cart-page.js",
+      "after": "<script src=\"/shared_components/js/storefront-navigation.js?v=2026.09.09.7\" defer></script>\n    <script src=\"/pages/js/quote-cart-page.js",
+      "count": 1,
+      "reason": "Reuse the existing menu focus, close and search controller."
+    },
+    {
+      "file": "pages/js/sample-checkout.js",
+      "before": "slot.innerHTML = '<div class=\"checkout-validation-alert\" style=\"' +\n            (kind === 'error' ? '' : 'border-color:#2d5f3f;') + 'margin:1rem 0;\">' +",
+      "after": "slot.innerHTML = '<div class=\"checkout-validation-alert sc-checkout-banner ' +\n            (kind === 'error' ? 'sc-checkout-error' : 'sc-checkout-info') + '\">' +",
+      "count": 1,
+      "reason": "Use named checkout banner states instead of inline paint."
+    },
+    {
+      "file": "pages/js/sample-cart-page.js",
+      "before": "───────────────────────\n(function wireChrome() {\n    const sidebar = document.getElementById('sidebar');\n    const overlay = document.getElementById('sidebarOverlay');\n    function setDrawer(open) {\nif (!sidebar || !overlay) return;\nsidebar.classList.toggle('show', open);\noverlay.classList.toggle('show', open);\ndocument.body.classList.toggle('drawer-open', open);\n    }\n    const openBtn = document.getElementById('mobileMenuBtn');\n    const closeBtn = document.getElementById('drawerClose');\n    if (openBtn) openBtn.addEventListener('click', () => setDrawer(true));\n    if (closeBtn) closeBtn.addEventListener('click', () => setDrawer(false));\n    if (overlay) overlay.addEventListener('click', () => setDrawer(false));\n    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setDrawer(false); });\n\n    const input = document.getElementById('navSearchInput');\n    const btn = document.getElementById('navSearchBtn');\n    function goSearch() {\nconst term = (input && input.value || '').trim();\nif (term) window.location.href = '/catalog?q=' + encodeURIComponent(term);\n    }\n    if (btn) btn.addEventListener('click', goSearch);\n    if (input) input.addEventListener('keydown', (e) => { if (e.key === 'Enter') goSearch(); });\n})();\n\n// Rendered cart rows ",
+      "after": "───────────────────────\n// Masthead navigation is owned by storefront-navigation.js.\n\n// Rendered cart rows ",
+      "count": 1,
+      "reason": "Remove duplicate menu and search controller."
+    },
+    {
+      "file": "pages/js/sample-cart-page.js",
+      "before": "nerHTML = `\n            <div style=\"text-align: center; padding: 3rem;\">\n                <i clas",
+      "after": "nerHTML = `\n            <div class=\"sc-inventory-loading\">\n                <i clas",
+      "count": 1,
+      "reason": "Move static renderer presentation into the scoped owner."
+    },
+    {
+      "file": "pages/js/sample-cart-page.js",
+      "before": "ading\">\n                <i class=\"fas fa-circle-notch fa-spin\" style=\"font-size: 2rem; color: var(--primary-color);\" aria-hidden=\"true\"></i>\n                <p ",
+      "after": "ading\">\n                <i class=\"fas fa-circle-notch fa-spin\" aria-hidden=\"true\"></i>\n                <p ",
+      "count": 1,
+      "reason": "Move static renderer presentation into the scoped owner."
+    },
+    {
+      "file": "pages/js/sample-cart-page.js",
+      "before": "e\"></i>\n                <p style=\"margin-top: 1rem; color: var(--text-secondary);\">Checking inventory...</p",
+      "after": "e\"></i>\n                <p>Checking inventory...</p",
+      "count": 1,
+      "reason": "Move static renderer presentation into the scoped owner."
+    },
+    {
+      "file": "pages/js/sample-cart-page.js",
+      "before": "\"/catalog?topSellers=1\" class=\"btn btn-primary\" style=\"margin-top: 1rem; padding: 1rem 2.5rem; font-size: 1.1rem;\">\n                    <i",
+      "after": "\"/catalog?topSellers=1\" class=\"btn btn-primary sc-empty-browse\">\n                    <i",
+      "count": 1,
+      "reason": "Move static renderer presentation into the scoped owner."
+    },
+    {
+      "file": "pages/js/sample-cart-page.js",
+      "before": "  </a>\n\n                <p style=\"margin-top: 2rem; font-size: 0.9rem;\">\n                    Nee",
+      "after": "  </a>\n\n                <p class=\"sc-help\">\n                    Nee",
+      "count": 1,
+      "reason": "Move static renderer presentation into the scoped owner."
+    },
+    {
+      "file": "pages/js/sample-cart-page.js",
+      "before": " href=\"tel:253-922-5793\" style=\"color: var(--primary-color); font-weight: 600;\">253-922-5793</a>\n      ",
+      "after": " href=\"tel:253-922-5793\" class=\"sc-help-link\">253-922-5793</a>\n      ",
+      "count": 1,
+      "reason": "Move static renderer presentation into the scoped owner."
+    },
+    {
+      "file": "pages/js/sample-cart-page.js",
+      "before": "iv>\n                    <div class=\"item-price\" style=\"margin-top: 0.5rem; font-weight: 600; color: var(--primary-color);\">\n                       ",
+      "after": "iv>\n                    <div class=\"item-price\">\n                       ",
+      "count": 1,
+      "reason": "Move static renderer presentation into the scoped owner."
+    },
+    {
+      "file": "pages/js/sample-cart-page.js",
+      "before": "                        <p style=\"margin-top: 1rem;\">Please remove out-of-stock items from",
+      "after": "                        <p class=\"sc-validation-help\">Please remove out-of-stock items from",
+      "count": 1,
+      "reason": "Move static renderer presentation into the scoped owner."
+    },
+    {
+      "file": "pages/js/quote-cart-page.js",
+      "before": "===================\n    function wireChrome() {\n        const sidebar = $('sidebar');\n        const overlay = $('sidebarOverlay');\n        const openBtn = $('mobileMenuBtn');\n        const closeBtn = $('drawerClose');\n\n        function setDrawer(open) {\n            if (!sidebar || !overlay) return;\n            sidebar.classList.toggle('show', open);\n            overlay.classList.toggle('show', open);\n            document.body.classList.toggle('drawer-open', open);\n        }\n        if (openBtn) openBtn.addEventListener('click', function () { setDrawer(true); });\n        if (closeBtn) closeBtn.addEventListener('click', function () { setDrawer(false); });\n        if (overlay) overlay.addEventListener('click', function () { setDrawer(false); });\n        document.addEventListener('keydown', function (e) {\n            if (e.key === 'Escape') setDrawer(false);\n        });\n\n        const input = $('navSearchInput');\n        const btn = $('navSearchBtn');\n        function goSearch() {\n            const term = (input && input.value || '').trim();\n            if (term) window.location.href = '/catalog?q=' + encodeURIComponent(term);\n        }\n        if (btn) btn.addEventListener('click', goSearch);\n        if (input) input.addEventListener('keydown', function (e) {\n            if (e.key === 'Enter') goSearch();\n        });\n    }\n\n    // ===============",
+      "after": "===================\n    // Masthead navigation is owned by storefront-navigation.js.\n\n    // ===============",
+      "count": 1,
+      "reason": "Remove duplicate menu and search controller."
+    },
+    {
+      "file": "pages/js/quote-cart-page.js",
+      "before": "=\n    function init() {\n        wireChrome();\n\n        if (!window.Qu",
+      "after": "=\n    function init() {\n        // Shared storefront navigation initializes independently.\n\n        if (!window.Qu",
+      "count": 1,
+      "reason": "Avoid double binding the shared native menu."
+    },
+    {
+      "file": "pages/js/quote-cart-page.js",
+      "before": "     rows.push('<button class=\"btn btn-cta\" type=\"button\" id=\"qcSav",
+      "after": "     rows.push('<button class=\"btn btn-primary\" type=\"button\" id=\"qcSav",
+      "count": 1,
+      "reason": "Use the shared brand action."
+    },
+    {
+      "file": "pages/js/quote-cart-page.js",
+      "before": "ows.push('<div class=\"qc-save-actions\">'\n            + '<button class=\"btn btn-cta\" type=\"button\" data-save-act=\"submit\">'\n            + (saveState",
+      "after": "ows.push('<div class=\"qc-save-actions\">'\n            + '<button class=\"btn btn-primary\" type=\"button\" data-save-act=\"submit\">'\n            + (saveState",
+      "count": 1,
+      "reason": "Use the shared brand action."
+    },
+    {
+      "file": "pages/js/quote-cart-page.js",
+      "before": "                     + '<input type=\"number\" inputmode=\"numeric\" min",
+      "after": "                     + '<input class=\"field-input\" type=\"number\" inputmode=\"numeric\" min",
+      "count": 1,
+      "reason": "Use canonical quantity fields."
+    },
+    {
+      "file": "pages/js/quote-cart-page.js",
+      "before": "on>'\n                + '<input type=\"number\" inputmode=\"numeric\" min",
+      "after": "on>'\n                + '<input class=\"field-input\" type=\"number\" inputmode=\"numeric\" min",
+      "count": 1,
+      "reason": "Use canonical quantity fields."
+    },
+    {
+      "file": "pages/sample-cart.html",
+      "before": "<link rel=\"stylesheet\" href=\"/pages/css/customer-cart.css\">\n    <link rel=\"stylesheet\" href=\"/pages/css/sample-cart.css?v=2026.09.07.8\">",
+      "after": "<link rel=\"stylesheet\" href=\"/pages/css/sample-cart.css?v=2026.09.07.8\">\n    <link rel=\"stylesheet\" href=\"/pages/css/customer-cart.css\">",
+      "count": 1,
+      "reason": "Let the shared cart paper rules follow page-specific screen layouts."
+    },
+    {
+      "file": "pages/quote-cart.html",
+      "before": "<link rel=\"stylesheet\" href=\"/pages/css/customer-cart.css\">\n    <link rel=\"stylesheet\" href=\"/pages/css/quote-cart.css?v=2026.09.07.8\">",
+      "after": "<link rel=\"stylesheet\" href=\"/pages/css/quote-cart.css?v=2026.09.07.8\">\n    <link rel=\"stylesheet\" href=\"/pages/css/customer-cart.css\">",
+      "count": 1,
+      "reason": "Let the shared cart paper rules follow page-specific screen layouts."
+    },
+    {
+      "file": "pages/js/sample-cart-page.js",
+      "before": "${size} (${qty})",
+      "after": "${escText(size)} (${escText(qty)})",
+      "count": 1,
+      "reason": "Render stored garment data as text and quoted attributes without executing markup."
+    },
+    {
+      "file": "pages/js/sample-cart-page.js",
+      "before": "${unavailableSizes.join(', ')}",
+      "after": "${escText(unavailableSizes.join(', '))}",
+      "count": 1,
+      "reason": "Render stored garment data as text and quoted attributes without executing markup."
+    },
+    {
+      "file": "pages/js/sample-cart-page.js",
+      "before": "<img src=\"${item.imageUrl || ''}\" alt=\"${item.name}\" class=\"item-image\">",
+      "after": "<img src=\"${escText(item.imageUrl || '')}\" alt=\"${escText(item.name)}\" class=\"item-image\">",
+      "count": 1,
+      "reason": "Render stored garment data as text and quoted attributes without executing markup."
+    },
+    {
+      "file": "pages/js/sample-cart-page.js",
+      "before": "<h3>${item.name}</h3>",
+      "after": "<h3>${escText(item.name)}</h3>",
+      "count": 1,
+      "reason": "Render stored garment data as text and quoted attributes without executing markup."
+    },
+    {
+      "file": "pages/js/sample-cart-page.js",
+      "before": "<div class=\"item-style\">Style: ${item.style}</div>",
+      "after": "<div class=\"item-style\">Style: ${escText(item.style)}</div>",
+      "count": 1,
+      "reason": "Render stored garment data as text and quoted attributes without executing markup."
+    },
+    {
+      "file": "pages/js/sample-cart-page.js",
+      "before": "<div class=\"item-color\">Color: ${item.color}</div>",
+      "after": "<div class=\"item-color\">Color: ${escText(item.color)}</div>",
+      "count": 1,
+      "reason": "Render stored garment data as text and quoted attributes without executing markup."
+    },
+    {
+      "file": "pages/js/sample-cart-page.js",
+      "before": "    sessionStorage.setItem('sampleCart', JSON.stringify(cartData));\n    loadCart();\n}",
+      "after": "    try {\n        sessionStorage.setItem('sampleCart', JSON.stringify(cartData));\n    } catch (error) {\n        let message = document.getElementById('sampleCartStorageError');\n        if (!message) {\n            message = document.createElement('p');\n            message.id = 'sampleCartStorageError';\n            message.className = 'alert alert-error';\n            message.setAttribute('role', 'alert');\n            message.tabIndex = -1;\n            document.getElementById('cartItems').before(message);\n        }\n        message.textContent = 'Could not remove this sample because browser storage is unavailable. Your cart is unchanged. Try again or call 253-922-5793.';\n        message.focus();\n        return;\n    }\n    const message = document.getElementById('sampleCartStorageError');\n    if (message) message.remove();\n    loadCart();\n}",
+      "count": 1,
+      "reason": "Report a failed removal visibly while preserving the stored and rendered cart."
+    },
+    {
+      "file": "pages/js/quote-cart-page.js",
+      "before": "    function openSavePanel() {\n        saveState.open = true;",
+      "after": "    function openSavePanel() {\n        if (saveState.phase === 'saving') return;\n        saveState.open = true;",
+      "count": 1,
+      "reason": "Do not reopen a form while its existing quote save is pending."
+    },
+    {
+      "file": "pages/js/quote-cart-page.js",
+      "before": "    async function doSave() {\n        readSaveFields();",
+      "after": "    async function doSave() {\n        if (saveState.phase === 'saving') return;\n        readSaveFields();",
+      "count": 1,
+      "reason": "Reject duplicate save actions during the pending request."
+    },
+    {
+      "file": "pages/js/quote-cart-page.js",
+      "before": "        panel.hidden = !saveState.open;\n        if (!saveState.open) return;",
+      "after": "        const trigger = $('qcSaveBtn');\n        if (trigger) trigger.disabled = saveState.phase === 'saving' || !state.priced || state.priced.grandTotal == null;\n        panel.hidden = !saveState.open;\n        if (!saveState.open) return;",
+      "count": 1,
+      "reason": "Keep the quote save trigger disabled until the pending save settles."
+    },
+    {
+      "file": "pages/js/quote-cart-page.js",
+      "before": "        if (!file) { delete saveState.files[gid]; return; }",
+      "after": "        if (!file) {\n            delete saveState.files[gid];\n            const picked = input.parentNode.querySelector('.qc-art-picked');\n            if (picked) picked.remove();\n            return;\n        }",
+      "count": 1,
+      "reason": "Clear the printed artwork reference when the customer clears its file."
+    },
+    {
+      "file": "pages/js/quote-cart-page.js",
+      "before": "        saveState.files[gid] = file;\n    }",
+      "after": "        saveState.files[gid] = file;\n        let picked = input.parentNode.querySelector('.qc-art-picked');\n        if (!picked) {\n            picked = document.createElement('span');\n            picked.className = 'qc-art-picked';\n            input.after(picked);\n        }\n        picked.textContent = file.name;\n    }",
+      "count": 1,
+      "reason": "Retain the chosen artwork filename as a text reference on paper without rebuilding the focused file input."
+    },
+    {
+      "file": "pages/js/sample-checkout.js",
+      "before": "            banner('error', '<h3>Couldn’t start checkout</h3><p>' + String(error.message || error) + '</p>');",
+      "after": "            var errorText = document.createElement('span');\n            errorText.textContent = String(error.message || error);\n            banner('error', '<h3>Couldn’t start checkout</h3><p>' + errorText.innerHTML + '</p>');",
+      "count": 1,
+      "reason": "Render checkout service errors as text rather than interpreting supplied markup."
+    },
+    {
+      "file": "pages/js/sample-checkout.js",
+      "before": "        slot.scrollIntoView({ block: 'center' });",
+      "after": "        slot.setAttribute('role', kind === 'error' ? 'alert' : 'status');\n        slot.scrollIntoView({ block: 'center' });",
+      "count": 1,
+      "reason": "Announce checkout errors and cancellation notices without changing their successful request contract."
+    },
+    {
+      "file": "pages/quote-cart.html",
+      "before": "<div id=\"qcTotalsBody\" aria-live=\"polite\"></div>",
+      "after": "<div id=\"qcTotalsBody\" class=\"qc-summary-content\" aria-live=\"polite\"></div>",
+      "count": 1,
+      "reason": "Keep the complete printed summary and grand total together."
+    },
+    {
+      "file": "pages/css/sample-cart.css",
+      "before": "/* sample-cart.css — Sample Cart page on the NWCA 2026 design system\n   (reskin 2026-07-06; replaces the legacy inline \\3c style> monolith).\n   Styles the SAME class names the extracted page controller renders\n   (cart-item / size-badge / inventory-status-badge / …) so the ported\n   JS needed zero markup changes. */\n\n/* Legacy token bridge — the ported renderer's inline styles reference the\n   old custom properties; resolve them to 2026 tokens. */\n\n/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its\n   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;\n   raw hex is allowed ONLY in this block. */\n/* stylelint-disable color-no-hex */\n:root {\n    --sc-red: #f87171;\n    --primary-color: var(--green-700);\n    --primary-dark: var(--green-900);\n    --text-primary: var(--ink);\n    --text-secondary: var(--ink-soft);\n    --border-color: var(--line);\n    --card-bg: var(--card);\n    --bg-color: var(--paper);\n}\n/* stylelint-enable color-no-hex */\n\n/* ── Layout: focused single-column checkout, properly centered ───────── */\n.sc-wrap { max-width: 920px; }\n.sc-section { padding: 8px 0 56px; }\n\n/* ── Summary band ─────────────────────────────────────────────────────── */\n.cart-summary-bar {\n    background: var(--card);\n    border: 1px solid var(--line);\n    border-radius: var(--radius);\n    box-shadow: var(--shadow-card);\n    padding: 18px 22px;\n    margin-bottom: 18px;\n}\n\n.summary-stats {\n    display: grid;\n    grid-template-columns: repeat(3, 1fr);\n    gap: 12px;\n}\n.summary-item { text-align: center; }\n\n.summary-label {\n    font-size: 12px; font-weight: 700; letter-spacing: 0.08em;\n    text-transform: uppercase; color: var(--ink-faint);\n}\n\n.summary-value {\n    font-family: var(--font-display);\n    font-size: 26px; font-weight: 800; color: var(--green-900);\n    line-height: 1.2;\n}\n\n#sampleCreditNote {\n    margin: 14px 0 0;\n    padding: 10px 14px;\n    border-top: 1px dashed var(--line-strong);\n    font-size: 13.5px; color: var(--green-900);\n}\n#sampleCreditNote i { color: var(--green-700); margin-right: 6px; }\n\n/* ── Cart items card ──────────────────────────────────────────────────── */\n.cart-section {\n    background: var(--card);\n    border: 1px solid var(--line);\n    border-radius: var(--radius);\n    box-shadow: var(--shadow-card);\n    padding: 8px 22px;\n    margin-bottom: 18px;\n}\n\n.cart-item {\n    display: grid;\n    grid-template-columns: 92px 1fr auto;\n    gap: 18px;\n    padding: 18px 0;\n    border-bottom: 1px dashed var(--line);\n    align-items: start;\n}\n.cart-item:last-child { border-bottom: none; }\n\n.item-image {\n    width: 92px; height: 92px;\n    object-fit: contain;\n    background: var(--paper-deep);\n    border: 1px solid var(--line);\n    border-radius: var(--radius-sm);\n}\n\n.item-details h3 {\n    font-family: var(--font-display);\n    font-size: 17px; font-weight: 700; color: var(--ink);\n    margin: 0 0 2px;\n}\n.item-style, .item-color { font-size: 13.5px; color: var(--ink-soft); }\n.item-sizes { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 13.5px; color: var(--ink-soft); }\n.item-price { font-size: 14px; }\n\n.item-remove {\n    align-self: start;\n    width: 32px; height: 32px;\n    display: flex; align-items: center; justify-content: center;\n    border-radius: var(--radius-sm);\n    color: var(--ink-faint); cursor: pointer;\n    transition: background 0.15s, color 0.15s;\n}\n.item-remove:hover { background: var(--bad-soft); color: var(--bad); }\n\n/* Size chips */\n.size-badge {\n    display: inline-flex; align-items: stretch;\n    border: 1.5px solid var(--line-strong);\n    border-radius: 999px; overflow: hidden;\n    font-size: 12.5px; font-weight: 700; color: var(--ink);\n    background: var(--card);\n}\n.size-badge .size-info { padding: 3px 8px 3px 10px; }\n.size-badge .size-price { padding: 3px 10px 3px 8px; background: var(--green-50); color: var(--green-900); }\n.size-badge.size-unavailable { border-color: var(--bad); color: var(--bad); }\n.size-badge.size-unavailable .size-price { background: var(--bad-soft); color: var(--bad); }\n\n/* Inventory status chips — block only reads as red; \"unknown\" stays quiet */\n.inventory-status-badge {\n    display: inline-flex; align-items: center; gap: 6px;\n    margin: 8px 0 2px;\n    padding: 3px 10px;\n    border-radius: 999px;\n    font-size: 12px; font-weight: 700;\n}\n.inventory-status-badge.in-stock { background: var(--green-50); color: var(--green-900); }\n.inventory-status-badge.low-stock { background: var(--warn-soft); color: var(--warn); }\n.inventory-status-badge.out-of-stock { background: var(--bad-soft); color: var(--bad); }\n.inventory-status-badge.checking { background: var(--paper-deep); color: var(--ink-faint); font-weight: 600; }\n\n.inventory-warning {\n    display: flex; gap: 8px; align-items: flex-start;\n    margin: 8px 0;\n    padding: 10px 12px;\n    border-radius: var(--radius-sm);\n    font-size: 13px;\n}\n.inventory-warning.error { background: var(--bad-soft); color: var(--bad); }\n\n/* ── Empty state ──────────────────────────────────────────────────────── */\n.empty-cart { text-align: center; padding: 40px 16px 32px; color: var(--ink-soft); }\n.empty-cart > i { font-size: 34px; color: var(--line-strong); }\n\n.empty-cart h3 {\n    font-family: var(--font-display);\n    font-size: 22px; font-weight: 800; color: var(--ink);\n    margin: 10px 0 4px;\n}\n\n.empty-cart .features {\n    display: grid; grid-template-columns: repeat(3, 1fr);\n    gap: 14px; margin: 22px 0;\n    text-align: left;\n}\n\n.empty-cart .feature {\n    display: flex; gap: 10px; align-items: flex-start;\n    padding: 12px;\n    border: 1px solid var(--line); border-radius: var(--radius-sm);\n    background: var(--paper);\n}\n.empty-cart .feature > i { color: var(--green-700); margin-top: 2px; }\n.empty-cart .feature-text h4 { font-size: 14px; margin: 0 0 2px; color: var(--ink); }\n.empty-cart .feature-text p { font-size: 12.5px; margin: 0; color: var(--ink-soft); }\n\n/* ── Form ─────────────────────────────────────────────────────────────── */\n.form-section {\n    background: var(--card);\n    border: 1px solid var(--line);\n    border-radius: var(--radius);\n    box-shadow: var(--shadow-card);\n    padding: 24px 22px;\n}\n.form-block { margin-bottom: 26px; }\n\n.form-block h2 {\n    font-family: var(--font-display);\n    font-size: 17px; font-weight: 800; color: var(--ink);\n    letter-spacing: 0.01em;\n    margin: 0 0 14px;\n    padding-bottom: 8px;\n    border-bottom: 1px dashed var(--line-strong);\n}\n\n.form-grid {\n    display: grid;\n    grid-template-columns: 1fr 1fr;\n    gap: 14px 18px;\n}\n.form-group { display: flex; flex-direction: column; gap: 5px; }\n.form-group.span-2 { grid-column: span 2; }\n\n.form-group label {\n    font-size: 13px; font-weight: 700; color: var(--ink-soft);\n}\n.form-group .label-soft { font-weight: 400; color: var(--ink-faint); }\n.form-group .required { color: var(--rush); }\n\n.form-group input[type=\"text\"],\n.form-group input[type=\"email\"],\n.form-group input[type=\"tel\"],\n.form-group select,\n.form-group textarea {\n    font: inherit;\n    font-size: 15px;\n    color: var(--ink);\n    background: var(--card);\n    border: 1.5px solid var(--line-strong);\n    border-radius: var(--radius-sm);\n    padding: 10px 12px;\n    transition: border-color 0.15s, box-shadow 0.15s;\n    width: 100%;\n}\n\n.form-group input:focus,\n.form-group select:focus,\n.form-group textarea:focus {\n    outline: none;\n    border-color: var(--green-700);\n    box-shadow: 0 0 0 3px var(--green-50);\n}\n.form-group textarea { min-height: 96px; resize: vertical; }\n\n.form-group input[type=\"file\"] {\n    font-size: 14px; color: var(--ink-soft);\n    border: 1.5px dashed var(--line-strong);\n    border-radius: var(--radius-sm);\n    padding: 12px;\n    background: var(--paper);\n}\n.field-hint { font-size: 12.5px; color: var(--ink-faint); }\n.input-upper { text-transform: uppercase; }\n\n.same-as-billing-container {\n    margin: 2px 0 26px;\n    padding: 12px 14px;\n    background: var(--green-50);\n    border: 1px solid var(--line);\n    border-radius: var(--radius-sm);\n}\n\n.checkbox-label {\n    display: flex; align-items: center; gap: 10px;\n    font-size: 14.5px; font-weight: 600; color: var(--ink);\n    cursor: pointer;\n}\n\n.checkbox-label input[type=\"checkbox\"] {\n    width: 18px; height: 18px;\n    accent-color: var(--green-700);\n    cursor: pointer; margin: 0;\n}\n.shipping-address-section { transition: opacity 0.2s ease; }\n\n.button-group {\n    display: flex; flex-wrap: wrap; gap: 12px;\n    margin-top: 6px;\n}\n.button-group.center { justify-content: center; }\n.btn-lg { padding: 13px 26px; font-size: 15.5px; }\n\n/* legacy alias used by ported markup strings */\n.btn-secondary { background: transparent; color: var(--ink-soft); border: 1.5px solid var(--line-strong); }\n.btn-secondary:hover { border-color: var(--green-700); color: var(--green-900); }\n\n/* ── Alerts (inventory validation + Stripe cancel/error banners) ─────── */\n.checkout-validation-alert {\n    display: flex; gap: 12px; align-items: flex-start;\n    background: var(--card);\n    border: 1.5px solid var(--bad);\n    border-radius: var(--radius);\n    box-shadow: var(--shadow-card);\n    padding: 16px 18px;\n    margin: 0 0 18px;\n}\n.checkout-validation-alert > i { color: var(--bad); font-size: 18px; margin-top: 2px; }\n\n.checkout-validation-alert h3 {\n    font-family: var(--font-display);\n    font-size: 16px; font-weight: 800; color: var(--ink);\n    margin: 0 0 4px;\n}\n.checkout-validation-alert p { margin: 0 0 6px; font-size: 14px; color: var(--ink-soft); }\n.out-of-stock-list { margin: 6px 0; padding-left: 2px; list-style: none; font-size: 13.5px; color: var(--bad); }\n.out-of-stock-list li { display: flex; align-items: center; gap: 6px; padding: 2px 0; }\n\n/* ── Success panel ────────────────────────────────────────────────────── */\n.success-message {\n    display: none;\n    text-align: center;\n    background: var(--card);\n    border: 1px solid var(--line);\n    border-radius: var(--radius);\n    box-shadow: var(--shadow-card);\n    padding: 48px 24px;\n}\n.success-message.show { display: block; }\n.success-message > i { font-size: 44px; color: var(--green-700); }\n\n.success-message h2 {\n    font-family: var(--font-display);\n    font-size: 26px; font-weight: 800; color: var(--ink);\n    margin: 14px 0 6px;\n}\n.success-message p { color: var(--ink-soft); margin: 0 0 6px; }\n.confirmation-line { font-size: 15px; margin-top: 10px; }\n.success-message .button-group { margin-top: 22px; }\n\n/* ── Responsive ───────────────────────────────────────────────────────── */\n@media (width <= 720px) {\n    .form-grid { grid-template-columns: 1fr; }\n    .form-group.span-2 { grid-column: span 1; }\n    .summary-stats { gap: 6px; }\n    .summary-value { font-size: 21px; }\n    .cart-item { grid-template-columns: 64px 1fr auto; gap: 12px; }\n    .item-image { width: 64px; height: 64px; }\n    .empty-cart .features { grid-template-columns: 1fr; }\n    .button-group .btn { width: 100%; justify-content: center; }\n}\n\n/* 2026-09-06 review: render-error card (was inline styles); remove control is a real button */\n.sc-render-error { margin: 2rem; padding: 1.5rem; background: var(--red-100); border: 1px solid var(--sc-red); border-radius: 8px; }\n.sc-render-error h4 { color: var(--red-800); margin-bottom: 0.5rem; }\n.sc-render-error p { color: var(--print-red); margin: 0; }\n.sc-render-error .sc-reload { margin-top: 1rem; }\nbutton.item-remove { border: 0; background: transparent; font: inherit; }\n\n/* 2026-09-06 review: the hidden attribute must beat any display rule */\n/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */\n[hidden] { display: none !important; }\n",
+      "after": "/* sample cart layout. Shared controls, tokens and storefront shell own common UI. */\n@layer components.pages {\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .sc-wrap {\n        max-width: 920px;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .sc-section {\n        padding: 8px 0 56px;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .cart-summary-bar {\n        background: var(--ui-surface);\n        border: 1px solid var(--ui-line);\n        border-radius: var(--radius-md);\n        box-shadow: var(--shadow-sm);\n        padding: 18px 22px;\n        margin-bottom: 18px;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .summary-stats {\n        display: grid;\n        grid-template-columns: repeat(3, minmax(0, 1fr));\n        gap: 12px;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .summary-item {\n        text-align: center;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .summary-label {\n        font-size: 12px;\n        font-weight: 700;\n        letter-spacing: 0.08em;\n        text-transform: uppercase;\n        color: var(--ui-muted);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .summary-value {\n        font-family: var(--ui-font);\n        font-size: 26px;\n        font-weight: 800;\n        color: var(--ui-accent-hover);\n        line-height: 1.2;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .sc-credit-note {\n        margin: 14px 0 0;\n        padding: 10px 14px;\n        border-top: 1px dashed var(--ui-line-strong);\n        font-size: 13.5px;\n        color: var(--ui-accent-hover);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .sc-credit-note i {\n        color: var(--ui-accent);\n        margin-right: 6px;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .cart-section {\n        background: var(--ui-surface);\n        border: 1px solid var(--ui-line);\n        border-radius: var(--radius-md);\n        box-shadow: var(--shadow-sm);\n        padding: 8px 22px;\n        margin-bottom: 18px;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .cart-item {\n        display: grid;\n        grid-template-columns: 92px minmax(0, 1fr) auto;\n        gap: 18px;\n        padding: 18px 0;\n        border-bottom: 1px dashed var(--ui-line);\n        align-items: start;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .cart-item:last-child {\n        border-bottom: none;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .item-image {\n        width: 92px;\n        height: 92px;\n        object-fit: contain;\n        background: var(--ui-tint);\n        border: 1px solid var(--ui-line);\n        border-radius: var(--radius-sm);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .item-details h3 {\n        font-family: var(--ui-font);\n        font-size: 17px;\n        font-weight: 700;\n        color: var(--ui-ink);\n        margin: 0 0 2px;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .item-style, :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .item-color {\n        font-size: 13.5px;\n        color: var(--ui-muted);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .item-sizes {\n        margin-top: 8px;\n        display: flex;\n        flex-wrap: wrap;\n        gap: 6px;\n        align-items: center;\n        font-size: 13.5px;\n        color: var(--ui-muted);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .item-price {\n        font-size: 14px;\n        margin-top: 8px;\n        font-weight: 600;\n        color: var(--ui-accent-hover);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .item-remove {\n        align-self: start;\n        width: 44px;\n        height: 44px;\n        display: flex;\n        align-items: center;\n        justify-content: center;\n        border-radius: var(--radius-sm);\n        color: var(--ui-muted);\n        cursor: pointer;\n        transition: background 0.15s, color 0.15s;\n        border: 0;\n        background: transparent;\n        font: inherit;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .item-remove:hover {\n        background: var(--red-100);\n        color: var(--red-700);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .size-badge {\n        display: inline-flex;\n        align-items: stretch;\n        border: 1.5px solid var(--ui-line-strong);\n        border-radius: 999px;\n        overflow: hidden;\n        font-size: 12.5px;\n        font-weight: 700;\n        color: var(--ui-ink);\n        background: var(--ui-surface);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .size-badge .size-info {\n        padding: 3px 8px 3px 10px;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .size-badge .size-price {\n        padding: 3px 10px 3px 8px;\n        background: var(--ui-tint);\n        color: var(--ui-accent-hover);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .size-badge.size-unavailable {\n        border-color: var(--red-700);\n        color: var(--red-700);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .size-badge.size-unavailable .size-price {\n        background: var(--red-100);\n        color: var(--red-700);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .inventory-status-badge {\n        display: inline-flex;\n        align-items: center;\n        gap: 6px;\n        margin: 8px 0 2px;\n        padding: 3px 10px;\n        border-radius: 999px;\n        font-size: 12px;\n        font-weight: 700;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .inventory-status-badge.in-stock {\n        background: var(--ui-tint);\n        color: var(--ui-accent-hover);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .inventory-status-badge.low-stock {\n        background: var(--amber-100);\n        color: var(--amber-700);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .inventory-status-badge.out-of-stock {\n        background: var(--red-100);\n        color: var(--red-700);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .inventory-status-badge.checking {\n        background: var(--ui-tint);\n        color: var(--ui-muted);\n        font-weight: 600;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .inventory-warning {\n        display: flex;\n        gap: 8px;\n        align-items: flex-start;\n        margin: 8px 0;\n        padding: 10px 12px;\n        border-radius: var(--radius-sm);\n        font-size: 13px;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .inventory-warning.error {\n        background: var(--red-100);\n        color: var(--red-700);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .empty-cart {\n        text-align: center;\n        padding: 40px 16px 32px;\n        color: var(--ui-muted);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .empty-cart > i {\n        font-size: 34px;\n        color: var(--ui-line-strong);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .empty-cart h3 {\n        font-family: var(--ui-font);\n        font-size: 22px;\n        font-weight: 800;\n        color: var(--ui-ink);\n        margin: 10px 0 4px;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .empty-cart .features {\n        display: grid;\n        grid-template-columns: repeat(3, minmax(0, 1fr));\n        gap: 14px;\n        margin: 22px 0;\n        text-align: left;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .empty-cart .feature {\n        display: flex;\n        gap: 10px;\n        align-items: flex-start;\n        padding: 12px;\n        border: 1px solid var(--ui-line);\n        border-radius: var(--radius-sm);\n        background: var(--ui-canvas);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .empty-cart .feature > i {\n        color: var(--ui-accent);\n        margin-top: 2px;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .empty-cart .feature-text h4 {\n        font-size: 14px;\n        margin: 0 0 2px;\n        color: var(--ui-ink);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .empty-cart .feature-text p {\n        font-size: 12.5px;\n        margin: 0;\n        color: var(--ui-muted);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .form-section {\n        background: var(--ui-surface);\n        border: 1px solid var(--ui-line);\n        border-radius: var(--radius-md);\n        box-shadow: var(--shadow-sm);\n        padding: 24px 22px;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .form-block {\n        margin-bottom: 26px;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .form-block h2 {\n        font-family: var(--ui-font);\n        font-size: 17px;\n        font-weight: 800;\n        color: var(--ui-ink);\n        letter-spacing: 0.01em;\n        margin: 0 0 14px;\n        padding-bottom: 8px;\n        border-bottom: 1px dashed var(--ui-line-strong);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .form-grid {\n        display: grid;\n        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);\n        gap: 14px 18px;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .form-group {\n        display: flex;\n        flex-direction: column;\n        gap: 5px;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .form-group.span-2 {\n        grid-column: span 2;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .form-group label {\n        font-size: 13px;\n        font-weight: 700;\n        color: var(--ui-muted);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .form-group .label-soft {\n        font-weight: 400;\n        color: var(--ui-muted);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .form-group .required {\n        color: var(--red-700);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .form-group input[type=\"file\"] {\n        font-size: 14px;\n        color: var(--ui-muted);\n        border: 1.5px dashed var(--ui-line-strong);\n        border-radius: var(--radius-sm);\n        padding: 12px;\n        background: var(--ui-canvas);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .field-hint {\n        font-size: 12.5px;\n        color: var(--ui-muted);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .input-upper {\n        text-transform: uppercase;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .same-as-billing-container {\n        margin: 2px 0 26px;\n        padding: 12px 14px;\n        background: var(--ui-tint);\n        border: 1px solid var(--ui-line);\n        border-radius: var(--radius-sm);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .checkbox-label {\n        display: flex;\n        align-items: center;\n        gap: 10px;\n        font-size: 14.5px;\n        font-weight: 600;\n        color: var(--ui-ink);\n        cursor: pointer;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .checkbox-label input[type=\"checkbox\"] {\n        width: 18px;\n        height: 18px;\n        accent-color: var(--ui-accent);\n        cursor: pointer;\n        margin: 0;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .shipping-address-section {\n        transition: opacity 0.2s ease;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .button-group {\n        display: flex;\n        flex-wrap: wrap;\n        gap: 12px;\n        margin-top: 6px;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .button-group.center {\n        justify-content: center;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .checkout-validation-alert {\n        display: flex;\n        gap: 12px;\n        align-items: flex-start;\n        background: var(--ui-surface);\n        border: 1.5px solid var(--red-700);\n        border-radius: var(--radius-md);\n        box-shadow: var(--shadow-sm);\n        padding: 16px 18px;\n        margin: 0 0 18px;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .checkout-validation-alert > i {\n        color: var(--red-700);\n        font-size: 18px;\n        margin-top: 2px;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .checkout-validation-alert h3 {\n        font-family: var(--ui-font);\n        font-size: 16px;\n        font-weight: 800;\n        color: var(--ui-ink);\n        margin: 0 0 4px;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .checkout-validation-alert p {\n        margin: 0 0 6px;\n        font-size: 14px;\n        color: var(--ui-muted);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .out-of-stock-list {\n        margin: 6px 0;\n        padding-left: 2px;\n        list-style: none;\n        font-size: 13.5px;\n        color: var(--red-700);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .out-of-stock-list li {\n        display: flex;\n        align-items: center;\n        gap: 6px;\n        padding: 2px 0;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .success-message {\n        display: none;\n        text-align: center;\n        background: var(--ui-surface);\n        border: 1px solid var(--ui-line);\n        border-radius: var(--radius-md);\n        box-shadow: var(--shadow-sm);\n        padding: 48px 24px;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .success-message.show {\n        display: block;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .success-message > i {\n        font-size: 44px;\n        color: var(--ui-accent);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .success-message h2 {\n        font-family: var(--ui-font);\n        font-size: 26px;\n        font-weight: 800;\n        color: var(--ui-ink);\n        margin: 14px 0 6px;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .success-message p {\n        color: var(--ui-muted);\n        margin: 0 0 6px;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .confirmation-line {\n        font-size: 15px;\n        margin-top: 10px;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .success-message .button-group {\n        margin-top: 22px;\n    }\n\n    @media (width <= 720px) {\n        :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .form-grid {\n            grid-template-columns: minmax(0, 1fr);\n        }\n\n        :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .form-group.span-2 {\n            grid-column: span 1;\n        }\n\n        :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .summary-stats {\n            gap: 6px;\n        }\n\n        :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .summary-value {\n            font-size: 21px;\n        }\n\n        :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .cart-item {\n            grid-template-columns: 64px minmax(0, 1fr) auto;\n            gap: 12px;\n        }\n\n        :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .item-image {\n            width: 64px;\n            height: 64px;\n        }\n\n        :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .empty-cart .features {\n            grid-template-columns: minmax(0, 1fr);\n        }\n\n        :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .button-group .btn {\n            width: 100%;\n            justify-content: center;\n        }\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .sc-render-error {\n        margin: 2rem;\n        padding: 1.5rem;\n        background: var(--red-100);\n        border: 1px solid var(--red-700);\n        border-radius: 8px;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .sc-render-error h4 {\n        color: var(--red-800);\n        margin-bottom: 0.5rem;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .sc-render-error p {\n        color: var(--print-red);\n        margin: 0;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) .sc-render-error .sc-reload {\n        margin-top: 1rem;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"sample\"]) [hidden] {\n        display: none;\n    }\n}\n",
+      "count": 1,
+      "reason": "One scoped page owner with shared semantic tokens, canonical controls, valid grids and formatted rules."
+    },
+    {
+      "file": "pages/css/quote-cart.css",
+      "before": "/* quote-cart.css — customer quote-cart page (pages/quote-cart.html).\n   Built on nwca-2026-core.css primitives/tokens (NWCA-2026-GUIDE.md);\n   this layer only adds the cart layout: group cards, tier meter, line\n   rows + steppers, fee rows, amber nudge, totals panel. */\n\n.qc-section {\n    padding: 26px 0 60px;\n}\n\n/* Two-column layout: group cards + sticky summary rail */\n.qc-layout {\n    display: grid;\n    grid-template-columns: minmax(0, 1fr) 340px;\n    gap: 26px;\n    align-items: start;\n}\n\n.qc-layout.is-repricing .qc-groups,\n.qc-layout.is-repricing .qc-totals {\n    opacity: 0.55;\n    pointer-events: none;\n    transition: opacity 0.15s ease;\n}\n\n/* ── Group cards ─────────────────────────────────────────────────── */\n.qc-groups {\n    display: flex;\n    flex-direction: column;\n    gap: 14px;\n    min-width: 0;\n}\n\n.qc-group {\n    background: var(--card);\n    border: 1px solid var(--line-strong);\n    border-radius: var(--radius);\n    box-shadow: var(--shadow-card);\n    padding: 18px 20px;\n}\n\n.qc-group-error {\n    border-color: var(--bad);\n}\n\n.qc-group-head {\n    display: flex;\n    align-items: center;\n    flex-wrap: wrap;\n    gap: 10px 12px;\n    margin-bottom: 12px;\n}\n\n.qc-group-ico {\n    flex: none;\n    width: 38px;\n    height: 38px;\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    border-radius: 50%;\n    background: var(--green-50);\n    color: var(--green-900);\n}\n.qc-group-ico svg { width: 20px; height: 20px; }\n\n.qc-group-title {\n    font-family: var(--font-display);\n    font-size: 19px;\n    font-weight: 800;\n    color: var(--ink);\n    margin: 0;\n    line-height: 1.2;\n}\n\n.qc-group-sub {\n    display: block;\n    font-family: var(--font-body);\n    font-size: 12.5px;\n    font-weight: 700;\n    color: var(--ink-soft);\n}\n\n.qc-group-pool {\n    margin-left: auto;\n    font-size: 13px;\n    font-weight: 800;\n    color: var(--green-900);\n    white-space: nowrap;\n}\n\n/* ── Tier-progress meter ─────────────────────────────────────────── */\n.qc-meter { margin: 2px 0 14px; }\n\n.qc-meter-bar {\n    height: 8px;\n    border-radius: 999px;\n    background: var(--paper-deep);\n    border: 1px solid var(--line);\n    overflow: hidden;\n}\n\n.qc-meter-fill {\n    display: block;\n    height: 100%;\n    width: 0;\n    border-radius: 999px;\n    background: var(--green-700);\n    transition: width 0.25s ease;\n}\n\n.qc-meter-labels {\n    display: flex;\n    justify-content: space-between;\n    gap: 10px;\n    margin-top: 5px;\n    font-size: 12px;\n    font-weight: 700;\n    color: var(--ink-soft);\n}\n\n/* ── Line rows ───────────────────────────────────────────────────── */\n.qc-lines {\n    border-top: 1px solid var(--line);\n}\n\n.qc-line {\n    display: grid;\n    grid-template-columns: minmax(0, 1fr) auto auto 36px;\n    gap: 8px 14px;\n    align-items: center;\n    padding: 11px 0;\n    border-bottom: 1px solid var(--line);\n}\n.qc-line-info { min-width: 0; }\n\n.qc-line-name {\n    display: block;\n    font-weight: 700;\n    font-size: 14px;\n    color: var(--ink);\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n\n.qc-line-meta {\n    display: block;\n    font-size: 12.5px;\n    font-weight: 600;\n    color: var(--ink-soft);\n}\n\n.qc-line-qty {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n}\n\n.qc-line-qty input {\n    width: 58px;\n    min-height: 38px;\n    text-align: center;\n    border: 1.5px solid var(--line-strong);\n    border-radius: var(--radius-sm);\n    background: var(--card);\n    color: var(--ink);\n    font-weight: 700;\n    font-size: 14px;\n    appearance: textfield;\n}\n\n.qc-line-qty input::-webkit-outer-spin-button,\n.qc-line-qty input::-webkit-inner-spin-button { appearance: none; margin: 0; }\n.qc-line-qty input:focus { outline: none; border-color: var(--green-700); }\n\n.qc-step {\n    width: 34px;\n    height: 38px;\n    border: 1.5px solid var(--line-strong);\n    border-radius: var(--radius-sm);\n    background: var(--card);\n    color: var(--ink);\n    font-size: 17px;\n    font-weight: 700;\n    cursor: pointer;\n}\n.qc-step:hover { border-color: var(--green-700); color: var(--green-700); }\n.qc-line-price { text-align: right; }\n\n/* Per-line size matrix (2026-08-19) — full-width row under the line; filled\n   async once the style's real size list arrives. When it shows, it replaces\n   the stepper as the quantity editor (total becomes the read-only pill). */\n.qc-line-sizes {\n    grid-column: 1 / -1;\n    display: flex;\n    flex-wrap: wrap;\n    gap: 6px 10px;\n    padding: 2px 0 4px;\n}\n.qc-line-sizes[hidden] { display: none; }\n\n.qc-size-cell {\n    display: flex;\n    flex-direction: column;\n    align-items: center;\n    gap: 2px;\n    font-size: 0.72rem;\n    font-weight: 600;\n    color: var(--ink-soft, var(--slate-500));\n    text-transform: uppercase;\n    letter-spacing: 0.03em;\n}\n\n.qc-size-cell input {\n    width: 52px;\n    height: 34px;\n    text-align: center;\n    border: 1px solid var(--line);\n    border-radius: 8px;\n    font: inherit;\n    font-weight: 600;\n    color: inherit;\n}\n\n.qc-size-cell input::-webkit-outer-spin-button,\n.qc-size-cell input::-webkit-inner-spin-button { appearance: none; margin: 0; }\n.qc-size-cell input:focus { outline: none; border-color: var(--green-700); }\n\n.qc-line-qty-total {\n    font-weight: 700;\n    font-size: 1rem;\n}\n\n.qc-line-qty-unit {\n    font-size: 0.75rem;\n    color: var(--ink-soft, var(--slate-500));\n    margin-left: 4px;\n}\n\n.qc-line-each {\n    display: block;\n    font-size: 12.5px;\n    font-weight: 700;\n    color: var(--ink-soft);\n    white-space: nowrap;\n}\n\n.qc-line-total {\n    display: block;\n    font-size: 15px;\n    font-weight: 800;\n    color: var(--ink);\n    white-space: nowrap;\n}\n\n.qc-remove {\n    width: 36px;\n    height: 36px;\n    border: none;\n    border-radius: var(--radius-sm);\n    background: none;\n    color: var(--ink-soft);\n    font-size: 18px;\n    line-height: 1;\n    cursor: pointer;\n}\n.qc-remove:hover { color: var(--bad); background: var(--bad-soft); }\n\n/* ── Service + fee rows ──────────────────────────────────────────── */\n.qc-svc, .qc-fees { border-bottom: 1px solid var(--line); padding: 6px 0; }\n\n.qc-svc-row, .qc-fee-row {\n    display: flex;\n    justify-content: space-between;\n    gap: 14px;\n    padding: 5px 0;\n    font-size: 13.5px;\n    font-weight: 600;\n    color: var(--ink);\n}\n.qc-fee-row em { font-style: normal; color: var(--ink-soft); font-weight: 600; }\n.qc-svc-row .num, .qc-fee-row .num { font-weight: 800; white-space: nowrap; }\n\n/* Honest small-batch line (baked LTM) */\n.qc-ltm-note {\n    margin: 10px 0 0;\n    font-size: 13px;\n    font-weight: 700;\n    color: var(--ink);\n}\n\n/* Amber tier nudge */\n.qc-nudge {\n    margin-top: 12px;\n    padding: 11px 14px;\n    border: 1px solid var(--warn);\n    border-left-width: 4px;\n    border-radius: var(--radius-sm);\n    background: var(--warn-soft);\n    font-size: 13.5px;\n    font-weight: 700;\n    color: var(--ink);\n}\n\n/* Group footer */\n.qc-group-foot {\n    display: flex;\n    justify-content: space-between;\n    align-items: baseline;\n    gap: 14px;\n    margin-top: 12px;\n    font-size: 14px;\n    font-weight: 700;\n    color: var(--ink-soft);\n}\n\n.qc-group-total {\n    font-family: var(--font-display);\n    font-size: 21px;\n    font-weight: 800;\n    color: var(--green-900);\n}\n.qc-group-retry { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }\n\n/* Pooling info line between group cards */\n.qc-pool-note {\n    margin: 0;\n    padding: 0 6px;\n    font-size: 13px;\n    font-weight: 600;\n    color: var(--ink-soft);\n    text-align: center;\n}\n\n/* ── Totals panel ────────────────────────────────────────────────── */\n.qc-totals {\n    position: sticky;\n    top: 86px;\n    background: var(--card);\n    border: 1px solid var(--line-strong);\n    border-radius: var(--radius);\n    box-shadow: var(--shadow-card);\n    padding: 18px 20px;\n}\n\n.qc-totals-title {\n    font-family: var(--font-display);\n    font-size: 19px;\n    font-weight: 800;\n    margin: 0 0 10px;\n    color: var(--ink);\n}\n\n.qc-totals-row {\n    display: flex;\n    justify-content: space-between;\n    gap: 12px;\n    padding: 6px 0;\n    font-size: 14px;\n    font-weight: 600;\n    color: var(--ink);\n    border-bottom: 1px solid var(--line);\n}\n.qc-totals-row .num { font-weight: 800; white-space: nowrap; }\n\n.qc-grand {\n    display: flex;\n    justify-content: space-between;\n    align-items: baseline;\n    gap: 12px;\n    padding: 12px 0 4px;\n    font-size: 15px;\n    font-weight: 800;\n    color: var(--ink);\n}\n\n.qc-grand span:last-child {\n    font-family: var(--font-display);\n    font-size: 28px;\n    font-weight: 800;\n    color: var(--green-900);\n}\n.qc-totals .alert { margin: 12px 0 0; }\n\n.qc-actions {\n    display: flex;\n    flex-direction: column;\n    gap: 9px;\n    margin-top: 14px;\n}\n.qc-actions .btn { width: 100%; }\n.qc-actions .btn[disabled] { opacity: 0.55; cursor: not-allowed; }\n\n.qc-totals-foot {\n    margin: 12px 0 0;\n    font-size: 12.5px;\n    font-weight: 600;\n    color: var(--ink-soft);\n    line-height: 1.5;\n}\n\n/* ── Save / share / email panel (Phase 3) ─────────────────────────── */\n.qc-save-panel {\n    margin-top: 16px;\n    padding: 16px;\n    border: 1.5px solid var(--line-strong);\n    border-radius: 12px;\n    background: var(--surface, var(--color-surface));\n    animation: qcSaveIn 0.25s ease-out;\n}\n\n@keyframes qcSaveIn {\n    from { opacity: 0; transform: translateY(-6px); }\n    to { opacity: 1; transform: translateY(0); }\n}\n\n.qc-save-title {\n    margin: 0 0 12px;\n    font-family: var(--font-display);\n    font-size: 19px;\n    font-weight: 800;\n    color: var(--green-900);\n}\n.qc-save-panel .field { margin-bottom: 12px; }\n\n.qc-save-art {\n    margin: 4px 0 12px;\n    padding: 10px 12px 12px;\n    border: 1px dashed var(--line-strong);\n    border-radius: 10px;\n}\n\n.qc-save-art legend {\n    padding: 0 6px;\n    font-size: 13px;\n    font-weight: 700;\n    color: var(--ink-soft);\n}\n\n.qc-art-row {\n    display: flex;\n    flex-wrap: wrap;\n    align-items: center;\n    gap: 8px;\n    margin-bottom: 8px;\n}\n\n.qc-art-label {\n    flex: 0 0 100%;\n    font-size: 12.5px;\n    font-weight: 700;\n    color: var(--ink);\n}\n.qc-art-row input[type='file'] { font-size: 12.5px; max-width: 100%; }\n\n.qc-art-picked {\n    font-size: 12px;\n    font-weight: 600;\n    color: var(--green-700);\n    overflow-wrap: anywhere;\n}\n\n.qc-save-actions {\n    display: flex;\n    flex-direction: column;\n    gap: 9px;\n    margin-top: 12px;\n}\n.qc-save-actions .btn { width: 100%; }\n\n.qc-save-busy {\n    display: flex;\n    align-items: center;\n    gap: 12px;\n    padding: 14px 4px;\n    font-weight: 600;\n    color: var(--ink-soft);\n}\n\n.qc-spin {\n    width: 22px;\n    height: 22px;\n    flex: 0 0 22px;\n    border: 3px solid var(--line-strong);\n    border-top-color: var(--green-700);\n    border-radius: 50%;\n    animation: qcSpin 0.8s linear infinite;\n}\n\n@keyframes qcSpin { to { transform: rotate(360deg); } }\n.qc-share { margin: 4px 0 10px; }\n.qc-share-row { display: flex; gap: 8px; }\n.qc-share-row .field-input { flex: 1; min-width: 0; font-size: 13px; }\n\n.qc-share-open {\n    display: inline-block;\n    margin-top: 8px;\n    font-size: 13.5px;\n    font-weight: 700;\n    color: var(--green-700);\n}\n\n.qc-save-emailline {\n    margin: 10px 0 0;\n    font-size: 13px;\n    font-weight: 600;\n    color: var(--ink-soft);\n    line-height: 1.5;\n}\n.qc-save-panel .alert { margin: 0 0 12px; }\n\n/* ── Responsive ──────────────────────────────────────────────────── */\n@media (width <= 960px) {\n    .qc-layout { grid-template-columns: 1fr; }\n    .qc-totals { position: static; }\n}\n\n@media (width <= 560px) {\n    .qc-group { padding: 14px; }\n\n    .qc-line {\n        grid-template-columns: minmax(0, 1fr) auto;\n        grid-template-areas:\n            'info remove'\n            'qty price';\n    }\n    .qc-line-info { grid-area: info; }\n    .qc-remove { grid-area: remove; justify-self: end; }\n    .qc-line-qty { grid-area: qty; }\n    .qc-line-price { grid-area: price; align-self: center; }\n}\n\n/* ============================================================================\n   Email capture (#18, 2026-07-05) — \"Email me this quote\" box under the\n   totals actions. Funnels into the existing Phase 3 save panel (email\n   pre-filled); reuses the .field-* primitives the save panel already uses.\n   ============================================================================ */\n.qc-capture {\n    margin-top: 14px;\n    padding-top: 14px;\n    border-top: 1px dashed var(--line, var(--slate-200));\n}\n\n.qc-capture-row {\n    display: flex;\n    gap: 8px;\n    align-items: stretch;\n}\n\n.qc-capture-row .field-input {\n    flex: 1 1 auto;\n    min-width: 0;\n}\n\n.qc-capture-row .btn {\n    flex: 0 0 auto;\n    white-space: nowrap;\n}\n\n.qc-capture-error {\n    margin: 6px 0 0;\n    font-size: 0.85rem;\n    font-weight: 600;\n    color: var(--red-700);\n}\n\n/* Delivery promise (BAW adoption #1, 2026-07-06) — per-group \"est. ship by\"\n   line under the group subtotal. Hidden until delivery-promise.js fills it. */\n.qc-delivery-promise {\n  margin: 6px 0 0;\n  font-size: 13px;\n  font-weight: 600;\n  color: var(--store-green-700);\n}\n",
+      "after": "/* quote cart layout. Shared controls, tokens and storefront shell own common UI. */\n@layer components.pages {\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-section {\n        padding: 26px 0 60px;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-layout {\n        display: grid;\n        grid-template-columns: minmax(0, 1fr) 340px;\n        gap: 26px;\n        align-items: start;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-layout.is-repricing .qc-groups, :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-layout.is-repricing .qc-totals {\n        opacity: 0.55;\n        pointer-events: none;\n        transition: opacity 0.15s ease;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-groups {\n        display: flex;\n        flex-direction: column;\n        gap: 14px;\n        min-width: 0;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-group {\n        background: var(--ui-surface);\n        border: 1px solid var(--ui-line-strong);\n        border-radius: var(--radius-md);\n        box-shadow: var(--shadow-sm);\n        padding: 18px 20px;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-group-error {\n        border-color: var(--red-700);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-group-head {\n        display: flex;\n        align-items: center;\n        flex-wrap: wrap;\n        gap: 10px 12px;\n        margin-bottom: 12px;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-group-ico {\n        flex: none;\n        width: 38px;\n        height: 38px;\n        display: inline-flex;\n        align-items: center;\n        justify-content: center;\n        border-radius: 50%;\n        background: var(--ui-tint);\n        color: var(--ui-accent-hover);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-group-ico svg {\n        width: 20px;\n        height: 20px;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-group-title {\n        font-family: var(--ui-font);\n        font-size: 19px;\n        font-weight: 800;\n        color: var(--ui-ink);\n        margin: 0;\n        line-height: 1.2;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-group-sub {\n        display: block;\n        font-family: var(--ui-font);\n        font-size: 12.5px;\n        font-weight: 700;\n        color: var(--ui-muted);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-group-pool {\n        margin-left: auto;\n        font-size: 13px;\n        font-weight: 800;\n        color: var(--ui-accent-hover);\n        white-space: nowrap;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-meter {\n        margin: 2px 0 14px;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-meter-bar {\n        height: 8px;\n        border-radius: 999px;\n        background: var(--ui-tint);\n        border: 1px solid var(--ui-line);\n        overflow: hidden;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-meter-fill {\n        display: block;\n        height: 100%;\n        width: 0;\n        border-radius: 999px;\n        background: var(--ui-accent);\n        transition: width 0.25s ease;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-meter-labels {\n        display: flex;\n        justify-content: space-between;\n        gap: 10px;\n        margin-top: 5px;\n        font-size: 12px;\n        font-weight: 700;\n        color: var(--ui-muted);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-lines {\n        border-top: 1px solid var(--ui-line);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-line {\n        display: grid;\n        grid-template-columns: minmax(0, 1fr) auto auto 36px;\n        gap: 8px 14px;\n        align-items: center;\n        padding: 11px 0;\n        border-bottom: 1px solid var(--ui-line);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-line-info {\n        min-width: 0;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-line-name {\n        display: block;\n        font-weight: 700;\n        font-size: 14px;\n        color: var(--ui-ink);\n        overflow: visible;\n        text-overflow: clip;\n        white-space: normal;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-line-meta {\n        display: block;\n        font-size: 12.5px;\n        font-weight: 600;\n        color: var(--ui-muted);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-line-qty {\n        display: inline-flex;\n        align-items: center;\n        gap: 4px;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-line-qty input {\n        width: 58px;\n        min-height: 44px;\n        text-align: center;\n        appearance: textfield;\n        padding: 8px;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-line-qty input::-webkit-outer-spin-button, :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-line-qty input::-webkit-inner-spin-button {\n        appearance: none;\n        margin: 0;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-line-qty input:focus {\n        outline: none;\n        border-color: var(--ui-accent);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-step {\n        width: 44px;\n        height: 44px;\n        border: 1.5px solid var(--ui-line-strong);\n        border-radius: var(--radius-sm);\n        background: var(--ui-surface);\n        color: var(--ui-ink);\n        font-size: 17px;\n        font-weight: 700;\n        cursor: pointer;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-step:hover {\n        border-color: var(--ui-accent);\n        color: var(--ui-accent);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-line-price {\n        text-align: right;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-line-sizes {\n        grid-column: 1 / -1;\n        display: flex;\n        flex-wrap: wrap;\n        gap: 6px 10px;\n        padding: 2px 0 4px;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-line-sizes[hidden] {\n        display: none;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-size-cell {\n        display: flex;\n        flex-direction: column;\n        align-items: center;\n        gap: 2px;\n        font-size: 0.72rem;\n        font-weight: 600;\n        color: var(--ui-muted, var(--slate-500));\n        text-transform: uppercase;\n        letter-spacing: 0.03em;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-size-cell input {\n        width: 52px;\n        text-align: center;\n        min-height: 44px;\n        padding: 8px;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-size-cell input::-webkit-outer-spin-button, :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-size-cell input::-webkit-inner-spin-button {\n        appearance: none;\n        margin: 0;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-size-cell input:focus {\n        outline: none;\n        border-color: var(--ui-accent);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-line-qty-total {\n        font-weight: 700;\n        font-size: 1rem;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-line-qty-unit {\n        font-size: 0.75rem;\n        color: var(--ui-muted, var(--slate-500));\n        margin-left: 4px;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-line-each {\n        display: block;\n        font-size: 12.5px;\n        font-weight: 700;\n        color: var(--ui-muted);\n        white-space: nowrap;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-line-total {\n        display: block;\n        font-size: 15px;\n        font-weight: 800;\n        color: var(--ui-ink);\n        white-space: nowrap;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-remove {\n        width: 44px;\n        height: 44px;\n        border: none;\n        border-radius: var(--radius-sm);\n        background: none;\n        color: var(--ui-muted);\n        font-size: 18px;\n        line-height: 1;\n        cursor: pointer;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-remove:hover {\n        color: var(--red-700);\n        background: var(--red-100);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-svc, :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-fees {\n        border-bottom: 1px solid var(--ui-line);\n        padding: 6px 0;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-svc-row, :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-fee-row {\n        display: flex;\n        justify-content: space-between;\n        gap: 14px;\n        padding: 5px 0;\n        font-size: 13.5px;\n        font-weight: 600;\n        color: var(--ui-ink);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-fee-row em {\n        font-style: normal;\n        color: var(--ui-muted);\n        font-weight: 600;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-svc-row .num, :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-fee-row .num {\n        font-weight: 800;\n        white-space: nowrap;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-ltm-note {\n        margin: 10px 0 0;\n        font-size: 13px;\n        font-weight: 700;\n        color: var(--ui-ink);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-nudge {\n        margin-top: 12px;\n        padding: 11px 14px;\n        border: 1px solid var(--amber-700);\n        border-left-width: 4px;\n        border-radius: var(--radius-sm);\n        background: var(--amber-100);\n        font-size: 13.5px;\n        font-weight: 700;\n        color: var(--ui-ink);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-group-foot {\n        display: flex;\n        justify-content: space-between;\n        align-items: baseline;\n        gap: 14px;\n        margin-top: 12px;\n        font-size: 14px;\n        font-weight: 700;\n        color: var(--ui-muted);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-group-total {\n        font-family: var(--ui-font);\n        font-size: 21px;\n        font-weight: 800;\n        color: var(--ui-accent-hover);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-group-retry {\n        display: flex;\n        gap: 10px;\n        flex-wrap: wrap;\n        margin-top: 12px;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-pool-note {\n        margin: 0;\n        padding: 0 6px;\n        font-size: 13px;\n        font-weight: 600;\n        color: var(--ui-muted);\n        text-align: center;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-totals {\n        position: sticky;\n        top: 86px;\n        background: var(--ui-surface);\n        border: 1px solid var(--ui-line-strong);\n        border-radius: var(--radius-md);\n        box-shadow: var(--shadow-sm);\n        padding: 18px 20px;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-totals-title {\n        font-family: var(--ui-font);\n        font-size: 19px;\n        font-weight: 800;\n        margin: 0 0 10px;\n        color: var(--ui-ink);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-totals-row {\n        display: flex;\n        justify-content: space-between;\n        gap: 12px;\n        padding: 6px 0;\n        font-size: 14px;\n        font-weight: 600;\n        color: var(--ui-ink);\n        border-bottom: 1px solid var(--ui-line);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-totals-row .num {\n        font-weight: 800;\n        white-space: nowrap;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-grand {\n        display: flex;\n        justify-content: space-between;\n        align-items: baseline;\n        gap: 12px;\n        padding: 12px 0 4px;\n        font-size: 15px;\n        font-weight: 800;\n        color: var(--ui-ink);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-grand span:last-child {\n        font-family: var(--ui-font);\n        font-size: 28px;\n        font-weight: 800;\n        color: var(--ui-accent-hover);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-totals .alert {\n        margin: 12px 0 0;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-actions {\n        display: flex;\n        flex-direction: column;\n        gap: 9px;\n        margin-top: 14px;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-actions .btn {\n        width: 100%;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-actions .btn[disabled] {\n        opacity: 0.55;\n        cursor: not-allowed;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-totals-foot {\n        margin: 12px 0 0;\n        font-size: 12.5px;\n        font-weight: 600;\n        color: var(--ui-muted);\n        line-height: 1.5;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-save-panel {\n        margin-top: 16px;\n        padding: 16px;\n        border: 1.5px solid var(--ui-line-strong);\n        border-radius: 12px;\n        background: var(--ui-surface, var(--color-surface));\n        animation: qcSaveIn 0.25s ease-out;\n    }\n\n    @keyframes qcSaveIn {\n        from {\n            opacity: 0;\n            transform: translateY(-6px);\n        }\n\n        to {\n            opacity: 1;\n            transform: translateY(0);\n        }\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-save-title {\n        margin: 0 0 12px;\n        font-family: var(--ui-font);\n        font-size: 19px;\n        font-weight: 800;\n        color: var(--ui-accent-hover);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-save-panel .field {\n        margin-bottom: 12px;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-save-art {\n        min-width: 0;\n        margin: 4px 0 12px;\n        padding: 10px 12px 12px;\n        border: 1px dashed var(--ui-line-strong);\n        border-radius: 10px;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-save-art legend {\n        padding: 0 6px;\n        font-size: 13px;\n        font-weight: 700;\n        color: var(--ui-muted);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-art-row {\n        display: flex;\n        flex-wrap: wrap;\n        align-items: center;\n        gap: 8px;\n        margin-bottom: 8px;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-art-label {\n        flex: 0 0 100%;\n        font-size: 12.5px;\n        font-weight: 700;\n        color: var(--ui-ink);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-art-row input[type='file'] {\n        font-size: 12.5px;\n        max-width: 100%;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-art-picked {\n        font-size: 12px;\n        font-weight: 600;\n        color: var(--ui-accent);\n        overflow-wrap: anywhere;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-save-actions {\n        display: flex;\n        flex-direction: column;\n        gap: 9px;\n        margin-top: 12px;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-save-actions .btn {\n        width: 100%;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-save-busy {\n        display: flex;\n        align-items: center;\n        gap: 12px;\n        padding: 14px 4px;\n        font-weight: 600;\n        color: var(--ui-muted);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-spin {\n        width: 22px;\n        height: 22px;\n        flex: 0 0 22px;\n        border: 3px solid var(--ui-line-strong);\n        border-top-color: var(--ui-accent);\n        border-radius: 50%;\n        animation: qcSpin 0.8s linear infinite;\n    }\n\n    @keyframes qcSpin {\n        to {\n            transform: rotate(360deg);\n        }\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-share {\n        margin: 4px 0 10px;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-share-row {\n        display: flex;\n        gap: 8px;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-share-row .field-input {\n        flex: 1;\n        min-width: 0;\n        font-size: 13px;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-share-open {\n        display: inline-block;\n        margin-top: 8px;\n        font-size: 13.5px;\n        font-weight: 700;\n        color: var(--ui-accent);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-save-emailline {\n        margin: 10px 0 0;\n        font-size: 13px;\n        font-weight: 600;\n        color: var(--ui-muted);\n        line-height: 1.5;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-save-panel .alert {\n        margin: 0 0 12px;\n    }\n\n    @media (width <= 960px) {\n        :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-layout {\n            grid-template-columns: minmax(0, 1fr);\n        }\n\n        :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-totals {\n            position: static;\n        }\n    }\n\n    @media (width <= 560px) {\n        :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-group {\n            padding: 14px;\n        }\n\n        :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-line {\n            grid-template-columns: minmax(0, 1fr) auto;\n            grid-template-areas: 'info remove'\n            'qty price';\n        }\n\n        :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-line-info {\n            grid-area: info;\n        }\n\n        :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-remove {\n            grid-area: remove;\n            justify-self: end;\n            width: 44px;\n            height: 44px;\n        }\n\n        :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-line-qty {\n            grid-area: qty;\n        }\n\n        :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-line-price {\n            grid-area: price;\n            align-self: center;\n        }\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-capture {\n        margin-top: 14px;\n        padding-top: 14px;\n        border-top: 1px dashed var(--ui-line, var(--slate-200));\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-capture-row {\n        display: flex;\n        gap: 8px;\n        align-items: stretch;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-capture-row .field-input {\n        flex: 1 1 auto;\n        min-width: 0;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-capture-row .btn {\n        flex: 0 0 auto;\n        white-space: nowrap;\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-capture-error {\n        margin: 6px 0 0;\n        font-size: 0.85rem;\n        font-weight: 600;\n        color: var(--red-700);\n    }\n\n    :where([data-ui=\"unified\"][data-customer-cart=\"quote\"]) .qc-delivery-promise {\n        margin: 6px 0 0;\n        font-size: 13px;\n        font-weight: 600;\n        color: var(--store-green-700);\n    }\n}\n",
+      "count": 1,
+      "reason": "One scoped page owner with shared semantic tokens, canonical controls, valid grids and formatted rules."
+    }
+  ],
   "retiredStyles": []
 }

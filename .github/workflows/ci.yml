@@ -58,9 +58,10 @@ jobs:
     # burned a runner and blocked a PR on a check that had not run a single test.
     # This bounds it: a hung setup now fails in minutes and is obviously a re-run,
     # not a mystery. The job itself takes ~2.5 min warm.
-    # The 813-case release took 19m53s end to end. With 883 mocked cases,
-    # allow 30 minutes for the full gate; bound browser setup separately below.
-    timeout-minutes: 30
+    # The 1,204-case account release took about28 minutes end to end.
+    # Cart coverage adds40 cases; allow40 minutes while retaining the
+    # separate five-minute browser setup limits below.
+    timeout-minutes: 40
     # 2026-09-08: the money-path and calculator-parity specs price through the LIVE proxy, whose reads have
     # required the proxy secret since the quote-plane lockdown — without it every run failed with "engine
     # error" (red from 2026-09-07 15:54). The rendered axe ratchet needs no secret and always runs; the two

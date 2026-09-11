@@ -100,7 +100,9 @@ async function open(page,state={}){
 async function snapshot(page){return page.evaluate(()=>{
  const norm=s=>String(s||'').replace(/\s+/g,' ').trim(),visible=n=>!!n.getClientRects().length&&getComputedStyle(n).visibility!=='hidden';
  return {title:document.title,text:norm(document.querySelector('main').innerText),ids:Object.fromEntries([...document.querySelectorAll('main [id]')].filter(n=>visible(n)&&!n.querySelector('[id]')).map(n=>[n.id,norm(n.innerText)])),
- links:[...document.querySelectorAll('a[href]')].filter(visible).map(n=>({href:n.getAttribute('href'),text:norm(n.innerText),label:n.getAttribute('aria-label')})),
+ // The original offscreen drawer contributed links; retain its destinations even
+ // when the native dialog now correctly removes them from screen/keyboard order.
+ links:[...document.querySelectorAll('a[href]')].filter(n=>visible(n)||n.closest('#sidebar')).map(n=>({href:n.getAttribute('href'),text:norm(n.innerText).replace(n.closest('#sidebar')&&n.querySelector('.flag-new')?/\bNew$/:/(?!)/,'NEW'),label:n.getAttribute('aria-label')})),
  fields:[...document.querySelectorAll('input,select,textarea')].filter(visible).map(n=>({id:n.id,name:n.name,size:n.dataset.size,value:n.value,checked:n.type==='checkbox'?n.checked:undefined})),
  engineCalls:window.__cartEngineCalls||[],emails:window.__cartEmails||[],injection:window.__cartInjection,overflow:document.documentElement.scrollWidth>innerWidth+1};
  });}

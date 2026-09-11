@@ -2,7 +2,7 @@ const {test,expect}=require('@playwright/test'),fs=require('node:fs'),path=requi
 const {open,snapshot,check}=require('./helpers/customer-cart-browser');
 test.use({timezoneId:'America/Los_Angeles',locale:'en-US'});
 const root=path.resolve(__dirname,'../..'),out=path.join(__dirname,'screenshots/css-unification'),capture=process.env.CAPTURE_CUSTOMER_CART_ORIGINAL==='1',phase=capture?'original':'current';
-async function evidence(page,name,events,{paper=false}={}){
+async function evidence(page,name,events,{paper=false,compare=true}={}){
  const states=[];
  for(const width of [1440,768,390,320]){
   await page.setViewportSize({width,height:1000});await page.evaluate(()=>document.fonts.ready);
@@ -13,15 +13,37 @@ async function evidence(page,name,events,{paper=false}={}){
  }
  check(expect,events);
  const record={name,states,reads:events.reads,actions:events.actions,dialogs:events.dialogs},file='tests/fixtures/customer-cart-'+name+'-original-browser.json';
+ if(!capture)fs.writeFileSync(path.join(out,'customer-cart-'+name+'-current-diagnostics.json'),JSON.stringify(record,null,2)+'\n');
  if(capture){
   if(fs.existsSync(path.join(root,file)))expect(record,'Immutable original '+name).toEqual(JSON.parse(fs.readFileSync(path.join(root,file),'utf8')));
   else {fs.writeFileSync(path.join(root,file),JSON.stringify(record,null,2)+'\n');fs.appendFileSync(path.join(root,'ACTIVE_FILES.md'),'\n- '+file+' — immutable synthetic original cart browser contract.\n');}
- }else {
+ }else if(compare){
   const before=JSON.parse(fs.readFileSync(path.join(root,file),'utf8'));
-  for(let i=0;i<states.length;i++)for(const k of ['title','ids','links','fields','engineCalls','emails'])expect(states[i][k],name+' '+k).toEqual(before.states[i][k]);
+  for(let i=0;i<states.length;i++){
+   const originalIds={...before.states[i].ids};
+   if(name==='sample-escaped')originalIds.cartItems=originalIds.cartItems.replace('Example company & "team"','Example <b>company</b> & "team"').replace('Color: Orange','Color: Orange <script>window.__cartInjection=true</script>');
+   for(const k of ['title','ids','fields','engineCalls','emails'])expect(states[i][k],name+' '+k).toEqual(k==='ids'?originalIds:before.states[i][k]);
+   const expected=before.states[i].links;
+   // Phone badges now keep their word label. Preserve the original count exactly.
+   const links=states[i].links.map(l=>states[i].width<=600&&['/quote-cart','/pages/sample-cart.html'].includes(l.href)?{...l,text:l.text.replace(/^(?:Samples|Quote)(?: |$)/,'')}:l);
+   const staticPage=require('../fixtures/customer-cart-original-content.json').pages.find(p=>p.file==='pages/'+(name.startsWith('sample')?'sample':'quote')+'-cart.html');
+   // The wrapping desktop masthead exposes existing links previously hidden by
+   // the legacy breakpoint. Every extra destination and label must be in the
+   // immutable original HTML; all originally visible links retain their order.
+   let originalIndex=0;
+   for(const l of links){
+    if(JSON.stringify(l)===JSON.stringify(expected[originalIndex]))originalIndex++;
+    else expect(staticPage.links.some(s=>s.href===l.href&&s.label===l.text.replace(/ NEW$/,' New')),name+' existing extra navigation '+l.href).toBe(true);
+   }
+   expect(originalIndex,name+' retained original navigation in order').toBe(expected.length);
+  }
   expect(events.actions).toEqual(before.actions);
  }
- if(paper){await page.setViewportSize({width:1440,height:1000});await page.pdf({path:path.join(out,'customer-cart-'+name+'-'+phase+'.pdf'),format:'Letter',printBackground:true});}
+ if(paper){
+  await page.setViewportSize({width:1440,height:1000});
+  if(!capture){await page.emulateMedia({media:'print'});expect(await page.locator('input:focus-visible,textarea:focus-visible').evaluateAll(nodes=>nodes.filter(n=>n.getClientRects().length&&getComputedStyle(n).outlineStyle!=='none').map(n=>n.id))).toEqual([]);}
+  await page.pdf({path:path.join(out,'customer-cart-'+name+'-'+phase+'.pdf'),format:'Letter',printBackground:true});await page.emulateMedia({media:'screen'});
+ }
 }
 async function ready(page,kind,mode){
  if(kind==='sample'){
@@ -105,4 +127,59 @@ test('CSS customer carts workflow: removing a failed group restores complete tot
  const events=await open(page,{kind:'quote',mode:'failed',original:capture});await ready(page,'quote','failed');
  await page.locator('[data-act="remove"][data-id="item-DTG"]').click();await expect(page.locator('#qcSaveBtn')).toBeEnabled();await expect(page.locator('#qcTotalsBody')).toContainText('450.00');
  await evidence(page,'quote-failed-group-removed',events);
+});
+
+test('CSS customer carts repair: stored garment markup stays literal',async({page})=>{
+ test.skip(capture,'Current safety regression; the original defect is recorded separately.');
+ const events=await open(page,{kind:'sample',mode:'mixed'});await ready(page,'sample','mixed');
+ const name='<img src="/__cart-fixture/probe.svg" onload="window.__cartInjection=true">';
+ await page.evaluate(async name=>{const cart=JSON.parse(sessionStorage.getItem('sampleCart'));cart.samples[0].name=name;sessionStorage.setItem('sampleCart',JSON.stringify(cart));await loadCart();},name);
+ await expect(page.locator('.item-details h3').first()).toHaveText(name);expect(await page.locator('.item-details h3 img').count()).toBe(0);
+ expect(await page.evaluate(()=>window.__cartInjection)).toBe(false);await expect(page.locator('#summaryTotalPrice')).toHaveText('$30.25');check(expect,events);
+});
+
+test('CSS customer carts repair: checkout error markup stays literal and announces failure',async({page})=>{
+ test.skip(capture,'Current checkout-error safety regression; original execution is recorded separately.');
+ const events=await open(page,{kind:'sample',mode:'mixed'});await ready(page,'sample','mixed');await fillSample(page);
+ const message='<img src="/__cart-fixture/probe.svg" onload="window.__cartInjection=true">';let requests=0;
+ await page.route('**/api/samples/create-checkout-session',route=>{requests++;return route.fulfill({status:400,json:{error:message}});});
+ await page.locator('#sampleRequestForm [type="submit"]').click();await expect(page.locator('#sampleCheckoutBanner p')).toHaveText(message);await expect(page.locator('#sampleCheckoutBanner')).toHaveAttribute('role','alert');
+ await expect(page.locator('#sampleRequestForm [type="submit"]')).toBeEnabled();expect(await page.locator('#sampleCheckoutBanner img').count()).toBe(0);expect(await page.evaluate(()=>window.__cartInjection)).toBe(false);expect(requests).toBe(1);
+ await expect(page.locator('#summaryTotalPrice')).toHaveText('$30.25');await expect(page.locator('#fldFirstName')).toHaveValue('Casey');check(expect,events);
+});
+
+test('CSS customer carts repair: failed removal is visible and retry preserves the other item',async({page})=>{
+ test.skip(capture,'Current recovery regression; the original failure is recorded separately.');
+ const events=await open(page,{kind:'sample',mode:'mixed'});await ready(page,'sample','mixed');
+ await page.evaluate(()=>{window.__cartSetItem=Storage.prototype.setItem;Storage.prototype.setItem=function(k,v){if(k==='sampleCart')throw new DOMException('Synthetic full storage','QuotaExceededError');return window.__cartSetItem.call(this,k,v);};});
+ await page.locator('[data-remove="0"]').click();await expect(page.locator('#sampleCartStorageError')).toContainText('Your cart is unchanged');await expect(page.locator('#sampleCartStorageError')).toBeFocused();
+ await expect(page.locator('#cartItems .cart-item')).toHaveCount(2);await expect(page.locator('#summaryTotalPrice')).toHaveText('$30.25');
+ await page.evaluate(()=>{Storage.prototype.setItem=window.__cartSetItem;});await page.locator('[data-remove="0"]').click();
+ await expect(page.locator('#cartItems .cart-item')).toHaveCount(1);await expect(page.locator('#cartItems')).toContainText('K500');await expect(page.locator('#sampleCartStorageError')).toHaveCount(0);check(expect,events);
+});
+
+test('CSS customer carts repair: pending quote cannot reopen or allocate a duplicate',async({page})=>{
+ test.skip(capture,'Current duplicate-save regression; the original duplicate is recorded separately.');
+ let release;const hold=new Promise(r=>release=r),events=await open(page,{kind:'quote',mode:'mixed',hold});await ready(page,'quote','mixed');await fillQuote(page);
+ await page.locator('[data-save-act="submit"]').click();await expect(page.locator('.qc-save-busy')).toBeVisible();await expect.poll(()=>events.actions.filter(a=>a.path==='/api/quote_sessions').length).toBe(1);
+ await expect(page.locator('#qcSaveBtn')).toBeDisabled();await page.locator('#qcSaveBtn').dispatchEvent('click');await expect(page.locator('#qcSvName')).toHaveCount(0);
+ expect(events.actions.filter(a=>a.path==='/api/quote-sequence/WQ')).toHaveLength(1);release();await expect(page.locator('#qcSavePanel')).toContainText('WQ-2026-1042 saved');await expect(page.locator('#qcSaveBtn')).toBeEnabled();
+ await expect.poll(()=>page.evaluate(()=>window.__cartEmails.length)).toBe(2);expect(events.actions.filter(a=>a.path==='/api/quote_sessions')).toHaveLength(1);check(expect,events);
+});
+
+for(const kind of ['sample','quote'])test('CSS customer carts keyboard: '+kind+' menu confines focus and restores its trigger',async({page})=>{
+ test.skip(capture,'Current native navigation regression.');
+ await page.setViewportSize({width:390,height:900});const events=await open(page,{kind,mode:'mixed'});await ready(page,kind,'mixed');
+ const opener=page.locator('#mobileMenuBtn'),menu=page.locator('#sidebar');await opener.click();await expect(menu).toBeVisible();await expect(opener).toHaveAttribute('aria-expanded','true');
+ await page.locator('#drawerClose').focus();await page.keyboard.press('Shift+Tab');await expect(menu.locator('a[href], button:not([disabled])').last()).toBeFocused();await page.keyboard.press('Tab');await expect(page.locator('#drawerClose')).toBeFocused();
+ await page.keyboard.press('Escape');await expect(menu).toBeHidden();await expect(opener).toBeFocused();await expect(opener).toHaveAttribute('aria-expanded','false');check(expect,events);
+});
+
+for(const kind of ['sample','quote'])test('CSS customer carts paper: '+kind+' complete note and selected artwork',async({page})=>{
+ test.skip(capture,'Additional complete-paper regression for the unified layout.');
+ const events=await open(page,{kind,mode:'mixed'});await ready(page,kind,'mixed');
+ const note=Array.from({length:8},(_,i)=>'Reference '+(i+1)+': Please preserve the navy and orange garments, all requested sizes, both decoration locations and delivery instructions.').join('\n')+'\nEND OF CUSTOMER NOTE.';
+ if(kind==='sample'){await fillSample(page,true);await page.locator('#fldNotes').fill(note);await page.locator('#logoUpload').setInputFiles({name:'sample-reference.svg',mimeType:'image/svg+xml',buffer:Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"/>')});}
+ else {await fillQuote(page);await page.locator('#qcSvNotes').fill(note);await page.locator('input[data-art-gid]').first().setInputFiles({name:'quote-reference.svg',mimeType:'image/svg+xml',buffer:Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"/>')});await expect(page.locator('.qc-art-picked')).toHaveText('quote-reference.svg');}
+ await evidence(page,kind+'-long-note',events,{paper:true,compare:false});expect(events.actions).toHaveLength(0);
 });

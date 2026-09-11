@@ -68,6 +68,7 @@ const CSS_LINT_SCOPE = [
     'pages/css/company-webstores.css',
     'pages/css/webstore-inquiry.css',
     'pages/css/instant-quote.css',
+    'pages/css/customer-cart.css',
     'pages/css/sample-cart.css',
     'pages/css/quote-cart.css',
     'pages/css/fall-catalog-2026.css',

@@ -1,17 +1,14 @@
 # CSS unification — design direction and implementation plan
 
-## NEXT — Sample Cart and Quote Cart original review
+## REVIEWED NEXT — Sample Cart and Quote Cart
 
-This isolated branch starts at the prepared .11 source9eb6e2a2. Account pair bba4306d/da6c2373 is frozen separately:54 browser cases,23 paper pages and261 post-cache guards passed. Full local1204-case CSS/money checks run on primaryda6c2373; exact-source CI34565556223 is running. Live remains .10/2102/44ccf020 at187/225; account candidate189/225,36pending. No account release yet.
+The cart pair is reviewed:40 distinct current browser cases pass (39-case full run plus the new checkout-error regression), with all affected paper refinements and the final stock-border cases passing. All39 current PDF pages across13 documents are visually reviewed, including complete long notes and chosen artwork filenames. Four widths1440/768/390/320, axe, exact successful checkout/free-request/quote/email payloads, five decoration groups, all quantities and withheld failed totals remain verified. All268 source/ownership checks pass:24 preserve original sources and financial/group/quantity functions; the rest enforce the shared CSS ownership manifest.
 
-- [x] Freeze both cart pages, full local styles/script graph and financial/size/group methods before editing application code.
-- [ ] Capture original empty/free/paid/mixed sample carts, stock states, long/escaped/legacy storage, form/address/attachments, canceled and confirmed payment returns, exact checkout/free-order/email/CRM request bodies. Intercept every business action and allocating read before load.
-- [ ] Capture quote cart method groups, sizes/pooling/tier nudges/fees and failed totals, size edits/removal/storage/reprice, save/share/email and delivery-promise states. Preserve all pricing authorities, group/size transformations and successful request payloads.
-- [ ] Review four widths1440/768/390/320, keyboard/axe, empty/errors/delays and every original PDF page. Shared nwca-2026-core remains original for the other storefront consumers.
-- [ ] Adopt shared controls/Public Sans and scoped cart/common storefront layout; externalize inline presentation and repair only demonstrated UI defects.
-- [ ] Compare original/current values and payloads, complete failure/retry/pending/paper checks before migration credit; full release gates before another deploy.
+Three readable style owners use the common application controls, Public Sans and existing storefront navigation. No page imports legacy nwca-2026-core; that shared file remains byte-identical for other consumers.89 reversible mappings retain21 immutable sources and34 original browser contracts from backed-up baseline7257164c. Four original defects were demonstrated and repaired: stored garment markup execution, checkout error markup execution, silent failed sample removal, and duplicate saves after reopening a pending form. Native-menu keyboard focus confines and returns correctly. Printed totals stay together, field labels stay with values, money remains unbroken, and headers/footer do not cover content.
 
-The source comments reference two older cart-design memory files that are absent in both checkouts. Preserve the existing pooling and customer workflow documented in source; do not invent pricing changes. No real orders, Stripe checkout, emails, lead writes, logout or device printing. Do not rerun consumed helpers or delete the node_modules junction.
+Reviewed candidate191/225,34pending. Account .11 exact-source CI34569384599 passed every actual job on880bc6eb; releaseefc4471f is on GitHub main/tag and Heroku upload44377 is in progress. Live remains .10/2102/44ccf020 until the actual slug and HTTP assets/access checks verify .11. The cart pair has not been deployed and still needs complete application/CI release gates after integrating the verified account release.
+
+Next: commit/back up this reviewed cart pair, merge the actual account release history, integrate the pair on develop, then run all unit/DOM/a11y/parity/build/stylelint/routes/boot/full CSS/live-money checks and exact-source CI before its separate deploy. Current full E2E CI took about28 minutes at1,204 CSS cases; the cart adds40 cases, so its job budget is40 minutes with the existing5-minute setup bounds retained. No real business writes, orders, emails, Stripe checkout, logout or device printing. Never rerun consumed helpers or delete the node_modules junction.
 
 ## RELEASE CANDIDATE — v2026.09.10.11 Customer Account and Product
 
@@ -1522,3 +1519,5 @@ Exact-source CI 34561449204 passed all four jobs on 0091eff76524acfc16ce3f5f401d
 - [ ] Adopt existing storefront-shell/navigation and canonical buttons/fields; keep shared legacy core unchanged for its unreviewed consumers. Scoped cart owners, no new override stack.
 - [ ] Demonstrate and repair focus/storage/late-response faults; preserve exact successful request/email/checkout bodies and original financial transforms. Review current screens, axe/keyboard and complete paper before migration credit.
 Live remains.10/2102/44cc187/225. Account .11 is separately gated on source4e763b26/CI34567159048 and full local3297. Cart gets no migration credit; reviewed candidate remains189/225,36pending. No .env copies, real orders/payments/emails or device printing.
+
+Cart implementation started after7257164c original review: existing shell/native navigation and canonical fields/buttons replace legacy core on only these two pages. Their scoped owners and shared cart print rules are a draft; visual/behavior/axe/source checks and fault probes still required. No migration credit or deploy yet.

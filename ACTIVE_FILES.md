@@ -658,3 +658,5 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - tests/fixtures/customer-cart-quote-save-sent-original-browser.json — immutable synthetic original cart browser contract.
 
 - tests/fixtures/customer-cart-quote-save-failed-original-browser.json — immutable synthetic original cart browser contract.
+
+- pages/css/customer-cart.css — shared sample/quote cart header, status and print layout; uses storefront shell and canonical components.
