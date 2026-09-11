@@ -1,0 +1,633 @@
+{
+  "name": "product-long",
+  "states": [
+    {
+      "width": 1440,
+      "title": "PC54 · Core Cotton Tee | Northwest Custom Apparel",
+      "text": "Northwest Custom Apparel Customer portal ← Back to your account ← Back to your account Core Cotton Tee Port & Company · T-Shirts · Style PC54 You’ve ordered 36 of this style · last ordered Sep 9, 2026 Product details Re-order Order history Navy Availability S M L XL 2XL 3XL Colors (your colors first) Top color Navy 24 ordered Brilliant Orange 12 ordered About this product A dependable cotton tee for every team. What you’ve ordered Your sizes by color — so a re-order matches what you bought. Color S M L XL 2XL 3XL Total Navy 2 4 6 8 3 1 24 Brilliant Orange 1 2 3 4 2 — 12 Re-order Color: Navy (tap any color above to switch) — pick your decoration + sizes and we’ll send it to your rep for a fresh quote. Decoration (how it’s made — defaults to your last order) Embroidery Stitched logo Screen Print Ink — best for larger runs last time DTG Full-color print Transfers Transfer — good for small/complex art Sizes & quantities S M L XL 2XL 3XL Total: 24 Notes (deadline, other sizes/colors — optional) Send to my rep + Add to Re-order List Order history Aug 4, 2026 · Long color name 1 1 pcs · S:1 Aug 4, 2026 · Long color name 2 2 pcs · S:2 Aug 4, 2026 · Long color name 3 3 pcs · S:3 Aug 4, 2026 · Long color name 4 4 pcs · S:4 Aug 4, 2026 · Long color name 5 5 pcs · S:5 Aug 4, 2026 · Long color name 6 6 pcs · S:6 Aug 4, 2026 · Long color name 7 7 pcs · S:7 Aug 4, 2026 · Long color name 8 8 pcs · S:8 Aug 4, 2026 · Long color name 9 9 pcs · S:9 Aug 4, 2026 · Long color name 10 10 pcs · S:10 Aug 4, 2026 · Long color name 11 11 pcs · S:11 Aug 4, 2026 · Long color name 12 12 pcs · S:12 Aug 4, 2026 · Long color name 13 13 pcs · S:13 Aug 4, 2026 · Long color name 14 14 pcs · S:14 Aug 4, 2026 · Long color name 15 15 pcs · S:15 Aug 4, 2026 · Long color name 16 16 pcs · S:16 Aug 4, 2026 · Long color name 17 17 pcs · S:17 Aug 4, 2026 · Long color name 18 18 pcs · S:18 Aug 4, 2026 · Long color name 19 19 pcs · S:19 Aug 4, 2026 · Long color name 20 20 pcs · S:20 Aug 4, 2026 · Long color name 21 21 pcs · S:21 Aug 4, 2026 · Long color name 22 22 pcs · S:22 Aug 4, 2026 · Long color name 23 23 pcs · S:23 Aug 4, 2026 · Long color name 24 24 pcs · S:24 Aug 4, 2026 · Long color name 25 25 pcs · S:25 Aug 4, 2026 · Long color name 26 26 pcs · S:26 Aug 4, 2026 · Long color name 27 27 pcs · S:27 Aug 4, 2026 · Long color name 28 28 pcs · S:28 Northwest Custom Apparel · (253) 922-5793 · sales@nwcustomapparel.com",
+      "ids": {
+        "pp-back-top": "← Back to your account",
+        "pp-back": "← Back to your account",
+        "pp-hero-img": "",
+        "pp-thumbs": "",
+        "pp-colorname": "Navy",
+        "pp-avail": "Availability S M L XL 2XL 3XL",
+        "pp-swatches": "Top color Navy 24 ordered Brilliant Orange 12 ordered",
+        "pp-about": "About this product A dependable cotton tee for every team.",
+        "pp-req-colorlabel": "Navy",
+        "pp-methods": "Embroidery Stitched logo Screen Print Ink — best for larger runs last time DTG Full-color print Transfers Transfer — good for small/complex art",
+        "pp-method-min": "",
+        "pp-sizes": "S M L XL 2XL 3XL",
+        "pp-sizetotal": "24",
+        "pp-note": "",
+        "pp-req-error": "",
+        "pp-req-submit": "Send to my rep",
+        "pp-req-addlist": "+ Add to Re-order List",
+        "pp-history": "Order history Aug 4, 2026 · Long color name 1 1 pcs · S:1 Aug 4, 2026 · Long color name 2 2 pcs · S:2 Aug 4, 2026 · Long color name 3 3 pcs · S:3 Aug 4, 2026 · Long color name 4 4 pcs · S:4 Aug 4, 2026 · Long color name 5 5 pcs · S:5 Aug 4, 2026 · Long color name 6 6 pcs · S:6 Aug 4, 2026 · Long color name 7 7 pcs · S:7 Aug 4, 2026 · Long color name 8 8 pcs · S:8 Aug 4, 2026 · Long color name 9 9 pcs · S:9 Aug 4, 2026 · Long color name 10 10 pcs · S:10 Aug 4, 2026 · Long color name 11 11 pcs · S:11 Aug 4, 2026 · Long color name 12 12 pcs · S:12 Aug 4, 2026 · Long color name 13 13 pcs · S:13 Aug 4, 2026 · Long color name 14 14 pcs · S:14 Aug 4, 2026 · Long color name 15 15 pcs · S:15 Aug 4, 2026 · Long color name 16 16 pcs · S:16 Aug 4, 2026 · Long color name 17 17 pcs · S:17 Aug 4, 2026 · Long color name 18 18 pcs · S:18 Aug 4, 2026 · Long color name 19 19 pcs · S:19 Aug 4, 2026 · Long color name 20 20 pcs · S:20 Aug 4, 2026 · Long color name 21 21 pcs · S:21 Aug 4, 2026 · Long color name 22 22 pcs · S:22 Aug 4, 2026 · Long color name 23 23 pcs · S:23 Aug 4, 2026 · Long color name 24 24 pcs · S:24 Aug 4, 2026 · Long color name 25 25 pcs · S:25 Aug 4, 2026 · Long color name 26 26 pcs · S:26 Aug 4, 2026 · Long color name 27 27 pcs · S:27 Aug 4, 2026 · Long color name 28 28 pcs · S:28",
+        "cp-toast": ""
+      },
+      "links": [
+        {
+          "href": "/portal",
+          "text": "← Back to your account",
+          "label": null
+        },
+        {
+          "href": "/portal",
+          "text": "← Back to your account",
+          "label": null
+        },
+        {
+          "href": "#pp-about",
+          "text": "Product details",
+          "label": null
+        },
+        {
+          "href": "#pp-reorder",
+          "text": "Re-order",
+          "label": null
+        },
+        {
+          "href": "#pp-history",
+          "text": "Order history",
+          "label": null
+        }
+      ],
+      "rows": [
+        [
+          "Navy",
+          "2",
+          "4",
+          "6",
+          "8",
+          "3",
+          "1",
+          "24"
+        ],
+        [
+          "Brilliant Orange",
+          "1",
+          "2",
+          "3",
+          "4",
+          "2",
+          "—",
+          "12"
+        ]
+      ],
+      "fields": [
+        {
+          "id": "",
+          "size": "S",
+          "value": "2"
+        },
+        {
+          "id": "",
+          "size": "M",
+          "value": "4"
+        },
+        {
+          "id": "",
+          "size": "L",
+          "value": "6"
+        },
+        {
+          "id": "",
+          "size": "XL",
+          "value": "8"
+        },
+        {
+          "id": "",
+          "size": "2XL",
+          "value": "3"
+        },
+        {
+          "id": "",
+          "size": "3XL",
+          "value": "1"
+        },
+        {
+          "id": "pp-note",
+          "value": ""
+        }
+      ],
+      "engineCalls": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".pp-dot--na"
+            ],
+            [
+              ".pp-swatches-label > small"
+            ],
+            [
+              ".pp-req-hint"
+            ],
+            [
+              ".pp-field:nth-child(3) > .pp-flabel > small"
+            ],
+            [
+              "button[data-method=\"EMB\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"SCP\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"DTG\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"DTF\"] > .pp-method-hint"
+            ],
+            [
+              ".pp-field:nth-child(5) > .pp-flabel > small"
+            ],
+            [
+              ".cp-footer"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "PC54 · Core Cotton Tee | Northwest Custom Apparel",
+      "text": "Northwest Custom Apparel Customer portal ← Back to your account ← Back to your account Core Cotton Tee Port & Company · T-Shirts · Style PC54 You’ve ordered 36 of this style · last ordered Sep 9, 2026 Product details Re-order Order history Navy Availability S M L XL 2XL 3XL Colors (your colors first) Top color Navy 24 ordered Brilliant Orange 12 ordered About this product A dependable cotton tee for every team. What you’ve ordered Your sizes by color — so a re-order matches what you bought. Color S M L XL 2XL 3XL Total Navy 2 4 6 8 3 1 24 Brilliant Orange 1 2 3 4 2 — 12 Re-order Color: Navy (tap any color above to switch) — pick your decoration + sizes and we’ll send it to your rep for a fresh quote. Decoration (how it’s made — defaults to your last order) Embroidery Stitched logo Screen Print Ink — best for larger runs last time DTG Full-color print Transfers Transfer — good for small/complex art Sizes & quantities S M L XL 2XL 3XL Total: 24 Notes (deadline, other sizes/colors — optional) Send to my rep + Add to Re-order List Order history Aug 4, 2026 · Long color name 1 1 pcs · S:1 Aug 4, 2026 · Long color name 2 2 pcs · S:2 Aug 4, 2026 · Long color name 3 3 pcs · S:3 Aug 4, 2026 · Long color name 4 4 pcs · S:4 Aug 4, 2026 · Long color name 5 5 pcs · S:5 Aug 4, 2026 · Long color name 6 6 pcs · S:6 Aug 4, 2026 · Long color name 7 7 pcs · S:7 Aug 4, 2026 · Long color name 8 8 pcs · S:8 Aug 4, 2026 · Long color name 9 9 pcs · S:9 Aug 4, 2026 · Long color name 10 10 pcs · S:10 Aug 4, 2026 · Long color name 11 11 pcs · S:11 Aug 4, 2026 · Long color name 12 12 pcs · S:12 Aug 4, 2026 · Long color name 13 13 pcs · S:13 Aug 4, 2026 · Long color name 14 14 pcs · S:14 Aug 4, 2026 · Long color name 15 15 pcs · S:15 Aug 4, 2026 · Long color name 16 16 pcs · S:16 Aug 4, 2026 · Long color name 17 17 pcs · S:17 Aug 4, 2026 · Long color name 18 18 pcs · S:18 Aug 4, 2026 · Long color name 19 19 pcs · S:19 Aug 4, 2026 · Long color name 20 20 pcs · S:20 Aug 4, 2026 · Long color name 21 21 pcs · S:21 Aug 4, 2026 · Long color name 22 22 pcs · S:22 Aug 4, 2026 · Long color name 23 23 pcs · S:23 Aug 4, 2026 · Long color name 24 24 pcs · S:24 Aug 4, 2026 · Long color name 25 25 pcs · S:25 Aug 4, 2026 · Long color name 26 26 pcs · S:26 Aug 4, 2026 · Long color name 27 27 pcs · S:27 Aug 4, 2026 · Long color name 28 28 pcs · S:28 Northwest Custom Apparel · (253) 922-5793 · sales@nwcustomapparel.com",
+      "ids": {
+        "pp-back-top": "← Back to your account",
+        "pp-back": "← Back to your account",
+        "pp-hero-img": "",
+        "pp-thumbs": "",
+        "pp-colorname": "Navy",
+        "pp-avail": "Availability S M L XL 2XL 3XL",
+        "pp-swatches": "Top color Navy 24 ordered Brilliant Orange 12 ordered",
+        "pp-about": "About this product A dependable cotton tee for every team.",
+        "pp-req-colorlabel": "Navy",
+        "pp-methods": "Embroidery Stitched logo Screen Print Ink — best for larger runs last time DTG Full-color print Transfers Transfer — good for small/complex art",
+        "pp-method-min": "",
+        "pp-sizes": "S M L XL 2XL 3XL",
+        "pp-sizetotal": "24",
+        "pp-note": "",
+        "pp-req-error": "",
+        "pp-req-submit": "Send to my rep",
+        "pp-req-addlist": "+ Add to Re-order List",
+        "pp-history": "Order history Aug 4, 2026 · Long color name 1 1 pcs · S:1 Aug 4, 2026 · Long color name 2 2 pcs · S:2 Aug 4, 2026 · Long color name 3 3 pcs · S:3 Aug 4, 2026 · Long color name 4 4 pcs · S:4 Aug 4, 2026 · Long color name 5 5 pcs · S:5 Aug 4, 2026 · Long color name 6 6 pcs · S:6 Aug 4, 2026 · Long color name 7 7 pcs · S:7 Aug 4, 2026 · Long color name 8 8 pcs · S:8 Aug 4, 2026 · Long color name 9 9 pcs · S:9 Aug 4, 2026 · Long color name 10 10 pcs · S:10 Aug 4, 2026 · Long color name 11 11 pcs · S:11 Aug 4, 2026 · Long color name 12 12 pcs · S:12 Aug 4, 2026 · Long color name 13 13 pcs · S:13 Aug 4, 2026 · Long color name 14 14 pcs · S:14 Aug 4, 2026 · Long color name 15 15 pcs · S:15 Aug 4, 2026 · Long color name 16 16 pcs · S:16 Aug 4, 2026 · Long color name 17 17 pcs · S:17 Aug 4, 2026 · Long color name 18 18 pcs · S:18 Aug 4, 2026 · Long color name 19 19 pcs · S:19 Aug 4, 2026 · Long color name 20 20 pcs · S:20 Aug 4, 2026 · Long color name 21 21 pcs · S:21 Aug 4, 2026 · Long color name 22 22 pcs · S:22 Aug 4, 2026 · Long color name 23 23 pcs · S:23 Aug 4, 2026 · Long color name 24 24 pcs · S:24 Aug 4, 2026 · Long color name 25 25 pcs · S:25 Aug 4, 2026 · Long color name 26 26 pcs · S:26 Aug 4, 2026 · Long color name 27 27 pcs · S:27 Aug 4, 2026 · Long color name 28 28 pcs · S:28",
+        "cp-toast": ""
+      },
+      "links": [
+        {
+          "href": "/portal",
+          "text": "← Back to your account",
+          "label": null
+        },
+        {
+          "href": "/portal",
+          "text": "← Back to your account",
+          "label": null
+        },
+        {
+          "href": "#pp-about",
+          "text": "Product details",
+          "label": null
+        },
+        {
+          "href": "#pp-reorder",
+          "text": "Re-order",
+          "label": null
+        },
+        {
+          "href": "#pp-history",
+          "text": "Order history",
+          "label": null
+        }
+      ],
+      "rows": [
+        [
+          "Navy",
+          "2",
+          "4",
+          "6",
+          "8",
+          "3",
+          "1",
+          "24"
+        ],
+        [
+          "Brilliant Orange",
+          "1",
+          "2",
+          "3",
+          "4",
+          "2",
+          "—",
+          "12"
+        ]
+      ],
+      "fields": [
+        {
+          "id": "",
+          "size": "S",
+          "value": "2"
+        },
+        {
+          "id": "",
+          "size": "M",
+          "value": "4"
+        },
+        {
+          "id": "",
+          "size": "L",
+          "value": "6"
+        },
+        {
+          "id": "",
+          "size": "XL",
+          "value": "8"
+        },
+        {
+          "id": "",
+          "size": "2XL",
+          "value": "3"
+        },
+        {
+          "id": "",
+          "size": "3XL",
+          "value": "1"
+        },
+        {
+          "id": "pp-note",
+          "value": ""
+        }
+      ],
+      "engineCalls": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".pp-dot--na"
+            ],
+            [
+              ".pp-swatches-label > small"
+            ],
+            [
+              ".pp-req-hint"
+            ],
+            [
+              ".pp-field:nth-child(3) > .pp-flabel > small"
+            ],
+            [
+              "button[data-method=\"EMB\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"SCP\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"DTG\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"DTF\"] > .pp-method-hint"
+            ],
+            [
+              ".pp-field:nth-child(5) > .pp-flabel > small"
+            ],
+            [
+              ".cp-footer"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "PC54 · Core Cotton Tee | Northwest Custom Apparel",
+      "text": "Northwest Custom Apparel ← Account ← Back to your account Core Cotton Tee Port & Company · T-Shirts · Style PC54 You’ve ordered 36 of this style · last ordered Sep 9, 2026 Product details Re-order Order history Navy Availability S M L XL 2XL 3XL Colors (your colors first) Top color Navy 24 ordered Brilliant Orange 12 ordered About this product A dependable cotton tee for every team. What you’ve ordered Your sizes by color — so a re-order matches what you bought. Color S M L XL 2XL 3XL Total Navy 2 4 6 8 3 1 24 Brilliant Orange 1 2 3 4 2 — 12 Re-order Color: Navy (tap any color above to switch) — pick your decoration + sizes and we’ll send it to your rep for a fresh quote. Decoration (how it’s made — defaults to your last order) Embroidery Stitched logo Screen Print Ink — best for larger runs last time DTG Full-color print Transfers Transfer — good for small/complex art Sizes & quantities S M L XL 2XL 3XL Total: 24 Notes (deadline, other sizes/colors — optional) Send to my rep + Add to Re-order List Order history Aug 4, 2026 · Long color name 1 1 pcs · S:1 Aug 4, 2026 · Long color name 2 2 pcs · S:2 Aug 4, 2026 · Long color name 3 3 pcs · S:3 Aug 4, 2026 · Long color name 4 4 pcs · S:4 Aug 4, 2026 · Long color name 5 5 pcs · S:5 Aug 4, 2026 · Long color name 6 6 pcs · S:6 Aug 4, 2026 · Long color name 7 7 pcs · S:7 Aug 4, 2026 · Long color name 8 8 pcs · S:8 Aug 4, 2026 · Long color name 9 9 pcs · S:9 Aug 4, 2026 · Long color name 10 10 pcs · S:10 Aug 4, 2026 · Long color name 11 11 pcs · S:11 Aug 4, 2026 · Long color name 12 12 pcs · S:12 Aug 4, 2026 · Long color name 13 13 pcs · S:13 Aug 4, 2026 · Long color name 14 14 pcs · S:14 Aug 4, 2026 · Long color name 15 15 pcs · S:15 Aug 4, 2026 · Long color name 16 16 pcs · S:16 Aug 4, 2026 · Long color name 17 17 pcs · S:17 Aug 4, 2026 · Long color name 18 18 pcs · S:18 Aug 4, 2026 · Long color name 19 19 pcs · S:19 Aug 4, 2026 · Long color name 20 20 pcs · S:20 Aug 4, 2026 · Long color name 21 21 pcs · S:21 Aug 4, 2026 · Long color name 22 22 pcs · S:22 Aug 4, 2026 · Long color name 23 23 pcs · S:23 Aug 4, 2026 · Long color name 24 24 pcs · S:24 Aug 4, 2026 · Long color name 25 25 pcs · S:25 Aug 4, 2026 · Long color name 26 26 pcs · S:26 Aug 4, 2026 · Long color name 27 27 pcs · S:27 Aug 4, 2026 · Long color name 28 28 pcs · S:28 Northwest Custom Apparel · (253) 922-5793 · sales@nwcustomapparel.com",
+      "ids": {
+        "pp-back-top": "← Account",
+        "pp-back": "← Back to your account",
+        "pp-hero-img": "",
+        "pp-thumbs": "",
+        "pp-colorname": "Navy",
+        "pp-avail": "Availability S M L XL 2XL 3XL",
+        "pp-swatches": "Top color Navy 24 ordered Brilliant Orange 12 ordered",
+        "pp-about": "About this product A dependable cotton tee for every team.",
+        "pp-req-colorlabel": "Navy",
+        "pp-methods": "Embroidery Stitched logo Screen Print Ink — best for larger runs last time DTG Full-color print Transfers Transfer — good for small/complex art",
+        "pp-method-min": "",
+        "pp-sizes": "S M L XL 2XL 3XL",
+        "pp-sizetotal": "24",
+        "pp-note": "",
+        "pp-req-error": "",
+        "pp-req-submit": "Send to my rep",
+        "pp-req-addlist": "+ Add to Re-order List",
+        "pp-history": "Order history Aug 4, 2026 · Long color name 1 1 pcs · S:1 Aug 4, 2026 · Long color name 2 2 pcs · S:2 Aug 4, 2026 · Long color name 3 3 pcs · S:3 Aug 4, 2026 · Long color name 4 4 pcs · S:4 Aug 4, 2026 · Long color name 5 5 pcs · S:5 Aug 4, 2026 · Long color name 6 6 pcs · S:6 Aug 4, 2026 · Long color name 7 7 pcs · S:7 Aug 4, 2026 · Long color name 8 8 pcs · S:8 Aug 4, 2026 · Long color name 9 9 pcs · S:9 Aug 4, 2026 · Long color name 10 10 pcs · S:10 Aug 4, 2026 · Long color name 11 11 pcs · S:11 Aug 4, 2026 · Long color name 12 12 pcs · S:12 Aug 4, 2026 · Long color name 13 13 pcs · S:13 Aug 4, 2026 · Long color name 14 14 pcs · S:14 Aug 4, 2026 · Long color name 15 15 pcs · S:15 Aug 4, 2026 · Long color name 16 16 pcs · S:16 Aug 4, 2026 · Long color name 17 17 pcs · S:17 Aug 4, 2026 · Long color name 18 18 pcs · S:18 Aug 4, 2026 · Long color name 19 19 pcs · S:19 Aug 4, 2026 · Long color name 20 20 pcs · S:20 Aug 4, 2026 · Long color name 21 21 pcs · S:21 Aug 4, 2026 · Long color name 22 22 pcs · S:22 Aug 4, 2026 · Long color name 23 23 pcs · S:23 Aug 4, 2026 · Long color name 24 24 pcs · S:24 Aug 4, 2026 · Long color name 25 25 pcs · S:25 Aug 4, 2026 · Long color name 26 26 pcs · S:26 Aug 4, 2026 · Long color name 27 27 pcs · S:27 Aug 4, 2026 · Long color name 28 28 pcs · S:28",
+        "cp-toast": ""
+      },
+      "links": [
+        {
+          "href": "/portal",
+          "text": "← Account",
+          "label": null
+        },
+        {
+          "href": "/portal",
+          "text": "← Back to your account",
+          "label": null
+        },
+        {
+          "href": "#pp-about",
+          "text": "Product details",
+          "label": null
+        },
+        {
+          "href": "#pp-reorder",
+          "text": "Re-order",
+          "label": null
+        },
+        {
+          "href": "#pp-history",
+          "text": "Order history",
+          "label": null
+        }
+      ],
+      "rows": [
+        [
+          "Navy",
+          "2",
+          "4",
+          "6",
+          "8",
+          "3",
+          "1",
+          "24"
+        ],
+        [
+          "Brilliant Orange",
+          "1",
+          "2",
+          "3",
+          "4",
+          "2",
+          "—",
+          "12"
+        ]
+      ],
+      "fields": [
+        {
+          "id": "",
+          "size": "S",
+          "value": "2"
+        },
+        {
+          "id": "",
+          "size": "M",
+          "value": "4"
+        },
+        {
+          "id": "",
+          "size": "L",
+          "value": "6"
+        },
+        {
+          "id": "",
+          "size": "XL",
+          "value": "8"
+        },
+        {
+          "id": "",
+          "size": "2XL",
+          "value": "3"
+        },
+        {
+          "id": "",
+          "size": "3XL",
+          "value": "1"
+        },
+        {
+          "id": "pp-note",
+          "value": ""
+        }
+      ],
+      "engineCalls": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".pp-dot--na"
+            ],
+            [
+              ".pp-swatches-label > small"
+            ],
+            [
+              ".pp-req-hint"
+            ],
+            [
+              ".pp-field:nth-child(3) > .pp-flabel > small"
+            ],
+            [
+              "button[data-method=\"EMB\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"SCP\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"DTG\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"DTF\"] > .pp-method-hint"
+            ],
+            [
+              ".pp-field:nth-child(5) > .pp-flabel > small"
+            ],
+            [
+              ".cp-footer"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "PC54 · Core Cotton Tee | Northwest Custom Apparel",
+      "text": "Northwest Custom Apparel ← Account ← Back to your account Core Cotton Tee Port & Company · T-Shirts · Style PC54 You’ve ordered 36 of this style · last ordered Sep 9, 2026 Product details Re-order Order history Navy Availability S M L XL 2XL 3XL Colors (your colors first) Top color Navy 24 ordered Brilliant Orange 12 ordered About this product A dependable cotton tee for every team. What you’ve ordered Your sizes by color — so a re-order matches what you bought. Color S M L XL 2XL 3XL Total Navy 2 4 6 8 3 1 24 Brilliant Orange 1 2 3 4 2 — 12 Re-order Color: Navy (tap any color above to switch) — pick your decoration + sizes and we’ll send it to your rep for a fresh quote. Decoration (how it’s made — defaults to your last order) Embroidery Stitched logo Screen Print Ink — best for larger runs last time DTG Full-color print Transfers Transfer — good for small/complex art Sizes & quantities S M L XL 2XL 3XL Total: 24 Notes (deadline, other sizes/colors — optional) Send to my rep + Add to Re-order List Order history Aug 4, 2026 · Long color name 1 1 pcs · S:1 Aug 4, 2026 · Long color name 2 2 pcs · S:2 Aug 4, 2026 · Long color name 3 3 pcs · S:3 Aug 4, 2026 · Long color name 4 4 pcs · S:4 Aug 4, 2026 · Long color name 5 5 pcs · S:5 Aug 4, 2026 · Long color name 6 6 pcs · S:6 Aug 4, 2026 · Long color name 7 7 pcs · S:7 Aug 4, 2026 · Long color name 8 8 pcs · S:8 Aug 4, 2026 · Long color name 9 9 pcs · S:9 Aug 4, 2026 · Long color name 10 10 pcs · S:10 Aug 4, 2026 · Long color name 11 11 pcs · S:11 Aug 4, 2026 · Long color name 12 12 pcs · S:12 Aug 4, 2026 · Long color name 13 13 pcs · S:13 Aug 4, 2026 · Long color name 14 14 pcs · S:14 Aug 4, 2026 · Long color name 15 15 pcs · S:15 Aug 4, 2026 · Long color name 16 16 pcs · S:16 Aug 4, 2026 · Long color name 17 17 pcs · S:17 Aug 4, 2026 · Long color name 18 18 pcs · S:18 Aug 4, 2026 · Long color name 19 19 pcs · S:19 Aug 4, 2026 · Long color name 20 20 pcs · S:20 Aug 4, 2026 · Long color name 21 21 pcs · S:21 Aug 4, 2026 · Long color name 22 22 pcs · S:22 Aug 4, 2026 · Long color name 23 23 pcs · S:23 Aug 4, 2026 · Long color name 24 24 pcs · S:24 Aug 4, 2026 · Long color name 25 25 pcs · S:25 Aug 4, 2026 · Long color name 26 26 pcs · S:26 Aug 4, 2026 · Long color name 27 27 pcs · S:27 Aug 4, 2026 · Long color name 28 28 pcs · S:28 Northwest Custom Apparel · (253) 922-5793 · sales@nwcustomapparel.com",
+      "ids": {
+        "pp-back-top": "← Account",
+        "pp-back": "← Back to your account",
+        "pp-hero-img": "",
+        "pp-thumbs": "",
+        "pp-colorname": "Navy",
+        "pp-avail": "Availability S M L XL 2XL 3XL",
+        "pp-swatches": "Top color Navy 24 ordered Brilliant Orange 12 ordered",
+        "pp-about": "About this product A dependable cotton tee for every team.",
+        "pp-req-colorlabel": "Navy",
+        "pp-methods": "Embroidery Stitched logo Screen Print Ink — best for larger runs last time DTG Full-color print Transfers Transfer — good for small/complex art",
+        "pp-method-min": "",
+        "pp-sizes": "S M L XL 2XL 3XL",
+        "pp-sizetotal": "24",
+        "pp-note": "",
+        "pp-req-error": "",
+        "pp-req-submit": "Send to my rep",
+        "pp-req-addlist": "+ Add to Re-order List",
+        "pp-history": "Order history Aug 4, 2026 · Long color name 1 1 pcs · S:1 Aug 4, 2026 · Long color name 2 2 pcs · S:2 Aug 4, 2026 · Long color name 3 3 pcs · S:3 Aug 4, 2026 · Long color name 4 4 pcs · S:4 Aug 4, 2026 · Long color name 5 5 pcs · S:5 Aug 4, 2026 · Long color name 6 6 pcs · S:6 Aug 4, 2026 · Long color name 7 7 pcs · S:7 Aug 4, 2026 · Long color name 8 8 pcs · S:8 Aug 4, 2026 · Long color name 9 9 pcs · S:9 Aug 4, 2026 · Long color name 10 10 pcs · S:10 Aug 4, 2026 · Long color name 11 11 pcs · S:11 Aug 4, 2026 · Long color name 12 12 pcs · S:12 Aug 4, 2026 · Long color name 13 13 pcs · S:13 Aug 4, 2026 · Long color name 14 14 pcs · S:14 Aug 4, 2026 · Long color name 15 15 pcs · S:15 Aug 4, 2026 · Long color name 16 16 pcs · S:16 Aug 4, 2026 · Long color name 17 17 pcs · S:17 Aug 4, 2026 · Long color name 18 18 pcs · S:18 Aug 4, 2026 · Long color name 19 19 pcs · S:19 Aug 4, 2026 · Long color name 20 20 pcs · S:20 Aug 4, 2026 · Long color name 21 21 pcs · S:21 Aug 4, 2026 · Long color name 22 22 pcs · S:22 Aug 4, 2026 · Long color name 23 23 pcs · S:23 Aug 4, 2026 · Long color name 24 24 pcs · S:24 Aug 4, 2026 · Long color name 25 25 pcs · S:25 Aug 4, 2026 · Long color name 26 26 pcs · S:26 Aug 4, 2026 · Long color name 27 27 pcs · S:27 Aug 4, 2026 · Long color name 28 28 pcs · S:28",
+        "cp-toast": ""
+      },
+      "links": [
+        {
+          "href": "/portal",
+          "text": "← Account",
+          "label": null
+        },
+        {
+          "href": "/portal",
+          "text": "← Back to your account",
+          "label": null
+        },
+        {
+          "href": "#pp-about",
+          "text": "Product details",
+          "label": null
+        },
+        {
+          "href": "#pp-reorder",
+          "text": "Re-order",
+          "label": null
+        },
+        {
+          "href": "#pp-history",
+          "text": "Order history",
+          "label": null
+        }
+      ],
+      "rows": [
+        [
+          "Navy",
+          "2",
+          "4",
+          "6",
+          "8",
+          "3",
+          "1",
+          "24"
+        ],
+        [
+          "Brilliant Orange",
+          "1",
+          "2",
+          "3",
+          "4",
+          "2",
+          "—",
+          "12"
+        ]
+      ],
+      "fields": [
+        {
+          "id": "",
+          "size": "S",
+          "value": "2"
+        },
+        {
+          "id": "",
+          "size": "M",
+          "value": "4"
+        },
+        {
+          "id": "",
+          "size": "L",
+          "value": "6"
+        },
+        {
+          "id": "",
+          "size": "XL",
+          "value": "8"
+        },
+        {
+          "id": "",
+          "size": "2XL",
+          "value": "3"
+        },
+        {
+          "id": "",
+          "size": "3XL",
+          "value": "1"
+        },
+        {
+          "id": "pp-note",
+          "value": ""
+        }
+      ],
+      "engineCalls": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".pp-dot--na"
+            ],
+            [
+              ".pp-swatches-label > small"
+            ],
+            [
+              ".pp-req-hint"
+            ],
+            [
+              ".pp-field:nth-child(3) > .pp-flabel > small"
+            ],
+            [
+              "button[data-method=\"EMB\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"SCP\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"DTG\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"DTF\"] > .pp-method-hint"
+            ],
+            [
+              ".pp-field:nth-child(5) > .pp-flabel > small"
+            ],
+            [
+              ".cp-footer"
+            ]
+          ]
+        },
+        {
+          "id": "scrollable-region-focusable",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".pp-mx-wrap"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "reads": [
+    {
+      "path": "/api/portal/product/PC54",
+      "query": ""
+    },
+    {
+      "path": "/api/portal/product/PC54/availability",
+      "query": "?color=Navy"
+    },
+    {
+      "path": "/api/pricing-bundle",
+      "query": "?method=DTG&styleNumber=PC54"
+    }
+  ],
+  "actions": []
+}

@@ -142,7 +142,7 @@
             return '<tr><td class="pp-mx-c">' + sw + '<span>' + esc(c.name) + '</span></td>' + cells
                 + '<td class="pp-mx-total">' + Number(c.totalQty).toLocaleString() + '</td></tr>';
         }).join('');
-        return '<div class="pp-mx-wrap"><table class="pp-mx"><thead><tr>' + head + '</tr></thead><tbody>' + body + '</tbody></table></div>';
+        return '<div class="pp-mx-wrap" tabindex="0" role="region" aria-label="Previously ordered sizes"><table class="pp-mx"><thead><tr>' + head + '</tr></thead><tbody>' + body + '</tbody></table></div>';
     }
 
     function historyHtml(hist) {
@@ -165,11 +165,11 @@
             + '<div class="cp-size-grid" id="pp-sizes"></div>'
             + '<div class="cp-size-total">Total: <strong id="pp-sizetotal">0</strong></div></div>'
             + '<label class="pp-field"><span class="pp-flabel">Notes <small>(deadline, other sizes/colors &mdash; optional)</small></span>'
-            + '<textarea id="pp-note" rows="2" placeholder="Anything the team should know"></textarea></label>'
+            + '<textarea class="field-textarea" id="pp-note" rows="2" placeholder="Anything the team should know"></textarea></label>'
             + '<div class="pp-req-error" id="pp-req-error"></div>'
             + '<div class="pp-req-actions">'
-            + '<button class="cp-btn-primary" id="pp-req-submit" type="button">Send to my rep</button>'
-            + '<button class="pp-addlist-btn" id="pp-req-addlist" type="button">+ Add to Re-order List</button>'
+            + '<button class="btn btn-primary cp-btn-primary" id="pp-req-submit" type="button">Send to my rep</button>'
+            + '<button class="btn pp-addlist-btn" id="pp-req-addlist" type="button">+ Add to Re-order List</button>'
             + '</div>'
             + '</section>';
     }
@@ -250,7 +250,9 @@
         renderGallery();
     }
 
+    var availabilityGeneration = 0;
     function fetchAvailability(color) {
+        var generation = ++availabilityGeneration;
         var box = document.getElementById('pp-avail'); if (!box || !color) { if (box) box.innerHTML = ''; return; }
         box.innerHTML = '<span class="pp-avail-load">checking availability&hellip;</span>';
         // Distinguish "no stock data to show" (empty lights → blank, legitimate) from a genuine
@@ -259,6 +261,7 @@
         fetch(AVAIL + '?color=' + encodeURIComponent(color), { credentials: 'same-origin' })
             .then(function (r) { if (!r.ok) throw new Error('avail ' + r.status); return r.json(); })
             .then(function (d) {
+                if (generation !== availabilityGeneration) return;
                 var lights = (d && d.lights) || {};
                 if (!Object.keys(lights).length) { box.innerHTML = ''; return; }
                 var labels = { in: 'in stock', low: 'low stock', out: 'out of stock', na: 'not offered' };
@@ -267,7 +270,7 @@
                     return '<span class="pp-dot pp-dot--' + lv + '" role="img" title="' + s + ': ' + labels[lv] + '" aria-label="' + s + ': ' + labels[lv] + '">' + s + '</span>';
                 }).join('');
             })
-            .catch(function () { box.innerHTML = '<span class="pp-avail-note">Availability unavailable &mdash; your rep will confirm.</span>'; });
+            .catch(function () { if (generation === availabilityGeneration) box.innerHTML = '<span class="pp-avail-note">Availability unavailable &mdash; your rep will confirm.</span>'; });
     }
 
     function buildSizeGrid(sizes) {
@@ -275,7 +278,7 @@
         grid.innerHTML = SIZE_ORDER.map(function (sz) {
             var v = Number(sizes && sizes[sz]) || 0;
             return '<label class="cp-size-cell"><span class="cp-size-name">' + sz + '</span>'
-                + '<input type="number" min="0" inputmode="numeric" class="cp-size-input pp-size-input" data-size="' + sz + '" value="' + (v > 0 ? v : '') + '" placeholder="0"></label>';
+                + '<input type="number" min="0" inputmode="numeric" class="field-input cp-size-input pp-size-input" data-size="' + sz + '" value="' + (v > 0 ? v : '') + '" placeholder="0"></label>';
         }).join('');
         var ins = grid.querySelectorAll('.pp-size-input');
         for (var i = 0; i < ins.length; i++) ins[i].addEventListener('input', updateSizeTotal);
@@ -343,23 +346,32 @@
         if (_minCache[bundle] != null) return Promise.resolve(_minCache[bundle]);
         var api = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
         return fetch(api + '/api/pricing-bundle?method=' + encodeURIComponent(bundle) + '&styleNumber=' + encodeURIComponent(state.data.product.style))
-            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (r) { if (!r.ok) throw new Error('minimum ' + r.status); return r.json(); })
             .then(function (j) {
                 var tiers = (j && (j.tiersR || j.tiers)) || [];
                 var mins = tiers.map(function (t) { return Number(t.MinQuantity != null ? t.MinQuantity : t.minQty); }).filter(function (n) { return n > 0; });
-                var min = mins.length ? Math.min.apply(null, mins) : 1;
+                if (!mins.length) return null;
+                var min = Math.min.apply(null, mins);
                 _minCache[bundle] = min;
                 return min;
             })
-            .catch(function () { return 1; });   // fail-open: never false-block on a fetch hiccup (rep re-checks)
+            .catch(function () { return null; });   // The rep can still quote, but the unavailable minimum must be visible.
     }
+    var minimumGeneration = 0;
     function checkMin() {
+        var generation = ++minimumGeneration;
         var box = document.getElementById('pp-method-min'); if (!box) return;
         var m = methodByKey(state.method);
         if (!m) { box.innerHTML = ''; state.minBlocked = false; return; }
         var qty = collectSizes().total;
         getMethodMin(m.bundle).then(function (min) {
-            if (methodByKey(state.method) !== m) return;   // method changed while fetching
+            if (generation !== minimumGeneration || methodByKey(state.method) !== m) return;
+            if (min == null) {
+                state.minBlocked = false;
+                box.className = 'pp-method-min pp-method-min--warn';
+                box.textContent = 'Minimum quantity unavailable — your rep will confirm the minimum for this request.';
+                return;
+            }
             if (min > 1 && qty > 0 && qty < min) {
                 state.minBlocked = true;
                 box.className = 'pp-method-min pp-method-min--warn';
@@ -405,7 +417,7 @@
         var grid = document.getElementById('pp-up-sizes-' + i); if (!grid) return;
         grid.innerHTML = SIZE_ORDER.map(function (sz) {
             return '<label class="cp-size-cell"><span class="cp-size-name">' + sz + '</span>'
-                + '<input type="number" min="0" inputmode="numeric" class="cp-size-input" data-size="' + sz + '" value="" placeholder="0"></label>';
+                + '<input type="number" min="0" inputmode="numeric" class="field-input cp-size-input" data-size="' + sz + '" value="" placeholder="0"></label>';
         }).join('');
         var ins = grid.querySelectorAll('.cp-size-input');
         for (var k = 0; k < ins.length; k++) ins[k].addEventListener('input', (function (idx) { return function () { updateUpTotal(idx); }; })(i));
@@ -481,7 +493,7 @@
                 + '<div class="cp-size-grid" id="pp-up-sizes-' + i + '"></div>'
                 + '<div class="cp-size-total">Total: <strong id="pp-up-total-' + i + '">0</strong></div></div>'
                 + '</div>'
-                + '<button class="cp-btn-primary pp-up-btn" type="button" data-up="' + i + '">Send this embroidered upgrade to my rep</button>'
+                + '<button class="btn btn-primary cp-btn-primary pp-up-btn" type="button" data-up="' + i + '">Send this embroidered upgrade to my rep</button>'
                 + '</div>';
         }).join('');
         return '<section class="pp-section pp-upgrade" id="pp-upgrade"><h2>Upgrade to embroidery</h2>'
@@ -553,7 +565,7 @@
         var priceRow = tiers.map(function (t) { return '<td>$' + t.base.toFixed(2) + '</td>'; }).join('');
         var ltmRow = hasLtm ? ('<tr><td class="lbl">Small-batch fee</td>' + tiers.map(function (t) { return '<td class="' + (t.ltmFee > 0 ? 'warn' : '') + '">' + (t.ltmFee > 0 ? '+$' + t.ltmFee.toFixed(2) : '—') + '</td>'; }).join('') + '</tr>') : '';
         return '<div class="pp-up-mxtitle">Price breaks — ' + Number(stitch).toLocaleString() + '-stitch left-chest embroidery</div>'
-            + '<div class="pp-up-mxwrap"><table class="pp-up-mxtable"><thead><tr><th class="lbl">Quantity</th>' + head + '</tr></thead>'
+            + '<div class="pp-up-mxwrap" tabindex="0" role="region" aria-label="Embroidery price breaks"><table class="pp-up-mxtable"><thead><tr><th class="lbl">Quantity</th>' + head + '</tr></thead>'
             + '<tbody><tr><td class="lbl">Per pc</td>' + priceRow + '</tr>' + ltmRow + '</tbody></table></div>'
             + '<div class="pp-up-mxfoot">Per pc for a standard size; 2XL+ adds its upcharge. Digitizing is a separate one-time fee. Same pricing engine as our quote tools &mdash; your rep confirms the final quote.</div>';
     }

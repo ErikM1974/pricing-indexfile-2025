@@ -17,8 +17,18 @@
     var PREVIEW = (function () { var m = location.pathname.match(/^\/portal-admin\/preview\/(\d+)\b/); return m ? m[1] : null; })();
     var API = '/api/portal/reorder-batch'; // preview never POSTs (read-only) — guarded in send()
 
-    function read() { try { var a = JSON.parse(sessionStorage.getItem(KEY) || '[]'); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
-    function write(a) { try { sessionStorage.setItem(KEY, JSON.stringify(a)); } catch (e) { /* private mode */ } render(); }
+    var volatileItems = null;
+    function read() { if (volatileItems) return volatileItems.slice(); try { var a = JSON.parse(sessionStorage.getItem(KEY) || '[]'); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
+    var sending = false, returnFocus = null;
+    function write(a, sentCleanup) {
+        try { sessionStorage.setItem(KEY, JSON.stringify(a)); }
+        catch (e) {
+            if (sentCleanup) { volatileItems = a; render(); }
+            else flash('Could not save your Re-order List on this device. Please send this item directly to your rep.');
+            return false;
+        }
+        volatileItems = null; render(); return true;
+    }
     function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
 
     function add(item) {
@@ -35,11 +45,9 @@
             method: item.method || '', sizeBreakdown: item.sizeBreakdown || '', qty: String(item.qty || ''),
             designNumber: item.designNumber || '', designName: item.designName || '', image: item.image || ''
         });
-        write(a);
-        flash('Added to your Re-order List (' + a.length + ')');
+        if (write(a)) flash('Added to your Re-order List (' + a.length + ')');
     }
-    function removeAt(i) { var a = read(); a.splice(i, 1); write(a); }
-    function clear() { write([]); }
+    function removeAt(i) { if (sending) return; var a = read(); a.splice(i, 1); write(a); }
     function count() { return read().length; }
 
     // ── UI: floating button + slide-in drawer (injected once) ──
@@ -50,15 +58,15 @@
         root.innerHTML =
             '<button type="button" class="rl-fab" id="rl-fab" hidden aria-label="Open your re-order list">' +
                 '&#129534; Re-order List <span class="rl-fab-badge" id="rl-badge">0</span></button>' +
-            '<div class="rl-drawer" id="rl-drawer" hidden><div class="rl-panel" role="dialog" aria-label="Your re-order list">' +
+            '<div class="rl-drawer" id="rl-drawer" hidden><div class="rl-panel" role="dialog" aria-modal="true" aria-label="Your re-order list">' +
                 '<div class="rl-head"><span>Your Re-order List</span><button type="button" class="rl-x" id="rl-close" aria-label="Close">&times;</button></div>' +
                 '<p class="rl-sub">Everything here goes to your rep as one request for a fresh quote.</p>' +
                 '<div class="rl-items" id="rl-items"></div>' +
                 '<label class="rl-note-l">Notes <small>(deadline, anything the team should know)</small>' +
-                    '<textarea id="rl-note" rows="2" placeholder="Optional"></textarea></label>' +
-                '<div class="rl-err" id="rl-err"></div>' +
-                '<button type="button" class="rl-send" id="rl-send">Send all to my rep</button>' +
-                '<button type="button" class="rl-cont" id="rl-cont">Keep shopping</button>' +
+                    '<textarea class="field-textarea" id="rl-note" rows="2" placeholder="Optional"></textarea></label>' +
+                '<div class="rl-err" id="rl-err" role="alert"></div>' +
+                '<button type="button" class="btn btn-primary rl-send" id="rl-send">Send all to my rep</button>' +
+                '<button type="button" class="btn rl-cont" id="rl-cont">Keep shopping</button>' +
             '</div></div>';
         document.body.appendChild(root);
         badge = document.getElementById('rl-badge');
@@ -89,18 +97,43 @@
                 '</div>' +
                 '<button type="button" class="rl-item-x" data-i="' + i + '" aria-label="Remove">&times;</button></div>';
         }).join('') : '<div class="rl-empty">Your list is empty.</div>';
+        if (box) box.querySelectorAll('.rl-item-x').forEach(function (button) { button.disabled = sending; });
     }
     // Broken thumbnails drop out (was inline onerror= — Rule 3); `error` doesn't bubble → capture.
     document.addEventListener('error', function (e) { var t = e.target; if (t && t.tagName === 'IMG' && t.dataset && t.dataset.onerror === 'remove' && t.closest('.rl-item-img')) t.remove(); }, true);
-    function open() { ensureUI(); render(); drawer.hidden = false; }
-    function close() { if (drawer) drawer.hidden = true; }
+    function open() {
+        ensureUI(); render(); returnFocus = document.activeElement; drawer.hidden = false;
+        document.getElementById('rl-close').focus({ preventScroll: true });
+    }
+    function close() {
+        if (!drawer || drawer.hidden) return;
+        drawer.hidden = true;
+        var target = returnFocus && returnFocus.isConnected && returnFocus.getClientRects().length ? returnFocus : document.getElementById('pp-req-addlist');
+        if (target) target.focus({ preventScroll: true });
+    }
+    document.addEventListener('keydown', function (event) {
+        if (!drawer || drawer.hidden) return;
+        if (event.key === 'Escape') { event.preventDefault(); close(); return; }
+        if (event.key !== 'Tab') return;
+        var fields = Array.from(drawer.querySelectorAll('button:not(:disabled), textarea:not(:disabled), [tabindex="0"]')).filter(function (node) { return node.getClientRects().length; });
+        var first = fields[0], last = fields[fields.length - 1];
+        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    });
+    function setSending(value) {
+        sending = value;
+        var btn = document.getElementById('rl-send'); btn.disabled = value; btn.textContent = value ? 'Sending…' : 'Send all to my rep';
+        document.getElementById('rl-note').readOnly = value;
+        document.querySelectorAll('#rl-items .rl-item-x').forEach(function (button) { button.disabled = value; });
+    }
 
     function send() {
+        if (sending) return;
         var a = read(); if (!a.length) return;
         var err = document.getElementById('rl-err'); err.textContent = '';
         var note = (document.getElementById('rl-note') || {}).value || '';
         if (PREVIEW) { flash('Staff preview — the customer would send ' + a.length + ' item' + (a.length === 1 ? '' : 's') + ' to their rep.'); return; }
-        var btn = document.getElementById('rl-send'); btn.disabled = true; btn.textContent = 'Sending…';
+        setSending(true);
         fetch(API, {
             method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -110,19 +143,24 @@
             })
         }).then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
             .then(function (x) {
-                btn.disabled = false; btn.textContent = 'Send all to my rep';
+                setSending(false);
                 if (!x.ok || !x.j.ok) { err.textContent = (x.j && x.j.error) || 'Could not send. Please try again.'; return; }
                 var n = x.j.count || a.length;
-                clear(); close();
-                flash('Sent ' + n + ' item' + (n === 1 ? '' : 's') + ' to your rep' + (x.j.rep ? ' (' + x.j.rep + ')' : '') + '! They’ll follow up with a quote.');
+                // New items may have been appended while this batch was in flight.
+                var current = read(), cleanupSaved = true;
+                if (JSON.stringify(current.slice(0, a.length)) === JSON.stringify(a)) {
+                    cleanupSaved = write(current.slice(a.length), true);
+                }
+                document.getElementById('rl-note').value = ''; close();
+                flash('Sent ' + n + ' item' + (n === 1 ? '' : 's') + ' to your rep' + (x.j.rep ? ' (' + x.j.rep + ')' : '') + '! They’ll follow up with a quote.' + (cleanupSaved ? '' : ' Your local list could not be saved. Check with your rep before sending again after a reload.'));
             })
-            .catch(function () { btn.disabled = false; btn.textContent = 'Send all to my rep'; err.textContent = 'Could not send. Please try again.'; });
+            .catch(function () { setSending(false); err.textContent = 'Could not send. Please try again.'; });
     }
 
     // Toast — reuse the portal toast (#cp-toast) if present, else a tiny inline flash.
     function flash(msg) {
         var t = document.getElementById('cp-toast');
-        if (t) { t.innerHTML = esc(msg); t.className = 'cp-toast show'; setTimeout(function () { t.className = 'cp-toast'; }, 4000); return; }
+        if (t) { clearTimeout(flash.timer); t.innerHTML = esc(msg); t.className = 'cp-toast show'; flash.timer = setTimeout(function () { t.className = 'cp-toast'; }, 4000); return; }
         var f = document.getElementById('rl-flash');
         if (!f) { f = document.createElement('div'); f.id = 'rl-flash'; f.className = 'rl-flash'; document.body.appendChild(f); }
         f.textContent = msg; f.classList.add('show'); setTimeout(function () { f.classList.remove('show'); }, 4000);

@@ -5,6 +5,12 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## Customer account requests must retain ownership and persisted state (2026-09-10)
+
+- Problem/root cause: storage exceptions still reported Added; a successful batch cleared later additions; older color/minimum responses and request completion replaced newer UI; custom drawers/modals let keyboard focus escape.
+- Solution: report write failure, remove only the submitted list prefix, protect pending rows, track response generations and restore/contain dialog focus. Keep failed requests and notes available for exact retry; unavailable minimums stay visibly unknown while the rep can still quote. After a confirmed send, failed storage cleanup retains only unsent rows in memory and shows Sent with a reload warning; never invite a duplicate request.
+- Prevention: reproduce defects against immutable originals with delayed/rejected synthetic requests and unavailable storage. Keep pricing/date/quantity transformations unchanged. Inspect every paper page: complete descriptions, size labels with inputs, visible entered notes and no footer-only page.
+
 ## Customer and vendor status views must own pending requests and paper (2026-09-10)
 
 - Problem/root cause: disabling Post did not guard Ctrl+Enter; late job errors escaped into the list, and pending note completion could reopen a prior job. Shared shell print rules hid branding; prefix class edits accidentally styled count labels as buttons.
@@ -53,17 +59,6 @@ Exercise state transitions and verify complete printed content. Full entry in LE
 ### Shared form styles and print pseudo-elements (2026-09-08, archived): inspect actual filled paper and scoped pseudo-elements. Full entry in LESSONS_LEARNED_ARCHIVE.md.
 
 ### Training state must survive every input path (2026-09-08, archived): preserve input/retry/storage behavior. Full entry in LESSONS_LEARNED_ARCHIVE.md.
-
-## Reference content and browser persistence need their own checks (2026-09-08)
-- Problem/root cause: rich quick-tip data carried inline presentation rules into redesigned pages; local date-only strings displayed a day earlier in Pacific time. Guide checklist writes and resets could fail silently after a one-time storage probe.
-- Solution: preserve shared JSON for other consumers, sanitize only the new renderer, use calendar-date comparisons and visible request/retry states; guard each storage read/write/reset and preserve unreadable saved progress.
-- Prevention: lock original prose/media/data, test timezone boundaries and later storage failures, and review actual PDF text plus page images. A green stylesheet check alone cannot verify these behaviors.
-
-
-### Manual navigation and paper visibility share one state owner (2026-09-08)
-- Problem/root cause: removed inline handlers left stale selected-link code; duplicate initializers ignored deep links; missing birthdays and UTC date parsing broke roster display. Generic card print rules forced long schedule sections onto new sheets.
-- Solution: real section links, native disclosure buttons, one navigation/print-state owner, optional-birthday handling and local calendar dates; retire the legacy card class from documents.
-- Prevention: exercise every chapter/day and back/forward history, preserve original lesson data, check temporary print expansion restores screen state, and inspect actual PDFs for blank pages and complete text.
 
 ### Training exercises: round lifecycle and saved progress (2026-09-08)
 
