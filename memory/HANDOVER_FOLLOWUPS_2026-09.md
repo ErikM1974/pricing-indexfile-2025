@@ -1,5 +1,11 @@
 # Handover follow-ups — 2026-09-07
 
+## RELEASE CANDIDATE — v2026.09.10.11 Customer Account and Product
+
+Reviewed pair bba4306d is integrated with live44ccf020 atda6c23738011d4f6d2e55aaf57dd3112d9083b1c. All241 unit suites/5,640 tests (four existing skips),88 DOM,four accessibility unit and84 quote parity checks pass;423-asset build, lint/types,485routes/24modules and boot pass. Full CSS and live pricing browser checks run on the unchanged primary integration checkout. This release checkout adds only nine cache references, their reversible mappings and these notes; all six application CSS/JS assets remain identical. Exact-source CI can run alongside local checks; both must pass before deployment.
+
+54 focused browser cases plus final layout/paper checks;49 original browser contracts,17 source hashes/106 mappings and23 reviewed current paper pages. Nine important flags removed, canonical shared controls and eight demonstrated workflow repairs. Candidate189/225,36pending; live .10/2102 remains187/225,38pending until verified rollout. No real customer requests, emails, orders, rewards or device printing.
+
 > Current: Customer Account/Product is reviewed at bba4306d (189/225 candidate,36pending); live .10/2102/44ccf020 is verified at187/225. The live baseline is now merged, including shipped status/monogram test corrections. Earlier release-candidate entries below are historical. Next: complete full application and exact-source CI gates, then deploy and verify the account pair.
 
 ## NEXT — Customer Account and Product original source capture
