@@ -1,0 +1,25 @@
+{
+  "detail": "×\nCore fleece hoodie\n\nStyle: PC90H\n\nColor: Navy",
+  "copied": [
+    "http://localhost:3400/quote/EMB0910-7401"
+  ],
+  "events": {
+    "errors": [],
+    "writes": [],
+    "unknown": [],
+    "missing": [],
+    "reads": [
+      {
+        "path": "/api/public/quote/EMB0910-7401",
+        "query": ""
+      },
+      {
+        "path": "/api/quote-sessions/EMB0910-7401/full",
+        "query": ""
+      }
+    ],
+    "actions": [],
+    "beacons": [],
+    "lazy": []
+  }
+}

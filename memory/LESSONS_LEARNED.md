@@ -32,11 +32,7 @@ Historical deployment, token, builder, junction, server split and proxy-auth mig
 
 Exact-source CI must pass its actual browser/parity jobs, including credentials when required; local green is not CI green. Resolved runner/secret incidents are in LESSONS_LEARNED_ARCHIVE.md.
 
-## Quote operations need caller and quote scope checks (2026-09-07)
-- Problem/root cause: bulk sync, tracking writes and change-log operations trusted their expected caller without authenticating it.
-- Solution: deploy credentials in proxy jobs/callbacks first; gate app operations with staff/shared-secret checks and authenticate loopback writes.
-- Customer refresh/vendor reads preserve existing share-token/legacy links, but resolve only that quote's work order; overrides require staff/trusted sync. Compare token byte lengths before timingSafeEqual.
-- Prevention: quote-sync-access.test.js exercises actual route chains, rejected callers, customer scope and internal forwarding; never probe live bulk mutations to test a gate.
+Quote-operation access rollout (2026-09-07) is archived in LESSONS_LEARNED_ARCHIVE.md; caller/quote scope and live-mutation boundaries remain enforced by quote-sync-access.test.js.
 
 ## Scoped CSS migration must replace every competing entry point (2026-09-08)
 - Problem/root cause: legacy unlayered sheets outrank layered components; print-form date helpers attach to the whole field, including its label.
@@ -53,19 +49,10 @@ Exact-source CI must pass its actual browser/parity jobs, including credentials 
 - Solution: require every entered row/positive size to have current pricing; invalidate on edits, discard old responses, copy size maps, and use the same guard for Save and Print. Pending manual rows throw a visible error instead of falling back to AI data.
 - Prevention: controlled pending/failure/out-of-order tests plus browser assertions on actual readiness and posted money. Keep Save independent of customer/Push completeness; unused blank rows are allowed. EMB/SCP already recalculate before save; DTF computes from state.
 
-## Dialog text must stay readable during entrance motion (2026-09-08)
-- Problem/root cause: whole-dialog and toast opacity animations briefly blended text into its background; CI and the full local suite sampled low-contrast frames that focused runs missed.
-- Solution/prevention: animate position/scale only, and pause real preview/toast entry and dismissal animations mid-frame during the browser contrast check. Do not hide the failure with a fixed delay or weaken the accessibility assertion.
+## Dialog entrance contrast (2026-09-08, archived)
+Whole-dialog opacity blended text into its background; animate position/scale only and sample mid-animation. Full resolved entry in LESSONS_LEARNED_ARCHIVE.md.
 
-## Style/build checks must distinguish source from platform artifacts (2026-09-08)
-- Problem/root cause: a clean Windows checkout restored CRLF and inflated CSS budgets; esbuild linked-map hashes differed from Linux although executable code matched.
-- Solution: measure committed LF source bytes. Resolve production bundles from the production manifest and compare executable bytes excluding only the source-map filename.
-- Prevention: keep exact source-asset/live-SHA checks and do not increase budgets or claim missing deployment from a local bundle filename alone.
-
-## Server authentication migrations must preserve every caller boundary (2026-09-08)
-- Problem/root cause: transfer/Supacolor routers were open; separate notes, image downloads, vision extraction and two scheduler jobs used different call paths. The app's smaller global parser would also reject previously valid screenshots.
-- Solution: staff-session relays keep the credential server-side, authenticate before the 10 MB screenshot parser, allowlist paths/queries and preserve binary downloads. Vendor sessions retain ownership checks; public customer mockups do not request staff transfers.
-- Prevention: test actual mounts/page gates, allowed and denied identities, large/malformed requests, vendor notes and customer rendering. Deploy browser relays first, then backend gates and authenticated cron callers; never infer identity from Origin.
+Transfer/Supacolor authentication migration (2026-09-08) is archived in LESSONS_LEARNED_ARCHIVE.md. Keep staff/vendor/customer boundaries and auth-before-large-parser checks; never infer identity from Origin.
 
 ## Art-family themes and dialogs need runtime state coverage (2026-09-08)
 - Problem/root cause: department-scoped layout vanished in customer mode, guessed palette names had no definition, tablists mixed navigation links with tabs, and selection/toast opacity reduced text contrast. Icon-only controls also depended on an unloaded font.
@@ -252,3 +239,25 @@ Box-label follow-up (2026-09-10): a failed/new lookup must clear old printable d
 - Problem/root cause: a display rule defeated Everything's hidden rows; welcome cleared inline display but retained hidden; Directory rendered an old search before clearing it, and a pending roster looked empty.
 - Solution: one scoped layout plus canonical hidden state, explicit welcome visibility, clear-before-filter ordering, and render open roster views when the read settles. Keep a separate library link outside summary, focusable directory scrolling and a real active descendant for palette selection.
 - Prevention: preserve original roles/links/values, distinguish loading/empty/failure, exercise reload/pins/disclosures and keyboard search at four widths. Historical UI fixtures still consume the legacy dashboard sheets; remove production links without breaking those fixtures.
+
+### Hosted employee lists need a bounded page and usable fallback (2026-09-10)
+- Problem/root cause: a wide provider table expanded the whole phone page; shared controls were duplicated by Bootstrap and two local sheets, and failed embeds left blank space.
+- Solution: share the wrapper owner and canonical controls, give the provider a labelled keyboard-scroll region plus an always-available direct destination, and keep provider markup/approval behavior externally owned. Remove focus outlines only on paper.
+- Prevention: original source/provider locks, wide DOM and iframe fixtures, delayed/failed/login/empty states, narrow-screen axe and every PDF page. Allow exact static font/icon CSS reads before rejecting other fetches in axe-aware mock handlers; use declared tokens such as radius-pill.
+
+### Customer invoice PDF exports need their own geometry and failure cleanup (2026-09-10)
+- Problem/root cause: PDF action was enabled before loading and failed silently; resized capture viewports clipped exports, scrolled phone captures were blank, and html2pdf kept an invisible blocking overlay after rendering failed.
+- Solution: enable after successful render, offer visible load/PDF retry, use an independent paper clone with explicit canvas scrollX/scrollY zero, and remove only the failed worker’s overlay. Keep financial values and date-only parsing unchanged.
+- Prevention: record original fields/amounts/links, test actual desktop and scrolled-phone downloads, raster ink/logo checks, real library failure/retry and every rendered PDF page. A successful download event is not proof that the invoice is visible. CSS scale tokens are not uniform multiples: space-8 is64px, not32px; validate every variable against the actual token file.
+
+### Compact invoice state must survive refresh and print (2026-09-10)
+- Problem/root cause: share links lost k, URL/storage flags exposed staff controls, one-way hiding and cached storefront blobs kept stale addresses/art, carrier overrides preceded terminal shipment state, and print display rules forced RUSH onto every invoice.
+- Solution: verify server identity, preserve quote tokens, reset optional fields/caches per full load, separate tracking links from send controls, guard pending actions and terminal shipments, use shared hidden state and named native dialogs with explicit trigger-focus restoration.
+- Prevention: original source/money/payload locks, fresh-versus-refreshed fixtures, delayed/failure/retry/duplicate cases, actual rush/cancelled paper, radio-group keyboard order and visual service-label review. Native showModal moves focus before shared helpers can capture the trigger; capture the trigger beforehand.
+
+### Quote documents need calendar dates, server identity and complete paper (2026-09-10)
+- Problem/root cause: invoice links dropped quote tokens, stale storage exposed staff controls, UTC parsing shifted requested calendar dates, and failed supplemental/sync reads left silent stale information. Wide tables hid money/sizes on phones and whole-table print avoidance created empty paper.
+- Solution: retain k through navigation, verify current server identity, format only calendar business dates locally, retain refresh warnings through print/retry, use labelled mobile cells, row-level paper pagination and native named dialogs with explicit focus return. Pending financial actions reject duplicates and expose errors inside the active dialog.
+- Prevention: freeze original values, request bodies and source hashes; compare rendered totals (the renderer replaces initial placeholder IDs), all four widths/axe, delayed/error/retry/keyboard paths, actual lazy art imports and every PDF page. Keep shared builder-print and garment-form owners unchanged until their other consumers migrate.
+
+Control-class follow-up: regex word boundaries treat hyphens as separators, so sw-action-btn falsely matches a check for the canonical btn class. Compare whitespace-delimited class tokens, assert real rendered target sizes, and inspect staff toolbars as well as public actions.

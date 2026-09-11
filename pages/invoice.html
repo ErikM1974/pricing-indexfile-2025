@@ -6,49 +6,59 @@
     <link rel="icon" href="/favicon.png" type="image/png">
     <title>Invoice — Northwest Custom Apparel</title>
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/pages/css/invoice.css?v=2026.09.07.19">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.10.8">
+    <link rel="stylesheet" href="/shared_components/css/customer-documents.css?v=2026.09.10.9">
+    <link rel="stylesheet" href="/pages/css/invoice.css?v=2026.09.10.9">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/shared_components/css/toast-notifications.css?v=2026.09.07.10">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Toasts use the shared components stylesheet. -->
 </head>
-<body>
-    <main class="invoice-page">
+<body data-ui="unified" data-customer-document="compact-invoice">
+    <a class="skip-link" href="#invoice-main">Skip to invoice</a>
+    <header class="document-header">
+        <div><p class="document-eyebrow">Northwest Custom Apparel</p><h1 class="document-title">Invoice</h1></div>
+        <div class="document-actions" id="invoice-public-actions" hidden></div>
+    </header>
+    <main class="invoice-page document-main" id="invoice-main" tabindex="-1">
         <!-- Loading -->
-        <div id="loading" class="invoice-loading">
+        <div id="loading" class="invoice-loading" role="status">
             <p>Loading invoice…</p>
         </div>
 
         <!-- Error -->
-        <div id="error" class="invoice-error" style="display: none;">
+        <div id="error" class="invoice-error" role="alert" hidden>
             <h2>Invoice Not Found</h2>
             <p id="error-message">The invoice you're looking for could not be loaded.</p>
+            <button type="button" id="btn-invoice-retry" class="btn btn-primary">Try again</button>
             <p class="error-help">Contact us at <a href="tel:2539225793">(253) 922-5793</a> or
                 <a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a></p>
         </div>
 
         <!-- Toolbar (hidden in print) -->
-        <div id="toolbar" class="invoice-toolbar" style="display: none;">
-            <button type="button" id="btn-print" class="toolbar-btn toolbar-btn--primary">
+        <div id="toolbar" class="invoice-toolbar" hidden>
+            <button type="button" id="btn-print" class="btn btn-primary toolbar-btn">
                 🖨 Print / Save as PDF
             </button>
-            <button type="button" id="btn-refresh" class="toolbar-btn">
+            <button type="button" id="btn-refresh" class="btn toolbar-btn">
                 🔄 Refresh from ShopWorks
             </button>
-            <a id="btn-back-to-quote" class="toolbar-btn toolbar-btn--ghost" href="#">
+            <a id="btn-back-to-quote" class="page-nav-link toolbar-btn" href="#">
                 ← Back to full quote view
             </a>
-            <button type="button" id="btn-shipstation" class="toolbar-btn" style="display: none;">
+            <button type="button" id="btn-shipstation" class="btn toolbar-btn" hidden>
                 🚢 Send to ShipStation
             </button>
-            <span id="sync-status" class="toolbar-sync-status"></span>
+            <a id="shipstation-tracking" class="page-nav-link" target="_blank" rel="noopener" hidden>Track shipment</a>
+            <span id="sync-status" class="toolbar-sync-status" role="status"></span>
             <span class="toolbar-print-tip" title="Chrome print dialog → More Settings → uncheck &quot;Headers and footers&quot; for the cleanest PDF (one-time setting)">
                 💡 Print tip
             </span>
         </div>
 
         <!-- Invoice content -->
-        <div id="invoice" class="invoice" style="display: none;">
+        <div id="invoice" class="invoice" hidden>
+            <p id="invoice-sync-error" class="invoice-sync-error" role="alert" hidden></p>
 
             <!-- Header strip: logo + invoice meta -->
             <header class="invoice-header">
@@ -62,7 +72,7 @@
                     </div>
                 </div>
                 <div class="invoice-header-right">
-                    <div class="invoice-title" id="invoice-title">INVOICE</div>
+                    <h2 class="invoice-title" id="invoice-title">INVOICE</h2>
                     <div class="invoice-meta-row">
                         <span class="invoice-meta-label">Order #</span>
                         <span class="invoice-meta-value" id="invoice-order-number">—</span>
@@ -82,8 +92,8 @@
                  shown only when the order qualifies as RUSH. Placed above the
                  line items per QuickBooks convention for "high-priority"
                  callouts: full-width, accent border, can't be missed. -->
-            <div id="status-banner" class="invoice-status-banner" style="display: none;">
-                <span class="invoice-status-icon">⚡</span>
+            <div id="status-banner" class="invoice-status-banner" hidden>
+                <span class="invoice-status-icon" aria-hidden="true">⚡</span>
                 <span class="invoice-status-text">RUSH ORDER</span>
                 <span class="invoice-status-detail" id="status-banner-detail"></span>
             </div>
@@ -139,12 +149,12 @@
                 <table class="invoice-items-table">
                     <thead>
                         <tr>
-                            <th class="col-style">Item</th>
-                            <th class="col-color">Color</th>
-                            <th class="col-desc">Description</th>
-                            <th class="col-qty">Qty</th>
-                            <th class="col-unit">Unit Price</th>
-                            <th class="col-total">Total</th>
+                            <th scope="col" class="col-style">Item</th>
+                            <th scope="col" class="col-color">Color</th>
+                            <th scope="col" class="col-desc">Description</th>
+                            <th scope="col" class="col-qty">Qty</th>
+                            <th scope="col" class="col-unit">Unit Price</th>
+                            <th scope="col" class="col-total">Total</th>
                         </tr>
                     </thead>
                     <tbody id="items-tbody">
@@ -160,7 +170,7 @@
                         <span class="invoice-totals-label">Subtotal</span>
                         <span class="invoice-totals-value" id="total-subtotal">$0.00</span>
                     </div>
-                    <div class="invoice-totals-row" id="discount-row" style="display: none;">
+                    <div class="invoice-totals-row" id="discount-row" hidden>
                         <span class="invoice-totals-label">Discount</span>
                         <span class="invoice-totals-value" id="total-discount">$0.00</span>
                     </div>
@@ -178,7 +188,7 @@
                         <span class="invoice-totals-label">Total</span>
                         <span class="invoice-totals-value" id="total-grand">$0.00</span>
                     </div>
-                    <div class="invoice-totals-row" id="paid-row" style="display: none;">
+                    <div class="invoice-totals-row" id="paid-row" hidden>
                         <span class="invoice-totals-label">Payments Received</span>
                         <span class="invoice-totals-value" id="total-paid">$0.00</span>
                     </div>
@@ -217,14 +227,14 @@
         </div>
     </main>
 
-    <!-- SAML identity → legacy nwca_user_* keys (StaffAuthHelper.ready(), 2026-09-05) -->
+    <!-- Shared dialog focus lifecycle; invoice.js verifies staff identity with the server. -->
 
-    <script src="/shared_components/js/staff-auth-helper.js?v=2026.09.06.37"></script>
+    <script src="/shared_components/js/ui-dialog.js?v=2026.09.10.8"></script>
 
     <!-- Shared toasts replace the page's browser alert() calls (2026-09-05) -->
 
     <script src="/shared_components/js/toast-notifications.js?v=2026.09.08.3"></script>
 
-    <script src="/pages/js/invoice.js?v=2026.09.05.10"></script>
+    <script src="/pages/js/invoice.js?v=2026.09.10.9"></script>
 </body>
 </html>

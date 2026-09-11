@@ -1,0 +1,61 @@
+{
+  "before": {
+    "title": "Invoice #740123 — NWCA",
+    "text": "2025 Freeman Rd. E, Milton, WA 98354\n253-922-5793 · accounting@nwcustomapparel.com\nInvoice: 740123\nDate Ordered: Sep 1, 2026\nDate Invoiced: Sep 9, 2026\nDate Due: Oct 9, 2026\nBILL TO\n\nCedar Example Construction\n\nRiver Sample\n\n253-555-0142\n\nreview@example.test\n\nCUSTOMER #\n90210\nPO NUMBER\nPO-REVIEW-2026\nTERMS\nNet 30\nSALESPERSON\nExample Rep\nDESIGN\n#43012 · Cedar crew chest embroidery\nQty\tItem\tUnit Price\tTotal\n24\t\nPC54 · Navy\nCore Cotton Tee · Left chest embroidery\nS 2 · M 4 · L 6 · XL 6 · 2XL 4 · 3XL 2\n\t$18.75\t$450.00\n6\t\nJ317_3X · Black\nCore Soft Shell Jacket · Large sizes\n2XL 2 · 3XL 4\n\t$64.50\t$387.00\n1\t\nSETUP\nComplimentary setup\n\t\t\nSubtotal\t$837.00\nSales Tax\t$85.37\nShipping\t$18.50\nTotal\t$940.87\nPaid\t$300.00\nBalance Due\t$640.87\nThank you for your business! · Northwest Custom Apparel · (253) 922-5793",
+    "rows": [
+      [
+        "24",
+        "PC54 · Navy\nCore Cotton Tee · Left chest embroidery\nS 2 · M 4 · L 6 · XL 6 · 2XL 4 · 3XL 2",
+        "$18.75",
+        "$450.00"
+      ],
+      [
+        "6",
+        "J317_3X · Black\nCore Soft Shell Jacket · Large sizes\n2XL 2 · 3XL 4",
+        "$64.50",
+        "$387.00"
+      ],
+      [
+        "1",
+        "SETUP\nComplimentary setup",
+        "",
+        ""
+      ]
+    ],
+    "totals": [
+      "Subtotal $837.00",
+      "Sales Tax $85.37",
+      "Shipping $18.50",
+      "Total $940.87",
+      "Paid $300.00",
+      "Balance Due $640.87"
+    ],
+    "back": [
+      "/portal",
+      "/portal"
+    ]
+  },
+  "views": [
+    {
+      "width": 1440,
+      "scrollWidth": 1440,
+      "paperWidth": 800
+    },
+    {
+      "width": 768,
+      "scrollWidth": 768,
+      "paperWidth": 768
+    },
+    {
+      "width": 390,
+      "scrollWidth": 390,
+      "paperWidth": 390
+    },
+    {
+      "width": 320,
+      "scrollWidth": 320,
+      "paperWidth": 320
+    }
+  ],
+  "paper": "2025 Freeman Rd. E, Milton, WA 98354\n253-922-5793 · accounting@nwcustomapparel.com\nInvoice: 740123\nDate Ordered: Sep 1, 2026\nDate Invoiced: Sep 9, 2026\nDate Due: Oct 9, 2026\nBILL TO\n\nCedar Example Construction\n\nRiver Sample\n\n253-555-0142\n\nreview@example.test\n\nCUSTOMER #\n90210\nPO NUMBER\nPO-REVIEW-2026\nTERMS\nNet 30\nSALESPERSON\nExample Rep\nDESIGN\n#43012 · Cedar crew chest embroidery\nQty\tItem\tUnit Price\tTotal\n24\t\nPC54 · Navy\nCore Cotton Tee · Left chest embroidery\nS 2 · M 4 · L 6 · XL 6 · 2XL 4 · 3XL 2\n\t$18.75\t$450.00\n6\t\nJ317_3X · Black\nCore Soft Shell Jacket · Large sizes\n2XL 2 · 3XL 4\n\t$64.50\t$387.00\n1\t\nSETUP\nComplimentary setup\n\t\t\nSubtotal\t$837.00\nSales Tax\t$85.37\nShipping\t$18.50\nTotal\t$940.87\nPaid\t$300.00\nBalance Due\t$640.87\nThank you for your business! · Northwest Custom Apparel · (253) 922-5793"
+}

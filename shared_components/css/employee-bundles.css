@@ -1,0 +1,353 @@
+/* Customer employee-label workspaces; hosted records keep their own controls. */
+@layer components.pages {
+    :where([data-ui="unified"][data-employee-bundle]) {
+        --bundle-identity: var(--indigo-700);
+        --bundle-highlight: var(--amber-400);
+        --ui-accent: var(--indigo-700);
+        --ui-accent-hover: var(--blue-800);
+        --ui-tint: var(--gray-50);
+    }
+
+    :where([data-ui="unified"][data-employee-bundle="wcttr"]) {
+        --bundle-identity: var(--gray-800);
+        --bundle-highlight: var(--amber-600);
+        --ui-accent: var(--gray-800);
+        --ui-accent-hover: var(--gray-900);
+    }
+
+    :where([data-ui="unified"][data-employee-bundle]) .bundle-header {
+        border-top: 5px solid var(--bundle-highlight);
+        color: var(--color-on-brand);
+        background: var(--bundle-identity);
+    }
+
+    :where([data-ui="unified"][data-employee-bundle]) .bundle-header-inner {
+        display: flex;
+        align-items: center;
+        gap: var(--space-6);
+        max-width: 1280px;
+        margin: auto;
+        padding: var(--space-6) var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-employee-bundle]) .logo-container {
+        flex: 0 1 200px;
+        min-width: 130px;
+        padding: var(--space-3);
+        background: var(--ui-surface);
+        border-radius: var(--radius-sm);
+    }
+
+    :where([data-ui="unified"][data-employee-bundle]) .logo-container img {
+        display: block;
+        width: 100%;
+        max-height: 90px;
+        object-fit: contain;
+    }
+
+    :where([data-ui="unified"][data-employee-bundle]) .bundle-title {
+        margin: 0;
+        font-size: clamp(1.75rem, 3vw, 2.5rem);
+        letter-spacing: -0.035em;
+    }
+
+    :where([data-ui="unified"][data-employee-bundle]) .bundle-header p {
+        margin: var(--space-3) 0 0;
+    }
+
+    :where([data-ui="unified"][data-employee-bundle]) .bundle-main {
+        max-width: 1280px;
+        margin: auto;
+        padding: var(--space-6) var(--space-5);
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-employee-bundle]) .section-title {
+        margin: 0;
+        padding: var(--space-5);
+        font-size: var(--font-size-xl);
+        border-bottom: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-employee-bundle]) .section-title i {
+        color: var(--ui-accent);
+        margin-right: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-employee-bundle]) .important-note {
+        display: flex;
+        align-items: baseline;
+        gap: var(--space-3);
+        margin: var(--space-5);
+        padding: var(--space-4);
+        border-left: 4px solid var(--amber-600);
+        background: var(--amber-100);
+        color: var(--amber-900);
+    }
+
+    :where([data-ui="unified"][data-employee-bundle])
+        .important-note
+        > div:first-child {
+        flex-shrink: 0;
+    }
+
+    :where([data-ui="unified"][data-employee-bundle]) .important-note i {
+        margin-right: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-employee-bundle]) .instructions-box {
+        padding: 0 var(--space-5) var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-employee-bundle]) .instructions-box h3 {
+        margin: 0 0 var(--space-4);
+        font-size: var(--font-size-base);
+    }
+
+    :where([data-ui="unified"][data-employee-bundle]) .instructions-list {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: var(--space-5);
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    :where([data-ui="unified"][data-employee-bundle]) .instruction-step {
+        display: flex;
+        align-items: flex-start;
+        gap: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-employee-bundle]) .step-number {
+        display: grid;
+        place-items: center;
+        flex: 0 0 28px;
+        height: 28px;
+        border-radius: var(--radius-pill);
+        background: var(--ui-accent);
+        color: var(--color-on-brand);
+        font-size: var(--font-size-sm);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-employee-bundle]) .hosted-help {
+        border-top: 1px solid var(--ui-line);
+        font-size: var(--font-size-md);
+    }
+
+    :where([data-ui="unified"][data-employee-bundle]) .hosted-embed {
+        min-height: 320px;
+    }
+
+    :where([data-ui="unified"][data-employee-bundle]) .hosted-embed iframe {
+        max-width: 100%;
+    }
+
+    :where([data-ui="unified"][data-employee-bundle]) .company-bundles {
+        margin-top: var(--space-7);
+    }
+
+    :where([data-ui="unified"][data-employee-bundle]) .bundles-title {
+        font-size: var(--font-size-lg);
+        margin: 0 0 var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-employee-bundle]) .bundles-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-employee-bundle]) .bundle-card {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+        min-width: 0;
+        padding: var(--space-3);
+        font-size: var(--font-size-md);
+        text-decoration: none;
+    }
+
+    :where([data-ui="unified"][data-employee-bundle]) .bundle-card.active {
+        cursor: default;
+    }
+
+    :where([data-ui="unified"][data-employee-bundle]) .bundle-status {
+        flex-basis: 100%;
+        font-size: var(--font-size-sm);
+    }
+
+    :where([data-ui="unified"][data-employee-bundle]) .footer-logo {
+        padding: var(--space-6) 0 0;
+        text-align: center;
+    }
+
+    :where([data-ui="unified"][data-employee-bundle]) .footer-logo img {
+        max-width: 150px;
+        max-height: 70px;
+        object-fit: contain;
+    }
+
+    @media (width <= 700px) {
+        :where([data-ui="unified"][data-employee-bundle]) .bundle-header-inner {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: var(--space-4);
+            padding: var(--space-5) var(--space-4);
+        }
+
+        :where([data-ui="unified"][data-employee-bundle]) .logo-container {
+            flex: none;
+            width: 170px;
+        }
+
+        :where([data-ui="unified"][data-employee-bundle]) .bundle-main {
+            padding: var(--space-4);
+        }
+
+        :where([data-ui="unified"][data-employee-bundle]) .section-title {
+            padding: var(--space-4);
+        }
+
+        :where([data-ui="unified"][data-employee-bundle]) .important-note {
+            flex-direction: column;
+            gap: var(--space-2);
+            margin: var(--space-4);
+        }
+
+        :where([data-ui="unified"][data-employee-bundle]) .instructions-box {
+            padding: 0 var(--space-4) var(--space-4);
+        }
+
+        :where([data-ui="unified"][data-employee-bundle]) .instructions-list {
+            grid-template-columns: 1fr;
+            gap: var(--space-4);
+        }
+
+        :where([data-ui="unified"][data-employee-bundle]) .bundles-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media print {
+        :where([data-ui="unified"][data-employee-bundle]) .bundle-header {
+            color: var(--print-ink);
+            background: var(--ui-surface);
+            border-top: 0;
+        }
+
+        :where([data-ui="unified"][data-employee-bundle]) .bundle-header-inner {
+            padding: 0 0 var(--space-3);
+            gap: var(--space-4);
+        }
+
+        :where([data-ui="unified"][data-employee-bundle]) .logo-container {
+            flex: 0 0 110px;
+            min-width: 0;
+            padding: 0;
+        }
+
+        :where([data-ui="unified"][data-employee-bundle]) .logo-container img {
+            max-height: 45px;
+        }
+
+        :where([data-ui="unified"][data-employee-bundle]) .bundle-title {
+            font-size: 23px;
+        }
+
+        :where([data-ui="unified"][data-employee-bundle]) .bundle-header p {
+            margin: var(--space-1) 0 0;
+        }
+
+        :where([data-ui="unified"][data-employee-bundle]) .bundle-main {
+            padding: 0;
+        }
+
+        :where([data-ui="unified"][data-employee-bundle]) .section-title {
+            padding: var(--space-3);
+            font-size: 16px;
+        }
+
+        :where([data-ui="unified"][data-employee-bundle]) .important-note {
+            margin: var(--space-3);
+            padding: var(--space-2);
+        }
+
+        :where([data-ui="unified"][data-employee-bundle]) .instructions-box {
+            padding: 0 var(--space-3) var(--space-3);
+        }
+
+        :where([data-ui="unified"][data-employee-bundle]) .instructions-box h3 {
+            margin-bottom: var(--space-2);
+            font-size: 12px;
+        }
+
+        :where([data-ui="unified"][data-employee-bundle]) .hosted-embed {
+            min-height: 0;
+        }
+
+        :where([data-ui="unified"][data-employee-bundle]) .company-bundles {
+            margin-top: var(--space-3);
+            break-inside: avoid;
+        }
+
+        :where([data-ui="unified"][data-employee-bundle]) .bundles-title {
+            font-size: 12px;
+            margin-bottom: var(--space-2);
+        }
+
+        :where([data-ui="unified"][data-employee-bundle]) .bundles-grid {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: var(--space-1);
+        }
+
+        :where([data-ui="unified"][data-employee-bundle]) .bundle-card {
+            min-height: 0;
+            padding: var(--space-1);
+            font-size: 10px;
+        }
+
+        :where([data-ui="unified"][data-employee-bundle]) .footer-logo {
+            padding-top: var(--space-2);
+        }
+
+        :where([data-ui="unified"][data-employee-bundle]) .footer-logo img {
+            max-height: 30px;
+        }
+    }
+
+    :where([data-ui="unified"][data-employee-bundle])
+        .bundle-card:not(.page-nav-link) {
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-employee-bundle]) .page-nav-link {
+        justify-content: flex-start;
+    }
+
+    :where([data-ui="unified"][data-employee-bundle]) .bundle-scroll-hint {
+        display: none;
+    }
+
+    @media (width <= 700px) {
+        :where([data-ui="unified"][data-employee-bundle]) .bundle-scroll-hint {
+            display: block;
+            margin: 0;
+            padding: var(--space-3) var(--space-4) 0;
+            font-size: var(--font-size-sm);
+            color: var(--ui-muted);
+        }
+    }
+
+    @media print {
+        :where([data-ui="unified"][data-employee-bundle]) .bundle-scroll-hint {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-employee-bundle]) .hosted-embed {
+            outline: none;
+        }
+    }
+}

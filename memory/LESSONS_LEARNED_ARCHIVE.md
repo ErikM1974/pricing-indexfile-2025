@@ -1,4 +1,4 @@
-﻿# LESSONS LEARNED â€” ARCHIVE
+# LESSONS LEARNED â€” ARCHIVE
 
 Resolved entries aged out of `LESSONS_LEARNED.md` (300-line cap). Newest first. No limit here.
 
@@ -4224,3 +4224,27 @@ CI setup follow-up (2026-09-09): a Google Chrome apt index checksum mismatch blo
 - Root cause: empty error branches and catch blocks inside prerequisite loaders.
 - Solution: propagate errors to the product loader's existing error UI; clear size data before requesting it.
 - Prevention: calculator-api-errors.test.js covers HTTP, transport, malformed/empty responses and successful API data.
+
+## Quote operations need caller and quote scope checks (2026-09-07)
+- Problem/root cause: bulk sync, tracking writes and change-log operations trusted their expected caller without authenticating it.
+- Solution: deploy credentials in proxy jobs/callbacks first; gate app operations with staff/shared-secret checks and authenticate loopback writes.
+- Customer refresh/vendor reads preserve existing share-token/legacy links, but resolve only that quote's work order; overrides require staff/trusted sync. Compare token byte lengths before timingSafeEqual.
+- Prevention: quote-sync-access.test.js exercises actual route chains, rejected callers, customer scope and internal forwarding; never probe live bulk mutations to test a gate.
+
+
+## Server authentication migrations must preserve every caller boundary (2026-09-08)
+- Problem/root cause: transfer/Supacolor routers were open; separate notes, image downloads, vision extraction and two scheduler jobs used different call paths. The app's smaller global parser would also reject previously valid screenshots.
+- Solution: staff-session relays keep the credential server-side, authenticate before the 10 MB screenshot parser, allowlist paths/queries and preserve binary downloads. Vendor sessions retain ownership checks; public customer mockups do not request staff transfers.
+- Prevention: test actual mounts/page gates, allowed and denied identities, large/malformed requests, vendor notes and customer rendering. Deploy browser relays first, then backend gates and authenticated cron callers; never infer identity from Origin.
+
+## Archived 2026-09-10 — superseded by the build-verification follow-up
+
+## Style/build checks must distinguish source from platform artifacts (2026-09-08)
+- Problem/root cause: a clean Windows checkout restored CRLF and inflated CSS budgets; esbuild linked-map hashes differed from Linux although executable code matched.
+- Solution: measure committed LF source bytes. Resolve production bundles from the production manifest and compare executable bytes excluding only the source-map filename.
+- Prevention: keep exact source-asset/live-SHA checks and do not increase budgets or claim missing deployment from a local bundle filename alone.
+
+
+## Dialog text must stay readable during entrance motion (2026-09-08)
+- Problem/root cause: whole-dialog and toast opacity animations briefly blended text into its background; CI and the full local suite sampled low-contrast frames that focused runs missed.
+- Solution/prevention: animate position/scale only, and pause real preview/toast entry and dismissal animations mid-frame during the browser contrast check. Do not hide the failure with a fixed delay or weaken the accessibility assertion.

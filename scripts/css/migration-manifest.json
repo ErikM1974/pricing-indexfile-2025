@@ -5294,6 +5294,248 @@
         "rawCssBytes": 246827,
         "localCssRequests": 10
       }
+    },
+    {
+      "source": "employee-bundles/streich-bros-bundle.html",
+      "family": "employee-bundles",
+      "status": "pilot",
+      "route": "/employee-bundles/streich-bros-bundle.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/hosted-workspace.css",
+        "shared_components/css/employee-bundles.css"
+      ],
+      "dynamicStyles": [],
+      "dynamicTokens": [],
+      "states": [
+        "four-width-content-links-and-keyboard-scrolling",
+        "exact-synthetic-provider-script-boundary",
+        "provider-login-empty-and-failure",
+        "delayed-provider-visible-direct-exit",
+        "phone-iframe-containment",
+        "complete-one-page-landscape-print-and-screen-restoration"
+      ],
+      "test": "tests/e2e/css-unification-employee-bundles.spec.js",
+      "maxCssBytes": 71699,
+      "measuredRawCssBytes": 70675,
+      "baseline": {
+        "commit": "a878f826466ece08c506c76d1633ae3c4e39b8d9",
+        "rawCssBytes": 20343,
+        "localCssRequests": 2
+      },
+      "providerOwnership": "Caspio employee records, approvals, export and sign-in remain provider-owned. Only the host page and containment are migrated."
+    },
+    {
+      "source": "employee-bundles/wcttr-bundle.html",
+      "family": "employee-bundles",
+      "status": "pilot",
+      "route": "/employee-bundles/wcttr-bundle.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/hosted-workspace.css",
+        "shared_components/css/employee-bundles.css"
+      ],
+      "dynamicStyles": [],
+      "dynamicTokens": [],
+      "states": [
+        "four-width-content-links-and-keyboard-scrolling",
+        "exact-synthetic-provider-script-boundary",
+        "provider-login-empty-and-failure",
+        "delayed-provider-visible-direct-exit",
+        "phone-iframe-containment",
+        "complete-one-page-landscape-print-and-screen-restoration"
+      ],
+      "test": "tests/e2e/css-unification-employee-bundles.spec.js",
+      "maxCssBytes": 71699,
+      "measuredRawCssBytes": 70675,
+      "baseline": {
+        "commit": "a878f826466ece08c506c76d1633ae3c4e39b8d9",
+        "rawCssBytes": 20114,
+        "localCssRequests": 2
+      },
+      "providerOwnership": "Caspio employee records, approvals, export and sign-in remain provider-owned. Only the host page and containment are migrated."
+    },
+    {
+      "source": "pages/customer-invoice.html",
+      "family": "customer-documents",
+      "status": "reviewed",
+      "route": "/portal/invoice/:orderNo",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/customer-documents.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "customer",
+        "staff-preview",
+        "paid",
+        "unpaid",
+        "empty",
+        "long-invoice",
+        "escaped-content",
+        "invalid-invoice",
+        "expired-session",
+        "missing-invoice",
+        "failed-load",
+        "pending-load",
+        "retry",
+        "keyboard",
+        "four-widths",
+        "print",
+        "pdf-success",
+        "pdf-failure",
+        "pdf-retry",
+        "pdf-library-missing",
+        "scrolled-phone-pdf"
+      ],
+      "test": "tests/e2e/css-unification-customer-invoice.spec.js",
+      "maxCssBytes": 73242,
+      "measuredRawCssBytes": 72218,
+      "baseline": {
+        "commit": "64b95d2d",
+        "rawCssBytes": 19995,
+        "localCssRequests": 2
+      }
+    },
+    {
+      "source": "pages/invoice.html",
+      "family": "customer-documents",
+      "status": "reviewed",
+      "route": "/invoice/:quoteId",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/customer-documents.css",
+        "pages/css/invoice.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "shopworks",
+        "original-submission",
+        "saved-quote-items",
+        "storefront",
+        "extended-sizes",
+        "discount",
+        "shipping",
+        "tax-exempt",
+        "wholesale",
+        "paid",
+        "empty",
+        "long",
+        "rush",
+        "cancelled",
+        "pickup",
+        "production-pending",
+        "already-sent",
+        "shipped",
+        "share-token",
+        "anonymous",
+        "verified-staff",
+        "pending-identity",
+        "pending-load",
+        "failed-load",
+        "retry",
+        "sync-failure",
+        "sync-pending",
+        "refreshed-addresses",
+        "refreshed-storefront",
+        "shipment-confirm",
+        "shipment-override",
+        "shipment-failure",
+        "shipment-retry",
+        "duplicate-clicks",
+        "keyboard",
+        "four-widths",
+        "artwork-failure",
+        "print"
+      ],
+      "test": "tests/e2e/css-unification-compact-invoice.spec.js",
+      "maxCssBytes": 97224,
+      "measuredRawCssBytes": 96200,
+      "baseline": {
+        "commit": "7fb740dc",
+        "rawCssBytes": 45903,
+        "localCssRequests": 3
+      }
+    },
+    {
+      "source": "pages/quote-view.html",
+      "family": "customer-documents",
+      "status": "reviewed",
+      "route": "/quote/:quoteId",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/customer-documents.css",
+        "pages/css/quote-view.css"
+      ],
+      "dynamicStyles": [
+        "shared_components/css/garment-submit-form.css"
+      ],
+      "states": [
+        "open",
+        "accepted",
+        "deposit",
+        "paid",
+        "full-payment",
+        "expired",
+        "empty",
+        "escaped",
+        "mixed-methods",
+        "dtf",
+        "dtg",
+        "screenprint",
+        "contract",
+        "sizeless",
+        "long",
+        "shopworks",
+        "cancelled",
+        "shipped",
+        "artwork",
+        "share-token",
+        "anonymous",
+        "verified-staff",
+        "forged-storage",
+        "pending-identity",
+        "pending-load",
+        "failed-load",
+        "retry",
+        "failed-supplemental-data",
+        "sync-failure",
+        "sync-retry",
+        "pending-sync",
+        "manual-work-order",
+        "shipstation",
+        "shipstation-terminal",
+        "push-three-methods",
+        "push-cancel",
+        "push-failure",
+        "accept-validation",
+        "accept-keyboard",
+        "accept-pending",
+        "accept-failure",
+        "checkout-pending",
+        "checkout-failure",
+        "deposit-enable-failure",
+        "duplicate-actions",
+        "product-dialog",
+        "lazy-art-form",
+        "art-prefill-and-import-boundaries",
+        "change-notice-severities",
+        "four-widths",
+        "print"
+      ],
+      "test": "tests/e2e/css-unification-quote-view.spec.js",
+      "maxCssBytes": 130091,
+      "measuredRawCssBytes": 129067,
+      "baseline": {
+        "commit": "85eba439",
+        "rawCssBytes": 159871,
+        "localCssRequests": 4
+      }
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",
@@ -5305,7 +5547,7 @@
         "dashboards/js/lead-workspace.js",
         "pages/js/quote-view.js"
       ],
-      "note": "Record trigger states before migrating their consumers. The lead workspace trigger is reviewed in crm-records (four widths, prefill, keyboard containment, close); garment-submit-form.css/js remain original and their shared-module modernization is still pending across all consumers."
+      "note": "The lead workspace and Quote View lazy triggers are reviewed at four widths with original prefill, keyboard close/focus, and intercepted reference-import bodies. garment-submit-form.css/js remain original; shared-module modernization stays pending across all consumers."
     },
     {
       "kind": "style-injection",

@@ -21,6 +21,8 @@
     document.getElementById('ci-error').hidden = false;
   }
 
+  document.getElementById('ci-retry').addEventListener('click', function () { location.reload(); });
+
   if (!/^\d+$/.test(orderNo)) { fail(); return; }
 
   fetch(INVOICE_API, { credentials: 'same-origin' })
@@ -42,12 +44,12 @@
     var rows = (d.items || []).map(function (it) {
       var sz = sizeStr(it.sizes);
       return '<tr>' +
-        '<td class="num">' + esc(it.quantity) + '</td>' +
-        '<td><div class="ci-item-part">' + esc(it.partNumber) + (it.color ? ' &middot; ' + esc(it.color) : '') + '</div>' +
+        '<td class="num" data-label="Qty">' + esc(it.quantity) + '</td>' +
+        '<td data-label="Item"><div class="ci-item-part">' + esc(it.partNumber) + (it.color ? ' &middot; ' + esc(it.color) : '') + '</div>' +
           '<div>' + esc(it.description) + '</div>' +
           (sz ? '<div class="ci-item-sizes">' + esc(sz) + '</div>' : '') + '</td>' +
-        '<td class="num">' + (it.unitPrice ? money(it.unitPrice) : '') + '</td>' +
-        '<td class="num">' + (it.lineTotal ? money(it.lineTotal) : '') + '</td>' +
+        '<td class="num" data-label="Unit Price">' + (it.unitPrice ? money(it.unitPrice) : '') + '</td>' +
+        '<td class="num" data-label="Total">' + (it.lineTotal ? money(it.lineTotal) : '') + '</td>' +
         '</tr>';
     }).join('');
 
@@ -59,7 +61,7 @@
           '<div class="ci-from">2025 Freeman Rd. E, Milton, WA 98354<br>253-922-5793 &middot; accounting@nwcustomapparel.com</div>' +
         '</div>' +
         '<div class="ci-head-right">' +
-          '<div class="ci-inv-title">Invoice: ' + esc(d.invoiceNumber) + '</div>' +
+          '<h2 class="ci-inv-title">Invoice: ' + esc(d.invoiceNumber) + '</h2>' +
           '<div class="ci-inv-meta">Date Ordered: ' + esc(fdate(d.dateOrdered)) + '<br>Date Invoiced: ' + esc(fdate(d.dateInvoiced) || '—') + '<br>Date Due: ' + esc(fdate(d.dueDate) || '—') + '</div>' +
         '</div>' +
       '</div>' +
@@ -74,9 +76,10 @@
         '<div><div class="k">PO Number</div><div class="v">' + esc(d.poNumber || '—') + '</div></div>' +
         '<div><div class="k">Terms</div><div class="v">' + esc(d.terms || '—') + '</div></div>' +
         '<div><div class="k">Salesperson</div><div class="v">' + esc(d.salesperson || '—') + '</div></div>' +
-        ((d.designId || d.designName) ? '<div style="grid-column:1/-1"><div class="k">Design</div><div class="v">' + (d.designId ? '#' + esc(d.designId) + ' · ' : '') + esc(d.designName || '') + '</div></div>' : '') +
+        ((d.designId || d.designName) ? '<div class="ci-design"><div class="k">Design</div><div class="v">' + (d.designId ? '#' + esc(d.designId) + ' · ' : '') + esc(d.designName || '') + '</div></div>' : '') +
       '</div>' +
-      '<table class="ci-table"><thead><tr><th class="num">Qty</th><th>Item</th><th class="num">Unit Price</th><th class="num">Total</th></tr></thead><tbody>' + rows + '</tbody></table>' +
+      '<table class="ci-table" aria-label="Invoice line items"><thead><tr><th scope="col" class="num">Qty</th><th scope="col">Item</th><th scope="col" class="num">Unit Price</th><th scope="col" class="num">Total</th></tr></thead><tbody>' + rows + '</tbody></table>' +
+      (rows ? '' : '<p class="ci-empty">No line items on this invoice.</p>') +
       '<div class="ci-totals"><table>' +
         '<tr><td class="lbl">Subtotal</td><td class="amt">' + money(d.subtotal) + '</td></tr>' +
         '<tr><td class="lbl">Sales Tax</td><td class="amt">' + money(d.salesTax) + '</td></tr>' +
@@ -93,19 +96,43 @@
     paper.hidden = false;
     document.title = 'Invoice #' + d.invoiceNumber + ' — NWCA';
 
+    document.getElementById('ci-download').disabled = false;
     document.getElementById('ci-download').addEventListener('click', function () {
+      if (this.disabled) return;
       var btn = this, old = btn.textContent;
+      var error = document.getElementById('ci-download-error');
+      var pdfWorker;
+      error.hidden = true;
       btn.disabled = true; btn.textContent = 'Preparing…';
       var opt = {
         margin: [10, 10, 10, 10],
         filename: 'Invoice-' + d.invoiceNumber + '.pdf',
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
+        html2canvas: { scale: 2, useCORS: true, scrollX: 0, scrollY: 0 },
+        pagebreak: { mode: ['css', 'legacy'], avoid: ['tr', '.ci-head', '.ci-parties', '.ci-meta-grid', '.ci-totals', '.ci-foot'] },
         jsPDF: { unit: 'mm', format: 'letter', orientation: 'portrait' }
       };
       var done = function () { btn.disabled = false; btn.textContent = old; };
-      if (typeof html2pdf === 'undefined') { window.print(); done(); return; }
-      html2pdf().set(opt).from(paper).save().then(done).catch(done);
+      var failed = function () {
+        // html2pdf leaves its invisible interaction-blocking overlay on render failure.
+        if (pdfWorker && pdfWorker.prop && pdfWorker.prop.overlay) pdfWorker.prop.overlay.remove();
+        error.textContent = "Couldn't prepare the PDF. Please try Download PDF again.";
+        error.hidden = false;
+        done();
+      };
+      try {
+        if (typeof window.html2pdf === 'undefined') {
+          error.textContent = 'PDF download is unavailable. Choose Save as PDF in the print dialog.';
+          error.hidden = false;
+          window.print(); done(); return;
+        }
+        // Export an independent paper layout, including when the live page is on a phone.
+        var exportPaper = paper.cloneNode(true);
+        exportPaper.removeAttribute('id');
+        exportPaper.classList.add('ci-export');
+        pdfWorker = window.html2pdf().set(opt).from(exportPaper);
+        pdfWorker.save().then(done).catch(failed);
+      } catch (_) { failed(); }
     });
   }
 })();

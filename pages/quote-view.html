@@ -6,36 +6,38 @@
     <link rel="icon" href="/favicon.png" type="image/png">
     <title>Quote - Northwest Custom Apparel</title>
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/pages/css/quote-view.css?v=2026.09.07.19">
-    <!-- Phase 11 (2026-05-14): QuickBooks-style invoice print stylesheet -->
-    <link rel="stylesheet" href="/shared_components/css/quote-print.css?v=2026.09.07.19" media="print">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.10.8">
+    <link rel="stylesheet" href="/shared_components/css/customer-documents.css?v=2026.09.10.9">
+    <link rel="stylesheet" href="/pages/css/quote-view.css?v=2026.09.10.9">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Phase 11 (2026-05-14): jsPDF + html2canvas removed. PDF generation
-         now uses native window.print() + the @media print styles in
-         quote-print.css. Vector text, selectable, single-page. -->
-    <link rel="stylesheet" href="/shared_components/css/toast-notifications.css?v=2026.09.07.10">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- The page owner supplies readable screen and native print layouts. -->
 </head>
-<body>
-    <main class="quote-page">
+<body data-ui="unified" data-customer-document="quote-view">
+    <header class="document-header">
+        <div><p class="document-eyebrow">Northwest Custom Apparel</p><h1 class="document-title">Your quote</h1></div>
+        <a class="page-nav-link" href="/">Browse the catalog</a>
+    </header>
+    <main class="quote-page document-main">
         <!-- Loading State -->
-        <div id="loading-state" class="loading-state">
+        <div id="loading-state" class="loading-state" role="status" aria-live="polite">
             <div class="loading-spinner"></div>
             <p>Loading quote...</p>
         </div>
 
         <!-- Error State -->
-        <div id="error-state" class="error-state" style="display: none;">
+        <div id="error-state" class="error-state" role="alert" hidden>
             <div class="error-icon">!</div>
             <h2>Quote Not Found</h2>
             <p id="error-message">The quote you're looking for could not be found.</p>
             <p class="error-help">If you believe this is an error, call us at <a href="tel:2539225793">(253) 922-5793</a> or email <a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a>.</p>
             <p class="error-help"><a href="/">Browse the catalog</a> to start a new quote.</p>
+            <button type="button" id="quote-retry" class="btn btn-primary">Try again</button>
         </div>
 
         <!-- Quote Content -->
-        <div id="quote-content" class="quote-container" style="display: none;">
+        <div id="quote-content" class="quote-container" hidden>
             <!-- Header -->
             <header class="quote-header">
                 <div class="header-left">
@@ -46,7 +48,7 @@
                     </div>
                 </div>
                 <div class="header-right">
-                    <h1 id="quote-id-header">Quote #---</h1>
+                    <h2 id="quote-id-header">Quote #---</h2>
                     <div class="quote-status" id="quote-status">
                         <span class="status-badge status-open">Open</span>
                     </div>
@@ -65,7 +67,7 @@
             <!-- CANCELLED-IN-SHOPWORKS banner (sits above the sync strip).
                  Shows when ShopWorks operator deleted the order. Soft-delete
                  keeps the row 30 days for audit, then bulk-sync cron purges. -->
-            <div id="sw-cancelled-banner" class="sw-cancelled-banner" style="display: none;">
+            <div id="sw-cancelled-banner" class="sw-cancelled-banner" hidden>
                 <span class="sw-cancelled-icon" aria-hidden="true">⊘</span>
                 <div class="sw-cancelled-text">
                     <strong>CANCELLED IN SHOPWORKS</strong>
@@ -73,7 +75,7 @@
                 </div>
             </div>
 
-            <div id="sw-sync-strip" class="sw-sync-strip" style="display: none;">
+            <div id="sw-sync-strip" class="sw-sync-strip" hidden>
                 <div class="sw-sync-left">
                     <span class="sw-sync-pill" id="sw-sync-pill">
                         <span class="sw-sync-pill-icon" id="sw-sync-pill-icon">⏳</span>
@@ -83,7 +85,7 @@
                 </div>
                 <div class="sw-sync-right">
                     <span class="sw-sync-timestamp" id="sw-sync-timestamp"></span>
-                    <button type="button" class="sw-sync-refresh-btn" id="sw-sync-refresh-btn"
+                    <button type="button" class="sw-sync-refresh-btn btn" id="sw-sync-refresh-btn"
                             aria-label="Refresh from ShopWorks">
                         <span class="sw-sync-refresh-icon" aria-hidden="true">🔄</span>
                         <span class="sw-sync-refresh-label">Refresh</span>
@@ -104,13 +106,13 @@
                  Hidden after the rep enters the number or once auto-mapping
                  succeeds.
                  ============================================================ -->
-            <div id="sw-manual-wo-strip" class="sw-manual-wo-strip" style="display: none;">
+            <div id="sw-manual-wo-strip" class="sw-manual-wo-strip" hidden>
                 <div class="sw-manual-wo-left">
                     <span class="sw-manual-wo-icon">🔗</span>
                     <span class="sw-manual-wo-label">Link to ShopWorks Order #:</span>
-                    <input type="text" id="sw-manual-wo-input" class="sw-manual-wo-input"
+                    <input type="text" id="sw-manual-wo-input" class="sw-manual-wo-input field-input"
                            inputmode="numeric" pattern="[0-9]*" maxlength="7" placeholder="e.g. 141899" aria-label="Link to ShopWorks Order #">
-                    <button type="button" class="sw-manual-wo-btn" id="sw-manual-wo-btn">Set &amp; Sync</button>
+                    <button type="button" class="sw-manual-wo-btn btn" id="sw-manual-wo-btn">Set &amp; Sync</button>
                 </div>
                 <div class="sw-manual-wo-help">
                     Find the WO# in ShopWorks (top-right of the order detail page) and paste it here. Stored once, used forever.
@@ -125,21 +127,21 @@
                  DEPOSIT-PCT) and freezes the terms + totals-hash into Notes
                  JSON. Managed by quote-view.js setupDepositStrip().
                  ============================================================ -->
-            <div id="qv-deposit-strip" class="qv-deposit-strip" style="display: none;">
+            <div id="qv-deposit-strip" class="qv-deposit-strip" hidden>
                 <div class="qv-deposit-strip-head">
                     <span class="qv-deposit-strip-icon">&#128176;</span>
                     <span class="qv-deposit-strip-title">Online payment</span>
                     <span class="qv-deposit-strip-state" id="qv-deposit-state"></span>
                 </div>
-                <div class="qv-deposit-strip-form" id="qv-deposit-form" style="display: none;">
+                <div class="qv-deposit-strip-form" id="qv-deposit-form" hidden>
                     <label class="qv-deposit-field">Shipping $
-                        <input type="number" id="qv-deposit-shipping" min="0" step="0.01" value="0">
+                        <input type="number" id="qv-deposit-shipping" min="0" step="0.01" value="0" class="field-input">
                     </label>
                     <label class="qv-deposit-field">Tax rate %
-                        <input type="number" id="qv-deposit-taxrate" min="0" max="15" step="0.001" placeholder="e.g. 10.2">
+                        <input type="number" id="qv-deposit-taxrate" min="0" max="15" step="0.001" placeholder="e.g. 10.2" class="field-input">
                     </label>
                     <span class="qv-deposit-preview" id="qv-deposit-preview"></span>
-                    <button type="button" class="qv-deposit-enable-btn" id="qv-deposit-enable-btn">Enable payment link</button>
+                    <button type="button" class="qv-deposit-enable-btn btn" id="qv-deposit-enable-btn">Enable payment link</button>
                 </div>
                 <div class="qv-deposit-strip-help">
                     Confirms tax + shipping and turns on the customer's Pay button on this page
@@ -153,37 +155,41 @@
                  Common per-order actions consolidated at the top. Always
                  visible for staff. Hidden in print mode.
                  ============================================================ -->
-            <div class="sw-actions-row" id="sw-actions-row">
-                <button type="button" class="sw-action-btn" id="sw-action-print" title="Print or save as PDF">
+            <div class="sw-actions-row" id="sw-actions-row" hidden>
+                <button type="button" class="sw-action-btn btn" id="sw-action-print" title="Print or save as PDF">
                     <span class="sw-action-icon">🖨</span> Print / PDF
                 </button>
-                <button type="button" class="sw-action-btn" id="sw-action-copy-link" title="Copy this quote's URL to clipboard">
+                <button type="button" class="sw-action-btn btn" id="sw-action-copy-link" title="Copy this quote's URL to clipboard">
                     <span class="sw-action-icon">📋</span> Copy link
                 </button>
-                <button type="button" class="sw-action-btn" id="sw-action-email" title="Email this quote to the customer">
+                <button type="button" class="sw-action-btn btn" id="sw-action-email" title="Email this quote to the customer">
                     <span class="sw-action-icon">📧</span> Email customer
                 </button>
                 <!-- ShipStation button (Erik 2026-05-22 — B). Hidden by default.
                      Visibility + label managed by _updateShipStationButton()
                      (mirrors invoice.js logic: production-complete gate, pickup
                      skip, UPS/FedEx override, already-sent state, tracking#). -->
-                <button type="button" class="sw-action-btn" id="sw-action-shipstation" style="display: none;" title="Push this order to ShipStation. Warehouse will rate + buy the label there.">
+                <button type="button" class="sw-action-btn btn" id="sw-action-shipstation" title="Push this order to ShipStation. Warehouse will rate + buy the label there." hidden>
                     <span class="sw-action-icon">🚢</span> Send to ShipStation
                 </button>
                 <!-- Send to Steve (Erik 2026-06-26). Hidden until a real ShopWorks
                      order exists in ManageOrders (gated in _updateSendToSteveButton).
                      Opens Steve's garment art form pre-filled from the synced order,
                      with the customer's art + approved mockups carried over. -->
-                <button type="button" class="sw-action-btn" id="sw-action-send-steve" style="display: none;" title="Open Steve's art form pre-filled from this order — needs a ShopWorks order">
+                <button type="button" class="sw-action-btn btn" id="sw-action-send-steve" title="Open Steve's art form pre-filled from this order — needs a ShopWorks order" hidden>
                     <span class="sw-action-icon">🎨</span> Send to Steve
                 </button>
             </div>
 
             <!-- PO Number (inline with header, shown if present) -->
-            <div id="po-number-row" style="display: none; text-align: right; margin: -8px 0 8px; padding-right: 4px;">
-                <span style="font-size: 14px; color: #475569; font-weight: 600;">PO# <span id="po-number-display" style="color: #0f172a;"></span></span>
+            <div id="po-number-row" class="qv-po-row" hidden>
+                <span>PO# <span id="po-number-display" class="qv-po-value"></span></span>
             </div>
 
+            <div id="quote-data-warning" class="qv-data-warning" role="alert" hidden>
+                <p id="quote-data-warning-text"></p>
+                <button type="button" class="btn" id="quote-data-retry">Try again</button>
+            </div>
             <!-- Quote Meta -->
             <section class="quote-meta">
                 <div class="meta-card customer-card">
@@ -195,18 +201,18 @@
                     <!-- Phase 8 (2026-05-14): CEMB billing-block — renders under
                          the customer info when the saved quote has a billing
                          address (CEMB-only; legacy quotes don't populate this). -->
-                    <div class="billing-block" id="customer-billing-block" style="display: none; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--quote-card-border, #e2e8f0);">
-                        <p style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--quote-green, #4caf50); margin: 0 0 4px;">Billing Address</p>
-                        <p class="billing-address" id="customer-billing-address" style="margin: 0; font-size: 14px;"></p>
-                        <p class="billing-city-state" id="customer-billing-city-state" style="margin: 2px 0 0; font-size: 14px;"></p>
+                    <div class="billing-block" id="customer-billing-block" hidden>
+                        <p>Billing Address</p>
+                        <p class="billing-address" id="customer-billing-address"></p>
+                        <p class="billing-city-state" id="customer-billing-city-state"></p>
                     </div>
                 </div>
-                <div class="meta-card ship-to-card" id="ship-to-card" style="display: none;">
+                <div class="meta-card ship-to-card" id="ship-to-card" hidden>
                     <h3>Ship To</h3>
                     <p id="ship-to-address"></p>
                     <p id="ship-to-city-state"></p>
-                    <p id="ship-to-method" style="margin-top: 4px; font-style: italic; color: #64748b;"></p>
-                    <p id="ship-to-tracking" style="margin-top: 6px; font-size: 13px; display: none;"></p>
+                    <p id="ship-to-method" class="qv-ship-method"></p>
+                    <p id="ship-to-tracking" class="qv-tracking" hidden></p>
                 </div>
                 <div class="meta-card dates-card">
                     <h3>Quote Details</h3>
@@ -222,31 +228,31 @@
                         <span class="label">Valid Until:</span>
                         <span class="value" id="expires-date">---</span>
                     </div>
-                    <div class="date-row" id="sales-rep-row" style="display: none;">
+                    <div class="date-row" id="sales-rep-row" hidden>
                         <span class="label">Sales Rep:</span>
                         <span class="value" id="sales-rep">---</span>
                     </div>
-                    <div class="date-row" id="order-number-row" style="display: none;">
+                    <div class="date-row" id="order-number-row" hidden>
                         <span class="label">Order #:</span>
                         <span class="value" id="order-number">---</span>
                     </div>
-                    <div class="date-row" id="req-ship-date-row" style="display: none;">
+                    <div class="date-row" id="req-ship-date-row" hidden>
                         <span class="label">Req Ship Date:</span>
                         <span class="value" id="req-ship-date">---</span>
                     </div>
-                    <div class="date-row" id="drop-dead-date-row" style="display: none;">
+                    <div class="date-row" id="drop-dead-date-row" hidden>
                         <span class="label">Drop Dead Date:</span>
                         <span class="value" id="drop-dead-date">---</span>
                     </div>
-                    <div class="date-row" id="customer-number-row" style="display: none;">
+                    <div class="date-row" id="customer-number-row" hidden>
                         <span class="label">Customer #:</span>
                         <span class="value" id="customer-number-display">---</span>
                     </div>
-                    <div class="date-row" id="payment-terms-row" style="display: none;">
+                    <div class="date-row" id="payment-terms-row" hidden>
                         <span class="label">Terms:</span>
                         <span class="value" id="payment-terms">---</span>
                     </div>
-                    <div class="date-row" id="revision-row" style="display: none;">
+                    <div class="date-row" id="revision-row" hidden>
                         <span class="label">Last Revised:</span>
                         <span class="value" id="revised-date">---</span>
                     </div>
@@ -254,7 +260,7 @@
             </section>
 
             <!-- Expired Banner -->
-            <div id="expired-banner" class="expired-banner" style="display: none;">
+            <div id="expired-banner" class="expired-banner" hidden>
                 <span class="expired-icon">&#9888;</span>
                 <div class="expired-text">
                     <strong>This quote has expired</strong>
@@ -267,7 +273,7 @@
             </div>
 
             <!-- Accepted Banner -->
-            <div id="accepted-banner" class="accepted-banner" style="display: none;">
+            <div id="accepted-banner" class="accepted-banner" hidden>
                 <span class="accepted-icon">&#10003;</span>
                 <div class="accepted-text">
                     <strong>Quote Accepted</strong>
@@ -284,7 +290,7 @@
                                       hosted Checkout via deposit-checkout API)
                    paid             → receipt summary + balance-due line
                  ============================================================ -->
-            <section id="deposit-panel" class="deposit-panel" style="display: none;"></section>
+            <section id="deposit-panel" class="deposit-panel" hidden></section>
 
             <!-- ============================================================
                  Quote Timeline (#15, 2026-07-05). Collapsible event history
@@ -294,7 +300,7 @@
                  (reused from the sync snapshot, never refetched). Staff-
                  internal events (push / ShopWorks) render only for staff.
                  ============================================================ -->
-            <section id="qv-timeline-section" class="qv-timeline-section" style="display: none;">
+            <section id="qv-timeline-section" class="qv-timeline-section" hidden>
                 <details class="qv-timeline-details">
                     <summary class="qv-timeline-summary">
                         <span class="qv-timeline-summary-icon">&#9656;</span>
@@ -308,7 +314,7 @@
             </section>
 
             <!-- DTF Transfer Specs (populated by JS for DTF quotes) -->
-            <section id="dtf-specs-section" class="dtf-specs-section" style="display: none;">
+            <section id="dtf-specs-section" class="dtf-specs-section" hidden>
                 <h2>Transfer Specifications</h2>
                 <div id="dtf-specs-container" class="dtf-specs-container">
                     <!-- DTF location specs will be populated by JavaScript -->
@@ -320,7 +326,7 @@
                  Mirrors the Designs block on the ShopWorks production PDF.
                  Hidden until a ShopWorks snapshot has been synced.
                  ============================================================ -->
-            <section id="sw-designs-section" class="sw-designs-section" style="display: none;">
+            <section id="sw-designs-section" class="sw-designs-section" hidden>
                 <h2>Designs</h2>
                 <div class="sw-designs-meta">
                     <div class="sw-designs-counter">
@@ -332,11 +338,11 @@
                         <span class="sw-designs-counter-value" id="sw-designs-imprints">—</span>
                     </div>
                 </div>
-                <div class="sw-designs-table-wrap">
+                <div class="sw-designs-table-wrap" role="region" aria-label="Order designs" tabindex="0">
                     <table class="sw-designs-table" id="sw-designs-table">
                         <thead>
                             <tr>
-                                <th class="sw-designs-th-thumb" aria-label="Design thumbnail"></th>
+                                <th class="sw-designs-th-thumb" scope="col">Preview</th>
                                 <th>ID</th>
                                 <th>Name</th>
                                 <th>Type</th>
@@ -356,7 +362,7 @@
                  10-tile grid of Yes/No flags mirroring the ShopWorks UI's
                  right-side Order Status panel. Hidden until snapshot synced.
                  ============================================================ -->
-            <section id="sw-status-section" class="sw-status-section" style="display: none;">
+            <section id="sw-status-section" class="sw-status-section" hidden>
                 <h2>Order Status</h2>
                 <div class="sw-status-grid" id="sw-status-grid">
                     <!-- 5 cells populated by JS — each cell: label + state (Yes/No/Partial/n/a) -->
@@ -368,7 +374,7 @@
                  backstory of the "Purchase Received" milestone — staff see the status
                  and where the blanks are in one place. Distinct from the OUTBOUND
                  Shipping section further down (us → customer). Staff-only overlay. -->
-            <section id="sw-vendor-shipment-section" class="sw-vendor-section" style="display: none;">
+            <section id="sw-vendor-shipment-section" class="sw-vendor-section" hidden>
                 <h2>Blank Goods — from SanMar</h2>
                 <div class="sw-vendor-body" id="sw-vendor-body">
                     <span class="sw-vendor-loading">Checking SanMar…</span>
@@ -384,9 +390,9 @@
             </section>
 
             <!-- Special Notes (shown when plain-text notes exist) -->
-            <section id="special-notes-section" class="special-notes-section" style="display: none;">
+            <section id="special-notes-section" class="special-notes-section" hidden>
                 <div class="special-notes-card">
-                    <h3><i class="fas fa-sticky-note" style="color: #f9a825; margin-right: 6px;" aria-hidden="true"></i>Special Notes</h3>
+                    <h3><i class="fas fa-sticky-note" aria-hidden="true"></i>Special Notes</h3>
                     <pre id="special-notes-content" class="special-notes-content"></pre>
                 </div>
             </section>
@@ -399,12 +405,12 @@
                  aren't surfaced by the MO /v1 read API — we show what we
                  submitted plus a note explaining the limitation.
                  ============================================================ -->
-            <section id="sw-notes-section" class="sw-notes-section" style="display: none;">
+            <section id="sw-notes-section" class="sw-notes-section" hidden>
                 <h2>Notes To Production</h2>
                 <ol class="sw-notes-list" id="sw-notes-list">
                     <!-- populated by JS — each <li> is a single Production note -->
                 </ol>
-                <div class="sw-notes-footer" id="sw-notes-footer" style="display: none;"></div>
+                <div class="sw-notes-footer" id="sw-notes-footer" hidden></div>
             </section>
 
             <!-- ============================================================
@@ -412,7 +418,7 @@
                  Sourced from /v1/orders cur_* fields (post-import, reflects
                  ShopWorks-side adjustments). Hidden until snapshot synced.
                  ============================================================ -->
-            <section id="sw-financial-section" class="sw-financial-section" style="display: none;">
+            <section id="sw-financial-section" class="sw-financial-section" hidden>
                 <h2>Financial Summary</h2>
                 <div class="sw-financial-grid">
                     <div class="sw-financial-row">
@@ -456,14 +462,14 @@
                  Helps reps + AR answer "what changed since submit?".
                  Hidden until snapshot synced.
                  ============================================================ -->
-            <section id="sw-original-section" class="sw-original-section" style="display: none;">
+            <section id="sw-original-section" class="sw-original-section" hidden>
                 <details class="sw-original-details">
                     <summary class="sw-original-summary">
                         <span class="sw-original-summary-icon">▸</span>
                         <span class="sw-original-summary-title">View original submission</span>
                         <span class="sw-original-summary-meta" id="sw-original-summary-meta"></span>
                     </summary>
-                    <div class="sw-original-body" id="sw-original-body">
+                    <div class="sw-original-body" id="sw-original-body" role="region" aria-label="Original submission details" tabindex="0">
                         <!-- populated by JS -->
                     </div>
                 </details>
@@ -478,7 +484,7 @@
                  ship.* fields (the MO /v1 /orders endpoint doesn't expose
                  ShippingAddresses — defer to a separate fetch later).
                  ============================================================ -->
-            <section id="sw-shipping-section" class="sw-shipping-section" style="display: none;">
+            <section id="sw-shipping-section" class="sw-shipping-section" hidden>
                 <h2>Shipping</h2>
                 <div class="sw-shipping-meta">
                     <div class="sw-shipping-meta-row">
@@ -517,7 +523,7 @@
                         <span class="label">Subtotal:</span>
                         <span class="value" id="subtotal">$0.00</span>
                     </div>
-                    <div class="total-row" id="ltm-row" style="display: none;">
+                    <div class="total-row" id="ltm-row" hidden>
                         <span class="label">LTM Fee:</span>
                         <span class="value" id="ltm-fee">$0.00</span>
                     </div>
@@ -561,7 +567,7 @@
                     </svg>
                     Accept Quote
                 </button>
-                <button class="btn btn-secondary" id="push-shopworks-btn" style="display:none">
+                <button class="btn btn-secondary" id="push-shopworks-btn" hidden>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z"/>
                     </svg>
@@ -573,12 +579,12 @@
             <footer class="quote-footer">
                 <div class="footer-content">
                     <div class="footer-section">
-                        <h4>Questions?</h4>
+                        <h2>Questions?</h2>
                         <p>Contact your sales representative or call us at</p>
                         <a href="tel:2539225793" class="phone-link">(253) 922-5793</a>
                     </div>
                     <div class="footer-section">
-                        <h4>Terms</h4>
+                        <h2>Terms</h2>
                         <ul class="terms-list">
                             <li>Quote valid for 30 days</li>
                             <li>Payment due before production begins</li>
@@ -593,30 +599,30 @@
         </div>
 
         <!-- Accept Quote Modal -->
-        <div id="accept-modal" class="modal" style="display: none;">
-            <div class="modal-backdrop"></div>
+        <dialog id="accept-modal" class="ui-dialog modal qv-dialog" aria-label="Accept Quote">
             <div class="modal-content">
                 <div class="modal-header">
                     <h2>Accept Quote</h2>
-                    <button class="modal-close" id="modal-close">&times;</button>
+                    <button class="modal-close btn" id="modal-close" type="button" aria-label="Close acceptance">&times;</button>
                 </div>
                 <div class="modal-body">
                     <p class="modal-description">By accepting this quote, you agree to the pricing and terms shown.</p>
 
+                    <p id="accept-error" class="qv-form-error" role="alert" hidden></p>
                     <form id="accept-form">
                         <div class="form-group">
                             <label for="accept-name">Your Name *</label>
-                            <input type="text" id="accept-name" name="name" required placeholder="John Doe">
+                            <input type="text" id="accept-name" name="name" required placeholder="John Doe" class="field-input">
                         </div>
                         <div class="form-group">
                             <label for="accept-email">Your Email *</label>
-                            <input type="email" id="accept-email" name="email" required placeholder="john@company.com">
+                            <input type="email" id="accept-email" name="email" required placeholder="john@company.com" class="field-input">
                         </div>
                         <!-- Delivery method (pickup skip-the-rep, 2026-07-06): pickup has
                              $0 shipping + fixed Milton tax, so the server auto-enables the
                              online payment right at acceptance. Ship-to keeps the rep gate. -->
-                        <div class="form-group qv-delivery-choice">
-                            <label>How will you get your order? *</label>
+                        <fieldset class="form-group qv-delivery-choice">
+                            <legend>How will you get your order? *</legend>
                             <label class="qv-delivery-option">
                                 <input type="radio" name="deliveryMethod" value="pickup" id="accept-pickup">
                                 <span><strong>Pickup — Milton, WA</strong><br><small>Free · pay online right after accepting</small></span>
@@ -625,7 +631,7 @@
                                 <input type="radio" name="deliveryMethod" value="ship" id="accept-ship">
                                 <span><strong>Ship it to me</strong><br><small>Your rep confirms shipping cost, then sends your pay link</small></span>
                             </label>
-                        </div>
+                        </fieldset>
                         <div class="form-info">
                             <p><strong>Quote Total:</strong> <span id="modal-total">$0.00</span></p>
                             <p><strong>Valid Until:</strong> <span id="modal-expires">---</span></p>
@@ -636,15 +642,14 @@
                     <button class="btn btn-secondary" id="modal-cancel">Cancel</button>
                     <button class="btn btn-primary" id="modal-accept">
                         <span id="accept-btn-text">Accept Quote</span>
-                        <span id="accept-btn-loading" style="display: none;">Processing...</span>
+                        <span id="accept-btn-loading" hidden>Processing...</span>
                     </button>
                 </div>
             </div>
-        </div>
+        </dialog>
 
         <!-- Success Modal -->
-        <div id="success-modal" class="modal" style="display: none;">
-            <div class="modal-backdrop"></div>
+        <dialog id="success-modal" class="ui-dialog modal qv-dialog" aria-label="Quote Accepted">
             <div class="modal-content success-modal">
                 <div class="success-icon">&#10003;</div>
                 <h2>Quote Accepted!</h2>
@@ -654,21 +659,20 @@
                 <p class="success-contact">Questions? Call us at <a href="tel:2539225793">(253) 922-5793</a></p>
                 <button class="btn btn-primary" id="success-close">Close</button>
             </div>
-        </div>
+        </dialog>
 
         <!-- Send to Steve modal (staff only) — mounts the shared garment art form
              (GarmentSubmitForm) pre-filled from this order. Deps are lazy-loaded
              on first open so this customer-facing page stays lean. -->
-        <div id="sts-modal" class="sts-modal" style="display:none;">
-            <div class="sts-modal-backdrop" id="sts-modal-backdrop"></div>
-            <div class="sts-modal-dialog" role="dialog" aria-modal="true" aria-label="Send artwork to Steve">
-                <button type="button" class="sts-modal-close" id="sts-modal-close" title="Close">&times;</button>
+        <dialog id="sts-modal" class="ui-dialog sts-modal qv-dialog" aria-label="Send artwork to Steve">
+            <div class="sts-modal-dialog">
+                <button type="button" class="sts-modal-close btn" id="sts-modal-close" title="Close" aria-label="Close artwork form">&times;</button>
                 <div id="sts-form-mount"></div>
             </div>
-        </div>
+        </dialog>
     </main>
 
-    <script src="/shared_components/js/staff-auth-helper.js?v=2026.09.06.37"></script>
+    <script src="/shared_components/js/ui-dialog.js?v=2026.09.10.8"></script>
     <!-- Deposit money-math (dual-load with the server; preview-only in the browser) -->
     <script src="/shared_components/js/quote-deposit-math.js?v=2026.07.09.1"></script>
     <!-- Same-origin rewrite for gated /api/box/* image URLs (design thumbnails) -->
@@ -677,6 +681,6 @@
     <script src="/shared_components/js/toast-notifications.js?v=2026.09.08.3"></script>
     <!-- Proxy host for product-image lookups (Rule 6) -->
     <script src="/config/app.config.js"></script>
-    <script src="/pages/js/quote-view.js?v=2026.09.07.35"></script>
+    <script src="/pages/js/quote-view.js?v=2026.09.10.9"></script>
 </body>
 </html>
