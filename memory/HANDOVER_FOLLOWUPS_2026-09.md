@@ -1,5 +1,11 @@
 # Handover follow-ups — 2026-09-07
 
+## RELEASE CANDIDATE — v2026.09.11.6 three contract calculators
+
+Reviewed source 4f793212a25530918d1045c2bbf647aa6c30177d is integrated with verified .5 history at e23f892888633587c800abc3d05af11c7d451d6c. Eleven references version seven changed assets, with 44 reversible mappings preserving14 source originals. All28 focused browser cases,279 source/ownership guards,72 full-page screens and20 paper pages in18 documents are reviewed. Eleven financial function bodies, the entire Embroidery controller and DST parser/math remain unchanged.
+
+Candidate207/225 reviewed,18pending. Verified LIVE remains.5/Heroku2108/93fe1568 at204/225,21pending. Run all full local and actual four-job exact-source CI checks before rollout; verify actual Heroku slug, source/compiled assets and anonymous access afterward. Next families remain isolated during release checks. No real business writes, email, uploads, payments, env copying or device printing; never recursively delete the node_modules junction.
+
 ## REVIEWED — three contract calculators, 2026-09-11
 
 Contract DTG, Contract Embroidery and its printable price sheet now use Public Sans, shared canonical controls and four scoped, token-based style owners. Reviewed all 72 full-page captures across 1440/768/390/320 using 50 detail sheets, plus all 20 current paper pages in 18 documents (35 original pages). A second PDF renderer confirmed complete headings. The price sheet fits one landscape page; full-back and multiple-stitch-file cases retain two complete pages.

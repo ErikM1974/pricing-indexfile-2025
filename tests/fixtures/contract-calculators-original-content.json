@@ -252,6 +252,83 @@
       "after": "    if (eff) eff.textContent = `Rates effective ${RATES_EFFECTIVE}`;\n    const footer = document.querySelector('.page-footer p');\n    if (footer) footer.textContent = `Pricing effective ${RATES_EFFECTIVE} — ${ORDER_MINIMUM ? formatPrice(ORDER_MINIMUM) + ' order minimum on every contract order' : 'order minimum not loaded — confirm before quoting.'}`;",
       "count": 1,
       "reason": "Printed footer reflects the same loaded or unavailable order minimum as the existing terms"
+    },
+    {
+      "file": "calculators/dtg-contract/index.html",
+      "before": "/shared_components/css/contract-pricing-2026.css?v=2026.09.07.12",
+      "after": "/shared_components/css/contract-pricing-2026.css?v=2026.09.11.6",
+      "count": 1,
+      "reason": "Refetch the reviewed contract calculator asset at this release version."
+    },
+    {
+      "file": "calculators/dtg-contract/index.html",
+      "before": "/calculators/dtg-contract/dtg-contract.css?v=2026.09.07.12",
+      "after": "/calculators/dtg-contract/dtg-contract.css?v=2026.09.11.6",
+      "count": 1,
+      "reason": "Refetch the reviewed contract calculator asset at this release version."
+    },
+    {
+      "file": "calculators/dtg-contract/index.html",
+      "before": "/calculators/dtg-contract/dtg-contract.js?v=2026.09.07.33",
+      "after": "/calculators/dtg-contract/dtg-contract.js?v=2026.09.11.6",
+      "count": 1,
+      "reason": "Refetch the reviewed contract calculator asset at this release version."
+    },
+    {
+      "file": "calculators/dtg-contract/index.html",
+      "before": "/shared_components/js/contract-calculator-ui.js",
+      "after": "/shared_components/js/contract-calculator-ui.js?v=2026.09.11.6",
+      "count": 1,
+      "reason": "Refetch the reviewed contract calculator asset at this release version."
+    },
+    {
+      "file": "calculators/embroidery-contract/index.html",
+      "before": "/shared_components/css/contract-pricing-2026.css?v=2026.09.07.12",
+      "after": "/shared_components/css/contract-pricing-2026.css?v=2026.09.11.6",
+      "count": 1,
+      "reason": "Refetch the reviewed contract calculator asset at this release version."
+    },
+    {
+      "file": "calculators/embroidery-contract/index.html",
+      "before": "/calculators/embroidery-contract/embroidery-contract.css?v=2026.09.07.12",
+      "after": "/calculators/embroidery-contract/embroidery-contract.css?v=2026.09.11.6",
+      "count": 1,
+      "reason": "Refetch the reviewed contract calculator asset at this release version."
+    },
+    {
+      "file": "calculators/embroidery-contract/index.html",
+      "before": "/shared_components/js/contract-calculator-ui.js",
+      "after": "/shared_components/js/contract-calculator-ui.js?v=2026.09.11.6",
+      "count": 1,
+      "reason": "Refetch the reviewed contract calculator asset at this release version."
+    },
+    {
+      "file": "pages/embroidery-contract-pricing.html",
+      "before": "/shared_components/css/contract-pricing-2026.css?v=2026.09.11.5",
+      "after": "/shared_components/css/contract-pricing-2026.css?v=2026.09.11.6",
+      "count": 1,
+      "reason": "Refetch the reviewed contract calculator asset at this release version."
+    },
+    {
+      "file": "pages/embroidery-contract-pricing.html",
+      "before": "/pages/embroidery-contract-pricing.css?v=2026.09.07.19",
+      "after": "/pages/embroidery-contract-pricing.css?v=2026.09.11.6",
+      "count": 1,
+      "reason": "Refetch the reviewed contract calculator asset at this release version."
+    },
+    {
+      "file": "pages/embroidery-contract-pricing.html",
+      "before": "/pages/embroidery-contract-pricing.js?v=2026.09.06.31",
+      "after": "/pages/embroidery-contract-pricing.js?v=2026.09.11.6",
+      "count": 1,
+      "reason": "Refetch the reviewed contract calculator asset at this release version."
+    },
+    {
+      "file": "pages/embroidery-contract-pricing.html",
+      "before": "/shared_components/js/contract-calculator-ui.js",
+      "after": "/shared_components/js/contract-calculator-ui.js?v=2026.09.11.6",
+      "count": 1,
+      "reason": "Refetch the reviewed contract calculator asset at this release version."
     }
   ],
   "capturedAt": "2026-09-11T16:03:36.521Z"
