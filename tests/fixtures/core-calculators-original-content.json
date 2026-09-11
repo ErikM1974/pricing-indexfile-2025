@@ -1055,6 +1055,160 @@
       "after": "                            <span>Printing on dark garment?</span>\n\n                            <span class=\"sp-dark-garment-info\">(White underbase required)</span>",
       "count": 1,
       "reason": "Remove whitespace left by presentation extraction without changing generated content."
+    },
+    {
+      "file": "calculators/cap-embroidery-pricing-integrated.html",
+      "before": "/shared_components/css/core-calculators.css?v=2026.09.11.4",
+      "after": "/shared_components/css/core-calculators.css?v=2026.09.11.5",
+      "count": 1,
+      "reason": "Refetch the reviewed core calculator asset at this release version."
+    },
+    {
+      "file": "calculators/cap-embroidery-pricing-integrated.html",
+      "before": "/calculators/css/cap-embroidery-pricing-integrated.css?v=2026.09.11.4",
+      "after": "/calculators/css/cap-embroidery-pricing-integrated.css?v=2026.09.11.5",
+      "count": 1,
+      "reason": "Refetch the reviewed core calculator asset at this release version."
+    },
+    {
+      "file": "calculators/cap-embroidery-pricing-integrated.html",
+      "before": "/calculators/js/cap-embroidery-pricing-integrated-page.js?v=2026.09.07.33",
+      "after": "/calculators/js/cap-embroidery-pricing-integrated-page.js?v=2026.09.11.5",
+      "count": 1,
+      "reason": "Refetch the reviewed core calculator asset at this release version."
+    },
+    {
+      "file": "calculators/cap-embroidery-pricing-integrated.html",
+      "before": "/shared_components/js/core-calculator-ui.js?v=2026.09.11.4",
+      "after": "/shared_components/js/core-calculator-ui.js?v=2026.09.11.5",
+      "count": 1,
+      "reason": "Refetch the reviewed core calculator asset at this release version."
+    },
+    {
+      "file": "calculators/dtf-pricing.html",
+      "before": "/shared_components/css/core-calculators.css?v=2026.09.11.4",
+      "after": "/shared_components/css/core-calculators.css?v=2026.09.11.5",
+      "count": 1,
+      "reason": "Refetch the reviewed core calculator asset at this release version."
+    },
+    {
+      "file": "calculators/dtf-pricing.html",
+      "before": "/calculators/css/dtf-pricing.css?v=2026.09.11.4",
+      "after": "/calculators/css/dtf-pricing.css?v=2026.09.11.5",
+      "count": 1,
+      "reason": "Refetch the reviewed core calculator asset at this release version."
+    },
+    {
+      "file": "calculators/dtf-pricing.html",
+      "before": "/shared_components/js/dtf-pricing-calculator.js?v=2026.09.06.37",
+      "after": "/shared_components/js/dtf-pricing-calculator.js?v=2026.09.11.5",
+      "count": 1,
+      "reason": "Refetch the reviewed core calculator asset at this release version."
+    },
+    {
+      "file": "calculators/dtf-pricing.html",
+      "before": "/calculators/js/dtf-pricing-page.js?v=2026.09.06.45",
+      "after": "/calculators/js/dtf-pricing-page.js?v=2026.09.11.5",
+      "count": 1,
+      "reason": "Refetch the reviewed core calculator asset at this release version."
+    },
+    {
+      "file": "calculators/dtf-pricing.html",
+      "before": "/shared_components/js/core-calculator-ui.js?v=2026.09.11.4",
+      "after": "/shared_components/js/core-calculator-ui.js?v=2026.09.11.5",
+      "count": 1,
+      "reason": "Refetch the reviewed core calculator asset at this release version."
+    },
+    {
+      "file": "calculators/dtg-pricing.html",
+      "before": "/shared_components/css/core-calculators.css?v=2026.09.11.4",
+      "after": "/shared_components/css/core-calculators.css?v=2026.09.11.5",
+      "count": 1,
+      "reason": "Refetch the reviewed core calculator asset at this release version."
+    },
+    {
+      "file": "calculators/dtg-pricing.html",
+      "before": "/calculators/css/dtg-pricing.css?v=2026.09.11.4",
+      "after": "/calculators/css/dtg-pricing.css?v=2026.09.11.5",
+      "count": 1,
+      "reason": "Refetch the reviewed core calculator asset at this release version."
+    },
+    {
+      "file": "calculators/dtg-pricing.html",
+      "before": "/calculators/js/dtg-pricing-page.js?v=2026.09.06.43",
+      "after": "/calculators/js/dtg-pricing-page.js?v=2026.09.11.5",
+      "count": 1,
+      "reason": "Refetch the reviewed core calculator asset at this release version."
+    },
+    {
+      "file": "calculators/dtg-pricing.html",
+      "before": "/shared_components/js/core-calculator-ui.js?v=2026.09.11.4",
+      "after": "/shared_components/js/core-calculator-ui.js?v=2026.09.11.5",
+      "count": 1,
+      "reason": "Refetch the reviewed core calculator asset at this release version."
+    },
+    {
+      "file": "calculators/embroidery-pricing.html",
+      "before": "/shared_components/css/core-calculators.css?v=2026.09.11.4",
+      "after": "/shared_components/css/core-calculators.css?v=2026.09.11.5",
+      "count": 1,
+      "reason": "Refetch the reviewed core calculator asset at this release version."
+    },
+    {
+      "file": "calculators/embroidery-pricing.html",
+      "before": "/calculators/css/embroidery-pricing.css?v=2026.09.11.4",
+      "after": "/calculators/css/embroidery-pricing.css?v=2026.09.11.5",
+      "count": 1,
+      "reason": "Refetch the reviewed core calculator asset at this release version."
+    },
+    {
+      "file": "calculators/embroidery-pricing.html",
+      "before": "/calculators/js/embroidery-pricing-page.js?v=2026.09.07.33",
+      "after": "/calculators/js/embroidery-pricing-page.js?v=2026.09.11.5",
+      "count": 1,
+      "reason": "Refetch the reviewed core calculator asset at this release version."
+    },
+    {
+      "file": "calculators/embroidery-pricing.html",
+      "before": "/shared_components/js/core-calculator-ui.js?v=2026.09.11.4",
+      "after": "/shared_components/js/core-calculator-ui.js?v=2026.09.11.5",
+      "count": 1,
+      "reason": "Refetch the reviewed core calculator asset at this release version."
+    },
+    {
+      "file": "calculators/screen-print-pricing.html",
+      "before": "/shared_components/css/core-calculators.css?v=2026.09.11.4",
+      "after": "/shared_components/css/core-calculators.css?v=2026.09.11.5",
+      "count": 1,
+      "reason": "Refetch the reviewed core calculator asset at this release version."
+    },
+    {
+      "file": "calculators/screen-print-pricing.html",
+      "before": "/calculators/css/screen-print-pricing.css?v=2026.09.11.4",
+      "after": "/calculators/css/screen-print-pricing.css?v=2026.09.11.5",
+      "count": 1,
+      "reason": "Refetch the reviewed core calculator asset at this release version."
+    },
+    {
+      "file": "calculators/screen-print-pricing.html",
+      "before": "/calculators/js/screen-print-pricing-product.js?v=2026.09.06.39",
+      "after": "/calculators/js/screen-print-pricing-product.js?v=2026.09.11.5",
+      "count": 1,
+      "reason": "Refetch the reviewed core calculator asset at this release version."
+    },
+    {
+      "file": "calculators/screen-print-pricing.html",
+      "before": "/shared_components/js/screenprint-pricing-v2.js?v=2026.09.07.33",
+      "after": "/shared_components/js/screenprint-pricing-v2.js?v=2026.09.11.5",
+      "count": 1,
+      "reason": "Refetch the reviewed core calculator asset at this release version."
+    },
+    {
+      "file": "calculators/screen-print-pricing.html",
+      "before": "/shared_components/js/core-calculator-ui.js?v=2026.09.11.4",
+      "after": "/shared_components/js/core-calculator-ui.js?v=2026.09.11.5",
+      "count": 1,
+      "reason": "Refetch the reviewed core calculator asset at this release version."
     }
   ],
   "retiredStyles": []

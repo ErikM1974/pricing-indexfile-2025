@@ -1,5 +1,13 @@
 # CSS unification — design direction and implementation plan
 
+## RELEASE CANDIDATE — v2026.09.11.5 five core calculators
+
+DTG, DTF, Embroidery, Cap Embroidery and Screen Print are reviewed and integrated with the verified .4 release at 8a180aa67829a414f24fb2d220e3b088bfda0ac8. This candidate versions 22 references for fourteen changed assets. All79 original source hashes are preserved through 114 reversible mappings; six financial services and31 controller financial functions remain unchanged.
+
+All80 full-page screens at1440/768/390/320 and all36 current paper pages in20 documents are visually reviewed. Forty main browser cases and ten added interaction cases passed in focused runs;345 source/ownership guards passed. The complete50-case group now joins the full release suite. Candidate204/225 reviewed,21pending; live remains .4/Heroku2107 at199/225,26pending until every full local gate, all four actual exact-source CI jobs and rollout verification pass.
+
+Next: run full application/CSS/browser/parity checks on this unchanged source, then release and verify the actual Heroku slug, source/compiled assets and anonymous access. No real business writes or device printing. Evidence: core-calculators-source-record.json and active-css-resume-state.json in the external artifact directory. Never rerun consumed helpers or recursively delete the node_modules junction.
+
 ## REVIEWED — five core calculators, 2026-09-11
 
 DTG, DTF, Embroidery, Cap Embroidery and Screen Print now share Public Sans, canonical controls, scoped common CSS and five small page owners. Review covers 80 full-page screens at four widths, all 36 current pages in 20 print documents, search and help panels. All original prices, fees, quantities and tiers are compared with immutable contracts; six financial services and 31 controller financial function bodies remain unchanged. Fifty focused browser cases are defined: the main 40 passed, followed by all 10 added search/image/help checks; the complete set will run again in the full release gate. 340 source/ownership guards and CSS lint270 passed before adding these five manifest entries.
