@@ -1008,3 +1008,31 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - shared_components/js/specialty-calculator-ui.js — scoped specialty calculator presentation.
 
 - tests/e2e/css-unification-specialty-controls.spec.js — canonical decal target sizes, full mobile emblem grid, dialog focus and print disclosure restoration.
+
+- tests/e2e/css-unification-specialty-richardson.spec.js — native Richardson tier/fee/category, error and presentation contracts with synthetic APIs.
+
+- tests/fixtures/specialty-calculators-richardson-empty-original-browser.json — immutable synthetic Richardson calculator evidence.
+
+- tests/fixtures/specialty-calculators-richardson-normal-original-browser.json — immutable synthetic Richardson calculator evidence.
+
+- tests/fixtures/specialty-calculators-richardson-ltm-original-browser.json — immutable synthetic Richardson calculator evidence.
+
+- tests/fixtures/specialty-calculators-richardson-patch-original-browser.json — immutable synthetic Richardson calculator evidence.
+
+- tests/fixtures/specialty-calculators-richardson-puff-original-browser.json — immutable synthetic Richardson calculator evidence.
+
+- tests/fixtures/specialty-calculators-richardson-existing-original-browser.json — immutable synthetic Richardson calculator evidence.
+
+- tests/fixtures/specialty-calculators-richardson-autocomplete-original-browser.json — immutable synthetic Richardson calculator evidence.
+
+- tests/fixtures/specialty-calculators-richardson-browse-original-browser.json — immutable synthetic Richardson calculator evidence.
+
+- tests/fixtures/specialty-calculators-richardson-no-results-original-browser.json — immutable synthetic Richardson calculator evidence.
+
+- tests/fixtures/specialty-calculators-richardson-failed-original-browser.json — immutable synthetic Richardson calculator evidence.
+
+- tests/fixtures/specialty-calculators-richardson-alternate-api-original-browser.json — immutable synthetic Richardson calculator evidence.
+
+- tests/fixtures/specialty-calculators-richardson-changed-style-original-browser.json — immutable synthetic Richardson calculator evidence.
+
+- tests/fixtures/specialty-calculators-richardson-tiers-categories-original-browser.json — immutable synthetic Richardson calculator evidence.

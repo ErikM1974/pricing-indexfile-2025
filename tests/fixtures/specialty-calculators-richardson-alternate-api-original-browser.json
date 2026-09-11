@@ -1,0 +1,744 @@
+{
+  "name": "richardson-alternate-api",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Richardson Pricing Factory Direct 2026 - Northwest Custom Apparel",
+      "url": "/calculators/richardson-2025.html",
+      "ids": {
+        "sanmarStylesList": "112 112FP 112FPR 112PFP 112PL 112PT 115 168 168P 169 173 212 220 225 256 256P 312 323FPC 326 336 355 356",
+        "capStyle": "",
+        "styleValidation": "✓",
+        "styleDescription": "R-Flex Trucker - $7.65 blank",
+        "quantity": "",
+        "quantityTier": "Tier: 8-23",
+        "newDesign": "",
+        "setupLabel": "Patch setup: $65.00 one-time (GRT-50)",
+        "setupPerUnit": "(+$8.13/cap)",
+        "pricePerCap": "$46.38",
+        "lineTotal": "$371.00",
+        "capCountBadge": "152 styles"
+      },
+      "fields": [
+        {
+          "id": "capStyle",
+          "type": "text",
+          "value": "110",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "quantity",
+          "type": "number",
+          "value": "8",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "radio",
+          "value": "embroidery",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "radio",
+          "value": "leatherette",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "radio",
+          "value": "puff",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "newDesign",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=112",
+          "text": "112"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=112FP",
+          "text": "112FP"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=112FPR",
+          "text": "112FPR"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=112PFP",
+          "text": "112PFP"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=112PL",
+          "text": "112PL"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=112PT",
+          "text": "112PT"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=115",
+          "text": "115"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=168",
+          "text": "168"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=168P",
+          "text": "168P"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=169",
+          "text": "169"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=173",
+          "text": "173"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=212",
+          "text": "212"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=220",
+          "text": "220"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=225",
+          "text": "225"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=256",
+          "text": "256"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=256P",
+          "text": "256P"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=312",
+          "text": "312"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=323FPC",
+          "text": "323FPC"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=326",
+          "text": "326"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=336",
+          "text": "336"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=355",
+          "text": "355"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=356",
+          "text": "356"
+        }
+      ],
+      "tables": [],
+      "headings": [
+        "Richardson Pricing Factory Direct 2026",
+        "Quick Price Lookup"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".page-subtitle"
+            ],
+            [
+              ".price-total > .price-label"
+            ],
+            [
+              ".line-total > .price-label"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Richardson Pricing Factory Direct 2026 - Northwest Custom Apparel",
+      "url": "/calculators/richardson-2025.html",
+      "ids": {
+        "sanmarStylesList": "112 112FP 112FPR 112PFP 112PL 112PT 115 168 168P 169 173 212 220 225 256 256P 312 323FPC 326 336 355 356",
+        "capStyle": "",
+        "styleValidation": "✓",
+        "styleDescription": "R-Flex Trucker - $7.65 blank",
+        "quantity": "",
+        "quantityTier": "Tier: 8-23",
+        "newDesign": "",
+        "setupLabel": "Patch setup: $65.00 one-time (GRT-50)",
+        "setupPerUnit": "(+$8.13/cap)",
+        "pricePerCap": "$46.38",
+        "lineTotal": "$371.00",
+        "capCountBadge": "152 styles"
+      },
+      "fields": [
+        {
+          "id": "capStyle",
+          "type": "text",
+          "value": "110",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "quantity",
+          "type": "number",
+          "value": "8",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "radio",
+          "value": "embroidery",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "radio",
+          "value": "leatherette",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "radio",
+          "value": "puff",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "newDesign",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=112",
+          "text": "112"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=112FP",
+          "text": "112FP"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=112FPR",
+          "text": "112FPR"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=112PFP",
+          "text": "112PFP"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=112PL",
+          "text": "112PL"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=112PT",
+          "text": "112PT"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=115",
+          "text": "115"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=168",
+          "text": "168"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=168P",
+          "text": "168P"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=169",
+          "text": "169"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=173",
+          "text": "173"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=212",
+          "text": "212"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=220",
+          "text": "220"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=225",
+          "text": "225"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=256",
+          "text": "256"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=256P",
+          "text": "256P"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=312",
+          "text": "312"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=323FPC",
+          "text": "323FPC"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=326",
+          "text": "326"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=336",
+          "text": "336"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=355",
+          "text": "355"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=356",
+          "text": "356"
+        }
+      ],
+      "tables": [],
+      "headings": [
+        "Richardson Pricing Factory Direct 2026",
+        "Quick Price Lookup"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".page-subtitle"
+            ],
+            [
+              ".price-total > .price-label"
+            ],
+            [
+              ".line-total > .price-label"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Richardson Pricing Factory Direct 2026 - Northwest Custom Apparel",
+      "url": "/calculators/richardson-2025.html",
+      "ids": {
+        "sanmarStylesList": "112 112FP 112FPR 112PFP 112PL 112PT 115 168 168P 169 173 212 220 225 256 256P 312 323FPC 326 336 355 356",
+        "capStyle": "",
+        "styleValidation": "✓",
+        "styleDescription": "R-Flex Trucker - $7.65 blank",
+        "quantity": "",
+        "quantityTier": "Tier: 8-23",
+        "newDesign": "",
+        "setupLabel": "Patch setup: $65.00 one-time (GRT-50)",
+        "setupPerUnit": "(+$8.13/cap)",
+        "pricePerCap": "$46.38",
+        "lineTotal": "$371.00",
+        "capCountBadge": "152 styles"
+      },
+      "fields": [
+        {
+          "id": "capStyle",
+          "type": "text",
+          "value": "110",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "quantity",
+          "type": "number",
+          "value": "8",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "radio",
+          "value": "embroidery",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "radio",
+          "value": "leatherette",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "radio",
+          "value": "puff",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "newDesign",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=112",
+          "text": "112"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=112FP",
+          "text": "112FP"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=112FPR",
+          "text": "112FPR"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=112PFP",
+          "text": "112PFP"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=112PL",
+          "text": "112PL"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=112PT",
+          "text": "112PT"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=115",
+          "text": "115"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=168",
+          "text": "168"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=168P",
+          "text": "168P"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=169",
+          "text": "169"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=173",
+          "text": "173"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=212",
+          "text": "212"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=220",
+          "text": "220"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=225",
+          "text": "225"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=256",
+          "text": "256"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=256P",
+          "text": "256P"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=312",
+          "text": "312"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=323FPC",
+          "text": "323FPC"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=326",
+          "text": "326"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=336",
+          "text": "336"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=355",
+          "text": "355"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=356",
+          "text": "356"
+        }
+      ],
+      "tables": [],
+      "headings": [
+        "Richardson Pricing Factory Direct 2026",
+        "Quick Price Lookup"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".page-subtitle"
+            ],
+            [
+              ".price-total > .price-label"
+            ],
+            [
+              ".line-total > .price-label"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Richardson Pricing Factory Direct 2026 - Northwest Custom Apparel",
+      "url": "/calculators/richardson-2025.html",
+      "ids": {
+        "sanmarStylesList": "112 112FP 112FPR 112PFP 112PL 112PT 115 168 168P 169 173 212 220 225 256 256P 312 323FPC 326 336 355 356",
+        "capStyle": "",
+        "styleValidation": "✓",
+        "styleDescription": "R-Flex Trucker - $7.65 blank",
+        "quantity": "",
+        "quantityTier": "Tier: 8-23",
+        "newDesign": "",
+        "setupLabel": "Patch setup: $65.00 one-time (GRT-50)",
+        "setupPerUnit": "(+$8.13/cap)",
+        "pricePerCap": "$46.38",
+        "lineTotal": "$371.00",
+        "capCountBadge": "152 styles"
+      },
+      "fields": [
+        {
+          "id": "capStyle",
+          "type": "text",
+          "value": "110",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "quantity",
+          "type": "number",
+          "value": "8",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "radio",
+          "value": "embroidery",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "radio",
+          "value": "leatherette",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "radio",
+          "value": "puff",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "newDesign",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=112",
+          "text": "112"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=112FP",
+          "text": "112FP"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=112FPR",
+          "text": "112FPR"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=112PFP",
+          "text": "112PFP"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=112PL",
+          "text": "112PL"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=112PT",
+          "text": "112PT"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=115",
+          "text": "115"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=168",
+          "text": "168"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=168P",
+          "text": "168P"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=169",
+          "text": "169"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=173",
+          "text": "173"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=212",
+          "text": "212"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=220",
+          "text": "220"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=225",
+          "text": "225"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=256",
+          "text": "256"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=256P",
+          "text": "256P"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=312",
+          "text": "312"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=323FPC",
+          "text": "323FPC"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=326",
+          "text": "326"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=336",
+          "text": "336"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=355",
+          "text": "355"
+        },
+        {
+          "href": "/pricing/cap-embroidery?StyleNumber=356",
+          "text": "356"
+        }
+      ],
+      "tables": [],
+      "headings": [
+        "Richardson Pricing Factory Direct 2026",
+        "Quick Price Lookup"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".page-subtitle"
+            ],
+            [
+              ".price-total > .price-label"
+            ],
+            [
+              ".line-total > .price-label"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "dialogs": [],
+  "mocked": [
+    {
+      "path": "/api/decorated-cap-prices?brand=Richardson&tier=72%2B",
+      "method": "GET"
+    },
+    {
+      "path": "/api/pricing-bundle?method=CAP&styleNumber=112",
+      "method": "GET"
+    },
+    {
+      "path": "/api/pricing-bundle?method=PATCH",
+      "method": "GET"
+    },
+    {
+      "path": "/api/pricing-bundle?method=CAP-PUFF",
+      "method": "GET"
+    },
+    {
+      "path": "/api/service-codes",
+      "method": "GET"
+    }
+  ]
+}

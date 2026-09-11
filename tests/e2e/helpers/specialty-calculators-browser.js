@@ -70,6 +70,18 @@ async function open(page, state = {}) {
             events.writes.push({path: filePath, method});
             return route.fulfill({status: 503});
         }
+        if (state.richardson && ['/api/decorated-cap-prices','/api/pricing-bundle','/api/service-codes'].includes(filePath)) {
+            events.mocked.push({path: filePath + url.search, method});
+            if (state.failed) return route.fulfill({status: 503});
+            const tierLabels = ['1-7','8-23','24-47','48-71','72+'];
+            if (filePath === '/api/decorated-cap-prices') return route.fulfill({json: {prices: {'112': 24, '115': 24}}});
+            if (filePath === '/api/service-codes') return route.fulfill({json: {data: [{ServiceCode: 'GRT-50', SellPrice: state.alternate ? 65 : 50}]}});
+            const methodName = url.searchParams.get('method');
+            if (methodName === 'CAP') return route.fulfill({json: {allEmbroideryCostsR: tierLabels.map((TierLabel,i) => ({StitchCount: 8000, TierLabel, EmbroideryCost: [17,17,13,11,9.5][i] + (state.alternate ? 1 : 0)})), tiersR: [{MarginDenominator: state.alternate ? 0.57 : 0.53}]}});
+            if (methodName === 'PATCH') return route.fulfill({json: {allPatchCostsR: [{ItemType: 'Patch', EmbroideryCost: state.alternate ? 6.25 : 5}]}});
+            if (methodName === 'CAP-PUFF') return route.fulfill({json: {allEmbroideryCostsR: [{ItemType: '3D-Puff', EmbroideryCost: state.alternate ? 7 : 5}]}});
+            events.unknown.push(req.url()); return route.fulfill({status: 503});
+        }
         if (filePath === '/api/custom-decal-pricing') return route.fulfill({status: state.failed ? 503 : 200, json: decal});
         if (filePath === '/api/emblem-pricing') return route.fulfill({status: state.failed ? 503 : 200, json: emblem});
         if (['fonts.googleapis.com', 'fonts.gstatic.com'].includes(url.hostname)) return route.continue();

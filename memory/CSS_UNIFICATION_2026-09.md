@@ -1,5 +1,11 @@
 # CSS unification — design direction and implementation plan
 
+## Richardson originals reviewed — 2026-09-11
+
+All13 original cases pass: twelve visual states plus72 native price/quantity/design combinations and all eight category result sets. All48 full-page screens and12 paper pages in12 documents reviewed (17 screen detail sheets, three paper sheets). Original source remains unchanged. Defects confirmed: failed pricing reads silently use defaults; changing a selected style can retain its old quote; autocomplete requires a mouse; mobile categories clip and desktop inputs stretch; paper loses brand/navigation and browsed caps. The API-altered patch fee computes correctly but its radio caption remains hardcoded. Preserve every successful financial result while correcting these presentation/state defects.
+
+Decal/emblem reviewed checkpoint019ec2008a0e69b960af7b317429e6ce2147876b is backed up. Verified .6 history merged cleanly at2b7800a8f00c424b137b74acf287098f83e665be and backed up. Live207/225 reviewed,18pending; candidate209/225,16pending. Next complete Richardson, then Polar Camel, Safety Stripes and customer-supplied screen printing.
+
 ## REVIEWED CHECKPOINT — decals and embroidered emblems, 2026-09-11
 
 The first two specialty calculators now use Public Sans, canonical controls, one scoped shared layout and two small page owners. All316 focused source/pricing/ownership checks and scoped CSS/JS lint pass. All18 focused browser checks pass, including immutable prices/requests, failure/retry, full phone price grids, keyboard scrolling, dialog focus through the delayed callback, and print disclosure restoration. Reviewed all52 full-page screens at1440/768/390/320 (28 detail sheets) and all26 current paper pages in13 documents (11 unique renders and15 exact duplicates). Originals:14 immutable browser contracts,52 screens and23 paper pages.
