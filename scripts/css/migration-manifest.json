@@ -6534,6 +6534,42 @@
         "rawCssBytes": 45671,
         "localCssRequests": 3
       }
+    },
+    {
+      "source": "calculators/screenprint-customer/index.html",
+      "family": "specialty-calculators",
+      "status": "reviewed",
+      "route": "/calculators/screenprint-customer/index.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/specialty-pricing.css",
+        "calculators/screenprint-customer/screenprint-customer-styles.css"
+      ],
+      "dynamicStyles": [
+        "calculators/screenprint-customer/screenprint-customer-invoice.css"
+      ],
+      "states": [
+        "1440-768-390-320",
+        "396-original-financial-combinations",
+        "original-successful-save-payloads-and-email-contents",
+        "native-dialog-keyboard-focus-and-retained-draft",
+        "short-phone-horizontal-quote-scroll-and-submit-reachability",
+        "pending-request-and-stale-price-and-tier-ownership",
+        "partial-session-item-setup-and-email-retries",
+        "new-completed-submission-retains-new-quote-identity",
+        "immutable-saved-invoice-after-later-input-edit",
+        "pricing-retry-clipboard-and-popup-failures",
+        "47-screen-captures-and-13-complete-single-page-pdfs-reviewed"
+      ],
+      "test": "tests/e2e/css-unification-specialty-screenprint-customer.spec.js",
+      "maxCssBytes": 80299,
+      "measuredRawCssBytes": 78251,
+      "baseline": {
+        "commit": "97cc05080d4689785bc0885b6a4223c0f1356cbf",
+        "rawCssBytes": 49682,
+        "localCssRequests": 4
+      }
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",

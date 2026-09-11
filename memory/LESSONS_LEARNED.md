@@ -5,6 +5,12 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## Customer quotes need a captured calculation and independent delivery states (2026-09-11)
+
+- Problem/root cause: customer-supplied screen print kept stale amounts actionable during debounce, mixed current prices into an older saved invoice/email, silently swallowed setup-item failures and claimed email success after failed delivery.
+- Solution: invalidate on edit before any debounce/early return; scope price and tier responses; capture immutable financial/customer data for submission and print. Track confirmed session/item/setup stages and email independently so manual retries repeat only unfinished operations. A completed quote frees its identity for the next intentional submission. Native dialogs retain drafts and block duplicate pending submissions.
+- Prevention: 396 immutable financial cases and exact shared engine/method locks; original request/email/invoice contents; retry each failure stage, delayed price/tier results, cancelled dialogs and short phones. External invoice CSS keeps notes and waiver together in a complete one-page quote. Captured HTML is rendered without opening the operating-system print dialog.
+
 ## Design saves must report complete persistence and keep retry ownership (2026-09-11)
 
 - Problem/root cause: Safety Stripe used a modal class its CSS never opened, swallowed item-save failure as success, dropped the design note, and still claimed email delivery after email had been removed. Empty image sources also look failed before a choice is selected.
@@ -108,10 +114,6 @@ Exercise state transitions and verify complete printed content. Full entry in LE
 Native storefront menu focus and paper migration (2026-09-09) is archived in LESSONS_LEARNED_ARCHIVE.md; existing keyboard/browser guards retain the contract.
 
 Staff reference failure-state findings (2026-09-09) are preserved in LESSONS_LEARNED_ARCHIVE.md.
-
-## Paper-like form layouts need a separate phone arrangement (2026-09-09)
-
-Problem: the quote request inherited line-oriented paper styling that pushed the project textarea beyond the phone viewport. Root cause: its legacy field row and width rules survived in an online customer form. Solution: canonical vertical fields and bounded grid columns; shared hosted-form wrappers, native keyboard upload and explicit page landmark names. Prevention: check actual control bounds at320/390/768/1440, source-lock serialization and lookup/upload helpers, exercise blocked embeds and retained draft retries, inspect every reference-PDF page. The lookup helper floats popups only on printable forms; anchor the public form menu absolutely to its input and assert its coordinates, not just visibility. Keep mock routes installed across fixture-state transitions: removing them between navigations can allow in-flight requests to reach a live API. Keep department colors tied to ownership: monogram is shop-floor blue, digitizing Ruth purple, purchasing Bradley slate.
 
 ## A reviewed page wrapper is not a reviewed external app (2026-09-09)
 

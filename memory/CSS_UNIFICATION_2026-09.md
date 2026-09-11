@@ -1,5 +1,13 @@
 # CSS unification — design direction and implementation plan
 
+## REVIEWED CHECKPOINT — Customer supplied screen print, 2026-09-11
+
+The sixth specialty calculator now uses canonical controls, native named dialogs, one scoped page stylesheet and external invoice styling. Current coverage: 30 distinct browser checks (29 full-suite checks plus the final new-submission case; all 16 ownership/retry checks repeated after the last behavior edit), one original-only defect capture skipped. All 396 original financial combinations, successful session/item/setup payloads, email HTML and printed customer/fee/waiver contents stay exact. All 47 screenshots and 13 single-page PDFs reviewed (16 sheets; duplicates tracked). Original PDFs needed 26 pages. Stale-price/ladder responses, duplicate pending submits, false success, incomplete saves and mixed-price invoices are fixed; exact retries keep accepted stages. No live business write or customer email occurred.
+
+Candidate now 213/225 reviewed, 12 pending. Live remains v2026.09.11.6 / Heroku2109 / 75ef80194384912f4c644e9b868898aa5d62de28, 207 reviewed / 18 pending. This supersedes historical counts below. The six-page specialty batch is still local.
+
+Next: finish final CSS/source ownership checks and save the local reviewed checkpoint, then full batch unit, DOM, accessibility, CSS-browser, e2e, pricing-parity, build and lint gates. GitHub publication remains blocked by automatic review pending explicit consent for the public repository; no push or deploy until answered. Remaining page groups: seasonal/Christmas bundles; embroidery-pricing-all, Quick Quote and its DTF prototype, webstores calculator, garment designer, and five quote-builder pages. Preserve that remaining work independently while checking this completed batch.
+
 ## ORIGINALS REVIEWED — Customer supplied screen print, 2026-09-11
 
 Before application edits, all 15 browser checks pass: 396 original financial combinations, original successful and failed mocked save/email requests, all 46 screenshots and 26 paper pages in 13 PDFs reviewed (17 sheets; exact duplicates accounted for). Original defects are preserved as evidence: old prices stay actionable during debounce, unsaved Print does nothing, failed delivery can claim success, setup-item failure is swallowed, narrow quote forms clip totals, and print layouts split customer notes and waiver onto a second page. No actual email or business write occurred.

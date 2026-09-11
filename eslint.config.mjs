@@ -74,6 +74,9 @@ const LEGACY_ESM = [
 ];
 
 export default [
+    { files: ['calculators/screenprint-customer/screenprint-customer-calculator.js'], languageOptions: { globals: { CustomerScreenPrintQuoteService: 'readonly' } } },
+    { files: ['calculators/screenprint-customer/screenprint-customer.js'], languageOptions: { globals: { CustomerScreenPrintCalculator: 'readonly' } } },
+    { files: ['calculators/screenprint-customer/*.js'], languageOptions: { sourceType: 'script', globals: { ...globals.browser, emailjs: 'readonly', BaseQuoteService: 'readonly', escapeHTML: 'readonly' } }, rules: { 'no-undef': 'error', 'no-unused-vars': ['error', { vars: 'local', argsIgnorePattern: '^_', caughtErrors: 'none' }] } },
     { files: ['calculators/safety-stripe-calculator.js', 'calculators/safety-stripe-creator-service.js'], languageOptions: { sourceType: 'script', globals: { ...globals.browser } }, rules: { 'no-undef': 'error', 'no-unused-vars': ['error', { vars: 'local', argsIgnorePattern: '^_', caughtErrors: 'none' }] } },
     { files: ['calculators/safety-stripe-calculator.js'], languageOptions: { globals: { SafetyStripeQuoteService: 'readonly' } } },
     { files: ['shared_components/js/laser-tumbler-simple.js'], languageOptions: { globals: { JDSApiService: 'readonly' } } },

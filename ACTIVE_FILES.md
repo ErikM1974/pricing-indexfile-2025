@@ -1126,3 +1126,6 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - tests/fixtures/specialty-calculators-screenprint-customer-invoice-145-original-browser.json — immutable synthetic customer-supplied screen-print presentation, financial and request evidence.
 
 - tests/fixtures/specialty-calculators-screenprint-customer-stale-input-original-browser.json — immutable synthetic customer-supplied screen-print presentation, financial and request evidence.
+
+- calculators/screenprint-customer/screenprint-customer-invoice.css — canonical external invoice stylesheet for immutable customer-supplied screen-print quotes.
+- calculators/screenprint-customer/screenprint-customer-fix.css — unloaded compatibility placeholder; its override stack is retired into the scoped screen-print owner.

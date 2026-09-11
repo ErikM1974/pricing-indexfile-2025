@@ -29,3 +29,11 @@ test('Safety Stripe image mappings and quote identifiers remain exact',()=>{
  const method=(text,name)=>{const ast=require('acorn').parse(text,{ecmaVersion:'latest'}),cls=ast.body.find(n=>n.type==='ClassDeclaration'),fn=cls.body.body.find(n=>n.key.name===name);return text.slice(fn.value.body.start,fn.value.body.end);};
  const service=fs.readFileSync(path.join(root,serviceFile),'utf8').replace(/\r\n/g,'\n');for(const name of ['generateQuoteID','generateSessionID','cleanupOldSequences','getDesign'])expect(method(service,name)).toBe(method(prior(serviceFile),name));
 });
+
+// Customer-supplied screen-print amounts remain owned by the original shared engine.
+test('customer screen print priceOrder and result arithmetic remain exact',()=>{
+ const file='calculators/screenprint-customer/screenprint-customer-calculator.js',current=fs.readFileSync(path.join(root,file),'utf8').replace(/\r\n/g,'\n');let prior=current;for(const c of original.changes.filter(c=>c.file===file).reverse())prior=prior.split(c.after).join(c.before);
+ const method=(source,name)=>{const cls=require('acorn').parse(source,{ecmaVersion:'latest'}).body.find(n=>n.type==='ClassDeclaration'&&n.id.name==='CustomerScreenPrintCalculator'),fn=cls.body.body.find(n=>n.key.name===name);return source.slice(fn.value.body.start,fn.value.body.end);};
+ expect(method(current,'priceOrder')).toBe(method(prior,'priceOrder'));expect(method(current,'renderResult').split('// Update display')[0]).toBe(method(prior,'renderResult').split('// Update display')[0]);
+ expect(original.changes.filter(c=>['shared_components/js/screenprint-pricing-service.js','shared_components/js/quote-cart-engine.js'].includes(c.file))).toEqual([]);
+});
