@@ -39,7 +39,10 @@ describe('calculator pages — Rule 3', () => {
             expect(read('shared_components/css/components.css')).toMatch(/\[hidden\]\s*\{\s*display: none;/);
         } else {
             expect(html).toContain(`/calculators/css/${pg}.css?v=`);
-            expect(read(`calculators/css/${pg}.css`)).toMatch(/\[hidden\] \{ display: none !important; \}/);
+            expect(html).toContain('data-ui="unified"');
+            expect(html).toContain('/shared_components/css/components.css?v=');
+            expect(html).toContain('/shared_components/css/core-calculators.css?v=');
+            expect(read('shared_components/css/components.css')).toMatch(/\[hidden\]\s*\{\s*display: none;/);
         }
         if (exists(`calculators/js/${pg}-page.js`)) {
             expect(html).toContain(`/calculators/js/${pg}-page.js?v=`);
@@ -54,12 +57,13 @@ describe('calculator pages — Rule 3', () => {
             }
         }
     });
-    test('embroidery keeps its cascade: overrides file linked after the in-between stylesheet', () => {
+    test('embroidery uses canonical components, common calculator styles, then its scoped owner', () => {
         const html = read('calculators/embroidery-pricing.html');
-        const a = html.indexOf('/calculators/css/embroidery-pricing.css?v=');
-        const b = html.indexOf('/calculators/css/embroidery-pricing-overrides.css?v=');
-        expect(a).toBeGreaterThan(-1);
-        expect(b).toBeGreaterThan(a);
+        const order = ['components.css', 'core-calculators.css', 'embroidery-pricing.css'];
+        const indexes = order.map(file => html.indexOf('/' + file + '?v='));
+        indexes.forEach(index => expect(index).toBeGreaterThan(-1));
+        for (let i = 1; i < indexes.length; i++) expect(indexes[i]).toBeGreaterThan(indexes[i - 1]);
+        expect(html).not.toContain('/embroidery-pricing-overrides.css');
     });
     test('digitizing form iframe load is a listener', () => {
         expect(read('calculators/digitizingform.html')).not.toMatch(/onload=/);

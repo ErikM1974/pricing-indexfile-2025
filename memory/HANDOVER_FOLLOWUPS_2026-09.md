@@ -972,3 +972,7 @@ The full local1,204-case CSS sweep completed1,203 passes and one confirmation-to
 ## Verified cart release and next original captures — 2026-09-11
 
 Cart v2026.09.11.1/2104/2463ce82 is live191/225,34pending. All exact-source CI/full local gates and31 live checks passed. Custom Tees/Caps has35 passing original scenarios/36 immutable contracts,16 source guards; no application edits. Finish paper review and baseline backup before shared layout/focus/retry/storage repairs. API fixture prices are synthetic unit-fixture values, real engines unchanged.
+
+## Core calculator full-suite compatibility correction
+
+The first integrated full run passed build/lint/types and243 unit suites. Eleven assertions in three historical test files still required removed override files or duplicated hidden-state rules. They now verify canonical shared ownership, hidden behavior and asset order; all36 checks in the three suites pass. No application code, immutable price evidence or accessibility requirement changed. The corrected exact Deploy source must pass the complete local and CI gates before .5 rollout.

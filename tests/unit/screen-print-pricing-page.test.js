@@ -34,7 +34,9 @@ describe('screen-print-pricing.html', () => {
         for (const id of ['productImage', 'imageThumbnails', 'colorSwatchesSection', 'caspio-iframe-container']) {
             expect(html).toMatch(new RegExp('id="' + id + '"[^>]* hidden>'));
         }
-        expect(read('calculators/css/screen-print-pricing.css')).toMatch(/\[hidden\] \{ display: none !important; \}/);
+        expect(html).toContain('data-ui="unified"');
+        expect(html).toContain('/shared_components/css/components.css?v=');
+        expect(read('shared_components/css/components.css')).toMatch(/\[hidden\]\s*\{\s*display: none;/);
     });
 });
 
