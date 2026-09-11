@@ -142,6 +142,427 @@
     "shared_components/js/caspio-date-utils.js": "631fad8e38f78d2f7a6d1f424b145ccc3f4bf0f0bf58e61d89e3a1851605474e",
     "shared_components/vendor/fontawesome/css/all.min.css": "e5e202e3c899507992952533f57b634722b69b34241d271963559d31aa33ef81"
   },
-  "changes": [],
+  "changes": [
+    {
+      "file": "pages/order-status.html",
+      "before": "<body class=\"status-body\">",
+      "after": "<body class=\"status-body\" data-ui=\"unified\">",
+      "count": 1
+    },
+    {
+      "file": "pages/order-status.html",
+      "before": "<link rel=\"stylesheet\" href=\"/pages/css/custom-tees.css?v=2026.09.07.20\">",
+      "after": "<link rel=\"stylesheet\" href=\"/shared_components/css/components.css?v=2026.09.10.2\">",
+      "count": 1
+    },
+    {
+      "file": "pages/order-status.html",
+      "before": "family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700",
+      "after": "family=Public+Sans:wght@400;500;600;700",
+      "count": 1
+    },
+    {
+      "file": "pages/order-status.html",
+      "before": "class=\"site-head\"",
+      "after": "class=\"page-header\"",
+      "count": 1
+    },
+    {
+      "file": "pages/order-status.html",
+      "before": "class=\"site-head-inner\"",
+      "after": "class=\"page-header-inner\"",
+      "count": 1
+    },
+    {
+      "file": "pages/order-status.html",
+      "before": "class=\"brand-logo\"",
+      "after": "class=\"page-header-logo\"",
+      "count": 1
+    },
+    {
+      "file": "pages/order-status.html",
+      "before": "class=\"status-main\"",
+      "after": "class=\"page-main status-main\"",
+      "count": 1
+    },
+    {
+      "file": "pages/order-status.html",
+      "before": "class=\"site-foot\"",
+      "after": "class=\"page-footer\"",
+      "count": 1
+    },
+    {
+      "file": "pages/order-status.html",
+      "before": "class=\"head-contact\"",
+      "after": "class=\"head-contact page-nav\"",
+      "count": 1
+    },
+    {
+      "file": "pages/order-status.html",
+      "before": "<section id=\"st-loading\" class=\"status-card\">",
+      "after": "<section id=\"st-loading\" class=\"status-card\" role=\"status\">",
+      "count": 1
+    },
+    {
+      "file": "pages/order-status.html",
+      "before": "<div class=\"status-table-wrap\">",
+      "after": "<div class=\"status-table-wrap\" role=\"region\" aria-label=\"Order items\" tabindex=\"0\">",
+      "count": 1
+    },
+    {
+      "file": "pages/order-status.html",
+      "before": "<h1>We couldn’t find that order</h1>",
+      "after": "<h1 id=\"st-error-title\">We couldn’t find that order</h1>",
+      "count": 1
+    },
+    {
+      "file": "pages/order-status.html",
+      "before": "<p class=\"status-phone\">",
+      "after": "<button type=\"button\" class=\"btn\" id=\"st-retry\" hidden>Try again</button>\n            <p class=\"status-phone\">",
+      "count": 1
+    },
+    {
+      "file": "pages/js/order-status.js",
+      "before": "    function showError(msg) {",
+      "after": "    function showError(msg, retryable = false) {\n        $('st-retry').hidden = !retryable;\n        $('st-error-title').textContent = retryable ? 'Order status is temporarily unavailable' : 'We couldn’t find that order';",
+      "count": 1
+    },
+    {
+      "file": "pages/js/order-status.js",
+      "before": "showError('Order status is temporarily unavailable. Please try again in a few minutes, or call us.');",
+      "after": "showError('Order status is temporarily unavailable. Please try again in a few minutes, or call us.', true);",
+      "count": 2
+    },
+    {
+      "file": "pages/js/order-status.js",
+      "before": "    async function load() {\n        try {",
+      "after": "    let loading = false;\n    async function load() {\n        if (loading) return;\n        loading = true;\n        show('st-loading');\n        try {",
+      "count": 1
+    },
+    {
+      "file": "pages/js/order-status.js",
+      "before": "            showError('Order status is temporarily unavailable. Please try again in a few minutes, or call us.', true);\n        }\n    }",
+      "after": "            showError('Order status is temporarily unavailable. Please try again in a few minutes, or call us.', true);\n        } finally {\n            loading = false;\n        }\n    }",
+      "count": 1
+    },
+    {
+      "file": "pages/js/order-status.js",
+      "before": "    document.addEventListener('DOMContentLoaded', () => {",
+      "after": "    document.addEventListener('DOMContentLoaded', () => {\n        $('st-retry').addEventListener('click', load);",
+      "count": 1
+    },
+    {
+      "file": "pages/vendor-portal.html",
+      "before": "<body>",
+      "after": "<body class=\"vendor-portal-page\" data-ui=\"unified\">",
+      "count": 1
+    },
+    {
+      "file": "pages/vendor-portal.html",
+      "before": "  <link rel=\"stylesheet\" href=\"/shared_components/vendor/fontawesome/css/all.min.css?v=2026.07.08.8\">",
+      "after": "  <link rel=\"stylesheet\" href=\"/shared_components/css/components.css?v=2026.09.10.2\">\n  <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n  <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n  <link href=\"https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap\" rel=\"stylesheet\">\n  <link rel=\"stylesheet\" href=\"/shared_components/vendor/fontawesome/css/all.min.css?v=2026.07.08.8\">",
+      "count": 1
+    },
+    {
+      "file": "pages/vendor-portal.html",
+      "before": "class=\"vp-header\"",
+      "after": "class=\"page-header\"",
+      "count": 1
+    },
+    {
+      "file": "pages/vendor-portal.html",
+      "before": "class=\"vp-header-inner\"",
+      "after": "class=\"page-header-inner\"",
+      "count": 1
+    },
+    {
+      "file": "pages/vendor-portal.html",
+      "before": "class=\"vp-logo\"",
+      "after": "class=\"page-header-logo\"",
+      "count": 1
+    },
+    {
+      "file": "pages/vendor-portal.html",
+      "before": "class=\"vp-container\"",
+      "after": "class=\"page-main vp-container\"",
+      "count": 1
+    },
+    {
+      "file": "pages/vendor-portal.html",
+      "before": "class=\"vp-footer\"",
+      "after": "class=\"page-footer\"",
+      "count": 1
+    },
+    {
+      "file": "pages/vendor-portal.html",
+      "before": "class=\"vp-btn vp-btn--ghost",
+      "after": "class=\"btn vp-btn",
+      "count": 3
+    },
+    {
+      "file": "pages/vendor-portal.html",
+      "before": "class=\"vp-btn vp-btn--primary\"",
+      "after": "class=\"btn btn-primary vp-btn\"",
+      "count": 1
+    },
+    {
+      "file": "pages/vendor-portal.html",
+      "before": "class=\"vp-chip",
+      "after": "class=\"btn vp-chip",
+      "count": 6
+    },
+    {
+      "file": "pages/vendor-portal.html",
+      "before": "type=\"search\" id=\"vp-search\"",
+      "after": "type=\"search\" class=\"field-input\" id=\"vp-search\"",
+      "count": 1
+    },
+    {
+      "file": "pages/vendor-portal.html",
+      "before": "<textarea id=\"vp-comment-input\"",
+      "after": "<textarea class=\"field-textarea\" id=\"vp-comment-input\"",
+      "count": 1
+    },
+    {
+      "file": "pages/vendor-portal.html",
+      "before": "<div class=\"vp-table-scroll\">",
+      "after": "<div class=\"vp-table-scroll\" role=\"region\" aria-label=\"Print lines\" tabindex=\"0\">",
+      "count": 1
+    },
+    {
+      "file": "pages/vendor-portal.html",
+      "before": "<div class=\"vp-timeline\" id=\"vp-d-notes\">",
+      "after": "<div class=\"vp-timeline\" id=\"vp-d-notes\" role=\"region\" aria-label=\"Activity and messages\" tabindex=\"0\">",
+      "count": 1
+    },
+    {
+      "file": "pages/js/vendor-portal.js",
+      "before": "      var thumb = job.mockupThumbnailUrl\n        ? '<img class=\"vp-job-thumb\" src=\"' + esc(job.mockupThumbnailUrl) + '\" alt=\"\" loading=\"lazy\" data-onerror=\"job-thumb\">'\n        : '<div class=\"vp-job-thumb vp-job-thumb--placeholder\"><i class=\"fas fa-tshirt\" aria-hidden=\"true\"></i></div>';\n      var pastDue = isPastDue(job);\n      return '<div class=\"vp-job-card' + (pastDue ? ' vp-job-card--pastdue' : '') + '\" data-job=\"' + esc(job.id) + '\" role=\"button\" tabindex=\"0\" aria-label=\"Open job ' + esc(job.id) + ', ' + esc(job.companyName || 'Unknown company') + '\">' +\n        thumb +\n        '<div class=\"vp-job-body\">' +\n          '<div class=\"vp-job-id\">' + esc(job.id) + '</div>' +\n          '<div class=\"vp-job-company\">' + esc(job.companyName || 'Unknown company') + '</div>' +\n          '<div class=\"vp-job-meta\">' +\n            (job.designNumber ? '<span><i class=\"fas fa-hashtag\" aria-hidden=\"true\"></i> Design ' + esc(job.designNumber) + '</span>' : '') +\n            '<span><i class=\"far fa-calendar\" aria-hidden=\"true\"></i> ' + fmtDate(job.requestedAt) + '</span>' +\n            (job.neededBy ? '<span' + (pastDue ? ' class=\"vp-overdue\"' : '') + '><i class=\"far fa-clock\" aria-hidden=\"true\"></i> Needed ' + fmtDate(job.neededBy) + (pastDue ? ' · past due' : '') + '</span>' : '') +\n            (job.fileCount ? '<span><i class=\"far fa-file\" aria-hidden=\"true\"></i> ' + esc(job.fileCount) + ' file' + (job.fileCount === 1 ? '' : 's') + '</span>' : '') +\n          '</div>' +\n          '<div class=\"vp-job-badges\">' + statusBadge(job.status) + (job.isRush ? rushBadge() : '') + '</div>' +\n        '</div>' +\n      '</div>';",
+      "after": "      var thumb = job.mockupThumbnailUrl\n        ? '<img class=\"vp-job-thumb\" src=\"' + esc(job.mockupThumbnailUrl) + '\" alt=\"\" loading=\"lazy\" data-onerror=\"job-thumb\">'\n        : '<span class=\"vp-job-thumb vp-job-thumb--placeholder\"><i class=\"fas fa-tshirt\" aria-hidden=\"true\"></i></span>';\n      var pastDue = isPastDue(job);\n      return '<button type=\"button\" class=\"vp-job-card' + (pastDue ? ' vp-job-card--pastdue' : '') + '\" data-job=\"' + esc(job.id) + '\" aria-label=\"Open job ' + esc(job.id) + ', ' + esc(job.companyName || 'Unknown company') + '\">' +\n        thumb +\n        '<span class=\"vp-job-body\">' +\n          '<span class=\"vp-job-id\">' + esc(job.id) + '</span>' +\n          '<span class=\"vp-job-company\">' + esc(job.companyName || 'Unknown company') + '</span>' +\n          '<span class=\"vp-job-meta\">' +\n            (job.designNumber ? '<span><i class=\"fas fa-hashtag\" aria-hidden=\"true\"></i> Design ' + esc(job.designNumber) + '</span>' : '') +\n            '<span><i class=\"far fa-calendar\" aria-hidden=\"true\"></i> ' + fmtDate(job.requestedAt) + '</span>' +\n            (job.neededBy ? '<span' + (pastDue ? ' class=\"vp-overdue\"' : '') + '><i class=\"far fa-clock\" aria-hidden=\"true\"></i> Needed ' + fmtDate(job.neededBy) + (pastDue ? ' · past due' : '') + '</span>' : '') +\n            (job.fileCount ? '<span><i class=\"far fa-file\" aria-hidden=\"true\"></i> ' + esc(job.fileCount) + ' file' + (job.fileCount === 1 ? '' : 's') + '</span>' : '') +\n          '</span>' +\n          '<span class=\"vp-job-badges\">' + statusBadge(job.status) + (job.isRush ? rushBadge() : '') + '</span>' +\n        '</span>' +\n      '</button>';",
+      "count": 1
+    },
+    {
+      "file": "pages/js/vendor-portal.js",
+      "before": "  $('vp-job-grid').addEventListener('keydown', function (e) {\n    if (e.key !== 'Enter' && e.key !== ' ') return;\n    var card = e.target.closest('.vp-job-card');\n    if (!card) return;\n    e.preventDefault();\n    openJob(card.dataset.job);\n  });\n",
+      "after": "  // Native job buttons handle Enter and Space through the delegated click listener.\n",
+      "count": 1
+    },
+    {
+      "file": "pages/js/vendor-portal.js",
+      "before": "class=\"vp-btn vp-btn--primary\"",
+      "after": "class=\"btn btn-primary vp-btn\"",
+      "count": 1
+    },
+    {
+      "file": "pages/js/vendor-portal.js",
+      "before": "'<td>' + esc(l.quantity",
+      "after": "'<td data-label=\"Qty\">' + esc(l.quantity",
+      "count": 1
+    },
+    {
+      "file": "pages/js/vendor-portal.js",
+      "before": "'<td>' + esc(l.transferSize",
+      "after": "'<td data-label=\"Size\">' + esc(l.transferSize",
+      "count": 1
+    },
+    {
+      "file": "pages/js/vendor-portal.js",
+      "before": "'<td>' + esc(wh)",
+      "after": "'<td data-label=\"W×H (in)\">' + esc(wh)",
+      "count": 1
+    },
+    {
+      "file": "pages/js/vendor-portal.js",
+      "before": "'<td>' + esc(l.pressCount",
+      "after": "'<td data-label=\"Presses\">' + esc(l.pressCount",
+      "count": 1
+    },
+    {
+      "file": "pages/js/vendor-portal.js",
+      "before": "'<td>' + esc(l.notes",
+      "after": "'<td data-label=\"Notes\">' + esc(l.notes",
+      "count": 1
+    },
+    {
+      "file": "pages/js/vendor-portal.js",
+      "before": "ph = document.createElement('div'); ph.className = 'vp-job-thumb",
+      "after": "ph = document.createElement('span'); ph.className = 'vp-job-thumb",
+      "count": 1
+    },
+    {
+      "file": "pages/js/vendor-portal.js",
+      "before": "    currentJobId: null,",
+      "after": "    currentJobId: null,\n    detailRequest: 0,\n    posting: false,\n    drafts: {},",
+      "count": 1
+    },
+    {
+      "file": "pages/js/vendor-portal.js",
+      "before": "  function showListView(fromHistory) {\n    state.currentJobId = null;",
+      "after": "  function showListView(fromHistory) {\n    if (state.currentJobId) state.drafts[state.currentJobId] = $('vp-comment-input').value;\n    state.detailRequest++;\n    state.currentJobId = null;",
+      "count": 1
+    },
+    {
+      "file": "pages/js/vendor-portal.js",
+      "before": "  function openJob(id, fromHistory) {\n    state.currentJobId = id;",
+      "after": "  function openJob(id, fromHistory) {\n    var request = ++state.detailRequest;\n    if (state.currentJobId !== id) {\n      if (state.currentJobId) state.drafts[state.currentJobId] = $('vp-comment-input').value;\n      $('vp-comment-input').value = state.drafts[id] || '';\n      $('vp-comment-status').hidden = true;\n      $('vp-comment-btn').disabled = state.posting || !$('vp-comment-input').value.trim();\n    }\n    state.currentJobId = id;",
+      "count": 1
+    },
+    {
+      "file": "pages/js/vendor-portal.js",
+      "before": "      if (state.currentJobId !== id) return;   // user already moved on",
+      "after": "      if (state.currentJobId !== id || state.detailRequest !== request) return;   // user already moved on",
+      "count": 1
+    },
+    {
+      "file": "pages/js/vendor-portal.js",
+      "before": "      if (e.message === 'signed out') return;\n      $('vp-detail-loading').hidden = true;",
+      "after": "      if (e.message === 'signed out' || state.currentJobId !== id || state.detailRequest !== request) return;\n      $('vp-detail-loading').hidden = true;",
+      "count": 1
+    },
+    {
+      "file": "pages/js/vendor-portal.js",
+      "before": "  function postComment() {\n    var input",
+      "after": "  function postComment() {\n    if (state.posting) return;\n    var input",
+      "count": 1
+    },
+    {
+      "file": "pages/js/vendor-portal.js",
+      "before": "    var jobId = state.currentJobId;\n    btn.disabled = true;",
+      "after": "    var jobId = state.currentJobId;\n    state.posting = true;\n    input.readOnly = true;\n    btn.disabled = true;",
+      "count": 1
+    },
+    {
+      "file": "pages/js/vendor-portal.js",
+      "before": "      input.value = '';\n      $('vp-comment-status')",
+      "after": "      state.drafts[jobId] = '';\n      if (state.currentJobId !== jobId) return;\n      input.value = '';\n      $('vp-comment-status')",
+      "count": 1
+    },
+    {
+      "file": "pages/js/vendor-portal.js",
+      "before": "    }).catch(function (e) {\n      showError('Unable to post your note right now.",
+      "after": "    }).catch(function (e) {\n      if (state.currentJobId !== jobId) return;\n      showError('Unable to post your note right now.",
+      "count": 1
+    },
+    {
+      "file": "pages/js/vendor-portal.js",
+      "before": "    }).finally(function () {\n      btn.innerHTML",
+      "after": "    }).finally(function () {\n      state.posting = false;\n      input.readOnly = false;\n      btn.innerHTML",
+      "count": 1
+    },
+    {
+      "file": "pages/js/vendor-portal.js",
+      "before": "    $('vp-comment-btn').disabled = !(e.target.value || '').trim();",
+      "after": "    $('vp-comment-btn').disabled = state.posting || !(e.target.value || '').trim();",
+      "count": 1
+    },
+    {
+      "file": "pages/css/order-status.css",
+      "before": "/* order-status.css — customer order-status page (rides on custom-tees.css\n   tokens: paper ground, ink greens, Bricolage display type). */\n\n.status-body { padding-bottom: 0; }\n\n.status-main {\n    max-width: 680px; margin: 0 auto; padding: 40px 18px 60px;\n}\n\n.status-card {\n    background: var(--card); border: 1px solid var(--line); border-radius: 16px;\n    box-shadow: var(--shadow-card); padding: 34px 28px; text-align: center;\n}\n.status-card h1 { font-size: 26px; font-weight: 800; margin-bottom: 6px; }\n.status-card > p { color: var(--ink-soft); }\n\n.status-kicker {\n    text-transform: uppercase; letter-spacing: 0.14em; font-size: 12px;\n    font-weight: 700; color: var(--green-700); margin-bottom: 4px;\n}\n.status-style { font-size: 15px; color: var(--ink-soft); }\n\n.status-style .status-rush {\n    display: inline-block; margin-left: 6px; padding: 2px 10px;\n    background: var(--rush-soft); color: var(--rush-deep);\n    border: 1px solid var(--rush); border-radius: 999px;\n    font-size: 12px; font-weight: 700;\n}\n\n.status-style .status-date {\n    display: block; font-size: 12.5px; color: var(--ink-faint); margin-top: 2px;\n}\n\n.status-spin { font-size: 34px; color: var(--green-700); margin-bottom: 14px; }\n.status-check { font-size: 46px; color: var(--green-700); margin-bottom: 14px; }\n.status-check.is-amber { color: var(--warn); }\n.status-phone a { font-weight: 700; }\n\n.status-promise {\n    display: inline-block; background: var(--green-50); color: var(--green-900);\n    border: 1px dashed var(--green-700); border-radius: 999px; padding: 8px 18px;\n    font-weight: 600; font-size: 14.5px; margin: 10px 0 4px;\n}\n.status-promise strong { font-family: var(--font-display); }\n\n.status-tracking { margin: 14px 0 4px; }\n.status-tracking .btn { text-decoration: none; }\n\n/* ── Timeline (4 steps) ──────────────────────────────────────────── */\n.status-timeline {\n    text-align: left; max-width: 460px; margin: 26px auto 6px;\n    display: grid; gap: 0; position: relative;\n}\n\n.status-step {\n    display: flex; gap: 14px; align-items: flex-start; position: relative;\n    padding-bottom: 22px;\n}\n.status-step:last-child { padding-bottom: 0; }\n\n/* connector line */\n.status-step:not(:last-child)::before {\n    content: ''; position: absolute; left: 15px; top: 32px; bottom: 0;\n    width: 2px; background: var(--line-strong);\n}\n.status-step.is-done:not(:last-child)::before { background: var(--green-700); }\n\n.status-step-dot {\n    flex: none; width: 32px; height: 32px; border-radius: 50%;\n    display: inline-flex; align-items: center; justify-content: center;\n    font-size: 13px; border: 2px solid var(--line-strong);\n    background: var(--card); color: var(--ink-faint); z-index: 1;\n}\n\n.status-step.is-done .status-step-dot {\n    background: var(--green-700); border-color: var(--green-700); color: var(--color-on-brand);\n}\n\n.status-step.is-current .status-step-dot {\n    background: var(--green-50); border-color: var(--green-700);\n    box-shadow: 0 0 0 4px var(--green-100);\n}\n.status-step-body strong { display: block; font-size: 15px; }\n.status-step.is-pending .status-step-body strong { color: var(--ink-faint); }\n.status-step.is-current .status-step-body strong { color: var(--green-900); }\n.status-step-body small { color: var(--ink-faint); font-size: 12.5px; }\n\n/* ── Pickup card ─────────────────────────────────────────────────── */\n.status-pickup {\n    display: flex; gap: 14px; align-items: flex-start; text-align: left;\n    max-width: 460px; margin: 18px auto 0;\n    background: var(--paper-deep); border: 1px solid var(--line);\n    border-radius: var(--radius); padding: 14px 16px;\n}\n.status-pickup i { color: var(--green-700); font-size: 20px; margin-top: 3px; }\n.status-pickup strong { display: block; font-size: 14.5px; }\n.status-pickup span { font-size: 13px; color: var(--ink-soft); }\n\n/* ── Mockups ─────────────────────────────────────────────────────── */\n.status-mockups { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin: 18px 0 4px; }\n.status-mockups figure { margin: 0; width: 110px; }\n.status-mockups img { width: 100%; border-radius: 10px; border: 1px solid var(--line); background: var(--paper-deep); }\n.status-mockups figcaption { font-size: 11px; color: var(--ink-faint); margin-top: 3px; }\n\n/* ── Order summary ───────────────────────────────────────────────── */\n.status-h2 {\n    font-size: 17px; margin-top: 26px; padding-top: 18px;\n    border-top: 1px solid var(--line);\n}\n.status-table-wrap { max-width: 460px; margin: 12px auto 0; overflow-x: auto; }\n.status-table { width: 100%; border-collapse: collapse; font-size: 14px; }\n\n.status-table th {\n    text-align: left; font-size: 11.5px; text-transform: uppercase;\n    letter-spacing: 0.06em; color: var(--ink-faint);\n    border-bottom: 1px solid var(--line-strong); padding: 4px 8px 6px;\n}\n.status-table td { padding: 6px 8px; border-bottom: 1px solid var(--line); }\n.status-table th:nth-child(n+3), .status-table td:nth-child(n+3) { text-align: right; }\n\n.status-summary { text-align: left; margin: 14px auto 0; max-width: 460px; }\n.status-summary .tot-row { display: flex; justify-content: space-between; font-size: 14px; padding: 3px 8px; }\n\n.status-summary .tot-row.is-grand {\n    font-family: var(--font-display); font-weight: 800; font-size: 18px;\n    border-top: 2px solid var(--ink); padding-top: 8px; margin-top: 6px;\n}\n\n.status-questions { margin-top: 22px; font-size: 13.5px; color: var(--ink-soft); }\n\n@media (width <= 560px) {\n    .status-card { padding: 26px 16px; }\n    .status-card h1 { font-size: 22px; }\n}\n\n/* 2026-09-05 review: the hidden attribute must beat any display rule */\n/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */\n[hidden] { display: none !important; }\n",
+      "after": "/* Order Status — shared primitives and a scoped fulfillment layout. */\n@layer components.pages {\n :where([data-ui=\"unified\"].status-body) .brand { display:flex; align-items:center; gap:var(--space-3); color:var(--ui-ink); text-decoration:none; min-width:0; }\n :where([data-ui=\"unified\"].status-body) .brand-text { display:grid; gap:var(--space-1); }\n :where([data-ui=\"unified\"].status-body) .brand-text strong { font-size:var(--font-size-md); }\n :where([data-ui=\"unified\"].status-body) .brand-text em { font-size:var(--font-size-sm); color:var(--ui-muted); font-style:normal; }\n :where([data-ui=\"unified\"].status-body) .head-contact { font-size:var(--font-size-md); }\n :where([data-ui=\"unified\"].status-body) .status-main { max-width:800px; }\n :where([data-ui=\"unified\"].status-body) .status-card { background:var(--ui-surface); border:1px solid var(--ui-line); border-radius:var(--radius-lg); padding:var(--space-6); overflow-wrap:anywhere; }\n :where([data-ui=\"unified\"].status-body) .status-card h1 { font-size:var(--font-size-2xl); margin:0 0 var(--space-2); }\n :where([data-ui=\"unified\"].status-body) .status-card > p { line-height:1.6; }\n :where([data-ui=\"unified\"].status-body) .status-kicker { margin:0 0 var(--space-2); color:var(--ui-accent); font-size:var(--font-size-md); font-weight:600; }\n :where([data-ui=\"unified\"].status-body) .status-style { margin:0; color:var(--ui-muted); }\n :where([data-ui=\"unified\"].status-body) .status-date { display:block; font-size:var(--font-size-sm); margin-top:var(--space-1); }\n :where([data-ui=\"unified\"].status-body) .status-rush { display:inline-block; margin:var(--space-1); padding:var(--space-1) var(--space-2); border-radius:var(--radius-pill); background:var(--color-warning-bg); color:var(--color-warning-ink); font-size:var(--font-size-sm); font-weight:700; }\n :where([data-ui=\"unified\"].status-body) .status-spin,:where([data-ui=\"unified\"].status-body) .status-check { font-size:var(--font-size-display); color:var(--ui-accent); margin-bottom:var(--space-4); }\n :where([data-ui=\"unified\"].status-body) .status-check.is-amber { color:var(--color-warning-ink); }\n :where([data-ui=\"unified\"].status-body) .status-phone a { font-weight:600; }\n :where([data-ui=\"unified\"].status-body) .status-promise { background:var(--ui-tint); color:var(--ui-accent); border-left:3px solid var(--ui-accent); border-radius:var(--radius-sm); padding:var(--space-3) var(--space-4); margin:var(--space-5) 0; font-size:var(--font-size-md); }\n :where([data-ui=\"unified\"].status-body) .status-tracking { margin:var(--space-4) 0; }\n :where([data-ui=\"unified\"].status-body) .status-tracking .btn { white-space:normal; text-align:left; overflow-wrap:anywhere; }\n :where([data-ui=\"unified\"].status-body) .status-timeline { margin:var(--space-5) 0; }\n :where([data-ui=\"unified\"].status-body) .status-step { display:flex; gap:var(--space-4); align-items:flex-start; position:relative; padding-bottom:var(--space-5); }\n :where([data-ui=\"unified\"].status-body) .status-step:last-child { padding-bottom:0; }\n :where([data-ui=\"unified\"].status-body) .status-step:not(:last-child)::before { content:''; position:absolute; left:15px; top:32px; bottom:0; width:2px; background:var(--ui-line); }\n :where([data-ui=\"unified\"].status-body) .status-step.is-done::before { background:var(--ui-accent); }\n :where([data-ui=\"unified\"].status-body) .status-step-dot { flex:none; width:32px; height:32px; border:2px solid var(--ui-line); border-radius:50%; display:inline-flex; align-items:center; justify-content:center; background:var(--ui-surface); color:var(--ui-muted); font-size:var(--font-size-sm); }\n :where([data-ui=\"unified\"].status-body) .is-done .status-step-dot { background:var(--ui-accent); border-color:var(--ui-accent); color:var(--color-on-brand); }\n :where([data-ui=\"unified\"].status-body) .is-current .status-step-dot { border-color:var(--ui-accent); color:var(--ui-accent); background:var(--ui-tint); }\n :where([data-ui=\"unified\"].status-body) .status-step-body { min-width:0; }\n :where([data-ui=\"unified\"].status-body) .status-step-body strong { display:block; font-size:var(--font-size-md); }\n :where([data-ui=\"unified\"].status-body) .is-current .status-step-body strong { color:var(--ui-accent); }\n :where([data-ui=\"unified\"].status-body) .status-step-body small { display:block; margin-top:var(--space-1); color:var(--ui-muted); font-size:var(--font-size-sm); }\n :where([data-ui=\"unified\"].status-body) .status-pickup { display:flex; gap:var(--space-3); background:var(--ui-tint); border-radius:var(--radius-md); padding:var(--space-4); font-size:var(--font-size-md); }\n :where([data-ui=\"unified\"].status-body) .status-pickup strong { display:block; margin-bottom:var(--space-1); }\n :where([data-ui=\"unified\"].status-body) .status-pickup i { color:var(--ui-accent); }\n :where([data-ui=\"unified\"].status-body) .status-mockups { display:flex; gap:var(--space-4); flex-wrap:wrap; margin:var(--space-5) 0; }\n :where([data-ui=\"unified\"].status-body) .status-mockups:empty { display:none; }\n :where([data-ui=\"unified\"].status-body) .status-mockups figure { margin:0; width:110px; }\n :where([data-ui=\"unified\"].status-body) .status-mockups img { width:100%; display:block; border:1px solid var(--ui-line); border-radius:var(--radius-sm); }\n :where([data-ui=\"unified\"].status-body) .status-mockups figcaption { font-size:var(--font-size-sm); color:var(--ui-muted); margin-top:var(--space-1); }\n :where([data-ui=\"unified\"].status-body) .status-h2 { margin:var(--space-5) 0 var(--space-3); padding-top:var(--space-5); border-top:1px solid var(--ui-line); font-size:var(--font-size-lg); }\n :where([data-ui=\"unified\"].status-body) .status-table { width:100%; border-collapse:collapse; table-layout:fixed; font-size:var(--font-size-md); text-align:left; }\n :where([data-ui=\"unified\"].status-body) .status-table th,:where([data-ui=\"unified\"].status-body) .status-table td { padding:var(--space-3) var(--space-2); border-bottom:1px solid var(--ui-line); vertical-align:top; overflow-wrap:anywhere; }\n :where([data-ui=\"unified\"].status-body) .status-table th { color:var(--ui-muted); font-weight:600; }\n :where([data-ui=\"unified\"].status-body) .status-table th:first-child { width:38%; }\n :where([data-ui=\"unified\"].status-body) .status-table th:nth-child(3) { width:15%; }\n :where([data-ui=\"unified\"].status-body) .status-table th:nth-child(n+3),:where([data-ui=\"unified\"].status-body) .status-table td:nth-child(n+3) { text-align:right; }\n :where([data-ui=\"unified\"].status-body) .status-summary { margin:var(--space-4) 0 0 auto; max-width:380px; }\n :where([data-ui=\"unified\"].status-body) .tot-row { display:flex; justify-content:space-between; gap:var(--space-4); padding:var(--space-2); font-size:var(--font-size-md); }\n :where([data-ui=\"unified\"].status-body) .tot-row span:last-child { flex:none; font-variant-numeric:tabular-nums; }\n :where([data-ui=\"unified\"].status-body) .tot-row.is-grand { border-top:2px solid var(--ui-ink); margin-top:var(--space-2); padding-top:var(--space-3); font-size:var(--font-size-lg); font-weight:700; }\n :where([data-ui=\"unified\"].status-body) .status-questions { margin:var(--space-5) 0 0; font-size:var(--font-size-md); color:var(--ui-muted); }\n\n @media (width <= 560px) {\n  :where([data-ui=\"unified\"].status-body) .page-main,:where([data-ui=\"unified\"].status-body) .status-card,:where([data-ui=\"unified\"].status-body) .page-header-inner { padding:var(--space-4); }\n  :where([data-ui=\"unified\"].status-body) .page-header-logo { height:36px; }\n  :where([data-ui=\"unified\"].status-body) .brand { align-items:flex-start; }\n  :where([data-ui=\"unified\"].status-body) .brand-text { flex:1; }\n  :where([data-ui=\"unified\"].status-body) .brand-text strong { font-size:var(--font-size-sm); }\n  :where([data-ui=\"unified\"].status-body) .status-table th,:where([data-ui=\"unified\"].status-body) .status-table td { padding:var(--space-2) var(--space-1); font-size:var(--font-size-sm); }\n }\n\n @media print {\n  @page { size:letter; margin:12mm; }\n  :where([data-ui=\"unified\"].status-body) { background:var(--ui-surface); font-size:12px; }\n  :where([data-ui=\"unified\"].status-body) .page-header { border-top:0; }\n  :where([data-ui=\"unified\"].status-body) .page-header-inner { padding:0 0 10px; }\n  :where([data-ui=\"unified\"].status-body) .page-header-logo { height:30px; }\n  :where([data-ui=\"unified\"].status-body) .brand-text strong,:where([data-ui=\"unified\"].status-body) .brand-text em,:where([data-ui=\"unified\"].status-body) .head-contact { font-size:10px; }\n  :where([data-ui=\"unified\"].status-body) .status-main { max-width:none; padding:12px 0 0; }\n  :where([data-ui=\"unified\"].status-body) .status-card { padding:0; border:0; border-radius:0; }\n  :where([data-ui=\"unified\"].status-body) .status-card h1 { font-size:20px; }\n  :where([data-ui=\"unified\"].status-body) .status-style,:where([data-ui=\"unified\"].status-body) .status-kicker { font-size:12px; }\n  :where([data-ui=\"unified\"].status-body) .status-promise { margin:10px 0; padding:8px 10px; font-size:12px; }\n  :where([data-ui=\"unified\"].status-body) .status-timeline { margin:12px 0; }\n  :where([data-ui=\"unified\"].status-body) .status-step { padding-bottom:10px; break-inside:avoid; }\n  :where([data-ui=\"unified\"].status-body) .status-step-body strong { font-size:12px; }\n  :where([data-ui=\"unified\"].status-body) .status-step-body small { font-size:10px; margin-top:2px; }\n  :where([data-ui=\"unified\"].status-body) .status-pickup { padding:8px 10px; font-size:11px; break-inside:avoid; }\n  :where([data-ui=\"unified\"].status-body) .status-mockups { margin:10px 0; gap:10px; break-inside:avoid; }\n  :where([data-ui=\"unified\"].status-body) .status-mockups figure { width:80px; }\n  :where([data-ui=\"unified\"].status-body) .status-mockups figcaption { font-size:10px; }\n  :where([data-ui=\"unified\"].status-body) .status-h2 { margin:12px 0 6px; padding-top:10px; font-size:14px; break-after:avoid; }\n  :where([data-ui=\"unified\"].status-body) .status-table th,:where([data-ui=\"unified\"].status-body) .status-table td { padding:5px 6px; font-size:11px; }\n  :where([data-ui=\"unified\"].status-body) .status-table tr,:where([data-ui=\"unified\"].status-body) .status-summary { break-inside:avoid; }\n  :where([data-ui=\"unified\"].status-body) .status-summary { margin-top:8px; }\n  :where([data-ui=\"unified\"].status-body) .tot-row { padding:4px 6px; font-size:11px; }\n  :where([data-ui=\"unified\"].status-body) .tot-row.is-grand { margin-top:5px; padding-top:6px; font-size:14px; }\n  :where([data-ui=\"unified\"].status-body) .status-questions { margin-top:12px; font-size:11px; break-inside:avoid; }\n  :where([data-ui=\"unified\"].status-body) .page-footer { padding:10px 0 0; font-size:9px; break-inside:avoid; }\n  :where([data-ui=\"unified\"].status-body) .status-tracking .btn { min-height:0; padding:6px 10px; font-size:11px; }\n }\n}\n",
+      "count": 1
+    },
+    {
+      "file": "pages/css/vendor-portal.css",
+      "before": "/* stylelint-disable no-duplicate-selectors -- legacy sheet: rules were appended over time; merging them would reorder the cascade (2026-09-07) */\n\n/* vendor-portal.css — L&P Screen Printing subcontractor job portal (/vendor).\n   Self-contained (vendor-facing page — deliberately does NOT pull staff dashboard CSS).\n   NWCA brand greens match the customer portal. */\n\n/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its\n   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;\n   raw hex is allowed ONLY in this block. */\n/* stylelint-disable color-no-hex */\n:root {\n    --vendor-portal-indigo: #5b21b6;\n    --vendor-portal-cyan: #93c5fd;\n  --vp-green-dark: var(--brand-800);\n  --vp-green: var(--brand-mid);\n  --vp-green-pale: var(--brand-100);\n  --vp-ink: var(--gray-800);\n  --vp-muted: var(--gray-500);\n  --vp-border: var(--gray-200);\n  --vp-bg: var(--gray-100);\n  --vp-card: var(--color-surface);\n  --vp-rush: var(--red-600);\n  --vp-radius: 10px;\n  --vp-shadow: 0 1px 3px rgb(0 0 0 / 8%);\n}\n/* stylelint-enable color-no-hex */\n\n* { box-sizing: border-box; }\n\n/* `hidden` must beat every display rule below (.vp-error is display:flex, .vp-btn inline-flex) -\n   without this the red error banner was visible on EVERY load (found 2026-09-05). */\n/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */\n[hidden] { display: none !important; }\n\nbody {\n  margin: 0;\n  font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif;\n  background: var(--vp-bg);\n  color: var(--vp-ink);\n  min-height: 100vh;\n  display: flex;\n  flex-direction: column;\n}\n\n/* ── Header ─────────────────────────────────────────────── */\n.vp-header {\n  background: var(--vp-card);\n  border-bottom: 3px solid var(--vp-green-dark);\n  box-shadow: var(--vp-shadow);\n}\n\n.vp-header-inner {\n  max-width: 1200px;\n  margin: 0 auto;\n  padding: 12px 20px;\n  display: flex;\n  align-items: center;\n  gap: 16px;\n  flex-wrap: wrap;\n}\n.vp-logo { height: 44px; width: auto; }\n.vp-header-title { flex: 1; min-width: 200px; }\n.vp-header-title h1 { margin: 0; font-size: 1.15rem; color: var(--vp-green-dark); }\n.vp-header-sub { font-size: 0.8rem; color: var(--vp-muted); }\n.vp-header-user { display: flex; align-items: center; gap: 10px; }\n\n.vp-user-chip {\n  font-size: 0.8rem;\n  color: var(--vp-muted);\n  background: var(--vp-green-pale);\n  padding: 5px 10px;\n  border-radius: 999px;\n}\n\n/* ── Layout ─────────────────────────────────────────────── */\n.vp-container {\n  max-width: 1200px;\n  width: 100%;\n  margin: 0 auto;\n  padding: 20px;\n  flex: 1;\n}\n\n.vp-footer {\n  text-align: center;\n  padding: 18px;\n  font-size: 0.8rem;\n  color: var(--vp-muted);\n}\n\n/* ── Buttons / chips ───────────────────────────────────── */\n.vp-btn {\n  display: inline-flex;\n  align-items: center;\n  gap: 7px;\n  border: 1px solid var(--vp-border);\n  background: var(--vp-card);\n  color: var(--vp-ink);\n  border-radius: 8px;\n  padding: 8px 14px;\n  font-size: 0.85rem;\n  cursor: pointer;\n  text-decoration: none;\n  transition: background 0.15s, color 0.15s;\n}\n.vp-btn--primary { background: var(--vp-green); border-color: var(--vp-green); color: var(--color-on-brand); }\n.vp-btn--primary:hover { background: var(--vp-green-dark); }\n.vp-btn--primary:disabled { opacity: 0.6; cursor: default; }\n.vp-btn--ghost:hover { background: var(--vp-green-pale); color: var(--vp-green-dark); }\n\n.vp-toolbar {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 12px;\n  flex-wrap: wrap;\n  margin-bottom: 16px;\n}\n.vp-filters { display: flex; gap: 8px; }\n\n.vp-chip {\n  border: 1px solid var(--vp-border);\n  background: var(--vp-card);\n  border-radius: 999px;\n  padding: 6px 16px;\n  font-size: 0.85rem;\n  cursor: pointer;\n  color: var(--vp-muted);\n}\n\n.vp-chip--active {\n  background: var(--vp-green-dark);\n  border-color: var(--vp-green-dark);\n  color: var(--color-on-brand);\n}\n\n.vp-search {\n  position: relative;\n  min-width: 240px;\n}\n\n.vp-search i {\n  position: absolute;\n  left: 11px;\n  top: 50%;\n  transform: translateY(-50%);\n  color: var(--vp-muted);\n  font-size: 0.8rem;\n}\n\n.vp-search input {\n  width: 100%;\n  padding: 8px 12px 8px 32px;\n  border: 1px solid var(--vp-border);\n  border-radius: 8px;\n  font-size: 0.85rem;\n}\n\n/* ── States ────────────────────────────────────────────── */\n.vp-loading { text-align: center; padding: 44px; color: var(--vp-muted); }\n.vp-empty { text-align: center; padding: 44px; color: var(--vp-muted); }\n.vp-empty i { font-size: 2rem; margin-bottom: 8px; }\n\n.vp-error {\n  background: var(--red-100);\n  border: 1px solid var(--red-200);\n  border-left: 4px solid var(--vp-rush);\n  color: var(--red-800);\n  border-radius: 8px;\n  padding: 12px 16px;\n  margin-bottom: 16px;\n  display: flex;\n  gap: 10px;\n  align-items: center;\n}\n.vp-empty-panel { color: var(--vp-muted); font-size: 0.85rem; padding: 10px 0; }\n\n/* ── Job cards ─────────────────────────────────────────── */\n.vp-job-grid {\n  display: grid;\n  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));\n  gap: 14px;\n}\n\n.vp-job-card {\n  background: var(--vp-card);\n  border: 1px solid var(--vp-border);\n  border-radius: var(--vp-radius);\n  box-shadow: var(--vp-shadow);\n  padding: 14px;\n  cursor: pointer;\n  display: flex;\n  gap: 12px;\n  transition: border-color 0.15s, transform 0.1s;\n}\n.vp-job-card:hover { border-color: var(--vp-green); transform: translateY(-1px); }\n\n.vp-job-thumb {\n  width: 72px;\n  height: 72px;\n  border-radius: 8px;\n  object-fit: contain;\n  background: var(--vp-green-pale);\n  flex-shrink: 0;\n}\n\n.vp-job-thumb--placeholder {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  color: var(--vp-green);\n  font-size: 1.3rem;\n}\n.vp-job-body { flex: 1; min-width: 0; }\n.vp-job-id { font-size: 0.75rem; color: var(--vp-muted); font-family: ui-monospace, Menlo, Consolas, monospace; }\n\n.vp-job-company {\n  font-weight: 600;\n  margin: 2px 0 4px;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n.vp-job-meta { font-size: 0.78rem; color: var(--vp-muted); display: flex; gap: 10px; flex-wrap: wrap; }\n.vp-job-badges { margin-top: 7px; display: flex; gap: 6px; flex-wrap: wrap; }\n\n.vp-badge {\n  display: inline-block;\n  font-size: 0.7rem;\n  font-weight: 600;\n  border-radius: 999px;\n  padding: 2px 9px;\n  background: var(--vp-green-pale);\n  color: var(--vp-green-dark);\n}\n.vp-badge--rush { background: var(--red-100); color: var(--vp-rush); }\n.vp-badge--status-Requested { background: var(--amber-100); color: var(--amber-800); }\n.vp-badge--status-Ordered { background: var(--sky-100); color: var(--blue-800); }\n.vp-badge--status-PO_Created { background: var(--color-ruth-tint); color: var(--vendor-portal-indigo); }\n.vp-badge--status-Shipped { background: var(--emerald-100); color: var(--emerald-800); }\n.vp-badge--status-Received { background: var(--vp-green-pale); color: var(--vp-green-dark); }\n.vp-badge--status-Cancelled { background: var(--gray-100); color: var(--vp-muted); }\n.vp-badge--status-On_Hold { background: var(--red-100); color: var(--store-rush-deeper); }\n\n/* ── Detail view ───────────────────────────────────────── */\n.vp-back { margin-bottom: 14px; }\n\n.vp-detail-header {\n  background: var(--vp-card);\n  border: 1px solid var(--vp-border);\n  border-radius: var(--vp-radius);\n  box-shadow: var(--vp-shadow);\n  padding: 18px;\n  display: flex;\n  justify-content: space-between;\n  gap: 14px;\n  flex-wrap: wrap;\n  margin-bottom: 16px;\n}\n.vp-detail-id { font-family: ui-monospace, Menlo, Consolas, monospace; color: var(--vp-muted); font-size: 0.85rem; }\n.vp-detail-company { margin: 4px 0; font-size: 1.35rem; color: var(--vp-green-dark); }\n.vp-detail-sub { color: var(--vp-muted); font-size: 0.85rem; }\n.vp-detail-badges { display: flex; gap: 8px; align-items: flex-start; flex-wrap: wrap; }\n.vp-detail-badges .vp-badge { font-size: 0.8rem; padding: 4px 12px; }\n\n.vp-grid {\n  display: grid;\n  grid-template-columns: 1.4fr 1fr;\n  gap: 16px;\n  align-items: start;\n}\n\n@media (width <= 860px) { .vp-grid { grid-template-columns: 1fr; } }\n.vp-col { display: flex; flex-direction: column; gap: 16px; }\n\n.vp-card {\n  background: var(--vp-card);\n  border: 1px solid var(--vp-border);\n  border-radius: var(--vp-radius);\n  box-shadow: var(--vp-shadow);\n  overflow: hidden;\n}\n\n.vp-card-header {\n  padding: 12px 16px;\n  border-bottom: 1px solid var(--vp-border);\n  background: var(--gray-50);\n}\n.vp-card-header h3 { margin: 0; font-size: 0.95rem; color: var(--vp-green-dark); }\n.vp-card-header h3 i { margin-right: 7px; }\n.vp-card-body { padding: 16px; }\n\n/* Work order meta grid */\n.vp-meta {\n  display: grid;\n  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));\n  gap: 12px 18px;\n  margin: 0;\n}\n.vp-meta dt { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--vp-muted); }\n.vp-meta dd { margin: 2px 0 0; font-size: 0.9rem; font-weight: 500; overflow-wrap: anywhere; }\n\n.vp-instructions {\n  margin-top: 14px;\n  background: var(--store-paper);\n  border: 1px solid var(--amber-200);\n  border-left: 4px solid var(--amber-500);\n  border-radius: 8px;\n  padding: 10px 14px;\n  font-size: 0.88rem;\n  white-space: pre-wrap;\n}\n\n/* Lines table */\n.vp-table-scroll { overflow-x: auto; }\n.vp-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }\n\n.vp-table th {\n  text-align: left;\n  font-size: 0.7rem;\n  text-transform: uppercase;\n  letter-spacing: 0.04em;\n  color: var(--vp-muted);\n  padding: 6px 10px;\n  border-bottom: 1px solid var(--vp-border);\n}\n.vp-table td { padding: 8px 10px; border-bottom: 1px solid var(--vp-border); }\n.vp-table tr:last-child td { border-bottom: none; }\n\n/* Files */\n.vp-files { display: flex; flex-direction: column; gap: 10px; }\n\n.vp-file {\n  display: flex;\n  align-items: center;\n  gap: 12px;\n  border: 1px solid var(--vp-border);\n  border-radius: 8px;\n  padding: 10px 12px;\n}\n\n.vp-file-thumb {\n  width: 46px;\n  height: 46px;\n  border-radius: 6px;\n  object-fit: contain;\n  background: var(--vp-green-pale);\n  flex-shrink: 0;\n}\n\n.vp-file-icon {\n  width: 46px;\n  height: 46px;\n  border-radius: 6px;\n  background: var(--vp-green-pale);\n  color: var(--vp-green);\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  font-size: 1.1rem;\n  flex-shrink: 0;\n}\n.vp-file-info { flex: 1; min-width: 0; }\n\n.vp-file-name {\n  font-size: 0.85rem;\n  font-weight: 600;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n.vp-file-meta { font-size: 0.72rem; color: var(--vp-muted); display: flex; gap: 8px; flex-wrap: wrap; }\n\n.vp-file-type {\n  font-size: 0.65rem;\n  font-weight: 700;\n  text-transform: uppercase;\n  background: var(--vp-green-pale);\n  color: var(--vp-green-dark);\n  border-radius: 4px;\n  padding: 1px 6px;\n}\n.vp-file-type--mockup { background: var(--sky-100); color: var(--blue-800); }\n\n/* Mockup panel */\n.vp-mockup-img {\n  width: 100%;\n  max-height: 420px;\n  object-fit: contain;\n  border-radius: 8px;\n  background: var(--vp-green-pale);\n}\n\n/* Timeline */\n.vp-comment-form { display: flex; gap: 8px; margin-bottom: 14px; align-items: flex-end; }\n\n.vp-comment-form textarea {\n  flex: 1;\n  border: 1px solid var(--vp-border);\n  border-radius: 8px;\n  padding: 8px 10px;\n  font-size: 0.85rem;\n  font-family: inherit;\n  resize: vertical;\n}\n.vp-timeline { display: flex; flex-direction: column; gap: 12px; max-height: 460px; overflow-y: auto; }\n.vp-note { border-left: 3px solid var(--vp-green-pale); padding: 2px 0 2px 12px; }\n.vp-note--vendor { border-left-color: var(--vp-green); }\n.vp-note--status { border-left-color: var(--vendor-portal-cyan); }\n.vp-note-head { font-size: 0.72rem; color: var(--vp-muted); margin-bottom: 2px; }\n.vp-note-head strong { color: var(--vp-ink); }\n.vp-note-text { font-size: 0.85rem; white-space: pre-wrap; overflow-wrap: anywhere; }\n\n/* ── 2026-09-05 review ─────────────────────────────────────── */\n.vp-sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }\n.vp-btn--sm { padding: 5px 10px; font-size: 0.78rem; }\n.vp-error { flex-wrap: wrap; }\n.vp-error #vp-error-retry { margin-left: auto; }\n.vp-chip-count { font-size: 0.72rem; opacity: 0.8; margin-left: 2px; }\n.vp-chip-count:empty { display: none; }\n\n.vp-chip:focus-visible, .vp-btn:focus-visible, .vp-job-card:focus-visible, .vp-search input:focus-visible,\n.vp-comment-form textarea:focus-visible, .vp-detail-company:focus-visible { outline: 3px solid var(--vp-green); outline-offset: 2px; }\n.vp-detail-company:focus { outline: none; }\n/* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */\n.vp-overdue { color: var(--vp-rush) !important; font-weight: 600; }\n.vp-job-card--pastdue { border-left: 4px solid var(--vp-rush); }\n.vp-comment-hint { font-size: 0.72rem; color: var(--vp-muted); margin: -8px 0 12px; }\n.vp-comment-status { font-size: 0.8rem; color: var(--vp-green-dark); background: var(--vp-green-pale); border-radius: 6px; padding: 6px 10px; margin-bottom: 12px; }\n.vp-mockup-img { display: block; }\n\n@media (width <= 560px) {\n  .vp-header-inner { padding: 10px 14px; gap: 10px; }\n  .vp-logo { height: 36px; }\n  .vp-header-title h1 { font-size: 1rem; }\n  .vp-header-sub { display: none; }\n  .vp-header-user { width: 100%; justify-content: space-between; }\n  .vp-container { padding: 14px; }\n  .vp-search { flex: 1 1 100%; min-width: 0; }\n  .vp-job-grid { grid-template-columns: 1fr; }\n  .vp-detail-header { padding: 14px; }\n  .vp-card-body { padding: 12px; }\n  .vp-comment-form { flex-direction: column; align-items: stretch; }\n  .vp-timeline { max-height: none; }\n}\n",
+      "after": "/* Vendor Job Portal — shared controls, scoped production details and paper. */\n@layer components.pages {\n :where([data-ui=\"unified\"].vendor-portal-page) { min-height:100vh; display:flex; flex-direction:column; }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-header-title { flex:1; min-width:min(250px,100%); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-header-title h1 { margin:0 0 var(--space-1); font-size:var(--font-size-xl); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-header-sub,:where([data-ui=\"unified\"].vendor-portal-page) .vp-user-chip { font-size:var(--font-size-sm); color:var(--ui-muted); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-header-user { display:flex; gap:var(--space-3); align-items:center; flex-wrap:wrap; }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-container { flex:1; width:100%; }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-toolbar { display:flex; justify-content:space-between; align-items:center; gap:var(--space-4); flex-wrap:wrap; margin-bottom:var(--space-5); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-filters { display:flex; flex-wrap:wrap; gap:var(--space-2); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-chip { border-radius:var(--radius-pill); padding-inline:var(--space-3); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-chip--active,:where([data-ui=\"unified\"].vendor-portal-page) .vp-chip--active:hover { background:var(--ui-accent); border-color:var(--ui-accent); color:var(--color-on-brand); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-chip-count { font-size:var(--font-size-sm); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-chip-count:empty { display:none; }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-search { position:relative; flex:0 1 360px; min-width:0; }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-search i { position:absolute; left:var(--space-3); top:50%; transform:translateY(-50%); color:var(--ui-muted); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-search input { padding-left:var(--space-6); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-loading,:where([data-ui=\"unified\"].vendor-portal-page) .vp-empty { padding:var(--space-7) var(--space-4); text-align:center; color:var(--ui-muted); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-empty i { font-size:var(--font-size-2xl); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-empty-panel { color:var(--ui-muted); font-size:var(--font-size-md); padding:var(--space-2) 0; }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-error { display:flex; flex-wrap:wrap; align-items:center; gap:var(--space-3); padding:var(--space-4); margin-bottom:var(--space-5); background:var(--red-100); color:var(--red-800); border-left:3px solid var(--red-800); border-radius:var(--radius-sm); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-error .vp-btn { margin-left:auto; }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-job-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr)); gap:var(--space-4); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-job-card { display:flex; align-items:flex-start; gap:var(--space-4); text-align:left; width:100%; min-width:0; padding:var(--space-5); background:var(--ui-surface); color:var(--ui-ink); border:1px solid var(--ui-line); border-radius:var(--radius-md); cursor:pointer; }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-job-card:hover { border-color:var(--ui-accent); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-job-card--pastdue { border-left:3px solid var(--red-800); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-job-thumb { display:block; width:64px; height:64px; flex:none; object-fit:contain; border-radius:var(--radius-sm); background:var(--ui-tint); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-job-thumb--placeholder { display:flex; align-items:center; justify-content:center; color:var(--ui-accent); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-job-body { display:block; flex:1; min-width:0; }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-job-id,:where([data-ui=\"unified\"].vendor-portal-page) .vp-detail-id { display:block; font-size:var(--font-size-sm); color:var(--ui-muted); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-job-company { display:block; margin:var(--space-1) 0 var(--space-2); font-size:var(--font-size-lg); font-weight:600; overflow-wrap:anywhere; }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-job-meta,:where([data-ui=\"unified\"].vendor-portal-page) .vp-file-meta { display:flex; flex-wrap:wrap; gap:var(--space-2) var(--space-3); font-size:var(--font-size-sm); color:var(--ui-muted); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-job-badges,:where([data-ui=\"unified\"].vendor-portal-page) .vp-detail-badges { display:flex; flex-wrap:wrap; align-items:flex-start; gap:var(--space-2); margin-top:var(--space-3); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-badge { display:inline-block; padding:var(--space-1) var(--space-2); border-radius:var(--radius-pill); font-size:var(--font-size-sm); font-weight:600; background:var(--ui-tint); color:var(--ui-accent); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-badge--rush,:where([data-ui=\"unified\"].vendor-portal-page) .vp-badge--status-On_Hold { background:var(--red-100); color:var(--red-800); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-badge--status-Requested { background:var(--color-warning-bg); color:var(--color-warning-ink); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-badge--status-Ordered,:where([data-ui=\"unified\"].vendor-portal-page) .vp-badge--status-In_Production { background:var(--color-info-bg); color:var(--color-info-ink); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-badge--status-PO_Created { background:var(--color-ruth-tint); color:var(--color-ruth-dark); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-badge--status-Cancelled { background:var(--gray-100); color:var(--ui-muted); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-overdue { color:var(--red-800); font-weight:600; }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-back { margin-bottom:var(--space-5); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-detail-header { display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:var(--space-4); margin-bottom:var(--space-5); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-detail-header > div { min-width:0; overflow-wrap:anywhere; }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-detail-company { margin:var(--space-1) 0 var(--space-2); font-size:var(--font-size-2xl); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-detail-sub { color:var(--ui-muted); font-size:var(--font-size-md); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-grid { display:grid; grid-template-columns:minmax(0,1.4fr) minmax(0,1fr); gap:var(--space-5); align-items:start; }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-col { display:flex; flex-direction:column; gap:var(--space-5); min-width:0; }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-card { border:1px solid var(--ui-line); border-radius:var(--radius-md); background:var(--ui-surface); min-width:0; }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-card-header { padding:var(--space-4) var(--space-5); border-bottom:1px solid var(--ui-line); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-card-header h3 { margin:0; font-size:var(--font-size-base); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-card-header i { margin-right:var(--space-2); color:var(--ui-accent); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-card-body { padding:var(--space-5); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-meta { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--space-4); margin:0; }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-meta dt { font-size:var(--font-size-sm); color:var(--ui-muted); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-meta dd { margin:var(--space-1) 0 0; font-size:var(--font-size-md); overflow-wrap:anywhere; }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-instructions { margin-top:var(--space-5); padding:var(--space-4); border-left:3px solid var(--color-warning-ink); background:var(--color-warning-bg); color:var(--ui-ink); white-space:pre-wrap; font-size:var(--font-size-md); overflow-wrap:anywhere; }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-table-scroll { overflow:auto; }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-table { width:100%; border-collapse:collapse; table-layout:fixed; font-size:var(--font-size-md); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-table th,:where([data-ui=\"unified\"].vendor-portal-page) .vp-table td { padding:var(--space-3) var(--space-2); border-bottom:1px solid var(--ui-line); text-align:left; vertical-align:top; overflow-wrap:anywhere; }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-table th { color:var(--ui-muted); font-size:var(--font-size-sm); font-weight:600; }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-table th:first-child { width:12%; }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-table th:last-child { width:30%; }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-files { display:grid; gap:var(--space-3); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-file { display:flex; flex-wrap:wrap; align-items:center; gap:var(--space-3); padding:var(--space-3); border:1px solid var(--ui-line); border-radius:var(--radius-sm); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-file-thumb,:where([data-ui=\"unified\"].vendor-portal-page) .vp-file-icon { width:40px; height:40px; flex:none; object-fit:contain; background:var(--ui-tint); border-radius:var(--radius-sm); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-file-icon { display:flex; align-items:center; justify-content:center; color:var(--ui-accent); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-file-info { flex:1; min-width:100px; }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-file-name { font-size:var(--font-size-md); font-weight:600; overflow-wrap:anywhere; }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-file-type { font-weight:600; color:var(--ui-accent); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-mockup-img { display:block; width:100%; max-height:320px; object-fit:contain; }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-comment-form { display:flex; gap:var(--space-3); align-items:flex-end; margin-bottom:var(--space-3); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-comment-form textarea { flex:1; min-width:0; }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-comment-hint { color:var(--ui-muted); font-size:var(--font-size-sm); margin-bottom:var(--space-5); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-comment-status { padding:var(--space-3); margin-bottom:var(--space-4); border-radius:var(--radius-sm); background:var(--ui-tint); color:var(--ui-accent); font-size:var(--font-size-md); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-timeline { display:grid; gap:var(--space-4); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-note { padding-left:var(--space-3); border-left:3px solid var(--ui-line); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-note--vendor { border-color:var(--ui-accent); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-note--status { border-color:var(--color-info-line); }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-note-head { margin-bottom:var(--space-1); font-size:var(--font-size-sm); color:var(--ui-muted); overflow-wrap:anywhere; }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-note-text { font-size:var(--font-size-md); white-space:pre-wrap; overflow-wrap:anywhere; }\n :where([data-ui=\"unified\"].vendor-portal-page) .vp-sr { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }\n\n @media (width <= 900px) { :where([data-ui=\"unified\"].vendor-portal-page) .vp-grid { grid-template-columns:minmax(0,1fr); } }\n\n @media (width <= 560px) {\n  :where([data-ui=\"unified\"].vendor-portal-page) .page-header-inner,:where([data-ui=\"unified\"].vendor-portal-page) .vp-container { padding:var(--space-4); }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-header-title { min-width:0; flex-basis:calc(100% - 100px); }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-header-title h1 { font-size:var(--font-size-base); }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-header-user { width:100%; justify-content:space-between; }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-search { flex-basis:100%; }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-job-card { padding:var(--space-4); gap:var(--space-3); }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-job-thumb { width:48px; height:48px; }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-job-company { font-size:var(--font-size-base); }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-card-header,:where([data-ui=\"unified\"].vendor-portal-page) .vp-card-body { padding:var(--space-4); }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-comment-form { flex-direction:column; align-items:stretch; }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-table thead { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-table,:where([data-ui=\"unified\"].vendor-portal-page) .vp-table tbody,:where([data-ui=\"unified\"].vendor-portal-page) .vp-table tr { display:block; }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-table tr { padding-block:var(--space-2); border-bottom:1px solid var(--ui-line); }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-table td { display:grid; grid-template-columns:90px minmax(0,1fr); gap:var(--space-3); padding:var(--space-1) 0; border:0; }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-table td::before { content:attr(data-label); color:var(--ui-muted); font-size:var(--font-size-sm); font-weight:600; }\n }\n\n @media print {\n  @page { size:letter; margin:12mm; }\n  :where([data-ui=\"unified\"].vendor-portal-page) { display:block; background:var(--ui-surface); font-size:11px; }\n  :where([data-ui=\"unified\"].vendor-portal-page) .page-header { border-top:0; }\n  :where([data-ui=\"unified\"].vendor-portal-page) .page-header-inner { padding:0 0 10px; gap:10px; }\n  :where([data-ui=\"unified\"].vendor-portal-page) .page-header-logo { height:30px; }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-header-title h1 { font-size:14px; }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-header-sub { font-size:10px; }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-header-user,:where([data-ui=\"unified\"].vendor-portal-page) .vp-toolbar,:where([data-ui=\"unified\"].vendor-portal-page) .vp-back,:where([data-ui=\"unified\"].vendor-portal-page) .vp-comment-form,:where([data-ui=\"unified\"].vendor-portal-page) .vp-comment-hint { display:none; }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-container { padding:12px 0 0; }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-detail-header { margin-bottom:12px; break-inside:avoid; }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-detail-company { font-size:18px; }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-detail-id,:where([data-ui=\"unified\"].vendor-portal-page) .vp-detail-sub { font-size:11px; }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-grid,:where([data-ui=\"unified\"].vendor-portal-page) .vp-col { display:block; }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-card { margin-bottom:12px; border-radius:0; overflow:visible; }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-card-header { padding:8px 10px; break-after:avoid; }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-card-header h3 { font-size:13px; }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-card-body { padding:10px; }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-meta { grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px 12px; }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-meta dt,:where([data-ui=\"unified\"].vendor-portal-page) .vp-meta dd { font-size:10px; }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-instructions { margin-top:10px; padding:8px; font-size:11px; }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-table-scroll { overflow:visible; }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-table { display:table; font-size:10px; }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-table thead { position:static; width:auto; height:auto; clip-path:none; display:table-header-group; }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-table tbody { display:table-row-group; }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-table tr { display:table-row; break-inside:avoid; }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-table th,:where([data-ui=\"unified\"].vendor-portal-page) .vp-table td { display:table-cell; padding:5px; font-size:10px; }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-table td::before { display:none; }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-file,:where([data-ui=\"unified\"].vendor-portal-page) .vp-note { break-inside:avoid; }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-file-name,:where([data-ui=\"unified\"].vendor-portal-page) .vp-file-meta,:where([data-ui=\"unified\"].vendor-portal-page) .vp-note-head,:where([data-ui=\"unified\"].vendor-portal-page) .vp-note-text { font-size:10px; }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-file .btn { min-height:0; padding:4px 8px; font-size:10px; }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-mockup-img { max-height:130px; }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-timeline { display:block; overflow:visible; }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-note { margin-bottom:10px; }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-job-card { break-inside:avoid; padding:12px; }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-job-company { font-size:13px; }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-job-meta,:where([data-ui=\"unified\"].vendor-portal-page) .vp-job-id,:where([data-ui=\"unified\"].vendor-portal-page) .vp-badge { font-size:10px; }\n  :where([data-ui=\"unified\"].vendor-portal-page) .page-footer { padding:10px 0 0; font-size:9px; }\n }\n}\n",
+      "count": 1
+    },
+    {
+      "file": "pages/vendor-portal.html",
+      "before": "class=\"btn vp-chip-count\"",
+      "after": "class=\"vp-chip-count\"",
+      "count": 3
+    },
+    {
+      "file": "pages/css/order-status.css",
+      "before": ":where([data-ui=\"unified\"].status-body) .page-header { border-top:0; }",
+      "after": ":where([data-ui=\"unified\"].status-body) .page-header { display:block; border-top:0; }",
+      "count": 1
+    },
+    {
+      "file": "pages/css/vendor-portal.css",
+      "before": ":where([data-ui=\"unified\"].vendor-portal-page) .page-header { border-top:0; }",
+      "after": ":where([data-ui=\"unified\"].vendor-portal-page) .page-header { display:block; border-top:0; }",
+      "count": 1
+    },
+    {
+      "file": "pages/css/vendor-portal.css",
+      "before": "display:block; background:var(--ui-surface); font-size:11px;",
+      "after": "display:block; min-height:0; background:var(--ui-surface); font-size:11px;",
+      "count": 1
+    },
+    {
+      "file": "pages/css/vendor-portal.css",
+      "before": "margin-bottom:12px; border-radius:0; overflow:visible;",
+      "after": "margin-bottom:10px; border:0; border-radius:0; overflow:visible;",
+      "count": 1
+    },
+    {
+      "file": "pages/css/vendor-portal.css",
+      "before": "padding:8px 10px; break-after:avoid;",
+      "after": "padding:5px 0; break-after:avoid;",
+      "count": 1
+    },
+    {
+      "file": "pages/css/vendor-portal.css",
+      "before": ".vp-card-body { padding:10px; }",
+      "after": ".vp-card-body { padding:6px 0; }",
+      "count": 1
+    },
+    {
+      "file": "pages/css/vendor-portal.css",
+      "before": ".vp-mockup-img { max-height:130px; }",
+      "after": ".vp-mockup-img { max-height:80px; }",
+      "count": 1
+    },
+    {
+      "file": "pages/css/vendor-portal.css",
+      "before": "display:table-cell; padding:5px; font-size:10px;",
+      "after": "display:table-cell; padding:5px; font-size:11px;",
+      "count": 1
+    },
+    {
+      "file": "pages/css/vendor-portal.css",
+      "before": ".vp-file-name,:where([data-ui=\"unified\"].vendor-portal-page) .vp-file-meta,:where([data-ui=\"unified\"].vendor-portal-page) .vp-note-head,:where([data-ui=\"unified\"].vendor-portal-page) .vp-note-text { font-size:10px; }",
+      "after": ".vp-file-name,:where([data-ui=\"unified\"].vendor-portal-page) .vp-file-meta,:where([data-ui=\"unified\"].vendor-portal-page) .vp-note-head,:where([data-ui=\"unified\"].vendor-portal-page) .vp-note-text { font-size:11px; }",
+      "count": 1
+    },
+    {
+      "file": "pages/css/vendor-portal.css",
+      "before": "  :where([data-ui=\"unified\"].vendor-portal-page) .page-footer { padding:10px 0 0; font-size:9px; }",
+      "after": "  :where([data-ui=\"unified\"].vendor-portal-page) .page-footer { padding:10px 0 0; font-size:9px; }\n  :where([data-ui=\"unified\"].vendor-portal-page) .vp-file { padding:6px; }\n  :where([data-ui=\"unified\"].vendor-portal-page) :focus { outline:0; }",
+      "count": 1
+    },
+    {
+      "file": "pages/css/order-status.css",
+      "before": ".status-mockups:empty { display:none; }",
+      "after": ".status-mockups:empty { margin:0; }",
+      "count": 1
+    },
+    {
+      "file": "pages/css/vendor-portal.css",
+      "before": "margin-bottom:10px; border:0; border-radius:0; overflow:visible;",
+      "after": "margin-bottom:6px; border:0; border-radius:0; overflow:visible;",
+      "count": 1
+    },
+    {
+      "file": "pages/css/vendor-portal.css",
+      "before": "padding:5px 0; break-after:avoid;",
+      "after": "padding:4px 0; break-after:avoid;",
+      "count": 1
+    },
+    {
+      "file": "pages/css/vendor-portal.css",
+      "before": ".vp-file { padding:6px; }",
+      "after": ".vp-file { padding:4px; }",
+      "count": 1
+    },
+    {
+      "file": "pages/css/vendor-portal.css",
+      "before": ".vp-mockup-img { max-height:80px; }",
+      "after": ".vp-mockup-img { max-height:72px; }",
+      "count": 1
+    }
+  ],
   "retiredStyles": []
 }

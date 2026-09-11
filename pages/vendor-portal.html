@@ -7,44 +7,48 @@
   <title>Job Portal — Northwest Custom Apparel</title>
   <link rel="icon" href="/favicon.png">
   <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
+  <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.10.2">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/shared_components/vendor/fontawesome/css/all.min.css?v=2026.07.08.8">
   <link rel="stylesheet" href="/pages/css/vendor-portal.css?v=2026.09.07.19">
 </head>
-<body>
-  <header class="vp-header">
-    <div class="vp-header-inner">
-      <img class="vp-logo" src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png" alt="Northwest Custom Apparel">
+<body class="vendor-portal-page" data-ui="unified">
+  <header class="page-header">
+    <div class="page-header-inner">
+      <img class="page-header-logo" src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png" alt="Northwest Custom Apparel">
       <div class="vp-header-title">
         <h1 id="vp-vendor-name">Job Portal</h1>
         <span class="vp-header-sub">Screen-print jobs from Northwest Custom Apparel</span>
       </div>
       <div class="vp-header-user">
         <span id="vp-user-chip" class="vp-user-chip"><i class="fas fa-user" aria-hidden="true"></i> <span id="vp-user-email"></span></span>
-        <a class="vp-btn vp-btn--ghost" href="/auth/vendor/logout"><i class="fas fa-sign-out-alt" aria-hidden="true"></i> Sign out</a>
+        <a class="btn vp-btn" href="/auth/vendor/logout"><i class="fas fa-sign-out-alt" aria-hidden="true"></i> Sign out</a>
       </div>
     </div>
   </header>
 
-  <main class="vp-container">
+  <main class="page-main vp-container">
     <!-- Error banner (API failures are always VISIBLE — never silent) -->
     <div id="vp-error" class="vp-error" role="alert" hidden>
       <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
       <span id="vp-error-text">Unable to load jobs. Please refresh.</span>
-      <button type="button" class="vp-btn vp-btn--ghost vp-btn--sm" id="vp-error-retry" hidden><i class="fas fa-rotate-right" aria-hidden="true"></i> Retry</button>
+      <button type="button" class="btn vp-btn vp-btn--sm" id="vp-error-retry" hidden><i class="fas fa-rotate-right" aria-hidden="true"></i> Retry</button>
     </div>
 
     <!-- ── LIST VIEW ─────────────────────────────────────────── -->
     <section id="vp-list-view">
       <div class="vp-toolbar">
         <div class="vp-filters" id="vp-filters" role="group" aria-label="Filter jobs">
-          <button type="button" class="vp-chip vp-chip--active" data-filter="active" aria-pressed="true">Active <span class="vp-chip-count" data-count="active"></span></button>
-          <button type="button" class="vp-chip" data-filter="completed" aria-pressed="false">Completed <span class="vp-chip-count" data-count="completed"></span></button>
-          <button type="button" class="vp-chip" data-filter="all" aria-pressed="false">All <span class="vp-chip-count" data-count="all"></span></button>
+          <button type="button" class="btn vp-chip vp-chip--active" data-filter="active" aria-pressed="true">Active <span class="vp-chip-count" data-count="active"></span></button>
+          <button type="button" class="btn vp-chip" data-filter="completed" aria-pressed="false">Completed <span class="vp-chip-count" data-count="completed"></span></button>
+          <button type="button" class="btn vp-chip" data-filter="all" aria-pressed="false">All <span class="vp-chip-count" data-count="all"></span></button>
         </div>
         <div class="vp-search">
           <label for="vp-search" class="vp-sr">Search jobs</label>
           <i class="fas fa-search" aria-hidden="true"></i>
-          <input type="search" id="vp-search" placeholder="Search company, design #, job #" autocomplete="off">
+          <input type="search" class="field-input" id="vp-search" placeholder="Search company, design #, job #" autocomplete="off">
         </div>
       </div>
 
@@ -58,7 +62,7 @@
 
     <!-- ── DETAIL VIEW ───────────────────────────────────────── -->
     <section id="vp-detail-view" hidden>
-      <button type="button" class="vp-btn vp-btn--ghost vp-back" id="vp-back-btn"><i class="fas fa-arrow-left" aria-hidden="true"></i> All jobs</button>
+      <button type="button" class="btn vp-btn vp-back" id="vp-back-btn"><i class="fas fa-arrow-left" aria-hidden="true"></i> All jobs</button>
 
       <div id="vp-detail-loading" class="vp-loading" role="status"><i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Loading job…</div>
 
@@ -85,7 +89,7 @@
             <div class="vp-card">
               <div class="vp-card-header"><h3><i class="fas fa-layer-group" aria-hidden="true"></i> Print Lines</h3></div>
               <div class="vp-card-body">
-                <div class="vp-table-scroll">
+                <div class="vp-table-scroll" role="region" aria-label="Print lines" tabindex="0">
                   <table class="vp-table" id="vp-d-lines-table">
                     <thead>
                       <tr><th>Qty</th><th>Size</th><th>W×H (in)</th><th>Presses</th><th>Notes</th></tr>
@@ -119,12 +123,12 @@
               <div class="vp-card-body">
                 <div class="vp-comment-form">
                   <label for="vp-comment-input" class="vp-sr">Message for NWCA</label>
-                  <textarea id="vp-comment-input" rows="2" maxlength="2000" placeholder="Question or update for NWCA? Post it here…" aria-describedby="vp-comment-hint"></textarea>
-                  <button type="button" class="vp-btn vp-btn--primary" id="vp-comment-btn" disabled><i class="fas fa-paper-plane" aria-hidden="true"></i> Post</button>
+                  <textarea class="field-textarea" id="vp-comment-input" rows="2" maxlength="2000" placeholder="Question or update for NWCA? Post it here…" aria-describedby="vp-comment-hint"></textarea>
+                  <button type="button" class="btn btn-primary vp-btn" id="vp-comment-btn" disabled><i class="fas fa-paper-plane" aria-hidden="true"></i> Post</button>
                 </div>
                 <div class="vp-comment-hint" id="vp-comment-hint">Ctrl+Enter posts. NWCA sees your note on the job.</div>
                 <div class="vp-comment-status" id="vp-comment-status" role="status" hidden></div>
-                <div class="vp-timeline" id="vp-d-notes"></div>
+                <div class="vp-timeline" id="vp-d-notes" role="region" aria-label="Activity and messages" tabindex="0"></div>
               </div>
             </div>
           </div>
@@ -133,7 +137,7 @@
     </section>
   </main>
 
-  <footer class="vp-footer">
+  <footer class="page-footer">
     Northwest Custom Apparel &middot; Milton, WA &middot; (253) 922-5793
   </footer>
 

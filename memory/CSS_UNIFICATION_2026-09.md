@@ -1,5 +1,25 @@
 # CSS unification — design direction and implementation plan
 
+## REVIEWED — Order Status and vendor Job Portal ready for integration
+
+Both pages adopt shared Public Sans/header/buttons/inputs and scoped page owners. Forty-six browser cases cover original values/links/rows at1440/768/390/320, all status/error modes, delayed retry, exact note payloads, duplicate keyboard submissions, separate job drafts, late responses, native card focus/history and failed image fallbacks. Seventy reversible mappings restore all10 original source hashes; the original38 browser JSONs remain immutable. Money/promise/render and vendor date/data functions stay byte-identical. Three important flags removed; shared custom-tees.css and CaspioDate unchanged.
+
+Seven current PDFs/10 pages visually reviewed: order paid1,pickup1,long2;vendor list1,normal detail1,dated detail1,long detail3. Every long row, size, quantity, dimension, note and order amount remains present; no footer-only extra sheets. Header branding survives shared print rules; editing controls are hidden on paper. Desktop and phone views reviewed. Initial comparison failures were fixed CSS uppercase labels becoming sentence case, with only exact interface labels normalized in comparison; customer data comparisons remain exact.
+
+Live .9/Heroku2101/0f518982 is185/225; reviewed candidate187/225,38pending. Next: commit/back up this exact branch, integrate into primary0f518982 preserving .7/.9 release history and cache mappings, run full local/exact-source release gates, then deploy and verify. Do not rerun consumed helpers. No real notes, orders, payments, emails, imports or device printing were sent.
+
+## RESUMED — Order Status and vendor Job Portal
+
+The five-page batch is now live as v2026.09.10.9 / Heroku 2101 / 0f518982c0b213f0c54e4eb41b5b2ef67b11c565. Exact-source CI34543191741 passed all four jobs including actual CSS and live calculator steps. The deployed slug, seven changed source assets, five page shells, prior anonymous access and retired styles passed 36 live checks. Live185/225 reviewed,40pending. This branch remains separate from the release.
+
+- [x] Resume from immutable original browser/paper evidence and verify prior release.
+- [ ] Demonstrate vendor pending-note duplicates and late detail errors with synthetic delayed responses.
+- [ ] Replace the two page owners using existing tokens/components, preserving all ten original hashes through reversible mappings.
+- [ ] Verify original values/actions, all four widths, keyboard/failure/retry/pending states, accessibility and complete Letter paper; update reviewed inventory only after these pass.
+- [ ] Integrate reviewed changes, run appropriate whole-app and exact-source release gates, deploy and verify live.
+
+Design: Public Sans throughout; existing white surface #ffffff, light gray canvas #f3f4f6, ink #1f2937, muted #4b5563, NWCA green #2e5827 and warning ink #92400e via shared tokens. Left-aligned branded header and customer order identity; the vertical fulfillment timeline remains the Order Status focus, with a quiet item summary below. The vendor list uses readable job cards; its detail view puts production instructions/lines beside artwork and activity. Phone rows retain every value, with wrapping labels. Print uses compact ink on white, complete rows and totals, and hides editing controls. Existing semantic header, button and input components provide the shared design; no new global stylesheet or palette is needed.
+
 ## PAUSED — shutdown checkpoint, September 10, 2026
 
 **40 pages still need CSS migration; estimated 25–40 working hours including visual review, pricing checks and releases.** Five additional pages are finished and tested, awaiting deployment. This estimate covers the remaining app migration and its shared styles; complex calculators/builders may change the range.
