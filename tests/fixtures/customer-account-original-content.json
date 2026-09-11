@@ -1,0 +1,564 @@
+{
+  "base": "73cc615a8e02bbdbd96a093a4e5968bfa7adf475",
+  "pages": [
+    {
+      "file": "pages/customer-portal.html",
+      "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, viewport-fit=cover\">\n    <meta name=\"robots\" content=\"noindex, nofollow\">\n    <meta name=\"theme-color\" content=\"#14401f\">\n    <title>Your Account - Northwest Custom Apparel</title>\n    <link rel=\"icon\" type=\"image/png\" href=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\">\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    <link href=\"https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap\" rel=\"stylesheet\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link rel=\"stylesheet\" href=\"/pages/css/customer-portal.css?v=2026.09.07.20\">\n    <link rel=\"stylesheet\" href=\"/pages/css/portal-reorder-list.css?v=2026.09.07.20\">\n</head>\n<body>\n    <!-- Icon sprite (stroke icons, referenced with <use href=\"#i-…\">) -->\n    <svg xmlns=\"http://www.w3.org/2000/svg\" style=\"display:none\" aria-hidden=\"true\">\n        <symbol id=\"i-home\" viewBox=\"0 0 24 24\"><path d=\"M3 11l9-8 9 8v9a2 2 0 0 1-2 2h-4v-7H9v7H5a2 2 0 0 1-2-2z\"/></symbol>\n        <symbol id=\"i-shirt\" viewBox=\"0 0 24 24\"><path d=\"M16 3l4 2-1.5 5H16v11H8V10H5.5L4 5l4-2c.6 1.4 2 2.5 4 2.5S15.4 4.4 16 3z\"/></symbol>\n        <symbol id=\"i-box\" viewBox=\"0 0 24 24\"><path d=\"M21 8l-9-5-9 5v8l9 5 9-5z\"/><path d=\"M3 8l9 5 9-5M12 13v8\"/></symbol>\n        <symbol id=\"i-receipt\" viewBox=\"0 0 24 24\"><path d=\"M6 2h12v20l-3-2-3 2-3-2-3 2z\"/><path d=\"M9 7h6M9 11h6M9 15h4\"/></symbol>\n        <symbol id=\"i-palette\" viewBox=\"0 0 24 24\"><path d=\"M12 3a9 9 0 0 0 0 18c1.5 0 2-.9 2-2 0-.6-.3-1-.7-1.4-.4-.4-.6-.8-.6-1.3 0-1 .8-1.8 1.8-1.8H16a5 5 0 0 0 5-5c0-3.6-4-6.5-9-6.5z\"/><circle cx=\"7.5\" cy=\"11.5\" r=\"1\"/><circle cx=\"10\" cy=\"7.5\" r=\"1\"/><circle cx=\"14.5\" cy=\"7.5\" r=\"1\"/></symbol>\n        <symbol id=\"i-file\" viewBox=\"0 0 24 24\"><path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"/><path d=\"M14 2v6h6M8 13h8M8 17h6\"/></symbol>\n        <symbol id=\"i-user\" viewBox=\"0 0 24 24\"><path d=\"M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2\"/><circle cx=\"12\" cy=\"7\" r=\"4\"/></symbol>\n        <symbol id=\"i-search\" viewBox=\"0 0 24 24\"><circle cx=\"11\" cy=\"11\" r=\"7\"/><path d=\"M21 21l-4.3-4.3\"/></symbol>\n        <symbol id=\"i-menu\" viewBox=\"0 0 24 24\"><path d=\"M4 7h16M4 12h16M4 17h16\"/></symbol>\n        <symbol id=\"i-x\" viewBox=\"0 0 24 24\"><path d=\"M18 6L6 18M6 6l12 12\"/></symbol>\n        <symbol id=\"i-chev\" viewBox=\"0 0 24 24\"><path d=\"M9 6l6 6-6 6\"/></symbol>\n        <symbol id=\"i-check\" viewBox=\"0 0 24 24\"><path d=\"M20 6L9 17l-5-5\"/></symbol>\n        <symbol id=\"i-alert\" viewBox=\"0 0 24 24\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 8v4M12 16h.01\"/></symbol>\n        <symbol id=\"i-star\" viewBox=\"0 0 24 24\"><path d=\"M12 3l2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3 6.4 20.2l1.1-6.2L3 9.6l6.2-.9z\"/></symbol>\n        <symbol id=\"i-download\" viewBox=\"0 0 24 24\"><path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3\"/></symbol>\n        <symbol id=\"i-truck\" viewBox=\"0 0 24 24\"><path d=\"M1 3h15v13H1zM16 8h4l3 3v5h-7z\"/><circle cx=\"5.5\" cy=\"18.5\" r=\"2.5\"/><circle cx=\"18.5\" cy=\"18.5\" r=\"2.5\"/></symbol>\n        <symbol id=\"i-phone\" viewBox=\"0 0 24 24\"><path d=\"M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.6a2 2 0 0 1-.5 2.1L8 9.7a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.8.3 1.7.5 2.6.7a2 2 0 0 1 1.7 2z\"/></symbol>\n        <symbol id=\"i-mail\" viewBox=\"0 0 24 24\"><path d=\"M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z\"/><path d=\"M22 6l-10 7L2 6\"/></symbol>\n        <symbol id=\"i-ext\" viewBox=\"0 0 24 24\"><path d=\"M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3\"/></symbol>\n        <symbol id=\"i-plus\" viewBox=\"0 0 24 24\"><path d=\"M12 5v14M5 12h14\"/></symbol>\n        <symbol id=\"i-sparkle\" viewBox=\"0 0 24 24\"><path d=\"M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z\"/><path d=\"M19 17l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z\"/></symbol>\n        <symbol id=\"i-printer\" viewBox=\"0 0 24 24\"><path d=\"M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2\"/><path d=\"M6 14h12v8H6z\"/></symbol>\n        <symbol id=\"i-refresh\" viewBox=\"0 0 24 24\"><path d=\"M21 12a9 9 0 1 1-2.6-6.4M21 3v6h-6\"/></symbol>\n        <!-- Quick-action icons (2026-09-02): re-order = box with a return arrow · quote = price tag · logo = upload · statement = receipt -->\n        <symbol id=\"i-qa-reorder\" viewBox=\"0 0 24 24\"><path d=\"M3 8.5 12 4l9 4.5v7L12 20l-9-4.5z\"/><path d=\"M3 8.5 12 13l9-4.5M12 13v7\"/><path d=\"M15.5 6.2 6.5 10.7\"/></symbol>\n        <symbol id=\"i-qa-quote\" viewBox=\"0 0 24 24\"><path d=\"M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z\"/><circle cx=\"7.5\" cy=\"7.5\" r=\"1.5\"/><path d=\"M13 11.5h3M14.5 10v3\"/></symbol>\n        <symbol id=\"i-qa-upload\" viewBox=\"0 0 24 24\"><path d=\"M12 16V5M7.5 9.5 12 5l4.5 4.5\"/><path d=\"M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3\"/></symbol>\n        <symbol id=\"i-qa-receipt\" viewBox=\"0 0 24 24\"><path d=\"M6 3h12v18l-2-1.5L14 21l-2-1.5L10 21l-2-1.5L6 21z\"/><path d=\"M9 8h6M9 11.5h6M9 15h4\"/></symbol>\n        <symbol id=\"i-arrow\" viewBox=\"0 0 24 24\"><path d=\"M5 12h14M13 6l6 6-6 6\"/></symbol>\n        <symbol id=\"i-clock\" viewBox=\"0 0 24 24\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 7v5l3 2\"/></symbol>\n        <symbol id=\"i-tag\" viewBox=\"0 0 24 24\"><path d=\"M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L2 12V2h10l8.6 8.6a2 2 0 0 1 0 2.8z\"/><circle cx=\"7\" cy=\"7\" r=\"1.5\"/></symbol>\n        <symbol id=\"i-help\" viewBox=\"0 0 24 24\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .8-1 1.7M12 17h.01\"/></symbol>\n        <symbol id=\"i-edit\" viewBox=\"0 0 24 24\"><path d=\"M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z\"/></symbol>\n        <symbol id=\"i-image\" viewBox=\"0 0 24 24\"><rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\"/><circle cx=\"8.5\" cy=\"8.5\" r=\"1.5\"/><path d=\"M21 15l-5-5L5 21\"/></symbol>\n    </svg>\n\n    <a class=\"cp-skip\" href=\"#cp-main\">Skip to content</a>\n\n    <div class=\"cp-app\">\n        <!-- ══ Sidebar spine ══ -->\n        <aside class=\"cp-side\" id=\"cp-side\" aria-label=\"Account navigation\">\n            <div class=\"cp-side-brand\">\n                <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\" alt=\"Northwest Custom Apparel\" class=\"cp-side-logo\" id=\"cp-side-logo\">\n                <div class=\"cp-side-brand-text\"><strong>Northwest Custom Apparel</strong><span>Customer portal</span></div>\n            </div>\n            <nav class=\"cp-nav\" id=\"cp-nav\" aria-label=\"Sections\">\n                <a href=\"#tab=overview\" data-tab=\"overview\" id=\"cp-nav-overview\" aria-current=\"page\"><svg class=\"cp-icon\"><use href=\"#i-home\"/></svg>Overview</a>\n                <a href=\"#tab=products\" data-tab=\"products\" id=\"cp-nav-products\"><svg class=\"cp-icon\"><use href=\"#i-shirt\"/></svg>Your products</a>\n                <a href=\"#tab=orders\" data-tab=\"orders\" id=\"cp-nav-orders\"><svg class=\"cp-icon\"><use href=\"#i-box\"/></svg>Orders</a>\n                <a href=\"#tab=invoices\" data-tab=\"invoices\" id=\"cp-nav-invoices\"><svg class=\"cp-icon\"><use href=\"#i-receipt\"/></svg>Invoices<span class=\"cp-nav-badge\" id=\"cp-nav-badge-invoices\" hidden>0</span></a>\n                <a href=\"#tab=logos\" data-tab=\"logos\" id=\"cp-nav-logos\"><svg class=\"cp-icon\"><use href=\"#i-palette\"/></svg>Logos &amp; proofs<span class=\"cp-nav-badge\" id=\"cp-nav-badge-logos\" hidden>0</span></a>\n                <a href=\"#tab=quotes\" data-tab=\"quotes\" id=\"cp-nav-quotes\"><svg class=\"cp-icon\"><use href=\"#i-file\"/></svg>Quotes<span class=\"cp-nav-badge\" id=\"cp-nav-badge-quotes\" hidden>0</span></a>\n                <a href=\"#tab=account\" data-tab=\"account\" id=\"cp-nav-account\"><svg class=\"cp-icon\"><use href=\"#i-user\"/></svg>Account &amp; help</a>\n            </nav>\n            <div class=\"cp-side-rep\" id=\"cp-side-rep\" hidden>\n                <div class=\"cp-side-rep-head\">\n                    <span class=\"cp-avatar\" id=\"cp-rep-avatar\" aria-hidden=\"true\">NW</span>\n                    <div><div class=\"cp-side-rep-label\">Your rep</div><div class=\"cp-side-rep-name\" id=\"cp-rep-name\"></div></div>\n                </div>\n                <div class=\"cp-side-rep-links\">\n                    <a id=\"cp-rep-email\" href=\"mailto:sales@nwcustomapparel.com\"><svg class=\"cp-icon\"><use href=\"#i-mail\"/></svg><span>sales@nwcustomapparel.com</span></a>\n                    <a id=\"cp-rep-phone\" href=\"tel:+12539225793\"><svg class=\"cp-icon\"><use href=\"#i-phone\"/></svg><span>(253) 922-5793</span></a>\n                </div>\n            </div>\n            <div class=\"cp-side-foot\">\n                <a href=\"/\" id=\"cp-catalog-link\">Browse catalog</a>\n                <a href=\"/auth/customer/logout\" id=\"cp-signout-link\">Sign out</a>\n            </div>\n        </aside>\n        <div class=\"cp-side-backdrop\" id=\"cp-side-backdrop\" hidden></div>\n\n        <!-- ══ Column ══ -->\n        <div class=\"cp-col\" id=\"cp-col\">\n            <header class=\"cp-topbar\">\n                <button class=\"cp-topbar-menu\" id=\"cp-menu-btn\" type=\"button\" aria-label=\"Open menu\" aria-controls=\"cp-side\" aria-expanded=\"false\"><svg class=\"cp-icon\"><use href=\"#i-menu\"/></svg></button>\n                <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\" alt=\"\" class=\"cp-topbar-logo\" aria-hidden=\"true\">\n                <div class=\"cp-topbar-title\">\n                    <div class=\"cp-topbar-company\" id=\"cp-topbar-company\"><span class=\"cp-skel\">Loading your account</span></div>\n                    <div class=\"cp-topbar-sub\" id=\"cp-topbar-sub\">Your account overview</div>\n                </div>\n                <form class=\"cp-search\" id=\"cp-search-form\" role=\"search\" autocomplete=\"off\">\n                    <svg class=\"cp-icon\"><use href=\"#i-search\"/></svg>\n                    <input type=\"search\" id=\"cp-global-search\" role=\"combobox\" aria-autocomplete=\"list\" aria-expanded=\"false\" placeholder=\"Find an order, product, logo or quote…\" aria-label=\"Search your account\" aria-controls=\"cp-search-results\" aria-expanded=\"false\">\n                    <div class=\"cp-search-results\" id=\"cp-search-results\" role=\"listbox\" hidden></div>\n                </form>\n                <div class=\"cp-topbar-actions\">\n                    <a class=\"cp-btn cp-btn--ghost cp-btn--sm\" href=\"/\" id=\"cp-topbar-catalog\">Browse catalog</a>\n                    <button class=\"cp-btn cp-btn--primary cp-btn--sm\" type=\"button\" id=\"cp-btn-quote\" data-open-request=\"quote\"><svg class=\"cp-icon\"><use href=\"#i-plus\"/></svg><span class=\"cp-btn-txt\">Request a quote</span></button>\n                </div>\n            </header>\n\n            <main class=\"cp-main\" id=\"cp-main\">\n                <div class=\"cp-alert\" id=\"cp-global-alert\" hidden role=\"alert\">\n                    <svg class=\"cp-icon\"><use href=\"#i-alert\"/></svg>\n                    <span id=\"cp-global-alert-text\">Something didn&rsquo;t load.</span>\n                    <button class=\"cp-btn cp-btn--danger cp-btn--xs\" type=\"button\" id=\"cp-global-alert-retry\">Retry</button>\n                </div>\n\n                <!-- ══ OVERVIEW ══ -->\n                <section class=\"cp-panel\" data-panel=\"overview\" id=\"cp-panel-overview\" tabindex=\"-1\" aria-labelledby=\"cp-nav-overview\">\n                    <div class=\"cp-hero\">\n                        <div class=\"cp-greet\">\n                            <div class=\"cp-greet-kicker\" id=\"cp-greet-kicker\">Your account</div>\n                            <h1 id=\"cp-greeting\">Welcome back.</h1>\n                            <p class=\"cp-greet-sub\" id=\"cp-greet-sub\">Everything you&rsquo;ve ordered, every logo on file, and every invoice &mdash; in one place.</p>\n                        </div>\n                        <div class=\"cp-rewards\" id=\"cp-rewards\">\n                            <div>\n                                <div class=\"cp-rewards-label\"><span class=\"cp-rewards-star\">&#9733;</span> <span id=\"cp-rewards-name\">Your reward dollars</span></div>\n                                <div class=\"cp-rewards-balance\" id=\"cp-rewards-balance\"><span class=\"cp-skel\">$0.00</span></div>\n                                <div class=\"cp-rewards-sub\" id=\"cp-rewards-sub\">Earn reward dollars on premium picks &mdash; look for the &#9733; tag under Recommended for You.</div>\n                            </div>\n                            <button class=\"cp-rewards-btn\" id=\"cp-redeem-btn\" type=\"button\">See ways to earn &#9733;</button>\n                        </div>\n                    </div>\n\n                    <div class=\"cp-attn\" id=\"cp-attn\">\n                        <div class=\"cp-attn-head\"><h2>Needs your attention</h2><span class=\"cp-count\" id=\"cp-attn-count\" hidden>0</span></div>\n                        <div class=\"cp-attn-list\" id=\"cp-attn-list\">\n                            <div class=\"cp-skel-rows\"><div class=\"cp-skel cp-skel-line\"></div><div class=\"cp-skel cp-skel-line\"></div></div>\n                        </div>\n                        <div class=\"cp-attn-clear\" id=\"cp-attn-clear\" hidden>\n                            <span class=\"cp-attn-ico\"><svg class=\"cp-icon\"><use href=\"#i-check\"/></svg></span>\n                            <span>You&rsquo;re all caught up &mdash; no proofs waiting and nothing past due.</span>\n                        </div>\n                    </div>\n\n                    <div class=\"cp-kpis\">\n                        <a class=\"cp-kpi\" href=\"#tab=invoices\" data-tab=\"invoices\">\n                            <div class=\"cp-kpi-label\"><svg class=\"cp-icon\"><use href=\"#i-receipt\"/></svg>Open balance</div>\n                            <div class=\"cp-kpi-val\" id=\"cp-kpi-balance\">&mdash;</div>\n                            <div class=\"cp-kpi-sub\" id=\"cp-kpi-balance-sub\"></div>\n                        </a>\n                        <a class=\"cp-kpi\" href=\"#tab=orders\" data-tab=\"orders\">\n                            <div class=\"cp-kpi-label\"><svg class=\"cp-icon\"><use href=\"#i-box\"/></svg>In production</div>\n                            <div class=\"cp-kpi-val\" id=\"cp-kpi-inprocess\">&mdash;</div>\n                            <div class=\"cp-kpi-sub\" id=\"cp-kpi-inprocess-sub\"></div>\n                        </a>\n                        <a class=\"cp-kpi\" href=\"#tab=logos\" data-tab=\"logos\">\n                            <div class=\"cp-kpi-label\"><svg class=\"cp-icon\"><use href=\"#i-palette\"/></svg>Logos on file</div>\n                            <div class=\"cp-kpi-val\" id=\"cp-kpi-logos\">&mdash;</div>\n                            <div class=\"cp-kpi-sub\" id=\"cp-kpi-logos-sub\"></div>\n                        </a>\n                        <a class=\"cp-kpi\" href=\"#tab=products\" data-tab=\"products\">\n                            <div class=\"cp-kpi-label\"><svg class=\"cp-icon\"><use href=\"#i-shirt\"/></svg>Products ordered</div>\n                            <div class=\"cp-kpi-val\" id=\"cp-kpi-products\">&mdash;</div>\n                            <div class=\"cp-kpi-sub\" id=\"cp-kpi-products-sub\"></div>\n                        </a>\n                    </div>\n\n                    <div class=\"cp-ov-grid\">\n                        <div class=\"cp-card\">\n                            <div class=\"cp-card-head\"><h2>Recent orders</h2><button class=\"cp-btn cp-btn--link cp-btn--sm\" type=\"button\" data-tab=\"orders\">View all &rarr;</button></div>\n                            <div class=\"cp-recent\" id=\"cp-recent-orders\">\n                                <div class=\"cp-card-body cp-skel-rows\"><div class=\"cp-skel cp-skel-line\"></div><div class=\"cp-skel cp-skel-line\"></div><div class=\"cp-skel cp-skel-line\"></div></div>\n                            </div>\n                        </div>\n                        <div>\n                            <div class=\"cp-card\">\n                                <div class=\"cp-card-head\"><h2>Quick actions</h2></div>\n                                <div class=\"cp-actions\">\n                                    <button class=\"cp-action\" type=\"button\" data-tab=\"products\"><span class=\"cp-action-ico\"><svg class=\"cp-icon\"><use href=\"#i-qa-reorder\"/></svg></span><strong>Re-order</strong><span>Pick a past product</span></button>\n                                    <button class=\"cp-action\" type=\"button\" data-open-request=\"quote\"><span class=\"cp-action-ico\"><svg class=\"cp-icon\"><use href=\"#i-qa-quote\"/></svg></span><strong>Request a quote</strong><span>Something new</span></button>\n                                    <button class=\"cp-action\" type=\"button\" data-open-request=\"logo\"><span class=\"cp-action-ico\"><svg class=\"cp-icon\"><use href=\"#i-qa-upload\"/></svg></span><strong>Send a new logo</strong><span>We&rsquo;ll set it up</span></button>\n                                    <button class=\"cp-action\" type=\"button\" id=\"cp-action-statement\"><span class=\"cp-action-ico\"><svg class=\"cp-icon\"><use href=\"#i-qa-receipt\"/></svg></span><strong>Print statement</strong><span>Open invoices</span></button>\n                                </div>\n                            </div>\n                            <div class=\"cp-card cp-rep-card cp-mt\" id=\"cp-ov-rep\" hidden>\n                                <span class=\"cp-avatar\" id=\"cp-ov-rep-avatar\" aria-hidden=\"true\">NW</span>\n                                <div class=\"cp-rep-card-text\"><strong id=\"cp-ov-rep-name\"></strong><span>Your account rep</span></div>\n                                <div class=\"cp-rep-card-links\">\n                                    <a id=\"cp-ov-rep-email\" href=\"mailto:sales@nwcustomapparel.com\" aria-label=\"Email your rep\"><svg class=\"cp-icon\"><use href=\"#i-mail\"/></svg></a>\n                                    <a id=\"cp-ov-rep-phone\" href=\"tel:+12539225793\" aria-label=\"Call your rep\"><svg class=\"cp-icon\"><use href=\"#i-phone\"/></svg></a>\n                                </div>\n                            </div>\n                        </div>\n                    </div>\n\n                    <section class=\"cp-section\" id=\"cp-ov-logos-section\" hidden>\n                        <div class=\"cp-section-header\"><h2>Your logos</h2><span class=\"cp-section-count\" id=\"cp-ov-logos-count\">0</span><button class=\"cp-btn cp-btn--link cp-btn--sm\" type=\"button\" data-tab=\"logos\">See all &rarr;</button></div>\n                        <div class=\"cp-strip\" id=\"cp-ov-logos\"></div>\n                    </section>\n\n                </section>\n\n                <!-- ══ PRODUCTS ══ -->\n                <section class=\"cp-panel\" data-panel=\"products\" id=\"cp-panel-products\" tabindex=\"-1\" aria-labelledby=\"cp-nav-products\" hidden>\n                    <div class=\"cp-page-head\">\n                        <div>\n                            <div class=\"cp-page-title\"><h2>Your products</h2><span class=\"cp-count\" id=\"cp-products-count\">&mdash;</span></div>\n                            <p class=\"cp-page-sub\">Everything you&rsquo;ve ordered in the last three years. Pick one to re-order &mdash; your rep sends back a fresh quote.</p>\n                        </div>\n                    </div>\n                    <div class=\"cp-toolbar\" id=\"cp-products-toolbar\" hidden>\n                        <input type=\"search\" id=\"cp-products-search\" class=\"cp-input-search\" placeholder=\"Search your products…\" autocomplete=\"off\" aria-label=\"Search your products\">\n                        <select id=\"cp-products-sort\" class=\"cp-select\" aria-label=\"Sort your products\">\n                            <option value=\"ordered\">Most ordered</option>\n                            <option value=\"recent\">Most recent</option>\n                            <option value=\"colors\">Most colors</option>\n                        </select>\n                    </div>\n                    <div class=\"cp-product-grid\" id=\"cp-products-grid\">\n                        <div class=\"cp-skel cp-skel-block\"></div><div class=\"cp-skel cp-skel-block\"></div><div class=\"cp-skel cp-skel-block\"></div><div class=\"cp-skel cp-skel-block\"></div>\n                    </div>\n                    <div class=\"cp-products-more\" id=\"cp-products-more\" hidden><button class=\"cp-btn cp-btn--ghost\" id=\"cp-products-more-btn\" type=\"button\">Show all</button></div>\n                    <div class=\"cp-empty\" id=\"cp-products-empty\" hidden>\n                        <div class=\"cp-empty-icon\">&#128717;</div>\n                        No past products on file yet.\n                        <div><button class=\"cp-btn cp-btn--soft cp-btn--sm\" type=\"button\" data-open-request=\"quote\">Request a quote</button></div>\n                    </div>\n                </section>\n\n                <!-- ══ ORDERS ══ -->\n                <section class=\"cp-panel\" data-panel=\"orders\" id=\"cp-panel-orders\" tabindex=\"-1\" aria-labelledby=\"cp-nav-orders\" hidden>\n                    <div class=\"cp-page-head\">\n                        <div>\n                            <div class=\"cp-page-title\"><h2>Orders</h2><span class=\"cp-count\" id=\"cp-orders-count\">&mdash;</span></div>\n                            <p class=\"cp-page-sub\">Click any order to see its line items, status and tracking.</p>\n                        </div>\n                    </div>\n                    <div class=\"cp-toolbar\" id=\"cp-orders-toolbar\" hidden>\n                        <div class=\"cp-chips\" id=\"cp-orders-filters\" role=\"group\" aria-label=\"Filter orders\">\n                            <button class=\"cp-chip\" type=\"button\" data-filter=\"all\" aria-pressed=\"true\">All</button>\n                            <button class=\"cp-chip\" type=\"button\" data-filter=\"inprocess\" aria-pressed=\"false\">In production <span class=\"cp-chip-n\" id=\"cp-ochip-inprocess\"></span></button>\n                            <button class=\"cp-chip\" type=\"button\" data-filter=\"shipped\" aria-pressed=\"false\">Shipped</button>\n                            <button class=\"cp-chip\" type=\"button\" data-filter=\"invoiced\" aria-pressed=\"false\">Invoiced</button>\n                        </div>\n                        <input type=\"search\" id=\"cp-orders-search\" class=\"cp-input-search\" placeholder=\"Search — design, order #, or PO…\" autocomplete=\"off\" aria-label=\"Search orders\">\n                    </div>\n                    <div class=\"cp-table-wrap\" id=\"cp-orders-wrap\"><div class=\"cp-card-body cp-skel-rows\"><div class=\"cp-skel cp-skel-line\"></div><div class=\"cp-skel cp-skel-line\"></div><div class=\"cp-skel cp-skel-line\"></div></div></div>\n                    <div class=\"cp-empty\" id=\"cp-orders-empty\" hidden><div class=\"cp-empty-icon\">&#128230;</div>No orders on file yet.</div>\n                </section>\n\n                <!-- ══ INVOICES ══ -->\n                <section class=\"cp-panel\" data-panel=\"invoices\" id=\"cp-panel-invoices\" tabindex=\"-1\" aria-labelledby=\"cp-nav-invoices\" hidden>\n                    <div class=\"cp-page-head\">\n                        <div>\n                            <div class=\"cp-page-title\"><h2>Invoices &amp; balances</h2><span class=\"cp-count\" id=\"cp-invoices-count\">&mdash;</span></div>\n                            <p class=\"cp-page-sub\">Open any invoice to view or download the PDF. Questions? <a href=\"mailto:accounting@nwcustomapparel.com\">accounting@nwcustomapparel.com</a></p>\n                        </div>\n                        <button class=\"cp-btn cp-btn--ghost cp-btn--sm\" type=\"button\" id=\"cp-statement-btn\" hidden><svg class=\"cp-icon\"><use href=\"#i-printer\"/></svg>Print statement</button>\n                    </div>\n                    <div class=\"cp-summary\" id=\"cp-inv-summary\" hidden>\n                        <div class=\"cp-summary-item\"><div class=\"cp-summary-label\">Open balance</div><div class=\"cp-summary-val\" id=\"cp-inv-open\">$0.00</div><div class=\"cp-summary-sub\" id=\"cp-inv-open-sub\"></div></div>\n                        <div class=\"cp-summary-item\"><div class=\"cp-summary-label\">Past due</div><div class=\"cp-summary-val\" id=\"cp-inv-pastdue\">$0.00</div><div class=\"cp-summary-sub\" id=\"cp-inv-pastdue-sub\"></div></div>\n                        <div class=\"cp-summary-item\"><div class=\"cp-summary-label\">Paid, last 12 months</div><div class=\"cp-summary-val\" id=\"cp-inv-paid12\">$0.00</div><div class=\"cp-summary-sub\" id=\"cp-inv-paid12-sub\"></div></div>\n                    </div>\n                    <div class=\"cp-toolbar\" id=\"cp-invoices-toolbar\" hidden>\n                        <div class=\"cp-chips\" id=\"cp-invoices-filters\" role=\"group\" aria-label=\"Filter invoices\">\n                            <button class=\"cp-chip\" type=\"button\" data-filter=\"all\" aria-pressed=\"true\">All</button>\n                            <button class=\"cp-chip\" type=\"button\" data-filter=\"open\" aria-pressed=\"false\">Open <span class=\"cp-chip-n\" id=\"cp-ichip-open\"></span></button>\n                            <button class=\"cp-chip\" type=\"button\" data-filter=\"pastdue\" aria-pressed=\"false\">Past due <span class=\"cp-chip-n\" id=\"cp-ichip-pastdue\"></span></button>\n                            <button class=\"cp-chip\" type=\"button\" data-filter=\"paid\" aria-pressed=\"false\">Paid</button>\n                        </div>\n                    </div>\n                    <div class=\"cp-table-wrap\" id=\"cp-invoices-wrap\"><div class=\"cp-card-body cp-skel-rows\"><div class=\"cp-skel cp-skel-line\"></div><div class=\"cp-skel cp-skel-line\"></div><div class=\"cp-skel cp-skel-line\"></div></div></div>\n                    <div class=\"cp-empty\" id=\"cp-invoices-empty\" hidden><div class=\"cp-empty-icon\">&#129534;</div>No invoices on file yet.</div>\n                </section>\n\n                <!-- ══ LOGOS & PROOFS ══ -->\n                <section class=\"cp-panel\" data-panel=\"logos\" id=\"cp-panel-logos\" tabindex=\"-1\" aria-labelledby=\"cp-nav-logos\" hidden>\n                    <div class=\"cp-page-head\">\n                        <div>\n                            <div class=\"cp-page-title\"><h2>Logos &amp; proofs</h2><span class=\"cp-count\" id=\"cp-logos-count\">&mdash;</span></div>\n                            <p class=\"cp-page-sub\">Every logo and design proof we have on file &mdash; ready to run again. Click one to view, download, or order with it.</p>\n                        </div>\n                        <button class=\"cp-btn cp-btn--soft cp-btn--sm\" type=\"button\" data-open-request=\"logo\"><svg class=\"cp-icon\"><use href=\"#i-plus\"/></svg>Send a new logo</button>\n                    </div>\n                    <div class=\"cp-toolbar\" id=\"cp-logos-toolbar\" hidden>\n                        <input type=\"search\" id=\"cp-logos-search\" class=\"cp-input-search\" placeholder=\"Search by name or design #…\" autocomplete=\"off\" aria-label=\"Search your logos\">\n                    </div>\n                    <div class=\"cp-subtabs\" id=\"cp-logos-subtabs\" role=\"tablist\" hidden>\n                        <button class=\"cp-subtab is-active\" id=\"cp-subtab-approved\" type=\"button\" role=\"tab\" aria-selected=\"true\" data-subtab=\"approved\">Approved logos <span class=\"cp-subtab-count\" id=\"cp-approved-count\">0</span></button>\n                        <button class=\"cp-subtab\" id=\"cp-subtab-mockups\" type=\"button\" role=\"tab\" aria-selected=\"false\" data-subtab=\"mockups\">Proofs &amp; mockups <span class=\"cp-subtab-count\" id=\"cp-mockups-count\">0</span></button>\n                        <button class=\"cp-subtab\" id=\"cp-subtab-finished\" type=\"button\" role=\"tab\" aria-selected=\"false\" data-subtab=\"finished\">Finished photos <span class=\"cp-subtab-count\" id=\"cp-finished-count\">0</span></button>\n                    </div>\n                    <div class=\"cp-subpanel\" data-subpanel=\"approved\">\n                        <div class=\"cp-card-grid\" id=\"cp-approved-grid\"><div class=\"cp-skel cp-skel-block\"></div><div class=\"cp-skel cp-skel-block\"></div><div class=\"cp-skel cp-skel-block\"></div></div>\n                        <div class=\"cp-empty\" id=\"cp-approved-empty\" hidden><div class=\"cp-empty-icon\">&#127912;</div>No approved logos on file yet.</div>\n                    </div>\n                    <div class=\"cp-subpanel\" data-subpanel=\"mockups\" hidden>\n                        <div class=\"cp-card-grid\" id=\"cp-mockups-grid\"></div>\n                        <div class=\"cp-empty\" id=\"cp-mockups-empty\" hidden><div class=\"cp-empty-icon\">&#128444;</div>No proofs or mockups on file yet.</div>\n                    </div>\n                    <div class=\"cp-subpanel\" data-subpanel=\"finished\" hidden>\n                        <div class=\"cp-card-grid\" id=\"cp-finished-grid\"></div>\n                        <div class=\"cp-empty\" id=\"cp-finished-empty\" hidden><div class=\"cp-empty-icon\">&#128248;</div>No finished-product photos yet.</div>\n                    </div>\n                    <div class=\"cp-soon-panel\" id=\"cp-logos-empty\" hidden>\n                        <div class=\"cp-soon-icon\" aria-hidden=\"true\">&#127912;</div>\n                        <div class=\"cp-soon-title\">Your logos are on their way</div>\n                        <div class=\"cp-soon-text\">We&rsquo;re gathering your logos and design proofs here. Your rep has every file on hand today &mdash; just ask.</div>\n                        <div><button class=\"cp-btn cp-btn--primary cp-btn--sm\" type=\"button\" data-open-request=\"logo\">Send us a logo</button> <a class=\"cp-btn cp-btn--ghost cp-btn--sm\" href=\"tel:12539225793\">Call (253) 922-5793</a></div>\n                    </div>\n                </section>\n\n                <!-- ══ QUOTES ══ -->\n                <section class=\"cp-panel\" data-panel=\"quotes\" id=\"cp-panel-quotes\" tabindex=\"-1\" aria-labelledby=\"cp-nav-quotes\" hidden>\n                    <div class=\"cp-page-head\">\n                        <div>\n                            <div class=\"cp-page-title\"><h2>Quotes</h2><span class=\"cp-count\" id=\"cp-quotes-count\">&mdash;</span></div>\n                            <p class=\"cp-page-sub\">Quotes sent to your sign-in email. Open one to review it, or ask for something new.</p>\n                        </div>\n                        <button class=\"cp-btn cp-btn--primary cp-btn--sm\" type=\"button\" data-open-request=\"quote\"><svg class=\"cp-icon\"><use href=\"#i-plus\"/></svg>Request a quote</button>\n                    </div>\n                    <div class=\"cp-table-wrap\" id=\"cp-quotes-wrap\"><div class=\"cp-card-body cp-skel-rows\"><div class=\"cp-skel cp-skel-line\"></div><div class=\"cp-skel cp-skel-line\"></div></div></div>\n                    <div class=\"cp-empty\" id=\"cp-quotes-empty\" hidden>\n                        <div class=\"cp-empty-icon\">&#128196;</div>\n                        No quotes on file for <strong id=\"cp-quotes-email\"></strong> yet.\n                        <div><button class=\"cp-btn cp-btn--soft cp-btn--sm\" type=\"button\" data-open-request=\"quote\">Request a quote</button></div>\n                    </div>\n                </section>\n\n                <!-- ══ ACCOUNT & HELP ══ -->\n                <section class=\"cp-panel\" data-panel=\"account\" id=\"cp-panel-account\" tabindex=\"-1\" aria-labelledby=\"cp-nav-account\" hidden>\n                    <div class=\"cp-page-head\">\n                        <div>\n                            <div class=\"cp-page-title\"><h2>Account &amp; help</h2></div>\n                            <p class=\"cp-page-sub\">Your details, how the portal works, and how to reach us.</p>\n                        </div>\n                    </div>\n                    <div class=\"cp-acct-grid\">\n                        <div>\n                            <div class=\"cp-card\">\n                                <div class=\"cp-card-head\"><h3>Your account</h3></div>\n                                <div class=\"cp-card-body\">\n                                    <dl class=\"cp-kv\">\n                                        <dt>Company</dt><dd id=\"cp-acct-company\">&mdash;</dd>\n                                        <dt>Customer #</dt><dd id=\"cp-acct-number\">&mdash;</dd>\n                                        <dt>Sign-in email</dt><dd id=\"cp-acct-email\">&mdash;</dd>\n                                        <dt>Account rep</dt><dd id=\"cp-acct-rep\">&mdash;</dd>\n                                    </dl>\n                                </div>\n                            </div>\n                            <div class=\"cp-card cp-mt\" id=\"cp-acct-rewards\">\n                                <div class=\"cp-card-head\"><h3>Reward dollars</h3><button class=\"cp-btn cp-btn--link cp-btn--sm\" type=\"button\" id=\"cp-acct-redeem\">Redeem &rarr;</button></div>\n                                <div class=\"cp-card-body\">\n                                    <div class=\"cp-rw-stats\">\n                                        <div><div class=\"cp-summary-label\">Available</div><div class=\"cp-summary-val\" id=\"cp-acct-rw-balance\">&mdash;</div></div>\n                                        <div><div class=\"cp-summary-label\" id=\"cp-acct-rw-earned-label\">Earned, last 12 months</div><div class=\"cp-summary-val\" id=\"cp-acct-rw-earned\">&mdash;</div></div>\n                                    </div>\n                                    <p class=\"cp-modal-intro\" id=\"cp-acct-rw-how\">Every order you pay in full earns reward dollars. Premium garments earn a higher rate.</p>\n                                    <div class=\"cp-rw-history\" id=\"cp-acct-rw-history\"></div>\n                                </div>\n                            </div>\n                            <div class=\"cp-card cp-mt\">\n                                <div class=\"cp-card-head\"><h3>Update your details</h3></div>\n                                <form class=\"cp-card-body\" id=\"cp-acct-form\" novalidate>\n                                    <p class=\"cp-modal-intro\">Moved, new phone, new contact, or a different sign-in email? Tell us what changed and your rep will update your account.</p>\n                                    <div class=\"cp-field-row\">\n                                        <label class=\"cp-field\"><span class=\"cp-field-label\">Contact name</span><input type=\"text\" id=\"cp-acct-contact\" autocomplete=\"name\" maxlength=\"80\"></label>\n                                        <label class=\"cp-field\"><span class=\"cp-field-label\">Phone</span><input type=\"tel\" id=\"cp-acct-phone\" autocomplete=\"tel\" maxlength=\"30\"></label>\n                                    </div>\n                                    <label class=\"cp-field\"><span class=\"cp-field-label\">What changed? <small>(address, billing contact, new sign-in email…)</small></span><textarea id=\"cp-acct-msg\" rows=\"3\" maxlength=\"240\" placeholder=\"e.g. Please update our shipping address to…\"></textarea></label>\n                                    <div class=\"cp-req-error\" id=\"cp-acct-error\"></div>\n                                    <div class=\"cp-mt-sm\"><button class=\"cp-btn cp-btn--primary cp-btn--sm\" type=\"submit\" id=\"cp-acct-submit\">Send to my rep</button></div>\n                                </form>\n                            </div>\n                        </div>\n                        <div>\n                            <div class=\"cp-card\">\n                                <div class=\"cp-card-head\"><h3>How it works</h3></div>\n                                <div class=\"cp-help\">\n                                    <details><summary><svg class=\"cp-icon\"><use href=\"#i-palette\"/></svg>Approving a design proof</summary><div class=\"cp-help-body\">When a new proof is ready you&rsquo;ll see it under <strong>Needs your attention</strong> and in <strong>Logos &amp; proofs</strong>. Click <em>Review &amp; approve</em> to open it, then approve or request changes. Production starts once you approve.</div></details>\n                                    <details><summary><svg class=\"cp-icon\"><use href=\"#i-refresh\"/></svg>Re-ordering</summary><div class=\"cp-help-body\">Go to <strong>Your products</strong>, open a product, pick the color and sizes, and send it to your rep. Or use <em>Re-order</em> on any past order to start from exactly what you bought. Nothing is charged until you approve a quote.</div></details>\n                                    <details><summary><svg class=\"cp-icon\"><use href=\"#i-clock\"/></svg>Turnaround &amp; rush</summary><div class=\"cp-help-body\">Standard production is about 7&ndash;10 business days after proof approval and garment arrival. Need it sooner? Say so in your request &mdash; rush options depend on the job.</div></details>\n                                    <details><summary><svg class=\"cp-icon\"><use href=\"#i-receipt\"/></svg>Invoices &amp; payment</summary><div class=\"cp-help-body\">Every invoice is under <strong>Invoices</strong> with a downloadable PDF. Balances reflect payments posted in our system. To pay or ask about terms, contact <a href=\"mailto:accounting@nwcustomapparel.com\">accounting@nwcustomapparel.com</a> or call (253) 922-5793.</div></details>\n                                    <details><summary><svg class=\"cp-icon\"><use href=\"#i-star\"/></svg>Reward dollars</summary><div class=\"cp-help-body\">Every order you pay in full earns reward dollars &mdash; premium garments earn a higher rate, and seasonal bonuses can multiply it. Rewards post after the invoice is paid; your balance is on the Overview and under Account. To redeem, click <em>Redeem on your next order</em> and tell us the amount: your rep adds it to that order as a credit line, so it shows right on the invoice. Reward dollars never expire while your account stays active.</div></details>\n                                    <details><summary><svg class=\"cp-icon\"><use href=\"#i-image\"/></svg>Logo files &amp; new artwork</summary><div class=\"cp-help-body\">Download any approved logo from <strong>Logos &amp; proofs</strong>. For new artwork, use <em>Send a new logo</em> &mdash; your rep replies with where to send the file. Vector (AI, EPS, PDF) or high-resolution PNG works best.</div></details>\n                                </div>\n                            </div>\n                            <div class=\"cp-card cp-mt\">\n                                <div class=\"cp-card-head\"><h3>Contact us</h3></div>\n                                <div class=\"cp-contact\">\n                                    <div><strong>Phone</strong><a href=\"tel:+12539225793\">(253) 922-5793</a></div>\n                                    <div><strong>Email</strong><a href=\"mailto:sales@nwcustomapparel.com\">sales@nwcustomapparel.com</a></div>\n                                    <div><strong>Hours</strong>Mon&ndash;Fri, 9:00 am &ndash; 5:00 pm PT</div>\n                                    <div><strong>Address</strong>2025 Freeman Rd E<br>Milton, WA 98354</div>\n                                </div>\n                            </div>\n                        </div>\n                    </div>\n                </section>\n            </main>\n\n            <footer class=\"cp-footer\">\n                Northwest Custom Apparel &middot; <a href=\"tel:+12539225793\">(253) 922-5793</a> &middot; <a href=\"mailto:sales@nwcustomapparel.com\">sales@nwcustomapparel.com</a>\n            </footer>\n        </div>\n    </div>\n\n    <!-- Mobile bottom navigation -->\n    <nav class=\"cp-bottomnav\" id=\"cp-bottomnav\" aria-label=\"Sections\">\n        <a href=\"#tab=overview\" data-tab=\"overview\" aria-current=\"page\"><svg class=\"cp-icon\"><use href=\"#i-home\"/></svg>Home</a>\n        <a href=\"#tab=products\" data-tab=\"products\"><svg class=\"cp-icon\"><use href=\"#i-shirt\"/></svg>Products</a>\n        <a href=\"#tab=orders\" data-tab=\"orders\"><svg class=\"cp-icon\"><use href=\"#i-box\"/></svg>Orders</a>\n        <a href=\"#tab=invoices\" data-tab=\"invoices\"><svg class=\"cp-icon\"><use href=\"#i-receipt\"/></svg>Invoices<span class=\"cp-bottomnav-badge\" id=\"cp-bnav-badge-invoices\" hidden>0</span></a>\n        <a href=\"#tab=logos\" data-tab=\"logos\"><svg class=\"cp-icon\"><use href=\"#i-palette\"/></svg>Logos<span class=\"cp-bottomnav-badge\" id=\"cp-bnav-badge-logos\" hidden>0</span></a>\n    </nav>\n\n    <!-- Order drawer -->\n    <div class=\"cp-drawer\" id=\"cp-drawer\" hidden>\n        <div class=\"cp-drawer-panel\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"cp-drawer-title\" id=\"cp-drawer-panel\" tabindex=\"-1\">\n            <div class=\"cp-drawer-head\">\n                <h2 id=\"cp-drawer-title\">Order</h2>\n                <span id=\"cp-drawer-status\"></span>\n                <button class=\"cp-drawer-close\" id=\"cp-drawer-close\" type=\"button\" aria-label=\"Close\">&times;</button>\n            </div>\n            <div class=\"cp-drawer-body\">\n                <div class=\"cp-drawer-section\"><h3>Progress</h3><div class=\"cp-timeline\" id=\"cp-drawer-timeline\"></div></div>\n                <div class=\"cp-drawer-section\"><div class=\"cp-meta-grid\" id=\"cp-drawer-meta\"></div></div>\n                <div class=\"cp-drawer-section\"><h3>Items</h3><div class=\"cp-items\" id=\"cp-drawer-items\"></div></div>\n                <div class=\"cp-drawer-section\"><h3>Shipping &amp; tracking</h3><div class=\"cp-tracking\" id=\"cp-drawer-tracking\"></div></div>\n                <div class=\"cp-drawer-actions\">\n                    <a class=\"cp-btn cp-btn--ghost cp-btn--sm\" id=\"cp-drawer-invoice-link\" href=\"#\"><svg class=\"cp-icon\"><use href=\"#i-receipt\"/></svg>View invoice / PDF</a>\n                    <button class=\"cp-btn cp-btn--primary cp-btn--sm\" id=\"cp-drawer-reorder\" type=\"button\"><svg class=\"cp-icon\"><use href=\"#i-refresh\"/></svg>Re-order this</button>\n                </div>\n            </div>\n        </div>\n    </div>\n\n    <!-- Re-order request modal -->\n    <div class=\"cp-modal-overlay\" id=\"cp-req-modal\" hidden>\n        <div class=\"cp-modal\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"cp-req-title\">\n            <div class=\"cp-modal-head\">\n                <h3 id=\"cp-req-title\">Request a Quote</h3>\n                <button class=\"cp-modal-close\" id=\"cp-req-close\" type=\"button\" aria-label=\"Close\">&times;</button>\n            </div>\n            <div class=\"cp-modal-body\">\n                <div class=\"cp-req-top\">\n                    <div class=\"cp-req-image\" id=\"cp-req-image\"></div>\n                    <div class=\"cp-req-product\" id=\"cp-req-product\"></div>\n                </div>\n                <div class=\"cp-field\" id=\"cp-req-color-field\">\n                    <span class=\"cp-field-label\">Color <span id=\"cp-req-colorstat\" class=\"cp-color-stat\"></span></span>\n                    <div id=\"cp-req-colors\" class=\"cp-swatch-picker\"></div>\n                    <input type=\"hidden\" id=\"cp-req-color\">\n                </div>\n                <div class=\"cp-field\">\n                    <span class=\"cp-field-label\">Sizes &amp; quantities <small>(fill in what you need)</small></span>\n                    <div class=\"cp-size-grid\" id=\"cp-size-grid\"></div>\n                    <div class=\"cp-size-total\">Total: <strong id=\"cp-size-total\">0</strong></div>\n                </div>\n                <label class=\"cp-field\">\n                    <span class=\"cp-field-label\">Notes <small>(deadline, other sizes/colors — optional)</small></span>\n                    <textarea id=\"cp-req-note\" rows=\"2\" placeholder=\"Anything the team should know\"></textarea>\n                </label>\n                <div class=\"cp-req-error\" id=\"cp-req-error\"></div>\n            </div>\n            <div class=\"cp-modal-foot\">\n                <button class=\"cp-btn-ghost\" id=\"cp-req-cancel\" type=\"button\">Cancel</button>\n                <button class=\"cp-btn-primary\" id=\"cp-req-submit\" type=\"button\">Send to my rep</button>\n            </div>\n        </div>\n    </div>\n\n    <!-- General request modal (quote / new logo / logo change) -->\n    <div class=\"cp-modal-overlay\" id=\"cp-gen-modal\" hidden>\n        <div class=\"cp-modal\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"cp-gen-title\">\n            <div class=\"cp-modal-head\">\n                <h3 id=\"cp-gen-title\">Request a quote</h3>\n                <button class=\"cp-modal-close\" id=\"cp-gen-close\" type=\"button\" aria-label=\"Close\">&times;</button>\n            </div>\n            <div class=\"cp-modal-body\">\n                <p class=\"cp-modal-intro\" id=\"cp-gen-intro\"></p>\n                <input type=\"hidden\" id=\"cp-gen-type\" value=\"quote\">\n                <label class=\"cp-field\"><span class=\"cp-field-label\" id=\"cp-gen-desc-label\">What do you need?</span><textarea id=\"cp-gen-desc\" rows=\"3\" maxlength=\"240\" placeholder=\"e.g. 36 polos with our logo on the left chest, plus 12 caps\"></textarea></label>\n                <div class=\"cp-field-row\" id=\"cp-gen-row-details\">\n                    <label class=\"cp-field\"><span class=\"cp-field-label\">Decoration</span>\n                        <select id=\"cp-gen-method\">\n                            <option value=\"\">Not sure — recommend</option>\n                            <option value=\"Embroidery\">Embroidery</option>\n                            <option value=\"Screen Print\">Screen print</option>\n                            <option value=\"DTG\">Direct-to-garment print</option>\n                            <option value=\"DTF\">Transfers (DTF)</option>\n                        </select>\n                    </label>\n                    <label class=\"cp-field\"><span class=\"cp-field-label\">Quantity <small>(approx.)</small></span><input type=\"text\" id=\"cp-gen-qty\" inputmode=\"numeric\" maxlength=\"30\" placeholder=\"e.g. 48\"></label>\n                </div>\n                <label class=\"cp-field\" id=\"cp-gen-logo-field\"><span class=\"cp-field-label\">Logo</span><select id=\"cp-gen-design\"></select></label>\n                <label class=\"cp-field\"><span class=\"cp-field-label\">Notes <small>(deadline, colors, anything else — optional)</small></span><textarea id=\"cp-gen-note\" rows=\"2\" maxlength=\"240\"></textarea></label>\n                <div class=\"cp-req-error\" id=\"cp-gen-error\"></div>\n            </div>\n            <div class=\"cp-modal-foot\">\n                <button class=\"cp-btn-ghost\" id=\"cp-gen-cancel\" type=\"button\">Cancel</button>\n                <button class=\"cp-btn-primary\" id=\"cp-gen-submit\" type=\"button\">Send to my rep</button>\n            </div>\n        </div>\n    </div>\n\n    <!-- Redeem reward dollars modal -->\n    <div class=\"cp-modal-overlay\" id=\"cp-redeem-modal\" hidden>\n        <div class=\"cp-modal\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"cp-redeem-title\">\n            <div class=\"cp-modal-head\">\n                <h3 id=\"cp-redeem-title\">Redeem reward dollars</h3>\n                <button class=\"cp-modal-close\" id=\"cp-redeem-close\" type=\"button\" aria-label=\"Close\">&times;</button>\n            </div>\n            <div class=\"cp-modal-body\">\n                <div class=\"cp-req-product\">\n                    <div class=\"cp-req-prod-title\">You have <span id=\"cp-redeem-avail\">$0.00</span> in reward dollars</div>\n                    <div class=\"cp-req-prod-sub\">Tell us how much to apply. Your rep adds it to your next order as a credit line, so you&rsquo;ll see it right on the invoice.</div>\n                </div>\n                <input type=\"hidden\" id=\"cp-redeem-amt\">\n                <p class=\"cp-modal-intro\" id=\"cp-redeem-rule\">Reward dollars are applied all at once, so your whole balance goes on one order.</p>\n                <div class=\"cp-req-error\" id=\"cp-redeem-error\"></div>\n                <div class=\"cp-redeem-history\" id=\"cp-redeem-history\" hidden>\n                    <span class=\"cp-field-label\">Recent activity</span>\n                    <div id=\"cp-redeem-history-list\"></div>\n                </div>\n            </div>\n            <div class=\"cp-modal-foot\">\n                <button class=\"cp-btn-ghost\" id=\"cp-redeem-cancel\" type=\"button\">Cancel</button>\n                <button class=\"cp-btn-primary\" id=\"cp-redeem-submit\" type=\"button\">Apply my full balance to my next order</button>\n            </div>\n        </div>\n    </div>\n\n    <!-- Statement (printable) -->\n    <div class=\"cp-modal-overlay\" id=\"cp-statement-modal\" hidden>\n        <div class=\"cp-modal cp-modal--wide\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"cp-statement-title\">\n            <div class=\"cp-modal-head\">\n                <h3 id=\"cp-statement-title\">Account statement</h3>\n                <div>\n                    <button class=\"cp-btn cp-btn--primary cp-btn--sm\" id=\"cp-statement-print\" type=\"button\"><svg class=\"cp-icon\"><use href=\"#i-printer\"/></svg>Print / save PDF</button>\n                    <button class=\"cp-modal-close\" id=\"cp-statement-close\" type=\"button\" aria-label=\"Close\">&times;</button>\n                </div>\n            </div>\n            <div class=\"cp-modal-body cp-stmt\" id=\"cp-statement-body\"></div>\n        </div>\n    </div>\n\n    <!-- Logo / proof lightbox -->\n    <div class=\"cp-lightbox\" id=\"cp-logo-lightbox\" hidden>\n        <div class=\"cp-lightbox-inner\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"cp-lightbox-title\">\n            <button class=\"cp-lightbox-close\" id=\"cp-lightbox-close\" type=\"button\" aria-label=\"Close\">&times;</button>\n            <img id=\"cp-lightbox-img\" alt=\"Design proof\">\n            <div class=\"cp-lightbox-cap\">\n                <div class=\"cp-lightbox-text\">\n                    <div class=\"cp-lightbox-title\" id=\"cp-lightbox-title\"></div>\n                    <div class=\"cp-lightbox-meta\" id=\"cp-lightbox-meta\"></div>\n                </div>\n                <div class=\"cp-lightbox-actions\">\n                    <a class=\"cp-btn cp-btn--gold cp-btn--sm\" id=\"cp-lb-approve\" href=\"#\" hidden><svg class=\"cp-icon\"><use href=\"#i-check\"/></svg>Review &amp; approve</a>\n                    <a class=\"cp-btn cp-btn--ghost cp-btn--sm\" id=\"cp-lb-download\" href=\"#\" download target=\"_blank\" rel=\"noopener\"><svg class=\"cp-icon\"><use href=\"#i-download\"/></svg>Download</a>\n                    <button class=\"cp-btn cp-btn--ghost cp-btn--sm\" id=\"cp-lb-change\" type=\"button\"><svg class=\"cp-icon\"><use href=\"#i-edit\"/></svg>Request a change</button>\n                    <button class=\"cp-btn cp-btn--primary cp-btn--sm\" id=\"cp-lb-order\" type=\"button\"><svg class=\"cp-icon\"><use href=\"#i-plus\"/></svg>Order with this logo</button>\n                </div>\n            </div>\n        </div>\n    </div>\n\n    <div class=\"cp-toast\" id=\"cp-toast\" role=\"status\" aria-live=\"polite\"></div>\n\n    <script src=\"/shared_components/js/app-config.js?v=2026.09.06.26\"></script>\n    <script src=\"/pages/js/portal-reorder-list.js?v=2026.09.05.24\"></script>\n    <script src=\"/pages/js/customer-portal.js?v=2026.09.06.1\"></script>\n</body>\n</html>\n",
+      "title": "Your Account - Northwest Custom Apparel",
+      "bodyText": "Skip to content Northwest Custom ApparelCustomer portal Overview Your products Orders Invoices0 Logos & proofs0 Quotes0 Account & help NW Your rep sales@nwcustomapparel.com (253) 922-5793 Browse catalog Sign out Loading your account Your account overview Browse catalog Request a quote Something didn’t load. Retry Your account Welcome back. Everything you’ve ordered, every logo on file, and every invoice — in one place. ★ Your reward dollars $0.00 Earn reward dollars on premium picks — look for the ★ tag under Recommended for You. See ways to earn ★ Needs your attention0 You’re all caught up — no proofs waiting and nothing past due. Open balance — In production — Logos on file — Products ordered — Recent ordersView all → Quick actions Re-orderPick a past product Request a quoteSomething new Send a new logoWe’ll set it up Print statementOpen invoices NW Your account rep Your logos0See all → Your products— Everything you’ve ordered in the last three years. Pick one to re-order — your rep sends back a fresh quote. Most ordered Most recent Most colors Show all 🛍 No past products on file yet. Request a quote Orders— Click any order to see its line items, status and tracking. All In production Shipped Invoiced 📦No orders on file yet. Invoices & balances— Open any invoice to view or download the PDF. Questions? accounting@nwcustomapparel.com Print statement Open balance$0.00 Past due$0.00 Paid, last 12 months$0.00 All Open Past due Paid 🧾No invoices on file yet. Logos & proofs— Every logo and design proof we have on file — ready to run again. Click one to view, download, or order with it. Send a new logo Approved logos 0 Proofs & mockups 0 Finished photos 0 🎨No approved logos on file yet. 🖼No proofs or mockups on file yet. 📸No finished-product photos yet. 🎨 Your logos are on their way We’re gathering your logos and design proofs here. Your rep has every file on hand today — just ask. Send us a logo Call (253) 922-5793 Quotes— Quotes sent to your sign-in email. Open one to review it, or ask for something new. Request a quote 📄 No quotes on file for yet. Request a quote Account & help Your details, how the portal works, and how to reach us. Your account Company— Customer #— Sign-in email— Account rep— Reward dollarsRedeem → Available— Earned, last 12 months— Every order you pay in full earns reward dollars. Premium garments earn a higher rate. Update your details Moved, new phone, new contact, or a different sign-in email? Tell us what changed and your rep will update your account. Contact name Phone What changed? (address, billing contact, new sign-in email…) Send to my rep How it works Approving a design proofWhen a new proof is ready you’ll see it under Needs your attention and in Logos & proofs. Click Review & approve to open it, then approve or request changes. Production starts once you approve. Re-orderingGo to Your products, open a product, pick the color and sizes, and send it to your rep. Or use Re-order on any past order to start from exactly what you bought. Nothing is charged until you approve a quote. Turnaround & rushStandard production is about 7–10 business days after proof approval and garment arrival. Need it sooner? Say so in your request — rush options depend on the job. Invoices & paymentEvery invoice is under Invoices with a downloadable PDF. Balances reflect payments posted in our system. To pay or ask about terms, contact accounting@nwcustomapparel.com or call (253) 922-5793. Reward dollarsEvery order you pay in full earns reward dollars — premium garments earn a higher rate, and seasonal bonuses can multiply it. Rewards post after the invoice is paid; your balance is on the Overview and under Account. To redeem, click Redeem on your next order and tell us the amount: your rep adds it to that order as a credit line, so it shows right on the invoice. Reward dollars never expire while your account stays active. Logo files & new artworkDownload any approved logo from Logos & proofs. For new artwork, use Send a new logo — your rep replies with where to send the file. Vector (AI, EPS, PDF) or high-resolution PNG works best. Contact us Phone(253) 922-5793 Emailsales@nwcustomapparel.com HoursMon–Fri, 9:00 am – 5:00 pm PT Address2025 Freeman Rd EMilton, WA 98354 Northwest Custom Apparel · (253) 922-5793 · sales@nwcustomapparel.com Home Products Orders Invoices0 Logos0 Order × Progress Items Shipping & tracking View invoice / PDF Re-order this Request a Quote × Color Sizes & quantities (fill in what you need) Total: 0 Notes (deadline, other sizes/colors — optional) Cancel Send to my rep Request a quote × What do you need? Decoration Not sure — recommend Embroidery Screen print Direct-to-garment print Transfers (DTF) Quantity (approx.) Logo Notes (deadline, colors, anything else — optional) Cancel Send to my rep Redeem reward dollars × You have $0.00 in reward dollars Tell us how much to apply. Your rep adds it to your next order as a credit line, so you’ll see it right on the invoice. Reward dollars are applied all at once, so your whole balance goes on one order. Recent activity Cancel Apply my full balance to my next order Account statement Print / save PDF × × Review & approve Download Request a change Order with this logo",
+      "bodyTextSha": "44b5306da418683e4a5ee8bf3a6e49810ad3d8582d9ceb7db31a55366202945e",
+      "ids": [
+        "i-home",
+        "i-shirt",
+        "i-box",
+        "i-receipt",
+        "i-palette",
+        "i-file",
+        "i-user",
+        "i-search",
+        "i-menu",
+        "i-x",
+        "i-chev",
+        "i-check",
+        "i-alert",
+        "i-star",
+        "i-download",
+        "i-truck",
+        "i-phone",
+        "i-mail",
+        "i-ext",
+        "i-plus",
+        "i-sparkle",
+        "i-printer",
+        "i-refresh",
+        "i-qa-reorder",
+        "i-qa-quote",
+        "i-qa-upload",
+        "i-qa-receipt",
+        "i-arrow",
+        "i-clock",
+        "i-tag",
+        "i-help",
+        "i-edit",
+        "i-image",
+        "cp-side",
+        "cp-side-logo",
+        "cp-nav",
+        "cp-nav-overview",
+        "cp-nav-products",
+        "cp-nav-orders",
+        "cp-nav-invoices",
+        "cp-nav-badge-invoices",
+        "cp-nav-logos",
+        "cp-nav-badge-logos",
+        "cp-nav-quotes",
+        "cp-nav-badge-quotes",
+        "cp-nav-account",
+        "cp-side-rep",
+        "cp-rep-avatar",
+        "cp-rep-name",
+        "cp-rep-email",
+        "cp-rep-phone",
+        "cp-catalog-link",
+        "cp-signout-link",
+        "cp-side-backdrop",
+        "cp-col",
+        "cp-menu-btn",
+        "cp-topbar-company",
+        "cp-topbar-sub",
+        "cp-search-form",
+        "cp-global-search",
+        "cp-search-results",
+        "cp-topbar-catalog",
+        "cp-btn-quote",
+        "cp-main",
+        "cp-global-alert",
+        "cp-global-alert-text",
+        "cp-global-alert-retry",
+        "cp-panel-overview",
+        "cp-greet-kicker",
+        "cp-greeting",
+        "cp-greet-sub",
+        "cp-rewards",
+        "cp-rewards-name",
+        "cp-rewards-balance",
+        "cp-rewards-sub",
+        "cp-redeem-btn",
+        "cp-attn",
+        "cp-attn-count",
+        "cp-attn-list",
+        "cp-attn-clear",
+        "cp-kpi-balance",
+        "cp-kpi-balance-sub",
+        "cp-kpi-inprocess",
+        "cp-kpi-inprocess-sub",
+        "cp-kpi-logos",
+        "cp-kpi-logos-sub",
+        "cp-kpi-products",
+        "cp-kpi-products-sub",
+        "cp-recent-orders",
+        "cp-action-statement",
+        "cp-ov-rep",
+        "cp-ov-rep-avatar",
+        "cp-ov-rep-name",
+        "cp-ov-rep-email",
+        "cp-ov-rep-phone",
+        "cp-ov-logos-section",
+        "cp-ov-logos-count",
+        "cp-ov-logos",
+        "cp-panel-products",
+        "cp-products-count",
+        "cp-products-toolbar",
+        "cp-products-search",
+        "cp-products-sort",
+        "cp-products-grid",
+        "cp-products-more",
+        "cp-products-more-btn",
+        "cp-products-empty",
+        "cp-panel-orders",
+        "cp-orders-count",
+        "cp-orders-toolbar",
+        "cp-orders-filters",
+        "cp-ochip-inprocess",
+        "cp-orders-search",
+        "cp-orders-wrap",
+        "cp-orders-empty",
+        "cp-panel-invoices",
+        "cp-invoices-count",
+        "cp-statement-btn",
+        "cp-inv-summary",
+        "cp-inv-open",
+        "cp-inv-open-sub",
+        "cp-inv-pastdue",
+        "cp-inv-pastdue-sub",
+        "cp-inv-paid12",
+        "cp-inv-paid12-sub",
+        "cp-invoices-toolbar",
+        "cp-invoices-filters",
+        "cp-ichip-open",
+        "cp-ichip-pastdue",
+        "cp-invoices-wrap",
+        "cp-invoices-empty",
+        "cp-panel-logos",
+        "cp-logos-count",
+        "cp-logos-toolbar",
+        "cp-logos-search",
+        "cp-logos-subtabs",
+        "cp-subtab-approved",
+        "cp-approved-count",
+        "cp-subtab-mockups",
+        "cp-mockups-count",
+        "cp-subtab-finished",
+        "cp-finished-count",
+        "cp-approved-grid",
+        "cp-approved-empty",
+        "cp-mockups-grid",
+        "cp-mockups-empty",
+        "cp-finished-grid",
+        "cp-finished-empty",
+        "cp-logos-empty",
+        "cp-panel-quotes",
+        "cp-quotes-count",
+        "cp-quotes-wrap",
+        "cp-quotes-empty",
+        "cp-quotes-email",
+        "cp-panel-account",
+        "cp-acct-company",
+        "cp-acct-number",
+        "cp-acct-email",
+        "cp-acct-rep",
+        "cp-acct-rewards",
+        "cp-acct-redeem",
+        "cp-acct-rw-balance",
+        "cp-acct-rw-earned-label",
+        "cp-acct-rw-earned",
+        "cp-acct-rw-how",
+        "cp-acct-rw-history",
+        "cp-acct-form",
+        "cp-acct-contact",
+        "cp-acct-phone",
+        "cp-acct-msg",
+        "cp-acct-error",
+        "cp-acct-submit",
+        "cp-bottomnav",
+        "cp-bnav-badge-invoices",
+        "cp-bnav-badge-logos",
+        "cp-drawer",
+        "cp-drawer-panel",
+        "cp-drawer-title",
+        "cp-drawer-status",
+        "cp-drawer-close",
+        "cp-drawer-timeline",
+        "cp-drawer-meta",
+        "cp-drawer-items",
+        "cp-drawer-tracking",
+        "cp-drawer-invoice-link",
+        "cp-drawer-reorder",
+        "cp-req-modal",
+        "cp-req-title",
+        "cp-req-close",
+        "cp-req-image",
+        "cp-req-product",
+        "cp-req-color-field",
+        "cp-req-colorstat",
+        "cp-req-colors",
+        "cp-req-color",
+        "cp-size-grid",
+        "cp-size-total",
+        "cp-req-note",
+        "cp-req-error",
+        "cp-req-cancel",
+        "cp-req-submit",
+        "cp-gen-modal",
+        "cp-gen-title",
+        "cp-gen-close",
+        "cp-gen-intro",
+        "cp-gen-type",
+        "cp-gen-desc-label",
+        "cp-gen-desc",
+        "cp-gen-row-details",
+        "cp-gen-method",
+        "cp-gen-qty",
+        "cp-gen-logo-field",
+        "cp-gen-design",
+        "cp-gen-note",
+        "cp-gen-error",
+        "cp-gen-cancel",
+        "cp-gen-submit",
+        "cp-redeem-modal",
+        "cp-redeem-title",
+        "cp-redeem-close",
+        "cp-redeem-avail",
+        "cp-redeem-amt",
+        "cp-redeem-rule",
+        "cp-redeem-error",
+        "cp-redeem-history",
+        "cp-redeem-history-list",
+        "cp-redeem-cancel",
+        "cp-redeem-submit",
+        "cp-statement-modal",
+        "cp-statement-title",
+        "cp-statement-print",
+        "cp-statement-close",
+        "cp-statement-body",
+        "cp-logo-lightbox",
+        "cp-lightbox-close",
+        "cp-lightbox-img",
+        "cp-lightbox-title",
+        "cp-lightbox-meta",
+        "cp-lb-approve",
+        "cp-lb-download",
+        "cp-lb-change",
+        "cp-lb-order",
+        "cp-toast"
+      ],
+      "links": [
+        {
+          "href": "#cp-main",
+          "label": "Skip to content"
+        },
+        {
+          "href": "#tab=overview",
+          "label": "Overview"
+        },
+        {
+          "href": "#tab=products",
+          "label": "Your products"
+        },
+        {
+          "href": "#tab=orders",
+          "label": "Orders"
+        },
+        {
+          "href": "#tab=invoices",
+          "label": "Invoices0"
+        },
+        {
+          "href": "#tab=logos",
+          "label": "Logos & proofs0"
+        },
+        {
+          "href": "#tab=quotes",
+          "label": "Quotes0"
+        },
+        {
+          "href": "#tab=account",
+          "label": "Account & help"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "label": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "tel:+12539225793",
+          "label": "(253) 922-5793"
+        },
+        {
+          "href": "/",
+          "label": "Browse catalog"
+        },
+        {
+          "href": "/auth/customer/logout",
+          "label": "Sign out"
+        },
+        {
+          "href": "/",
+          "label": "Browse catalog"
+        },
+        {
+          "href": "#tab=invoices",
+          "label": "Open balance —"
+        },
+        {
+          "href": "#tab=orders",
+          "label": "In production —"
+        },
+        {
+          "href": "#tab=logos",
+          "label": "Logos on file —"
+        },
+        {
+          "href": "#tab=products",
+          "label": "Products ordered —"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "label": ""
+        },
+        {
+          "href": "tel:+12539225793",
+          "label": ""
+        },
+        {
+          "href": "mailto:accounting@nwcustomapparel.com",
+          "label": "accounting@nwcustomapparel.com"
+        },
+        {
+          "href": "tel:12539225793",
+          "label": "Call (253) 922-5793"
+        },
+        {
+          "href": "mailto:accounting@nwcustomapparel.com",
+          "label": "accounting@nwcustomapparel.com"
+        },
+        {
+          "href": "tel:+12539225793",
+          "label": "(253) 922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "label": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "tel:+12539225793",
+          "label": "(253) 922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "label": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "#tab=overview",
+          "label": "Home"
+        },
+        {
+          "href": "#tab=products",
+          "label": "Products"
+        },
+        {
+          "href": "#tab=orders",
+          "label": "Orders"
+        },
+        {
+          "href": "#tab=invoices",
+          "label": "Invoices0"
+        },
+        {
+          "href": "#tab=logos",
+          "label": "Logos0"
+        },
+        {
+          "href": "#",
+          "label": "View invoice / PDF"
+        },
+        {
+          "href": "#",
+          "label": "Review & approve"
+        },
+        {
+          "href": "#",
+          "label": "Download"
+        }
+      ],
+      "fields": [
+        {
+          "id": "cp-global-search",
+          "type": "search",
+          "value": ""
+        },
+        {
+          "id": "cp-products-search",
+          "type": "search",
+          "value": ""
+        },
+        {
+          "id": "cp-products-sort",
+          "type": "select-one",
+          "value": "ordered"
+        },
+        {
+          "id": "cp-orders-search",
+          "type": "search",
+          "value": ""
+        },
+        {
+          "id": "cp-logos-search",
+          "type": "search",
+          "value": ""
+        },
+        {
+          "id": "cp-acct-contact",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "cp-acct-phone",
+          "type": "tel",
+          "value": ""
+        },
+        {
+          "id": "cp-acct-msg",
+          "type": "textarea",
+          "value": ""
+        },
+        {
+          "id": "cp-req-color",
+          "type": "hidden",
+          "value": ""
+        },
+        {
+          "id": "cp-req-note",
+          "type": "textarea",
+          "value": ""
+        },
+        {
+          "id": "cp-gen-type",
+          "type": "hidden",
+          "value": "quote"
+        },
+        {
+          "id": "cp-gen-desc",
+          "type": "textarea",
+          "value": ""
+        },
+        {
+          "id": "cp-gen-method",
+          "type": "select-one",
+          "value": ""
+        },
+        {
+          "id": "cp-gen-qty",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "cp-gen-design",
+          "type": "select-one",
+          "value": ""
+        },
+        {
+          "id": "cp-gen-note",
+          "type": "textarea",
+          "value": ""
+        },
+        {
+          "id": "cp-redeem-amt",
+          "type": "hidden",
+          "value": ""
+        }
+      ],
+      "styles": [
+        "https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap",
+        "/shared_components/css/tokens.css?v=2026.09.08.2",
+        "/pages/css/customer-portal.css?v=2026.09.07.20",
+        "/pages/css/portal-reorder-list.css?v=2026.09.07.20"
+      ],
+      "scripts": [
+        "/shared_components/js/app-config.js?v=2026.09.06.26",
+        "/pages/js/portal-reorder-list.js?v=2026.09.05.24",
+        "/pages/js/customer-portal.js?v=2026.09.06.1"
+      ],
+      "cssBytes": 97706
+    },
+    {
+      "file": "pages/customer-product.html",
+      "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <meta name=\"robots\" content=\"noindex, nofollow\">\n    <title>Product - Northwest Custom Apparel</title>\n    <link rel=\"icon\" type=\"image/png\" href=\"/favicon.png\">\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    <link href=\"https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap\" rel=\"stylesheet\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link rel=\"stylesheet\" href=\"/pages/css/customer-portal.css?v=2026.09.07.20\">\n    <link rel=\"stylesheet\" href=\"/pages/css/customer-product.css?v=2026.09.07.20\">\n    <link rel=\"stylesheet\" href=\"/pages/css/portal-reorder-list.css?v=2026.09.07.20\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/embroidery-quote-pricing.css?v=2026.09.07.8\">\n</head>\n<body>\n    <header class=\"cp-header\">\n        <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\"\n             alt=\"Northwest Custom Apparel\" class=\"cp-header-logo\">\n        <div class=\"cp-header-text\">\n            <div class=\"cp-header-brand\">Northwest Custom Apparel</div>\n            <p>Customer portal</p>\n        </div>\n        <div class=\"cp-header-actions\">\n            <a class=\"cp-header-link\" id=\"pp-back-top\" href=\"/portal\">&larr; <span class=\"pp-back-long\">Back to your account</span><span class=\"pp-back-short\">Account</span></a>\n        </div>\n    </header>\n\n    <div class=\"cp-loading\" id=\"pp-loading\">\n        <div class=\"cp-spinner\"></div>\n        <div class=\"cp-loading-text\">Loading product&hellip;</div>\n    </div>\n\n    <div class=\"cp-error\" id=\"pp-error\" hidden role=\"alert\">\n        <div class=\"cp-error-icon\">&#9888;</div>\n        <div class=\"cp-error-title\" id=\"pp-error-title\">Something went wrong</div>\n        <div class=\"cp-error-message\" id=\"pp-error-message\">Please try again or contact us at (253) 922-5793.</div>\n        <button type=\"button\" class=\"cp-btn cp-btn--primary cp-btn--sm pp-error-retry\" id=\"pp-error-retry\" hidden>Retry</button>\n    </div>\n\n    <main class=\"cp-main\" id=\"pp-content\" hidden>\n        <a class=\"pp-back\" id=\"pp-back\" href=\"/portal\">&larr; Back to your account</a>\n        <div id=\"pp-body\"></div>\n    </main>\n\n    <div class=\"cp-toast\" id=\"cp-toast\"></div>\n\n    <div class=\"cp-footer\">\n        Northwest Custom Apparel &middot; (253) 922-5793 &middot; sales@nwcustomapparel.com\n    </div>\n\n    <!-- Pricing engine (identical chain to Quick Quote) for the embroidery-upgrade price matrix — Rule 9 -->\n    <script src=\"/config/app.config.js?v=2026.09.03.11\"></script>\n    <script src=\"/shared_components/js/decoration-methods.js?v=2026.09.06.31\"></script>\n    <script src=\"/shared_components/js/embroidery-pricing-service.js?v=2026.09.06.31\"></script>\n    <script src=\"/shared_components/js/cap-embroidery-pricing-service.js?v=2026.09.06.31\"></script>\n    <script src=\"/shared_components/js/embroidery-quote-pricing.js?v=2026.09.07.33\"></script>\n    <script src=\"/shared_components/js/quote-cart-engine.js?v=2026.07.07.7\"></script>\n    <script src=\"/pages/js/portal-reorder-list.js?v=2026.09.05.24\"></script>\n    <script src=\"/pages/js/customer-product.js?v=2026.09.07.33\"></script>\n</body>\n</html>\n",
+      "title": "Product - Northwest Custom Apparel",
+      "bodyText": "Northwest Custom Apparel Customer portal ← Back to your accountAccount Loading product… ⚠ Something went wrong Please try again or contact us at (253) 922-5793. Retry ← Back to your account Northwest Custom Apparel · (253) 922-5793 · sales@nwcustomapparel.com",
+      "bodyTextSha": "fd4e4c39b07b7ef4bedd7e8d04984072d37924ac26ca3ac92d18ae914e86b310",
+      "ids": [
+        "pp-back-top",
+        "pp-loading",
+        "pp-error",
+        "pp-error-title",
+        "pp-error-message",
+        "pp-error-retry",
+        "pp-content",
+        "pp-back",
+        "pp-body",
+        "cp-toast"
+      ],
+      "links": [
+        {
+          "href": "/portal",
+          "label": "← Back to your accountAccount"
+        },
+        {
+          "href": "/portal",
+          "label": "← Back to your account"
+        }
+      ],
+      "fields": [],
+      "styles": [
+        "https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap",
+        "/shared_components/css/tokens.css?v=2026.09.08.2",
+        "/pages/css/customer-portal.css?v=2026.09.07.20",
+        "/pages/css/customer-product.css?v=2026.09.07.20",
+        "/pages/css/portal-reorder-list.css?v=2026.09.07.20",
+        "/shared_components/css/embroidery-quote-pricing.css?v=2026.09.07.8"
+      ],
+      "scripts": [
+        "/config/app.config.js?v=2026.09.03.11",
+        "/shared_components/js/decoration-methods.js?v=2026.09.06.31",
+        "/shared_components/js/embroidery-pricing-service.js?v=2026.09.06.31",
+        "/shared_components/js/cap-embroidery-pricing-service.js?v=2026.09.06.31",
+        "/shared_components/js/embroidery-quote-pricing.js?v=2026.09.07.33",
+        "/shared_components/js/quote-cart-engine.js?v=2026.07.07.7",
+        "/pages/js/portal-reorder-list.js?v=2026.09.05.24",
+        "/pages/js/customer-product.js?v=2026.09.07.33"
+      ],
+      "cssBytes": 112317
+    }
+  ],
+  "hashes": {
+    "config/app.config.js": "fe83e4329ce3eee97e48dd68dab81d9d5eb6ec94511d9650e2c9ebbb1528d6ea",
+    "pages/css/customer-portal.css": "95fe67637e0198ddcd200f667e9f4bb4ccee335692370b890992259c49041710",
+    "pages/css/customer-product.css": "94e2acd1c8fc49b525beac6980f852609fe02500739d4ad61c4a94451c6cfc82",
+    "pages/css/portal-reorder-list.css": "9935a386a58c9758ac3b6b1216c777139313b4c83cf0ba6e9a7bc21a56a9a7dc",
+    "pages/customer-portal.html": "9051d06843746e8b248d122a449177bbcffb767a0c6cab1728ae462e6a48bb6b",
+    "pages/customer-product.html": "f3a68015d1ea9003d0eec5e628a6bee26089d72ee28fc266006ac3c2dd25a725",
+    "pages/js/customer-portal.js": "a65b4532dc14d15bd43b47c1b2b4c6b982b941d498946ff747444d047eea37c3",
+    "pages/js/customer-product.js": "f2d1d42a5b2f8ba30872888dbf6e07b9e228360df6c02f37fa272b2a5521d8b5",
+    "pages/js/portal-reorder-list.js": "ba0b4b7232b5591a754c6467c1afb9c463d5a8617c6f7769718e8e2c3d9af155",
+    "shared_components/css/embroidery-quote-pricing.css": "d7e48a93fa554e0bf44cf5617a803069c942221458c191390f01ebc85a6779fa",
+    "shared_components/css/tokens.css": "2b3ab556bb9eaf40765a5c84683777cb64d50a6c42d1b4e82bc6beff33a127b6",
+    "shared_components/js/app-config.js": "fffd8cd7d934fcb67ea5165373f870cc20cd14a6c3dd62b1c36fe8ab2be44311",
+    "shared_components/js/cap-embroidery-pricing-service.js": "eaee03cfb727abb775532e37078bd41a9da94814602899eba14b611a855e1506",
+    "shared_components/js/decoration-methods.js": "27dc341efc94ece6d5a4eb061552c06fdf37754de43b27a4bc2a6f5c6f662b9b",
+    "shared_components/js/embroidery-pricing-service.js": "cb5ead0d8b9059ca640993e331e075d87b86016d993aec403179260f4c0b0dff",
+    "shared_components/js/embroidery-quote-pricing.js": "50a142670e991983b9a7ff09b20f05c59edd5cd72f19cb37d322f3bcb14c3fb3",
+    "shared_components/js/quote-cart-engine.js": "ae4d987c8a68b260c2acdc42e123883a12decc6b59c42359edb8c40ca348a7eb"
+  },
+  "changes": [],
+  "retiredStyles": []
+}

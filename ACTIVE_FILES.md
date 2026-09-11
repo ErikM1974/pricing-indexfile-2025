@@ -483,3 +483,5 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - tests/fixtures/customer-job-status-vendor-list-dated-original-browser.json — immutable synthetic original browser contract for customer/job status CSS migration.
 
 - tests/fixtures/customer-job-status-vendor-detail-dated-original-browser.json — immutable synthetic original browser contract for customer/job status CSS migration.
+
+- tests/fixtures/customer-account-original-content.json and tests/unit/customer-account-content.test.js — immutable Customer Account/Product HTML, labels, fields and full local source graph before CSS migration; no migration credit yet.

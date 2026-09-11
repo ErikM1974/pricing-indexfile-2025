@@ -1,5 +1,18 @@
 # CSS unification — design direction and implementation plan
 
+## NEXT — Customer Account and Product original source capture
+
+Isolated codex/customer-account-pages begins at73cc615a. The reviewed status pair is separately integrated on primary develop atf03b9117 with corrected full gates running; none of this next-family work belongs in its release. Live .9/2101 is185/225; reviewed candidate187/225,38 pending.
+
+- [x] Freeze both original HTML files, three page CSS owners, controllers, shared reorder list and complete local pricing dependency graph before application edits.
+- [ ] Capture original account overview/products/orders/invoices/logos/quotes/help, search/filter, order drawer/tracking/statement, proof/download links, rewards and every successful request payload using synthetic data.
+- [ ] Capture original product colors/gallery/availability/size history, decoration choice and minimum, reorder list storage/single/batch writes, upgrade embroidery engine ladder and setup fee. Keep shared pricing engines byte-identical and compare all quantities, totals and dates.
+- [ ] Review originals at1440/768/390/320 and all print pages, signed-out/staff-preview, empty/error/retry/partial/delayed states. Intercept all writes and unknown API reads; no live emails, reward requests, orders or logout.
+- [ ] Reuse shared typography/buttons/fields/dialogs and scope page layout after original review. Preserve independent account view loading and customer-only identity. Demonstrate stale responses, duplicate requests, keyboard/focus and storage failures before any repairs.
+- [ ] Current visual/axe/keyboard/paper, original-value and pricing evidence before migration credit; full release gates before deploy.
+
+Source capture is not migration credit. Do not overwrite immutable originals or rerun consumed helpers; no .env copying or recursive deletion of the node_modules junction.
+
 ## REVIEWED — Order Status and vendor Job Portal ready for integration
 
 Both pages adopt shared Public Sans/header/buttons/inputs and scoped page owners. Forty-six browser cases cover original values/links/rows at1440/768/390/320, all status/error modes, delayed retry, exact note payloads, duplicate keyboard submissions, separate job drafts, late responses, native card focus/history and failed image fallbacks. Seventy reversible mappings restore all10 original source hashes; the original38 browser JSONs remain immutable. Money/promise/render and vendor date/data functions stay byte-identical. Three important flags removed; shared custom-tees.css and CaspioDate unchanged.
