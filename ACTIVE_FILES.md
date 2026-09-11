@@ -483,3 +483,105 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - tests/fixtures/customer-job-status-vendor-list-dated-original-browser.json — immutable synthetic original browser contract for customer/job status CSS migration.
 
 - tests/fixtures/customer-job-status-vendor-detail-dated-original-browser.json — immutable synthetic original browser contract for customer/job status CSS migration.
+
+- tests/fixtures/customer-account-original-content.json and tests/unit/customer-account-content.test.js — immutable Customer Account/Product HTML, labels, fields and full local source graph before CSS migration; no migration credit yet.
+- tests/e2e/helpers/customer-account-browser.js — synthetic Customer Account/Product data, original source replay, deterministic engine presentation seam and intercepted request bodies for CSS review.
+- tests/e2e/css-unification-customer-account.spec.js — immutable original/current account views, product pricing presentation, failures, staff preview, four-width accessibility and paper contracts; baseline capture required before UI edits.
+
+- tests/fixtures/customer-account-account-normal-overview-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-account-normal-products-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-account-normal-orders-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-account-normal-invoices-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-account-normal-logos-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-account-normal-quotes-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-account-normal-account-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-account-empty-overview-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-account-empty-products-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-account-empty-orders-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-account-empty-invoices-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-account-empty-logos-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-account-empty-quotes-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-account-empty-account-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-account-long-orders-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-account-long-invoices-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-product-normal-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-product-empty-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-product-long-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-product-escaped-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-product-upgrade-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-preview-account-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-preview-product-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-account-failed-aggregate-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-account-failed-orders-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-account-failed-my-products-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-account-failed-quotes-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-account-failed-me-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-account-failed-rewards-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-product-failed-401-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-product-failed-404-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-product-failed-429-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-product-failed-500-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-account-quote-dialog-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-account-quote-sent-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-account-logo-dialog-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-account-logo-sent-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-account-logo-change-dialog-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-account-logo-change-sent-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-account-order-drawer-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-account-reorder-dialog-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-account-reorder-sent-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-account-statement-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-account-reward-dialog-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-account-reward-sent-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-product-single-sent-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-product-batch-drawer-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-product-batch-sent-original-browser.json — immutable synthetic original Customer Account/Product browser contract.
+
+- tests/fixtures/customer-account-product-upgrade-sent-original-browser.json — immutable synthetic original Customer Account/Product browser contract.

@@ -237,12 +237,20 @@
         if (lb && !lb.hidden && (e.target === lb || e.target.id === 'cp-lightbox-close')) { closeLogoLightbox(); return; }
     });
     document.addEventListener('keydown', function (e) {
+        if (e.key === 'Tab') {
+            var dialog = document.querySelector('.cp-modal-overlay:not([hidden]) .cp-modal, .cp-drawer:not([hidden]) .cp-drawer-panel, #cp-logo-lightbox:not([hidden]) .cp-lightbox-inner');
+            if (dialog) {
+                var controls = Array.from(dialog.querySelectorAll('button:not(:disabled), a[href], input:not(:disabled), select:not(:disabled), textarea:not(:disabled), [tabindex="0"]')).filter(function (node) { return node.getClientRects().length; });
+                var first = controls[0], last = controls[controls.length - 1];
+                if (first && (!dialog.contains(document.activeElement) || (!e.shiftKey && document.activeElement === last))) { e.preventDefault(); first.focus(); }
+                else if (last && e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+            }
+        }
         if (e.key === 'Escape') {
             closeLogoLightbox(); closeOrderDrawer(); closeSidebar(); closeReqModal(); closeRedeem(); closeGenModal(); closeStatement(); hideSearchResults();
             return;
         }
-        var card = e.target.closest && e.target.closest('.cp-logo-card');
-        if (card && (e.key === 'Enter' || e.key === ' ') && !e.target.closest('a, button')) { e.preventDefault(); openLogoLightbox(card); }
+        // Logo preview uses its native View button and the delegated click handler.
     });
     window.addEventListener('hashchange', function () { switchTab(tabFromHash(), { silent: true }); });
     (function wireShell() {
@@ -539,8 +547,8 @@
         S.awaiting.forEach(function (p) {
             items.push({ ico: 'proof', svg: 'palette', title: 'A proof for ' + (p.name || 'your design') + ' is waiting for your approval',
                 sub: [p.design ? 'Design #' + p.design : '', p.date ? 'Sent ' + formatDateShort(p.date) : ''].filter(Boolean).join(' · '),
-                cta: p.approveUrl ? '<a class="cp-btn cp-btn--gold cp-btn--sm" href="' + escapeAttr(p.approveUrl) + '">Review &amp; approve</a>'
-                    : '<button class="cp-btn cp-btn--gold cp-btn--sm" type="button" data-tab="logos">Review</button>' });
+                cta: p.approveUrl ? '<a class="btn btn-primary cp-btn cp-btn--gold cp-btn--sm" href="' + escapeAttr(p.approveUrl) + '">Review &amp; approve</a>'
+                    : '<button class="btn btn-primary cp-btn cp-btn--gold cp-btn--sm" type="button" data-tab="logos">Review</button>' });
         });
         if (S.ordersLoaded) {
             var inv = invoiceRows();
@@ -550,13 +558,13 @@
                 var pSum = past.reduce(function (s, o) { return s + (Number(o.balance) || 0); }, 0);
                 items.push({ ico: 'money', svg: 'receipt', title: plural(past.length, 'invoice is', 'invoices are') + ' past due &middot; ' + money(pSum),
                     sub: 'Questions? accounting@nwcustomapparel.com &middot; ' + PHONE_TXT,
-                    cta: '<button class="cp-btn cp-btn--danger cp-btn--sm" type="button" data-tab="invoices" data-invfilter="pastdue">View invoices</button>' });
+                    cta: '<button class="btn btn-danger cp-btn cp-btn--danger cp-btn--sm" type="button" data-tab="invoices" data-invfilter="pastdue">View invoices</button>' });
             }
             if (soon.length) {
                 var sSum = soon.reduce(function (s, o) { return s + (Number(o.balance) || 0); }, 0);
                 items.push({ ico: 'soon', svg: 'clock', title: plural(soon.length, 'invoice is', 'invoices are') + ' due within 7 days &middot; ' + money(sSum),
                     sub: soon.map(function (o) { return '#' + o.orderNumber + ' due ' + formatDateShort(o.dueDate); }).join(' · '),
-                    cta: '<button class="cp-btn cp-btn--ghost cp-btn--sm" type="button" data-tab="invoices" data-invfilter="open">View invoices</button>' });
+                    cta: '<button class="btn cp-btn cp-btn--ghost cp-btn--sm" type="button" data-tab="invoices" data-invfilter="open">View invoices</button>' });
             }
         }
         S.quotes.forEach(function (q) {
@@ -564,7 +572,7 @@
             if (q.status === 'Open' && d != null && d >= 0 && d <= 7) {
                 items.push({ ico: 'quote', svg: 'file', title: 'Quote ' + q.quoteId + ' expires ' + (d === 0 ? 'today' : 'in ' + plural(d, 'day')),
                     sub: [q.projectName, money(q.total)].filter(Boolean).join(' · '),
-                    cta: q.viewUrl ? '<a class="cp-btn cp-btn--ghost cp-btn--sm" href="' + escapeAttr(q.viewUrl) + '">View quote</a>' : '<button class="cp-btn cp-btn--ghost cp-btn--sm" type="button" data-tab="quotes">View quotes</button>' });
+                    cta: q.viewUrl ? '<a class="btn cp-btn cp-btn--ghost cp-btn--sm" href="' + escapeAttr(q.viewUrl) + '">View quote</a>' : '<button class="btn cp-btn cp-btn--ghost cp-btn--sm" type="button" data-tab="quotes">View quotes</button>' });
             }
         });
         if (list) {
@@ -621,7 +629,7 @@
         // Recent orders
         var rec = byId('cp-recent-orders');
         if (rec && (S.ordersLoaded || S.ordersFailed)) {
-            if (S.ordersFailed) rec.innerHTML = '<div class="cp-card-body cp-muted">Orders didn&rsquo;t load. <button type="button" class="cp-btn cp-btn--link cp-btn--xs" data-cp-retry="orders">Retry</button></div>';
+            if (S.ordersFailed) rec.innerHTML = '<div class="cp-card-body cp-muted">Orders didn&rsquo;t load. <button type="button" class="btn cp-btn cp-btn--link cp-btn--xs" data-cp-retry="orders">Retry</button></div>';
             else if (!S.orders.length) rec.innerHTML = '<div class="cp-card-body cp-muted">No orders on file yet.</div>';
             else rec.innerHTML = S.orders.slice().sort(byDateDesc('orderDate')).slice(0, 5).map(function (o) {
                 return '<button class="cp-recent-row" type="button" data-open-order="' + escapeAttr(String(o.orderNumber || '')) + '">' +
@@ -834,9 +842,9 @@
         var line1 = [designLabel, l.meta].filter(Boolean).join(' · ');
         var metaAll = [line1, l.typeName].filter(Boolean).join(' · ');
         var approve = (l.needs && l.approveUrl)
-            ? '<a class="cp-btn cp-btn--gold cp-btn--sm cp-tile-approve" href="' + escapeAttr(l.approveUrl) + '">' + icon('check') + 'Review &amp; approve</a>'
+            ? '<a class="btn btn-primary cp-btn cp-btn--gold cp-btn--sm cp-tile-approve" href="' + escapeAttr(l.approveUrl) + '">' + icon('check') + 'Review &amp; approve</a>'
             : '';
-        return '<div class="cp-tile cp-logo-card' + (l.needs ? ' cp-tile--action' : '') + '" role="button" tabindex="0"' +
+        return '<div class="cp-tile cp-logo-card' + (l.needs ? ' cp-tile--action' : '') + '"' +
             ' data-key="' + escapeAttr(l.key) + '" data-img="' + escapeAttr(l.largeSrc) + '" data-title="' + escapeAttr(l.name) + '" data-meta="' + escapeAttr(metaAll) + '"' +
             ' data-design="' + escapeAttr(l.design) + '" data-kind="' + escapeAttr(l.kind) + '" data-approve="' + escapeAttr(l.needs ? l.approveUrl : '') + '">' +
             '<div class="cp-tile-image' + (l.kind === 'finished' ? ' cp-tile-image--photo' : '') + '">' + img + badge + '</div>' +
@@ -845,7 +853,7 @@
                 (line1 || l.typeName ? '<div class="cp-tile-sub">' + escapeHtml([line1, l.typeName].filter(Boolean).join(' · ')) + '</div>' : '') +
                 (typeLabel ? '<div class="cp-tile-type">' + escapeHtml(typeLabel) + '</div>' : '') +
                 approve +
-                '<div class="cp-tile-foot"><span class="cp-tile-view">View</span><span class="cp-tile-date">' + escapeHtml(formatDate(l.date)) + '</span></div>' +
+                '<div class="cp-tile-foot"><button type="button" class="btn cp-tile-view">View</button><span class="cp-tile-date">' + escapeHtml(formatDate(l.date)) + '</span></div>' +
             '</div></div>';
     }
     // Broken thumbnails → placeholder (delegated; no inline onerror).
@@ -972,8 +980,8 @@
                 '<td class="cp-num">' + escapeHtml(String(o.quantity || '')) + '</td>' +
                 '<td class="cp-num cp-strong">' + money(o.total) + '</td>' +
                 '<td>' + renderStatusBadge(o.status) + shipPill + '</td>' +
-                '<td class="cp-cell-actions"><button type="button" class="cp-btn cp-btn--ghost cp-btn--xs" data-open-order="' + escapeAttr(String(o.orderNumber || '')) + '">Details</button>' +
-                    '<button type="button" class="cp-btn cp-btn--soft cp-btn--xs cp-row-reorder" data-order="' + escapeAttr(String(o.orderNumber || '')) + '" data-design="' + escapeAttr(designLabel(o.designName) || '') + '">Re-order</button></td>' +
+                '<td class="cp-cell-actions"><button type="button" class="btn cp-btn cp-btn--ghost cp-btn--xs" data-open-order="' + escapeAttr(String(o.orderNumber || '')) + '">Details</button>' +
+                    '<button type="button" class="btn cp-btn cp-btn--soft cp-btn--xs cp-row-reorder" data-order="' + escapeAttr(String(o.orderNumber || '')) + '" data-design="' + escapeAttr(designLabel(o.designName) || '') + '">Re-order</button></td>' +
                 '</tr>';
         }).join('');
         wrap.innerHTML = '<table class="cp-table"><thead><tr>' +
@@ -1137,7 +1145,7 @@
                 '<td class="cp-num">' + money(o.paid) + '</td>' +
                 '<td class="cp-num cp-strong">' + money(o.balance) + '</td>' +
                 '<td>' + renderStatusBadge(o.paidStatus) + '</td>' +
-                '<td class="cp-cell-actions"><a class="cp-btn cp-btn--ghost cp-btn--xs" href="' + escapeAttr(href) + '">' + icon('download') + 'PDF</a></td>' +
+                '<td class="cp-cell-actions"><a class="btn cp-btn cp-btn--ghost cp-btn--xs" href="' + escapeAttr(href) + '">' + icon('download') + 'PDF</a></td>' +
                 '</tr>';
         }).join('');
         wrap.innerHTML = '<table class="cp-table"><thead><tr>' +
@@ -1169,10 +1177,10 @@
         var total = open.reduce(function (s, o) { return s + (Number(o.balance) || 0); }, 0);
         var body = byId('cp-statement-body');
         body.innerHTML =
-            '<div class="cp-stmt-head"><div><img src="/images/nwca-logo.png" alt="Northwest Custom Apparel"><div class="cp-muted" style="font-size:11.5px;margin-top:4px">2025 Freeman Rd E, Milton, WA 98354 &middot; (253) 922-5793 &middot; accounting@nwcustomapparel.com</div></div>' +
+            '<div class="cp-stmt-head"><div><img src="/images/nwca-logo.png" alt="Northwest Custom Apparel"><div class="cp-muted cp-stmt-address">2025 Freeman Rd E, Milton, WA 98354 &middot; (253) 922-5793 &middot; accounting@nwcustomapparel.com</div></div>' +
             '<div><div class="cp-stmt-title">Statement of account</div><div class="cp-stmt-meta"><strong>' + escapeHtml(S.companyName || 'Your account') + '</strong>' + (S.custId ? ' &middot; Customer #' + escapeHtml(S.custId) : '') + '<br>As of ' + escapeHtml(new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })) + '</div></div></div>' +
             (open.length
-                ? '<div class="cp-stmt-scroll"><table><thead><tr><th>Invoice</th><th>Description</th><th>Invoiced</th><th>Due</th><th>Aging</th><th class="num">Total</th><th class="num">Paid</th><th class="num">Balance</th></tr></thead><tbody>' + rows + '</tbody>' +
+                ? '<div class="cp-stmt-scroll" tabindex="0" role="region" aria-label="Invoice statement"><table><thead><tr><th>Invoice</th><th>Description</th><th>Invoiced</th><th>Due</th><th>Aging</th><th class="num">Total</th><th class="num">Paid</th><th class="num">Balance</th></tr></thead><tbody>' + rows + '</tbody>' +
                   '<tfoot><tr><td colspan="7">Total balance due</td><td class="num">' + money(total) + '</td></tr></tfoot></table></div>' +
                   '<div class="cp-stmt-aging">' +
                     '<div><div class="k">Current</div><div class="v">' + money(buckets.current) + '</div></div>' +
@@ -1181,7 +1189,7 @@
                     '<div><div class="k">61–90 days</div><div class="v' + (buckets.d90 ? ' v--due' : '') + '">' + money(buckets.d90) + '</div></div>' +
                     '<div><div class="k">90+ days</div><div class="v' + (buckets.d90p ? ' v--due' : '') + '">' + money(buckets.d90p) + '</div></div>' +
                   '</div>'
-                : '<div class="cp-empty" style="margin-top:8px"><div class="cp-empty-icon">&#10003;</div>No open balance &mdash; every invoice on file is paid. Thank you!</div>') +
+                : '<div class="cp-empty cp-stmt-empty"><div class="cp-empty-icon">&#10003;</div>No open balance &mdash; every invoice on file is paid. Thank you!</div>') +
             '<div class="cp-stmt-foot">Balances reflect payments posted in our system as of the date above. To pay or ask about terms, contact accounting@nwcustomapparel.com or call (253) 922-5793.</div>';
         var sm = byId('cp-statement-modal'); if (sm.hidden) rememberFocus(); sm.hidden = false;
         try { byId('cp-statement-print').focus(); } catch (e) { }
@@ -1226,7 +1234,7 @@
             ? '<div class="cp-rec-reward"><span class="cp-rec-reward-star">&#9733;</span> ' + escapeHtml(p.rewardText) + '</div>' : '';
         var sizesJson = JSON.stringify(p.sizes || {});
         return '<div class="cp-product-card' + (comingSoon ? ' cp-product-card--soon' : '') + '">' +
-            '<div class="cp-product-img">' + (productHref ? '<a class="cp-product-imglink" href="' + escapeAttr(productHref) + '">' + img + '</a>' : img) + '</div>' +
+            '<div class="cp-product-img">' + (productHref ? '<a class="cp-product-imglink" aria-label="View ' + escapeAttr(p.title || p.style || 'product') + '" href="' + escapeAttr(productHref) + '">' + img + '</a>' : img) + '</div>' +
             '<div class="cp-product-body">' +
                 '<div class="cp-product-title">' + (productHref ? '<a class="cp-product-titlelink" href="' + escapeAttr(productHref) + '">' + escapeHtml(title) + '</a>' : escapeHtml(title)) + '</div>' +
                 (sub ? '<div class="cp-product-sub">' + escapeHtml(sub) + '</div>' : '') +
@@ -1235,9 +1243,9 @@
                 reward +
                 ((kind === 'product' && productHref)
                     // Your Products re-order → the method-aware product PAGE (decoration picker + API minimum live there).
-                    ? '<a class="cp-product-btn" href="' + escapeAttr(productHref) + '">' + btnLabel + '</a>'
+                    ? '<a class="btn btn-primary cp-product-btn" href="' + escapeAttr(productHref) + '">' + btnLabel + '</a>'
                     // Recommendations → the quick "ask for a quote" modal (exploratory; no method needed).
-                    : '<button class="cp-product-btn" type="button" data-kind="' + escapeAttr(kind) + '"' +
+                    : '<button class="btn btn-primary cp-product-btn" type="button" data-kind="' + escapeAttr(kind) + '"' +
                         ' data-style="' + escapeAttr(p.style) + '" data-color="' + escapeAttr(p.color || '') + '" data-image="' + escapeAttr(p.image || '') + '"' +
                         ' data-title="' + escapeAttr(title) + '" data-design="' + escapeAttr(String(p.designNumber || '')) + '" data-designname="' + escapeAttr(p.designName || '') + '"' +
                         " data-colors='" + escapeAttr(orderedColorsJson) + "' data-sizes='" + escapeAttr(sizesJson) + "'>" + btnLabel + '</button>') +
@@ -1453,7 +1461,7 @@
         grid.innerHTML = SIZE_ORDER.map(function (sz) {
             var v = Number(sizes && sizes[sz]) || 0;
             return '<label class="cp-size-cell"><span class="cp-size-name">' + sz + '</span>' +
-                '<input type="number" min="0" inputmode="numeric" class="cp-size-input" data-size="' + sz + '" value="' + (v > 0 ? v : '') + '" placeholder="0"></label>';
+                '<input type="number" min="0" inputmode="numeric" class="field-input cp-size-input" data-size="' + sz + '" value="' + (v > 0 ? v : '') + '" placeholder="0"></label>';
         }).join('');
         grid.querySelectorAll('.cp-size-input').forEach(function (i) { i.addEventListener('input', updateSizeTotal); });
         updateSizeTotal();
@@ -1517,7 +1525,10 @@
         opts.push('<option value="NEW">New logo — I\'ll send it</option>');
         sel.innerHTML = opts.join('');
     }
+    var generalRequestGeneration = 0;
     function openGenModal(type, prefill) {
+        generalRequestGeneration++;
+        var sendButton = byId('cp-gen-submit'); sendButton.disabled = false; sendButton.textContent = 'Send to my rep';
         var cfg = GEN_TYPES[type] || GEN_TYPES.quote;
         prefill = prefill || {};
         byId('cp-gen-type').value = GEN_TYPES[type] ? type : 'quote';
@@ -1542,17 +1553,21 @@
     }
     function closeGenModal() { var m = byId('cp-gen-modal'); if (m && !m.hidden) { m.hidden = true; restoreFocus(); } }
     function postRequest(payload, btn, idleLabel, okMsg, errEl, onOk) {
+        if (btn.disabled) return;
+        var generation = btn.id === 'cp-gen-submit' ? generalRequestGeneration : null;
+        function isCurrent() { return generation == null || generation === generalRequestGeneration; }
         if (PREVIEW) { showToast('Staff preview — the customer would send this to their rep.'); if (onOk) onOk(); return; }
         btn.disabled = true; btn.textContent = 'Sending…';
         fetch('/api/portal/request', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
             .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
             .then(function (x) {
+                if (!isCurrent()) { showToast(x.ok && x.j.ok ? okMsg.replace('{rep}', x.j.rep ? escapeHtml(x.j.rep) : 'Your rep') : 'An earlier request could not be sent. Please try again or call ' + PHONE_TXT + '.'); return; }
                 btn.disabled = false; btn.textContent = idleLabel;
                 if (!x.ok || !x.j.ok) { errEl.textContent = (x.j && x.j.error) || 'Could not send. Please try again.'; return; }
                 if (onOk) onOk();
                 showToast(okMsg.replace('{rep}', x.j.rep ? escapeHtml(x.j.rep) : 'Your rep'));
             })
-            .catch(function () { btn.disabled = false; btn.textContent = idleLabel; errEl.textContent = 'Could not send. Please try again or call ' + PHONE_TXT + '.'; });
+            .catch(function () { if (!isCurrent()) { showToast('An earlier request could not be sent. Please try again or call ' + PHONE_TXT + '.'); return; } btn.disabled = false; btn.textContent = idleLabel; errEl.textContent = 'Could not send. Please try again or call ' + PHONE_TXT + '.'; });
     }
     function submitGen() {
         var type = byId('cp-gen-type').value, cfg = GEN_TYPES[type] || GEN_TYPES.quote;
@@ -1729,9 +1744,9 @@
             var d = daysUntil(q.expires);
             var expires = q.expires ? escapeHtml(formatDate(q.expires)) + (q.status === 'Open' && d != null && d >= 0 && d <= 7 ? ' <span class="cp-due-badge">' + (d === 0 ? 'Today' : d + 'd left') + '</span>' : '') : '—';
             var track = q.tracking && q.tracking.number
-                ? (function () { var url = q.tracking.url || trackingLink(q.tracking.carrier, q.tracking.number); return url ? '<a class="cp-btn cp-btn--ghost cp-btn--xs" href="' + escapeAttr(url) + '" target="_blank" rel="noopener">' + icon('truck') + 'Track</a>' : ''; })()
+                ? (function () { var url = q.tracking.url || trackingLink(q.tracking.carrier, q.tracking.number); return url ? '<a class="btn cp-btn cp-btn--ghost cp-btn--xs" href="' + escapeAttr(url) + '" target="_blank" rel="noopener">' + icon('truck') + 'Track</a>' : ''; })()
                 : '';
-            var view = q.viewUrl ? '<a class="cp-btn cp-btn--soft cp-btn--xs" href="' + escapeAttr(q.viewUrl) + '">View quote</a>' : '';
+            var view = q.viewUrl ? '<a class="btn cp-btn cp-btn--soft cp-btn--xs" href="' + escapeAttr(q.viewUrl) + '">View quote</a>' : '';
             return '<tr>' +
                 '<td>' + (q.viewUrl ? '<a class="cp-link" href="' + escapeAttr(q.viewUrl) + '">' + escapeHtml(q.quoteId) + '</a>' : '<span class="cp-link">' + escapeHtml(q.quoteId) + '</span>') + (q.projectName ? '<span class="cp-cell-sub">' + escapeHtml(q.projectName) + '</span>' : '') + '</td>' +
                 '<td>' + escapeHtml(formatDate(q.created) || '—') + '</td>' +

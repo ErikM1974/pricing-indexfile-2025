@@ -1,0 +1,160 @@
+{
+  "name": "product-failed-429",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Product unavailable | Northwest Custom Apparel",
+      "text": "Northwest Custom Apparel Customer portal ← Back to your account ⚠ Something went wrong We couldn’t load this product. It may not be on file — call us at (253) 922-5793. Retry Northwest Custom Apparel · (253) 922-5793 · sales@nwcustomapparel.com",
+      "ids": {
+        "pp-back-top": "← Back to your account",
+        "pp-error-title": "Something went wrong",
+        "pp-error-message": "We couldn’t load this product. It may not be on file — call us at (253) 922-5793.",
+        "pp-error-retry": "Retry",
+        "cp-toast": ""
+      },
+      "links": [
+        {
+          "href": "/portal",
+          "text": "← Back to your account",
+          "label": null
+        }
+      ],
+      "rows": [],
+      "fields": [],
+      "engineCalls": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              "#pp-error-message"
+            ],
+            [
+              ".cp-footer"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Product unavailable | Northwest Custom Apparel",
+      "text": "Northwest Custom Apparel Customer portal ← Back to your account ⚠ Something went wrong We couldn’t load this product. It may not be on file — call us at (253) 922-5793. Retry Northwest Custom Apparel · (253) 922-5793 · sales@nwcustomapparel.com",
+      "ids": {
+        "pp-back-top": "← Back to your account",
+        "pp-error-title": "Something went wrong",
+        "pp-error-message": "We couldn’t load this product. It may not be on file — call us at (253) 922-5793.",
+        "pp-error-retry": "Retry",
+        "cp-toast": ""
+      },
+      "links": [
+        {
+          "href": "/portal",
+          "text": "← Back to your account",
+          "label": null
+        }
+      ],
+      "rows": [],
+      "fields": [],
+      "engineCalls": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              "#pp-error-message"
+            ],
+            [
+              ".cp-footer"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Product unavailable | Northwest Custom Apparel",
+      "text": "Northwest Custom Apparel ← Account ⚠ Something went wrong We couldn’t load this product. It may not be on file — call us at (253) 922-5793. Retry Northwest Custom Apparel · (253) 922-5793 · sales@nwcustomapparel.com",
+      "ids": {
+        "pp-back-top": "← Account",
+        "pp-error-title": "Something went wrong",
+        "pp-error-message": "We couldn’t load this product. It may not be on file — call us at (253) 922-5793.",
+        "pp-error-retry": "Retry",
+        "cp-toast": ""
+      },
+      "links": [
+        {
+          "href": "/portal",
+          "text": "← Account",
+          "label": null
+        }
+      ],
+      "rows": [],
+      "fields": [],
+      "engineCalls": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              "#pp-error-message"
+            ],
+            [
+              ".cp-footer"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Product unavailable | Northwest Custom Apparel",
+      "text": "Northwest Custom Apparel ← Account ⚠ Something went wrong We couldn’t load this product. It may not be on file — call us at (253) 922-5793. Retry Northwest Custom Apparel · (253) 922-5793 · sales@nwcustomapparel.com",
+      "ids": {
+        "pp-back-top": "← Account",
+        "pp-error-title": "Something went wrong",
+        "pp-error-message": "We couldn’t load this product. It may not be on file — call us at (253) 922-5793.",
+        "pp-error-retry": "Retry",
+        "cp-toast": ""
+      },
+      "links": [
+        {
+          "href": "/portal",
+          "text": "← Account",
+          "label": null
+        }
+      ],
+      "rows": [],
+      "fields": [],
+      "engineCalls": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              "#pp-error-message"
+            ],
+            [
+              ".cp-footer"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "reads": [
+    {
+      "path": "/api/portal/product/PC54",
+      "query": ""
+    }
+  ],
+  "actions": []
+}

@@ -1,5 +1,26 @@
 # Handover follow-ups — 2026-09-07
 
+## RELEASE CANDIDATE — v2026.09.10.11 Customer Account and Product
+
+Reviewed pair bba4306d is integrated with live44ccf020 atda6c23738011d4f6d2e55aaf57dd3112d9083b1c. All241 unit suites/5,640 tests (four existing skips),88 DOM,four accessibility unit and84 quote parity checks pass;423-asset build, lint/types,485routes/24modules and boot pass. Full CSS and live pricing browser checks run on the unchanged primary integration checkout. This release checkout adds only nine cache references, their reversible mappings and these notes; all six application CSS/JS assets remain identical. Exact-source CI can run alongside local checks; both must pass before deployment.
+
+54 focused browser cases plus final layout/paper checks;49 original browser contracts,17 source hashes/106 mappings and23 reviewed current paper pages. Nine important flags removed, canonical shared controls and eight demonstrated workflow repairs. Candidate189/225,36pending; live .10/2102 remains187/225,38pending until verified rollout. No real customer requests, emails, orders, rewards or device printing.
+
+> Current: Customer Account/Product is reviewed at bba4306d (189/225 candidate,36pending); live .10/2102/44ccf020 is verified at187/225. The live baseline is now merged, including shipped status/monogram test corrections. Earlier release-candidate entries below are historical. Next: complete full application and exact-source CI gates, then deploy and verify the account pair.
+
+## NEXT — Customer Account and Product original source capture
+
+Isolated codex/customer-account-pages begins at73cc615a. The reviewed status pair is separately integrated on primary develop atf03b9117 with corrected full gates running; none of this next-family work belongs in its release. Live .9/2101 is185/225; reviewed candidate187/225,38 pending.
+
+- [x] Freeze both original HTML files, three page CSS owners, controllers, shared reorder list and complete local pricing dependency graph before application edits.
+- [ ] Capture original account overview/products/orders/invoices/logos/quotes/help, search/filter, order drawer/tracking/statement, proof/download links, rewards and every successful request payload using synthetic data.
+- [ ] Capture original product colors/gallery/availability/size history, decoration choice and minimum, reorder list storage/single/batch writes, upgrade embroidery engine ladder and setup fee. Keep shared pricing engines byte-identical and compare all quantities, totals and dates.
+- [ ] Review originals at1440/768/390/320 and all print pages, signed-out/staff-preview, empty/error/retry/partial/delayed states. Intercept all writes and unknown API reads; no live emails, reward requests, orders or logout.
+- [ ] Reuse shared typography/buttons/fields/dialogs and scope page layout after original review. Preserve independent account view loading and customer-only identity. Demonstrate stale responses, duplicate requests, keyboard/focus and storage failures before any repairs.
+- [ ] Current visual/axe/keyboard/paper, original-value and pricing evidence before migration credit; full release gates before deploy.
+
+Source capture is not migration credit. Do not overwrite immutable originals or rerun consumed helpers; no .env copying or recursive deletion of the node_modules junction.
+
 ## RELEASE CANDIDATE — v2026.09.10.10 Order Status and Job Portal
 
 Reviewed pair a878bceb is integrated at73cc615a with the legacy guard correction atf03b9117f3213b033795fbd4f8346559ae0ca14c. All240 unit suites/5,619 tests,88 DOM,four accessibility unit and84 quote parity checks pass; build/lint/types/routes/boot passed. The full1,150-case CSS browser sweep and remaining live pricing/browser checks are still running on that application SHA. This candidate changes only four HTML cache references, their reversible mappings and release notes; all four application CSS/JS assets remain identical. The exact candidate CI can run in parallel, but deployment requires both the complete local gate record and successful actual CSS/live-pricing CI steps.
@@ -826,3 +847,18 @@ Two original Mission Control browser scenarios pass: all six tabs at four widths
 No AE application/CSS edits yet. Capture original invoice/inbound/box-label paper workflows, expanded lists/drawers, rep-switch and degraded states before redesign. Test fixtures adapt the existing local render harness: customer/contact labels and contact details are replaced; representative amounts and policy structures remain. They validate UI behavior, not live route/auth availability. Unknown APIs and all unconfigured writes fail closed across the whole browser context.
 
 Reviewed application draft remains287cf762 (Drain-Pro, production shifts, payroll); live remains.2/2098/df7bebed,170/225 and55 pending. Three staff pages remain; this baseline gets no migration credit. GitHub last confirmed624f5188; newer local commits still need backup when intermittent TLS failures clear. Backend unchanged. Continue from the newest staff-workspaces baseline commit and preserve the exact reviewed application source when integrating later.
+
+## Customer Account/Product originals reviewed — 2026-09-10
+
+41 browser cases passed,49 immutable contracts at1440/768/390/320,17 original source hashes and19 source/function guards. All15 pages from10 original PDFs visually reviewed (six blank account views share an identical rendered image). Original statement preserves1048.20total/698.80current/349.40pastdue; product long history28 rows and complete upgrade price matrix retained. Baseline defects: widespread muted-text contrast failures and account320px overflow; ordinary account printing is blank. No application changes yet. Next: canonical controls/Public Sans/scoped token layouts, responsive and paper fixes, then demonstrate and cover delayed/failure/focus/reorder-state behavior. Artifact evidence: customer-account-original-review.json.
+
+## Customer Account/Product current review — 2026-09-10
+
+Status .10/2102/44ccf020 is verified live with24 checks and all source/main/develop CI green. Account pair remains under review on its isolated branch:49 immutable originals/17source hashes, shared controls/scoped layout, seven original workflow defects reproduced and repaired,53 current browser checks running. Complete all paper review and integration/full gates before any migration credit or deploy. Artifact pointer: active-css-resume-state.json.
+
+## Customer Account/Product pair reviewed — 2026-09-10
+
+54 browser cases plus final paper/spacing checks passed;49 immutable originals,17 source hashes/97 maps,19 guards and23 current paper pages reviewed. Eight demonstrated workflow fixes and9 important flags removed. Candidate189/225,36pending; live .10/2102 remains187/225,38pending until full checks/CI/deploy verification. See customer-account-reviewed-record.json. Merge live44ccf020 before full validation; no real business actions sent.
+
+### Account release test timing correction — 2026-09-10
+The full local1,204-case CSS sweep completed1,203 passes and one confirmation-toast wait timeout under three-worker load. The real page retains the toast4.2 seconds; the test allowed only5 seconds including scheduling. No application or fixture source changed. The test now allows10 seconds but still requires the real timer to dismiss the toast. Five repeated failing-case runs passed under three-worker load; all affected account cases and the remaining local browser/pricing suites must pass before release. Exact-source CI must be rerun on this test correction; the earlier9eb6e2a2 run is not final-source evidence.

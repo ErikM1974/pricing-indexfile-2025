@@ -1,0 +1,1390 @@
+{
+  "name": "account-normal-products",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Cedar Example Construction · Your products | NWCA",
+      "text": "Skip to content Northwest Custom Apparel CUSTOMER PORTAL Overview Your products Orders Invoices 1 Logos & proofs 1 Quotes 1 Account & help RE YOUR REP River Example rep@example.test (253) 922-5793 Browse catalog Sign out Cedar Example Construction Customer #7401 Browse catalog Request a quote Your products 8 Everything you’ve ordered in the last three years. Pick one to re-order — your rep sends back a fresh quote. Most ordered Most recent Most colors Sample Team Garment 8 2 colors ordered · Design #44012 You’ve ordered 43 Last ordered Sep 9, 2026 Re-order Sample Team Garment 7 2 colors ordered · Design #44012 You’ve ordered 42 Last ordered Sep 9, 2026 Re-order Sample Team Garment 6 2 colors ordered · Design #44012 You’ve ordered 41 Last ordered Sep 9, 2026 Re-order Sample Team Garment 5 2 colors ordered · Design #44012 You’ve ordered 40 Last ordered Sep 9, 2026 Re-order Sample Team Garment 4 2 colors ordered · Design #44012 You’ve ordered 39 Last ordered Sep 9, 2026 Re-order Sample Team Garment 3 2 colors ordered · Design #44012 You’ve ordered 38 Last ordered Sep 9, 2026 Re-order Sample Team Garment 2 2 colors ordered · Design #44012 You’ve ordered 37 Last ordered Sep 9, 2026 Re-order Core Cotton Tee 2 colors ordered · Design #44012 You’ve ordered 36 Last ordered Sep 9, 2026 Re-order Northwest Custom Apparel · (253) 922-5793 · sales@nwcustomapparel.com",
+      "ids": {
+        "cp-side-logo": "",
+        "cp-nav-overview": "Overview",
+        "cp-nav-products": "Your products",
+        "cp-nav-orders": "Orders",
+        "cp-nav-badge-invoices": "1",
+        "cp-nav-badge-logos": "1",
+        "cp-nav-badge-quotes": "1",
+        "cp-nav-account": "Account & help",
+        "cp-rep-avatar": "RE",
+        "cp-rep-name": "River Example",
+        "cp-rep-email": "rep@example.test",
+        "cp-rep-phone": "(253) 922-5793",
+        "cp-catalog-link": "Browse catalog",
+        "cp-signout-link": "Sign out",
+        "cp-topbar-company": "Cedar Example Construction",
+        "cp-topbar-sub": "Customer #7401",
+        "cp-global-search": "",
+        "cp-topbar-catalog": "Browse catalog",
+        "cp-btn-quote": "Request a quote",
+        "cp-products-count": "8",
+        "cp-products-search": "",
+        "cp-products-sort": "Most ordered Most recent Most colors",
+        "cp-products-grid": "Sample Team Garment 8 2 colors ordered · Design #44012 You’ve ordered 43 Last ordered Sep 9, 2026 Re-order Sample Team Garment 7 2 colors ordered · Design #44012 You’ve ordered 42 Last ordered Sep 9, 2026 Re-order Sample Team Garment 6 2 colors ordered · Design #44012 You’ve ordered 41 Last ordered Sep 9, 2026 Re-order Sample Team Garment 5 2 colors ordered · Design #44012 You’ve ordered 40 Last ordered Sep 9, 2026 Re-order Sample Team Garment 4 2 colors ordered · Design #44012 You’ve ordered 39 Last ordered Sep 9, 2026 Re-order Sample Team Garment 3 2 colors ordered · Design #44012 You’ve ordered 38 Last ordered Sep 9, 2026 Re-order Sample Team Garment 2 2 colors ordered · Design #44012 You’ve ordered 37 Last ordered Sep 9, 2026 Re-order Core Cotton Tee 2 colors ordered · Design #44012 You’ve ordered 36 Last ordered Sep 9, 2026 Re-order",
+        "cp-toast": ""
+      },
+      "links": [
+        {
+          "href": "#cp-main",
+          "text": "Skip to content",
+          "label": null
+        },
+        {
+          "href": "#tab=overview",
+          "text": "Overview",
+          "label": null
+        },
+        {
+          "href": "#tab=products",
+          "text": "Your products",
+          "label": null
+        },
+        {
+          "href": "#tab=orders",
+          "text": "Orders",
+          "label": null
+        },
+        {
+          "href": "#tab=invoices",
+          "text": "Invoices 1",
+          "label": null
+        },
+        {
+          "href": "#tab=logos",
+          "text": "Logos & proofs 1",
+          "label": null
+        },
+        {
+          "href": "#tab=quotes",
+          "text": "Quotes 1",
+          "label": null
+        },
+        {
+          "href": "#tab=account",
+          "text": "Account & help",
+          "label": null
+        },
+        {
+          "href": "mailto:rep@example.test",
+          "text": "rep@example.test",
+          "label": null
+        },
+        {
+          "href": "tel:+12539225793",
+          "text": "(253) 922-5793",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Browse catalog",
+          "label": null
+        },
+        {
+          "href": "/auth/customer/logout",
+          "text": "Sign out",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Browse catalog",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE8",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE8",
+          "text": "Sample Team Garment 8",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE8",
+          "text": "Re-order",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE7",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE7",
+          "text": "Sample Team Garment 7",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE7",
+          "text": "Re-order",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE6",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE6",
+          "text": "Sample Team Garment 6",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE6",
+          "text": "Re-order",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE5",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE5",
+          "text": "Sample Team Garment 5",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE5",
+          "text": "Re-order",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE4",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE4",
+          "text": "Sample Team Garment 4",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE4",
+          "text": "Re-order",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE3",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE3",
+          "text": "Sample Team Garment 3",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE3",
+          "text": "Re-order",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE2",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE2",
+          "text": "Sample Team Garment 2",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE2",
+          "text": "Re-order",
+          "label": null
+        },
+        {
+          "href": "/portal/product/PC54",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/portal/product/PC54",
+          "text": "Core Cotton Tee",
+          "label": null
+        },
+        {
+          "href": "/portal/product/PC54",
+          "text": "Re-order",
+          "label": null
+        },
+        {
+          "href": "tel:+12539225793",
+          "text": "(253) 922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        }
+      ],
+      "rows": [],
+      "fields": [
+        {
+          "id": "cp-global-search",
+          "value": ""
+        },
+        {
+          "id": "cp-products-search",
+          "value": ""
+        },
+        {
+          "id": "cp-products-sort",
+          "value": "ordered"
+        }
+      ],
+      "engineCalls": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              "#cp-topbar-sub"
+            ],
+            [
+              ".cp-product-card:nth-child(1) > .cp-product-body > .cp-product-meta"
+            ],
+            [
+              ".cp-product-card:nth-child(2) > .cp-product-body > .cp-product-meta"
+            ],
+            [
+              ".cp-product-card:nth-child(3) > .cp-product-body > .cp-product-meta"
+            ],
+            [
+              ".cp-product-card:nth-child(4) > .cp-product-body > .cp-product-meta"
+            ],
+            [
+              ".cp-product-card:nth-child(5) > .cp-product-body > .cp-product-meta"
+            ],
+            [
+              ".cp-product-card:nth-child(6) > .cp-product-body > .cp-product-meta"
+            ],
+            [
+              ".cp-product-card:nth-child(7) > .cp-product-body > .cp-product-meta"
+            ],
+            [
+              ".cp-product-card:nth-child(8) > .cp-product-body > .cp-product-meta"
+            ],
+            [
+              "footer"
+            ]
+          ]
+        },
+        {
+          "id": "link-name",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".cp-product-imglink[href$=\"STYLE8\"]"
+            ],
+            [
+              ".cp-product-imglink[href$=\"STYLE7\"]"
+            ],
+            [
+              ".cp-product-imglink[href$=\"STYLE6\"]"
+            ],
+            [
+              ".cp-product-imglink[href$=\"STYLE5\"]"
+            ],
+            [
+              ".cp-product-imglink[href$=\"STYLE4\"]"
+            ],
+            [
+              ".cp-product-imglink[href$=\"STYLE3\"]"
+            ],
+            [
+              ".cp-product-imglink[href$=\"STYLE2\"]"
+            ],
+            [
+              ".cp-product-imglink[href=\"/portal/product/PC54\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Cedar Example Construction · Your products | NWCA",
+      "text": "Skip to content Northwest Custom Apparel CUSTOMER PORTAL Overview Your products Orders Invoices 1 Logos & proofs 1 Quotes 1 Account & help RE YOUR REP River Example rep@example.test (253) 922-5793 Browse catalog Sign out Cedar Example Construction Customer #7401 Request a quote Your products 8 Everything you’ve ordered in the last three years. Pick one to re-order — your rep sends back a fresh quote. Most ordered Most recent Most colors Sample Team Garment 8 2 colors ordered · Design #44012 You’ve ordered 43 Last ordered Sep 9, 2026 Re-order Sample Team Garment 7 2 colors ordered · Design #44012 You’ve ordered 42 Last ordered Sep 9, 2026 Re-order Sample Team Garment 6 2 colors ordered · Design #44012 You’ve ordered 41 Last ordered Sep 9, 2026 Re-order Sample Team Garment 5 2 colors ordered · Design #44012 You’ve ordered 40 Last ordered Sep 9, 2026 Re-order Sample Team Garment 4 2 colors ordered · Design #44012 You’ve ordered 39 Last ordered Sep 9, 2026 Re-order Sample Team Garment 3 2 colors ordered · Design #44012 You’ve ordered 38 Last ordered Sep 9, 2026 Re-order Sample Team Garment 2 2 colors ordered · Design #44012 You’ve ordered 37 Last ordered Sep 9, 2026 Re-order Core Cotton Tee 2 colors ordered · Design #44012 You’ve ordered 36 Last ordered Sep 9, 2026 Re-order Northwest Custom Apparel · (253) 922-5793 · sales@nwcustomapparel.com Home Products Orders Invoices 1 Logos 1",
+      "ids": {
+        "cp-side-logo": "",
+        "cp-nav-overview": "Overview",
+        "cp-nav-products": "Your products",
+        "cp-nav-orders": "Orders",
+        "cp-nav-badge-invoices": "1",
+        "cp-nav-badge-logos": "1",
+        "cp-nav-badge-quotes": "1",
+        "cp-nav-account": "Account & help",
+        "cp-rep-avatar": "RE",
+        "cp-rep-name": "River Example",
+        "cp-rep-email": "rep@example.test",
+        "cp-rep-phone": "(253) 922-5793",
+        "cp-catalog-link": "Browse catalog",
+        "cp-signout-link": "Sign out",
+        "cp-menu-btn": "",
+        "cp-topbar-company": "Cedar Example Construction",
+        "cp-topbar-sub": "Customer #7401",
+        "cp-global-search": "",
+        "cp-btn-quote": "Request a quote",
+        "cp-products-count": "8",
+        "cp-products-search": "",
+        "cp-products-sort": "Most ordered Most recent Most colors",
+        "cp-products-grid": "Sample Team Garment 8 2 colors ordered · Design #44012 You’ve ordered 43 Last ordered Sep 9, 2026 Re-order Sample Team Garment 7 2 colors ordered · Design #44012 You’ve ordered 42 Last ordered Sep 9, 2026 Re-order Sample Team Garment 6 2 colors ordered · Design #44012 You’ve ordered 41 Last ordered Sep 9, 2026 Re-order Sample Team Garment 5 2 colors ordered · Design #44012 You’ve ordered 40 Last ordered Sep 9, 2026 Re-order Sample Team Garment 4 2 colors ordered · Design #44012 You’ve ordered 39 Last ordered Sep 9, 2026 Re-order Sample Team Garment 3 2 colors ordered · Design #44012 You’ve ordered 38 Last ordered Sep 9, 2026 Re-order Sample Team Garment 2 2 colors ordered · Design #44012 You’ve ordered 37 Last ordered Sep 9, 2026 Re-order Core Cotton Tee 2 colors ordered · Design #44012 You’ve ordered 36 Last ordered Sep 9, 2026 Re-order",
+        "cp-bnav-badge-invoices": "1",
+        "cp-bnav-badge-logos": "1",
+        "cp-toast": ""
+      },
+      "links": [
+        {
+          "href": "#cp-main",
+          "text": "Skip to content",
+          "label": null
+        },
+        {
+          "href": "#tab=overview",
+          "text": "Overview",
+          "label": null
+        },
+        {
+          "href": "#tab=products",
+          "text": "Your products",
+          "label": null
+        },
+        {
+          "href": "#tab=orders",
+          "text": "Orders",
+          "label": null
+        },
+        {
+          "href": "#tab=invoices",
+          "text": "Invoices 1",
+          "label": null
+        },
+        {
+          "href": "#tab=logos",
+          "text": "Logos & proofs 1",
+          "label": null
+        },
+        {
+          "href": "#tab=quotes",
+          "text": "Quotes 1",
+          "label": null
+        },
+        {
+          "href": "#tab=account",
+          "text": "Account & help",
+          "label": null
+        },
+        {
+          "href": "mailto:rep@example.test",
+          "text": "rep@example.test",
+          "label": null
+        },
+        {
+          "href": "tel:+12539225793",
+          "text": "(253) 922-5793",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Browse catalog",
+          "label": null
+        },
+        {
+          "href": "/auth/customer/logout",
+          "text": "Sign out",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE8",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE8",
+          "text": "Sample Team Garment 8",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE8",
+          "text": "Re-order",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE7",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE7",
+          "text": "Sample Team Garment 7",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE7",
+          "text": "Re-order",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE6",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE6",
+          "text": "Sample Team Garment 6",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE6",
+          "text": "Re-order",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE5",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE5",
+          "text": "Sample Team Garment 5",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE5",
+          "text": "Re-order",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE4",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE4",
+          "text": "Sample Team Garment 4",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE4",
+          "text": "Re-order",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE3",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE3",
+          "text": "Sample Team Garment 3",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE3",
+          "text": "Re-order",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE2",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE2",
+          "text": "Sample Team Garment 2",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE2",
+          "text": "Re-order",
+          "label": null
+        },
+        {
+          "href": "/portal/product/PC54",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/portal/product/PC54",
+          "text": "Core Cotton Tee",
+          "label": null
+        },
+        {
+          "href": "/portal/product/PC54",
+          "text": "Re-order",
+          "label": null
+        },
+        {
+          "href": "tel:+12539225793",
+          "text": "(253) 922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "#tab=overview",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "#tab=products",
+          "text": "Products",
+          "label": null
+        },
+        {
+          "href": "#tab=orders",
+          "text": "Orders",
+          "label": null
+        },
+        {
+          "href": "#tab=invoices",
+          "text": "Invoices 1",
+          "label": null
+        },
+        {
+          "href": "#tab=logos",
+          "text": "Logos 1",
+          "label": null
+        }
+      ],
+      "rows": [],
+      "fields": [
+        {
+          "id": "cp-global-search",
+          "value": ""
+        },
+        {
+          "id": "cp-products-search",
+          "value": ""
+        },
+        {
+          "id": "cp-products-sort",
+          "value": "ordered"
+        }
+      ],
+      "engineCalls": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              "#cp-topbar-sub"
+            ],
+            [
+              ".cp-product-card:nth-child(1) > .cp-product-body > .cp-product-meta"
+            ],
+            [
+              ".cp-product-card:nth-child(2) > .cp-product-body > .cp-product-meta"
+            ],
+            [
+              ".cp-product-card:nth-child(3) > .cp-product-body > .cp-product-meta"
+            ],
+            [
+              ".cp-product-card:nth-child(4) > .cp-product-body > .cp-product-meta"
+            ],
+            [
+              ".cp-product-card:nth-child(5) > .cp-product-body > .cp-product-meta"
+            ],
+            [
+              ".cp-product-card:nth-child(6) > .cp-product-body > .cp-product-meta"
+            ],
+            [
+              ".cp-product-card:nth-child(7) > .cp-product-body > .cp-product-meta"
+            ],
+            [
+              ".cp-product-card:nth-child(8) > .cp-product-body > .cp-product-meta"
+            ],
+            [
+              "footer"
+            ],
+            [
+              "#cp-bottomnav > a[href$=\"#tab=overview\"][data-tab=\"overview\"]"
+            ],
+            [
+              "#cp-bottomnav > a[href$=\"#tab=orders\"][data-tab=\"orders\"]"
+            ],
+            [
+              "#cp-bottomnav > a[href$=\"#tab=logos\"][data-tab=\"logos\"]"
+            ]
+          ]
+        },
+        {
+          "id": "link-name",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".cp-product-imglink[href$=\"STYLE8\"]"
+            ],
+            [
+              ".cp-product-imglink[href$=\"STYLE7\"]"
+            ],
+            [
+              ".cp-product-imglink[href$=\"STYLE6\"]"
+            ],
+            [
+              ".cp-product-imglink[href$=\"STYLE5\"]"
+            ],
+            [
+              ".cp-product-imglink[href$=\"STYLE4\"]"
+            ],
+            [
+              ".cp-product-imglink[href$=\"STYLE3\"]"
+            ],
+            [
+              ".cp-product-imglink[href$=\"STYLE2\"]"
+            ],
+            [
+              ".cp-product-imglink[href=\"/portal/product/PC54\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Cedar Example Construction · Your products | NWCA",
+      "text": "Skip to content Northwest Custom Apparel CUSTOMER PORTAL Overview Your products Orders Invoices 1 Logos & proofs 1 Quotes 1 Account & help RE YOUR REP River Example rep@example.test (253) 922-5793 Browse catalog Sign out Cedar Example Construction Your products 8 Everything you’ve ordered in the last three years. Pick one to re-order — your rep sends back a fresh quote. Most ordered Most recent Most colors Sample Team Garment 8 2 colors ordered · Design #44012 You’ve ordered 43 Last ordered Sep 9, 2026 Re-order Sample Team Garment 7 2 colors ordered · Design #44012 You’ve ordered 42 Last ordered Sep 9, 2026 Re-order Sample Team Garment 6 2 colors ordered · Design #44012 You’ve ordered 41 Last ordered Sep 9, 2026 Re-order Sample Team Garment 5 2 colors ordered · Design #44012 You’ve ordered 40 Last ordered Sep 9, 2026 Re-order Sample Team Garment 4 2 colors ordered · Design #44012 You’ve ordered 39 Last ordered Sep 9, 2026 Re-order Sample Team Garment 3 2 colors ordered · Design #44012 You’ve ordered 38 Last ordered Sep 9, 2026 Re-order Sample Team Garment 2 2 colors ordered · Design #44012 You’ve ordered 37 Last ordered Sep 9, 2026 Re-order Core Cotton Tee 2 colors ordered · Design #44012 You’ve ordered 36 Last ordered Sep 9, 2026 Re-order Northwest Custom Apparel · (253) 922-5793 · sales@nwcustomapparel.com Home Products Orders Invoices 1 Logos 1",
+      "ids": {
+        "cp-side-logo": "",
+        "cp-nav-overview": "Overview",
+        "cp-nav-products": "Your products",
+        "cp-nav-orders": "Orders",
+        "cp-nav-badge-invoices": "1",
+        "cp-nav-badge-logos": "1",
+        "cp-nav-badge-quotes": "1",
+        "cp-nav-account": "Account & help",
+        "cp-rep-avatar": "RE",
+        "cp-rep-name": "River Example",
+        "cp-rep-email": "rep@example.test",
+        "cp-rep-phone": "(253) 922-5793",
+        "cp-catalog-link": "Browse catalog",
+        "cp-signout-link": "Sign out",
+        "cp-menu-btn": "",
+        "cp-topbar-company": "Cedar Example Construction",
+        "cp-global-search": "",
+        "cp-btn-quote": "",
+        "cp-products-count": "8",
+        "cp-products-search": "",
+        "cp-products-sort": "Most ordered Most recent Most colors",
+        "cp-products-grid": "Sample Team Garment 8 2 colors ordered · Design #44012 You’ve ordered 43 Last ordered Sep 9, 2026 Re-order Sample Team Garment 7 2 colors ordered · Design #44012 You’ve ordered 42 Last ordered Sep 9, 2026 Re-order Sample Team Garment 6 2 colors ordered · Design #44012 You’ve ordered 41 Last ordered Sep 9, 2026 Re-order Sample Team Garment 5 2 colors ordered · Design #44012 You’ve ordered 40 Last ordered Sep 9, 2026 Re-order Sample Team Garment 4 2 colors ordered · Design #44012 You’ve ordered 39 Last ordered Sep 9, 2026 Re-order Sample Team Garment 3 2 colors ordered · Design #44012 You’ve ordered 38 Last ordered Sep 9, 2026 Re-order Sample Team Garment 2 2 colors ordered · Design #44012 You’ve ordered 37 Last ordered Sep 9, 2026 Re-order Core Cotton Tee 2 colors ordered · Design #44012 You’ve ordered 36 Last ordered Sep 9, 2026 Re-order",
+        "cp-bnav-badge-invoices": "1",
+        "cp-bnav-badge-logos": "1",
+        "cp-toast": ""
+      },
+      "links": [
+        {
+          "href": "#cp-main",
+          "text": "Skip to content",
+          "label": null
+        },
+        {
+          "href": "#tab=overview",
+          "text": "Overview",
+          "label": null
+        },
+        {
+          "href": "#tab=products",
+          "text": "Your products",
+          "label": null
+        },
+        {
+          "href": "#tab=orders",
+          "text": "Orders",
+          "label": null
+        },
+        {
+          "href": "#tab=invoices",
+          "text": "Invoices 1",
+          "label": null
+        },
+        {
+          "href": "#tab=logos",
+          "text": "Logos & proofs 1",
+          "label": null
+        },
+        {
+          "href": "#tab=quotes",
+          "text": "Quotes 1",
+          "label": null
+        },
+        {
+          "href": "#tab=account",
+          "text": "Account & help",
+          "label": null
+        },
+        {
+          "href": "mailto:rep@example.test",
+          "text": "rep@example.test",
+          "label": null
+        },
+        {
+          "href": "tel:+12539225793",
+          "text": "(253) 922-5793",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Browse catalog",
+          "label": null
+        },
+        {
+          "href": "/auth/customer/logout",
+          "text": "Sign out",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE8",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE8",
+          "text": "Sample Team Garment 8",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE8",
+          "text": "Re-order",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE7",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE7",
+          "text": "Sample Team Garment 7",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE7",
+          "text": "Re-order",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE6",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE6",
+          "text": "Sample Team Garment 6",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE6",
+          "text": "Re-order",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE5",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE5",
+          "text": "Sample Team Garment 5",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE5",
+          "text": "Re-order",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE4",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE4",
+          "text": "Sample Team Garment 4",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE4",
+          "text": "Re-order",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE3",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE3",
+          "text": "Sample Team Garment 3",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE3",
+          "text": "Re-order",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE2",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE2",
+          "text": "Sample Team Garment 2",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE2",
+          "text": "Re-order",
+          "label": null
+        },
+        {
+          "href": "/portal/product/PC54",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/portal/product/PC54",
+          "text": "Core Cotton Tee",
+          "label": null
+        },
+        {
+          "href": "/portal/product/PC54",
+          "text": "Re-order",
+          "label": null
+        },
+        {
+          "href": "tel:+12539225793",
+          "text": "(253) 922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "#tab=overview",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "#tab=products",
+          "text": "Products",
+          "label": null
+        },
+        {
+          "href": "#tab=orders",
+          "text": "Orders",
+          "label": null
+        },
+        {
+          "href": "#tab=invoices",
+          "text": "Invoices 1",
+          "label": null
+        },
+        {
+          "href": "#tab=logos",
+          "text": "Logos 1",
+          "label": null
+        }
+      ],
+      "rows": [],
+      "fields": [
+        {
+          "id": "cp-global-search",
+          "value": ""
+        },
+        {
+          "id": "cp-products-search",
+          "value": ""
+        },
+        {
+          "id": "cp-products-sort",
+          "value": "ordered"
+        }
+      ],
+      "engineCalls": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "button-name",
+          "impact": "critical",
+          "nodes": [
+            [
+              "#cp-btn-quote"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".cp-product-card:nth-child(1) > .cp-product-body > .cp-product-meta"
+            ],
+            [
+              ".cp-product-card:nth-child(2) > .cp-product-body > .cp-product-meta"
+            ],
+            [
+              ".cp-product-card:nth-child(3) > .cp-product-body > .cp-product-meta"
+            ],
+            [
+              ".cp-product-card:nth-child(4) > .cp-product-body > .cp-product-meta"
+            ],
+            [
+              ".cp-product-card:nth-child(5) > .cp-product-body > .cp-product-meta"
+            ],
+            [
+              ".cp-product-card:nth-child(6) > .cp-product-body > .cp-product-meta"
+            ],
+            [
+              ".cp-product-card:nth-child(7) > .cp-product-body > .cp-product-meta"
+            ],
+            [
+              ".cp-product-card:nth-child(8) > .cp-product-body > .cp-product-meta"
+            ],
+            [
+              "footer"
+            ],
+            [
+              "#cp-bottomnav > a[href$=\"#tab=overview\"][data-tab=\"overview\"]"
+            ],
+            [
+              "#cp-bottomnav > a[href$=\"#tab=orders\"][data-tab=\"orders\"]"
+            ],
+            [
+              "#cp-bottomnav > a[href$=\"#tab=invoices\"][data-tab=\"invoices\"]"
+            ],
+            [
+              "#cp-bottomnav > a[href$=\"#tab=logos\"][data-tab=\"logos\"]"
+            ]
+          ]
+        },
+        {
+          "id": "link-name",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".cp-product-imglink[href$=\"STYLE8\"]"
+            ],
+            [
+              ".cp-product-imglink[href$=\"STYLE7\"]"
+            ],
+            [
+              ".cp-product-imglink[href$=\"STYLE6\"]"
+            ],
+            [
+              ".cp-product-imglink[href$=\"STYLE5\"]"
+            ],
+            [
+              ".cp-product-imglink[href$=\"STYLE4\"]"
+            ],
+            [
+              ".cp-product-imglink[href$=\"STYLE3\"]"
+            ],
+            [
+              ".cp-product-imglink[href$=\"STYLE2\"]"
+            ],
+            [
+              ".cp-product-imglink[href=\"/portal/product/PC54\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Cedar Example Construction · Your products | NWCA",
+      "text": "Skip to content Northwest Custom Apparel CUSTOMER PORTAL Overview Your products Orders Invoices 1 Logos & proofs 1 Quotes 1 Account & help RE YOUR REP River Example rep@example.test (253) 922-5793 Browse catalog Sign out Cedar Example Construction Your products 8 Everything you’ve ordered in the last three years. Pick one to re-order — your rep sends back a fresh quote. Most ordered Most recent Most colors Sample Team Garment 8 2 colors ordered · Design #44012 You’ve ordered 43 Last ordered Sep 9, 2026 Re-order Sample Team Garment 7 2 colors ordered · Design #44012 You’ve ordered 42 Last ordered Sep 9, 2026 Re-order Sample Team Garment 6 2 colors ordered · Design #44012 You’ve ordered 41 Last ordered Sep 9, 2026 Re-order Sample Team Garment 5 2 colors ordered · Design #44012 You’ve ordered 40 Last ordered Sep 9, 2026 Re-order Sample Team Garment 4 2 colors ordered · Design #44012 You’ve ordered 39 Last ordered Sep 9, 2026 Re-order Sample Team Garment 3 2 colors ordered · Design #44012 You’ve ordered 38 Last ordered Sep 9, 2026 Re-order Sample Team Garment 2 2 colors ordered · Design #44012 You’ve ordered 37 Last ordered Sep 9, 2026 Re-order Core Cotton Tee 2 colors ordered · Design #44012 You’ve ordered 36 Last ordered Sep 9, 2026 Re-order Northwest Custom Apparel · (253) 922-5793 · sales@nwcustomapparel.com Home Products Orders Invoices 1 Logos 1",
+      "ids": {
+        "cp-side-logo": "",
+        "cp-nav-overview": "Overview",
+        "cp-nav-products": "Your products",
+        "cp-nav-orders": "Orders",
+        "cp-nav-badge-invoices": "1",
+        "cp-nav-badge-logos": "1",
+        "cp-nav-badge-quotes": "1",
+        "cp-nav-account": "Account & help",
+        "cp-rep-avatar": "RE",
+        "cp-rep-name": "River Example",
+        "cp-rep-email": "rep@example.test",
+        "cp-rep-phone": "(253) 922-5793",
+        "cp-catalog-link": "Browse catalog",
+        "cp-signout-link": "Sign out",
+        "cp-menu-btn": "",
+        "cp-topbar-company": "Cedar Example Construction",
+        "cp-global-search": "",
+        "cp-btn-quote": "",
+        "cp-products-count": "8",
+        "cp-products-search": "",
+        "cp-products-sort": "Most ordered Most recent Most colors",
+        "cp-products-grid": "Sample Team Garment 8 2 colors ordered · Design #44012 You’ve ordered 43 Last ordered Sep 9, 2026 Re-order Sample Team Garment 7 2 colors ordered · Design #44012 You’ve ordered 42 Last ordered Sep 9, 2026 Re-order Sample Team Garment 6 2 colors ordered · Design #44012 You’ve ordered 41 Last ordered Sep 9, 2026 Re-order Sample Team Garment 5 2 colors ordered · Design #44012 You’ve ordered 40 Last ordered Sep 9, 2026 Re-order Sample Team Garment 4 2 colors ordered · Design #44012 You’ve ordered 39 Last ordered Sep 9, 2026 Re-order Sample Team Garment 3 2 colors ordered · Design #44012 You’ve ordered 38 Last ordered Sep 9, 2026 Re-order Sample Team Garment 2 2 colors ordered · Design #44012 You’ve ordered 37 Last ordered Sep 9, 2026 Re-order Core Cotton Tee 2 colors ordered · Design #44012 You’ve ordered 36 Last ordered Sep 9, 2026 Re-order",
+        "cp-bnav-badge-invoices": "1",
+        "cp-bnav-badge-logos": "1",
+        "cp-toast": ""
+      },
+      "links": [
+        {
+          "href": "#cp-main",
+          "text": "Skip to content",
+          "label": null
+        },
+        {
+          "href": "#tab=overview",
+          "text": "Overview",
+          "label": null
+        },
+        {
+          "href": "#tab=products",
+          "text": "Your products",
+          "label": null
+        },
+        {
+          "href": "#tab=orders",
+          "text": "Orders",
+          "label": null
+        },
+        {
+          "href": "#tab=invoices",
+          "text": "Invoices 1",
+          "label": null
+        },
+        {
+          "href": "#tab=logos",
+          "text": "Logos & proofs 1",
+          "label": null
+        },
+        {
+          "href": "#tab=quotes",
+          "text": "Quotes 1",
+          "label": null
+        },
+        {
+          "href": "#tab=account",
+          "text": "Account & help",
+          "label": null
+        },
+        {
+          "href": "mailto:rep@example.test",
+          "text": "rep@example.test",
+          "label": null
+        },
+        {
+          "href": "tel:+12539225793",
+          "text": "(253) 922-5793",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Browse catalog",
+          "label": null
+        },
+        {
+          "href": "/auth/customer/logout",
+          "text": "Sign out",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE8",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE8",
+          "text": "Sample Team Garment 8",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE8",
+          "text": "Re-order",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE7",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE7",
+          "text": "Sample Team Garment 7",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE7",
+          "text": "Re-order",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE6",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE6",
+          "text": "Sample Team Garment 6",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE6",
+          "text": "Re-order",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE5",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE5",
+          "text": "Sample Team Garment 5",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE5",
+          "text": "Re-order",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE4",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE4",
+          "text": "Sample Team Garment 4",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE4",
+          "text": "Re-order",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE3",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE3",
+          "text": "Sample Team Garment 3",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE3",
+          "text": "Re-order",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE2",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE2",
+          "text": "Sample Team Garment 2",
+          "label": null
+        },
+        {
+          "href": "/portal/product/STYLE2",
+          "text": "Re-order",
+          "label": null
+        },
+        {
+          "href": "/portal/product/PC54",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/portal/product/PC54",
+          "text": "Core Cotton Tee",
+          "label": null
+        },
+        {
+          "href": "/portal/product/PC54",
+          "text": "Re-order",
+          "label": null
+        },
+        {
+          "href": "tel:+12539225793",
+          "text": "(253) 922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "#tab=overview",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "#tab=products",
+          "text": "Products",
+          "label": null
+        },
+        {
+          "href": "#tab=orders",
+          "text": "Orders",
+          "label": null
+        },
+        {
+          "href": "#tab=invoices",
+          "text": "Invoices 1",
+          "label": null
+        },
+        {
+          "href": "#tab=logos",
+          "text": "Logos 1",
+          "label": null
+        }
+      ],
+      "rows": [],
+      "fields": [
+        {
+          "id": "cp-global-search",
+          "value": ""
+        },
+        {
+          "id": "cp-products-search",
+          "value": ""
+        },
+        {
+          "id": "cp-products-sort",
+          "value": "ordered"
+        }
+      ],
+      "engineCalls": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "button-name",
+          "impact": "critical",
+          "nodes": [
+            [
+              "#cp-btn-quote"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".cp-product-card:nth-child(1) > .cp-product-body > .cp-product-meta"
+            ],
+            [
+              ".cp-product-card:nth-child(2) > .cp-product-body > .cp-product-meta"
+            ],
+            [
+              ".cp-product-card:nth-child(3) > .cp-product-body > .cp-product-meta"
+            ],
+            [
+              ".cp-product-card:nth-child(4) > .cp-product-body > .cp-product-meta"
+            ],
+            [
+              ".cp-product-card:nth-child(5) > .cp-product-body > .cp-product-meta"
+            ],
+            [
+              ".cp-product-card:nth-child(6) > .cp-product-body > .cp-product-meta"
+            ],
+            [
+              ".cp-product-card:nth-child(7) > .cp-product-body > .cp-product-meta"
+            ],
+            [
+              ".cp-product-card:nth-child(8) > .cp-product-body > .cp-product-meta"
+            ],
+            [
+              "footer"
+            ],
+            [
+              "#cp-bottomnav > a[href$=\"#tab=orders\"][data-tab=\"orders\"]"
+            ],
+            [
+              "#cp-bottomnav > a[href$=\"#tab=invoices\"][data-tab=\"invoices\"]"
+            ],
+            [
+              "#cp-bottomnav > a[href$=\"#tab=logos\"][data-tab=\"logos\"]"
+            ]
+          ]
+        },
+        {
+          "id": "link-name",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".cp-product-imglink[href$=\"STYLE8\"]"
+            ],
+            [
+              ".cp-product-imglink[href$=\"STYLE7\"]"
+            ],
+            [
+              ".cp-product-imglink[href$=\"STYLE6\"]"
+            ],
+            [
+              ".cp-product-imglink[href$=\"STYLE5\"]"
+            ],
+            [
+              ".cp-product-imglink[href$=\"STYLE4\"]"
+            ],
+            [
+              ".cp-product-imglink[href$=\"STYLE3\"]"
+            ],
+            [
+              ".cp-product-imglink[href$=\"STYLE2\"]"
+            ],
+            [
+              ".cp-product-imglink[href=\"/portal/product/PC54\"]"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "reads": [
+    {
+      "path": "/api/portal",
+      "query": ""
+    },
+    {
+      "path": "/api/portal/orders",
+      "query": ""
+    },
+    {
+      "path": "/api/portal/my-products",
+      "query": ""
+    },
+    {
+      "path": "/api/portal/rewards",
+      "query": ""
+    },
+    {
+      "path": "/api/portal/me",
+      "query": ""
+    },
+    {
+      "path": "/api/portal/quotes",
+      "query": ""
+    }
+  ],
+  "actions": []
+}

@@ -1,0 +1,1589 @@
+{
+  "name": "product-upgrade",
+  "states": [
+    {
+      "width": 1440,
+      "title": "PC54 · Core Cotton Tee | Northwest Custom Apparel",
+      "text": "Northwest Custom Apparel Customer portal ← Back to your account ← Back to your account Core Cotton Tee Port & Company · T-Shirts · Style PC54 You’ve ordered 36 of this style · last ordered Sep 9, 2026 Product details Re-order Upgrade to embroidery Order history Navy Availability S M L XL 2XL 3XL Colors (your colors first) Top color Navy 24 ordered Brilliant Orange 12 ordered About this product A dependable cotton tee for every team. What you’ve ordered Your sizes by color — so a re-order matches what you bought. Color S M L XL 2XL 3XL Total Navy 2 4 6 8 3 1 24 Brilliant Orange 1 2 3 4 2 — 12 Re-order Color: Navy (tap any color above to switch) — pick your decoration + sizes and we’ll send it to your rep for a fresh quote. Decoration (how it’s made — defaults to your last order) Embroidery Stitched logo Screen Print Ink — best for larger runs last time DTG Full-color print Transfers Transfer — good for small/complex art Sizes & quantities S M L XL 2XL 3XL Total: 24 Notes (deadline, other sizes/colors — optional) Send to my rep + Add to Re-order List Upgrade to embroidery Your logo, embroidered on a premium garment — the upgraded version of what you already buy. Your rep quotes the final price. Premium Silk Touch Polo Port Authority Upgrade your team uniform. 🧵 New to embroidery? We’ll digitize your logo — $50.00 $100.00, half off. One-time setup, and the file’s yours to reuse. Price breaks — 8,000-stitch left-chest embroidery Quantity 1–7 8–23 24–47 48–71 72+ Per pc $25.75 $22.50 $20.25 $19.50 $18.75 Small-batch fee +$50.00 — — — — Per pc for a standard size; 2XL+ adds its upcharge. Digitizing is a separate one-time fee. Same pricing engine as our quote tools — your rep confirms the final quote. Color: Navy (tap a swatch to change) Sizes & quantities (fill in what you need) S M L XL 2XL 3XL Total: 0 Send this embroidered upgrade to my rep Order history Sep 9, 2026 · Navy 24 pcs · S:2 M:4 L:6 XL:8 2XL:3 3XL:1 Aug 4, 2026 · Brilliant Orange 12 pcs · S:1 M:2 L:3 XL:4 2XL:2 Northwest Custom Apparel · (253) 922-5793 · sales@nwcustomapparel.com",
+      "ids": {
+        "pp-back-top": "← Back to your account",
+        "pp-back": "← Back to your account",
+        "pp-hero-img": "",
+        "pp-thumbs": "",
+        "pp-colorname": "Navy",
+        "pp-avail": "Availability S M L XL 2XL 3XL",
+        "pp-swatches": "Top color Navy 24 ordered Brilliant Orange 12 ordered",
+        "pp-about": "About this product A dependable cotton tee for every team.",
+        "pp-req-colorlabel": "Navy",
+        "pp-methods": "Embroidery Stitched logo Screen Print Ink — best for larger runs last time DTG Full-color print Transfers Transfer — good for small/complex art",
+        "pp-method-min": "",
+        "pp-sizes": "S M L XL 2XL 3XL",
+        "pp-sizetotal": "24",
+        "pp-note": "",
+        "pp-req-error": "",
+        "pp-req-submit": "Send to my rep",
+        "pp-req-addlist": "+ Add to Re-order List",
+        "pp-up-img-0": "",
+        "pp-up-dig-0": "🧵 New to embroidery? We’ll digitize your logo — $50.00 $100.00, half off. One-time setup, and the file’s yours to reuse.",
+        "pp-up-mx-0": "Price breaks — 8,000-stitch left-chest embroidery Quantity 1–7 8–23 24–47 48–71 72+ Per pc $25.75 $22.50 $20.25 $19.50 $18.75 Small-batch fee +$50.00 — — — — Per pc for a standard size; 2XL+ adds its upcharge. Digitizing is a separate one-time fee. Same pricing engine as our quote tools — your rep confirms the final quote.",
+        "pp-up-cn-0": "Navy",
+        "pp-up-colors-0": "",
+        "pp-up-sizes-0": "S M L XL 2XL 3XL",
+        "pp-up-total-0": "0",
+        "pp-history": "Order history Sep 9, 2026 · Navy 24 pcs · S:2 M:4 L:6 XL:8 2XL:3 3XL:1 Aug 4, 2026 · Brilliant Orange 12 pcs · S:1 M:2 L:3 XL:4 2XL:2",
+        "cp-toast": ""
+      },
+      "links": [
+        {
+          "href": "/portal",
+          "text": "← Back to your account",
+          "label": null
+        },
+        {
+          "href": "/portal",
+          "text": "← Back to your account",
+          "label": null
+        },
+        {
+          "href": "#pp-about",
+          "text": "Product details",
+          "label": null
+        },
+        {
+          "href": "#pp-reorder",
+          "text": "Re-order",
+          "label": null
+        },
+        {
+          "href": "#pp-upgrade",
+          "text": "Upgrade to embroidery",
+          "label": null
+        },
+        {
+          "href": "#pp-history",
+          "text": "Order history",
+          "label": null
+        }
+      ],
+      "rows": [
+        [
+          "Navy",
+          "2",
+          "4",
+          "6",
+          "8",
+          "3",
+          "1",
+          "24"
+        ],
+        [
+          "Brilliant Orange",
+          "1",
+          "2",
+          "3",
+          "4",
+          "2",
+          "—",
+          "12"
+        ],
+        [
+          "Per pc",
+          "$25.75",
+          "$22.50",
+          "$20.25",
+          "$19.50",
+          "$18.75"
+        ],
+        [
+          "Small-batch fee",
+          "+$50.00",
+          "—",
+          "—",
+          "—",
+          "—"
+        ]
+      ],
+      "fields": [
+        {
+          "id": "",
+          "size": "S",
+          "value": "2"
+        },
+        {
+          "id": "",
+          "size": "M",
+          "value": "4"
+        },
+        {
+          "id": "",
+          "size": "L",
+          "value": "6"
+        },
+        {
+          "id": "",
+          "size": "XL",
+          "value": "8"
+        },
+        {
+          "id": "",
+          "size": "2XL",
+          "value": "3"
+        },
+        {
+          "id": "",
+          "size": "3XL",
+          "value": "1"
+        },
+        {
+          "id": "pp-note",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "S",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "M",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "L",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "XL",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "2XL",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "3XL",
+          "value": ""
+        }
+      ],
+      "engineCalls": [
+        {
+          "item": {
+            "id": "__up__",
+            "method": "EMB",
+            "styleNumber": "K500",
+            "title": "K500",
+            "colorName": "",
+            "catalogColor": "",
+            "isCap": false,
+            "sizes": {
+              "S": 4
+            }
+          },
+          "groups": {
+            "emb:garment": {
+              "logos": {
+                "primary": {
+                  "position": "Left Chest",
+                  "stitchCount": 8000,
+                  "needsDigitizing": false
+                },
+                "additional": []
+              }
+            }
+          },
+          "nudge": false
+        },
+        {
+          "item": {
+            "id": "__up__",
+            "method": "EMB",
+            "styleNumber": "K500",
+            "title": "K500",
+            "colorName": "",
+            "catalogColor": "",
+            "isCap": false,
+            "sizes": {
+              "S": 12
+            }
+          },
+          "groups": {
+            "emb:garment": {
+              "logos": {
+                "primary": {
+                  "position": "Left Chest",
+                  "stitchCount": 8000,
+                  "needsDigitizing": false
+                },
+                "additional": []
+              }
+            }
+          },
+          "nudge": false
+        },
+        {
+          "item": {
+            "id": "__up__",
+            "method": "EMB",
+            "styleNumber": "K500",
+            "title": "K500",
+            "colorName": "",
+            "catalogColor": "",
+            "isCap": false,
+            "sizes": {
+              "S": 36
+            }
+          },
+          "groups": {
+            "emb:garment": {
+              "logos": {
+                "primary": {
+                  "position": "Left Chest",
+                  "stitchCount": 8000,
+                  "needsDigitizing": false
+                },
+                "additional": []
+              }
+            }
+          },
+          "nudge": false
+        },
+        {
+          "item": {
+            "id": "__up__",
+            "method": "EMB",
+            "styleNumber": "K500",
+            "title": "K500",
+            "colorName": "",
+            "catalogColor": "",
+            "isCap": false,
+            "sizes": {
+              "S": 60
+            }
+          },
+          "groups": {
+            "emb:garment": {
+              "logos": {
+                "primary": {
+                  "position": "Left Chest",
+                  "stitchCount": 8000,
+                  "needsDigitizing": false
+                },
+                "additional": []
+              }
+            }
+          },
+          "nudge": false
+        },
+        {
+          "item": {
+            "id": "__up__",
+            "method": "EMB",
+            "styleNumber": "K500",
+            "title": "K500",
+            "colorName": "",
+            "catalogColor": "",
+            "isCap": false,
+            "sizes": {
+              "S": 100
+            }
+          },
+          "groups": {
+            "emb:garment": {
+              "logos": {
+                "primary": {
+                  "position": "Left Chest",
+                  "stitchCount": 8000,
+                  "needsDigitizing": false
+                },
+                "additional": []
+              }
+            }
+          },
+          "nudge": false
+        },
+        {
+          "item": {
+            "id": "__up__",
+            "method": "EMB",
+            "styleNumber": "K500",
+            "title": "K500",
+            "colorName": "",
+            "catalogColor": "",
+            "isCap": false,
+            "sizes": {
+              "S": 24
+            }
+          },
+          "groups": {
+            "emb:garment": {
+              "logos": {
+                "primary": {
+                  "position": "Left Chest",
+                  "stitchCount": 8000,
+                  "needsDigitizing": true
+                },
+                "additional": []
+              }
+            }
+          },
+          "nudge": false
+        }
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".pp-dot--na"
+            ],
+            [
+              ".pp-swatches-label > small"
+            ],
+            [
+              ".pp-section-sub > .pp-req-hint"
+            ],
+            [
+              "#pp-reorder > .pp-field:nth-child(3) > .pp-flabel > small"
+            ],
+            [
+              "button[data-method=\"EMB\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"SCP\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"DTG\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"DTF\"] > .pp-method-hint"
+            ],
+            [
+              ".pp-field:nth-child(5) > .pp-flabel > small"
+            ],
+            [
+              ".pp-up-brand"
+            ],
+            [
+              "s"
+            ],
+            [
+              ".pp-up-mxfoot"
+            ],
+            [
+              ".pp-up-colorrow > .pp-req-hint"
+            ],
+            [
+              ".pp-up-order > .pp-field > .pp-flabel > small"
+            ],
+            [
+              ".cp-footer"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "PC54 · Core Cotton Tee | Northwest Custom Apparel",
+      "text": "Northwest Custom Apparel Customer portal ← Back to your account ← Back to your account Core Cotton Tee Port & Company · T-Shirts · Style PC54 You’ve ordered 36 of this style · last ordered Sep 9, 2026 Product details Re-order Upgrade to embroidery Order history Navy Availability S M L XL 2XL 3XL Colors (your colors first) Top color Navy 24 ordered Brilliant Orange 12 ordered About this product A dependable cotton tee for every team. What you’ve ordered Your sizes by color — so a re-order matches what you bought. Color S M L XL 2XL 3XL Total Navy 2 4 6 8 3 1 24 Brilliant Orange 1 2 3 4 2 — 12 Re-order Color: Navy (tap any color above to switch) — pick your decoration + sizes and we’ll send it to your rep for a fresh quote. Decoration (how it’s made — defaults to your last order) Embroidery Stitched logo Screen Print Ink — best for larger runs last time DTG Full-color print Transfers Transfer — good for small/complex art Sizes & quantities S M L XL 2XL 3XL Total: 24 Notes (deadline, other sizes/colors — optional) Send to my rep + Add to Re-order List Upgrade to embroidery Your logo, embroidered on a premium garment — the upgraded version of what you already buy. Your rep quotes the final price. Premium Silk Touch Polo Port Authority Upgrade your team uniform. 🧵 New to embroidery? We’ll digitize your logo — $50.00 $100.00, half off. One-time setup, and the file’s yours to reuse. Price breaks — 8,000-stitch left-chest embroidery Quantity 1–7 8–23 24–47 48–71 72+ Per pc $25.75 $22.50 $20.25 $19.50 $18.75 Small-batch fee +$50.00 — — — — Per pc for a standard size; 2XL+ adds its upcharge. Digitizing is a separate one-time fee. Same pricing engine as our quote tools — your rep confirms the final quote. Color: Navy (tap a swatch to change) Sizes & quantities (fill in what you need) S M L XL 2XL 3XL Total: 0 Send this embroidered upgrade to my rep Order history Sep 9, 2026 · Navy 24 pcs · S:2 M:4 L:6 XL:8 2XL:3 3XL:1 Aug 4, 2026 · Brilliant Orange 12 pcs · S:1 M:2 L:3 XL:4 2XL:2 Northwest Custom Apparel · (253) 922-5793 · sales@nwcustomapparel.com",
+      "ids": {
+        "pp-back-top": "← Back to your account",
+        "pp-back": "← Back to your account",
+        "pp-hero-img": "",
+        "pp-thumbs": "",
+        "pp-colorname": "Navy",
+        "pp-avail": "Availability S M L XL 2XL 3XL",
+        "pp-swatches": "Top color Navy 24 ordered Brilliant Orange 12 ordered",
+        "pp-about": "About this product A dependable cotton tee for every team.",
+        "pp-req-colorlabel": "Navy",
+        "pp-methods": "Embroidery Stitched logo Screen Print Ink — best for larger runs last time DTG Full-color print Transfers Transfer — good for small/complex art",
+        "pp-method-min": "",
+        "pp-sizes": "S M L XL 2XL 3XL",
+        "pp-sizetotal": "24",
+        "pp-note": "",
+        "pp-req-error": "",
+        "pp-req-submit": "Send to my rep",
+        "pp-req-addlist": "+ Add to Re-order List",
+        "pp-up-img-0": "",
+        "pp-up-dig-0": "🧵 New to embroidery? We’ll digitize your logo — $50.00 $100.00, half off. One-time setup, and the file’s yours to reuse.",
+        "pp-up-mx-0": "Price breaks — 8,000-stitch left-chest embroidery Quantity 1–7 8–23 24–47 48–71 72+ Per pc $25.75 $22.50 $20.25 $19.50 $18.75 Small-batch fee +$50.00 — — — — Per pc for a standard size; 2XL+ adds its upcharge. Digitizing is a separate one-time fee. Same pricing engine as our quote tools — your rep confirms the final quote.",
+        "pp-up-cn-0": "Navy",
+        "pp-up-colors-0": "",
+        "pp-up-sizes-0": "S M L XL 2XL 3XL",
+        "pp-up-total-0": "0",
+        "pp-history": "Order history Sep 9, 2026 · Navy 24 pcs · S:2 M:4 L:6 XL:8 2XL:3 3XL:1 Aug 4, 2026 · Brilliant Orange 12 pcs · S:1 M:2 L:3 XL:4 2XL:2",
+        "cp-toast": ""
+      },
+      "links": [
+        {
+          "href": "/portal",
+          "text": "← Back to your account",
+          "label": null
+        },
+        {
+          "href": "/portal",
+          "text": "← Back to your account",
+          "label": null
+        },
+        {
+          "href": "#pp-about",
+          "text": "Product details",
+          "label": null
+        },
+        {
+          "href": "#pp-reorder",
+          "text": "Re-order",
+          "label": null
+        },
+        {
+          "href": "#pp-upgrade",
+          "text": "Upgrade to embroidery",
+          "label": null
+        },
+        {
+          "href": "#pp-history",
+          "text": "Order history",
+          "label": null
+        }
+      ],
+      "rows": [
+        [
+          "Navy",
+          "2",
+          "4",
+          "6",
+          "8",
+          "3",
+          "1",
+          "24"
+        ],
+        [
+          "Brilliant Orange",
+          "1",
+          "2",
+          "3",
+          "4",
+          "2",
+          "—",
+          "12"
+        ],
+        [
+          "Per pc",
+          "$25.75",
+          "$22.50",
+          "$20.25",
+          "$19.50",
+          "$18.75"
+        ],
+        [
+          "Small-batch fee",
+          "+$50.00",
+          "—",
+          "—",
+          "—",
+          "—"
+        ]
+      ],
+      "fields": [
+        {
+          "id": "",
+          "size": "S",
+          "value": "2"
+        },
+        {
+          "id": "",
+          "size": "M",
+          "value": "4"
+        },
+        {
+          "id": "",
+          "size": "L",
+          "value": "6"
+        },
+        {
+          "id": "",
+          "size": "XL",
+          "value": "8"
+        },
+        {
+          "id": "",
+          "size": "2XL",
+          "value": "3"
+        },
+        {
+          "id": "",
+          "size": "3XL",
+          "value": "1"
+        },
+        {
+          "id": "pp-note",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "S",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "M",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "L",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "XL",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "2XL",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "3XL",
+          "value": ""
+        }
+      ],
+      "engineCalls": [
+        {
+          "item": {
+            "id": "__up__",
+            "method": "EMB",
+            "styleNumber": "K500",
+            "title": "K500",
+            "colorName": "",
+            "catalogColor": "",
+            "isCap": false,
+            "sizes": {
+              "S": 4
+            }
+          },
+          "groups": {
+            "emb:garment": {
+              "logos": {
+                "primary": {
+                  "position": "Left Chest",
+                  "stitchCount": 8000,
+                  "needsDigitizing": false
+                },
+                "additional": []
+              }
+            }
+          },
+          "nudge": false
+        },
+        {
+          "item": {
+            "id": "__up__",
+            "method": "EMB",
+            "styleNumber": "K500",
+            "title": "K500",
+            "colorName": "",
+            "catalogColor": "",
+            "isCap": false,
+            "sizes": {
+              "S": 12
+            }
+          },
+          "groups": {
+            "emb:garment": {
+              "logos": {
+                "primary": {
+                  "position": "Left Chest",
+                  "stitchCount": 8000,
+                  "needsDigitizing": false
+                },
+                "additional": []
+              }
+            }
+          },
+          "nudge": false
+        },
+        {
+          "item": {
+            "id": "__up__",
+            "method": "EMB",
+            "styleNumber": "K500",
+            "title": "K500",
+            "colorName": "",
+            "catalogColor": "",
+            "isCap": false,
+            "sizes": {
+              "S": 36
+            }
+          },
+          "groups": {
+            "emb:garment": {
+              "logos": {
+                "primary": {
+                  "position": "Left Chest",
+                  "stitchCount": 8000,
+                  "needsDigitizing": false
+                },
+                "additional": []
+              }
+            }
+          },
+          "nudge": false
+        },
+        {
+          "item": {
+            "id": "__up__",
+            "method": "EMB",
+            "styleNumber": "K500",
+            "title": "K500",
+            "colorName": "",
+            "catalogColor": "",
+            "isCap": false,
+            "sizes": {
+              "S": 60
+            }
+          },
+          "groups": {
+            "emb:garment": {
+              "logos": {
+                "primary": {
+                  "position": "Left Chest",
+                  "stitchCount": 8000,
+                  "needsDigitizing": false
+                },
+                "additional": []
+              }
+            }
+          },
+          "nudge": false
+        },
+        {
+          "item": {
+            "id": "__up__",
+            "method": "EMB",
+            "styleNumber": "K500",
+            "title": "K500",
+            "colorName": "",
+            "catalogColor": "",
+            "isCap": false,
+            "sizes": {
+              "S": 100
+            }
+          },
+          "groups": {
+            "emb:garment": {
+              "logos": {
+                "primary": {
+                  "position": "Left Chest",
+                  "stitchCount": 8000,
+                  "needsDigitizing": false
+                },
+                "additional": []
+              }
+            }
+          },
+          "nudge": false
+        },
+        {
+          "item": {
+            "id": "__up__",
+            "method": "EMB",
+            "styleNumber": "K500",
+            "title": "K500",
+            "colorName": "",
+            "catalogColor": "",
+            "isCap": false,
+            "sizes": {
+              "S": 24
+            }
+          },
+          "groups": {
+            "emb:garment": {
+              "logos": {
+                "primary": {
+                  "position": "Left Chest",
+                  "stitchCount": 8000,
+                  "needsDigitizing": true
+                },
+                "additional": []
+              }
+            }
+          },
+          "nudge": false
+        }
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".pp-dot--na"
+            ],
+            [
+              ".pp-swatches-label > small"
+            ],
+            [
+              ".pp-section-sub > .pp-req-hint"
+            ],
+            [
+              "#pp-reorder > .pp-field:nth-child(3) > .pp-flabel > small"
+            ],
+            [
+              "button[data-method=\"EMB\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"SCP\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"DTG\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"DTF\"] > .pp-method-hint"
+            ],
+            [
+              ".pp-field:nth-child(5) > .pp-flabel > small"
+            ],
+            [
+              ".pp-up-brand"
+            ],
+            [
+              "s"
+            ],
+            [
+              ".pp-up-mxfoot"
+            ],
+            [
+              ".pp-up-colorrow > .pp-req-hint"
+            ],
+            [
+              ".pp-up-order > .pp-field > .pp-flabel > small"
+            ],
+            [
+              ".cp-footer"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "PC54 · Core Cotton Tee | Northwest Custom Apparel",
+      "text": "Northwest Custom Apparel ← Account ← Back to your account Core Cotton Tee Port & Company · T-Shirts · Style PC54 You’ve ordered 36 of this style · last ordered Sep 9, 2026 Product details Re-order Upgrade to embroidery Order history Navy Availability S M L XL 2XL 3XL Colors (your colors first) Top color Navy 24 ordered Brilliant Orange 12 ordered About this product A dependable cotton tee for every team. What you’ve ordered Your sizes by color — so a re-order matches what you bought. Color S M L XL 2XL 3XL Total Navy 2 4 6 8 3 1 24 Brilliant Orange 1 2 3 4 2 — 12 Re-order Color: Navy (tap any color above to switch) — pick your decoration + sizes and we’ll send it to your rep for a fresh quote. Decoration (how it’s made — defaults to your last order) Embroidery Stitched logo Screen Print Ink — best for larger runs last time DTG Full-color print Transfers Transfer — good for small/complex art Sizes & quantities S M L XL 2XL 3XL Total: 24 Notes (deadline, other sizes/colors — optional) Send to my rep + Add to Re-order List Upgrade to embroidery Your logo, embroidered on a premium garment — the upgraded version of what you already buy. Your rep quotes the final price. Premium Silk Touch Polo Port Authority Upgrade your team uniform. 🧵 New to embroidery? We’ll digitize your logo — $50.00 $100.00, half off. One-time setup, and the file’s yours to reuse. Price breaks — 8,000-stitch left-chest embroidery Quantity 1–7 8–23 24–47 48–71 72+ Per pc $25.75 $22.50 $20.25 $19.50 $18.75 Small-batch fee +$50.00 — — — — Per pc for a standard size; 2XL+ adds its upcharge. Digitizing is a separate one-time fee. Same pricing engine as our quote tools — your rep confirms the final quote. Color: Navy (tap a swatch to change) Sizes & quantities (fill in what you need) S M L XL 2XL 3XL Total: 0 Send this embroidered upgrade to my rep Order history Sep 9, 2026 · Navy 24 pcs · S:2 M:4 L:6 XL:8 2XL:3 3XL:1 Aug 4, 2026 · Brilliant Orange 12 pcs · S:1 M:2 L:3 XL:4 2XL:2 Northwest Custom Apparel · (253) 922-5793 · sales@nwcustomapparel.com",
+      "ids": {
+        "pp-back-top": "← Account",
+        "pp-back": "← Back to your account",
+        "pp-hero-img": "",
+        "pp-thumbs": "",
+        "pp-colorname": "Navy",
+        "pp-avail": "Availability S M L XL 2XL 3XL",
+        "pp-swatches": "Top color Navy 24 ordered Brilliant Orange 12 ordered",
+        "pp-about": "About this product A dependable cotton tee for every team.",
+        "pp-req-colorlabel": "Navy",
+        "pp-methods": "Embroidery Stitched logo Screen Print Ink — best for larger runs last time DTG Full-color print Transfers Transfer — good for small/complex art",
+        "pp-method-min": "",
+        "pp-sizes": "S M L XL 2XL 3XL",
+        "pp-sizetotal": "24",
+        "pp-note": "",
+        "pp-req-error": "",
+        "pp-req-submit": "Send to my rep",
+        "pp-req-addlist": "+ Add to Re-order List",
+        "pp-up-img-0": "",
+        "pp-up-dig-0": "🧵 New to embroidery? We’ll digitize your logo — $50.00 $100.00, half off. One-time setup, and the file’s yours to reuse.",
+        "pp-up-mx-0": "Price breaks — 8,000-stitch left-chest embroidery Quantity 1–7 8–23 24–47 48–71 72+ Per pc $25.75 $22.50 $20.25 $19.50 $18.75 Small-batch fee +$50.00 — — — — Per pc for a standard size; 2XL+ adds its upcharge. Digitizing is a separate one-time fee. Same pricing engine as our quote tools — your rep confirms the final quote.",
+        "pp-up-cn-0": "Navy",
+        "pp-up-colors-0": "",
+        "pp-up-sizes-0": "S M L XL 2XL 3XL",
+        "pp-up-total-0": "0",
+        "pp-history": "Order history Sep 9, 2026 · Navy 24 pcs · S:2 M:4 L:6 XL:8 2XL:3 3XL:1 Aug 4, 2026 · Brilliant Orange 12 pcs · S:1 M:2 L:3 XL:4 2XL:2",
+        "cp-toast": ""
+      },
+      "links": [
+        {
+          "href": "/portal",
+          "text": "← Account",
+          "label": null
+        },
+        {
+          "href": "/portal",
+          "text": "← Back to your account",
+          "label": null
+        },
+        {
+          "href": "#pp-about",
+          "text": "Product details",
+          "label": null
+        },
+        {
+          "href": "#pp-reorder",
+          "text": "Re-order",
+          "label": null
+        },
+        {
+          "href": "#pp-upgrade",
+          "text": "Upgrade to embroidery",
+          "label": null
+        },
+        {
+          "href": "#pp-history",
+          "text": "Order history",
+          "label": null
+        }
+      ],
+      "rows": [
+        [
+          "Navy",
+          "2",
+          "4",
+          "6",
+          "8",
+          "3",
+          "1",
+          "24"
+        ],
+        [
+          "Brilliant Orange",
+          "1",
+          "2",
+          "3",
+          "4",
+          "2",
+          "—",
+          "12"
+        ],
+        [
+          "Per pc",
+          "$25.75",
+          "$22.50",
+          "$20.25",
+          "$19.50",
+          "$18.75"
+        ],
+        [
+          "Small-batch fee",
+          "+$50.00",
+          "—",
+          "—",
+          "—",
+          "—"
+        ]
+      ],
+      "fields": [
+        {
+          "id": "",
+          "size": "S",
+          "value": "2"
+        },
+        {
+          "id": "",
+          "size": "M",
+          "value": "4"
+        },
+        {
+          "id": "",
+          "size": "L",
+          "value": "6"
+        },
+        {
+          "id": "",
+          "size": "XL",
+          "value": "8"
+        },
+        {
+          "id": "",
+          "size": "2XL",
+          "value": "3"
+        },
+        {
+          "id": "",
+          "size": "3XL",
+          "value": "1"
+        },
+        {
+          "id": "pp-note",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "S",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "M",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "L",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "XL",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "2XL",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "3XL",
+          "value": ""
+        }
+      ],
+      "engineCalls": [
+        {
+          "item": {
+            "id": "__up__",
+            "method": "EMB",
+            "styleNumber": "K500",
+            "title": "K500",
+            "colorName": "",
+            "catalogColor": "",
+            "isCap": false,
+            "sizes": {
+              "S": 4
+            }
+          },
+          "groups": {
+            "emb:garment": {
+              "logos": {
+                "primary": {
+                  "position": "Left Chest",
+                  "stitchCount": 8000,
+                  "needsDigitizing": false
+                },
+                "additional": []
+              }
+            }
+          },
+          "nudge": false
+        },
+        {
+          "item": {
+            "id": "__up__",
+            "method": "EMB",
+            "styleNumber": "K500",
+            "title": "K500",
+            "colorName": "",
+            "catalogColor": "",
+            "isCap": false,
+            "sizes": {
+              "S": 12
+            }
+          },
+          "groups": {
+            "emb:garment": {
+              "logos": {
+                "primary": {
+                  "position": "Left Chest",
+                  "stitchCount": 8000,
+                  "needsDigitizing": false
+                },
+                "additional": []
+              }
+            }
+          },
+          "nudge": false
+        },
+        {
+          "item": {
+            "id": "__up__",
+            "method": "EMB",
+            "styleNumber": "K500",
+            "title": "K500",
+            "colorName": "",
+            "catalogColor": "",
+            "isCap": false,
+            "sizes": {
+              "S": 36
+            }
+          },
+          "groups": {
+            "emb:garment": {
+              "logos": {
+                "primary": {
+                  "position": "Left Chest",
+                  "stitchCount": 8000,
+                  "needsDigitizing": false
+                },
+                "additional": []
+              }
+            }
+          },
+          "nudge": false
+        },
+        {
+          "item": {
+            "id": "__up__",
+            "method": "EMB",
+            "styleNumber": "K500",
+            "title": "K500",
+            "colorName": "",
+            "catalogColor": "",
+            "isCap": false,
+            "sizes": {
+              "S": 60
+            }
+          },
+          "groups": {
+            "emb:garment": {
+              "logos": {
+                "primary": {
+                  "position": "Left Chest",
+                  "stitchCount": 8000,
+                  "needsDigitizing": false
+                },
+                "additional": []
+              }
+            }
+          },
+          "nudge": false
+        },
+        {
+          "item": {
+            "id": "__up__",
+            "method": "EMB",
+            "styleNumber": "K500",
+            "title": "K500",
+            "colorName": "",
+            "catalogColor": "",
+            "isCap": false,
+            "sizes": {
+              "S": 100
+            }
+          },
+          "groups": {
+            "emb:garment": {
+              "logos": {
+                "primary": {
+                  "position": "Left Chest",
+                  "stitchCount": 8000,
+                  "needsDigitizing": false
+                },
+                "additional": []
+              }
+            }
+          },
+          "nudge": false
+        },
+        {
+          "item": {
+            "id": "__up__",
+            "method": "EMB",
+            "styleNumber": "K500",
+            "title": "K500",
+            "colorName": "",
+            "catalogColor": "",
+            "isCap": false,
+            "sizes": {
+              "S": 24
+            }
+          },
+          "groups": {
+            "emb:garment": {
+              "logos": {
+                "primary": {
+                  "position": "Left Chest",
+                  "stitchCount": 8000,
+                  "needsDigitizing": true
+                },
+                "additional": []
+              }
+            }
+          },
+          "nudge": false
+        }
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".pp-dot--na"
+            ],
+            [
+              ".pp-swatches-label > small"
+            ],
+            [
+              ".pp-section-sub > .pp-req-hint"
+            ],
+            [
+              "#pp-reorder > .pp-field:nth-child(3) > .pp-flabel > small"
+            ],
+            [
+              "button[data-method=\"EMB\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"SCP\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"DTG\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"DTF\"] > .pp-method-hint"
+            ],
+            [
+              ".pp-field:nth-child(5) > .pp-flabel > small"
+            ],
+            [
+              ".pp-up-brand"
+            ],
+            [
+              "s"
+            ],
+            [
+              ".pp-up-mxfoot"
+            ],
+            [
+              ".pp-up-colorrow > .pp-req-hint"
+            ],
+            [
+              ".pp-up-order > .pp-field > .pp-flabel > small"
+            ],
+            [
+              ".cp-footer"
+            ]
+          ]
+        },
+        {
+          "id": "scrollable-region-focusable",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".pp-up-mxwrap"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "PC54 · Core Cotton Tee | Northwest Custom Apparel",
+      "text": "Northwest Custom Apparel ← Account ← Back to your account Core Cotton Tee Port & Company · T-Shirts · Style PC54 You’ve ordered 36 of this style · last ordered Sep 9, 2026 Product details Re-order Upgrade to embroidery Order history Navy Availability S M L XL 2XL 3XL Colors (your colors first) Top color Navy 24 ordered Brilliant Orange 12 ordered About this product A dependable cotton tee for every team. What you’ve ordered Your sizes by color — so a re-order matches what you bought. Color S M L XL 2XL 3XL Total Navy 2 4 6 8 3 1 24 Brilliant Orange 1 2 3 4 2 — 12 Re-order Color: Navy (tap any color above to switch) — pick your decoration + sizes and we’ll send it to your rep for a fresh quote. Decoration (how it’s made — defaults to your last order) Embroidery Stitched logo Screen Print Ink — best for larger runs last time DTG Full-color print Transfers Transfer — good for small/complex art Sizes & quantities S M L XL 2XL 3XL Total: 24 Notes (deadline, other sizes/colors — optional) Send to my rep + Add to Re-order List Upgrade to embroidery Your logo, embroidered on a premium garment — the upgraded version of what you already buy. Your rep quotes the final price. Premium Silk Touch Polo Port Authority Upgrade your team uniform. 🧵 New to embroidery? We’ll digitize your logo — $50.00 $100.00, half off. One-time setup, and the file’s yours to reuse. Price breaks — 8,000-stitch left-chest embroidery Quantity 1–7 8–23 24–47 48–71 72+ Per pc $25.75 $22.50 $20.25 $19.50 $18.75 Small-batch fee +$50.00 — — — — Per pc for a standard size; 2XL+ adds its upcharge. Digitizing is a separate one-time fee. Same pricing engine as our quote tools — your rep confirms the final quote. Color: Navy (tap a swatch to change) Sizes & quantities (fill in what you need) S M L XL 2XL 3XL Total: 0 Send this embroidered upgrade to my rep Order history Sep 9, 2026 · Navy 24 pcs · S:2 M:4 L:6 XL:8 2XL:3 3XL:1 Aug 4, 2026 · Brilliant Orange 12 pcs · S:1 M:2 L:3 XL:4 2XL:2 Northwest Custom Apparel · (253) 922-5793 · sales@nwcustomapparel.com",
+      "ids": {
+        "pp-back-top": "← Account",
+        "pp-back": "← Back to your account",
+        "pp-hero-img": "",
+        "pp-thumbs": "",
+        "pp-colorname": "Navy",
+        "pp-avail": "Availability S M L XL 2XL 3XL",
+        "pp-swatches": "Top color Navy 24 ordered Brilliant Orange 12 ordered",
+        "pp-about": "About this product A dependable cotton tee for every team.",
+        "pp-req-colorlabel": "Navy",
+        "pp-methods": "Embroidery Stitched logo Screen Print Ink — best for larger runs last time DTG Full-color print Transfers Transfer — good for small/complex art",
+        "pp-method-min": "",
+        "pp-sizes": "S M L XL 2XL 3XL",
+        "pp-sizetotal": "24",
+        "pp-note": "",
+        "pp-req-error": "",
+        "pp-req-submit": "Send to my rep",
+        "pp-req-addlist": "+ Add to Re-order List",
+        "pp-up-img-0": "",
+        "pp-up-dig-0": "🧵 New to embroidery? We’ll digitize your logo — $50.00 $100.00, half off. One-time setup, and the file’s yours to reuse.",
+        "pp-up-mx-0": "Price breaks — 8,000-stitch left-chest embroidery Quantity 1–7 8–23 24–47 48–71 72+ Per pc $25.75 $22.50 $20.25 $19.50 $18.75 Small-batch fee +$50.00 — — — — Per pc for a standard size; 2XL+ adds its upcharge. Digitizing is a separate one-time fee. Same pricing engine as our quote tools — your rep confirms the final quote.",
+        "pp-up-cn-0": "Navy",
+        "pp-up-colors-0": "",
+        "pp-up-sizes-0": "S M L XL 2XL 3XL",
+        "pp-up-total-0": "0",
+        "pp-history": "Order history Sep 9, 2026 · Navy 24 pcs · S:2 M:4 L:6 XL:8 2XL:3 3XL:1 Aug 4, 2026 · Brilliant Orange 12 pcs · S:1 M:2 L:3 XL:4 2XL:2",
+        "cp-toast": ""
+      },
+      "links": [
+        {
+          "href": "/portal",
+          "text": "← Account",
+          "label": null
+        },
+        {
+          "href": "/portal",
+          "text": "← Back to your account",
+          "label": null
+        },
+        {
+          "href": "#pp-about",
+          "text": "Product details",
+          "label": null
+        },
+        {
+          "href": "#pp-reorder",
+          "text": "Re-order",
+          "label": null
+        },
+        {
+          "href": "#pp-upgrade",
+          "text": "Upgrade to embroidery",
+          "label": null
+        },
+        {
+          "href": "#pp-history",
+          "text": "Order history",
+          "label": null
+        }
+      ],
+      "rows": [
+        [
+          "Navy",
+          "2",
+          "4",
+          "6",
+          "8",
+          "3",
+          "1",
+          "24"
+        ],
+        [
+          "Brilliant Orange",
+          "1",
+          "2",
+          "3",
+          "4",
+          "2",
+          "—",
+          "12"
+        ],
+        [
+          "Per pc",
+          "$25.75",
+          "$22.50",
+          "$20.25",
+          "$19.50",
+          "$18.75"
+        ],
+        [
+          "Small-batch fee",
+          "+$50.00",
+          "—",
+          "—",
+          "—",
+          "—"
+        ]
+      ],
+      "fields": [
+        {
+          "id": "",
+          "size": "S",
+          "value": "2"
+        },
+        {
+          "id": "",
+          "size": "M",
+          "value": "4"
+        },
+        {
+          "id": "",
+          "size": "L",
+          "value": "6"
+        },
+        {
+          "id": "",
+          "size": "XL",
+          "value": "8"
+        },
+        {
+          "id": "",
+          "size": "2XL",
+          "value": "3"
+        },
+        {
+          "id": "",
+          "size": "3XL",
+          "value": "1"
+        },
+        {
+          "id": "pp-note",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "S",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "M",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "L",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "XL",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "2XL",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "3XL",
+          "value": ""
+        }
+      ],
+      "engineCalls": [
+        {
+          "item": {
+            "id": "__up__",
+            "method": "EMB",
+            "styleNumber": "K500",
+            "title": "K500",
+            "colorName": "",
+            "catalogColor": "",
+            "isCap": false,
+            "sizes": {
+              "S": 4
+            }
+          },
+          "groups": {
+            "emb:garment": {
+              "logos": {
+                "primary": {
+                  "position": "Left Chest",
+                  "stitchCount": 8000,
+                  "needsDigitizing": false
+                },
+                "additional": []
+              }
+            }
+          },
+          "nudge": false
+        },
+        {
+          "item": {
+            "id": "__up__",
+            "method": "EMB",
+            "styleNumber": "K500",
+            "title": "K500",
+            "colorName": "",
+            "catalogColor": "",
+            "isCap": false,
+            "sizes": {
+              "S": 12
+            }
+          },
+          "groups": {
+            "emb:garment": {
+              "logos": {
+                "primary": {
+                  "position": "Left Chest",
+                  "stitchCount": 8000,
+                  "needsDigitizing": false
+                },
+                "additional": []
+              }
+            }
+          },
+          "nudge": false
+        },
+        {
+          "item": {
+            "id": "__up__",
+            "method": "EMB",
+            "styleNumber": "K500",
+            "title": "K500",
+            "colorName": "",
+            "catalogColor": "",
+            "isCap": false,
+            "sizes": {
+              "S": 36
+            }
+          },
+          "groups": {
+            "emb:garment": {
+              "logos": {
+                "primary": {
+                  "position": "Left Chest",
+                  "stitchCount": 8000,
+                  "needsDigitizing": false
+                },
+                "additional": []
+              }
+            }
+          },
+          "nudge": false
+        },
+        {
+          "item": {
+            "id": "__up__",
+            "method": "EMB",
+            "styleNumber": "K500",
+            "title": "K500",
+            "colorName": "",
+            "catalogColor": "",
+            "isCap": false,
+            "sizes": {
+              "S": 60
+            }
+          },
+          "groups": {
+            "emb:garment": {
+              "logos": {
+                "primary": {
+                  "position": "Left Chest",
+                  "stitchCount": 8000,
+                  "needsDigitizing": false
+                },
+                "additional": []
+              }
+            }
+          },
+          "nudge": false
+        },
+        {
+          "item": {
+            "id": "__up__",
+            "method": "EMB",
+            "styleNumber": "K500",
+            "title": "K500",
+            "colorName": "",
+            "catalogColor": "",
+            "isCap": false,
+            "sizes": {
+              "S": 100
+            }
+          },
+          "groups": {
+            "emb:garment": {
+              "logos": {
+                "primary": {
+                  "position": "Left Chest",
+                  "stitchCount": 8000,
+                  "needsDigitizing": false
+                },
+                "additional": []
+              }
+            }
+          },
+          "nudge": false
+        },
+        {
+          "item": {
+            "id": "__up__",
+            "method": "EMB",
+            "styleNumber": "K500",
+            "title": "K500",
+            "colorName": "",
+            "catalogColor": "",
+            "isCap": false,
+            "sizes": {
+              "S": 24
+            }
+          },
+          "groups": {
+            "emb:garment": {
+              "logos": {
+                "primary": {
+                  "position": "Left Chest",
+                  "stitchCount": 8000,
+                  "needsDigitizing": true
+                },
+                "additional": []
+              }
+            }
+          },
+          "nudge": false
+        }
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".pp-dot--na"
+            ],
+            [
+              ".pp-swatches-label > small"
+            ],
+            [
+              ".pp-section-sub > .pp-req-hint"
+            ],
+            [
+              "#pp-reorder > .pp-field:nth-child(3) > .pp-flabel > small"
+            ],
+            [
+              "button[data-method=\"EMB\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"SCP\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"DTG\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"DTF\"] > .pp-method-hint"
+            ],
+            [
+              ".pp-field:nth-child(5) > .pp-flabel > small"
+            ],
+            [
+              ".pp-up-brand"
+            ],
+            [
+              "s"
+            ],
+            [
+              ".pp-up-mxfoot"
+            ],
+            [
+              ".pp-up-colorrow > .pp-req-hint"
+            ],
+            [
+              ".pp-up-order > .pp-field > .pp-flabel > small"
+            ],
+            [
+              ".cp-footer"
+            ]
+          ]
+        },
+        {
+          "id": "scrollable-region-focusable",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".pp-mx-wrap"
+            ],
+            [
+              ".pp-up-mxwrap"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "reads": [
+    {
+      "path": "/api/portal/product/PC54",
+      "query": ""
+    },
+    {
+      "path": "/api/portal/product/PC54/availability",
+      "query": "?color=Navy"
+    },
+    {
+      "path": "/api/pricing-bundle",
+      "query": "?method=DTG&styleNumber=PC54"
+    }
+  ],
+  "actions": []
+}

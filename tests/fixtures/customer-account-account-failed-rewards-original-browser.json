@@ -1,0 +1,961 @@
+{
+  "name": "account-failed-rewards",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Cedar Example Construction · Account & help | NWCA",
+      "text": "Skip to content Northwest Custom Apparel CUSTOMER PORTAL Overview Your products Orders Invoices 1 Logos & proofs 1 Quotes 1 Account & help RE YOUR REP River Example rep@example.test (253) 922-5793 Browse catalog Sign out Cedar Example Construction Customer #7401 Browse catalog Request a quote Account & help Your details, how the portal works, and how to reach us. Your account Company Cedar Example Construction Customer # 7401 Sign-in email customer@example.test Account rep River Example · rep@example.test Reward dollars Redeem → AVAILABLE — EARNED, LAST 12 MONTHS — Every order you pay in full earns reward dollars. Premium garments earn a higher rate. Update your details Moved, new phone, new contact, or a different sign-in email? Tell us what changed and your rep will update your account. Contact name Phone What changed? (address, billing contact, new sign-in email…) Send to my rep How it works Approving a design proof Re-ordering Turnaround & rush Invoices & payment Reward dollars Logo files & new artwork Contact us PHONE (253) 922-5793 EMAIL sales@nwcustomapparel.com HOURS Mon–Fri, 9:00 am – 5:00 pm PT ADDRESS 2025 Freeman Rd E Milton, WA 98354 Northwest Custom Apparel · (253) 922-5793 · sales@nwcustomapparel.com",
+      "ids": {
+        "cp-side-logo": "",
+        "cp-nav-overview": "Overview",
+        "cp-nav-products": "Your products",
+        "cp-nav-orders": "Orders",
+        "cp-nav-badge-invoices": "1",
+        "cp-nav-badge-logos": "1",
+        "cp-nav-badge-quotes": "1",
+        "cp-nav-account": "Account & help",
+        "cp-rep-avatar": "RE",
+        "cp-rep-name": "River Example",
+        "cp-rep-email": "rep@example.test",
+        "cp-rep-phone": "(253) 922-5793",
+        "cp-catalog-link": "Browse catalog",
+        "cp-signout-link": "Sign out",
+        "cp-topbar-company": "Cedar Example Construction",
+        "cp-topbar-sub": "Customer #7401",
+        "cp-global-search": "",
+        "cp-topbar-catalog": "Browse catalog",
+        "cp-btn-quote": "Request a quote",
+        "cp-acct-company": "Cedar Example Construction",
+        "cp-acct-number": "7401",
+        "cp-acct-email": "customer@example.test",
+        "cp-acct-rep": "River Example · rep@example.test",
+        "cp-acct-redeem": "Redeem →",
+        "cp-acct-rw-balance": "—",
+        "cp-acct-rw-earned-label": "EARNED, LAST 12 MONTHS",
+        "cp-acct-rw-earned": "—",
+        "cp-acct-rw-how": "Every order you pay in full earns reward dollars. Premium garments earn a higher rate.",
+        "cp-acct-rw-history": "",
+        "cp-acct-contact": "",
+        "cp-acct-phone": "",
+        "cp-acct-msg": "",
+        "cp-acct-error": "",
+        "cp-acct-submit": "Send to my rep",
+        "cp-toast": ""
+      },
+      "links": [
+        {
+          "href": "#cp-main",
+          "text": "Skip to content",
+          "label": null
+        },
+        {
+          "href": "#tab=overview",
+          "text": "Overview",
+          "label": null
+        },
+        {
+          "href": "#tab=products",
+          "text": "Your products",
+          "label": null
+        },
+        {
+          "href": "#tab=orders",
+          "text": "Orders",
+          "label": null
+        },
+        {
+          "href": "#tab=invoices",
+          "text": "Invoices 1",
+          "label": null
+        },
+        {
+          "href": "#tab=logos",
+          "text": "Logos & proofs 1",
+          "label": null
+        },
+        {
+          "href": "#tab=quotes",
+          "text": "Quotes 1",
+          "label": null
+        },
+        {
+          "href": "#tab=account",
+          "text": "Account & help",
+          "label": null
+        },
+        {
+          "href": "mailto:rep@example.test",
+          "text": "rep@example.test",
+          "label": null
+        },
+        {
+          "href": "tel:+12539225793",
+          "text": "(253) 922-5793",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Browse catalog",
+          "label": null
+        },
+        {
+          "href": "/auth/customer/logout",
+          "text": "Sign out",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Browse catalog",
+          "label": null
+        },
+        {
+          "href": "mailto:accounting@nwcustomapparel.com",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "tel:+12539225793",
+          "text": "(253) 922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "tel:+12539225793",
+          "text": "(253) 922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        }
+      ],
+      "rows": [],
+      "fields": [
+        {
+          "id": "cp-global-search",
+          "value": ""
+        },
+        {
+          "id": "cp-acct-contact",
+          "value": ""
+        },
+        {
+          "id": "cp-acct-phone",
+          "value": ""
+        },
+        {
+          "id": "cp-acct-msg",
+          "value": ""
+        }
+      ],
+      "engineCalls": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              "#cp-topbar-sub"
+            ],
+            [
+              "dt:nth-child(1)"
+            ],
+            [
+              "dt:nth-child(3)"
+            ],
+            [
+              "dt:nth-child(5)"
+            ],
+            [
+              "dt:nth-child(7)"
+            ],
+            [
+              ".cp-rw-stats > div:nth-child(1) > .cp-summary-label"
+            ],
+            [
+              "#cp-acct-rw-earned-label"
+            ],
+            [
+              "#cp-acct-form > label > .cp-field-label > small"
+            ],
+            [
+              "div:nth-child(1) > strong"
+            ],
+            [
+              ".cp-contact > div:nth-child(2) > strong"
+            ],
+            [
+              ".cp-contact > div:nth-child(3) > strong"
+            ],
+            [
+              "div:nth-child(4) > strong"
+            ],
+            [
+              "footer"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Cedar Example Construction · Account & help | NWCA",
+      "text": "Skip to content Northwest Custom Apparel CUSTOMER PORTAL Overview Your products Orders Invoices 1 Logos & proofs 1 Quotes 1 Account & help RE YOUR REP River Example rep@example.test (253) 922-5793 Browse catalog Sign out Cedar Example Construction Customer #7401 Request a quote Account & help Your details, how the portal works, and how to reach us. Your account Company Cedar Example Construction Customer # 7401 Sign-in email customer@example.test Account rep River Example · rep@example.test Reward dollars Redeem → AVAILABLE — EARNED, LAST 12 MONTHS — Every order you pay in full earns reward dollars. Premium garments earn a higher rate. Update your details Moved, new phone, new contact, or a different sign-in email? Tell us what changed and your rep will update your account. Contact name Phone What changed? (address, billing contact, new sign-in email…) Send to my rep How it works Approving a design proof Re-ordering Turnaround & rush Invoices & payment Reward dollars Logo files & new artwork Contact us PHONE (253) 922-5793 EMAIL sales@nwcustomapparel.com HOURS Mon–Fri, 9:00 am – 5:00 pm PT ADDRESS 2025 Freeman Rd E Milton, WA 98354 Northwest Custom Apparel · (253) 922-5793 · sales@nwcustomapparel.com Home Products Orders Invoices 1 Logos 1",
+      "ids": {
+        "cp-side-logo": "",
+        "cp-nav-overview": "Overview",
+        "cp-nav-products": "Your products",
+        "cp-nav-orders": "Orders",
+        "cp-nav-badge-invoices": "1",
+        "cp-nav-badge-logos": "1",
+        "cp-nav-badge-quotes": "1",
+        "cp-nav-account": "Account & help",
+        "cp-rep-avatar": "RE",
+        "cp-rep-name": "River Example",
+        "cp-rep-email": "rep@example.test",
+        "cp-rep-phone": "(253) 922-5793",
+        "cp-catalog-link": "Browse catalog",
+        "cp-signout-link": "Sign out",
+        "cp-menu-btn": "",
+        "cp-topbar-company": "Cedar Example Construction",
+        "cp-topbar-sub": "Customer #7401",
+        "cp-global-search": "",
+        "cp-btn-quote": "Request a quote",
+        "cp-acct-company": "Cedar Example Construction",
+        "cp-acct-number": "7401",
+        "cp-acct-email": "customer@example.test",
+        "cp-acct-rep": "River Example · rep@example.test",
+        "cp-acct-redeem": "Redeem →",
+        "cp-acct-rw-balance": "—",
+        "cp-acct-rw-earned-label": "EARNED, LAST 12 MONTHS",
+        "cp-acct-rw-earned": "—",
+        "cp-acct-rw-how": "Every order you pay in full earns reward dollars. Premium garments earn a higher rate.",
+        "cp-acct-rw-history": "",
+        "cp-acct-contact": "",
+        "cp-acct-phone": "",
+        "cp-acct-msg": "",
+        "cp-acct-error": "",
+        "cp-acct-submit": "Send to my rep",
+        "cp-bnav-badge-invoices": "1",
+        "cp-bnav-badge-logos": "1",
+        "cp-toast": ""
+      },
+      "links": [
+        {
+          "href": "#cp-main",
+          "text": "Skip to content",
+          "label": null
+        },
+        {
+          "href": "#tab=overview",
+          "text": "Overview",
+          "label": null
+        },
+        {
+          "href": "#tab=products",
+          "text": "Your products",
+          "label": null
+        },
+        {
+          "href": "#tab=orders",
+          "text": "Orders",
+          "label": null
+        },
+        {
+          "href": "#tab=invoices",
+          "text": "Invoices 1",
+          "label": null
+        },
+        {
+          "href": "#tab=logos",
+          "text": "Logos & proofs 1",
+          "label": null
+        },
+        {
+          "href": "#tab=quotes",
+          "text": "Quotes 1",
+          "label": null
+        },
+        {
+          "href": "#tab=account",
+          "text": "Account & help",
+          "label": null
+        },
+        {
+          "href": "mailto:rep@example.test",
+          "text": "rep@example.test",
+          "label": null
+        },
+        {
+          "href": "tel:+12539225793",
+          "text": "(253) 922-5793",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Browse catalog",
+          "label": null
+        },
+        {
+          "href": "/auth/customer/logout",
+          "text": "Sign out",
+          "label": null
+        },
+        {
+          "href": "mailto:accounting@nwcustomapparel.com",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "tel:+12539225793",
+          "text": "(253) 922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "tel:+12539225793",
+          "text": "(253) 922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "#tab=overview",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "#tab=products",
+          "text": "Products",
+          "label": null
+        },
+        {
+          "href": "#tab=orders",
+          "text": "Orders",
+          "label": null
+        },
+        {
+          "href": "#tab=invoices",
+          "text": "Invoices 1",
+          "label": null
+        },
+        {
+          "href": "#tab=logos",
+          "text": "Logos 1",
+          "label": null
+        }
+      ],
+      "rows": [],
+      "fields": [
+        {
+          "id": "cp-global-search",
+          "value": ""
+        },
+        {
+          "id": "cp-acct-contact",
+          "value": ""
+        },
+        {
+          "id": "cp-acct-phone",
+          "value": ""
+        },
+        {
+          "id": "cp-acct-msg",
+          "value": ""
+        }
+      ],
+      "engineCalls": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              "#cp-topbar-sub"
+            ],
+            [
+              "dt:nth-child(1)"
+            ],
+            [
+              "dt:nth-child(3)"
+            ],
+            [
+              "dt:nth-child(5)"
+            ],
+            [
+              "dt:nth-child(7)"
+            ],
+            [
+              ".cp-rw-stats > div:nth-child(1) > .cp-summary-label"
+            ],
+            [
+              "#cp-acct-rw-earned-label"
+            ],
+            [
+              "#cp-acct-form > label > .cp-field-label > small"
+            ],
+            [
+              "div:nth-child(1) > strong"
+            ],
+            [
+              ".cp-contact > div:nth-child(2) > strong"
+            ],
+            [
+              ".cp-contact > div:nth-child(3) > strong"
+            ],
+            [
+              "div:nth-child(4) > strong"
+            ],
+            [
+              "footer"
+            ],
+            [
+              "#cp-bottomnav > a[href$=\"#tab=overview\"][data-tab=\"overview\"]"
+            ],
+            [
+              "#cp-bottomnav > a[href$=\"#tab=products\"][data-tab=\"products\"]"
+            ],
+            [
+              "#cp-bottomnav > a[href$=\"#tab=orders\"][data-tab=\"orders\"]"
+            ],
+            [
+              "#cp-bottomnav > a[href$=\"#tab=invoices\"][data-tab=\"invoices\"]"
+            ],
+            [
+              "#cp-bottomnav > a[href$=\"#tab=logos\"][data-tab=\"logos\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Cedar Example Construction · Account & help | NWCA",
+      "text": "Skip to content Northwest Custom Apparel CUSTOMER PORTAL Overview Your products Orders Invoices 1 Logos & proofs 1 Quotes 1 Account & help RE YOUR REP River Example rep@example.test (253) 922-5793 Browse catalog Sign out Cedar Example Construction Account & help Your details, how the portal works, and how to reach us. Your account Company Cedar Example Construction Customer # 7401 Sign-in email customer@example.test Account rep River Example · rep@example.test Reward dollars Redeem → AVAILABLE — EARNED, LAST 12 MONTHS — Every order you pay in full earns reward dollars. Premium garments earn a higher rate. Update your details Moved, new phone, new contact, or a different sign-in email? Tell us what changed and your rep will update your account. Contact name Phone What changed? (address, billing contact, new sign-in email…) Send to my rep How it works Approving a design proof Re-ordering Turnaround & rush Invoices & payment Reward dollars Logo files & new artwork Contact us PHONE (253) 922-5793 EMAIL sales@nwcustomapparel.com HOURS Mon–Fri, 9:00 am – 5:00 pm PT ADDRESS 2025 Freeman Rd E Milton, WA 98354 Northwest Custom Apparel · (253) 922-5793 · sales@nwcustomapparel.com Home Products Orders Invoices 1 Logos 1",
+      "ids": {
+        "cp-side-logo": "",
+        "cp-nav-overview": "Overview",
+        "cp-nav-products": "Your products",
+        "cp-nav-orders": "Orders",
+        "cp-nav-badge-invoices": "1",
+        "cp-nav-badge-logos": "1",
+        "cp-nav-badge-quotes": "1",
+        "cp-nav-account": "Account & help",
+        "cp-rep-avatar": "RE",
+        "cp-rep-name": "River Example",
+        "cp-rep-email": "rep@example.test",
+        "cp-rep-phone": "(253) 922-5793",
+        "cp-catalog-link": "Browse catalog",
+        "cp-signout-link": "Sign out",
+        "cp-menu-btn": "",
+        "cp-topbar-company": "Cedar Example Construction",
+        "cp-global-search": "",
+        "cp-btn-quote": "",
+        "cp-acct-company": "Cedar Example Construction",
+        "cp-acct-number": "7401",
+        "cp-acct-email": "customer@example.test",
+        "cp-acct-rep": "River Example · rep@example.test",
+        "cp-acct-redeem": "Redeem →",
+        "cp-acct-rw-balance": "—",
+        "cp-acct-rw-earned-label": "EARNED, LAST 12 MONTHS",
+        "cp-acct-rw-earned": "—",
+        "cp-acct-rw-how": "Every order you pay in full earns reward dollars. Premium garments earn a higher rate.",
+        "cp-acct-rw-history": "",
+        "cp-acct-contact": "",
+        "cp-acct-phone": "",
+        "cp-acct-msg": "",
+        "cp-acct-error": "",
+        "cp-acct-submit": "Send to my rep",
+        "cp-bnav-badge-invoices": "1",
+        "cp-bnav-badge-logos": "1",
+        "cp-toast": ""
+      },
+      "links": [
+        {
+          "href": "#cp-main",
+          "text": "Skip to content",
+          "label": null
+        },
+        {
+          "href": "#tab=overview",
+          "text": "Overview",
+          "label": null
+        },
+        {
+          "href": "#tab=products",
+          "text": "Your products",
+          "label": null
+        },
+        {
+          "href": "#tab=orders",
+          "text": "Orders",
+          "label": null
+        },
+        {
+          "href": "#tab=invoices",
+          "text": "Invoices 1",
+          "label": null
+        },
+        {
+          "href": "#tab=logos",
+          "text": "Logos & proofs 1",
+          "label": null
+        },
+        {
+          "href": "#tab=quotes",
+          "text": "Quotes 1",
+          "label": null
+        },
+        {
+          "href": "#tab=account",
+          "text": "Account & help",
+          "label": null
+        },
+        {
+          "href": "mailto:rep@example.test",
+          "text": "rep@example.test",
+          "label": null
+        },
+        {
+          "href": "tel:+12539225793",
+          "text": "(253) 922-5793",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Browse catalog",
+          "label": null
+        },
+        {
+          "href": "/auth/customer/logout",
+          "text": "Sign out",
+          "label": null
+        },
+        {
+          "href": "mailto:accounting@nwcustomapparel.com",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "tel:+12539225793",
+          "text": "(253) 922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "tel:+12539225793",
+          "text": "(253) 922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "#tab=overview",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "#tab=products",
+          "text": "Products",
+          "label": null
+        },
+        {
+          "href": "#tab=orders",
+          "text": "Orders",
+          "label": null
+        },
+        {
+          "href": "#tab=invoices",
+          "text": "Invoices 1",
+          "label": null
+        },
+        {
+          "href": "#tab=logos",
+          "text": "Logos 1",
+          "label": null
+        }
+      ],
+      "rows": [],
+      "fields": [
+        {
+          "id": "cp-global-search",
+          "value": ""
+        },
+        {
+          "id": "cp-acct-contact",
+          "value": ""
+        },
+        {
+          "id": "cp-acct-phone",
+          "value": ""
+        },
+        {
+          "id": "cp-acct-msg",
+          "value": ""
+        }
+      ],
+      "engineCalls": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "button-name",
+          "impact": "critical",
+          "nodes": [
+            [
+              "#cp-btn-quote"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              "dt:nth-child(1)"
+            ],
+            [
+              "dt:nth-child(3)"
+            ],
+            [
+              "dt:nth-child(5)"
+            ],
+            [
+              "dt:nth-child(7)"
+            ],
+            [
+              ".cp-rw-stats > div:nth-child(1) > .cp-summary-label"
+            ],
+            [
+              "#cp-acct-rw-earned-label"
+            ],
+            [
+              "#cp-acct-form > label > .cp-field-label > small"
+            ],
+            [
+              "div:nth-child(1) > strong"
+            ],
+            [
+              ".cp-contact > div:nth-child(2) > strong"
+            ],
+            [
+              ".cp-contact > div:nth-child(3) > strong"
+            ],
+            [
+              "div:nth-child(4) > strong"
+            ],
+            [
+              "footer"
+            ],
+            [
+              "#cp-bottomnav > a[href$=\"#tab=overview\"][data-tab=\"overview\"]"
+            ],
+            [
+              "#cp-bottomnav > a[href$=\"#tab=products\"][data-tab=\"products\"]"
+            ],
+            [
+              "#cp-bottomnav > a[href$=\"#tab=orders\"][data-tab=\"orders\"]"
+            ],
+            [
+              "#cp-bottomnav > a[href$=\"#tab=invoices\"][data-tab=\"invoices\"]"
+            ],
+            [
+              "#cp-bottomnav > a[href$=\"#tab=logos\"][data-tab=\"logos\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Cedar Example Construction · Account & help | NWCA",
+      "text": "Skip to content Northwest Custom Apparel CUSTOMER PORTAL Overview Your products Orders Invoices 1 Logos & proofs 1 Quotes 1 Account & help RE YOUR REP River Example rep@example.test (253) 922-5793 Browse catalog Sign out Cedar Example Construction Account & help Your details, how the portal works, and how to reach us. Your account Company Cedar Example Construction Customer # 7401 Sign-in email customer@example.test Account rep River Example · rep@example.test Reward dollars Redeem → AVAILABLE — EARNED, LAST 12 MONTHS — Every order you pay in full earns reward dollars. Premium garments earn a higher rate. Update your details Moved, new phone, new contact, or a different sign-in email? Tell us what changed and your rep will update your account. Contact name Phone What changed? (address, billing contact, new sign-in email…) Send to my rep How it works Approving a design proof Re-ordering Turnaround & rush Invoices & payment Reward dollars Logo files & new artwork Contact us PHONE (253) 922-5793 EMAIL sales@nwcustomapparel.com HOURS Mon–Fri, 9:00 am – 5:00 pm PT ADDRESS 2025 Freeman Rd E Milton, WA 98354 Northwest Custom Apparel · (253) 922-5793 · sales@nwcustomapparel.com Home Products Orders Invoices 1 Logos 1",
+      "ids": {
+        "cp-side-logo": "",
+        "cp-nav-overview": "Overview",
+        "cp-nav-products": "Your products",
+        "cp-nav-orders": "Orders",
+        "cp-nav-badge-invoices": "1",
+        "cp-nav-badge-logos": "1",
+        "cp-nav-badge-quotes": "1",
+        "cp-nav-account": "Account & help",
+        "cp-rep-avatar": "RE",
+        "cp-rep-name": "River Example",
+        "cp-rep-email": "rep@example.test",
+        "cp-rep-phone": "(253) 922-5793",
+        "cp-catalog-link": "Browse catalog",
+        "cp-signout-link": "Sign out",
+        "cp-menu-btn": "",
+        "cp-topbar-company": "Cedar Example Construction",
+        "cp-global-search": "",
+        "cp-btn-quote": "",
+        "cp-acct-company": "Cedar Example Construction",
+        "cp-acct-number": "7401",
+        "cp-acct-email": "customer@example.test",
+        "cp-acct-rep": "River Example · rep@example.test",
+        "cp-acct-redeem": "Redeem →",
+        "cp-acct-rw-balance": "—",
+        "cp-acct-rw-earned-label": "EARNED, LAST 12 MONTHS",
+        "cp-acct-rw-earned": "—",
+        "cp-acct-rw-how": "Every order you pay in full earns reward dollars. Premium garments earn a higher rate.",
+        "cp-acct-rw-history": "",
+        "cp-acct-contact": "",
+        "cp-acct-phone": "",
+        "cp-acct-msg": "",
+        "cp-acct-error": "",
+        "cp-acct-submit": "Send to my rep",
+        "cp-bnav-badge-invoices": "1",
+        "cp-bnav-badge-logos": "1",
+        "cp-toast": ""
+      },
+      "links": [
+        {
+          "href": "#cp-main",
+          "text": "Skip to content",
+          "label": null
+        },
+        {
+          "href": "#tab=overview",
+          "text": "Overview",
+          "label": null
+        },
+        {
+          "href": "#tab=products",
+          "text": "Your products",
+          "label": null
+        },
+        {
+          "href": "#tab=orders",
+          "text": "Orders",
+          "label": null
+        },
+        {
+          "href": "#tab=invoices",
+          "text": "Invoices 1",
+          "label": null
+        },
+        {
+          "href": "#tab=logos",
+          "text": "Logos & proofs 1",
+          "label": null
+        },
+        {
+          "href": "#tab=quotes",
+          "text": "Quotes 1",
+          "label": null
+        },
+        {
+          "href": "#tab=account",
+          "text": "Account & help",
+          "label": null
+        },
+        {
+          "href": "mailto:rep@example.test",
+          "text": "rep@example.test",
+          "label": null
+        },
+        {
+          "href": "tel:+12539225793",
+          "text": "(253) 922-5793",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Browse catalog",
+          "label": null
+        },
+        {
+          "href": "/auth/customer/logout",
+          "text": "Sign out",
+          "label": null
+        },
+        {
+          "href": "mailto:accounting@nwcustomapparel.com",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "tel:+12539225793",
+          "text": "(253) 922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "tel:+12539225793",
+          "text": "(253) 922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "#tab=overview",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "#tab=products",
+          "text": "Products",
+          "label": null
+        },
+        {
+          "href": "#tab=orders",
+          "text": "Orders",
+          "label": null
+        },
+        {
+          "href": "#tab=invoices",
+          "text": "Invoices 1",
+          "label": null
+        },
+        {
+          "href": "#tab=logos",
+          "text": "Logos 1",
+          "label": null
+        }
+      ],
+      "rows": [],
+      "fields": [
+        {
+          "id": "cp-global-search",
+          "value": ""
+        },
+        {
+          "id": "cp-acct-contact",
+          "value": ""
+        },
+        {
+          "id": "cp-acct-phone",
+          "value": ""
+        },
+        {
+          "id": "cp-acct-msg",
+          "value": ""
+        }
+      ],
+      "engineCalls": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "button-name",
+          "impact": "critical",
+          "nodes": [
+            [
+              "#cp-btn-quote"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              "dt:nth-child(1)"
+            ],
+            [
+              "dt:nth-child(3)"
+            ],
+            [
+              "dt:nth-child(5)"
+            ],
+            [
+              "dt:nth-child(7)"
+            ],
+            [
+              ".cp-rw-stats > div:nth-child(1) > .cp-summary-label"
+            ],
+            [
+              "#cp-acct-rw-earned-label"
+            ],
+            [
+              "#cp-acct-form > label > .cp-field-label > small"
+            ],
+            [
+              "div:nth-child(1) > strong"
+            ],
+            [
+              ".cp-contact > div:nth-child(2) > strong"
+            ],
+            [
+              ".cp-contact > div:nth-child(3) > strong"
+            ],
+            [
+              "div:nth-child(4) > strong"
+            ],
+            [
+              "footer"
+            ],
+            [
+              "#cp-bottomnav > a[href$=\"#tab=overview\"][data-tab=\"overview\"]"
+            ],
+            [
+              "#cp-bottomnav > a[href$=\"#tab=products\"][data-tab=\"products\"]"
+            ],
+            [
+              "#cp-bottomnav > a[href$=\"#tab=orders\"][data-tab=\"orders\"]"
+            ],
+            [
+              "#cp-bottomnav > a[href$=\"#tab=invoices\"][data-tab=\"invoices\"]"
+            ],
+            [
+              "#cp-bottomnav > a[href$=\"#tab=logos\"][data-tab=\"logos\"]"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "reads": [
+    {
+      "path": "/api/portal",
+      "query": ""
+    },
+    {
+      "path": "/api/portal/orders",
+      "query": ""
+    },
+    {
+      "path": "/api/portal/my-products",
+      "query": ""
+    },
+    {
+      "path": "/api/portal/rewards",
+      "query": ""
+    },
+    {
+      "path": "/api/portal/me",
+      "query": ""
+    },
+    {
+      "path": "/api/portal/quotes",
+      "query": ""
+    }
+  ],
+  "actions": []
+}

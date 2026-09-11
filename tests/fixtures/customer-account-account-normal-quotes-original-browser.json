@@ -1,0 +1,881 @@
+{
+  "name": "account-normal-quotes",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Cedar Example Construction · Quotes | NWCA",
+      "text": "Skip to content Northwest Custom Apparel CUSTOMER PORTAL Overview Your products Orders Invoices 1 Logos & proofs 1 Quotes 1 Account & help RE YOUR REP River Example rep@example.test (253) 922-5793 Browse catalog Sign out Cedar Example Construction Customer #7401 Browse catalog Request a quote Quotes 2 Quotes sent to your sign-in email. Open one to review it, or ask for something new. Request a quote QUOTE CREATED EXPIRES QTY TOTAL STATUS EMB0910-7401 Team polos Sep 9, 2026 Sep 15, 2026 5d left 36 $1,092.38 Open View quote DTG0901-7402 Completed team tees Sep 1, 2026 Sep 8, 2026 24 $654.15 Paid TrackView quote Northwest Custom Apparel · (253) 922-5793 · sales@nwcustomapparel.com",
+      "ids": {
+        "cp-side-logo": "",
+        "cp-nav-overview": "Overview",
+        "cp-nav-products": "Your products",
+        "cp-nav-orders": "Orders",
+        "cp-nav-badge-invoices": "1",
+        "cp-nav-badge-logos": "1",
+        "cp-nav-badge-quotes": "1",
+        "cp-nav-account": "Account & help",
+        "cp-rep-avatar": "RE",
+        "cp-rep-name": "River Example",
+        "cp-rep-email": "rep@example.test",
+        "cp-rep-phone": "(253) 922-5793",
+        "cp-catalog-link": "Browse catalog",
+        "cp-signout-link": "Sign out",
+        "cp-topbar-company": "Cedar Example Construction",
+        "cp-topbar-sub": "Customer #7401",
+        "cp-global-search": "",
+        "cp-topbar-catalog": "Browse catalog",
+        "cp-btn-quote": "Request a quote",
+        "cp-quotes-count": "2",
+        "cp-quotes-wrap": "QUOTE CREATED EXPIRES QTY TOTAL STATUS EMB0910-7401 Team polos Sep 9, 2026 Sep 15, 2026 5d left 36 $1,092.38 Open View quote DTG0901-7402 Completed team tees Sep 1, 2026 Sep 8, 2026 24 $654.15 Paid TrackView quote",
+        "cp-toast": ""
+      },
+      "links": [
+        {
+          "href": "#cp-main",
+          "text": "Skip to content",
+          "label": null
+        },
+        {
+          "href": "#tab=overview",
+          "text": "Overview",
+          "label": null
+        },
+        {
+          "href": "#tab=products",
+          "text": "Your products",
+          "label": null
+        },
+        {
+          "href": "#tab=orders",
+          "text": "Orders",
+          "label": null
+        },
+        {
+          "href": "#tab=invoices",
+          "text": "Invoices 1",
+          "label": null
+        },
+        {
+          "href": "#tab=logos",
+          "text": "Logos & proofs 1",
+          "label": null
+        },
+        {
+          "href": "#tab=quotes",
+          "text": "Quotes 1",
+          "label": null
+        },
+        {
+          "href": "#tab=account",
+          "text": "Account & help",
+          "label": null
+        },
+        {
+          "href": "mailto:rep@example.test",
+          "text": "rep@example.test",
+          "label": null
+        },
+        {
+          "href": "tel:+12539225793",
+          "text": "(253) 922-5793",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Browse catalog",
+          "label": null
+        },
+        {
+          "href": "/auth/customer/logout",
+          "text": "Sign out",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Browse catalog",
+          "label": null
+        },
+        {
+          "href": "/quote/EMB0910-7401?token=synthetic-only",
+          "text": "EMB0910-7401",
+          "label": null
+        },
+        {
+          "href": "/quote/EMB0910-7401?token=synthetic-only",
+          "text": "View quote",
+          "label": null
+        },
+        {
+          "href": "/quote/DTG0901-7402?token=synthetic-only",
+          "text": "DTG0901-7402",
+          "label": null
+        },
+        {
+          "href": "https://www.ups.com/track?tracknum=1ZTEST7402",
+          "text": "Track",
+          "label": null
+        },
+        {
+          "href": "/quote/DTG0901-7402?token=synthetic-only",
+          "text": "View quote",
+          "label": null
+        },
+        {
+          "href": "tel:+12539225793",
+          "text": "(253) 922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        }
+      ],
+      "rows": [
+        [
+          "EMB0910-7401 Team polos",
+          "Sep 9, 2026",
+          "Sep 15, 2026 5d left",
+          "36",
+          "$1,092.38",
+          "Open",
+          "View quote"
+        ],
+        [
+          "DTG0901-7402 Completed team tees",
+          "Sep 1, 2026",
+          "Sep 8, 2026",
+          "24",
+          "$654.15",
+          "Paid",
+          "TrackView quote"
+        ]
+      ],
+      "fields": [
+        {
+          "id": "cp-global-search",
+          "value": ""
+        }
+      ],
+      "engineCalls": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              "#cp-topbar-sub"
+            ],
+            [
+              "#cp-quotes-wrap > table > tbody > tr:nth-child(1) > td:nth-child(1) > .cp-cell-sub"
+            ],
+            [
+              "#cp-quotes-wrap > table > tbody > tr:nth-child(1) > td:nth-child(3) > .cp-due-badge"
+            ],
+            [
+              "#cp-quotes-wrap > table > tbody > tr:nth-child(2) > td:nth-child(1) > .cp-cell-sub"
+            ],
+            [
+              "footer"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Cedar Example Construction · Quotes | NWCA",
+      "text": "Skip to content Northwest Custom Apparel CUSTOMER PORTAL Overview Your products Orders Invoices 1 Logos & proofs 1 Quotes 1 Account & help RE YOUR REP River Example rep@example.test (253) 922-5793 Browse catalog Sign out Cedar Example Construction Customer #7401 Request a quote Quotes 2 Quotes sent to your sign-in email. Open one to review it, or ask for something new. Request a quote QUOTE CREATED EXPIRES QTY TOTAL STATUS EMB0910-7401 Team polos Sep 9, 2026 Sep 15, 2026 5d left 36 $1,092.38 Open View quote DTG0901-7402 Completed team tees Sep 1, 2026 Sep 8, 2026 24 $654.15 Paid TrackView quote Northwest Custom Apparel · (253) 922-5793 · sales@nwcustomapparel.com Home Products Orders Invoices 1 Logos 1",
+      "ids": {
+        "cp-side-logo": "",
+        "cp-nav-overview": "Overview",
+        "cp-nav-products": "Your products",
+        "cp-nav-orders": "Orders",
+        "cp-nav-badge-invoices": "1",
+        "cp-nav-badge-logos": "1",
+        "cp-nav-badge-quotes": "1",
+        "cp-nav-account": "Account & help",
+        "cp-rep-avatar": "RE",
+        "cp-rep-name": "River Example",
+        "cp-rep-email": "rep@example.test",
+        "cp-rep-phone": "(253) 922-5793",
+        "cp-catalog-link": "Browse catalog",
+        "cp-signout-link": "Sign out",
+        "cp-menu-btn": "",
+        "cp-topbar-company": "Cedar Example Construction",
+        "cp-topbar-sub": "Customer #7401",
+        "cp-global-search": "",
+        "cp-btn-quote": "Request a quote",
+        "cp-quotes-count": "2",
+        "cp-quotes-wrap": "QUOTE CREATED EXPIRES QTY TOTAL STATUS EMB0910-7401 Team polos Sep 9, 2026 Sep 15, 2026 5d left 36 $1,092.38 Open View quote DTG0901-7402 Completed team tees Sep 1, 2026 Sep 8, 2026 24 $654.15 Paid TrackView quote",
+        "cp-bnav-badge-invoices": "1",
+        "cp-bnav-badge-logos": "1",
+        "cp-toast": ""
+      },
+      "links": [
+        {
+          "href": "#cp-main",
+          "text": "Skip to content",
+          "label": null
+        },
+        {
+          "href": "#tab=overview",
+          "text": "Overview",
+          "label": null
+        },
+        {
+          "href": "#tab=products",
+          "text": "Your products",
+          "label": null
+        },
+        {
+          "href": "#tab=orders",
+          "text": "Orders",
+          "label": null
+        },
+        {
+          "href": "#tab=invoices",
+          "text": "Invoices 1",
+          "label": null
+        },
+        {
+          "href": "#tab=logos",
+          "text": "Logos & proofs 1",
+          "label": null
+        },
+        {
+          "href": "#tab=quotes",
+          "text": "Quotes 1",
+          "label": null
+        },
+        {
+          "href": "#tab=account",
+          "text": "Account & help",
+          "label": null
+        },
+        {
+          "href": "mailto:rep@example.test",
+          "text": "rep@example.test",
+          "label": null
+        },
+        {
+          "href": "tel:+12539225793",
+          "text": "(253) 922-5793",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Browse catalog",
+          "label": null
+        },
+        {
+          "href": "/auth/customer/logout",
+          "text": "Sign out",
+          "label": null
+        },
+        {
+          "href": "/quote/EMB0910-7401?token=synthetic-only",
+          "text": "EMB0910-7401",
+          "label": null
+        },
+        {
+          "href": "/quote/EMB0910-7401?token=synthetic-only",
+          "text": "View quote",
+          "label": null
+        },
+        {
+          "href": "/quote/DTG0901-7402?token=synthetic-only",
+          "text": "DTG0901-7402",
+          "label": null
+        },
+        {
+          "href": "https://www.ups.com/track?tracknum=1ZTEST7402",
+          "text": "Track",
+          "label": null
+        },
+        {
+          "href": "/quote/DTG0901-7402?token=synthetic-only",
+          "text": "View quote",
+          "label": null
+        },
+        {
+          "href": "tel:+12539225793",
+          "text": "(253) 922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "#tab=overview",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "#tab=products",
+          "text": "Products",
+          "label": null
+        },
+        {
+          "href": "#tab=orders",
+          "text": "Orders",
+          "label": null
+        },
+        {
+          "href": "#tab=invoices",
+          "text": "Invoices 1",
+          "label": null
+        },
+        {
+          "href": "#tab=logos",
+          "text": "Logos 1",
+          "label": null
+        }
+      ],
+      "rows": [
+        [
+          "EMB0910-7401 Team polos",
+          "Sep 9, 2026",
+          "Sep 15, 2026 5d left",
+          "36",
+          "$1,092.38",
+          "Open",
+          "View quote"
+        ],
+        [
+          "DTG0901-7402 Completed team tees",
+          "Sep 1, 2026",
+          "Sep 8, 2026",
+          "24",
+          "$654.15",
+          "Paid",
+          "TrackView quote"
+        ]
+      ],
+      "fields": [
+        {
+          "id": "cp-global-search",
+          "value": ""
+        }
+      ],
+      "engineCalls": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              "#cp-topbar-sub"
+            ],
+            [
+              "#cp-quotes-wrap > table > tbody > tr:nth-child(1) > td:nth-child(1) > .cp-cell-sub"
+            ],
+            [
+              "#cp-quotes-wrap > table > tbody > tr:nth-child(1) > td:nth-child(3) > .cp-due-badge"
+            ],
+            [
+              "#cp-quotes-wrap > table > tbody > tr:nth-child(2) > td:nth-child(1) > .cp-cell-sub"
+            ],
+            [
+              "footer"
+            ],
+            [
+              "#cp-bottomnav > a[href$=\"#tab=overview\"][data-tab=\"overview\"]"
+            ],
+            [
+              "#cp-bottomnav > a[href$=\"#tab=products\"][data-tab=\"products\"]"
+            ],
+            [
+              "#cp-bottomnav > a[href$=\"#tab=orders\"][data-tab=\"orders\"]"
+            ],
+            [
+              "#cp-bottomnav > a[href$=\"#tab=invoices\"][data-tab=\"invoices\"]"
+            ],
+            [
+              "#cp-bottomnav > a[href$=\"#tab=logos\"][data-tab=\"logos\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Cedar Example Construction · Quotes | NWCA",
+      "text": "Skip to content Northwest Custom Apparel CUSTOMER PORTAL Overview Your products Orders Invoices 1 Logos & proofs 1 Quotes 1 Account & help RE YOUR REP River Example rep@example.test (253) 922-5793 Browse catalog Sign out Cedar Example Construction Quotes 2 Quotes sent to your sign-in email. Open one to review it, or ask for something new. Request a quote QUOTE CREATED EXPIRES QTY TOTAL STATUS EMB0910-7401 Team polos Sep 9, 2026 Sep 15, 2026 5d left 36 $1,092.38 Open View quote DTG0901-7402 Completed team tees Sep 1, 2026 Sep 8, 2026 24 $654.15 Paid TrackView quote Northwest Custom Apparel · (253) 922-5793 · sales@nwcustomapparel.com Home Products Orders Invoices 1 Logos 1",
+      "ids": {
+        "cp-side-logo": "",
+        "cp-nav-overview": "Overview",
+        "cp-nav-products": "Your products",
+        "cp-nav-orders": "Orders",
+        "cp-nav-badge-invoices": "1",
+        "cp-nav-badge-logos": "1",
+        "cp-nav-badge-quotes": "1",
+        "cp-nav-account": "Account & help",
+        "cp-rep-avatar": "RE",
+        "cp-rep-name": "River Example",
+        "cp-rep-email": "rep@example.test",
+        "cp-rep-phone": "(253) 922-5793",
+        "cp-catalog-link": "Browse catalog",
+        "cp-signout-link": "Sign out",
+        "cp-menu-btn": "",
+        "cp-topbar-company": "Cedar Example Construction",
+        "cp-global-search": "",
+        "cp-btn-quote": "",
+        "cp-quotes-count": "2",
+        "cp-quotes-wrap": "QUOTE CREATED EXPIRES QTY TOTAL STATUS EMB0910-7401 Team polos Sep 9, 2026 Sep 15, 2026 5d left 36 $1,092.38 Open View quote DTG0901-7402 Completed team tees Sep 1, 2026 Sep 8, 2026 24 $654.15 Paid TrackView quote",
+        "cp-bnav-badge-invoices": "1",
+        "cp-bnav-badge-logos": "1",
+        "cp-toast": ""
+      },
+      "links": [
+        {
+          "href": "#cp-main",
+          "text": "Skip to content",
+          "label": null
+        },
+        {
+          "href": "#tab=overview",
+          "text": "Overview",
+          "label": null
+        },
+        {
+          "href": "#tab=products",
+          "text": "Your products",
+          "label": null
+        },
+        {
+          "href": "#tab=orders",
+          "text": "Orders",
+          "label": null
+        },
+        {
+          "href": "#tab=invoices",
+          "text": "Invoices 1",
+          "label": null
+        },
+        {
+          "href": "#tab=logos",
+          "text": "Logos & proofs 1",
+          "label": null
+        },
+        {
+          "href": "#tab=quotes",
+          "text": "Quotes 1",
+          "label": null
+        },
+        {
+          "href": "#tab=account",
+          "text": "Account & help",
+          "label": null
+        },
+        {
+          "href": "mailto:rep@example.test",
+          "text": "rep@example.test",
+          "label": null
+        },
+        {
+          "href": "tel:+12539225793",
+          "text": "(253) 922-5793",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Browse catalog",
+          "label": null
+        },
+        {
+          "href": "/auth/customer/logout",
+          "text": "Sign out",
+          "label": null
+        },
+        {
+          "href": "/quote/EMB0910-7401?token=synthetic-only",
+          "text": "EMB0910-7401",
+          "label": null
+        },
+        {
+          "href": "/quote/EMB0910-7401?token=synthetic-only",
+          "text": "View quote",
+          "label": null
+        },
+        {
+          "href": "/quote/DTG0901-7402?token=synthetic-only",
+          "text": "DTG0901-7402",
+          "label": null
+        },
+        {
+          "href": "https://www.ups.com/track?tracknum=1ZTEST7402",
+          "text": "Track",
+          "label": null
+        },
+        {
+          "href": "/quote/DTG0901-7402?token=synthetic-only",
+          "text": "View quote",
+          "label": null
+        },
+        {
+          "href": "tel:+12539225793",
+          "text": "(253) 922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "#tab=overview",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "#tab=products",
+          "text": "Products",
+          "label": null
+        },
+        {
+          "href": "#tab=orders",
+          "text": "Orders",
+          "label": null
+        },
+        {
+          "href": "#tab=invoices",
+          "text": "Invoices 1",
+          "label": null
+        },
+        {
+          "href": "#tab=logos",
+          "text": "Logos 1",
+          "label": null
+        }
+      ],
+      "rows": [
+        [
+          "EMB0910-7401 Team polos",
+          "Sep 9, 2026",
+          "Sep 15, 2026 5d left",
+          "36",
+          "$1,092.38",
+          "Open",
+          "View quote"
+        ],
+        [
+          "DTG0901-7402 Completed team tees",
+          "Sep 1, 2026",
+          "Sep 8, 2026",
+          "24",
+          "$654.15",
+          "Paid",
+          "TrackView quote"
+        ]
+      ],
+      "fields": [
+        {
+          "id": "cp-global-search",
+          "value": ""
+        }
+      ],
+      "engineCalls": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "button-name",
+          "impact": "critical",
+          "nodes": [
+            [
+              "#cp-btn-quote"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              "#cp-quotes-wrap > table > tbody > tr:nth-child(1) > td:nth-child(1) > .cp-cell-sub"
+            ],
+            [
+              "#cp-quotes-wrap > table > tbody > tr:nth-child(1) > td:nth-child(3) > .cp-due-badge"
+            ],
+            [
+              "#cp-quotes-wrap > table > tbody > tr:nth-child(2) > td:nth-child(1) > .cp-cell-sub"
+            ],
+            [
+              "footer"
+            ],
+            [
+              "#cp-bottomnav > a[href$=\"#tab=overview\"][data-tab=\"overview\"]"
+            ],
+            [
+              "#cp-bottomnav > a[href$=\"#tab=products\"][data-tab=\"products\"]"
+            ],
+            [
+              "#cp-bottomnav > a[href$=\"#tab=orders\"][data-tab=\"orders\"]"
+            ],
+            [
+              "#cp-bottomnav > a[href$=\"#tab=invoices\"][data-tab=\"invoices\"]"
+            ],
+            [
+              "#cp-bottomnav > a[href$=\"#tab=logos\"][data-tab=\"logos\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Cedar Example Construction · Quotes | NWCA",
+      "text": "Skip to content Northwest Custom Apparel CUSTOMER PORTAL Overview Your products Orders Invoices 1 Logos & proofs 1 Quotes 1 Account & help RE YOUR REP River Example rep@example.test (253) 922-5793 Browse catalog Sign out Cedar Example Construction Quotes 2 Quotes sent to your sign-in email. Open one to review it, or ask for something new. Request a quote QUOTE CREATED EXPIRES QTY TOTAL STATUS EMB0910-7401 Team polos Sep 9, 2026 Sep 15, 2026 5d left 36 $1,092.38 Open View quote DTG0901-7402 Completed team tees Sep 1, 2026 Sep 8, 2026 24 $654.15 Paid TrackView quote Northwest Custom Apparel · (253) 922-5793 · sales@nwcustomapparel.com Home Products Orders Invoices 1 Logos 1",
+      "ids": {
+        "cp-side-logo": "",
+        "cp-nav-overview": "Overview",
+        "cp-nav-products": "Your products",
+        "cp-nav-orders": "Orders",
+        "cp-nav-badge-invoices": "1",
+        "cp-nav-badge-logos": "1",
+        "cp-nav-badge-quotes": "1",
+        "cp-nav-account": "Account & help",
+        "cp-rep-avatar": "RE",
+        "cp-rep-name": "River Example",
+        "cp-rep-email": "rep@example.test",
+        "cp-rep-phone": "(253) 922-5793",
+        "cp-catalog-link": "Browse catalog",
+        "cp-signout-link": "Sign out",
+        "cp-menu-btn": "",
+        "cp-topbar-company": "Cedar Example Construction",
+        "cp-global-search": "",
+        "cp-btn-quote": "",
+        "cp-quotes-count": "2",
+        "cp-quotes-wrap": "QUOTE CREATED EXPIRES QTY TOTAL STATUS EMB0910-7401 Team polos Sep 9, 2026 Sep 15, 2026 5d left 36 $1,092.38 Open View quote DTG0901-7402 Completed team tees Sep 1, 2026 Sep 8, 2026 24 $654.15 Paid TrackView quote",
+        "cp-bnav-badge-invoices": "1",
+        "cp-bnav-badge-logos": "1",
+        "cp-toast": ""
+      },
+      "links": [
+        {
+          "href": "#cp-main",
+          "text": "Skip to content",
+          "label": null
+        },
+        {
+          "href": "#tab=overview",
+          "text": "Overview",
+          "label": null
+        },
+        {
+          "href": "#tab=products",
+          "text": "Your products",
+          "label": null
+        },
+        {
+          "href": "#tab=orders",
+          "text": "Orders",
+          "label": null
+        },
+        {
+          "href": "#tab=invoices",
+          "text": "Invoices 1",
+          "label": null
+        },
+        {
+          "href": "#tab=logos",
+          "text": "Logos & proofs 1",
+          "label": null
+        },
+        {
+          "href": "#tab=quotes",
+          "text": "Quotes 1",
+          "label": null
+        },
+        {
+          "href": "#tab=account",
+          "text": "Account & help",
+          "label": null
+        },
+        {
+          "href": "mailto:rep@example.test",
+          "text": "rep@example.test",
+          "label": null
+        },
+        {
+          "href": "tel:+12539225793",
+          "text": "(253) 922-5793",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Browse catalog",
+          "label": null
+        },
+        {
+          "href": "/auth/customer/logout",
+          "text": "Sign out",
+          "label": null
+        },
+        {
+          "href": "/quote/EMB0910-7401?token=synthetic-only",
+          "text": "EMB0910-7401",
+          "label": null
+        },
+        {
+          "href": "/quote/EMB0910-7401?token=synthetic-only",
+          "text": "View quote",
+          "label": null
+        },
+        {
+          "href": "/quote/DTG0901-7402?token=synthetic-only",
+          "text": "DTG0901-7402",
+          "label": null
+        },
+        {
+          "href": "https://www.ups.com/track?tracknum=1ZTEST7402",
+          "text": "Track",
+          "label": null
+        },
+        {
+          "href": "/quote/DTG0901-7402?token=synthetic-only",
+          "text": "View quote",
+          "label": null
+        },
+        {
+          "href": "tel:+12539225793",
+          "text": "(253) 922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "#tab=overview",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "#tab=products",
+          "text": "Products",
+          "label": null
+        },
+        {
+          "href": "#tab=orders",
+          "text": "Orders",
+          "label": null
+        },
+        {
+          "href": "#tab=invoices",
+          "text": "Invoices 1",
+          "label": null
+        },
+        {
+          "href": "#tab=logos",
+          "text": "Logos 1",
+          "label": null
+        }
+      ],
+      "rows": [
+        [
+          "EMB0910-7401 Team polos",
+          "Sep 9, 2026",
+          "Sep 15, 2026 5d left",
+          "36",
+          "$1,092.38",
+          "Open",
+          "View quote"
+        ],
+        [
+          "DTG0901-7402 Completed team tees",
+          "Sep 1, 2026",
+          "Sep 8, 2026",
+          "24",
+          "$654.15",
+          "Paid",
+          "TrackView quote"
+        ]
+      ],
+      "fields": [
+        {
+          "id": "cp-global-search",
+          "value": ""
+        }
+      ],
+      "engineCalls": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "button-name",
+          "impact": "critical",
+          "nodes": [
+            [
+              "#cp-btn-quote"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              "#cp-quotes-wrap > table > tbody > tr:nth-child(1) > td:nth-child(1) > .cp-cell-sub"
+            ],
+            [
+              "#cp-quotes-wrap > table > tbody > tr:nth-child(1) > td:nth-child(3) > .cp-due-badge"
+            ],
+            [
+              "#cp-quotes-wrap > table > tbody > tr:nth-child(2) > td:nth-child(1) > .cp-cell-sub"
+            ],
+            [
+              "footer"
+            ],
+            [
+              "#cp-bottomnav > a[href$=\"#tab=overview\"][data-tab=\"overview\"]"
+            ],
+            [
+              "#cp-bottomnav > a[href$=\"#tab=products\"][data-tab=\"products\"]"
+            ],
+            [
+              "#cp-bottomnav > a[href$=\"#tab=orders\"][data-tab=\"orders\"]"
+            ],
+            [
+              "#cp-bottomnav > a[href$=\"#tab=invoices\"][data-tab=\"invoices\"]"
+            ],
+            [
+              "#cp-bottomnav > a[href$=\"#tab=logos\"][data-tab=\"logos\"]"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "reads": [
+    {
+      "path": "/api/portal",
+      "query": ""
+    },
+    {
+      "path": "/api/portal/orders",
+      "query": ""
+    },
+    {
+      "path": "/api/portal/my-products",
+      "query": ""
+    },
+    {
+      "path": "/api/portal/rewards",
+      "query": ""
+    },
+    {
+      "path": "/api/portal/me",
+      "query": ""
+    },
+    {
+      "path": "/api/portal/quotes",
+      "query": ""
+    }
+  ],
+  "actions": []
+}

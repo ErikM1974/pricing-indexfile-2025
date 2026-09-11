@@ -1,0 +1,639 @@
+{
+  "name": "product-single-sent",
+  "states": [
+    {
+      "width": 1440,
+      "title": "PC54 · Core Cotton Tee | Northwest Custom Apparel",
+      "text": "Northwest Custom Apparel Customer portal ← Back to your account ← Back to your account Core Cotton Tee Port & Company · T-Shirts · Style PC54 You’ve ordered 36 of this style · last ordered Sep 9, 2026 Product details Re-order Order history Brilliant Orange Availability S M L XL 2XL 3XL Colors (your colors first) Top color Navy 24 ordered Brilliant Orange 12 ordered About this product A dependable cotton tee for every team. What you’ve ordered Your sizes by color — so a re-order matches what you bought. Color S M L XL 2XL 3XL Total Navy 2 4 6 8 3 1 24 Brilliant Orange 1 2 3 4 2 — 12 Re-order Color: Brilliant Orange (tap any color above to switch) — pick your decoration + sizes and we’ll send it to your rep for a fresh quote. Decoration (how it’s made — defaults to your last order) Embroidery Stitched logo Screen Print Ink — best for larger runs last time DTG Full-color print Transfers Transfer — good for small/complex art Sizes & quantities S M L XL 2XL 3XL Total: 0 Notes (deadline, other sizes/colors — optional) Send to my rep + Add to Re-order List Order history Sep 9, 2026 · Navy 24 pcs · S:2 M:4 L:6 XL:8 2XL:3 3XL:1 Aug 4, 2026 · Brilliant Orange 12 pcs · S:1 M:2 L:3 XL:4 2XL:2 Sent to your rep (River Example)! We’ll follow up with a quote. Northwest Custom Apparel · (253) 922-5793 · sales@nwcustomapparel.com",
+      "ids": {
+        "pp-back-top": "← Back to your account",
+        "pp-back": "← Back to your account",
+        "pp-hero-img": "",
+        "pp-colorname": "Brilliant Orange",
+        "pp-avail": "Availability S M L XL 2XL 3XL",
+        "pp-swatches": "Top color Navy 24 ordered Brilliant Orange 12 ordered",
+        "pp-about": "About this product A dependable cotton tee for every team.",
+        "pp-req-colorlabel": "Brilliant Orange",
+        "pp-methods": "Embroidery Stitched logo Screen Print Ink — best for larger runs last time DTG Full-color print Transfers Transfer — good for small/complex art",
+        "pp-method-min": "",
+        "pp-sizes": "S M L XL 2XL 3XL",
+        "pp-sizetotal": "0",
+        "pp-note": "",
+        "pp-req-error": "",
+        "pp-req-submit": "Send to my rep",
+        "pp-req-addlist": "+ Add to Re-order List",
+        "pp-history": "Order history Sep 9, 2026 · Navy 24 pcs · S:2 M:4 L:6 XL:8 2XL:3 3XL:1 Aug 4, 2026 · Brilliant Orange 12 pcs · S:1 M:2 L:3 XL:4 2XL:2",
+        "cp-toast": "Sent to your rep (River Example)! We’ll follow up with a quote."
+      },
+      "links": [
+        {
+          "href": "/portal",
+          "text": "← Back to your account",
+          "label": null
+        },
+        {
+          "href": "/portal",
+          "text": "← Back to your account",
+          "label": null
+        },
+        {
+          "href": "#pp-about",
+          "text": "Product details",
+          "label": null
+        },
+        {
+          "href": "#pp-reorder",
+          "text": "Re-order",
+          "label": null
+        },
+        {
+          "href": "#pp-history",
+          "text": "Order history",
+          "label": null
+        }
+      ],
+      "rows": [
+        [
+          "Navy",
+          "2",
+          "4",
+          "6",
+          "8",
+          "3",
+          "1",
+          "24"
+        ],
+        [
+          "Brilliant Orange",
+          "1",
+          "2",
+          "3",
+          "4",
+          "2",
+          "—",
+          "12"
+        ]
+      ],
+      "fields": [
+        {
+          "id": "",
+          "size": "S",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "M",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "L",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "XL",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "2XL",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "3XL",
+          "value": ""
+        },
+        {
+          "id": "pp-note",
+          "value": ""
+        }
+      ],
+      "engineCalls": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".pp-dot--na"
+            ],
+            [
+              ".pp-swatches-label > small"
+            ],
+            [
+              ".pp-req-hint"
+            ],
+            [
+              ".pp-field:nth-child(3) > .pp-flabel > small"
+            ],
+            [
+              "button[data-method=\"EMB\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"SCP\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"DTG\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"DTF\"] > .pp-method-hint"
+            ],
+            [
+              ".pp-field:nth-child(5) > .pp-flabel > small"
+            ],
+            [
+              ".cp-footer"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "PC54 · Core Cotton Tee | Northwest Custom Apparel",
+      "text": "Northwest Custom Apparel Customer portal ← Back to your account ← Back to your account Core Cotton Tee Port & Company · T-Shirts · Style PC54 You’ve ordered 36 of this style · last ordered Sep 9, 2026 Product details Re-order Order history Brilliant Orange Availability S M L XL 2XL 3XL Colors (your colors first) Top color Navy 24 ordered Brilliant Orange 12 ordered About this product A dependable cotton tee for every team. What you’ve ordered Your sizes by color — so a re-order matches what you bought. Color S M L XL 2XL 3XL Total Navy 2 4 6 8 3 1 24 Brilliant Orange 1 2 3 4 2 — 12 Re-order Color: Brilliant Orange (tap any color above to switch) — pick your decoration + sizes and we’ll send it to your rep for a fresh quote. Decoration (how it’s made — defaults to your last order) Embroidery Stitched logo Screen Print Ink — best for larger runs last time DTG Full-color print Transfers Transfer — good for small/complex art Sizes & quantities S M L XL 2XL 3XL Total: 0 Notes (deadline, other sizes/colors — optional) Send to my rep + Add to Re-order List Order history Sep 9, 2026 · Navy 24 pcs · S:2 M:4 L:6 XL:8 2XL:3 3XL:1 Aug 4, 2026 · Brilliant Orange 12 pcs · S:1 M:2 L:3 XL:4 2XL:2 Sent to your rep (River Example)! We’ll follow up with a quote. Northwest Custom Apparel · (253) 922-5793 · sales@nwcustomapparel.com",
+      "ids": {
+        "pp-back-top": "← Back to your account",
+        "pp-back": "← Back to your account",
+        "pp-hero-img": "",
+        "pp-colorname": "Brilliant Orange",
+        "pp-avail": "Availability S M L XL 2XL 3XL",
+        "pp-swatches": "Top color Navy 24 ordered Brilliant Orange 12 ordered",
+        "pp-about": "About this product A dependable cotton tee for every team.",
+        "pp-req-colorlabel": "Brilliant Orange",
+        "pp-methods": "Embroidery Stitched logo Screen Print Ink — best for larger runs last time DTG Full-color print Transfers Transfer — good for small/complex art",
+        "pp-method-min": "",
+        "pp-sizes": "S M L XL 2XL 3XL",
+        "pp-sizetotal": "0",
+        "pp-note": "",
+        "pp-req-error": "",
+        "pp-req-submit": "Send to my rep",
+        "pp-req-addlist": "+ Add to Re-order List",
+        "pp-history": "Order history Sep 9, 2026 · Navy 24 pcs · S:2 M:4 L:6 XL:8 2XL:3 3XL:1 Aug 4, 2026 · Brilliant Orange 12 pcs · S:1 M:2 L:3 XL:4 2XL:2",
+        "cp-toast": "Sent to your rep (River Example)! We’ll follow up with a quote."
+      },
+      "links": [
+        {
+          "href": "/portal",
+          "text": "← Back to your account",
+          "label": null
+        },
+        {
+          "href": "/portal",
+          "text": "← Back to your account",
+          "label": null
+        },
+        {
+          "href": "#pp-about",
+          "text": "Product details",
+          "label": null
+        },
+        {
+          "href": "#pp-reorder",
+          "text": "Re-order",
+          "label": null
+        },
+        {
+          "href": "#pp-history",
+          "text": "Order history",
+          "label": null
+        }
+      ],
+      "rows": [
+        [
+          "Navy",
+          "2",
+          "4",
+          "6",
+          "8",
+          "3",
+          "1",
+          "24"
+        ],
+        [
+          "Brilliant Orange",
+          "1",
+          "2",
+          "3",
+          "4",
+          "2",
+          "—",
+          "12"
+        ]
+      ],
+      "fields": [
+        {
+          "id": "",
+          "size": "S",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "M",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "L",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "XL",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "2XL",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "3XL",
+          "value": ""
+        },
+        {
+          "id": "pp-note",
+          "value": ""
+        }
+      ],
+      "engineCalls": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".pp-dot--na"
+            ],
+            [
+              ".pp-swatches-label > small"
+            ],
+            [
+              ".pp-req-hint"
+            ],
+            [
+              ".pp-field:nth-child(3) > .pp-flabel > small"
+            ],
+            [
+              "button[data-method=\"EMB\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"SCP\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"DTG\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"DTF\"] > .pp-method-hint"
+            ],
+            [
+              ".pp-field:nth-child(5) > .pp-flabel > small"
+            ],
+            [
+              ".cp-footer"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "PC54 · Core Cotton Tee | Northwest Custom Apparel",
+      "text": "Northwest Custom Apparel ← Account ← Back to your account Core Cotton Tee Port & Company · T-Shirts · Style PC54 You’ve ordered 36 of this style · last ordered Sep 9, 2026 Product details Re-order Order history Brilliant Orange Availability S M L XL 2XL 3XL Colors (your colors first) Top color Navy 24 ordered Brilliant Orange 12 ordered About this product A dependable cotton tee for every team. What you’ve ordered Your sizes by color — so a re-order matches what you bought. Color S M L XL 2XL 3XL Total Navy 2 4 6 8 3 1 24 Brilliant Orange 1 2 3 4 2 — 12 Re-order Color: Brilliant Orange (tap any color above to switch) — pick your decoration + sizes and we’ll send it to your rep for a fresh quote. Decoration (how it’s made — defaults to your last order) Embroidery Stitched logo Screen Print Ink — best for larger runs last time DTG Full-color print Transfers Transfer — good for small/complex art Sizes & quantities S M L XL 2XL 3XL Total: 0 Notes (deadline, other sizes/colors — optional) Send to my rep + Add to Re-order List Order history Sep 9, 2026 · Navy 24 pcs · S:2 M:4 L:6 XL:8 2XL:3 3XL:1 Aug 4, 2026 · Brilliant Orange 12 pcs · S:1 M:2 L:3 XL:4 2XL:2 Sent to your rep (River Example)! We’ll follow up with a quote. Northwest Custom Apparel · (253) 922-5793 · sales@nwcustomapparel.com",
+      "ids": {
+        "pp-back-top": "← Account",
+        "pp-back": "← Back to your account",
+        "pp-hero-img": "",
+        "pp-colorname": "Brilliant Orange",
+        "pp-avail": "Availability S M L XL 2XL 3XL",
+        "pp-swatches": "Top color Navy 24 ordered Brilliant Orange 12 ordered",
+        "pp-about": "About this product A dependable cotton tee for every team.",
+        "pp-req-colorlabel": "Brilliant Orange",
+        "pp-methods": "Embroidery Stitched logo Screen Print Ink — best for larger runs last time DTG Full-color print Transfers Transfer — good for small/complex art",
+        "pp-method-min": "",
+        "pp-sizes": "S M L XL 2XL 3XL",
+        "pp-sizetotal": "0",
+        "pp-note": "",
+        "pp-req-error": "",
+        "pp-req-submit": "Send to my rep",
+        "pp-req-addlist": "+ Add to Re-order List",
+        "pp-history": "Order history Sep 9, 2026 · Navy 24 pcs · S:2 M:4 L:6 XL:8 2XL:3 3XL:1 Aug 4, 2026 · Brilliant Orange 12 pcs · S:1 M:2 L:3 XL:4 2XL:2",
+        "cp-toast": "Sent to your rep (River Example)! We’ll follow up with a quote."
+      },
+      "links": [
+        {
+          "href": "/portal",
+          "text": "← Account",
+          "label": null
+        },
+        {
+          "href": "/portal",
+          "text": "← Back to your account",
+          "label": null
+        },
+        {
+          "href": "#pp-about",
+          "text": "Product details",
+          "label": null
+        },
+        {
+          "href": "#pp-reorder",
+          "text": "Re-order",
+          "label": null
+        },
+        {
+          "href": "#pp-history",
+          "text": "Order history",
+          "label": null
+        }
+      ],
+      "rows": [
+        [
+          "Navy",
+          "2",
+          "4",
+          "6",
+          "8",
+          "3",
+          "1",
+          "24"
+        ],
+        [
+          "Brilliant Orange",
+          "1",
+          "2",
+          "3",
+          "4",
+          "2",
+          "—",
+          "12"
+        ]
+      ],
+      "fields": [
+        {
+          "id": "",
+          "size": "S",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "M",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "L",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "XL",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "2XL",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "3XL",
+          "value": ""
+        },
+        {
+          "id": "pp-note",
+          "value": ""
+        }
+      ],
+      "engineCalls": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".pp-dot--na"
+            ],
+            [
+              ".pp-swatches-label > small"
+            ],
+            [
+              ".pp-req-hint"
+            ],
+            [
+              ".pp-field:nth-child(3) > .pp-flabel > small"
+            ],
+            [
+              "button[data-method=\"EMB\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"SCP\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"DTG\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"DTF\"] > .pp-method-hint"
+            ],
+            [
+              ".pp-field:nth-child(5) > .pp-flabel > small"
+            ],
+            [
+              ".cp-footer"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "PC54 · Core Cotton Tee | Northwest Custom Apparel",
+      "text": "Northwest Custom Apparel ← Account ← Back to your account Core Cotton Tee Port & Company · T-Shirts · Style PC54 You’ve ordered 36 of this style · last ordered Sep 9, 2026 Product details Re-order Order history Brilliant Orange Availability S M L XL 2XL 3XL Colors (your colors first) Top color Navy 24 ordered Brilliant Orange 12 ordered About this product A dependable cotton tee for every team. What you’ve ordered Your sizes by color — so a re-order matches what you bought. Color S M L XL 2XL 3XL Total Navy 2 4 6 8 3 1 24 Brilliant Orange 1 2 3 4 2 — 12 Re-order Color: Brilliant Orange (tap any color above to switch) — pick your decoration + sizes and we’ll send it to your rep for a fresh quote. Decoration (how it’s made — defaults to your last order) Embroidery Stitched logo Screen Print Ink — best for larger runs last time DTG Full-color print Transfers Transfer — good for small/complex art Sizes & quantities S M L XL 2XL 3XL Total: 0 Notes (deadline, other sizes/colors — optional) Send to my rep + Add to Re-order List Order history Sep 9, 2026 · Navy 24 pcs · S:2 M:4 L:6 XL:8 2XL:3 3XL:1 Aug 4, 2026 · Brilliant Orange 12 pcs · S:1 M:2 L:3 XL:4 2XL:2 Sent to your rep (River Example)! We’ll follow up with a quote. Northwest Custom Apparel · (253) 922-5793 · sales@nwcustomapparel.com",
+      "ids": {
+        "pp-back-top": "← Account",
+        "pp-back": "← Back to your account",
+        "pp-hero-img": "",
+        "pp-colorname": "Brilliant Orange",
+        "pp-avail": "Availability S M L XL 2XL 3XL",
+        "pp-swatches": "Top color Navy 24 ordered Brilliant Orange 12 ordered",
+        "pp-about": "About this product A dependable cotton tee for every team.",
+        "pp-req-colorlabel": "Brilliant Orange",
+        "pp-methods": "Embroidery Stitched logo Screen Print Ink — best for larger runs last time DTG Full-color print Transfers Transfer — good for small/complex art",
+        "pp-method-min": "",
+        "pp-sizes": "S M L XL 2XL 3XL",
+        "pp-sizetotal": "0",
+        "pp-note": "",
+        "pp-req-error": "",
+        "pp-req-submit": "Send to my rep",
+        "pp-req-addlist": "+ Add to Re-order List",
+        "pp-history": "Order history Sep 9, 2026 · Navy 24 pcs · S:2 M:4 L:6 XL:8 2XL:3 3XL:1 Aug 4, 2026 · Brilliant Orange 12 pcs · S:1 M:2 L:3 XL:4 2XL:2",
+        "cp-toast": "Sent to your rep (River Example)! We’ll follow up with a quote."
+      },
+      "links": [
+        {
+          "href": "/portal",
+          "text": "← Account",
+          "label": null
+        },
+        {
+          "href": "/portal",
+          "text": "← Back to your account",
+          "label": null
+        },
+        {
+          "href": "#pp-about",
+          "text": "Product details",
+          "label": null
+        },
+        {
+          "href": "#pp-reorder",
+          "text": "Re-order",
+          "label": null
+        },
+        {
+          "href": "#pp-history",
+          "text": "Order history",
+          "label": null
+        }
+      ],
+      "rows": [
+        [
+          "Navy",
+          "2",
+          "4",
+          "6",
+          "8",
+          "3",
+          "1",
+          "24"
+        ],
+        [
+          "Brilliant Orange",
+          "1",
+          "2",
+          "3",
+          "4",
+          "2",
+          "—",
+          "12"
+        ]
+      ],
+      "fields": [
+        {
+          "id": "",
+          "size": "S",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "M",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "L",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "XL",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "2XL",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "3XL",
+          "value": ""
+        },
+        {
+          "id": "pp-note",
+          "value": ""
+        }
+      ],
+      "engineCalls": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".pp-dot--na"
+            ],
+            [
+              ".pp-swatches-label > small"
+            ],
+            [
+              ".pp-req-hint"
+            ],
+            [
+              ".pp-field:nth-child(3) > .pp-flabel > small"
+            ],
+            [
+              "button[data-method=\"EMB\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"SCP\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"DTG\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"DTF\"] > .pp-method-hint"
+            ],
+            [
+              ".pp-field:nth-child(5) > .pp-flabel > small"
+            ],
+            [
+              ".cp-footer"
+            ]
+          ]
+        },
+        {
+          "id": "scrollable-region-focusable",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".pp-mx-wrap"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "reads": [
+    {
+      "path": "/api/portal/product/PC54",
+      "query": ""
+    },
+    {
+      "path": "/api/pricing-bundle",
+      "query": "?method=DTG&styleNumber=PC54"
+    },
+    {
+      "path": "/api/portal/product/PC54/availability",
+      "query": "?color=Navy"
+    },
+    {
+      "path": "/api/portal/product/PC54/availability",
+      "query": "?color=BrillOrng"
+    }
+  ],
+  "actions": [
+    {
+      "path": "/api/portal/reorder-request",
+      "method": "POST",
+      "body": "{\"style\":\"PC54\",\"color\":\"Brilliant Orange\",\"product_title\":\"Core Cotton Tee\",\"design_number\":44012,\"design_name\":\"Cedar Example Logo\",\"qty\":\"14\",\"size_breakdown\":\"S:1, M:2, L:3, XL:4, 2XL:2, 3XL:2\",\"method\":\"DTG\",\"note\":\"Synthetic reorder & exact sizes\",\"source\":\"reorder\"}"
+    }
+  ]
+}
