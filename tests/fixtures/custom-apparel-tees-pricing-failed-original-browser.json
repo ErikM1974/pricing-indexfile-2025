@@ -1,0 +1,495 @@
+{
+  "name": "tees-pricing-failed",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Custom T-Shirts — Full-Color Printing, Shipped in 7-10 Days | Northwest Custom Apparel",
+      "ids": {
+        "gallery-grid": "PORT & CO BEST SELLER Port & Company Example Shirt PC54 · T-Shirt · Cotton Soft everyday apparel for your team. $20.58/shirt 12 shirts · full-front print 24+ $16.00 · 48+ $15.00 · 72+ $14.00 per shirt 300 printed Customize PORT & CO BEST SELLER Port & Company Example Shirt PC61LS · Long Sleeve Tee · Cotton Soft everyday apparel for your team. $20.58/shirt 12 shirts · full-front print 24+ $16.00 · 48+ $15.00 · 72+ $14.00 per shirt 220 printed Customize PORT & CO BEST SELLER Port & Company Example Shirt PC90H · Hoodie · Cotton Soft everyday apparel for your team. $20.58/shirt 12 shirts · full-front print 24+ $16.00 · 48+ $15.00 · 72+ $14.00 per shirt 140 printed Customize",
+        "tdt-fatal": "We can’t load live pricing right now We couldn’t load live pricing or stock for PC54 (HTTP 503 from https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bundle {\"tiersR\":[{\"TierLabel\":\"1-11\",\"MinQuantity\":1,\"MaxQuantity\":11,\"MarginDenominator\":0.53,\"LTM_Fee\":25},{\"TierLabel\":\"12-23\",\"MinQuantity\":12) — or call us and we’ll take your order by phone. 253-922-5793 Try again"
+      },
+      "fields": [
+        {
+          "id": "gallery-search",
+          "name": "",
+          "type": "search",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gallery-sort",
+          "name": "",
+          "type": "select-one",
+          "value": "popular",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#stage-gallery",
+          "text": "Skip to the catalog"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "/",
+          "text": "Northwest Custom Apparel Custom T-Shirts · Full-Color DTG"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "#stage-gallery",
+          "text": "Pick your shirt — upload your AI art"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        }
+      ],
+      "cart": {
+        "lines": []
+      },
+      "quote": null,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              "em"
+            ],
+            [
+              "figure:nth-child(1) > figcaption"
+            ],
+            [
+              "figure:nth-child(2) > figcaption"
+            ],
+            [
+              "figure:nth-child(3) > figcaption"
+            ],
+            [
+              "figure:nth-child(4) > figcaption"
+            ],
+            [
+              "figure:nth-child(5) > figcaption"
+            ],
+            [
+              "article:nth-child(1) > .gallery-card-body > .gallery-card-style"
+            ],
+            [
+              "article:nth-child(1) > .gallery-card-body > .gallery-card-pricing > .gallery-price-ladder"
+            ],
+            [
+              "article:nth-child(2) > .gallery-card-body > .gallery-card-style"
+            ],
+            [
+              "article:nth-child(2) > .gallery-card-body > .gallery-card-pricing > .gallery-price-ladder"
+            ],
+            [
+              "article:nth-child(3) > .gallery-card-body > .gallery-card-style"
+            ],
+            [
+              "article:nth-child(3) > .gallery-card-body > .gallery-card-pricing > .gallery-price-ladder"
+            ]
+          ]
+        },
+        {
+          "id": "nested-interactive",
+          "impact": "serious",
+          "nodes": [
+            [
+              "article:nth-child(1)"
+            ],
+            [
+              "article:nth-child(2)"
+            ],
+            [
+              "article:nth-child(3)"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Custom T-Shirts — Full-Color Printing, Shipped in 7-10 Days | Northwest Custom Apparel",
+      "ids": {
+        "gallery-grid": "PORT & CO BEST SELLER Port & Company Example Shirt PC54 · T-Shirt · Cotton Soft everyday apparel for your team. $20.58/shirt 12 shirts · full-front print 24+ $16.00 · 48+ $15.00 · 72+ $14.00 per shirt 300 printed Customize PORT & CO BEST SELLER Port & Company Example Shirt PC61LS · Long Sleeve Tee · Cotton Soft everyday apparel for your team. $20.58/shirt 12 shirts · full-front print 24+ $16.00 · 48+ $15.00 · 72+ $14.00 per shirt 220 printed Customize PORT & CO BEST SELLER Port & Company Example Shirt PC90H · Hoodie · Cotton Soft everyday apparel for your team. $20.58/shirt 12 shirts · full-front print 24+ $16.00 · 48+ $15.00 · 72+ $14.00 per shirt 140 printed Customize",
+        "tdt-fatal": "We can’t load live pricing right now We couldn’t load live pricing or stock for PC54 (HTTP 503 from https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bundle {\"tiersR\":[{\"TierLabel\":\"1-11\",\"MinQuantity\":1,\"MaxQuantity\":11,\"MarginDenominator\":0.53,\"LTM_Fee\":25},{\"TierLabel\":\"12-23\",\"MinQuantity\":12) — or call us and we’ll take your order by phone. 253-922-5793 Try again"
+      },
+      "fields": [
+        {
+          "id": "gallery-search",
+          "name": "",
+          "type": "search",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gallery-sort",
+          "name": "",
+          "type": "select-one",
+          "value": "popular",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#stage-gallery",
+          "text": "Skip to the catalog"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "/",
+          "text": "Northwest Custom Apparel Custom T-Shirts · Full-Color DTG"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "#stage-gallery",
+          "text": "Pick your shirt — upload your AI art"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        }
+      ],
+      "cart": {
+        "lines": []
+      },
+      "quote": null,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              "em"
+            ],
+            [
+              "figure:nth-child(1) > figcaption"
+            ],
+            [
+              "figure:nth-child(2) > figcaption"
+            ],
+            [
+              "figure:nth-child(3) > figcaption"
+            ],
+            [
+              "figure:nth-child(4) > figcaption"
+            ],
+            [
+              "figure:nth-child(5) > figcaption"
+            ],
+            [
+              "article:nth-child(1) > .gallery-card-body > .gallery-card-style"
+            ],
+            [
+              "article:nth-child(1) > .gallery-card-body > .gallery-card-pricing > .gallery-price-ladder"
+            ],
+            [
+              "article:nth-child(2) > .gallery-card-body > .gallery-card-style"
+            ],
+            [
+              "article:nth-child(2) > .gallery-card-body > .gallery-card-pricing > .gallery-price-ladder"
+            ],
+            [
+              "article:nth-child(3) > .gallery-card-body > .gallery-card-pricing > .gallery-price-ladder"
+            ]
+          ]
+        },
+        {
+          "id": "nested-interactive",
+          "impact": "serious",
+          "nodes": [
+            [
+              "article:nth-child(1)"
+            ],
+            [
+              "article:nth-child(2)"
+            ],
+            [
+              "article:nth-child(3)"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Custom T-Shirts — Full-Color Printing, Shipped in 7-10 Days | Northwest Custom Apparel",
+      "ids": {
+        "gallery-grid": "PORT & CO BEST SELLER Port & Company Example Shirt PC54 · T-Shirt · Cotton Soft everyday apparel for your team. $20.58/shirt 12 shirts · full-front print 24+ $16.00 · 48+ $15.00 · 72+ $14.00 per shirt 300 printed Customize PORT & CO BEST SELLER Port & Company Example Shirt PC61LS · Long Sleeve Tee · Cotton Soft everyday apparel for your team. $20.58/shirt 12 shirts · full-front print 24+ $16.00 · 48+ $15.00 · 72+ $14.00 per shirt 220 printed Customize PORT & CO BEST SELLER Port & Company Example Shirt PC90H · Hoodie · Cotton Soft everyday apparel for your team. $20.58/shirt 12 shirts · full-front print 24+ $16.00 · 48+ $15.00 · 72+ $14.00 per shirt 140 printed Customize",
+        "tdt-fatal": "We can’t load live pricing right now We couldn’t load live pricing or stock for PC54 (HTTP 503 from https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bundle {\"tiersR\":[{\"TierLabel\":\"1-11\",\"MinQuantity\":1,\"MaxQuantity\":11,\"MarginDenominator\":0.53,\"LTM_Fee\":25},{\"TierLabel\":\"12-23\",\"MinQuantity\":12) — or call us and we’ll take your order by phone. 253-922-5793 Try again"
+      },
+      "fields": [
+        {
+          "id": "gallery-search",
+          "name": "",
+          "type": "search",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gallery-sort",
+          "name": "",
+          "type": "select-one",
+          "value": "popular",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#stage-gallery",
+          "text": "Skip to the catalog"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "/",
+          "text": "Northwest Custom Apparel Custom T-Shirts · Full-Color DTG"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "#stage-gallery",
+          "text": "Pick your shirt — upload your AI art"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        }
+      ],
+      "cart": {
+        "lines": []
+      },
+      "quote": null,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              "em"
+            ],
+            [
+              "figure:nth-child(1) > figcaption"
+            ],
+            [
+              "figure:nth-child(2) > figcaption"
+            ],
+            [
+              "figure:nth-child(3) > figcaption"
+            ],
+            [
+              "figure:nth-child(4) > figcaption"
+            ],
+            [
+              "figure:nth-child(5) > figcaption"
+            ],
+            [
+              "article:nth-child(1) > .gallery-card-body > .gallery-card-style"
+            ],
+            [
+              "article:nth-child(1) > .gallery-card-body > .gallery-card-pricing > .gallery-price-ladder"
+            ],
+            [
+              "article:nth-child(2) > .gallery-card-body > .gallery-card-style"
+            ],
+            [
+              "article:nth-child(2) > .gallery-card-body > .gallery-card-pricing > .gallery-price-ladder"
+            ],
+            [
+              "article:nth-child(3) > .gallery-card-body > .gallery-card-style"
+            ],
+            [
+              "article:nth-child(3) > .gallery-card-body > .gallery-card-pricing > .gallery-price-ladder"
+            ]
+          ]
+        },
+        {
+          "id": "nested-interactive",
+          "impact": "serious",
+          "nodes": [
+            [
+              "article:nth-child(1)"
+            ],
+            [
+              "article:nth-child(2)"
+            ],
+            [
+              "article:nth-child(3)"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Custom T-Shirts — Full-Color Printing, Shipped in 7-10 Days | Northwest Custom Apparel",
+      "ids": {
+        "gallery-grid": "PORT & CO BEST SELLER Port & Company Example Shirt PC54 · T-Shirt · Cotton Soft everyday apparel for your team. $20.58/shirt 12 shirts · full-front print 24+ $16.00 · 48+ $15.00 · 72+ $14.00 per shirt 300 printed Customize PORT & CO BEST SELLER Port & Company Example Shirt PC61LS · Long Sleeve Tee · Cotton Soft everyday apparel for your team. $20.58/shirt 12 shirts · full-front print 24+ $16.00 · 48+ $15.00 · 72+ $14.00 per shirt 220 printed Customize PORT & CO BEST SELLER Port & Company Example Shirt PC90H · Hoodie · Cotton Soft everyday apparel for your team. $20.58/shirt 12 shirts · full-front print 24+ $16.00 · 48+ $15.00 · 72+ $14.00 per shirt 140 printed Customize",
+        "tdt-fatal": "We can’t load live pricing right now We couldn’t load live pricing or stock for PC54 (HTTP 503 from https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bundle {\"tiersR\":[{\"TierLabel\":\"1-11\",\"MinQuantity\":1,\"MaxQuantity\":11,\"MarginDenominator\":0.53,\"LTM_Fee\":25},{\"TierLabel\":\"12-23\",\"MinQuantity\":12) — or call us and we’ll take your order by phone. 253-922-5793 Try again"
+      },
+      "fields": [
+        {
+          "id": "gallery-search",
+          "name": "",
+          "type": "search",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gallery-sort",
+          "name": "",
+          "type": "select-one",
+          "value": "popular",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#stage-gallery",
+          "text": "Skip to the catalog"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "/",
+          "text": "Northwest Custom Apparel Custom T-Shirts · Full-Color DTG"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "#stage-gallery",
+          "text": "Pick your shirt — upload your AI art"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        }
+      ],
+      "cart": {
+        "lines": []
+      },
+      "quote": null,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              "em"
+            ],
+            [
+              "figure:nth-child(1) > figcaption"
+            ],
+            [
+              "figure:nth-child(2) > figcaption"
+            ],
+            [
+              "figure:nth-child(3) > figcaption"
+            ],
+            [
+              "figure:nth-child(4) > figcaption"
+            ],
+            [
+              "figure:nth-child(5) > figcaption"
+            ],
+            [
+              "article:nth-child(1) > .gallery-card-body > .gallery-card-pricing > .gallery-price-ladder"
+            ],
+            [
+              "article:nth-child(2) > .gallery-card-body > .gallery-card-pricing > .gallery-price-ladder"
+            ],
+            [
+              "article:nth-child(3) > .gallery-card-body > .gallery-card-pricing > .gallery-price-ladder"
+            ]
+          ]
+        },
+        {
+          "id": "nested-interactive",
+          "impact": "serious",
+          "nodes": [
+            [
+              "article:nth-child(1)"
+            ],
+            [
+              "article:nth-child(2)"
+            ],
+            [
+              "article:nth-child(3)"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "actions": [],
+  "dialogs": []
+}

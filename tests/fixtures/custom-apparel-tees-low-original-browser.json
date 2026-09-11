@@ -1,0 +1,1883 @@
+{
+  "name": "tees-low",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Custom T-Shirts — Full-Color Printing, Shipped in 7-10 Days | Northwest Custom Apparel",
+      "ids": {
+        "gallery-grid": "PORT & CO BEST SELLER Port & Company Example Shirt PC54 · T-Shirt · Cotton Soft everyday apparel for your team. $20.58/shirt 12 shirts · full-front print 24+ $16.00 · 48+ $15.00 · 72+ $14.00 per shirt 300 printed Customize PORT & CO BEST SELLER Port & Company Example Shirt PC61LS · Long Sleeve Tee · Cotton Soft everyday apparel for your team. $20.58/shirt 12 shirts · full-front print 24+ $16.00 · 48+ $15.00 · 72+ $14.00 per shirt 220 printed Customize PORT & CO BEST SELLER Port & Company Example Shirt PC90H · Hoodie · Cotton Soft everyday apparel for your team. $20.58/shirt 12 shirts · full-front print 24+ $16.00 · 48+ $15.00 · 72+ $14.00 per shirt 140 printed Customize",
+        "current-product-name": "Port & Company Example Shirt",
+        "current-product-style": "Style PC54 · 2 print-tested colors",
+        "color-chips": "Jet Black 12 left Brilliant Orange 12 left",
+        "color-cards": "Jet Black S Only 2 left − + M Only 2 left − + L Only 2 left − + XL Only 2 left − + 2XL +$2.00 Only 2 left − + 3XL +$3.00 Only 2 left − + 2 pieces",
+        "review-lines": "COLOR SIZE QTY EACH TOTAL Jet Black M 2 $26.00 $52.00",
+        "review-totals": "Shirts (2) $52.00 UPS Ground shipping $7.99 Sales tax enter address Total $59.99",
+        "review-promise": "Ships Wed, Sep 23 – Mon, Sep 28 from Milton, WA",
+        "pay-reasons": "Add artwork Enter contact info Enter shipping address Confirm you have rights to your artwork",
+        "pay-btn-label": "Pay",
+        "tax-stamp": "Sales tax is calculated from your ZIP."
+      },
+      "fields": [
+        {
+          "id": "gallery-search",
+          "name": "",
+          "type": "search",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gallery-sort",
+          "name": "",
+          "type": "select-one",
+          "value": "popular",
+          "disabled": false
+        },
+        {
+          "id": "back-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "2",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-first",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-last",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-email",
+          "name": "",
+          "type": "email",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-phone",
+          "name": "",
+          "type": "tel",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-company",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "rush-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "d-ship",
+          "name": "delivery",
+          "type": "radio",
+          "value": "ship",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "d-pickup",
+          "name": "delivery",
+          "type": "radio",
+          "value": "pickup",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-addr1",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-city",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-state",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-zip",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-notes",
+          "name": "",
+          "type": "textarea",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "rights-ack",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#stage-gallery",
+          "text": "Skip to the catalog"
+        },
+        {
+          "href": "/",
+          "text": "Northwest Custom Apparel Custom T-Shirts · Full-Color DTG"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "#stage-gallery",
+          "text": "Pick your shirt — upload your AI art"
+        },
+        {
+          "href": "https://maps.google.com/?cid=4107380119454186786",
+          "text": "★★★★★ Google review · 4.9 from 185+"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        }
+      ],
+      "cart": {
+        "lines": [
+          {
+            "catalogColor": "JetBlack",
+            "qty": {
+              "S": 0,
+              "M": 2,
+              "L": 0,
+              "XL": 0,
+              "2XL": 0,
+              "3XL": 0
+            }
+          }
+        ]
+      },
+      "quote": {
+        "combinedQty": 2,
+        "tierLabel": "1-11",
+        "unitBySize": {
+          "S": {
+            "finalPrice": 26,
+            "basePrice": 13.5,
+            "rushFee": 0,
+            "upcharge": 0,
+            "tierLabel": "1-11",
+            "costLabel": "24-47"
+          },
+          "M": {
+            "finalPrice": 26,
+            "basePrice": 13.5,
+            "rushFee": 0,
+            "upcharge": 0,
+            "tierLabel": "1-11",
+            "costLabel": "24-47"
+          },
+          "L": {
+            "finalPrice": 26,
+            "basePrice": 13.5,
+            "rushFee": 0,
+            "upcharge": 0,
+            "tierLabel": "1-11",
+            "costLabel": "24-47"
+          },
+          "XL": {
+            "finalPrice": 26,
+            "basePrice": 13.5,
+            "rushFee": 0,
+            "upcharge": 0,
+            "tierLabel": "1-11",
+            "costLabel": "24-47"
+          },
+          "2XL": {
+            "finalPrice": 28,
+            "basePrice": 13.5,
+            "rushFee": 0,
+            "upcharge": 2,
+            "tierLabel": "1-11",
+            "costLabel": "24-47"
+          },
+          "3XL": {
+            "finalPrice": 29,
+            "basePrice": 13.5,
+            "rushFee": 0,
+            "upcharge": 3,
+            "tierLabel": "1-11",
+            "costLabel": "24-47"
+          }
+        },
+        "lines": [
+          {
+            "catalogColor": "JetBlack",
+            "colorName": "Jet Black",
+            "size": "M",
+            "quantity": 2,
+            "unitPrice": 26,
+            "extended": 52
+          }
+        ],
+        "shirtsSubtotal": 52,
+        "ltmFee": 0,
+        "ltmPerPiece": 0,
+        "ltmBaked": true,
+        "ltmBakedPerPiece": 12.5,
+        "ltmBakedTotal": 25,
+        "rush": false,
+        "saleOff": 0,
+        "backLocation": null,
+        "shipping": 7.99,
+        "shippingModel": "threshold",
+        "freeShipRemaining": 48,
+        "shipFreeOver": 100,
+        "taxRate": null,
+        "taxableBase": 59.99,
+        "tax": 0,
+        "total": 59.99,
+        "perShirt": 26,
+        "nudge": {
+          "type": "best"
+        }
+      },
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              "em"
+            ],
+            [
+              "figure:nth-child(1) > figcaption"
+            ],
+            [
+              "figure:nth-child(2) > figcaption"
+            ],
+            [
+              "figure:nth-child(3) > figcaption"
+            ],
+            [
+              "figure:nth-child(4) > figcaption"
+            ],
+            [
+              "figure:nth-child(5) > figcaption"
+            ],
+            [
+              "article:nth-child(1) > .gallery-card-body > .gallery-card-pricing > .gallery-price-ladder"
+            ],
+            [
+              "article:nth-child(2) > .gallery-card-body > .gallery-card-pricing > .gallery-price-ladder"
+            ],
+            [
+              "article:nth-child(3) > .gallery-card-body > .gallery-card-pricing > .gallery-price-ladder"
+            ],
+            [
+              "#canvas-hint"
+            ],
+            [
+              ".canvas-disclaimer"
+            ],
+            [
+              ".control-block:nth-child(1) > .control-label"
+            ],
+            [
+              ".spr-row > span:nth-child(2)"
+            ],
+            [
+              ".size-price-note"
+            ],
+            [
+              "#back-delta"
+            ],
+            [
+              "#drop-label"
+            ],
+            [
+              "#drop-formats"
+            ],
+            [
+              ".drop-quality"
+            ],
+            [
+              ".size-cell:nth-child(5) > .size-cell-label > small"
+            ],
+            [
+              ".size-cell:nth-child(6) > .size-cell-label > small"
+            ],
+            [
+              ".tier-notch-label:nth-child(4)"
+            ],
+            [
+              ".tier-notch-label:nth-child(6)"
+            ],
+            [
+              ".tier-notch-label:nth-child(8)"
+            ],
+            [
+              ".tier-notch-label:nth-child(10)"
+            ],
+            [
+              "#rush-copy"
+            ],
+            [
+              "#ship-fee-label"
+            ],
+            [
+              ".delivery-card:nth-child(2) > .delivery-card-body > small"
+            ],
+            [
+              "#tax-stamp"
+            ],
+            [
+              "th:nth-child(1)"
+            ],
+            [
+              "th:nth-child(2)"
+            ],
+            [
+              "th:nth-child(3)"
+            ],
+            [
+              "th:nth-child(4)"
+            ],
+            [
+              "th:nth-child(5)"
+            ],
+            [
+              ".stripe-note"
+            ],
+            [
+              "#smart-cta"
+            ]
+          ]
+        },
+        {
+          "id": "nested-interactive",
+          "impact": "serious",
+          "nodes": [
+            [
+              "article:nth-child(1)"
+            ],
+            [
+              "article:nth-child(2)"
+            ],
+            [
+              "article:nth-child(3)"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Custom T-Shirts — Full-Color Printing, Shipped in 7-10 Days | Northwest Custom Apparel",
+      "ids": {
+        "gallery-grid": "PORT & CO BEST SELLER Port & Company Example Shirt PC54 · T-Shirt · Cotton Soft everyday apparel for your team. $20.58/shirt 12 shirts · full-front print 24+ $16.00 · 48+ $15.00 · 72+ $14.00 per shirt 300 printed Customize PORT & CO BEST SELLER Port & Company Example Shirt PC61LS · Long Sleeve Tee · Cotton Soft everyday apparel for your team. $20.58/shirt 12 shirts · full-front print 24+ $16.00 · 48+ $15.00 · 72+ $14.00 per shirt 220 printed Customize PORT & CO BEST SELLER Port & Company Example Shirt PC90H · Hoodie · Cotton Soft everyday apparel for your team. $20.58/shirt 12 shirts · full-front print 24+ $16.00 · 48+ $15.00 · 72+ $14.00 per shirt 140 printed Customize",
+        "current-product-name": "Port & Company Example Shirt",
+        "current-product-style": "Style PC54 · 2 print-tested colors",
+        "color-chips": "Jet Black 12 left Brilliant Orange 12 left",
+        "color-cards": "Jet Black S Only 2 left − + M Only 2 left − + L Only 2 left − + XL Only 2 left − + 2XL +$2.00 Only 2 left − + 3XL +$3.00 Only 2 left − + 2 pieces",
+        "review-lines": "COLOR SIZE QTY EACH TOTAL Jet Black M 2 $26.00 $52.00",
+        "review-totals": "Shirts (2) $52.00 UPS Ground shipping $7.99 Sales tax enter address Total $59.99",
+        "review-promise": "Ships Wed, Sep 23 – Mon, Sep 28 from Milton, WA",
+        "pay-reasons": "Add artwork Enter contact info Enter shipping address Confirm you have rights to your artwork",
+        "pay-btn-label": "Pay",
+        "tax-stamp": "Sales tax is calculated from your ZIP."
+      },
+      "fields": [
+        {
+          "id": "gallery-search",
+          "name": "",
+          "type": "search",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gallery-sort",
+          "name": "",
+          "type": "select-one",
+          "value": "popular",
+          "disabled": false
+        },
+        {
+          "id": "back-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "2",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-first",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-last",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-email",
+          "name": "",
+          "type": "email",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-phone",
+          "name": "",
+          "type": "tel",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-company",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "rush-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "d-ship",
+          "name": "delivery",
+          "type": "radio",
+          "value": "ship",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "d-pickup",
+          "name": "delivery",
+          "type": "radio",
+          "value": "pickup",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-addr1",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-city",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-state",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-zip",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-notes",
+          "name": "",
+          "type": "textarea",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "rights-ack",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#stage-gallery",
+          "text": "Skip to the catalog"
+        },
+        {
+          "href": "/",
+          "text": "Northwest Custom Apparel Custom T-Shirts · Full-Color DTG"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "#stage-gallery",
+          "text": "Pick your shirt — upload your AI art"
+        },
+        {
+          "href": "https://maps.google.com/?cid=4107380119454186786",
+          "text": "★★★★★ Google review · 4.9 from 185+"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        }
+      ],
+      "cart": {
+        "lines": [
+          {
+            "catalogColor": "JetBlack",
+            "qty": {
+              "S": 0,
+              "M": 2,
+              "L": 0,
+              "XL": 0,
+              "2XL": 0,
+              "3XL": 0
+            }
+          }
+        ]
+      },
+      "quote": {
+        "combinedQty": 2,
+        "tierLabel": "1-11",
+        "unitBySize": {
+          "S": {
+            "finalPrice": 26,
+            "basePrice": 13.5,
+            "rushFee": 0,
+            "upcharge": 0,
+            "tierLabel": "1-11",
+            "costLabel": "24-47"
+          },
+          "M": {
+            "finalPrice": 26,
+            "basePrice": 13.5,
+            "rushFee": 0,
+            "upcharge": 0,
+            "tierLabel": "1-11",
+            "costLabel": "24-47"
+          },
+          "L": {
+            "finalPrice": 26,
+            "basePrice": 13.5,
+            "rushFee": 0,
+            "upcharge": 0,
+            "tierLabel": "1-11",
+            "costLabel": "24-47"
+          },
+          "XL": {
+            "finalPrice": 26,
+            "basePrice": 13.5,
+            "rushFee": 0,
+            "upcharge": 0,
+            "tierLabel": "1-11",
+            "costLabel": "24-47"
+          },
+          "2XL": {
+            "finalPrice": 28,
+            "basePrice": 13.5,
+            "rushFee": 0,
+            "upcharge": 2,
+            "tierLabel": "1-11",
+            "costLabel": "24-47"
+          },
+          "3XL": {
+            "finalPrice": 29,
+            "basePrice": 13.5,
+            "rushFee": 0,
+            "upcharge": 3,
+            "tierLabel": "1-11",
+            "costLabel": "24-47"
+          }
+        },
+        "lines": [
+          {
+            "catalogColor": "JetBlack",
+            "colorName": "Jet Black",
+            "size": "M",
+            "quantity": 2,
+            "unitPrice": 26,
+            "extended": 52
+          }
+        ],
+        "shirtsSubtotal": 52,
+        "ltmFee": 0,
+        "ltmPerPiece": 0,
+        "ltmBaked": true,
+        "ltmBakedPerPiece": 12.5,
+        "ltmBakedTotal": 25,
+        "rush": false,
+        "saleOff": 0,
+        "backLocation": null,
+        "shipping": 7.99,
+        "shippingModel": "threshold",
+        "freeShipRemaining": 48,
+        "shipFreeOver": 100,
+        "taxRate": null,
+        "taxableBase": 59.99,
+        "tax": 0,
+        "total": 59.99,
+        "perShirt": 26,
+        "nudge": {
+          "type": "best"
+        }
+      },
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              "em"
+            ],
+            [
+              "figure:nth-child(1) > figcaption"
+            ],
+            [
+              "figure:nth-child(2) > figcaption"
+            ],
+            [
+              "figure:nth-child(3) > figcaption"
+            ],
+            [
+              "figure:nth-child(4) > figcaption"
+            ],
+            [
+              "figure:nth-child(5) > figcaption"
+            ],
+            [
+              "article:nth-child(1) > .gallery-card-body > .gallery-card-pricing > .gallery-price-ladder"
+            ],
+            [
+              "article:nth-child(2) > .gallery-card-body > .gallery-card-pricing > .gallery-price-ladder"
+            ],
+            [
+              "article:nth-child(3) > .gallery-card-body > .gallery-card-pricing > .gallery-price-ladder"
+            ],
+            [
+              "#canvas-hint"
+            ],
+            [
+              ".canvas-disclaimer"
+            ],
+            [
+              ".control-block:nth-child(1) > .control-label"
+            ],
+            [
+              ".spr-row > span:nth-child(2)"
+            ],
+            [
+              ".size-price-note"
+            ],
+            [
+              "#back-delta"
+            ],
+            [
+              "#drop-label"
+            ],
+            [
+              "#drop-formats"
+            ],
+            [
+              ".drop-quality"
+            ],
+            [
+              ".size-cell:nth-child(5) > .size-cell-label > small"
+            ],
+            [
+              ".size-cell:nth-child(6) > .size-cell-label > small"
+            ],
+            [
+              ".tier-notch-label:nth-child(4)"
+            ],
+            [
+              ".tier-notch-label:nth-child(6)"
+            ],
+            [
+              ".tier-notch-label:nth-child(8)"
+            ],
+            [
+              ".tier-notch-label:nth-child(10)"
+            ],
+            [
+              "#rush-copy"
+            ],
+            [
+              "#ship-fee-label"
+            ],
+            [
+              ".delivery-card:nth-child(2) > .delivery-card-body > small"
+            ],
+            [
+              "#tax-stamp"
+            ],
+            [
+              "th:nth-child(1)"
+            ],
+            [
+              "th:nth-child(2)"
+            ],
+            [
+              "th:nth-child(3)"
+            ],
+            [
+              "th:nth-child(4)"
+            ],
+            [
+              "th:nth-child(5)"
+            ],
+            [
+              ".stripe-note"
+            ],
+            [
+              "#smart-cta"
+            ]
+          ]
+        },
+        {
+          "id": "nested-interactive",
+          "impact": "serious",
+          "nodes": [
+            [
+              "article:nth-child(1)"
+            ],
+            [
+              "article:nth-child(2)"
+            ],
+            [
+              "article:nth-child(3)"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Custom T-Shirts — Full-Color Printing, Shipped in 7-10 Days | Northwest Custom Apparel",
+      "ids": {
+        "gallery-grid": "PORT & CO BEST SELLER Port & Company Example Shirt PC54 · T-Shirt · Cotton Soft everyday apparel for your team. $20.58/shirt 12 shirts · full-front print 24+ $16.00 · 48+ $15.00 · 72+ $14.00 per shirt 300 printed Customize PORT & CO BEST SELLER Port & Company Example Shirt PC61LS · Long Sleeve Tee · Cotton Soft everyday apparel for your team. $20.58/shirt 12 shirts · full-front print 24+ $16.00 · 48+ $15.00 · 72+ $14.00 per shirt 220 printed Customize PORT & CO BEST SELLER Port & Company Example Shirt PC90H · Hoodie · Cotton Soft everyday apparel for your team. $20.58/shirt 12 shirts · full-front print 24+ $16.00 · 48+ $15.00 · 72+ $14.00 per shirt 140 printed Customize",
+        "current-product-name": "Port & Company Example Shirt",
+        "current-product-style": "Style PC54 · 2 print-tested colors",
+        "color-chips": "Jet Black 12 left Brilliant Orange 12 left",
+        "color-cards": "Jet Black S Only 2 left − + M Only 2 left − + L Only 2 left − + XL Only 2 left − + 2XL +$2.00 Only 2 left − + 3XL +$3.00 Only 2 left − + 2 pieces",
+        "review-lines": "COLOR SIZE QTY EACH TOTAL Jet Black M 2 $26.00 $52.00",
+        "review-totals": "Shirts (2) $52.00 UPS Ground shipping $7.99 Sales tax enter address Total $59.99",
+        "review-promise": "Ships Wed, Sep 23 – Mon, Sep 28 from Milton, WA",
+        "pay-reasons": "Add artwork Enter contact info Enter shipping address Confirm you have rights to your artwork",
+        "pay-btn-label": "Pay",
+        "tax-stamp": "Sales tax is calculated from your ZIP."
+      },
+      "fields": [
+        {
+          "id": "gallery-search",
+          "name": "",
+          "type": "search",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gallery-sort",
+          "name": "",
+          "type": "select-one",
+          "value": "popular",
+          "disabled": false
+        },
+        {
+          "id": "back-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "2",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-first",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-last",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-email",
+          "name": "",
+          "type": "email",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-phone",
+          "name": "",
+          "type": "tel",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-company",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "rush-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "d-ship",
+          "name": "delivery",
+          "type": "radio",
+          "value": "ship",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "d-pickup",
+          "name": "delivery",
+          "type": "radio",
+          "value": "pickup",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-addr1",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-city",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-state",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-zip",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-notes",
+          "name": "",
+          "type": "textarea",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "rights-ack",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#stage-gallery",
+          "text": "Skip to the catalog"
+        },
+        {
+          "href": "/",
+          "text": "Northwest Custom Apparel Custom T-Shirts · Full-Color DTG"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "#stage-gallery",
+          "text": "Pick your shirt — upload your AI art"
+        },
+        {
+          "href": "https://maps.google.com/?cid=4107380119454186786",
+          "text": "★★★★★ Google review · 4.9 from 185+"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        }
+      ],
+      "cart": {
+        "lines": [
+          {
+            "catalogColor": "JetBlack",
+            "qty": {
+              "S": 0,
+              "M": 2,
+              "L": 0,
+              "XL": 0,
+              "2XL": 0,
+              "3XL": 0
+            }
+          }
+        ]
+      },
+      "quote": {
+        "combinedQty": 2,
+        "tierLabel": "1-11",
+        "unitBySize": {
+          "S": {
+            "finalPrice": 26,
+            "basePrice": 13.5,
+            "rushFee": 0,
+            "upcharge": 0,
+            "tierLabel": "1-11",
+            "costLabel": "24-47"
+          },
+          "M": {
+            "finalPrice": 26,
+            "basePrice": 13.5,
+            "rushFee": 0,
+            "upcharge": 0,
+            "tierLabel": "1-11",
+            "costLabel": "24-47"
+          },
+          "L": {
+            "finalPrice": 26,
+            "basePrice": 13.5,
+            "rushFee": 0,
+            "upcharge": 0,
+            "tierLabel": "1-11",
+            "costLabel": "24-47"
+          },
+          "XL": {
+            "finalPrice": 26,
+            "basePrice": 13.5,
+            "rushFee": 0,
+            "upcharge": 0,
+            "tierLabel": "1-11",
+            "costLabel": "24-47"
+          },
+          "2XL": {
+            "finalPrice": 28,
+            "basePrice": 13.5,
+            "rushFee": 0,
+            "upcharge": 2,
+            "tierLabel": "1-11",
+            "costLabel": "24-47"
+          },
+          "3XL": {
+            "finalPrice": 29,
+            "basePrice": 13.5,
+            "rushFee": 0,
+            "upcharge": 3,
+            "tierLabel": "1-11",
+            "costLabel": "24-47"
+          }
+        },
+        "lines": [
+          {
+            "catalogColor": "JetBlack",
+            "colorName": "Jet Black",
+            "size": "M",
+            "quantity": 2,
+            "unitPrice": 26,
+            "extended": 52
+          }
+        ],
+        "shirtsSubtotal": 52,
+        "ltmFee": 0,
+        "ltmPerPiece": 0,
+        "ltmBaked": true,
+        "ltmBakedPerPiece": 12.5,
+        "ltmBakedTotal": 25,
+        "rush": false,
+        "saleOff": 0,
+        "backLocation": null,
+        "shipping": 7.99,
+        "shippingModel": "threshold",
+        "freeShipRemaining": 48,
+        "shipFreeOver": 100,
+        "taxRate": null,
+        "taxableBase": 59.99,
+        "tax": 0,
+        "total": 59.99,
+        "perShirt": 26,
+        "nudge": {
+          "type": "best"
+        }
+      },
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              "em"
+            ],
+            [
+              "figure:nth-child(1) > figcaption"
+            ],
+            [
+              "figure:nth-child(2) > figcaption"
+            ],
+            [
+              "figure:nth-child(3) > figcaption"
+            ],
+            [
+              "figure:nth-child(4) > figcaption"
+            ],
+            [
+              "figure:nth-child(5) > figcaption"
+            ],
+            [
+              "article:nth-child(1) > .gallery-card-body > .gallery-card-style"
+            ],
+            [
+              "article:nth-child(1) > .gallery-card-body > .gallery-card-pricing > .gallery-price-ladder"
+            ],
+            [
+              "article:nth-child(2) > .gallery-card-body > .gallery-card-style"
+            ],
+            [
+              "article:nth-child(2) > .gallery-card-body > .gallery-card-pricing > .gallery-price-ladder"
+            ],
+            [
+              "article:nth-child(3) > .gallery-card-body > .gallery-card-style"
+            ],
+            [
+              "article:nth-child(3) > .gallery-card-body > .gallery-card-pricing > .gallery-price-ladder"
+            ],
+            [
+              "#canvas-hint"
+            ],
+            [
+              ".canvas-disclaimer"
+            ],
+            [
+              ".control-block:nth-child(1) > .control-label"
+            ],
+            [
+              ".spr-row > span:nth-child(2)"
+            ],
+            [
+              ".size-price-note"
+            ],
+            [
+              "#back-delta"
+            ],
+            [
+              "#drop-label"
+            ],
+            [
+              "#drop-formats"
+            ],
+            [
+              ".drop-quality"
+            ],
+            [
+              ".size-cell:nth-child(5) > .size-cell-label > small"
+            ],
+            [
+              ".size-cell:nth-child(6) > .size-cell-label > small"
+            ],
+            [
+              ".tier-notch-label:nth-child(4)"
+            ],
+            [
+              ".tier-notch-label:nth-child(6)"
+            ],
+            [
+              ".tier-notch-label:nth-child(8)"
+            ],
+            [
+              ".tier-notch-label:nth-child(10)"
+            ],
+            [
+              "#rush-copy"
+            ],
+            [
+              "#ship-fee-label"
+            ],
+            [
+              ".delivery-card:nth-child(2) > .delivery-card-body > small"
+            ],
+            [
+              "#tax-stamp"
+            ],
+            [
+              "th:nth-child(1)"
+            ],
+            [
+              "th:nth-child(2)"
+            ],
+            [
+              "th:nth-child(3)"
+            ],
+            [
+              "th:nth-child(4)"
+            ],
+            [
+              "th:nth-child(5)"
+            ],
+            [
+              ".stripe-note"
+            ],
+            [
+              "#smart-cta"
+            ]
+          ]
+        },
+        {
+          "id": "nested-interactive",
+          "impact": "serious",
+          "nodes": [
+            [
+              "article:nth-child(1)"
+            ],
+            [
+              "article:nth-child(2)"
+            ],
+            [
+              "article:nth-child(3)"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Custom T-Shirts — Full-Color Printing, Shipped in 7-10 Days | Northwest Custom Apparel",
+      "ids": {
+        "gallery-grid": "PORT & CO BEST SELLER Port & Company Example Shirt PC54 · T-Shirt · Cotton Soft everyday apparel for your team. $20.58/shirt 12 shirts · full-front print 24+ $16.00 · 48+ $15.00 · 72+ $14.00 per shirt 300 printed Customize PORT & CO BEST SELLER Port & Company Example Shirt PC61LS · Long Sleeve Tee · Cotton Soft everyday apparel for your team. $20.58/shirt 12 shirts · full-front print 24+ $16.00 · 48+ $15.00 · 72+ $14.00 per shirt 220 printed Customize PORT & CO BEST SELLER Port & Company Example Shirt PC90H · Hoodie · Cotton Soft everyday apparel for your team. $20.58/shirt 12 shirts · full-front print 24+ $16.00 · 48+ $15.00 · 72+ $14.00 per shirt 140 printed Customize",
+        "current-product-name": "Port & Company Example Shirt",
+        "current-product-style": "Style PC54 · 2 print-tested colors",
+        "color-chips": "Jet Black 12 left Brilliant Orange 12 left",
+        "color-cards": "Jet Black S Only 2 left − + M Only 2 left − + L Only 2 left − + XL Only 2 left − + 2XL +$2.00 Only 2 left − + 3XL +$3.00 Only 2 left − + 2 pieces",
+        "review-lines": "COLOR SIZE QTY EACH TOTAL Jet Black M 2 $26.00 $52.00",
+        "review-totals": "Shirts (2) $52.00 UPS Ground shipping $7.99 Sales tax enter address Total $59.99",
+        "review-promise": "Ships Wed, Sep 23 – Mon, Sep 28 from Milton, WA",
+        "pay-reasons": "Add artwork Enter contact info Enter shipping address Confirm you have rights to your artwork",
+        "pay-btn-label": "Pay",
+        "tax-stamp": "Sales tax is calculated from your ZIP."
+      },
+      "fields": [
+        {
+          "id": "gallery-search",
+          "name": "",
+          "type": "search",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gallery-sort",
+          "name": "",
+          "type": "select-one",
+          "value": "popular",
+          "disabled": false
+        },
+        {
+          "id": "back-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "2",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-first",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-last",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-email",
+          "name": "",
+          "type": "email",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-phone",
+          "name": "",
+          "type": "tel",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-company",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "rush-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "d-ship",
+          "name": "delivery",
+          "type": "radio",
+          "value": "ship",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "d-pickup",
+          "name": "delivery",
+          "type": "radio",
+          "value": "pickup",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-addr1",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-city",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-state",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-zip",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-notes",
+          "name": "",
+          "type": "textarea",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "rights-ack",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#stage-gallery",
+          "text": "Skip to the catalog"
+        },
+        {
+          "href": "/",
+          "text": "Northwest Custom Apparel Custom T-Shirts · Full-Color DTG"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "#stage-gallery",
+          "text": "Pick your shirt — upload your AI art"
+        },
+        {
+          "href": "https://maps.google.com/?cid=4107380119454186786",
+          "text": "★★★★★ Google review · 4.9 from 185+"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        }
+      ],
+      "cart": {
+        "lines": [
+          {
+            "catalogColor": "JetBlack",
+            "qty": {
+              "S": 0,
+              "M": 2,
+              "L": 0,
+              "XL": 0,
+              "2XL": 0,
+              "3XL": 0
+            }
+          }
+        ]
+      },
+      "quote": {
+        "combinedQty": 2,
+        "tierLabel": "1-11",
+        "unitBySize": {
+          "S": {
+            "finalPrice": 26,
+            "basePrice": 13.5,
+            "rushFee": 0,
+            "upcharge": 0,
+            "tierLabel": "1-11",
+            "costLabel": "24-47"
+          },
+          "M": {
+            "finalPrice": 26,
+            "basePrice": 13.5,
+            "rushFee": 0,
+            "upcharge": 0,
+            "tierLabel": "1-11",
+            "costLabel": "24-47"
+          },
+          "L": {
+            "finalPrice": 26,
+            "basePrice": 13.5,
+            "rushFee": 0,
+            "upcharge": 0,
+            "tierLabel": "1-11",
+            "costLabel": "24-47"
+          },
+          "XL": {
+            "finalPrice": 26,
+            "basePrice": 13.5,
+            "rushFee": 0,
+            "upcharge": 0,
+            "tierLabel": "1-11",
+            "costLabel": "24-47"
+          },
+          "2XL": {
+            "finalPrice": 28,
+            "basePrice": 13.5,
+            "rushFee": 0,
+            "upcharge": 2,
+            "tierLabel": "1-11",
+            "costLabel": "24-47"
+          },
+          "3XL": {
+            "finalPrice": 29,
+            "basePrice": 13.5,
+            "rushFee": 0,
+            "upcharge": 3,
+            "tierLabel": "1-11",
+            "costLabel": "24-47"
+          }
+        },
+        "lines": [
+          {
+            "catalogColor": "JetBlack",
+            "colorName": "Jet Black",
+            "size": "M",
+            "quantity": 2,
+            "unitPrice": 26,
+            "extended": 52
+          }
+        ],
+        "shirtsSubtotal": 52,
+        "ltmFee": 0,
+        "ltmPerPiece": 0,
+        "ltmBaked": true,
+        "ltmBakedPerPiece": 12.5,
+        "ltmBakedTotal": 25,
+        "rush": false,
+        "saleOff": 0,
+        "backLocation": null,
+        "shipping": 7.99,
+        "shippingModel": "threshold",
+        "freeShipRemaining": 48,
+        "shipFreeOver": 100,
+        "taxRate": null,
+        "taxableBase": 59.99,
+        "tax": 0,
+        "total": 59.99,
+        "perShirt": 26,
+        "nudge": {
+          "type": "best"
+        }
+      },
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              "em"
+            ],
+            [
+              "figure:nth-child(1) > figcaption"
+            ],
+            [
+              "figure:nth-child(2) > figcaption"
+            ],
+            [
+              "figure:nth-child(3) > figcaption"
+            ],
+            [
+              "figure:nth-child(4) > figcaption"
+            ],
+            [
+              "figure:nth-child(5) > figcaption"
+            ],
+            [
+              "article:nth-child(1) > .gallery-card-body > .gallery-card-style"
+            ],
+            [
+              "article:nth-child(1) > .gallery-card-body > .gallery-card-pricing > .gallery-price-ladder"
+            ],
+            [
+              "article:nth-child(2) > .gallery-card-body > .gallery-card-pricing > .gallery-price-ladder"
+            ],
+            [
+              "article:nth-child(3) > .gallery-card-body > .gallery-card-pricing > .gallery-price-ladder"
+            ],
+            [
+              "#canvas-hint"
+            ],
+            [
+              ".canvas-disclaimer"
+            ],
+            [
+              ".control-block:nth-child(1) > .control-label"
+            ],
+            [
+              ".spr-row > span:nth-child(2)"
+            ],
+            [
+              ".size-price-note"
+            ],
+            [
+              "#back-delta"
+            ],
+            [
+              "#drop-label"
+            ],
+            [
+              "#drop-formats"
+            ],
+            [
+              ".drop-quality"
+            ],
+            [
+              ".size-cell:nth-child(5) > .size-cell-label > small"
+            ],
+            [
+              ".size-cell:nth-child(6) > .size-cell-label > small"
+            ],
+            [
+              ".tier-notch-label:nth-child(4)"
+            ],
+            [
+              ".tier-notch-label:nth-child(6)"
+            ],
+            [
+              ".tier-notch-label:nth-child(8)"
+            ],
+            [
+              ".tier-notch-label:nth-child(10)"
+            ],
+            [
+              "#rush-copy"
+            ],
+            [
+              "#ship-fee-label"
+            ],
+            [
+              ".delivery-card:nth-child(2) > .delivery-card-body > small"
+            ],
+            [
+              "#tax-stamp"
+            ],
+            [
+              "th:nth-child(1)"
+            ],
+            [
+              "th:nth-child(2)"
+            ],
+            [
+              "th:nth-child(3)"
+            ],
+            [
+              "th:nth-child(4)"
+            ],
+            [
+              "th:nth-child(5)"
+            ],
+            [
+              ".stripe-note"
+            ],
+            [
+              "#smart-cta"
+            ]
+          ]
+        },
+        {
+          "id": "nested-interactive",
+          "impact": "serious",
+          "nodes": [
+            [
+              "article:nth-child(1)"
+            ],
+            [
+              "article:nth-child(2)"
+            ],
+            [
+              "article:nth-child(3)"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "actions": [],
+  "dialogs": []
+}

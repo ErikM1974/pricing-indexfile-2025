@@ -1,26 +1,22 @@
 const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto');
 const { JSDOM } = require('jsdom');
-const original = require('../fixtures/customer-job-status-original-content.json');
+const original = require('../fixtures/custom-apparel-original-content.json');
 const root = path.resolve(__dirname, '../..'), norm = s => s.replace(/\s+/g, ' ').trim();
 const hash = s => crypto.createHash('sha256').update(s).digest('hex');
 
-function beforeEdits(file) {
-    let text = fs.readFileSync(path.join(root, file), 'utf8').replace(/\r\n/g, '\n');
-    for (const change of original.changes.filter(c => c.file === file).reverse()) text = text.split(change.after).join(change.before);
-    return text;
-}
-
 test.each([
-    ['pages/js/order-status.js', ['money', 'escapeHTML', 'promiseLabel', 'render']],
-    ['pages/js/vendor-portal.js', ['esc', 'parseDate', 'fmtDate', 'isPastDue', 'statusBadge', 'matchesFilter', 'jobMatchesSearch', 'renderNotes']],
-])('%s preserves financial rendering, dates and data transformations', (file, names) => {
+    ['pages/js/custom-caps-app.js', ['combinedQty', 'minQty', 'currentQuote', 'perCapAt', 'buildTotalsHtml', 'buildCheckoutPayload']],
+    ['pages/js/custom-tees-app.js', ['pricingConfig', 'artDims', 'derivedFrontLocation', 'derivedBackLocation', 'buildShipPromise', 'currentQuote', 'buildTotalsHtml', 'buildCheckoutPayload']],
+])('%s preserves financial, date and quantity transformations', (file, names) => {
     const espree = require('espree');
+    const current = fs.readFileSync(path.join(root, file), 'utf8').replace(/\r\n/g, '\n');
+    let before = current;
+    for (const change of original.changes.filter(c => c.file === file).reverse()) before = before.split(change.after).join(change.before);
     function functions(source) {
         const found = {};
         function visit(node) {
             if (!node || typeof node !== 'object') return;
             if (node.type === 'FunctionDeclaration' && names.includes(node.id.name)) found[node.id.name] = source.slice(...node.range);
-            if (node.type === 'VariableDeclarator' && names.includes(node.id.name)) found[node.id.name] = source.slice(...node.range);
             for (const value of Object.values(node)) {
                 if (Array.isArray(value)) value.forEach(visit);
                 else if (value && typeof value === 'object') visit(value);
@@ -30,14 +26,7 @@ test.each([
         expect(Object.keys(found).sort()).toEqual([...names].sort());
         return found;
     }
-    expect(functions(fs.readFileSync(path.join(root, file), 'utf8').replace(/\r\n/g, '\n'))).toEqual(functions(beforeEdits(file)));
-});
-
-test('job count labels remain text inside the three canonical filter buttons', () => {
-    const d = new JSDOM(fs.readFileSync(path.join(root, 'pages/vendor-portal.html'), 'utf8')).window.document;
-    expect(d.querySelectorAll('button.btn.vp-chip')).toHaveLength(3);
-    expect(d.querySelectorAll('.vp-chip-count.btn')).toHaveLength(0);
-    expect(d.querySelectorAll('#vp-search.field-input, #vp-comment-input.field-textarea')).toHaveLength(2);
+    expect(functions(current)).toEqual(functions(before));
 });
 
 test.each(original.pages)('$file preserves original labels, fields, links and identifiers', record => {
@@ -62,17 +51,6 @@ test.each(Object.keys(original.hashes).filter(f => !f.endsWith('.html')))('%s re
         return;
     }
     let s = fs.readFileSync(path.join(root, file), 'utf8').replace(/\r\n/g, '\n');
-    // This sheet was retained during the status-page cut, then migrated by its own storefront.
-    // Reconstruct that verified baseline before applying this suite's original source lock.
-    if (file === 'pages/css/custom-tees.css') {
-        const apparel = require('../fixtures/custom-apparel-original-content.json');
-        expect(apparel.hashes[file]).toBe(original.hashes[file]);
-        for (const change of apparel.changes.filter(c => c.file === file).reverse()) {
-            expect(change.after).not.toBe('');
-            expect(s.split(change.after).length - 1).toBe(change.count);
-            s = s.split(change.after).join(change.before);
-        }
-    }
     for (const change of original.changes.filter(c => c.file === file).reverse()) {
         expect(change.after).not.toBe('');
         expect(s.split(change.after).length - 1).toBe(change.count);

@@ -1,5 +1,13 @@
 # Handover follow-ups — 2026-09-07
 
+## REVIEWED — Custom Tees and Custom Caps ready for release checks
+
+The pair now shares Public Sans, canonical controls and a scoped layout owner with222 previously duplicated rules. Forty-four browser scenarios pass at1440/768/390/320; the final22 affected print cases also pass. All78 current paper pages across22 documents were visually inspected, including complete long notes, front/back artwork, mixed sizes/colors, taxes, pickup, rush and checkout failure. No blank sheets remain; the contact footer moves beside the printed letterhead and returns after printing.
+
+Fourteen original source hashes and36 immutable browser contracts remain preserved through42 reversible UI mappings. The original134 paper pages were reviewed before editing. Pricing engines, date/quantity functions and successful checkout payloads remain unchanged. Initial-failure Retry, visible storage quota errors, native gallery keyboard controls and summary-dialog focus/Escape are repaired. No real orders, uploads, payments, messages or device printing occurred.
+
+Reviewed candidate193/225,32pending; live remains v2026.09.11.1/Heroku2104/2463ce82 at191/225,34pending until rollout verifies. Next: commit/back up the reviewed pair, integrate clean develop, run complete application/browser/parity checks and exact-source CI, then deploy and verify the actual slug, assets and access. Evidence: custom-apparel-reviewed-record.json and active-css-resume-state.json in the external artifact directory. Never rerun consumed one-shot helpers.
+
 ## RELEASE CANDIDATE — v2026.09.11.1 Sample and Quote Carts
 
 Reviewed source7498f6fc and verified account releaseefc4471f are integrated at77bc80d490118b1f674c5c7543abba3e9b6fbf79. Complete local gates are running on that unchanged checkout. This candidate adds only release cache references and their reversible mappings; the six application CSS/JS assets are unchanged. Require every local gate and all four exact-source CI jobs, including actual CSS and live money/calculator parity, before release.
@@ -895,3 +903,7 @@ Live remains.10/2102/44cc187/225. Account .11 is separately gated on source4e763
 
 ### Account release test timing correction — 2026-09-10
 The full local1,204-case CSS sweep completed1,203 passes and one confirmation-toast wait timeout under three-worker load. The real page retains the toast4.2 seconds; the test allowed only5 seconds including scheduling. No application or fixture source changed. The test now allows10 seconds but still requires the real timer to dismiss the toast. Five repeated failing-case runs passed under three-worker load; all affected account cases and the remaining local browser/pricing suites must pass before release. Exact-source CI must be rerun on this test correction; the earlier9eb6e2a2 run is not final-source evidence.
+
+## Verified cart release and next original captures — 2026-09-11
+
+Cart v2026.09.11.1/2104/2463ce82 is live191/225,34pending. All exact-source CI/full local gates and31 live checks passed. Custom Tees/Caps has35 passing original scenarios/36 immutable contracts,16 source guards; no application edits. Finish paper review and baseline backup before shared layout/focus/retry/storage repairs. API fixture prices are synthetic unit-fixture values, real engines unchanged.

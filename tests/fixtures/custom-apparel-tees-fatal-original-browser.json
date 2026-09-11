@@ -1,0 +1,403 @@
+{
+  "name": "tees-fatal",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Custom T-Shirts — Full-Color Printing, Shipped in 7-10 Days | Northwest Custom Apparel",
+      "ids": {
+        "gallery-grid": "",
+        "tdt-fatal": "We can’t load live pricing right now We couldn’t load live pricing or the catalog (HTTP 503 from https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/service-codes {\"data\":[{\"ServiceCode\":\"3DT-RUSH\",\"SellPrice\":25,\"IsActive\":true}]}). — or call us and we’ll take your order by phone. 253-922-5793 Try again"
+      },
+      "fields": [
+        {
+          "id": "gallery-search",
+          "name": "",
+          "type": "search",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gallery-sort",
+          "name": "",
+          "type": "select-one",
+          "value": "popular",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#stage-gallery",
+          "text": "Skip to the catalog"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "/",
+          "text": "Northwest Custom Apparel Custom T-Shirts · Full-Color DTG"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "#stage-gallery",
+          "text": "Pick your shirt — upload your AI art"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        }
+      ],
+      "cart": null,
+      "quote": null,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "aria-prohibited-attr",
+          "impact": "serious",
+          "nodes": [
+            [
+              "#gallery-chips"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              "em"
+            ],
+            [
+              "figure:nth-child(1) > figcaption"
+            ],
+            [
+              "figure:nth-child(2) > figcaption"
+            ],
+            [
+              "figure:nth-child(3) > figcaption"
+            ],
+            [
+              "figure:nth-child(4) > figcaption"
+            ],
+            [
+              "figure:nth-child(5) > figcaption"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Custom T-Shirts — Full-Color Printing, Shipped in 7-10 Days | Northwest Custom Apparel",
+      "ids": {
+        "gallery-grid": "",
+        "tdt-fatal": "We can’t load live pricing right now We couldn’t load live pricing or the catalog (HTTP 503 from https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/service-codes {\"data\":[{\"ServiceCode\":\"3DT-RUSH\",\"SellPrice\":25,\"IsActive\":true}]}). — or call us and we’ll take your order by phone. 253-922-5793 Try again"
+      },
+      "fields": [
+        {
+          "id": "gallery-search",
+          "name": "",
+          "type": "search",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gallery-sort",
+          "name": "",
+          "type": "select-one",
+          "value": "popular",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#stage-gallery",
+          "text": "Skip to the catalog"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "/",
+          "text": "Northwest Custom Apparel Custom T-Shirts · Full-Color DTG"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "#stage-gallery",
+          "text": "Pick your shirt — upload your AI art"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        }
+      ],
+      "cart": null,
+      "quote": null,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "aria-prohibited-attr",
+          "impact": "serious",
+          "nodes": [
+            [
+              "#gallery-chips"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              "em"
+            ],
+            [
+              "figure:nth-child(1) > figcaption"
+            ],
+            [
+              "figure:nth-child(2) > figcaption"
+            ],
+            [
+              "figure:nth-child(3) > figcaption"
+            ],
+            [
+              "figure:nth-child(4) > figcaption"
+            ],
+            [
+              "figure:nth-child(5) > figcaption"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Custom T-Shirts — Full-Color Printing, Shipped in 7-10 Days | Northwest Custom Apparel",
+      "ids": {
+        "gallery-grid": "",
+        "tdt-fatal": "We can’t load live pricing right now We couldn’t load live pricing or the catalog (HTTP 503 from https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/service-codes {\"data\":[{\"ServiceCode\":\"3DT-RUSH\",\"SellPrice\":25,\"IsActive\":true}]}). — or call us and we’ll take your order by phone. 253-922-5793 Try again"
+      },
+      "fields": [
+        {
+          "id": "gallery-search",
+          "name": "",
+          "type": "search",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gallery-sort",
+          "name": "",
+          "type": "select-one",
+          "value": "popular",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#stage-gallery",
+          "text": "Skip to the catalog"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "/",
+          "text": "Northwest Custom Apparel Custom T-Shirts · Full-Color DTG"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "#stage-gallery",
+          "text": "Pick your shirt — upload your AI art"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        }
+      ],
+      "cart": null,
+      "quote": null,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "aria-prohibited-attr",
+          "impact": "serious",
+          "nodes": [
+            [
+              "#gallery-chips"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              "em"
+            ],
+            [
+              "figure:nth-child(1) > figcaption"
+            ],
+            [
+              "figure:nth-child(2) > figcaption"
+            ],
+            [
+              "figure:nth-child(3) > figcaption"
+            ],
+            [
+              "figure:nth-child(4) > figcaption"
+            ],
+            [
+              "figure:nth-child(5) > figcaption"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Custom T-Shirts — Full-Color Printing, Shipped in 7-10 Days | Northwest Custom Apparel",
+      "ids": {
+        "gallery-grid": "",
+        "tdt-fatal": "We can’t load live pricing right now We couldn’t load live pricing or the catalog (HTTP 503 from https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/service-codes {\"data\":[{\"ServiceCode\":\"3DT-RUSH\",\"SellPrice\":25,\"IsActive\":true}]}). — or call us and we’ll take your order by phone. 253-922-5793 Try again"
+      },
+      "fields": [
+        {
+          "id": "gallery-search",
+          "name": "",
+          "type": "search",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gallery-sort",
+          "name": "",
+          "type": "select-one",
+          "value": "popular",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#stage-gallery",
+          "text": "Skip to the catalog"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "/",
+          "text": "Northwest Custom Apparel Custom T-Shirts · Full-Color DTG"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "#stage-gallery",
+          "text": "Pick your shirt — upload your AI art"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        }
+      ],
+      "cart": null,
+      "quote": null,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "aria-prohibited-attr",
+          "impact": "serious",
+          "nodes": [
+            [
+              "#gallery-chips"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              "em"
+            ],
+            [
+              "figure:nth-child(1) > figcaption"
+            ],
+            [
+              "figure:nth-child(2) > figcaption"
+            ],
+            [
+              "figure:nth-child(3) > figcaption"
+            ],
+            [
+              "figure:nth-child(4) > figcaption"
+            ],
+            [
+              "figure:nth-child(5) > figcaption"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "actions": [],
+  "dialogs": []
+}
