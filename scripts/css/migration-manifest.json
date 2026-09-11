@@ -5536,6 +5536,103 @@
         "rawCssBytes": 159871,
         "localCssRequests": 4
       }
+    },
+    {
+      "source": "pages/order-status.html",
+      "family": "customer-job-status",
+      "status": "reviewed",
+      "route": "/order-status",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "pages/css/order-status.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "paid",
+        "pending-payment",
+        "in-production",
+        "shipped",
+        "pickup-ready-soon",
+        "rush",
+        "free-shipping",
+        "no-fee-tax",
+        "empty",
+        "escaped",
+        "long",
+        "missing-credential",
+        "404",
+        "429",
+        "500",
+        "network-error",
+        "retry",
+        "pending-retry",
+        "duplicate-retry",
+        "four-widths",
+        "keyboard",
+        "print"
+      ],
+      "test": "tests/e2e/css-unification-customer-job-status.spec.js",
+      "maxCssBytes": 67351,
+      "measuredRawCssBytes": 66327,
+      "baseline": {
+        "commit": "135adf30",
+        "rawCssBytes": 74280,
+        "localCssRequests": 3
+      }
+    },
+    {
+      "source": "pages/vendor-portal.html",
+      "family": "customer-job-status",
+      "status": "reviewed",
+      "route": "/vendor",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/vendor/fontawesome/css/all.min.css",
+        "pages/css/vendor-portal.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "list",
+        "empty",
+        "escaped",
+        "actual-caspio-dates",
+        "detail",
+        "minimal",
+        "long",
+        "received",
+        "cancelled",
+        "401",
+        "404",
+        "429",
+        "500",
+        "filters",
+        "search",
+        "deep-link",
+        "history",
+        "keyboard-enter-space-escape",
+        "focus-return",
+        "note-success",
+        "note-failure",
+        "pending-note",
+        "duplicate-note",
+        "note-retry",
+        "draft-per-job",
+        "late-detail-error",
+        "late-note-success",
+        "image-failure",
+        "four-widths",
+        "print"
+      ],
+      "test": "tests/e2e/css-unification-customer-job-status.spec.js",
+      "maxCssBytes": 171691,
+      "measuredRawCssBytes": 170667,
+      "baseline": {
+        "commit": "135adf30",
+        "rawCssBytes": 126103,
+        "localCssRequests": 3
+      }
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",

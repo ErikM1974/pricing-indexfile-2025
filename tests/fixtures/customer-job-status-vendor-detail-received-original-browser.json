@@ -1,0 +1,327 @@
+{
+  "views": [
+    {
+      "width": 1440,
+      "title": "LNP-7401 · Cedar Example Construction | Job Portal — Northwest Custom Apparel",
+      "text": "Example Screen Printing — Job Portal Screen-print jobs from Northwest Custom Apparel River Sample Sign out All jobs LNP-7401 Cedar Example Construction Design #44012 · PO PO-SYNTHETIC · NWCA contact: Example Rep Received RUSH Work Order REQUESTED Sep 8, 2026 NEEDED BY — EST. SHIP — TRANSFER TYPE Screen Print FABRIC Cotton # COLORS 2 PRIMARY COLOR White ADDITIONAL COLORS Forest Green Instructions: Keep the approved size and placement. Use the supplied vector artwork. Print Lines QTY SIZE W×H (IN) PRESSES NOTES 24 Full front 11 × 12 1 Adult XS–4XL 12 Left chest 4 × 3 2 White underbase Artwork & Working Files Approved mockup.png MOCKUP 1200 × 800 px Approved placement Download Cedar-Example-Print-Ready-Artwork-Long-Filename.ai ARTWORK 11\" × 12\" Download Mockup Activity & Messages Message for NWCA Post Ctrl+Enter posts. NWCA sees your note on the job. NWCA · Sep 10, 2026 Job requested River Sample (Example Screen Printing) · Sep 9, 2026 Files received. Checking placement. Example Rep · Sep 8, 2026 Please confirm receipt. Northwest Custom Apparel · Milton, WA · (253) 922-5793",
+      "ids": {
+        "vp-vendor-name": "Example Screen Printing — Job Portal",
+        "vp-user-email": "River Sample",
+        "vp-back-btn": "All jobs",
+        "vp-d-id": "LNP-7401",
+        "vp-d-company": "Cedar Example Construction",
+        "vp-d-sub": "Design #44012 · PO PO-SYNTHETIC · NWCA contact: Example Rep",
+        "vp-d-badges": "Received RUSH",
+        "vp-d-meta": "REQUESTED Sep 8, 2026 NEEDED BY — EST. SHIP — TRANSFER TYPE Screen Print FABRIC Cotton # COLORS 2 PRIMARY COLOR White ADDITIONAL COLORS Forest Green",
+        "vp-d-instructions": "Instructions: Keep the approved size and placement. Use the supplied vector artwork.",
+        "vp-d-lines": "24 Full front 11 × 12 1 Adult XS–4XL 12 Left chest 4 × 3 2 White underbase",
+        "vp-d-files": "Approved mockup.png MOCKUP 1200 × 800 px Approved placement Download Cedar-Example-Print-Ready-Artwork-Long-Filename.ai ARTWORK 11\" × 12\" Download",
+        "vp-d-mockup": "",
+        "vp-comment-input": "",
+        "vp-comment-btn": "Post",
+        "vp-comment-hint": "Ctrl+Enter posts. NWCA sees your note on the job.",
+        "vp-d-notes": "NWCA · Sep 10, 2026 Job requested River Sample (Example Screen Printing) · Sep 9, 2026 Files received. Checking placement. Example Rep · Sep 8, 2026 Please confirm receipt."
+      },
+      "links": [
+        {
+          "href": "/auth/vendor/logout",
+          "text": "Sign out",
+          "label": null
+        },
+        {
+          "href": "https://files.example.test/approved-mockup.png",
+          "text": "Download",
+          "label": "Download Approved mockup.png"
+        },
+        {
+          "href": "https://files.example.test/print-ready.ai",
+          "text": "Download",
+          "label": "Download Cedar-Example-Print-Ready-Artwork-Long-Filename.ai"
+        },
+        {
+          "href": "https://files.example.test/approved-mockup.png",
+          "text": "",
+          "label": "Open mockup full size"
+        }
+      ],
+      "rows": [
+        [
+          "24",
+          "Full front",
+          "11 × 12",
+          "1",
+          "Adult XS–4XL"
+        ],
+        [
+          "12",
+          "Left chest",
+          "4 × 3",
+          "2",
+          "White underbase"
+        ]
+      ],
+      "overflow": false,
+      "axe": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#vp-user-email"
+            ],
+            [
+              ".vp-badge--rush"
+            ],
+            [
+              "footer"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "LNP-7401 · Cedar Example Construction | Job Portal — Northwest Custom Apparel",
+      "text": "Example Screen Printing — Job Portal Screen-print jobs from Northwest Custom Apparel River Sample Sign out All jobs LNP-7401 Cedar Example Construction Design #44012 · PO PO-SYNTHETIC · NWCA contact: Example Rep Received RUSH Work Order REQUESTED Sep 8, 2026 NEEDED BY — EST. SHIP — TRANSFER TYPE Screen Print FABRIC Cotton # COLORS 2 PRIMARY COLOR White ADDITIONAL COLORS Forest Green Instructions: Keep the approved size and placement. Use the supplied vector artwork. Print Lines QTY SIZE W×H (IN) PRESSES NOTES 24 Full front 11 × 12 1 Adult XS–4XL 12 Left chest 4 × 3 2 White underbase Artwork & Working Files Approved mockup.png MOCKUP 1200 × 800 px Approved placement Download Cedar-Example-Print-Ready-Artwork-Long-Filename.ai ARTWORK 11\" × 12\" Download Mockup Activity & Messages Message for NWCA Post Ctrl+Enter posts. NWCA sees your note on the job. NWCA · Sep 10, 2026 Job requested River Sample (Example Screen Printing) · Sep 9, 2026 Files received. Checking placement. Example Rep · Sep 8, 2026 Please confirm receipt. Northwest Custom Apparel · Milton, WA · (253) 922-5793",
+      "ids": {
+        "vp-vendor-name": "Example Screen Printing — Job Portal",
+        "vp-user-email": "River Sample",
+        "vp-back-btn": "All jobs",
+        "vp-d-id": "LNP-7401",
+        "vp-d-company": "Cedar Example Construction",
+        "vp-d-sub": "Design #44012 · PO PO-SYNTHETIC · NWCA contact: Example Rep",
+        "vp-d-badges": "Received RUSH",
+        "vp-d-meta": "REQUESTED Sep 8, 2026 NEEDED BY — EST. SHIP — TRANSFER TYPE Screen Print FABRIC Cotton # COLORS 2 PRIMARY COLOR White ADDITIONAL COLORS Forest Green",
+        "vp-d-instructions": "Instructions: Keep the approved size and placement. Use the supplied vector artwork.",
+        "vp-d-lines": "24 Full front 11 × 12 1 Adult XS–4XL 12 Left chest 4 × 3 2 White underbase",
+        "vp-d-files": "Approved mockup.png MOCKUP 1200 × 800 px Approved placement Download Cedar-Example-Print-Ready-Artwork-Long-Filename.ai ARTWORK 11\" × 12\" Download",
+        "vp-d-mockup": "",
+        "vp-comment-input": "",
+        "vp-comment-btn": "Post",
+        "vp-comment-hint": "Ctrl+Enter posts. NWCA sees your note on the job.",
+        "vp-d-notes": "NWCA · Sep 10, 2026 Job requested River Sample (Example Screen Printing) · Sep 9, 2026 Files received. Checking placement. Example Rep · Sep 8, 2026 Please confirm receipt."
+      },
+      "links": [
+        {
+          "href": "/auth/vendor/logout",
+          "text": "Sign out",
+          "label": null
+        },
+        {
+          "href": "https://files.example.test/approved-mockup.png",
+          "text": "Download",
+          "label": "Download Approved mockup.png"
+        },
+        {
+          "href": "https://files.example.test/print-ready.ai",
+          "text": "Download",
+          "label": "Download Cedar-Example-Print-Ready-Artwork-Long-Filename.ai"
+        },
+        {
+          "href": "https://files.example.test/approved-mockup.png",
+          "text": "",
+          "label": "Open mockup full size"
+        }
+      ],
+      "rows": [
+        [
+          "24",
+          "Full front",
+          "11 × 12",
+          "1",
+          "Adult XS–4XL"
+        ],
+        [
+          "12",
+          "Left chest",
+          "4 × 3",
+          "2",
+          "White underbase"
+        ]
+      ],
+      "overflow": false,
+      "axe": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#vp-user-email"
+            ],
+            [
+              ".vp-badge--rush"
+            ],
+            [
+              "footer"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "LNP-7401 · Cedar Example Construction | Job Portal — Northwest Custom Apparel",
+      "text": "Example Screen Printing — Job Portal River Sample Sign out All jobs LNP-7401 Cedar Example Construction Design #44012 · PO PO-SYNTHETIC · NWCA contact: Example Rep Received RUSH Work Order REQUESTED Sep 8, 2026 NEEDED BY — EST. SHIP — TRANSFER TYPE Screen Print FABRIC Cotton # COLORS 2 PRIMARY COLOR White ADDITIONAL COLORS Forest Green Instructions: Keep the approved size and placement. Use the supplied vector artwork. Print Lines QTY SIZE W×H (IN) PRESSES NOTES 24 Full front 11 × 12 1 Adult XS–4XL 12 Left chest 4 × 3 2 White underbase Artwork & Working Files Approved mockup.png MOCKUP 1200 × 800 px Approved placement Download Cedar-Example-Print-Ready-Artwork-Long-Filename.ai ARTWORK 11\" × 12\" Download Mockup Activity & Messages Message for NWCA Post Ctrl+Enter posts. NWCA sees your note on the job. NWCA · Sep 10, 2026 Job requested River Sample (Example Screen Printing) · Sep 9, 2026 Files received. Checking placement. Example Rep · Sep 8, 2026 Please confirm receipt. Northwest Custom Apparel · Milton, WA · (253) 922-5793",
+      "ids": {
+        "vp-vendor-name": "Example Screen Printing — Job Portal",
+        "vp-user-email": "River Sample",
+        "vp-back-btn": "All jobs",
+        "vp-d-id": "LNP-7401",
+        "vp-d-company": "Cedar Example Construction",
+        "vp-d-sub": "Design #44012 · PO PO-SYNTHETIC · NWCA contact: Example Rep",
+        "vp-d-badges": "Received RUSH",
+        "vp-d-meta": "REQUESTED Sep 8, 2026 NEEDED BY — EST. SHIP — TRANSFER TYPE Screen Print FABRIC Cotton # COLORS 2 PRIMARY COLOR White ADDITIONAL COLORS Forest Green",
+        "vp-d-instructions": "Instructions: Keep the approved size and placement. Use the supplied vector artwork.",
+        "vp-d-lines": "24 Full front 11 × 12 1 Adult XS–4XL 12 Left chest 4 × 3 2 White underbase",
+        "vp-d-files": "Approved mockup.png MOCKUP 1200 × 800 px Approved placement Download Cedar-Example-Print-Ready-Artwork-Long-Filename.ai ARTWORK 11\" × 12\" Download",
+        "vp-d-mockup": "",
+        "vp-comment-input": "",
+        "vp-comment-btn": "Post",
+        "vp-comment-hint": "Ctrl+Enter posts. NWCA sees your note on the job.",
+        "vp-d-notes": "NWCA · Sep 10, 2026 Job requested River Sample (Example Screen Printing) · Sep 9, 2026 Files received. Checking placement. Example Rep · Sep 8, 2026 Please confirm receipt."
+      },
+      "links": [
+        {
+          "href": "/auth/vendor/logout",
+          "text": "Sign out",
+          "label": null
+        },
+        {
+          "href": "https://files.example.test/approved-mockup.png",
+          "text": "Download",
+          "label": "Download Approved mockup.png"
+        },
+        {
+          "href": "https://files.example.test/print-ready.ai",
+          "text": "Download",
+          "label": "Download Cedar-Example-Print-Ready-Artwork-Long-Filename.ai"
+        },
+        {
+          "href": "https://files.example.test/approved-mockup.png",
+          "text": "",
+          "label": "Open mockup full size"
+        }
+      ],
+      "rows": [
+        [
+          "24",
+          "Full front",
+          "11 × 12",
+          "1",
+          "Adult XS–4XL"
+        ],
+        [
+          "12",
+          "Left chest",
+          "4 × 3",
+          "2",
+          "White underbase"
+        ]
+      ],
+      "overflow": true,
+      "axe": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#vp-user-email"
+            ],
+            [
+              ".vp-badge--rush"
+            ],
+            [
+              "footer"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "LNP-7401 · Cedar Example Construction | Job Portal — Northwest Custom Apparel",
+      "text": "Example Screen Printing — Job Portal River Sample Sign out All jobs LNP-7401 Cedar Example Construction Design #44012 · PO PO-SYNTHETIC · NWCA contact: Example Rep Received RUSH Work Order REQUESTED Sep 8, 2026 NEEDED BY — EST. SHIP — TRANSFER TYPE Screen Print FABRIC Cotton # COLORS 2 PRIMARY COLOR White ADDITIONAL COLORS Forest Green Instructions: Keep the approved size and placement. Use the supplied vector artwork. Print Lines QTY SIZE W×H (IN) PRESSES NOTES 24 Full front 11 × 12 1 Adult XS–4XL 12 Left chest 4 × 3 2 White underbase Artwork & Working Files Approved mockup.png MOCKUP 1200 × 800 px Approved placement Download Cedar-Example-Print-Ready-Artwork-Long-Filename.ai ARTWORK 11\" × 12\" Download Mockup Activity & Messages Message for NWCA Post Ctrl+Enter posts. NWCA sees your note on the job. NWCA · Sep 10, 2026 Job requested River Sample (Example Screen Printing) · Sep 9, 2026 Files received. Checking placement. Example Rep · Sep 8, 2026 Please confirm receipt. Northwest Custom Apparel · Milton, WA · (253) 922-5793",
+      "ids": {
+        "vp-vendor-name": "Example Screen Printing — Job Portal",
+        "vp-user-email": "River Sample",
+        "vp-back-btn": "All jobs",
+        "vp-d-id": "LNP-7401",
+        "vp-d-company": "Cedar Example Construction",
+        "vp-d-sub": "Design #44012 · PO PO-SYNTHETIC · NWCA contact: Example Rep",
+        "vp-d-badges": "Received RUSH",
+        "vp-d-meta": "REQUESTED Sep 8, 2026 NEEDED BY — EST. SHIP — TRANSFER TYPE Screen Print FABRIC Cotton # COLORS 2 PRIMARY COLOR White ADDITIONAL COLORS Forest Green",
+        "vp-d-instructions": "Instructions: Keep the approved size and placement. Use the supplied vector artwork.",
+        "vp-d-lines": "24 Full front 11 × 12 1 Adult XS–4XL 12 Left chest 4 × 3 2 White underbase",
+        "vp-d-files": "Approved mockup.png MOCKUP 1200 × 800 px Approved placement Download Cedar-Example-Print-Ready-Artwork-Long-Filename.ai ARTWORK 11\" × 12\" Download",
+        "vp-d-mockup": "",
+        "vp-comment-input": "",
+        "vp-comment-btn": "Post",
+        "vp-comment-hint": "Ctrl+Enter posts. NWCA sees your note on the job.",
+        "vp-d-notes": "NWCA · Sep 10, 2026 Job requested River Sample (Example Screen Printing) · Sep 9, 2026 Files received. Checking placement. Example Rep · Sep 8, 2026 Please confirm receipt."
+      },
+      "links": [
+        {
+          "href": "/auth/vendor/logout",
+          "text": "Sign out",
+          "label": null
+        },
+        {
+          "href": "https://files.example.test/approved-mockup.png",
+          "text": "Download",
+          "label": "Download Approved mockup.png"
+        },
+        {
+          "href": "https://files.example.test/print-ready.ai",
+          "text": "Download",
+          "label": "Download Cedar-Example-Print-Ready-Artwork-Long-Filename.ai"
+        },
+        {
+          "href": "https://files.example.test/approved-mockup.png",
+          "text": "",
+          "label": "Open mockup full size"
+        }
+      ],
+      "rows": [
+        [
+          "24",
+          "Full front",
+          "11 × 12",
+          "1",
+          "Adult XS–4XL"
+        ],
+        [
+          "12",
+          "Left chest",
+          "4 × 3",
+          "2",
+          "White underbase"
+        ]
+      ],
+      "overflow": true,
+      "axe": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#vp-user-email"
+            ],
+            [
+              ".vp-badge--rush"
+            ],
+            [
+              "footer"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "actions": [],
+  "reads": [
+    {
+      "path": "/api/vendor/jobs",
+      "query": ""
+    },
+    {
+      "path": "/api/vendor/jobs/LNP-7401",
+      "query": ""
+    }
+  ]
+}

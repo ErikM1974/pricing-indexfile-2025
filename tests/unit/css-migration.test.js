@@ -40,6 +40,13 @@ describe('unified CSS ownership and preserved content', () => {
         files.delete('shared_components/css/tokens.css');
         // Existing utility animations/sr-only remain independently maintained and linted.
         files.delete('shared_components/css/utilities.css');
+        // Vendor Portal retains the bundled Font Awesome 6.6.0 library used by other pages.
+        // Its upstream selectors are not app layout rules; pin every source byte instead.
+        const bundledIcons = 'shared_components/vendor/fontawesome/css/all.min.css';
+        if (files.delete(bundledIcons)) {
+            expect(crypto.createHash('sha256').update(read(bundledIcons).replace(/\r\n/g, '\n')).digest('hex'))
+                .toBe('e5e202e3c899507992952533f57b634722b69b34241d271963559d31aa33ef81');
+        }
         for (const file of files) {
             const css = postcss.parse(read(file));
             css.walkRules(rule => {
