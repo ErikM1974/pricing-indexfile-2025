@@ -47,6 +47,104 @@
     "calculators/screenprint-customer/screenprint-customer-calculator.js": "4cbdfad1954c345ce4cb19d2b0d8d6cc49397140f6ccd2c02c207d648f4916d9",
     "calculators/screenprint-customer/screenprint-customer.js": "fef61eecb32d41228db1c65a68ce9b5b0b3957fedf33dd2157a761c97c676a9b"
   },
-  "changes": [],
+  "changes": [
+    {
+      "file": "calculators/custom-decal-pricing.html",
+      "before": "family=Inter:wght@400;500;600;700",
+      "after": "family=Public+Sans:wght@400;500;600;700",
+      "count": 1,
+      "reason": "Use the canonical application type family"
+    },
+    {
+      "file": "calculators/custom-decal-pricing.html",
+      "before": "<body>",
+      "after": "<body data-ui=\"unified\" data-specialty-calculator=\"decal\">",
+      "count": 1,
+      "reason": "Scope shared presentation to the reviewed calculator"
+    },
+    {
+      "file": "calculators/custom-decal-pricing.html",
+      "before": "<div id=\"pricingError\" class=\"pricing-error\" hidden>",
+      "after": "<div id=\"pricingError\" class=\"pricing-error\" role=\"alert\" hidden>",
+      "count": 1,
+      "reason": "Announce API failure without changing quote behavior"
+    },
+    {
+      "file": "calculators/custom-decal-pricing.html",
+      "before": "    <!-- Reuses sticker-pricing-page.css deliberately. That file already owns every\n         .decal-* rule this page needs and is shared by 5 other pages (emblem,\n         webstores, DTG + EMB builders, and formerly the sticker page), so it\n         cannot be deleted or renamed without touching all of them. Splitting the\n         ~200 decal lines into a new file would duplicate rules for no gain.\n         Its name is now slightly stale — see ACTIVE_FILES.md. -->\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/sticker-pricing-page.css?v=2026.09.07.19\">",
+      "after": "    <!-- Canonical controls, common specialty layout, then the page owner. -->\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/components.css?v=2026.09.11.6\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/specialty-pricing.css?v=2026.09.11.7\">\n    <link rel=\"stylesheet\" href=\"/calculators/custom-decal-pricing.css?v=2026.09.11.7\">",
+      "count": 1,
+      "reason": "Replace inherited legacy style stack with scoped canonical owners; legacy assets remain for other consumers"
+    },
+    {
+      "file": "calculators/custom-decal-pricing.html",
+      "before": "</body>",
+      "after": "    <script src=\"/shared_components/js/specialty-calculator-ui.js?v=2026.09.11.7\"></script>\n</body>",
+      "count": 1,
+      "reason": "Presentation-only controls, focus and paper enhancement"
+    },
+    {
+      "file": "calculators/embroidered-emblem/index.html",
+      "before": "family=Inter:wght@400;500;600;700",
+      "after": "family=Public+Sans:wght@400;500;600;700",
+      "count": 1,
+      "reason": "Use the canonical application type family"
+    },
+    {
+      "file": "calculators/embroidered-emblem/index.html",
+      "before": "<body>",
+      "after": "<body data-ui=\"unified\" data-specialty-calculator=\"emblem\">",
+      "count": 1,
+      "reason": "Scope shared presentation to the reviewed calculator"
+    },
+    {
+      "file": "calculators/embroidered-emblem/index.html",
+      "before": "<div id=\"pricingError\" class=\"pricing-error\" hidden>",
+      "after": "<div id=\"pricingError\" class=\"pricing-error\" role=\"alert\" hidden>",
+      "count": 1,
+      "reason": "Announce API failure without changing quote behavior"
+    },
+    {
+      "file": "calculators/embroidered-emblem/index.html",
+      "before": "    <!-- Shared chat/page CSS (sticker is the canonical pattern) + emblem overrides -->\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/sticker-pricing-page.css?v=2026.09.07.19\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/emblem-pricing-page.css?v=2026.09.07.12\">",
+      "after": "    <!-- Canonical controls, common specialty layout, then the page owner. -->\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/components.css?v=2026.09.11.6\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/specialty-pricing.css?v=2026.09.11.7\">\n    <link rel=\"stylesheet\" href=\"/calculators/embroidered-emblem/embroidered-emblem.css?v=2026.09.11.7\">",
+      "count": 1,
+      "reason": "Replace inherited legacy style stack with scoped canonical owners; legacy assets remain for other consumers"
+    },
+    {
+      "file": "calculators/embroidered-emblem/index.html",
+      "before": "</body>",
+      "after": "    <script src=\"/shared_components/js/specialty-calculator-ui.js?v=2026.09.11.7\"></script>\n</body>",
+      "count": 1,
+      "reason": "Presentation-only controls, focus and paper enhancement"
+    },
+    {
+      "file": "calculators/embroidered-emblem/index.html",
+      "before": "class=\"banner-formula\" style=\"margin-top:12px;\">\n                        <strong>How prices work:</strong>",
+      "after": "class=\"banner-formula\">\n                        <strong>How prices work:</strong>",
+      "count": 1,
+      "reason": "Move formula spacing into its scoped owner"
+    },
+    {
+      "file": "calculators/embroidered-emblem/index.html",
+      "before": "<div class=\"ai-chat-messages\" id=\"aiChatMessages\"></div>",
+      "after": "<div class=\"ai-chat-messages\" id=\"aiChatMessages\" tabindex=\"0\" role=\"region\" aria-label=\"Emblem quote conversation\"></div>",
+      "count": 1,
+      "reason": "Make overflowing conversation keyboard-scrollable"
+    },
+    {
+      "file": "shared_components/js/emblem-pricing-page.js",
+      "before": "            if (ta) ta.focus();\n        }, 320);",
+      "after": "            if (ta && aiState.opened && !panel.contains(document.activeElement)) ta.focus();\n        }, 320);",
+      "count": 1,
+      "reason": "Do not steal focus from a keyboard user or reopen focus after a delayed assistant callback"
+    },
+    {
+      "file": "calculators/embroidered-emblem/index.html",
+      "before": "/shared_components/js/emblem-pricing-page.js?v=2026.09.06.31",
+      "after": "/shared_components/js/emblem-pricing-page.js?v=2026.09.11.7",
+      "count": 1
+    }
+  ],
   "capturedAt": "2026-09-11T17:28:04.536Z"
 }

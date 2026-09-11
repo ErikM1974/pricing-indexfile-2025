@@ -1001,3 +1001,10 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - tests/fixtures/specialty-calculators-emblem-chat-failed-original-browser.json — immutable synthetic specialty calculator browser evidence.
 
 - tests/fixtures/specialty-calculators-emblem-save-retry-original-browser.json — immutable synthetic specialty calculator browser evidence.
+
+- shared_components/css/specialty-pricing.css — scoped specialty calculator presentation.
+- calculators/custom-decal-pricing.css — scoped specialty calculator presentation.
+- calculators/embroidered-emblem/embroidered-emblem.css — scoped specialty calculator presentation.
+- shared_components/js/specialty-calculator-ui.js — scoped specialty calculator presentation.
+
+- tests/e2e/css-unification-specialty-controls.spec.js — canonical decal target sizes, full mobile emblem grid, dialog focus and print disclosure restoration.

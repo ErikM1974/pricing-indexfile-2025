@@ -28,6 +28,7 @@ const MAGIC_LINK_FILES = ['pages/js/customer-login.js', 'pages/js/vendor-login.j
 const CATALOG_DISCOVERY_FILES = ['brands.js', 'pages/js/fall-catalog-2026.js'];
 const CONTRACT_UI_FILES = ['shared_components/js/contract-calculator-ui.js'];
 const STRICT_FILES = [
+    'shared_components/js/specialty-calculator-ui.js',
     ...CONTRACT_UI_FILES,
     ...CATALOG_DISCOVERY_FILES,
     ...MAGIC_LINK_FILES,
@@ -181,7 +182,7 @@ export default [
         },
     },
     {
-        files: [...CONTRACT_UI_FILES, ...CATALOG_DISCOVERY_FILES, ...MAGIC_LINK_FILES, ...STAFF_REFERENCE_FILES, 'shared_components/js/storefront-navigation.js', 'shared_components/js/catalog-storefront-navigation.js', 'shared_components/js/campaign-storefront.js', ...POLICY_UI_FILES, 'shared_components/js/webstore-guide.js'],
+        files: ['shared_components/js/specialty-calculator-ui.js', ...CONTRACT_UI_FILES, ...CATALOG_DISCOVERY_FILES, ...MAGIC_LINK_FILES, ...STAFF_REFERENCE_FILES, 'shared_components/js/storefront-navigation.js', 'shared_components/js/catalog-storefront-navigation.js', 'shared_components/js/campaign-storefront.js', ...POLICY_UI_FILES, 'shared_components/js/webstore-guide.js'],
         languageOptions: { sourceType: 'script', globals: { ...globals.browser } },
     },
     {

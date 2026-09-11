@@ -6372,6 +6372,68 @@
         "rawCssBytes": 28097,
         "localCssRequests": 2
       }
+    },
+    {
+      "source": "calculators/custom-decal-pricing.html",
+      "family": "specialty-calculators",
+      "status": "reviewed",
+      "route": "/calculators/custom-decal-pricing.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/specialty-pricing.css",
+        "calculators/custom-decal-pricing.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "1440-768-390-320",
+        "original-text-fields-links-prices-tiers-and-request-bodies",
+        "normal-failed-invalid-and-retry",
+        "44-pixel-controls-and-keyboard-table-scroll",
+        "all-160-emblem-prices-on-phones",
+        "closed-assistant-inert-and-native-tab-focus-restoration",
+        "delayed-focus-does-not-steal-the-selected-action",
+        "all-paper-pages-and-print-disclosure-restoration"
+      ],
+      "test": "tests/e2e/css-unification-specialty-decal-emblem.spec.js",
+      "maxCssBytes": 74267,
+      "measuredRawCssBytes": 72219,
+      "baseline": {
+        "commit": "97cc05080d4689785bc0885b6a4223c0f1356cbf",
+        "rawCssBytes": 77693,
+        "localCssRequests": 2
+      }
+    },
+    {
+      "source": "calculators/embroidered-emblem/index.html",
+      "family": "specialty-calculators",
+      "status": "reviewed",
+      "route": "/calculators/embroidered-emblem/index.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/specialty-pricing.css",
+        "calculators/embroidered-emblem/embroidered-emblem.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "1440-768-390-320",
+        "original-text-fields-links-prices-tiers-and-request-bodies",
+        "normal-failed-invalid-and-retry",
+        "44-pixel-controls-and-keyboard-table-scroll",
+        "all-160-emblem-prices-on-phones",
+        "closed-assistant-inert-and-native-tab-focus-restoration",
+        "delayed-focus-does-not-steal-the-selected-action",
+        "all-paper-pages-and-print-disclosure-restoration"
+      ],
+      "test": "tests/e2e/css-unification-specialty-decal-emblem.spec.js",
+      "maxCssBytes": 80519,
+      "measuredRawCssBytes": 78471,
+      "baseline": {
+        "commit": "97cc05080d4689785bc0885b6a4223c0f1356cbf",
+        "rawCssBytes": 89181,
+        "localCssRequests": 3
+      }
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",

@@ -1,5 +1,15 @@
 # CSS unification — design direction and implementation plan
 
+## REVIEWED CHECKPOINT — decals and embroidered emblems, 2026-09-11
+
+The first two specialty calculators now use Public Sans, canonical controls, one scoped shared layout and two small page owners. All316 focused source/pricing/ownership checks and scoped CSS/JS lint pass. All18 focused browser checks pass, including immutable prices/requests, failure/retry, full phone price grids, keyboard scrolling, dialog focus through the delayed callback, and print disclosure restoration. Reviewed all52 full-page screens at1440/768/390/320 (28 detail sheets) and all26 current paper pages in13 documents (11 unique renders and15 exact duplicates). Originals:14 immutable browser contracts,52 screens and23 paper pages.
+
+The decal controller remains byte-for-byte unchanged. The emblem controller changes only its delayed focus guard; pricing, saved-quote payloads, taxes, fees and every financial transformation remain unchanged. The source ledger has37 original hashes and14 reversible presentation/version mappings. Shared JS GUIDE, lint scope and migration manifest include only these two reviewed pages. Candidate209/225 reviewed,16pending; no specialty deployment yet.
+
+Verified LIVE is v2026.09.11.6 / Heroku2109 / 75ef80194384912f4c644e9b868898aa5d62de28,207/225 reviewed and18pending. Source CI34628828613 and release main/develop CI34633028735/34633354446 are green; full247 unit suites,1416 CSS browser checks,16 e2e and both parity gates passed. Primary develop is clean and synchronized. This replaces historical live/candidate statements below.
+
+Next: save this reviewed partial batch, merge verified .6 history, then capture/review originals for Polar Camel, Richardson factory direct, Safety Stripe Creator and customer-supplied screen printing. Finish their presentation and full batch gates before rollout. Business requests, allocating GETs, clipboard and printing remain synthetic/local artifacts. No .env copying or dependency-junction deletion. Updated LESSONS_LEARNED and shared-JS GUIDE.
+
 ## Specialty original review — decals and emblems
 
 All14 original browser cases pass with14 immutable contracts. Reviewed all52 full-page screens at1440/768/390/320 using29 detail sheets, and all23 paper pages in13 documents (15 unique renders, eight exact duplicates). All37 original source guards pass. The other four specialty pages still need their original browser/paper review; no application edits or migration credit yet.

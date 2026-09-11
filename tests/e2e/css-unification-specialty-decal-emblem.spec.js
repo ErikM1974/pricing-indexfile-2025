@@ -28,7 +28,34 @@ async function evidence(page, name, events) {
     if (capture) fixture(name, record);
     else {
         const prior = JSON.parse(fs.readFileSync(path.join(root, 'tests/fixtures/specialty-calculators-' + name + '-original-browser.json'), 'utf8'));
-        for (let i = 0; i < states.length; i++) for (const key of ['title', 'url', 'ids', 'fields', 'links', 'tables', 'headings']) expect(states[i][key], name + ' ' + key).toEqual(prior.states[i][key]);
+        for (let i = 0; i < states.length; i++) {
+            const expected = JSON.parse(JSON.stringify(prior.states[i])), actual = JSON.parse(JSON.stringify(states[i]));
+            if (name.startsWith('decal-')) {
+                const labels = text => text.replace('TOTAL FINISHED SQ FT RATE TIER MINIMUM', 'Total finished sq ft Rate Tier minimum').replace('SIZE SQ FT EACH', 'Size Sq ft each');
+                if (expected.ids.decalRateGrid) expected.ids.decalRateGrid = labels(expected.ids.decalRateGrid);
+                expected.tables = expected.tables.map(labels);
+            } else {
+                // The previous page exposed its closed drawer, idle toast and disabled actions.
+                // Keep the original text contract, but explicitly repair those visibility defects.
+                const open = ['emblem-assistant', 'emblem-quote', 'emblem-chat-failed', 'emblem-save-retry'].includes(name);
+                expected.ids.emblemHeroArt = '';
+                if (!open) {
+                    for (const key of Object.keys(expected.ids)) if (key.startsWith('ai') && key !== 'aiOpenBtn') delete expected.ids[key];
+                    expected.fields = [];
+                } else {
+                    expected.ids.aiChatTip = prior.states[0].ids.aiChatTip;
+                    expected.ids.aiChatMessages = expected.ids.aiChatMessages.replace('LIVE EMBLEM QUOTE', 'Live emblem quote').replace('EMAIL DRAFT', 'Email draft');
+                    if (['emblem-assistant', 'emblem-chat-failed'].includes(name)) for (const key of ['aiOutlookBtn', 'aiCopyEmailBtn', 'aiSaveQuoteBtn']) delete expected.ids[key];
+                }
+                await expect(page.locator('#shareToastText')).toHaveText(prior.states[i].ids.shareToastText);
+                delete expected.ids.shareToastText; delete actual.ids.shareToastText;
+                if (name === 'emblem-reference') {
+                    expected.tables = prior.states[0].tables.map(text => text.replace('SIZE (AVG)', 'Size (avg)'));
+                    expected.ids.emblemGridWrap = prior.states[0].ids.emblemGridWrap.replace('SIZE (AVG)', 'Size (avg)');
+                }
+            }
+            for (const key of ['title', 'url', 'ids', 'fields', 'links', 'tables', 'headings']) expect(actual[key], name + ' width=' + states[i].width + ' ' + key).toEqual(expected[key]);
+        }
         expect(record.dialogs).toEqual(prior.dialogs); expect(record.mocked).toEqual(prior.mocked);
     }
     await page.setViewportSize({width: 1440, height: 1000});

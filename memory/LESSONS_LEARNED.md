@@ -5,6 +5,12 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## Specialty pricing references must remain usable in every state (2026-09-11)
+
+- Problem/root cause: legacy phone CSS hid every emblem price; closed chat actions and idle confirmation appeared prematurely. A delayed textarea-focus callback moved focus after keyboard navigation or panel close. Print omitted collapsed references.
+- Solution: preserve the full grid in a named keyboard scroll region, use canonical hidden/inert state, guard delayed focus against current panel ownership, and open/restore references only around print. Separate reference sections into complete paper pages.
+- Prevention: exact original prices and intercepted request bodies, native Tab/Shift+Tab/Escape followed by the real delay, phone horizontal scrolling, hidden-state checks, and visual review of every PDF page.
+
 ## Contract calculators need one policy and visibility owner (2026-09-11)
 
 - Problem/root cause: explanatory DTG fee labels and the reference footer stayed hardcoded after API policy changed; author display rules exposed contradictory hidden notices. Assistant focus escaped, and clipped screen-reader-only elements damaged printed headings.
@@ -84,10 +90,6 @@ Exercise state transitions and verify complete printed content. Full entry in LE
 Native storefront menu focus and paper migration (2026-09-09) is archived in LESSONS_LEARNED_ARCHIVE.md; existing keyboard/browser guards retain the contract.
 
 Staff reference failure-state findings (2026-09-09) are preserved in LESSONS_LEARNED_ARCHIVE.md.
-
-### Sign-in and confirmation owners need honest state and paper checks (2026-09-09)
-
-Problem: shared form arrangements initially omitted canonical field styles, infrastructure failures falsely displayed an email-sent state, and artwork pushed receipt contact details onto a trailing sheet. Root cause: class ownership, treating all HTTP responses as success, and screen spacing inherited by print. Solution: canonical fields/shared access shell, generic outage errors preserving the email for retry while keeping successful known/unknown accounts identical, and compact print spacing with empty artwork regions hidden. Fulfillment controllers, totals and server shipping promises remain unchanged and hash-locked. Prevention: exercise keyboard/invalid/pending/rate/network/outage/sent states with all writes and emails blocked, inspect paper with actual artwork fixtures and compare every content block. Preserve line endings in scripted registry edits so removing a line cannot merge an adjacent entry into a comment.
 
 ### Catalog discovery must distinguish failed data from absent products (2026-09-09)
 

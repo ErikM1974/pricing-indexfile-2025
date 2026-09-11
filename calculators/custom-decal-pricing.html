@@ -6,18 +6,15 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Custom &amp; Oversize Decal Pricing — Northwest Custom Apparel</title>
     <link rel="icon" href="/favicon.png" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <!-- Reuses sticker-pricing-page.css deliberately. That file already owns every
-         .decal-* rule this page needs and is shared by 5 other pages (emblem,
-         webstores, DTG + EMB builders, and formerly the sticker page), so it
-         cannot be deleted or renamed without touching all of them. Splitting the
-         ~200 decal lines into a new file would duplicate rules for no gain.
-         Its name is now slightly stale — see ACTIVE_FILES.md. -->
+    <!-- Canonical controls, common specialty layout, then the page owner. -->
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/sticker-pricing-page.css?v=2026.09.07.19">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.11.6">
+    <link rel="stylesheet" href="/shared_components/css/specialty-pricing.css?v=2026.09.11.7">
+    <link rel="stylesheet" href="/calculators/custom-decal-pricing.css?v=2026.09.11.7">
 </head>
-<body>
+<body data-ui="unified" data-specialty-calculator="decal">
     <!-- ========== Header ========== -->
     <header class="header">
         <div class="header-container">
@@ -59,7 +56,7 @@
         </section>
 
         <!-- Rule 4: API failure is loud and total — no cached or guessed rate. -->
-        <div id="pricingError" class="pricing-error" hidden>
+        <div id="pricingError" class="pricing-error" role="alert" hidden>
             <strong>Unable to load decal rates.</strong> Refresh the page, or contact Erik if this persists.
             Do not quote from memory — the rate card lives in Caspio and may have changed.
         </div>
@@ -166,5 +163,6 @@
          (fees and modal copy) and would leave the proxy URL undefined. -->
     <script src="/config/app.config.js?v=2026.09.03.11"></script>
     <script src="/shared_components/js/custom-decal-pricing-page.js?v=2026.09.06.31"></script>
+    <script src="/shared_components/js/specialty-calculator-ui.js?v=2026.09.11.7"></script>
 </body>
 </html>
