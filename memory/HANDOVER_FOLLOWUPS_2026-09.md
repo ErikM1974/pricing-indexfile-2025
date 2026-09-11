@@ -1,5 +1,11 @@
 # Handover follow-ups — 2026-09-07
 
+## RELEASE CANDIDATE — v2026.09.11.3 Home, Catalog and Product
+
+Reviewed source a1a136333d3eef7f978e60cd39c2a48fd928bf67 is integrated on clean develop. This candidate adds 15 cache references for nine changed application assets and their reversible mappings. All 34 focused browser cases, 57 visually reviewed current paper pages and 298 source/ownership guards passed. All 47 original sources and 29 original browser records remain preserved. The 16 financial functions remain byte-identical; quantity edits immediately withhold stale prices while recalculating.
+
+Candidate 196/225 reviewed, 29 pending; live remains .2 / Heroku 2105 at 193/225, 32 pending. Full local application/browser/parity checks and all four actual exact-source CI jobs must pass before release. Then verify the running slug, source/compiled assets and access. No real business writes, emails, uploads or device printing.
+
 ## REVIEWED — Home, Catalog and Product
 
 All three pages share Public Sans, canonical controls, the storefront shell and scoped page owners. All 34 focused browser tests pass at 1440/768/390/320, followed by the final empty-catalog print checks and open sample-drawer accessibility check. All 57 current paper pages across 25 documents and 62 full-page screen panels were visually reviewed; 16 final control previews verify mobile labels, browse, quick view and sample controls. Print retains full pricing ladders, fees, totals and failure states.

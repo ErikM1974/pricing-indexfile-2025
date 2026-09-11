@@ -1532,6 +1532,111 @@
       "after": "/* Sample drawer layout. Canonical tokens and controls are provided by components.css. */\n@layer components.pages {\n:where([data-ui=\"unified\"][data-catalog-storefront]) .drawer-overlay {\ndisplay: none;\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .drawer-overlay.open {\ndisplay: none;\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer {\n    position: fixed;\n    top: 0;\n    right: 0;\n    width: 450px;\n    max-width: 100vw;\n    height: 100%;\n    background: white;\n    z-index: 9999;\n    transform: translateX(100%);\n    visibility: hidden;\n    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s linear 0.3s;\n    display: flex;\n    flex-direction: column;\n    box-shadow: -4px 0 24px rgb(0 0 0 / 15%);\n    margin: 0 0 0 auto;\n    padding: 0;\n    border: 0;\n    max-height: 100dvh;\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer.open {\n    transform: translateX(0);\n    visibility: visible;\n    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s;\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .drawer-header {\n    padding: 20px 24px;\n    border-bottom: 1px solid var(--gray-200);\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    background: var(--gray-50);\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .drawer-title {\n    margin: 0;\n    font-size: 20px;\n    font-weight: 600;\n    color: var(--print-green);\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .drawer-close {\n    background: none;\n    border: none;\n    font-size: 24px;\n    color: var(--store-ink-soft);\n    cursor: pointer;\n    padding: 0;\n    width: 32px;\n    height: 32px;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    border-radius: 4px;\n    transition: all 0.2s;\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .drawer-close:hover {\n    background: var(--gray-200);\n    color: var(--store-ink);\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .drawer-content {\n    flex: 1;\n    overflow-y: auto;\n    padding: 24px;\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .product-selection-section {\n    border-bottom: 2px solid var(--gray-200);\n    padding-bottom: 24px;\n    margin-bottom: 24px;\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .product-preview {\n    display: flex;\n    gap: 16px;\n    margin-bottom: 20px;\n    padding: 16px;\n    background: var(--gray-50);\n    border-radius: 8px;\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .product-preview-image {\n    width: 80px;\n    height: 80px;\n    object-fit: cover;\n    border-radius: 6px;\n    border: 1px solid var(--store-line);\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .product-preview-info {\n    flex: 1;\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .product-preview-info h4 {\n    margin: 0 0 8px;\n    font-size: 16px;\n    font-weight: 600;\n    color: var(--store-ink);\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .product-preview-info p {\n    margin: 0 0 8px;\n    font-size: 14px;\n    color: var(--store-ink-soft);\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .badge-free {\n    background: var(--color-success-bg);\n    color: var(--ui-accent-hover);\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .badge-paid {\n    background: var(--bs-warning);\n    color: var(--store-ink);\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .selection-group {\n    margin-bottom: 20px;\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .selection-label {\n    display: block;\n    font-weight: 600;\n    font-size: 14px;\n    color: var(--store-ink);\n    margin-bottom: 12px;\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .color-swatches {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 10px;\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .color-swatch {\n    width: 50px;\n    height: 50px;\n    border-radius: 8px;\n    border: 3px solid transparent;\n    cursor: pointer;\n    transition: all 0.2s;\n    position: relative;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    box-shadow: 0 2px 4px rgb(0 0 0 / 10%);\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .color-swatch:hover {\n    transform: scale(1.1);\n    box-shadow: 0 4px 8px rgb(0 0 0 / 15%);\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .color-swatch.selected {\n    border-color: var(--print-green);\n    box-shadow: 0 0 0 2px white, 0 0 0 4px var(--print-green);\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .color-check {\n    color: white;\n    font-size: 20px;\n    text-shadow: 0 0 4px rgb(0 0 0 / 50%);\n    opacity: 0;\n    transition: opacity 0.2s;\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .color-swatch.selected .color-check {\n    opacity: 1;\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .size-buttons {\n    display: grid;\n    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));\n    gap: 10px;\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .size-button {\n    padding: 12px;\n    border: 2px solid var(--store-line);\n    background: white;\n    border-radius: 6px;\n    font-size: 14px;\n    font-weight: 600;\n    color: var(--store-ink);\n    cursor: pointer;\n    transition: all 0.2s;\n    text-align: center;\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .size-button:hover {\n    border-color: var(--print-green);\n    background: var(--gray-100);\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .size-button.selected {\n    border-color: var(--print-green);\n    background: var(--print-green);\n    color: white;\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .btn-add-to-cart {\n    width: 100%;\n    margin-top: 20px;\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .cart-items-section {\n    margin-top: 24px;\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .section-title {\n    font-size: 16px;\n    font-weight: 600;\n    color: var(--store-ink);\n    margin: 0 0 16px;\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .cart-items-list {\n    display: flex;\n    flex-direction: column;\n    gap: 12px;\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .empty-cart-message {\n    text-align: center;\n    color: var(--ui-muted);\n    padding: 40px 20px;\n    font-size: 14px;\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .cart-item {\n    display: flex;\n    gap: 12px;\n    padding: 12px;\n    background: var(--gray-50);\n    border-radius: 8px;\n    border: 1px solid var(--gray-200);\n    transition: all 0.2s;\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .cart-item:hover {\n    box-shadow: 0 2px 8px rgb(0 0 0 / 8%);\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .cart-item-image {\n    width: 60px;\n    height: 60px;\n    object-fit: cover;\n    border-radius: 6px;\n    border: 1px solid var(--store-line);\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .cart-item-details {\n    flex: 1;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .cart-item-name {\n    font-weight: 600;\n    font-size: 14px;\n    color: var(--store-ink);\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .cart-item-variant {\n    font-size: 13px;\n    color: var(--store-ink-soft);\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .cart-item-remove {\n    background: none;\n    border: none;\n    color: var(--bs-danger);\n    cursor: pointer;\n    padding: 8px;\n    font-size: 16px;\n    align-self: flex-start;\n    border-radius: 4px;\n    transition: all 0.2s;\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .cart-item-remove:hover {\n    background: var(--red-50);\n    color: var(--color-ae-light);\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .drawer-footer {\n    padding: 20px 24px;\n    border-top: 1px solid var(--gray-200);\n    background: var(--gray-50);\n    display: flex;\n    gap: 12px;\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .btn-continue-shopping {\n    flex: 1;\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .btn-checkout {\n    flex: 1;\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .drawer-toast {\n    position: fixed;\n    bottom: 24px;\n    left: 50%;\n    transform: translateX(-50%) translateY(100px);\n    background: var(--ui-accent-hover);\n    color: white;\n    padding: 12px 24px;\n    border-radius: 8px;\n    box-shadow: 0 4px 16px rgb(0 0 0 / 20%);\n    display: flex;\n    align-items: center;\n    gap: 10px;\n    font-size: 14px;\n    font-weight: 500;\n    z-index: 10000;\n    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .drawer-toast.show {\n    transform: translateX(-50%) translateY(0);\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .drawer-toast-warning {\n    background: var(--amber-700);\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .drawer-toast-info {\n    background: var(--gray-700);\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront]) .drawer-toast i {\n    font-size: 18px;\n}\n\n@media (width <= 768px) {\n    :where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer {\n        width: 100%;\n        max-width: 100vw;\n    }\n\n    :where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .drawer-content {\n        padding: 16px;\n    }\n\n    :where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .product-selection-section {\n        padding-bottom: 16px;\n        margin-bottom: 16px;\n    }\n\n    :where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .product-preview {\n        flex-direction: column;\n        align-items: center;\n        text-align: center;\n    }\n\n    :where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .product-preview-image {\n        width: 100px;\n        height: 100px;\n    }\n\n    :where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .color-swatches {\n        justify-content: center;\n    }\n\n    :where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .size-buttons {\n        grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));\n        gap: 8px;\n    }\n\n    :where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .drawer-footer {\n        flex-direction: column;\n        gap: 10px;\n    }\n\n    :where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .btn-continue-shopping,\n    :where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .btn-checkout {\n        width: 100%;\n    }\n}\n\n@media (width <= 480px) {\n    :where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .drawer-header {\n        padding: 16px;\n    }\n\n    :where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .drawer-title {\n        font-size: 18px;\n    }\n\n    :where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .drawer-content {\n        padding: 12px;\n    }\n\n    :where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .product-preview {\n        padding: 12px;\n    }\n\n    :where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .cart-item {\n        padding: 10px;\n    }\n\n    :where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .cart-item-image {\n        width: 50px;\n        height: 50px;\n    }\n\n    :where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .drawer-footer {\n        padding: 16px;\n    }\n}\n\n@media (prefers-reduced-motion: reduce) {\n    :where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer,\n    :where([data-ui=\"unified\"][data-catalog-storefront]) .drawer-overlay,\n    :where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .color-swatch,\n    :where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .size-button,\n    :where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer .cart-item,\n    :where([data-ui=\"unified\"][data-catalog-storefront]) .drawer-toast {\n        transition: none;\n    }\n}\n\n@media print {\n    :where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer,\n    :where([data-ui=\"unified\"][data-catalog-storefront]) .drawer-overlay {\n        display: none;\n    }\n}:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer::backdrop { background: rgb(0 0 0 / 45%); }\n:where([data-ui=\"unified\"][data-catalog-storefront]) .cart-drawer:not([open]) { display: none; }\n}\n",
       "count": 1,
       "reason": "Consolidated scoped layout, canonical tokens and documented print/accessibility repairs. Complete original stylesheet preserved from baseline85ecba58; replaces intermediate formatting mappings."
+    },
+    {
+      "file": "index.html",
+      "before": "/shared_components/css/catalog-storefront.css",
+      "after": "/shared_components/css/catalog-storefront.css?v=2026.09.11.3",
+      "count": 1,
+      "reason": "Refetch the reviewed catalog storefront asset at this release version."
+    },
+    {
+      "file": "index.html",
+      "before": "/shared_components/css/nwca-2026.css?v=2026.09.07.20",
+      "after": "/shared_components/css/nwca-2026.css?v=2026.09.11.3",
+      "count": 1,
+      "reason": "Refetch the reviewed catalog storefront asset at this release version."
+    },
+    {
+      "file": "index.html",
+      "before": "/shared_components/js/catalog-storefront-navigation.js",
+      "after": "/shared_components/js/catalog-storefront-navigation.js?v=2026.09.11.3",
+      "count": 1,
+      "reason": "Refetch the reviewed catalog storefront asset at this release version."
+    },
+    {
+      "file": "pages/catalog.html",
+      "before": "/shared_components/css/catalog-storefront.css",
+      "after": "/shared_components/css/catalog-storefront.css?v=2026.09.11.3",
+      "count": 1,
+      "reason": "Refetch the reviewed catalog storefront asset at this release version."
+    },
+    {
+      "file": "pages/catalog.html",
+      "before": "/pages/css/catalog-2026.css?v=2026.09.07.8",
+      "after": "/pages/css/catalog-2026.css?v=2026.09.11.3",
+      "count": 1,
+      "reason": "Refetch the reviewed catalog storefront asset at this release version."
+    },
+    {
+      "file": "pages/catalog.html",
+      "before": "/shared_components/css/cart-drawer.css?v=2026.09.07.20",
+      "after": "/shared_components/css/cart-drawer.css?v=2026.09.11.3",
+      "count": 1,
+      "reason": "Refetch the reviewed catalog storefront asset at this release version."
+    },
+    {
+      "file": "pages/catalog.html",
+      "before": "/shared_components/js/cart-drawer.js?v=2026.09.06.37",
+      "after": "/shared_components/js/cart-drawer.js?v=2026.09.11.3",
+      "count": 1,
+      "reason": "Refetch the reviewed catalog storefront asset at this release version."
+    },
+    {
+      "file": "pages/catalog.html",
+      "before": "/pages/js/catalog-2026.js?v=2026.08.26.9",
+      "after": "/pages/js/catalog-2026.js?v=2026.09.11.3",
+      "count": 1,
+      "reason": "Refetch the reviewed catalog storefront asset at this release version."
+    },
+    {
+      "file": "pages/catalog.html",
+      "before": "/shared_components/js/catalog-storefront-navigation.js",
+      "after": "/shared_components/js/catalog-storefront-navigation.js?v=2026.09.11.3",
+      "count": 1,
+      "reason": "Refetch the reviewed catalog storefront asset at this release version."
+    },
+    {
+      "file": "product.html",
+      "before": "/shared_components/css/catalog-storefront.css",
+      "after": "/shared_components/css/catalog-storefront.css?v=2026.09.11.3",
+      "count": 1,
+      "reason": "Refetch the reviewed catalog storefront asset at this release version."
+    },
+    {
+      "file": "product.html",
+      "before": "/product/css/product-2026.css?v=2026.09.07.20",
+      "after": "/product/css/product-2026.css?v=2026.09.11.3",
+      "count": 1,
+      "reason": "Refetch the reviewed catalog storefront asset at this release version."
+    },
+    {
+      "file": "product.html",
+      "before": "/shared_components/css/cart-drawer.css?v=2026.09.07.20",
+      "after": "/shared_components/css/cart-drawer.css?v=2026.09.11.3",
+      "count": 1,
+      "reason": "Refetch the reviewed catalog storefront asset at this release version."
+    },
+    {
+      "file": "product.html",
+      "before": "/product/js/pdp-configurator.js?v=2026.08.18.4",
+      "after": "/product/js/pdp-configurator.js?v=2026.09.11.3",
+      "count": 1,
+      "reason": "Refetch the reviewed catalog storefront asset at this release version."
+    },
+    {
+      "file": "product.html",
+      "before": "/shared_components/js/cart-drawer.js?v=2026.09.06.37",
+      "after": "/shared_components/js/cart-drawer.js?v=2026.09.11.3",
+      "count": 1,
+      "reason": "Refetch the reviewed catalog storefront asset at this release version."
+    },
+    {
+      "file": "product.html",
+      "before": "/shared_components/js/catalog-storefront-navigation.js",
+      "after": "/shared_components/js/catalog-storefront-navigation.js?v=2026.09.11.3",
+      "count": 1,
+      "reason": "Refetch the reviewed catalog storefront asset at this release version."
     }
   ],
   "retiredStyles": []

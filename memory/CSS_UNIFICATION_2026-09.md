@@ -1,5 +1,11 @@
 # CSS unification — design direction and implementation plan
 
+## RELEASE CANDIDATE — v2026.09.11.3 Home, Catalog and Product
+
+Reviewed source a1a136333d3eef7f978e60cd39c2a48fd928bf67 is integrated on clean develop. This candidate adds 15 cache references for nine changed application assets and their reversible mappings. All 34 focused browser cases, 57 visually reviewed current paper pages and 298 source/ownership guards passed. All 47 original sources and 29 original browser records remain preserved. The 16 financial functions remain byte-identical; quantity edits immediately withhold stale prices while recalculating.
+
+Candidate 196/225 reviewed, 29 pending; live remains .2 / Heroku 2105 at 193/225, 32 pending. Full local application/browser/parity checks and all four actual exact-source CI jobs must pass before release. Then verify the running slug, source/compiled assets and access. No real business writes, emails, uploads or device printing.
+
 
 
 ## REVIEWED — Home, Catalog and Product
