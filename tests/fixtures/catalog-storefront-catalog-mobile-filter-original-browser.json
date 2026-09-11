@@ -1,0 +1,1925 @@
+{
+  "name": "catalog-mobile-filter",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Caps — NWCA Catalog",
+      "url": "/catalog?category=Caps",
+      "ids": {
+        "catalogCrumbs": "Home / Catalog / Caps",
+        "catalogTitle": "Caps",
+        "catalogSub": "1 customizable style — embroidery, screen print, DTG, and DTF done in-house.",
+        "filtersClose": "",
+        "filterGroups": "COLLECTION Our proven favorites — most offer a free sample. Top sellers CATEGORY All categories T-Shirts 2 Caps 2 Polos/Knits 2 DECORATION Methods we run in-house. Fabric fit is confirmed on each product. All methods Embroidery DTG Print Screen Print DTF Transfer TYPE All Caps Performance/ Athletic Visors Stretch-to-Fit Youth Fashion Fleece/Beanies Twill Full Brim Show all (10) BRAND Port & Company 3 Port Authority 1 COLOR Colors available in these results. Brilliant Orange 1 Jet Black 1 SIZE OSFA 1",
+        "clearAllFilters": "Clear all filters",
+        "resultsStatus": "1 product",
+        "sortSelect": "Best match Price: low to high Price: high to low Name: A–Z Name: Z–A Style number Newest",
+        "activeChips": "Category Caps × Clear all",
+        "resultsGrid": "Quick view : C112 Port & Company C112 Embroidered Cap $22.50 with embroidery Buy online →",
+        "pager": ""
+      },
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-topsellers",
+          "type": "checkbox",
+          "value": "1",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-category",
+          "type": "radio",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-category",
+          "type": "radio",
+          "value": "T-Shirts",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-category",
+          "type": "radio",
+          "value": "Caps",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-category",
+          "type": "radio",
+          "value": "Polos/Knits",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-method",
+          "type": "radio",
+          "value": "",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-method",
+          "type": "radio",
+          "value": "emb",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-method",
+          "type": "radio",
+          "value": "dtg",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-method",
+          "type": "radio",
+          "value": "scp",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-method",
+          "type": "radio",
+          "value": "dtf",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-subcategory",
+          "type": "radio",
+          "value": "",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-subcategory",
+          "type": "radio",
+          "value": "Performance/ Athletic",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-subcategory",
+          "type": "radio",
+          "value": "Visors",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-subcategory",
+          "type": "radio",
+          "value": "Stretch-to-Fit",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-subcategory",
+          "type": "radio",
+          "value": "Youth",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-subcategory",
+          "type": "radio",
+          "value": "Fashion",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-subcategory",
+          "type": "radio",
+          "value": "Fleece/Beanies",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-subcategory",
+          "type": "radio",
+          "value": "Twill",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-subcategory",
+          "type": "radio",
+          "value": "Full Brim",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-brand",
+          "type": "checkbox",
+          "value": "Port & Company",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-brand",
+          "type": "checkbox",
+          "value": "Port Authority",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-color",
+          "type": "checkbox",
+          "value": "Brilliant Orange",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-color",
+          "type": "checkbox",
+          "value": "Jet Black",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-size",
+          "type": "checkbox",
+          "value": "OSFA",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "sortSelect",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#main",
+          "text": "Skip to content"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/catalog",
+          "text": "Products"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "text": "Fall Catalog '26 New"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom Tees New"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats New"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Webstores"
+        },
+        {
+          "href": "/blog",
+          "text": "Blog"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "Stickers"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "text": "Get a Quote"
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/catalog",
+          "text": "Catalog"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "text": "Fall Catalog '26 New"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts New"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats New"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "Custom Stickers New"
+        },
+        {
+          "href": "/custom-banners",
+          "text": "Vinyl Banners New"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers & Free Samples"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/blog",
+          "text": "Blog"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "text": "Get a Quote"
+        },
+        {
+          "href": "#",
+          "text": "T-Shirts"
+        },
+        {
+          "href": "#",
+          "text": "Polos/Knits"
+        },
+        {
+          "href": "#",
+          "text": "Sweatshirts/Fleece"
+        },
+        {
+          "href": "#",
+          "text": "Caps"
+        },
+        {
+          "href": "#",
+          "text": "Activewear"
+        },
+        {
+          "href": "#",
+          "text": "Outerwear"
+        },
+        {
+          "href": "#",
+          "text": "Bags"
+        },
+        {
+          "href": "#",
+          "text": "Accessories"
+        },
+        {
+          "href": "#",
+          "text": "Workwear"
+        },
+        {
+          "href": "#",
+          "text": "Woven Shirts"
+        },
+        {
+          "href": "#",
+          "text": "Ladies"
+        },
+        {
+          "href": "#",
+          "text": "Youth"
+        },
+        {
+          "href": "#",
+          "text": "Infant & Toddler"
+        },
+        {
+          "href": "#",
+          "text": "Tall"
+        },
+        {
+          "href": "#",
+          "text": "Juniors & Young Men"
+        },
+        {
+          "href": "#",
+          "text": "Personal Protection"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/catalog",
+          "text": "Catalog"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "text": "New Fall Catalog '26 is here 170+ new styles — MiiR, The North Face, Carhartt, Nike, Port Authority & more Explore the collection"
+        },
+        {
+          "href": "/product.html?style=C112",
+          "text": ""
+        },
+        {
+          "href": "/product.html?style=C112",
+          "text": "Embroidered Cap"
+        },
+        {
+          "href": "/custom-caps?style=C112",
+          "text": "Buy online →"
+        },
+        {
+          "href": "/catalog",
+          "text": "Product Catalog"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free Sample Program"
+        },
+        {
+          "href": "/golf-tournament-apparel?utm_source=catalog&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "text": "Tournament Packages"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "Die-Cut Stickers"
+        },
+        {
+          "href": "/custom-banners",
+          "text": "Vinyl Banners"
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "Laser-Engraved Tumblers"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Portal"
+        }
+      ],
+      "selection": null,
+      "overflow": true,
+      "violations": [
+        {
+          "id": "aria-prohibited-attr",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".pcard-swatches"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".fall26-promo-badge"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Caps — NWCA Catalog",
+      "url": "/catalog?category=Caps",
+      "ids": {
+        "catalogCrumbs": "Home / Catalog / Caps",
+        "catalogTitle": "Caps",
+        "catalogSub": "1 customizable style — embroidery, screen print, DTG, and DTF done in-house.",
+        "filtersClose": "",
+        "filterGroups": "COLLECTION Our proven favorites — most offer a free sample. Top sellers CATEGORY All categories T-Shirts 2 Caps 2 Polos/Knits 2 DECORATION Methods we run in-house. Fabric fit is confirmed on each product. All methods Embroidery DTG Print Screen Print DTF Transfer TYPE All Caps Performance/ Athletic Visors Stretch-to-Fit Youth Fashion Fleece/Beanies Twill Full Brim Show all (10) BRAND Port & Company 3 Port Authority 1 COLOR Colors available in these results. Brilliant Orange 1 Jet Black 1 SIZE OSFA 1",
+        "clearAllFilters": "Clear all filters",
+        "filtersApply": "Show 1 result",
+        "filtersOpenCount": "1",
+        "resultsStatus": "1 product",
+        "sortSelect": "Best match Price: low to high Price: high to low Name: A–Z Name: Z–A Style number Newest",
+        "activeChips": "Category Caps × Clear all",
+        "resultsGrid": "Quick view : C112 Port & Company C112 Embroidered Cap $22.50 with embroidery Buy online →",
+        "pager": ""
+      },
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-topsellers",
+          "type": "checkbox",
+          "value": "1",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-category",
+          "type": "radio",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-category",
+          "type": "radio",
+          "value": "T-Shirts",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-category",
+          "type": "radio",
+          "value": "Caps",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-category",
+          "type": "radio",
+          "value": "Polos/Knits",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-method",
+          "type": "radio",
+          "value": "",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-method",
+          "type": "radio",
+          "value": "emb",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-method",
+          "type": "radio",
+          "value": "dtg",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-method",
+          "type": "radio",
+          "value": "scp",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-method",
+          "type": "radio",
+          "value": "dtf",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-subcategory",
+          "type": "radio",
+          "value": "",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-subcategory",
+          "type": "radio",
+          "value": "Performance/ Athletic",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-subcategory",
+          "type": "radio",
+          "value": "Visors",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-subcategory",
+          "type": "radio",
+          "value": "Stretch-to-Fit",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-subcategory",
+          "type": "radio",
+          "value": "Youth",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-subcategory",
+          "type": "radio",
+          "value": "Fashion",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-subcategory",
+          "type": "radio",
+          "value": "Fleece/Beanies",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-subcategory",
+          "type": "radio",
+          "value": "Twill",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-subcategory",
+          "type": "radio",
+          "value": "Full Brim",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-brand",
+          "type": "checkbox",
+          "value": "Port & Company",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-brand",
+          "type": "checkbox",
+          "value": "Port Authority",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-color",
+          "type": "checkbox",
+          "value": "Brilliant Orange",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-color",
+          "type": "checkbox",
+          "value": "Jet Black",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-size",
+          "type": "checkbox",
+          "value": "OSFA",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "sortSelect",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#main",
+          "text": "Skip to content"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/catalog",
+          "text": "Catalog"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "text": "Fall Catalog '26 New"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts New"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats New"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "Custom Stickers New"
+        },
+        {
+          "href": "/custom-banners",
+          "text": "Vinyl Banners New"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers & Free Samples"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/blog",
+          "text": "Blog"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "text": "Get a Quote"
+        },
+        {
+          "href": "#",
+          "text": "T-Shirts"
+        },
+        {
+          "href": "#",
+          "text": "Polos/Knits"
+        },
+        {
+          "href": "#",
+          "text": "Sweatshirts/Fleece"
+        },
+        {
+          "href": "#",
+          "text": "Caps"
+        },
+        {
+          "href": "#",
+          "text": "Activewear"
+        },
+        {
+          "href": "#",
+          "text": "Outerwear"
+        },
+        {
+          "href": "#",
+          "text": "Bags"
+        },
+        {
+          "href": "#",
+          "text": "Accessories"
+        },
+        {
+          "href": "#",
+          "text": "Workwear"
+        },
+        {
+          "href": "#",
+          "text": "Woven Shirts"
+        },
+        {
+          "href": "#",
+          "text": "Ladies"
+        },
+        {
+          "href": "#",
+          "text": "Youth"
+        },
+        {
+          "href": "#",
+          "text": "Infant & Toddler"
+        },
+        {
+          "href": "#",
+          "text": "Tall"
+        },
+        {
+          "href": "#",
+          "text": "Juniors & Young Men"
+        },
+        {
+          "href": "#",
+          "text": "Personal Protection"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/catalog",
+          "text": "Catalog"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "text": "New Fall Catalog '26 is here 170+ new styles — MiiR, The North Face, Carhartt, Nike, Port Authority & more Explore the collection"
+        },
+        {
+          "href": "/product.html?style=C112",
+          "text": ""
+        },
+        {
+          "href": "/product.html?style=C112",
+          "text": "Embroidered Cap"
+        },
+        {
+          "href": "/custom-caps?style=C112",
+          "text": "Buy online →"
+        },
+        {
+          "href": "/catalog",
+          "text": "Product Catalog"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free Sample Program"
+        },
+        {
+          "href": "/golf-tournament-apparel?utm_source=catalog&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "text": "Tournament Packages"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "Die-Cut Stickers"
+        },
+        {
+          "href": "/custom-banners",
+          "text": "Vinyl Banners"
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "Laser-Engraved Tumblers"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Portal"
+        }
+      ],
+      "selection": null,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "aria-prohibited-attr",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".pcard-swatches"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".fall26-promo-badge"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Caps — NWCA Catalog",
+      "url": "/catalog?category=Caps",
+      "ids": {
+        "catalogCrumbs": "Home / Catalog / Caps",
+        "catalogTitle": "Caps",
+        "catalogSub": "1 customizable style — embroidery, screen print, DTG, and DTF done in-house.",
+        "filtersClose": "",
+        "filterGroups": "COLLECTION Our proven favorites — most offer a free sample. Top sellers CATEGORY All categories T-Shirts 2 Caps 2 Polos/Knits 2 DECORATION Methods we run in-house. Fabric fit is confirmed on each product. All methods Embroidery DTG Print Screen Print DTF Transfer TYPE All Caps Performance/ Athletic Visors Stretch-to-Fit Youth Fashion Fleece/Beanies Twill Full Brim Show all (10) BRAND Port & Company 3 Port Authority 1 COLOR Colors available in these results. Brilliant Orange 1 Jet Black 1 SIZE OSFA 1",
+        "clearAllFilters": "Clear all filters",
+        "filtersApply": "Show 1 result",
+        "filtersOpenCount": "1",
+        "resultsStatus": "1 product",
+        "sortSelect": "Best match Price: low to high Price: high to low Name: A–Z Name: Z–A Style number Newest",
+        "activeChips": "Category Caps × Clear all",
+        "resultsGrid": "Quick view : C112 Port & Company C112 Embroidered Cap $22.50 with embroidery Buy online →",
+        "pager": ""
+      },
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-topsellers",
+          "type": "checkbox",
+          "value": "1",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-category",
+          "type": "radio",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-category",
+          "type": "radio",
+          "value": "T-Shirts",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-category",
+          "type": "radio",
+          "value": "Caps",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-category",
+          "type": "radio",
+          "value": "Polos/Knits",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-method",
+          "type": "radio",
+          "value": "",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-method",
+          "type": "radio",
+          "value": "emb",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-method",
+          "type": "radio",
+          "value": "dtg",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-method",
+          "type": "radio",
+          "value": "scp",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-method",
+          "type": "radio",
+          "value": "dtf",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-subcategory",
+          "type": "radio",
+          "value": "",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-subcategory",
+          "type": "radio",
+          "value": "Performance/ Athletic",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-subcategory",
+          "type": "radio",
+          "value": "Visors",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-subcategory",
+          "type": "radio",
+          "value": "Stretch-to-Fit",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-subcategory",
+          "type": "radio",
+          "value": "Youth",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-subcategory",
+          "type": "radio",
+          "value": "Fashion",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-subcategory",
+          "type": "radio",
+          "value": "Fleece/Beanies",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-subcategory",
+          "type": "radio",
+          "value": "Twill",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-subcategory",
+          "type": "radio",
+          "value": "Full Brim",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-brand",
+          "type": "checkbox",
+          "value": "Port & Company",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-brand",
+          "type": "checkbox",
+          "value": "Port Authority",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-color",
+          "type": "checkbox",
+          "value": "Brilliant Orange",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-color",
+          "type": "checkbox",
+          "value": "Jet Black",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-size",
+          "type": "checkbox",
+          "value": "OSFA",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "sortSelect",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#main",
+          "text": "Skip to content"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/catalog",
+          "text": "Catalog"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "text": "Fall Catalog '26 New"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts New"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats New"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "Custom Stickers New"
+        },
+        {
+          "href": "/custom-banners",
+          "text": "Vinyl Banners New"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers & Free Samples"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/blog",
+          "text": "Blog"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "text": "Get a Quote"
+        },
+        {
+          "href": "#",
+          "text": "T-Shirts"
+        },
+        {
+          "href": "#",
+          "text": "Polos/Knits"
+        },
+        {
+          "href": "#",
+          "text": "Sweatshirts/Fleece"
+        },
+        {
+          "href": "#",
+          "text": "Caps"
+        },
+        {
+          "href": "#",
+          "text": "Activewear"
+        },
+        {
+          "href": "#",
+          "text": "Outerwear"
+        },
+        {
+          "href": "#",
+          "text": "Bags"
+        },
+        {
+          "href": "#",
+          "text": "Accessories"
+        },
+        {
+          "href": "#",
+          "text": "Workwear"
+        },
+        {
+          "href": "#",
+          "text": "Woven Shirts"
+        },
+        {
+          "href": "#",
+          "text": "Ladies"
+        },
+        {
+          "href": "#",
+          "text": "Youth"
+        },
+        {
+          "href": "#",
+          "text": "Infant & Toddler"
+        },
+        {
+          "href": "#",
+          "text": "Tall"
+        },
+        {
+          "href": "#",
+          "text": "Juniors & Young Men"
+        },
+        {
+          "href": "#",
+          "text": "Personal Protection"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/catalog",
+          "text": "Catalog"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "text": "New Fall Catalog '26 is here 170+ new styles — MiiR, The North Face, Carhartt, Nike, Port Authority & more Explore the collection"
+        },
+        {
+          "href": "/product.html?style=C112",
+          "text": ""
+        },
+        {
+          "href": "/product.html?style=C112",
+          "text": "Embroidered Cap"
+        },
+        {
+          "href": "/custom-caps?style=C112",
+          "text": "Buy online →"
+        },
+        {
+          "href": "/catalog",
+          "text": "Product Catalog"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free Sample Program"
+        },
+        {
+          "href": "/golf-tournament-apparel?utm_source=catalog&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "text": "Tournament Packages"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "Die-Cut Stickers"
+        },
+        {
+          "href": "/custom-banners",
+          "text": "Vinyl Banners"
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "Laser-Engraved Tumblers"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Portal"
+        }
+      ],
+      "selection": null,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "aria-prohibited-attr",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".pcard-swatches"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".fall26-promo-badge"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Caps — NWCA Catalog",
+      "url": "/catalog?category=Caps",
+      "ids": {
+        "catalogCrumbs": "Home / Catalog / Caps",
+        "catalogTitle": "Caps",
+        "catalogSub": "1 customizable style — embroidery, screen print, DTG, and DTF done in-house.",
+        "filtersClose": "",
+        "filterGroups": "COLLECTION Our proven favorites — most offer a free sample. Top sellers CATEGORY All categories T-Shirts 2 Caps 2 Polos/Knits 2 DECORATION Methods we run in-house. Fabric fit is confirmed on each product. All methods Embroidery DTG Print Screen Print DTF Transfer TYPE All Caps Performance/ Athletic Visors Stretch-to-Fit Youth Fashion Fleece/Beanies Twill Full Brim Show all (10) BRAND Port & Company 3 Port Authority 1 COLOR Colors available in these results. Brilliant Orange 1 Jet Black 1 SIZE OSFA 1",
+        "clearAllFilters": "Clear all filters",
+        "filtersApply": "Show 1 result",
+        "filtersOpenCount": "1",
+        "resultsStatus": "1 product",
+        "sortSelect": "Best match Price: low to high Price: high to low Name: A–Z Name: Z–A Style number Newest",
+        "activeChips": "Category Caps × Clear all",
+        "resultsGrid": "Quick view : C112 Port & Company C112 Embroidered Cap $22.50 with embroidery Buy online →",
+        "pager": ""
+      },
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-topsellers",
+          "type": "checkbox",
+          "value": "1",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-category",
+          "type": "radio",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-category",
+          "type": "radio",
+          "value": "T-Shirts",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-category",
+          "type": "radio",
+          "value": "Caps",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-category",
+          "type": "radio",
+          "value": "Polos/Knits",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-method",
+          "type": "radio",
+          "value": "",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-method",
+          "type": "radio",
+          "value": "emb",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-method",
+          "type": "radio",
+          "value": "dtg",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-method",
+          "type": "radio",
+          "value": "scp",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-method",
+          "type": "radio",
+          "value": "dtf",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-subcategory",
+          "type": "radio",
+          "value": "",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-subcategory",
+          "type": "radio",
+          "value": "Performance/ Athletic",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-subcategory",
+          "type": "radio",
+          "value": "Visors",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-subcategory",
+          "type": "radio",
+          "value": "Stretch-to-Fit",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-subcategory",
+          "type": "radio",
+          "value": "Youth",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-subcategory",
+          "type": "radio",
+          "value": "Fashion",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-subcategory",
+          "type": "radio",
+          "value": "Fleece/Beanies",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-subcategory",
+          "type": "radio",
+          "value": "Twill",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-subcategory",
+          "type": "radio",
+          "value": "Full Brim",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-brand",
+          "type": "checkbox",
+          "value": "Port & Company",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-brand",
+          "type": "checkbox",
+          "value": "Port Authority",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-color",
+          "type": "checkbox",
+          "value": "Brilliant Orange",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-color",
+          "type": "checkbox",
+          "value": "Jet Black",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "f-size",
+          "type": "checkbox",
+          "value": "OSFA",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "sortSelect",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#main",
+          "text": "Skip to content"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/catalog",
+          "text": "Catalog"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "text": "Fall Catalog '26 New"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts New"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats New"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "Custom Stickers New"
+        },
+        {
+          "href": "/custom-banners",
+          "text": "Vinyl Banners New"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers & Free Samples"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/blog",
+          "text": "Blog"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "text": "Get a Quote"
+        },
+        {
+          "href": "#",
+          "text": "T-Shirts"
+        },
+        {
+          "href": "#",
+          "text": "Polos/Knits"
+        },
+        {
+          "href": "#",
+          "text": "Sweatshirts/Fleece"
+        },
+        {
+          "href": "#",
+          "text": "Caps"
+        },
+        {
+          "href": "#",
+          "text": "Activewear"
+        },
+        {
+          "href": "#",
+          "text": "Outerwear"
+        },
+        {
+          "href": "#",
+          "text": "Bags"
+        },
+        {
+          "href": "#",
+          "text": "Accessories"
+        },
+        {
+          "href": "#",
+          "text": "Workwear"
+        },
+        {
+          "href": "#",
+          "text": "Woven Shirts"
+        },
+        {
+          "href": "#",
+          "text": "Ladies"
+        },
+        {
+          "href": "#",
+          "text": "Youth"
+        },
+        {
+          "href": "#",
+          "text": "Infant & Toddler"
+        },
+        {
+          "href": "#",
+          "text": "Tall"
+        },
+        {
+          "href": "#",
+          "text": "Juniors & Young Men"
+        },
+        {
+          "href": "#",
+          "text": "Personal Protection"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/catalog",
+          "text": "Catalog"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "text": "New Fall Catalog '26 is here 170+ new styles — MiiR, The North Face, Carhartt, Nike, Port Authority & more Explore the collection"
+        },
+        {
+          "href": "/product.html?style=C112",
+          "text": ""
+        },
+        {
+          "href": "/product.html?style=C112",
+          "text": "Embroidered Cap"
+        },
+        {
+          "href": "/custom-caps?style=C112",
+          "text": "Buy online →"
+        },
+        {
+          "href": "/catalog",
+          "text": "Product Catalog"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free Sample Program"
+        },
+        {
+          "href": "/golf-tournament-apparel?utm_source=catalog&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "text": "Tournament Packages"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "Die-Cut Stickers"
+        },
+        {
+          "href": "/custom-banners",
+          "text": "Vinyl Banners"
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "Laser-Engraved Tumblers"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Portal"
+        }
+      ],
+      "selection": null,
+      "overflow": true,
+      "violations": [
+        {
+          "id": "aria-prohibited-attr",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".pcard-swatches"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".fall26-promo-badge"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "actions": [],
+  "dialogs": []
+}

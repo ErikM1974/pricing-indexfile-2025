@@ -1,0 +1,1250 @@
+{
+  "name": "product-capemb-frontBack-24",
+  "states": [
+    {
+      "width": 1440,
+      "title": "C112 Embroidered Cap — Custom Caps | Northwest Custom Apparel",
+      "url": "/product.html?style=C112&color=Brilliant+Orange",
+      "ids": {
+        "crumbCategory": "Caps",
+        "crumbStyle": "C112",
+        "productTitle": "Embroidered Cap",
+        "productSub": "Port & Company · Style C112",
+        "productBlurb": "Comfortable, durable 100% cotton apparel for the whole team.",
+        "galleryMainImg": "",
+        "galleryThumbs": "Front Back Flat front Flat back",
+        "colorCount": "(2)",
+        "swatchGrid": "Jet Black Brilliant Orange",
+        "selectedColorName": "Brilliant Orange",
+        "invColorName": "— Brilliant Orange",
+        "inventoryBody": "OSFA IN STOCK Live supplier warehouse stock — about 500 pieces available across all sizes.",
+        "ctaQuote": "Price it & add to quote",
+        "expressLaneNote": "Just need caps, fast? Embroidered and paid online — 8-cap minimum, free setup.",
+        "expressLaneLink": "Buy online now →",
+        "ctaSample": "Order a sample",
+        "pricingHeading": "Decoration pricing",
+        "methodAlert": "",
+        "cfgQtyMinus": "−",
+        "cfgQtyInput": "",
+        "cfgQtyPlus": "+",
+        "cfgLocations": "Front Front logo Front + back Front + back logos",
+        "cfgAlert": "",
+        "cfgMethods": "EMBROIDERY $24.75/pc Front + back logos included",
+        "cfgNudgeJump": "At 48+ caps: $22.50/cap — save $2.25/cap",
+        "cfgAddToQuote": "Add to quote",
+        "cfgEmailQuote": "or email us directly",
+        "cfgMatrixToggle": "Hide the full price table ▴",
+        "cfgMatrix": "Per-cap price includes a front logo (up to 10,000 stitches) plus a back logo. Orders under 8 caps add a one-time $50.00 small-order fee. QUANTITY 1-7 8-23 24-47 48-71 72+ Price per cap $30.50 $29.50 $24.75 $22.50 $20.25 Small-order fee +$50.00 per order No fee No fee No fee No fee Side logos, 3D puff, and leather patches are quoted per design. Final pricing confirmed with your free proof.",
+        "toastStack": "Added — 24 caps · Embroidery View quote (1) ×"
+      },
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "cfgQtyInput",
+          "name": "",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#main",
+          "text": "Skip to content"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/catalog",
+          "text": "Products"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "text": "Fall Catalog '26 New"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom Tees New"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats New"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "text": "Get a Quote"
+        },
+        {
+          "href": "/quote-cart",
+          "text": "Quote 1"
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts New"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats New"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers & Free Samples"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/catalog",
+          "text": "Catalog"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "text": "Fall Catalog '26"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "Custom Stickers"
+        },
+        {
+          "href": "/custom-banners",
+          "text": "Vinyl Banners"
+        },
+        {
+          "href": "/blog",
+          "text": "Blog"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "text": "Get a Quote"
+        },
+        {
+          "href": "/catalog?category=T-Shirts",
+          "text": "T-Shirts"
+        },
+        {
+          "href": "/catalog?category=Polos%2FKnits",
+          "text": "Polos & Knits"
+        },
+        {
+          "href": "/catalog?category=Sweatshirts%2FFleece",
+          "text": "Sweatshirts & Fleece"
+        },
+        {
+          "href": "/catalog?category=Caps",
+          "text": "Caps"
+        },
+        {
+          "href": "/catalog?category=Outerwear",
+          "text": "Outerwear"
+        },
+        {
+          "href": "/catalog?category=Workwear",
+          "text": "Workwear"
+        },
+        {
+          "href": "/catalog?category=Bags",
+          "text": "Bags"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/catalog?category=Caps",
+          "text": "Caps"
+        },
+        {
+          "href": "#pricingHeading",
+          "text": "Price it & add to quote"
+        },
+        {
+          "href": "/custom-caps?style=C112",
+          "text": "Buy online now →"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Order a sample"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "https://maps.google.com/?cid=4107380119454186786",
+          "text": "★★★★★ Google review · 4.9 from 185+"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com?subject=Quote%20request%20%E2%80%94%20C112%20Embroidered%20Cap&body=Hi%20NWCA%2C%0A%0AI'd%20like%20a%20quote%20for%3A%0A%0AStyle%3A%20C112%20%E2%80%94%20Embroidered%20Cap%0AColor%3A%20Brilliant%20Orange%0AQuantity%3A%2024%0APlacement%3A%20Front%20%2B%20back%0AMethod%3A%20Embroidery%0AOnline%20price%3A%20%24594.00%20total%20%E2%80%94%20%2424.75%2Fpc%20(24-47%20tier)%0A%0AMy%20name%3A%0ACompany%3A%0APhone%3A%0A",
+          "text": "or email us directly"
+        },
+        {
+          "href": "/quote-cart",
+          "text": "View quote (1)"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free Sample Program"
+        },
+        {
+          "href": "/pages/golf-tournaments-2026.html?utm_source=product&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "text": "Tournament Packages"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "Laser-Engraved Tumblers"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Portal"
+        }
+      ],
+      "selection": {
+        "qty": 24,
+        "locationKey": "frontBack",
+        "locationLabel": "Front + back",
+        "methodId": "capemb",
+        "methodLabel": "Embroidery",
+        "engineMethod": "CAP",
+        "isCap": true,
+        "inkColors": null,
+        "safetyStripes": false,
+        "status": "ok",
+        "price": {
+          "total": 594,
+          "perPiece": 24.75,
+          "tierLabel": "24-47",
+          "oneTimeFees": []
+        },
+        "sizes": {
+          "OSFA": 24
+        },
+        "belowMin": false
+      },
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".pdp-cfg-total-tier"
+            ],
+            [
+              ".is-active-tier > .tier-fee-no"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "C112 Embroidered Cap — Custom Caps | Northwest Custom Apparel",
+      "url": "/product.html?style=C112&color=Brilliant+Orange",
+      "ids": {
+        "crumbCategory": "Caps",
+        "crumbStyle": "C112",
+        "productTitle": "Embroidered Cap",
+        "productSub": "Port & Company · Style C112",
+        "productBlurb": "Comfortable, durable 100% cotton apparel for the whole team.",
+        "galleryMainImg": "",
+        "galleryThumbs": "Front Back Flat front Flat back",
+        "colorCount": "(2)",
+        "swatchGrid": "Jet Black Brilliant Orange",
+        "selectedColorName": "Brilliant Orange",
+        "invColorName": "— Brilliant Orange",
+        "inventoryBody": "OSFA IN STOCK Live supplier warehouse stock — about 500 pieces available across all sizes.",
+        "expressLaneNote": "Just need caps, fast? Embroidered and paid online — 8-cap minimum, free setup.",
+        "expressLaneLink": "Buy online now →",
+        "ctaSample": "Order a sample",
+        "pricingHeading": "Decoration pricing",
+        "methodAlert": "",
+        "cfgQtyMinus": "−",
+        "cfgQtyInput": "",
+        "cfgQtyPlus": "+",
+        "cfgLocations": "Front Front logo Front + back Front + back logos",
+        "cfgAlert": "",
+        "cfgMethods": "EMBROIDERY $24.75/pc Front + back logos included",
+        "cfgNudgeJump": "At 48+ caps: $22.50/cap — save $2.25/cap",
+        "cfgAddToQuote": "Add to quote",
+        "cfgEmailQuote": "or email us directly",
+        "cfgMatrixToggle": "Hide the full price table ▴",
+        "cfgMatrix": "Per-cap price includes a front logo (up to 10,000 stitches) plus a back logo. Orders under 8 caps add a one-time $50.00 small-order fee. QUANTITY 1-7 8-23 24-47 48-71 72+ Price per cap $30.50 $29.50 $24.75 $22.50 $20.25 Small-order fee +$50.00 per order No fee No fee No fee No fee Side logos, 3D puff, and leather patches are quoted per design. Final pricing confirmed with your free proof.",
+        "toastStack": "Added — 24 caps · Embroidery View quote (1) ×",
+        "cfgMobilePrice": "24 × Emb · $24.75/pc · $594.00",
+        "ctaQuoteMobile": "Add to quote",
+        "ctaSampleMobile": "Sample"
+      },
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "cfgQtyInput",
+          "name": "",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#main",
+          "text": "Skip to content"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/quote-cart",
+          "text": "Quote 1"
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts New"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats New"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers & Free Samples"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/catalog",
+          "text": "Catalog"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "text": "Fall Catalog '26"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "Custom Stickers"
+        },
+        {
+          "href": "/custom-banners",
+          "text": "Vinyl Banners"
+        },
+        {
+          "href": "/blog",
+          "text": "Blog"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "text": "Get a Quote"
+        },
+        {
+          "href": "/catalog?category=T-Shirts",
+          "text": "T-Shirts"
+        },
+        {
+          "href": "/catalog?category=Polos%2FKnits",
+          "text": "Polos & Knits"
+        },
+        {
+          "href": "/catalog?category=Sweatshirts%2FFleece",
+          "text": "Sweatshirts & Fleece"
+        },
+        {
+          "href": "/catalog?category=Caps",
+          "text": "Caps"
+        },
+        {
+          "href": "/catalog?category=Outerwear",
+          "text": "Outerwear"
+        },
+        {
+          "href": "/catalog?category=Workwear",
+          "text": "Workwear"
+        },
+        {
+          "href": "/catalog?category=Bags",
+          "text": "Bags"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/catalog?category=Caps",
+          "text": "Caps"
+        },
+        {
+          "href": "/custom-caps?style=C112",
+          "text": "Buy online now →"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Order a sample"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "https://maps.google.com/?cid=4107380119454186786",
+          "text": "★★★★★ Google review · 4.9 from 185+"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com?subject=Quote%20request%20%E2%80%94%20C112%20Embroidered%20Cap&body=Hi%20NWCA%2C%0A%0AI'd%20like%20a%20quote%20for%3A%0A%0AStyle%3A%20C112%20%E2%80%94%20Embroidered%20Cap%0AColor%3A%20Brilliant%20Orange%0AQuantity%3A%2024%0APlacement%3A%20Front%20%2B%20back%0AMethod%3A%20Embroidery%0AOnline%20price%3A%20%24594.00%20total%20%E2%80%94%20%2424.75%2Fpc%20(24-47%20tier)%0A%0AMy%20name%3A%0ACompany%3A%0APhone%3A%0A",
+          "text": "or email us directly"
+        },
+        {
+          "href": "/quote-cart",
+          "text": "View quote (1)"
+        },
+        {
+          "href": "#pricingHeading",
+          "text": "Add to quote"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "Call us"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Sample"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free Sample Program"
+        },
+        {
+          "href": "/pages/golf-tournaments-2026.html?utm_source=product&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "text": "Tournament Packages"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "Laser-Engraved Tumblers"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Portal"
+        }
+      ],
+      "selection": {
+        "qty": 24,
+        "locationKey": "frontBack",
+        "locationLabel": "Front + back",
+        "methodId": "capemb",
+        "methodLabel": "Embroidery",
+        "engineMethod": "CAP",
+        "isCap": true,
+        "inkColors": null,
+        "safetyStripes": false,
+        "status": "ok",
+        "price": {
+          "total": 594,
+          "perPiece": 24.75,
+          "tierLabel": "24-47",
+          "oneTimeFees": []
+        },
+        "sizes": {
+          "OSFA": 24
+        },
+        "belowMin": false
+      },
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".pdp-cfg-total-tier"
+            ],
+            [
+              ".is-active-tier > .tier-fee-no"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "C112 Embroidered Cap — Custom Caps | Northwest Custom Apparel",
+      "url": "/product.html?style=C112&color=Brilliant+Orange",
+      "ids": {
+        "crumbCategory": "Caps",
+        "crumbStyle": "C112",
+        "productTitle": "Embroidered Cap",
+        "productSub": "Port & Company · Style C112",
+        "productBlurb": "Comfortable, durable 100% cotton apparel for the whole team.",
+        "galleryMainImg": "",
+        "galleryThumbs": "Front Back Flat front Flat back",
+        "colorCount": "(2)",
+        "swatchGrid": "Jet Black Brilliant Orange",
+        "selectedColorName": "Brilliant Orange",
+        "invColorName": "— Brilliant Orange",
+        "inventoryBody": "OSFA IN STOCK Live supplier warehouse stock — about 500 pieces available across all sizes.",
+        "expressLaneNote": "Just need caps, fast? Embroidered and paid online — 8-cap minimum, free setup.",
+        "expressLaneLink": "Buy online now →",
+        "ctaSample": "Order a sample",
+        "pricingHeading": "Decoration pricing",
+        "methodAlert": "",
+        "cfgQtyMinus": "−",
+        "cfgQtyInput": "",
+        "cfgQtyPlus": "+",
+        "cfgLocations": "Front Front logo Front + back Front + back logos",
+        "cfgAlert": "",
+        "cfgMethods": "EMBROIDERY $24.75/pc Front + back logos included",
+        "cfgNudgeJump": "At 48+ caps: $22.50/cap — save $2.25/cap",
+        "cfgAddToQuote": "Add to quote",
+        "cfgEmailQuote": "or email us directly",
+        "cfgMatrixToggle": "Hide the full price table ▴",
+        "cfgMatrix": "Per-cap price includes a front logo (up to 10,000 stitches) plus a back logo. Orders under 8 caps add a one-time $50.00 small-order fee. QUANTITY 1-7 8-23 24-47 48-71 72+ Price per cap $30.50 $29.50 $24.75 $22.50 $20.25 Small-order fee +$50.00 per order No fee No fee No fee No fee Side logos, 3D puff, and leather patches are quoted per design. Final pricing confirmed with your free proof.",
+        "toastStack": "Added — 24 caps · Embroidery View quote (1) ×",
+        "cfgMobilePrice": "24 × Emb · $24.75/pc · $594.00",
+        "ctaQuoteMobile": "Add to quote",
+        "ctaSampleMobile": "Sample"
+      },
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "cfgQtyInput",
+          "name": "",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#main",
+          "text": "Skip to content"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/quote-cart",
+          "text": "Quote 1"
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts New"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats New"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers & Free Samples"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/catalog",
+          "text": "Catalog"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "text": "Fall Catalog '26"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "Custom Stickers"
+        },
+        {
+          "href": "/custom-banners",
+          "text": "Vinyl Banners"
+        },
+        {
+          "href": "/blog",
+          "text": "Blog"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "text": "Get a Quote"
+        },
+        {
+          "href": "/catalog?category=T-Shirts",
+          "text": "T-Shirts"
+        },
+        {
+          "href": "/catalog?category=Polos%2FKnits",
+          "text": "Polos & Knits"
+        },
+        {
+          "href": "/catalog?category=Sweatshirts%2FFleece",
+          "text": "Sweatshirts & Fleece"
+        },
+        {
+          "href": "/catalog?category=Caps",
+          "text": "Caps"
+        },
+        {
+          "href": "/catalog?category=Outerwear",
+          "text": "Outerwear"
+        },
+        {
+          "href": "/catalog?category=Workwear",
+          "text": "Workwear"
+        },
+        {
+          "href": "/catalog?category=Bags",
+          "text": "Bags"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/catalog?category=Caps",
+          "text": "Caps"
+        },
+        {
+          "href": "/custom-caps?style=C112",
+          "text": "Buy online now →"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Order a sample"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "https://maps.google.com/?cid=4107380119454186786",
+          "text": "★★★★★ Google review · 4.9 from 185+"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com?subject=Quote%20request%20%E2%80%94%20C112%20Embroidered%20Cap&body=Hi%20NWCA%2C%0A%0AI'd%20like%20a%20quote%20for%3A%0A%0AStyle%3A%20C112%20%E2%80%94%20Embroidered%20Cap%0AColor%3A%20Brilliant%20Orange%0AQuantity%3A%2024%0APlacement%3A%20Front%20%2B%20back%0AMethod%3A%20Embroidery%0AOnline%20price%3A%20%24594.00%20total%20%E2%80%94%20%2424.75%2Fpc%20(24-47%20tier)%0A%0AMy%20name%3A%0ACompany%3A%0APhone%3A%0A",
+          "text": "or email us directly"
+        },
+        {
+          "href": "/quote-cart",
+          "text": "View quote (1)"
+        },
+        {
+          "href": "#pricingHeading",
+          "text": "Add to quote"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "Call us"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Sample"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free Sample Program"
+        },
+        {
+          "href": "/pages/golf-tournaments-2026.html?utm_source=product&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "text": "Tournament Packages"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "Laser-Engraved Tumblers"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Portal"
+        }
+      ],
+      "selection": {
+        "qty": 24,
+        "locationKey": "frontBack",
+        "locationLabel": "Front + back",
+        "methodId": "capemb",
+        "methodLabel": "Embroidery",
+        "engineMethod": "CAP",
+        "isCap": true,
+        "inkColors": null,
+        "safetyStripes": false,
+        "status": "ok",
+        "price": {
+          "total": 594,
+          "perPiece": 24.75,
+          "tierLabel": "24-47",
+          "oneTimeFees": []
+        },
+        "sizes": {
+          "OSFA": 24
+        },
+        "belowMin": false
+      },
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".pdp-cfg-total-tier"
+            ],
+            [
+              ".is-active-tier > .tier-fee-no"
+            ]
+          ]
+        },
+        {
+          "id": "scrollable-region-focusable",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".table-wrap"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "C112 Embroidered Cap — Custom Caps | Northwest Custom Apparel",
+      "url": "/product.html?style=C112&color=Brilliant+Orange",
+      "ids": {
+        "crumbCategory": "Caps",
+        "crumbStyle": "C112",
+        "productTitle": "Embroidered Cap",
+        "productSub": "Port & Company · Style C112",
+        "productBlurb": "Comfortable, durable 100% cotton apparel for the whole team.",
+        "galleryMainImg": "",
+        "galleryThumbs": "Front Back Flat front Flat back",
+        "colorCount": "(2)",
+        "swatchGrid": "Jet Black Brilliant Orange",
+        "selectedColorName": "Brilliant Orange",
+        "invColorName": "— Brilliant Orange",
+        "inventoryBody": "OSFA IN STOCK Live supplier warehouse stock — about 500 pieces available across all sizes.",
+        "expressLaneNote": "Just need caps, fast? Embroidered and paid online — 8-cap minimum, free setup.",
+        "expressLaneLink": "Buy online now →",
+        "ctaSample": "Order a sample",
+        "pricingHeading": "Decoration pricing",
+        "methodAlert": "",
+        "cfgQtyMinus": "−",
+        "cfgQtyInput": "",
+        "cfgQtyPlus": "+",
+        "cfgLocations": "Front Front logo Front + back Front + back logos",
+        "cfgAlert": "",
+        "cfgMethods": "EMBROIDERY $24.75/pc Front + back logos included",
+        "cfgNudgeJump": "At 48+ caps: $22.50/cap — save $2.25/cap",
+        "cfgAddToQuote": "Add to quote",
+        "cfgEmailQuote": "or email us directly",
+        "cfgMatrixToggle": "Hide the full price table ▴",
+        "cfgMatrix": "Per-cap price includes a front logo (up to 10,000 stitches) plus a back logo. Orders under 8 caps add a one-time $50.00 small-order fee. QUANTITY 1-7 8-23 24-47 48-71 72+ Price per cap $30.50 $29.50 $24.75 $22.50 $20.25 Small-order fee +$50.00 per order No fee No fee No fee No fee Side logos, 3D puff, and leather patches are quoted per design. Final pricing confirmed with your free proof.",
+        "toastStack": "Added — 24 caps · Embroidery View quote (1) ×",
+        "cfgMobilePrice": "24 × Emb · $24.75/pc · $594.00",
+        "ctaQuoteMobile": "Add to quote",
+        "ctaSampleMobile": "Sample"
+      },
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "cfgQtyInput",
+          "name": "",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#main",
+          "text": "Skip to content"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/quote-cart",
+          "text": "Quote 1"
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts New"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats New"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers & Free Samples"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/catalog",
+          "text": "Catalog"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "text": "Fall Catalog '26"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "Custom Stickers"
+        },
+        {
+          "href": "/custom-banners",
+          "text": "Vinyl Banners"
+        },
+        {
+          "href": "/blog",
+          "text": "Blog"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "text": "Get a Quote"
+        },
+        {
+          "href": "/catalog?category=T-Shirts",
+          "text": "T-Shirts"
+        },
+        {
+          "href": "/catalog?category=Polos%2FKnits",
+          "text": "Polos & Knits"
+        },
+        {
+          "href": "/catalog?category=Sweatshirts%2FFleece",
+          "text": "Sweatshirts & Fleece"
+        },
+        {
+          "href": "/catalog?category=Caps",
+          "text": "Caps"
+        },
+        {
+          "href": "/catalog?category=Outerwear",
+          "text": "Outerwear"
+        },
+        {
+          "href": "/catalog?category=Workwear",
+          "text": "Workwear"
+        },
+        {
+          "href": "/catalog?category=Bags",
+          "text": "Bags"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/catalog?category=Caps",
+          "text": "Caps"
+        },
+        {
+          "href": "/custom-caps?style=C112",
+          "text": "Buy online now →"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Order a sample"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "https://maps.google.com/?cid=4107380119454186786",
+          "text": "★★★★★ Google review · 4.9 from 185+"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com?subject=Quote%20request%20%E2%80%94%20C112%20Embroidered%20Cap&body=Hi%20NWCA%2C%0A%0AI'd%20like%20a%20quote%20for%3A%0A%0AStyle%3A%20C112%20%E2%80%94%20Embroidered%20Cap%0AColor%3A%20Brilliant%20Orange%0AQuantity%3A%2024%0APlacement%3A%20Front%20%2B%20back%0AMethod%3A%20Embroidery%0AOnline%20price%3A%20%24594.00%20total%20%E2%80%94%20%2424.75%2Fpc%20(24-47%20tier)%0A%0AMy%20name%3A%0ACompany%3A%0APhone%3A%0A",
+          "text": "or email us directly"
+        },
+        {
+          "href": "/quote-cart",
+          "text": "View quote (1)"
+        },
+        {
+          "href": "#pricingHeading",
+          "text": "Add to quote"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "Call us"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Sample"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free Sample Program"
+        },
+        {
+          "href": "/pages/golf-tournaments-2026.html?utm_source=product&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "text": "Tournament Packages"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "Laser-Engraved Tumblers"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Portal"
+        }
+      ],
+      "selection": {
+        "qty": 24,
+        "locationKey": "frontBack",
+        "locationLabel": "Front + back",
+        "methodId": "capemb",
+        "methodLabel": "Embroidery",
+        "engineMethod": "CAP",
+        "isCap": true,
+        "inkColors": null,
+        "safetyStripes": false,
+        "status": "ok",
+        "price": {
+          "total": 594,
+          "perPiece": 24.75,
+          "tierLabel": "24-47",
+          "oneTimeFees": []
+        },
+        "sizes": {
+          "OSFA": 24
+        },
+        "belowMin": false
+      },
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".pdp-cfg-total-tier"
+            ],
+            [
+              ".is-active-tier > .tier-fee-no"
+            ]
+          ]
+        },
+        {
+          "id": "scrollable-region-focusable",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".table-wrap"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "label": "configured",
+      "selection": {
+        "qty": 24,
+        "locationKey": "frontBack",
+        "locationLabel": "Front + back",
+        "methodId": "capemb",
+        "methodLabel": "Embroidery",
+        "engineMethod": "CAP",
+        "isCap": true,
+        "inkColors": null,
+        "safetyStripes": false,
+        "status": "ok",
+        "price": {
+          "total": 594,
+          "perPiece": 24.75,
+          "tierLabel": "24-47",
+          "oneTimeFees": []
+        },
+        "sizes": {
+          "OSFA": 24
+        },
+        "belowMin": false
+      },
+      "url": "/product.html?style=C112&color=Brilliant+Orange"
+    },
+    {
+      "label": "successful quote cart payload",
+      "items": [
+        {
+          "id": "qc_mtxajrk0_di",
+          "style": "C112",
+          "productTitle": "Embroidered Cap",
+          "color": "Brilliant Orange",
+          "catalogColor": "BrillOrng",
+          "qty": 24,
+          "sizes": {
+            "OSFA": 24
+          },
+          "method": "CAP",
+          "placement": "frontBack",
+          "placementLabel": "Front + back",
+          "methodLabel": "Embroidery",
+          "inkColors": null,
+          "safetyStripes": false,
+          "isCap": true,
+          "addedAt": 1789151400000
+        }
+      ]
+    }
+  ],
+  "dialogs": []
+}

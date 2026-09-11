@@ -30,7 +30,7 @@ const STRICT_FILES = [
     ...CATALOG_DISCOVERY_FILES,
     ...MAGIC_LINK_FILES,
     ...STAFF_REFERENCE_FILES,
-    'shared_components/js/storefront-navigation.js', 'shared_components/js/campaign-storefront.js',
+    'shared_components/js/storefront-navigation.js', 'shared_components/js/catalog-storefront-navigation.js', 'shared_components/js/campaign-storefront.js',
       'shared_components/js/instant-storefront.js',
     'shared_components/js/webstore-guide.js',
     ...POLICY_UI_FILES,
@@ -179,7 +179,7 @@ export default [
         },
     },
     {
-        files: [...CATALOG_DISCOVERY_FILES, ...MAGIC_LINK_FILES, ...STAFF_REFERENCE_FILES, 'shared_components/js/storefront-navigation.js', 'shared_components/js/campaign-storefront.js', ...POLICY_UI_FILES, 'shared_components/js/webstore-guide.js'],
+        files: [...CATALOG_DISCOVERY_FILES, ...MAGIC_LINK_FILES, ...STAFF_REFERENCE_FILES, 'shared_components/js/storefront-navigation.js', 'shared_components/js/catalog-storefront-navigation.js', 'shared_components/js/campaign-storefront.js', ...POLICY_UI_FILES, 'shared_components/js/webstore-guide.js'],
         languageOptions: { sourceType: 'script', globals: { ...globals.browser } },
     },
     {

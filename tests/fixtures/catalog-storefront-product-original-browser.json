@@ -1,0 +1,1203 @@
+{
+  "name": "product",
+  "states": [
+    {
+      "width": 1440,
+      "title": "PC61 Core Cotton Tee — Custom Apparel | Northwest Custom Apparel",
+      "url": "/product.html?style=PC61",
+      "ids": {
+        "crumbCategory": "T-Shirts",
+        "crumbStyle": "PC61",
+        "productTitle": "Core Cotton Tee",
+        "productSub": "Port & Company · Style PC61",
+        "productBlurb": "Comfortable, durable 100% cotton apparel for the whole team.",
+        "galleryMainImg": "",
+        "galleryThumbs": "Front Back Flat front Flat back",
+        "colorCount": "(2)",
+        "swatchGrid": "Jet Black Brilliant Orange",
+        "selectedColorName": "Jet Black",
+        "invColorName": "— Jet Black",
+        "inventoryBody": "S IN STOCK M IN STOCK L IN STOCK XL IN STOCK 2XL IN STOCK 3XL IN STOCK Live supplier warehouse stock — about 3,000 pieces available across all sizes.",
+        "ctaQuote": "Price it & add to quote",
+        "expressLaneNote": "Need fewer than 24, fast? Full-color print, no minimum — checkout in minutes.",
+        "expressLaneLink": "Buy online now →",
+        "ctaSample": "Order a sample",
+        "pricingHeading": "Decoration pricing",
+        "methodAlert": "",
+        "cfgQtyMinus": "−",
+        "cfgQtyInput": "",
+        "cfgQtyPlus": "+",
+        "cfgLocations": "Left chest Logo size Back Full back Front + back Left chest + full back",
+        "cfgAlert": "",
+        "cfgMethods": "EMBROIDERY $21.00/pc Stitched logo up to 10K — included",
+        "cfgNudgeJump": "At 48+ pieces: $20.00/piece — save $1.00/piece",
+        "cfgAddToQuote": "Add to quote",
+        "cfgEmailQuote": "or email us directly",
+        "cfgMatrixToggle": "Hide the full price table ▴",
+        "cfgMatrix": "Per-piece price includes the garment plus an embroidered logo up to 10,000 stitches (left chest). Orders under 8 pieces add a one-time $50.00 small-order fee. At 1-7 and 8-23 the per-piece price is identical — the fee is the whole difference. QUANTITY 1-7 8-23 24-47 48-71 72+ Price per piece $25.00 $25.00 $21.00 $20.00 $19.00 Small-order fee +$50.00 per order No fee No fee No fee No fee Prices shown for size S — extended sizes carry a small upcharge. Larger logos and extra locations are quoted per design. Final pricing confirmed with your free proof.",
+        "relatedHeading": "You might also like",
+        "relatedGrid": "PORT & COMPANY · PC54 Essential Cotton Tee",
+        "toastStack": ""
+      },
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "cfgQtyInput",
+          "name": "",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#main",
+          "text": "Skip to content"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/catalog",
+          "text": "Products"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "text": "Fall Catalog '26 New"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom Tees New"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats New"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Webstores"
+        },
+        {
+          "href": "/blog",
+          "text": "Blog"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "Stickers"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "text": "Get a Quote"
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts New"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats New"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers & Free Samples"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/catalog",
+          "text": "Catalog"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "text": "Fall Catalog '26"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "Custom Stickers"
+        },
+        {
+          "href": "/custom-banners",
+          "text": "Vinyl Banners"
+        },
+        {
+          "href": "/blog",
+          "text": "Blog"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "text": "Get a Quote"
+        },
+        {
+          "href": "/catalog?category=T-Shirts",
+          "text": "T-Shirts"
+        },
+        {
+          "href": "/catalog?category=Polos%2FKnits",
+          "text": "Polos & Knits"
+        },
+        {
+          "href": "/catalog?category=Sweatshirts%2FFleece",
+          "text": "Sweatshirts & Fleece"
+        },
+        {
+          "href": "/catalog?category=Caps",
+          "text": "Caps"
+        },
+        {
+          "href": "/catalog?category=Outerwear",
+          "text": "Outerwear"
+        },
+        {
+          "href": "/catalog?category=Workwear",
+          "text": "Workwear"
+        },
+        {
+          "href": "/catalog?category=Bags",
+          "text": "Bags"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/catalog?category=T-Shirts",
+          "text": "T-Shirts"
+        },
+        {
+          "href": "#pricingHeading",
+          "text": "Price it & add to quote"
+        },
+        {
+          "href": "/custom-tees?style=PC61&color=Jet%20Black",
+          "text": "Buy online now →"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Order a sample"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "https://maps.google.com/?cid=4107380119454186786",
+          "text": "★★★★★ Google review · 4.9 from 185+"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com?subject=Quote%20request%20%E2%80%94%20PC61%20Core%20Cotton%20Tee&body=Hi%20NWCA%2C%0A%0AI'd%20like%20a%20quote%20for%3A%0A%0AStyle%3A%20PC61%20%E2%80%94%20Core%20Cotton%20Tee%0AColor%3A%20Jet%20Black%0AQuantity%3A%2024%0APlacement%3A%20Left%20chest%0AMethod%3A%20Embroidery%0AOnline%20price%3A%20%24504.00%20total%20%E2%80%94%20%2421.00%2Fpc%20(24-47%20tier)%0A%0AMy%20name%3A%0ACompany%3A%0APhone%3A%0A",
+          "text": "or email us directly"
+        },
+        {
+          "href": "/product.html?style=PC54",
+          "text": "Port & Company · PC54Essential Cotton Tee"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free Sample Program"
+        },
+        {
+          "href": "/pages/golf-tournaments-2026.html?utm_source=product&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "text": "Tournament Packages"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "Laser-Engraved Tumblers"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Portal"
+        }
+      ],
+      "selection": {
+        "qty": 24,
+        "locationKey": "leftChest",
+        "locationLabel": "Left chest",
+        "methodId": "emb",
+        "methodLabel": "Embroidery",
+        "engineMethod": "EMB",
+        "isCap": false,
+        "inkColors": null,
+        "safetyStripes": false,
+        "status": "ok",
+        "price": {
+          "total": 504,
+          "perPiece": 21,
+          "tierLabel": "24-47",
+          "oneTimeFees": []
+        },
+        "sizes": {
+          "S": 24
+        },
+        "belowMin": false
+      },
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".pdp-cfg-total-tier"
+            ],
+            [
+              ".is-active-tier > .tier-fee-no"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "PC61 Core Cotton Tee — Custom Apparel | Northwest Custom Apparel",
+      "url": "/product.html?style=PC61",
+      "ids": {
+        "crumbCategory": "T-Shirts",
+        "crumbStyle": "PC61",
+        "productTitle": "Core Cotton Tee",
+        "productSub": "Port & Company · Style PC61",
+        "productBlurb": "Comfortable, durable 100% cotton apparel for the whole team.",
+        "galleryMainImg": "",
+        "galleryThumbs": "Front Back Flat front Flat back",
+        "colorCount": "(2)",
+        "swatchGrid": "Jet Black Brilliant Orange",
+        "selectedColorName": "Jet Black",
+        "invColorName": "— Jet Black",
+        "inventoryBody": "S IN STOCK M IN STOCK L IN STOCK XL IN STOCK 2XL IN STOCK 3XL IN STOCK Live supplier warehouse stock — about 3,000 pieces available across all sizes.",
+        "expressLaneNote": "Need fewer than 24, fast? Full-color print, no minimum — checkout in minutes.",
+        "expressLaneLink": "Buy online now →",
+        "ctaSample": "Order a sample",
+        "pricingHeading": "Decoration pricing",
+        "methodAlert": "",
+        "cfgQtyMinus": "−",
+        "cfgQtyInput": "",
+        "cfgQtyPlus": "+",
+        "cfgLocations": "Left chest Logo size Back Full back Front + back Left chest + full back",
+        "cfgAlert": "",
+        "cfgMethods": "EMBROIDERY $21.00/pc Stitched logo up to 10K — included",
+        "cfgNudgeJump": "At 48+ pieces: $20.00/piece — save $1.00/piece",
+        "cfgAddToQuote": "Add to quote",
+        "cfgEmailQuote": "or email us directly",
+        "cfgMatrixToggle": "Hide the full price table ▴",
+        "cfgMatrix": "Per-piece price includes the garment plus an embroidered logo up to 10,000 stitches (left chest). Orders under 8 pieces add a one-time $50.00 small-order fee. At 1-7 and 8-23 the per-piece price is identical — the fee is the whole difference. QUANTITY 1-7 8-23 24-47 48-71 72+ Price per piece $25.00 $25.00 $21.00 $20.00 $19.00 Small-order fee +$50.00 per order No fee No fee No fee No fee Prices shown for size S — extended sizes carry a small upcharge. Larger logos and extra locations are quoted per design. Final pricing confirmed with your free proof.",
+        "relatedHeading": "You might also like",
+        "relatedGrid": "PORT & COMPANY · PC54 Essential Cotton Tee",
+        "toastStack": "",
+        "cfgMobilePrice": "24 × Emb · $21.00/pc · $504.00",
+        "ctaQuoteMobile": "Add to quote",
+        "ctaSampleMobile": "Sample"
+      },
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "cfgQtyInput",
+          "name": "",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#main",
+          "text": "Skip to content"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts New"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats New"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers & Free Samples"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/catalog",
+          "text": "Catalog"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "text": "Fall Catalog '26"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "Custom Stickers"
+        },
+        {
+          "href": "/custom-banners",
+          "text": "Vinyl Banners"
+        },
+        {
+          "href": "/blog",
+          "text": "Blog"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "text": "Get a Quote"
+        },
+        {
+          "href": "/catalog?category=T-Shirts",
+          "text": "T-Shirts"
+        },
+        {
+          "href": "/catalog?category=Polos%2FKnits",
+          "text": "Polos & Knits"
+        },
+        {
+          "href": "/catalog?category=Sweatshirts%2FFleece",
+          "text": "Sweatshirts & Fleece"
+        },
+        {
+          "href": "/catalog?category=Caps",
+          "text": "Caps"
+        },
+        {
+          "href": "/catalog?category=Outerwear",
+          "text": "Outerwear"
+        },
+        {
+          "href": "/catalog?category=Workwear",
+          "text": "Workwear"
+        },
+        {
+          "href": "/catalog?category=Bags",
+          "text": "Bags"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/catalog?category=T-Shirts",
+          "text": "T-Shirts"
+        },
+        {
+          "href": "/custom-tees?style=PC61&color=Jet%20Black",
+          "text": "Buy online now →"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Order a sample"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "https://maps.google.com/?cid=4107380119454186786",
+          "text": "★★★★★ Google review · 4.9 from 185+"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com?subject=Quote%20request%20%E2%80%94%20PC61%20Core%20Cotton%20Tee&body=Hi%20NWCA%2C%0A%0AI'd%20like%20a%20quote%20for%3A%0A%0AStyle%3A%20PC61%20%E2%80%94%20Core%20Cotton%20Tee%0AColor%3A%20Jet%20Black%0AQuantity%3A%2024%0APlacement%3A%20Left%20chest%0AMethod%3A%20Embroidery%0AOnline%20price%3A%20%24504.00%20total%20%E2%80%94%20%2421.00%2Fpc%20(24-47%20tier)%0A%0AMy%20name%3A%0ACompany%3A%0APhone%3A%0A",
+          "text": "or email us directly"
+        },
+        {
+          "href": "/product.html?style=PC54",
+          "text": "Port & Company · PC54Essential Cotton Tee"
+        },
+        {
+          "href": "#pricingHeading",
+          "text": "Add to quote"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "Call us"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Sample"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free Sample Program"
+        },
+        {
+          "href": "/pages/golf-tournaments-2026.html?utm_source=product&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "text": "Tournament Packages"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "Laser-Engraved Tumblers"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Portal"
+        }
+      ],
+      "selection": {
+        "qty": 24,
+        "locationKey": "leftChest",
+        "locationLabel": "Left chest",
+        "methodId": "emb",
+        "methodLabel": "Embroidery",
+        "engineMethod": "EMB",
+        "isCap": false,
+        "inkColors": null,
+        "safetyStripes": false,
+        "status": "ok",
+        "price": {
+          "total": 504,
+          "perPiece": 21,
+          "tierLabel": "24-47",
+          "oneTimeFees": []
+        },
+        "sizes": {
+          "S": 24
+        },
+        "belowMin": false
+      },
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".pdp-cfg-total-tier"
+            ],
+            [
+              ".is-active-tier > .tier-fee-no"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "PC61 Core Cotton Tee — Custom Apparel | Northwest Custom Apparel",
+      "url": "/product.html?style=PC61",
+      "ids": {
+        "crumbCategory": "T-Shirts",
+        "crumbStyle": "PC61",
+        "productTitle": "Core Cotton Tee",
+        "productSub": "Port & Company · Style PC61",
+        "productBlurb": "Comfortable, durable 100% cotton apparel for the whole team.",
+        "galleryMainImg": "",
+        "galleryThumbs": "Front Back Flat front Flat back",
+        "colorCount": "(2)",
+        "swatchGrid": "Jet Black Brilliant Orange",
+        "selectedColorName": "Jet Black",
+        "invColorName": "— Jet Black",
+        "inventoryBody": "S IN STOCK M IN STOCK L IN STOCK XL IN STOCK 2XL IN STOCK 3XL IN STOCK Live supplier warehouse stock — about 3,000 pieces available across all sizes.",
+        "expressLaneNote": "Need fewer than 24, fast? Full-color print, no minimum — checkout in minutes.",
+        "expressLaneLink": "Buy online now →",
+        "ctaSample": "Order a sample",
+        "pricingHeading": "Decoration pricing",
+        "methodAlert": "",
+        "cfgQtyMinus": "−",
+        "cfgQtyInput": "",
+        "cfgQtyPlus": "+",
+        "cfgLocations": "Left chest Logo size Back Full back Front + back Left chest + full back",
+        "cfgAlert": "",
+        "cfgMethods": "EMBROIDERY $21.00/pc Stitched logo up to 10K — included",
+        "cfgNudgeJump": "At 48+ pieces: $20.00/piece — save $1.00/piece",
+        "cfgAddToQuote": "Add to quote",
+        "cfgEmailQuote": "or email us directly",
+        "cfgMatrixToggle": "Hide the full price table ▴",
+        "cfgMatrix": "Per-piece price includes the garment plus an embroidered logo up to 10,000 stitches (left chest). Orders under 8 pieces add a one-time $50.00 small-order fee. At 1-7 and 8-23 the per-piece price is identical — the fee is the whole difference. QUANTITY 1-7 8-23 24-47 48-71 72+ Price per piece $25.00 $25.00 $21.00 $20.00 $19.00 Small-order fee +$50.00 per order No fee No fee No fee No fee Prices shown for size S — extended sizes carry a small upcharge. Larger logos and extra locations are quoted per design. Final pricing confirmed with your free proof.",
+        "relatedHeading": "You might also like",
+        "relatedGrid": "PORT & COMPANY · PC54 Essential Cotton Tee",
+        "toastStack": "",
+        "cfgMobilePrice": "24 × Emb · $21.00/pc · $504.00",
+        "ctaQuoteMobile": "Add to quote",
+        "ctaSampleMobile": "Sample"
+      },
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "cfgQtyInput",
+          "name": "",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#main",
+          "text": "Skip to content"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts New"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats New"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers & Free Samples"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/catalog",
+          "text": "Catalog"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "text": "Fall Catalog '26"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "Custom Stickers"
+        },
+        {
+          "href": "/custom-banners",
+          "text": "Vinyl Banners"
+        },
+        {
+          "href": "/blog",
+          "text": "Blog"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "text": "Get a Quote"
+        },
+        {
+          "href": "/catalog?category=T-Shirts",
+          "text": "T-Shirts"
+        },
+        {
+          "href": "/catalog?category=Polos%2FKnits",
+          "text": "Polos & Knits"
+        },
+        {
+          "href": "/catalog?category=Sweatshirts%2FFleece",
+          "text": "Sweatshirts & Fleece"
+        },
+        {
+          "href": "/catalog?category=Caps",
+          "text": "Caps"
+        },
+        {
+          "href": "/catalog?category=Outerwear",
+          "text": "Outerwear"
+        },
+        {
+          "href": "/catalog?category=Workwear",
+          "text": "Workwear"
+        },
+        {
+          "href": "/catalog?category=Bags",
+          "text": "Bags"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/catalog?category=T-Shirts",
+          "text": "T-Shirts"
+        },
+        {
+          "href": "/custom-tees?style=PC61&color=Jet%20Black",
+          "text": "Buy online now →"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Order a sample"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "https://maps.google.com/?cid=4107380119454186786",
+          "text": "★★★★★ Google review · 4.9 from 185+"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com?subject=Quote%20request%20%E2%80%94%20PC61%20Core%20Cotton%20Tee&body=Hi%20NWCA%2C%0A%0AI'd%20like%20a%20quote%20for%3A%0A%0AStyle%3A%20PC61%20%E2%80%94%20Core%20Cotton%20Tee%0AColor%3A%20Jet%20Black%0AQuantity%3A%2024%0APlacement%3A%20Left%20chest%0AMethod%3A%20Embroidery%0AOnline%20price%3A%20%24504.00%20total%20%E2%80%94%20%2421.00%2Fpc%20(24-47%20tier)%0A%0AMy%20name%3A%0ACompany%3A%0APhone%3A%0A",
+          "text": "or email us directly"
+        },
+        {
+          "href": "/product.html?style=PC54",
+          "text": "Port & Company · PC54Essential Cotton Tee"
+        },
+        {
+          "href": "#pricingHeading",
+          "text": "Add to quote"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "Call us"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Sample"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free Sample Program"
+        },
+        {
+          "href": "/pages/golf-tournaments-2026.html?utm_source=product&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "text": "Tournament Packages"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "Laser-Engraved Tumblers"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Portal"
+        }
+      ],
+      "selection": {
+        "qty": 24,
+        "locationKey": "leftChest",
+        "locationLabel": "Left chest",
+        "methodId": "emb",
+        "methodLabel": "Embroidery",
+        "engineMethod": "EMB",
+        "isCap": false,
+        "inkColors": null,
+        "safetyStripes": false,
+        "status": "ok",
+        "price": {
+          "total": 504,
+          "perPiece": 21,
+          "tierLabel": "24-47",
+          "oneTimeFees": []
+        },
+        "sizes": {
+          "S": 24
+        },
+        "belowMin": false
+      },
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".pdp-cfg-total-tier"
+            ],
+            [
+              ".is-active-tier > .tier-fee-no"
+            ]
+          ]
+        },
+        {
+          "id": "scrollable-region-focusable",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".table-wrap"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "PC61 Core Cotton Tee — Custom Apparel | Northwest Custom Apparel",
+      "url": "/product.html?style=PC61",
+      "ids": {
+        "crumbCategory": "T-Shirts",
+        "crumbStyle": "PC61",
+        "productTitle": "Core Cotton Tee",
+        "productSub": "Port & Company · Style PC61",
+        "productBlurb": "Comfortable, durable 100% cotton apparel for the whole team.",
+        "galleryMainImg": "",
+        "galleryThumbs": "Front Back Flat front Flat back",
+        "colorCount": "(2)",
+        "swatchGrid": "Jet Black Brilliant Orange",
+        "selectedColorName": "Jet Black",
+        "invColorName": "— Jet Black",
+        "inventoryBody": "S IN STOCK M IN STOCK L IN STOCK XL IN STOCK 2XL IN STOCK 3XL IN STOCK Live supplier warehouse stock — about 3,000 pieces available across all sizes.",
+        "expressLaneNote": "Need fewer than 24, fast? Full-color print, no minimum — checkout in minutes.",
+        "expressLaneLink": "Buy online now →",
+        "ctaSample": "Order a sample",
+        "pricingHeading": "Decoration pricing",
+        "methodAlert": "",
+        "cfgQtyMinus": "−",
+        "cfgQtyInput": "",
+        "cfgQtyPlus": "+",
+        "cfgLocations": "Left chest Logo size Back Full back Front + back Left chest + full back",
+        "cfgAlert": "",
+        "cfgMethods": "EMBROIDERY $21.00/pc Stitched logo up to 10K — included",
+        "cfgNudgeJump": "At 48+ pieces: $20.00/piece — save $1.00/piece",
+        "cfgAddToQuote": "Add to quote",
+        "cfgEmailQuote": "or email us directly",
+        "cfgMatrixToggle": "Hide the full price table ▴",
+        "cfgMatrix": "Per-piece price includes the garment plus an embroidered logo up to 10,000 stitches (left chest). Orders under 8 pieces add a one-time $50.00 small-order fee. At 1-7 and 8-23 the per-piece price is identical — the fee is the whole difference. QUANTITY 1-7 8-23 24-47 48-71 72+ Price per piece $25.00 $25.00 $21.00 $20.00 $19.00 Small-order fee +$50.00 per order No fee No fee No fee No fee Prices shown for size S — extended sizes carry a small upcharge. Larger logos and extra locations are quoted per design. Final pricing confirmed with your free proof.",
+        "relatedHeading": "You might also like",
+        "relatedGrid": "PORT & COMPANY · PC54 Essential Cotton Tee",
+        "toastStack": "",
+        "cfgMobilePrice": "24 × Emb · $21.00/pc · $504.00",
+        "ctaQuoteMobile": "Add to quote",
+        "ctaSampleMobile": "Sample"
+      },
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "cfgQtyInput",
+          "name": "",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#main",
+          "text": "Skip to content"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts New"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats New"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers & Free Samples"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/catalog",
+          "text": "Catalog"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "text": "Fall Catalog '26"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "Custom Stickers"
+        },
+        {
+          "href": "/custom-banners",
+          "text": "Vinyl Banners"
+        },
+        {
+          "href": "/blog",
+          "text": "Blog"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "text": "Get a Quote"
+        },
+        {
+          "href": "/catalog?category=T-Shirts",
+          "text": "T-Shirts"
+        },
+        {
+          "href": "/catalog?category=Polos%2FKnits",
+          "text": "Polos & Knits"
+        },
+        {
+          "href": "/catalog?category=Sweatshirts%2FFleece",
+          "text": "Sweatshirts & Fleece"
+        },
+        {
+          "href": "/catalog?category=Caps",
+          "text": "Caps"
+        },
+        {
+          "href": "/catalog?category=Outerwear",
+          "text": "Outerwear"
+        },
+        {
+          "href": "/catalog?category=Workwear",
+          "text": "Workwear"
+        },
+        {
+          "href": "/catalog?category=Bags",
+          "text": "Bags"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/catalog?category=T-Shirts",
+          "text": "T-Shirts"
+        },
+        {
+          "href": "/custom-tees?style=PC61&color=Jet%20Black",
+          "text": "Buy online now →"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Order a sample"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "https://maps.google.com/?cid=4107380119454186786",
+          "text": "★★★★★ Google review · 4.9 from 185+"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com?subject=Quote%20request%20%E2%80%94%20PC61%20Core%20Cotton%20Tee&body=Hi%20NWCA%2C%0A%0AI'd%20like%20a%20quote%20for%3A%0A%0AStyle%3A%20PC61%20%E2%80%94%20Core%20Cotton%20Tee%0AColor%3A%20Jet%20Black%0AQuantity%3A%2024%0APlacement%3A%20Left%20chest%0AMethod%3A%20Embroidery%0AOnline%20price%3A%20%24504.00%20total%20%E2%80%94%20%2421.00%2Fpc%20(24-47%20tier)%0A%0AMy%20name%3A%0ACompany%3A%0APhone%3A%0A",
+          "text": "or email us directly"
+        },
+        {
+          "href": "/product.html?style=PC54",
+          "text": "Port & Company · PC54Essential Cotton Tee"
+        },
+        {
+          "href": "#pricingHeading",
+          "text": "Add to quote"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "Call us"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Sample"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free Sample Program"
+        },
+        {
+          "href": "/pages/golf-tournaments-2026.html?utm_source=product&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "text": "Tournament Packages"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "Laser-Engraved Tumblers"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Portal"
+        }
+      ],
+      "selection": {
+        "qty": 24,
+        "locationKey": "leftChest",
+        "locationLabel": "Left chest",
+        "methodId": "emb",
+        "methodLabel": "Embroidery",
+        "engineMethod": "EMB",
+        "isCap": false,
+        "inkColors": null,
+        "safetyStripes": false,
+        "status": "ok",
+        "price": {
+          "total": 504,
+          "perPiece": 21,
+          "tierLabel": "24-47",
+          "oneTimeFees": []
+        },
+        "sizes": {
+          "S": 24
+        },
+        "belowMin": false
+      },
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".pdp-cfg-total-tier"
+            ],
+            [
+              ".is-active-tier > .tier-fee-no"
+            ]
+          ]
+        },
+        {
+          "id": "scrollable-region-focusable",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".table-wrap"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "actions": [],
+  "dialogs": []
+}

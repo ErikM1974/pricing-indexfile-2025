@@ -581,7 +581,10 @@
         const def = METHODS[id];
         state.results[id] = { status: 'loading' };
         renderMethodChip(id);
-        if (id === state.method) renderTotal();
+        if (id === state.method) {
+            renderTotal();
+            notifyChange(); // Keep the email/cart controls aligned with the loading state.
+        }
 
         try {
             if (!def.supports[state.loc]) {
@@ -736,6 +739,17 @@
         $('cfgQtyInput').value = n;
         if (n === state.qty) return;
         state.qty = n;
+        // Invalidate the previous quantity immediately, including requests that
+        // might finish during the debounce. Never hand off its old size/price pair.
+        state.methods.forEach(function (method) {
+            nextSeq(method.id);
+            state.results[method.id] = { status: 'loading' };
+            renderMethodChip(method.id);
+        });
+        renderTotal();
+        notifyChange();
+        ++matrixSeq;
+        if (state.matrixOpen) $('cfgMatrix').textContent = 'Updating prices for ' + n + ' pieces…';
         state.matrixCache = {}; // tier highlight depends on qty; matrices stay valid but re-render
         if (state.qtyTimer) clearTimeout(state.qtyTimer);
         if (immediate) {
@@ -1223,7 +1237,7 @@
             (model.approx ? '<p class="pdp-panel-note pdp-panel-note--warn" role="status">⚠ Live pricing is temporarily unavailable — this table is approximate. Your free proof confirms exact pricing.</p>' : '')
             + '<p class="pdp-panel-note">' + escapeHtml(model.note) + '</p>'
             + feeNote
-            + '<div class="table-wrap"><table class="data-table tier-table">'
+            + '<div class="table-wrap" tabindex="0" role="region" aria-label="Prices by quantity"><table class="data-table tier-table">'
             + '<thead><tr><th>Quantity</th>' + head + '</tr></thead>'
             + '<tbody><tr><td>Price per ' + (state.ctx.isCap ? 'cap' : 'piece') + '</td>' + priceRow + '</tr>' + feeRow + '</tbody>'
             + '</table></div>'

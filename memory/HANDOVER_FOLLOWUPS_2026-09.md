@@ -1,5 +1,32 @@
 # Handover follow-ups — 2026-09-07
 
+## RELEASE CANDIDATE — v2026.09.11.3 Home, Catalog and Product
+
+Reviewed source a1a136333d3eef7f978e60cd39c2a48fd928bf67 is integrated on clean develop. This candidate adds 15 cache references for nine changed application assets, plus six versioned imports of the existing shared components/shell, with all reversible mappings. All 34 focused browser cases, 57 visually reviewed current paper pages and 298 source/ownership guards passed. All 47 original sources and 29 original browser records remain preserved. The 16 financial functions remain byte-identical; quantity edits immediately withhold stale prices while recalculating.
+
+Candidate 196/225 reviewed, 29 pending; live remains .2 / Heroku 2105 at 193/225, 32 pending. The initial full unit run caught the six missing versions on newly imported shared stylesheets; those references are corrected without changing stylesheet or pricing content. Full local application/browser/parity checks and all four actual exact-source CI jobs must pass before release. Then verify the running slug, source/compiled assets and access. No real business writes, emails, uploads or device printing.
+
+## REVIEWED — Home, Catalog and Product
+
+All three pages share Public Sans, canonical controls, the storefront shell and scoped page owners. All 34 focused browser tests pass at 1440/768/390/320, followed by the final empty-catalog print checks and open sample-drawer accessibility check. All 57 current paper pages across 25 documents and 62 full-page screen panels were visually reviewed; 16 final control previews verify mobile labels, browse, quick view and sample controls. Print retains full pricing ladders, fees, totals and failure states.
+
+Forty-seven original source hashes, 29 immutable browser records (28 active) and 100 reviewed original paper pages are preserved. All 48 source/financial guards pass; the 16 financial functions remain byte-identical. A demonstrated quantity-edit defect now immediately withholds old prices and Add to quote while recalculation runs, including the email summary. Native dialog/filter focus, keyboard colors, mobile filter flow and readable empty-cart text are repaired.
+
+Reviewed candidate: 196 of 225 pages, 29 pending. Live remains v2026.09.11.2 / Heroku 2105 / ae3a8276 at 193 reviewed, 32 pending until rollout verifies. Next: commit/back up this family, integrate clean develop, run all application/browser/parity checks and all four actual exact-source CI jobs, then deploy and verify source/compiled assets and access. Evidence: catalog-storefront-reviewed-record.json and active-css-resume-state.json. No real business writes or device printing; never rerun consumed helpers.
+
+## IN PROGRESS — Home, Catalog and Product migration
+
+Custom apparel is verified live as v2026.09.11.2, Heroku2105, ae3a8276. All local release gates, four actual exact-source CI jobs, deployed slug, six source/compiled assets and29 live access checks passed. Primary main/develop and origin are synchronized. Live193/225 reviewed,32pending. The original baseline85ecba58 is backed up on codex/catalog-storefront, and verified release ae3a8276 is merged. Scoped application edits are now in progress in this isolated worktree.
+
+Current home/catalog/product review:47 immutable source hashes,29 browser records (28 active),100 original paper pages reviewed,48 source/financial guards passing. Shared styling and proven quantity/focus/layout repairs are implemented; final34 browser and full paper review are underway. Live193/225,32pending; no catalog migration credit or deployment yet. Resume from the current CSS unification document and active-css-resume-state.json.
+
+- [x] Freeze original HTML, styles, controllers and pricing/cart dependencies for index.html, pages/catalog.html and product.html.
+- [x] Capture original navigation, search/filter/sort/pagination, quick view/color links, stock states, all decoration methods/tier prices and sample/quote-cart handoffs using synthetic APIs. Review four widths, keyboard access and all paper pages before changing application code.
+- [ ] Share existing storefront navigation and canonical controls; remove competing layout owners while retaining imagery, offer copy and distinct product configuration. Preserve calculations, quantities, successful cart payloads, stock keys and navigation destinations.
+- [ ] Compare current rendered output and immutable source/contracts, then grant migration credit and complete a separate release.
+
+Design: existing Public Sans, NWCA green, white panels, gray canvas and readable existing warning tokens. No new global palette or competing button definitions. Reuse the reviewed storefront shell where its structure fits; the product configurator keeps its shared pricing authorities. No real saves, orders, payments, emails, uploads, logout or device printing.
+
 ## RELEASE CANDIDATE — v2026.09.11.2 Custom Tees and Custom Caps
 
 The reviewed pair 296b30e5 is integrated at c4a1ea4c058f6cf1300e5605a64b0df5549f17ba. This release adds eight cache references for the six changed application assets and their reversible mappings. All 44 focused browser scenarios, 78 visually reviewed current paper pages and 387 source/pricing/ownership guards passed before preparation. All 14 original source hashes and 36 browser contracts remain unchanged through 50 mappings.
