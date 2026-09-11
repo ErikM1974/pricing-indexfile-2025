@@ -1,0 +1,60 @@
+{
+  "name": "product-failed-401",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Fixture sign in",
+      "text": "Customer sign in",
+      "ids": {},
+      "links": [],
+      "rows": [],
+      "fields": [],
+      "engineCalls": [],
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "width": 768,
+      "title": "Fixture sign in",
+      "text": "Customer sign in",
+      "ids": {},
+      "links": [],
+      "rows": [],
+      "fields": [],
+      "engineCalls": [],
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "width": 390,
+      "title": "Fixture sign in",
+      "text": "Customer sign in",
+      "ids": {},
+      "links": [],
+      "rows": [],
+      "fields": [],
+      "engineCalls": [],
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "width": 320,
+      "title": "Fixture sign in",
+      "text": "Customer sign in",
+      "ids": {},
+      "links": [],
+      "rows": [],
+      "fields": [],
+      "engineCalls": [],
+      "overflow": false,
+      "violations": []
+    }
+  ],
+  "reads": [
+    {
+      "path": "/api/portal/product/PC54",
+      "query": ""
+    }
+  ],
+  "actions": []
+}

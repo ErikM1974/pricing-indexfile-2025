@@ -1,0 +1,516 @@
+{
+  "name": "product-empty",
+  "states": [
+    {
+      "width": 1440,
+      "title": "PC54 · Core Cotton Tee | Northwest Custom Apparel",
+      "text": "Northwest Custom Apparel Customer portal ← Back to your account ← Back to your account Core Cotton Tee Port & Company · T-Shirts · Style PC54 Product details Re-order Navy Availability S M L XL 2XL 3XL Colors (your colors first) Navy Brilliant Orange About this product A dependable cotton tee for every team. Re-order Color: Navy (tap any color above to switch) — pick your decoration + sizes and we’ll send it to your rep for a fresh quote. Decoration (how it’s made — defaults to your last order) Embroidery Stitched logo Screen Print Ink — best for larger runs last time DTG Full-color print Transfers Transfer — good for small/complex art Sizes & quantities S M L XL 2XL 3XL Total: 0 Notes (deadline, other sizes/colors — optional) Send to my rep + Add to Re-order List Northwest Custom Apparel · (253) 922-5793 · sales@nwcustomapparel.com",
+      "ids": {
+        "pp-back-top": "← Back to your account",
+        "pp-back": "← Back to your account",
+        "pp-hero-img": "",
+        "pp-thumbs": "",
+        "pp-colorname": "Navy",
+        "pp-avail": "Availability S M L XL 2XL 3XL",
+        "pp-swatches": "Navy Brilliant Orange",
+        "pp-about": "About this product A dependable cotton tee for every team.",
+        "pp-req-colorlabel": "Navy",
+        "pp-methods": "Embroidery Stitched logo Screen Print Ink — best for larger runs last time DTG Full-color print Transfers Transfer — good for small/complex art",
+        "pp-method-min": "",
+        "pp-sizes": "S M L XL 2XL 3XL",
+        "pp-sizetotal": "0",
+        "pp-note": "",
+        "pp-req-error": "",
+        "pp-req-submit": "Send to my rep",
+        "pp-req-addlist": "+ Add to Re-order List",
+        "cp-toast": ""
+      },
+      "links": [
+        {
+          "href": "/portal",
+          "text": "← Back to your account",
+          "label": null
+        },
+        {
+          "href": "/portal",
+          "text": "← Back to your account",
+          "label": null
+        },
+        {
+          "href": "#pp-about",
+          "text": "Product details",
+          "label": null
+        },
+        {
+          "href": "#pp-reorder",
+          "text": "Re-order",
+          "label": null
+        }
+      ],
+      "rows": [],
+      "fields": [
+        {
+          "id": "",
+          "size": "S",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "M",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "L",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "XL",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "2XL",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "3XL",
+          "value": ""
+        },
+        {
+          "id": "pp-note",
+          "value": ""
+        }
+      ],
+      "engineCalls": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".pp-dot--na"
+            ],
+            [
+              ".pp-swatches-label > small"
+            ],
+            [
+              ".pp-req-hint"
+            ],
+            [
+              ".pp-field:nth-child(3) > .pp-flabel > small"
+            ],
+            [
+              "button[data-method=\"EMB\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"SCP\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"DTG\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"DTF\"] > .pp-method-hint"
+            ],
+            [
+              ".pp-field:nth-child(5) > .pp-flabel > small"
+            ],
+            [
+              ".cp-footer"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "PC54 · Core Cotton Tee | Northwest Custom Apparel",
+      "text": "Northwest Custom Apparel Customer portal ← Back to your account ← Back to your account Core Cotton Tee Port & Company · T-Shirts · Style PC54 Product details Re-order Navy Availability S M L XL 2XL 3XL Colors (your colors first) Navy Brilliant Orange About this product A dependable cotton tee for every team. Re-order Color: Navy (tap any color above to switch) — pick your decoration + sizes and we’ll send it to your rep for a fresh quote. Decoration (how it’s made — defaults to your last order) Embroidery Stitched logo Screen Print Ink — best for larger runs last time DTG Full-color print Transfers Transfer — good for small/complex art Sizes & quantities S M L XL 2XL 3XL Total: 0 Notes (deadline, other sizes/colors — optional) Send to my rep + Add to Re-order List Northwest Custom Apparel · (253) 922-5793 · sales@nwcustomapparel.com",
+      "ids": {
+        "pp-back-top": "← Back to your account",
+        "pp-back": "← Back to your account",
+        "pp-hero-img": "",
+        "pp-thumbs": "",
+        "pp-colorname": "Navy",
+        "pp-avail": "Availability S M L XL 2XL 3XL",
+        "pp-swatches": "Navy Brilliant Orange",
+        "pp-about": "About this product A dependable cotton tee for every team.",
+        "pp-req-colorlabel": "Navy",
+        "pp-methods": "Embroidery Stitched logo Screen Print Ink — best for larger runs last time DTG Full-color print Transfers Transfer — good for small/complex art",
+        "pp-method-min": "",
+        "pp-sizes": "S M L XL 2XL 3XL",
+        "pp-sizetotal": "0",
+        "pp-note": "",
+        "pp-req-error": "",
+        "pp-req-submit": "Send to my rep",
+        "pp-req-addlist": "+ Add to Re-order List",
+        "cp-toast": ""
+      },
+      "links": [
+        {
+          "href": "/portal",
+          "text": "← Back to your account",
+          "label": null
+        },
+        {
+          "href": "/portal",
+          "text": "← Back to your account",
+          "label": null
+        },
+        {
+          "href": "#pp-about",
+          "text": "Product details",
+          "label": null
+        },
+        {
+          "href": "#pp-reorder",
+          "text": "Re-order",
+          "label": null
+        }
+      ],
+      "rows": [],
+      "fields": [
+        {
+          "id": "",
+          "size": "S",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "M",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "L",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "XL",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "2XL",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "3XL",
+          "value": ""
+        },
+        {
+          "id": "pp-note",
+          "value": ""
+        }
+      ],
+      "engineCalls": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".pp-dot--na"
+            ],
+            [
+              ".pp-swatches-label > small"
+            ],
+            [
+              ".pp-req-hint"
+            ],
+            [
+              ".pp-field:nth-child(3) > .pp-flabel > small"
+            ],
+            [
+              "button[data-method=\"EMB\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"SCP\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"DTG\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"DTF\"] > .pp-method-hint"
+            ],
+            [
+              ".pp-field:nth-child(5) > .pp-flabel > small"
+            ],
+            [
+              ".cp-footer"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "PC54 · Core Cotton Tee | Northwest Custom Apparel",
+      "text": "Northwest Custom Apparel ← Account ← Back to your account Core Cotton Tee Port & Company · T-Shirts · Style PC54 Product details Re-order Navy Availability S M L XL 2XL 3XL Colors (your colors first) Navy Brilliant Orange About this product A dependable cotton tee for every team. Re-order Color: Navy (tap any color above to switch) — pick your decoration + sizes and we’ll send it to your rep for a fresh quote. Decoration (how it’s made — defaults to your last order) Embroidery Stitched logo Screen Print Ink — best for larger runs last time DTG Full-color print Transfers Transfer — good for small/complex art Sizes & quantities S M L XL 2XL 3XL Total: 0 Notes (deadline, other sizes/colors — optional) Send to my rep + Add to Re-order List Northwest Custom Apparel · (253) 922-5793 · sales@nwcustomapparel.com",
+      "ids": {
+        "pp-back-top": "← Account",
+        "pp-back": "← Back to your account",
+        "pp-hero-img": "",
+        "pp-thumbs": "",
+        "pp-colorname": "Navy",
+        "pp-avail": "Availability S M L XL 2XL 3XL",
+        "pp-swatches": "Navy Brilliant Orange",
+        "pp-about": "About this product A dependable cotton tee for every team.",
+        "pp-req-colorlabel": "Navy",
+        "pp-methods": "Embroidery Stitched logo Screen Print Ink — best for larger runs last time DTG Full-color print Transfers Transfer — good for small/complex art",
+        "pp-method-min": "",
+        "pp-sizes": "S M L XL 2XL 3XL",
+        "pp-sizetotal": "0",
+        "pp-note": "",
+        "pp-req-error": "",
+        "pp-req-submit": "Send to my rep",
+        "pp-req-addlist": "+ Add to Re-order List",
+        "cp-toast": ""
+      },
+      "links": [
+        {
+          "href": "/portal",
+          "text": "← Account",
+          "label": null
+        },
+        {
+          "href": "/portal",
+          "text": "← Back to your account",
+          "label": null
+        },
+        {
+          "href": "#pp-about",
+          "text": "Product details",
+          "label": null
+        },
+        {
+          "href": "#pp-reorder",
+          "text": "Re-order",
+          "label": null
+        }
+      ],
+      "rows": [],
+      "fields": [
+        {
+          "id": "",
+          "size": "S",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "M",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "L",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "XL",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "2XL",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "3XL",
+          "value": ""
+        },
+        {
+          "id": "pp-note",
+          "value": ""
+        }
+      ],
+      "engineCalls": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".pp-dot--na"
+            ],
+            [
+              ".pp-swatches-label > small"
+            ],
+            [
+              ".pp-req-hint"
+            ],
+            [
+              ".pp-field:nth-child(3) > .pp-flabel > small"
+            ],
+            [
+              "button[data-method=\"EMB\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"SCP\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"DTG\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"DTF\"] > .pp-method-hint"
+            ],
+            [
+              ".pp-field:nth-child(5) > .pp-flabel > small"
+            ],
+            [
+              ".cp-footer"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "PC54 · Core Cotton Tee | Northwest Custom Apparel",
+      "text": "Northwest Custom Apparel ← Account ← Back to your account Core Cotton Tee Port & Company · T-Shirts · Style PC54 Product details Re-order Navy Availability S M L XL 2XL 3XL Colors (your colors first) Navy Brilliant Orange About this product A dependable cotton tee for every team. Re-order Color: Navy (tap any color above to switch) — pick your decoration + sizes and we’ll send it to your rep for a fresh quote. Decoration (how it’s made — defaults to your last order) Embroidery Stitched logo Screen Print Ink — best for larger runs last time DTG Full-color print Transfers Transfer — good for small/complex art Sizes & quantities S M L XL 2XL 3XL Total: 0 Notes (deadline, other sizes/colors — optional) Send to my rep + Add to Re-order List Northwest Custom Apparel · (253) 922-5793 · sales@nwcustomapparel.com",
+      "ids": {
+        "pp-back-top": "← Account",
+        "pp-back": "← Back to your account",
+        "pp-hero-img": "",
+        "pp-thumbs": "",
+        "pp-colorname": "Navy",
+        "pp-avail": "Availability S M L XL 2XL 3XL",
+        "pp-swatches": "Navy Brilliant Orange",
+        "pp-about": "About this product A dependable cotton tee for every team.",
+        "pp-req-colorlabel": "Navy",
+        "pp-methods": "Embroidery Stitched logo Screen Print Ink — best for larger runs last time DTG Full-color print Transfers Transfer — good for small/complex art",
+        "pp-method-min": "",
+        "pp-sizes": "S M L XL 2XL 3XL",
+        "pp-sizetotal": "0",
+        "pp-note": "",
+        "pp-req-error": "",
+        "pp-req-submit": "Send to my rep",
+        "pp-req-addlist": "+ Add to Re-order List",
+        "cp-toast": ""
+      },
+      "links": [
+        {
+          "href": "/portal",
+          "text": "← Account",
+          "label": null
+        },
+        {
+          "href": "/portal",
+          "text": "← Back to your account",
+          "label": null
+        },
+        {
+          "href": "#pp-about",
+          "text": "Product details",
+          "label": null
+        },
+        {
+          "href": "#pp-reorder",
+          "text": "Re-order",
+          "label": null
+        }
+      ],
+      "rows": [],
+      "fields": [
+        {
+          "id": "",
+          "size": "S",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "M",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "L",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "XL",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "2XL",
+          "value": ""
+        },
+        {
+          "id": "",
+          "size": "3XL",
+          "value": ""
+        },
+        {
+          "id": "pp-note",
+          "value": ""
+        }
+      ],
+      "engineCalls": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".pp-dot--na"
+            ],
+            [
+              ".pp-swatches-label > small"
+            ],
+            [
+              ".pp-req-hint"
+            ],
+            [
+              ".pp-field:nth-child(3) > .pp-flabel > small"
+            ],
+            [
+              "button[data-method=\"EMB\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"SCP\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"DTG\"] > .pp-method-hint"
+            ],
+            [
+              "button[data-method=\"DTF\"] > .pp-method-hint"
+            ],
+            [
+              ".pp-field:nth-child(5) > .pp-flabel > small"
+            ],
+            [
+              ".cp-footer"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "reads": [
+    {
+      "path": "/api/portal/product/PC54",
+      "query": ""
+    },
+    {
+      "path": "/api/pricing-bundle",
+      "query": "?method=DTG&styleNumber=PC54"
+    },
+    {
+      "path": "/api/portal/product/PC54/availability",
+      "query": "?color=Navy"
+    }
+  ],
+  "actions": []
+}

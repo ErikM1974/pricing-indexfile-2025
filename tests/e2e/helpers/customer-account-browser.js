@@ -43,6 +43,8 @@ async function open(page,state={}){
   if(local&&(p===base||p===base+'/product/'+style)){const f='pages/customer-'+(isProduct?'product':'portal')+'.html';return route.fulfill({contentType:'text/html',body:state.original?originalFile(f):fs.readFileSync(path.join(root,f),'utf8')});}
   if(local&&['/customer/login','/auth/saml/login'].includes(p))return route.fulfill({contentType:'text/html',body:'<!doctype html><html lang="en"><head><title>Fixture sign in</title></head><body><main><h1>Customer sign in</h1></main></body></html>'});
   if(url.hostname==='fonts.googleapis.com'&&p==='/css2')return route.continue();
+  // Axe inspects this public logo with fetch as well as the browser's image request.
+  if(url.hostname==='cdn.caspio.com'&&p==='/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png')return route.continue();
   if(p.startsWith('/api/')||['fetch','xhr'].includes(request.resourceType())){events.unknown.push(request.url());return route.fulfill({status:503});}
   if(local){const file=path.resolve(root,'.'+decodeURIComponent(p)),relative=p.slice(1);if(!file.startsWith(root+path.sep)||!fs.existsSync(file)||!fs.statSync(file).isFile()){events.missing.push(p);return route.fulfill({status:404});}
    let body=state.original&&source.hashes[relative]?Buffer.from(originalFile(relative)):fs.readFileSync(file);if(relative==='pages/js/customer-product.js')body=Buffer.from(engineSource+'\n'+body.toString('utf8'));

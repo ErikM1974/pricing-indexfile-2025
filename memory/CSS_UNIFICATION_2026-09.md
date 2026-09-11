@@ -1478,3 +1478,7 @@ Exact-source CI 34525732554 passed all four jobs on 8546e9ddbeb3b24e8b09734f75ec
 ## Employee and customer document release record — v2026.09.10.9
 
 Exact-source CI 34543191741 passed all four jobs on 0b271bb2ae12b083936a1add6c86d32ca41c3bab, including actual1,104-case CSS sweep and live money/calculator parity. Employee bundles, Customer Portal Invoice, compact Invoice and Quote View share canonical controls and scoped styles;147 focused browser cases/33 reviewed current paper pages/28 distinct original sources/217 reversible mappings. Three old stylesheets retired;161 important flags removed. Counts become185/225 reviewed,40pending only after verified rollout. Next Order Status/vendor Job Portal branch is separate and excluded.
+
+## Customer Account/Product originals reviewed — 2026-09-10
+
+41 browser cases passed,49 immutable contracts at1440/768/390/320,17 original source hashes and19 source/function guards. All15 pages from10 original PDFs visually reviewed (six blank account views share an identical rendered image). Original statement preserves1048.20total/698.80current/349.40pastdue; product long history28 rows and complete upgrade price matrix retained. Baseline defects: widespread muted-text contrast failures and account320px overflow; ordinary account printing is blank. No application changes yet. Next: canonical controls/Public Sans/scoped token layouts, responsive and paper fixes, then demonstrate and cover delayed/failure/focus/reorder-state behavior. Artifact evidence: customer-account-original-review.json.
