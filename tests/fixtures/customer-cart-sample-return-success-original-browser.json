@@ -1,0 +1,666 @@
+{
+  "name": "sample-return-success",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Sample Cart | Northwest Custom Apparel",
+      "text": "Home / Top Sellers / Sample cart Your sample cart See and feel the quality before you order — free shipping on every sample. Keep browsing Payment received — samples on the way! Thanks! Your payment went through and your sample order is in our system. We’ll ship your samples within 2–3 business days — and the sample cost is credited toward your first decorated order. Confirmation ID: WEB-2026-1042 Back to Top Sellers",
+      "ids": {
+        "confirmationId": "WEB-2026-1042"
+      },
+      "links": [
+        {
+          "href": "#main",
+          "text": "Skip to content",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/catalog",
+          "text": "Products",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom Tees NEW",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Webstores",
+          "label": null
+        },
+        {
+          "href": "/pages/sample-cart.html",
+          "text": "Samples 0",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts NEW",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers & Free Samples",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Keep browsing",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Back to Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/catalog",
+          "text": "Product Catalog",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free Sample Program",
+          "label": null
+        },
+        {
+          "href": "/pages/golf-tournaments-2026.html?utm_source=sample-cart&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "text": "Tournament Packages",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores",
+          "label": null
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "Laser-Engraved Tumblers",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Portal",
+          "label": null
+        }
+      ],
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "name": "",
+          "value": ""
+        }
+      ],
+      "engineCalls": [],
+      "emails": [],
+      "injection": false,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "width": 768,
+      "title": "Sample Cart | Northwest Custom Apparel",
+      "text": "Home / Top Sellers / Sample cart Your sample cart See and feel the quality before you order — free shipping on every sample. Keep browsing Payment received — samples on the way! Thanks! Your payment went through and your sample order is in our system. We’ll ship your samples within 2–3 business days — and the sample cost is credited toward your first decorated order. Confirmation ID: WEB-2026-1042 Back to Top Sellers",
+      "ids": {
+        "confirmationId": "WEB-2026-1042"
+      },
+      "links": [
+        {
+          "href": "#main",
+          "text": "Skip to content",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/pages/sample-cart.html",
+          "text": "Samples 0",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts NEW",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers & Free Samples",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Keep browsing",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Back to Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/catalog",
+          "text": "Product Catalog",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free Sample Program",
+          "label": null
+        },
+        {
+          "href": "/pages/golf-tournaments-2026.html?utm_source=sample-cart&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "text": "Tournament Packages",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores",
+          "label": null
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "Laser-Engraved Tumblers",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Portal",
+          "label": null
+        }
+      ],
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "name": "",
+          "value": ""
+        }
+      ],
+      "engineCalls": [],
+      "emails": [],
+      "injection": false,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "width": 390,
+      "title": "Sample Cart | Northwest Custom Apparel",
+      "text": "Home / Top Sellers / Sample cart Your sample cart See and feel the quality before you order — free shipping on every sample. Keep browsing Payment received — samples on the way! Thanks! Your payment went through and your sample order is in our system. We’ll ship your samples within 2–3 business days — and the sample cost is credited toward your first decorated order. Confirmation ID: WEB-2026-1042 Back to Top Sellers",
+      "ids": {
+        "confirmationId": "WEB-2026-1042"
+      },
+      "links": [
+        {
+          "href": "#main",
+          "text": "Skip to content",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/pages/sample-cart.html",
+          "text": "0",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts NEW",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers & Free Samples",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Keep browsing",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Back to Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/catalog",
+          "text": "Product Catalog",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free Sample Program",
+          "label": null
+        },
+        {
+          "href": "/pages/golf-tournaments-2026.html?utm_source=sample-cart&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "text": "Tournament Packages",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores",
+          "label": null
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "Laser-Engraved Tumblers",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Portal",
+          "label": null
+        }
+      ],
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "name": "",
+          "value": ""
+        }
+      ],
+      "engineCalls": [],
+      "emails": [],
+      "injection": false,
+      "overflow": true,
+      "violations": []
+    },
+    {
+      "width": 320,
+      "title": "Sample Cart | Northwest Custom Apparel",
+      "text": "Home / Top Sellers / Sample cart Your sample cart See and feel the quality before you order — free shipping on every sample. Keep browsing Payment received — samples on the way! Thanks! Your payment went through and your sample order is in our system. We’ll ship your samples within 2–3 business days — and the sample cost is credited toward your first decorated order. Confirmation ID: WEB-2026-1042 Back to Top Sellers",
+      "ids": {
+        "confirmationId": "WEB-2026-1042"
+      },
+      "links": [
+        {
+          "href": "#main",
+          "text": "Skip to content",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/pages/sample-cart.html",
+          "text": "0",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts NEW",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers & Free Samples",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Keep browsing",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Back to Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/catalog",
+          "text": "Product Catalog",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free Sample Program",
+          "label": null
+        },
+        {
+          "href": "/pages/golf-tournaments-2026.html?utm_source=sample-cart&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "text": "Tournament Packages",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores",
+          "label": null
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "Laser-Engraved Tumblers",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Portal",
+          "label": null
+        }
+      ],
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "name": "",
+          "value": ""
+        }
+      ],
+      "engineCalls": [],
+      "emails": [],
+      "injection": false,
+      "overflow": true,
+      "violations": []
+    }
+  ],
+  "reads": [],
+  "actions": [],
+  "dialogs": []
+}

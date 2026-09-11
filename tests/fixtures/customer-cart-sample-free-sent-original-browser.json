@@ -1,0 +1,804 @@
+{
+  "name": "sample-free-sent",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Sample Cart | Northwest Custom Apparel",
+      "text": "Home / Top Sellers / Sample cart Your sample cart See and feel the quality before you order — free shipping on every sample. Keep browsing Sample request submitted! Thank you for your request. We'll process your samples and be in touch shortly. Confirmation ID: SAMPLE-TEST-1042 Back to Top Sellers",
+      "ids": {
+        "confirmationId": "SAMPLE-TEST-1042"
+      },
+      "links": [
+        {
+          "href": "#main",
+          "text": "Skip to content",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/catalog",
+          "text": "Products",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom Tees NEW",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Webstores",
+          "label": null
+        },
+        {
+          "href": "/pages/sample-cart.html",
+          "text": "Samples 1",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts NEW",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers & Free Samples",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Keep browsing",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Back to Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/catalog",
+          "text": "Product Catalog",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free Sample Program",
+          "label": null
+        },
+        {
+          "href": "/pages/golf-tournaments-2026.html?utm_source=sample-cart&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "text": "Tournament Packages",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores",
+          "label": null
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "Laser-Engraved Tumblers",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Portal",
+          "label": null
+        }
+      ],
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "name": "",
+          "value": ""
+        }
+      ],
+      "engineCalls": [],
+      "emails": [
+        {
+          "service": "service_jgrave3",
+          "template": "template_wjxuice",
+          "body": {
+            "to_email": "erik@nwcustomapparel.com",
+            "to_name": "Erik",
+            "subject": "Sample Order SAMPLE-TEST-1042 - Example Team",
+            "order_number": "SAMPLE-TEST-1042",
+            "company": "Example Team",
+            "message": "A new sample order has been submitted. View complete order details, line items, and shipping information in ShopWorks OnSite.",
+            "order_date": "9/10/2026"
+          }
+        },
+        {
+          "service": "service_1c4k67j",
+          "template": "template_sample_request",
+          "body": {
+            "to_name": "Northwest Custom Apparel",
+            "from_name": "Casey Example",
+            "from_email": "customer@example.test",
+            "from_phone": "2535550142",
+            "from_company": "Example Team",
+            "message": "Please send the listed sizes. Reference artwork stays blank on samples.",
+            "order_number": "SAMPLE-TEST-1042",
+            "samples": "Core Cotton Tee (PC54) - Brilliant Orange - Sizes: M (1), 2XL (2)"
+          }
+        }
+      ],
+      "injection": false,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "width": 768,
+      "title": "Sample Cart | Northwest Custom Apparel",
+      "text": "Home / Top Sellers / Sample cart Your sample cart See and feel the quality before you order — free shipping on every sample. Keep browsing Sample request submitted! Thank you for your request. We'll process your samples and be in touch shortly. Confirmation ID: SAMPLE-TEST-1042 Back to Top Sellers",
+      "ids": {
+        "confirmationId": "SAMPLE-TEST-1042"
+      },
+      "links": [
+        {
+          "href": "#main",
+          "text": "Skip to content",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/pages/sample-cart.html",
+          "text": "Samples 1",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts NEW",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers & Free Samples",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Keep browsing",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Back to Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/catalog",
+          "text": "Product Catalog",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free Sample Program",
+          "label": null
+        },
+        {
+          "href": "/pages/golf-tournaments-2026.html?utm_source=sample-cart&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "text": "Tournament Packages",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores",
+          "label": null
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "Laser-Engraved Tumblers",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Portal",
+          "label": null
+        }
+      ],
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "name": "",
+          "value": ""
+        }
+      ],
+      "engineCalls": [],
+      "emails": [
+        {
+          "service": "service_jgrave3",
+          "template": "template_wjxuice",
+          "body": {
+            "to_email": "erik@nwcustomapparel.com",
+            "to_name": "Erik",
+            "subject": "Sample Order SAMPLE-TEST-1042 - Example Team",
+            "order_number": "SAMPLE-TEST-1042",
+            "company": "Example Team",
+            "message": "A new sample order has been submitted. View complete order details, line items, and shipping information in ShopWorks OnSite.",
+            "order_date": "9/10/2026"
+          }
+        },
+        {
+          "service": "service_1c4k67j",
+          "template": "template_sample_request",
+          "body": {
+            "to_name": "Northwest Custom Apparel",
+            "from_name": "Casey Example",
+            "from_email": "customer@example.test",
+            "from_phone": "2535550142",
+            "from_company": "Example Team",
+            "message": "Please send the listed sizes. Reference artwork stays blank on samples.",
+            "order_number": "SAMPLE-TEST-1042",
+            "samples": "Core Cotton Tee (PC54) - Brilliant Orange - Sizes: M (1), 2XL (2)"
+          }
+        }
+      ],
+      "injection": false,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".center > .btn-primary.btn-lg.btn"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Sample Cart | Northwest Custom Apparel",
+      "text": "Home / Top Sellers / Sample cart Your sample cart See and feel the quality before you order — free shipping on every sample. Keep browsing Sample request submitted! Thank you for your request. We'll process your samples and be in touch shortly. Confirmation ID: SAMPLE-TEST-1042 Back to Top Sellers",
+      "ids": {
+        "confirmationId": "SAMPLE-TEST-1042"
+      },
+      "links": [
+        {
+          "href": "#main",
+          "text": "Skip to content",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/pages/sample-cart.html",
+          "text": "1",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts NEW",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers & Free Samples",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Keep browsing",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Back to Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/catalog",
+          "text": "Product Catalog",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free Sample Program",
+          "label": null
+        },
+        {
+          "href": "/pages/golf-tournaments-2026.html?utm_source=sample-cart&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "text": "Tournament Packages",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores",
+          "label": null
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "Laser-Engraved Tumblers",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Portal",
+          "label": null
+        }
+      ],
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "name": "",
+          "value": ""
+        }
+      ],
+      "engineCalls": [],
+      "emails": [
+        {
+          "service": "service_jgrave3",
+          "template": "template_wjxuice",
+          "body": {
+            "to_email": "erik@nwcustomapparel.com",
+            "to_name": "Erik",
+            "subject": "Sample Order SAMPLE-TEST-1042 - Example Team",
+            "order_number": "SAMPLE-TEST-1042",
+            "company": "Example Team",
+            "message": "A new sample order has been submitted. View complete order details, line items, and shipping information in ShopWorks OnSite.",
+            "order_date": "9/10/2026"
+          }
+        },
+        {
+          "service": "service_1c4k67j",
+          "template": "template_sample_request",
+          "body": {
+            "to_name": "Northwest Custom Apparel",
+            "from_name": "Casey Example",
+            "from_email": "customer@example.test",
+            "from_phone": "2535550142",
+            "from_company": "Example Team",
+            "message": "Please send the listed sizes. Reference artwork stays blank on samples.",
+            "order_number": "SAMPLE-TEST-1042",
+            "samples": "Core Cotton Tee (PC54) - Brilliant Orange - Sizes: M (1), 2XL (2)"
+          }
+        }
+      ],
+      "injection": false,
+      "overflow": true,
+      "violations": []
+    },
+    {
+      "width": 320,
+      "title": "Sample Cart | Northwest Custom Apparel",
+      "text": "Home / Top Sellers / Sample cart Your sample cart See and feel the quality before you order — free shipping on every sample. Keep browsing Sample request submitted! Thank you for your request. We'll process your samples and be in touch shortly. Confirmation ID: SAMPLE-TEST-1042 Back to Top Sellers",
+      "ids": {
+        "confirmationId": "SAMPLE-TEST-1042"
+      },
+      "links": [
+        {
+          "href": "#main",
+          "text": "Skip to content",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "",
+          "label": null
+        },
+        {
+          "href": "/pages/sample-cart.html",
+          "text": "1",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts NEW",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers & Free Samples",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/",
+          "text": "Home",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Keep browsing",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Back to Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/catalog",
+          "text": "Product Catalog",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers",
+          "label": null
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands",
+          "label": null
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts",
+          "label": null
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free Sample Program",
+          "label": null
+        },
+        {
+          "href": "/pages/golf-tournaments-2026.html?utm_source=sample-cart&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "text": "Tournament Packages",
+          "label": null
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores",
+          "label": null
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "Laser-Engraved Tumblers",
+          "label": null
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793",
+          "label": null
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com",
+          "label": null
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Portal",
+          "label": null
+        }
+      ],
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "name": "",
+          "value": ""
+        }
+      ],
+      "engineCalls": [],
+      "emails": [
+        {
+          "service": "service_jgrave3",
+          "template": "template_wjxuice",
+          "body": {
+            "to_email": "erik@nwcustomapparel.com",
+            "to_name": "Erik",
+            "subject": "Sample Order SAMPLE-TEST-1042 - Example Team",
+            "order_number": "SAMPLE-TEST-1042",
+            "company": "Example Team",
+            "message": "A new sample order has been submitted. View complete order details, line items, and shipping information in ShopWorks OnSite.",
+            "order_date": "9/10/2026"
+          }
+        },
+        {
+          "service": "service_1c4k67j",
+          "template": "template_sample_request",
+          "body": {
+            "to_name": "Northwest Custom Apparel",
+            "from_name": "Casey Example",
+            "from_email": "customer@example.test",
+            "from_phone": "2535550142",
+            "from_company": "Example Team",
+            "message": "Please send the listed sizes. Reference artwork stays blank on samples.",
+            "order_number": "SAMPLE-TEST-1042",
+            "samples": "Core Cotton Tee (PC54) - Brilliant Orange - Sizes: M (1), 2XL (2)"
+          }
+        }
+      ],
+      "injection": false,
+      "overflow": true,
+      "violations": []
+    }
+  ],
+  "reads": [
+    {
+      "path": "/api/sizes-by-style-color",
+      "query": "?styleNumber=PC54&color=BrillOrng"
+    }
+  ],
+  "actions": [
+    {
+      "path": "/api/manageorders/orders/create",
+      "method": "POST",
+      "body": "{\"orderNumber\":\"SAMPLE-0910-1-000\",\"orderDate\":\"2026-09-10\",\"isTest\":false,\"purchaseOrderNumber\":\"SAMPLE-0910-1-000\",\"salesRep\":\"House\",\"terms\":\"FREE SAMPLE\",\"taxTotal\":0,\"taxPartNumber\":\"Tax_0\",\"taxPartDescription\":\"No sales tax\",\"customer\":{\"firstName\":\"Casey\",\"lastName\":\"Example\",\"email\":\"customer@example.test\",\"phone\":\"2535550142\",\"company\":\"Example Team\"},\"billing\":{\"company\":\"Example Team\",\"address1\":\"100 Example Way\",\"address2\":\"Suite 5\",\"city\":\"Milton\",\"state\":\"WA\",\"zip\":\"98354\",\"country\":\"USA\"},\"shipping\":{\"company\":\"Example Team\",\"address1\":\"200 Sample Lane\",\"address2\":\"Unit 8\",\"city\":\"Tacoma\",\"state\":\"WA\",\"zip\":\"98402\",\"country\":\"USA\",\"method\":\"UPS Ground\"},\"lineItems\":[{\"partNumber\":\"PC54\",\"description\":\"Core Cotton Tee\",\"color\":\"BrillOrng\",\"size\":\"M\",\"quantity\":1,\"price\":8.75,\"notes\":\"FREE SAMPLE\"},{\"partNumber\":\"PC54\",\"description\":\"Core Cotton Tee\",\"color\":\"BrillOrng\",\"size\":\"2XL\",\"quantity\":2,\"price\":10.75,\"notes\":\"FREE SAMPLE\"}],\"notes\":[{\"type\":\"Notes On Order\",\"text\":\"Note From Customer:\\nPlease send the listed sizes. Reference artwork stays blank on samples.\"},{\"type\":\"Notes On Order\",\"text\":\"FREE SAMPLE - Top Sellers Showcase - Example Team\"}],\"files\":[{\"fileName\":\"example-logo.svg\",\"fileData\":\"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCI+PHJlY3Qgd2lkdGg9IjEwIiBoZWlnaHQ9IjEwIiBmaWxsPSJncmVlbiIvPjwvc3ZnPg==\",\"category\":\"reference\",\"description\":\"Customer reference logo (samples ship BLANK)\"}]}"
+    },
+    {
+      "path": "/api/form-submissions",
+      "method": "POST",
+      "body": "{\"formId\":\"sample-request\",\"company\":\"Example Team\",\"contactName\":\"Casey Example\",\"phone\":\"2535550142\",\"email\":\"customer@example.test\",\"salesRep\":\"\",\"summary\":\"3 free samples · PC54 · SAMPLE-TEST-1042\",\"payload\":{\"fields\":[[\"ShopWorks Order\",\"SAMPLE-TEST-1042\"],[\"Rep chosen\",\"House\"],[\"Shipping\",\"UPS Ground\"],[\"Ship to\",\"200 Sample Lane, Unit 8, Tacoma, WA, 98402\"]],\"tables\":[{\"title\":\"Samples requested\",\"columns\":[\"Style\",\"Description\",\"Color\",\"Sizes\"],\"rows\":[[\"PC54\",\"Core Cotton Tee\",\"Brilliant Orange\",\"M(1) 2XL(2)\"]]}],\"notes\":[[\"Customer notes\",\"Please send the listed sizes. Reference artwork stays blank on samples.\"]],\"orderNumber\":\"SAMPLE-TEST-1042\",\"requestedAt\":\"2026-09-10T18:30:00.000Z\",\"items\":[{\"style\":\"PC54\",\"name\":\"Core Cotton Tee\",\"color\":\"Brilliant Orange\",\"catalogColor\":\"BrillOrng\",\"sizes\":\"M(1) 2XL(2)\"}]}}"
+    }
+  ],
+  "dialogs": []
+}

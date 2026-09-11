@@ -5733,6 +5733,93 @@
         "rawCssBytes": 112317,
         "localCssRequests": 5
       }
+    },
+    {
+      "source": "pages/quote-cart.html",
+      "family": "customer-cart",
+      "status": "reviewed",
+      "route": "/quote-cart",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/storefront-shell.css",
+        "pages/css/quote-cart.css",
+        "pages/css/customer-cart.css",
+        "shared_components/css/embroidery-quote-pricing.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "empty",
+        "free-paid-mixed",
+        "legacy-storage",
+        "five-decoration-groups",
+        "all-sizes-and-quantity-edits",
+        "original-successful-request-bodies",
+        "low-out-unknown-inventory",
+        "failed-pricing-withheld-total",
+        "failed-save-retains-fields",
+        "paid-checkout-pending-canceled-success",
+        "stored-markup-stays-text",
+        "checkout-error-stays-text",
+        "storage-removal-error-and-retry",
+        "pending-save-rejects-duplicate",
+        "native-menu-keyboard-focus-return",
+        "four-widths",
+        "axe",
+        "complete-print",
+        "long-note-and-artwork-reference"
+      ],
+      "test": "tests/e2e/css-unification-customer-cart.spec.js",
+      "maxCssBytes": 97282,
+      "measuredRawCssBytes": 96258,
+      "baseline": {
+        "commit": "9eb6e2a2870c2547c89bd5e2e36a4851620b14de",
+        "rawCssBytes": 73091,
+        "localCssRequests": 4
+      }
+    },
+    {
+      "source": "pages/sample-cart.html",
+      "family": "customer-cart",
+      "status": "reviewed",
+      "route": "/pages/sample-cart.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/storefront-shell.css",
+        "pages/css/sample-cart.css",
+        "pages/css/customer-cart.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "empty",
+        "free-paid-mixed",
+        "legacy-storage",
+        "five-decoration-groups",
+        "all-sizes-and-quantity-edits",
+        "original-successful-request-bodies",
+        "low-out-unknown-inventory",
+        "failed-pricing-withheld-total",
+        "failed-save-retains-fields",
+        "paid-checkout-pending-canceled-success",
+        "stored-markup-stays-text",
+        "checkout-error-stays-text",
+        "storage-removal-error-and-retry",
+        "pending-save-rejects-duplicate",
+        "native-menu-keyboard-focus-return",
+        "four-widths",
+        "axe",
+        "complete-print",
+        "long-note-and-artwork-reference"
+      ],
+      "test": "tests/e2e/css-unification-customer-cart.spec.js",
+      "maxCssBytes": 93994,
+      "measuredRawCssBytes": 92970,
+      "baseline": {
+        "commit": "9eb6e2a2870c2547c89bd5e2e36a4851620b14de",
+        "rawCssBytes": 71646,
+        "localCssRequests": 3
+      }
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",

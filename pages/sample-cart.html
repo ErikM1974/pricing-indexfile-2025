@@ -13,14 +13,16 @@
 
     <link rel="icon" href="/favicon.png" type="image/png">
 
-    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Font Awesome: the cart renderer + toasts use fa icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/nwca-2026-core.css?v=2026.09.07.8">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.09.7">
+    <link rel="stylesheet" href="/shared_components/css/storefront-shell.css?v=2026.09.09.7">
     <link rel="stylesheet" href="/pages/css/sample-cart.css?v=2026.09.07.8">
+    <link rel="stylesheet" href="/pages/css/customer-cart.css">
 </head>
-<body>
+<body data-ui="unified" data-storefront="cart" data-customer-cart="sample">
     <a class="skip-link" href="#main">Skip to content</a>
 
     <!-- Utility strip -->
@@ -39,7 +41,7 @@
     <!-- Masthead -->
     <header class="nav-bar">
         <div class="nav-bar-inner">
-            <button class="mobile-menu-btn" id="mobileMenuBtn" type="button" aria-label="Open menu" aria-controls="sidebar">
+            <button class="mobile-menu-btn" id="mobileMenuBtn" type="button" aria-expanded="false" aria-label="Open menu" aria-controls="sidebar">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                     <line x1="3" y1="6" x2="21" y2="6"></line>
                     <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -73,7 +75,7 @@
             <div class="nav-search" role="search">
                 <input type="text"
                        id="navSearchInput"
-                       class="nav-search-input"
+                       class="field-input nav-search-input"
                        placeholder="Search styles — PC61, hoodies, caps…"
                        autocomplete="off"
                        aria-label="Search products">
@@ -99,7 +101,7 @@
     </header>
 
     <!-- Drawer (mobile menu + category browse) -->
-    <aside class="sidebar" id="sidebar" aria-label="Browse menu">
+    <dialog class="sidebar" id="sidebar" aria-label="Browse menu">
         <div class="drawer-head">
             <span class="drawer-head-title">Browse NWCA</span>
             <button class="drawer-close" id="drawerClose" type="button" aria-label="Close menu">
@@ -122,8 +124,8 @@
             <a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a><br>
             2025 Freeman Rd E, Milton, WA 98354
         </div>
-    </aside>
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    </dialog>
+    <div class="sidebar-overlay" id="sidebarOverlay" hidden></div>
 
     <main id="main">
         <!-- Page header -->
@@ -164,7 +166,7 @@
                             </div>
                         </div>
                         <!-- Unhidden by sample-checkout.js when the cart holds paid samples -->
-                        <p id="sampleCreditNote" hidden>
+                        <p id="sampleCreditNote" class="sc-credit-note" hidden>
                             <i class="fas fa-gift" aria-hidden="true"></i>
                             Paid samples check out securely online — the sample cost is <strong>credited toward your first decorated order</strong>. Free shipping, always.
                         </p>
@@ -182,28 +184,28 @@
                                 <h2>Contact information</h2>
                                 <div class="form-grid">
                                     <div class="form-group">
-                                        <label for="fldFirstName">First name <span class="required">*</span></label>
-                                        <input type="text" id="fldFirstName" name="firstName" autocomplete="given-name" required>
+                                        <label for="fldFirstName" class="field-label">First name <span class="required">*</span></label>
+                                        <input type="text" id="fldFirstName" name="firstName" autocomplete="given-name" required class="field-input">
                                     </div>
                                     <div class="form-group">
-                                        <label for="fldLastName">Last name <span class="required">*</span></label>
-                                        <input type="text" id="fldLastName" name="lastName" autocomplete="family-name" required>
+                                        <label for="fldLastName" class="field-label">Last name <span class="required">*</span></label>
+                                        <input type="text" id="fldLastName" name="lastName" autocomplete="family-name" required class="field-input">
                                     </div>
                                     <div class="form-group">
-                                        <label for="fldEmail">Email <span class="required">*</span></label>
-                                        <input type="email" id="fldEmail" name="email" autocomplete="email" required>
+                                        <label for="fldEmail" class="field-label">Email <span class="required">*</span></label>
+                                        <input type="email" id="fldEmail" name="email" autocomplete="email" required class="field-input">
                                     </div>
                                     <div class="form-group">
-                                        <label for="fldPhone">Phone <span class="required">*</span></label>
-                                        <input type="tel" id="fldPhone" name="phone" autocomplete="tel" required>
+                                        <label for="fldPhone" class="field-label">Phone <span class="required">*</span></label>
+                                        <input type="tel" id="fldPhone" name="phone" autocomplete="tel" required class="field-input">
                                     </div>
                                     <div class="form-group">
-                                        <label for="fldCompany">Company</label>
-                                        <input type="text" id="fldCompany" name="company" autocomplete="organization">
+                                        <label for="fldCompany" class="field-label">Company</label>
+                                        <input type="text" id="fldCompany" name="company" autocomplete="organization" class="field-input">
                                     </div>
                                     <div class="form-group">
-                                        <label for="salesRep">Sales representative</label>
-                                        <select name="salesRep" id="salesRep">
+                                        <label for="salesRep" class="field-label">Sales representative</label>
+                                        <select name="salesRep" id="salesRep" class="field-input">
                                             <option value="House" selected>House (no specific rep)</option>
                                             <option value="Nika Lao">Nika Lao</option>
                                             <option value="Taneisha Clark">Taneisha Clark</option>
@@ -218,24 +220,24 @@
                                 <h2>Billing address</h2>
                                 <div class="form-grid">
                                     <div class="form-group span-2">
-                                        <label for="billing-address1">Street address <span class="required">*</span></label>
-                                        <input type="text" name="billing_address1" id="billing-address1" autocomplete="billing address-line1" required placeholder="123 Main St">
+                                        <label for="billing-address1" class="field-label">Street address <span class="required">*</span></label>
+                                        <input type="text" name="billing_address1" id="billing-address1" autocomplete="billing address-line1" required placeholder="123 Main St" class="field-input">
                                     </div>
                                     <div class="form-group">
-                                        <label for="billing-address2">Apt / Suite</label>
-                                        <input type="text" name="billing_address2" id="billing-address2" autocomplete="billing address-line2" placeholder="Apt 4B">
+                                        <label for="billing-address2" class="field-label">Apt / Suite</label>
+                                        <input type="text" name="billing_address2" id="billing-address2" autocomplete="billing address-line2" placeholder="Apt 4B" class="field-input">
                                     </div>
                                     <div class="form-group">
-                                        <label for="billing-city">City <span class="required">*</span></label>
-                                        <input type="text" name="billing_city" id="billing-city" autocomplete="billing address-level2" required>
+                                        <label for="billing-city" class="field-label">City <span class="required">*</span></label>
+                                        <input type="text" name="billing_city" id="billing-city" autocomplete="billing address-level2" required class="field-input">
                                     </div>
                                     <div class="form-group">
-                                        <label for="billing-state">State <span class="required">*</span></label>
-                                        <input type="text" name="billing_state" id="billing-state" autocomplete="billing address-level1" required placeholder="WA" maxlength="2" pattern="[A-Za-z]{2}" class="input-upper">
+                                        <label for="billing-state" class="field-label">State <span class="required">*</span></label>
+                                        <input type="text" name="billing_state" id="billing-state" autocomplete="billing address-level1" required placeholder="WA" maxlength="2" pattern="[A-Za-z]{2}" class="field-input input-upper">
                                     </div>
                                     <div class="form-group">
-                                        <label for="billing-zip">ZIP code <span class="required">*</span></label>
-                                        <input type="text" name="billing_zip" id="billing-zip" autocomplete="billing postal-code" required placeholder="98101" pattern="\d{5}" maxlength="5" inputmode="numeric">
+                                        <label for="billing-zip" class="field-label">ZIP code <span class="required">*</span></label>
+                                        <input type="text" name="billing_zip" id="billing-zip" autocomplete="billing postal-code" required placeholder="98101" pattern="\d{5}" maxlength="5" inputmode="numeric" class="field-input">
                                     </div>
                                 </div>
                             </section>
@@ -251,24 +253,24 @@
                                 <h2>Shipping address</h2>
                                 <div class="form-grid">
                                     <div class="form-group span-2">
-                                        <label for="shipping-address1">Street address</label>
-                                        <input type="text" name="shipping_address1" id="shipping-address1" autocomplete="shipping address-line1" placeholder="123 Main St">
+                                        <label for="shipping-address1" class="field-label">Street address</label>
+                                        <input type="text" name="shipping_address1" id="shipping-address1" autocomplete="shipping address-line1" placeholder="123 Main St" class="field-input">
                                     </div>
                                     <div class="form-group">
-                                        <label for="shipping-address2">Apt / Suite</label>
-                                        <input type="text" name="shipping_address2" id="shipping-address2" autocomplete="shipping address-line2" placeholder="Apt 4B">
+                                        <label for="shipping-address2" class="field-label">Apt / Suite</label>
+                                        <input type="text" name="shipping_address2" id="shipping-address2" autocomplete="shipping address-line2" placeholder="Apt 4B" class="field-input">
                                     </div>
                                     <div class="form-group">
-                                        <label for="shipping-city">City</label>
-                                        <input type="text" name="shipping_city" id="shipping-city" autocomplete="shipping address-level2">
+                                        <label for="shipping-city" class="field-label">City</label>
+                                        <input type="text" name="shipping_city" id="shipping-city" autocomplete="shipping address-level2" class="field-input">
                                     </div>
                                     <div class="form-group">
-                                        <label for="shipping-state">State</label>
-                                        <input type="text" name="shipping_state" id="shipping-state" autocomplete="shipping address-level1" placeholder="WA" maxlength="2" pattern="[A-Za-z]{2}" class="input-upper">
+                                        <label for="shipping-state" class="field-label">State</label>
+                                        <input type="text" name="shipping_state" id="shipping-state" autocomplete="shipping address-level1" placeholder="WA" maxlength="2" pattern="[A-Za-z]{2}" class="field-input input-upper">
                                     </div>
                                     <div class="form-group">
-                                        <label for="shipping-zip">ZIP code</label>
-                                        <input type="text" name="shipping_zip" id="shipping-zip" autocomplete="shipping postal-code" placeholder="98101" pattern="\d{5}" maxlength="5" inputmode="numeric">
+                                        <label for="shipping-zip" class="field-label">ZIP code</label>
+                                        <input type="text" name="shipping_zip" id="shipping-zip" autocomplete="shipping postal-code" placeholder="98101" pattern="\d{5}" maxlength="5" inputmode="numeric" class="field-input">
                                     </div>
                                 </div>
                             </section>
@@ -279,11 +281,11 @@
                                 <h2>Anything else?</h2>
                                 <div class="form-grid">
                                     <div class="form-group span-2">
-                                        <label for="fldNotes">Additional notes</label>
-                                        <textarea id="fldNotes" name="notes" placeholder="Any specific requirements or questions…"></textarea>
+                                        <label for="fldNotes" class="field-label">Additional notes</label>
+                                        <textarea id="fldNotes" name="notes" placeholder="Any specific requirements or questions…" class="field-textarea"></textarea>
                                     </div>
                                     <div class="form-group span-2">
-                                        <label for="logoUpload">Upload logo / artwork <span class="label-soft">(optional — AI, PDF, PNG, JPG)</span></label>
+                                        <label for="logoUpload" class="field-label">Upload logo / artwork <span class="label-soft">(optional — AI, PDF, PNG, JPG)</span></label>
                                         <input type="file" id="logoUpload" name="logoUpload" accept=".ai,.pdf,.png,.jpg,.jpeg,.eps,.psd,.svg">
                                         <small class="field-hint">Samples ship blank — your artwork is saved for the quote that follows.</small>
                                     </div>
@@ -291,11 +293,11 @@
                             </section>
 
                             <div class="button-group">
-                                <button type="submit" class="btn btn-primary btn-lg">
+                                <button type="submit" class="btn btn-primary">
                                     <i class="fas fa-paper-plane" aria-hidden="true"></i>
                                     Submit sample request
                                 </button>
-                                <a href="/catalog?topSellers=1" class="btn btn-ghost btn-lg">Continue shopping</a>
+                                <a href="/catalog?topSellers=1" class="btn btn-ghost">Continue shopping</a>
                             </div>
                         </form>
                     </div>
@@ -308,7 +310,7 @@
                     <p>Thank you for your request. We'll process your samples and be in touch shortly.</p>
                     <p class="confirmation-line"><strong>Confirmation ID:</strong> <span id="confirmationId"></span></p>
                     <div class="button-group center">
-                        <a href="/catalog?topSellers=1" class="btn btn-primary btn-lg">Back to Top Sellers</a>
+                        <a href="/catalog?topSellers=1" class="btn btn-primary">Back to Top Sellers</a>
                     </div>
                 </div>
             </div>
@@ -372,6 +374,7 @@
     <!-- Paid-sample Stripe checkout (samples channel) -->
     <script src="/pages/js/sample-checkout.js?v=2026.09.06.27" defer></script>
     <!-- Page controller (extracted from the legacy inline script, 2026 reskin) -->
+    <script src="/shared_components/js/storefront-navigation.js?v=2026.09.09.7" defer></script>
     <script src="/pages/js/sample-cart-page.js?v=2026.09.07.33" defer></script>
 </body>
 </html>

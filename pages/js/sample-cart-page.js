@@ -180,9 +180,9 @@ async function loadCart() {
 
         // Show loading indicator
         container.innerHTML = `
-            <div style="text-align: center; padding: 3rem;">
-                <i class="fas fa-circle-notch fa-spin" style="font-size: 2rem; color: var(--primary-color);" aria-hidden="true"></i>
-                <p style="margin-top: 1rem; color: var(--text-secondary);">Checking inventory...</p>
+            <div class="sc-inventory-loading">
+                <i class="fas fa-circle-notch fa-spin" aria-hidden="true"></i>
+                <p>Checking inventory...</p>
             </div>
         `;
 
@@ -246,13 +246,13 @@ async function loadCart() {
                     </div>
                 </div>
 
-                <a href="/catalog?topSellers=1" class="btn btn-primary" style="margin-top: 1rem; padding: 1rem 2.5rem; font-size: 1.1rem;">
+                <a href="/catalog?topSellers=1" class="btn btn-primary sc-empty-browse">
                     <i class="fas fa-search" aria-hidden="true"></i>
                     Browse Top Sellers
                 </a>
 
-                <p style="margin-top: 2rem; font-size: 0.9rem;">
-                    Need help? Call us at <a href="tel:253-922-5793" style="color: var(--primary-color); font-weight: 600;">253-922-5793</a>
+                <p class="sc-help">
+                    Need help? Call us at <a href="tel:253-922-5793" class="sc-help-link">253-922-5793</a>
                 </p>
             </div>
         `;
@@ -306,7 +306,7 @@ async function loadCart() {
 
                 return `
                     <div class="size-badge${unavailableClass}" title="${!isAvailable ? 'Out of Stock' : ''}">
-                        <span class="size-info">${size} (${qty})</span>
+                        <span class="size-info">${escText(size)} (${escText(qty)})</span>
                         <span class="size-price">$${sizePrice.toFixed(2)}</span>
                     </div>
                 `;
@@ -340,7 +340,7 @@ async function loadCart() {
                         <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
                         <div>
                             <strong>Some sizes are unavailable:</strong>
-                            ${unavailableSizes.join(', ')}
+                            ${escText(unavailableSizes.join(', '))}
                         </div>
                     </div>
                 `;
@@ -349,15 +349,15 @@ async function loadCart() {
 
         return `
             <div class="cart-item" data-index="${index}">
-                <img src="${item.imageUrl || ''}" alt="${item.name}" class="item-image">
+                <img src="${escText(item.imageUrl || '')}" alt="${escText(item.name)}" class="item-image">
                 <div class="item-details">
-                    <h3>${item.name}</h3>
-                    <div class="item-style">Style: ${item.style}</div>
-                    <div class="item-color">Color: ${item.color}</div>
+                    <h3>${escText(item.name)}</h3>
+                    <div class="item-style">Style: ${escText(item.style)}</div>
+                    <div class="item-color">Color: ${escText(item.color)}</div>
                     ${inventoryBadge}
                     ${sizeWarnings}
                     <div class="item-sizes">Sizes: ${sizesDisplay}</div>
-                    <div class="item-price" style="margin-top: 0.5rem; font-weight: 600; color: var(--primary-color);">
+                    <div class="item-price">
                         ${totalQty} ${totalQty === 1 ? 'item' : 'items'} = $${itemTotal.toFixed(2)}
                     </div>
                 </div>
@@ -395,7 +395,24 @@ function removeItem(index) {
         samples: cart,
         timestamp: new Date().toISOString()
     };
-    sessionStorage.setItem('sampleCart', JSON.stringify(cartData));
+    try {
+        sessionStorage.setItem('sampleCart', JSON.stringify(cartData));
+    } catch (error) {
+        let message = document.getElementById('sampleCartStorageError');
+        if (!message) {
+            message = document.createElement('p');
+            message.id = 'sampleCartStorageError';
+            message.className = 'alert alert-error';
+            message.setAttribute('role', 'alert');
+            message.tabIndex = -1;
+            document.getElementById('cartItems').before(message);
+        }
+        message.textContent = 'Could not remove this sample because browser storage is unavailable. Your cart is unchanged. Try again or call 253-922-5793.';
+        message.focus();
+        return;
+    }
+    const message = document.getElementById('sampleCartStorageError');
+    if (message) message.remove();
     loadCart();
 }
 
@@ -474,7 +491,7 @@ document.getElementById('sampleRequestForm').addEventListener('submit', async fu
                                 </li>
                             `).join('')}
                         </ul>
-                        <p style="margin-top: 1rem;">Please remove out-of-stock items from your cart and try again.</p>
+                        <p class="sc-validation-help">Please remove out-of-stock items from your cart and try again.</p>
                     </div>
                 </div>
             `;
@@ -825,31 +842,7 @@ window.finishSampleLeadHandoff = finishSampleLeadHandoff; // sample-checkout.js 
 applySampleLeadPrefill();
 
 // ── 2026 chrome: drawer + masthead search ─────────────────────────────
-(function wireChrome() {
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('sidebarOverlay');
-    function setDrawer(open) {
-if (!sidebar || !overlay) return;
-sidebar.classList.toggle('show', open);
-overlay.classList.toggle('show', open);
-document.body.classList.toggle('drawer-open', open);
-    }
-    const openBtn = document.getElementById('mobileMenuBtn');
-    const closeBtn = document.getElementById('drawerClose');
-    if (openBtn) openBtn.addEventListener('click', () => setDrawer(true));
-    if (closeBtn) closeBtn.addEventListener('click', () => setDrawer(false));
-    if (overlay) overlay.addEventListener('click', () => setDrawer(false));
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setDrawer(false); });
-
-    const input = document.getElementById('navSearchInput');
-    const btn = document.getElementById('navSearchBtn');
-    function goSearch() {
-const term = (input && input.value || '').trim();
-if (term) window.location.href = '/catalog?q=' + encodeURIComponent(term);
-    }
-    if (btn) btn.addEventListener('click', goSearch);
-    if (input) input.addEventListener('keydown', (e) => { if (e.key === 'Enter') goSearch(); });
-})();
+// Masthead navigation is owned by storefront-navigation.js.
 
 // Rendered cart rows use inline onclick — keep the handler global
 window.removeItem = removeItem;
