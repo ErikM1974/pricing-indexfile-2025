@@ -1,5 +1,9 @@
 # CSS unification — design direction and implementation plan
 
+## INTEGRATED — Order Status and Job Portal full regression checks
+
+Reviewed pair a878bceb is integrated and backed up on primary develop at73cc615a. The initial whole-app run passed build, lint and types; seven legacy source-format assertions failed in two unit suites because visibility/focus now belong to shared components, filter classes are canonical, job cards are native buttons and Post includes a pending guard. Updated those assertions while preserving all accessibility requirements; both suites now pass22 tests. No application source or original evidence changed in this correction. Resume the remaining full unit/DOM/accessibility/parity, boot, CSS browser, pricing browser and release gates on the corrected commit before release. Live remains .9/2101,185 reviewed; this pair brings the reviewed candidate to187,38 pending. The separate codex/customer-account-pages branch starts at73cc615a with no account-page edits yet.
+
 ## REVIEWED — Order Status and vendor Job Portal ready for integration
 
 Both pages adopt shared Public Sans/header/buttons/inputs and scoped page owners. Forty-six browser cases cover original values/links/rows at1440/768/390/320, all status/error modes, delayed retry, exact note payloads, duplicate keyboard submissions, separate job drafts, late responses, native card focus/history and failed image fallbacks. Seventy reversible mappings restore all10 original source hashes; the original38 browser JSONs remain immutable. Money/promise/render and vendor date/data functions stay byte-identical. Three important flags removed; shared custom-tees.css and CaspioDate unchanged.

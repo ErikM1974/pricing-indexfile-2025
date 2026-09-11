@@ -1,5 +1,9 @@
 # Handover follow-ups — 2026-09-07
 
+## INTEGRATED — status pair awaiting complete release checks
+
+The reviewed Order Status/Job Portal pair a878bceb is integrated at73cc615a. Full build/lint/types passed; seven outdated structural assertions in two unit suites were updated for shared visibility/focus, native job buttons, canonical classes and the pending-note guard. Both corrected suites pass22 tests; application source and originals are unchanged. Continue full release gates before deploying. Live .9/2101 remains185/225; reviewed candidate187/225,38 pending. Customer account-page work is isolated on codex/customer-account-pages, initially unchanged at73cc615a.
+
 ## REVIEWED — Order Status and vendor Job Portal ready for integration
 
 Both pages adopt shared Public Sans/header/buttons/inputs and scoped page owners. Forty-six browser cases cover original values/links/rows at1440/768/390/320, all status/error modes, delayed retry, exact note payloads, duplicate keyboard submissions, separate job drafts, late responses, native card focus/history and failed image fallbacks. Seventy reversible mappings restore all10 original source hashes; the original38 browser JSONs remain immutable. Money/promise/render and vendor date/data functions stay byte-identical. Three important flags removed; shared custom-tees.css and CaspioDate unchanged.
