@@ -1,3 +1,11 @@
+## v2026.09.11.3 (2026.09.11)
+
+- Capture original catalog storefront workflows and paper baseline
+- Merge commit 'ae3a8276e41c3784d3fa19964fa70490165f5942' into codex/catalog-storefront
+- Unify home catalog and product styles with accessible shopping controls
+- Deploy v2026.09.11.3: unify home catalog and product shopping
+- Deploy v2026.09.11.3: version new shared storefront stylesheet imports
+
 ## v2026.09.11.2 (2026.09.11)
 
 - Capture original custom shirt and cap storefront source contracts
