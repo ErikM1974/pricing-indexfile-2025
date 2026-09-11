@@ -1,5 +1,17 @@
 # CSS unification — design direction and implementation plan
 
+## NEXT — Custom Tees and Custom Caps original review
+
+Isolated codex/custom-apparel-storefront starts at88526ec0. The separate cart candidate v2026.09.11.1 is in full local28662 and exact-source CI34572654837; do not mix this next-family work into that release. Live account .11/2103 remains189/225; carts add two reviewed pages only after verified release.
+
+- [x] Freeze original HTML, page CSS, controllers, pure pricing engines, shipping calendar, calibration and designer sources.
+- [ ] Capture original gallery/search/filter/sort, product/color/quantity tiers, front/back art, proof/designer, rush/delivery/tax, notes, consent, refresh/session and mock checkout states at1440/768/390/320. Unknown business reads/writes fail closed in fixtures.
+- [ ] Review original screens and every printed page before editing. Demonstrate any storage/request/focus defects with synthetic fixtures first.
+- [ ] Share layout and canonical controls while retaining the distinct shirt designer and cap proof workflow. Preserve all API financial transforms, input payloads, quantities, stock keys, shipping dates and offer copy.
+- [ ] Compare current screens/axe/keyboard/paper and source contracts; update migration credit only after all pass. Complete separate full application/CI/deploy gates.
+
+Design: Public Sans; NWCA green #2e5827, white #ffffff, gray canvas #f3f4f6, ink #1f2937, muted #4b5563, warning ink #92400e through existing tokens. Left-aligned product gallery leads into the actual customization workspace; preview and artwork controls sit beside quantity and order details on desktop and stack on phones. Existing product imagery carries the identity. Consolidate duplicated header, gallery, fields, order summary and paper rules into one scoped owner; keep canvas geometry and cap-specific proof controls separately owned. Retain every offer and price label. No new global palette, live order, upload, payment or email.
+
 ## RELEASE CANDIDATE — v2026.09.11.1 Sample and Quote Carts
 
 Reviewed source7498f6fc and verified account releaseefc4471f are integrated at77bc80d490118b1f674c5c7543abba3e9b6fbf79. Complete local gates are running on that unchanged checkout. This candidate adds only release cache references and their reversible mappings; the six application CSS/JS assets are unchanged. Require every local gate and all four exact-source CI jobs, including actual CSS and live money/calculator parity, before release.

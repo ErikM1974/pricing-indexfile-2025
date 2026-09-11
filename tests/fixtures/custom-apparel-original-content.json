@@ -1,0 +1,577 @@
+{
+  "base": "88526ec0e1b89c7ab3b98bc48ebad4b824b7bc64",
+  "pages": [
+    {
+      "file": "pages/custom-caps.html",
+      "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, viewport-fit=cover\">\n    <meta name=\"description\" content=\"Custom embroidered hats — pick from 9 stocked cap styles, upload your logo, and order online. Free logo setup, digital proof before we stitch, free shipping. 8-cap minimum.\">\n    <meta name=\"robots\" content=\"index, follow\">\n\n    <title>Custom Embroidered Hats — Design Online | Northwest Custom Apparel</title>\n\n    <!-- Social share cards -->\n    <meta property=\"og:type\" content=\"website\">\n    <meta property=\"og:title\" content=\"Custom Embroidered Hats — your logo stitched on caps people actually wear\">\n    <meta property=\"og:description\" content=\"9 stocked cap styles from Richardson, Carhartt, Port Authority and more. Free logo setup, digital proof before anything stitches, free shipping. Order online in minutes — 8-cap minimum.\">\n    <meta property=\"og:image\" content=\"https://cdnm.sanmar.com/imglib/mresjpg/2025/f29/112_black_hat_detail.jpg\">\n    <meta property=\"og:url\" content=\"https://www.teamnwca.com/custom-caps\">\n    <meta name=\"twitter:card\" content=\"summary_large_image\">\n\n    <link rel=\"icon\" href=\"/favicon.png\" type=\"image/png\">\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    <link href=\"https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap\" rel=\"stylesheet\">\n    <link href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css\" rel=\"stylesheet\">\n\n    <!-- Absolute asset paths: this page will serve from BOTH /custom-caps (clean\n         URL) and /pages/custom-caps.html — relative paths break on the former. -->\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link rel=\"stylesheet\" href=\"/pages/css/custom-caps.css?v=2026.09.07.20\">\n</head>\n<body>\n    <a class=\"skip-link\" href=\"#stage-gallery\">Skip to the cap lineup</a>\n\n    <div id=\"caps-toasts\" class=\"tdt-toasts\" aria-live=\"polite\"></div>\n\n    <!-- Fatal boot error (pricing/config unavailable — never a guessed price) -->\n    <div id=\"caps-fatal\" class=\"tdt-fatal\" hidden>\n        <div class=\"tdt-fatal-card\">\n            <i class=\"fas fa-triangle-exclamation\" aria-hidden=\"true\"></i>\n            <h2>We can’t load live pricing right now</h2>\n            <p id=\"caps-fatal-msg\">Please refresh the page — or call us and we’ll take your order by phone.</p>\n            <p class=\"tdt-fatal-phone\"><a href=\"tel:253-922-5793\"><i class=\"fas fa-phone\" aria-hidden=\"true\"></i> 253-922-5793</a></p>\n            <button type=\"button\" class=\"btn btn-primary\" id=\"caps-fatal-retry\">Try again</button>\n        </div>\n    </div>\n\n    <!-- ── Header ─────────────────────────────────────────────────── -->\n    <header class=\"site-head\">\n        <div class=\"site-head-inner\">\n            <a class=\"brand\" href=\"/\">\n                <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\" alt=\"Northwest Custom Apparel\" class=\"brand-logo\">\n                <span class=\"brand-text\">\n                    <strong>Northwest Custom Apparel</strong>\n                    <em>Custom Hats · Embroidered</em>\n                </span>\n            </a>\n            <div class=\"head-contact\">\n                <span><i class=\"fas fa-location-dot\" aria-hidden=\"true\"></i> Embroidered in Milton, WA</span>\n                <a href=\"tel:253-922-5793\"><i class=\"fas fa-phone\" aria-hidden=\"true\"></i> 253-922-5793</a>\n                <a href=\"mailto:sales@nwcustomapparel.com\"><i class=\"fas fa-envelope\" aria-hidden=\"true\"></i> sales@nwcustomapparel.com</a>\n            </div>\n        </div>\n    </header>\n\n    <!-- ── Promise banner (proof-first) ───────────────────────────── -->\n    <div class=\"promise-banner\">\n        <div class=\"promise-tag\">\n            <i class=\"fas fa-stamp\" aria-hidden=\"true\"></i>\n            <div class=\"promise-copy\">\n                <strong>Digital proof within 2–3 business days — nothing stitches until you approve</strong>\n                <span>Embroidered in Milton, WA · ships 7–10 business days after proof approval</span>\n            </div>\n        </div>\n    </div>\n\n    <!-- ── Hero ───────────────────────────────────────────────────── -->\n    <section class=\"hero\">\n        <div class=\"hero-inner\">\n            <div class=\"hero-copy\">\n                <h1>Custom embroidered hats — your logo, <span class=\"hero-underline\">stitched</span> on caps people actually wear.</h1>\n                <p class=\"hero-sub\">Pick from 9 stocked styles — Richardson, Carhartt, Port Authority and more. Upload your logo, approve a digital proof, and we embroider it in our Milton, WA shop. Front logo and setup included in the price.</p>\n                <button type=\"button\" class=\"btn btn-hero\" id=\"hero-cta\">\n                    <i class=\"fas fa-hat-cowboy\" aria-hidden=\"true\"></i> Pick your cap — see live pricing\n                </button>\n                <div class=\"hero-trust\">\n                    <span><i class=\"fas fa-lock\" aria-hidden=\"true\"></i> Stripe secure checkout</span>\n                    <span><i class=\"fas fa-house-flag\" aria-hidden=\"true\"></i> Family-owned, Milton WA — since 1977</span>\n                </div>\n            </div>\n            <div class=\"hero-visual\">\n                <img src=\"https://cdnm.sanmar.com/imglib/mresjpg/2025/f29/112_black_hat_detail.jpg\" alt=\"Richardson 112 trucker cap\" loading=\"eager\">\n            </div>\n        </div>\n    </section>\n\n    <!-- ── Trust strip (locked decisions, verbatim intents) ───────── -->\n    <section class=\"trust-strip\" aria-label=\"Why order here\">\n        <div class=\"trust-strip-inner\">\n            <div class=\"trust-item\"><i class=\"fas fa-gift\" aria-hidden=\"true\"></i><span><strong>Free logo setup</strong> Embroidered front logo included — free setup, always.</span></div>\n            <div class=\"trust-item\"><i class=\"fas fa-stamp\" aria-hidden=\"true\"></i><span><strong>Digital proof first</strong> Proof within 2–3 business days — nothing stitches until you approve.</span></div>\n            <div class=\"trust-item\"><i class=\"fas fa-truck-fast\" aria-hidden=\"true\"></i><span><strong>Free shipping, always</strong> Every order ships free, anywhere in the US.</span></div>\n            <div class=\"trust-item\"><i class=\"fas fa-layer-group\" aria-hidden=\"true\"></i><span><strong>8-cap minimum</strong> Small enough for a crew, priced better as you add caps.</span></div>\n        </div>\n    </section>\n\n    <!-- ── Step 1: cap gallery ────────────────────────────────────── -->\n    <section class=\"gallery-band\" id=\"stage-gallery\">\n        <div class=\"gallery-inner\">\n            <div class=\"stage-head\">\n                <span class=\"stage-num\">1</span>\n                <h2>Pick your cap</h2>\n            </div>\n            <p class=\"gallery-sub\">Our 9 best embroidery caps — every style stocked, every price live, front logo included.</p>\n            <div class=\"gallery-loading\" id=\"gallery-loading\"><i class=\"fas fa-spinner fa-spin\" aria-hidden=\"true\"></i> Loading the cap lineup…</div>\n            <div class=\"gallery-error\" id=\"gallery-error\" hidden>\n                <i class=\"fas fa-triangle-exclamation\" aria-hidden=\"true\"></i> <span id=\"gallery-error-msg\">We couldn’t load the cap lineup.</span>\n                <button type=\"button\" class=\"link-btn\" id=\"gallery-retry\">Retry</button>\n            </div>\n            <div class=\"gallery-grid\" id=\"gallery-grid\"></div>\n        </div>\n    </section>\n\n    <!-- ── Studio ─────────────────────────────────────────────────── -->\n    <main class=\"studio\" id=\"studio\" hidden>\n        <div class=\"studio-grid\">\n\n            <!-- LEFT: logos (sticky on desktop) -->\n            <div class=\"studio-logo-col\" id=\"stage-logos\">\n                <div class=\"stage-head\">\n                    <span class=\"stage-num\">2</span>\n                    <h2>Add your logo</h2>\n                </div>\n\n                <div class=\"current-product\" id=\"current-product\">\n                    <span class=\"current-product-meta\">\n                        <strong id=\"current-product-name\">—</strong>\n                        <small id=\"current-product-style\"></small>\n                    </span>\n                    <button type=\"button\" class=\"chip-btn\" id=\"change-product\"><i class=\"fas fa-rotate-left\" aria-hidden=\"true\"></i> Change cap</button>\n                </div>\n\n                <!-- Side-by-side proof panel: cap photo + your logo (no fake compositing) -->\n                <div class=\"proof-panel\">\n                    <div class=\"proof-grid\">\n                        <div class=\"proof-cap\">\n                            <img id=\"proof-cap-img\" src=\"\" alt=\"\" hidden>\n                            <i class=\"fas fa-hat-cowboy\" id=\"proof-cap-placeholder\" aria-hidden=\"true\"></i>\n                            <span class=\"proof-cap-color\" id=\"proof-cap-color\" hidden></span>\n                        </div>\n                        <div class=\"proof-logos\">\n                            <div class=\"proof-logo-slot\" id=\"proof-front-slot\">\n                                <span class=\"proof-logo-thumb\" id=\"proof-front-thumb\" hidden></span>\n                                <span class=\"proof-logo-empty\" id=\"proof-front-empty\">Your front logo appears here</span>\n                                <span class=\"location-chip\"><i class=\"fas fa-location-crosshairs\" aria-hidden=\"true\"></i> Front — embroidered, up to 10,000 stitches included</span>\n                            </div>\n                            <div class=\"proof-logo-slot\" id=\"proof-back-slot\" hidden>\n                                <span class=\"proof-logo-thumb\" id=\"proof-back-thumb\" hidden></span>\n                                <span class=\"proof-logo-empty\" id=\"proof-back-empty\">Your back logo appears here</span>\n                                <span class=\"location-chip is-muted\"><i class=\"fas fa-location-crosshairs\" aria-hidden=\"true\"></i> Back — small logo or text</span>\n                            </div>\n                        </div>\n                    </div>\n                    <p class=\"proof-note\">We don’t fake an on-cap preview — your emailed proof shows your logo digitized and placed on the exact cap, before anything stitches.</p>\n                </div>\n\n                <div class=\"logo-controls\">\n                    <!-- FRONT logo (required) -->\n                    <div class=\"control-block\">\n                        <label class=\"control-label\" id=\"front-drop-label\">Front logo <span class=\"included-tag\">included — free setup</span></label>\n                        <div class=\"art-drop\" id=\"front-drop\" tabindex=\"0\" role=\"button\" aria-label=\"Upload your front logo\" aria-describedby=\"front-drop-formats\">\n                            <i class=\"fas fa-cloud-arrow-up\" aria-hidden=\"true\"></i>\n                            <strong>Drop your logo here</strong> <span>or click to browse</span>\n                            <small id=\"front-drop-formats\">PNG · JPG · WEBP · SVG · AI · EPS · PDF · PSD · TIFF — 20 MB max</small>\n                        </div>\n                        <input type=\"file\" id=\"front-input\" accept=\".png,.jpg,.jpeg,.webp,.svg,.ai,.eps,.pdf,.psd,.tif,.tiff\" hidden aria-label=\"Choose the front logo file\">\n                        <div class=\"art-file\" id=\"front-file\" hidden>\n                            <span class=\"art-file-thumb\" id=\"front-file-thumb\"></span>\n                            <span class=\"art-file-meta\">\n                                <strong id=\"front-file-name\"></strong>\n                                <small id=\"front-file-size\"></small>\n                            </span>\n                            <button type=\"button\" class=\"art-file-remove\" id=\"front-remove\" aria-label=\"Remove front logo\"><i class=\"fas fa-times\" aria-hidden=\"true\"></i></button>\n                        </div>\n                        <div class=\"art-warning\" id=\"front-warning\" hidden></div>\n                    </div>\n\n                    <!-- BACK logo (optional, priced live from CAP-AL) -->\n                    <div class=\"control-block\">\n                        <label class=\"toggle-row\" for=\"back-toggle\">\n                            <input type=\"checkbox\" id=\"back-toggle\">\n                            <span class=\"toggle-pill\" aria-hidden=\"true\"></span>\n                            <span class=\"toggle-text\">Add a back logo <small id=\"back-delta\">priced per cap by quantity</small></span>\n                        </label>\n                        <div id=\"back-upload-block\" hidden>\n                            <div class=\"art-drop\" id=\"back-drop\" tabindex=\"0\" role=\"button\" aria-label=\"Upload your back logo\" aria-describedby=\"front-drop-formats\">\n                                <i class=\"fas fa-cloud-arrow-up\" aria-hidden=\"true\"></i>\n                                <strong>Drop your back logo here</strong> <span>or click to browse</span>\n                                <small>Small logo or text — same formats, 20 MB max</small>\n                            </div>\n                            <input type=\"file\" id=\"back-input\" accept=\".png,.jpg,.jpeg,.webp,.svg,.ai,.eps,.pdf,.psd,.tif,.tiff\" hidden aria-label=\"Choose the back logo file\">\n                            <div class=\"art-file\" id=\"back-file\" hidden>\n                                <span class=\"art-file-thumb\" id=\"back-file-thumb\"></span>\n                                <span class=\"art-file-meta\">\n                                    <strong id=\"back-file-name\"></strong>\n                                    <small id=\"back-file-size\"></small>\n                                </span>\n                                <button type=\"button\" class=\"art-file-remove\" id=\"back-remove\" aria-label=\"Remove back logo\"><i class=\"fas fa-times\" aria-hidden=\"true\"></i></button>\n                            </div>\n                            <div class=\"art-warning\" id=\"back-warning\" hidden></div>\n                        </div>\n                    </div>\n                </div>\n            </div>\n\n            <!-- RIGHT: colors/quantities + checkout -->\n            <div class=\"studio-flow-col\">\n\n                <!-- Stage 3: colors & quantities -->\n                <section class=\"stage\" id=\"stage-colors\">\n                    <div class=\"stage-head\">\n                        <span class=\"stage-num\">3</span>\n                        <h2>Colors &amp; quantities</h2>\n                    </div>\n\n                    <div class=\"color-chips\" id=\"color-chips\" aria-label=\"Add a cap color\"></div>\n                    <div class=\"color-cards\" id=\"color-cards\"></div>\n\n                    <div class=\"min-alert\" id=\"min-alert\" role=\"alert\" hidden></div>\n\n                    <div class=\"ladder-card\" id=\"ladder-card\" hidden>\n                        <p class=\"ladder-title\">Per-cap price — front logo included</p>\n                        <table class=\"tier-ladder\" id=\"tier-ladder\" aria-label=\"Quantity price ladder\"></table>\n                        <p class=\"ladder-foot\" id=\"ladder-foot\"></p>\n                        <p class=\"nudge-line\" id=\"nudge-line\"></p>\n                    </div>\n                    <p class=\"inventory-stamp\" id=\"inventory-stamp\"></p>\n                    <div class=\"inventory-error\" id=\"inventory-error\" hidden>\n                        <i class=\"fas fa-triangle-exclamation\" aria-hidden=\"true\"></i> Live stock is unavailable right now — we’ll confirm stock before charging your card. <button type=\"button\" class=\"link-btn\" id=\"inventory-retry\">Retry</button>\n                    </div>\n                </section>\n\n                <!-- Stage 4: checkout -->\n                <section class=\"stage\" id=\"stage-checkout\">\n                    <div class=\"stage-head\">\n                        <span class=\"stage-num\">4</span>\n                        <h2>Checkout</h2>\n                    </div>\n\n                    <div class=\"form-card\">\n                        <h3><i class=\"fas fa-user\" aria-hidden=\"true\"></i> Contact</h3>\n                        <div class=\"form-grid\">\n                            <div class=\"form-field\">\n                                <label for=\"f-first\">First name *</label>\n                                <input type=\"text\" id=\"f-first\" autocomplete=\"given-name\" required>\n                            </div>\n                            <div class=\"form-field\">\n                                <label for=\"f-last\">Last name *</label>\n                                <input type=\"text\" id=\"f-last\" autocomplete=\"family-name\" required>\n                            </div>\n                            <div class=\"form-field form-span\">\n                                <label for=\"f-email\">Email *</label>\n                                <input type=\"email\" id=\"f-email\" autocomplete=\"email\" required>\n                            </div>\n                            <div class=\"form-field\">\n                                <label for=\"f-phone\">Phone *</label>\n                                <input type=\"tel\" id=\"f-phone\" autocomplete=\"tel\" required>\n                            </div>\n                            <div class=\"form-field\">\n                                <label for=\"f-company\">Company / group name (optional)</label>\n                                <input type=\"text\" id=\"f-company\" autocomplete=\"organization\">\n                            </div>\n                        </div>\n                    </div>\n\n                    <div class=\"form-card\">\n                        <h3><i class=\"fas fa-truck-fast\" aria-hidden=\"true\"></i> Delivery</h3>\n                        <div class=\"delivery-cards\">\n                            <label class=\"delivery-card\">\n                                <input type=\"radio\" name=\"delivery\" id=\"d-ship\" value=\"ship\" checked>\n                                <span class=\"delivery-card-body\">\n                                    <i class=\"fas fa-truck\" aria-hidden=\"true\"></i>\n                                    <strong>Ship it</strong>\n                                    <small id=\"ship-fee-label\">Free shipping, always</small>\n                                </span>\n                            </label>\n                            <label class=\"delivery-card\">\n                                <input type=\"radio\" name=\"delivery\" id=\"d-pickup\" value=\"pickup\">\n                                <span class=\"delivery-card-body\">\n                                    <i class=\"fas fa-store\" aria-hidden=\"true\"></i>\n                                    <strong>Pick up free</strong>\n                                    <small>Milton, WA</small>\n                                </span>\n                            </label>\n                        </div>\n\n                        <div id=\"pickup-card\" class=\"pickup-card\" hidden>\n                            <i class=\"fas fa-store\" aria-hidden=\"true\"></i>\n                            <div>\n                                <strong>NW Custom Apparel — 2025 Freeman Rd E, Milton, WA 98354</strong>\n                                <p>We’ll call you the moment your caps are ready. Pickup orders are taxed at the Milton rate.</p>\n                            </div>\n                        </div>\n\n                        <div id=\"address-fields\">\n                            <div class=\"form-grid\">\n                                <div class=\"form-field form-span\">\n                                    <label for=\"f-addr1\">Street address *</label>\n                                    <input type=\"text\" id=\"f-addr1\" autocomplete=\"address-line1\" required>\n                                </div>\n                                <div class=\"form-field\">\n                                    <label for=\"f-city\">City *</label>\n                                    <input type=\"text\" id=\"f-city\" autocomplete=\"address-level2\" required>\n                                </div>\n                                <div class=\"form-field form-field-sm\">\n                                    <label for=\"f-state\">State *</label>\n                                    <input type=\"text\" id=\"f-state\" autocomplete=\"address-level1\" maxlength=\"2\" placeholder=\"WA\" required>\n                                </div>\n                                <div class=\"form-field form-field-sm\">\n                                    <label for=\"f-zip\">ZIP *</label>\n                                    <input type=\"text\" id=\"f-zip\" autocomplete=\"postal-code\" inputmode=\"numeric\" required>\n                                </div>\n                            </div>\n                            <p class=\"tax-stamp\" id=\"tax-stamp\"></p>\n                            <div class=\"tax-error\" id=\"tax-error\" hidden>\n                                <i class=\"fas fa-triangle-exclamation\" aria-hidden=\"true\"></i> We couldn’t look up the sales-tax rate for this address. <button type=\"button\" class=\"link-btn\" id=\"tax-retry\">Retry</button>\n                            </div>\n                        </div>\n\n                        <div class=\"form-field form-span\">\n                            <label for=\"f-notes\">Special instructions</label>\n                            <textarea id=\"f-notes\" rows=\"2\" placeholder=\"Thread colors, placement notes — anything we should know?\"></textarea>\n                        </div>\n                    </div>\n\n                    <!-- Review -->\n                    <div class=\"form-card review-card\" id=\"review-card\">\n                        <h3><i class=\"fas fa-clipboard-check\" aria-hidden=\"true\"></i> Review your order</h3>\n                        <div class=\"review-logos\" id=\"review-logos\"></div>\n                        <div class=\"review-lines\" id=\"review-lines\"></div>\n                        <div class=\"review-totals\" id=\"review-totals\" aria-live=\"polite\"></div>\n                        <p class=\"review-promise\" id=\"review-promise\"></p>\n                        <div class=\"review-ack\" id=\"review-ack\" hidden></div>\n\n                        <div class=\"rights-ack\" id=\"rights-ack-row\">\n                            <label><input type=\"checkbox\" id=\"rights-ack\"> <span><strong>I own this logo or have permission to embroider it.</strong> It doesn’t contain trademarks, logos, or characters I don’t have rights to, and nothing hateful or illegal.</span></label>\n                        </div>\n\n                        <div class=\"pay-reasons\" id=\"pay-reasons\"></div>\n                        <button type=\"button\" class=\"btn btn-pay\" id=\"pay-btn\" disabled>\n                            <i class=\"fas fa-lock\" aria-hidden=\"true\"></i> <span id=\"pay-btn-label\">Pay</span>\n                        </button>\n                        <p class=\"stripe-note\"><i class=\"fab fa-stripe\" aria-hidden=\"true\"></i> You’ll be redirected to Stripe — we never see your card number.</p>\n                        <blockquote class=\"checkout-review\">\n                            <p>&ldquo;Had a previous apparel company and they dropped the ball. Contacted NW Custom and they were all over it and had the items ready even before the due date. Would highly recommend.&rdquo;</p>\n                            <footer><strong>Jeremy Hanson</strong> &middot; <a href=\"https://maps.google.com/?cid=4107380119454186786\" target=\"_blank\" rel=\"noopener\">★★★★★ Google review &middot; 4.9 from 185+</a></footer>\n                        </blockquote>\n                        <ul class=\"pay-fineprint\">\n                            <li>Your digital proof comes first — we email it within 2–3 business days and nothing stitches until you approve it.</li>\n                            <li>Custom caps are made just for you — no returns, but if we get it wrong (defect, wrong item), we re-stitch or refund, no drama.</li>\n                            <li>Change or cancel free anytime before we stitch — call 253-922-5793 with your order number.</li>\n                            <li>We may decline artwork we can’t legally or ethically embroider — full refund, and we’ll tell you why.</li>\n                            <li>We use your info only to produce and ship your order — we never sell it.</li>\n                        </ul>\n                    </div>\n                </section>\n            </div>\n        </div>\n    </main>\n\n    <!-- ── Marketing bands ────────────────────────────────────────── -->\n    <section class=\"band band-how\">\n        <h2 class=\"band-title\">How it works</h2>\n        <div class=\"how-grid\">\n            <div class=\"how-step\"><span>1</span><strong>Pick &amp; upload</strong><p>Choose one of our 9 stocked cap styles and upload your logo — any common file format works.</p></div>\n            <div class=\"how-step\"><span>2</span><strong>Approve your proof</strong><p>Within 2–3 business days we email a digital sew-out proof. Nothing stitches until you approve it.</p></div>\n            <div class=\"how-step\"><span>3</span><strong>We embroider</strong><p>Your logo is stitched on the exact caps and colors you picked, in our Milton WA shop.</p></div>\n            <div class=\"how-step\"><span>4</span><strong>Ships free</strong><p>Your caps ship 7–10 business days after proof approval — free shipping, always.</p></div>\n        </div>\n    </section>\n\n    <section class=\"band band-faq\">\n        <h2 class=\"band-title\">Questions, answered</h2>\n        <div class=\"faq\">\n            <details><summary>When exactly will my caps ship?</summary><p>We email your digital proof within 2–3 business days of your order. Once you approve it, your caps ship 7–10 business days later. Weekends and holidays don’t count as business days — and nothing stitches until you’ve approved the proof.</p></details>\n            <details><summary>What’s included in the price?</summary><p>Everything on the front: the cap itself, logo setup and digitizing (free, always), and an embroidered front logo up to 10,000 stitches — which covers nearly every logo. A back logo is an optional per-cap add-on, priced live as you build your order.</p></details>\n            <details><summary>Why is there an 8-cap minimum?</summary><p>Embroidery setup makes one-off caps expensive — 8 caps is where the price gets fair. The price ladder shows exactly how the per-cap price drops at 24, 48, and 72 caps.</p></details>\n            <details><summary>What file should I upload?</summary><p>Anything common: PNG, JPG, SVG, AI, EPS, PDF, PSD, or TIFF up to 20 MB. Our digitizers convert it to stitches by hand and your emailed proof shows exactly how it will sew before we start.</p></details>\n            <details><summary>Can I mix cap colors?</summary><p>Yes — pick as many colors of the same style as you like. The combined quantity sets your price tier, so 12 black + 12 navy caps all get the 24-cap price.</p></details>\n            <details><summary>How much is shipping?</summary><p>Free. Every order ships free anywhere in the US, or pick up free at our shop in Milton, WA.</p></details>\n            <details><summary>Can I return custom caps?</summary><p>Because every cap is embroidered just for you, we can’t resell returns. If we got something wrong — wrong color shipped, stitching defect — we’ll re-stitch or refund, no drama.</p></details>\n            <details><summary>Do you charge sales tax?</summary><p>Washington destination sales tax applies to orders shipped within WA (and pickup orders at the Milton rate). Out-of-state shipments aren’t taxed.</p></details>\n        </div>\n    </section>\n\n    <section class=\"band band-guarantee\">\n        <div class=\"guarantee-tag\">\n            <i class=\"fas fa-handshake\" aria-hidden=\"true\"></i>\n            <div>\n                <strong>Nothing stitches until you approve the proof.</strong>\n                <p>We’ve been embroidering in Milton, Washington since 1977. Call us at <a href=\"tel:253-922-5793\">253-922-5793</a> — a human answers.</p>\n            </div>\n        </div>\n    </section>\n\n    <footer class=\"site-foot\">\n        <p>© Northwest Custom Apparel · Custom Embroidered Hats · 2025 Freeman Rd E, Milton, WA 98354 · <a href=\"tel:253-922-5793\">253-922-5793</a> · <a href=\"mailto:sales@nwcustomapparel.com\">sales@nwcustomapparel.com</a></p>\n    </footer>\n\n    <!-- ── Sticky order bar ───────────────────────────────────────── -->\n    <div class=\"order-bar\" id=\"order-bar\" hidden>\n        <button type=\"button\" class=\"order-bar-summary\" id=\"order-bar-summary\" aria-haspopup=\"dialog\">\n            <strong id=\"bar-total\">$0.00</strong>\n            <span id=\"bar-meta\">0 caps</span>\n            <small class=\"bar-min-note\" id=\"bar-min-note\" hidden></small>\n        </button>\n        <button type=\"button\" class=\"btn btn-cta\" id=\"smart-cta\">Pick your cap</button>\n    </div>\n\n    <!-- ── Summary sheet ──────────────────────────────────────────── -->\n    <div class=\"sheet-backdrop\" id=\"sheet-backdrop\" hidden></div>\n    <div class=\"summary-sheet\" id=\"summary-sheet\" role=\"dialog\" aria-label=\"Order summary\" hidden>\n        <div class=\"sheet-grab\" aria-hidden=\"true\"></div>\n        <h3>Your order so far</h3>\n        <div id=\"sheet-lines\"></div>\n        <div id=\"sheet-totals\"></div>\n        <p class=\"review-promise\" id=\"sheet-promise\"></p>\n        <button type=\"button\" class=\"btn btn-primary\" id=\"sheet-close\">Keep building</button>\n    </div>\n\n    <!-- ── Checkout pipeline modal ────────────────────────────────── -->\n    <div class=\"modal-backdrop\" id=\"pipeline-backdrop\" hidden>\n        <div class=\"pipeline-modal\" role=\"dialog\" aria-label=\"Placing your order\">\n            <h3>Placing your order…</h3>\n            <ol class=\"pipeline-steps\">\n                <li id=\"pl-step-1\"><i class=\"far fa-circle\" aria-hidden=\"true\"></i> Confirming live stock</li>\n                <li id=\"pl-step-2\"><i class=\"far fa-circle\" aria-hidden=\"true\"></i> Uploading your logo</li>\n                <li id=\"pl-step-3\"><i class=\"far fa-circle\" aria-hidden=\"true\"></i> Saving your order</li>\n                <li id=\"pl-step-4\"><i class=\"far fa-circle\" aria-hidden=\"true\"></i> Opening secure checkout</li>\n            </ol>\n            <div class=\"pipeline-error\" id=\"pipeline-error\" hidden></div>\n            <button type=\"button\" class=\"btn btn-ghost\" id=\"pipeline-cancel\">Cancel</button>\n        </div>\n    </div>\n\n    <!-- ── Stock conflict modal ───────────────────────────────────── -->\n    <div class=\"modal-backdrop\" id=\"conflict-backdrop\" hidden>\n        <div class=\"pipeline-modal\" role=\"dialog\" aria-label=\"Stock changed\">\n            <h3><i class=\"fas fa-triangle-exclamation\" aria-hidden=\"true\"></i> Stock changed while you were ordering</h3>\n            <div id=\"conflict-list\"></div>\n            <button type=\"button\" class=\"btn btn-primary\" id=\"conflict-apply\">Apply fixes &amp; continue</button>\n            <button type=\"button\" class=\"btn btn-ghost\" id=\"conflict-close\">Back to my order</button>\n        </div>\n    </div>\n\n    <!-- Config + modules (order matters). Absolute paths — see head comment. -->\n    <script src=\"/config/app.config.js\"></script>\n    <script src=\"/pages/js/custom-caps-pricing.js?v=2026.06.11\"></script>\n    <script src=\"/pages/js/custom-caps-app.js?v=2026.09.05.79\"></script>\n</body>\n</html>\n",
+      "title": "Custom Embroidered Hats — Design Online | Northwest Custom Apparel",
+      "bodyText": "Skip to the cap lineup We can’t load live pricing right now Please refresh the page — or call us and we’ll take your order by phone. 253-922-5793 Try again Northwest Custom Apparel Custom Hats · Embroidered Embroidered in Milton, WA 253-922-5793 sales@nwcustomapparel.com Digital proof within 2–3 business days — nothing stitches until you approve Embroidered in Milton, WA · ships 7–10 business days after proof approval Custom embroidered hats — your logo, stitched on caps people actually wear. Pick from 9 stocked styles — Richardson, Carhartt, Port Authority and more. Upload your logo, approve a digital proof, and we embroider it in our Milton, WA shop. Front logo and setup included in the price. Pick your cap — see live pricing Stripe secure checkout Family-owned, Milton WA — since 1977 Free logo setup Embroidered front logo included — free setup, always. Digital proof first Proof within 2–3 business days — nothing stitches until you approve. Free shipping, always Every order ships free, anywhere in the US. 8-cap minimum Small enough for a crew, priced better as you add caps. 1 Pick your cap Our 9 best embroidery caps — every style stocked, every price live, front logo included. Loading the cap lineup… We couldn’t load the cap lineup. Retry 2 Add your logo — Change cap Your front logo appears here Front — embroidered, up to 10,000 stitches included Your back logo appears here Back — small logo or text We don’t fake an on-cap preview — your emailed proof shows your logo digitized and placed on the exact cap, before anything stitches. Front logo included — free setup Drop your logo here or click to browse PNG · JPG · WEBP · SVG · AI · EPS · PDF · PSD · TIFF — 20 MB max Add a back logo priced per cap by quantity Drop your back logo here or click to browse Small logo or text — same formats, 20 MB max 3 Colors & quantities Per-cap price — front logo included Live stock is unavailable right now — we’ll confirm stock before charging your card. Retry 4 Checkout Contact First name * Last name * Email * Phone * Company / group name (optional) Delivery Ship it Free shipping, always Pick up free Milton, WA NW Custom Apparel — 2025 Freeman Rd E, Milton, WA 98354 We’ll call you the moment your caps are ready. Pickup orders are taxed at the Milton rate. Street address * City * State * ZIP * We couldn’t look up the sales-tax rate for this address. Retry Special instructions Review your order I own this logo or have permission to embroider it. It doesn’t contain trademarks, logos, or characters I don’t have rights to, and nothing hateful or illegal. Pay You’ll be redirected to Stripe — we never see your card number. “Had a previous apparel company and they dropped the ball. Contacted NW Custom and they were all over it and had the items ready even before the due date. Would highly recommend.” Jeremy Hanson · ★★★★★ Google review · 4.9 from 185+ Your digital proof comes first — we email it within 2–3 business days and nothing stitches until you approve it. Custom caps are made just for you — no returns, but if we get it wrong (defect, wrong item), we re-stitch or refund, no drama. Change or cancel free anytime before we stitch — call 253-922-5793 with your order number. We may decline artwork we can’t legally or ethically embroider — full refund, and we’ll tell you why. We use your info only to produce and ship your order — we never sell it. How it works 1Pick & uploadChoose one of our 9 stocked cap styles and upload your logo — any common file format works. 2Approve your proofWithin 2–3 business days we email a digital sew-out proof. Nothing stitches until you approve it. 3We embroiderYour logo is stitched on the exact caps and colors you picked, in our Milton WA shop. 4Ships freeYour caps ship 7–10 business days after proof approval — free shipping, always. Questions, answered When exactly will my caps ship?We email your digital proof within 2–3 business days of your order. Once you approve it, your caps ship 7–10 business days later. Weekends and holidays don’t count as business days — and nothing stitches until you’ve approved the proof. What’s included in the price?Everything on the front: the cap itself, logo setup and digitizing (free, always), and an embroidered front logo up to 10,000 stitches — which covers nearly every logo. A back logo is an optional per-cap add-on, priced live as you build your order. Why is there an 8-cap minimum?Embroidery setup makes one-off caps expensive — 8 caps is where the price gets fair. The price ladder shows exactly how the per-cap price drops at 24, 48, and 72 caps. What file should I upload?Anything common: PNG, JPG, SVG, AI, EPS, PDF, PSD, or TIFF up to 20 MB. Our digitizers convert it to stitches by hand and your emailed proof shows exactly how it will sew before we start. Can I mix cap colors?Yes — pick as many colors of the same style as you like. The combined quantity sets your price tier, so 12 black + 12 navy caps all get the 24-cap price. How much is shipping?Free. Every order ships free anywhere in the US, or pick up free at our shop in Milton, WA. Can I return custom caps?Because every cap is embroidered just for you, we can’t resell returns. If we got something wrong — wrong color shipped, stitching defect — we’ll re-stitch or refund, no drama. Do you charge sales tax?Washington destination sales tax applies to orders shipped within WA (and pickup orders at the Milton rate). Out-of-state shipments aren’t taxed. Nothing stitches until you approve the proof. We’ve been embroidering in Milton, Washington since 1977. Call us at 253-922-5793 — a human answers. © Northwest Custom Apparel · Custom Embroidered Hats · 2025 Freeman Rd E, Milton, WA 98354 · 253-922-5793 · sales@nwcustomapparel.com $0.00 0 caps Pick your cap Your order so far Keep building Placing your order… Confirming live stock Uploading your logo Saving your order Opening secure checkout Cancel Stock changed while you were ordering Apply fixes & continue Back to my order",
+      "bodyTextSha": "45bf57853f81cfd41590212bee833a9100a111d3a24b058abfa17e8276afdd71",
+      "ids": [
+        "caps-toasts",
+        "caps-fatal",
+        "caps-fatal-msg",
+        "caps-fatal-retry",
+        "hero-cta",
+        "stage-gallery",
+        "gallery-loading",
+        "gallery-error",
+        "gallery-error-msg",
+        "gallery-retry",
+        "gallery-grid",
+        "studio",
+        "stage-logos",
+        "current-product",
+        "current-product-name",
+        "current-product-style",
+        "change-product",
+        "proof-cap-img",
+        "proof-cap-placeholder",
+        "proof-cap-color",
+        "proof-front-slot",
+        "proof-front-thumb",
+        "proof-front-empty",
+        "proof-back-slot",
+        "proof-back-thumb",
+        "proof-back-empty",
+        "front-drop-label",
+        "front-drop",
+        "front-drop-formats",
+        "front-input",
+        "front-file",
+        "front-file-thumb",
+        "front-file-name",
+        "front-file-size",
+        "front-remove",
+        "front-warning",
+        "back-toggle",
+        "back-delta",
+        "back-upload-block",
+        "back-drop",
+        "back-input",
+        "back-file",
+        "back-file-thumb",
+        "back-file-name",
+        "back-file-size",
+        "back-remove",
+        "back-warning",
+        "stage-colors",
+        "color-chips",
+        "color-cards",
+        "min-alert",
+        "ladder-card",
+        "tier-ladder",
+        "ladder-foot",
+        "nudge-line",
+        "inventory-stamp",
+        "inventory-error",
+        "inventory-retry",
+        "stage-checkout",
+        "f-first",
+        "f-last",
+        "f-email",
+        "f-phone",
+        "f-company",
+        "d-ship",
+        "ship-fee-label",
+        "d-pickup",
+        "pickup-card",
+        "address-fields",
+        "f-addr1",
+        "f-city",
+        "f-state",
+        "f-zip",
+        "tax-stamp",
+        "tax-error",
+        "tax-retry",
+        "f-notes",
+        "review-card",
+        "review-logos",
+        "review-lines",
+        "review-totals",
+        "review-promise",
+        "review-ack",
+        "rights-ack-row",
+        "rights-ack",
+        "pay-reasons",
+        "pay-btn",
+        "pay-btn-label",
+        "order-bar",
+        "order-bar-summary",
+        "bar-total",
+        "bar-meta",
+        "bar-min-note",
+        "smart-cta",
+        "sheet-backdrop",
+        "summary-sheet",
+        "sheet-lines",
+        "sheet-totals",
+        "sheet-promise",
+        "sheet-close",
+        "pipeline-backdrop",
+        "pl-step-1",
+        "pl-step-2",
+        "pl-step-3",
+        "pl-step-4",
+        "pipeline-error",
+        "pipeline-cancel",
+        "conflict-backdrop",
+        "conflict-list",
+        "conflict-apply",
+        "conflict-close"
+      ],
+      "links": [
+        {
+          "href": "#stage-gallery",
+          "label": "Skip to the cap lineup"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "/",
+          "label": "Northwest Custom Apparel Custom Hats · Embroidered"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "label": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "https://maps.google.com/?cid=4107380119454186786",
+          "label": "★★★★★ Google review · 4.9 from 185+"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "label": "sales@nwcustomapparel.com"
+        }
+      ],
+      "fields": [
+        {
+          "id": "front-input",
+          "type": "file",
+          "value": ""
+        },
+        {
+          "id": "back-toggle",
+          "type": "checkbox",
+          "value": "on"
+        },
+        {
+          "id": "back-input",
+          "type": "file",
+          "value": ""
+        },
+        {
+          "id": "f-first",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "f-last",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "f-email",
+          "type": "email",
+          "value": ""
+        },
+        {
+          "id": "f-phone",
+          "type": "tel",
+          "value": ""
+        },
+        {
+          "id": "f-company",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "d-ship",
+          "type": "radio",
+          "value": "ship"
+        },
+        {
+          "id": "d-pickup",
+          "type": "radio",
+          "value": "pickup"
+        },
+        {
+          "id": "f-addr1",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "f-city",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "f-state",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "f-zip",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "f-notes",
+          "type": "textarea",
+          "value": ""
+        },
+        {
+          "id": "rights-ack",
+          "type": "checkbox",
+          "value": "on"
+        }
+      ],
+      "styles": [
+        "https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap",
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
+        "/shared_components/css/tokens.css?v=2026.09.08.2",
+        "/pages/css/custom-caps.css?v=2026.09.07.20"
+      ],
+      "scripts": [
+        "/config/app.config.js",
+        "/pages/js/custom-caps-pricing.js?v=2026.06.11",
+        "/pages/js/custom-caps-app.js?v=2026.09.05.79"
+      ],
+      "cssBytes": 58194
+    },
+    {
+      "file": "pages/custom-tees.html",
+      "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, viewport-fit=cover\">\n    <meta name=\"description\" content=\"Custom T-shirts, full-color DTG printing — pick from our 20 print-tested styles, upload your artwork, see it on a real shirt, and order online. Ships in 7-10 business days from Milton, WA.\">\n    <meta name=\"robots\" content=\"index, follow\">\n\n    <title>Custom T-Shirts — Full-Color Printing, Shipped in 7-10 Days | Northwest Custom Apparel</title>\n\n    <!-- Social share cards -->\n    <meta property=\"og:type\" content=\"website\">\n    <meta property=\"og:title\" content=\"Custom T-Shirts — design yours online, full-color DTG printing\">\n    <meta property=\"og:description\" content=\"Pick from 20 print-tested styles, upload your art, see it on a real shirt, and check out in minutes. No setup fees, no minimums. Ships in 7-10 business days — 3-Day Rush available.\">\n    <meta property=\"og:image\" content=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/AI%20Artwork.jpg?ver=1\">\n    <meta property=\"og:url\" content=\"https://www.teamnwca.com/custom-tees\">\n    <meta name=\"twitter:card\" content=\"summary_large_image\">\n\n    <link rel=\"icon\" href=\"/favicon.png\" type=\"image/png\">\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    <link href=\"https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap\" rel=\"stylesheet\">\n    <link href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css\" rel=\"stylesheet\">\n\n    <!-- Absolute asset paths: this page serves from BOTH /custom-tees (clean\n         URL) and /pages/custom-tees.html — relative paths break on the former. -->\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link rel=\"stylesheet\" href=\"/pages/css/custom-tees.css?v=2026.09.07.20\">\n</head>\n<body>\n    <a class=\"skip-link\" href=\"#stage-gallery\">Skip to the catalog</a>\n\n    <div id=\"tdt-toasts\" class=\"tdt-toasts\" aria-live=\"polite\"></div>\n\n    <!-- Fatal boot error (pricing/config unavailable) -->\n    <div id=\"tdt-fatal\" class=\"tdt-fatal\" hidden>\n        <div class=\"tdt-fatal-card\">\n            <i class=\"fas fa-triangle-exclamation\" aria-hidden=\"true\"></i>\n            <h2>We can’t load live pricing right now</h2>\n            <p id=\"tdt-fatal-msg\">Please refresh the page — or call us and we’ll take your order by phone.</p>\n            <p class=\"tdt-fatal-phone\"><a href=\"tel:253-922-5793\"><i class=\"fas fa-phone\" aria-hidden=\"true\"></i> 253-922-5793</a></p>\n            <button type=\"button\" class=\"btn btn-primary\" id=\"tdt-fatal-retry\">Try again</button>\n        </div>\n    </div>\n\n    <!-- ── Header ─────────────────────────────────────────────────── -->\n    <header class=\"site-head\">\n        <div class=\"site-head-inner\">\n            <a class=\"brand\" href=\"/\">\n                <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\" alt=\"Northwest Custom Apparel\" class=\"brand-logo\">\n                <span class=\"brand-text\">\n                    <strong>Northwest Custom Apparel</strong>\n                    <em>Custom T-Shirts · Full-Color DTG</em>\n                </span>\n            </a>\n            <div class=\"head-contact\">\n                <span><i class=\"fas fa-location-dot\" aria-hidden=\"true\"></i> Ships from Milton, WA</span>\n                <a href=\"tel:253-922-5793\"><i class=\"fas fa-phone\" aria-hidden=\"true\"></i> 253-922-5793</a>\n                <a href=\"mailto:sales@nwcustomapparel.com\"><i class=\"fas fa-envelope\" aria-hidden=\"true\"></i> sales@nwcustomapparel.com</a>\n            </div>\n        </div>\n    </header>\n\n    <!-- ── Promise banner (rush tag) ──────────────────────────────── -->\n    <div class=\"promise-banner\" id=\"promise-banner\">\n        <div class=\"promise-tag\">\n            <i class=\"fas fa-truck-fast\" aria-hidden=\"true\"></i>\n            <div class=\"promise-copy\">\n                <strong id=\"promise-main\">Ships in 7–10 business days</strong>\n                <span id=\"promise-sub\">Full-color DTG · printed in Milton, WA</span>\n            </div>\n        </div>\n    </div>\n\n    <!-- ── Hero ───────────────────────────────────────────────────── -->\n    <section class=\"hero\">\n        <div class=\"hero-inner\">\n            <div class=\"hero-copy\">\n                <h1>Custom T-shirts, printed in <span class=\"hero-underline\">full color</span> — shipped in 7–10 business days.</h1>\n                <p class=\"hero-sub\">Pick from our 20 print-tested styles, upload your art, see it on a real shirt, and check out in minutes. Full-color DTG printing. No setup fees. No minimums.</p>\n                <button type=\"button\" class=\"btn btn-hero\" id=\"hero-cta\">\n                    <i class=\"fas fa-shirt\" aria-hidden=\"true\"></i> Pick your shirt — see your art on it\n                </button>\n                <div class=\"hero-trust\">\n                    <span><i class=\"fas fa-lock\" aria-hidden=\"true\"></i> Stripe secure checkout</span>\n                    <span><i class=\"fas fa-house-flag\" aria-hidden=\"true\"></i> Family-owned, Milton WA — since 1977</span>\n                </div>\n            </div>\n            <div class=\"hero-visual\">\n                <img id=\"hero-shirt\" src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/AI%20Artwork.jpg?ver=1\" alt=\"Full-color DTG print on a black tee by Northwest Custom Apparel\" loading=\"eager\">\n            </div>\n        </div>\n    </section>\n\n    <!-- ── AI Artwork feature band ─────────────────────────────────────────\n         Sits between the hero and the product gallery. Styles in custom-tees.css.\n         CTA is an anchor styled as .btn .btn-hero → scrolls to #stage-gallery\n         via the page's smooth-scroll, no new JS.\n         5 PLACEHOLDER SLOTS (AI ART 1–5): swap each src for a real ~1200×1000\n         AI-art-on-tee photo on white/transparent; keep loading=\"lazy\" + alt. -->\n    <section class=\"band band-ai\" id=\"ai-artwork-band\" aria-labelledby=\"ai-band-title\">\n        <div class=\"ai-band-inner\">\n            <div class=\"ai-band-head\">\n                <p class=\"ai-band-eyebrow\"><i class=\"fas fa-wand-magic-sparkles\" aria-hidden=\"true\"></i> AI Artwork + Full-Color DTG</p>\n                <h2 class=\"band-title ai-band-title\" id=\"ai-band-title\">Made it with AI? <span class=\"hero-underline\">We&rsquo;ll print it</span> on a real shirt.</h2>\n                <p class=\"ai-band-sub\">Design your art in ChatGPT, Midjourney, DALL&middot;E, or Adobe Firefly &mdash; any AI tool you like. Upload the file and we print it in vivid, full-color DTG on a real shirt. No setup fees, no minimums, printed right here in Milton, WA.</p>\n                <div class=\"ai-band-tools\" aria-label=\"AI tools we print from\">\n                    <span class=\"ai-tool-chip\">ChatGPT</span>\n                    <span class=\"ai-tool-chip\">Midjourney</span>\n                    <span class=\"ai-tool-chip\">DALL&middot;E</span>\n                    <span class=\"ai-tool-chip\">Adobe Firefly</span>\n                    <span class=\"ai-tool-chip ai-tool-chip-any\">+ any AI tool</span>\n                </div>\n            </div>\n\n            <!-- 5 sample tiles — real AI-art-on-tee designs (Erik's AI artwork) -->\n            <div class=\"ai-band-gallery\" role=\"list\" aria-label=\"Sample AI-generated artwork printed by NWCA\">\n                <figure class=\"ai-band-tile\" role=\"listitem\">\n                    <span class=\"ai-band-tag\">1</span>\n                    <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/Squad%2051%20rat%20fink.jpg?ver=1\" alt=\"Squad 51 cartoon fire-truck AI artwork printed full-color on a tee\" loading=\"lazy\">\n                    <figcaption class=\"ai-band-cap\">Squad 51</figcaption>\n                </figure>\n                <figure class=\"ai-band-tile\" role=\"listitem\">\n                    <span class=\"ai-band-tag\">2</span>\n                    <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/Momma%20Bear.jpg?ver=1\" alt=\"Momma Bear AI artwork design printed full-color on a tee\" loading=\"lazy\">\n                    <figcaption class=\"ai-band-cap\">Momma Bear</figcaption>\n                </figure>\n                <figure class=\"ai-band-tile\" role=\"listitem\">\n                    <span class=\"ai-band-tag\">3</span>\n                    <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/404%20knight.jpg?ver=1\" alt=\"404 Knight cyber-skull AI artwork printed full-color on a tee\" loading=\"lazy\">\n                    <figcaption class=\"ai-band-cap\">404 Knight</figcaption>\n                </figure>\n                <figure class=\"ai-band-tile\" role=\"listitem\">\n                    <span class=\"ai-band-tag\">4</span>\n                    <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/built%20for%20adventure.jpg?ver=1\" alt=\"Built for Adventure outdoor AI artwork printed full-color on a tee\" loading=\"lazy\">\n                    <figcaption class=\"ai-band-cap\">Built for Adventure</figcaption>\n                </figure>\n                <figure class=\"ai-band-tile\" role=\"listitem\">\n                    <span class=\"ai-band-tag\">5</span>\n                    <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/dog%20mom.jpg?ver=1\" alt=\"Dog Mom Yorkie AI artwork design printed full-color on a tee\" loading=\"lazy\">\n                    <figcaption class=\"ai-band-cap\">Dog Mom</figcaption>\n                </figure>\n            </div>\n\n            <div class=\"ai-band-foot\">\n                <p class=\"ai-band-spec\">\n                    <i class=\"fas fa-file-image\" aria-hidden=\"true\"></i>\n                    Easy upload: just send a <strong>PNG with a see-through background</strong>, saved at <strong>300 DPI</strong> &mdash; that&rsquo;s all we need to print it sharp, edge to edge.\n                </p>\n                <a class=\"btn btn-hero ai-band-cta\" href=\"#stage-gallery\">\n                    <i class=\"fas fa-wand-magic-sparkles\" aria-hidden=\"true\"></i> Pick your shirt &mdash; upload your AI art\n                </a>\n            </div>\n        </div>\n    </section>\n\n    <!-- ── Step 1: product gallery ────────────────────────────────── -->\n    <section class=\"gallery-band\" id=\"stage-gallery\">\n        <div class=\"gallery-inner\">\n            <div class=\"stage-head\">\n                <span class=\"stage-num\">1</span>\n                <h2>Pick your garment</h2>\n            </div>\n            <p class=\"gallery-sub\">Our 20 best-selling, print-tested styles — each color shown is one we’ve proven prints beautifully in full-color DTG.</p>\n            <div class=\"gallery-controls\">\n                <div class=\"gallery-chips\" id=\"gallery-chips\" aria-label=\"Filter by category\"></div>\n                <div class=\"gallery-search\">\n                    <i class=\"fas fa-magnifying-glass\" aria-hidden=\"true\"></i>\n                    <input type=\"search\" id=\"gallery-search\" placeholder=\"Search style # or name\" aria-label=\"Search the catalog\">\n                </div>\n                <select id=\"gallery-sort\" class=\"gallery-sort\" aria-label=\"Sort styles\">\n                    <option value=\"popular\" selected>Most popular</option>\n                    <option value=\"price\">Price: low to high</option>\n                    <option value=\"name\">Name A–Z</option>\n                </select>\n            </div>\n            <p class=\"gallery-price-note\">Card prices include a full-front print, per shirt — shipping &amp; tax are calculated at checkout.</p>\n            <div class=\"gallery-loading\" id=\"gallery-loading\"><i class=\"fas fa-spinner fa-spin\" aria-hidden=\"true\"></i> Loading the catalog…</div>\n            <div class=\"gallery-grid\" id=\"gallery-grid\"></div>\n            <p class=\"gallery-empty\" id=\"gallery-empty\" hidden>No styles match — try a different search or category.</p>\n        </div>\n    </section>\n\n    <!-- ── Studio ─────────────────────────────────────────────────── -->\n    <main class=\"studio\" id=\"studio\" hidden>\n        <div class=\"studio-grid\">\n\n            <!-- LEFT: the designer (sticky on desktop) -->\n            <div class=\"studio-canvas-col\" id=\"stage-design\">\n                <div class=\"stage-head\">\n                    <span class=\"stage-num\">2</span>\n                    <h2>Design your shirt</h2>\n                </div>\n\n                <div class=\"current-product\" id=\"current-product\">\n                    <span class=\"current-product-meta\">\n                        <strong id=\"current-product-name\">—</strong>\n                        <small id=\"current-product-style\"></small>\n                    </span>\n                    <button type=\"button\" class=\"chip-btn\" id=\"change-product\"><i class=\"fas fa-rotate-left\" aria-hidden=\"true\"></i> Change product</button>\n                </div>\n\n                <!-- SanMar product detail (lead + spec bullets, parsed from the\n                     PRODUCT_DESCRIPTION the page already fetches) — collapsed by\n                     default so the studio stays focused; hidden when no copy. -->\n                <details class=\"product-about\" id=\"product-about\" hidden>\n                    <summary><i class=\"fas fa-circle-info\" aria-hidden=\"true\"></i> About this shirt — fabric &amp; specs</summary>\n                    <p id=\"product-about-lead\"></p>\n                    <ul id=\"product-about-specs\"></ul>\n                </details>\n\n                <div class=\"canvas-card\">\n                    <div class=\"view-tabs\" role=\"tablist\" aria-label=\"Shirt side\">\n                        <button type=\"button\" class=\"view-tab is-active\" id=\"tab-front\" role=\"tab\" aria-selected=\"true\">\n                            Front <span class=\"tab-badge\" id=\"tab-front-badge\" hidden></span>\n                        </button>\n                        <button type=\"button\" class=\"view-tab\" id=\"tab-back\" role=\"tab\" aria-selected=\"false\">\n                            Back <span class=\"tab-badge\" id=\"tab-back-badge\" hidden></span>\n                        </button>\n                    </div>\n                    <div class=\"canvas-wrap\" id=\"canvas-wrap\">\n                        <canvas id=\"tdt-canvas\" tabindex=\"0\" role=\"application\"\n                                aria-label=\"T-shirt designer. Drag your artwork to position it. Arrow keys nudge, plus and minus resize, C centers.\"></canvas>\n                        <div class=\"canvas-note\" id=\"canvas-note\" hidden></div>\n                        <div class=\"canvas-loading\" id=\"canvas-loading\"><i class=\"fas fa-spinner fa-spin\" aria-hidden=\"true\"></i></div>\n                        <button type=\"button\" class=\"canvas-zoom-btn\" id=\"canvas-zoom-btn\" title=\"Zoom in on your design\" aria-label=\"Zoom in on your design\" hidden>\n                            <i class=\"fas fa-magnifying-glass-plus\" aria-hidden=\"true\"></i> Zoom\n                        </button>\n                    </div>\n                    <p class=\"canvas-hint\" id=\"canvas-hint\">Tap inside the dashed area to add your artwork</p>\n                    <p class=\"canvas-disclaimer\">Placement preview is approximate — our print team positions your design at the standard print location for the garment.</p>\n                    <div class=\"sr-live\" id=\"designer-live\" aria-live=\"polite\"></div>\n                </div>\n\n                <div class=\"designer-controls\">\n                    <!-- Print size & price (derived live from the art's printed size) -->\n                    <div class=\"control-block\">\n                        <label class=\"control-label\">Print size &amp; price</label>\n                        <div class=\"size-price-readout\" id=\"size-price-readout\" aria-live=\"polite\"></div>\n                        <p class=\"size-price-note\">Price is set by print <strong>size</strong> — keep front art within 4″×4″ for the Left Chest rate.</p>\n                    </div>\n\n                    <!-- Back print toggle -->\n                    <div class=\"control-block\">\n                        <label class=\"toggle-row\" for=\"back-toggle\">\n                            <input type=\"checkbox\" id=\"back-toggle\">\n                            <span class=\"toggle-pill\" aria-hidden=\"true\"></span>\n                            <span class=\"toggle-text\">Add a back print <small id=\"back-delta\">priced by your art’s size</small></span>\n                        </label>\n                    </div>\n\n                    <!-- Upload -->\n                    <div class=\"control-block\">\n                        <label class=\"control-label\" id=\"drop-label\">Front artwork</label>\n                        <div class=\"art-drop\" id=\"art-drop\" tabindex=\"0\" role=\"button\" aria-describedby=\"drop-formats\">\n                            <i class=\"fas fa-cloud-arrow-up\" aria-hidden=\"true\"></i>\n                            <strong>Drop your art here</strong> <span>or click to browse</span>\n                            <small id=\"drop-formats\">PNG · JPG · WEBP · SVG · AI · EPS · PDF · PSD · TIFF — 20 MB max</small>\n                            <small class=\"drop-quality\">150+ DPI recommended · transparent PNG prints best</small>\n                        </div>\n                        <input type=\"file\" id=\"art-input\" accept=\".png,.jpg,.jpeg,.webp,.svg,.ai,.eps,.pdf,.psd,.tif,.tiff\" hidden aria-label=\"Choose an artwork file\">\n                        <div class=\"art-file\" id=\"art-file\" hidden>\n                            <span class=\"art-file-thumb\" id=\"art-file-thumb\"></span>\n                            <span class=\"art-file-meta\">\n                                <strong id=\"art-file-name\"></strong>\n                                <small id=\"art-file-size\"></small>\n                            </span>\n                            <button type=\"button\" class=\"art-file-remove\" id=\"art-remove\" aria-label=\"Remove artwork\"><i class=\"fas fa-times\" aria-hidden=\"true\"></i></button>\n                        </div>\n                        <div class=\"art-warning\" id=\"art-warning\" hidden></div>\n                    </div>\n\n                    <!-- Size + position -->\n                    <div class=\"control-block\" id=\"size-block\" hidden>\n                        <label class=\"control-label\" for=\"art-size\">Artwork width — <strong id=\"art-size-label\">3.2″</strong></label>\n                        <input type=\"range\" id=\"art-size\" min=\"0.5\" max=\"16\" step=\"0.1\" value=\"3.2\">\n                        <div class=\"art-actions\">\n                            <button type=\"button\" class=\"chip-btn\" id=\"art-center\"><i class=\"fas fa-arrows-left-right-to-line\" aria-hidden=\"true\"></i> Center</button>\n                            <button type=\"button\" class=\"chip-btn\" id=\"art-fit\"><i class=\"fas fa-maximize\" aria-hidden=\"true\"></i> Fit width</button>\n                            <button type=\"button\" class=\"chip-btn\" id=\"art-reset\"><i class=\"fas fa-rotate-left\" aria-hidden=\"true\"></i> Reset</button>\n                        </div>\n                        <div class=\"dpi-meter\" id=\"dpi-meter\" hidden>\n                            <span class=\"dpi-dot\" id=\"dpi-dot\"></span>\n                            <span id=\"dpi-text\">—</span>\n                        </div>\n                        <div class=\"dpi-ack\" id=\"dpi-ack-row\" hidden>\n                            <label><input type=\"checkbox\" id=\"dpi-ack\"> I understand it may print blurry.</label>\n                        </div>\n                    </div>\n                </div>\n            </div>\n\n            <!-- RIGHT: quantities + checkout -->\n            <div class=\"studio-flow-col\">\n\n                <!-- Stage 2: colors & sizes -->\n                <section class=\"stage\" id=\"stage-colors\">\n                    <div class=\"stage-head\">\n                        <span class=\"stage-num\">3</span>\n                        <h2>Colors &amp; sizes</h2>\n                    </div>\n\n                    <div class=\"color-chips\" id=\"color-chips\" aria-label=\"Add a shirt color\"></div>\n                    <div class=\"color-cards\" id=\"color-cards\"></div>\n\n                    <div class=\"tier-meter-card\" id=\"tier-card\" hidden>\n                        <div class=\"tier-meter\" id=\"tier-meter\"></div>\n                        <p class=\"nudge-line\" id=\"nudge-line\"></p>\n                    </div>\n                    <p class=\"inventory-stamp\" id=\"inventory-stamp\"></p>\n                    <div class=\"inventory-error\" id=\"inventory-error\" hidden>\n                        <i class=\"fas fa-triangle-exclamation\" aria-hidden=\"true\"></i> Live stock is unavailable right now — quantities are locked so we never oversell. <button type=\"button\" class=\"link-btn\" id=\"inventory-retry\">Retry</button>\n                    </div>\n                </section>\n\n                <!-- Stage 3: checkout -->\n                <section class=\"stage\" id=\"stage-checkout\">\n                    <div class=\"stage-head\">\n                        <span class=\"stage-num\">4</span>\n                        <h2>Checkout</h2>\n                    </div>\n\n                    <div class=\"form-card\">\n                        <h3><i class=\"fas fa-user\" aria-hidden=\"true\"></i> Contact</h3>\n                        <div class=\"form-grid\">\n                            <div class=\"form-field\">\n                                <label for=\"f-first\">First name *</label>\n                                <input type=\"text\" id=\"f-first\" autocomplete=\"given-name\" required>\n                            </div>\n                            <div class=\"form-field\">\n                                <label for=\"f-last\">Last name *</label>\n                                <input type=\"text\" id=\"f-last\" autocomplete=\"family-name\" required>\n                            </div>\n                            <div class=\"form-field form-span\">\n                                <label for=\"f-email\">Email *</label>\n                                <input type=\"email\" id=\"f-email\" autocomplete=\"email\" required>\n                            </div>\n                            <div class=\"form-field\">\n                                <label for=\"f-phone\">Phone *</label>\n                                <input type=\"tel\" id=\"f-phone\" autocomplete=\"tel\" required>\n                            </div>\n                            <div class=\"form-field\">\n                                <label for=\"f-company\">Company / group name (optional)</label>\n                                <input type=\"text\" id=\"f-company\" autocomplete=\"organization\">\n                            </div>\n                        </div>\n                    </div>\n\n                    <div class=\"form-card\" id=\"turnaround-card\" hidden>\n                        <h3><i class=\"fas fa-bolt\" aria-hidden=\"true\"></i> Turnaround</h3>\n                        <label class=\"toggle-row\" for=\"rush-toggle\">\n                            <input type=\"checkbox\" id=\"rush-toggle\">\n                            <span class=\"toggle-pill\" aria-hidden=\"true\"></span>\n                            <span class=\"toggle-text\">3-Day Rush <small id=\"rush-copy\">Order by 9 AM Pacific on a business day — ships 3 business days later</small></span>\n                        </label>\n                    </div>\n\n                    <div class=\"form-card\">\n                        <h3><i class=\"fas fa-truck-fast\" aria-hidden=\"true\"></i> Delivery</h3>\n                        <div class=\"delivery-cards\">\n                            <label class=\"delivery-card\">\n                                <input type=\"radio\" name=\"delivery\" id=\"d-ship\" value=\"ship\" checked>\n                                <span class=\"delivery-card-body\">\n                                    <i class=\"fas fa-truck\" aria-hidden=\"true\"></i>\n                                    <strong>Ship it</strong>\n                                    <!-- Static default = the empty-cart state; renderAll() replaces\n                                         it with live Caspio values on first render. -->\n                                    <small id=\"ship-fee-label\">FREE on orders $100+ · $7.99 under</small>\n                                </span>\n                            </label>\n                            <label class=\"delivery-card\">\n                                <input type=\"radio\" name=\"delivery\" id=\"d-pickup\" value=\"pickup\">\n                                <span class=\"delivery-card-body\">\n                                    <i class=\"fas fa-store\" aria-hidden=\"true\"></i>\n                                    <strong>Pick up free</strong>\n                                    <small>Milton, WA</small>\n                                </span>\n                            </label>\n                        </div>\n                        <p class=\"free-ship-nudge\" id=\"ship-nudge\" hidden></p>\n\n                        <div id=\"pickup-card\" class=\"pickup-card\" hidden>\n                            <i class=\"fas fa-store\" aria-hidden=\"true\"></i>\n                            <div>\n                                <strong>NW Custom Apparel — 2025 Freeman Rd E, Milton, WA 98354</strong>\n                                <p>We’ll call you the moment your order is ready. For pickup orders, sales tax is calculated for our Milton, WA location.</p>\n                            </div>\n                        </div>\n\n                        <div id=\"address-fields\">\n                            <div class=\"form-grid\">\n                                <div class=\"form-field form-span\">\n                                    <label for=\"f-addr1\">Street address *</label>\n                                    <input type=\"text\" id=\"f-addr1\" autocomplete=\"address-line1\" required>\n                                </div>\n                                <div class=\"form-field\">\n                                    <label for=\"f-city\">City *</label>\n                                    <input type=\"text\" id=\"f-city\" autocomplete=\"address-level2\" required>\n                                </div>\n                                <div class=\"form-field form-field-sm\">\n                                    <label for=\"f-state\">State *</label>\n                                    <input type=\"text\" id=\"f-state\" autocomplete=\"address-level1\" maxlength=\"2\" placeholder=\"WA\" required>\n                                </div>\n                                <div class=\"form-field form-field-sm\">\n                                    <label for=\"f-zip\">ZIP *</label>\n                                    <input type=\"text\" id=\"f-zip\" autocomplete=\"postal-code\" inputmode=\"numeric\" required>\n                                </div>\n                            </div>\n                            <p class=\"tax-stamp\" id=\"tax-stamp\"></p>\n                            <div class=\"tax-error\" id=\"tax-error\" hidden>\n                                <i class=\"fas fa-triangle-exclamation\" aria-hidden=\"true\"></i> We couldn’t look up the sales-tax rate for this address. <button type=\"button\" class=\"link-btn\" id=\"tax-retry\">Retry</button>\n                            </div>\n                        </div>\n\n                        <div class=\"form-field form-span\">\n                            <label for=\"f-notes\">Special instructions</label>\n                            <textarea id=\"f-notes\" rows=\"2\" placeholder=\"Anything we should know?\"></textarea>\n                        </div>\n                    </div>\n\n                    <!-- Review -->\n                    <div class=\"form-card review-card\" id=\"review-card\">\n                        <h3><i class=\"fas fa-clipboard-check\" aria-hidden=\"true\"></i> Review your order</h3>\n                        <div class=\"review-mockups\" id=\"review-mockups\"></div>\n                        <div class=\"review-lines\" id=\"review-lines\"></div>\n                        <div class=\"review-totals\" id=\"review-totals\"></div>\n                        <p class=\"review-promise\" id=\"review-promise\"></p>\n                        <div class=\"review-ack\" id=\"review-ack\" hidden></div>\n\n                        <div class=\"rights-ack\" id=\"rights-ack-row\">\n                            <label><input type=\"checkbox\" id=\"rights-ack\"> <span><strong>I own this artwork or have permission to print it.</strong> It doesn’t contain trademarks, logos, or characters I don’t have rights to, and nothing hateful or illegal.</span></label>\n                        </div>\n\n                        <div class=\"pay-reasons\" id=\"pay-reasons\"></div>\n                        <button type=\"button\" class=\"btn btn-pay\" id=\"pay-btn\" disabled>\n                            <i class=\"fas fa-lock\" aria-hidden=\"true\"></i> <span id=\"pay-btn-label\">Pay</span>\n                        </button>\n                        <p class=\"stripe-note\"><i class=\"fab fa-stripe\" aria-hidden=\"true\"></i> You’ll be redirected to Stripe — we never see your card number.</p>\n                        <blockquote class=\"checkout-review\">\n                            <p>&ldquo;Great communication, excellent quality, and easy location to find. We will be using them again for sure soon.&rdquo;</p>\n                            <footer><strong>Robyn Readwin</strong> &middot; <a href=\"https://maps.google.com/?cid=4107380119454186786\" target=\"_blank\" rel=\"noopener\">★★★★★ Google review &middot; 4.9 from 185+</a></footer>\n                        </blockquote>\n                        <ul class=\"pay-fineprint\">\n                            <li>Custom goods are made just for you — no returns, but if we get it wrong (defect, wrong item), we reprint or refund, no drama.</li>\n                            <li>Change or cancel free anytime before we print — call 253-922-5793 with your order number.</li>\n                            <li>If your file needs a proof, we email it within ~2 business hours; production starts when you approve.</li>\n                            <li>We may decline artwork we can’t legally or ethically print — full refund, and we’ll tell you why.</li>\n                            <li>We use your info only to produce and ship your order — we never sell it.</li>\n                        </ul>\n                    </div>\n                </section>\n            </div>\n        </div>\n    </main>\n\n    <!-- ── Marketing band ─────────────────────────────────────────── -->\n    <section class=\"band band-how\">\n        <h2 class=\"band-title\">How it works</h2>\n        <div class=\"how-grid\">\n            <div class=\"how-step\"><span>1</span><strong>Pick &amp; upload</strong><p>Choose one of our 20 print-tested styles, then drop your artwork into the live designer.</p></div>\n            <div class=\"how-step\"><span>2</span><strong>Approve the preview</strong><p>What you see on the shirt is the approval record our printers work from.</p></div>\n            <div class=\"how-step\"><span>3</span><strong>We print</strong><p>Full-color DTG on the exact garment and color you picked, in our Milton WA shop.</p></div>\n            <div class=\"how-step\"><span>4</span><strong>Ships in 7–10 days</strong><p>Standard orders ship in 7–10 business days. Need it faster? 3-Day Rush is available on select styles.</p></div>\n        </div>\n    </section>\n\n    <section class=\"band band-faq\">\n        <h2 class=\"band-title\">Questions, answered</h2>\n        <div class=\"faq\" id=\"faq\">\n            <details><summary>When exactly will my order ship?</summary><p>Standard orders ship in 7–10 business days. Select styles offer a 3-Day Rush upgrade — orders placed before 9 AM Pacific on a business day ship 3 business days later, and the exact date is shown on the Pay button before you’re charged. Weekends and holidays don’t count as business days.</p></details>\n            <details><summary>What if my artwork is low resolution?</summary><p>The designer measures your file’s print resolution live. If it’s too low to print crisply we’ll flag it before checkout — you can shrink it, swap the file, or accept how it will look.</p></details>\n            <details><summary>Can I upload AI / EPS / PDF files?</summary><p>Yes. Browsers can’t preview those formats, so you’ll position a sized box where you want the art, and our team will match it and email you a proof before printing — usually within 2 business hours. Your production clock starts at proof approval.</p></details>\n            <details><summary>How are small orders priced?</summary><p>Orders under 24 pieces are priced at our small-batch per-shirt rate — built into the price you see, no extra fees. Volume pricing kicks in at 24+ pieces, and the designer shows you exactly how close you are.</p></details>\n            <details><summary>How much is shipping?</summary><p>FREE UPS Ground shipping on orders $100+ ($7.99 flat under $100). Free pickup in Milton, WA.</p></details>\n            <details><summary>Can I return custom-printed shirts?</summary><p>Because every order is printed just for you, we can’t resell returns. If we got something wrong — wrong size shipped, print defect — we’ll reprint or refund, no drama.</p></details>\n            <details><summary>Do you charge sales tax?</summary><p>Washington destination sales tax applies to orders shipped within WA. For pickup orders, sales tax is calculated for our Milton, WA location. Out-of-state shipments aren’t taxed.</p></details>\n        </div>\n    </section>\n\n    <section class=\"band band-guarantee\">\n        <div class=\"guarantee-tag\">\n            <i class=\"fas fa-handshake\" aria-hidden=\"true\"></i>\n            <div>\n                <strong>If we miss the ship date, shipping’s on us.</strong>\n                <p>We’ve been printing in Milton, Washington since 1977. Call us at <a href=\"tel:253-922-5793\">253-922-5793</a> — a human answers.</p>\n            </div>\n        </div>\n    </section>\n\n    <footer class=\"site-foot\">\n        <p>© Northwest Custom Apparel · Custom T-Shirts · 2025 Freeman Rd E, Milton, WA 98354 · <a href=\"tel:253-922-5793\">253-922-5793</a> · <a href=\"mailto:sales@nwcustomapparel.com\">sales@nwcustomapparel.com</a></p>\n    </footer>\n\n    <!-- ── Sticky order bar ───────────────────────────────────────── -->\n    <div class=\"order-bar\" id=\"order-bar\" hidden>\n        <button type=\"button\" class=\"order-bar-summary\" id=\"order-bar-summary\" aria-haspopup=\"dialog\">\n            <strong id=\"bar-total\">$0.00</strong>\n            <span id=\"bar-meta\">0 shirts</span>\n            <small class=\"bar-ship-nudge\" id=\"bar-ship-nudge\" hidden></small>\n        </button>\n        <button type=\"button\" class=\"btn btn-cta\" id=\"smart-cta\">Pick your shirt</button>\n    </div>\n\n    <!-- ── Summary sheet ──────────────────────────────────────────── -->\n    <div class=\"sheet-backdrop\" id=\"sheet-backdrop\" hidden></div>\n    <div class=\"summary-sheet\" id=\"summary-sheet\" role=\"dialog\" aria-label=\"Order summary\" hidden>\n        <div class=\"sheet-grab\" aria-hidden=\"true\"></div>\n        <h3>Your order so far</h3>\n        <div id=\"sheet-lines\"></div>\n        <div id=\"sheet-totals\"></div>\n        <p class=\"review-promise\" id=\"sheet-promise\"></p>\n        <button type=\"button\" class=\"btn btn-primary\" id=\"sheet-close\">Keep building</button>\n    </div>\n\n    <!-- ── Checkout pipeline modal ────────────────────────────────── -->\n    <div class=\"modal-backdrop\" id=\"pipeline-backdrop\" hidden>\n        <div class=\"pipeline-modal\" role=\"dialog\" aria-label=\"Placing your order\">\n            <h3>Placing your order…</h3>\n            <ol class=\"pipeline-steps\">\n                <li id=\"pl-step-1\"><i class=\"far fa-circle\" aria-hidden=\"true\"></i> Confirming stock</li>\n                <li id=\"pl-step-2\"><i class=\"far fa-circle\" aria-hidden=\"true\"></i> Uploading your artwork &amp; mockups</li>\n                <li id=\"pl-step-3\"><i class=\"far fa-circle\" aria-hidden=\"true\"></i> Saving your order</li>\n                <li id=\"pl-step-4\"><i class=\"far fa-circle\" aria-hidden=\"true\"></i> Opening secure checkout</li>\n            </ol>\n            <div class=\"pipeline-error\" id=\"pipeline-error\" hidden></div>\n            <button type=\"button\" class=\"btn btn-ghost\" id=\"pipeline-cancel\">Cancel</button>\n        </div>\n    </div>\n\n    <!-- ── Stock conflict modal ───────────────────────────────────── -->\n    <div class=\"modal-backdrop\" id=\"conflict-backdrop\" hidden>\n        <div class=\"pipeline-modal\" role=\"dialog\" aria-label=\"Stock changed\">\n            <h3><i class=\"fas fa-triangle-exclamation\" aria-hidden=\"true\"></i> Stock changed while you were designing</h3>\n            <div id=\"conflict-list\"></div>\n            <button type=\"button\" class=\"btn btn-primary\" id=\"conflict-apply\">Apply fixes &amp; continue</button>\n            <button type=\"button\" class=\"btn btn-ghost\" id=\"conflict-close\">Back to my order</button>\n        </div>\n    </div>\n\n    <!-- Zoom lightbox: hi-res close-up of the print area (front/back) -->\n    <div class=\"zoom-lightbox\" id=\"zoom-lightbox\" hidden role=\"dialog\" aria-modal=\"true\" aria-label=\"Design close-up\">\n        <div class=\"zoom-lightbox-inner\">\n            <img id=\"zoom-lightbox-img\" alt=\"Close-up of your design on the shirt\">\n            <p class=\"zoom-lightbox-caption\" id=\"zoom-lightbox-caption\"></p>\n            <button type=\"button\" class=\"zoom-lightbox-close\" id=\"zoom-lightbox-close\" aria-label=\"Close close-up\">\n                <i class=\"fas fa-xmark\" aria-hidden=\"true\"></i>\n            </button>\n        </div>\n    </div>\n\n    <!-- Config + modules (order matters). Absolute paths — see head comment. -->\n    <script src=\"/config/app.config.js\"></script>\n    <script src=\"/pages/js/custom-tees-pricing.js?v=2026.06.22.8\"></script>\n    <script src=\"/pages/js/custom-tees-shipdate.js?v=2026.06.10.13\"></script>\n    <script src=\"/pages/js/custom-tees-calibration.js?v=2026.06.10.13\"></script>\n    <script src=\"/pages/js/cts-gallery-merch.js?v=2026.06.12.7\"></script>\n    <script src=\"/pages/js/custom-tees-designer.js?v=2026.06.10.13\"></script>\n    <script src=\"/pages/js/custom-tees-app.js?v=2026.09.05.79\"></script>\n</body>\n</html>\n",
+      "title": "Custom T-Shirts — Full-Color Printing, Shipped in 7-10 Days | Northwest Custom Apparel",
+      "bodyText": "Skip to the catalog We can’t load live pricing right now Please refresh the page — or call us and we’ll take your order by phone. 253-922-5793 Try again Northwest Custom Apparel Custom T-Shirts · Full-Color DTG Ships from Milton, WA 253-922-5793 sales@nwcustomapparel.com Ships in 7–10 business days Full-color DTG · printed in Milton, WA Custom T-shirts, printed in full color — shipped in 7–10 business days. Pick from our 20 print-tested styles, upload your art, see it on a real shirt, and check out in minutes. Full-color DTG printing. No setup fees. No minimums. Pick your shirt — see your art on it Stripe secure checkout Family-owned, Milton WA — since 1977 AI Artwork + Full-Color DTG Made it with AI? We’ll print it on a real shirt. Design your art in ChatGPT, Midjourney, DALL·E, or Adobe Firefly — any AI tool you like. Upload the file and we print it in vivid, full-color DTG on a real shirt. No setup fees, no minimums, printed right here in Milton, WA. ChatGPT Midjourney DALL·E Adobe Firefly + any AI tool 1 Squad 51 2 Momma Bear 3 404 Knight 4 Built for Adventure 5 Dog Mom Easy upload: just send a PNG with a see-through background, saved at 300 DPI — that’s all we need to print it sharp, edge to edge. Pick your shirt — upload your AI art 1 Pick your garment Our 20 best-selling, print-tested styles — each color shown is one we’ve proven prints beautifully in full-color DTG. Most popular Price: low to high Name A–Z Card prices include a full-front print, per shirt — shipping & tax are calculated at checkout. Loading the catalog… No styles match — try a different search or category. 2 Design your shirt — Change product About this shirt — fabric & specs Front Back Zoom Tap inside the dashed area to add your artwork Placement preview is approximate — our print team positions your design at the standard print location for the garment. Print size & price Price is set by print size — keep front art within 4″×4″ for the Left Chest rate. Add a back print priced by your art’s size Front artwork Drop your art here or click to browse PNG · JPG · WEBP · SVG · AI · EPS · PDF · PSD · TIFF — 20 MB max 150+ DPI recommended · transparent PNG prints best Artwork width — 3.2″ Center Fit width Reset — I understand it may print blurry. 3 Colors & sizes Live stock is unavailable right now — quantities are locked so we never oversell. Retry 4 Checkout Contact First name * Last name * Email * Phone * Company / group name (optional) Turnaround 3-Day Rush Order by 9 AM Pacific on a business day — ships 3 business days later Delivery Ship it FREE on orders $100+ · $7.99 under Pick up free Milton, WA NW Custom Apparel — 2025 Freeman Rd E, Milton, WA 98354 We’ll call you the moment your order is ready. For pickup orders, sales tax is calculated for our Milton, WA location. Street address * City * State * ZIP * We couldn’t look up the sales-tax rate for this address. Retry Special instructions Review your order I own this artwork or have permission to print it. It doesn’t contain trademarks, logos, or characters I don’t have rights to, and nothing hateful or illegal. Pay You’ll be redirected to Stripe — we never see your card number. “Great communication, excellent quality, and easy location to find. We will be using them again for sure soon.” Robyn Readwin · ★★★★★ Google review · 4.9 from 185+ Custom goods are made just for you — no returns, but if we get it wrong (defect, wrong item), we reprint or refund, no drama. Change or cancel free anytime before we print — call 253-922-5793 with your order number. If your file needs a proof, we email it within ~2 business hours; production starts when you approve. We may decline artwork we can’t legally or ethically print — full refund, and we’ll tell you why. We use your info only to produce and ship your order — we never sell it. How it works 1Pick & uploadChoose one of our 20 print-tested styles, then drop your artwork into the live designer. 2Approve the previewWhat you see on the shirt is the approval record our printers work from. 3We printFull-color DTG on the exact garment and color you picked, in our Milton WA shop. 4Ships in 7–10 daysStandard orders ship in 7–10 business days. Need it faster? 3-Day Rush is available on select styles. Questions, answered When exactly will my order ship?Standard orders ship in 7–10 business days. Select styles offer a 3-Day Rush upgrade — orders placed before 9 AM Pacific on a business day ship 3 business days later, and the exact date is shown on the Pay button before you’re charged. Weekends and holidays don’t count as business days. What if my artwork is low resolution?The designer measures your file’s print resolution live. If it’s too low to print crisply we’ll flag it before checkout — you can shrink it, swap the file, or accept how it will look. Can I upload AI / EPS / PDF files?Yes. Browsers can’t preview those formats, so you’ll position a sized box where you want the art, and our team will match it and email you a proof before printing — usually within 2 business hours. Your production clock starts at proof approval. How are small orders priced?Orders under 24 pieces are priced at our small-batch per-shirt rate — built into the price you see, no extra fees. Volume pricing kicks in at 24+ pieces, and the designer shows you exactly how close you are. How much is shipping?FREE UPS Ground shipping on orders $100+ ($7.99 flat under $100). Free pickup in Milton, WA. Can I return custom-printed shirts?Because every order is printed just for you, we can’t resell returns. If we got something wrong — wrong size shipped, print defect — we’ll reprint or refund, no drama. Do you charge sales tax?Washington destination sales tax applies to orders shipped within WA. For pickup orders, sales tax is calculated for our Milton, WA location. Out-of-state shipments aren’t taxed. If we miss the ship date, shipping’s on us. We’ve been printing in Milton, Washington since 1977. Call us at 253-922-5793 — a human answers. © Northwest Custom Apparel · Custom T-Shirts · 2025 Freeman Rd E, Milton, WA 98354 · 253-922-5793 · sales@nwcustomapparel.com $0.00 0 shirts Pick your shirt Your order so far Keep building Placing your order… Confirming stock Uploading your artwork & mockups Saving your order Opening secure checkout Cancel Stock changed while you were designing Apply fixes & continue Back to my order",
+      "bodyTextSha": "ae3cc81cff818e491ccee8817f80f1c8dd49abac30c54fe3843b5a9aff987db6",
+      "ids": [
+        "tdt-toasts",
+        "tdt-fatal",
+        "tdt-fatal-msg",
+        "tdt-fatal-retry",
+        "promise-banner",
+        "promise-main",
+        "promise-sub",
+        "hero-cta",
+        "hero-shirt",
+        "ai-artwork-band",
+        "ai-band-title",
+        "stage-gallery",
+        "gallery-chips",
+        "gallery-search",
+        "gallery-sort",
+        "gallery-loading",
+        "gallery-grid",
+        "gallery-empty",
+        "studio",
+        "stage-design",
+        "current-product",
+        "current-product-name",
+        "current-product-style",
+        "change-product",
+        "product-about",
+        "product-about-lead",
+        "product-about-specs",
+        "tab-front",
+        "tab-front-badge",
+        "tab-back",
+        "tab-back-badge",
+        "canvas-wrap",
+        "tdt-canvas",
+        "canvas-note",
+        "canvas-loading",
+        "canvas-zoom-btn",
+        "canvas-hint",
+        "designer-live",
+        "size-price-readout",
+        "back-toggle",
+        "back-delta",
+        "drop-label",
+        "art-drop",
+        "drop-formats",
+        "art-input",
+        "art-file",
+        "art-file-thumb",
+        "art-file-name",
+        "art-file-size",
+        "art-remove",
+        "art-warning",
+        "size-block",
+        "art-size-label",
+        "art-size",
+        "art-center",
+        "art-fit",
+        "art-reset",
+        "dpi-meter",
+        "dpi-dot",
+        "dpi-text",
+        "dpi-ack-row",
+        "dpi-ack",
+        "stage-colors",
+        "color-chips",
+        "color-cards",
+        "tier-card",
+        "tier-meter",
+        "nudge-line",
+        "inventory-stamp",
+        "inventory-error",
+        "inventory-retry",
+        "stage-checkout",
+        "f-first",
+        "f-last",
+        "f-email",
+        "f-phone",
+        "f-company",
+        "turnaround-card",
+        "rush-toggle",
+        "rush-copy",
+        "d-ship",
+        "ship-fee-label",
+        "d-pickup",
+        "ship-nudge",
+        "pickup-card",
+        "address-fields",
+        "f-addr1",
+        "f-city",
+        "f-state",
+        "f-zip",
+        "tax-stamp",
+        "tax-error",
+        "tax-retry",
+        "f-notes",
+        "review-card",
+        "review-mockups",
+        "review-lines",
+        "review-totals",
+        "review-promise",
+        "review-ack",
+        "rights-ack-row",
+        "rights-ack",
+        "pay-reasons",
+        "pay-btn",
+        "pay-btn-label",
+        "faq",
+        "order-bar",
+        "order-bar-summary",
+        "bar-total",
+        "bar-meta",
+        "bar-ship-nudge",
+        "smart-cta",
+        "sheet-backdrop",
+        "summary-sheet",
+        "sheet-lines",
+        "sheet-totals",
+        "sheet-promise",
+        "sheet-close",
+        "pipeline-backdrop",
+        "pl-step-1",
+        "pl-step-2",
+        "pl-step-3",
+        "pl-step-4",
+        "pipeline-error",
+        "pipeline-cancel",
+        "conflict-backdrop",
+        "conflict-list",
+        "conflict-apply",
+        "conflict-close",
+        "zoom-lightbox",
+        "zoom-lightbox-img",
+        "zoom-lightbox-caption",
+        "zoom-lightbox-close"
+      ],
+      "links": [
+        {
+          "href": "#stage-gallery",
+          "label": "Skip to the catalog"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "/",
+          "label": "Northwest Custom Apparel Custom T-Shirts · Full-Color DTG"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "label": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "#stage-gallery",
+          "label": "Pick your shirt — upload your AI art"
+        },
+        {
+          "href": "https://maps.google.com/?cid=4107380119454186786",
+          "label": "★★★★★ Google review · 4.9 from 185+"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "label": "sales@nwcustomapparel.com"
+        }
+      ],
+      "fields": [
+        {
+          "id": "gallery-search",
+          "type": "search",
+          "value": ""
+        },
+        {
+          "id": "gallery-sort",
+          "type": "select-one",
+          "value": "popular"
+        },
+        {
+          "id": "back-toggle",
+          "type": "checkbox",
+          "value": "on"
+        },
+        {
+          "id": "art-input",
+          "type": "file",
+          "value": ""
+        },
+        {
+          "id": "art-size",
+          "type": "range",
+          "value": "3.2"
+        },
+        {
+          "id": "dpi-ack",
+          "type": "checkbox",
+          "value": "on"
+        },
+        {
+          "id": "f-first",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "f-last",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "f-email",
+          "type": "email",
+          "value": ""
+        },
+        {
+          "id": "f-phone",
+          "type": "tel",
+          "value": ""
+        },
+        {
+          "id": "f-company",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "rush-toggle",
+          "type": "checkbox",
+          "value": "on"
+        },
+        {
+          "id": "d-ship",
+          "type": "radio",
+          "value": "ship"
+        },
+        {
+          "id": "d-pickup",
+          "type": "radio",
+          "value": "pickup"
+        },
+        {
+          "id": "f-addr1",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "f-city",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "f-state",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "f-zip",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "f-notes",
+          "type": "textarea",
+          "value": ""
+        },
+        {
+          "id": "rights-ack",
+          "type": "checkbox",
+          "value": "on"
+        }
+      ],
+      "styles": [
+        "https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap",
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
+        "/shared_components/css/tokens.css?v=2026.09.08.2",
+        "/pages/css/custom-tees.css?v=2026.09.07.20"
+      ],
+      "scripts": [
+        "/config/app.config.js",
+        "/pages/js/custom-tees-pricing.js?v=2026.06.22.8",
+        "/pages/js/custom-tees-shipdate.js?v=2026.06.10.13",
+        "/pages/js/custom-tees-calibration.js?v=2026.06.10.13",
+        "/pages/js/cts-gallery-merch.js?v=2026.06.12.7",
+        "/pages/js/custom-tees-designer.js?v=2026.06.10.13",
+        "/pages/js/custom-tees-app.js?v=2026.09.05.79"
+      ],
+      "cssBytes": 68094
+    }
+  ],
+  "hashes": {
+    "config/app.config.js": "fe83e4329ce3eee97e48dd68dab81d9d5eb6ec94511d9650e2c9ebbb1528d6ea",
+    "pages/css/custom-caps.css": "116b463b97b16456f9ad074354bb776905646644572bcccf6168a5befac0e468",
+    "pages/css/custom-tees.css": "6a9fabb18dd612fef0bf5ce54adc6c3f63e20f470e9a189b4d0144517a7a8c14",
+    "pages/custom-caps.html": "5def3b73a707b448ea4c6c696757abf188bd94ffb5bbf8519dc43cf2cb42df5d",
+    "pages/custom-tees.html": "61ceb31ac2e7016d02882b42ae9d28d7f2e1e41813d57532e7a53f159326eaf0",
+    "pages/js/cts-gallery-merch.js": "acb2c774c74998a49b3899ed72c0bbda180ee3f84804764437b99ab5950f088b",
+    "pages/js/custom-caps-app.js": "37a2a6cb0b59303933a8564edf72fb7771cc12b0cb3b2c45e5ea8a1e1e4d9216",
+    "pages/js/custom-caps-pricing.js": "930229ce69022a5fa900b34ae27f45ffef5e1f38995db255753bade514ad52a3",
+    "pages/js/custom-tees-app.js": "98a078ed04b6c0f09f72038f643d976edce803dee84f41f07cc32397c88b95c0",
+    "pages/js/custom-tees-calibration.js": "f9138912911240de89662cb12e308848b89f5d82997b69c3fcd284d1d17f406b",
+    "pages/js/custom-tees-designer.js": "2e759388e581987228ad4c63b7805e8598baf7933a55819e8986a14f15997664",
+    "pages/js/custom-tees-pricing.js": "74e3164821a36e3baf6c49d753fa3321bfa9c45315bd80887704449075ac10af",
+    "pages/js/custom-tees-shipdate.js": "b4f1b952e521b2df2bca1bd3f1bce7b855bb525878e1291b244d8625f36601a4",
+    "shared_components/css/tokens.css": "2b3ab556bb9eaf40765a5c84683777cb64d50a6c42d1b4e82bc6beff33a127b6"
+  },
+  "changes": [],
+  "retiredStyles": []
+}
