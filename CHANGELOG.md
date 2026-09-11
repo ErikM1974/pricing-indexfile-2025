@@ -1,3 +1,12 @@
+## v2026.09.11.5 (2026.09.11)
+
+- Capture original core calculator behavior, source ownership and print defects
+- Checkpoint core calculator CSS review before laptop shutdown
+- Unify and review five core calculator interfaces
+- Merge commit 'afc3678dbae7ddf951bda047b874dcc0e6b5c1b6' into codex/core-calculators
+- Deploy v2026.09.11.5: unify five core calculators
+- Deploy v2026.09.11.5: align calculator guards with shared CSS ownership
+
 ## v2026.09.11.4 (2026.09.11)
 
 - Capture manual calculator and shop menu original workflows and print layouts
