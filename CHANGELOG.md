@@ -1,3 +1,12 @@
+## v2026.09.11.2 (2026.09.11)
+
+- Capture original custom shirt and cap storefront source contracts
+- Capture custom apparel original workflows and printed layouts
+- Merge verified cart release into custom apparel work
+- Unify custom apparel studios and repair draft and keyboard recovery
+- Integrate reviewed custom apparel studios
+- Deploy v2026.09.11.2: unify custom tees and caps studios
+
 ## v2026.09.11.1 (2026.09.11)
 
 - Capture original sample and quote cart workflows and paper
