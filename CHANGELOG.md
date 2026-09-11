@@ -1,3 +1,11 @@
+## v2026.09.11.6 (2026.09.11)
+
+- Capture contract calculator behavior and original print review
+- Unify contract calculator presentation and policy labels
+- Merge commit '93fe1568983cc232f169cb354b777117e67d6949' into codex/contract-calculators
+- Deploy v2026.09.11.6: unify three contract calculators
+- Deploy v2026.09.11.6: verify canonical contract visibility
+
 ## v2026.09.11.5 (2026.09.11)
 
 - Capture original core calculator behavior, source ownership and print defects
