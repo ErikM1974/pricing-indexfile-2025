@@ -2,6 +2,8 @@
 
 ## NEXT — Customer Account and Product original source capture
 
+Source originals are committed/backed up atd3a5efff:17 source hashes and17 passing source guards. A41-case browser capture harness is now syntax-checked/listed but NOT executed: seven account tabs, empty/long/product/upgrade/preview/failure states, request dialogs, statement, reward/reorder and batch bodies. Its deterministic engine presentation seam records every input while the actual shared engine sources stay immutable; real engine pricing remains a separate full money/calculator gate. No account UI changes or migration credit. Run original capture only after the primary status full gate releases port3400; inspect every original paper page before layout changes. Frozen status .10source9f021460/CI34559320512 is separate; ROOTf03b9117 intentionally stays on the identical pre-cache app during its local sweep.
+
 Isolated codex/customer-account-pages begins at73cc615a. The reviewed status pair is separately integrated on primary develop atf03b9117 with corrected full gates running; none of this next-family work belongs in its release. Live .9/2101 is185/225; reviewed candidate187/225,38 pending.
 
 - [x] Freeze both original HTML files, three page CSS owners, controllers, shared reorder list and complete local pricing dependency graph before application edits.
