@@ -1,0 +1,1033 @@
+@layer components.pages {
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) {
+        margin: 0;
+        background: var(--ui-canvas);
+        color: var(--ui-ink);
+        font-family: var(--ui-font);
+        font-size: 16px;
+        line-height: 1.6;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) * {
+        box-sizing: border-box;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) p {
+        max-width: 76ch;
+        margin: 0 0 16px;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) h1,
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) h2,
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) h3,
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) h4 {
+        color: var(--gray-900);
+        line-height: 1.22;
+        text-wrap: balance;
+        margin: 0 0 14px;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) h1 {
+        font-size: clamp(30px, 4vw, 46px);
+        letter-spacing: -0.03em;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) h2 {
+        font-size: 28px;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) h3 {
+        font-size: 23px;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) h4 {
+        font-size: 18px;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) svg {
+        width: 20px;
+        height: 20px;
+        flex: none;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-header {
+        background: var(--ui-surface);
+        border-bottom: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-header > div {
+        max-width: 1180px;
+        margin: auto;
+        padding: 18px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-header img {
+        width: 104px;
+        height: 46px;
+        object-fit: contain;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-contact {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        color: var(--ui-muted);
+        font-size: 14px;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-main {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 36px 24px;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-intro {
+        max-width: 870px;
+        margin-bottom: 24px;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-intro > p {
+        color: var(--ui-muted);
+        font-size: 18px;
+        margin: 0;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-deadline {
+        background: var(--color-warning-bg);
+        color: var(--color-warning-ink);
+        border: 1px solid var(--amber-500);
+        padding: 16px 20px;
+        border-radius: var(--radius-sm);
+        margin-bottom: 24px;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-deadline > div {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: start;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-deadline h3 {
+        color: inherit;
+        font-size: 18px;
+        text-wrap: auto;
+        margin: 0;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-deadline p {
+        font-size: 14px;
+        margin: 6px 0 0;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-deadline .bca-row {
+        align-items: start;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-step-list {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px;
+        margin: 24px 0;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-step {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 2px solid var(--ui-line);
+        color: var(--ui-muted);
+        font-size: 14px;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-step[aria-current='step'] {
+        color: var(--ui-accent);
+        border-color: var(--ui-accent);
+        font-weight: 700;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-step-number {
+        border: 1px solid var(--ui-line-strong);
+        border-radius: 50%;
+        width: 28px;
+        height: 28px;
+        display: inline-grid;
+        place-items: center;
+        flex: none;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-step.is-complete .bca-step-number {
+        background: var(--ui-tint);
+        color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-step-line {
+        display: none;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .step-content {
+        display: none;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .step-content.active {
+        display: block;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-grid {
+        display: grid;
+        gap: 20px;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-grid-two {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-grid-three {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-grid-four {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-row {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-between {
+        justify-content: space-between;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-panel {
+        background: var(--ui-surface);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-md);
+        padding: 24px;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-panel > :last-child {
+        margin-bottom: 0;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-hero {
+        align-items: start;
+        gap: 32px;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-hero > .bca-panel {
+        padding: 28px;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-hero-image {
+        width: 100%;
+        max-height: 510px;
+        object-fit: contain;
+        object-position: top;
+        border-radius: var(--radius-md);
+        display: block;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-section {
+        margin-top: 44px;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-section > h3 {
+        margin-bottom: 20px;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-section > p {
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-section .bca-panel {
+        padding: 20px;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-section .product-image-container {
+        display: block;
+        width: 100%;
+        padding: 0;
+        margin: 0 0 20px;
+        border: 0;
+        border-radius: var(--radius-sm);
+        background: var(--ui-surface);
+        cursor: zoom-in;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .product-image-container img {
+        display: block;
+        height: 230px;
+        width: 100%;
+        object-fit: contain;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-product-placeholder {
+        min-height: 230px;
+        display: grid;
+        place-items: center;
+        background: var(--ui-canvas);
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-product-placeholder .fa-tshirt {
+        font-size: 48px;
+        color: var(--ui-muted);
+        margin-bottom: 12px;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-features {
+        margin-top: 24px;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-features > .bca-panel {
+        padding: 20px 0 0;
+        border: 0;
+        border-top: 2px solid var(--ui-line);
+        border-radius: 0;
+        background: transparent;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-note {
+        margin: 20px 0;
+        padding: 14px 16px;
+        border-left: 3px solid var(--ui-line-strong);
+        background: var(--ui-canvas);
+        font-size: 14px;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-note p {
+        margin-bottom: 6px;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-price {
+        padding: 20px 0;
+        margin: 20px 0;
+        border-block: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-price > span:first-child {
+        font-size: 38px;
+        font-weight: 700;
+        color: var(--ui-accent);
+        line-height: 1.2;
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-price > span:last-child {
+        color: var(--ui-muted);
+        font-size: 14px;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-quantity {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-quantity .field-input {
+        width: 110px;
+        text-align: center;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-field {
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-field > label {
+        display: block;
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-fieldset {
+        margin-top: 24px;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-size-grid {
+        margin: 24px 0;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-size-grid input {
+        text-align: center;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-size-status {
+        border: 1px solid var(--ui-line);
+        background: var(--ui-canvas);
+        padding: 16px;
+        border-radius: var(--radius-sm);
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-size-status.is-complete {
+        color: var(--ui-accent);
+        background: var(--ui-tint);
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-size-status.is-error,
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-error {
+        color: var(--red-800);
+        background: var(--red-50);
+        border: 1px solid var(--red-600);
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-error {
+        padding: 16px;
+        margin: 16px 0;
+        border-radius: var(--radius-sm);
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .error-message {
+        display: none;
+        color: var(--red-800);
+        font-size: 14px;
+        margin-top: 6px;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .error-message.show {
+        display: block;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-choice {
+        display: flex;
+        gap: 12px;
+        align-items: start;
+        padding: 16px;
+        border: 1px solid var(--ui-line-strong);
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-choice:has(input:checked) {
+        border-color: var(--ui-accent);
+        background: var(--ui-tint);
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-choice input {
+        width: 20px;
+        height: 20px;
+        flex: none;
+        margin: 3px 0 0;
+        accent-color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-design-choice > div {
+        width: 100%;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-design-choice img {
+        width: 100%;
+        height: 155px;
+        object-fit: contain;
+        display: block;
+        margin: 0 0 12px;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-selected {
+        display: none;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"])
+        .bca-choice:has(input:checked)
+        .bca-selected {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--ui-accent);
+        margin-top: 6px;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-upload {
+        border: 1px dashed var(--ui-line-strong);
+        padding: 20px;
+        border-radius: var(--radius-sm);
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-upload input {
+        display: block;
+        max-width: 100%;
+        margin-top: 12px;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-upload i {
+        display: none;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-logo-preview {
+        margin-top: 16px;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-logo-preview img {
+        width: 100px;
+        max-height: 80px;
+        object-fit: contain;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-review {
+        max-width: 900px;
+        margin: auto;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-review .bca-panel {
+        margin: 16px 0;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-review h3 {
+        padding-top: 18px;
+        margin-bottom: 12px;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-review h2 + div h3 {
+        padding-top: 0;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-review .bca-review-design + div {
+        margin-top: 20px;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-review-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 20px;
+        padding: 6px 0;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-review-row > :last-child {
+        text-align: right;
+        flex: none;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-review-total {
+        border-top: 1px solid var(--ui-line-strong);
+        margin-top: 8px;
+        padding-top: 8px;
+        font-weight: 700;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-review-details {
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-review-details > div {
+        margin: 5px 0;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-review-design {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-review-design img {
+        width: 80px;
+        max-height: 130px;
+        object-fit: contain;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-review-size {
+        background: var(--ui-canvas);
+        padding: 10px;
+        text-align: center;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-step-nav {
+        margin-top: 28px;
+        padding: 20px 0 0;
+        border-top: 1px solid var(--ui-line-strong);
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-step-nav > div > div {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-next {
+        margin-left: auto;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-success {
+        max-width: 740px;
+        margin: 0 auto;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-success .fa-check-circle {
+        font-size: 28px;
+        color: var(--ui-accent);
+        margin-bottom: 16px;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-success p {
+        margin: 16px 0;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-footer {
+        padding: 24px;
+        margin-top: 24px;
+        border-top: 1px solid var(--ui-line);
+        color: var(--ui-muted);
+        font-size: 13px;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-footer > div {
+        max-width: 1132px;
+        margin: auto;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-footer p {
+        margin: 0 0 6px;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-dialog {
+        padding: 24px;
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-md);
+        width: min(800px, calc(100vw - 32px));
+        max-height: calc(100dvh - 32px);
+        color: var(--ui-ink);
+        background: var(--ui-surface);
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-dialog::backdrop {
+        background: rgb(0 0 0 / 55%);
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-dialog .bca-dialog-close {
+        display: flex;
+        margin-left: auto;
+        margin-bottom: 12px;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-dialog img {
+        display: block;
+        width: 100%;
+        max-height: 58dvh;
+        object-fit: contain;
+        margin-bottom: 20px;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-loading {
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        background: rgb(0 0 0 / 55%);
+        display: grid;
+        place-items: center;
+        padding: 24px;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-loading > div {
+        background: var(--ui-surface);
+        color: var(--ui-ink);
+        padding: 24px;
+        border-radius: var(--radius-md);
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-loading p {
+        margin: 0;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-chip {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--ui-muted);
+        margin-top: 12px;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-spaced {
+        margin-top: 24px;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-muted {
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-bold {
+        font-weight: 700;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-small {
+        font-size: 14px;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-title-small {
+        font-size: 18px;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) ul {
+        padding: 0;
+        list-style: none;
+        margin: 12px 0;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) li {
+        margin: 6px 0;
+    }
+
+    :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-hidden {
+        display: none;
+    }
+
+    @media (width <= 760px) {
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-header > div {
+            padding: 16px;
+            align-items: start;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-contact {
+            display: grid;
+            gap: 4px;
+            font-size: 12px;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-contact > span:nth-child(2) {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-main {
+            padding: 28px 16px;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-grid-two,
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-grid-three {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-grid-four {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-hero {
+            gap: 20px;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-hero > .bca-panel,
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-panel {
+            padding: 20px;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-hero-image {
+            max-height: 400px;
+            object-fit: contain;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-step {
+            display: grid;
+            gap: 6px;
+            font-size: 12px;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-deadline {
+            padding: 16px;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-deadline h3 {
+            font-size: 16px;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-review-row {
+            font-size: 14px;
+            gap: 14px;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-review-design {
+            align-items: start;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-section {
+            margin-top: 32px;
+        }
+    }
+
+    @media print {
+        @page {
+            size: letter;
+            margin: 10mm;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-contact-step .bca-spaced {
+            margin-top: 6px;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-contact-step .bca-panel {
+            padding: 8px;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-contact-step p {
+            margin-bottom: 6px;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"])
+            .bca-contact-step
+            .bca-design-choice
+            img {
+            height: 60px;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) p {
+            margin-bottom: 8px;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) h1,
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) h2,
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) h3,
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) h4 {
+            margin-bottom: 8px;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-review h3 {
+            padding-top: 4px;
+            margin-bottom: 4px;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"])
+            .bca-review
+            .bca-review-design
+            + div {
+            margin-top: 8px;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-section,
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-field {
+            break-inside: avoid;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-section > h3 {
+            margin-bottom: 10px;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-error {
+            padding: 8px 12px;
+            margin: 8px 0;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .field-textarea {
+            height: 48px;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-footer p {
+            margin-bottom: 4px;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) {
+            background: var(--ui-surface);
+            font-size: 9pt;
+            line-height: 1.4;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-main {
+            padding: 12px 0;
+            max-width: none;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-header > div {
+            padding: 0 0 8px;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-header img {
+            width: 85px;
+            height: 36px;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-contact {
+            display: flex;
+            font-size: 8pt;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) h1 {
+            font-size: 20pt;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) h2 {
+            font-size: 16pt;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) h3 {
+            font-size: 13pt;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) h4 {
+            font-size: 10pt;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-intro {
+            margin-bottom: 12px;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-intro > p {
+            font-size: 9pt;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-deadline {
+            padding: 8px 12px;
+            margin-bottom: 10px;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-deadline h3 {
+            font-size: 10pt;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-deadline p {
+            font-size: 8pt;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-step-list,
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-step-nav,
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) button,
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-upload,
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-loading {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-grid-two {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-grid-three {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-grid-four {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-grid {
+            gap: 8px;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-panel,
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-hero > .bca-panel,
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-section .bca-panel {
+            padding: 12px;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-section {
+            margin-top: 18px;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-hero-image {
+            max-height: 260px;
+            object-fit: contain;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"])
+            .bca-section
+            .product-image-container {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .product-image-container img,
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-product-placeholder {
+            height: 135px;
+            min-height: 0;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"])
+            .bca-product-placeholder
+            .fa-tshirt {
+            font-size: 24px;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-note,
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-price {
+            padding: 8px;
+            margin: 10px 0;
+            font-size: 8pt;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-price > span:first-child {
+            font-size: 22pt;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-price > span:last-child,
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-small,
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-title-small {
+            font-size: 9pt;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .field-input,
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .field-select,
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .field-textarea {
+            min-height: 24px;
+            padding: 3px 6px;
+            font-size: 9pt;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-field > label {
+            font-size: 9pt;
+            margin-bottom: 4px;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-fieldset,
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-spaced {
+            margin-top: 12px;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-choice {
+            padding: 8px;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-choice input {
+            width: 12px;
+            height: 12px;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-design-choice > div {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-design-choice img {
+            width: 65px;
+            height: 70px;
+            flex: none;
+            margin: 0;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-review .bca-panel {
+            padding: 10px;
+            margin: 10px 0;
+            break-inside: avoid;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-review-row {
+            font-size: 9pt;
+            padding: 3px 0;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-review-design img {
+            width: 60px;
+            max-height: 80px;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-footer {
+            margin-top: 12px;
+            padding: 8px 0 0;
+            font-size: 8pt;
+            break-inside: avoid;
+        }
+
+        :where([data-ui="unified"][data-seasonal-bundle="bca"]) .bca-features > .bca-panel {
+            padding: 10px 0 0;
+        }
+    }
+}

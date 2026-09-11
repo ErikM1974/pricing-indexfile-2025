@@ -108,7 +108,7 @@ for (const mode of ['normal', 'reference', 'failed', 'assistant', 'quote', 'chat
             expect(events.mocked.filter((entry) => entry.path === '/api/quote_sessions')).toHaveLength(1);
             expect(events.mocked.filter((entry) => entry.path === '/api/quote_items')).toHaveLength(3);
             await page.locator('#aiCopyEmailBtn').click(); await page.locator('#aiSaveQuoteBtn').click();
-            expect(await page.evaluate(() => window.__copied)).toEqual(['Subject: Example emblem quote\n\n100 sewn-on emblems and digitizing total $889.00 before tax.', 'http://localhost:3410/quote/PATCH-2026-901']);
+            expect(await page.evaluate(() => window.__copied)).toEqual(['Subject: Example emblem quote\n\n100 sewn-on emblems and digitizing total $889.00 before tax.', new URL('/quote/PATCH-2026-901', page.url()).href]);
         }
     }
     await evidence(page, 'emblem-' + mode, events);

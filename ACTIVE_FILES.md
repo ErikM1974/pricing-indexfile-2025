@@ -1155,3 +1155,10 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - tests/fixtures/seasonal-bca-failed-email-original-browser.json — immutable synthetic awareness-bundle browser evidence; service-link diagnostic labeled explicitly.
 
 - tests/unit/seasonal-bundles-content.test.js — original-source preservation guards for seasonal bundle migrations.
+
+- calculators/breast-cancer-awareness-bundle.js — extracted awareness-bundle controller with accessible steps and explicit submission outcomes.
+- calculators/breast-cancer-awareness-bundle.css — scoped awareness-bundle layout over canonical tokens and controls; replaces inline and CDN-generated CSS.
+
+- tests/unit/seasonal-bundles-orders.test.js — original/current order payload parity and confirmed-stage retry tests; synthetic data only.
+
+- calculators/breast-cancer-bundle-service.js — reviewed public awareness ordering service; archived original remains frozen behind the 410 boundary.

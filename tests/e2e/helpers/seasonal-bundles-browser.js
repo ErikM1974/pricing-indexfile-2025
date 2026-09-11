@@ -5,22 +5,25 @@ const servicePath = 'calculators/archive/seasonal-2025/breast-cancer-bundle-serv
 async function openBca(page, state = {}) {
     const events = {errors: [], missing: [], unknown: [], writes: [], dialogs: []};
     await page.clock.setFixedTime(new Date('2026-09-11T18:30:00.000Z'));
-    await page.context().addInitScript(({failEmail}) => {
+    await page.context().addInitScript(({failEmail, failCustomer, failSales, missingEmail}) => {
         window.__emails = []; window.__prints = [];
+        window.__failCustomer = failEmail || failCustomer; window.__failSales = failEmail || failSales;
         window.print = () => window.__prints.push(document.title);
         Math.random = () => 0.1;
         window.emailjs = {init() {}, send: async (service, template, data) => {
             window.__emails.push({service, template, data});
-            if (failEmail) throw new Error('Synthetic email failure');
+            if (window.__failCustomer && template === 'template_2rlgjio' || window.__failSales && template === 'template_af6h6kh') throw new Error('Synthetic email failure');
             return {status: 200};
         }};
-    }, {failEmail: Boolean(state.failEmail)});
+        if (missingEmail) delete window.emailjs;
+    }, {failEmail: Boolean(state.failEmail), failCustomer: Boolean(state.failCustomer), failSales: Boolean(state.failSales), missingEmail: Boolean(state.missingEmail)});
     page.on('pageerror', e => events.errors.push(e.message));
     page.on('dialog', async d => {events.dialogs.push(d.message()); await d.dismiss();});
     await page.context().route('**/*', async route => {
         const req = route.request(), url = new URL(req.url()), pathname = url.pathname;
         if (/\/api\/quote_(sessions|items)$/.test(pathname) && req.method() === 'POST') {
             events.writes.push({path: pathname, body: req.postDataJSON()});
+            if (state.hold) await state.hold;
             const failed = state.failSession && pathname.endsWith('sessions') || state.failItem && pathname.endsWith('items');
             return route.fulfill({status: failed ? 503 : 201, json: failed ? {error: 'Synthetic failure'} : {success: true}});
         }
@@ -34,6 +37,10 @@ async function openBca(page, state = {}) {
         if (url.hostname === 'cdn.jsdelivr.net' && pathname.endsWith('/email.min.js')) return route.fulfill({contentType: 'application/javascript', body: '/* Email provider mocked before the page loads. */'});
         if (url.hostname === 'cdn.tailwindcss.com' || ['fonts.googleapis.com', 'fonts.gstatic.com', 'cdnjs.cloudflare.com'].includes(url.hostname)) return route.continue();
         if (['localhost', '127.0.0.1'].includes(url.hostname)) {
+            if (state.missingService && pathname.endsWith('/breast-cancer-bundle-service.js')) return route.fulfill({contentType: 'application/javascript', body: '/* Unavailable order service. */'});
+            // Current checks exercise Express's real mounts, including archive tombstones.
+            // Only immutable original captures use the filesystem/diagnostic override.
+            if (process.env.CAPTURE_SEASONAL_ORIGINAL !== '1') return route.continue();
             let file = pathname === '/breast-cancer-awareness-bundle.html' ? bcaPath : decodeURIComponent(pathname.slice(1));
             if (state.diagnosticService && pathname === '/calculators/breast-cancer-bundle-service.js') file = servicePath;
             const absolute = path.resolve(root, file);

@@ -74,6 +74,7 @@ const LEGACY_ESM = [
 ];
 
 export default [
+    { files: ['calculators/breast-cancer-awareness-bundle.js', 'calculators/breast-cancer-bundle-service.js'], languageOptions: { sourceType: 'script', globals: { ...globals.browser, emailjs: 'readonly' } }, rules: { 'no-undef': 'error', 'no-unused-vars': ['error', { vars: 'local', argsIgnorePattern: '^_', caughtErrors: 'none' }] } },
     { files: ['calculators/screenprint-customer/screenprint-customer-calculator.js'], languageOptions: { globals: { CustomerScreenPrintQuoteService: 'readonly' } } },
     { files: ['calculators/screenprint-customer/screenprint-customer.js'], languageOptions: { globals: { CustomerScreenPrintCalculator: 'readonly' } } },
     { files: ['calculators/screenprint-customer/*.js'], languageOptions: { sourceType: 'script', globals: { ...globals.browser, emailjs: 'readonly', BaseQuoteService: 'readonly', escapeHTML: 'readonly' } }, rules: { 'no-undef': 'error', 'no-unused-vars': ['error', { vars: 'local', argsIgnorePattern: '^_', caughtErrors: 'none' }] } },
@@ -112,7 +113,7 @@ export default [
     {
         // LEGACY browser scope (2026-09-07) — see the header.
         files: ['**/*.js'],
-        ignores: [...STRICT_FILES, 'shared_components/js/quote-builder-utils.js'],
+        ignores: [...STRICT_FILES, 'shared_components/js/quote-builder-utils.js', 'calculators/breast-cancer-awareness-bundle.js', 'calculators/breast-cancer-bundle-service.js'],
         languageOptions: {
             ecmaVersion: 2022,
             sourceType: 'script',

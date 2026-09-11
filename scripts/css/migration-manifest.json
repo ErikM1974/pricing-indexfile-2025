@@ -6570,6 +6570,36 @@
         "rawCssBytes": 49682,
         "localCssRequests": 4
       }
+    },
+    {
+      "source": "calculators/archive/seasonal-2025/breast-cancer-awareness-bundle.html",
+      "family": "seasonal-bundles",
+      "status": "reviewed",
+      "route": "/breast-cancer-awareness-bundle.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "calculators/breast-cancer-awareness-bundle.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "1440-768-390-320",
+        "original-products-fields-links-images-and-prices",
+        "16-original-order-payload-combinations",
+        "keyboard-product-dialog-and-focus-return",
+        "image-pdf-upload-replace-remove-and-escaped-file-names",
+        "failed-session-item-upload-and-email-recovery",
+        "pending-request-freezes-captured-order-and-prevents-duplicate-writes",
+        "confirmed-stage-retries-keep-original-reference",
+        "36-screens-and-ten-paper-pages-reviewed"
+      ],
+      "test": "tests/e2e/css-unification-seasonal-bca.spec.js",
+      "maxCssBytes": 89990,
+      "measuredRawCssBytes": 87942,
+      "baseline": {
+        "commit": "efa9012ae3b5b77ad8612da53f986024155ce77b",
+        "note": "Original runtime Tailwind CDN; exact original styles and content retained in source fixture. Broken service-link evidence labeled separately."
+      }
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",

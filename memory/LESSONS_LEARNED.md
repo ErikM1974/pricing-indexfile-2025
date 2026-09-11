@@ -5,6 +5,12 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## Seasonal assets and order confirmations need real serving and persistence checks (2026-09-11)
+
+- Problem/root cause: the awareness page pointed at a missing service; placing replacements beside its archived HTML would hit the intentional archive410 gate. The original order service swallowed item failures and claimed email delivery after rejection.
+- Solution: keep the existing public HTML alias and archive tombstone; place the page assets in the public calculator mount. Capture one order, track confirmed session/items and both emails independently, retain partial progress for explicit retry, and expose upload/service failures. Preserve successful payloads and all original prices.
+- Prevention: route current browser assets through the real local Express server; assert public asset bytes and archive410 responses. Keep filesystem-only original diagnostics separate. Compare original/current payloads, exercise partial failures and duplicates, and inspect all mobile/print states.
+
 ## Customer quotes need a captured calculation and independent delivery states (2026-09-11)
 
 - Problem/root cause: customer-supplied screen print kept stale amounts actionable during debounce, mixed current prices into an older saved invoice/email, silently swallowed setup-item failures and claimed email success after failed delivery.
@@ -250,10 +256,6 @@ Control-class follow-up: regex word boundaries treat hyphens as separators, so s
 - Problem/root cause: stored garment names and checkout errors rendered as HTML, failed removals threw without a visible message, and the save trigger reopened a form while its previous save was pending.
 - Solution: escape rendered text/attributes without changing payload values; retain the cart with a focused storage error; guard and disable pending save entry points.
 - Prevention: immutable pricing/payload contracts plus harmless stored-markup, quota-error/retry and delayed duplicate-save browser probes. Artwork fieldsets need min-width:0 on phones; printed fields need matching control specificity, complete text/file references and review of every PDF page.
-
-### Confirmation timers need scheduling room in browser checks (2026-09-10)
-- Problem/root cause: a4.2-second UI toast occasionally exceeded a5-second test wait with three browsers active. Solution: allow10 seconds while still asserting the real dismissal; application timing stays unchanged. Prevention: compare immutable values after transient confirmation clears and repeat the failed case under the original worker load.
-- Redirect follow-up: a product401 navigates to sign-in while the harness waits for fonts. Wait for the expected login document to load before page evaluation; catching a destroyed execution context or retrying the whole test hides the race.
 
 ### Heroku Git must use the trust store that verifies its certificate (2026-09-11)
 - Problem/root cause: the corporate OpenSSL CA verified GitHub but rejected git.heroku.com before upload. Solution: verify ls-remote with the Windows schannel backend, then use the same backend and sslVerify=true for the push. Prevention: never disable verification; prove the prior slug is unchanged after a transport failure, then verify the actual release, source assets and access after resuming.
