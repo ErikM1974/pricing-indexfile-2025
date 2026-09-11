@@ -1629,3 +1629,7 @@ Catalog .3 is verified live: Heroku2106/bf0a27f3,196/225 reviewed,29pending. All
 ## Catalog storefront release record — v2026.09.11.3
 
 Exact-source CI 34591727152 passed all four actual jobs on 99db3fd9d6af43dddae384b9f48a12c6f49d5ed1, including CSS and live money/calculator parity. Full local checks passed on that identical source. Home, Catalog and Product share canonical controls and scoped style owners.34 focused browser cases,57 visually reviewed current paper pages,47 original sources,29 original browser records and64 reversible mappings preserve the original behavior. The 16 financial functions remain byte-identical; the demonstrated quantity-edit defect now withholds stale totals and Add to quote immediately while recalculating. Native browse/sample dialogs, keyboard colors, mobile filtering and complete printed price ladders are reviewed. Counts become196/225 reviewed,29pending only after verified rollout. Next calculator/reference baseline is separate and excluded.
+
+### Calculator reference full-suite correction
+
+The first full local run found a stale laser extraction lock plus two resource-contention timeouts. The laser guard now verifies its canonical shared hidden rule and both linked style owners. No application code changed. All 23 tests in the three affected suites passed sequentially without changing timeouts or assertions. Full local checks and exact-source CI must pass again on the resulting commit; the earlier failed run is not release evidence.

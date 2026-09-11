@@ -29,6 +29,14 @@ describe('calculator pages — Rule 3', () => {
             expect(html).toContain('/shared_components/css/components.css?v=');
             expect(html).toContain('/shared_components/css/customer-intake.css?v=');
             expect(read('shared_components/css/components.css')).toMatch(/\[hidden\]\s*\{\s*display: none;/);
+        } else if (pg === 'laser-manual-pricing') {
+            // The unified laser page inherits hidden-state behavior from the
+            // shared component layer instead of duplicating an !important rule.
+            expect(html).toContain('data-ui="unified"');
+            expect(html).toContain('/shared_components/css/components.css?v=');
+            expect(html).toContain('/shared_components/css/calculator-reference.css?v=');
+            expect(html).toContain(`/calculators/css/${pg}.css?v=`);
+            expect(read('shared_components/css/components.css')).toMatch(/\[hidden\]\s*\{\s*display: none;/);
         } else {
             expect(html).toContain(`/calculators/css/${pg}.css?v=`);
             expect(read(`calculators/css/${pg}.css`)).toMatch(/\[hidden\] \{ display: none !important; \}/);
