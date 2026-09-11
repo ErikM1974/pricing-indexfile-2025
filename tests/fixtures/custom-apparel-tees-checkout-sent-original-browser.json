@@ -1,0 +1,173 @@
+{
+  "name": "tees-checkout-sent",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Synthetic checkout",
+      "ids": {},
+      "fields": [],
+      "links": [],
+      "cart": null,
+      "quote": null,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "width": 768,
+      "title": "Synthetic checkout",
+      "ids": {},
+      "fields": [],
+      "links": [],
+      "cart": null,
+      "quote": null,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "width": 390,
+      "title": "Synthetic checkout",
+      "ids": {},
+      "fields": [],
+      "links": [],
+      "cart": null,
+      "quote": null,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "width": 320,
+      "title": "Synthetic checkout",
+      "ids": {},
+      "fields": [],
+      "links": [],
+      "cart": null,
+      "quote": null,
+      "overflow": false,
+      "violations": []
+    }
+  ],
+  "actions": [
+    {
+      "path": "/api/tax-rates/lookup",
+      "method": "POST",
+      "body": {
+        "address": "100 Example Way",
+        "city": "Milton",
+        "state": "WA",
+        "zip": "98354"
+      }
+    },
+    {
+      "path": "/api/files/upload",
+      "method": "POST",
+      "fileName": "example-front.svg"
+    },
+    {
+      "path": "/api/files/upload",
+      "method": "POST",
+      "fileName": "CTS-mockup-PC54-JetBlack-front.jpg"
+    },
+    {
+      "path": "/api/create-checkout-session",
+      "method": "POST",
+      "body": {
+        "customer_email": "customer@example.test",
+        "customerData": {
+          "firstName": "Casey",
+          "lastName": "Example",
+          "email": "customer@example.test",
+          "phone": "2535550142",
+          "company": "Example Team",
+          "address1": "100 Example Way",
+          "city": "Milton",
+          "state": "WA",
+          "zip": "98354",
+          "deliveryMethod": "ship",
+          "notes": "Preserve all selected colors, sizes, and both artwork files. Example request only."
+        },
+        "colorConfigs": {
+          "JetBlack": {
+            "catalogColor": "JetBlack",
+            "displayColor": "Jet Black",
+            "totalQuantity": 24,
+            "sizeBreakdown": {
+              "M": {
+                "quantity": 24,
+                "unitPrice": 18.5
+              }
+            }
+          }
+        },
+        "orderTotals": {
+          "totalQuantity": 24,
+          "subtotal": 444,
+          "rushFee": 0,
+          "ltmFee": 0,
+          "shipping": 0,
+          "shippingSource": "free-threshold",
+          "salesTax": 44.84,
+          "taxRate": 0.101,
+          "taxableBase": 444,
+          "taxAccount": "2717",
+          "taxAccountName": "MILTON",
+          "grandTotal": 488.84
+        },
+        "orderSettings": {
+          "channel": "custom-tees",
+          "styleNumber": "PC54",
+          "productTitle": "Port & Company Example Shirt",
+          "rush": false,
+          "frontLocation": "JF",
+          "backLocation": null,
+          "printLocationCode": "JF",
+          "printLocationName": "Jumbo Front",
+          "frontLogo": {
+            "fileUrl": "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/files/fixture-art-1042",
+            "fileName": "example-front.svg"
+          },
+          "backLogo": null,
+          "mockups": [
+            {
+              "color": "Jet Black",
+              "catalogColor": "JetBlack",
+              "view": "front",
+              "url": "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/files/fixture-art-1042"
+            }
+          ],
+          "placement": {
+            "front": {
+              "location": "JF",
+              "wIn": 13,
+              "xIn": 0,
+              "yIn": 1,
+              "hIn": 6.5,
+              "anchor": "top-center",
+              "effectiveDpi": null,
+              "lowDpiAck": false,
+              "previewable": true,
+              "fileName": "example-front.svg",
+              "warnings": [
+                "svg-needs-review"
+              ]
+            },
+            "back": null
+          },
+          "ltmBaked": null,
+          "shipPromise": {
+            "iso": "2026-09-28",
+            "label": "Wed, Sep 23 – Mon, Sep 28",
+            "rush": false
+          },
+          "needsArtReview": true,
+          "rightsAck": {
+            "checked": true,
+            "ts": "2026-09-11T18:30:00.000Z"
+          }
+        },
+        "successUrl": "http://localhost:3400/pages/custom-tees-success.html?session_id={CHECKOUT_SESSION_ID}",
+        "cancelUrl": "http://localhost:3400/custom-tees?canceled=1"
+      }
+    }
+  ],
+  "dialogs": []
+}

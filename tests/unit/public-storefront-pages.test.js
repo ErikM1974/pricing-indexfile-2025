@@ -59,6 +59,12 @@ describe('storefront JS hygiene', () => {
         const js = read('pages/js/custom-tees-app.js');
         expect(js).not.toMatch(/body\.style\.overflow/);
         expect(js).toMatch(/document\.body\.classList\.add\('is-modal-open'\);/);
-        expect(read('pages/css/custom-tees.css')).toMatch(/body\.is-modal-open \{ overflow: hidden; \}/);
+        const rules = [];
+        require('postcss').parse(read('pages/css/custom-tees.css')).walkRules(rule => {
+            if (rule.selector === ':where([data-ui="unified"][data-custom-apparel="tees"]).is-modal-open') {
+                rule.walkDecls('overflow', declaration => rules.push(declaration.value));
+            }
+        });
+        expect(rules).toEqual(['hidden']);
     });
 });

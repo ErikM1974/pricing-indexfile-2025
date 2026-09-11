@@ -1,0 +1,227 @@
+{
+  "name": "caps-fatal",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Custom Embroidered Hats — Design Online | Northwest Custom Apparel",
+      "ids": {
+        "gallery-grid": "",
+        "caps-fatal": "We can’t load live pricing right now We couldn’t load live pricing or the cap lineup (HTTP 503 from https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/service-codes {\"data\":[{\"ServiceCode\":\"CAPS-SHIP-FLAT\",\"SellPrice\":7.99,\"IsActive\":true}]}). — or call us and we’ll take your order by phone. 253-922-5793 Try again"
+      },
+      "fields": [],
+      "links": [
+        {
+          "href": "#stage-gallery",
+          "text": "Skip to the cap lineup"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "/",
+          "text": "Northwest Custom Apparel Custom Hats · Embroidered"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        }
+      ],
+      "cart": null,
+      "quote": null,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              "em"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Custom Embroidered Hats — Design Online | Northwest Custom Apparel",
+      "ids": {
+        "gallery-grid": "",
+        "caps-fatal": "We can’t load live pricing right now We couldn’t load live pricing or the cap lineup (HTTP 503 from https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/service-codes {\"data\":[{\"ServiceCode\":\"CAPS-SHIP-FLAT\",\"SellPrice\":7.99,\"IsActive\":true}]}). — or call us and we’ll take your order by phone. 253-922-5793 Try again"
+      },
+      "fields": [],
+      "links": [
+        {
+          "href": "#stage-gallery",
+          "text": "Skip to the cap lineup"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "/",
+          "text": "Northwest Custom Apparel Custom Hats · Embroidered"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        }
+      ],
+      "cart": null,
+      "quote": null,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              "em"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Custom Embroidered Hats — Design Online | Northwest Custom Apparel",
+      "ids": {
+        "gallery-grid": "",
+        "caps-fatal": "We can’t load live pricing right now We couldn’t load live pricing or the cap lineup (HTTP 503 from https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/service-codes {\"data\":[{\"ServiceCode\":\"CAPS-SHIP-FLAT\",\"SellPrice\":7.99,\"IsActive\":true}]}). — or call us and we’ll take your order by phone. 253-922-5793 Try again"
+      },
+      "fields": [],
+      "links": [
+        {
+          "href": "#stage-gallery",
+          "text": "Skip to the cap lineup"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "/",
+          "text": "Northwest Custom Apparel Custom Hats · Embroidered"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        }
+      ],
+      "cart": null,
+      "quote": null,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              "em"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Custom Embroidered Hats — Design Online | Northwest Custom Apparel",
+      "ids": {
+        "gallery-grid": "",
+        "caps-fatal": "We can’t load live pricing right now We couldn’t load live pricing or the cap lineup (HTTP 503 from https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/service-codes {\"data\":[{\"ServiceCode\":\"CAPS-SHIP-FLAT\",\"SellPrice\":7.99,\"IsActive\":true}]}). — or call us and we’ll take your order by phone. 253-922-5793 Try again"
+      },
+      "fields": [],
+      "links": [
+        {
+          "href": "#stage-gallery",
+          "text": "Skip to the cap lineup"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "/",
+          "text": "Northwest Custom Apparel Custom Hats · Embroidered"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        }
+      ],
+      "cart": null,
+      "quote": null,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              "em"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "actions": [],
+  "dialogs": []
+}

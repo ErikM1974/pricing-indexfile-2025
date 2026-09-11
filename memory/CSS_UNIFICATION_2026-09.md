@@ -1,5 +1,19 @@
 # CSS unification — design direction and implementation plan
 
+## RELEASE CANDIDATE — v2026.09.11.2 Custom Tees and Custom Caps
+
+The reviewed pair 296b30e5 is integrated at c4a1ea4c058f6cf1300e5605a64b0df5549f17ba. This release adds eight cache references for the six changed application assets and their reversible mappings. All 44 focused browser scenarios, 78 visually reviewed current paper pages and 387 source/pricing/ownership guards passed before preparation. All 14 original source hashes and 36 browser contracts remain unchanged through 50 mappings.
+
+Candidate193/225 reviewed,32pending; live remains .1/Heroku2104 at191/225,34pending. Require complete local application/browser/parity checks and all four actual exact-source CI jobs before deployment, then verify the running slug, source/compiled assets and access. No real orders, uploads, payments, messages or device printing.
+
+## REVIEWED — Custom Tees and Custom Caps ready for release checks
+
+The pair now shares Public Sans, canonical controls and a scoped layout owner with222 previously duplicated rules. Forty-four browser scenarios pass at1440/768/390/320; the final22 affected print cases also pass. All78 current paper pages across22 documents were visually inspected, including complete long notes, front/back artwork, mixed sizes/colors, taxes, pickup, rush and checkout failure. No blank sheets remain; the contact footer moves beside the printed letterhead and returns after printing.
+
+Fourteen original source hashes and36 immutable browser contracts remain preserved through42 reversible UI mappings. The original134 paper pages were reviewed before editing. Pricing engines, date/quantity functions and successful checkout payloads remain unchanged. Initial-failure Retry, visible storage quota errors, native gallery keyboard controls and summary-dialog focus/Escape are repaired. No real orders, uploads, payments, messages or device printing occurred.
+
+Reviewed candidate193/225,32pending; live remains v2026.09.11.1/Heroku2104/2463ce82 at191/225,34pending until rollout verifies. Next: commit/back up the reviewed pair, integrate clean develop, run complete application/browser/parity checks and exact-source CI, then deploy and verify the actual slug, assets and access. Evidence: custom-apparel-reviewed-record.json and active-css-resume-state.json in the external artifact directory. Never rerun consumed one-shot helpers.
+
 ## RELEASE CANDIDATE — v2026.09.11.1 Sample and Quote Carts
 
 Reviewed source7498f6fc and verified account releaseefc4471f are integrated at77bc80d490118b1f674c5c7543abba3e9b6fbf79. Complete local gates are running on that unchanged checkout. This candidate adds only release cache references and their reversible mappings; the six application CSS/JS assets are unchanged. Require every local gate and all four exact-source CI jobs, including actual CSS and live money/calculator parity, before release.
@@ -1546,6 +1560,14 @@ Exact-source CI 34569384599 passed all four jobs on 880bc6ebb75ca891f07f342e56f9
 
 Whole-app gate preparation: the first integrated unit run found the new common stylesheet had no cache version and a legacy test still demanded a page-local important hidden rule. The release cache step versions both imports; the guard now asserts the imported shared components hidden rule and absence of page important flags. All471 affected hygiene/header tests and268 source/ownership tests pass. Run the complete suite on this exact release source; the original failed integration run is not release evidence.
 
+Original capture correction: the first cap-gallery observer invoked currentQuote before selecting a style, which itself displayed a fatal error. That invalid capture is preserved outside the repo as custom-apparel-caps-gallery-observer-error.json; the observer now calls the quote hook only when the real studio is ready. No application behavior was changed. Recapture that gallery before accepting any baseline.
+
+## Custom apparel original baseline complete — 2026-09-11
+
+35 original browser scenarios passed;36 immutable contracts include exact checkout payloads. Original20 PDFs/134 pages are visually reviewed, with4 pixel-identical pages deduplicated against already-viewed sheets. Fixed bars and modal overlays cover printed content, and tees prints a full-page designer plus near-empty tail pages. Three defects on both originals are demonstrated in custom-apparel-original-defects.json: unwired initial Retry, silent session quota and summary keyboard focus escaping. Tee Escape also leaves that summary open. Source14hashes/16guards remain unchanged. Next: merge verified2463ce82, then shared scoped style owner/canonical controls/print/nativesummary and these bounded repairs.
+
 ## Sample and Quote Cart release record — v2026.09.11.1
 
 Exact-source CI 34572654837 passed all four jobs on 88526ec0e1b89c7ab3b98bc48ebad4b824b7bc64, including actual CSS and live money/calculator parity. Full local gates passed on the exact source 88526ec0e1b89c7ab3b98bc48ebad4b824b7bc64. Shared controls and three scoped cart style owners;40 focused browser cases,39 visually reviewed current paper pages across13 documents,21 immutable original source hashes,34 original browser contracts and96 reversible mappings. Original prices, quantities and successful payloads preserved. Four demonstrated stored-text, checkout-error, storage-removal and duplicate-save defects repaired. Counts become191/225 reviewed,34 pending after verified rollout. Separate Custom Tees/Custom Caps original-capture work is excluded.
+
+Release-check preparation: all 387 focused source, pricing, ownership and legacy storefront checks pass. The prior status source lock now reconstructs the independently reviewed apparel stylesheet while retaining its original hash; the zoom guard verifies the scoped overflow rule. The full application suite remains a separate release gate.

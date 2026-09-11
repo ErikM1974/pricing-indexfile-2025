@@ -19,18 +19,22 @@
     <link rel="icon" href="/favicon.png" type="image/png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
     <!-- Absolute asset paths: this page serves from BOTH /custom-tees (clean
          URL) and /pages/custom-tees.html — relative paths break on the former. -->
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/pages/css/custom-tees.css?v=2026.09.07.20">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.11.1">
+    <link rel="stylesheet" href="/shared_components/css/custom-apparel-studio.css?v=2026.09.11.2">
+    <link rel="stylesheet" href="/pages/css/custom-tees.css?v=2026.09.11.2">
 </head>
-<body>
+<body data-ui="unified" data-custom-apparel="tees">
     <a class="skip-link" href="#stage-gallery">Skip to the catalog</a>
 
     <div id="tdt-toasts" class="tdt-toasts" aria-live="polite"></div>
+
+    <p id="storage-notice" class="storage-notice" role="status" hidden></p>
 
     <!-- Fatal boot error (pricing/config unavailable) -->
     <div id="tdt-fatal" class="tdt-fatal" hidden>
@@ -78,7 +82,7 @@
             <div class="hero-copy">
                 <h1>Custom T-shirts, printed in <span class="hero-underline">full color</span> — shipped in 7–10 business days.</h1>
                 <p class="hero-sub">Pick from our 20 print-tested styles, upload your art, see it on a real shirt, and check out in minutes. Full-color DTG printing. No setup fees. No minimums.</p>
-                <button type="button" class="btn btn-hero" id="hero-cta">
+                <button type="button" class="btn-primary btn btn-hero" id="hero-cta">
                     <i class="fas fa-shirt" aria-hidden="true"></i> Pick your shirt — see your art on it
                 </button>
                 <div class="hero-trust">
@@ -104,7 +108,7 @@
                 <p class="ai-band-eyebrow"><i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i> AI Artwork + Full-Color DTG</p>
                 <h2 class="band-title ai-band-title" id="ai-band-title">Made it with AI? <span class="hero-underline">We&rsquo;ll print it</span> on a real shirt.</h2>
                 <p class="ai-band-sub">Design your art in ChatGPT, Midjourney, DALL&middot;E, or Adobe Firefly &mdash; any AI tool you like. Upload the file and we print it in vivid, full-color DTG on a real shirt. No setup fees, no minimums, printed right here in Milton, WA.</p>
-                <div class="ai-band-tools" aria-label="AI tools we print from">
+                <div class="ai-band-tools" role="group" aria-label="AI tools we print from">
                     <span class="ai-tool-chip">ChatGPT</span>
                     <span class="ai-tool-chip">Midjourney</span>
                     <span class="ai-tool-chip">DALL&middot;E</span>
@@ -163,12 +167,12 @@
             </div>
             <p class="gallery-sub">Our 20 best-selling, print-tested styles — each color shown is one we’ve proven prints beautifully in full-color DTG.</p>
             <div class="gallery-controls">
-                <div class="gallery-chips" id="gallery-chips" aria-label="Filter by category"></div>
+                <div class="gallery-chips" id="gallery-chips" role="group" aria-label="Filter by category"></div>
                 <div class="gallery-search">
                     <i class="fas fa-magnifying-glass" aria-hidden="true"></i>
-                    <input type="search" id="gallery-search" placeholder="Search style # or name" aria-label="Search the catalog">
+                    <input type="search" id="gallery-search" placeholder="Search style # or name" aria-label="Search the catalog" class="field-input">
                 </div>
-                <select id="gallery-sort" class="gallery-sort" aria-label="Sort styles">
+                <select id="gallery-sort" class="field-select gallery-sort" aria-label="Sort styles">
                     <option value="popular" selected>Most popular</option>
                     <option value="price">Price: low to high</option>
                     <option value="name">Name A–Z</option>
@@ -197,7 +201,7 @@
                         <strong id="current-product-name">—</strong>
                         <small id="current-product-style"></small>
                     </span>
-                    <button type="button" class="chip-btn" id="change-product"><i class="fas fa-rotate-left" aria-hidden="true"></i> Change product</button>
+                    <button type="button" class="btn chip-btn" id="change-product"><i class="fas fa-rotate-left" aria-hidden="true"></i> Change product</button>
                 </div>
 
                 <!-- SanMar product detail (lead + spec bullets, parsed from the
@@ -219,7 +223,7 @@
                         </button>
                     </div>
                     <div class="canvas-wrap" id="canvas-wrap">
-                        <canvas id="tdt-canvas" tabindex="0" role="application"
+                        <canvas id="tdt-canvas" class="apparel-canvas" tabindex="0" role="application"
                                 aria-label="T-shirt designer. Drag your artwork to position it. Arrow keys nudge, plus and minus resize, C centers."></canvas>
                         <div class="canvas-note" id="canvas-note" hidden></div>
                         <div class="canvas-loading" id="canvas-loading"><i class="fas fa-spinner fa-spin" aria-hidden="true"></i></div>
@@ -275,9 +279,9 @@
                         <label class="control-label" for="art-size">Artwork width — <strong id="art-size-label">3.2″</strong></label>
                         <input type="range" id="art-size" min="0.5" max="16" step="0.1" value="3.2">
                         <div class="art-actions">
-                            <button type="button" class="chip-btn" id="art-center"><i class="fas fa-arrows-left-right-to-line" aria-hidden="true"></i> Center</button>
-                            <button type="button" class="chip-btn" id="art-fit"><i class="fas fa-maximize" aria-hidden="true"></i> Fit width</button>
-                            <button type="button" class="chip-btn" id="art-reset"><i class="fas fa-rotate-left" aria-hidden="true"></i> Reset</button>
+                            <button type="button" class="btn chip-btn" id="art-center"><i class="fas fa-arrows-left-right-to-line" aria-hidden="true"></i> Center</button>
+                            <button type="button" class="btn chip-btn" id="art-fit"><i class="fas fa-maximize" aria-hidden="true"></i> Fit width</button>
+                            <button type="button" class="btn chip-btn" id="art-reset"><i class="fas fa-rotate-left" aria-hidden="true"></i> Reset</button>
                         </div>
                         <div class="dpi-meter" id="dpi-meter" hidden>
                             <span class="dpi-dot" id="dpi-dot"></span>
@@ -300,7 +304,7 @@
                         <h2>Colors &amp; sizes</h2>
                     </div>
 
-                    <div class="color-chips" id="color-chips" aria-label="Add a shirt color"></div>
+                    <div class="color-chips" id="color-chips" role="group" aria-label="Add a shirt color"></div>
                     <div class="color-cards" id="color-cards"></div>
 
                     <div class="tier-meter-card" id="tier-card" hidden>
@@ -309,7 +313,7 @@
                     </div>
                     <p class="inventory-stamp" id="inventory-stamp"></p>
                     <div class="inventory-error" id="inventory-error" hidden>
-                        <i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Live stock is unavailable right now — quantities are locked so we never oversell. <button type="button" class="link-btn" id="inventory-retry">Retry</button>
+                        <i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Live stock is unavailable right now — quantities are locked so we never oversell. <button type="button" class="btn link-btn" id="inventory-retry">Retry</button>
                     </div>
                 </section>
 
@@ -325,23 +329,23 @@
                         <div class="form-grid">
                             <div class="form-field">
                                 <label for="f-first">First name *</label>
-                                <input type="text" id="f-first" autocomplete="given-name" required>
+                                <input type="text" id="f-first" autocomplete="given-name" required class="field-input">
                             </div>
                             <div class="form-field">
                                 <label for="f-last">Last name *</label>
-                                <input type="text" id="f-last" autocomplete="family-name" required>
+                                <input type="text" id="f-last" autocomplete="family-name" required class="field-input">
                             </div>
                             <div class="form-field form-span">
                                 <label for="f-email">Email *</label>
-                                <input type="email" id="f-email" autocomplete="email" required>
+                                <input type="email" id="f-email" autocomplete="email" required class="field-input">
                             </div>
                             <div class="form-field">
                                 <label for="f-phone">Phone *</label>
-                                <input type="tel" id="f-phone" autocomplete="tel" required>
+                                <input type="tel" id="f-phone" autocomplete="tel" required class="field-input">
                             </div>
                             <div class="form-field">
                                 <label for="f-company">Company / group name (optional)</label>
-                                <input type="text" id="f-company" autocomplete="organization">
+                                <input type="text" id="f-company" autocomplete="organization" class="field-input">
                             </div>
                         </div>
                     </div>
@@ -391,30 +395,30 @@
                             <div class="form-grid">
                                 <div class="form-field form-span">
                                     <label for="f-addr1">Street address *</label>
-                                    <input type="text" id="f-addr1" autocomplete="address-line1" required>
+                                    <input type="text" id="f-addr1" autocomplete="address-line1" required class="field-input">
                                 </div>
                                 <div class="form-field">
                                     <label for="f-city">City *</label>
-                                    <input type="text" id="f-city" autocomplete="address-level2" required>
+                                    <input type="text" id="f-city" autocomplete="address-level2" required class="field-input">
                                 </div>
                                 <div class="form-field form-field-sm">
                                     <label for="f-state">State *</label>
-                                    <input type="text" id="f-state" autocomplete="address-level1" maxlength="2" placeholder="WA" required>
+                                    <input type="text" id="f-state" autocomplete="address-level1" maxlength="2" placeholder="WA" required class="field-input">
                                 </div>
                                 <div class="form-field form-field-sm">
                                     <label for="f-zip">ZIP *</label>
-                                    <input type="text" id="f-zip" autocomplete="postal-code" inputmode="numeric" required>
+                                    <input type="text" id="f-zip" autocomplete="postal-code" inputmode="numeric" required class="field-input">
                                 </div>
                             </div>
                             <p class="tax-stamp" id="tax-stamp"></p>
                             <div class="tax-error" id="tax-error" hidden>
-                                <i class="fas fa-triangle-exclamation" aria-hidden="true"></i> We couldn’t look up the sales-tax rate for this address. <button type="button" class="link-btn" id="tax-retry">Retry</button>
+                                <i class="fas fa-triangle-exclamation" aria-hidden="true"></i> We couldn’t look up the sales-tax rate for this address. <button type="button" class="btn link-btn" id="tax-retry">Retry</button>
                             </div>
                         </div>
 
                         <div class="form-field form-span">
                             <label for="f-notes">Special instructions</label>
-                            <textarea id="f-notes" rows="2" placeholder="Anything we should know?"></textarea>
+                            <textarea id="f-notes" rows="2" placeholder="Anything we should know?" class="field-textarea"></textarea>
                         </div>
                     </div>
 
@@ -422,7 +426,7 @@
                     <div class="form-card review-card" id="review-card">
                         <h3><i class="fas fa-clipboard-check" aria-hidden="true"></i> Review your order</h3>
                         <div class="review-mockups" id="review-mockups"></div>
-                        <div class="review-lines" id="review-lines"></div>
+                        <div class="review-lines" id="review-lines" role="region" aria-label="Order items" tabindex="0"></div>
                         <div class="review-totals" id="review-totals"></div>
                         <p class="review-promise" id="review-promise"></p>
                         <div class="review-ack" id="review-ack" hidden></div>
@@ -432,7 +436,7 @@
                         </div>
 
                         <div class="pay-reasons" id="pay-reasons"></div>
-                        <button type="button" class="btn btn-pay" id="pay-btn" disabled>
+                        <button type="button" class="btn-primary btn btn-pay" id="pay-btn" disabled>
                             <i class="fas fa-lock" aria-hidden="true"></i> <span id="pay-btn-label">Pay</span>
                         </button>
                         <p class="stripe-note"><i class="fab fa-stripe" aria-hidden="true"></i> You’ll be redirected to Stripe — we never see your card number.</p>
@@ -498,19 +502,19 @@
             <span id="bar-meta">0 shirts</span>
             <small class="bar-ship-nudge" id="bar-ship-nudge" hidden></small>
         </button>
-        <button type="button" class="btn btn-cta" id="smart-cta">Pick your shirt</button>
+        <button type="button" class="btn-primary btn btn-cta" id="smart-cta">Pick your shirt</button>
     </div>
 
     <!-- ── Summary sheet ──────────────────────────────────────────── -->
     <div class="sheet-backdrop" id="sheet-backdrop" hidden></div>
-    <div class="summary-sheet" id="summary-sheet" role="dialog" aria-label="Order summary" hidden>
+    <dialog class="ui-dialog summary-sheet" id="summary-sheet" aria-label="Order summary">
         <div class="sheet-grab" aria-hidden="true"></div>
         <h3>Your order so far</h3>
         <div id="sheet-lines"></div>
         <div id="sheet-totals"></div>
         <p class="review-promise" id="sheet-promise"></p>
         <button type="button" class="btn btn-primary" id="sheet-close">Keep building</button>
-    </div>
+    </dialog>
 
     <!-- ── Checkout pipeline modal ────────────────────────────────── -->
     <div class="modal-backdrop" id="pipeline-backdrop" hidden>
@@ -555,6 +559,7 @@
     <script src="/pages/js/custom-tees-calibration.js?v=2026.06.10.13"></script>
     <script src="/pages/js/cts-gallery-merch.js?v=2026.06.12.7"></script>
     <script src="/pages/js/custom-tees-designer.js?v=2026.06.10.13"></script>
-    <script src="/pages/js/custom-tees-app.js?v=2026.09.05.79"></script>
+    <script src="/shared_components/js/custom-apparel-print.js?v=2026.09.11.2"></script>
+    <script src="/pages/js/custom-tees-app.js?v=2026.09.11.2"></script>
 </body>
 </html>
