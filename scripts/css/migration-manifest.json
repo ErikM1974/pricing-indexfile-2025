@@ -6500,6 +6500,40 @@
         "rawCssBytes": 84072,
         "localCssRequests": 3
       }
+    },
+    {
+      "source": "calculators/safety-stripe-creator.html",
+      "family": "specialty-calculators",
+      "status": "reviewed",
+      "route": "/calculators/safety-stripe-creator.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/specialty-pricing.css",
+        "shared_components/css/safety-stripe-creator.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "1440-768-390-320",
+        "64-original-style-and-placement-combinations",
+        "native-keyboard-choices-and-dialog-focus",
+        "saved-design-note-and-original-session-item-contracts",
+        "partial-save-retry-reuses-accepted-session",
+        "pending-save-blocks-duplicate-submit-and-closing",
+        "clipboard-success-and-failure",
+        "empty-previews-do-not-warn-and-failed-images-use-visible-placeholders",
+        "short-phone-dialog-save-and-retry-controls-reachable",
+        "all-44-screens-and-ten-single-page-print-documents-reviewed",
+        "changed-design-clears-obsolete-saved-or-failed-reference"
+      ],
+      "test": "tests/e2e/css-unification-specialty-safety-stripe.spec.js",
+      "maxCssBytes": 78657,
+      "measuredRawCssBytes": 76609,
+      "baseline": {
+        "commit": "97cc05080d4689785bc0885b6a4223c0f1356cbf",
+        "rawCssBytes": 45671,
+        "localCssRequests": 3
+      }
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",

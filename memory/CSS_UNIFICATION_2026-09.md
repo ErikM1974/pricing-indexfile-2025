@@ -1,5 +1,13 @@
 # CSS unification — design direction and implementation plan
 
+## REVIEWED CHECKPOINT — Safety Stripe Creator, 2026-09-11
+
+Safety Stripe now uses canonical controls, native keyboard choices and save dialogs, scoped responsive CSS and complete single-page print layouts. All 21 current focused browser checks pass; one original-only defect capture is intentionally skipped. All 64 original design combinations and image mappings remain exact. The original service identifier/read functions remain source-locked; the session/item payloads retain their values with the previously dropped design note added to item details. Failed item saves no longer claim success, exact retries reuse an accepted session, pending writes reject duplicate submission, and clipboard/image failures stay visible. All 44 screenshots and ten pages in ten PDFs are reviewed (14 screen sheets, three paper sheets; duplicate views are recorded). No live business write or customer email was sent.
+
+Candidate now 212/225 reviewed, 13 pending. Live remains verified v2026.09.11.6 / Heroku2109 / 75ef80194384912f4c644e9b868898aa5d62de28, 207/225 reviewed and 18 pending. No specialty deployment yet. This status supersedes historical notes below.
+
+Final checks: 356 source/ownership/token/lint/lessons/runtime tests and four shared-control browser regressions pass; scoped JavaScript and CSS lint are clean. All 75 affected source checks were repeated after clearing obsolete saved references when design choices change. This local checkpoint is complete. Next: capture/review customer-supplied screen-print originals and migrate that last page of the six-page specialty batch. Full unit, CSS browser, e2e, pricing parity and actual exact-source CI remain required before release. GitHub publication is pending explicit public-repository consent after automatic review rejected the push; do not retry without the answer. Local checkpoints remain preserved.
+
 ## ORIGINALS REVIEWED — Safety Stripe Creator, 2026-09-11
 
 Before application edits: all 11 original browser checks pass, including 64 native style/front/back combinations and intercepted session/item request bodies. All 36 screen captures and 17 pages across nine PDFs reviewed (ten screen sheets and three paper sheets; exact duplicates accounted for). The actual original UI cannot open either dialog: JavaScript adds .show, CSS expects .active. To diagnose persistence, tests populate its unreachable fields and dispatch the original form handler without changing the original CSS. Failed item saves falsely report success; phone previews overflow. These are preserved defects, not successful original interactions.

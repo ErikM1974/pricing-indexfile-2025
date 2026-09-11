@@ -47,10 +47,11 @@ describe('calculator page scripts', () => {
 describe('delegated handlers', () => {
     test('safety-stripe-creator: tiles are keyboard buttons through the delegator', () => {
         const html = read('calculators/safety-stripe-creator.html');
-        expect((html.match(/data-call="selectStripeStyle" data-args='\["\w+"\]' role="button" tabindex="0"/g) || []).length).toBe(4);
+        const document = new (require("jsdom").JSDOM)(html).window.document;
+        expect(document.querySelectorAll('button[type="button"][data-call="selectStripeStyle"][aria-pressed="false"]')).toHaveLength(4);
+        expect(document.querySelectorAll("dialog[aria-labelledby]")).toHaveLength(2);
         expect(html).toMatch(/data-call="openSendModal"/);
         expect(html).toMatch(/data-call-delegator\.js\?v=/);
-        expect(read('calculators/safety-stripe-calculator.js')).toMatch(/closest\('\.stripe-option\[data-style\]'\)/);
     });
     test('webstores hero image fallback via data-onerror', () => {
         expect(read('calculators/webstores.html')).toMatch(/data-onerror="hide"/);

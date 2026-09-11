@@ -3,6 +3,7 @@ async function ready(page,state={}) {
  state.requests ||= [];
  const events=await open(page,{original:state.original,url:'/calculators/safety-stripe-creator.html',route:async route=>{
   const request=route.request(),url=new URL(request.url());
+  if(state.failedPreview&&url.hostname==='northwestcustomapparel.box.com'&&url.pathname.endsWith('/lvqvm0ucwz8zm2yvi4d4qbr3wayozmi0'))return {status:503,body:'Synthetic unavailable image'};
   if(url.hostname==='cdn.jsdelivr.net'&&url.pathname.includes('/@emailjs/browser@3/'))return {contentType:'application/javascript',body:'window.emailjs={init:function(){}};'};
   if(['/api/quote_sessions','/api/quote_items'].includes(url.pathname)&&request.method()==='POST'){
    const body=request.postDataJSON();state.requests.push({path:url.pathname,method:'POST',body});

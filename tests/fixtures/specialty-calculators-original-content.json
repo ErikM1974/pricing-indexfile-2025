@@ -636,6 +636,540 @@
       "before": "@media print {",
       "after": "@media print {\n :where([data-ui=\"unified\"][data-specialty-calculator=\"polar-camel\"]) .footer-inner { display: grid; grid-template-columns: 1.3fr 1fr; gap: 20px; }\n :where([data-ui=\"unified\"][data-specialty-calculator=\"polar-camel\"]) .site-footer :is(p,h3,li) { margin-block: 0 4px; }\n :where([data-ui=\"unified\"][data-specialty-calculator=\"polar-camel\"]) .site-footer h3 { font-size: 9pt; }\n :where([data-ui=\"unified\"][data-specialty-calculator=\"polar-camel\"]) :is(.footer-est,.footer-bottom) { font-size: 7pt; }",
       "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "family=Inter:wght@400;500;600;700",
+      "after": "family=Public+Sans:wght@400;500;600;700",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "<body>",
+      "after": "<body data-ui=\"unified\" data-specialty-calculator=\"safety-stripe\">",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "<main class=\"container\">",
+      "after": "<main class=\"container main-container\">",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "<div class=\"title-section\">",
+      "after": "<div class=\"title-section page-hero\">",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "Design custom safety stripes and send mockups to customers",
+      "after": "Choose a stripe style and save a front and back design.",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "    <link href=\"/shared_components/css/calculator-base.css?v=2026.09.07.19\" rel=\"stylesheet\">",
+      "after": "    <link href=\"/shared_components/css/components.css?v=2026.09.11.6\" rel=\"stylesheet\">\n    <link href=\"/shared_components/css/specialty-pricing.css?v=2026.09.11.6\" rel=\"stylesheet\">",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "safety-stripe-creator.css?v=2026.09.07.12",
+      "after": "safety-stripe-creator.css?v=2026.09.11.6",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "    <script type=\"text/javascript\" src=\"https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js\"></script>",
+      "after": "    <!-- Designs are saved locally through the existing quote relay; no customer email is sent. -->",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "<nav class=\"breadcrumb\">",
+      "after": "<nav class=\"breadcrumb\" aria-label=\"Breadcrumb\">",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "<div class=\"stripe-options\">",
+      "after": "<div class=\"stripe-options\" role=\"group\" aria-label=\"Stripe style\">",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "<div class=\"stripe-option\" data-style=\"Standard\" data-call=\"selectStripeStyle\" data-args='[\"Standard\"]' role=\"button\" tabindex=\"0\">\n                    <img src=\"https://northwestcustomapparel.box.com/shared/static/l5pnj4hhvrfgtzs0lae32c4zefz8feib\" alt=\"Standard\">\n                    <h3>Standard</h3>\n                </div>",
+      "after": "<button type=\"button\" class=\"btn stripe-option\" data-style=\"Standard\" data-call=\"selectStripeStyle\" data-args='[\"Standard\"]' aria-pressed=\"false\">\n                    <img src=\"https://northwestcustomapparel.box.com/shared/static/l5pnj4hhvrfgtzs0lae32c4zefz8feib\" alt=\"Standard\">\n                    <span class=\"stripe-label\">Standard</span>\n                </button>",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "<div class=\"stripe-option\" data-style=\"Warning\" data-call=\"selectStripeStyle\" data-args='[\"Warning\"]' role=\"button\" tabindex=\"0\">\n                    <img src=\"https://northwestcustomapparel.box.com/shared/static/tcmcme9ihfx15cu70rhycxdqgbceervl\" alt=\"Warning\">\n                    <h3>Warning</h3>\n                </div>",
+      "after": "<button type=\"button\" class=\"btn stripe-option\" data-style=\"Warning\" data-call=\"selectStripeStyle\" data-args='[\"Warning\"]' aria-pressed=\"false\">\n                    <img src=\"https://northwestcustomapparel.box.com/shared/static/tcmcme9ihfx15cu70rhycxdqgbceervl\" alt=\"Warning\">\n                    <span class=\"stripe-label\">Warning</span>\n                </button>",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "<div class=\"stripe-option\" data-style=\"DiamondPlate\" data-call=\"selectStripeStyle\" data-args='[\"DiamondPlate\"]' role=\"button\" tabindex=\"0\">\n                    <img src=\"https://northwestcustomapparel.box.com/shared/static/6oa86o7o4lou6v0ablxrr32hxn1gxplw\" alt=\"Diamond Plate\">\n                    <h3>Diamond Plate</h3>\n                </div>",
+      "after": "<button type=\"button\" class=\"btn stripe-option\" data-style=\"DiamondPlate\" data-call=\"selectStripeStyle\" data-args='[\"DiamondPlate\"]' aria-pressed=\"false\">\n                    <img src=\"https://northwestcustomapparel.box.com/shared/static/6oa86o7o4lou6v0ablxrr32hxn1gxplw\" alt=\"Diamond Plate\">\n                    <span class=\"stripe-label\">Diamond Plate</span>\n                </button>",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "<div class=\"stripe-option\" data-style=\"ConstructionZone\" data-call=\"selectStripeStyle\" data-args='[\"ConstructionZone\"]' role=\"button\" tabindex=\"0\">\n                    <img src=\"https://northwestcustomapparel.box.com/shared/static/6r1rp6x7q6nifuw6whtwdhqbl2g8je27\" alt=\"Construction Zone\">\n                    <h3>Construction Zone</h3>\n                </div>",
+      "after": "<button type=\"button\" class=\"btn stripe-option\" data-style=\"ConstructionZone\" data-call=\"selectStripeStyle\" data-args='[\"ConstructionZone\"]' aria-pressed=\"false\">\n                    <img src=\"https://northwestcustomapparel.box.com/shared/static/6r1rp6x7q6nifuw6whtwdhqbl2g8je27\" alt=\"Construction Zone\">\n                    <span class=\"stripe-label\">Construction Zone</span>\n                </button>",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "id=\"designArea\" style=\"display: none;\"",
+      "after": "id=\"designArea\" hidden",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "id=\"actionSection\" style=\"display: none;\"",
+      "after": "id=\"actionSection\" hidden",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "<h3>Step 2: Select Front Design</h3>",
+      "after": "<h2>Step 2: Select Front Design</h2>",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "id=\"frontOptions\"",
+      "after": "id=\"frontOptions\" role=\"group\" aria-label=\"Front placement\"",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "<h3>Step 3: Select Back Design</h3>",
+      "after": "<h2>Step 3: Select Back Design</h2>",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "id=\"backOptions\"",
+      "after": "id=\"backOptions\" role=\"group\" aria-label=\"Back placement\"",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "        <!-- Stripe Style Selector -->",
+      "after": "        <p id=\"stripeImageWarning\" class=\"stripe-status\" role=\"alert\" hidden></p>\n\n        <!-- Stripe Style Selector -->",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "class=\"send-button\"",
+      "after": "class=\"btn btn-primary send-button\"",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "Send Design to Customer",
+      "after": "Save Design",
+      "count": 2
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "<h3>Save Design</h3>",
+      "after": "<h2 id=\"stripeSendTitle\">Save Design</h2>",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "<div class=\"modal-overlay\" id=\"sendModal\">",
+      "after": "<dialog class=\"ui-dialog stripe-dialog\" id=\"sendModal\" aria-labelledby=\"stripeSendTitle\">",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "    </div>\n\n    <!-- Success Modal -->",
+      "after": "    </dialog>\n\n    <!-- Success Modal -->",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "<div class=\"modal-overlay\" id=\"successModal\">",
+      "after": "<dialog class=\"ui-dialog stripe-dialog\" id=\"successModal\" aria-labelledby=\"stripeSuccessTitle\">",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "    </div>\n\n</body>",
+      "after": "    </dialog>\n\n</body>",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "<h3>Design Sent Successfully!</h3>",
+      "after": "<h2 id=\"stripeSuccessTitle\" tabindex=\"-1\" autofocus>Design saved</h2>",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "The safety stripe design has been sent to the customer.",
+      "after": "Your safety stripe design is saved. No customer email has been sent.",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "                            Send Design\n",
+      "after": "                            Save Design\n",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "<label>Reference ID:</label>",
+      "after": "<span>Reference ID:</span>",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "class=\"copy-btn\"",
+      "after": "class=\"btn copy-btn\"",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "                <p class=\"success-note\">",
+      "after": "                <p id=\"stripeCopyStatus\" class=\"copy-status\" role=\"status\"></p>\n                <p class=\"success-note\">",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "                    <div class=\"modal-actions\">",
+      "after": "                    <p id=\"stripeSaveStatus\" class=\"stripe-status\" role=\"alert\" hidden></p>\n                    <div class=\"modal-actions\">",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "id=\"customerName\"",
+      "after": "class=\"field-input\" id=\"customerName\"",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "id=\"customerEmail\"",
+      "after": "class=\"field-input\" id=\"customerEmail\"",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "id=\"customerPhone\"",
+      "after": "class=\"field-input\" id=\"customerPhone\"",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "id=\"companyName\"",
+      "after": "class=\"field-input\" id=\"companyName\"",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "<select id=\"salesRep\"",
+      "after": "<select class=\"field-select\" id=\"salesRep\"",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "<textarea id=\"customMessage\"",
+      "after": "<textarea class=\"field-textarea\" id=\"customMessage\"",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "placeholder=\"Add a personal note to the customer...\"",
+      "after": "placeholder=\"Add a note about this design...\"",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "Message (Optional)",
+      "after": "Design note (Optional)",
+      "count": 1
+    },
+    {
+      "file": "shared_components/css/safety-stripe-creator.css",
+      "before": "/* stylelint-disable no-duplicate-selectors -- legacy sheet: rules were appended over time; merging them would reorder the cascade (2026-09-07) */\n\n/**\n * Safety Stripe Creator - Additional Styles\n * Custom styling enhancements for the Safety Stripe Creator tool\n */\n\n/* Safety-specific color variables */\n\n/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its\n   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;\n   raw hex is allowed ONLY in this block. */\n/* stylelint-disable color-no-hex */\n:root {\n    --safety-stripe-creator-orange: #ff6b35;\n    --safety-stripe-creator-orange-2: #ff8c42;\n    --safety-stripe-creator-orange-3: #e55a2b;\n    --safety-stripe-creator-gray-dark: #333;\n    --safety-orange: var(--safety-stripe-creator-orange);\n    --safety-orange-light: var(--safety-stripe-creator-orange-2);\n    --safety-orange-dark: var(--safety-stripe-creator-orange-3);\n}\n/* stylelint-enable color-no-hex */\n\n/* Title Section */\n.title-section {\n    text-align: center;\n    margin-bottom: 3rem;\n}\n\n.title-section h1 {\n    font-size: 2.5rem;\n    font-weight: 700;\n    color: var(--text-primary);\n    margin-bottom: 0.5rem;\n}\n\n.title-section p {\n    color: var(--text-secondary);\n    font-size: 1.125rem;\n}\n\n/* Stripe Style Selector */\n.stripe-selector {\n    background: var(--card-bg);\n    border-radius: 12px;\n    padding: 2rem;\n    box-shadow: 0 1px 3px rgb(0 0 0 / 10%);\n    margin-bottom: 2rem;\n}\n\n.stripe-selector h2 {\n    font-size: 1.5rem;\n    margin-bottom: 1.5rem;\n    color: var(--text-primary);\n}\n\n.stripe-options {\n    display: grid;\n    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));\n    gap: 1rem;\n}\n\n/* Enhanced stripe option hover effects */\n.stripe-option {\n    border: 2px solid var(--border-color);\n    border-radius: 8px;\n    padding: 1rem;\n    cursor: pointer;\n    transition: all 0.3s ease;\n    text-align: center;\n    position: relative;\n    overflow: hidden;\n}\n\n.stripe-option:hover {\n    border-color: var(--safety-orange);\n    transform: translateY(-2px);\n    box-shadow: 0 4px 12px rgb(255 107 53 / 20%);\n}\n\n.stripe-option.selected {\n    border-color: var(--safety-orange);\n    background: rgb(255 107 53 / 5%);\n}\n\n.stripe-option img {\n    width: 100%;\n    height: 80px;\n    object-fit: cover;\n    border-radius: 4px;\n    margin-bottom: 0.5rem;\n}\n\n.stripe-option h3 {\n    font-size: 1rem;\n    font-weight: 600;\n    color: var(--text-primary);\n}\n\n.stripe-option::before {\n    content: '';\n    position: absolute;\n    top: 0;\n    left: 0;\n    width: 100%;\n    height: 100%;\n    background: linear-gradient(135deg, transparent 0%, rgb(255 107 53 / 10%) 100%);\n    opacity: 0;\n    transition: opacity 0.3s ease;\n}\n\n.stripe-option:hover::before {\n    opacity: 1;\n}\n\n.stripe-option.selected::after {\n    content: '✓';\n    position: absolute;\n    top: 0.5rem;\n    right: 0.5rem;\n    background: var(--safety-orange);\n    color: white;\n    width: 2rem;\n    height: 2rem;\n    border-radius: 50%;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    font-size: 1.25rem;\n    box-shadow: 0 2px 4px rgb(0 0 0 / 20%);\n}\n\n/* Design Area */\n.design-area {\n    display: grid;\n    grid-template-columns: 1fr 1fr;\n    gap: 2rem;\n    margin-bottom: 2rem;\n}\n\n.shirt-section {\n    background: var(--card-bg);\n    border-radius: 12px;\n    padding: 2rem;\n    box-shadow: 0 1px 3px rgb(0 0 0 / 10%);\n}\n\n.shirt-section h3 {\n    font-size: 1.25rem;\n    margin-bottom: 1.5rem;\n    color: var(--text-primary);\n    text-align: center;\n}\n\n.shirt-preview {\n    width: 100%;\n    max-width: 400px;\n    margin: 0 auto 2rem;\n    border: 2px solid var(--border-color);\n    border-radius: 8px;\n    overflow: hidden;\n}\n\n.shirt-preview img {\n    width: 100%;\n    height: auto;\n    display: block;\n}\n\n.option-grid {\n    display: grid;\n    grid-template-columns: repeat(2, 1fr);\n    gap: 1rem;\n}\n\n.placement-option {\n    border: 2px solid var(--border-color);\n    border-radius: 6px;\n    padding: 0.75rem;\n    cursor: pointer;\n    transition: all 0.2s ease;\n    text-align: center;\n    position: relative;\n}\n\n.placement-option:hover {\n    border-color: var(--safety-orange);\n    background: rgb(255 107 53 / 5%);\n}\n\n.placement-option.selected {\n    border-color: var(--safety-orange);\n    background: rgb(255 107 53 / 10%);\n}\n\n.placement-option.selected::after {\n    content: '✓';\n    position: absolute;\n    top: 0.25rem;\n    right: 0.25rem;\n    background: var(--safety-orange);\n    color: white;\n    width: 1.5rem;\n    height: 1.5rem;\n    border-radius: 50%;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    font-size: 0.875rem;\n}\n\n.placement-option img {\n    width: 100%;\n    height: 80px;\n    object-fit: cover;\n    border-radius: 4px;\n    margin-bottom: 0.5rem;\n}\n\n.placement-option span {\n    font-size: 0.875rem;\n    color: var(--text-primary);\n}\n\n/* Action Button */\n.action-section {\n    text-align: center;\n    margin: 3rem 0;\n}\n\n.send-button {\n    background: var(--safety-orange);\n    color: white;\n    border: none;\n    padding: 1rem 2rem;\n    font-size: 1.125rem;\n    font-weight: 600;\n    border-radius: 8px;\n    cursor: pointer;\n    transition: all 0.3s ease;\n    display: inline-flex;\n    align-items: center;\n    gap: 0.75rem;\n}\n\n.send-button:hover {\n    background: var(--safety-orange-dark);\n    transform: translateY(-2px);\n    box-shadow: 0 4px 12px rgb(255 107 53 / 30%);\n}\n\n.send-button:disabled {\n    background: var(--gray-300);\n    cursor: not-allowed;\n    transform: none;\n}\n\n/* Design Summary */\n.design-summary {\n    background: var(--bg-color);\n    padding: 1rem;\n    border-radius: 6px;\n    margin: 1rem 0;\n}\n\n.design-summary h4 {\n    margin-bottom: 0.5rem;\n    color: var(--text-primary);\n}\n\n.design-summary p {\n    margin: 0.25rem 0;\n    color: var(--text-secondary);\n}\n\n.design-summary span {\n    font-weight: 600;\n    color: var(--text-primary);\n}\n\n/* Success Content */\n.success-content {\n    text-align: center;\n    padding: 2rem;\n}\n\n.success-icon {\n    font-size: 4rem;\n    color: var(--success-green);\n    margin-bottom: 1rem;\n}\n\n.success-content h3 {\n    font-size: 1.5rem;\n    margin-bottom: 0.5rem;\n    color: var(--text-primary);\n}\n\n.quote-id-display {\n    background: var(--bg-color);\n    padding: 1rem;\n    border-radius: 6px;\n    margin: 1.5rem 0;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    gap: 1rem;\n}\n\n.quote-id {\n    font-family: monospace;\n    font-size: 1.25rem;\n    font-weight: 600;\n    color: var(--safety-orange);\n}\n\n.success-note {\n    color: var(--text-secondary);\n    margin: 1rem 0;\n}\n\n.success-actions {\n    display: flex;\n    gap: 1rem;\n    justify-content: center;\n    margin-top: 2rem;\n}\n\n/* Image loading states */\n.stripe-option img,\n.placement-option img,\n.shirt-preview img {\n    background: var(--gray-100);\n    position: relative;\n}\n\n.stripe-option img::before,\n.placement-option img::before {\n    content: '';\n    position: absolute;\n    top: 0;\n    left: 0;\n    width: 100%;\n    height: 100%;\n    background: linear-gradient(90deg, var(--gray-100) 25%, var(--gray-200) 50%, var(--gray-100) 75%);\n    background-size: 200% 100%;\n    animation: loading 1.5s infinite;\n}\n\n@keyframes loading {\n    0% {\n        background-position: 200% 0;\n    }\n\n    100% {\n        background-position: -200% 0;\n    }\n}\n\n/* Enhanced placement options */\n.placement-option {\n    background: white;\n    box-shadow: 0 1px 3px rgb(0 0 0 / 5%);\n}\n\n.placement-option:hover {\n    transform: translateY(-2px);\n    box-shadow: 0 4px 8px rgb(255 107 53 / 15%);\n}\n\n.placement-option.selected {\n    box-shadow: 0 0 0 2px var(--safety-orange);\n}\n\n/* Smooth transitions for previews */\n.shirt-preview img {\n    transition: all 0.3s ease;\n}\n\n.shirt-preview:hover img {\n    transform: scale(1.02);\n}\n\n/* Enhanced modal animations */\n.modal-overlay {\n    backdrop-filter: blur(4px);\n    animation: fadeIn 0.3s ease;\n}\n\n.modal-content {\n    animation: slideUp 0.3s ease;\n}\n\n@keyframes fadeIn {\n    from {\n        opacity: 0;\n    }\n\n    to {\n        opacity: 1;\n    }\n}\n\n@keyframes slideUp {\n    from {\n        transform: translateY(20px);\n        opacity: 0;\n    }\n\n    to {\n        transform: translateY(0);\n        opacity: 1;\n    }\n}\n\n/* Form focus effects */\n.form-group input:focus,\n.form-group select:focus,\n.form-group textarea:focus {\n    background: rgb(255 107 53 / 2%);\n}\n\n/* Success animation */\n.success-icon {\n    animation: checkmark 0.6s ease;\n}\n\n@keyframes checkmark {\n    0% {\n        transform: scale(0) rotate(-45deg);\n    }\n\n    50% {\n        transform: scale(1.2) rotate(-45deg);\n    }\n\n    100% {\n        transform: scale(1) rotate(0);\n    }\n}\n\n/* Copy button feedback */\n.copy-btn {\n    position: relative;\n    overflow: hidden;\n}\n\n.copy-btn::after {\n    content: '';\n    position: absolute;\n    top: 50%;\n    left: 50%;\n    width: 0;\n    height: 0;\n    background: rgb(255 255 255 / 30%);\n    border-radius: 50%;\n    transform: translate(-50%, -50%);\n    transition: width 0.3s, height 0.3s;\n}\n\n.copy-btn:active::after {\n    width: 100px;\n    height: 100px;\n}\n\n/* Responsive enhancements */\n@media (width <= 1024px) {\n    .stripe-options {\n        grid-template-columns: repeat(2, 1fr);\n    }\n}\n\n@media (width <= 640px) {\n    .modal-content {\n        margin: 20px;\n        width: calc(100% - 40px);\n    }\n    \n    .form-grid {\n        grid-template-columns: 1fr;\n    }\n    \n    .placement-option img {\n        height: 60px;\n    }\n    \n    .placement-option span {\n        font-size: 0.7rem;\n    }\n}\n\n/* Print styles */\n@media print {\n    .header,\n    .stripe-selector,\n    .action-section,\n    .modal-overlay {\n        /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */\n        display: none !important;\n    }\n    \n    .design-area {\n        /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */\n        grid-template-columns: 1fr !important;\n    }\n    \n    .shirt-section {\n        break-inside: avoid;\n        margin-bottom: 2rem;\n    }\n}\n\n/* Accessibility improvements */\n.stripe-option:focus-visible,\n.placement-option:focus-visible,\nbutton:focus-visible {\n    outline: 3px solid var(--safety-orange);\n    outline-offset: 2px;\n}\n\n/* Loading spinner enhancement */\n.loading {\n    border-color: rgb(255 107 53 / 20%);\n    border-top-color: var(--safety-orange);\n}\n\n/* Badge for new feature */\n.new-badge {\n    display: inline-block;\n    background: var(--safety-orange);\n    color: white;\n    padding: 0.25rem 0.5rem;\n    border-radius: 4px;\n    font-size: 0.75rem;\n    font-weight: 600;\n    text-transform: uppercase;\n    margin-left: 0.5rem;\n    animation: pulse 2s infinite;\n}\n\n@keyframes pulse {\n    0%, 100% {\n        opacity: 1;\n    }\n\n    50% {\n        opacity: 0.8;\n    }\n}\n\n/* Error states */\n.form-group input.error,\n.form-group select.error {\n    border-color: var(--error-red);\n}\n\n.form-group .error-message {\n    color: var(--error-red);\n    font-size: 0.875rem;\n    margin-top: 0.25rem;\n}\n\n/* Tooltip styles */\n.tooltip {\n    position: relative;\n    cursor: help;\n}\n\n.tooltip::after {\n    content: attr(data-tooltip);\n    position: absolute;\n    bottom: 100%;\n    left: 50%;\n    transform: translateX(-50%);\n    background: var(--safety-stripe-creator-gray-dark);\n    color: white;\n    padding: 0.5rem;\n    border-radius: 4px;\n    font-size: 0.875rem;\n    white-space: nowrap;\n    opacity: 0;\n    pointer-events: none;\n    transition: opacity 0.3s;\n}\n\n.tooltip:hover::after {\n    opacity: 1;\n}\n\n/* Custom scrollbar */\n.modal-content::-webkit-scrollbar {\n    width: 8px;\n}\n\n.modal-content::-webkit-scrollbar-track {\n    background: var(--gray-100);\n}\n\n.modal-content::-webkit-scrollbar-thumb {\n    background: var(--safety-orange);\n    border-radius: 4px;\n}\n\n.modal-content::-webkit-scrollbar-thumb:hover {\n    background: var(--safety-orange-dark);\n}\n\n/* 2026-09-06 review */\n.req { color: var(--red-600); }\n.stripe-option:focus-visible { outline: 3px solid var(--print-green); outline-offset: 2px; }\n",
+      "after": "/* Safety Stripe Creator: canonical controls, complete pattern previews and native dialogs. */\n@layer components.pages {\n:where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .header-container { display: flex; align-items: center; justify-content: space-between; gap: 20px; }\n:where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .title-section { margin-bottom: 32px; }\n:where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .title-section p { color: var(--ui-muted); max-width: 68ch; line-height: 1.6; }\n:where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .stripe-selector { margin-bottom: 32px; }\n:where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .stripe-selector h2, :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .shirt-section h2 { margin: 0 0 20px; font-size: 20px; letter-spacing: -0.015em; }\n:where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .stripe-options { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }\n:where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .stripe-option, :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .placement-option { display: flex; flex-direction: column; gap: 12px; white-space: normal; width: 100%; height: auto; min-width: 0; padding: 12px; border: 1px solid var(--ui-line-strong); background: var(--ui-surface); border-radius: var(--radius-md); color: var(--ui-ink); }\n:where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .stripe-option:hover, :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .placement-option:hover { border-color: var(--ui-accent); background: var(--ui-tint); }\n:where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .stripe-option.selected, :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .placement-option.selected { border: 2px solid var(--ui-accent); padding: 11px; background: var(--ui-tint); }\n:where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .stripe-option img { width: 100%; height: 156px; object-fit: contain; }\n:where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .stripe-label { font-weight: 600; }\n:where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .design-area { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px; border-top: 1px solid var(--ui-line); padding-top: 28px; scroll-margin-top: 24px; }\n:where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .shirt-section { min-width: 0; }\n:where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .shirt-preview { display: flex; justify-content: center; padding: 24px; margin-bottom: 20px; border: 1px solid var(--ui-line); background: var(--ui-surface); border-radius: var(--radius-lg); }\n:where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .shirt-preview img { display: block; width: 100%; height: 320px; object-fit: contain; }\n:where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .option-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }\n:where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .placement-option { gap: 8px; padding: 8px; font-size: 12px; line-height: 1.4; }\n:where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .placement-option.selected { padding: 7px; }\n:where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .placement-option img { width: 100%; height: 70px; object-fit: contain; }\n:where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .action-section { display: flex; justify-content: flex-end; padding-top: 24px; margin-top: 28px; border-top: 1px solid var(--ui-line); }\n:where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .stripe-status { margin: 20px 0; padding: 16px; border: 1px solid var(--amber-500); border-radius: var(--radius-sm); color: var(--color-warning-ink); background: var(--color-warning-bg); line-height: 1.6; }\n:where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .stripe-dialog { width: min(640px, calc(100% - 32px)); max-height: calc(100dvh - 32px); overflow: auto; }\n:where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .modal-header h2 { font-size: 24px; letter-spacing: -0.02em; margin-bottom: 24px; }\n:where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }\n:where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .form-group { min-width: 0; margin-bottom: 16px; }\n:where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .form-group label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; }\n:where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .design-summary { margin-block: 24px; padding: 16px; background: var(--ui-canvas); border-radius: var(--radius-sm); }\n:where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .design-summary h4 { margin: 0 0 12px; }\n:where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .design-summary p { margin: 6px 0; font-size: 14px; }\n:where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .modal-actions, :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .success-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 12px; }\n:where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .success-content > h2 { margin: 16px 0; font-size: 26px; }\n:where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .success-icon { font-size: 36px; color: var(--ui-accent); }\n:where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .success-content p { line-height: 1.6; color: var(--ui-muted); }\n:where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .quote-id-display { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; padding-block: 20px; margin-block: 20px; border-block: 1px solid var(--ui-line); }\n:where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .quote-id { font-size: 20px; font-weight: 600; }\n:where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .success-note { margin-bottom: 24px; }\n:where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .copy-status { margin-bottom: 16px; }\n@media (width <= 900px) {\n :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .option-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }\n :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .shirt-preview { padding: 16px; }\n :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .shirt-preview img { height: 260px; }\n}\n@media (width <= 640px) {\n :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .header-container { align-items: flex-start; }\n :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .breadcrumb { max-width: 150px; }\n :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .stripe-options { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }\n :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .stripe-option img { height: 112px; }\n :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .stripe-option { font-size: 14px; }\n :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .design-area { grid-template-columns: minmax(0, 1fr); }\n :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .shirt-preview img { height: 280px; }\n :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .placement-option img { height: 96px; }\n :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .action-section .btn { width: 100%; }\n :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .form-grid { grid-template-columns: minmax(0, 1fr); gap: 0; }\n :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .modal-actions .btn, :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .success-actions .btn { flex: 1; }\n}\n@media print {\n :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .header-container { align-items: center; }\n :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .title-section { margin-bottom: 16px; }\n :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .title-section p { font-size: 9pt; }\n :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .stripe-selector { margin-bottom: 16px; }\n :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .stripe-selector h2, :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .shirt-section h2 { font-size: 12pt; margin-bottom: 10px; }\n :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .stripe-options { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }\n :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .stripe-option { font-size: 8pt; gap: 4px; padding: 6px; break-inside: avoid; }\n :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .stripe-option.selected { padding: 5px; }\n :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .stripe-option img { height: 90px; }\n :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .design-area { gap: 16px; padding-top: 16px; break-inside: avoid; grid-template-columns: repeat(2, minmax(0, 1fr)); }\n :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .shirt-preview { padding: 10px; margin-bottom: 10px; }\n :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .shirt-preview img { height: 225px; }\n :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .option-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }\n :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .placement-option { font-size: 7pt; gap: 4px; padding: 5px; }\n :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .placement-option.selected { padding: 4px; }\n :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .placement-option img { height: 58px; }\n :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .stripe-dialog, :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .action-section { display: none; }\n :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .stripe-status { font-size: 8pt; margin: 8px 0; padding: 10px; }\n}\n}\n",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-calculator.js",
+      "before": "// Open send modal\nfunction openSendModal() {\n    if (!currentDesign.style) {\n        alert('Please select a stripe style first');\n        return;\n    }\n    \n    // Update summary\n    document.getElementById('summaryStyle').textContent = currentDesign.style;\n    document.getElementById('summaryFront').textContent = formatOptionName(currentDesign.front);\n    document.getElementById('summaryBack').textContent = formatOptionName(currentDesign.back);\n    \n    // Show modal\n    document.getElementById('sendModal').classList.add('show');\n}\n\n// Close send modal\nfunction closeSendModal() {\n    document.getElementById('sendModal').classList.remove('show');\n    document.getElementById('sendForm').reset();\n}\n\n// Get sales rep name from email\nfunction getSalesRepName(email) {\n    const reps = {\n        'ruth@nwcustomapparel.com': 'Ruth Nhong',\n        'taylar@nwcustomapparel.com': 'Taylar',\n        'nika@nwcustomapparel.com': 'Nika',\n        'erik@nwcustomapparel.com': 'Erik',\n        'adriyella@nwcustomapparel.com': 'Adriyella',\n        'bradley@nwcustomapparel.com': 'Bradley',\n        'jim@nwcustomapparel.com': 'Jim',\n        'art@nwcustomapparel.com': 'Steve (Artist)'\n    };\n    return reps[email] || 'Sales Team';\n}\n\n// Handle form submission\ndocument.addEventListener('DOMContentLoaded', () => {\n    document.getElementById('sendForm').addEventListener('submit', async (e) => {\n        e.preventDefault();\n        \n        const sendButton = document.getElementById('sendButton');\n        const originalContent = sendButton.innerHTML;\n        \n        try {\n            // Show loading state\n            sendButton.disabled = true;\n            sendButton.innerHTML = '<span class=\"loading\"></span> Sending...';\n            \n            // Get form data\n            const designData = {\n                customerName: document.getElementById('customerName').value.trim(),\n                customerEmail: document.getElementById('customerEmail').value.trim(),\n                customerPhone: document.getElementById('customerPhone').value.trim(),\n                companyName: document.getElementById('companyName').value.trim(),\n                salesRepEmail: document.getElementById('salesRep').value,\n                message: document.getElementById('customMessage').value.trim(),\n                \n                // Design details\n                stripeStyle: currentDesign.style,\n                frontOption: currentDesign.front,\n                backOption: currentDesign.back,\n                frontImage: currentDesign.frontImage,\n                backImage: currentDesign.backImage\n            };\n            \n            // Save to database. The save and the confirmation email are INDEPENDENT\n            // operations — an email failure must never mask a saved design\n            // (2026-07-01, same fix as the SCP calculator). Especially important here\n            // because the EmailJS template below is still a placeholder, so the email\n            // currently fails on every submit even though the design saves fine.\n            const saveResult = await quoteService.saveDesign(designData);\n            const quoteID = saveResult.quoteID;\n            const saved = !!saveResult.success;\n\n            if (!saved) {\n                console.error('Database save warning:', saveResult.error);\n            }\n\n            // Send email - ALL variables must have values (never empty)\n            const emailData = {\n                // Email routing\n                to_email: designData.customerEmail,\n                from_name: 'Northwest Custom Apparel',\n                reply_to: designData.salesRepEmail,\n                \n                // Quote details\n                quote_id: quoteID,\n                quote_type: 'Safety Stripe Design',\n                quote_date: new Date().toLocaleDateString(),\n                \n                // Customer info\n                customer_name: designData.customerName,\n                customer_email: designData.customerEmail,\n                company_name: designData.companyName || 'Not Provided',\n                customer_phone: designData.customerPhone || 'Not Provided',\n                \n                // Design details\n                stripe_style: designData.stripeStyle,\n                front_option: formatOptionName(designData.frontOption),\n                back_option: formatOptionName(designData.backOption),\n                \n                // Image URLs\n                front_image_url: designData.frontImage,\n                back_image_url: designData.backImage,\n                \n                // Message - NEVER empty string to avoid EmailJS corruption\n                custom_message: designData.message || 'Thank you for your interest in our safety stripe shirts! I look forward to helping you with your order.',\n                \n                // Sales rep\n                sales_rep_email: designData.salesRepEmail,\n                sales_rep_name: getSalesRepName(designData.salesRepEmail),\n                sales_rep_phone: '253-922-5793',\n                \n                // Company\n                company_year: '1977'\n            };\n            \n            // Confirmation email removed 2026-07-05: the 'template_stripe' EmailJS template was\n            // never created (placeholder stub with a TODO), so this send always silently 400'd.\n            // The design save is the source of truth for a successful submission.\n            if (saved) {\n                showSuccess(quoteID);\n                closeSendModal();\n            } else {\n                alert('Unable to submit the design. Please try again or call (253) 922-5793.');\n            }\n\n        } catch (error) {\n            console.error('Error sending design:', error);\n            alert('Failed to send design. Please try again.');\n        } finally {\n            sendButton.disabled = false;\n            sendButton.innerHTML = originalContent;\n        }\n    });\n});\n\n// Show success modal\nfunction showSuccess(quoteID) {\n    document.getElementById('quoteIdDisplay').textContent = quoteID;\n    document.getElementById('successModal').classList.add('show');\n}\n\n// Close success modal\nfunction closeSuccessModal() {\n    document.getElementById('successModal').classList.remove('show');\n}\n\n// Copy quote ID\nfunction copyQuoteId() {\n    const quoteId = document.getElementById('quoteIdDisplay').textContent;\n    navigator.clipboard.writeText(quoteId).then(() => {\n        const btn = event.target.closest('button');\n        const originalText = btn.innerHTML;\n        btn.innerHTML = '<i class=\"fas fa-check\" aria-hidden=\"true\"></i> Copied!';\n        setTimeout(() => {\n            btn.innerHTML = originalText;\n        }, 2000);\n    });\n}\n\n// Start new design\nfunction startNewDesign() {\n    // Reset everything\n    currentDesign = {\n        style: '',\n        front: '',\n        back: '',\n        frontImage: '',\n        backImage: ''\n    };\n    \n    // Reset UI\n    document.querySelectorAll('.stripe-option').forEach(el => {\n        el.classList.remove('selected');\n    });\n    document.getElementById('designArea').style.display = 'none';\n    document.getElementById('actionSection').style.display = 'none';\n    \n    // Close modal and scroll to top\n    closeSuccessModal();\n    window.scrollTo({ top: 0, behavior: 'smooth' });\n}\n\n// Stripe tiles are role=button (were inline onclick= divs); Enter/Space selects like a click\ndocument.addEventListener('keydown', function (e) {\n    if (e.key !== 'Enter' && e.key !== ' ') return;\n    var tile = e.target && e.target.closest && e.target.closest('.stripe-option[data-style]');\n    if (tile) { e.preventDefault(); selectStripeStyle(tile.dataset.style); }\n});\n",
+      "after": "let savingDesign = false;\nlet copyGeneration = 0;\n\n// Dialogs retain drafts on cancel and own focus through the native browser lifecycle.\nfunction openSendModal() {\n    if (savingDesign || !currentDesign.style) return;\n    document.getElementById('summaryStyle').textContent = currentDesign.style;\n    document.getElementById('summaryFront').textContent = formatOptionName(currentDesign.front);\n    document.getElementById('summaryBack').textContent = formatOptionName(currentDesign.back);\n    const modal = document.getElementById('sendModal');\n    if (!modal.open) modal.showModal();\n}\nfunction closeSendModal() {\n    if (!savingDesign) document.getElementById('sendModal').close();\n}\nfunction showSaveFailure(message) {\n    const status = document.getElementById('stripeSaveStatus');\n    status.textContent = message;\n    status.hidden = false;\n}\nfunction setSaving(saving) {\n    savingDesign = saving;\n    const form = document.getElementById('sendForm');\n    form.setAttribute('aria-busy', String(saving));\n    form.querySelectorAll('input, select, textarea, button').forEach(node => { node.disabled = saving; });\n    document.getElementById('sendButton').textContent = saving ? 'Saving design…' : 'Save Design';\n}\ndocument.addEventListener('DOMContentLoaded', () => {\n    const form = document.getElementById('sendForm');\n    const modal = document.getElementById('sendModal');\n    modal.addEventListener('cancel', event => { if (savingDesign) event.preventDefault(); });\n    form.addEventListener('submit', async event => {\n        event.preventDefault();\n        if (savingDesign || !form.reportValidity()) return;\n        const designData = {\n            customerName: document.getElementById('customerName').value.trim(),\n            customerEmail: document.getElementById('customerEmail').value.trim(),\n            customerPhone: document.getElementById('customerPhone').value.trim(),\n            companyName: document.getElementById('companyName').value.trim(),\n            salesRepEmail: document.getElementById('salesRep').value,\n            message: document.getElementById('customMessage').value.trim(),\n            stripeStyle: currentDesign.style,\n            frontOption: currentDesign.front,\n            backOption: currentDesign.back,\n            frontImage: currentDesign.frontImage,\n            backImage: currentDesign.backImage\n        };\n        setSaving(true);\n        document.getElementById('stripeSaveStatus').hidden = true;\n        try {\n            const result = await quoteService.saveDesign(designData);\n            if (result.success) {\n                form.reset();\n                modal.close();\n                showSuccess(result.quoteID);\n            } else {\n                const reference = result.sessionSaved ? ' Reference: ' + result.quoteID + '.' : '';\n                showSaveFailure('Unable to save the complete design. Your information is still here. Try Save Design again or call (253) 922-5793.' + reference);\n            }\n        } catch (error) {\n            console.error('Unable to save design:', error);\n            showSaveFailure('Unable to save the design. Your information is still here. Please try again.');\n        } finally {\n            setSaving(false);\n        }\n    });\n    document.addEventListener('error', event => {\n        if (!(event.target instanceof HTMLImageElement)) return;\n        const warning = document.getElementById('stripeImageWarning');\n        warning.textContent = 'A design preview could not load. Refresh the page to check the artwork before saving.';\n        warning.hidden = false;\n    }, true);\n});\nfunction showSuccess(quoteID) {\n    copyGeneration++;\n    document.getElementById('quoteIdDisplay').textContent = quoteID;\n    document.getElementById('stripeCopyStatus').textContent = '';\n    document.getElementById('successModal').showModal();\n}\nfunction closeSuccessModal() {\n    copyGeneration++;\n    document.getElementById('successModal').close();\n}\nasync function copyQuoteId() {\n    const generation = ++copyGeneration;\n    const quoteId = document.getElementById('quoteIdDisplay').textContent;\n    const modal = document.getElementById('successModal');\n    try {\n        await navigator.clipboard.writeText(quoteId);\n        if (generation === copyGeneration && modal.open) document.getElementById('stripeCopyStatus').textContent = 'Reference copied.';\n    } catch (error) {\n        if (generation === copyGeneration && modal.open) document.getElementById('stripeCopyStatus').textContent = 'Unable to copy. Select the reference number and copy it manually.';\n    }\n}\nfunction startNewDesign() {\n    if (savingDesign) return;\n    currentDesign = {style: '', front: '', back: '', frontImage: '', backImage: ''};\n    document.querySelectorAll('.stripe-option').forEach(node => {\n        node.classList.remove('selected');\n        node.setAttribute('aria-pressed', 'false');\n    });\n    document.getElementById('designArea').hidden = true;\n    document.getElementById('actionSection').hidden = true;\n    document.getElementById('sendForm').reset();\n    document.getElementById('stripeSaveStatus').hidden = true;\n    closeSuccessModal();\n    document.querySelector('.stripe-option').focus();\n    window.scrollTo({top: 0, behavior: 'instant'});\n}\n",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-calculator.js",
+      "before": "// Initialize EmailJS\nemailjs.init(((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.EMAIL && window.APP_CONFIG.EMAIL.PUBLIC_KEY) || ''));\n\n",
+      "after": "// The design save is the only delivery action on this page.\n\n",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-calculator.js",
+      "before": "function selectStripeStyle(style) {",
+      "after": "function selectStripeStyle(style) {\n    if (savingDesign) return;",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-calculator.js",
+      "before": "        el.classList.remove('selected');",
+      "after": "        el.classList.remove('selected');\n        el.setAttribute('aria-pressed', 'false');",
+      "count": 2
+    },
+    {
+      "file": "calculators/safety-stripe-calculator.js",
+      "before": "document.querySelector(`[data-style=\"${style}\"]`).classList.add('selected');",
+      "after": "document.querySelector(`[data-style=\"${style}\"]`).classList.add('selected');\n    document.querySelector(`[data-style=\"${style}\"]`).setAttribute('aria-pressed', 'true');",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-calculator.js",
+      "before": "document.getElementById('designArea').style.display = 'grid';",
+      "after": "document.getElementById('designArea').hidden = false;",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-calculator.js",
+      "before": "document.getElementById('actionSection').style.display = 'block';",
+      "after": "document.getElementById('actionSection').hidden = false;",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-calculator.js",
+      "before": "{ behavior: 'smooth' }",
+      "after": "{ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' }",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-calculator.js",
+      "before": "const optionEl = document.createElement('div');",
+      "after": "const optionEl = document.createElement('button');\n        optionEl.type = 'button';",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-calculator.js",
+      "before": "optionEl.className = 'placement-option';",
+      "after": "optionEl.className = 'btn placement-option';",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-calculator.js",
+      "before": "function selectOption(side, option) {",
+      "after": "function selectOption(side, option) {\n    if (savingDesign) return;",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-calculator.js",
+      "before": "container.querySelector(`[data-option=\"${option}\"]`).classList.add('selected');",
+      "after": "container.querySelector(`[data-option=\"${option}\"]`).classList.add('selected');\n    container.querySelector(`[data-option=\"${option}\"]`).setAttribute('aria-pressed', 'true');",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator-service.js",
+      "before": "        this.quotePrefix = 'SSC'; // Safety Stripe Creator",
+      "after": "        this.quotePrefix = 'SSC'; // Safety Stripe Creator\n        this.pendingSave = null;",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator-service.js",
+      "before": "    async saveDesign(designData) {\n        try {\n            const quoteID = this.generateQuoteID();\n            const sessionID = this.generateSessionID();",
+      "after": "    async saveDesign(designData) {\n        let quoteID;\n        try {\n            const key = JSON.stringify(designData);\n            if (this.pendingSave && this.pendingSave.key !== key) this.pendingSave = null;\n            const pending = this.pendingSave;\n            quoteID = pending ? pending.quoteID : this.generateQuoteID();\n            const sessionID = pending ? pending.sessionID : this.generateSessionID();",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator-service.js",
+      "before": "            const sessionResponse = await fetch(`${this.baseURL}/api/quote_sessions`, {",
+      "after": "            if (!pending) {\n            const sessionResponse = await fetch(`${this.baseURL}/api/quote_sessions`, {",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator-service.js",
+      "before": "            // Step 2: Add design details to quote_items",
+      "after": "            this.pendingSave = {key, quoteID, sessionID};\n            }\n\n            // Step 2: Add design details to quote_items",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator-service.js",
+      "before": "                    sentBy: designData.salesRepEmail,",
+      "after": "                    sentBy: designData.salesRepEmail,\n                    message: designData.message || '',",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator-service.js",
+      "before": "                // Don't throw - session was created successfully",
+      "after": "                throw new Error('Design details could not be saved');",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator-service.js",
+      "before": "            return {\n                success: true,\n                quoteID: quoteID,",
+      "after": "            this.pendingSave = null;\n            return {\n                success: true,\n                quoteID: quoteID,",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator-service.js",
+      "before": "            // Still return a quote ID even if database save failed\n            // This ensures the customer gets their design",
+      "after": "            // Keep the accepted session for an exact retry of its missing item.",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator-service.js",
+      "before": "                quoteID: this.generateQuoteID(),",
+      "after": "                quoteID: quoteID,\n                sessionSaved: !!this.pendingSave,",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-calculator.js",
+      "before": "function loadOptions(side, style) {\n    const container = document.getElementById(`${side}Options`);\n    const preview = document.getElementById(`${side}Preview`);\n    const options = STRIPE_IMAGES[style][side];\n    \n    container.innerHTML = '';\n    \n    Object.entries(options).forEach(([option, imageUrl]) => {\n        const optionEl = document.createElement('button');\n        optionEl.type = 'button';\n        optionEl.className = 'btn placement-option';\n        optionEl.dataset.option = option;\n        optionEl.onclick = () => selectOption(side, option);\n        \n        optionEl.innerHTML = `\n            <img src=\"${imageUrl}\" alt=\"${formatOptionName(option)}\">\n            <span>${formatOptionName(option)}</span>\n        `;\n        \n        container.appendChild(optionEl);\n    });\n    \n    // Select first option by default\n    selectOption(side, 'JustStripes');\n}\n\n",
+      "after": "function loadOptions(side, style) {\n    const container = document.getElementById(`${side}Options`);\n    const options = STRIPE_IMAGES[style][side];\n    \n    container.innerHTML = '';\n    \n    Object.entries(options).forEach(([option, imageUrl]) => {\n        const optionEl = document.createElement('button');\n        optionEl.type = 'button';\n        optionEl.className = 'btn placement-option';\n        optionEl.dataset.option = option;\n        optionEl.onclick = () => selectOption(side, option);\n        \n        optionEl.innerHTML = `\n            <img src=\"${imageUrl}\" alt=\"${formatOptionName(option)}\">\n            <span>${formatOptionName(option)}</span>\n        `;\n        \n        container.appendChild(optionEl);\n    });\n    \n    // Select first option by default\n    selectOption(side, 'JustStripes');\n}\n\n",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "safety-stripe-creator-service.js?v=2026.09.06.37",
+      "after": "safety-stripe-creator-service.js?v=2026.09.11.6",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "safety-stripe-calculator.js?v=2026.09.06.36",
+      "after": "safety-stripe-calculator.js?v=2026.09.11.6",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "<!-- Designs are saved locally through the existing quote relay; no customer email is sent. -->",
+      "after": "<!-- The existing quote relay saves designs; no customer email is sent. -->",
+      "count": 1
+    },
+    {
+      "file": "shared_components/css/safety-stripe-creator.css",
+      "before": "\n@media",
+      "after": "\n\n@media",
+      "count": 3
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "    <!-- Custom Styles -->\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link href=\"/shared_components/css/safety-stripe-creator.css?v=2026.09.11.6\" rel=\"stylesheet\">\n    \n    <!-- Shared Calculator Styles -->\n    <link href=\"/shared_components/css/components.css?v=2026.09.11.6\" rel=\"stylesheet\">\n    <link href=\"/shared_components/css/specialty-pricing.css?v=2026.09.11.6\" rel=\"stylesheet\">\n    ",
+      "after": "    <!-- Canonical components establish sublayer order before the page owner. -->\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.11.6\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/components.css?v=2026.09.11.6\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/specialty-pricing.css?v=2026.09.11.6\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/safety-stripe-creator.css?v=2026.09.11.6\">",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "        <!-- Send Button -->",
+      "after": "        <p id=\"stripePaperStatus\" class=\"stripe-paper-status\"></p>\n\n        <!-- Send Button -->",
+      "count": 1
+    },
+    {
+      "file": "shared_components/css/safety-stripe-creator.css",
+      "before": ":where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .copy-status { margin-bottom: 16px; }",
+      "after": ":where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .copy-status { margin-bottom: 16px; }\n:where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .stripe-paper-status { display: none; }",
+      "count": 1
+    },
+    {
+      "file": "shared_components/css/safety-stripe-creator.css",
+      "before": "@media print {",
+      "after": "@media print {\n :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .stripe-paper-status { display: block; font-size: 9pt; line-height: 1.5; }\n :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .stripe-paper-status:empty { display: none; }",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-calculator.js",
+      "before": "    status.textContent = message;",
+      "after": "    status.textContent = message;\n    document.getElementById('stripePaperStatus').textContent = message;",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-calculator.js",
+      "before": "    modal.addEventListener('cancel', event => { if (savingDesign) event.preventDefault(); });",
+      "after": "    modal.addEventListener('cancel', event => { if (savingDesign) event.preventDefault(); });\n    for (const dialog of document.querySelectorAll('.stripe-dialog')) {\n        dialog.addEventListener('keydown', event => {\n            if (event.key !== 'Tab') return;\n            const controls = [...dialog.querySelectorAll('button, input, select, textarea, a[href]')].filter(node => !node.disabled && node.getClientRects().length);\n            const first = controls[0], last = controls.at(-1);\n            if (controls.length && (event.shiftKey ? document.activeElement === first : document.activeElement === last)) {\n                event.preventDefault();\n                (event.shiftKey ? last : first).focus();\n            }\n        });\n    }\n",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-calculator.js",
+      "before": "    document.getElementById('stripeCopyStatus').textContent = '';",
+      "after": "    document.getElementById('stripeCopyStatus').textContent = '';\n    document.getElementById('stripePaperStatus').textContent = 'Design saved. Reference: ' + quoteID + '. No customer email has been sent.';",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-calculator.js",
+      "before": "    closeSuccessModal();\n    document.querySelector('.stripe-option').focus();",
+      "after": "    closeSuccessModal();\n    document.getElementById('stripePaperStatus').textContent = '';\n    document.querySelector('.stripe-option').focus();",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator-service.js",
+      "before": "            if (!pending) {\n            const sessionResponse = await fetch(`${this.baseURL}/api/quote_sessions`, {\n                method: 'POST',\n                headers: {\n                    'Content-Type': 'application/json'\n                },\n                body: JSON.stringify(sessionData)\n            });\n\n            const responseText = await sessionResponse.text();\n            safestricreaLog('[SafetyStripeQuoteService] Session response:', sessionResponse.status, responseText);\n\n            if (!sessionResponse.ok) {\n                let errorMessage = `Session creation failed: ${sessionResponse.status}`;\n                try {\n                    const errorData = JSON.parse(responseText);\n                    errorMessage = errorData.message || errorData.error || errorMessage;\n                } catch (e) {\n                    errorMessage += ` - ${responseText}`;\n                }\n                throw new Error(errorMessage);\n            }\n\n            this.pendingSave = {key, quoteID, sessionID};\n            }\n",
+      "after": "            if (!pending) {\n                const sessionResponse = await fetch(`${this.baseURL}/api/quote_sessions`, {\n                    method: 'POST',\n                    headers: {\n                        'Content-Type': 'application/json'\n                    },\n                    body: JSON.stringify(sessionData)\n                });\n\n                const responseText = await sessionResponse.text();\n                safestricreaLog('[SafetyStripeQuoteService] Session response:', sessionResponse.status, responseText);\n\n                if (!sessionResponse.ok) {\n                    let errorMessage = `Session creation failed: ${sessionResponse.status}`;\n                    try {\n                        const errorData = JSON.parse(responseText);\n                        errorMessage = errorData.message || errorData.error || errorMessage;\n                    } catch (e) {\n                        errorMessage += ` - ${responseText}`;\n                    }\n                    throw new Error(errorMessage);\n                }\n\n                this.pendingSave = {key, quoteID, sessionID};\n            }\n",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-calculator.js",
+      "before": "        if (!(event.target instanceof HTMLImageElement)) return;",
+      "after": "        if (!(event.target instanceof HTMLImageElement) || !event.target.getAttribute('src')) return;",
+      "count": 1
+    },
+    {
+      "file": "shared_components/css/safety-stripe-creator.css",
+      "before": ":where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .title-section { margin-bottom: 32px; }",
+      "after": ":where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .title-section { display: block; margin-bottom: 32px; }\n:where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .title-section h1 { margin-bottom: 12px; }",
+      "count": 1
+    },
+    {
+      "file": "shared_components/css/safety-stripe-creator.css",
+      "before": " .title-section p { color: var(--ui-muted); max-width: 68ch; line-height: 1.6; }",
+      "after": " .title-section p { color: var(--ui-muted); max-width: 68ch; line-height: 1.6; margin: 0; }",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-calculator.js",
+      "before": "    document.addEventListener('error', event => {\n        if (!(event.target instanceof HTMLImageElement) || !event.target.getAttribute('src')) return;\n        const warning = document.getElementById('stripeImageWarning');\n        warning.textContent = 'A design preview could not load. Refresh the page to check the artwork before saving.';\n        warning.hidden = false;\n    }, true);",
+      "after": "    function markUnavailable(img) {\n        if (!(img instanceof HTMLImageElement) || !img.getAttribute('src')) return;\n        img.hidden = true;\n        img.dataset.previewUnavailable = 'true';\n        if (!img.parentElement.querySelector('.stripe-image-placeholder')) {\n            const placeholder = document.createElement('span');\n            placeholder.className = 'stripe-image-placeholder';\n            placeholder.textContent = img.closest('.shirt-preview') ? 'Preview unavailable' : 'Image unavailable';\n            img.before(placeholder);\n        }\n        const warning = document.getElementById('stripeImageWarning');\n        warning.textContent = 'A design preview could not load. Refresh the page to check the artwork before saving.';\n        warning.hidden = false;\n    }\n    document.addEventListener('error', event => markUnavailable(event.target), true);\n    document.addEventListener('load', event => {\n        const img = event.target;\n        if (!(img instanceof HTMLImageElement) || !img.dataset.previewUnavailable) return;\n        img.hidden = false;\n        delete img.dataset.previewUnavailable;\n        img.parentElement.querySelector('.stripe-image-placeholder')?.remove();\n        document.getElementById('stripeImageWarning').hidden = !document.querySelector('img[data-preview-unavailable]');\n    }, true);\n    document.querySelectorAll('img[src]').forEach(img => {\n        if (img.getAttribute('src') && img.complete && !img.naturalWidth) markUnavailable(img);\n    });",
+      "count": 1
+    },
+    {
+      "file": "shared_components/css/safety-stripe-creator.css",
+      "before": ":where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .copy-status { margin-bottom: 16px; }",
+      "after": ":where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .copy-status { margin-bottom: 16px; }\n:where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .stripe-image-placeholder { display: grid; place-items: center; width: 100%; min-height: 70px; color: var(--ui-muted); background: var(--ui-canvas); border-radius: var(--radius-sm); }\n:where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .shirt-preview .stripe-image-placeholder { height: 320px; }\n:where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .stripe-option .stripe-image-placeholder { height: 156px; }",
+      "count": 1
+    },
+    {
+      "file": "shared_components/css/safety-stripe-creator.css",
+      "before": "@media (width <= 900px) {",
+      "after": "@media (width <= 900px) {\n :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .shirt-preview .stripe-image-placeholder { height: 260px; }",
+      "count": 1
+    },
+    {
+      "file": "shared_components/css/safety-stripe-creator.css",
+      "before": "@media (width <= 640px) {",
+      "after": "@media (width <= 640px) {\n :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .shirt-preview .stripe-image-placeholder { height: 280px; }\n :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .stripe-option .stripe-image-placeholder { height: 112px; }\n :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .placement-option .stripe-image-placeholder { height: 96px; }",
+      "count": 1
+    },
+    {
+      "file": "shared_components/css/safety-stripe-creator.css",
+      "before": "@media print {",
+      "after": "@media print {\n :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .shirt-preview .stripe-image-placeholder { height: 225px; }\n :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .stripe-option .stripe-image-placeholder { height: 90px; }\n :where([data-ui=\"unified\"][data-specialty-calculator=\"safety-stripe\"]) .placement-option .stripe-image-placeholder { height: 58px; min-height: 0; }",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-calculator.js",
+      "before": "function selectOption(side, option) {\n    if (savingDesign) return;",
+      "after": "function selectOption(side, option) {\n    if (savingDesign) return;\n    document.getElementById('stripePaperStatus').textContent = '';\n    document.getElementById('stripeSaveStatus').textContent = '';\n    document.getElementById('stripeSaveStatus').hidden = true;",
+      "count": 1
+    },
+    {
+      "file": "calculators/safety-stripe-creator-service.js",
+      "before": "async saveDesign(designData) {\n        let quoteID;\n        try {\n            const key = JSON.stringify(designData);\n            if (this.pendingSave && this.pendingSave.key !== key) this.pendingSave = null;\n            const pending = this.pendingSave;\n            quoteID = pending ? pending.quoteID : this.generateQuoteID();\n            const sessionID = pending ? pending.sessionID : this.generateSessionID();\n            \n            safestricreaLog('[SafetyStripeQuoteService] Saving design with ID:', quoteID);\n\n            // Step 1: Create quote session\n            const expiresAtDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);\n            const formattedExpiresAt = expiresAtDate.toISOString().replace(/\\.\\d{3}Z$/, '');\n            \n            const sessionData = {\n                QuoteID: quoteID,\n                SessionID: sessionID,\n                CustomerEmail: designData.customerEmail,\n                CustomerName: designData.customerName || 'Guest',\n                CompanyName: designData.companyName || 'Not Provided',\n                Phone: designData.customerPhone || '',\n                TotalQuantity: 0, // No quantity for designs\n                SubtotalAmount: 0,\n                LTMFeeTotal: 0,\n                TotalAmount: 0,\n                Status: 'Design Sent',\n                ExpiresAt: formattedExpiresAt,\n                Notes: `Safety Stripe Design - ${designData.stripeStyle}\\nFront: ${designData.frontOption}, Back: ${designData.backOption}`\n            };\n\n            safestricreaLog('[SafetyStripeQuoteService] Session data:', sessionData);\n\n            if (!pending) {\n                const sessionResponse = await fetch(`${this.baseURL}/api/quote_sessions`, {\n                    method: 'POST',\n                    headers: {\n                        'Content-Type': 'application/json'\n                    },\n                    body: JSON.stringify(sessionData)\n                });\n\n                const responseText = await sessionResponse.text();\n                safestricreaLog('[SafetyStripeQuoteService] Session response:', sessionResponse.status, responseText);\n\n                if (!sessionResponse.ok) {\n                    let errorMessage = `Session creation failed: ${sessionResponse.status}`;\n                    try {\n                        const errorData = JSON.parse(responseText);\n                        errorMessage = errorData.message || errorData.error || errorMessage;\n                    } catch (e) {\n                        errorMessage += ` - ${responseText}`;\n                    }\n                    throw new Error(errorMessage);\n                }\n\n                this.pendingSave = {key, quoteID, sessionID};\n            }\n\n            // Step 2: Add design details to quote_items\n            const addedAt = new Date().toISOString().replace(/\\.\\d{3}Z$/, '');\n            \n            // Format option names for display\n            const formatOption = (opt) => opt.replace(/([A-Z])/g, ' $1').trim();\n            \n            const itemData = {\n                QuoteID: quoteID,\n                LineNumber: 1,\n                StyleNumber: 'SAFETY-STRIPE',\n                ProductName: `Safety Stripe Design - ${designData.stripeStyle}`,\n                Color: 'Safety Orange',\n                ColorCode: '#FF6B35',\n                EmbellishmentType: 'safety-stripes',\n                PrintLocation: `Front: ${formatOption(designData.frontOption)}, Back: ${formatOption(designData.backOption)}`,\n                PrintLocationName: designData.stripeStyle,\n                Quantity: 0,\n                HasLTM: 'No',\n                BaseUnitPrice: 0,\n                LTMPerUnit: 0,\n                FinalUnitPrice: 0,\n                LineTotal: 0,\n                // Store design configuration as JSON\n                SizeBreakdown: JSON.stringify({\n                    stripeStyle: designData.stripeStyle,\n                    frontOption: designData.frontOption,\n                    backOption: designData.backOption,\n                    frontImage: designData.frontImage,\n                    backImage: designData.backImage,\n                    sentBy: designData.salesRepEmail,\n                    message: designData.message || '',\n                    sentAt: new Date().toISOString()\n                }),\n                PricingTier: 'Design Only',\n                ImageURL: designData.frontImage || '',\n                AddedAt: addedAt\n            };\n\n            safestricreaLog('[SafetyStripeQuoteService] Item data:', itemData);\n\n            const itemResponse = await fetch(`${this.baseURL}/api/quote_items`, {\n                method: 'POST',\n                headers: {\n                    'Content-Type': 'application/json'\n                },\n                body: JSON.stringify(itemData)\n            });\n\n            const itemResponseText = await itemResponse.text();\n            safestricreaLog('[SafetyStripeQuoteService] Item response:', itemResponse.status, itemResponseText);\n\n            if (!itemResponse.ok) {\n                console.error('Failed to save design details:', itemResponseText);\n                throw new Error('Design details could not be saved');\n            }\n\n            this.pendingSave = null;\n            return {\n                success: true,\n                quoteID: quoteID,\n                message: 'Design saved successfully'\n            };\n\n        } catch (error) {\n            console.error('[SafetyStripeQuoteService] Error saving design:', error);\n            // Keep the accepted session for an exact retry of its missing item.\n            return {\n                success: false,\n                quoteID: quoteID,\n                sessionSaved: !!this.pendingSave,\n                error: error.message\n            };\n        }\n    }",
+      "after": "async saveDesign(designData) {\n        let quoteID;\n        try {\n            const key = JSON.stringify(designData);\n            if (this.pendingSave && this.pendingSave.key !== key) this.pendingSave = null;\n            const pending = this.pendingSave;\n            quoteID = pending ? pending.quoteID : this.generateQuoteID();\n            const sessionID = pending ? pending.sessionID : this.generateSessionID();\n\n            safestricreaLog('[SafetyStripeQuoteService] Saving design with ID:', quoteID);\n\n            // Step 1: Create quote session\n            const expiresAtDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);\n            const formattedExpiresAt = expiresAtDate.toISOString().replace(/\\.\\d{3}Z$/, '');\n\n            const sessionData = {\n                QuoteID: quoteID,\n                SessionID: sessionID,\n                CustomerEmail: designData.customerEmail,\n                CustomerName: designData.customerName || 'Guest',\n                CompanyName: designData.companyName || 'Not Provided',\n                Phone: designData.customerPhone || '',\n                TotalQuantity: 0, // No quantity for designs\n                SubtotalAmount: 0,\n                LTMFeeTotal: 0,\n                TotalAmount: 0,\n                Status: 'Design Sent',\n                ExpiresAt: formattedExpiresAt,\n                Notes: `Safety Stripe Design - ${designData.stripeStyle}\\nFront: ${designData.frontOption}, Back: ${designData.backOption}`\n            };\n\n            safestricreaLog('[SafetyStripeQuoteService] Session data:', sessionData);\n\n            if (!pending) {\n                const sessionResponse = await fetch(`${this.baseURL}/api/quote_sessions`, {\n                    method: 'POST',\n                    headers: {\n                        'Content-Type': 'application/json'\n                    },\n                    body: JSON.stringify(sessionData)\n                });\n\n                const responseText = await sessionResponse.text();\n                safestricreaLog('[SafetyStripeQuoteService] Session response:', sessionResponse.status, responseText);\n\n                if (!sessionResponse.ok) {\n                    let errorMessage = `Session creation failed: ${sessionResponse.status}`;\n                    try {\n                        const errorData = JSON.parse(responseText);\n                        errorMessage = errorData.message || errorData.error || errorMessage;\n                    } catch (e) {\n                        errorMessage += ` - ${responseText}`;\n                    }\n                    throw new Error(errorMessage);\n                }\n\n                this.pendingSave = {key, quoteID, sessionID};\n            }\n\n            // Step 2: Add design details to quote_items\n            const addedAt = new Date().toISOString().replace(/\\.\\d{3}Z$/, '');\n\n            // Format option names for display\n            const formatOption = (opt) => opt.replace(/([A-Z])/g, ' $1').trim();\n\n            const itemData = {\n                QuoteID: quoteID,\n                LineNumber: 1,\n                StyleNumber: 'SAFETY-STRIPE',\n                ProductName: `Safety Stripe Design - ${designData.stripeStyle}`,\n                Color: 'Safety Orange',\n                ColorCode: '#FF6B35',\n                EmbellishmentType: 'safety-stripes',\n                PrintLocation: `Front: ${formatOption(designData.frontOption)}, Back: ${formatOption(designData.backOption)}`,\n                PrintLocationName: designData.stripeStyle,\n                Quantity: 0,\n                HasLTM: 'No',\n                BaseUnitPrice: 0,\n                LTMPerUnit: 0,\n                FinalUnitPrice: 0,\n                LineTotal: 0,\n                // Store design configuration as JSON\n                SizeBreakdown: JSON.stringify({\n                    stripeStyle: designData.stripeStyle,\n                    frontOption: designData.frontOption,\n                    backOption: designData.backOption,\n                    frontImage: designData.frontImage,\n                    backImage: designData.backImage,\n                    sentBy: designData.salesRepEmail,\n                    message: designData.message || '',\n                    sentAt: new Date().toISOString()\n                }),\n                PricingTier: 'Design Only',\n                ImageURL: designData.frontImage || '',\n                AddedAt: addedAt\n            };\n\n            safestricreaLog('[SafetyStripeQuoteService] Item data:', itemData);\n\n            const itemResponse = await fetch(`${this.baseURL}/api/quote_items`, {\n                method: 'POST',\n                headers: {\n                    'Content-Type': 'application/json'\n                },\n                body: JSON.stringify(itemData)\n            });\n\n            const itemResponseText = await itemResponse.text();\n            safestricreaLog('[SafetyStripeQuoteService] Item response:', itemResponse.status, itemResponseText);\n\n            if (!itemResponse.ok) {\n                console.error('Failed to save design details:', itemResponseText);\n                throw new Error('Design details could not be saved');\n            }\n\n            this.pendingSave = null;\n            return {\n                success: true,\n                quoteID: quoteID,\n                message: 'Design saved successfully'\n            };\n\n        } catch (error) {\n            console.error('[SafetyStripeQuoteService] Error saving design:', error);\n            // Keep the accepted session for an exact retry of its missing item.\n            return {\n                success: false,\n                quoteID: quoteID,\n                sessionSaved: !!this.pendingSave,\n                error: error.message\n            };\n        }\n    }",
+      "count": 1
     }
   ],
   "capturedAt": "2026-09-11T17:28:04.536Z"

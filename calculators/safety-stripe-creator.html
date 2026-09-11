@@ -6,38 +6,36 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Safety Stripe Creator - Northwest Custom Apparel</title>
     <link rel="icon" href="/favicon.png" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
     <!-- EmailJS SDK -->
     <script src="/config/app.config.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <!-- The existing quote relay saves designs; no customer email is sent. -->
     
     <!-- Base Quote Service -->
     <script src="/shared_components/js/base-quote-service.js?v=2026.09.06.37"></script>
     <!-- Calculator Utilities -->
     <script src="/shared_components/js/calculator-utilities.js?v=2026.09.06.36"></script>
     <!-- Quote Service -->
-    <script src="/calculators/safety-stripe-creator-service.js?v=2026.09.06.37"></script>
+    <script src="/calculators/safety-stripe-creator-service.js?v=2026.09.11.6"></script>
     <!-- Safety Stripe Calculator Class -->
     <script src="/shared_components/js/data-call-delegator.js?v=2026.09.06.27"></script>
-    <script src="/calculators/safety-stripe-calculator.js?v=2026.09.06.36"></script>
+    <script src="/calculators/safety-stripe-calculator.js?v=2026.09.11.6"></script>
     
-    <!-- Custom Styles -->
-    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link href="/shared_components/css/safety-stripe-creator.css?v=2026.09.07.12" rel="stylesheet">
-    
-    <!-- Shared Calculator Styles -->
-    <link href="/shared_components/css/calculator-base.css?v=2026.09.07.19" rel="stylesheet">
-    
+    <!-- Canonical components establish sublayer order before the page owner. -->
+    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.11.6">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.11.6">
+    <link rel="stylesheet" href="/shared_components/css/specialty-pricing.css?v=2026.09.11.6">
+    <link rel="stylesheet" href="/shared_components/css/safety-stripe-creator.css?v=2026.09.11.6">
 </head>
-<body>
+<body data-ui="unified" data-specialty-calculator="safety-stripe">
     <!-- Header -->
     <header class="header">
         <div class="header-container">
             <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
                  alt="Northwest Custom Apparel" class="logo">
-            <nav class="breadcrumb">
+            <nav class="breadcrumb" aria-label="Breadcrumb">
                 <a href="/staff-dashboard.html">Staff Dashboard</a>
                 <span>/</span>
                 <span>Safety Stripe Creator</span>
@@ -46,103 +44,107 @@
     </header>
 
     <!-- Main Content -->
-    <main class="container">
+    <main class="container main-container">
         <!-- Title -->
-        <div class="title-section">
+        <div class="title-section page-hero">
             <h1>Safety Stripe Creator</h1>
-            <p>Design custom safety stripes and send mockups to customers</p>
+            <p>Choose a stripe style and save a front and back design.</p>
         </div>
+
+        <p id="stripeImageWarning" class="stripe-status" role="alert" hidden></p>
 
         <!-- Stripe Style Selector -->
         <div class="stripe-selector">
             <h2>Step 1: Choose Your Stripe Style</h2>
-            <div class="stripe-options">
-                <div class="stripe-option" data-style="Standard" data-call="selectStripeStyle" data-args='["Standard"]' role="button" tabindex="0">
+            <div class="stripe-options" role="group" aria-label="Stripe style">
+                <button type="button" class="btn stripe-option" data-style="Standard" data-call="selectStripeStyle" data-args='["Standard"]' aria-pressed="false">
                     <img src="https://northwestcustomapparel.box.com/shared/static/l5pnj4hhvrfgtzs0lae32c4zefz8feib" alt="Standard">
-                    <h3>Standard</h3>
-                </div>
-                <div class="stripe-option" data-style="Warning" data-call="selectStripeStyle" data-args='["Warning"]' role="button" tabindex="0">
+                    <span class="stripe-label">Standard</span>
+                </button>
+                <button type="button" class="btn stripe-option" data-style="Warning" data-call="selectStripeStyle" data-args='["Warning"]' aria-pressed="false">
                     <img src="https://northwestcustomapparel.box.com/shared/static/tcmcme9ihfx15cu70rhycxdqgbceervl" alt="Warning">
-                    <h3>Warning</h3>
-                </div>
-                <div class="stripe-option" data-style="DiamondPlate" data-call="selectStripeStyle" data-args='["DiamondPlate"]' role="button" tabindex="0">
+                    <span class="stripe-label">Warning</span>
+                </button>
+                <button type="button" class="btn stripe-option" data-style="DiamondPlate" data-call="selectStripeStyle" data-args='["DiamondPlate"]' aria-pressed="false">
                     <img src="https://northwestcustomapparel.box.com/shared/static/6oa86o7o4lou6v0ablxrr32hxn1gxplw" alt="Diamond Plate">
-                    <h3>Diamond Plate</h3>
-                </div>
-                <div class="stripe-option" data-style="ConstructionZone" data-call="selectStripeStyle" data-args='["ConstructionZone"]' role="button" tabindex="0">
+                    <span class="stripe-label">Diamond Plate</span>
+                </button>
+                <button type="button" class="btn stripe-option" data-style="ConstructionZone" data-call="selectStripeStyle" data-args='["ConstructionZone"]' aria-pressed="false">
                     <img src="https://northwestcustomapparel.box.com/shared/static/6r1rp6x7q6nifuw6whtwdhqbl2g8je27" alt="Construction Zone">
-                    <h3>Construction Zone</h3>
-                </div>
+                    <span class="stripe-label">Construction Zone</span>
+                </button>
             </div>
         </div>
 
         <!-- Design Area -->
-        <div class="design-area" id="designArea" style="display: none;">
+        <div class="design-area" id="designArea" hidden>
             <!-- Front Design -->
             <div class="shirt-section">
-                <h3>Step 2: Select Front Design</h3>
+                <h2>Step 2: Select Front Design</h2>
                 <div class="shirt-preview">
                     <img id="frontPreview" src="" alt="Front View">
                 </div>
-                <div class="option-grid" id="frontOptions">
+                <div class="option-grid" id="frontOptions" role="group" aria-label="Front placement">
                     <!-- Options will be populated dynamically -->
                 </div>
             </div>
 
             <!-- Back Design -->
             <div class="shirt-section">
-                <h3>Step 3: Select Back Design</h3>
+                <h2>Step 3: Select Back Design</h2>
                 <div class="shirt-preview">
                     <img id="backPreview" src="" alt="Back View">
                 </div>
-                <div class="option-grid" id="backOptions">
+                <div class="option-grid" id="backOptions" role="group" aria-label="Back placement">
                     <!-- Options will be populated dynamically -->
                 </div>
             </div>
         </div>
 
+        <p id="stripePaperStatus" class="stripe-paper-status"></p>
+
         <!-- Send Button -->
-        <div class="action-section" id="actionSection" style="display: none;">
-            <button class="send-button" data-call="openSendModal">
+        <div class="action-section" id="actionSection" hidden>
+            <button class="btn btn-primary send-button" data-call="openSendModal">
                 <i class="fas fa-paper-plane" aria-hidden="true"></i>
-                Send Design to Customer
+                Save Design
             </button>
         </div>
     </main>
 
     <!-- Send Modal -->
-    <div class="modal-overlay" id="sendModal">
+    <dialog class="ui-dialog stripe-dialog" id="sendModal" aria-labelledby="stripeSendTitle">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Send Design to Customer</h3>
+                <h2 id="stripeSendTitle">Save Design</h2>
             </div>
             <div class="modal-body">
                 <form id="sendForm">
                     <div class="form-grid">
                         <div class="form-group">
                             <label for="customerName">Customer Name <span class="req" aria-hidden="true">*</span></label>
-                            <input type="text" id="customerName" required>
+                            <input type="text" class="field-input" id="customerName" required>
                         </div>
                         
                         <div class="form-group">
                             <label for="customerEmail">Customer Email <span class="req" aria-hidden="true">*</span></label>
-                            <input type="email" id="customerEmail" required>
+                            <input type="email" class="field-input" id="customerEmail" required>
                         </div>
                         
                         <div class="form-group">
                             <label for="customerPhone">Phone (Optional)</label>
-                            <input type="tel" id="customerPhone" placeholder="(555) 123-4567">
+                            <input type="tel" class="field-input" id="customerPhone" placeholder="(555) 123-4567">
                         </div>
                         
                         <div class="form-group">
                             <label for="companyName">Company (Optional)</label>
-                            <input type="text" id="companyName">
+                            <input type="text" class="field-input" id="companyName">
                         </div>
                     </div>
                     
                     <div class="form-group">
                         <label for="salesRep">Sales Representative <span class="req" aria-hidden="true">*</span></label>
-                        <select id="salesRep" required>
+                        <select class="field-select" id="salesRep" required>
                             <option value="">Select Sales Rep</option>
                             <option value="ruth@nwcustomapparel.com">Ruth Nhong</option>
                             <option value="taylar@nwcustomapparel.com">Taylar</option>
@@ -155,8 +157,8 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="customMessage">Message (Optional)</label>
-                        <textarea id="customMessage" rows="3" placeholder="Add a personal note to the customer..."></textarea>
+                        <label for="customMessage">Design note (Optional)</label>
+                        <textarea class="field-textarea" id="customMessage" rows="3" placeholder="Add a note about this design..."></textarea>
                     </div>
                     
                     <div class="design-summary">
@@ -166,34 +168,36 @@
                         <p>Back: <span id="summaryBack"></span></p>
                     </div>
                     
+                    <p id="stripeSaveStatus" class="stripe-status" role="alert" hidden></p>
                     <div class="modal-actions">
                         <button type="button" class="btn btn-secondary" data-call="closeSendModal">Cancel</button>
                         <button type="submit" class="btn btn-primary" id="sendButton">
                             <i class="fas fa-paper-plane" aria-hidden="true"></i>
-                            Send Design
+                            Save Design
                         </button>
                     </div>
                 </form>
             </div>
         </div>
-    </div>
+    </dialog>
 
     <!-- Success Modal -->
-    <div class="modal-overlay" id="successModal">
+    <dialog class="ui-dialog stripe-dialog" id="successModal" aria-labelledby="stripeSuccessTitle">
         <div class="modal-content">
             <div class="success-content">
                 <i class="fas fa-check-circle success-icon" aria-hidden="true"></i>
-                <h3>Design Sent Successfully!</h3>
-                <p>The safety stripe design has been sent to the customer.</p>
+                <h2 id="stripeSuccessTitle" tabindex="-1" autofocus>Design saved</h2>
+                <p>Your safety stripe design is saved. No customer email has been sent.</p>
                 
                 <div class="quote-id-display">
-                    <label>Reference ID:</label>
+                    <span>Reference ID:</span>
                     <span class="quote-id" id="quoteIdDisplay"></span>
-                    <button data-call="copyQuoteId" class="copy-btn">
+                    <button data-call="copyQuoteId" class="btn copy-btn">
                         <i class="fas fa-copy" aria-hidden="true"></i> Copy
                     </button>
                 </div>
                 
+                <p id="stripeCopyStatus" class="copy-status" role="status"></p>
                 <p class="success-note">
                     This design has been saved and can be referenced 
                     when the customer is ready to order.
@@ -205,7 +209,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </dialog>
 
 </body>
 </html>

@@ -5,6 +5,12 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## Design saves must report complete persistence and keep retry ownership (2026-09-11)
+
+- Problem/root cause: Safety Stripe used a modal class its CSS never opened, swallowed item-save failure as success, dropped the design note, and still claimed email delivery after email had been removed. Empty image sources also look failed before a choice is selected.
+- Solution: native named dialogs and buttons, pending-save guards, persistent errors with retained drafts, reuse an accepted session when only its item needs retry, and save the note in the existing design detail. Say Design saved only after both writes succeed. Ignore empty image sources and clearly label genuinely missing previews.
+- Prevention: capture original hidden-dialog and false-success defects without changing original CSS, compare all 64 design combinations and original request values, exercise partial retries, keyboard focus, clipboard failure and short phone dialogs, and review every paper page with warning/reference retention.
+
 ## Product caches and previews must describe current pricing and selection (2026-09-11)
 
 - Problem/root cause: cached products retained old calculated prices and renewed their own age; failed inventory looked like zero stock, and delayed color/image responses could replace the latest selection. Failed product reads left placeholder prices visible.
@@ -102,10 +108,6 @@ Exercise state transitions and verify complete printed content. Full entry in LE
 Native storefront menu focus and paper migration (2026-09-09) is archived in LESSONS_LEARNED_ARCHIVE.md; existing keyboard/browser guards retain the contract.
 
 Staff reference failure-state findings (2026-09-09) are preserved in LESSONS_LEARNED_ARCHIVE.md.
-
-### Shared CSS migration must preserve responsive and interaction ownership (2026-09-09)
-
-Problem: consolidating repeated .stk-card selectors moved desktop grid placement after the mobile media query, making tiny phone columns; legacy and shared menu handlers also toggled the same disclosure twice. Root cause: deduplication ignored cascade order, and both controllers owned aria-expanded/visibility. Solution: base geometry precedes responsive rules; the instant pages bypass legacy disclosure/mobile adapters and use existing shared native owners. Financial/submission/artwork code remains source locked. Prevention: real four-width geometry/axe and open/close/resize keyboard checks, every published sticker row and banner preset, retained upload/draft retry, and full paper text plus visual inspection. A clipped screen-reader caption needs an explicit visible print arrangement; shrink optional paper chrome without dropping original content.
 
 ## Paper-like form layouts need a separate phone arrangement (2026-09-09)
 

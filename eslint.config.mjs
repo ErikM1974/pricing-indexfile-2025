@@ -74,6 +74,8 @@ const LEGACY_ESM = [
 ];
 
 export default [
+    { files: ['calculators/safety-stripe-calculator.js', 'calculators/safety-stripe-creator-service.js'], languageOptions: { sourceType: 'script', globals: { ...globals.browser } }, rules: { 'no-undef': 'error', 'no-unused-vars': ['error', { vars: 'local', argsIgnorePattern: '^_', caughtErrors: 'none' }] } },
+    { files: ['calculators/safety-stripe-calculator.js'], languageOptions: { globals: { SafetyStripeQuoteService: 'readonly' } } },
     { files: ['shared_components/js/laser-tumbler-simple.js'], languageOptions: { globals: { JDSApiService: 'readonly' } } },
     {
         // Existing tumbler controllers now have explicit browser globals and zero unused bindings.

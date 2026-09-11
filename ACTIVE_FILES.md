@@ -1090,3 +1090,5 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - tests/fixtures/specialty-calculators-safety-stripe-failed-item-original-browser.json — immutable synthetic Safety Stripe selection, presentation and save evidence.
 
 - tests/fixtures/specialty-calculators-safety-stripe-all-combinations-original-browser.json — immutable synthetic Safety Stripe selection, presentation and save evidence.
+
+- shared_components/css/safety-stripe-creator.css — reviewed scoped Safety Stripe owner; canonical shared controls, native save dialogs, complete phone design previews and single-page paper layouts.
