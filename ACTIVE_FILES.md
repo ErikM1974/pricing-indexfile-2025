@@ -1066,3 +1066,27 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - tests/fixtures/specialty-calculators-polar-camel-cached-policy-original-browser.json — immutable synthetic Polar Camel browser and native financial evidence.
 
 - shared_components/css/laser-tumbler-simple.css — reviewed scoped Polar Camel owner; canonical storefront controls, responsive logo preview and two-page print layout.
+
+- tests/e2e/helpers/safety-stripe-browser.js — Safety Stripe original/current browser contracts with synthetic saves; business writes blocked.
+
+- tests/e2e/css-unification-specialty-safety-stripe.spec.js — Safety Stripe original/current browser contracts with synthetic saves; business writes blocked.
+
+- tests/fixtures/specialty-calculators-safety-stripe-empty-original-browser.json — immutable synthetic Safety Stripe selection, presentation and save evidence.
+
+- tests/fixtures/specialty-calculators-safety-stripe-Standard-original-browser.json — immutable synthetic Safety Stripe selection, presentation and save evidence.
+
+- tests/fixtures/specialty-calculators-safety-stripe-Warning-original-browser.json — immutable synthetic Safety Stripe selection, presentation and save evidence.
+
+- tests/fixtures/specialty-calculators-safety-stripe-DiamondPlate-original-browser.json — immutable synthetic Safety Stripe selection, presentation and save evidence.
+
+- tests/fixtures/specialty-calculators-safety-stripe-ConstructionZone-original-browser.json — immutable synthetic Safety Stripe selection, presentation and save evidence.
+
+- tests/fixtures/specialty-calculators-safety-stripe-form-original-browser.json — immutable synthetic Safety Stripe selection, presentation and save evidence.
+
+- tests/fixtures/specialty-calculators-safety-stripe-success-original-browser.json — immutable synthetic Safety Stripe selection, presentation and save evidence.
+
+- tests/fixtures/specialty-calculators-safety-stripe-failed-session-original-browser.json — immutable synthetic Safety Stripe selection, presentation and save evidence.
+
+- tests/fixtures/specialty-calculators-safety-stripe-failed-item-original-browser.json — immutable synthetic Safety Stripe selection, presentation and save evidence.
+
+- tests/fixtures/specialty-calculators-safety-stripe-all-combinations-original-browser.json — immutable synthetic Safety Stripe selection, presentation and save evidence.

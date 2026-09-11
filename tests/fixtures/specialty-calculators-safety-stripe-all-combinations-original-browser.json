@@ -1,0 +1,1028 @@
+{
+  "values": [
+    {
+      "design": {
+        "style": "Standard",
+        "front": "JustStripes",
+        "back": "JustStripes",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/l5pnj4hhvrfgtzs0lae32c4zefz8feib",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/iv55adzxyl135c8qyw513v25sogquqzm"
+      },
+      "selected": [
+        "Standard",
+        "JustStripes",
+        "JustStripes"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/l5pnj4hhvrfgtzs0lae32c4zefz8feib",
+      "back": "https://northwestcustomapparel.box.com/shared/static/iv55adzxyl135c8qyw513v25sogquqzm"
+    },
+    {
+      "design": {
+        "style": "Standard",
+        "front": "JustStripes",
+        "back": "BackCenterLogo",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/l5pnj4hhvrfgtzs0lae32c4zefz8feib",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/g5j4tv6o583m0c8dr5w39kp8b8ixbcqj"
+      },
+      "selected": [
+        "Standard",
+        "JustStripes",
+        "BackCenterLogo"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/l5pnj4hhvrfgtzs0lae32c4zefz8feib",
+      "back": "https://northwestcustomapparel.box.com/shared/static/g5j4tv6o583m0c8dr5w39kp8b8ixbcqj"
+    },
+    {
+      "design": {
+        "style": "Standard",
+        "front": "JustStripes",
+        "back": "BackBetweenLinesText",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/l5pnj4hhvrfgtzs0lae32c4zefz8feib",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/27llevl5yg0wksit2kvm4l0wyd9o74uo"
+      },
+      "selected": [
+        "Standard",
+        "JustStripes",
+        "BackBetweenLinesText"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/l5pnj4hhvrfgtzs0lae32c4zefz8feib",
+      "back": "https://northwestcustomapparel.box.com/shared/static/27llevl5yg0wksit2kvm4l0wyd9o74uo"
+    },
+    {
+      "design": {
+        "style": "Standard",
+        "front": "JustStripes",
+        "back": "BackBuiltInImage",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/l5pnj4hhvrfgtzs0lae32c4zefz8feib",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/z48kfyvvhsmy5yz9pu2pmewzo13kwrct"
+      },
+      "selected": [
+        "Standard",
+        "JustStripes",
+        "BackBuiltInImage"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/l5pnj4hhvrfgtzs0lae32c4zefz8feib",
+      "back": "https://northwestcustomapparel.box.com/shared/static/z48kfyvvhsmy5yz9pu2pmewzo13kwrct"
+    },
+    {
+      "design": {
+        "style": "Standard",
+        "front": "LeftChestLogo",
+        "back": "JustStripes",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/lvqvm0ucwz8zm2yvi4d4qbr3wayozmi0",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/iv55adzxyl135c8qyw513v25sogquqzm"
+      },
+      "selected": [
+        "Standard",
+        "LeftChestLogo",
+        "JustStripes"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/lvqvm0ucwz8zm2yvi4d4qbr3wayozmi0",
+      "back": "https://northwestcustomapparel.box.com/shared/static/iv55adzxyl135c8qyw513v25sogquqzm"
+    },
+    {
+      "design": {
+        "style": "Standard",
+        "front": "LeftChestLogo",
+        "back": "BackCenterLogo",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/lvqvm0ucwz8zm2yvi4d4qbr3wayozmi0",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/g5j4tv6o583m0c8dr5w39kp8b8ixbcqj"
+      },
+      "selected": [
+        "Standard",
+        "LeftChestLogo",
+        "BackCenterLogo"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/lvqvm0ucwz8zm2yvi4d4qbr3wayozmi0",
+      "back": "https://northwestcustomapparel.box.com/shared/static/g5j4tv6o583m0c8dr5w39kp8b8ixbcqj"
+    },
+    {
+      "design": {
+        "style": "Standard",
+        "front": "LeftChestLogo",
+        "back": "BackBetweenLinesText",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/lvqvm0ucwz8zm2yvi4d4qbr3wayozmi0",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/27llevl5yg0wksit2kvm4l0wyd9o74uo"
+      },
+      "selected": [
+        "Standard",
+        "LeftChestLogo",
+        "BackBetweenLinesText"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/lvqvm0ucwz8zm2yvi4d4qbr3wayozmi0",
+      "back": "https://northwestcustomapparel.box.com/shared/static/27llevl5yg0wksit2kvm4l0wyd9o74uo"
+    },
+    {
+      "design": {
+        "style": "Standard",
+        "front": "LeftChestLogo",
+        "back": "BackBuiltInImage",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/lvqvm0ucwz8zm2yvi4d4qbr3wayozmi0",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/z48kfyvvhsmy5yz9pu2pmewzo13kwrct"
+      },
+      "selected": [
+        "Standard",
+        "LeftChestLogo",
+        "BackBuiltInImage"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/lvqvm0ucwz8zm2yvi4d4qbr3wayozmi0",
+      "back": "https://northwestcustomapparel.box.com/shared/static/z48kfyvvhsmy5yz9pu2pmewzo13kwrct"
+    },
+    {
+      "design": {
+        "style": "Standard",
+        "front": "FrontCenterLogo",
+        "back": "JustStripes",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/sl7bn6qpiqhotdpuoetcgbtg8256upq7",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/iv55adzxyl135c8qyw513v25sogquqzm"
+      },
+      "selected": [
+        "Standard",
+        "FrontCenterLogo",
+        "JustStripes"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/sl7bn6qpiqhotdpuoetcgbtg8256upq7",
+      "back": "https://northwestcustomapparel.box.com/shared/static/iv55adzxyl135c8qyw513v25sogquqzm"
+    },
+    {
+      "design": {
+        "style": "Standard",
+        "front": "FrontCenterLogo",
+        "back": "BackCenterLogo",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/sl7bn6qpiqhotdpuoetcgbtg8256upq7",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/g5j4tv6o583m0c8dr5w39kp8b8ixbcqj"
+      },
+      "selected": [
+        "Standard",
+        "FrontCenterLogo",
+        "BackCenterLogo"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/sl7bn6qpiqhotdpuoetcgbtg8256upq7",
+      "back": "https://northwestcustomapparel.box.com/shared/static/g5j4tv6o583m0c8dr5w39kp8b8ixbcqj"
+    },
+    {
+      "design": {
+        "style": "Standard",
+        "front": "FrontCenterLogo",
+        "back": "BackBetweenLinesText",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/sl7bn6qpiqhotdpuoetcgbtg8256upq7",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/27llevl5yg0wksit2kvm4l0wyd9o74uo"
+      },
+      "selected": [
+        "Standard",
+        "FrontCenterLogo",
+        "BackBetweenLinesText"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/sl7bn6qpiqhotdpuoetcgbtg8256upq7",
+      "back": "https://northwestcustomapparel.box.com/shared/static/27llevl5yg0wksit2kvm4l0wyd9o74uo"
+    },
+    {
+      "design": {
+        "style": "Standard",
+        "front": "FrontCenterLogo",
+        "back": "BackBuiltInImage",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/sl7bn6qpiqhotdpuoetcgbtg8256upq7",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/z48kfyvvhsmy5yz9pu2pmewzo13kwrct"
+      },
+      "selected": [
+        "Standard",
+        "FrontCenterLogo",
+        "BackBuiltInImage"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/sl7bn6qpiqhotdpuoetcgbtg8256upq7",
+      "back": "https://northwestcustomapparel.box.com/shared/static/z48kfyvvhsmy5yz9pu2pmewzo13kwrct"
+    },
+    {
+      "design": {
+        "style": "Standard",
+        "front": "BuiltInImage",
+        "back": "JustStripes",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/hvwtwqsvh7yivu0kih95y1jxqo7ntgyz",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/iv55adzxyl135c8qyw513v25sogquqzm"
+      },
+      "selected": [
+        "Standard",
+        "BuiltInImage",
+        "JustStripes"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/hvwtwqsvh7yivu0kih95y1jxqo7ntgyz",
+      "back": "https://northwestcustomapparel.box.com/shared/static/iv55adzxyl135c8qyw513v25sogquqzm"
+    },
+    {
+      "design": {
+        "style": "Standard",
+        "front": "BuiltInImage",
+        "back": "BackCenterLogo",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/hvwtwqsvh7yivu0kih95y1jxqo7ntgyz",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/g5j4tv6o583m0c8dr5w39kp8b8ixbcqj"
+      },
+      "selected": [
+        "Standard",
+        "BuiltInImage",
+        "BackCenterLogo"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/hvwtwqsvh7yivu0kih95y1jxqo7ntgyz",
+      "back": "https://northwestcustomapparel.box.com/shared/static/g5j4tv6o583m0c8dr5w39kp8b8ixbcqj"
+    },
+    {
+      "design": {
+        "style": "Standard",
+        "front": "BuiltInImage",
+        "back": "BackBetweenLinesText",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/hvwtwqsvh7yivu0kih95y1jxqo7ntgyz",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/27llevl5yg0wksit2kvm4l0wyd9o74uo"
+      },
+      "selected": [
+        "Standard",
+        "BuiltInImage",
+        "BackBetweenLinesText"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/hvwtwqsvh7yivu0kih95y1jxqo7ntgyz",
+      "back": "https://northwestcustomapparel.box.com/shared/static/27llevl5yg0wksit2kvm4l0wyd9o74uo"
+    },
+    {
+      "design": {
+        "style": "Standard",
+        "front": "BuiltInImage",
+        "back": "BackBuiltInImage",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/hvwtwqsvh7yivu0kih95y1jxqo7ntgyz",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/z48kfyvvhsmy5yz9pu2pmewzo13kwrct"
+      },
+      "selected": [
+        "Standard",
+        "BuiltInImage",
+        "BackBuiltInImage"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/hvwtwqsvh7yivu0kih95y1jxqo7ntgyz",
+      "back": "https://northwestcustomapparel.box.com/shared/static/z48kfyvvhsmy5yz9pu2pmewzo13kwrct"
+    },
+    {
+      "design": {
+        "style": "Warning",
+        "front": "JustStripes",
+        "back": "JustStripes",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/tcmcme9ihfx15cu70rhycxdqgbceervl",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/ewqxx67q137t94touo856itlh7m2idlc"
+      },
+      "selected": [
+        "Warning",
+        "JustStripes",
+        "JustStripes"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/tcmcme9ihfx15cu70rhycxdqgbceervl",
+      "back": "https://northwestcustomapparel.box.com/shared/static/ewqxx67q137t94touo856itlh7m2idlc"
+    },
+    {
+      "design": {
+        "style": "Warning",
+        "front": "JustStripes",
+        "back": "BackCenterLogo",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/tcmcme9ihfx15cu70rhycxdqgbceervl",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/u8nsbnrkq614tanwbn8conmtdadw90eq"
+      },
+      "selected": [
+        "Warning",
+        "JustStripes",
+        "BackCenterLogo"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/tcmcme9ihfx15cu70rhycxdqgbceervl",
+      "back": "https://northwestcustomapparel.box.com/shared/static/u8nsbnrkq614tanwbn8conmtdadw90eq"
+    },
+    {
+      "design": {
+        "style": "Warning",
+        "front": "JustStripes",
+        "back": "BackBetweenLinesText",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/tcmcme9ihfx15cu70rhycxdqgbceervl",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/zqhsu8x1jj5iza03t8ltj0xhp0pgvbgu"
+      },
+      "selected": [
+        "Warning",
+        "JustStripes",
+        "BackBetweenLinesText"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/tcmcme9ihfx15cu70rhycxdqgbceervl",
+      "back": "https://northwestcustomapparel.box.com/shared/static/zqhsu8x1jj5iza03t8ltj0xhp0pgvbgu"
+    },
+    {
+      "design": {
+        "style": "Warning",
+        "front": "JustStripes",
+        "back": "BackBuiltInImage",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/tcmcme9ihfx15cu70rhycxdqgbceervl",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/gdwmhv9bt3oe5izy4720bj5x8k0g2v02"
+      },
+      "selected": [
+        "Warning",
+        "JustStripes",
+        "BackBuiltInImage"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/tcmcme9ihfx15cu70rhycxdqgbceervl",
+      "back": "https://northwestcustomapparel.box.com/shared/static/gdwmhv9bt3oe5izy4720bj5x8k0g2v02"
+    },
+    {
+      "design": {
+        "style": "Warning",
+        "front": "LeftChestLogo",
+        "back": "JustStripes",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/5yvwfnq6xlazpmivqymzatzaapokywpx",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/ewqxx67q137t94touo856itlh7m2idlc"
+      },
+      "selected": [
+        "Warning",
+        "LeftChestLogo",
+        "JustStripes"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/5yvwfnq6xlazpmivqymzatzaapokywpx",
+      "back": "https://northwestcustomapparel.box.com/shared/static/ewqxx67q137t94touo856itlh7m2idlc"
+    },
+    {
+      "design": {
+        "style": "Warning",
+        "front": "LeftChestLogo",
+        "back": "BackCenterLogo",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/5yvwfnq6xlazpmivqymzatzaapokywpx",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/u8nsbnrkq614tanwbn8conmtdadw90eq"
+      },
+      "selected": [
+        "Warning",
+        "LeftChestLogo",
+        "BackCenterLogo"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/5yvwfnq6xlazpmivqymzatzaapokywpx",
+      "back": "https://northwestcustomapparel.box.com/shared/static/u8nsbnrkq614tanwbn8conmtdadw90eq"
+    },
+    {
+      "design": {
+        "style": "Warning",
+        "front": "LeftChestLogo",
+        "back": "BackBetweenLinesText",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/5yvwfnq6xlazpmivqymzatzaapokywpx",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/zqhsu8x1jj5iza03t8ltj0xhp0pgvbgu"
+      },
+      "selected": [
+        "Warning",
+        "LeftChestLogo",
+        "BackBetweenLinesText"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/5yvwfnq6xlazpmivqymzatzaapokywpx",
+      "back": "https://northwestcustomapparel.box.com/shared/static/zqhsu8x1jj5iza03t8ltj0xhp0pgvbgu"
+    },
+    {
+      "design": {
+        "style": "Warning",
+        "front": "LeftChestLogo",
+        "back": "BackBuiltInImage",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/5yvwfnq6xlazpmivqymzatzaapokywpx",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/gdwmhv9bt3oe5izy4720bj5x8k0g2v02"
+      },
+      "selected": [
+        "Warning",
+        "LeftChestLogo",
+        "BackBuiltInImage"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/5yvwfnq6xlazpmivqymzatzaapokywpx",
+      "back": "https://northwestcustomapparel.box.com/shared/static/gdwmhv9bt3oe5izy4720bj5x8k0g2v02"
+    },
+    {
+      "design": {
+        "style": "Warning",
+        "front": "FrontCenterLogo",
+        "back": "JustStripes",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/lpgbp3ymgkykrl2zdydfoie4rda8o0ti",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/ewqxx67q137t94touo856itlh7m2idlc"
+      },
+      "selected": [
+        "Warning",
+        "FrontCenterLogo",
+        "JustStripes"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/lpgbp3ymgkykrl2zdydfoie4rda8o0ti",
+      "back": "https://northwestcustomapparel.box.com/shared/static/ewqxx67q137t94touo856itlh7m2idlc"
+    },
+    {
+      "design": {
+        "style": "Warning",
+        "front": "FrontCenterLogo",
+        "back": "BackCenterLogo",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/lpgbp3ymgkykrl2zdydfoie4rda8o0ti",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/u8nsbnrkq614tanwbn8conmtdadw90eq"
+      },
+      "selected": [
+        "Warning",
+        "FrontCenterLogo",
+        "BackCenterLogo"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/lpgbp3ymgkykrl2zdydfoie4rda8o0ti",
+      "back": "https://northwestcustomapparel.box.com/shared/static/u8nsbnrkq614tanwbn8conmtdadw90eq"
+    },
+    {
+      "design": {
+        "style": "Warning",
+        "front": "FrontCenterLogo",
+        "back": "BackBetweenLinesText",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/lpgbp3ymgkykrl2zdydfoie4rda8o0ti",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/zqhsu8x1jj5iza03t8ltj0xhp0pgvbgu"
+      },
+      "selected": [
+        "Warning",
+        "FrontCenterLogo",
+        "BackBetweenLinesText"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/lpgbp3ymgkykrl2zdydfoie4rda8o0ti",
+      "back": "https://northwestcustomapparel.box.com/shared/static/zqhsu8x1jj5iza03t8ltj0xhp0pgvbgu"
+    },
+    {
+      "design": {
+        "style": "Warning",
+        "front": "FrontCenterLogo",
+        "back": "BackBuiltInImage",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/lpgbp3ymgkykrl2zdydfoie4rda8o0ti",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/gdwmhv9bt3oe5izy4720bj5x8k0g2v02"
+      },
+      "selected": [
+        "Warning",
+        "FrontCenterLogo",
+        "BackBuiltInImage"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/lpgbp3ymgkykrl2zdydfoie4rda8o0ti",
+      "back": "https://northwestcustomapparel.box.com/shared/static/gdwmhv9bt3oe5izy4720bj5x8k0g2v02"
+    },
+    {
+      "design": {
+        "style": "Warning",
+        "front": "BuiltInImage",
+        "back": "JustStripes",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/ako9y6ae6rr66eaedklwaf5wplqnqb7o",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/ewqxx67q137t94touo856itlh7m2idlc"
+      },
+      "selected": [
+        "Warning",
+        "BuiltInImage",
+        "JustStripes"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/ako9y6ae6rr66eaedklwaf5wplqnqb7o",
+      "back": "https://northwestcustomapparel.box.com/shared/static/ewqxx67q137t94touo856itlh7m2idlc"
+    },
+    {
+      "design": {
+        "style": "Warning",
+        "front": "BuiltInImage",
+        "back": "BackCenterLogo",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/ako9y6ae6rr66eaedklwaf5wplqnqb7o",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/u8nsbnrkq614tanwbn8conmtdadw90eq"
+      },
+      "selected": [
+        "Warning",
+        "BuiltInImage",
+        "BackCenterLogo"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/ako9y6ae6rr66eaedklwaf5wplqnqb7o",
+      "back": "https://northwestcustomapparel.box.com/shared/static/u8nsbnrkq614tanwbn8conmtdadw90eq"
+    },
+    {
+      "design": {
+        "style": "Warning",
+        "front": "BuiltInImage",
+        "back": "BackBetweenLinesText",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/ako9y6ae6rr66eaedklwaf5wplqnqb7o",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/zqhsu8x1jj5iza03t8ltj0xhp0pgvbgu"
+      },
+      "selected": [
+        "Warning",
+        "BuiltInImage",
+        "BackBetweenLinesText"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/ako9y6ae6rr66eaedklwaf5wplqnqb7o",
+      "back": "https://northwestcustomapparel.box.com/shared/static/zqhsu8x1jj5iza03t8ltj0xhp0pgvbgu"
+    },
+    {
+      "design": {
+        "style": "Warning",
+        "front": "BuiltInImage",
+        "back": "BackBuiltInImage",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/ako9y6ae6rr66eaedklwaf5wplqnqb7o",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/gdwmhv9bt3oe5izy4720bj5x8k0g2v02"
+      },
+      "selected": [
+        "Warning",
+        "BuiltInImage",
+        "BackBuiltInImage"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/ako9y6ae6rr66eaedklwaf5wplqnqb7o",
+      "back": "https://northwestcustomapparel.box.com/shared/static/gdwmhv9bt3oe5izy4720bj5x8k0g2v02"
+    },
+    {
+      "design": {
+        "style": "DiamondPlate",
+        "front": "JustStripes",
+        "back": "JustStripes",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/6oa86o7o4lou6v0ablxrr32hxn1gxplw",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/nqbu6jh0p79ms7x6nun8h7pn1nxbejj1"
+      },
+      "selected": [
+        "DiamondPlate",
+        "JustStripes",
+        "JustStripes"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/6oa86o7o4lou6v0ablxrr32hxn1gxplw",
+      "back": "https://northwestcustomapparel.box.com/shared/static/nqbu6jh0p79ms7x6nun8h7pn1nxbejj1"
+    },
+    {
+      "design": {
+        "style": "DiamondPlate",
+        "front": "JustStripes",
+        "back": "BackCenterLogo",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/6oa86o7o4lou6v0ablxrr32hxn1gxplw",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/eabctv2qani98vrthvu6jnhsbw5lu0zc"
+      },
+      "selected": [
+        "DiamondPlate",
+        "JustStripes",
+        "BackCenterLogo"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/6oa86o7o4lou6v0ablxrr32hxn1gxplw",
+      "back": "https://northwestcustomapparel.box.com/shared/static/eabctv2qani98vrthvu6jnhsbw5lu0zc"
+    },
+    {
+      "design": {
+        "style": "DiamondPlate",
+        "front": "JustStripes",
+        "back": "BackBetweenLinesText",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/6oa86o7o4lou6v0ablxrr32hxn1gxplw",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/m4cpxfaflguu20a51dvxgzfqxooh0qyr"
+      },
+      "selected": [
+        "DiamondPlate",
+        "JustStripes",
+        "BackBetweenLinesText"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/6oa86o7o4lou6v0ablxrr32hxn1gxplw",
+      "back": "https://northwestcustomapparel.box.com/shared/static/m4cpxfaflguu20a51dvxgzfqxooh0qyr"
+    },
+    {
+      "design": {
+        "style": "DiamondPlate",
+        "front": "JustStripes",
+        "back": "BackBuiltInImage",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/6oa86o7o4lou6v0ablxrr32hxn1gxplw",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/nqbu6jh0p79ms7x6nun8h7pn1nxbejj1"
+      },
+      "selected": [
+        "DiamondPlate",
+        "JustStripes",
+        "BackBuiltInImage"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/6oa86o7o4lou6v0ablxrr32hxn1gxplw",
+      "back": "https://northwestcustomapparel.box.com/shared/static/nqbu6jh0p79ms7x6nun8h7pn1nxbejj1"
+    },
+    {
+      "design": {
+        "style": "DiamondPlate",
+        "front": "LeftChestLogo",
+        "back": "JustStripes",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/kkxqv0vdv02tw4sxvj8jtq6igj2yov5f",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/nqbu6jh0p79ms7x6nun8h7pn1nxbejj1"
+      },
+      "selected": [
+        "DiamondPlate",
+        "LeftChestLogo",
+        "JustStripes"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/kkxqv0vdv02tw4sxvj8jtq6igj2yov5f",
+      "back": "https://northwestcustomapparel.box.com/shared/static/nqbu6jh0p79ms7x6nun8h7pn1nxbejj1"
+    },
+    {
+      "design": {
+        "style": "DiamondPlate",
+        "front": "LeftChestLogo",
+        "back": "BackCenterLogo",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/kkxqv0vdv02tw4sxvj8jtq6igj2yov5f",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/eabctv2qani98vrthvu6jnhsbw5lu0zc"
+      },
+      "selected": [
+        "DiamondPlate",
+        "LeftChestLogo",
+        "BackCenterLogo"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/kkxqv0vdv02tw4sxvj8jtq6igj2yov5f",
+      "back": "https://northwestcustomapparel.box.com/shared/static/eabctv2qani98vrthvu6jnhsbw5lu0zc"
+    },
+    {
+      "design": {
+        "style": "DiamondPlate",
+        "front": "LeftChestLogo",
+        "back": "BackBetweenLinesText",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/kkxqv0vdv02tw4sxvj8jtq6igj2yov5f",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/m4cpxfaflguu20a51dvxgzfqxooh0qyr"
+      },
+      "selected": [
+        "DiamondPlate",
+        "LeftChestLogo",
+        "BackBetweenLinesText"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/kkxqv0vdv02tw4sxvj8jtq6igj2yov5f",
+      "back": "https://northwestcustomapparel.box.com/shared/static/m4cpxfaflguu20a51dvxgzfqxooh0qyr"
+    },
+    {
+      "design": {
+        "style": "DiamondPlate",
+        "front": "LeftChestLogo",
+        "back": "BackBuiltInImage",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/kkxqv0vdv02tw4sxvj8jtq6igj2yov5f",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/nqbu6jh0p79ms7x6nun8h7pn1nxbejj1"
+      },
+      "selected": [
+        "DiamondPlate",
+        "LeftChestLogo",
+        "BackBuiltInImage"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/kkxqv0vdv02tw4sxvj8jtq6igj2yov5f",
+      "back": "https://northwestcustomapparel.box.com/shared/static/nqbu6jh0p79ms7x6nun8h7pn1nxbejj1"
+    },
+    {
+      "design": {
+        "style": "DiamondPlate",
+        "front": "FrontCenterLogo",
+        "back": "JustStripes",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/0npwfnjwyuew5wpv02gwrmshgqsf7v6k",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/nqbu6jh0p79ms7x6nun8h7pn1nxbejj1"
+      },
+      "selected": [
+        "DiamondPlate",
+        "FrontCenterLogo",
+        "JustStripes"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/0npwfnjwyuew5wpv02gwrmshgqsf7v6k",
+      "back": "https://northwestcustomapparel.box.com/shared/static/nqbu6jh0p79ms7x6nun8h7pn1nxbejj1"
+    },
+    {
+      "design": {
+        "style": "DiamondPlate",
+        "front": "FrontCenterLogo",
+        "back": "BackCenterLogo",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/0npwfnjwyuew5wpv02gwrmshgqsf7v6k",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/eabctv2qani98vrthvu6jnhsbw5lu0zc"
+      },
+      "selected": [
+        "DiamondPlate",
+        "FrontCenterLogo",
+        "BackCenterLogo"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/0npwfnjwyuew5wpv02gwrmshgqsf7v6k",
+      "back": "https://northwestcustomapparel.box.com/shared/static/eabctv2qani98vrthvu6jnhsbw5lu0zc"
+    },
+    {
+      "design": {
+        "style": "DiamondPlate",
+        "front": "FrontCenterLogo",
+        "back": "BackBetweenLinesText",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/0npwfnjwyuew5wpv02gwrmshgqsf7v6k",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/m4cpxfaflguu20a51dvxgzfqxooh0qyr"
+      },
+      "selected": [
+        "DiamondPlate",
+        "FrontCenterLogo",
+        "BackBetweenLinesText"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/0npwfnjwyuew5wpv02gwrmshgqsf7v6k",
+      "back": "https://northwestcustomapparel.box.com/shared/static/m4cpxfaflguu20a51dvxgzfqxooh0qyr"
+    },
+    {
+      "design": {
+        "style": "DiamondPlate",
+        "front": "FrontCenterLogo",
+        "back": "BackBuiltInImage",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/0npwfnjwyuew5wpv02gwrmshgqsf7v6k",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/nqbu6jh0p79ms7x6nun8h7pn1nxbejj1"
+      },
+      "selected": [
+        "DiamondPlate",
+        "FrontCenterLogo",
+        "BackBuiltInImage"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/0npwfnjwyuew5wpv02gwrmshgqsf7v6k",
+      "back": "https://northwestcustomapparel.box.com/shared/static/nqbu6jh0p79ms7x6nun8h7pn1nxbejj1"
+    },
+    {
+      "design": {
+        "style": "DiamondPlate",
+        "front": "BuiltInImage",
+        "back": "JustStripes",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/7atgrmzrcrbythr3sdw59tsju3lyutt1",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/nqbu6jh0p79ms7x6nun8h7pn1nxbejj1"
+      },
+      "selected": [
+        "DiamondPlate",
+        "BuiltInImage",
+        "JustStripes"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/7atgrmzrcrbythr3sdw59tsju3lyutt1",
+      "back": "https://northwestcustomapparel.box.com/shared/static/nqbu6jh0p79ms7x6nun8h7pn1nxbejj1"
+    },
+    {
+      "design": {
+        "style": "DiamondPlate",
+        "front": "BuiltInImage",
+        "back": "BackCenterLogo",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/7atgrmzrcrbythr3sdw59tsju3lyutt1",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/eabctv2qani98vrthvu6jnhsbw5lu0zc"
+      },
+      "selected": [
+        "DiamondPlate",
+        "BuiltInImage",
+        "BackCenterLogo"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/7atgrmzrcrbythr3sdw59tsju3lyutt1",
+      "back": "https://northwestcustomapparel.box.com/shared/static/eabctv2qani98vrthvu6jnhsbw5lu0zc"
+    },
+    {
+      "design": {
+        "style": "DiamondPlate",
+        "front": "BuiltInImage",
+        "back": "BackBetweenLinesText",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/7atgrmzrcrbythr3sdw59tsju3lyutt1",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/m4cpxfaflguu20a51dvxgzfqxooh0qyr"
+      },
+      "selected": [
+        "DiamondPlate",
+        "BuiltInImage",
+        "BackBetweenLinesText"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/7atgrmzrcrbythr3sdw59tsju3lyutt1",
+      "back": "https://northwestcustomapparel.box.com/shared/static/m4cpxfaflguu20a51dvxgzfqxooh0qyr"
+    },
+    {
+      "design": {
+        "style": "DiamondPlate",
+        "front": "BuiltInImage",
+        "back": "BackBuiltInImage",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/7atgrmzrcrbythr3sdw59tsju3lyutt1",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/nqbu6jh0p79ms7x6nun8h7pn1nxbejj1"
+      },
+      "selected": [
+        "DiamondPlate",
+        "BuiltInImage",
+        "BackBuiltInImage"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/7atgrmzrcrbythr3sdw59tsju3lyutt1",
+      "back": "https://northwestcustomapparel.box.com/shared/static/nqbu6jh0p79ms7x6nun8h7pn1nxbejj1"
+    },
+    {
+      "design": {
+        "style": "ConstructionZone",
+        "front": "JustStripes",
+        "back": "JustStripes",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/6r1rp6x7q6nifuw6whtwdhqbl2g8je27",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/sfwsfi8h4k4o0mxx7mx5s873w912scff"
+      },
+      "selected": [
+        "ConstructionZone",
+        "JustStripes",
+        "JustStripes"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/6r1rp6x7q6nifuw6whtwdhqbl2g8je27",
+      "back": "https://northwestcustomapparel.box.com/shared/static/sfwsfi8h4k4o0mxx7mx5s873w912scff"
+    },
+    {
+      "design": {
+        "style": "ConstructionZone",
+        "front": "JustStripes",
+        "back": "BackCenterLogo",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/6r1rp6x7q6nifuw6whtwdhqbl2g8je27",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/27llevl5yg0wksit2kvm4l0wyd9o74uo"
+      },
+      "selected": [
+        "ConstructionZone",
+        "JustStripes",
+        "BackCenterLogo"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/6r1rp6x7q6nifuw6whtwdhqbl2g8je27",
+      "back": "https://northwestcustomapparel.box.com/shared/static/27llevl5yg0wksit2kvm4l0wyd9o74uo"
+    },
+    {
+      "design": {
+        "style": "ConstructionZone",
+        "front": "JustStripes",
+        "back": "BackBetweenLinesText",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/6r1rp6x7q6nifuw6whtwdhqbl2g8je27",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/gariv0oxdxu7oren2xd3kk2hl3g2jl31"
+      },
+      "selected": [
+        "ConstructionZone",
+        "JustStripes",
+        "BackBetweenLinesText"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/6r1rp6x7q6nifuw6whtwdhqbl2g8je27",
+      "back": "https://northwestcustomapparel.box.com/shared/static/gariv0oxdxu7oren2xd3kk2hl3g2jl31"
+    },
+    {
+      "design": {
+        "style": "ConstructionZone",
+        "front": "JustStripes",
+        "back": "BackBuiltInImage",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/6r1rp6x7q6nifuw6whtwdhqbl2g8je27",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/vuh2p7hb6n16yz8xqs8vyg8u9rhihr05"
+      },
+      "selected": [
+        "ConstructionZone",
+        "JustStripes",
+        "BackBuiltInImage"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/6r1rp6x7q6nifuw6whtwdhqbl2g8je27",
+      "back": "https://northwestcustomapparel.box.com/shared/static/vuh2p7hb6n16yz8xqs8vyg8u9rhihr05"
+    },
+    {
+      "design": {
+        "style": "ConstructionZone",
+        "front": "LeftChestLogo",
+        "back": "JustStripes",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/aw40v2m8adw1l03anqqut9vlz5u6auo5",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/sfwsfi8h4k4o0mxx7mx5s873w912scff"
+      },
+      "selected": [
+        "ConstructionZone",
+        "LeftChestLogo",
+        "JustStripes"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/aw40v2m8adw1l03anqqut9vlz5u6auo5",
+      "back": "https://northwestcustomapparel.box.com/shared/static/sfwsfi8h4k4o0mxx7mx5s873w912scff"
+    },
+    {
+      "design": {
+        "style": "ConstructionZone",
+        "front": "LeftChestLogo",
+        "back": "BackCenterLogo",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/aw40v2m8adw1l03anqqut9vlz5u6auo5",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/27llevl5yg0wksit2kvm4l0wyd9o74uo"
+      },
+      "selected": [
+        "ConstructionZone",
+        "LeftChestLogo",
+        "BackCenterLogo"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/aw40v2m8adw1l03anqqut9vlz5u6auo5",
+      "back": "https://northwestcustomapparel.box.com/shared/static/27llevl5yg0wksit2kvm4l0wyd9o74uo"
+    },
+    {
+      "design": {
+        "style": "ConstructionZone",
+        "front": "LeftChestLogo",
+        "back": "BackBetweenLinesText",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/aw40v2m8adw1l03anqqut9vlz5u6auo5",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/gariv0oxdxu7oren2xd3kk2hl3g2jl31"
+      },
+      "selected": [
+        "ConstructionZone",
+        "LeftChestLogo",
+        "BackBetweenLinesText"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/aw40v2m8adw1l03anqqut9vlz5u6auo5",
+      "back": "https://northwestcustomapparel.box.com/shared/static/gariv0oxdxu7oren2xd3kk2hl3g2jl31"
+    },
+    {
+      "design": {
+        "style": "ConstructionZone",
+        "front": "LeftChestLogo",
+        "back": "BackBuiltInImage",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/aw40v2m8adw1l03anqqut9vlz5u6auo5",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/vuh2p7hb6n16yz8xqs8vyg8u9rhihr05"
+      },
+      "selected": [
+        "ConstructionZone",
+        "LeftChestLogo",
+        "BackBuiltInImage"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/aw40v2m8adw1l03anqqut9vlz5u6auo5",
+      "back": "https://northwestcustomapparel.box.com/shared/static/vuh2p7hb6n16yz8xqs8vyg8u9rhihr05"
+    },
+    {
+      "design": {
+        "style": "ConstructionZone",
+        "front": "FrontCenterLogo",
+        "back": "JustStripes",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/rulbnpjt19jewoh482c33wosw9aciuc9",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/sfwsfi8h4k4o0mxx7mx5s873w912scff"
+      },
+      "selected": [
+        "ConstructionZone",
+        "FrontCenterLogo",
+        "JustStripes"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/rulbnpjt19jewoh482c33wosw9aciuc9",
+      "back": "https://northwestcustomapparel.box.com/shared/static/sfwsfi8h4k4o0mxx7mx5s873w912scff"
+    },
+    {
+      "design": {
+        "style": "ConstructionZone",
+        "front": "FrontCenterLogo",
+        "back": "BackCenterLogo",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/rulbnpjt19jewoh482c33wosw9aciuc9",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/27llevl5yg0wksit2kvm4l0wyd9o74uo"
+      },
+      "selected": [
+        "ConstructionZone",
+        "FrontCenterLogo",
+        "BackCenterLogo"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/rulbnpjt19jewoh482c33wosw9aciuc9",
+      "back": "https://northwestcustomapparel.box.com/shared/static/27llevl5yg0wksit2kvm4l0wyd9o74uo"
+    },
+    {
+      "design": {
+        "style": "ConstructionZone",
+        "front": "FrontCenterLogo",
+        "back": "BackBetweenLinesText",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/rulbnpjt19jewoh482c33wosw9aciuc9",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/gariv0oxdxu7oren2xd3kk2hl3g2jl31"
+      },
+      "selected": [
+        "ConstructionZone",
+        "FrontCenterLogo",
+        "BackBetweenLinesText"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/rulbnpjt19jewoh482c33wosw9aciuc9",
+      "back": "https://northwestcustomapparel.box.com/shared/static/gariv0oxdxu7oren2xd3kk2hl3g2jl31"
+    },
+    {
+      "design": {
+        "style": "ConstructionZone",
+        "front": "FrontCenterLogo",
+        "back": "BackBuiltInImage",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/rulbnpjt19jewoh482c33wosw9aciuc9",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/vuh2p7hb6n16yz8xqs8vyg8u9rhihr05"
+      },
+      "selected": [
+        "ConstructionZone",
+        "FrontCenterLogo",
+        "BackBuiltInImage"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/rulbnpjt19jewoh482c33wosw9aciuc9",
+      "back": "https://northwestcustomapparel.box.com/shared/static/vuh2p7hb6n16yz8xqs8vyg8u9rhihr05"
+    },
+    {
+      "design": {
+        "style": "ConstructionZone",
+        "front": "BuiltInImage",
+        "back": "JustStripes",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/4q39xizfwnl9cuwv93i5fnl1nqeh624d",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/sfwsfi8h4k4o0mxx7mx5s873w912scff"
+      },
+      "selected": [
+        "ConstructionZone",
+        "BuiltInImage",
+        "JustStripes"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/4q39xizfwnl9cuwv93i5fnl1nqeh624d",
+      "back": "https://northwestcustomapparel.box.com/shared/static/sfwsfi8h4k4o0mxx7mx5s873w912scff"
+    },
+    {
+      "design": {
+        "style": "ConstructionZone",
+        "front": "BuiltInImage",
+        "back": "BackCenterLogo",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/4q39xizfwnl9cuwv93i5fnl1nqeh624d",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/27llevl5yg0wksit2kvm4l0wyd9o74uo"
+      },
+      "selected": [
+        "ConstructionZone",
+        "BuiltInImage",
+        "BackCenterLogo"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/4q39xizfwnl9cuwv93i5fnl1nqeh624d",
+      "back": "https://northwestcustomapparel.box.com/shared/static/27llevl5yg0wksit2kvm4l0wyd9o74uo"
+    },
+    {
+      "design": {
+        "style": "ConstructionZone",
+        "front": "BuiltInImage",
+        "back": "BackBetweenLinesText",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/4q39xizfwnl9cuwv93i5fnl1nqeh624d",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/gariv0oxdxu7oren2xd3kk2hl3g2jl31"
+      },
+      "selected": [
+        "ConstructionZone",
+        "BuiltInImage",
+        "BackBetweenLinesText"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/4q39xizfwnl9cuwv93i5fnl1nqeh624d",
+      "back": "https://northwestcustomapparel.box.com/shared/static/gariv0oxdxu7oren2xd3kk2hl3g2jl31"
+    },
+    {
+      "design": {
+        "style": "ConstructionZone",
+        "front": "BuiltInImage",
+        "back": "BackBuiltInImage",
+        "frontImage": "https://northwestcustomapparel.box.com/shared/static/4q39xizfwnl9cuwv93i5fnl1nqeh624d",
+        "backImage": "https://northwestcustomapparel.box.com/shared/static/vuh2p7hb6n16yz8xqs8vyg8u9rhihr05"
+      },
+      "selected": [
+        "ConstructionZone",
+        "BuiltInImage",
+        "BackBuiltInImage"
+      ],
+      "front": "https://northwestcustomapparel.box.com/shared/static/4q39xizfwnl9cuwv93i5fnl1nqeh624d",
+      "back": "https://northwestcustomapparel.box.com/shared/static/vuh2p7hb6n16yz8xqs8vyg8u9rhihr05"
+    }
+  ]
+}

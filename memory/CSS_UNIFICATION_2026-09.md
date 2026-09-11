@@ -1,5 +1,13 @@
 # CSS unification — design direction and implementation plan
 
+## ORIGINALS REVIEWED — Safety Stripe Creator, 2026-09-11
+
+Before application edits: all 11 original browser checks pass, including 64 native style/front/back combinations and intercepted session/item request bodies. All 36 screen captures and 17 pages across nine PDFs reviewed (ten screen sheets and three paper sheets; exact duplicates accounted for). The actual original UI cannot open either dialog: JavaScript adds .show, CSS expects .active. To diagnose persistence, tests populate its unreachable fields and dispatch the original form handler without changing the original CSS. Failed item saves falsely report success; phone previews overflow. These are preserved defects, not successful original interactions.
+
+Design plan: reuse Public Sans and the existing neutral/green canonical tokens; let the actual orange shirt artwork be the visual focus. Four full, uncropped pattern choices lead to front/back previews, stacked on phones. Use native named dialogs and buttons, visible retained failures, truthful Save wording and complete paper output. Preserve all 32 source image mappings, 64 combinations, original successful payload values and quote IDs. Verify partial-save retry and pending-state ownership with synthetic requests before release.
+
+Candidate remains 211/225 reviewed, 14 pending; Safety Stripe is not migrated yet. Polar Camel local reviewed commit f0ff040b is complete. GitHub push was rejected by automatic review because the destination is public; an explicit publication question is pending. Do not bypass that restriction. Live remains v2026.09.11.6 / Heroku2109. Next apply this page migration, then customer-supplied screen printing; full batch gates before deployment.
+
 ## REVIEWED CHECKPOINT — Polar Camel tumbler, 2026-09-11
 
 Polar Camel now uses the canonical storefront, shared specialty controls and scoped page styles. All 20 focused browser checks pass, including 64 original financial states, byte-identical 1800×1800 logo download, changed live policy with cached products, keyboard dialogs/radios, failed/incomplete reads and latest-request ownership. All 36 screen captures and 17 pages across nine PDFs are reviewed (26 screen-detail sheets and three paper sheets). Prices and engraving math remain unchanged; unavailable data is visible. The four JDS financial methods and original successful quote calculation are source-locked; all 96 reversible mappings retain the 37 original source hashes.

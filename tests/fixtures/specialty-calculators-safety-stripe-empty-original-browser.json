@@ -1,0 +1,150 @@
+{
+  "states": [
+    {
+      "width": 1440,
+      "title": "Safety Stripe Creator - Northwest Custom Apparel",
+      "url": "/calculators/safety-stripe-creator.html",
+      "ids": {},
+      "fields": [],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        }
+      ],
+      "tables": [],
+      "headings": [
+        "Safety Stripe Creator",
+        "Step 1: Choose Your Stripe Style",
+        "Standard",
+        "Warning",
+        "Diamond Plate",
+        "Construction Zone"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a"
+            ],
+            [
+              ".title-section > p"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Safety Stripe Creator - Northwest Custom Apparel",
+      "url": "/calculators/safety-stripe-creator.html",
+      "ids": {},
+      "fields": [],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        }
+      ],
+      "tables": [],
+      "headings": [
+        "Safety Stripe Creator",
+        "Step 1: Choose Your Stripe Style",
+        "Standard",
+        "Warning",
+        "Diamond Plate",
+        "Construction Zone"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a"
+            ],
+            [
+              ".title-section > p"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Safety Stripe Creator - Northwest Custom Apparel",
+      "url": "/calculators/safety-stripe-creator.html",
+      "ids": {},
+      "fields": [],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        }
+      ],
+      "tables": [],
+      "headings": [
+        "Safety Stripe Creator",
+        "Step 1: Choose Your Stripe Style",
+        "Standard",
+        "Warning",
+        "Diamond Plate",
+        "Construction Zone"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a"
+            ],
+            [
+              ".title-section > p"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Safety Stripe Creator - Northwest Custom Apparel",
+      "url": "/calculators/safety-stripe-creator.html",
+      "ids": {},
+      "fields": [],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        }
+      ],
+      "tables": [],
+      "headings": [
+        "Safety Stripe Creator",
+        "Step 1: Choose Your Stripe Style",
+        "Standard",
+        "Warning",
+        "Diamond Plate",
+        "Construction Zone"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a"
+            ],
+            [
+              ".title-section > p"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "mocked": [],
+  "dialogs": []
+}
