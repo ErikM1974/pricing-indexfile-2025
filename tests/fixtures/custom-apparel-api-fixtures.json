@@ -1,0 +1,326 @@
+{
+  "purpose": "Synthetic browser responses using the existing immutable unit-fixture pricing values; never a claim of current live pricing.",
+  "caps": {
+    "bundle": {
+      "tiersR": [
+        {
+          "TierLabel": "24-47",
+          "MinQuantity": 24,
+          "MaxQuantity": 47,
+          "MarginDenominator": 0.53,
+          "LTM_Fee": 0
+        },
+        {
+          "TierLabel": "48-71",
+          "MinQuantity": 48,
+          "MaxQuantity": 71,
+          "MarginDenominator": 0.53,
+          "LTM_Fee": 0
+        },
+        {
+          "TierLabel": "72+",
+          "MinQuantity": 72,
+          "MaxQuantity": 99999,
+          "MarginDenominator": 0.53,
+          "LTM_Fee": 0
+        },
+        {
+          "TierLabel": "1-7",
+          "MinQuantity": 1,
+          "MaxQuantity": 7,
+          "MarginDenominator": 0.55,
+          "LTM_Fee": 50
+        },
+        {
+          "TierLabel": "8-23",
+          "MinQuantity": 8,
+          "MaxQuantity": 23,
+          "MarginDenominator": 0.53,
+          "LTM_Fee": 0
+        }
+      ],
+      "allEmbroideryCostsR": [
+        {
+          "ItemType": "Cap",
+          "TierLabel": "1-7",
+          "StitchCount": 8000,
+          "EmbroideryCost": 17,
+          "AdditionalStitchRate": 1,
+          "BaseStitchCount": 8000
+        },
+        {
+          "ItemType": "Cap",
+          "TierLabel": "8-23",
+          "StitchCount": 8000,
+          "EmbroideryCost": 17,
+          "AdditionalStitchRate": 1,
+          "BaseStitchCount": 8000
+        },
+        {
+          "ItemType": "Cap",
+          "TierLabel": "24-47",
+          "StitchCount": 8000,
+          "EmbroideryCost": 13,
+          "AdditionalStitchRate": 1,
+          "BaseStitchCount": 8000
+        },
+        {
+          "ItemType": "Cap",
+          "TierLabel": "48-71",
+          "StitchCount": 8000,
+          "EmbroideryCost": 11,
+          "AdditionalStitchRate": 1,
+          "BaseStitchCount": 8000
+        },
+        {
+          "ItemType": "Cap",
+          "TierLabel": "72+",
+          "StitchCount": 8000,
+          "EmbroideryCost": 9.5,
+          "AdditionalStitchRate": 1,
+          "BaseStitchCount": 8000
+        }
+      ],
+      "rulesR": {
+        "RoundingMethod": "CeilDollar"
+      },
+      "sizes": [
+        {
+          "size": "OSFA",
+          "price": 6.75,
+          "sortOrder": 90
+        }
+      ],
+      "locations": [
+        {
+          "code": "CF"
+        },
+        {
+          "code": "CB"
+        }
+      ]
+    },
+    "additional": {
+      "tiersR": [
+        {
+          "TierLabel": "24-47",
+          "MinQuantity": 24,
+          "MaxQuantity": 47,
+          "MarginDenominator": 0.53,
+          "LTM_Fee": 0
+        },
+        {
+          "TierLabel": "48-71",
+          "MinQuantity": 48,
+          "MaxQuantity": 71,
+          "MarginDenominator": 0.53,
+          "LTM_Fee": 0
+        },
+        {
+          "TierLabel": "72+",
+          "MinQuantity": 72,
+          "MaxQuantity": 99999,
+          "MarginDenominator": 0.53,
+          "LTM_Fee": 0
+        },
+        {
+          "TierLabel": "1-7",
+          "MinQuantity": 1,
+          "MaxQuantity": 7,
+          "MarginDenominator": 0.55,
+          "LTM_Fee": 50
+        },
+        {
+          "TierLabel": "8-23",
+          "MinQuantity": 8,
+          "MaxQuantity": 23,
+          "MarginDenominator": 0.53,
+          "LTM_Fee": 0
+        }
+      ],
+      "allEmbroideryCostsR": [
+        {
+          "ItemType": "AL-CAP",
+          "TierLabel": "1-7",
+          "StitchCount": 5000,
+          "EmbroideryCost": 6.5
+        },
+        {
+          "ItemType": "AL-CAP",
+          "TierLabel": "8-23",
+          "StitchCount": 5000,
+          "EmbroideryCost": 5.5
+        },
+        {
+          "ItemType": "AL-CAP",
+          "TierLabel": "24-47",
+          "StitchCount": 5000,
+          "EmbroideryCost": 4.75
+        },
+        {
+          "ItemType": "AL-CAP",
+          "TierLabel": "48-71",
+          "StitchCount": 5000,
+          "EmbroideryCost": 4.5
+        },
+        {
+          "ItemType": "AL-CAP",
+          "TierLabel": "72+",
+          "StitchCount": 5000,
+          "EmbroideryCost": 4.25
+        }
+      ]
+    }
+  },
+  "tees": {
+    "tiersR": [
+      {
+        "TierLabel": "1-11",
+        "MinQuantity": 1,
+        "MaxQuantity": 11,
+        "MarginDenominator": 0.53,
+        "LTM_Fee": 25
+      },
+      {
+        "TierLabel": "12-23",
+        "MinQuantity": 12,
+        "MaxQuantity": 23,
+        "MarginDenominator": 0.53,
+        "LTM_Fee": 25
+      },
+      {
+        "TierLabel": "24-47",
+        "MinQuantity": 24,
+        "MaxQuantity": 47,
+        "MarginDenominator": 0.53,
+        "LTM_Fee": 0
+      },
+      {
+        "TierLabel": "48-71",
+        "MinQuantity": 48,
+        "MaxQuantity": 71,
+        "MarginDenominator": 0.53,
+        "LTM_Fee": 0
+      },
+      {
+        "TierLabel": "72+",
+        "MinQuantity": 72,
+        "MaxQuantity": 99999,
+        "MarginDenominator": 0.53,
+        "LTM_Fee": 0
+      }
+    ],
+    "allDtgCostsR": [
+      {
+        "PrintLocationCode": "LC",
+        "TierLabel": "12-23",
+        "PrintCost": 8.5
+      },
+      {
+        "PrintLocationCode": "LC",
+        "TierLabel": "24-47",
+        "PrintCost": 7.5
+      },
+      {
+        "PrintLocationCode": "LC",
+        "TierLabel": "48-71",
+        "PrintCost": 6.5
+      },
+      {
+        "PrintLocationCode": "LC",
+        "TierLabel": "72+",
+        "PrintCost": 5.5
+      },
+      {
+        "PrintLocationCode": "FF",
+        "TierLabel": "24-47",
+        "PrintCost": 10
+      },
+      {
+        "PrintLocationCode": "FF",
+        "TierLabel": "48-71",
+        "PrintCost": 9
+      },
+      {
+        "PrintLocationCode": "FF",
+        "TierLabel": "72+",
+        "PrintCost": 8
+      },
+      {
+        "PrintLocationCode": "JF",
+        "TierLabel": "24-47",
+        "PrintCost": 12.5
+      },
+      {
+        "PrintLocationCode": "JF",
+        "TierLabel": "48-71",
+        "PrintCost": 11.5
+      },
+      {
+        "PrintLocationCode": "JF",
+        "TierLabel": "72+",
+        "PrintCost": 10.5
+      },
+      {
+        "PrintLocationCode": "FB",
+        "TierLabel": "24-47",
+        "PrintCost": 10
+      },
+      {
+        "PrintLocationCode": "FB",
+        "TierLabel": "48-71",
+        "PrintCost": 9
+      },
+      {
+        "PrintLocationCode": "FB",
+        "TierLabel": "72+",
+        "PrintCost": 8
+      },
+      {
+        "PrintLocationCode": "JB",
+        "TierLabel": "24-47",
+        "PrintCost": 12.5
+      },
+      {
+        "PrintLocationCode": "JB",
+        "TierLabel": "48-71",
+        "PrintCost": 11.5
+      },
+      {
+        "PrintLocationCode": "JB",
+        "TierLabel": "72+",
+        "PrintCost": 10.5
+      }
+    ],
+    "sizes": [
+      {
+        "size": "S",
+        "price": 3
+      },
+      {
+        "size": "M",
+        "price": 3
+      },
+      {
+        "size": "L",
+        "price": 3
+      },
+      {
+        "size": "XL",
+        "price": 3
+      },
+      {
+        "size": "2XL",
+        "price": 4.25
+      },
+      {
+        "size": "3XL",
+        "price": 5.53
+      }
+    ],
+    "sellingPriceDisplayAddOns": {
+      "2XL": 2,
+      "3XL": 3
+    }
+  }
+}

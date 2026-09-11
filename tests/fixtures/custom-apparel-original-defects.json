@@ -1,0 +1,109 @@
+[
+  {
+    "kind": "caps",
+    "case": "initial-failure-retry",
+    "retried": false,
+    "readsBefore": 4,
+    "readsAfter": 4,
+    "fatalVisible": true
+  },
+  {
+    "kind": "caps",
+    "case": "storage-quota",
+    "attempts": 1,
+    "notice": "",
+    "cart": {
+      "lines": [
+        {
+          "catalogColor": "JetBlack",
+          "quantity": 24
+        }
+      ]
+    }
+  },
+  {
+    "kind": "caps",
+    "case": "summary-focus",
+    "opened": {
+      "id": "order-bar-summary",
+      "within": false
+    },
+    "tabStops": [
+      {
+        "id": "smart-cta",
+        "within": false
+      },
+      {
+        "id": "sheet-close",
+        "within": true
+      },
+      {
+        "id": "",
+        "within": false
+      },
+      {
+        "id": "",
+        "within": false
+      }
+    ],
+    "closed": true,
+    "returnFocus": ""
+  },
+  {
+    "kind": "tees",
+    "case": "initial-failure-retry",
+    "retried": false,
+    "readsBefore": 6,
+    "readsAfter": 6,
+    "fatalVisible": true
+  },
+  {
+    "kind": "tees",
+    "case": "storage-quota",
+    "attempts": 1,
+    "notice": "Volume pricing unlocked — the small-batch rate is gone",
+    "cart": {
+      "lines": [
+        {
+          "catalogColor": "JetBlack",
+          "qty": {
+            "S": 0,
+            "M": 24,
+            "L": 0,
+            "XL": 0,
+            "2XL": 0,
+            "3XL": 0
+          }
+        }
+      ]
+    }
+  },
+  {
+    "kind": "tees",
+    "case": "summary-focus",
+    "opened": {
+      "id": "order-bar-summary",
+      "within": false
+    },
+    "tabStops": [
+      {
+        "id": "smart-cta",
+        "within": false
+      },
+      {
+        "id": "sheet-close",
+        "within": true
+      },
+      {
+        "id": "",
+        "within": false
+      },
+      {
+        "id": "",
+        "within": false
+      }
+    ],
+    "closed": false,
+    "returnFocus": ""
+  }
+]

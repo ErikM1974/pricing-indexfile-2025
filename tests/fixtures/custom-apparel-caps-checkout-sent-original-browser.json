@@ -1,0 +1,136 @@
+{
+  "name": "caps-checkout-sent",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Synthetic checkout",
+      "ids": {},
+      "fields": [],
+      "links": [],
+      "cart": null,
+      "quote": null,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "width": 768,
+      "title": "Synthetic checkout",
+      "ids": {},
+      "fields": [],
+      "links": [],
+      "cart": null,
+      "quote": null,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "width": 390,
+      "title": "Synthetic checkout",
+      "ids": {},
+      "fields": [],
+      "links": [],
+      "cart": null,
+      "quote": null,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "width": 320,
+      "title": "Synthetic checkout",
+      "ids": {},
+      "fields": [],
+      "links": [],
+      "cart": null,
+      "quote": null,
+      "overflow": false,
+      "violations": []
+    }
+  ],
+  "actions": [
+    {
+      "path": "/api/tax-rates/lookup",
+      "method": "POST",
+      "body": {
+        "address": "100 Example Way",
+        "city": "Milton",
+        "state": "WA",
+        "zip": "98354"
+      }
+    },
+    {
+      "path": "/api/files/upload",
+      "method": "POST",
+      "fileName": "example-front.svg"
+    },
+    {
+      "path": "/api/create-checkout-session",
+      "method": "POST",
+      "body": {
+        "customer_email": "customer@example.test",
+        "customerData": {
+          "firstName": "Casey",
+          "lastName": "Example",
+          "email": "customer@example.test",
+          "phone": "2535550142",
+          "company": "Example Team",
+          "address1": "100 Example Way",
+          "city": "Milton",
+          "state": "WA",
+          "zip": "98354",
+          "deliveryMethod": "ship",
+          "notes": "Preserve all selected colors, sizes, and both artwork files. Example request only."
+        },
+        "colorConfigs": {
+          "JetBlack": {
+            "catalogColor": "JetBlack",
+            "displayColor": "Jet Black",
+            "totalQuantity": 24,
+            "sizeBreakdown": {
+              "OSFA": {
+                "quantity": 24,
+                "unitPrice": 26
+              }
+            }
+          }
+        },
+        "orderTotals": {
+          "totalQuantity": 24,
+          "subtotal": 624,
+          "rushFee": 0,
+          "ltmFee": 0,
+          "shipping": 0,
+          "shippingSource": "free-threshold",
+          "salesTax": 63.02,
+          "taxRate": 0.101,
+          "taxableBase": 624,
+          "taxAccount": "2717",
+          "taxAccountName": "MILTON",
+          "grandTotal": 687.02
+        },
+        "orderSettings": {
+          "channel": "custom-caps",
+          "styleNumber": "112",
+          "productTitle": "Example Embroidered Cap 112",
+          "rush": false,
+          "frontLocation": "CF",
+          "backLocation": null,
+          "printLocationCode": "CF",
+          "printLocationName": "Cap Front",
+          "frontLogo": {
+            "fileUrl": "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/files/fixture-art-1042",
+            "fileName": "example-front.svg"
+          },
+          "backLogo": null,
+          "backLogoPerCap": 0,
+          "mockups": [],
+          "needsArtReview": true,
+          "rightsAck": {
+            "checked": true,
+            "ts": "2026-09-11T18:30:00.000Z"
+          }
+        }
+      }
+    }
+  ],
+  "dialogs": []
+}

@@ -907,3 +907,7 @@ Live remains.10/2102/44cc187/225. Account .11 is separately gated on source4e763
 
 ### Account release test timing correction — 2026-09-10
 The full local1,204-case CSS sweep completed1,203 passes and one confirmation-toast wait timeout under three-worker load. The real page retains the toast4.2 seconds; the test allowed only5 seconds including scheduling. No application or fixture source changed. The test now allows10 seconds but still requires the real timer to dismiss the toast. Five repeated failing-case runs passed under three-worker load; all affected account cases and the remaining local browser/pricing suites must pass before release. Exact-source CI must be rerun on this test correction; the earlier9eb6e2a2 run is not final-source evidence.
+
+## Verified cart release and next original captures — 2026-09-11
+
+Cart v2026.09.11.1/2104/2463ce82 is live191/225,34pending. All exact-source CI/full local gates and31 live checks passed. Custom Tees/Caps has35 passing original scenarios/36 immutable contracts,16 source guards; no application edits. Finish paper review and baseline backup before shared layout/focus/retry/storage repairs. API fixture prices are synthetic unit-fixture values, real engines unchanged.

@@ -1,0 +1,307 @@
+{
+  "name": "caps-pricing-failed",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Custom Embroidered Hats — Design Online | Northwest Custom Apparel",
+      "ids": {
+        "gallery-grid": "EXAMPLE CAPS Example Embroidered Cap 112 Everyday cap 2 stocked colors Live price unavailable — tap to retry Customize EXAMPLE CAPS Example Embroidered Cap C402 Everyday cap 2 stocked colors Live price unavailable — tap to retry Customize EXAMPLE CAPS Example Embroidered Cap C914 Everyday cap 2 stocked colors Live price unavailable — tap to retry Customize",
+        "caps-fatal": "We can’t load live pricing right now We couldn’t load live pricing or stock for 112 (HTTP 503 from https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bundle {\"tiersR\":[{\"TierLabel\":\"24-47\",\"MinQuantity\":24,\"MaxQuantity\":47,\"MarginDenominator\":0.53,\"LTM_Fee\":0},{\"TierLabel\":\"48-71\",\"MinQuantity\":4) — or call us and we’ll take your order by phone. 253-922-5793 Try again"
+      },
+      "fields": [],
+      "links": [
+        {
+          "href": "#stage-gallery",
+          "text": "Skip to the cap lineup"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "/",
+          "text": "Northwest Custom Apparel Custom Hats · Embroidered"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        }
+      ],
+      "cart": {
+        "lines": []
+      },
+      "quote": null,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              "em"
+            ],
+            [
+              "article[data-style=\"112\"] > .gallery-card-body > .gallery-card-role"
+            ],
+            [
+              "article[data-style=\"112\"] > .gallery-card-body > .gallery-card-colors"
+            ],
+            [
+              "article[data-style=\"C402\"] > .gallery-card-body > .gallery-card-role"
+            ],
+            [
+              "article[data-style=\"C402\"] > .gallery-card-body > .gallery-card-colors"
+            ],
+            [
+              "article[data-style=\"C914\"] > .gallery-card-body > .gallery-card-role"
+            ],
+            [
+              "article[data-style=\"C914\"] > .gallery-card-body > .gallery-card-colors"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Custom Embroidered Hats — Design Online | Northwest Custom Apparel",
+      "ids": {
+        "gallery-grid": "EXAMPLE CAPS Example Embroidered Cap 112 Everyday cap 2 stocked colors Live price unavailable — tap to retry Customize EXAMPLE CAPS Example Embroidered Cap C402 Everyday cap 2 stocked colors Live price unavailable — tap to retry Customize EXAMPLE CAPS Example Embroidered Cap C914 Everyday cap 2 stocked colors Live price unavailable — tap to retry Customize",
+        "caps-fatal": "We can’t load live pricing right now We couldn’t load live pricing or stock for 112 (HTTP 503 from https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bundle {\"tiersR\":[{\"TierLabel\":\"24-47\",\"MinQuantity\":24,\"MaxQuantity\":47,\"MarginDenominator\":0.53,\"LTM_Fee\":0},{\"TierLabel\":\"48-71\",\"MinQuantity\":4) — or call us and we’ll take your order by phone. 253-922-5793 Try again"
+      },
+      "fields": [],
+      "links": [
+        {
+          "href": "#stage-gallery",
+          "text": "Skip to the cap lineup"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "/",
+          "text": "Northwest Custom Apparel Custom Hats · Embroidered"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        }
+      ],
+      "cart": {
+        "lines": []
+      },
+      "quote": null,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              "em"
+            ],
+            [
+              "article[data-style=\"112\"] > .gallery-card-body > .gallery-card-role"
+            ],
+            [
+              "article[data-style=\"112\"] > .gallery-card-body > .gallery-card-colors"
+            ],
+            [
+              "article[data-style=\"C402\"] > .gallery-card-body > .gallery-card-role"
+            ],
+            [
+              "article[data-style=\"C402\"] > .gallery-card-body > .gallery-card-colors"
+            ],
+            [
+              "article[data-style=\"C914\"] > .gallery-card-body > .gallery-card-role"
+            ],
+            [
+              "article[data-style=\"C914\"] > .gallery-card-body > .gallery-card-colors"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Custom Embroidered Hats — Design Online | Northwest Custom Apparel",
+      "ids": {
+        "gallery-grid": "EXAMPLE CAPS Example Embroidered Cap 112 Everyday cap 2 stocked colors Live price unavailable — tap to retry Customize EXAMPLE CAPS Example Embroidered Cap C402 Everyday cap 2 stocked colors Live price unavailable — tap to retry Customize EXAMPLE CAPS Example Embroidered Cap C914 Everyday cap 2 stocked colors Live price unavailable — tap to retry Customize",
+        "caps-fatal": "We can’t load live pricing right now We couldn’t load live pricing or stock for 112 (HTTP 503 from https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bundle {\"tiersR\":[{\"TierLabel\":\"24-47\",\"MinQuantity\":24,\"MaxQuantity\":47,\"MarginDenominator\":0.53,\"LTM_Fee\":0},{\"TierLabel\":\"48-71\",\"MinQuantity\":4) — or call us and we’ll take your order by phone. 253-922-5793 Try again"
+      },
+      "fields": [],
+      "links": [
+        {
+          "href": "#stage-gallery",
+          "text": "Skip to the cap lineup"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "/",
+          "text": "Northwest Custom Apparel Custom Hats · Embroidered"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        }
+      ],
+      "cart": {
+        "lines": []
+      },
+      "quote": null,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              "em"
+            ],
+            [
+              "article[data-style=\"112\"] > .gallery-card-body > .gallery-card-role"
+            ],
+            [
+              "article[data-style=\"112\"] > .gallery-card-body > .gallery-card-colors"
+            ],
+            [
+              "article[data-style=\"C402\"] > .gallery-card-body > .gallery-card-role"
+            ],
+            [
+              "article[data-style=\"C402\"] > .gallery-card-body > .gallery-card-colors"
+            ],
+            [
+              "article[data-style=\"C914\"] > .gallery-card-body > .gallery-card-role"
+            ],
+            [
+              "article[data-style=\"C914\"] > .gallery-card-body > .gallery-card-colors"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Custom Embroidered Hats — Design Online | Northwest Custom Apparel",
+      "ids": {
+        "gallery-grid": "EXAMPLE CAPS Example Embroidered Cap 112 Everyday cap 2 stocked colors Live price unavailable — tap to retry Customize EXAMPLE CAPS Example Embroidered Cap C402 Everyday cap 2 stocked colors Live price unavailable — tap to retry Customize EXAMPLE CAPS Example Embroidered Cap C914 Everyday cap 2 stocked colors Live price unavailable — tap to retry Customize",
+        "caps-fatal": "We can’t load live pricing right now We couldn’t load live pricing or stock for 112 (HTTP 503 from https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bundle {\"tiersR\":[{\"TierLabel\":\"24-47\",\"MinQuantity\":24,\"MaxQuantity\":47,\"MarginDenominator\":0.53,\"LTM_Fee\":0},{\"TierLabel\":\"48-71\",\"MinQuantity\":4) — or call us and we’ll take your order by phone. 253-922-5793 Try again"
+      },
+      "fields": [],
+      "links": [
+        {
+          "href": "#stage-gallery",
+          "text": "Skip to the cap lineup"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "/",
+          "text": "Northwest Custom Apparel Custom Hats · Embroidered"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        }
+      ],
+      "cart": {
+        "lines": []
+      },
+      "quote": null,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              "em"
+            ],
+            [
+              "article[data-style=\"112\"] > .gallery-card-body > .gallery-card-role"
+            ],
+            [
+              "article[data-style=\"112\"] > .gallery-card-body > .gallery-card-colors"
+            ],
+            [
+              "article[data-style=\"C402\"] > .gallery-card-body > .gallery-card-role"
+            ],
+            [
+              "article[data-style=\"C402\"] > .gallery-card-body > .gallery-card-colors"
+            ],
+            [
+              "article[data-style=\"C914\"] > .gallery-card-body > .gallery-card-role"
+            ],
+            [
+              "article[data-style=\"C914\"] > .gallery-card-body > .gallery-card-colors"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "actions": [],
+  "dialogs": []
+}

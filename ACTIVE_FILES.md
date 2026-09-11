@@ -662,3 +662,83 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - pages/css/customer-cart.css — shared sample/quote cart header, status and print layout; uses storefront shell and canonical components.
 
 - tests/fixtures/custom-apparel-original-content.json and tests/unit/custom-apparel-content.test.js — immutable Custom Tees/Custom Caps HTML, source, field and financial-engine graph before shared CSS migration; no migration credit yet.
+
+- tests/fixtures/custom-apparel-api-fixtures.json — synthetic Custom Tees/Caps browser API fixtures; pure engines remain unchanged.
+
+- tests/e2e/helpers/custom-apparel-browser.js and tests/e2e/css-unification-custom-apparel.spec.js — synthetic original gallery, product, art, quantity, failure and checkout browser/paper capture; all business writes intercepted.
+
+
+
+- tests/fixtures/custom-apparel-caps-selected-original-browser.json — immutable synthetic original custom apparel browser contract.
+
+- tests/fixtures/custom-apparel-tees-gallery-original-browser.json — immutable synthetic original custom apparel browser contract.
+
+- tests/fixtures/custom-apparel-tees-selected-original-browser.json — immutable synthetic original custom apparel browser contract.
+
+- tests/fixtures/custom-apparel-caps-gallery-original-browser.json — immutable synthetic original custom apparel browser contract.
+
+- tests/fixtures/custom-apparel-caps-fatal-original-browser.json — immutable synthetic original custom apparel browser contract.
+
+- tests/fixtures/custom-apparel-caps-empty-original-browser.json — immutable synthetic original custom apparel browser contract.
+
+- tests/fixtures/custom-apparel-caps-pricing-failed-original-browser.json — immutable synthetic original custom apparel browser contract.
+
+- tests/fixtures/custom-apparel-caps-inventory-failed-original-browser.json — immutable synthetic original custom apparel browser contract.
+
+- tests/fixtures/custom-apparel-caps-low-original-browser.json — immutable synthetic original custom apparel browser contract.
+
+- tests/fixtures/custom-apparel-caps-out-original-browser.json — immutable synthetic original custom apparel browser contract.
+
+- tests/fixtures/custom-apparel-tees-fatal-original-browser.json — immutable synthetic original custom apparel browser contract.
+
+- tests/fixtures/custom-apparel-tees-empty-original-browser.json — immutable synthetic original custom apparel browser contract.
+
+- tests/fixtures/custom-apparel-tees-pricing-failed-original-browser.json — immutable synthetic original custom apparel browser contract.
+
+- tests/fixtures/custom-apparel-tees-inventory-failed-original-browser.json — immutable synthetic original custom apparel browser contract.
+
+- tests/fixtures/custom-apparel-tees-low-original-browser.json — immutable synthetic original custom apparel browser contract.
+
+- tests/fixtures/custom-apparel-tees-out-original-browser.json — immutable synthetic original custom apparel browser contract.
+
+- tests/fixtures/custom-apparel-caps-filled-original-browser.json — immutable synthetic original custom apparel browser contract.
+
+- tests/fixtures/custom-apparel-caps-checkout-failed-original-browser.json — immutable synthetic original custom apparel browser contract.
+
+- tests/fixtures/custom-apparel-caps-back-original-browser.json — immutable synthetic original custom apparel browser contract.
+
+- tests/fixtures/custom-apparel-caps-pickup-original-browser.json — immutable synthetic original custom apparel browser contract.
+
+- tests/fixtures/custom-apparel-caps-tax-failed-original-browser.json — immutable synthetic original custom apparel browser contract.
+
+- tests/fixtures/custom-apparel-caps-checkout-sent-original-browser.json — immutable synthetic original custom apparel browser contract.
+
+- tests/fixtures/custom-apparel-caps-sheet-original-browser.json — immutable synthetic original custom apparel browser contract.
+
+- tests/fixtures/custom-apparel-caps-multiple-colors-original-browser.json — immutable synthetic original custom apparel browser contract.
+
+- tests/fixtures/custom-apparel-tees-search-empty-original-browser.json — immutable synthetic original custom apparel browser contract.
+
+- tests/fixtures/custom-apparel-tees-filtered-original-browser.json — immutable synthetic original custom apparel browser contract.
+
+- tests/fixtures/custom-apparel-caps-below-minimum-original-browser.json — immutable synthetic original custom apparel browser contract.
+
+- tests/fixtures/custom-apparel-tees-filled-original-browser.json — immutable synthetic original custom apparel browser contract.
+
+- tests/fixtures/custom-apparel-tees-back-original-browser.json — immutable synthetic original custom apparel browser contract.
+
+- tests/fixtures/custom-apparel-tees-checkout-failed-original-browser.json — immutable synthetic original custom apparel browser contract.
+
+- tests/fixtures/custom-apparel-tees-pickup-original-browser.json — immutable synthetic original custom apparel browser contract.
+
+- tests/fixtures/custom-apparel-tees-tax-failed-original-browser.json — immutable synthetic original custom apparel browser contract.
+
+- tests/fixtures/custom-apparel-tees-checkout-sent-original-browser.json — immutable synthetic original custom apparel browser contract.
+
+- tests/fixtures/custom-apparel-tees-sheet-original-browser.json — immutable synthetic original custom apparel browser contract.
+
+- tests/fixtures/custom-apparel-tees-multiple-colors-original-browser.json — immutable synthetic original custom apparel browser contract.
+
+- tests/fixtures/custom-apparel-tees-rush-original-browser.json — immutable synthetic original custom apparel browser contract.
+
+- tests/fixtures/custom-apparel-original-defects.json — synthetic original retry/storage/summary focus defect observations.

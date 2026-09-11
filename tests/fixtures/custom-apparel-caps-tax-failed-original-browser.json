@@ -1,0 +1,1251 @@
+{
+  "name": "caps-tax-failed",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Custom Embroidered Hats — Design Online | Northwest Custom Apparel",
+      "ids": {
+        "gallery-grid": "EXAMPLE CAPS Example Embroidered Cap 112 Everyday cap 2 stocked colors from $23 /cap at 72+ Customize EXAMPLE CAPS Example Embroidered Cap C402 Everyday cap 2 stocked colors from $23 /cap at 72+ Customize EXAMPLE CAPS Example Embroidered Cap C914 Everyday cap 2 stocked colors from $23 /cap at 72+ Customize",
+        "current-product-name": "Example Embroidered Cap 112",
+        "current-product-style": "Style 112 · 2 stocked colors · one size fits most",
+        "color-chips": "Jet Black In stock Brilliant Orange In stock",
+        "color-cards": "Jet Black 500 in stock − +",
+        "tier-ladder": "QUANTITY PRICE 8–23 caps $30/cap 24–47 caps← YOU $26/cap 48–71 caps $24/cap 72+ caps $23/cap",
+        "review-lines": "COLOR QTY EACH TOTAL Jet Black 24 $26.00 $624.00",
+        "review-totals": "Caps (24) — front logo included $624.00 Logo setup & digitizing FREE ✓ Shipping FREE Sales tax enter address Total $624.00",
+        "review-promise": "Ships free, 7–10 business days after you approve your proof — from Milton, WA",
+        "pay-reasons": "Tax lookup failed — retry",
+        "pay-btn-label": "Pay",
+        "tax-stamp": "Sales tax is calculated from your ZIP.",
+        "front-file-name": "example-front.svg"
+      },
+      "fields": [
+        {
+          "id": "back-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-first",
+          "name": "",
+          "type": "text",
+          "value": "Casey",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-last",
+          "name": "",
+          "type": "text",
+          "value": "Example",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-email",
+          "name": "",
+          "type": "email",
+          "value": "customer@example.test",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-phone",
+          "name": "",
+          "type": "tel",
+          "value": "2535550142",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-company",
+          "name": "",
+          "type": "text",
+          "value": "Example Team",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "d-ship",
+          "name": "delivery",
+          "type": "radio",
+          "value": "ship",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "d-pickup",
+          "name": "delivery",
+          "type": "radio",
+          "value": "pickup",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-addr1",
+          "name": "",
+          "type": "text",
+          "value": "100 Example Way",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-city",
+          "name": "",
+          "type": "text",
+          "value": "Milton",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-state",
+          "name": "",
+          "type": "text",
+          "value": "WA",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-zip",
+          "name": "",
+          "type": "text",
+          "value": "98354",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-notes",
+          "name": "",
+          "type": "textarea",
+          "value": "Preserve all selected colors, sizes, and both artwork files. Example request only.",
+          "disabled": false
+        },
+        {
+          "id": "rights-ack",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#stage-gallery",
+          "text": "Skip to the cap lineup"
+        },
+        {
+          "href": "/",
+          "text": "Northwest Custom Apparel Custom Hats · Embroidered"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "https://maps.google.com/?cid=4107380119454186786",
+          "text": "★★★★★ Google review · 4.9 from 185+"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        }
+      ],
+      "cart": {
+        "lines": [
+          {
+            "catalogColor": "JetBlack",
+            "quantity": 24
+          }
+        ]
+      },
+      "quote": {
+        "combinedQty": 24,
+        "tierLabel": "24-47",
+        "minQuantity": 8,
+        "unitBySize": {
+          "OSFA": {
+            "finalPrice": 26,
+            "basePrice": 26,
+            "backLogoPerCap": 0,
+            "upcharge": 0,
+            "tierLabel": "24-47"
+          }
+        },
+        "perCap": 26,
+        "backLogo": false,
+        "backLogoPerCap": 0,
+        "lines": [
+          {
+            "catalogColor": "JetBlack",
+            "colorName": "Jet Black",
+            "size": "OSFA",
+            "quantity": 24,
+            "unitPrice": 26,
+            "extended": 624
+          }
+        ],
+        "capsSubtotal": 624,
+        "shirtsSubtotal": 624,
+        "ltmFee": 0,
+        "ltmPerPiece": 0,
+        "shipping": 0,
+        "shippingModel": "threshold",
+        "freeShipRemaining": 0,
+        "shipFreeOver": 100,
+        "taxRate": null,
+        "taxableBase": 624,
+        "tax": 0,
+        "total": 624
+      },
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              "em"
+            ],
+            [
+              ".proof-note"
+            ],
+            [
+              "#front-drop-label"
+            ],
+            [
+              "#front-file-size"
+            ],
+            [
+              "#back-delta"
+            ],
+            [
+              ".color-chip.is-active[aria-label=\"Remove Jet Black\"] > .chip-stock"
+            ],
+            [
+              "button[aria-label=\"Add Brilliant Orange\"] > .chip-stock"
+            ],
+            [
+              ".color-card-name > small"
+            ],
+            [
+              ".ladder-title"
+            ],
+            [
+              "th[scope=\"col\"]:nth-child(1)"
+            ],
+            [
+              "th[scope=\"col\"]:nth-child(2)"
+            ],
+            [
+              "#ladder-foot"
+            ],
+            [
+              "#ship-fee-label"
+            ],
+            [
+              ".delivery-card:nth-child(2) > .delivery-card-body > small"
+            ],
+            [
+              "#tax-stamp"
+            ],
+            [
+              "#tax-retry"
+            ],
+            [
+              ".review-logo > small"
+            ],
+            [
+              "#review-lines > table > thead > tr > th:nth-child(1)"
+            ],
+            [
+              "#review-lines > table > thead > tr > th:nth-child(2)"
+            ],
+            [
+              "th:nth-child(3)"
+            ],
+            [
+              "th:nth-child(4)"
+            ],
+            [
+              ".stripe-note"
+            ],
+            [
+              "#smart-cta"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Custom Embroidered Hats — Design Online | Northwest Custom Apparel",
+      "ids": {
+        "gallery-grid": "EXAMPLE CAPS Example Embroidered Cap 112 Everyday cap 2 stocked colors from $23 /cap at 72+ Customize EXAMPLE CAPS Example Embroidered Cap C402 Everyday cap 2 stocked colors from $23 /cap at 72+ Customize EXAMPLE CAPS Example Embroidered Cap C914 Everyday cap 2 stocked colors from $23 /cap at 72+ Customize",
+        "current-product-name": "Example Embroidered Cap 112",
+        "current-product-style": "Style 112 · 2 stocked colors · one size fits most",
+        "color-chips": "Jet Black In stock Brilliant Orange In stock",
+        "color-cards": "Jet Black 500 in stock − +",
+        "tier-ladder": "QUANTITY PRICE 8–23 caps $30/cap 24–47 caps← YOU $26/cap 48–71 caps $24/cap 72+ caps $23/cap",
+        "review-lines": "COLOR QTY EACH TOTAL Jet Black 24 $26.00 $624.00",
+        "review-totals": "Caps (24) — front logo included $624.00 Logo setup & digitizing FREE ✓ Shipping FREE Sales tax enter address Total $624.00",
+        "review-promise": "Ships free, 7–10 business days after you approve your proof — from Milton, WA",
+        "pay-reasons": "Tax lookup failed — retry",
+        "pay-btn-label": "Pay",
+        "tax-stamp": "Sales tax is calculated from your ZIP.",
+        "front-file-name": "example-front.svg"
+      },
+      "fields": [
+        {
+          "id": "back-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-first",
+          "name": "",
+          "type": "text",
+          "value": "Casey",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-last",
+          "name": "",
+          "type": "text",
+          "value": "Example",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-email",
+          "name": "",
+          "type": "email",
+          "value": "customer@example.test",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-phone",
+          "name": "",
+          "type": "tel",
+          "value": "2535550142",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-company",
+          "name": "",
+          "type": "text",
+          "value": "Example Team",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "d-ship",
+          "name": "delivery",
+          "type": "radio",
+          "value": "ship",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "d-pickup",
+          "name": "delivery",
+          "type": "radio",
+          "value": "pickup",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-addr1",
+          "name": "",
+          "type": "text",
+          "value": "100 Example Way",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-city",
+          "name": "",
+          "type": "text",
+          "value": "Milton",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-state",
+          "name": "",
+          "type": "text",
+          "value": "WA",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-zip",
+          "name": "",
+          "type": "text",
+          "value": "98354",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-notes",
+          "name": "",
+          "type": "textarea",
+          "value": "Preserve all selected colors, sizes, and both artwork files. Example request only.",
+          "disabled": false
+        },
+        {
+          "id": "rights-ack",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#stage-gallery",
+          "text": "Skip to the cap lineup"
+        },
+        {
+          "href": "/",
+          "text": "Northwest Custom Apparel Custom Hats · Embroidered"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "https://maps.google.com/?cid=4107380119454186786",
+          "text": "★★★★★ Google review · 4.9 from 185+"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        }
+      ],
+      "cart": {
+        "lines": [
+          {
+            "catalogColor": "JetBlack",
+            "quantity": 24
+          }
+        ]
+      },
+      "quote": {
+        "combinedQty": 24,
+        "tierLabel": "24-47",
+        "minQuantity": 8,
+        "unitBySize": {
+          "OSFA": {
+            "finalPrice": 26,
+            "basePrice": 26,
+            "backLogoPerCap": 0,
+            "upcharge": 0,
+            "tierLabel": "24-47"
+          }
+        },
+        "perCap": 26,
+        "backLogo": false,
+        "backLogoPerCap": 0,
+        "lines": [
+          {
+            "catalogColor": "JetBlack",
+            "colorName": "Jet Black",
+            "size": "OSFA",
+            "quantity": 24,
+            "unitPrice": 26,
+            "extended": 624
+          }
+        ],
+        "capsSubtotal": 624,
+        "shirtsSubtotal": 624,
+        "ltmFee": 0,
+        "ltmPerPiece": 0,
+        "shipping": 0,
+        "shippingModel": "threshold",
+        "freeShipRemaining": 0,
+        "shipFreeOver": 100,
+        "taxRate": null,
+        "taxableBase": 624,
+        "tax": 0,
+        "total": 624
+      },
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              "em"
+            ],
+            [
+              "#card-price-112 > small"
+            ],
+            [
+              "#card-price-C402 > small"
+            ],
+            [
+              ".proof-note"
+            ],
+            [
+              "#front-drop-label"
+            ],
+            [
+              "#front-file-size"
+            ],
+            [
+              "#back-delta"
+            ],
+            [
+              ".color-chip.is-active[aria-label=\"Remove Jet Black\"] > .chip-stock"
+            ],
+            [
+              "button[aria-label=\"Add Brilliant Orange\"] > .chip-stock"
+            ],
+            [
+              ".color-card-name > small"
+            ],
+            [
+              ".ladder-title"
+            ],
+            [
+              "th[scope=\"col\"]:nth-child(1)"
+            ],
+            [
+              "th[scope=\"col\"]:nth-child(2)"
+            ],
+            [
+              "#ladder-foot"
+            ],
+            [
+              "#ship-fee-label"
+            ],
+            [
+              ".delivery-card:nth-child(2) > .delivery-card-body > small"
+            ],
+            [
+              "#tax-stamp"
+            ],
+            [
+              "#tax-retry"
+            ],
+            [
+              ".review-logo > small"
+            ],
+            [
+              "#review-lines > table > thead > tr > th:nth-child(1)"
+            ],
+            [
+              "#review-lines > table > thead > tr > th:nth-child(2)"
+            ],
+            [
+              "th:nth-child(3)"
+            ],
+            [
+              "th:nth-child(4)"
+            ],
+            [
+              ".stripe-note"
+            ],
+            [
+              "#smart-cta"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Custom Embroidered Hats — Design Online | Northwest Custom Apparel",
+      "ids": {
+        "gallery-grid": "EXAMPLE CAPS Example Embroidered Cap 112 Everyday cap 2 stocked colors from $23 /cap at 72+ Customize EXAMPLE CAPS Example Embroidered Cap C402 Everyday cap 2 stocked colors from $23 /cap at 72+ Customize EXAMPLE CAPS Example Embroidered Cap C914 Everyday cap 2 stocked colors from $23 /cap at 72+ Customize",
+        "current-product-name": "Example Embroidered Cap 112",
+        "current-product-style": "Style 112 · 2 stocked colors · one size fits most",
+        "color-chips": "Jet Black In stock Brilliant Orange In stock",
+        "color-cards": "Jet Black 500 in stock − +",
+        "tier-ladder": "QUANTITY PRICE 8–23 caps $30/cap 24–47 caps← YOU $26/cap 48–71 caps $24/cap 72+ caps $23/cap",
+        "review-lines": "COLOR QTY EACH TOTAL Jet Black 24 $26.00 $624.00",
+        "review-totals": "Caps (24) — front logo included $624.00 Logo setup & digitizing FREE ✓ Shipping FREE Sales tax enter address Total $624.00",
+        "review-promise": "Ships free, 7–10 business days after you approve your proof — from Milton, WA",
+        "pay-reasons": "Tax lookup failed — retry",
+        "pay-btn-label": "Pay",
+        "tax-stamp": "Sales tax is calculated from your ZIP.",
+        "front-file-name": "example-front.svg"
+      },
+      "fields": [
+        {
+          "id": "back-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-first",
+          "name": "",
+          "type": "text",
+          "value": "Casey",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-last",
+          "name": "",
+          "type": "text",
+          "value": "Example",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-email",
+          "name": "",
+          "type": "email",
+          "value": "customer@example.test",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-phone",
+          "name": "",
+          "type": "tel",
+          "value": "2535550142",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-company",
+          "name": "",
+          "type": "text",
+          "value": "Example Team",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "d-ship",
+          "name": "delivery",
+          "type": "radio",
+          "value": "ship",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "d-pickup",
+          "name": "delivery",
+          "type": "radio",
+          "value": "pickup",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-addr1",
+          "name": "",
+          "type": "text",
+          "value": "100 Example Way",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-city",
+          "name": "",
+          "type": "text",
+          "value": "Milton",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-state",
+          "name": "",
+          "type": "text",
+          "value": "WA",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-zip",
+          "name": "",
+          "type": "text",
+          "value": "98354",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-notes",
+          "name": "",
+          "type": "textarea",
+          "value": "Preserve all selected colors, sizes, and both artwork files. Example request only.",
+          "disabled": false
+        },
+        {
+          "id": "rights-ack",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#stage-gallery",
+          "text": "Skip to the cap lineup"
+        },
+        {
+          "href": "/",
+          "text": "Northwest Custom Apparel Custom Hats · Embroidered"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "https://maps.google.com/?cid=4107380119454186786",
+          "text": "★★★★★ Google review · 4.9 from 185+"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        }
+      ],
+      "cart": {
+        "lines": [
+          {
+            "catalogColor": "JetBlack",
+            "quantity": 24
+          }
+        ]
+      },
+      "quote": {
+        "combinedQty": 24,
+        "tierLabel": "24-47",
+        "minQuantity": 8,
+        "unitBySize": {
+          "OSFA": {
+            "finalPrice": 26,
+            "basePrice": 26,
+            "backLogoPerCap": 0,
+            "upcharge": 0,
+            "tierLabel": "24-47"
+          }
+        },
+        "perCap": 26,
+        "backLogo": false,
+        "backLogoPerCap": 0,
+        "lines": [
+          {
+            "catalogColor": "JetBlack",
+            "colorName": "Jet Black",
+            "size": "OSFA",
+            "quantity": 24,
+            "unitPrice": 26,
+            "extended": 624
+          }
+        ],
+        "capsSubtotal": 624,
+        "shirtsSubtotal": 624,
+        "ltmFee": 0,
+        "ltmPerPiece": 0,
+        "shipping": 0,
+        "shippingModel": "threshold",
+        "freeShipRemaining": 0,
+        "shipFreeOver": 100,
+        "taxRate": null,
+        "taxableBase": 624,
+        "tax": 0,
+        "total": 624
+      },
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              "em"
+            ],
+            [
+              "article[data-style=\"112\"] > .gallery-card-body > .gallery-card-role"
+            ],
+            [
+              "article[data-style=\"112\"] > .gallery-card-body > .gallery-card-colors"
+            ],
+            [
+              "#card-price-112 > small"
+            ],
+            [
+              "article[data-style=\"C402\"] > .gallery-card-body > .gallery-card-role"
+            ],
+            [
+              "article[data-style=\"C402\"] > .gallery-card-body > .gallery-card-colors"
+            ],
+            [
+              "#card-price-C402 > small"
+            ],
+            [
+              "article[data-style=\"C914\"] > .gallery-card-body > .gallery-card-role"
+            ],
+            [
+              "article[data-style=\"C914\"] > .gallery-card-body > .gallery-card-colors"
+            ],
+            [
+              "#card-price-C914 > small"
+            ],
+            [
+              ".proof-note"
+            ],
+            [
+              "#front-drop-label"
+            ],
+            [
+              "#front-file-size"
+            ],
+            [
+              "#back-delta"
+            ],
+            [
+              ".color-chip.is-active[aria-label=\"Remove Jet Black\"] > .chip-stock"
+            ],
+            [
+              "button[aria-label=\"Add Brilliant Orange\"] > .chip-stock"
+            ],
+            [
+              ".color-card-name > small"
+            ],
+            [
+              ".ladder-title"
+            ],
+            [
+              "th[scope=\"col\"]:nth-child(1)"
+            ],
+            [
+              "th[scope=\"col\"]:nth-child(2)"
+            ],
+            [
+              "#ladder-foot"
+            ],
+            [
+              "#ship-fee-label"
+            ],
+            [
+              ".delivery-card:nth-child(2) > .delivery-card-body > small"
+            ],
+            [
+              "#tax-stamp"
+            ],
+            [
+              "#tax-retry"
+            ],
+            [
+              ".review-logo > small"
+            ],
+            [
+              "#review-lines > table > thead > tr > th:nth-child(1)"
+            ],
+            [
+              "#review-lines > table > thead > tr > th:nth-child(2)"
+            ],
+            [
+              "th:nth-child(3)"
+            ],
+            [
+              "th:nth-child(4)"
+            ],
+            [
+              ".stripe-note"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Custom Embroidered Hats — Design Online | Northwest Custom Apparel",
+      "ids": {
+        "gallery-grid": "EXAMPLE CAPS Example Embroidered Cap 112 Everyday cap 2 stocked colors from $23 /cap at 72+ Customize EXAMPLE CAPS Example Embroidered Cap C402 Everyday cap 2 stocked colors from $23 /cap at 72+ Customize EXAMPLE CAPS Example Embroidered Cap C914 Everyday cap 2 stocked colors from $23 /cap at 72+ Customize",
+        "current-product-name": "Example Embroidered Cap 112",
+        "current-product-style": "Style 112 · 2 stocked colors · one size fits most",
+        "color-chips": "Jet Black In stock Brilliant Orange In stock",
+        "color-cards": "Jet Black 500 in stock − +",
+        "tier-ladder": "QUANTITY PRICE 8–23 caps $30/cap 24–47 caps← YOU $26/cap 48–71 caps $24/cap 72+ caps $23/cap",
+        "review-lines": "COLOR QTY EACH TOTAL Jet Black 24 $26.00 $624.00",
+        "review-totals": "Caps (24) — front logo included $624.00 Logo setup & digitizing FREE ✓ Shipping FREE Sales tax enter address Total $624.00",
+        "review-promise": "Ships free, 7–10 business days after you approve your proof — from Milton, WA",
+        "pay-reasons": "Tax lookup failed — retry",
+        "pay-btn-label": "Pay",
+        "tax-stamp": "Sales tax is calculated from your ZIP.",
+        "front-file-name": "example-front.svg"
+      },
+      "fields": [
+        {
+          "id": "back-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-first",
+          "name": "",
+          "type": "text",
+          "value": "Casey",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-last",
+          "name": "",
+          "type": "text",
+          "value": "Example",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-email",
+          "name": "",
+          "type": "email",
+          "value": "customer@example.test",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-phone",
+          "name": "",
+          "type": "tel",
+          "value": "2535550142",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-company",
+          "name": "",
+          "type": "text",
+          "value": "Example Team",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "d-ship",
+          "name": "delivery",
+          "type": "radio",
+          "value": "ship",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "d-pickup",
+          "name": "delivery",
+          "type": "radio",
+          "value": "pickup",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-addr1",
+          "name": "",
+          "type": "text",
+          "value": "100 Example Way",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-city",
+          "name": "",
+          "type": "text",
+          "value": "Milton",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-state",
+          "name": "",
+          "type": "text",
+          "value": "WA",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-zip",
+          "name": "",
+          "type": "text",
+          "value": "98354",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "f-notes",
+          "name": "",
+          "type": "textarea",
+          "value": "Preserve all selected colors, sizes, and both artwork files. Example request only.",
+          "disabled": false
+        },
+        {
+          "id": "rights-ack",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#stage-gallery",
+          "text": "Skip to the cap lineup"
+        },
+        {
+          "href": "/",
+          "text": "Northwest Custom Apparel Custom Hats · Embroidered"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "https://maps.google.com/?cid=4107380119454186786",
+          "text": "★★★★★ Google review · 4.9 from 185+"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        }
+      ],
+      "cart": {
+        "lines": [
+          {
+            "catalogColor": "JetBlack",
+            "quantity": 24
+          }
+        ]
+      },
+      "quote": {
+        "combinedQty": 24,
+        "tierLabel": "24-47",
+        "minQuantity": 8,
+        "unitBySize": {
+          "OSFA": {
+            "finalPrice": 26,
+            "basePrice": 26,
+            "backLogoPerCap": 0,
+            "upcharge": 0,
+            "tierLabel": "24-47"
+          }
+        },
+        "perCap": 26,
+        "backLogo": false,
+        "backLogoPerCap": 0,
+        "lines": [
+          {
+            "catalogColor": "JetBlack",
+            "colorName": "Jet Black",
+            "size": "OSFA",
+            "quantity": 24,
+            "unitPrice": 26,
+            "extended": 624
+          }
+        ],
+        "capsSubtotal": 624,
+        "shirtsSubtotal": 624,
+        "ltmFee": 0,
+        "ltmPerPiece": 0,
+        "shipping": 0,
+        "shippingModel": "threshold",
+        "freeShipRemaining": 0,
+        "shipFreeOver": 100,
+        "taxRate": null,
+        "taxableBase": 624,
+        "tax": 0,
+        "total": 624
+      },
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              "em"
+            ],
+            [
+              "article[data-style=\"112\"] > .gallery-card-body > .gallery-card-colors"
+            ],
+            [
+              "#card-price-112 > small"
+            ],
+            [
+              "article[data-style=\"C914\"] > .gallery-card-body > .gallery-card-role"
+            ],
+            [
+              "article[data-style=\"C914\"] > .gallery-card-body > .gallery-card-colors"
+            ],
+            [
+              "#card-price-C914 > small"
+            ],
+            [
+              ".proof-note"
+            ],
+            [
+              "#front-drop-label"
+            ],
+            [
+              "#front-file-size"
+            ],
+            [
+              "#back-delta"
+            ],
+            [
+              ".color-chip.is-active[aria-label=\"Remove Jet Black\"] > .chip-stock"
+            ],
+            [
+              "button[aria-label=\"Add Brilliant Orange\"] > .chip-stock"
+            ],
+            [
+              ".color-card-name > small"
+            ],
+            [
+              ".ladder-title"
+            ],
+            [
+              "th[scope=\"col\"]:nth-child(1)"
+            ],
+            [
+              "th[scope=\"col\"]:nth-child(2)"
+            ],
+            [
+              "#ladder-foot"
+            ],
+            [
+              "#ship-fee-label"
+            ],
+            [
+              ".delivery-card:nth-child(2) > .delivery-card-body > small"
+            ],
+            [
+              "#tax-stamp"
+            ],
+            [
+              "#tax-retry"
+            ],
+            [
+              ".review-logo > small"
+            ],
+            [
+              "#review-lines > table > thead > tr > th:nth-child(1)"
+            ],
+            [
+              "#review-lines > table > thead > tr > th:nth-child(2)"
+            ],
+            [
+              "th:nth-child(3)"
+            ],
+            [
+              "th:nth-child(4)"
+            ],
+            [
+              ".stripe-note"
+            ],
+            [
+              "#smart-cta"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "path": "/api/tax-rates/lookup",
+      "method": "POST",
+      "body": {
+        "address": "100 Example Way",
+        "city": "Milton",
+        "state": "WA",
+        "zip": "98354"
+      }
+    }
+  ],
+  "dialogs": []
+}

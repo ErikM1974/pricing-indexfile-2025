@@ -4,6 +4,31 @@ const original = require('../fixtures/custom-apparel-original-content.json');
 const root = path.resolve(__dirname, '../..'), norm = s => s.replace(/\s+/g, ' ').trim();
 const hash = s => crypto.createHash('sha256').update(s).digest('hex');
 
+test.each([
+    ['pages/js/custom-caps-app.js', ['combinedQty', 'minQty', 'currentQuote', 'perCapAt', 'buildTotalsHtml', 'buildCheckoutPayload']],
+    ['pages/js/custom-tees-app.js', ['pricingConfig', 'artDims', 'derivedFrontLocation', 'derivedBackLocation', 'buildShipPromise', 'currentQuote', 'buildTotalsHtml', 'buildCheckoutPayload']],
+])('%s preserves financial, date and quantity transformations', (file, names) => {
+    const espree = require('espree');
+    const current = fs.readFileSync(path.join(root, file), 'utf8').replace(/\r\n/g, '\n');
+    let before = current;
+    for (const change of original.changes.filter(c => c.file === file).reverse()) before = before.split(change.after).join(change.before);
+    function functions(source) {
+        const found = {};
+        function visit(node) {
+            if (!node || typeof node !== 'object') return;
+            if (node.type === 'FunctionDeclaration' && names.includes(node.id.name)) found[node.id.name] = source.slice(...node.range);
+            for (const value of Object.values(node)) {
+                if (Array.isArray(value)) value.forEach(visit);
+                else if (value && typeof value === 'object') visit(value);
+            }
+        }
+        visit(espree.parse(source, { ecmaVersion: 'latest', range: true }));
+        expect(Object.keys(found).sort()).toEqual([...names].sort());
+        return found;
+    }
+    expect(functions(current)).toEqual(functions(before));
+});
+
 test.each(original.pages)('$file preserves original labels, fields, links and identifiers', record => {
     let html = fs.readFileSync(path.join(root, record.file), 'utf8').replace(/\r\n/g, '\n');
     for (const change of original.changes.filter(c => c.file === record.file).reverse()) {
