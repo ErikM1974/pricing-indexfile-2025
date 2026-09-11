@@ -1,3 +1,12 @@
+## v2026.09.11.4 (2026.09.11)
+
+- Capture manual calculator and shop menu original workflows and print layouts
+- Unify manual calculators and shop menu with accessible fields and complete printing
+- Integrate verified catalog release before calculator reference rollout
+- Deploy v2026.09.11.4: unify manual calculators and shop menu
+- Verify unified laser hidden state through shared component owner
+- Deploy v2026.09.11.4: run complete release gates after shared-state guard fix
+
 ## v2026.09.11.3 (2026.09.11)
 
 - Capture original catalog storefront workflows and paper baseline
