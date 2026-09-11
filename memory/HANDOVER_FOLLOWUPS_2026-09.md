@@ -1,5 +1,13 @@
 # Handover follow-ups — 2026-09-07
 
+## REVIEWED — Manual Pricing, Manual Laser and Shop Menu
+
+Three pages now use Public Sans, canonical fields/buttons and scoped style owners. Sixteen focused browser cases cover four widths, exact original prices/content, keyboard access to all size columns, selected garment/cap state, validation and load failures, rep/customer visibility and print restoration. All 23 current paper pages across 18 documents and 46 screen panels are visually reviewed; six final screen sheets confirm the corrected quantity fields. Ordinary menus fit one sheet and long lists fit two; every original price, rule and contact detail remains present. The existing laser Coming Soon content is preserved.
+
+Nineteen immutable source hashes and 18 browser contracts remain backed up. The menu controller and all pricing services are byte-identical. The manual controller differs only by two literal accessibility additions; all calculation, rounding, API and row-generation logic is unchanged. Existing manual-calculator-styles.css now has no live consumer; it is flagged here, retained unchanged per the dead-code policy.
+
+Candidate: 199 of 225 pages reviewed, 26 pending. Live: v2026.09.11.3 / Heroku2106 / bf0a27f3,196 reviewed,29 pending until this group passes full local/CI release checks and verified rollout. Evidence: calculator-reference-reviewed-record.json and active-css-resume-state.json.
+
 ## RELEASE CANDIDATE — v2026.09.11.3 Home, Catalog and Product
 
 Reviewed source a1a136333d3eef7f978e60cd39c2a48fd928bf67 is integrated on clean develop. This candidate adds 15 cache references for nine changed application assets, plus six versioned imports of the existing shared components/shell, with all reversible mappings. All 34 focused browser cases, 57 visually reviewed current paper pages and 298 source/ownership guards passed. All 47 original sources and 29 original browser records remain preserved. The 16 financial functions remain byte-identical; quantity edits immediately withhold stale prices while recalculating.

@@ -6008,6 +6008,111 @@
         "rawCssBytes": 195159,
         "localCssRequests": 6
       }
+    },
+    {
+      "source": "calculators/manual-pricing.html",
+      "family": "calculator-reference",
+      "status": "reviewed",
+      "route": "/calculators/manual-pricing.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/calculator-reference.css",
+        "calculators/manual-pricing.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "1440-768-390-320",
+        "original-text-links-fields-and-prices",
+        "canonical-quantity-fields",
+        "exact-financial-and-data-transformations",
+        "keyboard-scroll-all-sizes",
+        "selected-garment-cap-state",
+        "invalid-zero-and-high-cost",
+        "all-method-and-partial-price-failure",
+        "rep-customer-visibility",
+        "print-view-restoration",
+        "complete-letter-price-tables",
+        "menu-no-footer-only-sheet"
+      ],
+      "test": "tests/e2e/css-unification-calculator-reference.spec.js",
+      "maxCssBytes": 72966,
+      "measuredRawCssBytes": 70918,
+      "baseline": {
+        "commit": "99db3fd9d6af43dddae384b9f48a12c6f49d5ed1",
+        "rawCssBytes": 42882,
+        "localCssRequests": 3
+      }
+    },
+    {
+      "source": "calculators/laser-manual-pricing.html",
+      "family": "calculator-reference",
+      "status": "reviewed",
+      "route": "/calculators/laser-manual-pricing.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/calculator-reference.css",
+        "calculators/css/laser-manual-pricing.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "1440-768-390-320",
+        "original-text-links-fields-and-prices",
+        "canonical-quantity-fields",
+        "exact-financial-and-data-transformations",
+        "keyboard-scroll-all-sizes",
+        "selected-garment-cap-state",
+        "invalid-zero-and-high-cost",
+        "all-method-and-partial-price-failure",
+        "rep-customer-visibility",
+        "print-view-restoration",
+        "complete-letter-price-tables",
+        "menu-no-footer-only-sheet"
+      ],
+      "test": "tests/e2e/css-unification-calculator-reference.spec.js",
+      "maxCssBytes": 67218,
+      "measuredRawCssBytes": 65170,
+      "baseline": {
+        "commit": "99db3fd9d6af43dddae384b9f48a12c6f49d5ed1",
+        "rawCssBytes": 31047,
+        "localCssRequests": 3
+      }
+    },
+    {
+      "source": "calculators/service-price-cheat-sheet.html",
+      "family": "calculator-reference",
+      "status": "reviewed",
+      "route": "/calculators/service-price-cheat-sheet.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/calculator-reference.css",
+        "calculators/service-price-cheat-sheet.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "1440-768-390-320",
+        "original-text-links-fields-and-prices",
+        "canonical-quantity-fields",
+        "exact-financial-and-data-transformations",
+        "keyboard-scroll-all-sizes",
+        "selected-garment-cap-state",
+        "invalid-zero-and-high-cost",
+        "all-method-and-partial-price-failure",
+        "rep-customer-visibility",
+        "print-view-restoration",
+        "complete-letter-price-tables",
+        "menu-no-footer-only-sheet"
+      ],
+      "test": "tests/e2e/css-unification-calculator-reference.spec.js",
+      "maxCssBytes": 73431,
+      "measuredRawCssBytes": 71383,
+      "baseline": {
+        "commit": "99db3fd9d6af43dddae384b9f48a12c6f49d5ed1",
+        "rawCssBytes": 28525,
+        "localCssRequests": 2
+      }
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",

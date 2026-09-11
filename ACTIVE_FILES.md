@@ -854,3 +854,5 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - tests/fixtures/calculator-reference-menu-empty-rep-original-browser.json — immutable original synthetic calculator/reference browser contract.
 
 - tests/fixtures/calculator-reference-menu-empty-customer-original-browser.json — immutable original synthetic calculator/reference browser contract.
+
+- shared_components/css/calculator-reference.css — shared scoped chrome for Manual Pricing, Manual Laser and Shop Menu.

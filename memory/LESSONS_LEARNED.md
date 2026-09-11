@@ -6,6 +6,12 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 ---
 
 
+## Calculator references need complete field and paper ownership (2026-09-11)
+
+- Problem/root cause: legacy price tables clipped rightmost size columns on paper; page-local print rules hid price-load failures, while broad class matching missed compound quantity-control classes.
+- Solution: canonical fields on every quantity selector/input, focusable named scroll regions and selected-type state; scoped print table sizing and visible error banners. Preserve each amount, tier, fee and original financial transformation.
+- Prevention: compare actual original/current values at four widths, keyboard-scroll all sizes, exercise failure and print-view restoration, and inspect every rendered page including long service lists and the contact footer. Keep headings with rows without making entire long categories unbreakable.
+
 ## Storefront quantity edits and scoped CSS (2026-09-11)
 
 - Problem/root cause: the quantity debounce retained the previous successful price and size breakdown for350ms, while the quantity field had already changed; the email/cart controls could therefore reference the old quote.
@@ -67,13 +73,6 @@ Exercise state transitions and verify complete printed content. Full entry in LE
 ### Shared form styles and print pseudo-elements (2026-09-08, archived): inspect actual filled paper and scoped pseudo-elements. Full entry in LESSONS_LEARNED_ARCHIVE.md.
 
 ### Training state must survive every input path (2026-09-08, archived): preserve input/retry/storage behavior. Full entry in LESSONS_LEARNED_ARCHIVE.md.
-
-### Public family migrations must preserve offer text and all stylesheet paths (2026-09-08)
-
-Problem: borrowed campaign CSS hid navigation without its original controller, CSS byte audits missed a relative stylesheet link, and printed footers split onto a trailing page. Root cause: cross-page stylesheet dependencies and incomplete source/path/print accounting. Solution: one scoped family layout with native navigation and FAQs, resolve relative and root asset paths alike, preserve the entire original main text plus SEO/image/link data, and keep footer blocks together. Prevention: check every route alias, four widths and keyboard disclosures, then compare actual PDF offer/pricing/FAQ text and render paper samples.
-
-Webstore follow-up: full hygiene checks also require cache versions on every new local CSS/JS reference. Add the reserved candidate version before full gates, including unchanged shared components newly linked into a page.
-
 
 ### Native storefront menus still need keyboard and layout ownership checks (2026-09-09)
 

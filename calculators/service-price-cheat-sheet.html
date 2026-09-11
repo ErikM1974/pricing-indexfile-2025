@@ -6,26 +6,28 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Shop Menu | Northwest Custom Apparel</title>
     <link rel="icon" href="/favicon.png" type="image/png">
-    <!-- Menu typography: Bodoni Moda for the masthead and course titles, Libre Franklin for items and codes -->
+    <!-- Public Sans matches the shared application typography. -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,600;0,6..96,700;1,6..96,400&family=Libre+Franklin:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Page styles -->
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.11.3">
+    <link rel="stylesheet" href="/shared_components/css/calculator-reference.css?v=2026.09.11.3">
     <link rel="stylesheet" href="/calculators/service-price-cheat-sheet.css?v=2026.09.07.12">
 </head>
-<body class="view-rep">
+<body class="view-rep" data-ui="unified" data-calculator-reference="menu">
     <!-- Staff bar: never prints -->
     <header class="topbar">
         <a href="/staff-dashboard.html" class="topbar-link"><i class="fas fa-arrow-left" aria-hidden="true"></i> Staff Dashboard</a>
         <div class="topbar-spacer"></div>
         <div class="view-toggle" role="group" aria-label="Menu view">
-            <button type="button" class="view-btn is-active" data-view="rep" aria-pressed="true">Rep view <small>codes &amp; book times</small></button>
-            <button type="button" class="view-btn" data-view="customer" aria-pressed="false">Customer view <small>prices only</small></button>
+            <button type="button" class="btn btn-secondary view-btn is-active" data-view="rep" aria-pressed="true">Rep view <small>codes &amp; book times</small></button>
+            <button type="button" class="btn btn-secondary view-btn" data-view="customer" aria-pressed="false">Customer view <small>prices only</small></button>
         </div>
-        <button type="button" class="topbar-link topbar-link--solid" id="printCustomerBtn" title="Prints the customer copy: prices only, no codes or book times"><i class="fas fa-print" aria-hidden="true"></i> Print customer menu</button>
-        <button type="button" class="topbar-link" id="printRepBtn" title="Prints the rep copy with ShopWorks codes and book times"><i class="fas fa-print" aria-hidden="true"></i> Print rep copy</button>
+        <button type="button" class="btn btn-primary topbar-link topbar-link--solid" id="printCustomerBtn" title="Prints the customer copy: prices only, no codes or book times"><i class="fas fa-print" aria-hidden="true"></i> Print customer menu</button>
+        <button type="button" class="btn btn-secondary topbar-link" id="printRepBtn" title="Prints the rep copy with ShopWorks codes and book times"><i class="fas fa-print" aria-hidden="true"></i> Print rep copy</button>
     </header>
 
     <div id="errorBanner" class="error-banner" role="alert"></div>
@@ -52,6 +54,7 @@
             </ol>
         </section>
 
+        <div class="menu-services">
         <div class="courses" id="courses">
             <p class="loading"><i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Setting the table&hellip;</p>
         </div>
@@ -61,6 +64,7 @@
             <p class="rep-only">Prices load from Caspio <code>Service_Codes</code> &mdash; change it there, the menu follows. Loaded <span id="loadTimestamp">&mdash;</span>. Subject to change; sales tax extra.</p>
             <p class="customer-only">Prices subject to change without notice. Sales tax extra.</p>
         </footer>
+        </div>
     </main>
 
     <script src="/shared_components/js/app-config.js?v=2026.09.06.15"></script>

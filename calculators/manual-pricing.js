@@ -60,6 +60,7 @@ class ManualPricingCalculator {
         // Update toggle buttons
         document.querySelectorAll('.toggle-btn').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.type === type);
+            btn.setAttribute('aria-pressed', String(btn.dataset.type === type));
         });
 
         // Show/hide card groups
@@ -532,7 +533,7 @@ class ManualPricingCalculator {
         const isSingle = options.singleColumn || sizeLabels.length === 1;
         const hasLTM = rows.some(r => r.isLTM);
 
-        let html = '<div class="pricing-table-wrapper"><table class="pricing-table">';
+        let html = '<div class="pricing-table-wrapper" tabindex="0" role="region" aria-label="Prices by quantity and size"><table class="pricing-table">';
 
         // Header row
         html += '<thead><tr><th>Qty</th>';

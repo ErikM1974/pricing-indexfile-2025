@@ -64,6 +64,7 @@ const CSS_LINT_SCOPE = [
     'pages/css/brand-guide.css',
     'shared_components/css/storefront-shell.css',
     'shared_components/css/catalog-storefront.css',
+    'shared_components/css/calculator-reference.css',
     'shared_components/css/storefront-commerce.css',
     'shared_components/css/staff-reference.css',
     'pages/css/company-webstores.css',

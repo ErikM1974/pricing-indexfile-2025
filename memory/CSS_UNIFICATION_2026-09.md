@@ -1,5 +1,13 @@
 # CSS unification — design direction and implementation plan
 
+## REVIEWED — Manual Pricing, Manual Laser and Shop Menu
+
+Three pages now use Public Sans, canonical fields/buttons and scoped style owners. Sixteen focused browser cases cover four widths, exact original prices/content, keyboard access to all size columns, selected garment/cap state, validation and load failures, rep/customer visibility and print restoration. All 23 current paper pages across 18 documents and 46 screen panels are visually reviewed; six final screen sheets confirm the corrected quantity fields. Ordinary menus fit one sheet and long lists fit two; every original price, rule and contact detail remains present. The existing laser Coming Soon content is preserved.
+
+Nineteen immutable source hashes and 18 browser contracts remain backed up. The menu controller and all pricing services are byte-identical. The manual controller differs only by two literal accessibility additions; all calculation, rounding, API and row-generation logic is unchanged. Existing manual-calculator-styles.css now has no live consumer; it is flagged here, retained unchanged per the dead-code policy.
+
+Candidate: 199 of 225 pages reviewed, 26 pending. Live: v2026.09.11.3 / Heroku2106 / bf0a27f3,196 reviewed,29 pending until this group passes full local/CI release checks and verified rollout. Evidence: calculator-reference-reviewed-record.json and active-css-resume-state.json.
+
 ## NEXT BATCH — Manual Calculator, Laser Pricing and Shop Menu
 
 Catalog v2026.09.11.3 candidate 99db3fd9 is running full local and exact-source CI gates on primary develop. It is separate from this branch. Live remains .2 / Heroku 2105, 193/225; reviewed catalog candidate is 196/225, 29 pending.
@@ -1607,3 +1615,7 @@ Exact-source CI 34581412644 passed all four actual jobs on 7ce2f00c6d25de153358a
 ## Calculator/reference original review
 
 Original calculator/reference baseline is reviewed: 19 source hashes, 18 immutable browser records and 13 passing scenarios; 21 source/financial guards pass. All 29 original paper pages across 18 documents were inspected (26 unique rendered pages on seven contact sheets). Existing manual printouts clip rightmost size prices; normal rep menu emits a footer-only second sheet, and failed menu hides its error banner on paper. Manual and laser text/button contrast fails. No application source is changed yet. Next: shared controls/Public Sans/scoped layout owners, readable errors and complete print columns; preserve original financial/data transformations.
+
+Calculator/reference implementation started from reviewed baseline 7d4ea4de51ed297de18fe5fb9e295f422bce366d: shared controls and Public Sans, scoped page owners, readable error/fee colors and complete print table sizing. The original manual shared stylesheet and canonical pricing services stay byte-identical. The menu controller is unchanged; the manual controller differs only by a named focusable table wrapper and aria-pressed on selected item type. No migration credit until current source/browser/paper review passes.
+
+Catalog .3 is verified live: Heroku2106/bf0a27f3,196/225 reviewed,29pending. All1,322 CSS browser cases,16 remaining browser checks/three existing optional skips,244unit suites/5735tests/four existing skips,84parity and actual four-job CI34591727152 passed. Nine source/compiled assets and38 live checks verified. Calculator/reference drafts remain excluded pending final visual/paper review.

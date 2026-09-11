@@ -1,227 +1,97 @@
-/* ==========================================================================
-   service-price-cheat-sheet.css — the NWCA Shop Menu (2026-09-03)
+@layer components.pages {
+/* Shop Menu owns service rows and rep/customer visibility; prices come from its controller. */
+:where([data-ui="unified"][data-calculator-reference]) .topbar { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; padding: 16px 24px; background: var(--ui-surface); border-bottom: 1px solid var(--ui-line); }
+:where([data-ui="unified"][data-calculator-reference]) .topbar-spacer { flex: 1; }
+:where([data-ui="unified"][data-calculator-reference]) .view-toggle { display: flex; gap: 6px; }
+:where([data-ui="unified"][data-calculator-reference]) .view-btn { display: flex; flex-direction: column; align-items: flex-start; }
+:where([data-ui="unified"][data-calculator-reference]) .view-btn small { font-size: 11px; font-weight: 400; }
+:where([data-ui="unified"][data-calculator-reference]) .view-btn.is-active { background: var(--ui-accent); color: var(--ui-surface); border-color: var(--ui-accent); }
+:where([data-ui="unified"][data-calculator-reference]) .error-banner { display: none; padding: 16px 24px; color: var(--print-red); background: var(--red-50); border-bottom: 1px solid var(--red-200); }
+:where([data-ui="unified"][data-calculator-reference]) .error-banner.show { display: block; }
+:where([data-ui="unified"][data-calculator-reference]) .menu { max-width: 1180px; margin: 32px auto; padding: 32px; background: var(--ui-surface); border: 1px solid var(--ui-line); border-radius: var(--radius-md); }
+:where([data-ui="unified"][data-calculator-reference]) .masthead { margin-bottom: 28px; }
+:where([data-ui="unified"][data-calculator-reference]) .masthead-rule { height: 1px; background: var(--ui-line); }
+:where([data-ui="unified"][data-calculator-reference]) .masthead-eyebrow { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--ui-muted); margin: 16px 0 8px; }
+:where([data-ui="unified"][data-calculator-reference]) .masthead-title { font-size: 40px; letter-spacing: -.03em; margin: 0 0 8px; }
+:where([data-ui="unified"][data-calculator-reference]) .masthead-sub { color: var(--ui-muted); margin: 0 0 20px; font-size: 14px; }
+:where([data-ui="unified"][data-calculator-reference]) .minimum-stamp { display: flex; gap: 20px; align-items: center; padding: 20px; margin-top: 24px; background: var(--ui-tint); border-left: 4px solid var(--ui-accent); }
+:where([data-ui="unified"][data-calculator-reference]) .minimum-amount { font-size: 36px; font-weight: 700; color: var(--ui-accent); }
+:where([data-ui="unified"][data-calculator-reference]) .minimum-text { font-size: 14px; }
+:where([data-ui="unified"][data-calculator-reference]) .minimum-text strong { font-size: 16px; }
+:where([data-ui="unified"][data-calculator-reference]) .house-rules { margin-bottom: 28px; padding-bottom: 24px; border-bottom: 1px solid var(--ui-line); }
+:where([data-ui="unified"][data-calculator-reference]) .house-rules-title { font-size: 18px; margin: 0 0 12px; }
+:where([data-ui="unified"][data-calculator-reference]) .house-rules-list { margin: 0; padding-left: 22px; display: grid; gap: 12px; font-size: 14px; }
+:where([data-ui="unified"][data-calculator-reference]) .house-rules code, :where([data-ui="unified"][data-calculator-reference]) .colophon code, :where([data-ui="unified"][data-calculator-reference]) .minimum-text code, :where([data-ui="unified"][data-calculator-reference]) .item-meta code { font: 12px var(--font-mono); background: var(--gray-100); color: var(--ui-ink); padding: 2px 5px; border-radius: 3px; }
+:where([data-ui="unified"][data-calculator-reference]) .courses { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 28px 40px; }
+:where([data-ui="unified"][data-calculator-reference]) .course { min-width: 0; }
+:where([data-ui="unified"][data-calculator-reference]) .course--wide { grid-column: 1/-1; }
+:where([data-ui="unified"][data-calculator-reference]) .course-title { font-size: 20px; color: var(--ui-accent); margin: 0 0 8px; padding-bottom: 10px; border-bottom: 1px solid var(--ui-line-strong); }
+:where([data-ui="unified"][data-calculator-reference]) .course-note { font-size: 13px; color: var(--ui-muted); margin: 0 0 14px; }
+:where([data-ui="unified"][data-calculator-reference]) .item { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 4px 12px; padding: 10px 0; border-bottom: 1px solid var(--ui-line); break-inside: avoid; }
+:where([data-ui="unified"][data-calculator-reference]) .item-name { font-size: 15px; font-weight: 600; }
+:where([data-ui="unified"][data-calculator-reference]) .item-name .leader { display: none; }
+:where([data-ui="unified"][data-calculator-reference]) .item-price { font-size: 16px; font-weight: 600; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+:where([data-ui="unified"][data-calculator-reference]) .item-price .unit { display: block; font-size: 12px; color: var(--ui-muted); font-weight: 400; }
+:where([data-ui="unified"][data-calculator-reference]) .item-price .plus { margin-right: 2px; }
+:where([data-ui="unified"][data-calculator-reference]) .item-meta, :where([data-ui="unified"][data-calculator-reference]) .item-desc { grid-column: 1/-1; color: var(--ui-muted); font-size: 12px; }
+:where([data-ui="unified"][data-calculator-reference]) .item-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+:where([data-ui="unified"][data-calculator-reference]) .item-meta .warn { color: var(--print-red); }
+:where([data-ui="unified"][data-calculator-reference]) .course-addon { font-size: 13px; color: var(--ui-muted); padding: 12px; margin: 12px 0 0; background: var(--gray-50); border-left: 3px solid var(--ui-accent); }
+:where([data-ui="unified"][data-calculator-reference]) .course-addon strong { color: var(--ui-ink); }
+:where([data-ui="unified"][data-calculator-reference]) .course-addon .item-meta { display: inline-flex; margin-left: 6px; }
+:where([data-ui="unified"][data-calculator-reference]) .loading { color: var(--ui-muted); }
+:where([data-ui="unified"][data-calculator-reference]) .colophon { margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--ui-line); font-size: 12px; color: var(--ui-muted); }
+:where([data-ui="unified"][data-calculator-reference]) .colophon p { margin: 4px 0; }
+:where([data-ui="unified"][data-calculator-reference]).view-customer .rep-only, :where([data-ui="unified"][data-calculator-reference]).view-rep .customer-only { display: none; }
 
-   Erik's brief: make the one rep price page look like a restaurant menu so the
-   reps remember it ("the MENU"). Ink on warm paper, Bodoni Moda masthead and
-   course titles, Libre Franklin items, dot leaders to every price, a House Rules
-   box, one printed letter page. Two views on one page: rep (ShopWorks codes +
-   book times) and customer (prices only). No hourly rate appears on either.
-   ========================================================================== */
-
-/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
-   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
-   raw hex is allowed ONLY in this block. */
-/* stylelint-disable color-no-hex */
-:root {
-    --service-price-cheat-sheet-orange-dark: #4a3f35;
-    --service-price-cheat-sheet-orange: #7d7061;
-    --service-price-cheat-sheet-orange-2: #c9b99c;
-    --service-price-cheat-sheet-yellow: #b08a3c;
-    --service-price-cheat-sheet-red: #91303c;
-    --paper: var(--store-paper-deep);
-    --paper-deep: var(--store-line);
-    --ink: var(--print-ink);
-    --ink-2: var(--service-price-cheat-sheet-orange-dark);
-    --ink-3: var(--service-price-cheat-sheet-orange);
-    --rule: var(--service-price-cheat-sheet-orange-2);
-    --wine: var(--color-ae-dark);
-    --wine-soft: var(--gray-200);
-    --gold: var(--service-price-cheat-sheet-yellow);
-    --display: 'Bodoni Moda', 'Didot', 'Times New Roman', serif;
-    --text: 'Libre Franklin', 'Franklin Gothic Medium', 'Helvetica Neue', arial, sans-serif;
-}
-/* stylelint-enable color-no-hex */
-
-* { box-sizing: border-box; }
-html { background: var(--store-line); }
-
-body {
-    margin: 0;
-    color: var(--ink);
-    font: 15px/1.5 var(--text);
-    background: var(--store-line);
-    -webkit-font-smoothing: antialiased;
-}
-
-/* ── Staff bar (never prints) ─────────────────────────────────────────────── */
-.topbar {
-    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-    padding: 10px 18px; background: var(--ink); color: var(--paper);
-    font-size: 13px;
-}
-.topbar-spacer { flex: 1; }
-
-.topbar-link {
-    color: var(--paper); text-decoration: none; padding: 6px 10px; border-radius: 4px;
-    background: transparent; border: 1px solid transparent; font: 500 13px var(--text); cursor: pointer;
-}
-.topbar-link:hover { border-color: rgb(246 239 225 / 35%); }
-.topbar-link--solid { background: var(--wine); border-color: var(--wine); }
-.topbar-link--solid:hover { background: var(--service-price-cheat-sheet-red); }
-.view-toggle { display: inline-flex; border: 1px solid rgb(246 239 225 / 35%); border-radius: 4px; overflow: hidden; }
-
-.view-btn {
-    background: transparent; color: var(--paper); border: 0; padding: 6px 12px; cursor: pointer;
-    font: 500 13px var(--text); display: flex; flex-direction: column; align-items: flex-start; line-height: 1.15;
-}
-.view-btn small { font-size: 10px; opacity: .7; font-weight: 400; }
-.view-btn.is-active { background: var(--paper); color: var(--ink); }
-.view-btn.is-active small { opacity: .8; }
-.error-banner { display: none; margin: 16px auto 0; max-width: 880px; background: var(--wine-soft); color: var(--wine); border: 1px solid var(--wine); padding: 12px 16px; font-weight: 600; }
-.error-banner.show { display: block; }
-
-/* ── The menu sheet ─────────────────────────────────────────────────────────── */
-.menu {
-    max-width: 880px; margin: 24px auto 48px; padding: 40px 48px 36px;
-    background: var(--paper);
-    background-image:
-        radial-gradient(ellipse at 20% 0%, rgb(255 255 255 / 55%), transparent 55%),
-        radial-gradient(ellipse at 100% 100%, rgb(176 138 60 / 10%), transparent 50%);
-    box-shadow: 0 1px 0 rgb(255 255 255 / 60%) inset, 0 18px 40px -22px rgb(28 23 18 / 55%);
-    border: 1px solid var(--store-line-strong);
-    position: relative;
+@media (width <= 800px) {
+ :where([data-ui="unified"][data-calculator-reference]) .topbar { padding: 16px; }
+ :where([data-ui="unified"][data-calculator-reference]) .topbar-spacer { display: none; }
+ :where([data-ui="unified"][data-calculator-reference]) .view-toggle { flex-basis: 100%; }
+ :where([data-ui="unified"][data-calculator-reference]) .view-btn { flex: 1; }
+ :where([data-ui="unified"][data-calculator-reference]) .menu { padding: 24px; margin: 20px 16px; }
+ :where([data-ui="unified"][data-calculator-reference]) .courses { grid-template-columns: minmax(0,1fr); }
+ :where([data-ui="unified"][data-calculator-reference]) .masthead-title { font-size: 32px; }
+ :where([data-ui="unified"][data-calculator-reference]) .minimum-stamp { padding: 16px; gap: 12px; }
+ :where([data-ui="unified"][data-calculator-reference]) .minimum-amount { font-size: 30px; }
 }
 
-.menu::before {
-    content: ""; position: absolute; inset: 10px; border: 1px solid var(--rule); pointer-events: none;
+@media (width <= 400px) {
+ :where([data-ui="unified"][data-calculator-reference]) .menu { padding: 20px; margin: 16px 12px; }
+ :where([data-ui="unified"][data-calculator-reference]) .minimum-stamp { align-items: flex-start; flex-direction: column; }
+ :where([data-ui="unified"][data-calculator-reference]) .item { gap: 4px 8px; }
+ :where([data-ui="unified"][data-calculator-reference]) .item-name { font-size: 14px; }
+ :where([data-ui="unified"][data-calculator-reference]) .item-price { font-size: 14px; }
 }
 
-.masthead { text-align: center; margin-bottom: 22px; position: relative; }
-.masthead-rule { height: 2px; background: var(--ink); margin: 0 auto; width: 100%; position: relative; }
-.masthead-rule::after { content: ""; display: block; height: 1px; background: var(--ink); margin-top: 3px; }
-.masthead-eyebrow { margin: 14px 0 4px; font-size: 11px; letter-spacing: .28em; text-transform: uppercase; color: var(--ink-2); }
-
-.masthead-title {
-    font-family: var(--display); font-weight: 600; font-size: 60px; line-height: 1; margin: 0; letter-spacing: .01em; color: var(--ink);
-}
-.masthead-sub { margin: 8px 0 14px; font-size: 12.5px; color: var(--ink-2); font-style: italic; }
-.masthead-sub .est { font-style: normal; font-family: var(--display); letter-spacing: .06em; color: var(--wine); }
-
-/* The cover charge: the job minimum, stamped under the masthead on both views */
-.minimum-stamp {
-    display: inline-flex; align-items: center; gap: 14px; margin: 16px auto 4px; padding: 8px 18px 8px 12px;
-    border: 2px solid var(--wine); border-radius: 4px; background: rgb(122 31 43 / 6%);
-    transform: rotate(-1.2deg); text-align: left;
-}
-.minimum-amount { font-family: var(--display); font-weight: 700; font-size: 38px; line-height: 1; color: var(--wine); letter-spacing: -.01em; }
-.minimum-text { font-size: 12.5px; line-height: 1.3; color: var(--ink-2); }
-.minimum-text strong { display: block; font-size: 14px; letter-spacing: .12em; text-transform: uppercase; color: var(--wine); }
-.minimum-text code { font: 500 11px var(--text); background: rgb(28 23 18 / 6%); border: 1px solid var(--rule); border-radius: 3px; padding: 0 4px; color: var(--ink); }
-
-/* House rules */
-.house-rules {
-    border: 1px solid var(--ink); padding: 14px 18px 12px; margin: 0 auto 26px; max-width: 760px; position: relative;
-    background: rgb(255 255 255 / 28%);
-}
-
-.house-rules-title {
-    position: absolute; top: -11px; left: 50%; transform: translateX(-50%);
-    background: var(--paper); padding: 0 12px; margin: 0;
-    font-family: var(--display); font-size: 15px; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; color: var(--wine);
-}
-.house-rules-list { margin: 4px 0 0; padding-left: 1.2em; font-size: 13.5px; color: var(--ink-2); display: grid; gap: 5px; }
-.house-rules-list strong { color: var(--ink); }
-.house-rules code, .colophon code { font: 500 11.5px var(--text); background: rgb(28 23 18 / 6%); border: 1px solid var(--rule); border-radius: 3px; padding: 0 4px; color: var(--ink); }
-
-/* Courses */
-.courses { display: grid; grid-template-columns: 1fr 1fr; gap: 26px 40px; }
-.course { break-inside: avoid; }
-.course--wide { grid-column: 1 / -1; }
-
-.course-title {
-    font-family: var(--display); font-size: 22px; font-weight: 600; margin: 0 0 2px; color: var(--ink); letter-spacing: .01em;
-    display: flex; align-items: baseline; gap: 10px;
-}
-.course-title::after { content: ""; flex: 1; height: 1px; background: var(--rule); transform: translateY(-4px); }
-.course-note { margin: 0 0 10px; font-size: 12px; font-style: italic; color: var(--ink-3); }
-
-.item { display: grid; grid-template-columns: 1fr auto; column-gap: 8px; align-items: baseline; padding: 5px 0; }
-.item-name { font-weight: 500; font-size: 14px; color: var(--ink); display: flex; align-items: baseline; gap: 6px; min-width: 0; }
-.item-name .txt { flex: 0 1 auto; }
-.item-name .leader { flex: 1 1 12px; border-bottom: 1px dotted var(--ink-3); transform: translateY(-4px); min-width: 12px; }
-.item-price { font-family: var(--display); font-size: 17px; font-weight: 600; color: var(--ink); white-space: nowrap; font-variant-numeric: tabular-nums; }
-.item-price .unit { font: italic 400 11px var(--text); color: var(--ink-3); margin-left: 7px; }
-.item-price .plus { color: var(--wine); }
-.item-meta { grid-column: 1 / -1; font-size: 11.5px; color: var(--ink-3); display: flex; gap: 10px; align-items: center; margin-top: -2px; }
-.item-meta code { font: 500 11px var(--text); background: rgb(122 31 43 / 8%); color: var(--wine); border: 1px solid rgb(122 31 43 / 25%); border-radius: 3px; padding: 0 5px; letter-spacing: .02em; }
-.item-meta .book { font-style: italic; }
-.item-meta .warn { color: var(--wine); font-weight: 600; }
-.item-desc { grid-column: 1 / -1; font-size: 12px; font-style: italic; color: var(--ink-2); margin-top: -2px; }
-
-.loading { grid-column: 1 / -1; text-align: center; color: var(--ink-3); font-style: italic; padding: 20px; }
-
-/* Colophon */
-.colophon { margin-top: 26px; padding-top: 12px; border-top: 1px solid var(--ink); text-align: center; font-size: 11.5px; color: var(--ink-3); }
-.colophon p { margin: 2px 0; }
-
-/* Views */
-/* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
-body.view-customer .rep-only { display: none !important; }
-/* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
-body.view-rep .customer-only { display: none !important; }
-
-/* Page-load: courses rise in, staggered */
-@media (prefers-reduced-motion: no-preference) {
-    .course { animation: rise .5s ease both; }
-    .course:nth-child(1) { animation-delay: .05s } .course:nth-child(2) { animation-delay: .12s }
-    .course:nth-child(3) { animation-delay: .19s } .course:nth-child(4) { animation-delay: .26s }
-    .course:nth-child(5) { animation-delay: .33s } .course:nth-child(6) { animation-delay: .40s }
-
-    @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-}
-
-@media (width <= 720px) {
-    .menu { padding: 26px 20px; margin: 12px; }
-    .courses { grid-template-columns: 1fr; }
-    .masthead-title { font-size: 42px; }
-}
-
-/* ── Print: one letter page ─────────────────────────────────────────────────── */
 @media print {
-    /* margin: 0 suppresses the browser's own header/footer (date, title, URL, page x/y);
-       the page margin is re-created as padding on the sheet. One letter page. */
-    @page { size: letter portrait; margin: 0; }
-    * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
-    html, body { background: var(--color-surface); }
-    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
-    .topbar, .error-banner { display: none !important; }
-    .menu { max-width: none; margin: 0; padding: 0.42in 0.5in 0.3in; box-shadow: none; border: 0; background: var(--color-surface); }
-    .menu::before { inset: 0.28in 0.34in; }
-    .masthead { margin-bottom: 8px; }
-    .masthead-title { font-size: 34px; }
-    .masthead-eyebrow { margin-top: 6px; font-size: 9.5px; }
-    .masthead-sub { margin: 4px 0 8px; font-size: 10.5px; }
-    .minimum-stamp { margin: 8px auto 2px; padding: 5px 12px 5px 9px; gap: 10px; }
-    .minimum-amount { font-size: 26px; }
-    .minimum-text { font-size: 10px; }
-    .minimum-text strong { font-size: 11px; }
-    .house-rules { margin-bottom: 10px; padding: 8px 12px 6px; }
-    .house-rules-list { font-size: 10px; gap: 1px; }
-    .house-rules-title { background: var(--color-surface); font-size: 11px; top: -9px; }
-    .courses { gap: 8px 22px; }
-    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
-    .course { animation: none !important; }
-    .course-title { font-size: 14.5px; }
-    .course-note { font-size: 9.5px; margin-bottom: 2px; }
-    .course-addon { font-size: 9.5px; padding: 2px 8px; margin-top: 4px; }
-    .item { padding: 1px 0; }
-    .item-name { font-size: 11px; }
-    .item-price { font-size: 12px; }
-    .item-price .unit { font-size: 9px; margin-left: 6px; }
-    .item-meta, .item-desc { font-size: 9px; margin-top: -1px; }
-    .colophon { margin-top: 8px; padding-top: 5px; font-size: 8.5px; }
-
-    /* Rep copy carries a code + book-time line under every item; pull those lines in so it also lands on one page (2026-09-03). */
-    body.view-rep .menu { padding-top: 0.3in; padding-bottom: 0.2in; }
-    body.view-rep .masthead { margin-bottom: 6px; }
-    body.view-rep .house-rules { margin-bottom: 8px; padding-bottom: 5px; }
-    body.view-rep .courses { row-gap: 4px; }
-    body.view-rep .item-meta { font-size: 8.5px; line-height: 1.15; margin-top: -3px; }
-    body.view-rep .item { padding: 0.5px 0; }
-    body.view-rep .colophon { margin-top: 3px; padding-top: 3px; }
+ :where([data-ui="unified"][data-calculator-reference]) .topbar { display: none; }
+ :where([data-ui="unified"][data-calculator-reference]) .error-banner { padding: 8px; font-size: 9pt; margin-bottom: 12px; }
+ :where([data-ui="unified"][data-calculator-reference]) .menu { max-width: none; margin: 0; padding: 0; border: 0; border-radius: 0; line-height: 1.3; }
+ :where([data-ui="unified"][data-calculator-reference]) .masthead { margin-bottom: 12px; }
+ :where([data-ui="unified"][data-calculator-reference]) .masthead-eyebrow { font-size: 8pt; margin: 8px 0 4px; }
+ :where([data-ui="unified"][data-calculator-reference]) .masthead-title { font-size: 22pt; margin-bottom: 4px; }
+ :where([data-ui="unified"][data-calculator-reference]) .masthead-sub { font-size: 8pt; margin-bottom: 10px; }
+ :where([data-ui="unified"][data-calculator-reference]) .minimum-stamp { margin-top: 10px; padding: 8px 12px; gap: 12px; }
+ :where([data-ui="unified"][data-calculator-reference]) .minimum-amount { font-size: 20pt; }
+ :where([data-ui="unified"][data-calculator-reference]) .minimum-text, :where([data-ui="unified"][data-calculator-reference]) .minimum-text strong { font-size: 8.5pt; }
+ :where([data-ui="unified"][data-calculator-reference]) .house-rules { margin-bottom: 12px; padding-bottom: 10px; }
+ :where([data-ui="unified"][data-calculator-reference]) .house-rules-title { font-size: 11pt; margin-bottom: 6px; }
+ :where([data-ui="unified"][data-calculator-reference]) .house-rules-list { font-size: 8pt; gap: 4px; padding-left: 16px; }
+ :where([data-ui="unified"][data-calculator-reference]) .menu-services { column-count: 2; column-gap: 24px; }
+ :where([data-ui="unified"][data-calculator-reference]) .courses { display: contents; }
+ :where([data-ui="unified"][data-calculator-reference]) .course { break-inside: auto; margin-bottom: 6px; }
+ :where([data-ui="unified"][data-calculator-reference]) .course-title, :where([data-ui="unified"][data-calculator-reference]) .course-note { break-after: avoid; }
+ :where([data-ui="unified"][data-calculator-reference]) .course--wide { column-span: all; }
+ :where([data-ui="unified"][data-calculator-reference]) .course-title { font-size: 11pt; padding-bottom: 2px; margin-bottom: 2px; }
+ :where([data-ui="unified"][data-calculator-reference]) .course-note { font-size: 8pt; margin-bottom: 5px; }
+ :where([data-ui="unified"][data-calculator-reference]) .item { padding: 2px 0; gap: 2px 8px; }
+ :where([data-ui="unified"][data-calculator-reference]) .item-name, :where([data-ui="unified"][data-calculator-reference]) .item-price { font-size: 8.5pt; }
+ :where([data-ui="unified"][data-calculator-reference]) .item-price .unit, :where([data-ui="unified"][data-calculator-reference]) .item-meta, :where([data-ui="unified"][data-calculator-reference]) .item-desc { font-size: 7.5pt; }
+ :where([data-ui="unified"][data-calculator-reference]) .item-price .unit { display: inline; margin-left: 4px; }
+ :where([data-ui="unified"][data-calculator-reference]) .house-rules code, :where([data-ui="unified"][data-calculator-reference]) .colophon code, :where([data-ui="unified"][data-calculator-reference]) .minimum-text code, :where([data-ui="unified"][data-calculator-reference]) .item-meta code { font-size: 7.5pt; padding: 1px 3px; }
+ :where([data-ui="unified"][data-calculator-reference]) .course-addon { font-size: 8pt; padding: 6px 8px; margin-top: 6px; }
+ :where([data-ui="unified"][data-calculator-reference]) .colophon { margin-top: 10px; padding-top: 8px; font-size: 7.5pt; break-inside: avoid; }
 }
 
-/* Rep-only course (screen print & pass-through) and add-on footnotes (2026-09-03) */
-.course-addon { margin: 8px 0 0; padding: 6px 10px; font-size: 12.5px; color: var(--ink-2); border-left: 2px solid var(--wine); background: rgb(122 31 43 / 5%); }
-.course-addon strong { color: var(--wine); }
-.course-addon .item-meta { display: inline-flex; margin-left: 6px; }
+}
