@@ -1,3 +1,11 @@
+## v2026.09.11.1 (2026.09.11)
+
+- Capture original sample and quote cart workflows and paper
+- Unify sample and quote cart layouts and repair demonstrated cart failures
+- Merge verified account release into reviewed cart layouts
+- Integrate reviewed sample and quote cart layouts
+- Deploy v2026.09.11.1: unify sample and quote cart layouts
+
 ## v2026.09.10.11 (2026.09.10)
 
 - test: preserve customer account and product source before CSS migration
