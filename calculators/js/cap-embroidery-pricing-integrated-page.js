@@ -100,9 +100,9 @@ function setupSearch() {
                 // Add message about beanies if any were found
                 if (beanieResults.length > 0) {
                     resultsHTML += `
-                        <div style="padding: 10px; background: #fef3c7; border-bottom: 1px solid #fbbf24; color: #92400e; font-size: 13px;">
-                            <i class="fas fa-info-circle" style="margin-right: 5px;" aria-hidden="true"></i>
-                            Found ${beanieResults.length} beanie/knit item(s). Please use the <a href="/pricing/embroidery" style="color: #4cb354; font-weight: 600;">Flat Embroidery Pricing</a> page for beanies and knit caps.
+                        <div>
+                            <i class="fas fa-info-circle" aria-hidden="true"></i>
+                            Found ${beanieResults.length} beanie/knit item(s). Please use the <a href="/pricing/embroidery">Flat Embroidery Pricing</a> page for beanies and knit caps.
                         </div>
                     `;
                 }

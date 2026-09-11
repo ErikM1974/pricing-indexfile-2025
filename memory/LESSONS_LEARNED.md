@@ -6,6 +6,12 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 ---
 
 
+## Core calculator state and paper boundaries (2026-09-11)
+
+- Problem/root cause: DTG/DTF color handlers read an undeclared currentStyleNumber; inline presentation duplicated CSS; fixed print headers covered prices, and the Embroidery product wrapper also contained pricing/inventory. Screen Print errors disappeared after10 seconds without recovery.
+- Solution: use the displayed product style with CATALOG_COLOR, canonical scoped CSS and keyboard controls, complete table scroll regions, an independent product wrapper, static print headers and persistent dismissible pricing errors. Keep every financial function body and pricing service unchanged.
+- Prevention: immutable original source/value contracts, exact financial function checks, every quantity/color/input path, keyboard focus after generated controls are replaced, failed inventory/pricing, and visual review of every paper page. Do not make whole long sections unbreakable.
+
 ## Calculator references need complete field and paper ownership (2026-09-11)
 
 - Problem/root cause: legacy price tables clipped rightmost size columns on paper; page-local print rules hid price-load failures, while broad class matching missed compound quantity-control classes.
@@ -74,9 +80,7 @@ Exercise state transitions and verify complete printed content. Full entry in LE
 
 ### Training state must survive every input path (2026-09-08, archived): preserve input/retry/storage behavior. Full entry in LESSONS_LEARNED_ARCHIVE.md.
 
-### Native storefront menus still need keyboard and layout ownership checks (2026-09-09)
-
-Problem: the inherited drawer had no focus boundary or return, and initial native-dialog review found reverse Tab leaving the menu. Root cause: hidden custom panels and relying on browser traversal alone. Solution: native modal with explicit first/last Tab wrap, Escape/backdrop/close-button dismissal, return focus, desktop-resize cleanup; scope every CSS rule to unified ownership and merge repeated selectors. Prevention: run all fifteen brand pages at four widths, test both search triggers and empty input, lock original brand/SEO/product text, and compare rendered PDF text allowing CSS text-transform case changes.
+Native storefront menu focus and paper migration (2026-09-09) is archived in LESSONS_LEARNED_ARCHIVE.md; existing keyboard/browser guards retain the contract.
 
 ### Staff reference data and paper need explicit failure states (2026-09-09)
 

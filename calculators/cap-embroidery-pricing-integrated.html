@@ -5,26 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cap Embroidery Pricing | Northwest Custom Apparel</title>
     <link rel="icon" href="/favicon.png" type="image/png">
-    
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
-
-    <!-- Universal Pricing Header -->
-    <!-- Phase 2d (2026-05-23): PNW palette tokens — must load BEFORE universal-pricing-header.css to uplift --primary-* tokens -->
-    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/quote-builder-shell.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/universal-pricing-header.css?v=2026.09.07.12">
-
-    <link rel="stylesheet" href="/calculators/css/cap-embroidery-pricing-integrated.css?v=2026.09.07.19">
-    <!-- Additional Logo Calculator -->
-    <link rel="stylesheet" href="/shared_components/css/additional-logo-pricing-table.css?v=2026.09.07.19">
     <script src="/config/app.config.js"></script>
-    <link rel="stylesheet" href="/shared_components/css/calculator-inventory.css?v=2026.09.07.12">
-    <link rel="stylesheet" href="/shared_components/css/manual-mode-indicator.css?v=2026.09.07.19">
+    <!-- Canonical tokens and controls; one shared structure and one method owner. -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.11.3">
+    <link rel="stylesheet" href="/shared_components/css/core-calculators.css?v=2026.09.11.4">
+    <link rel="stylesheet" href="/calculators/css/cap-embroidery-pricing-integrated.css?v=2026.09.11.4">
 </head>
-<body class="pricing-calculator-page">
+<body class="pricing-calculator-page" data-ui="unified" data-core-calculator="cap">
     <!-- Enhanced Pricing Header -->
     <header class="enhanced-pricing-header">
         <!-- TIER 1: Contact Bar -->
@@ -129,7 +119,7 @@
                         <div class="main-image-container">
                             <img id="productImage" class="product-image" style="display: none;" alt="Product image">
                             <div id="imagePlaceholder" class="image-placeholder">
-                                <i class="fas fa-hat-cowboy" aria-hidden="true" style="font-size: 48px; margin-bottom: 12px;"></i>
+                                <i class="fas fa-hat-cowboy" aria-hidden="true"></i>
                                 <div>Cap Image</div>
                             </div>
                         </div>
@@ -203,7 +193,7 @@
                     <!-- Pricing rows will be dynamically generated -->
                 </tbody>
             </table>
-            <p class="pricing-note" style="font-size: 12px; color: #666; margin-top: 8px; font-style: italic;">*Small-order prices vary by quantity selected below</p>
+            <p class="pricing-note">*Small-order prices vary by quantity selected below</p>
 
             <!-- LTM Quick Calculator -->
             <div class="ltm-calculator" id="ltmCalculator">
@@ -226,7 +216,7 @@
                             </select>
                         </div>
                     </div>
-                    <p style="font-size: 13px; color: #666; margin: 8px 0 0;">Prices in the 1-7 column update based on your selection.</p>
+                    <p>Prices in the 1-7 column update based on your selection.</p>
                 </div>
             </div>
 
@@ -258,7 +248,7 @@
                 </tr>
             </tbody>
         </table>
-        <p class="pricing-note" style="font-size: 12px; color: #666; margin-top: 8px; font-style: italic;">*Small-order prices vary by quantity selected above</p>
+        <p class="pricing-note">*Small-order prices vary by quantity selected above</p>
 
         <div class="additional-logo-notes">
             <p><strong>Note:</strong> Additional logos up to 5,000 stitches. Add $1.00 per 1,000 stitches over base.</p>
@@ -328,5 +318,6 @@
     <!-- Additional Logo Calculator Script -->
     <script src="/shared_components/js/additional-logo-cap-simple.js?v=2026.09.06.48"></script>
 <script src="/shared_components/js/calculator-inventory.js?v=2026.09.06.40"></script>
+<script src="/shared_components/js/core-calculator-ui.js?v=2026.09.11.4"></script>
 </body>
 </html>

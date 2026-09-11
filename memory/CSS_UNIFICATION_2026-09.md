@@ -1,19 +1,27 @@
 # CSS unification — design direction and implementation plan
 
-## ACTIVE BATCH — Five public product calculators
+## PAUSED — laptop shutdown checkpoint, 2026-09-11
 
-Separate branch codex/core-calculators starts from 5caf8bbb. Manual Pricing, Manual Laser and Shop Menu v2026.09.11.4 are running corrected full local and exact-source CI gates in the primary checkout. Live remains .3/Heroku2106,196/225 reviewed,29pending. The .4 candidate is199/225,26pending. No core calculator migration credit yet.
+Latest instruction: save a stopping point for shutdown. Resume on codex/core-calculators in the isolated training-final-worktree; the current branch checkpoint contains unfinished work and is NOT a release candidate.
 
-- [x] Capture immutable originals for DTG, DTF, Embroidery, Cap Embroidery and Screen Print, including dynamic style owners. Review normal/options/manual/error behavior, all price tiers, colors, inventory, mobile and printed pages.
-- [ ] Use the established Public Sans typography and canonical tokens/components. Keep the garment and its color selection together, followed by method-specific options and clearly aligned price ladders. Shared structure has one scoped calculator owner; retain method-specific inputs and API pricing.
-- [ ] Remove redundant imports only from these five reviewed pages. Replace their CSS owners instead of adding overrides. Shared controllers may receive reversible presentation/accessibility changes only; all financial logic and data transformations must remain exact.
-- [ ] Compare every recorded value and fee, exercise keyboard and failure states, inspect screenshots at1440/768/390/320 and every paper page. Grant review credit only after passing.
-- [ ] Commit/back up and run full exact-source gates before deployment. Projected204/225,21pending only after verified rollout.
+Live: v2026.09.11.4 / Heroku 2107 / afc3678dbae7ddf951bda047b874dcc0e6b5c1b6. 199 of 225 pages reviewed and live; 26 pending. The last release passed all full local gates, all four actual source CI jobs (34597016238), and 30 live checks. Primary main/develop and origin were synchronized at shutdown. No new deployment in this checkpoint.
 
-Original capture:79 source hashes,20 browser states,5 full tier contracts and55 visually reviewed paper pages across20 documents. Existing DTG/DTF color-click ReferenceErrors are preserved in original-defects.json; current checks require zero errors. Fixed print headers cover price rows and DTG recommendation grids clip content. Evidence:core-calculators-original-reviewed-record.json. No application edits or migration credit yet.
+Current five pages: DTG, DTF, Embroidery, Cap Embroidery and Screen Print. Shared Public Sans, tokens, common scoped calculator CSS, five smaller page owners and a keyboard adapter are implemented. Original baseline caf0ddbe preserves 79 source hashes, 20 browser states, five complete tier contracts and 55 visually reviewed original paper pages. Original pricing services remain byte-identical; 31 financial function bodies are checked. DTG/DTF color inventory ReferenceErrors, persistent Screen Print errors, generated control semantics and several paper layout defects have been addressed.
 
-Design uses the application’s existing white surfaces, slate text, NWCA green action/selection color and muted divider tokens. Product imagery identifies each calculator; avoid new decorative panels, badges or marketing copy. Left-aligned labels and tabular numerals make garment/color/quantity changes easy to compare. All business requests use synthetic interception; no real saves, payments, emails, uploads or device printing.
+- [x] Preserve original source and browser contracts; implement common layout and generated presentation ownership.
+- [x] Latest source/financial guard: 88 passed. CSS lint: all 270 files clean.
+- [ ] Latest focused browser run: 35 passed, 1 failed. The remaining failure is Embroidery keyboard colors/inventory at tests/e2e/css-unification-core-calculators.spec.js:70: ArrowRight leaves scrollLeft at zero after the inventory rerender. Inspect focus/refresh timing; do not remove or weaken this check. DTG and DTF keyboard cases passed in that run.
+- [ ] Complete visual review of all 80 current screens and all 20 current PDF documents. Original paper review is complete; current paper review is partial. Latest DTG/DTF normal PDFs now have two pages each, but their latest rendered sheets still need inspection.
+- [ ] Repeat affected browser checks after the final fix, then all focused cases. Add migration manifest/ownership credit only after complete review. No credit for these five pages yet; projected 204 reviewed / 21 pending only after verified rollout.
+- [ ] Merge verified .4 release history from primary into this feature branch after the checkpoint. Update cache references and reversible mappings, then run full unit, DOM, accessibility, CSS/e2e, both quote parity suites, all five calculator parity surfaces, lint/types, build, audit and exact-source CI before deployment.
 
+Most recent repair: recover-core-css-formatting.cjs completed successfully. It reconciled known partial formatting, merged only adjacent duplicate selectors, updated the five CSS ledger entries and archived/added lessons. All 84 reversible mappings now pass. Do NOT rerun format-core-css-and-document.cjs (partially executed), its recovery, or other consumed one-shot mutation helpers. The last browser run preceded this final formatting recovery; 88 source checks and CSS lint were rerun afterward.
+
+Resume evidence and helper directory: C:\Users\erik\.codex\visualizations\2026\09\07\01a07d90-9a4c-7e70-9e4e-c196377b7c6b. Read active-css-resume-state.json first. Browser log: core-calculators-final-layout-browser.log (35/36). Failure artifacts: core-calculators-test-results/css-unification-core-calcu-18fc6-yboard-colors-and-inventory-chromium/. Shared keyboard logic: shared_components/js/core-calculator-ui.js. Core browser config: core-calculators-playwright.config.cjs. Paper helpers review-core-calculators-paper.py and make-core-calculators-paper-sheets.py are reusable. Avoid replacing current CSS from the obsolete layout template.
+
+Focused source command: node node_modules/jest/bin/jest.js --runInBand --runTestsByPath tests/unit/core-calculators-content.test.js. Focused browser command: node node_modules/@playwright/test/cli.js test --config ../core-calculators-playwright.config.cjs css-unification-core-calculators --workers=1. Use the supported temporary Node 22 runtime for full release checks and explicit PowerShell exit checks between phases. Three existing changed-line whitespace warnings remain for later cleanup through the reversible ledger.
+
+After this group, remaining work is 14 other calculators/served archive pages, embroidery-contract-pricing and garment-designer, plus five quote builders. Read memory/quote-builder-architecture.md before builder changes. No new automated wakeups; all task test processes are finished. No real business writes, emails, payments, uploads, device printing or environment copies. node_modules is a junction to primary: never recursively delete it.
 
 ## RELEASE CANDIDATE — v2026.09.11.4 Manual Pricing, Manual Laser and Shop Menu
 

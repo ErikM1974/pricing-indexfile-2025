@@ -53,7 +53,7 @@ function dtgInlineAlert(message) {
             const container = document.getElementById('dtg-recommendations-grid');
             if (!container) return;
 
-            container.innerHTML = '<div style="text-align: center; padding: 20px;"><div class="spinner-border text-primary" role="status"><span class="sr-only">Loading recommendations...</span></div></div>';
+            container.innerHTML = '<div><div class="spinner-border text-primary" role="status"><span class="sr-only">Loading recommendations...</span></div></div>';
 
             // Group products by type
             const tshirts = recommendationsData.filter(p => p.type === 'tshirt');
@@ -489,21 +489,11 @@ function dtgInlineAlert(message) {
 
             // Add "Show All Locations" button
             const buttonContainer = document.createElement('div');
-            buttonContainer.style.cssText = 'text-align: center; margin-top: 20px;';
+            buttonContainer.classList.add('core-combo-controls');
 
             const showAllBtn = document.createElement('button');
             showAllBtn.textContent = 'Show Combo Locations';
-            showAllBtn.style.cssText = `
-                background: #4cb354;
-                color: white;
-                padding: 12px 24px;
-                border: none;
-                border-radius: 8px;
-                font-size: 16px;
-                font-weight: 600;
-                cursor: pointer;
-                transition: all 0.3s;
-            `;
+            showAllBtn.classList.add('btn');
 
             showAllBtn.addEventListener('click', () => {
                 showingAll = !showingAll;
@@ -519,38 +509,18 @@ function dtgInlineAlert(message) {
                 }
             });
 
-            showAllBtn.addEventListener('mouseenter', () => {
-                showAllBtn.style.background = '#3a8d42';
-                showAllBtn.style.transform = 'translateY(-2px)';
-            });
-
-            showAllBtn.addEventListener('mouseleave', () => {
-                showAllBtn.style.background = '#4cb354';
-                showAllBtn.style.transform = 'translateY(0)';
-            });
-
+            // Hover and focus use canonical button styles.
             buttonContainer.appendChild(showAllBtn);
 
             // Add container for UniversalPricingGrid to display upcharges
             const upchargesSection = document.createElement('div');
             upchargesSection.className = 'upcharge-info';
-            upchargesSection.style.cssText = `
-                margin-top: 30px;
-                padding: 20px;
-                background: #f9fafb;
-                border-radius: 12px;
-                border: 1px solid #e5e7eb;
-            `;
+            upchargesSection.classList.add('upcharge-info');
 
             // Add a title before the UniversalPricingGrid content
             const upchargesTitle = document.createElement('h3');
             upchargesTitle.textContent = 'Size Upcharges';
-            upchargesTitle.style.cssText = `
-                font-size: 18px;
-                font-weight: 700;
-                color: #1f2937;
-                margin-bottom: 15px;
-            `;
+            upchargesTitle.classList.add('core-upcharge-title');
             upchargesSection.appendChild(upchargesTitle);
 
             // The UniversalPricingGrid will populate the rest of the content
@@ -870,7 +840,7 @@ function dtgInlineAlert(message) {
 
             // If no upcharges found
             if (upchargeSizes.length === 0) {
-                html += '<div style="text-align: center; color: #6b7280; padding: 10px;">';
+                html += '<div>';
                 html += 'No size upcharges for this style';
                 html += '</div>';
             }
@@ -1016,7 +986,7 @@ function dtgInlineAlert(message) {
             if (!(ltmFee > 0) || !(quantity > 0)) { feeCalc.textContent = '—'; return; }
             const feePerShirt = Math.floor((ltmFee / quantity) * 100) / 100;
 
-            feeCalc.innerHTML = `$${ltmFee.toFixed(2)} ÷ ${quantity} = <span style="color: #4cb354;">$${feePerShirt.toFixed(2)}/shirt</span>`;
+            feeCalc.innerHTML = `$${ltmFee.toFixed(2)} ÷ ${quantity} = <span>$${feePerShirt.toFixed(2)}/shirt</span>`;
 
             dtgLog(`💰 LTM fee updated: $${feePerShirt.toFixed(2)}/shirt for ${quantity} pieces (Caspio LTM_Fee = $${ltmFee})`);
         }
@@ -1253,18 +1223,7 @@ function dtgInlineAlert(message) {
                 product.colors.forEach(color => {
                     const swatch = document.createElement('div');
                     swatch.className = 'color-swatch';
-                    swatch.style.cssText = `
-                        width: 40px;
-                        height: 40px;
-                        border-radius: 8px;
-                        border: 2px solid #e5e7eb;
-                        cursor: pointer;
-                        display: inline-block;
-                        margin-right: 8px;
-                        margin-bottom: 8px;
-                        position: relative;
-                        overflow: hidden;
-                    `;
+                    // Color geometry and selected state are owned by core-calculators.css.
 
                     if (color.HEX_CODE) {
                         swatch.style.backgroundColor = color.HEX_CODE;
@@ -1285,12 +1244,12 @@ function dtgInlineAlert(message) {
                             document.getElementById('productImage').src = color.MAIN_IMAGE_URL;
                             document.getElementById('currentColor').textContent = color.COLOR_NAME || 'Selected';
                             // Highlight selected swatch
-                            document.querySelectorAll('.color-swatch').forEach(s => s.style.border = '2px solid #e5e7eb');
-                            swatch.style.border = '2px solid #4cb354';
+                            document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+                            swatch.classList.add('selected');
                         }
                         // Load warehouse inventory
                         if (typeof loadCalculatorInventory === 'function') {
-                            loadCalculatorInventory(currentStyleNumber || window.currentStyleNumber, color.CATALOG_COLOR || color.COLOR_NAME, color.COLOR_NAME, color.COLOR_SQUARE_IMAGE);
+                            loadCalculatorInventory(product.styleNumber || product.STYLE || document.getElementById('currentStyle').textContent.replace('#', '').trim(), color.CATALOG_COLOR || color.COLOR_NAME, color.COLOR_NAME, color.COLOR_SQUARE_IMAGE);
                         }
                     });
 

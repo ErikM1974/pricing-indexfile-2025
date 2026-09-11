@@ -1,5 +1,7 @@
 # shared_components/js/ — File Guide
 
+- `core-calculator-ui.js` — shared presentation/keyboard adapter for DTG, DTF, Embroidery, Cap Embroidery and Screen Print public calculators. Reads controller state; never computes pricing.
+
 **124 JavaScript files** organized by function. Updated 2026-02-27.
 
 ## Quote Builder System (shared across all builders)

@@ -4,76 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Screen Print Pricing Calculator | Northwest Custom Apparel</title>
-
-    <!-- SEO Meta Tags -->
     <meta name="description" content="Get instant screen print pricing on custom apparel. Professional calculator with automatic pricing, quantity discounts, setup fees, and multi-color printing options.">
     <meta name="keywords" content="screen print pricing, custom apparel calculator, t-shirt printing prices, bulk screen printing, screen print quotes">
-
-    <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://www.nwcustomapparel.com/calculators/screen-print-pricing.html">
     <meta property="og:title" content="Screen Print Pricing Calculator | Northwest Custom Apparel">
     <meta property="og:description" content="Calculate screen printing costs instantly. Get accurate quotes with quantity discounts, color options, and setup fees.">
     <meta property="og:image" content="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png">
-
-    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Screen Print Pricing Calculator | Northwest Custom Apparel">
     <meta name="twitter:description" content="Get instant screen printing quotes with our professional pricing calculator.">
     <meta name="twitter:image" content="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png">
-
-    <!-- NWCA Favicon -->
     <link rel="icon" type="image/png" href="/favicon.png">
-
-    <!-- UNIVERSAL PRICING HEADER (New Unified Design) -->
-    <!-- Phase 2d (2026-05-23): PNW palette tokens — must load BEFORE universal-pricing-header.css to uplift --primary-* tokens -->
-    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/quote-builder-shell.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/universal-pricing-header.css?v=2026.09.07.12">
-
-    <!-- Universal Toggle Pricing CSS for consistency across all calculators -->
-    <link rel="stylesheet" href="/shared_components/css/universal-toggle-pricing.css?v=2026.09.07.12">
-    <link rel="stylesheet" href="/shared_components/css/universal-calculator-theme.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/universal-pricing-components.css?v=2026.09.07.19">
-    
-    <!-- Shared CSS -->
-    <link rel="stylesheet" href="/shared_components/css/shared-pricing-styles.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/modern-enhancements.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/universal-header.css?v=2026.09.07.12">
-    <!-- NOTE: Not using universal-product-display.css - we have custom DTG-style CSS in this file -->
-    <link rel="stylesheet" href="/shared_components/css/universal-image-gallery.css?v=2026.09.07.12">
-    <link rel="stylesheet" href="/shared_components/css/universal-quick-quote.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/universal-pricing-grid.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/image-modal.css?v=2026.09.07.12">
-    
-    <!-- FORCE GREEN THEME - Load LAST to override everything -->
-    <link rel="stylesheet" href="/shared_components/css/force-green-theme.css?v=2026.09.07.29">
-    
-    <!-- Screen Print Pricing Tables - Modern styling -->
-    <link rel="stylesheet" href="/shared_components/css/screenprint-pricing-tables.css?v=2026.09.07.19">
-    
-    <!-- Screen Print Safety Stripes - Safety Orange Theme -->
-    <link rel="stylesheet" href="/shared_components/css/screenprint-safety-stripes.css?v=2026.09.07.12">
-
-    <!-- Screen Print Toggle Styles - NEW for Phase 1 -->
-    <link rel="stylesheet" href="/shared_components/css/screenprint-toggle-styles.css?v=2026.09.07.19">
-    <!-- Universal LTM Quantity Input CSS (shared across all calculators) -->
-    <link rel="stylesheet" href="/shared_components/css/universal-ltm-quantity-input.css?v=2026.09.07.19">
-
-    <!-- Screen Print Clean Style - New clean layout matching DTG -->
-    <link rel="stylesheet" href="/shared_components/css/screenprint-pricing-clean.css?v=2026.09.07.19">
-
-    <!-- Font Awesome for header icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- Screen Print V2 Styles -->
-    <link rel="stylesheet" href="/calculators/css/screen-print-pricing.css?v=2026.09.07.19">
     <script src="/config/app.config.js"></script>
-    <link rel="stylesheet" href="/shared_components/css/calculator-inventory.css?v=2026.09.07.12">
-    <link rel="stylesheet" href="/shared_components/css/manual-mode-indicator.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/screenprint-pricing-v2.css?v=2026.09.07.19">
+    <!-- Canonical tokens and controls; one shared structure and one method owner. -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.11.3">
+    <link rel="stylesheet" href="/shared_components/css/core-calculators.css?v=2026.09.11.4">
+    <link rel="stylesheet" href="/calculators/css/screen-print-pricing.css?v=2026.09.11.4">
 </head>
-<body class="pricing-calculator-page">
+<body class="pricing-calculator-page" data-ui="unified" data-core-calculator="sp">
 
     <!-- ========================================
          UNIVERSAL PRICING CALCULATOR HEADER
@@ -263,5 +215,6 @@
     <!-- API Testing Utilities -->
     <script src="/calculators/js/screen-print-pricing-page.js?v=2026.09.06.19"></script>
 <script src="/shared_components/js/calculator-inventory.js?v=2026.09.06.40"></script>
+<script src="/shared_components/js/core-calculator-ui.js?v=2026.09.11.4"></script>
 </body>
 </html>

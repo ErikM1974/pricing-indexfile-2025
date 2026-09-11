@@ -200,7 +200,7 @@ class ScreenPrintPricing {
                     <div class="sp-dark-garment-toggle${this.state.isDarkGarment ? ' active' : ''}" id="sp-dark-garment-toggle">
                         <div class="sp-dark-garment-label">
                             <span>Printing on dark garment?</span>
-                            <i class="fas fa-info-circle sp-dark-info-icon" aria-hidden="true" id="sp-dark-info-icon"></i>
+                            
                             <span class="sp-dark-garment-info">(White underbase required)</span>
                         </div>
                         <div class="sp-toggle-switch">
@@ -209,6 +209,7 @@ class ScreenPrintPricing {
                     </div>
 
                     <!-- Dark Garment Tooltip - Shows on hover/click -->
+                    <i class="fas fa-info-circle sp-dark-info-icon" aria-hidden="true" id="sp-dark-info-icon"></i>
                     <div id="sp-dark-tooltip" class="sp-dark-tooltip" style="display: none;">
                         <div class="sp-dark-tooltip-content">
                             <div class="sp-dark-tooltip-header">
@@ -1859,7 +1860,7 @@ class ScreenPrintPricing {
             }
 
             // Total setup
-            html += `<div class="sp-breakdown-item sp-breakdown-subtotal" style="margin-top: 12px; border-top: 2px solid #f3f4f6; padding-top: 12px;">`;
+            html += `<div class="sp-breakdown-item sp-breakdown-subtotal">`;
             html += `<span>Total Setup:</span><span>$${pricing.setupFee.toFixed(2)}</span>`;
             html += `</div>`;
 
@@ -2061,7 +2062,7 @@ class ScreenPrintPricing {
             if (pricing.garmentCost && pricing.frontPrintCost) {
                 subtitleParts.push(
                     `Shirt + ${this.state.frontColors} Color Front: $${displayPrice.toFixed(2)} ` +
-                    `<span style="color: #666; font-size: 0.9em;">(Shirt: $${pricing.garmentCost.toFixed(2)} + Print: $${pricing.frontPrintCost.toFixed(2)})</span>`
+                    `<span>(Shirt: $${pricing.garmentCost.toFixed(2)} + Print: $${pricing.frontPrintCost.toFixed(2)})</span>`
                 );
             } else {
                 // Fallback if breakdown not available
@@ -2087,7 +2088,7 @@ class ScreenPrintPricing {
             
             // Add safety stripes note if applicable
             if (hasSafetyStripes) {
-                subtitleText += `<br/><span style="font-size: 0.85em; color: #ff6b35;">(Includes safety stripe surcharges)</span>`;
+                subtitleText += `<br/><span>(Includes safety stripe surcharges)</span>`;
             }
 
         } else if (pricing.basePrice > 0 && this.state.frontColors === 0 && pricing.additionalCost === 0) { 
@@ -2261,25 +2262,14 @@ class ScreenPrintPricing {
         if (!loadingOverlay) {
             loadingOverlay = document.createElement('div');
             loadingOverlay.id = 'sp-loading-overlay';
-            loadingOverlay.style.cssText = `
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: rgba(255, 255, 255, 0.9);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 1000;
-            `;
+            loadingOverlay.classList.add('core-pricing-loading');
             loadingOverlay.innerHTML = `
                 <div class="sp-loading-inner">
                     <div class="sp-loading-spinner"></div>
                     <p class="sp-loading-text">Loading pricing data...</p>
                 </div>
             `;
-            container.style.position = 'relative';
+            container.classList.add('core-pricing-host');
             container.appendChild(loadingOverlay);
         }
         loadingOverlay.style.display = 'flex';
@@ -2307,17 +2297,7 @@ class ScreenPrintPricing {
         if (!errorBanner) {
             errorBanner = document.createElement('div');
             errorBanner.id = 'sp-error-banner';
-            errorBanner.style.cssText = `
-                background: #fee2e2;
-                border: 1px solid #ef4444;
-                color: #991b1b;
-                padding: 1rem;
-                border-radius: 8px;
-                margin-bottom: 1rem;
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-            `;
+            errorBanner.classList.add('core-pricing-error');
             container.insertBefore(errorBanner, container.firstChild);
         }
         errorBanner.innerHTML = `
@@ -2329,10 +2309,8 @@ class ScreenPrintPricing {
         const dismiss = errorBanner.querySelector('.sp-error-dismiss');
         if (dismiss) dismiss.addEventListener('click', () => errorBanner.remove());
 
-        // Auto-hide after 10 seconds
-        setTimeout(() => {
-            if (errorBanner) errorBanner.style.display = 'none';
-        }, 10000);
+        // Keep pricing failures visible until the user dismisses them.
+        errorBanner.setAttribute('role', 'alert');
     }
 }
 
