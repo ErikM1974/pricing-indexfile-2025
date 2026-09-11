@@ -1,5 +1,11 @@
 # CSS unification — design direction and implementation plan
 
+## RELEASE CANDIDATE — v2026.09.10.10 Order Status and Job Portal
+
+Reviewed pair a878bceb is integrated at73cc615a with the legacy guard correction atf03b9117f3213b033795fbd4f8346559ae0ca14c. All240 unit suites/5,619 tests,88 DOM,four accessibility unit and84 quote parity checks pass; build/lint/types/routes/boot passed. The full1,150-case CSS browser sweep and remaining live pricing/browser checks are still running on that application SHA. This candidate changes only four HTML cache references, their reversible mappings and release notes; all four application CSS/JS assets remain identical. The exact candidate CI can run in parallel, but deployment requires both the complete local gate record and successful actual CSS/live-pricing CI steps.
+
+Live .9/2101 remains185/225. The reviewed pair brings the candidate to187/225,38 pending. Forty-six focused browser cases,10 visually reviewed current paper pages,10 immutable original source hashes and74 mappings preserve dates, quantities, totals, successful note payloads and keyboard access. Three important flags removed. Customer Account/Product originals are backed up separately atd3a5efff and excluded from this release. No real business writes, emails or printing.
+
 ## INTEGRATED — Order Status and Job Portal full regression checks
 
 Reviewed pair a878bceb is integrated and backed up on primary develop at73cc615a. The initial whole-app run passed build, lint and types; seven legacy source-format assertions failed in two unit suites because visibility/focus now belong to shared components, filter classes are canonical, job cards are native buttons and Post includes a pending guard. Updated those assertions while preserving all accessibility requirements; both suites now pass22 tests. No application source or original evidence changed in this correction. Resume the remaining full unit/DOM/accessibility/parity, boot, CSS browser, pricing browser and release gates on the corrected commit before release. Live remains .9/2101,185 reviewed; this pair brings the reviewed candidate to187,38 pending. The separate codex/customer-account-pages branch starts at73cc615a with no account-page edits yet.
