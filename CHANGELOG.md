@@ -1,3 +1,19 @@
+## v2026.09.10.9 (2026.09.10)
+
+- Capture employee bundle source contracts before shared CSS migration
+- Capture employee bundle provider and paper baselines
+- Unify employee bundle workspaces and preserve hosted records and paper
+- Capture customer document source contracts before visual changes
+- Record verified staff tools release and next CSS batch
+- Capture synthetic invoice data, access and complete paper baselines
+- Unify customer portal invoice and preserve readable PDF exports
+- Capture compact invoice workflows, share-link and paper baselines
+- Unify compact invoice styling and preserve shared staff workflows
+- Capture Quote View workflow, payment, art form and paper baselines
+- Unify Quote View and verify customer, staff and print workflows
+- Integrate five reviewed employee and customer document pages
+- Deploy v2026.09.10.9: unify employee bundles and customer invoice and quote documents
+
 ## v2026.09.10.7 (2026.09.10)
 
 - Preserve four final staff tools before CSS review

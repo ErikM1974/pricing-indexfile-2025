@@ -1397,3 +1397,7 @@ Exact-source CI 34511709902 passed all four jobs on 06b3b5cdac0bb8b3ee590c22f49d
 ## Four staff tools release record — v2026.09.10.7
 
 Exact-source CI 34525732554 passed all four jobs on 8546e9ddbeb3b24e8b09734f75ec5362941aef4b, including actual957-case CSS sweep and live money/calculator parity. Calibration, Records Admin, Box Labels and Staff Dashboard share canonical controls and scoped styles.49 original sources/270 reversible mappings/74 focused browser scenarios/11 reviewed paper pages. Four legacy page sheets retired; the dashboard legacy sheets remain for historical harnesses. Count becomes180/225,45pending only after verified rollout. The employee-bundle branch is separate and excluded from this release.
+
+## Employee and customer document release record — v2026.09.10.9
+
+Exact-source CI 34543191741 passed all four jobs on 0b271bb2ae12b083936a1add6c86d32ca41c3bab, including actual1,104-case CSS sweep and live money/calculator parity. Employee bundles, Customer Portal Invoice, compact Invoice and Quote View share canonical controls and scoped styles;147 focused browser cases/33 reviewed current paper pages/28 distinct original sources/217 reversible mappings. Three old stylesheets retired;161 important flags removed. Counts become185/225 reviewed,40pending only after verified rollout. Next Order Status/vendor Job Portal branch is separate and excluded.
