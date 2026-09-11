@@ -966,3 +966,38 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - shared_components/js/contract-calculator-ui.js — contract-family controls, accessible product selectors, scrollable price tables and assistant focus handling.
 
 - tests/e2e/css-unification-contract-calculator-controls.spec.js — contract policy-label, assistant-focus, product-keyboard and horizontal-table regression checks with intercepted service requests.
+
+- tests/fixtures/specialty-calculators-original-content.json — original hashes and reversible mappings for six specialty calculators.
+- tests/unit/specialty-calculators-content.test.js — guards original specialty-calculator source and later reviewed edits.
+
+- tests/e2e/helpers/specialty-calculators-browser.js — synthetic specialty calculator presentation and immutable behavior capture.
+
+- tests/e2e/css-unification-specialty-decal-emblem.spec.js — synthetic specialty calculator presentation and immutable behavior capture.
+
+- tests/fixtures/specialty-calculators-decal-tiers-original-browser.json — immutable synthetic specialty calculator browser evidence.
+
+- tests/fixtures/specialty-calculators-decal-empty-original-browser.json — immutable synthetic specialty calculator browser evidence.
+
+- tests/fixtures/specialty-calculators-decal-mixed-original-browser.json — immutable synthetic specialty calculator browser evidence.
+
+- tests/fixtures/specialty-calculators-decal-waived-original-browser.json — immutable synthetic specialty calculator browser evidence.
+
+- tests/fixtures/specialty-calculators-decal-oversize-original-browser.json — immutable synthetic specialty calculator browser evidence.
+
+- tests/fixtures/specialty-calculators-decal-invalid-original-browser.json — immutable synthetic specialty calculator browser evidence.
+
+- tests/fixtures/specialty-calculators-decal-failed-original-browser.json — immutable synthetic specialty calculator browser evidence.
+
+- tests/fixtures/specialty-calculators-emblem-normal-original-browser.json — immutable synthetic specialty calculator browser evidence.
+
+- tests/fixtures/specialty-calculators-emblem-reference-original-browser.json — immutable synthetic specialty calculator browser evidence.
+
+- tests/fixtures/specialty-calculators-emblem-failed-original-browser.json — immutable synthetic specialty calculator browser evidence.
+
+- tests/fixtures/specialty-calculators-emblem-assistant-original-browser.json — immutable synthetic specialty calculator browser evidence.
+
+- tests/fixtures/specialty-calculators-emblem-quote-original-browser.json — immutable synthetic specialty calculator browser evidence.
+
+- tests/fixtures/specialty-calculators-emblem-chat-failed-original-browser.json — immutable synthetic specialty calculator browser evidence.
+
+- tests/fixtures/specialty-calculators-emblem-save-retry-original-browser.json — immutable synthetic specialty calculator browser evidence.

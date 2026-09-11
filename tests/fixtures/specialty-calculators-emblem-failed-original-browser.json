@@ -1,0 +1,185 @@
+{
+  "name": "emblem-failed",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Embroidered Emblem Patches — Northwest Custom Apparel",
+      "url": "/calculators/embroidered-emblem/index.html",
+      "ids": {
+        "aiOpenBtn": "✨ Start a Quote with AI",
+        "autoOpenHint": "Chat opens automatically…",
+        "emblemHeroArt": "",
+        "pricingError": "Unable to load emblem pricing. Refresh the page, or contact Erik if this persists.",
+        "emblemGridWrap": "",
+        "floatingQuoteBtn": "✨ Quote",
+        "aiChatBackdrop": "",
+        "shareToastText": "Quote link copied — paste into your email or chat"
+      },
+      "fields": [],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "(253) 922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        }
+      ],
+      "tables": [],
+      "headings": [
+        "Embroidered emblem pricing — start a quote in 30 seconds",
+        "What you get"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "span:nth-child(3)"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Embroidered Emblem Patches — Northwest Custom Apparel",
+      "url": "/calculators/embroidered-emblem/index.html",
+      "ids": {
+        "aiOpenBtn": "✨ Start a Quote with AI",
+        "autoOpenHint": "Chat opens automatically…",
+        "pricingError": "Unable to load emblem pricing. Refresh the page, or contact Erik if this persists.",
+        "emblemGridWrap": "",
+        "floatingQuoteBtn": "✨ Quote",
+        "shareToastText": "Quote link copied — paste into your email or chat"
+      },
+      "fields": [],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "(253) 922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        }
+      ],
+      "tables": [],
+      "headings": [
+        "Embroidered emblem pricing — start a quote in 30 seconds",
+        "What you get"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "span:nth-child(3)"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Embroidered Emblem Patches — Northwest Custom Apparel",
+      "url": "/calculators/embroidered-emblem/index.html",
+      "ids": {
+        "aiOpenBtn": "✨ Start a Quote with AI",
+        "autoOpenHint": "Chat opens automatically…",
+        "pricingError": "Unable to load emblem pricing. Refresh the page, or contact Erik if this persists.",
+        "emblemGridWrap": "",
+        "floatingQuoteBtn": "✨ Quote",
+        "shareToastText": "Quote link copied — paste into your email or chat"
+      },
+      "fields": [],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "(253) 922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        }
+      ],
+      "tables": [],
+      "headings": [
+        "Embroidered emblem pricing — start a quote in 30 seconds",
+        "What you get"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "span:nth-child(3)"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Embroidered Emblem Patches — Northwest Custom Apparel",
+      "url": "/calculators/embroidered-emblem/index.html",
+      "ids": {
+        "aiOpenBtn": "✨ Start a Quote with AI",
+        "autoOpenHint": "Chat opens automatically…",
+        "pricingError": "Unable to load emblem pricing. Refresh the page, or contact Erik if this persists.",
+        "emblemGridWrap": "",
+        "floatingQuoteBtn": "✨ Quote",
+        "shareToastText": "Quote link copied — paste into your email or chat"
+      },
+      "fields": [],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "(253) 922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        }
+      ],
+      "tables": [],
+      "headings": [
+        "Embroidered emblem pricing — start a quote in 30 seconds",
+        "What you get"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "span:nth-child(3)"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "dialogs": [],
+  "mocked": []
+}

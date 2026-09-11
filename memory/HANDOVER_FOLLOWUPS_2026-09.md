@@ -1,5 +1,24 @@
 # Handover follow-ups — 2026-09-07
 
+## Specialty original review — decals and emblems
+
+All14 original browser cases pass with14 immutable contracts. Reviewed all52 full-page screens at1440/768/390/320 using29 detail sheets, and all23 paper pages in13 documents (15 unique renders, eight exact duplicates). All37 original source guards pass. The other four specialty pages still need their original browser/paper review; no application edits or migration credit yet.
+
+Defects to repair: decal introductory text is broken by inherited flex layout, cramped controls and incomplete print headings; emblem hero image overlaps the heading, phone CSS removes all160 price cells, the idle copied-link toast and hidden quote actions appear prematurely, and most emblem print states contain only the footer. Use shared canonical controls, scoped owners, accessible full price grids, complete print content and robust dialog focus. Preserve both calculator controllers and immutable financial/request contracts. Business requests, allocating GETs, clipboard and printing are synthetic or local artifacts only.
+
+Contract .6 source is now8ab22de7a98b3726a3a26509742c10831bc5b990 after correcting an obsolete test to check canonical shared hidden styling. Its full release checks continue on primary develop; live remains.5/2108/93fe1568 (204/225 reviewed,21pending).
+
+## NEXT — six specialty calculators, 2026-09-11
+
+Isolated codex/specialty-calculators starts at 97cc05080d4689785bc0885b6a4223c0f1356cbf while contract .6 passes its own release gates on primary develop. Pages: custom decals, embroidered emblems, Polar Camel tumblers, Richardson factory direct, Safety Stripe Creator and customer-supplied screen printing. Captured 37 original source hashes; no application changes or migration credit.
+
+- [ ] Capture original successful and failed API states, complete prices/fees/tiers, all controls, keyboard behavior and paper. Intercept quote allocation, saved quotes, messages and all business writes with synthetic responses.
+- [ ] Inspect all original paper and representative desktop/phone layouts before replacing shared legacy owners. Audit every consuming page before changing a shared stylesheet or helper.
+- [ ] Use canonical typography/controls, one scoped specialty layout owner and small page-specific owners. Keep every financial function and successful request unchanged; test images, previews, warnings, chat and modal states.
+- [ ] Complete visual/source checks and the manifest, then integrate only after the contract release is live. Require full local and exact-source CI checks before deployment.
+
+LIVE remains.5/Heroku2108/93fe1568 at204/225 reviewed,21pending. Contract candidate.6 is207/225,18pending and is fixed at97cc05080d4689785bc0885b6a4223c0f1356cbf for full verification. No business writes, messages, uploads, payments, env copies or device printing. Never recursively delete the node_modules junction.
+
 ## RELEASE CANDIDATE — v2026.09.11.6 three contract calculators
 
 Reviewed source 4f793212a25530918d1045c2bbf647aa6c30177d is integrated with verified .5 history at e23f892888633587c800abc3d05af11c7d451d6c. Eleven references version seven changed assets, with 44 reversible mappings preserving14 source originals. All28 focused browser cases,279 source/ownership guards,72 full-page screens and20 paper pages in18 documents are reviewed. Eleven financial function bodies, the entire Embroidery controller and DST parser/math remain unchanged.

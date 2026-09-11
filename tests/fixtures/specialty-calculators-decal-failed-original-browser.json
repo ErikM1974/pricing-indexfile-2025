@@ -1,0 +1,411 @@
+{
+  "name": "decal-failed",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Custom & Oversize Decal Pricing — Northwest Custom Apparel",
+      "url": "/calculators/custom-decal-pricing.html",
+      "ids": {
+        "pricingError": "Unable to load decal rates. Refresh the page, or contact Erik if this persists. Do not quote from memory — the rate card lives in Caspio and may have changed.",
+        "decalSizeRows": "— ×",
+        "decalAddRow": "Add another size",
+        "decalArtOnFile": "",
+        "decalTaxRate": "",
+        "decalWarnings": "",
+        "decalOutput": "",
+        "decalRateGrid": "",
+        "decalMinNote": "$90 material"
+      },
+      "fields": [
+        {
+          "id": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "decalArtOnFile",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "decalTaxRate",
+          "type": "number",
+          "value": "10.2",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "the customer sticker page"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "(253) 922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "/custom-stickers"
+        },
+        {
+          "href": "/custom-banners",
+          "text": "/custom-banners"
+        }
+      ],
+      "tables": [
+        "SIZE SQ FT EACH 6\" × 6\" 0.25 6\" × 12\" 0.50 8\" × 8\" 0.44 8\" × 12\" 0.67 10\" × 10\" 0.69 12\" × 12\" 1.00 12\" × 18\" 1.50 12\" × 24\" 2.00 15\" × 15\" 1.56 18\" × 18\" 2.25 18\" × 24\" 3.00 24\" × 24\" 4.00 24\" × 36\" 6.00 24\" × 48\" 8.00 30\" × 30\" 6.25 36\" × 36\" 9.00 36\" × 48\" 12.00 48\" × 48\" 16.00 48\" × 96\" 32.00"
+      ],
+      "headings": [
+        "Price a decal the sticker grid can't",
+        "Square-foot rate card",
+        "Square-foot cheat sheet"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "nav > span:nth-child(3)"
+            ],
+            [
+              ".page-hero-hint"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Custom & Oversize Decal Pricing — Northwest Custom Apparel",
+      "url": "/calculators/custom-decal-pricing.html",
+      "ids": {
+        "pricingError": "Unable to load decal rates. Refresh the page, or contact Erik if this persists. Do not quote from memory — the rate card lives in Caspio and may have changed.",
+        "decalSizeRows": "— ×",
+        "decalAddRow": "Add another size",
+        "decalArtOnFile": "",
+        "decalTaxRate": "",
+        "decalWarnings": "",
+        "decalOutput": "",
+        "decalRateGrid": "",
+        "decalMinNote": "$90 material"
+      },
+      "fields": [
+        {
+          "id": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "decalArtOnFile",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "decalTaxRate",
+          "type": "number",
+          "value": "10.2",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "the customer sticker page"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "(253) 922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "/custom-stickers"
+        },
+        {
+          "href": "/custom-banners",
+          "text": "/custom-banners"
+        }
+      ],
+      "tables": [
+        "SIZE SQ FT EACH 6\" × 6\" 0.25 6\" × 12\" 0.50 8\" × 8\" 0.44 8\" × 12\" 0.67 10\" × 10\" 0.69 12\" × 12\" 1.00 12\" × 18\" 1.50 12\" × 24\" 2.00 15\" × 15\" 1.56 18\" × 18\" 2.25 18\" × 24\" 3.00 24\" × 24\" 4.00 24\" × 36\" 6.00 24\" × 48\" 8.00 30\" × 30\" 6.25 36\" × 36\" 9.00 36\" × 48\" 12.00 48\" × 48\" 16.00 48\" × 96\" 32.00"
+      ],
+      "headings": [
+        "Price a decal the sticker grid can't",
+        "Square-foot rate card",
+        "Square-foot cheat sheet"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "nav > span:nth-child(3)"
+            ],
+            [
+              ".page-hero-hint"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Custom & Oversize Decal Pricing — Northwest Custom Apparel",
+      "url": "/calculators/custom-decal-pricing.html",
+      "ids": {
+        "pricingError": "Unable to load decal rates. Refresh the page, or contact Erik if this persists. Do not quote from memory — the rate card lives in Caspio and may have changed.",
+        "decalSizeRows": "— ×",
+        "decalAddRow": "Add another size",
+        "decalArtOnFile": "",
+        "decalTaxRate": "",
+        "decalWarnings": "",
+        "decalOutput": "",
+        "decalRateGrid": "",
+        "decalMinNote": "$90 material"
+      },
+      "fields": [
+        {
+          "id": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "decalArtOnFile",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "decalTaxRate",
+          "type": "number",
+          "value": "10.2",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "the customer sticker page"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "(253) 922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "/custom-stickers"
+        },
+        {
+          "href": "/custom-banners",
+          "text": "/custom-banners"
+        }
+      ],
+      "tables": [
+        "SIZE SQ FT EACH 6\" × 6\" 0.25 6\" × 12\" 0.50 8\" × 8\" 0.44 8\" × 12\" 0.67 10\" × 10\" 0.69 12\" × 12\" 1.00 12\" × 18\" 1.50 12\" × 24\" 2.00 15\" × 15\" 1.56 18\" × 18\" 2.25 18\" × 24\" 3.00 24\" × 24\" 4.00 24\" × 36\" 6.00 24\" × 48\" 8.00 30\" × 30\" 6.25 36\" × 36\" 9.00 36\" × 48\" 12.00 48\" × 48\" 16.00 48\" × 96\" 32.00"
+      ],
+      "headings": [
+        "Price a decal the sticker grid can't",
+        "Square-foot rate card",
+        "Square-foot cheat sheet"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "nav > span:nth-child(3)"
+            ],
+            [
+              ".page-hero-hint"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Custom & Oversize Decal Pricing — Northwest Custom Apparel",
+      "url": "/calculators/custom-decal-pricing.html",
+      "ids": {
+        "pricingError": "Unable to load decal rates. Refresh the page, or contact Erik if this persists. Do not quote from memory — the rate card lives in Caspio and may have changed.",
+        "decalSizeRows": "— ×",
+        "decalAddRow": "Add another size",
+        "decalArtOnFile": "",
+        "decalTaxRate": "",
+        "decalWarnings": "",
+        "decalOutput": "",
+        "decalRateGrid": "",
+        "decalMinNote": "$90 material"
+      },
+      "fields": [
+        {
+          "id": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "decalArtOnFile",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "decalTaxRate",
+          "type": "number",
+          "value": "10.2",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "the customer sticker page"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "(253) 922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "/custom-stickers"
+        },
+        {
+          "href": "/custom-banners",
+          "text": "/custom-banners"
+        }
+      ],
+      "tables": [
+        "SIZE SQ FT EACH 6\" × 6\" 0.25 6\" × 12\" 0.50 8\" × 8\" 0.44 8\" × 12\" 0.67 10\" × 10\" 0.69 12\" × 12\" 1.00 12\" × 18\" 1.50 12\" × 24\" 2.00 15\" × 15\" 1.56 18\" × 18\" 2.25 18\" × 24\" 3.00 24\" × 24\" 4.00 24\" × 36\" 6.00 24\" × 48\" 8.00 30\" × 30\" 6.25 36\" × 36\" 9.00 36\" × 48\" 12.00 48\" × 48\" 16.00 48\" × 96\" 32.00"
+      ],
+      "headings": [
+        "Price a decal the sticker grid can't",
+        "Square-foot rate card",
+        "Square-foot cheat sheet"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "nav > span:nth-child(3)"
+            ],
+            [
+              ".page-hero-hint"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "dialogs": [],
+  "mocked": []
+}

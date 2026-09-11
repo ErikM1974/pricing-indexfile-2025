@@ -1,0 +1,216 @@
+{
+  "name": "emblem-reference",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Embroidered Emblem Patches — Northwest Custom Apparel",
+      "url": "/calculators/embroidered-emblem/index.html",
+      "ids": {
+        "aiOpenBtn": "✨ Start a Quote with AI",
+        "autoOpenHint": "Chat opens automatically…",
+        "emblemHeroArt": "",
+        "emblemGridWrap": "SIZE (AVG) 25+ 50+ 100+ 200+ 300+ 500+ 1,000+ 2,000+ 5,000+ 10,000+ 1.00\" $5.15 $4.87 $4.59 $4.31 $4.03 $3.75 $3.47 $3.19 $2.91 $2.63 1.50\" $5.85 $5.57 $5.29 $5.01 $4.73 $4.45 $4.17 $3.89 $3.61 $3.33 2.00\" $6.55 $6.27 $5.99 $5.71 $5.43 $5.15 $4.87 $4.59 $4.31 $4.03 2.50\" $7.25 $6.97 $6.69 $6.41 $6.13 $5.85 $5.57 $5.29 $5.01 $4.73 3.00\" $7.95 $7.67 $7.39 $7.11 $6.83 $6.55 $6.27 $5.99 $5.71 $5.43 3.50\" $8.65 $8.37 $8.09 $7.81 $7.53 $7.25 $6.97 $6.69 $6.41 $6.13 4.00\" $9.35 $9.07 $8.79 $8.51 $8.23 $7.95 $7.67 $7.39 $7.11 $6.83 4.50\" $10.05 $9.77 $9.49 $9.21 $8.93 $8.65 $8.37 $8.09 $7.81 $7.53 5.00\" $10.75 $10.47 $10.19 $9.91 $9.63 $9.35 $9.07 $8.79 $8.51 $8.23 5.50\" $11.45 $11.17 $10.89 $10.61 $10.33 $10.05 $9.77 $9.49 $9.21 $8.93 6.00\" $12.15 $11.87 $11.59 $11.31 $11.03 $10.75 $10.47 $10.19 $9.91 $9.63 7.00\" $13.55 $13.27 $12.99 $12.71 $12.43 $12.15 $11.87 $11.59 $11.31 $11.03 8.00\" $14.95 $14.67 $14.39 $14.11 $13.83 $13.55 $13.27 $12.99 $12.71 $12.43 9.00\" $16.35 $16.07 $15.79 $15.51 $15.23 $14.95 $14.67 $14.39 $14.11 $13.83 10.00\" $17.75 $17.47 $17.19 $16.91 $16.63 $16.35 $16.07 $15.79 $15.51 $15.23 12.00\" $20.55 $20.27 $19.99 $19.71 $19.43 $19.15 $18.87 $18.59 $18.31 $18.03",
+        "floatingQuoteBtn": "✨ Quote",
+        "aiChatTitle": "✨ AI Emblem Patch Assistant",
+        "aiChatResetBtn": "",
+        "aiChatClose": "",
+        "aiChatContextPill": "Ready when you are.",
+        "aiChatStatus": "Assistant ready. Tell me the emblem size and quantity to start, or paste the full spec.",
+        "aiChatMessages": "Hi! Ready to draft an emblem patch quote. Tell me the size and quantity to start — or paste the whole spec at once (size, qty, backing, colors, art status, customer) and I will quote it in one shot.",
+        "aiOutlookBtn": "Open in Outlook",
+        "aiCopyEmailBtn": "Copy email",
+        "aiSaveQuoteBtn": "Save & share link",
+        "aiChatTip": "Tip: paste the whole spec at once (size · qty · backing · colors · art status · customer) to skip the back-and-forth.",
+        "aiChatTextarea": "",
+        "aiChatSend": "",
+        "aiChatBackdrop": "",
+        "shareToastText": "Quote link copied — paste into your email or chat"
+      },
+      "fields": [
+        {
+          "id": "aiChatTextarea",
+          "type": "textarea",
+          "value": "",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "(253) 922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        }
+      ],
+      "tables": [
+        "SIZE (AVG) 25+ 50+ 100+ 200+ 300+ 500+ 1,000+ 2,000+ 5,000+ 10,000+ 1.00\" $5.15 $4.87 $4.59 $4.31 $4.03 $3.75 $3.47 $3.19 $2.91 $2.63 1.50\" $5.85 $5.57 $5.29 $5.01 $4.73 $4.45 $4.17 $3.89 $3.61 $3.33 2.00\" $6.55 $6.27 $5.99 $5.71 $5.43 $5.15 $4.87 $4.59 $4.31 $4.03 2.50\" $7.25 $6.97 $6.69 $6.41 $6.13 $5.85 $5.57 $5.29 $5.01 $4.73 3.00\" $7.95 $7.67 $7.39 $7.11 $6.83 $6.55 $6.27 $5.99 $5.71 $5.43 3.50\" $8.65 $8.37 $8.09 $7.81 $7.53 $7.25 $6.97 $6.69 $6.41 $6.13 4.00\" $9.35 $9.07 $8.79 $8.51 $8.23 $7.95 $7.67 $7.39 $7.11 $6.83 4.50\" $10.05 $9.77 $9.49 $9.21 $8.93 $8.65 $8.37 $8.09 $7.81 $7.53 5.00\" $10.75 $10.47 $10.19 $9.91 $9.63 $9.35 $9.07 $8.79 $8.51 $8.23 5.50\" $11.45 $11.17 $10.89 $10.61 $10.33 $10.05 $9.77 $9.49 $9.21 $8.93 6.00\" $12.15 $11.87 $11.59 $11.31 $11.03 $10.75 $10.47 $10.19 $9.91 $9.63 7.00\" $13.55 $13.27 $12.99 $12.71 $12.43 $12.15 $11.87 $11.59 $11.31 $11.03 8.00\" $14.95 $14.67 $14.39 $14.11 $13.83 $13.55 $13.27 $12.99 $12.71 $12.43 9.00\" $16.35 $16.07 $15.79 $15.51 $15.23 $14.95 $14.67 $14.39 $14.11 $13.83 10.00\" $17.75 $17.47 $17.19 $16.91 $16.63 $16.35 $16.07 $15.79 $15.51 $15.23 12.00\" $20.55 $20.27 $19.99 $19.71 $19.43 $19.15 $18.87 $18.59 $18.31 $18.03"
+      ],
+      "headings": [
+        "Embroidered emblem pricing — start a quote in 30 seconds",
+        "What you get"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "span:nth-child(3)"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Embroidered Emblem Patches — Northwest Custom Apparel",
+      "url": "/calculators/embroidered-emblem/index.html",
+      "ids": {
+        "aiOpenBtn": "✨ Start a Quote with AI",
+        "autoOpenHint": "Chat opens automatically…",
+        "emblemGridWrap": "SIZE (AVG) 25+ 50+ 100+ 200+ 300+ 500+ 1,000+ 2,000+ 5,000+ 10,000+ 1.00\" $5.15 $4.87 $4.59 $4.31 $4.03 $3.75 $3.47 $3.19 $2.91 $2.63 1.50\" $5.85 $5.57 $5.29 $5.01 $4.73 $4.45 $4.17 $3.89 $3.61 $3.33 2.00\" $6.55 $6.27 $5.99 $5.71 $5.43 $5.15 $4.87 $4.59 $4.31 $4.03 2.50\" $7.25 $6.97 $6.69 $6.41 $6.13 $5.85 $5.57 $5.29 $5.01 $4.73 3.00\" $7.95 $7.67 $7.39 $7.11 $6.83 $6.55 $6.27 $5.99 $5.71 $5.43 3.50\" $8.65 $8.37 $8.09 $7.81 $7.53 $7.25 $6.97 $6.69 $6.41 $6.13 4.00\" $9.35 $9.07 $8.79 $8.51 $8.23 $7.95 $7.67 $7.39 $7.11 $6.83 4.50\" $10.05 $9.77 $9.49 $9.21 $8.93 $8.65 $8.37 $8.09 $7.81 $7.53 5.00\" $10.75 $10.47 $10.19 $9.91 $9.63 $9.35 $9.07 $8.79 $8.51 $8.23 5.50\" $11.45 $11.17 $10.89 $10.61 $10.33 $10.05 $9.77 $9.49 $9.21 $8.93 6.00\" $12.15 $11.87 $11.59 $11.31 $11.03 $10.75 $10.47 $10.19 $9.91 $9.63 7.00\" $13.55 $13.27 $12.99 $12.71 $12.43 $12.15 $11.87 $11.59 $11.31 $11.03 8.00\" $14.95 $14.67 $14.39 $14.11 $13.83 $13.55 $13.27 $12.99 $12.71 $12.43 9.00\" $16.35 $16.07 $15.79 $15.51 $15.23 $14.95 $14.67 $14.39 $14.11 $13.83 10.00\" $17.75 $17.47 $17.19 $16.91 $16.63 $16.35 $16.07 $15.79 $15.51 $15.23 12.00\" $20.55 $20.27 $19.99 $19.71 $19.43 $19.15 $18.87 $18.59 $18.31 $18.03",
+        "floatingQuoteBtn": "✨ Quote",
+        "shareToastText": "Quote link copied — paste into your email or chat"
+      },
+      "fields": [],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "(253) 922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        }
+      ],
+      "tables": [
+        "SIZE (AVG) 25+ 50+ 100+ 200+ 300+ 500+ 1,000+ 2,000+ 5,000+ 10,000+ 1.00\" $5.15 $4.87 $4.59 $4.31 $4.03 $3.75 $3.47 $3.19 $2.91 $2.63 1.50\" $5.85 $5.57 $5.29 $5.01 $4.73 $4.45 $4.17 $3.89 $3.61 $3.33 2.00\" $6.55 $6.27 $5.99 $5.71 $5.43 $5.15 $4.87 $4.59 $4.31 $4.03 2.50\" $7.25 $6.97 $6.69 $6.41 $6.13 $5.85 $5.57 $5.29 $5.01 $4.73 3.00\" $7.95 $7.67 $7.39 $7.11 $6.83 $6.55 $6.27 $5.99 $5.71 $5.43 3.50\" $8.65 $8.37 $8.09 $7.81 $7.53 $7.25 $6.97 $6.69 $6.41 $6.13 4.00\" $9.35 $9.07 $8.79 $8.51 $8.23 $7.95 $7.67 $7.39 $7.11 $6.83 4.50\" $10.05 $9.77 $9.49 $9.21 $8.93 $8.65 $8.37 $8.09 $7.81 $7.53 5.00\" $10.75 $10.47 $10.19 $9.91 $9.63 $9.35 $9.07 $8.79 $8.51 $8.23 5.50\" $11.45 $11.17 $10.89 $10.61 $10.33 $10.05 $9.77 $9.49 $9.21 $8.93 6.00\" $12.15 $11.87 $11.59 $11.31 $11.03 $10.75 $10.47 $10.19 $9.91 $9.63 7.00\" $13.55 $13.27 $12.99 $12.71 $12.43 $12.15 $11.87 $11.59 $11.31 $11.03 8.00\" $14.95 $14.67 $14.39 $14.11 $13.83 $13.55 $13.27 $12.99 $12.71 $12.43 9.00\" $16.35 $16.07 $15.79 $15.51 $15.23 $14.95 $14.67 $14.39 $14.11 $13.83 10.00\" $17.75 $17.47 $17.19 $16.91 $16.63 $16.35 $16.07 $15.79 $15.51 $15.23 12.00\" $20.55 $20.27 $19.99 $19.71 $19.43 $19.15 $18.87 $18.59 $18.31 $18.03"
+      ],
+      "headings": [
+        "Embroidered emblem pricing — start a quote in 30 seconds",
+        "What you get"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "span:nth-child(3)"
+            ]
+          ]
+        },
+        {
+          "id": "scrollable-region-focusable",
+          "nodes": [
+            [
+              "#emblemGridWrap"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Embroidered Emblem Patches — Northwest Custom Apparel",
+      "url": "/calculators/embroidered-emblem/index.html",
+      "ids": {
+        "aiOpenBtn": "✨ Start a Quote with AI",
+        "autoOpenHint": "Chat opens automatically…",
+        "emblemGridWrap": "1.00\" 1.50\" 2.00\" 2.50\" 3.00\" 3.50\" 4.00\" 4.50\" 5.00\" 5.50\" 6.00\" 7.00\" 8.00\" 9.00\" 10.00\" 12.00\"",
+        "floatingQuoteBtn": "✨ Quote",
+        "shareToastText": "Quote link copied — paste into your email or chat"
+      },
+      "fields": [],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "(253) 922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        }
+      ],
+      "tables": [
+        "1.00\" 1.50\" 2.00\" 2.50\" 3.00\" 3.50\" 4.00\" 4.50\" 5.00\" 5.50\" 6.00\" 7.00\" 8.00\" 9.00\" 10.00\" 12.00\""
+      ],
+      "headings": [
+        "Embroidered emblem pricing — start a quote in 30 seconds",
+        "What you get"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "span:nth-child(3)"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Embroidered Emblem Patches — Northwest Custom Apparel",
+      "url": "/calculators/embroidered-emblem/index.html",
+      "ids": {
+        "aiOpenBtn": "✨ Start a Quote with AI",
+        "autoOpenHint": "Chat opens automatically…",
+        "emblemGridWrap": "1.00\" 1.50\" 2.00\" 2.50\" 3.00\" 3.50\" 4.00\" 4.50\" 5.00\" 5.50\" 6.00\" 7.00\" 8.00\" 9.00\" 10.00\" 12.00\"",
+        "floatingQuoteBtn": "✨ Quote",
+        "shareToastText": "Quote link copied — paste into your email or chat"
+      },
+      "fields": [],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "(253) 922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        }
+      ],
+      "tables": [
+        "1.00\" 1.50\" 2.00\" 2.50\" 3.00\" 3.50\" 4.00\" 4.50\" 5.00\" 5.50\" 6.00\" 7.00\" 8.00\" 9.00\" 10.00\" 12.00\""
+      ],
+      "headings": [
+        "Embroidered emblem pricing — start a quote in 30 seconds",
+        "What you get"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "span:nth-child(3)"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "dialogs": [],
+  "mocked": []
+}
