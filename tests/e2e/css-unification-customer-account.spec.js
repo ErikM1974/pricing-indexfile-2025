@@ -8,7 +8,10 @@ async function evidence(page,name,events,{paper=false,compare=true}={}){
   await page.setViewportSize({width,height:1000});await page.evaluate(()=>document.fonts.ready);
   const state=await snapshot(page),axe=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
   states.push({width,...state,violations:axe.violations.map(v=>({id:v.id,impact:v.impact,nodes:v.nodes.map(n=>n.target)}))});
-  if(!capture){expect(state.overflow,name+' width '+width).toBe(false);expect(axe.violations,name+' axe '+width).toEqual([]);}
+  if(!capture){
+   fs.mkdirSync(out,{recursive:true});fs.writeFileSync(path.join(out,'customer-account-'+name+'-current-diagnostics.json'),JSON.stringify({states,violations:axe.violations.map(v=>({id:v.id,nodes:v.nodes.map(n=>({target:n.target,html:n.html,reason:n.failureSummary}))}))},null,2));
+   expect(state.overflow,name+' width '+width).toBe(false);expect(await page.locator('.pp-up-mxtable td:not(.lbl)').evaluateAll(cells=>cells.filter(c=>c.getClientRects().length&&getComputedStyle(c).whiteSpace!=='nowrap').map(c=>c.textContent)),name+' unbroken price amounts '+width).toEqual([]);expect(axe.violations.map(v=>({id:v.id,nodes:v.nodes.map(n=>n.target)})),name+' axe '+width).toEqual([]);
+  }
   fs.mkdirSync(out,{recursive:true});await page.screenshot({path:path.join(out,'customer-account-'+name+'-'+phase+'-'+width+'.png'),fullPage:true});
  }
  check(expect,events);
@@ -23,12 +26,26 @@ async function evidence(page,name,events,{paper=false,compare=true}={}){
   const before=JSON.parse(fs.readFileSync(path.join(root,file),'utf8'));
   for(let i=0;i<states.length;i++){
    expect(states[i].title).toBe(before.states[i].title);
-   for(const[id,value]of Object.entries(before.states[i].ids))expect(states[i].ids[id],name+' '+id).toBe(value);
-   expect(states[i].links).toEqual(before.states[i].links);expect(states[i].rows).toEqual(before.states[i].rows);expect(states[i].fields).toEqual(before.states[i].fields);expect(states[i].engineCalls).toEqual(before.states[i].engineCalls);
+   for(const[id,value]of Object.entries(before.states[i].ids)){
+    // The drawer's due date now occupies its own line; retain every saved amount and date.
+    const expected=id==='cp-drawer-meta'?value.replace(/(BALANCE \$[0-9,.]+)due /,'$1 due '):value;
+    expect(states[i].ids[id],name+' '+id).toBe(expected);
+   }
+   const links=states[i].links.map((link,index)=>{
+    const old=before.states[i].links[index];
+    if(old&&old.label===null&&old.text===''&&/^\/portal(?:-admin\/preview\/7401)?\/product\//.test(old.href)){expect(link.label).toMatch(/^View .+/);return {...link,label:null};}
+    return link;
+   });
+   expect(links).toEqual(before.states[i].links);expect(states[i].rows).toEqual(before.states[i].rows);expect(states[i].fields).toEqual(before.states[i].fields);expect(states[i].engineCalls).toEqual(before.states[i].engineCalls);
   }
   expect(events.actions).toEqual(before.actions);
  }
- if(paper){await page.setViewportSize({width:1440,height:1000});await page.pdf({path:path.join(out,'customer-account-'+name+'-'+phase+'.pdf'),format:'Letter',printBackground:true});}
+ if(paper){
+  await page.setViewportSize({width:1440,height:1000});
+  if(!capture){await page.emulateMedia({media:'print'});expect(await page.locator('.cp-table td.cp-num').evaluateAll(cells=>cells.filter(c=>c.getClientRects().length).map(c=>({text:c.textContent,nowrap:getComputedStyle(c).whiteSpace==='nowrap'}))).then(cells=>cells.filter(c=>!c.nowrap)),'printed amounts remain unbroken').toEqual([]);}
+  await page.pdf({path:path.join(out,'customer-account-'+name+'-'+phase+'.pdf'),format:'Letter',printBackground:true});
+  await page.emulateMedia({media:'screen'});
+ }
 }
 async function ready(page,state){if(state.page==='product')await expect(page.locator('#pp-content')).toBeVisible();else await expect(page.locator('#cp-acct-email')).toHaveText('customer@example.test');await page.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))));}
 
@@ -106,3 +123,58 @@ for(const mode of ['single','batch','upgrade'])test('CSS customer product: origi
  }
  await expect.poll(()=>events.actions.length).toBe(1);await expect(page.locator('#cp-toast')).not.toHaveClass(/show/);await evidence(page,'product-'+mode+'-sent',events);
 });
+
+if(!capture){
+ const workflowOriginal=process.env.PROBE_CUSTOMER_ACCOUNT_ORIGINAL==='1';
+ async function workflow(page,extra={}){const state={page:'product',original:workflowOriginal,...extra},events=await open(page,state);await ready(page,state);await expect(page.locator('#pp-methods .pp-method')).toHaveCount(4);return {state,events};}
+ const queued={style:'PC54',color:'Navy',title:'Core Cotton Tee',method:'DTG',qty:'24',sizeBreakdown:'M:24'};
+ test('CSS customer account workflow: a storage failure cannot claim that a reorder was saved',async({page})=>{
+  const {events}=await workflow(page);await page.evaluate(()=>{const set=Storage.prototype.setItem;Storage.prototype.setItem=function(k,v){if(k==='nwca.reorderList.v1')throw new DOMException('Synthetic quota','QuotaExceededError');return set.call(this,k,v);};});
+  await page.locator('#pp-req-addlist').click();await expect(page.locator('#cp-toast')).toContainText(/could not save/i);expect(await page.evaluate(()=>window.ReorderList.count())).toBe(0);check(expect,events);
+ });
+ test('CSS customer account workflow: sent batch stays sent when local cleanup fails',async({page})=>{
+  const {events}=await workflow(page,{storage:[queued]});await page.locator('#rl-fab').click();await page.evaluate(()=>{const set=Storage.prototype.setItem;Storage.prototype.setItem=function(k,v){if(k==='nwca.reorderList.v1')throw new DOMException('Synthetic quota','QuotaExceededError');return set.call(this,k,v);};});
+  await page.locator('#rl-send').click();await expect(page.locator('#cp-toast')).toContainText('Sent');await expect(page.locator('#cp-toast')).toContainText(/local list.*reload/i);expect(await page.evaluate(()=>window.ReorderList.count())).toBe(0);await expect(page.locator('#rl-drawer')).toBeHidden();expect(events.actions).toHaveLength(1);check(expect,events);
+ });
+ test('CSS customer account workflow: a pending batch preserves items added after submission',async({page})=>{
+  let release;const hold=new Promise(r=>release=r);const {events}=await workflow(page,{storage:[queued],actionHold:hold});
+  await page.locator('#rl-fab').click();await page.locator('#rl-send').click();await expect.poll(()=>events.actions.length).toBe(1);
+  await page.locator('#rl-cont').click();await page.locator('#pp-req-addlist').click();expect(await page.evaluate(()=>window.ReorderList.count())).toBe(2);
+  release();await expect(page.locator('#cp-toast')).toContainText('Sent');expect(await page.evaluate(()=>window.ReorderList.count())).toBe(1);expect(JSON.parse(events.actions[0].body).items).toHaveLength(1);check(expect,events);
+ });
+ test('CSS customer account workflow: reorder drawer contains focus and restores its trigger',async({page})=>{
+  const {events}=await workflow(page,{storage:[queued]});await page.locator('#rl-fab').click();await expect(page.locator('#rl-close')).toBeFocused();await page.keyboard.press('Shift+Tab');await expect(page.locator('#rl-cont')).toBeFocused();await page.keyboard.press('Escape');await expect(page.locator('#rl-drawer')).toBeHidden();await expect(page.locator('#rl-fab')).toBeFocused();check(expect,events);
+ });
+ test('CSS customer account workflow: late availability cannot replace the selected color',async({page})=>{
+  const {events}=await workflow(page);let release,arrived=false;const hold=new Promise(r=>release=r);
+  await page.route('**/api/portal/product/PC54/availability?**',async route=>{const color=new URL(route.request().url()).searchParams.get('color');if(color==='BrillOrng'){arrived=true;await hold;}await route.fulfill({json:{lights:{S:color==='BrillOrng'?'out':'in'}}});});
+  await page.locator('#pp-swatches [data-color="Brilliant Orange"]').click();await expect.poll(()=>arrived).toBe(true);await page.locator('#pp-swatches [data-color="Navy"]').click();await expect(page.locator('#pp-avail [aria-label="S: in stock"]')).toBeVisible();
+  const oldResponse=page.waitForResponse(r=>r.url().includes('/availability?color=BrillOrng')).then(r=>r.finished());release();await oldResponse;await page.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))));await expect(page.locator('#pp-avail [aria-label="S: in stock"]')).toBeVisible();check(expect,events);
+ });
+ test('CSS customer account workflow: unavailable minimums show a rep-confirmation warning',async({page})=>{
+  const {events}=await workflow(page);await page.route('**/api/pricing-bundle?**',route=>route.fulfill({status:500,json:{error:'Synthetic minimum unavailable'}}));await page.locator('#pp-methods [data-method="SCP"]').click();await expect(page.locator('#pp-method-min')).toContainText(/minimum.*unavailable/i);await expect(page.locator('#pp-method-min')).toContainText(/rep.*confirm/i);check(expect,events);
+ });
+ test('CSS customer account workflow: order details open from a native keyboard control',async({page})=>{
+  const state={tab:'orders',original:workflowOriginal},events=await open(page,state);await ready(page,state);const control=page.locator('#cp-orders-wrap button[data-open-order="7401"]');await expect(control).toHaveCount(1);await control.focus();await page.keyboard.press('Enter');await expect(page.locator('#cp-drawer')).toBeVisible();await expect(page.locator('#cp-drawer-items')).toContainText('Core Cotton Tee');check(expect,events);
+ });
+ test('CSS customer account workflow: failed batch keeps its rows and note for an exact retry',async({page})=>{
+  const {state,events}=await workflow(page,{storage:[queued],postStatus:500});await page.locator('#rl-fab').click();await page.locator('#rl-note').fill('Keep this batch note');await page.locator('#rl-send').click();await expect(page.locator('#rl-err')).toContainText('Synthetic request failed');await expect(page.locator('#rl-note')).toHaveValue('Keep this batch note');expect(await page.evaluate(()=>window.ReorderList.count())).toBe(1);
+  state.postStatus=0;await page.locator('#rl-send').click();await expect(page.locator('#rl-drawer')).toBeHidden();expect(events.actions).toHaveLength(2);expect(events.actions[1].body).toBe(events.actions[0].body);expect(await page.evaluate(()=>window.ReorderList.count())).toBe(0);check(expect,events);
+ });
+ test('CSS customer account workflow: failed single reorder keeps sizes and note for retry',async({page})=>{
+  const {state,events}=await workflow(page,{postStatus:500});await page.locator('#pp-note').fill('Keep single request note');await page.locator('#pp-req-submit').click();await expect(page.locator('#pp-req-error')).toContainText('Synthetic request failed');await expect(page.locator('#pp-note')).toHaveValue('Keep single request note');await expect(page.locator('#pp-sizes [data-size="M"]')).toHaveValue('4');state.postStatus=0;await page.locator('#pp-req-submit').click();await expect(page.locator('#cp-toast')).toContainText('Sent');expect(events.actions).toHaveLength(2);expect(events.actions[1].body).toBe(events.actions[0].body);check(expect,events);
+ });
+ test('CSS customer account workflow: late modal response cannot close a newer draft',async({page})=>{
+  let release;const state={original:workflowOriginal,actionHold:new Promise(r=>release=r)},events=await open(page,state);await ready(page,state);await page.locator('#cp-btn-quote').click();await page.locator('#cp-gen-desc').fill('First synthetic draft');await page.locator('#cp-gen-submit').click();await expect.poll(()=>events.actions.length).toBe(1);await page.locator('#cp-gen-close').click();await page.locator('#cp-btn-quote').click();await page.locator('#cp-gen-desc').fill('A newer unsent draft');
+  const response=page.waitForResponse(r=>r.url().endsWith('/api/portal/request')).then(r=>r.finished());release();await response;await page.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))));await expect(page.locator('#cp-gen-modal')).toBeVisible();await expect(page.locator('#cp-gen-desc')).toHaveValue('A newer unsent draft');expect(events.actions).toHaveLength(1);check(expect,events);
+ });
+ test('CSS customer account workflow: request modal contains keyboard focus',async({page})=>{
+  const state={original:workflowOriginal},events=await open(page,state);await ready(page,state);await page.locator('#cp-btn-quote').click();await page.locator('#cp-gen-submit').focus();await page.keyboard.press('Tab');await expect(page.locator('#cp-gen-close')).toBeFocused();await page.keyboard.press('Shift+Tab');await expect(page.locator('#cp-gen-submit')).toBeFocused();await page.keyboard.press('Escape');await expect(page.locator('#cp-gen-modal')).toBeHidden();await expect(page.locator('#cp-btn-quote')).toBeFocused();check(expect,events);
+ });
+ test('CSS customer account workflow: staff preview never sends single or batch requests',async({page})=>{
+  const {events}=await workflow(page,{preview:true,storage:[queued]});await page.locator('#pp-req-submit').click();await expect(page.locator('#cp-toast')).toContainText('Staff preview');await page.locator('#rl-fab').click();await page.locator('#rl-send').click();await expect(page.locator('#cp-toast')).toContainText('Staff preview');expect(events.actions).toEqual([]);check(expect,events);
+ });
+ test('CSS customer account workflow: printed product retains a long entered note',async({page})=>{
+  const {events}=await workflow(page);const note='Synthetic print note: keep every requested detail. '.repeat(12)+'END OF NOTE';await page.locator('#pp-note').fill(note);await page.emulateMedia({media:'print'});await expect(page.locator('#pp-note')).toBeVisible();expect(await page.locator('#pp-note').evaluate(n=>n.clientHeight>=n.scrollHeight-1)).toBe(true);await page.emulateMedia({media:'screen'});await evidence(page,'product-printed-note',events,{compare:false,paper:true});
+ });
+}

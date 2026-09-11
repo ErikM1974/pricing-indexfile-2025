@@ -9,14 +9,15 @@
     <link rel="icon" type="image/png" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.10.2">
     <link rel="stylesheet" href="/pages/css/customer-portal.css?v=2026.09.07.20">
     <link rel="stylesheet" href="/pages/css/portal-reorder-list.css?v=2026.09.07.20">
 </head>
-<body>
+<body class="customer-account customer-portal" data-ui="unified">
     <!-- Icon sprite (stroke icons, referenced with <use href="#i-…">) -->
-    <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+    <svg xmlns="http://www.w3.org/2000/svg" hidden aria-hidden="true">
         <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v9a2 2 0 0 1-2 2h-4v-7H9v7H5a2 2 0 0 1-2-2z"/></symbol>
         <symbol id="i-shirt" viewBox="0 0 24 24"><path d="M16 3l4 2-1.5 5H16v11H8V10H5.5L4 5l4-2c.6 1.4 2 2.5 4 2.5S15.4 4.4 16 3z"/></symbol>
         <symbol id="i-box" viewBox="0 0 24 24"><path d="M21 8l-9-5-9 5v8l9 5 9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></symbol>
@@ -99,12 +100,12 @@
                 </div>
                 <form class="cp-search" id="cp-search-form" role="search" autocomplete="off">
                     <svg class="cp-icon"><use href="#i-search"/></svg>
-                    <input type="search" id="cp-global-search" role="combobox" aria-autocomplete="list" aria-expanded="false" placeholder="Find an order, product, logo or quote…" aria-label="Search your account" aria-controls="cp-search-results" aria-expanded="false">
+                    <input class="field-input" type="search" id="cp-global-search" role="combobox" aria-autocomplete="list" aria-expanded="false" placeholder="Find an order, product, logo or quote…" aria-label="Search your account" aria-controls="cp-search-results" aria-expanded="false">
                     <div class="cp-search-results" id="cp-search-results" role="listbox" hidden></div>
                 </form>
                 <div class="cp-topbar-actions">
-                    <a class="cp-btn cp-btn--ghost cp-btn--sm" href="/" id="cp-topbar-catalog">Browse catalog</a>
-                    <button class="cp-btn cp-btn--primary cp-btn--sm" type="button" id="cp-btn-quote" data-open-request="quote"><svg class="cp-icon"><use href="#i-plus"/></svg><span class="cp-btn-txt">Request a quote</span></button>
+                    <a class="btn cp-btn cp-btn--ghost cp-btn--sm" href="/" id="cp-topbar-catalog">Browse catalog</a>
+                    <button class="btn btn-primary cp-btn cp-btn--primary cp-btn--sm" type="button" id="cp-btn-quote" aria-label="Request a quote" data-open-request="quote"><svg class="cp-icon"><use href="#i-plus"/></svg><span class="cp-btn-txt">Request a quote</span></button>
                 </div>
             </header>
 
@@ -112,7 +113,7 @@
                 <div class="cp-alert" id="cp-global-alert" hidden role="alert">
                     <svg class="cp-icon"><use href="#i-alert"/></svg>
                     <span id="cp-global-alert-text">Something didn&rsquo;t load.</span>
-                    <button class="cp-btn cp-btn--danger cp-btn--xs" type="button" id="cp-global-alert-retry">Retry</button>
+                    <button class="btn btn-danger cp-btn cp-btn--danger cp-btn--xs" type="button" id="cp-global-alert-retry">Retry</button>
                 </div>
 
                 <!-- ══ OVERVIEW ══ -->
@@ -129,7 +130,7 @@
                                 <div class="cp-rewards-balance" id="cp-rewards-balance"><span class="cp-skel">$0.00</span></div>
                                 <div class="cp-rewards-sub" id="cp-rewards-sub">Earn reward dollars on premium picks &mdash; look for the &#9733; tag under Recommended for You.</div>
                             </div>
-                            <button class="cp-rewards-btn" id="cp-redeem-btn" type="button">See ways to earn &#9733;</button>
+                            <button class="btn cp-rewards-btn" id="cp-redeem-btn" type="button">See ways to earn &#9733;</button>
                         </div>
                     </div>
 
@@ -169,7 +170,7 @@
 
                     <div class="cp-ov-grid">
                         <div class="cp-card">
-                            <div class="cp-card-head"><h2>Recent orders</h2><button class="cp-btn cp-btn--link cp-btn--sm" type="button" data-tab="orders">View all &rarr;</button></div>
+                            <div class="cp-card-head"><h2>Recent orders</h2><button class="btn cp-btn cp-btn--link cp-btn--sm" type="button" data-tab="orders">View all &rarr;</button></div>
                             <div class="cp-recent" id="cp-recent-orders">
                                 <div class="cp-card-body cp-skel-rows"><div class="cp-skel cp-skel-line"></div><div class="cp-skel cp-skel-line"></div><div class="cp-skel cp-skel-line"></div></div>
                             </div>
@@ -196,7 +197,7 @@
                     </div>
 
                     <section class="cp-section" id="cp-ov-logos-section" hidden>
-                        <div class="cp-section-header"><h2>Your logos</h2><span class="cp-section-count" id="cp-ov-logos-count">0</span><button class="cp-btn cp-btn--link cp-btn--sm" type="button" data-tab="logos">See all &rarr;</button></div>
+                        <div class="cp-section-header"><h2>Your logos</h2><span class="cp-section-count" id="cp-ov-logos-count">0</span><button class="btn cp-btn cp-btn--link cp-btn--sm" type="button" data-tab="logos">See all &rarr;</button></div>
                         <div class="cp-strip" id="cp-ov-logos"></div>
                     </section>
 
@@ -211,8 +212,8 @@
                         </div>
                     </div>
                     <div class="cp-toolbar" id="cp-products-toolbar" hidden>
-                        <input type="search" id="cp-products-search" class="cp-input-search" placeholder="Search your products…" autocomplete="off" aria-label="Search your products">
-                        <select id="cp-products-sort" class="cp-select" aria-label="Sort your products">
+                        <input type="search" id="cp-products-search" class="field-input cp-input-search" placeholder="Search your products…" autocomplete="off" aria-label="Search your products">
+                        <select id="cp-products-sort" class="field-select cp-select" aria-label="Sort your products">
                             <option value="ordered">Most ordered</option>
                             <option value="recent">Most recent</option>
                             <option value="colors">Most colors</option>
@@ -221,11 +222,11 @@
                     <div class="cp-product-grid" id="cp-products-grid">
                         <div class="cp-skel cp-skel-block"></div><div class="cp-skel cp-skel-block"></div><div class="cp-skel cp-skel-block"></div><div class="cp-skel cp-skel-block"></div>
                     </div>
-                    <div class="cp-products-more" id="cp-products-more" hidden><button class="cp-btn cp-btn--ghost" id="cp-products-more-btn" type="button">Show all</button></div>
+                    <div class="cp-products-more" id="cp-products-more" hidden><button class="btn cp-btn cp-btn--ghost" id="cp-products-more-btn" type="button">Show all</button></div>
                     <div class="cp-empty" id="cp-products-empty" hidden>
                         <div class="cp-empty-icon">&#128717;</div>
                         No past products on file yet.
-                        <div><button class="cp-btn cp-btn--soft cp-btn--sm" type="button" data-open-request="quote">Request a quote</button></div>
+                        <div><button class="btn cp-btn cp-btn--soft cp-btn--sm" type="button" data-open-request="quote">Request a quote</button></div>
                     </div>
                 </section>
 
@@ -244,7 +245,7 @@
                             <button class="cp-chip" type="button" data-filter="shipped" aria-pressed="false">Shipped</button>
                             <button class="cp-chip" type="button" data-filter="invoiced" aria-pressed="false">Invoiced</button>
                         </div>
-                        <input type="search" id="cp-orders-search" class="cp-input-search" placeholder="Search — design, order #, or PO…" autocomplete="off" aria-label="Search orders">
+                        <input type="search" id="cp-orders-search" class="field-input cp-input-search" placeholder="Search — design, order #, or PO…" autocomplete="off" aria-label="Search orders">
                     </div>
                     <div class="cp-table-wrap" id="cp-orders-wrap"><div class="cp-card-body cp-skel-rows"><div class="cp-skel cp-skel-line"></div><div class="cp-skel cp-skel-line"></div><div class="cp-skel cp-skel-line"></div></div></div>
                     <div class="cp-empty" id="cp-orders-empty" hidden><div class="cp-empty-icon">&#128230;</div>No orders on file yet.</div>
@@ -257,7 +258,7 @@
                             <div class="cp-page-title"><h2>Invoices &amp; balances</h2><span class="cp-count" id="cp-invoices-count">&mdash;</span></div>
                             <p class="cp-page-sub">Open any invoice to view or download the PDF. Questions? <a href="mailto:accounting@nwcustomapparel.com">accounting@nwcustomapparel.com</a></p>
                         </div>
-                        <button class="cp-btn cp-btn--ghost cp-btn--sm" type="button" id="cp-statement-btn" hidden><svg class="cp-icon"><use href="#i-printer"/></svg>Print statement</button>
+                        <button class="btn cp-btn cp-btn--ghost cp-btn--sm" type="button" id="cp-statement-btn" hidden><svg class="cp-icon"><use href="#i-printer"/></svg>Print statement</button>
                     </div>
                     <div class="cp-summary" id="cp-inv-summary" hidden>
                         <div class="cp-summary-item"><div class="cp-summary-label">Open balance</div><div class="cp-summary-val" id="cp-inv-open">$0.00</div><div class="cp-summary-sub" id="cp-inv-open-sub"></div></div>
@@ -272,7 +273,7 @@
                             <button class="cp-chip" type="button" data-filter="paid" aria-pressed="false">Paid</button>
                         </div>
                     </div>
-                    <div class="cp-table-wrap" id="cp-invoices-wrap"><div class="cp-card-body cp-skel-rows"><div class="cp-skel cp-skel-line"></div><div class="cp-skel cp-skel-line"></div><div class="cp-skel cp-skel-line"></div></div></div>
+                    <div class="cp-table-wrap cp-invoices" id="cp-invoices-wrap"><div class="cp-card-body cp-skel-rows"><div class="cp-skel cp-skel-line"></div><div class="cp-skel cp-skel-line"></div><div class="cp-skel cp-skel-line"></div></div></div>
                     <div class="cp-empty" id="cp-invoices-empty" hidden><div class="cp-empty-icon">&#129534;</div>No invoices on file yet.</div>
                 </section>
 
@@ -283,10 +284,10 @@
                             <div class="cp-page-title"><h2>Logos &amp; proofs</h2><span class="cp-count" id="cp-logos-count">&mdash;</span></div>
                             <p class="cp-page-sub">Every logo and design proof we have on file &mdash; ready to run again. Click one to view, download, or order with it.</p>
                         </div>
-                        <button class="cp-btn cp-btn--soft cp-btn--sm" type="button" data-open-request="logo"><svg class="cp-icon"><use href="#i-plus"/></svg>Send a new logo</button>
+                        <button class="btn cp-btn cp-btn--soft cp-btn--sm" type="button" data-open-request="logo"><svg class="cp-icon"><use href="#i-plus"/></svg>Send a new logo</button>
                     </div>
                     <div class="cp-toolbar" id="cp-logos-toolbar" hidden>
-                        <input type="search" id="cp-logos-search" class="cp-input-search" placeholder="Search by name or design #…" autocomplete="off" aria-label="Search your logos">
+                        <input type="search" id="cp-logos-search" class="field-input cp-input-search" placeholder="Search by name or design #…" autocomplete="off" aria-label="Search your logos">
                     </div>
                     <div class="cp-subtabs" id="cp-logos-subtabs" role="tablist" hidden>
                         <button class="cp-subtab is-active" id="cp-subtab-approved" type="button" role="tab" aria-selected="true" data-subtab="approved">Approved logos <span class="cp-subtab-count" id="cp-approved-count">0</span></button>
@@ -309,7 +310,7 @@
                         <div class="cp-soon-icon" aria-hidden="true">&#127912;</div>
                         <div class="cp-soon-title">Your logos are on their way</div>
                         <div class="cp-soon-text">We&rsquo;re gathering your logos and design proofs here. Your rep has every file on hand today &mdash; just ask.</div>
-                        <div><button class="cp-btn cp-btn--primary cp-btn--sm" type="button" data-open-request="logo">Send us a logo</button> <a class="cp-btn cp-btn--ghost cp-btn--sm" href="tel:12539225793">Call (253) 922-5793</a></div>
+                        <div><button class="btn btn-primary cp-btn cp-btn--primary cp-btn--sm" type="button" data-open-request="logo">Send us a logo</button> <a class="btn cp-btn cp-btn--ghost cp-btn--sm" href="tel:12539225793">Call (253) 922-5793</a></div>
                     </div>
                 </section>
 
@@ -320,13 +321,13 @@
                             <div class="cp-page-title"><h2>Quotes</h2><span class="cp-count" id="cp-quotes-count">&mdash;</span></div>
                             <p class="cp-page-sub">Quotes sent to your sign-in email. Open one to review it, or ask for something new.</p>
                         </div>
-                        <button class="cp-btn cp-btn--primary cp-btn--sm" type="button" data-open-request="quote"><svg class="cp-icon"><use href="#i-plus"/></svg>Request a quote</button>
+                        <button class="btn btn-primary cp-btn cp-btn--primary cp-btn--sm" type="button" data-open-request="quote"><svg class="cp-icon"><use href="#i-plus"/></svg>Request a quote</button>
                     </div>
                     <div class="cp-table-wrap" id="cp-quotes-wrap"><div class="cp-card-body cp-skel-rows"><div class="cp-skel cp-skel-line"></div><div class="cp-skel cp-skel-line"></div></div></div>
                     <div class="cp-empty" id="cp-quotes-empty" hidden>
                         <div class="cp-empty-icon">&#128196;</div>
                         No quotes on file for <strong id="cp-quotes-email"></strong> yet.
-                        <div><button class="cp-btn cp-btn--soft cp-btn--sm" type="button" data-open-request="quote">Request a quote</button></div>
+                        <div><button class="btn cp-btn cp-btn--soft cp-btn--sm" type="button" data-open-request="quote">Request a quote</button></div>
                     </div>
                 </section>
 
@@ -352,7 +353,7 @@
                                 </div>
                             </div>
                             <div class="cp-card cp-mt" id="cp-acct-rewards">
-                                <div class="cp-card-head"><h3>Reward dollars</h3><button class="cp-btn cp-btn--link cp-btn--sm" type="button" id="cp-acct-redeem">Redeem &rarr;</button></div>
+                                <div class="cp-card-head"><h3>Reward dollars</h3><button class="btn cp-btn cp-btn--link cp-btn--sm" type="button" id="cp-acct-redeem">Redeem &rarr;</button></div>
                                 <div class="cp-card-body">
                                     <div class="cp-rw-stats">
                                         <div><div class="cp-summary-label">Available</div><div class="cp-summary-val" id="cp-acct-rw-balance">&mdash;</div></div>
@@ -367,12 +368,12 @@
                                 <form class="cp-card-body" id="cp-acct-form" novalidate>
                                     <p class="cp-modal-intro">Moved, new phone, new contact, or a different sign-in email? Tell us what changed and your rep will update your account.</p>
                                     <div class="cp-field-row">
-                                        <label class="cp-field"><span class="cp-field-label">Contact name</span><input type="text" id="cp-acct-contact" autocomplete="name" maxlength="80"></label>
-                                        <label class="cp-field"><span class="cp-field-label">Phone</span><input type="tel" id="cp-acct-phone" autocomplete="tel" maxlength="30"></label>
+                                        <label class="cp-field"><span class="cp-field-label">Contact name</span><input class="field-input" type="text" id="cp-acct-contact" autocomplete="name" maxlength="80"></label>
+                                        <label class="cp-field"><span class="cp-field-label">Phone</span><input class="field-input" type="tel" id="cp-acct-phone" autocomplete="tel" maxlength="30"></label>
                                     </div>
-                                    <label class="cp-field"><span class="cp-field-label">What changed? <small>(address, billing contact, new sign-in email…)</small></span><textarea id="cp-acct-msg" rows="3" maxlength="240" placeholder="e.g. Please update our shipping address to…"></textarea></label>
+                                    <label class="cp-field"><span class="cp-field-label">What changed? <small>(address, billing contact, new sign-in email…)</small></span><textarea class="field-textarea" id="cp-acct-msg" rows="3" maxlength="240" placeholder="e.g. Please update our shipping address to…"></textarea></label>
                                     <div class="cp-req-error" id="cp-acct-error"></div>
-                                    <div class="cp-mt-sm"><button class="cp-btn cp-btn--primary cp-btn--sm" type="submit" id="cp-acct-submit">Send to my rep</button></div>
+                                    <div class="cp-mt-sm"><button class="btn btn-primary cp-btn cp-btn--primary cp-btn--sm" type="submit" id="cp-acct-submit">Send to my rep</button></div>
                                 </form>
                             </div>
                         </div>
@@ -431,8 +432,8 @@
                 <div class="cp-drawer-section"><h3>Items</h3><div class="cp-items" id="cp-drawer-items"></div></div>
                 <div class="cp-drawer-section"><h3>Shipping &amp; tracking</h3><div class="cp-tracking" id="cp-drawer-tracking"></div></div>
                 <div class="cp-drawer-actions">
-                    <a class="cp-btn cp-btn--ghost cp-btn--sm" id="cp-drawer-invoice-link" href="#"><svg class="cp-icon"><use href="#i-receipt"/></svg>View invoice / PDF</a>
-                    <button class="cp-btn cp-btn--primary cp-btn--sm" id="cp-drawer-reorder" type="button"><svg class="cp-icon"><use href="#i-refresh"/></svg>Re-order this</button>
+                    <a class="btn cp-btn cp-btn--ghost cp-btn--sm" id="cp-drawer-invoice-link" href="#"><svg class="cp-icon"><use href="#i-receipt"/></svg>View invoice / PDF</a>
+                    <button class="btn btn-primary cp-btn cp-btn--primary cp-btn--sm" id="cp-drawer-reorder" type="button"><svg class="cp-icon"><use href="#i-refresh"/></svg>Re-order this</button>
                 </div>
             </div>
         </div>
@@ -462,13 +463,13 @@
                 </div>
                 <label class="cp-field">
                     <span class="cp-field-label">Notes <small>(deadline, other sizes/colors — optional)</small></span>
-                    <textarea id="cp-req-note" rows="2" placeholder="Anything the team should know"></textarea>
+                    <textarea class="field-textarea" id="cp-req-note" rows="2" placeholder="Anything the team should know"></textarea>
                 </label>
                 <div class="cp-req-error" id="cp-req-error"></div>
             </div>
             <div class="cp-modal-foot">
-                <button class="cp-btn-ghost" id="cp-req-cancel" type="button">Cancel</button>
-                <button class="cp-btn-primary" id="cp-req-submit" type="button">Send to my rep</button>
+                <button class="btn cp-btn-ghost" id="cp-req-cancel" type="button">Cancel</button>
+                <button class="btn btn-primary cp-btn-primary" id="cp-req-submit" type="button">Send to my rep</button>
             </div>
         </div>
     </div>
@@ -483,10 +484,10 @@
             <div class="cp-modal-body">
                 <p class="cp-modal-intro" id="cp-gen-intro"></p>
                 <input type="hidden" id="cp-gen-type" value="quote">
-                <label class="cp-field"><span class="cp-field-label" id="cp-gen-desc-label">What do you need?</span><textarea id="cp-gen-desc" rows="3" maxlength="240" placeholder="e.g. 36 polos with our logo on the left chest, plus 12 caps"></textarea></label>
+                <label class="cp-field"><span class="cp-field-label" id="cp-gen-desc-label">What do you need?</span><textarea class="field-textarea" id="cp-gen-desc" rows="3" maxlength="240" placeholder="e.g. 36 polos with our logo on the left chest, plus 12 caps"></textarea></label>
                 <div class="cp-field-row" id="cp-gen-row-details">
                     <label class="cp-field"><span class="cp-field-label">Decoration</span>
-                        <select id="cp-gen-method">
+                        <select class="field-select" id="cp-gen-method">
                             <option value="">Not sure — recommend</option>
                             <option value="Embroidery">Embroidery</option>
                             <option value="Screen Print">Screen print</option>
@@ -494,15 +495,15 @@
                             <option value="DTF">Transfers (DTF)</option>
                         </select>
                     </label>
-                    <label class="cp-field"><span class="cp-field-label">Quantity <small>(approx.)</small></span><input type="text" id="cp-gen-qty" inputmode="numeric" maxlength="30" placeholder="e.g. 48"></label>
+                    <label class="cp-field"><span class="cp-field-label">Quantity <small>(approx.)</small></span><input class="field-input" type="text" id="cp-gen-qty" inputmode="numeric" maxlength="30" placeholder="e.g. 48"></label>
                 </div>
-                <label class="cp-field" id="cp-gen-logo-field"><span class="cp-field-label">Logo</span><select id="cp-gen-design"></select></label>
-                <label class="cp-field"><span class="cp-field-label">Notes <small>(deadline, colors, anything else — optional)</small></span><textarea id="cp-gen-note" rows="2" maxlength="240"></textarea></label>
+                <label class="cp-field" id="cp-gen-logo-field"><span class="cp-field-label">Logo</span><select class="field-select" id="cp-gen-design"></select></label>
+                <label class="cp-field"><span class="cp-field-label">Notes <small>(deadline, colors, anything else — optional)</small></span><textarea class="field-textarea" id="cp-gen-note" rows="2" maxlength="240"></textarea></label>
                 <div class="cp-req-error" id="cp-gen-error"></div>
             </div>
             <div class="cp-modal-foot">
-                <button class="cp-btn-ghost" id="cp-gen-cancel" type="button">Cancel</button>
-                <button class="cp-btn-primary" id="cp-gen-submit" type="button">Send to my rep</button>
+                <button class="btn cp-btn-ghost" id="cp-gen-cancel" type="button">Cancel</button>
+                <button class="btn btn-primary cp-btn-primary" id="cp-gen-submit" type="button">Send to my rep</button>
             </div>
         </div>
     </div>
@@ -528,19 +529,19 @@
                 </div>
             </div>
             <div class="cp-modal-foot">
-                <button class="cp-btn-ghost" id="cp-redeem-cancel" type="button">Cancel</button>
-                <button class="cp-btn-primary" id="cp-redeem-submit" type="button">Apply my full balance to my next order</button>
+                <button class="btn cp-btn-ghost" id="cp-redeem-cancel" type="button">Cancel</button>
+                <button class="btn btn-primary cp-btn-primary" id="cp-redeem-submit" type="button">Apply my full balance to my next order</button>
             </div>
         </div>
     </div>
 
     <!-- Statement (printable) -->
-    <div class="cp-modal-overlay" id="cp-statement-modal" hidden>
+    <div class="cp-modal-overlay cp-statement-modal" id="cp-statement-modal" hidden>
         <div class="cp-modal cp-modal--wide" role="dialog" aria-modal="true" aria-labelledby="cp-statement-title">
             <div class="cp-modal-head">
                 <h3 id="cp-statement-title">Account statement</h3>
                 <div>
-                    <button class="cp-btn cp-btn--primary cp-btn--sm" id="cp-statement-print" type="button"><svg class="cp-icon"><use href="#i-printer"/></svg>Print / save PDF</button>
+                    <button class="btn btn-primary cp-btn cp-btn--primary cp-btn--sm" id="cp-statement-print" type="button"><svg class="cp-icon"><use href="#i-printer"/></svg>Print / save PDF</button>
                     <button class="cp-modal-close" id="cp-statement-close" type="button" aria-label="Close">&times;</button>
                 </div>
             </div>
@@ -559,10 +560,10 @@
                     <div class="cp-lightbox-meta" id="cp-lightbox-meta"></div>
                 </div>
                 <div class="cp-lightbox-actions">
-                    <a class="cp-btn cp-btn--gold cp-btn--sm" id="cp-lb-approve" href="#" hidden><svg class="cp-icon"><use href="#i-check"/></svg>Review &amp; approve</a>
-                    <a class="cp-btn cp-btn--ghost cp-btn--sm" id="cp-lb-download" href="#" download target="_blank" rel="noopener"><svg class="cp-icon"><use href="#i-download"/></svg>Download</a>
-                    <button class="cp-btn cp-btn--ghost cp-btn--sm" id="cp-lb-change" type="button"><svg class="cp-icon"><use href="#i-edit"/></svg>Request a change</button>
-                    <button class="cp-btn cp-btn--primary cp-btn--sm" id="cp-lb-order" type="button"><svg class="cp-icon"><use href="#i-plus"/></svg>Order with this logo</button>
+                    <a class="btn btn-primary cp-btn cp-btn--gold cp-btn--sm" id="cp-lb-approve" href="#" hidden><svg class="cp-icon"><use href="#i-check"/></svg>Review &amp; approve</a>
+                    <a class="btn cp-btn cp-btn--ghost cp-btn--sm" id="cp-lb-download" href="#" download target="_blank" rel="noopener"><svg class="cp-icon"><use href="#i-download"/></svg>Download</a>
+                    <button class="btn cp-btn cp-btn--ghost cp-btn--sm" id="cp-lb-change" type="button"><svg class="cp-icon"><use href="#i-edit"/></svg>Request a change</button>
+                    <button class="btn btn-primary cp-btn cp-btn--primary cp-btn--sm" id="cp-lb-order" type="button"><svg class="cp-icon"><use href="#i-plus"/></svg>Order with this logo</button>
                 </div>
             </div>
         </div>

@@ -833,3 +833,11 @@ Reviewed application draft remains287cf762 (Drain-Pro, production shifts, payrol
 ## Customer Account/Product originals reviewed — 2026-09-10
 
 41 browser cases passed,49 immutable contracts at1440/768/390/320,17 original source hashes and19 source/function guards. All15 pages from10 original PDFs visually reviewed (six blank account views share an identical rendered image). Original statement preserves1048.20total/698.80current/349.40pastdue; product long history28 rows and complete upgrade price matrix retained. Baseline defects: widespread muted-text contrast failures and account320px overflow; ordinary account printing is blank. No application changes yet. Next: canonical controls/Public Sans/scoped token layouts, responsive and paper fixes, then demonstrate and cover delayed/failure/focus/reorder-state behavior. Artifact evidence: customer-account-original-review.json.
+
+## Customer Account/Product current review — 2026-09-10
+
+Status .10/2102/44ccf020 is verified live with24 checks and all source/main/develop CI green. Account pair remains under review on its isolated branch:49 immutable originals/17source hashes, shared controls/scoped layout, seven original workflow defects reproduced and repaired,53 current browser checks running. Complete all paper review and integration/full gates before any migration credit or deploy. Artifact pointer: active-css-resume-state.json.
+
+## Customer Account/Product pair reviewed — 2026-09-10
+
+54 browser cases plus final paper/spacing checks passed;49 immutable originals,17 source hashes/97 maps,19 guards and23 current paper pages reviewed. Eight demonstrated workflow fixes and9 important flags removed. Candidate189/225,36pending; live .10/2102 remains187/225,38pending until full checks/CI/deploy verification. See customer-account-reviewed-record.json. Merge live44ccf020 before full validation; no real business actions sent.

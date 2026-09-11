@@ -1,19 +1,12 @@
 # CSS unification — design direction and implementation plan
 
-## NEXT — Customer Account and Product original source capture
+## REVIEWED — Customer Account and Product pair
 
-Source originals are committed/backed up atd3a5efff:17 source hashes and17 passing source guards. A41-case browser capture harness is now syntax-checked/listed but NOT executed: seven account tabs, empty/long/product/upgrade/preview/failure states, request dialogs, statement, reward/reorder and batch bodies. Its deterministic engine presentation seam records every input while the actual shared engine sources stay immutable; real engine pricing remains a separate full money/calculator gate. No account UI changes or migration credit. Run original capture only after the primary status full gate releases port3400; inspect every original paper page before layout changes. Frozen status .10source9f021460/CI34559320512 is separate; ROOTf03b9117 intentionally stays on the identical pre-cache app during its local sweep.
+Shared Public Sans/buttons/fields and three class-scoped single-layer page owners are reviewed.54 browser cases passed (5.3min), followed by11 final print/layout cases, the final order drawer spacing case and entered-note paper case. All49 original browser contracts and17 source hashes remain intact through97 reversible mappings;19 source/financial/date/quantity guards pass. Eight original workflow defects were demonstrated and repaired: storage-add failures, sent-batch cleanup failures, pending batches removing newer items, focus escaping drawers/modals, late availability, unknown minimums, and late general requests replacing new drafts. Failed requests retain exact retry payloads; shared pricing engines and financial/date/quantity functions remain byte-identical.
 
-Isolated codex/customer-account-pages begins at73cc615a. The reviewed status pair is separately integrated on primary develop atf03b9117 with corrected full gates running; none of this next-family work belongs in its release. Live .9/2101 is185/225; reviewed candidate187/225,38 pending.
+All11 current PDFs/23 pages are visually reviewed, including30 orders,30 invoice rows,28 product-history rows, all garment sizes and price breaks/fees, statement1048.20total/698.80current/349.40pastdue, and the complete entered note. Dollar amounts remain unbroken, due dates are distinct from balances, and screen-only textarea focus decoration is absent from paper. Nine important flags removed; source graph tokens resolve and each page retains its own layout owner. No real customer request, order, email, redemption or device printing was sent.
 
-- [x] Freeze both original HTML files, three page CSS owners, controllers, shared reorder list and complete local pricing dependency graph before application edits.
-- [ ] Capture original account overview/products/orders/invoices/logos/quotes/help, search/filter, order drawer/tracking/statement, proof/download links, rewards and every successful request payload using synthetic data.
-- [ ] Capture original product colors/gallery/availability/size history, decoration choice and minimum, reorder list storage/single/batch writes, upgrade embroidery engine ladder and setup fee. Keep shared pricing engines byte-identical and compare all quantities, totals and dates.
-- [ ] Review originals at1440/768/390/320 and all print pages, signed-out/staff-preview, empty/error/retry/partial/delayed states. Intercept all writes and unknown API reads; no live emails, reward requests, orders or logout.
-- [ ] Reuse shared typography/buttons/fields/dialogs and scope page layout after original review. Preserve independent account view loading and customer-only identity. Demonstrate stale responses, duplicate requests, keyboard/focus and storage failures before any repairs.
-- [ ] Current visual/axe/keyboard/paper, original-value and pricing evidence before migration credit; full release gates before deploy.
-
-Source capture is not migration credit. Do not overwrite immutable originals or rerun consumed helpers; no .env copying or recursive deletion of the node_modules junction.
+Reviewed candidate189/225,36pending; live remains .10/Heroku2102/44ccf020 at187/225,38pending. Next: commit/back up the reviewed pair, merge current live44ccf020 (which contains the already-fixed legacy status/monogram tests), preserve both release and account notes, run complete local and exact-source CI gates, then deploy and verify live assets/access. Evidence: customer-account-reviewed-record.json and active-css-resume-state.json. Do not repeat consumed helpers or delete the node_modules junction.
 
 ## REVIEWED — Order Status and vendor Job Portal ready for integration
 
