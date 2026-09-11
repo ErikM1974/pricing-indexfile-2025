@@ -1,0 +1,324 @@
+{
+  "states": [
+    {
+      "width": 1440,
+      "title": "Customer Supplied Screen Print Calculator - Northwest Custom Apparel",
+      "url": "/calculators/screenprint-customer/index.html",
+      "ids": {
+        "quantity": "",
+        "frontColors": "1 2 3 4 5 6",
+        "backColors": "0 1 2 3 4 5 6",
+        "darkShirtToggle": "",
+        "safetyStripesToggle": "",
+        "priceDisplay": "Enter Details",
+        "orderSummary": ""
+      },
+      "fields": [
+        {
+          "id": "quantity",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "frontColors",
+          "type": "select-one",
+          "value": "1",
+          "disabled": false
+        },
+        {
+          "id": "backColors",
+          "type": "select-one",
+          "value": "0",
+          "disabled": false
+        },
+        {
+          "id": "darkShirtToggle",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "safetyStripesToggle",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        }
+      ],
+      "tables": [],
+      "headings": [
+        "Customer Supplied Screen Print Calculator",
+        "Screen Printing on Your Items",
+        "Your Quote",
+        "Important Notice: Customer Supplied Garments"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a"
+            ],
+            [
+              ".product-showcase-content > h3"
+            ],
+            [
+              "#priceDisplay"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Customer Supplied Screen Print Calculator - Northwest Custom Apparel",
+      "url": "/calculators/screenprint-customer/index.html",
+      "ids": {
+        "quantity": "",
+        "frontColors": "1 2 3 4 5 6",
+        "backColors": "0 1 2 3 4 5 6",
+        "darkShirtToggle": "",
+        "safetyStripesToggle": "",
+        "priceDisplay": "Enter Details",
+        "orderSummary": ""
+      },
+      "fields": [
+        {
+          "id": "quantity",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "frontColors",
+          "type": "select-one",
+          "value": "1",
+          "disabled": false
+        },
+        {
+          "id": "backColors",
+          "type": "select-one",
+          "value": "0",
+          "disabled": false
+        },
+        {
+          "id": "darkShirtToggle",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "safetyStripesToggle",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        }
+      ],
+      "tables": [],
+      "headings": [
+        "Customer Supplied Screen Print Calculator",
+        "Screen Printing on Your Items",
+        "Your Quote",
+        "Important Notice: Customer Supplied Garments"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a"
+            ],
+            [
+              ".product-showcase-content > h3"
+            ],
+            [
+              "#priceDisplay"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Customer Supplied Screen Print Calculator - Northwest Custom Apparel",
+      "url": "/calculators/screenprint-customer/index.html",
+      "ids": {
+        "quantity": "",
+        "frontColors": "1 2 3 4 5 6",
+        "backColors": "0 1 2 3 4 5 6",
+        "darkShirtToggle": "",
+        "safetyStripesToggle": "",
+        "priceDisplay": "Enter Details",
+        "orderSummary": ""
+      },
+      "fields": [
+        {
+          "id": "quantity",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "frontColors",
+          "type": "select-one",
+          "value": "1",
+          "disabled": false
+        },
+        {
+          "id": "backColors",
+          "type": "select-one",
+          "value": "0",
+          "disabled": false
+        },
+        {
+          "id": "darkShirtToggle",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "safetyStripesToggle",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        }
+      ],
+      "tables": [],
+      "headings": [
+        "Customer Supplied Screen Print Calculator",
+        "Screen Printing on Your Items",
+        "Your Quote",
+        "Important Notice: Customer Supplied Garments"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a"
+            ],
+            [
+              ".product-showcase-content > h3"
+            ],
+            [
+              "#priceDisplay"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Customer Supplied Screen Print Calculator - Northwest Custom Apparel",
+      "url": "/calculators/screenprint-customer/index.html",
+      "ids": {
+        "quantity": "",
+        "frontColors": "1 2 3 4 5 6",
+        "backColors": "0 1 2 3 4 5 6",
+        "darkShirtToggle": "",
+        "safetyStripesToggle": "",
+        "priceDisplay": "Enter Details",
+        "orderSummary": ""
+      },
+      "fields": [
+        {
+          "id": "quantity",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "frontColors",
+          "type": "select-one",
+          "value": "1",
+          "disabled": false
+        },
+        {
+          "id": "backColors",
+          "type": "select-one",
+          "value": "0",
+          "disabled": false
+        },
+        {
+          "id": "darkShirtToggle",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "safetyStripesToggle",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        }
+      ],
+      "tables": [],
+      "headings": [
+        "Customer Supplied Screen Print Calculator",
+        "Screen Printing on Your Items",
+        "Your Quote",
+        "Important Notice: Customer Supplied Garments"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a"
+            ],
+            [
+              ".product-showcase-content > h3"
+            ],
+            [
+              "#priceDisplay"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "calculation": null,
+  "mocked": [],
+  "emails": [],
+  "dialogs": []
+}

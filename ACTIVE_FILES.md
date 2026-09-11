@@ -1092,3 +1092,37 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - tests/fixtures/specialty-calculators-safety-stripe-all-combinations-original-browser.json — immutable synthetic Safety Stripe selection, presentation and save evidence.
 
 - shared_components/css/safety-stripe-creator.css — reviewed scoped Safety Stripe owner; canonical shared controls, native save dialogs, complete phone design previews and single-page paper layouts.
+
+- tests/e2e/helpers/screenprint-customer-browser.js — synthetic customer-supplied screen-print original/current browser and workflow checks; real pricing engine with fixture-backed APIs, no live saves or emails.
+
+- tests/e2e/css-unification-specialty-screenprint-customer.spec.js — synthetic customer-supplied screen-print original/current browser and workflow checks; real pricing engine with fixture-backed APIs, no live saves or emails.
+
+- tests/fixtures/specialty-calculators-screenprint-customer-empty-original-browser.json — immutable synthetic customer-supplied screen-print presentation, financial and request evidence.
+
+- tests/fixtures/specialty-calculators-screenprint-customer-minimum-original-browser.json — immutable synthetic customer-supplied screen-print presentation, financial and request evidence.
+
+- tests/fixtures/specialty-calculators-screenprint-customer-priced-original-browser.json — immutable synthetic customer-supplied screen-print presentation, financial and request evidence.
+
+- tests/fixtures/specialty-calculators-screenprint-customer-form-original-browser.json — immutable synthetic customer-supplied screen-print presentation, financial and request evidence.
+
+- tests/fixtures/specialty-calculators-screenprint-customer-success-original-browser.json — immutable synthetic customer-supplied screen-print presentation, financial and request evidence.
+
+- tests/fixtures/specialty-calculators-screenprint-customer-failed-pricing-original-browser.json — immutable synthetic customer-supplied screen-print presentation, financial and request evidence.
+
+- tests/fixtures/specialty-calculators-screenprint-customer-failed-session-original-browser.json — immutable synthetic customer-supplied screen-print presentation, financial and request evidence.
+
+- tests/fixtures/specialty-calculators-screenprint-customer-failed-item-original-browser.json — immutable synthetic customer-supplied screen-print presentation, financial and request evidence.
+
+- tests/fixtures/specialty-calculators-screenprint-customer-failed-setup-original-browser.json — immutable synthetic customer-supplied screen-print presentation, financial and request evidence.
+
+- tests/fixtures/specialty-calculators-screenprint-customer-failed-email-original-browser.json — immutable synthetic customer-supplied screen-print presentation, financial and request evidence.
+
+- tests/fixtures/specialty-calculators-screenprint-customer-failed-both-original-browser.json — immutable synthetic customer-supplied screen-print presentation, financial and request evidence.
+
+- tests/fixtures/specialty-calculators-screenprint-customer-all-combinations-original-browser.json — immutable synthetic customer-supplied screen-print presentation, financial and request evidence.
+
+- tests/fixtures/specialty-calculators-screenprint-customer-invoice-24-original-browser.json — immutable synthetic customer-supplied screen-print presentation, financial and request evidence.
+
+- tests/fixtures/specialty-calculators-screenprint-customer-invoice-145-original-browser.json — immutable synthetic customer-supplied screen-print presentation, financial and request evidence.
+
+- tests/fixtures/specialty-calculators-screenprint-customer-stale-input-original-browser.json — immutable synthetic customer-supplied screen-print presentation, financial and request evidence.

@@ -1,5 +1,13 @@
 # Handover follow-ups — 2026-09-07
 
+## ORIGINALS REVIEWED — Customer supplied screen print, 2026-09-11
+
+Before application edits, all 15 browser checks pass: 396 original financial combinations, original successful and failed mocked save/email requests, all 46 screenshots and 26 paper pages in 13 PDFs reviewed (17 sheets; exact duplicates accounted for). Original defects are preserved as evidence: old prices stay actionable during debounce, unsaved Print does nothing, failed delivery can claim success, setup-item failure is swallowed, narrow quote forms clip totals, and print layouts split customer notes and waiver onto a second page. No actual email or business write occurred.
+
+Plan: canonical shared controls and Public Sans, compact product introduction, two-column desktop calculator with complete phone layout, native named dialogs, persistent failure feedback, immutable quote snapshots and guarded partial retries. Keep the exact shared pricing engine, priceOrder financial behavior, 396 original amounts, successful payloads, email contents and printed customer/waiver text. Externalize the invoice styling and verify every paper page. Capture baseline before changing any application code.
+
+Candidate remains 212/225 reviewed, 13 pending; this page has not yet migrated. Live remains v2026.09.11.6 / Heroku2109 / 207 reviewed, 18 pending. Safety Stripe local reviewed checkpoint is 73443967. Automatic review blocked public GitHub publication; the explicit question is unanswered. No push/deploy until answered, and full batch gates remain required.
+
 ## REVIEWED CHECKPOINT — Safety Stripe Creator, 2026-09-11
 
 Safety Stripe now uses canonical controls, native keyboard choices and save dialogs, scoped responsive CSS and complete single-page print layouts. All 21 current focused browser checks pass; one original-only defect capture is intentionally skipped. All 64 original design combinations and image mappings remain exact. The original service identifier/read functions remain source-locked; the session/item payloads retain their values with the previously dropped design note added to item details. Failed item saves no longer claim success, exact retries reuse an accepted session, pending writes reject duplicate submission, and clipboard/image failures stay visible. All 44 screenshots and ten pages in ten PDFs are reviewed (14 screen sheets, three paper sheets; duplicate views are recorded). No live business write or customer email was sent.

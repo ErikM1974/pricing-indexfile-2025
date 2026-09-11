@@ -1,0 +1,473 @@
+{
+  "states": [
+    {
+      "width": 1440,
+      "title": "Customer Supplied Screen Print Calculator - Northwest Custom Apparel",
+      "url": "/calculators/screenprint-customer/index.html",
+      "ids": {
+        "quantity": "",
+        "frontColors": "1 2 3 4 5 6",
+        "backColors": "0 1 2 3 4 5 6",
+        "darkShirtToggle": "",
+        "safetyStripesToggle": "",
+        "safetyStripesNotice": "Safety Stripes: Available in pocket or shoulder placement. Contact sales for specific requirements.",
+        "priceDisplay": "$19.50",
+        "priceSmallBatchNote": "+ $50.00 small-batch fee",
+        "orderSummary": "Subtotal (24 prints) $468.00 Less Than Minimum Fee $50.00 Screen setup — 7 screens × $30 $210.00 Total Order Cost $728.00",
+        "tierLadder": "Order more, pay less per shirt 24-47 pcs $19.50/pc + $50 LTM 48-71 pcs $16.50/pc 72-144 pcs $15.50/pc 145-576 pcs $15.00/pc Live pricing for this front/back color setup — updates as you change your selections.",
+        "sendQuoteBtn": "Send Quote"
+      },
+      "fields": [
+        {
+          "id": "quantity",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "frontColors",
+          "type": "select-one",
+          "value": "3",
+          "disabled": false
+        },
+        {
+          "id": "backColors",
+          "type": "select-one",
+          "value": "2",
+          "disabled": false
+        },
+        {
+          "id": "darkShirtToggle",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "safetyStripesToggle",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        }
+      ],
+      "tables": [
+        "24-47 pcs $19.50/pc + $50 LTM 48-71 pcs $16.50/pc 72-144 pcs $15.50/pc 145-576 pcs $15.00/pc"
+      ],
+      "headings": [
+        "Customer Supplied Screen Print Calculator",
+        "Screen Printing on Your Items",
+        "Your Quote",
+        "Important Notice: Customer Supplied Garments"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a"
+            ],
+            [
+              ".product-showcase-content > h3"
+            ],
+            [
+              "#priceDisplay"
+            ],
+            [
+              ".total > span"
+            ],
+            [
+              ".total > strong"
+            ],
+            [
+              ".tier-current > .tier-qty"
+            ],
+            [
+              ".tier-current > .tier-price"
+            ],
+            [
+              "tr:nth-child(2) > .tier-qty"
+            ],
+            [
+              "tr:nth-child(3) > .tier-qty"
+            ],
+            [
+              "tr:nth-child(4) > .tier-qty"
+            ],
+            [
+              ".tier-ladder-note"
+            ],
+            [
+              "#sendQuoteBtn"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Customer Supplied Screen Print Calculator - Northwest Custom Apparel",
+      "url": "/calculators/screenprint-customer/index.html",
+      "ids": {
+        "quantity": "",
+        "frontColors": "1 2 3 4 5 6",
+        "backColors": "0 1 2 3 4 5 6",
+        "darkShirtToggle": "",
+        "safetyStripesToggle": "",
+        "safetyStripesNotice": "Safety Stripes: Available in pocket or shoulder placement. Contact sales for specific requirements.",
+        "priceDisplay": "$19.50",
+        "priceSmallBatchNote": "+ $50.00 small-batch fee",
+        "orderSummary": "Subtotal (24 prints) $468.00 Less Than Minimum Fee $50.00 Screen setup — 7 screens × $30 $210.00 Total Order Cost $728.00",
+        "tierLadder": "Order more, pay less per shirt 24-47 pcs $19.50/pc + $50 LTM 48-71 pcs $16.50/pc 72-144 pcs $15.50/pc 145-576 pcs $15.00/pc Live pricing for this front/back color setup — updates as you change your selections.",
+        "sendQuoteBtn": "Send Quote"
+      },
+      "fields": [
+        {
+          "id": "quantity",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "frontColors",
+          "type": "select-one",
+          "value": "3",
+          "disabled": false
+        },
+        {
+          "id": "backColors",
+          "type": "select-one",
+          "value": "2",
+          "disabled": false
+        },
+        {
+          "id": "darkShirtToggle",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "safetyStripesToggle",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        }
+      ],
+      "tables": [
+        "24-47 pcs $19.50/pc + $50 LTM 48-71 pcs $16.50/pc 72-144 pcs $15.50/pc 145-576 pcs $15.00/pc"
+      ],
+      "headings": [
+        "Customer Supplied Screen Print Calculator",
+        "Screen Printing on Your Items",
+        "Your Quote",
+        "Important Notice: Customer Supplied Garments"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a"
+            ],
+            [
+              ".product-showcase-content > h3"
+            ],
+            [
+              "#priceDisplay"
+            ],
+            [
+              ".total > span"
+            ],
+            [
+              ".total > strong"
+            ],
+            [
+              ".tier-current > .tier-qty"
+            ],
+            [
+              ".tier-current > .tier-price"
+            ],
+            [
+              "tr:nth-child(2) > .tier-qty"
+            ],
+            [
+              "tr:nth-child(3) > .tier-qty"
+            ],
+            [
+              "tr:nth-child(4) > .tier-qty"
+            ],
+            [
+              ".tier-ladder-note"
+            ],
+            [
+              "#sendQuoteBtn"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Customer Supplied Screen Print Calculator - Northwest Custom Apparel",
+      "url": "/calculators/screenprint-customer/index.html",
+      "ids": {
+        "quantity": "",
+        "frontColors": "1 2 3 4 5 6",
+        "backColors": "0 1 2 3 4 5 6",
+        "darkShirtToggle": "",
+        "safetyStripesToggle": "",
+        "safetyStripesNotice": "Safety Stripes: Available in pocket or shoulder placement. Contact sales for specific requirements.",
+        "priceDisplay": "$19.50",
+        "priceSmallBatchNote": "+ $50.00 small-batch fee",
+        "orderSummary": "Subtotal (24 prints) $468.00 Less Than Minimum Fee $50.00 Screen setup — 7 screens × $30 $210.00 Total Order Cost $728.00",
+        "tierLadder": "Order more, pay less per shirt 24-47 pcs $19.50/pc + $50 LTM 48-71 pcs $16.50/pc 72-144 pcs $15.50/pc 145-576 pcs $15.00/pc Live pricing for this front/back color setup — updates as you change your selections.",
+        "sendQuoteBtn": "Send Quote"
+      },
+      "fields": [
+        {
+          "id": "quantity",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "frontColors",
+          "type": "select-one",
+          "value": "3",
+          "disabled": false
+        },
+        {
+          "id": "backColors",
+          "type": "select-one",
+          "value": "2",
+          "disabled": false
+        },
+        {
+          "id": "darkShirtToggle",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "safetyStripesToggle",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        }
+      ],
+      "tables": [
+        "24-47 pcs $19.50/pc + $50 LTM 48-71 pcs $16.50/pc 72-144 pcs $15.50/pc 145-576 pcs $15.00/pc"
+      ],
+      "headings": [
+        "Customer Supplied Screen Print Calculator",
+        "Screen Printing on Your Items",
+        "Your Quote",
+        "Important Notice: Customer Supplied Garments"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a"
+            ],
+            [
+              ".product-showcase-content > h3"
+            ],
+            [
+              "#priceDisplay"
+            ],
+            [
+              ".total > span"
+            ],
+            [
+              ".total > strong"
+            ],
+            [
+              ".tier-current > .tier-qty"
+            ],
+            [
+              ".tier-current > .tier-price"
+            ],
+            [
+              "tr:nth-child(2) > .tier-qty"
+            ],
+            [
+              "tr:nth-child(3) > .tier-qty"
+            ],
+            [
+              "tr:nth-child(4) > .tier-qty"
+            ],
+            [
+              ".tier-ladder-note"
+            ],
+            [
+              "#sendQuoteBtn"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Customer Supplied Screen Print Calculator - Northwest Custom Apparel",
+      "url": "/calculators/screenprint-customer/index.html",
+      "ids": {
+        "quantity": "",
+        "frontColors": "1 2 3 4 5 6",
+        "backColors": "0 1 2 3 4 5 6",
+        "darkShirtToggle": "",
+        "safetyStripesToggle": "",
+        "safetyStripesNotice": "Safety Stripes: Available in pocket or shoulder placement. Contact sales for specific requirements.",
+        "priceDisplay": "$19.50",
+        "priceSmallBatchNote": "+ $50.00 small-batch fee",
+        "orderSummary": "Subtotal (24 prints) $468.00 Less Than Minimum Fee $50.00 Screen setup — 7 screens × $30 $210.00 Total Order Cost $728.00",
+        "tierLadder": "Order more, pay less per shirt 24-47 pcs $19.50/pc + $50 LTM 48-71 pcs $16.50/pc 72-144 pcs $15.50/pc 145-576 pcs $15.00/pc Live pricing for this front/back color setup — updates as you change your selections.",
+        "sendQuoteBtn": "Send Quote"
+      },
+      "fields": [
+        {
+          "id": "quantity",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "frontColors",
+          "type": "select-one",
+          "value": "3",
+          "disabled": false
+        },
+        {
+          "id": "backColors",
+          "type": "select-one",
+          "value": "2",
+          "disabled": false
+        },
+        {
+          "id": "darkShirtToggle",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "safetyStripesToggle",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        }
+      ],
+      "tables": [
+        "24-47 pcs $19.50/pc + $50 LTM 48-71 pcs $16.50/pc 72-144 pcs $15.50/pc 145-576 pcs $15.00/pc"
+      ],
+      "headings": [
+        "Customer Supplied Screen Print Calculator",
+        "Screen Printing on Your Items",
+        "Your Quote",
+        "Important Notice: Customer Supplied Garments"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a"
+            ],
+            [
+              ".product-showcase-content > h3"
+            ],
+            [
+              "#priceDisplay"
+            ],
+            [
+              ".total > span"
+            ],
+            [
+              ".total > strong"
+            ],
+            [
+              ".tier-current > .tier-qty"
+            ],
+            [
+              ".tier-current > .tier-price"
+            ],
+            [
+              "tr:nth-child(2) > .tier-qty"
+            ],
+            [
+              "tr:nth-child(3) > .tier-qty"
+            ],
+            [
+              "tr:nth-child(4) > .tier-qty"
+            ],
+            [
+              ".tier-ladder-note"
+            ],
+            [
+              "#sendQuoteBtn"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "calculation": {
+    "quantity": 24,
+    "frontColors": 3,
+    "backColors": 2,
+    "isDarkGarment": true,
+    "hasSafetyStripes": true,
+    "frontPerPiece": 9,
+    "addlPerPiece": 6.5,
+    "stripesPerPiece": 4,
+    "pricePerShirt": 19.5,
+    "totalScreenColors": 7,
+    "totalSetupFee": 210,
+    "setupFeeLabel": "Screen setup — 7 screens × $30",
+    "ltmFeeTotal": 50,
+    "orderSubtotal": 468,
+    "finalTotal": 728,
+    "tierLabel": "24-47"
+  },
+  "mocked": [],
+  "emails": [],
+  "dialogs": []
+}
