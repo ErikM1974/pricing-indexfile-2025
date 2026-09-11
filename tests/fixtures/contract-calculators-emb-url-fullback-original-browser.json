@@ -1,0 +1,502 @@
+{
+  "name": "emb-url-fullback",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Contract Embroidery Pricing 2026 — Northwest Custom Apparel",
+      "url": "/calculators/embroidery-contract/index.html?type=fullback&qty=72&stitches=42000",
+      "ids": {
+        "ledeOrderMin": "$250.00",
+        "factOrderMin": "$250.00",
+        "factNoFee": "SMALL-ORDER FEE None — the order minimum covers small runs",
+        "factLtmFee": "$0.00",
+        "factLtmBand": "1–23",
+        "factFbLtm": "$0.00",
+        "factFbBand": "1–23",
+        "segItemTypeLabel": "ITEM TYPE",
+        "segItemType": "Garment CTR-Garmt Cap CTR-Cap Full Back DECG-FB",
+        "qty": "",
+        "stitch": "",
+        "dstFieldLabel": "STITCH FILE · optional",
+        "dstDropHint": "Reads the exact stitch count in your browser — the file never leaves your computer",
+        "dstStatus": "",
+        "dstLines": "",
+        "resProductLabel": "FULL BACK",
+        "resTier": "TIER 72+",
+        "unitPrice": "51.66",
+        "unitSub": "42K × $1.23/1K",
+        "orderTotalNote": "72 × $51.66",
+        "orderTotal": "$3,719.52",
+        "aiDraftBtn": "✨ Draft Email Quote with AI",
+        "tableTabs": "Garments CTR-Garmt Caps CTR-Cap Full Back DECG-FB",
+        "cardIcon": "",
+        "cardTitle": "Full Back Embroidery",
+        "cardSubtitle": "Large back designs — 25K minimum stitches",
+        "cardCode": "DECG-FB",
+        "priceTable": "STITCHES 1–7 8–23 24–47 48–71 72+ 25K $41.75 $39.00 $36.25 $33.50 $30.75 26K $43.42 $40.56 $37.70 $34.84 $31.98 27K $45.09 $42.12 $39.15 $36.18 $33.21 28K $46.76 $43.68 $40.60 $37.52 $34.44 29K $48.43 $45.24 $42.05 $38.86 $35.67 30K $50.10 $46.80 $43.50 $40.20 $36.90 31K $51.77 $48.36 $44.95 $41.54 $38.13 32K $53.44 $49.92 $46.40 $42.88 $39.36 33K $55.11 $51.48 $47.85 $44.22 $40.59 34K $56.78 $53.04 $49.30 $45.56 $41.82 35K $58.45 $54.60 $50.75 $46.90 $43.05 36K $60.12 $56.16 $52.20 $48.24 $44.28 37K $61.79 $57.72 $53.65 $49.58 $45.51 38K $63.46 $59.28 $55.10 $50.92 $46.74 39K $65.13 $60.84 $56.55 $52.26 $47.97 40K $66.80 $62.40 $58.00 $53.60 $49.20 41K $68.47 $63.96 $59.45 $54.94 $50.43 42K $70.14 $65.52 $60.90 $56.28 $51.66 43K $71.81 $67.08 $62.35 $57.62 $52.89 44K $73.48 $68.64 $63.80 $58.96 $54.12 45K $75.15 $70.20 $65.25 $60.30 $55.35 46K $76.82 $71.76 $66.70 $61.64 $56.58 47K $78.49 $73.32 $68.15 $62.98 $57.81 48K $80.16 $74.88 $69.60 $64.32 $59.04 49K $81.83 $76.44 $71.05 $65.66 $60.27 50K $83.50 $78.00 $72.50 $67.00 $61.50 $ / 1,000 STITCHES $1.67 $1.56 $1.45 $1.34 $1.23",
+        "cardMins": "Min stitches 25K No small-order fee Order minimum $250.00",
+        "shareToastText": "Quote link copied — paste into your email or chat"
+      },
+      "fields": [
+        {
+          "id": "qty",
+          "type": "number",
+          "value": "72",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "stitch",
+          "type": "number",
+          "value": "42000",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "/pages/embroidery-contract-pricing.html",
+          "text": "Print price list (PDF) ↗"
+        },
+        {
+          "href": "tel:+12539225793,119",
+          "text": "Direct 253-922-5793 ext. 119"
+        },
+        {
+          "href": "mailto:ruth@nwcustomapparel.com",
+          "text": "Email ruth@nwcustomapparel.com"
+        }
+      ],
+      "tables": [
+        "STITCHES 1–7 8–23 24–47 48–71 72+ 25K $41.75 $39.00 $36.25 $33.50 $30.75 26K $43.42 $40.56 $37.70 $34.84 $31.98 27K $45.09 $42.12 $39.15 $36.18 $33.21 28K $46.76 $43.68 $40.60 $37.52 $34.44 29K $48.43 $45.24 $42.05 $38.86 $35.67 30K $50.10 $46.80 $43.50 $40.20 $36.90 31K $51.77 $48.36 $44.95 $41.54 $38.13 32K $53.44 $49.92 $46.40 $42.88 $39.36 33K $55.11 $51.48 $47.85 $44.22 $40.59 34K $56.78 $53.04 $49.30 $45.56 $41.82 35K $58.45 $54.60 $50.75 $46.90 $43.05 36K $60.12 $56.16 $52.20 $48.24 $44.28 37K $61.79 $57.72 $53.65 $49.58 $45.51 38K $63.46 $59.28 $55.10 $50.92 $46.74 39K $65.13 $60.84 $56.55 $52.26 $47.97 40K $66.80 $62.40 $58.00 $53.60 $49.20 41K $68.47 $63.96 $59.45 $54.94 $50.43 42K $70.14 $65.52 $60.90 $56.28 $51.66 43K $71.81 $67.08 $62.35 $57.62 $52.89 44K $73.48 $68.64 $63.80 $58.96 $54.12 45K $75.15 $70.20 $65.25 $60.30 $55.35 46K $76.82 $71.76 $66.70 $61.64 $56.58 47K $78.49 $73.32 $68.15 $62.98 $57.81 48K $80.16 $74.88 $69.60 $64.32 $59.04 49K $81.83 $76.44 $71.05 $65.66 $60.27 50K $83.50 $78.00 $72.50 $67.00 $61.50 $ / 1,000 STITCHES $1.67 $1.56 $1.45 $1.34 $1.23"
+      ],
+      "headings": [
+        "Contract Embroidery 2026.",
+        "Quick price calculator",
+        "Pricing tables",
+        "Full Back Embroidery",
+        "Ruthie Nhoung"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".fact:nth-child(1) > .k"
+            ],
+            [
+              ".fact:nth-child(2) > .k"
+            ],
+            [
+              "#factNoFee > .k"
+            ],
+            [
+              "#factLtm > .k"
+            ],
+            [
+              "#factFb > .k"
+            ],
+            [
+              ".meta"
+            ],
+            [
+              "button[data-product=\"garment\"][role=\"tab\"][type=\"button\"] > .code"
+            ],
+            [
+              "button[data-product=\"cap\"][role=\"tab\"][type=\"button\"] > .code"
+            ],
+            [
+              ".footnote"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Contract Embroidery Pricing 2026 — Northwest Custom Apparel",
+      "url": "/calculators/embroidery-contract/index.html?type=fullback&qty=72&stitches=42000",
+      "ids": {
+        "ledeOrderMin": "$250.00",
+        "factOrderMin": "$250.00",
+        "factNoFee": "SMALL-ORDER FEE None — the order minimum covers small runs",
+        "factLtmFee": "$0.00",
+        "factLtmBand": "1–23",
+        "factFbLtm": "$0.00",
+        "factFbBand": "1–23",
+        "segItemTypeLabel": "ITEM TYPE",
+        "segItemType": "Garment CTR-Garmt Cap CTR-Cap Full Back DECG-FB",
+        "qty": "",
+        "stitch": "",
+        "dstFieldLabel": "STITCH FILE · optional",
+        "dstDropHint": "Reads the exact stitch count in your browser — the file never leaves your computer",
+        "dstStatus": "",
+        "dstLines": "",
+        "resProductLabel": "FULL BACK",
+        "resTier": "TIER 72+",
+        "unitPrice": "51.66",
+        "unitSub": "42K × $1.23/1K",
+        "orderTotalNote": "72 × $51.66",
+        "orderTotal": "$3,719.52",
+        "aiDraftBtn": "✨ Draft Email Quote with AI",
+        "tableTabs": "Garments CTR-Garmt Caps CTR-Cap Full Back DECG-FB",
+        "cardIcon": "",
+        "cardTitle": "Full Back Embroidery",
+        "cardSubtitle": "Large back designs — 25K minimum stitches",
+        "cardCode": "DECG-FB",
+        "priceTable": "STITCHES 1–7 8–23 24–47 48–71 72+ 25K $41.75 $39.00 $36.25 $33.50 $30.75 26K $43.42 $40.56 $37.70 $34.84 $31.98 27K $45.09 $42.12 $39.15 $36.18 $33.21 28K $46.76 $43.68 $40.60 $37.52 $34.44 29K $48.43 $45.24 $42.05 $38.86 $35.67 30K $50.10 $46.80 $43.50 $40.20 $36.90 31K $51.77 $48.36 $44.95 $41.54 $38.13 32K $53.44 $49.92 $46.40 $42.88 $39.36 33K $55.11 $51.48 $47.85 $44.22 $40.59 34K $56.78 $53.04 $49.30 $45.56 $41.82 35K $58.45 $54.60 $50.75 $46.90 $43.05 36K $60.12 $56.16 $52.20 $48.24 $44.28 37K $61.79 $57.72 $53.65 $49.58 $45.51 38K $63.46 $59.28 $55.10 $50.92 $46.74 39K $65.13 $60.84 $56.55 $52.26 $47.97 40K $66.80 $62.40 $58.00 $53.60 $49.20 41K $68.47 $63.96 $59.45 $54.94 $50.43 42K $70.14 $65.52 $60.90 $56.28 $51.66 43K $71.81 $67.08 $62.35 $57.62 $52.89 44K $73.48 $68.64 $63.80 $58.96 $54.12 45K $75.15 $70.20 $65.25 $60.30 $55.35 46K $76.82 $71.76 $66.70 $61.64 $56.58 47K $78.49 $73.32 $68.15 $62.98 $57.81 48K $80.16 $74.88 $69.60 $64.32 $59.04 49K $81.83 $76.44 $71.05 $65.66 $60.27 50K $83.50 $78.00 $72.50 $67.00 $61.50 $ / 1,000 STITCHES $1.67 $1.56 $1.45 $1.34 $1.23",
+        "cardMins": "Min stitches 25K No small-order fee Order minimum $250.00",
+        "shareToastText": "Quote link copied — paste into your email or chat"
+      },
+      "fields": [
+        {
+          "id": "qty",
+          "type": "number",
+          "value": "72",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "stitch",
+          "type": "number",
+          "value": "42000",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "/pages/embroidery-contract-pricing.html",
+          "text": "Print price list (PDF) ↗"
+        },
+        {
+          "href": "tel:+12539225793,119",
+          "text": "Direct 253-922-5793 ext. 119"
+        },
+        {
+          "href": "mailto:ruth@nwcustomapparel.com",
+          "text": "Email ruth@nwcustomapparel.com"
+        }
+      ],
+      "tables": [
+        "STITCHES 1–7 8–23 24–47 48–71 72+ 25K $41.75 $39.00 $36.25 $33.50 $30.75 26K $43.42 $40.56 $37.70 $34.84 $31.98 27K $45.09 $42.12 $39.15 $36.18 $33.21 28K $46.76 $43.68 $40.60 $37.52 $34.44 29K $48.43 $45.24 $42.05 $38.86 $35.67 30K $50.10 $46.80 $43.50 $40.20 $36.90 31K $51.77 $48.36 $44.95 $41.54 $38.13 32K $53.44 $49.92 $46.40 $42.88 $39.36 33K $55.11 $51.48 $47.85 $44.22 $40.59 34K $56.78 $53.04 $49.30 $45.56 $41.82 35K $58.45 $54.60 $50.75 $46.90 $43.05 36K $60.12 $56.16 $52.20 $48.24 $44.28 37K $61.79 $57.72 $53.65 $49.58 $45.51 38K $63.46 $59.28 $55.10 $50.92 $46.74 39K $65.13 $60.84 $56.55 $52.26 $47.97 40K $66.80 $62.40 $58.00 $53.60 $49.20 41K $68.47 $63.96 $59.45 $54.94 $50.43 42K $70.14 $65.52 $60.90 $56.28 $51.66 43K $71.81 $67.08 $62.35 $57.62 $52.89 44K $73.48 $68.64 $63.80 $58.96 $54.12 45K $75.15 $70.20 $65.25 $60.30 $55.35 46K $76.82 $71.76 $66.70 $61.64 $56.58 47K $78.49 $73.32 $68.15 $62.98 $57.81 48K $80.16 $74.88 $69.60 $64.32 $59.04 49K $81.83 $76.44 $71.05 $65.66 $60.27 50K $83.50 $78.00 $72.50 $67.00 $61.50 $ / 1,000 STITCHES $1.67 $1.56 $1.45 $1.34 $1.23"
+      ],
+      "headings": [
+        "Contract Embroidery 2026.",
+        "Quick price calculator",
+        "Pricing tables",
+        "Full Back Embroidery",
+        "Ruthie Nhoung"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".fact:nth-child(1) > .k"
+            ],
+            [
+              ".fact:nth-child(2) > .k"
+            ],
+            [
+              "#factNoFee > .k"
+            ],
+            [
+              "#factLtm > .k"
+            ],
+            [
+              "#factFb > .k"
+            ],
+            [
+              ".meta"
+            ],
+            [
+              "button[data-product=\"garment\"][role=\"tab\"][type=\"button\"] > .code"
+            ],
+            [
+              "button[data-product=\"cap\"][role=\"tab\"][type=\"button\"] > .code"
+            ],
+            [
+              ".footnote"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Contract Embroidery Pricing 2026 — Northwest Custom Apparel",
+      "url": "/calculators/embroidery-contract/index.html?type=fullback&qty=72&stitches=42000",
+      "ids": {
+        "ledeOrderMin": "$250.00",
+        "factOrderMin": "$250.00",
+        "factNoFee": "SMALL-ORDER FEE None — the order minimum covers small runs",
+        "factLtmFee": "$0.00",
+        "factLtmBand": "1–23",
+        "factFbLtm": "$0.00",
+        "factFbBand": "1–23",
+        "segItemTypeLabel": "ITEM TYPE",
+        "segItemType": "Garment CTR-Garmt Cap CTR-Cap Full Back DECG-FB",
+        "qty": "",
+        "stitch": "",
+        "dstFieldLabel": "STITCH FILE · optional",
+        "dstDropHint": "Reads the exact stitch count in your browser — the file never leaves your computer",
+        "dstStatus": "",
+        "dstLines": "",
+        "resProductLabel": "FULL BACK",
+        "resTier": "TIER 72+",
+        "unitPrice": "51.66",
+        "unitSub": "42K × $1.23/1K",
+        "orderTotalNote": "72 × $51.66",
+        "orderTotal": "$3,719.52",
+        "aiDraftBtn": "✨ Draft Email Quote with AI",
+        "tableTabs": "Garments CTR-Garmt Caps CTR-Cap Full Back DECG-FB",
+        "cardIcon": "",
+        "cardTitle": "Full Back Embroidery",
+        "cardSubtitle": "Large back designs — 25K minimum stitches",
+        "cardCode": "DECG-FB",
+        "priceTable": "STITCHES 1–7 8–23 24–47 48–71 72+ 25K $41.75 $39.00 $36.25 $33.50 $30.75 26K $43.42 $40.56 $37.70 $34.84 $31.98 27K $45.09 $42.12 $39.15 $36.18 $33.21 28K $46.76 $43.68 $40.60 $37.52 $34.44 29K $48.43 $45.24 $42.05 $38.86 $35.67 30K $50.10 $46.80 $43.50 $40.20 $36.90 31K $51.77 $48.36 $44.95 $41.54 $38.13 32K $53.44 $49.92 $46.40 $42.88 $39.36 33K $55.11 $51.48 $47.85 $44.22 $40.59 34K $56.78 $53.04 $49.30 $45.56 $41.82 35K $58.45 $54.60 $50.75 $46.90 $43.05 36K $60.12 $56.16 $52.20 $48.24 $44.28 37K $61.79 $57.72 $53.65 $49.58 $45.51 38K $63.46 $59.28 $55.10 $50.92 $46.74 39K $65.13 $60.84 $56.55 $52.26 $47.97 40K $66.80 $62.40 $58.00 $53.60 $49.20 41K $68.47 $63.96 $59.45 $54.94 $50.43 42K $70.14 $65.52 $60.90 $56.28 $51.66 43K $71.81 $67.08 $62.35 $57.62 $52.89 44K $73.48 $68.64 $63.80 $58.96 $54.12 45K $75.15 $70.20 $65.25 $60.30 $55.35 46K $76.82 $71.76 $66.70 $61.64 $56.58 47K $78.49 $73.32 $68.15 $62.98 $57.81 48K $80.16 $74.88 $69.60 $64.32 $59.04 49K $81.83 $76.44 $71.05 $65.66 $60.27 50K $83.50 $78.00 $72.50 $67.00 $61.50 $ / 1,000 STITCHES $1.67 $1.56 $1.45 $1.34 $1.23",
+        "cardMins": "Min stitches 25K No small-order fee Order minimum $250.00",
+        "shareToastText": "Quote link copied — paste into your email or chat"
+      },
+      "fields": [
+        {
+          "id": "qty",
+          "type": "number",
+          "value": "72",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "stitch",
+          "type": "number",
+          "value": "42000",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "/pages/embroidery-contract-pricing.html",
+          "text": "Print price list (PDF) ↗"
+        },
+        {
+          "href": "tel:+12539225793,119",
+          "text": "Direct 253-922-5793 ext. 119"
+        },
+        {
+          "href": "mailto:ruth@nwcustomapparel.com",
+          "text": "Email ruth@nwcustomapparel.com"
+        }
+      ],
+      "tables": [
+        "STITCHES 1–7 8–23 24–47 48–71 72+ 25K $41.75 $39.00 $36.25 $33.50 $30.75 26K $43.42 $40.56 $37.70 $34.84 $31.98 27K $45.09 $42.12 $39.15 $36.18 $33.21 28K $46.76 $43.68 $40.60 $37.52 $34.44 29K $48.43 $45.24 $42.05 $38.86 $35.67 30K $50.10 $46.80 $43.50 $40.20 $36.90 31K $51.77 $48.36 $44.95 $41.54 $38.13 32K $53.44 $49.92 $46.40 $42.88 $39.36 33K $55.11 $51.48 $47.85 $44.22 $40.59 34K $56.78 $53.04 $49.30 $45.56 $41.82 35K $58.45 $54.60 $50.75 $46.90 $43.05 36K $60.12 $56.16 $52.20 $48.24 $44.28 37K $61.79 $57.72 $53.65 $49.58 $45.51 38K $63.46 $59.28 $55.10 $50.92 $46.74 39K $65.13 $60.84 $56.55 $52.26 $47.97 40K $66.80 $62.40 $58.00 $53.60 $49.20 41K $68.47 $63.96 $59.45 $54.94 $50.43 42K $70.14 $65.52 $60.90 $56.28 $51.66 43K $71.81 $67.08 $62.35 $57.62 $52.89 44K $73.48 $68.64 $63.80 $58.96 $54.12 45K $75.15 $70.20 $65.25 $60.30 $55.35 46K $76.82 $71.76 $66.70 $61.64 $56.58 47K $78.49 $73.32 $68.15 $62.98 $57.81 48K $80.16 $74.88 $69.60 $64.32 $59.04 49K $81.83 $76.44 $71.05 $65.66 $60.27 50K $83.50 $78.00 $72.50 $67.00 $61.50 $ / 1,000 STITCHES $1.67 $1.56 $1.45 $1.34 $1.23"
+      ],
+      "headings": [
+        "Contract Embroidery 2026.",
+        "Quick price calculator",
+        "Pricing tables",
+        "Full Back Embroidery",
+        "Ruthie Nhoung"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".fact:nth-child(1) > .k"
+            ],
+            [
+              ".fact:nth-child(2) > .k"
+            ],
+            [
+              "#factNoFee > .k"
+            ],
+            [
+              "#factLtm > .k"
+            ],
+            [
+              "#factFb > .k"
+            ],
+            [
+              ".meta"
+            ],
+            [
+              "button[data-product=\"garment\"][role=\"tab\"][type=\"button\"] > .code"
+            ],
+            [
+              "button[data-product=\"cap\"][role=\"tab\"][type=\"button\"] > .code"
+            ],
+            [
+              ".footnote"
+            ]
+          ]
+        },
+        {
+          "id": "scrollable-region-focusable",
+          "nodes": [
+            [
+              "#priceTable"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Contract Embroidery Pricing 2026 — Northwest Custom Apparel",
+      "url": "/calculators/embroidery-contract/index.html?type=fullback&qty=72&stitches=42000",
+      "ids": {
+        "ledeOrderMin": "$250.00",
+        "factOrderMin": "$250.00",
+        "factNoFee": "SMALL-ORDER FEE None — the order minimum covers small runs",
+        "factLtmFee": "$0.00",
+        "factLtmBand": "1–23",
+        "factFbLtm": "$0.00",
+        "factFbBand": "1–23",
+        "segItemTypeLabel": "ITEM TYPE",
+        "segItemType": "Garment CTR-Garmt Cap CTR-Cap Full Back DECG-FB",
+        "qty": "",
+        "stitch": "",
+        "dstFieldLabel": "STITCH FILE · optional",
+        "dstDropHint": "Reads the exact stitch count in your browser — the file never leaves your computer",
+        "dstStatus": "",
+        "dstLines": "",
+        "resProductLabel": "FULL BACK",
+        "resTier": "TIER 72+",
+        "unitPrice": "51.66",
+        "unitSub": "42K × $1.23/1K",
+        "orderTotalNote": "72 × $51.66",
+        "orderTotal": "$3,719.52",
+        "aiDraftBtn": "✨ Draft Email Quote with AI",
+        "tableTabs": "Garments CTR-Garmt Caps CTR-Cap Full Back DECG-FB",
+        "cardIcon": "",
+        "cardTitle": "Full Back Embroidery",
+        "cardSubtitle": "Large back designs — 25K minimum stitches",
+        "cardCode": "DECG-FB",
+        "priceTable": "STITCHES 1–7 8–23 24–47 48–71 72+ 25K $41.75 $39.00 $36.25 $33.50 $30.75 26K $43.42 $40.56 $37.70 $34.84 $31.98 27K $45.09 $42.12 $39.15 $36.18 $33.21 28K $46.76 $43.68 $40.60 $37.52 $34.44 29K $48.43 $45.24 $42.05 $38.86 $35.67 30K $50.10 $46.80 $43.50 $40.20 $36.90 31K $51.77 $48.36 $44.95 $41.54 $38.13 32K $53.44 $49.92 $46.40 $42.88 $39.36 33K $55.11 $51.48 $47.85 $44.22 $40.59 34K $56.78 $53.04 $49.30 $45.56 $41.82 35K $58.45 $54.60 $50.75 $46.90 $43.05 36K $60.12 $56.16 $52.20 $48.24 $44.28 37K $61.79 $57.72 $53.65 $49.58 $45.51 38K $63.46 $59.28 $55.10 $50.92 $46.74 39K $65.13 $60.84 $56.55 $52.26 $47.97 40K $66.80 $62.40 $58.00 $53.60 $49.20 41K $68.47 $63.96 $59.45 $54.94 $50.43 42K $70.14 $65.52 $60.90 $56.28 $51.66 43K $71.81 $67.08 $62.35 $57.62 $52.89 44K $73.48 $68.64 $63.80 $58.96 $54.12 45K $75.15 $70.20 $65.25 $60.30 $55.35 46K $76.82 $71.76 $66.70 $61.64 $56.58 47K $78.49 $73.32 $68.15 $62.98 $57.81 48K $80.16 $74.88 $69.60 $64.32 $59.04 49K $81.83 $76.44 $71.05 $65.66 $60.27 50K $83.50 $78.00 $72.50 $67.00 $61.50 $ / 1,000 STITCHES $1.67 $1.56 $1.45 $1.34 $1.23",
+        "cardMins": "Min stitches 25K No small-order fee Order minimum $250.00",
+        "shareToastText": "Quote link copied — paste into your email or chat"
+      },
+      "fields": [
+        {
+          "id": "qty",
+          "type": "number",
+          "value": "72",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "stitch",
+          "type": "number",
+          "value": "42000",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "/pages/embroidery-contract-pricing.html",
+          "text": "Print price list (PDF) ↗"
+        },
+        {
+          "href": "tel:+12539225793,119",
+          "text": "Direct 253-922-5793 ext. 119"
+        },
+        {
+          "href": "mailto:ruth@nwcustomapparel.com",
+          "text": "Email ruth@nwcustomapparel.com"
+        }
+      ],
+      "tables": [
+        "STITCHES 1–7 8–23 24–47 48–71 72+ 25K $41.75 $39.00 $36.25 $33.50 $30.75 26K $43.42 $40.56 $37.70 $34.84 $31.98 27K $45.09 $42.12 $39.15 $36.18 $33.21 28K $46.76 $43.68 $40.60 $37.52 $34.44 29K $48.43 $45.24 $42.05 $38.86 $35.67 30K $50.10 $46.80 $43.50 $40.20 $36.90 31K $51.77 $48.36 $44.95 $41.54 $38.13 32K $53.44 $49.92 $46.40 $42.88 $39.36 33K $55.11 $51.48 $47.85 $44.22 $40.59 34K $56.78 $53.04 $49.30 $45.56 $41.82 35K $58.45 $54.60 $50.75 $46.90 $43.05 36K $60.12 $56.16 $52.20 $48.24 $44.28 37K $61.79 $57.72 $53.65 $49.58 $45.51 38K $63.46 $59.28 $55.10 $50.92 $46.74 39K $65.13 $60.84 $56.55 $52.26 $47.97 40K $66.80 $62.40 $58.00 $53.60 $49.20 41K $68.47 $63.96 $59.45 $54.94 $50.43 42K $70.14 $65.52 $60.90 $56.28 $51.66 43K $71.81 $67.08 $62.35 $57.62 $52.89 44K $73.48 $68.64 $63.80 $58.96 $54.12 45K $75.15 $70.20 $65.25 $60.30 $55.35 46K $76.82 $71.76 $66.70 $61.64 $56.58 47K $78.49 $73.32 $68.15 $62.98 $57.81 48K $80.16 $74.88 $69.60 $64.32 $59.04 49K $81.83 $76.44 $71.05 $65.66 $60.27 50K $83.50 $78.00 $72.50 $67.00 $61.50 $ / 1,000 STITCHES $1.67 $1.56 $1.45 $1.34 $1.23"
+      ],
+      "headings": [
+        "Contract Embroidery 2026.",
+        "Quick price calculator",
+        "Pricing tables",
+        "Full Back Embroidery",
+        "Ruthie Nhoung"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".fact:nth-child(1) > .k"
+            ],
+            [
+              ".fact:nth-child(2) > .k"
+            ],
+            [
+              "#factNoFee > .k"
+            ],
+            [
+              "#factLtm > .k"
+            ],
+            [
+              "#factFb > .k"
+            ],
+            [
+              ".meta"
+            ],
+            [
+              "button[data-product=\"garment\"][role=\"tab\"][type=\"button\"] > .code"
+            ],
+            [
+              "button[data-product=\"cap\"][role=\"tab\"][type=\"button\"] > .code"
+            ],
+            [
+              ".footnote"
+            ]
+          ]
+        },
+        {
+          "id": "scrollable-region-focusable",
+          "nodes": [
+            [
+              "#priceTable"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "dialogs": []
+}

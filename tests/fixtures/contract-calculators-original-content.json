@@ -1,0 +1,26 @@
+{
+  "baseline": "62b3ad7acc48cdc002619675f2a8bc9390f3fdb0",
+  "pages": [
+    "calculators/dtg-contract/index.html",
+    "calculators/embroidery-contract/index.html",
+    "pages/embroidery-contract-pricing.html"
+  ],
+  "hashes": {
+    "calculators/dtg-contract/index.html": "ee6730a8d5d236aec4250bb9aa3cec242bb1b965bff9ec0b4ab1ce0429207b6e",
+    "shared_components/css/tokens.css": "2b3ab556bb9eaf40765a5c84683777cb64d50a6c42d1b4e82bc6beff33a127b6",
+    "shared_components/css/contract-pricing-2026.css": "1af52235a0d8b46193d6ef292449368ee62a0ddaadd61a239d0bbfc62a7b9a8e",
+    "calculators/dtg-contract/dtg-contract.css": "d27c89c8bcd5c775f40c73ce60a808b57be4f0bb49509ef56d0a32847d267cf4",
+    "config/app.config.js": "fe83e4329ce3eee97e48dd68dab81d9d5eb6ec94511d9650e2c9ebbb1528d6ea",
+    "calculators/dtg-contract/dtg-contract.js": "3ea8e6c4ae2446b4a269f41a133dee9b306ed1084d5feeb357bd7d6ebf114d0b",
+    "calculators/embroidery-contract/index.html": "a0193e05bdca62ffa09a8d5d4df92eb3f8d21d50e553209f539ef06d1037f0ae",
+    "calculators/embroidery-contract/embroidery-contract.css": "e8dda2e165ad64317b8fa55a49f664113445048ec60c0531b37b75101e32b5b3",
+    "pages/js/dst-parser.js": "fe7eb75dd7d3b4d6296445c3ffa1ab0e5f9dcde4d0aafb610308c3847b27120d",
+    "shared_components/js/dst-quote-math.js": "8130a5b6e67f19881b63dd9af6b3622ac3f4427ff9d0606476ffc14396db3bd1",
+    "calculators/embroidery-contract/embroidery-contract.js": "993155a832b333092fa04b36a7d233ba03f910eec18e281b4b860bea60e62f62",
+    "pages/embroidery-contract-pricing.html": "f50e9f9d1a0a99b84a5ca80d66fa130ccd69191cc6765bead2477fd28fd1c114",
+    "pages/embroidery-contract-pricing.css": "ffcd15bb8c72da25663857d17cd1a8669ad8d0c6d404db9ffde23335fc6adb81",
+    "pages/embroidery-contract-pricing.js": "8ebe60d1946ffefeceebebf94559cd458c45c1c37fe555b1f0c190800da70ef6"
+  },
+  "changes": [],
+  "capturedAt": "2026-09-11T16:03:36.521Z"
+}

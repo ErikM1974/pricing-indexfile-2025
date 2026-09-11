@@ -1,0 +1,502 @@
+{
+  "name": "emb-url-cap",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Contract Embroidery Pricing 2026 — Northwest Custom Apparel",
+      "url": "/calculators/embroidery-contract/index.html?type=cap&qty=12&stitches=9412",
+      "ids": {
+        "ledeOrderMin": "$250.00",
+        "factOrderMin": "$250.00",
+        "factNoFee": "SMALL-ORDER FEE None — the order minimum covers small runs",
+        "factLtmFee": "$0.00",
+        "factLtmBand": "1–23",
+        "factFbLtm": "$0.00",
+        "factFbBand": "1–23",
+        "segItemTypeLabel": "ITEM TYPE",
+        "segItemType": "Garment CTR-Garmt Cap CTR-Cap Full Back DECG-FB",
+        "qty": "",
+        "stitch": "",
+        "dstFieldLabel": "STITCH FILE · optional",
+        "dstDropHint": "Reads the exact stitch count in your browser — the file never leaves your computer",
+        "dstStatus": "",
+        "dstLines": "",
+        "resProductLabel": "CAP",
+        "resTier": "TIER 8–23",
+        "unitPrice": "20.83",
+        "unitSub": "9.41K × $1.36/1K · $250.00 order minimum applied",
+        "orderTotalNote": "Order minimum $250.00 (priced at $153.60)",
+        "orderTotal": "$250.00",
+        "aiDraftBtn": "✨ Draft Email Quote with AI",
+        "tableTabs": "Garments CTR-Garmt Caps CTR-Cap Full Back DECG-FB",
+        "cardIcon": "",
+        "cardTitle": "Contract Caps",
+        "cardSubtitle": "Embroidery on any cap panel — front, back, or side",
+        "cardCode": "CTR-Cap",
+        "priceTable": "STITCHES 1–7 8–23 24–47 48–71 72+ 8K $11.76 $10.88 $10.00 $9.12 $8.24 9K $13.23 $12.24 $11.25 $10.26 $9.27 10K $14.70 $13.60 $12.50 $11.40 $10.30 11K $16.17 $14.96 $13.75 $12.54 $11.33 12K $17.64 $16.32 $15.00 $13.68 $12.36 13K $19.11 $17.68 $16.25 $14.82 $13.39 14K $20.58 $19.04 $17.50 $15.96 $14.42 15K $22.05 $20.40 $18.75 $17.10 $15.45 16K $23.52 $21.76 $20.00 $18.24 $16.48 17K $24.99 $23.12 $21.25 $19.38 $17.51 18K $26.46 $24.48 $22.50 $20.52 $18.54 19K $27.93 $25.84 $23.75 $21.66 $19.57 20K $29.40 $27.20 $25.00 $22.80 $20.60 $ / 1,000 STITCHES $1.47 $1.36 $1.25 $1.14 $1.03",
+        "cardMins": "Min stitches 8K No small-order fee Order minimum $250.00",
+        "shareToastText": "Quote link copied — paste into your email or chat"
+      },
+      "fields": [
+        {
+          "id": "qty",
+          "type": "number",
+          "value": "12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "stitch",
+          "type": "number",
+          "value": "9412",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "/pages/embroidery-contract-pricing.html",
+          "text": "Print price list (PDF) ↗"
+        },
+        {
+          "href": "tel:+12539225793,119",
+          "text": "Direct 253-922-5793 ext. 119"
+        },
+        {
+          "href": "mailto:ruth@nwcustomapparel.com",
+          "text": "Email ruth@nwcustomapparel.com"
+        }
+      ],
+      "tables": [
+        "STITCHES 1–7 8–23 24–47 48–71 72+ 8K $11.76 $10.88 $10.00 $9.12 $8.24 9K $13.23 $12.24 $11.25 $10.26 $9.27 10K $14.70 $13.60 $12.50 $11.40 $10.30 11K $16.17 $14.96 $13.75 $12.54 $11.33 12K $17.64 $16.32 $15.00 $13.68 $12.36 13K $19.11 $17.68 $16.25 $14.82 $13.39 14K $20.58 $19.04 $17.50 $15.96 $14.42 15K $22.05 $20.40 $18.75 $17.10 $15.45 16K $23.52 $21.76 $20.00 $18.24 $16.48 17K $24.99 $23.12 $21.25 $19.38 $17.51 18K $26.46 $24.48 $22.50 $20.52 $18.54 19K $27.93 $25.84 $23.75 $21.66 $19.57 20K $29.40 $27.20 $25.00 $22.80 $20.60 $ / 1,000 STITCHES $1.47 $1.36 $1.25 $1.14 $1.03"
+      ],
+      "headings": [
+        "Contract Embroidery 2026.",
+        "Quick price calculator",
+        "Pricing tables",
+        "Contract Caps",
+        "Ruthie Nhoung"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".fact:nth-child(1) > .k"
+            ],
+            [
+              ".fact:nth-child(2) > .k"
+            ],
+            [
+              "#factNoFee > .k"
+            ],
+            [
+              "#factLtm > .k"
+            ],
+            [
+              "#factFb > .k"
+            ],
+            [
+              ".meta"
+            ],
+            [
+              "button[data-product=\"garment\"][role=\"tab\"][type=\"button\"] > .code"
+            ],
+            [
+              "button[data-product=\"fullback\"][role=\"tab\"][type=\"button\"] > .code"
+            ],
+            [
+              ".footnote"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Contract Embroidery Pricing 2026 — Northwest Custom Apparel",
+      "url": "/calculators/embroidery-contract/index.html?type=cap&qty=12&stitches=9412",
+      "ids": {
+        "ledeOrderMin": "$250.00",
+        "factOrderMin": "$250.00",
+        "factNoFee": "SMALL-ORDER FEE None — the order minimum covers small runs",
+        "factLtmFee": "$0.00",
+        "factLtmBand": "1–23",
+        "factFbLtm": "$0.00",
+        "factFbBand": "1–23",
+        "segItemTypeLabel": "ITEM TYPE",
+        "segItemType": "Garment CTR-Garmt Cap CTR-Cap Full Back DECG-FB",
+        "qty": "",
+        "stitch": "",
+        "dstFieldLabel": "STITCH FILE · optional",
+        "dstDropHint": "Reads the exact stitch count in your browser — the file never leaves your computer",
+        "dstStatus": "",
+        "dstLines": "",
+        "resProductLabel": "CAP",
+        "resTier": "TIER 8–23",
+        "unitPrice": "20.83",
+        "unitSub": "9.41K × $1.36/1K · $250.00 order minimum applied",
+        "orderTotalNote": "Order minimum $250.00 (priced at $153.60)",
+        "orderTotal": "$250.00",
+        "aiDraftBtn": "✨ Draft Email Quote with AI",
+        "tableTabs": "Garments CTR-Garmt Caps CTR-Cap Full Back DECG-FB",
+        "cardIcon": "",
+        "cardTitle": "Contract Caps",
+        "cardSubtitle": "Embroidery on any cap panel — front, back, or side",
+        "cardCode": "CTR-Cap",
+        "priceTable": "STITCHES 1–7 8–23 24–47 48–71 72+ 8K $11.76 $10.88 $10.00 $9.12 $8.24 9K $13.23 $12.24 $11.25 $10.26 $9.27 10K $14.70 $13.60 $12.50 $11.40 $10.30 11K $16.17 $14.96 $13.75 $12.54 $11.33 12K $17.64 $16.32 $15.00 $13.68 $12.36 13K $19.11 $17.68 $16.25 $14.82 $13.39 14K $20.58 $19.04 $17.50 $15.96 $14.42 15K $22.05 $20.40 $18.75 $17.10 $15.45 16K $23.52 $21.76 $20.00 $18.24 $16.48 17K $24.99 $23.12 $21.25 $19.38 $17.51 18K $26.46 $24.48 $22.50 $20.52 $18.54 19K $27.93 $25.84 $23.75 $21.66 $19.57 20K $29.40 $27.20 $25.00 $22.80 $20.60 $ / 1,000 STITCHES $1.47 $1.36 $1.25 $1.14 $1.03",
+        "cardMins": "Min stitches 8K No small-order fee Order minimum $250.00",
+        "shareToastText": "Quote link copied — paste into your email or chat"
+      },
+      "fields": [
+        {
+          "id": "qty",
+          "type": "number",
+          "value": "12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "stitch",
+          "type": "number",
+          "value": "9412",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "/pages/embroidery-contract-pricing.html",
+          "text": "Print price list (PDF) ↗"
+        },
+        {
+          "href": "tel:+12539225793,119",
+          "text": "Direct 253-922-5793 ext. 119"
+        },
+        {
+          "href": "mailto:ruth@nwcustomapparel.com",
+          "text": "Email ruth@nwcustomapparel.com"
+        }
+      ],
+      "tables": [
+        "STITCHES 1–7 8–23 24–47 48–71 72+ 8K $11.76 $10.88 $10.00 $9.12 $8.24 9K $13.23 $12.24 $11.25 $10.26 $9.27 10K $14.70 $13.60 $12.50 $11.40 $10.30 11K $16.17 $14.96 $13.75 $12.54 $11.33 12K $17.64 $16.32 $15.00 $13.68 $12.36 13K $19.11 $17.68 $16.25 $14.82 $13.39 14K $20.58 $19.04 $17.50 $15.96 $14.42 15K $22.05 $20.40 $18.75 $17.10 $15.45 16K $23.52 $21.76 $20.00 $18.24 $16.48 17K $24.99 $23.12 $21.25 $19.38 $17.51 18K $26.46 $24.48 $22.50 $20.52 $18.54 19K $27.93 $25.84 $23.75 $21.66 $19.57 20K $29.40 $27.20 $25.00 $22.80 $20.60 $ / 1,000 STITCHES $1.47 $1.36 $1.25 $1.14 $1.03"
+      ],
+      "headings": [
+        "Contract Embroidery 2026.",
+        "Quick price calculator",
+        "Pricing tables",
+        "Contract Caps",
+        "Ruthie Nhoung"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".fact:nth-child(1) > .k"
+            ],
+            [
+              ".fact:nth-child(2) > .k"
+            ],
+            [
+              "#factNoFee > .k"
+            ],
+            [
+              "#factLtm > .k"
+            ],
+            [
+              "#factFb > .k"
+            ],
+            [
+              ".meta"
+            ],
+            [
+              "button[data-product=\"garment\"][role=\"tab\"][type=\"button\"] > .code"
+            ],
+            [
+              "button[data-product=\"fullback\"][role=\"tab\"][type=\"button\"] > .code"
+            ],
+            [
+              ".footnote"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Contract Embroidery Pricing 2026 — Northwest Custom Apparel",
+      "url": "/calculators/embroidery-contract/index.html?type=cap&qty=12&stitches=9412",
+      "ids": {
+        "ledeOrderMin": "$250.00",
+        "factOrderMin": "$250.00",
+        "factNoFee": "SMALL-ORDER FEE None — the order minimum covers small runs",
+        "factLtmFee": "$0.00",
+        "factLtmBand": "1–23",
+        "factFbLtm": "$0.00",
+        "factFbBand": "1–23",
+        "segItemTypeLabel": "ITEM TYPE",
+        "segItemType": "Garment CTR-Garmt Cap CTR-Cap Full Back DECG-FB",
+        "qty": "",
+        "stitch": "",
+        "dstFieldLabel": "STITCH FILE · optional",
+        "dstDropHint": "Reads the exact stitch count in your browser — the file never leaves your computer",
+        "dstStatus": "",
+        "dstLines": "",
+        "resProductLabel": "CAP",
+        "resTier": "TIER 8–23",
+        "unitPrice": "20.83",
+        "unitSub": "9.41K × $1.36/1K · $250.00 order minimum applied",
+        "orderTotalNote": "Order minimum $250.00 (priced at $153.60)",
+        "orderTotal": "$250.00",
+        "aiDraftBtn": "✨ Draft Email Quote with AI",
+        "tableTabs": "Garments CTR-Garmt Caps CTR-Cap Full Back DECG-FB",
+        "cardIcon": "",
+        "cardTitle": "Contract Caps",
+        "cardSubtitle": "Embroidery on any cap panel — front, back, or side",
+        "cardCode": "CTR-Cap",
+        "priceTable": "STITCHES 1–7 8–23 24–47 48–71 72+ 8K $11.76 $10.88 $10.00 $9.12 $8.24 9K $13.23 $12.24 $11.25 $10.26 $9.27 10K $14.70 $13.60 $12.50 $11.40 $10.30 11K $16.17 $14.96 $13.75 $12.54 $11.33 12K $17.64 $16.32 $15.00 $13.68 $12.36 13K $19.11 $17.68 $16.25 $14.82 $13.39 14K $20.58 $19.04 $17.50 $15.96 $14.42 15K $22.05 $20.40 $18.75 $17.10 $15.45 16K $23.52 $21.76 $20.00 $18.24 $16.48 17K $24.99 $23.12 $21.25 $19.38 $17.51 18K $26.46 $24.48 $22.50 $20.52 $18.54 19K $27.93 $25.84 $23.75 $21.66 $19.57 20K $29.40 $27.20 $25.00 $22.80 $20.60 $ / 1,000 STITCHES $1.47 $1.36 $1.25 $1.14 $1.03",
+        "cardMins": "Min stitches 8K No small-order fee Order minimum $250.00",
+        "shareToastText": "Quote link copied — paste into your email or chat"
+      },
+      "fields": [
+        {
+          "id": "qty",
+          "type": "number",
+          "value": "12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "stitch",
+          "type": "number",
+          "value": "9412",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "/pages/embroidery-contract-pricing.html",
+          "text": "Print price list (PDF) ↗"
+        },
+        {
+          "href": "tel:+12539225793,119",
+          "text": "Direct 253-922-5793 ext. 119"
+        },
+        {
+          "href": "mailto:ruth@nwcustomapparel.com",
+          "text": "Email ruth@nwcustomapparel.com"
+        }
+      ],
+      "tables": [
+        "STITCHES 1–7 8–23 24–47 48–71 72+ 8K $11.76 $10.88 $10.00 $9.12 $8.24 9K $13.23 $12.24 $11.25 $10.26 $9.27 10K $14.70 $13.60 $12.50 $11.40 $10.30 11K $16.17 $14.96 $13.75 $12.54 $11.33 12K $17.64 $16.32 $15.00 $13.68 $12.36 13K $19.11 $17.68 $16.25 $14.82 $13.39 14K $20.58 $19.04 $17.50 $15.96 $14.42 15K $22.05 $20.40 $18.75 $17.10 $15.45 16K $23.52 $21.76 $20.00 $18.24 $16.48 17K $24.99 $23.12 $21.25 $19.38 $17.51 18K $26.46 $24.48 $22.50 $20.52 $18.54 19K $27.93 $25.84 $23.75 $21.66 $19.57 20K $29.40 $27.20 $25.00 $22.80 $20.60 $ / 1,000 STITCHES $1.47 $1.36 $1.25 $1.14 $1.03"
+      ],
+      "headings": [
+        "Contract Embroidery 2026.",
+        "Quick price calculator",
+        "Pricing tables",
+        "Contract Caps",
+        "Ruthie Nhoung"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".fact:nth-child(1) > .k"
+            ],
+            [
+              ".fact:nth-child(2) > .k"
+            ],
+            [
+              "#factNoFee > .k"
+            ],
+            [
+              "#factLtm > .k"
+            ],
+            [
+              "#factFb > .k"
+            ],
+            [
+              ".meta"
+            ],
+            [
+              "button[data-product=\"garment\"][role=\"tab\"][type=\"button\"] > .code"
+            ],
+            [
+              "button[data-product=\"fullback\"][role=\"tab\"][type=\"button\"] > .code"
+            ],
+            [
+              ".footnote"
+            ]
+          ]
+        },
+        {
+          "id": "scrollable-region-focusable",
+          "nodes": [
+            [
+              "#priceTable"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Contract Embroidery Pricing 2026 — Northwest Custom Apparel",
+      "url": "/calculators/embroidery-contract/index.html?type=cap&qty=12&stitches=9412",
+      "ids": {
+        "ledeOrderMin": "$250.00",
+        "factOrderMin": "$250.00",
+        "factNoFee": "SMALL-ORDER FEE None — the order minimum covers small runs",
+        "factLtmFee": "$0.00",
+        "factLtmBand": "1–23",
+        "factFbLtm": "$0.00",
+        "factFbBand": "1–23",
+        "segItemTypeLabel": "ITEM TYPE",
+        "segItemType": "Garment CTR-Garmt Cap CTR-Cap Full Back DECG-FB",
+        "qty": "",
+        "stitch": "",
+        "dstFieldLabel": "STITCH FILE · optional",
+        "dstDropHint": "Reads the exact stitch count in your browser — the file never leaves your computer",
+        "dstStatus": "",
+        "dstLines": "",
+        "resProductLabel": "CAP",
+        "resTier": "TIER 8–23",
+        "unitPrice": "20.83",
+        "unitSub": "9.41K × $1.36/1K · $250.00 order minimum applied",
+        "orderTotalNote": "Order minimum $250.00 (priced at $153.60)",
+        "orderTotal": "$250.00",
+        "aiDraftBtn": "✨ Draft Email Quote with AI",
+        "tableTabs": "Garments CTR-Garmt Caps CTR-Cap Full Back DECG-FB",
+        "cardIcon": "",
+        "cardTitle": "Contract Caps",
+        "cardSubtitle": "Embroidery on any cap panel — front, back, or side",
+        "cardCode": "CTR-Cap",
+        "priceTable": "STITCHES 1–7 8–23 24–47 48–71 72+ 8K $11.76 $10.88 $10.00 $9.12 $8.24 9K $13.23 $12.24 $11.25 $10.26 $9.27 10K $14.70 $13.60 $12.50 $11.40 $10.30 11K $16.17 $14.96 $13.75 $12.54 $11.33 12K $17.64 $16.32 $15.00 $13.68 $12.36 13K $19.11 $17.68 $16.25 $14.82 $13.39 14K $20.58 $19.04 $17.50 $15.96 $14.42 15K $22.05 $20.40 $18.75 $17.10 $15.45 16K $23.52 $21.76 $20.00 $18.24 $16.48 17K $24.99 $23.12 $21.25 $19.38 $17.51 18K $26.46 $24.48 $22.50 $20.52 $18.54 19K $27.93 $25.84 $23.75 $21.66 $19.57 20K $29.40 $27.20 $25.00 $22.80 $20.60 $ / 1,000 STITCHES $1.47 $1.36 $1.25 $1.14 $1.03",
+        "cardMins": "Min stitches 8K No small-order fee Order minimum $250.00",
+        "shareToastText": "Quote link copied — paste into your email or chat"
+      },
+      "fields": [
+        {
+          "id": "qty",
+          "type": "number",
+          "value": "12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "stitch",
+          "type": "number",
+          "value": "9412",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "/pages/embroidery-contract-pricing.html",
+          "text": "Print price list (PDF) ↗"
+        },
+        {
+          "href": "tel:+12539225793,119",
+          "text": "Direct 253-922-5793 ext. 119"
+        },
+        {
+          "href": "mailto:ruth@nwcustomapparel.com",
+          "text": "Email ruth@nwcustomapparel.com"
+        }
+      ],
+      "tables": [
+        "STITCHES 1–7 8–23 24–47 48–71 72+ 8K $11.76 $10.88 $10.00 $9.12 $8.24 9K $13.23 $12.24 $11.25 $10.26 $9.27 10K $14.70 $13.60 $12.50 $11.40 $10.30 11K $16.17 $14.96 $13.75 $12.54 $11.33 12K $17.64 $16.32 $15.00 $13.68 $12.36 13K $19.11 $17.68 $16.25 $14.82 $13.39 14K $20.58 $19.04 $17.50 $15.96 $14.42 15K $22.05 $20.40 $18.75 $17.10 $15.45 16K $23.52 $21.76 $20.00 $18.24 $16.48 17K $24.99 $23.12 $21.25 $19.38 $17.51 18K $26.46 $24.48 $22.50 $20.52 $18.54 19K $27.93 $25.84 $23.75 $21.66 $19.57 20K $29.40 $27.20 $25.00 $22.80 $20.60 $ / 1,000 STITCHES $1.47 $1.36 $1.25 $1.14 $1.03"
+      ],
+      "headings": [
+        "Contract Embroidery 2026.",
+        "Quick price calculator",
+        "Pricing tables",
+        "Contract Caps",
+        "Ruthie Nhoung"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".fact:nth-child(1) > .k"
+            ],
+            [
+              ".fact:nth-child(2) > .k"
+            ],
+            [
+              "#factNoFee > .k"
+            ],
+            [
+              "#factLtm > .k"
+            ],
+            [
+              "#factFb > .k"
+            ],
+            [
+              ".meta"
+            ],
+            [
+              "button[data-product=\"garment\"][role=\"tab\"][type=\"button\"] > .code"
+            ],
+            [
+              "button[data-product=\"fullback\"][role=\"tab\"][type=\"button\"] > .code"
+            ],
+            [
+              ".footnote"
+            ]
+          ]
+        },
+        {
+          "id": "scrollable-region-focusable",
+          "nodes": [
+            [
+              "#priceTable"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "dialogs": []
+}
