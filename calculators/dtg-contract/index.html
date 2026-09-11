@@ -10,16 +10,17 @@
     <!-- Editorial typography: Fraunces serif display, Geist sans body, Geist Mono numbers -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Shared contract chrome (tokens, top bar, hero, calc shell, result panel,
          buttons, table base, contact, AI chat panel) — must load BEFORE the page CSS. -->
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.11.5">
     <link rel="stylesheet" href="/shared_components/css/contract-pricing-2026.css?v=2026.09.07.12">
     <!-- Page-specific styles (location grid, heavyweight toggle, per-piece breakdown) -->
     <link rel="stylesheet" href="/calculators/dtg-contract/dtg-contract.css?v=2026.09.07.12">
 </head>
-<body>
+<body data-ui="unified" data-contract-calculator="dtg">
 
     <!-- ========== Top bar ========== -->
     <header class="topbar">
@@ -28,7 +29,7 @@
         </a>
         <nav class="crumbs">
             <a href="/staff-dashboard.html">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(180deg)" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="contract-back" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
                 Dashboard
             </a>
             <span class="sep">/</span>
@@ -48,7 +49,7 @@
                 <p class="lede">
                     Wholesale DTG printing for production accounts &mdash; partners who
                     supply their own blanks. Single price tier per location, no segment
-                    tabs, $1/pc upcharge for heavyweight fabrics.
+                    tabs, <span data-contract-hw>—</span>/pc upcharge for heavyweight fabrics.
                 </p>
             </div>
             <aside class="hero-aside">
@@ -59,14 +60,14 @@
                 <div class="fact">
                     <span class="k">LTM Fee</span>
                     <span class="v">
-                        <strong>$50</strong> on orders 1–23 pcs
+                        <strong data-contract-ltm>—</strong> on orders <span data-contract-ltm-band>—</span> pcs
                         <span class="pill">LTM</span>
                     </span>
                 </div>
                 <div class="fact">
                     <span class="k">Heavyweight</span>
                     <span class="v">
-                        <strong>+$1</strong> per piece (hoodies, etc.)
+                        <strong>+<span data-contract-hw>—</span></strong> per piece (hoodies, etc.)
                         <span class="pill">HW</span>
                     </span>
                 </div>
@@ -158,7 +159,7 @@
                             <span class="hw-switch" aria-hidden="true"></span>
                             <span class="hw-text">
                                 <span class="hw-title">Heavyweight (hoodies, etc.)</span>
-                                <span class="hw-sub">+$1.00 per piece</span>
+                                <span class="hw-sub">+<span data-contract-hw>—</span> per piece</span>
                             </span>
                         </label>
                     </div>
@@ -227,7 +228,7 @@
                         </span>
                         <div>
                             <h3>Contract DTG &mdash; per location</h3>
-                            <div class="sub">Customer-supplied blanks. Heavyweight (hoodies, etc.) adds $1/pc on top.</div>
+                            <div class="sub">Customer-supplied blanks. Heavyweight (hoodies, etc.) adds <span data-contract-hw>—</span>/pc on top.</div>
                         </div>
                     </div>
                     <span class="code-chip">DTG-CONTRACT</span>
@@ -268,7 +269,7 @@
                         <span class="legend-item"><span class="sw bg"></span> Active quantity column</span>
                     </div>
                     <div class="mins">
-                        <span id="tableLtmNote">LTM fee <b>$50</b> on orders 1–23 pcs · adds <b>$50 ÷ qty</b> per piece</span>
+                        <span id="tableLtmNote">Small-order fee unavailable until pricing loads.</span>
                     </div>
                 </div>
             </article>
@@ -326,7 +327,7 @@
                         <span class="num">02</span>
                         <div>
                             <div class="what">Garment style + fabric weight</div>
-                            <div class="why">Heavyweight (hoodies, fleece) adds $1/pc</div>
+                            <div class="why">Heavyweight (hoodies, fleece) adds <span data-contract-hw>—</span>/pc</div>
                         </div>
                     </li>
                     <li>
@@ -392,5 +393,6 @@
     <!-- Shared config — exposes APP_CONFIG.API.BASE_URL (Rule #6). Must load first. -->
     <script src="/config/app.config.js"></script>
     <script src="/calculators/dtg-contract/dtg-contract.js?v=2026.09.07.33"></script>
+    <script src="/shared_components/js/contract-calculator-ui.js"></script>
 </body>
 </html>

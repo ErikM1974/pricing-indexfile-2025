@@ -19,7 +19,7 @@ async function open(page,state={}){
   if(!['GET','HEAD'].includes(method)||/quote-sequence|logout/.test(p)){events.writes.push({path:p,method});return route.fulfill({status:503});}
   if(p==='/api/contract-pricing')return route.fulfill({status:state.failed?503:200,json:prices(state.fee)});
   if(p==='/api/contract-dtg/print-costs')return route.fulfill({status:state.failed?503:200,json:dtg});
-  if(p==='/api/service-codes'&&u.searchParams.get('code')==='CTR-MIN-ORDER')return route.fulfill({status:state.failedMin?503:200,json:[{ServiceCode:'CTR-MIN-ORDER',SellPrice:250,IsActive:true}]});
+  if(p==='/api/service-codes'&&u.searchParams.get('code')==='CTR-MIN-ORDER')return route.fulfill({status:state.failedMin?503:200,json:[{ServiceCode:'CTR-MIN-ORDER',SellPrice:state.minimum??250,IsActive:true}]});
   if(p==='/api/contract-embroidery/cost-model')return route.fulfill(state.staff?{json:{productionHourRate:63,orderPool:47,asOf:'synthetic'}}:{status:401});
   if(['fonts.googleapis.com','fonts.gstatic.com'].includes(u.hostname))return route.continue();
   if(p.startsWith('/api/')||['fetch','xhr'].includes(req.resourceType())){events.unknown.push(req.url());return route.fulfill({status:503});}

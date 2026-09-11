@@ -109,6 +109,8 @@ function buildTerms() {
     if (laserFee) laserFee.textContent = (fee > 0 ? `Orders of 1-${band} pieces include the ${formatPrice(fee)} small-order fee · ` : '') + `${ORDER_MINIMUM ? formatPrice(ORDER_MINIMUM) : '(not loaded)'} order minimum on every contract order`;
     const eff = document.getElementById('effectiveDate');
     if (eff) eff.textContent = `Rates effective ${RATES_EFFECTIVE}`;
+    const footer = document.querySelector('.page-footer p');
+    if (footer) footer.textContent = `Pricing effective ${RATES_EFFECTIVE} — ${ORDER_MINIMUM ? formatPrice(ORDER_MINIMUM) + ' order minimum on every contract order' : 'order minimum not loaded — confirm before quoting.'}`;
 }
 
 /**

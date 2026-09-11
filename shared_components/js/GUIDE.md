@@ -282,3 +282,5 @@ Draft design family: shared_components/css/design-libraries.css owns local desig
 - custom-apparel-print.js: loaded by Custom Tees/Caps; prints full entered field values using textContent, temporarily keeps the contact footer beside the letterhead, and restores its position and removes mirrors after printing.
 
 - catalog-storefront-navigation.js — native navigation for home, catalog and product, compatible with their existing category hooks.
+
+- `contract-calculator-ui.js`: presentation and keyboard access for the DTG/embroidery contract calculators and printable contract price list; controllers retain pricing and request ownership.

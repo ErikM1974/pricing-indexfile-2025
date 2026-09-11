@@ -6276,6 +6276,102 @@
         "rawCssBytes": 281658,
         "localCssRequests": 23
       }
+    },
+    {
+      "source": "calculators/dtg-contract/index.html",
+      "family": "contract-calculators",
+      "status": "reviewed",
+      "route": "/calculators/dtg-contract/index.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/contract-pricing-2026.css",
+        "calculators/dtg-contract/dtg-contract.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "1440-768-390-320",
+        "original-prices-tiers-fields-links-and-parameters",
+        "normal-failed-and-missing-order-minimum",
+        "api-fees-and-order-minimum-labels",
+        "keyboard-product-controls-and-scrollable-tables",
+        "assistant-focus-trap-escape-and-restoration",
+        "local-valid-invalid-and-multiple-stitch-files",
+        "staff-cost-panel-hidden-from-public-and-print",
+        "all-current-paper-pages-reviewed"
+      ],
+      "test": "tests/e2e/css-unification-contract-calculators.spec.js",
+      "maxCssBytes": 88045,
+      "measuredRawCssBytes": 85997,
+      "baseline": {
+        "commit": "62b3ad7acc48cdc002619675f2a8bc9390f3fdb0",
+        "rawCssBytes": 58230,
+        "localCssRequests": 3
+      }
+    },
+    {
+      "source": "calculators/embroidery-contract/index.html",
+      "family": "contract-calculators",
+      "status": "reviewed",
+      "route": "/calculators/embroidery-contract/index.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/contract-pricing-2026.css",
+        "calculators/embroidery-contract/embroidery-contract.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "1440-768-390-320",
+        "original-prices-tiers-fields-links-and-parameters",
+        "normal-failed-and-missing-order-minimum",
+        "api-fees-and-order-minimum-labels",
+        "keyboard-product-controls-and-scrollable-tables",
+        "assistant-focus-trap-escape-and-restoration",
+        "local-valid-invalid-and-multiple-stitch-files",
+        "staff-cost-panel-hidden-from-public-and-print",
+        "all-current-paper-pages-reviewed"
+      ],
+      "test": "tests/e2e/css-unification-contract-calculators.spec.js",
+      "maxCssBytes": 103710,
+      "measuredRawCssBytes": 101662,
+      "baseline": {
+        "commit": "62b3ad7acc48cdc002619675f2a8bc9390f3fdb0",
+        "rawCssBytes": 67136,
+        "localCssRequests": 3
+      }
+    },
+    {
+      "source": "pages/embroidery-contract-pricing.html",
+      "family": "contract-calculators",
+      "status": "reviewed",
+      "route": "/pages/embroidery-contract-pricing.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/contract-pricing-2026.css",
+        "pages/embroidery-contract-pricing.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "1440-768-390-320",
+        "original-prices-tiers-fields-links-and-parameters",
+        "normal-failed-and-missing-order-minimum",
+        "api-fees-and-order-minimum-labels",
+        "keyboard-product-controls-and-scrollable-tables",
+        "assistant-focus-trap-escape-and-restoration",
+        "local-valid-invalid-and-multiple-stitch-files",
+        "staff-cost-panel-hidden-from-public-and-print",
+        "all-current-paper-pages-reviewed"
+      ],
+      "test": "tests/e2e/css-unification-contract-calculators.spec.js",
+      "maxCssBytes": 90772,
+      "measuredRawCssBytes": 88724,
+      "baseline": {
+        "commit": "62b3ad7acc48cdc002619675f2a8bc9390f3fdb0",
+        "rawCssBytes": 28097,
+        "localCssRequests": 2
+      }
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",

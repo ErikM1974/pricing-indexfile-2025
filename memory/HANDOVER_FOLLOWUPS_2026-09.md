@@ -1,15 +1,14 @@
 # Handover follow-ups — 2026-09-07
 
-## NEXT — three contract pricing pages
+## REVIEWED — three contract calculators, 2026-09-11
 
-Isolated codex/contract-calculators starts at 62b3ad7acc48cdc002619675f2a8bc9390f3fdb0 while core .5 release gates run on primary develop. Pages: Contract DTG, Contract Embroidery and printable Contract Embroidery Pricing. 14 immutable source hashes are captured. No application edits or migration credit yet.
+Contract DTG, Contract Embroidery and its printable price sheet now use Public Sans, shared canonical controls and four scoped, token-based style owners. Reviewed all 72 full-page captures across 1440/768/390/320 using 50 detail sheets, plus all 20 current paper pages in 18 documents (35 original pages). A second PDF renderer confirmed complete headings. The price sheet fits one landscape page; full-back and multiple-stitch-file cases retain two complete pages.
 
-- [ ] Capture original prices/fees/minimums, all tier boundaries, URL parameters, garment/cap/full-back views, location/heavyweight options, visible failures, assistant boundaries, keyboard and complete paper at four widths.
-- [ ] Review every original paper page, then use the established Public Sans, neutral canvas, navy text and green action tokens; shared canonical controls, one scoped contract owner and small page-specific owners. Lead with the selected production work and its exact price; preserve the full pricing ladders and customer terms.
-- [ ] Keep price/date/quantity math unchanged; compare original/current values and successful synthetic payloads. Verify staff cost visibility and local DST workflows before granting credit.
-- [ ] Review current mobile/keyboard/axe/print, commit/back up, then full local and exact-source CI gates before deployment.
+All 28 focused browser checks passed; the 18 affected paper scenarios passed again after the final print-only refinement. Nineteen source guards preserve 14 original hashes through 33 reversible mappings, 11 financial function bodies, the entire Embroidery controller, DST parser and quote math. UI fixes cover keyboard product selection/table scrolling, assistant focus trapping/Escape/restoration, hidden notices/toasts, API-backed DTG fee/heavyweight labels and the printable order-minimum footer. Staff costs stay out of public views and print. No price, fee, tier, date, quantity or rounding calculation changed.
 
-Live remains .4/Heroku2107/afc3678d at199/225,26pending; reviewed core candidate204/225,21pending. No real quotes, customer messages, uploads, payment or device printing. Original captures intercept all APIs and writes, using synthetic data. Never delete the node_modules junction.
+Verified LIVE: v2026.09.11.5 / Heroku2108 / 93fe1568983cc232f169cb354b777117e67d6949, 204/225 reviewed and 21 pending. Core source/main/develop CI is green and both branches synchronized. This contract candidate reaches 207/225 reviewed, 18 pending, only after its own full local and exact-source CI gates and verified rollout. Next: commit and back up this reviewed batch, merge verified .5 history, integrate clean develop, version changed assets, run all full gates, deploy and verify. Remaining 18: twelve other calculators/served archive, garment-designer and five quote builders. Read quote-builder-architecture.md before builders.
+
+Evidence: contract-calculators-reviewed-record.json and active-css-resume-state.json in the private artifact directory; review images/logs in the 2026/09/08 workspace. LESSONS_LEARNED and shared-JS GUIDE updated. No business writes, customer messages, uploads, payments or device printing. Never copy .env, rerun consumed helpers or recursively delete the node_modules junction.
 
 ## RELEASE CANDIDATE — v2026.09.11.5 five core calculators
 

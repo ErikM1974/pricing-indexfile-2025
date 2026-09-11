@@ -962,3 +962,7 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - tests/fixtures/contract-calculators-emb-dst-staff-original-browser.json — immutable synthetic contract-pricing browser evidence.
 
 - tests/fixtures/contract-calculators-emb-dst-invalid-original-browser.json — immutable synthetic contract-pricing browser evidence.
+
+- shared_components/js/contract-calculator-ui.js — contract-family controls, accessible product selectors, scrollable price tables and assistant focus handling.
+
+- tests/e2e/css-unification-contract-calculator-controls.spec.js — contract policy-label, assistant-focus, product-keyboard and horizontal-table regression checks with intercepted service requests.
