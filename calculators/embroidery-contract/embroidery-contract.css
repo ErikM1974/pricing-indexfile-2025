@@ -1,178 +1,32 @@
-/* =====================================================
-   CONTRACT EMBROIDERY — PAGE-SPECIFIC STYLES
-   ----------------------------------------------------------
-   The shared editorial chrome (design tokens, top bar, hero,
-   calculator shell, result panel, totals, buttons, pricing-table
-   base, contact card, footer, toast, pricing-error, and the entire
-   AI chat panel) lives in:
-     /shared_components/css/contract-pricing-2026.css
-   which is loaded BEFORE this file, so the rules below win the
-   cascade where they overlap.
+@layer components.pages {
+:where([data-ui="unified"][data-contract-calculator="emb"]) .calc-form .row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .seg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .seg button { flex-direction: column; gap: 4px; padding-inline: 8px; }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .seg .label { display: flex; align-items: center; flex-wrap: wrap; justify-content: center; gap: 5px; }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .seg .code, :where([data-ui="unified"][data-contract-calculator="emb"]) .tabs .tab-code { font-size: 12px; color: inherit; }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .seg button.active, :where([data-ui="unified"][data-contract-calculator="emb"]) .tabs button.active { border-color: var(--ui-accent); background: var(--ui-tint); color: var(--ui-accent); }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .tabs button { gap: 6px; }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .divider { height: 1px; background: var(--ui-line); margin-block: 16px; }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .print-list-link { display: inline-block; margin-top: 8px; }
 
-   Only the embroidery-specific input components live here:
-     · Two-column quantity + stitch-count row (.calc-form .row)
-     · Segmented item-type picker (.seg)  — Garment / Cap / Full Back
-     · Pricing-table tabs (.tabs)          — one table per item type
-     · .divider between the unit price and the Order Total card
-     · tfoot active-column highlight (td.cell-hi)
-   ===================================================== */
-
-/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
-   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
-   every rule below uses var(). Raw hex is allowed ONLY in this block. */
-/* stylelint-disable color-no-hex */
-:root {
-    --embroidery-contract-orange: #ffd08a;
-    --embroidery-contract-green: #6ee7a8;
-    --embroidery-contract-red: #ff9aa8;
-}
-/* stylelint-enable color-no-hex */
-
-/* Two-column quantity + stitch-count row */
-.calc-form .row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 18px;
+@media (width <= 400px) {
+ :where([data-ui="unified"][data-contract-calculator="emb"]) .calc-form .row { grid-template-columns: 1fr; gap: 0; }
+ :where([data-ui="unified"][data-contract-calculator="emb"]) .seg { grid-template-columns: 1fr; }
+ :where([data-ui="unified"][data-contract-calculator="emb"]) .seg button { flex-flow: row wrap; justify-content: start; }
 }
 
-/* Segmented toggle (Item Type) */
-.seg {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    background: var(--paper-3);
-    border: 1px solid var(--line);
-    border-radius: var(--r);
-    padding: 4px;
-    gap: 4px;
+@media print {
+ :where([data-ui="unified"][data-contract-calculator="emb"]) .seg { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; }
+ :where([data-ui="unified"][data-contract-calculator="emb"]) .seg button { font-size: 9px; min-height: 0; padding: 4px; }
+ :where([data-ui="unified"][data-contract-calculator="emb"]) .seg .code { font-size: 8px; }
+ :where([data-ui="unified"][data-contract-calculator="emb"]) .seg svg, :where([data-ui="unified"][data-contract-calculator="emb"]) .tabs { display: none; }
+ :where([data-ui="unified"][data-contract-calculator="emb"]) .calc-form .row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+ :where([data-ui="unified"][data-contract-calculator="emb"]) .dst-field, :where([data-ui="unified"][data-contract-calculator="emb"]) .dst-card { break-inside: avoid; }
 }
 
-.seg button {
-    background: transparent;
-    border: 0;
-    padding: 9px 10px;
-    border-radius: 7px;
-    font-size: 13px;
-    color: var(--slate);
-    font-weight: 500;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 3px;
-    text-align: center;
-    line-height: 1.1;
-    transition: background 120ms, color 120ms, box-shadow 120ms;
-}
 
-.seg button .label {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.seg button .code {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--slate-2);
-    letter-spacing: 0.04em;
-}
-
-.seg button.active {
-    background: var(--paper);
-    color: var(--ink);
-    box-shadow: 0 1px 2px rgb(0 0 0 / 4%), 0 0 0 1px var(--pink-200);
-}
-.seg button.active .code { color: var(--pink-600); }
-.seg button:hover:not(.active) { color: var(--ink-2); }
-
-/* Pricing-table tabs (Garments / Caps / Full Back) */
-.tabs {
-    display: inline-flex;
-    background: var(--paper);
-    border: 1px solid var(--line);
-    border-radius: var(--r);
-    padding: 4px;
-    gap: 2px;
-}
-
-.tabs button {
-    background: transparent;
-    border: 0;
-    padding: 8px 14px;
-    border-radius: 7px;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--slate);
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 120ms;
-}
-
-.tabs button .code {
-    font-family: var(--mono);
-    font-size: 10px;
-    background: var(--paper-3);
-    color: var(--slate);
-    padding: 1px 6px;
-    border-radius: 4px;
-    letter-spacing: 0.04em;
-}
-
-.tabs button.active {
-    background: var(--ink);
-    color: var(--color-on-brand);
-}
-
-.tabs button.active .code {
-    background: rgb(255 255 255 / 15%);
-    color: rgb(255 255 255 / 85%);
-}
-.tabs button:hover:not(.active) { color: var(--ink); }
-
-/* Keyboard focus rings for the page-specific tab controls (WCAG 2.4.7).
-   The shared buttons (.btn, AI panel) get their rings from the shared CSS. */
-.seg button:focus-visible,
-.tabs button:focus-visible {
-    outline: 2px solid var(--pink-600);
-    outline-offset: 2px;
-}
-
-/* Divider between the unit price and the Order Total card */
-.divider {
-    height: 1px;
-    background: var(--pink-200);
-    margin: 18px 0;
-    opacity: 0.6;
-}
-
-/* tfoot "$ / 1,000 stitches" row — highlight the active quantity column */
-table.price tfoot td.cell-hi {
-    color: var(--pink-700);
-}
-
-/* =====================================================
-   DST stitch-file drop zone + parsed-file card (Round 12, 2026-08-04)
-   The drop zone hides while a file is loaded (the card takes its place);
-   the ✕ on the card brings it back. #dstField.dragging is toggled by JS
-   during drag-over.
-   ===================================================== */
-
-/* 🔴 The [hidden] attribute is a UA-stylesheet rule, so ANY author `display`
-   declaration beats it — these are all flex/grid containers and would stay on
-   screen with el.hidden = true (an empty bordered strip in the card, a drop
-   zone showing under the loaded file). These attribute-qualified rules
-   outrank the plain class rules and restore it. Every NEW rule below that
-   sets `display` on a hideable element must be added here too. */
-.dst-drop[hidden],
-.dst-note[hidden],
-.dst-suggest[hidden],
-.dst-prod[hidden],
-.dst-margin[hidden],
-.res-lines[hidden] { display: none; }
-
-/* Screen-reader-only live region — announces a parsed file to AT users, who
-   get nothing from the visual card appearing. */
-.dst-sr-only {
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-sr-only {
     position: absolute;
     width: 1px; height: 1px;
     margin: -1px; padding: 0;
@@ -183,301 +37,282 @@ table.price tfoot td.cell-hi {
     border: 0;
 }
 
-.dst-opt {
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-opt {
     font-weight: 400;
-    color: var(--slate);
+    color: var(--ui-muted);
     text-transform: none;
-    letter-spacing: 0;
+    letter-spacing: normal;
 }
 
-.dst-drop {
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-drop {
     display: flex;
     align-items: center;
     gap: 12px;
     padding: 14px 16px;
-    border: 1.5px dashed var(--line);
-    border-radius: var(--r);
-    background: var(--paper-3);
-    color: var(--slate);
+    border: 1.5px dashed var(--ui-line);
+    border-radius: var(--radius-sm);
+    background: var(--ui-canvas);
+    color: var(--ui-muted);
     cursor: pointer;
     transition: border-color 120ms, background 120ms, color 120ms;
 }
 
-.dst-drop:hover,
-#dstField.dragging .dst-drop {
-    border-color: var(--pink-600);
-    background: var(--paper);
-    color: var(--ink);
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-drop:hover,
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-field.dragging .dst-drop {
+    border-color: var(--ui-accent);
+    background: var(--ui-surface);
+    color: var(--ui-ink);
 }
 
-.dst-drop:focus-visible {
-    outline: 2px solid var(--pink-600);
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-drop:focus-visible {
+    outline: 2px solid var(--ui-accent);
     outline-offset: 2px;
 }
-.dst-drop svg { flex: none; }
-.dst-drop-text { font-size: 13px; line-height: 1.35; }
-.dst-drop-text strong { color: var(--ink); font-weight: 600; }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-drop svg { flex: none; }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-drop-text { font-size: 13px; line-height: 1.35; }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-drop-text strong { color: var(--ui-ink); font-weight: 600; }
 
-.dst-drop-text .hint {
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-drop-text .hint {
     display: block;
     font-size: 11px;
-    color: var(--slate);
+    color: var(--ui-muted);
     margin-top: 2px;
 }
 
-/* Matches the page's ONE established error treatment (.pricing-error in the
-   shared CSS) — same --warn token + left accent, no off-palette reds. */
-.dst-error {
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-error {
     margin-top: 8px;
     padding: 10px 12px;
-    border: 1px solid rgb(180 122 0 / 25%);
-    border-left: 3px solid var(--warn);
-    border-radius: var(--r);
-    background: rgb(180 122 0 / 8%);
-    color: var(--warn);
+    border: 1px solid var(--color-warning);
+    border-left: 3px solid var(--color-warning-ink);
+    border-radius: var(--radius-sm);
+    background: var(--color-warning-bg);
+    color: var(--color-warning-ink);
     font-size: 12.5px;
     line-height: 1.4;
-    /* stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- overflow-wrap: anywhere is not a byte-identical swap; legacy */
-    word-break: break-word;
+    overflow-wrap: anywhere;
 }
 
-.dst-card {
-    border: 1px solid var(--pink-200);
-    border-radius: var(--r);
-    background: var(--paper);
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-card {
+    border: 1px solid var(--ui-line-strong);
+    border-radius: var(--radius-sm);
+    background: var(--ui-surface);
     padding: 12px 14px;
 }
-#dstField.dragging .dst-card { border-color: var(--pink-600); }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-field.dragging .dst-card { border-color: var(--ui-accent); }
 
-.dst-card-head {
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-card-head {
     display: flex;
     align-items: center;
     gap: 10px;
-    color: var(--pink-600);
+    color: var(--ui-accent); flex-wrap: wrap;
 }
 
-.dst-card-names {
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-card-names {
     display: flex;
     flex-direction: column;
-    min-width: 0;
+    min-width: 0; flex: 1;
 }
 
-.dst-file-name {
-    font-family: var(--mono);
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-file-name {
+    font-family: var(--ui-font);
     font-size: 12.5px;
     font-weight: 600;
-    color: var(--ink);
-    word-break: break-all;
+    color: var(--ui-ink);
+    overflow-wrap: anywhere;
 }
-.dst-file-label { font-size: 11px; color: var(--slate); }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-file-label { font-size: 11px; color: var(--ui-muted); }
 
-.dst-remove {
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-remove {
     margin-left: auto;
     background: transparent;
     border: 0;
-    color: var(--slate-2);
+    color: var(--ui-muted);
     cursor: pointer;
     padding: 5px;
     border-radius: 6px;
     display: inline-flex;
     transition: color 120ms, background 120ms;
 }
-.dst-remove:hover { color: var(--ink); background: var(--paper-3); }
-.dst-remove:focus-visible { outline: 2px solid var(--pink-600); outline-offset: 2px; }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-remove:hover { color: var(--ui-ink); background: var(--ui-canvas); }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-remove:focus-visible { outline: 2px solid var(--ui-accent); outline-offset: 2px; }
 
-.dst-facts {
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-facts {
     display: grid;
-    grid-template-columns: repeat(4, auto);
     justify-content: start;
     gap: 6px 22px;
-    margin: 10px 0 0;
+    margin: 10px 0 0; grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.dst-facts dt {
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-facts dt {
     font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-    color: var(--slate);
+    text-transform: none;
+    letter-spacing: normal;
+    color: var(--ui-muted);
     margin-bottom: 2px;
 }
 
-.dst-facts dd {
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-facts dd {
     margin: 0;
-    font-family: var(--mono);
+    font-family: var(--ui-font);
     font-size: 12.5px;
-    color: var(--ink);
+    color: var(--ui-ink);
 }
 
-.dst-note,
-.dst-suggest {
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-note,
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-suggest {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
     gap: 6px 10px;
     margin-top: 10px;
     padding-top: 10px;
-    border-top: 1px dashed var(--pink-200);
+    border-top: 1px dashed var(--ui-line-strong);
     font-size: 12px;
-    color: var(--slate);
+    color: var(--ui-muted);
     line-height: 1.4;
 }
 
-.dst-mini-btn {
-    background: var(--paper-3);
-    border: 1px solid var(--line);
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-mini-btn {
+    background: var(--ui-canvas);
+    border: 1px solid var(--ui-line);
     border-radius: 6px;
     padding: 3px 10px;
     font-size: 11.5px;
     font-weight: 600;
-    color: var(--ink);
+    color: var(--ui-ink);
     cursor: pointer;
     transition: border-color 120ms, background 120ms;
 }
-.dst-mini-btn:hover { border-color: var(--pink-600); background: var(--paper); }
-.dst-mini-btn:focus-visible { outline: 2px solid var(--pink-600); outline-offset: 2px; }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-mini-btn:hover { border-color: var(--ui-accent); background: var(--ui-surface); }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-mini-btn:focus-visible { outline: 2px solid var(--ui-accent); outline-offset: 2px; }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-lines { flex-direction: column; display: grid; gap: 12px; }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-lines:not(:empty) { margin-bottom: 10px; }
 
-/* ── Multi-location (Round 13) ─────────────────────────────────────────── */
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-drop.is-compact { padding: 10px 14px; }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-drop.is-compact svg { width: 18px; height: 18px; }
 
-/* Cards stack; the drop zone shrinks to an "add another" affordance once at
-   least one file is loaded. */
-#dstLines { display: flex; flex-direction: column; gap: 10px; }
-
-/* The adjacent-sibling form broke when the margin panel was inserted between
-   #dstLines and .dst-prod (Round 14). The spacing only ever needed to hang off
-   the card list itself. */
-#dstLines:not(:empty) { margin-bottom: 10px; }
-
-.dst-drop.is-compact { padding: 10px 14px; }
-.dst-drop.is-compact svg { width: 18px; height: 18px; }
-
-.dst-thumb {
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-thumb {
     width: 40px;
     height: 40px;
     flex: none;
     object-fit: contain;
-    background: var(--paper-3);
-    border: 1px solid var(--line);
+    background: var(--ui-canvas);
+    border: 1px solid var(--ui-line);
     border-radius: 7px;
 }
-.dst-card-ico { display: inline-flex; flex: none; color: var(--pink-600); }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-card-ico { display: inline-flex; flex: none; color: var(--ui-accent); }
 
-.dst-loc-badge {
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-loc-badge {
     font-size: 9.5px;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--pink-600);
+    text-transform: none;
+    letter-spacing: normal;
+    color: var(--ui-accent);
     font-weight: 600;
 }
 
-.dst-line-price {
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-line-price {
     margin-left: auto;
-    font-family: var(--mono);
+    font-family: var(--ui-font);
     font-size: 13px;
     font-weight: 600;
-    color: var(--ink);
+    color: var(--ui-ink);
     white-space: nowrap;
 }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-card-head .dst-line-price + .dst-remove { margin-left: 4px; }
 
-/* The ✕ follows the price, so it must not also claim the auto margin. */
-.dst-card-head .dst-line-price + .dst-remove { margin-left: 4px; }
-
-.dst-line-ctl {
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-line-ctl {
     display: flex;
     align-items: flex-end;
     flex-wrap: wrap;
     gap: 10px;
     margin-top: 10px;
 }
-.dst-chips { display: inline-flex; gap: 4px; }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-chips { display: inline-flex; gap: 4px; }
 
-.dst-chip {
-    background: var(--paper-3);
-    border: 1px solid var(--line);
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-chip {
+    background: var(--ui-canvas);
+    border: 1px solid var(--ui-line);
     border-radius: 6px;
     padding: 4px 10px;
     font-size: 11.5px;
     font-weight: 500;
-    color: var(--slate);
+    color: var(--ui-muted);
     cursor: pointer;
     transition: background 120ms, color 120ms, border-color 120ms;
 }
-.dst-chip:hover { color: var(--ink); border-color: var(--slate-3); }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-chip:hover { color: var(--ui-ink); border-color: var(--ui-line-strong); }
 
-.dst-chip.active {
-    background: var(--ink);
-    border-color: var(--ink);
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-chip.active {
+    background: var(--ui-ink);
+    border-color: var(--ui-ink);
     color: var(--color-on-brand);
 }
-.dst-chip:focus-visible { outline: 2px solid var(--pink-600); outline-offset: 2px; }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-chip:focus-visible { outline: 2px solid var(--ui-accent); outline-offset: 2px; }
 
-.dst-line-stitch { display: inline-flex; align-items: center; gap: 8px; }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-line-stitch { display: inline-flex; align-items: center; gap: 8px; }
 
-.dst-line-stitch span {
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-line-stitch span {
     font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-    color: var(--slate);
+    text-transform: none;
+    letter-spacing: normal;
+    color: var(--ui-muted);
 }
-.dst-line-stitch input { width: 110px; padding: 6px 10px; font-size: 13px; }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-line-stitch input { width: 110px; padding: 6px 10px; font-size: 13px; }
 
-/* ── Production read ───────────────────────────────────────────────────── */
-
-.dst-prod {
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-prod {
     display: block;
     margin-top: 12px;
     padding: 12px 14px;
-    border: 1px solid var(--line);
-    border-radius: var(--r);
-    background: var(--paper-2);
+    border: 1px solid var(--ui-line);
+    border-radius: var(--radius-sm);
+    background: var(--ui-canvas);
 }
 
-.dst-prod-head {
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-prod-head {
     display: flex;
     align-items: baseline;
     flex-wrap: wrap;
     gap: 4px 10px;
     font-size: 11px;
     font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-    color: var(--ink);
+    text-transform: none;
+    letter-spacing: normal;
+    color: var(--ui-ink);
 }
 
-.dst-prod-sub {
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-prod-sub {
     font-weight: 400;
     text-transform: none;
-    letter-spacing: 0;
+    letter-spacing: normal;
     font-size: 11px;
-    color: var(--slate);
+    color: var(--ui-muted);
 }
-.dst-time { margin-top: 8px; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-time { margin-top: 8px; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
 
-.dst-time-big {
-    font-family: var(--mono);
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-time-big {
+    font-family: var(--ui-font);
     font-size: 18px;
     font-weight: 600;
-    color: var(--ink);
+    color: var(--ui-ink);
 }
-.dst-time-sub { font-size: 11.5px; color: var(--slate); }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-time-sub { font-size: 11.5px; color: var(--ui-muted); }
 
-.dst-risks { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 8px; }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-risks { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 8px; }
 
-.dst-risk {
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-risk {
     display: grid;
     gap: 2px;
     padding-left: 10px;
-    border-left: 3px solid var(--slate-3);
+    border-left: 3px solid var(--ui-line-strong);
 }
-.dst-risk.warn { border-left-color: var(--warn); }
-.dst-risk.ok { border-left-color: var(--ok); }
-.dst-risk-title { font-size: 12px; font-weight: 600; color: var(--ink); }
-.dst-risk.warn .dst-risk-title { color: var(--warn); }
-.dst-risk.ok .dst-risk-title { color: var(--ok); }
-.dst-risk-detail { font-size: 11.5px; line-height: 1.45; color: var(--slate); }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-risk.warn { border-left-color: var(--color-warning-ink); }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-risk.ok { border-left-color: var(--ui-accent); }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-risk-title { font-size: 12px; font-weight: 600; color: var(--ui-ink); }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-risk.warn .dst-risk-title { color: var(--color-warning-ink); }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-risk.ok .dst-risk-title { color: var(--ui-accent); }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-risk-detail { font-size: 11.5px; line-height: 1.45; color: var(--ui-muted); }
 
-/* ── Per-location breakdown in the result panel ────────────────────────── */
-
-.res-lines {
+:where([data-ui="unified"][data-contract-calculator="emb"]) .res-lines {
     list-style: none;
     margin: 12px 0 0;
     padding: 0;
@@ -485,7 +320,7 @@ table.price tfoot td.cell-hi {
     gap: 6px;
 }
 
-.res-lines li {
+:where([data-ui="unified"][data-contract-calculator="emb"]) .res-lines li {
     display: grid;
     grid-template-columns: 1fr auto;
     gap: 0 10px;
@@ -493,59 +328,51 @@ table.price tfoot td.cell-hi {
     font-size: 12px;
 }
 
-.res-lines .rl-name {
-    font-family: var(--mono);
+:where([data-ui="unified"][data-contract-calculator="emb"]) .res-lines .rl-name {
+    font-family: var(--ui-font);
     font-size: 11.5px;
-    color: var(--ink);
+    color: var(--ui-ink);
     overflow-wrap: anywhere;
 }
 
-.res-lines .rl-meta {
+:where([data-ui="unified"][data-contract-calculator="emb"]) .res-lines .rl-meta {
     grid-column: 1;
     font-size: 10.5px;
-    color: var(--slate);
+    color: var(--ui-muted);
 }
 
-.res-lines .rl-amt {
+:where([data-ui="unified"][data-contract-calculator="emb"]) .res-lines .rl-amt {
     grid-column: 2;
     grid-row: 1 / span 2;
-    font-family: var(--mono);
+    font-family: var(--ui-font);
     font-weight: 600;
-    color: var(--ink);
+    color: var(--ui-ink);
     white-space: nowrap;
 }
 
-/* ── Reorder recall (Round 14) ─────────────────────────────────────────── */
-
-.dst-recall {
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-recall {
     display: flex;
     align-items: baseline;
     gap: 7px;
     margin-top: 10px;
     padding-top: 10px;
-    border-top: 1px dashed var(--pink-200);
+    border-top: 1px dashed var(--ui-line-strong);
     font-size: 12px;
-    color: var(--pink-700);
+    color: var(--ui-accent);
     font-weight: 500;
 }
-.dst-recall-ico { font-size: 13px; line-height: 1; }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-recall-ico { font-size: 13px; line-height: 1; }
 
-/* ── STAFF-ONLY margin panel (Round 14) ────────────────────────────────────
-   Only ever rendered when /api/contract-embroidery/cost-model returns 200,
-   i.e. for a signed-in staff session. Styled to be unmistakably internal so
-   nobody screenshots it into a customer thread by accident. */
-
-.dst-margin {
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-margin {
     display: block;
     margin-top: 12px;
     padding: 12px 14px;
-    border: 1px solid var(--ink);
-    border-radius: var(--r);
-    background: var(--ink);
-    color: var(--color-on-brand);
+    border: 1px solid var(--ui-ink);
+    border-radius: var(--radius-sm);
+    color: var(--color-on-brand); background: var(--ui-ink);
 }
 
-.dst-margin-head {
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-margin-head {
     display: flex;
     align-items: baseline;
     justify-content: space-between;
@@ -553,104 +380,103 @@ table.price tfoot td.cell-hi {
     gap: 4px 10px;
 }
 
-/* --pink-400 (#E45D92) gives only 3.34:1 against white at 10px/700 — under the
-   4.5:1 AA floor. This chip is the single visual thing stopping a rep pasting a
-   cost screenshot into a distributor thread, so it gets the darkest pink:
-   --pink-600 (#B91C5C) measures 6.2:1. */
-.dst-staff-chip {
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-staff-chip {
     font-size: 10px;
     font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.09em;
-    background: var(--pink-600);
+    text-transform: none;
+    letter-spacing: normal;
+    background: var(--ui-accent);
     color: var(--color-on-brand);
     padding: 2px 8px;
     border-radius: 999px;
 }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dm-incomplete { display: grid; gap: 3px; }
 
-/* Partial cost basis — deliberately plain and unmissable, no numbers. */
-.dm-incomplete { display: grid; gap: 3px; }
-
-.dm-incomplete-title {
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dm-incomplete-title {
     font-size: 12.5px;
     font-weight: 600;
-    color: var(--embroidery-contract-orange);
+    color: var(--amber-300);
 }
 
-.dm-incomplete-detail {
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dm-incomplete-detail {
     font-size: 11.5px;
     line-height: 1.45;
-    color: rgb(255 255 255 / 78%);
+    color: var(--gray-200);
 }
 
-.dst-margin-asof {
-    font-family: var(--mono);
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-margin-asof {
+    font-family: var(--ui-font);
     font-size: 10.5px;
-    color: rgb(255 255 255 / 62%);
+    color: var(--gray-200);
 }
 
-.dst-margin-grid {
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-margin-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
     gap: 10px;
-    margin-top: 10px;
+    margin-top: 10px; grid-template-columns: repeat(2, minmax(0, 1fr));
 }
-.dm-cell { display: grid; gap: 2px; }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dm-cell { display: grid; gap: 2px; }
 
-.dm-k {
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dm-k {
     font-size: 9.5px;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-    color: rgb(255 255 255 / 60%);
+    text-transform: none;
+    letter-spacing: normal;
+    color: var(--gray-200);
 }
 
-.dm-v {
-    font-family: var(--mono);
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dm-v {
+    font-family: var(--ui-font);
     font-size: 14px;
     font-weight: 600;
     color: var(--color-on-brand);
 }
-.dm-cell.pos .dm-v { color: var(--embroidery-contract-green); }
-.dm-cell.neg .dm-v { color: var(--embroidery-contract-red); }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dm-cell.pos .dm-v { color: var(--emerald-200); }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dm-cell.neg .dm-v { color: var(--red-200); }
 
-.dst-margin-note {
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-margin-note {
     margin: 10px 0 0;
     font-size: 10.5px;
     line-height: 1.45;
-    color: rgb(255 255 255 / 62%);
+    color: var(--gray-200);
 }
 
-/* 🔴 Cost NEVER reaches paper. A printed contract quote goes to the customer. */
 @media print {
-    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
-    .dst-margin { display: none !important; }
-}
-
-/* Responsive — stack the two-column qty/stitch row on narrow screens */
-@media (width <= 980px) {
-    .dst-margin-grid { grid-template-columns: repeat(2, 1fr); }
+    :where([data-ui="unified"][data-contract-calculator="emb"]) .dst-margin { display: none; }
 }
 
 @media (width <= 980px) {
-    .calc-form .row { grid-template-columns: 1fr; }
-    .dst-facts { grid-template-columns: repeat(2, auto); }
-    .dst-line-stitch { width: 100%; }
-    .dst-line-stitch input { flex: 1; width: auto; }
+    :where([data-ui="unified"][data-contract-calculator="emb"]) .dst-margin-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
-/* Terms line under the hero lede (2026-09-02): order minimum + small-order fee, values filled from Caspio by embroidery-contract.js */
-.hero .lede-terms { margin-top: .6rem; font-size: .95em; }
-.hero .lede-terms strong { color: var(--text-strong, inherit); }
+@media (width <= 980px) {
+    :where([data-ui="unified"][data-contract-calculator="emb"]) .dst-facts { grid-template-columns: repeat(2, auto); }
+}
 
-/* Table-card terms line (2026-09-02): min stitches, small-order fee + band, order minimum, all from the API */
-#cardMins { display: flex; flex-wrap: wrap; gap: 6px 16px; justify-content: flex-end; }
-.tables-head .print-list { margin-left: auto; }
+@media (width <= 980px) {
+    :where([data-ui="unified"][data-contract-calculator="emb"]) .dst-line-stitch { width: 100%; }
+}
 
-.price-foot .print-list-link { flex-basis: 100%; text-align: right; font-size: .85em; font-weight: 600; text-decoration: none; margin-top: 6px; }
-.price-foot .print-list-link:hover { text-decoration: underline; }
+@media (width <= 980px) {
+    :where([data-ui="unified"][data-contract-calculator="emb"]) .dst-line-stitch input { flex: 1; width: auto; }
+}
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-facts dt, :where([data-ui="unified"][data-contract-calculator="emb"]) .dst-facts dd, :where([data-ui="unified"][data-contract-calculator="emb"]) .dst-line-stitch span, :where([data-ui="unified"][data-contract-calculator="emb"]) .dm-k, :where([data-ui="unified"][data-contract-calculator="emb"]) .dst-margin-note, :where([data-ui="unified"][data-contract-calculator="emb"]) .dst-margin-asof { font-size: 12px; }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .dst-remove, :where([data-ui="unified"][data-contract-calculator="emb"]) .dst-mini-btn, :where([data-ui="unified"][data-contract-calculator="emb"]) .dst-chip { min-height: 44px; }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .contract-card-mins { display: flex; flex-wrap: wrap; gap: 8px 16px; }
+:where([data-ui="unified"][data-contract-calculator="emb"]) .tabs .code { font-size: 12px; }
 
-/* Phone (≤640px) — 2026-09-05 sweep: the segmented control / tab strip did not wrap. */
-@media (width <= 640px) {
-    .tabs { flex-wrap: wrap; }
-    .seg { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+@media print {
+ :where([data-ui="unified"][data-contract-calculator="emb"]) .dst-margin, :where([data-ui="unified"][data-contract-calculator="emb"]) .dst-prod, :where([data-ui="unified"][data-contract-calculator="emb"]) .dst-drop, :where([data-ui="unified"][data-contract-calculator="emb"]) .dst-recall, :where([data-ui="unified"][data-contract-calculator="emb"]) .dst-note, :where([data-ui="unified"][data-contract-calculator="emb"]) .dst-suggest, :where([data-ui="unified"][data-contract-calculator="emb"]) .dst-remove, :where([data-ui="unified"][data-contract-calculator="emb"]) .dst-line-ctl { display: none; }
+ :where([data-ui="unified"][data-contract-calculator="emb"]) .dst-card { padding: 6px; }
+ :where([data-ui="unified"][data-contract-calculator="emb"]) .dst-file-name, :where([data-ui="unified"][data-contract-calculator="emb"]) .dst-line-price, :where([data-ui="unified"][data-contract-calculator="emb"]) .dst-file-label, :where([data-ui="unified"][data-contract-calculator="emb"]) .dst-facts dt, :where([data-ui="unified"][data-contract-calculator="emb"]) .dst-facts dd { font-size: 9px; }
+ :where([data-ui="unified"][data-contract-calculator="emb"]) .dst-thumb { width: 24px; height: 24px; }
+ :where([data-ui="unified"][data-contract-calculator="emb"]) .field-input { min-height: 0; height: auto; padding: 4px 6px; font-size: 10px; }
+}
+
+@media print {
+ :where([data-ui="unified"][data-contract-calculator="emb"]) .print-list-link { display: none; }
+ :where([data-ui="unified"][data-contract-calculator="emb"]) .dst-field:not(:has(.dst-card), :has(.dst-error:not([hidden]))) { display: none; }
+ :where([data-ui="unified"][data-contract-calculator="emb"]) .dst-facts { grid-template-columns: repeat(4, auto); gap: 4px 12px; margin-top: 6px; }
+}
+
+@media print { :where([data-ui="unified"][data-contract-calculator="emb"]) .dst-sr-only { display: none; } }
 }

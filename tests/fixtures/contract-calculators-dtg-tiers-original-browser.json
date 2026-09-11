@@ -1,0 +1,323 @@
+{
+  "records": [
+    {
+      "qty": 1,
+      "values": [
+        [
+          "resTier",
+          "Tier 1–23"
+        ],
+        [
+          "unitPrice",
+          "51.50"
+        ],
+        [
+          "unitSub",
+          "2 locations · base $14.50/pc · + LTM $37.00/pc"
+        ],
+        [
+          "orderTotalNote",
+          "1 × $51.50"
+        ],
+        [
+          "orderTotal",
+          "$51.50"
+        ],
+        [
+          "tableLtmNote",
+          "LTM fee $37.00 ÷ 1 pcs = adds +$37.00/pc on this order"
+        ]
+      ]
+    },
+    {
+      "qty": 7,
+      "values": [
+        [
+          "resTier",
+          "Tier 1–23"
+        ],
+        [
+          "unitPrice",
+          "19.79"
+        ],
+        [
+          "unitSub",
+          "2 locations · base $14.50/pc · + LTM $5.29/pc"
+        ],
+        [
+          "orderTotalNote",
+          "7 × $19.79"
+        ],
+        [
+          "orderTotal",
+          "$138.50"
+        ],
+        [
+          "tableLtmNote",
+          "LTM fee $37.00 ÷ 7 pcs = adds +$5.29/pc on this order"
+        ]
+      ]
+    },
+    {
+      "qty": 8,
+      "values": [
+        [
+          "resTier",
+          "Tier 1–23"
+        ],
+        [
+          "unitPrice",
+          "19.13"
+        ],
+        [
+          "unitSub",
+          "2 locations · base $14.50/pc · + LTM $4.63/pc"
+        ],
+        [
+          "orderTotalNote",
+          "8 × $19.13"
+        ],
+        [
+          "orderTotal",
+          "$153.00"
+        ],
+        [
+          "tableLtmNote",
+          "LTM fee $37.00 ÷ 8 pcs = adds +$4.63/pc on this order"
+        ]
+      ]
+    },
+    {
+      "qty": 12,
+      "values": [
+        [
+          "resTier",
+          "Tier 1–23"
+        ],
+        [
+          "unitPrice",
+          "17.58"
+        ],
+        [
+          "unitSub",
+          "2 locations · base $14.50/pc · + LTM $3.08/pc"
+        ],
+        [
+          "orderTotalNote",
+          "12 × $17.58"
+        ],
+        [
+          "orderTotal",
+          "$211.00"
+        ],
+        [
+          "tableLtmNote",
+          "LTM fee $37.00 ÷ 12 pcs = adds +$3.08/pc on this order"
+        ]
+      ]
+    },
+    {
+      "qty": 23,
+      "values": [
+        [
+          "resTier",
+          "Tier 1–23"
+        ],
+        [
+          "unitPrice",
+          "16.11"
+        ],
+        [
+          "unitSub",
+          "2 locations · base $14.50/pc · + LTM $1.61/pc"
+        ],
+        [
+          "orderTotalNote",
+          "23 × $16.11"
+        ],
+        [
+          "orderTotal",
+          "$370.50"
+        ],
+        [
+          "tableLtmNote",
+          "LTM fee $37.00 ÷ 23 pcs = adds +$1.61/pc on this order"
+        ]
+      ]
+    },
+    {
+      "qty": 24,
+      "values": [
+        [
+          "resTier",
+          "Tier 24–47"
+        ],
+        [
+          "unitPrice",
+          "13.00"
+        ],
+        [
+          "unitSub",
+          "2 locations · base $13.00/pc"
+        ],
+        [
+          "orderTotalNote",
+          "24 × $13.00"
+        ],
+        [
+          "orderTotal",
+          "$312.00"
+        ],
+        [
+          "tableLtmNote",
+          "LTM fee $50 on orders 1–23 pcs · adds $50 ÷ qty per piece"
+        ]
+      ]
+    },
+    {
+      "qty": 47,
+      "values": [
+        [
+          "resTier",
+          "Tier 24–47"
+        ],
+        [
+          "unitPrice",
+          "13.00"
+        ],
+        [
+          "unitSub",
+          "2 locations · base $13.00/pc"
+        ],
+        [
+          "orderTotalNote",
+          "47 × $13.00"
+        ],
+        [
+          "orderTotal",
+          "$611.00"
+        ],
+        [
+          "tableLtmNote",
+          "LTM fee $50 on orders 1–23 pcs · adds $50 ÷ qty per piece"
+        ]
+      ]
+    },
+    {
+      "qty": 48,
+      "values": [
+        [
+          "resTier",
+          "Tier 48–71"
+        ],
+        [
+          "unitPrice",
+          "11.50"
+        ],
+        [
+          "unitSub",
+          "2 locations · base $11.50/pc"
+        ],
+        [
+          "orderTotalNote",
+          "48 × $11.50"
+        ],
+        [
+          "orderTotal",
+          "$552.00"
+        ],
+        [
+          "tableLtmNote",
+          "LTM fee $50 on orders 1–23 pcs · adds $50 ÷ qty per piece"
+        ]
+      ]
+    },
+    {
+      "qty": 71,
+      "values": [
+        [
+          "resTier",
+          "Tier 48–71"
+        ],
+        [
+          "unitPrice",
+          "11.50"
+        ],
+        [
+          "unitSub",
+          "2 locations · base $11.50/pc"
+        ],
+        [
+          "orderTotalNote",
+          "71 × $11.50"
+        ],
+        [
+          "orderTotal",
+          "$816.50"
+        ],
+        [
+          "tableLtmNote",
+          "LTM fee $50 on orders 1–23 pcs · adds $50 ÷ qty per piece"
+        ]
+      ]
+    },
+    {
+      "qty": 72,
+      "values": [
+        [
+          "resTier",
+          "Tier 72+"
+        ],
+        [
+          "unitPrice",
+          "10.00"
+        ],
+        [
+          "unitSub",
+          "2 locations · base $10.00/pc"
+        ],
+        [
+          "orderTotalNote",
+          "72 × $10.00"
+        ],
+        [
+          "orderTotal",
+          "$720.00"
+        ],
+        [
+          "tableLtmNote",
+          "LTM fee $50 on orders 1–23 pcs · adds $50 ÷ qty per piece"
+        ]
+      ]
+    },
+    {
+      "qty": 144,
+      "values": [
+        [
+          "resTier",
+          "Tier 72+"
+        ],
+        [
+          "unitPrice",
+          "10.00"
+        ],
+        [
+          "unitSub",
+          "2 locations · base $10.00/pc"
+        ],
+        [
+          "orderTotalNote",
+          "144 × $10.00"
+        ],
+        [
+          "orderTotal",
+          "$1,440.00"
+        ],
+        [
+          "tableLtmNote",
+          "LTM fee $50 on orders 1–23 pcs · adds $50 ÷ qty per piece"
+        ]
+      ]
+    }
+  ]
+}

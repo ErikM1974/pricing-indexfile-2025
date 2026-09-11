@@ -1,0 +1,279 @@
+{
+  "records": [
+    {
+      "qty": 1,
+      "values": [
+        [
+          "resTier",
+          "Tier 1–7"
+        ],
+        [
+          "unitPrice",
+          "250.00"
+        ],
+        [
+          "unitSub",
+          "8K × $1.23/1K · $250.00 order minimum applied"
+        ],
+        [
+          "orderTotalNote",
+          "Order minimum $250.00 (priced at $9.84)"
+        ],
+        [
+          "orderTotal",
+          "$250.00"
+        ]
+      ]
+    },
+    {
+      "qty": 7,
+      "values": [
+        [
+          "resTier",
+          "Tier 1–7"
+        ],
+        [
+          "unitPrice",
+          "35.71"
+        ],
+        [
+          "unitSub",
+          "8K × $1.23/1K · $250.00 order minimum applied"
+        ],
+        [
+          "orderTotalNote",
+          "Order minimum $250.00 (priced at $68.88)"
+        ],
+        [
+          "orderTotal",
+          "$250.00"
+        ]
+      ]
+    },
+    {
+      "qty": 8,
+      "values": [
+        [
+          "resTier",
+          "Tier 8–23"
+        ],
+        [
+          "unitPrice",
+          "31.25"
+        ],
+        [
+          "unitSub",
+          "8K × $1.12/1K · $250.00 order minimum applied"
+        ],
+        [
+          "orderTotalNote",
+          "Order minimum $250.00 (priced at $71.68)"
+        ],
+        [
+          "orderTotal",
+          "$250.00"
+        ]
+      ]
+    },
+    {
+      "qty": 12,
+      "values": [
+        [
+          "resTier",
+          "Tier 8–23"
+        ],
+        [
+          "unitPrice",
+          "20.83"
+        ],
+        [
+          "unitSub",
+          "8K × $1.12/1K · $250.00 order minimum applied"
+        ],
+        [
+          "orderTotalNote",
+          "Order minimum $250.00 (priced at $107.52)"
+        ],
+        [
+          "orderTotal",
+          "$250.00"
+        ]
+      ]
+    },
+    {
+      "qty": 23,
+      "values": [
+        [
+          "resTier",
+          "Tier 8–23"
+        ],
+        [
+          "unitPrice",
+          "10.87"
+        ],
+        [
+          "unitSub",
+          "8K × $1.12/1K · $250.00 order minimum applied"
+        ],
+        [
+          "orderTotalNote",
+          "Order minimum $250.00 (priced at $206.08)"
+        ],
+        [
+          "orderTotal",
+          "$250.00"
+        ]
+      ]
+    },
+    {
+      "qty": 24,
+      "values": [
+        [
+          "resTier",
+          "Tier 24–47"
+        ],
+        [
+          "unitPrice",
+          "10.42"
+        ],
+        [
+          "unitSub",
+          "8K × $1.01/1K · $250.00 order minimum applied"
+        ],
+        [
+          "orderTotalNote",
+          "Order minimum $250.00 (priced at $193.92)"
+        ],
+        [
+          "orderTotal",
+          "$250.00"
+        ]
+      ]
+    },
+    {
+      "qty": 47,
+      "values": [
+        [
+          "resTier",
+          "Tier 24–47"
+        ],
+        [
+          "unitPrice",
+          "8.08"
+        ],
+        [
+          "unitSub",
+          "8K × $1.01/1K"
+        ],
+        [
+          "orderTotalNote",
+          "47 × $8.08"
+        ],
+        [
+          "orderTotal",
+          "$379.76"
+        ]
+      ]
+    },
+    {
+      "qty": 48,
+      "values": [
+        [
+          "resTier",
+          "Tier 48–71"
+        ],
+        [
+          "unitPrice",
+          "7.20"
+        ],
+        [
+          "unitSub",
+          "8K × $0.90/1K"
+        ],
+        [
+          "orderTotalNote",
+          "48 × $7.20"
+        ],
+        [
+          "orderTotal",
+          "$345.60"
+        ]
+      ]
+    },
+    {
+      "qty": 71,
+      "values": [
+        [
+          "resTier",
+          "Tier 48–71"
+        ],
+        [
+          "unitPrice",
+          "7.20"
+        ],
+        [
+          "unitSub",
+          "8K × $0.90/1K"
+        ],
+        [
+          "orderTotalNote",
+          "71 × $7.20"
+        ],
+        [
+          "orderTotal",
+          "$511.20"
+        ]
+      ]
+    },
+    {
+      "qty": 72,
+      "values": [
+        [
+          "resTier",
+          "Tier 72+"
+        ],
+        [
+          "unitPrice",
+          "6.32"
+        ],
+        [
+          "unitSub",
+          "8K × $0.79/1K"
+        ],
+        [
+          "orderTotalNote",
+          "72 × $6.32"
+        ],
+        [
+          "orderTotal",
+          "$455.04"
+        ]
+      ]
+    },
+    {
+      "qty": 144,
+      "values": [
+        [
+          "resTier",
+          "Tier 72+"
+        ],
+        [
+          "unitPrice",
+          "6.32"
+        ],
+        [
+          "unitSub",
+          "8K × $0.79/1K"
+        ],
+        [
+          "orderTotalNote",
+          "144 × $6.32"
+        ],
+        [
+          "orderTotal",
+          "$910.08"
+        ]
+      ]
+    }
+  ]
+}

@@ -1,0 +1,618 @@
+{
+  "name": "dtg-assistant",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Contract DTG Pricing 2026 — Northwest Custom Apparel",
+      "url": "/calculators/dtg-contract/index.html?locs=LC&qty=24",
+      "ids": {
+        "qty": "",
+        "locGrid": "Left Chest 4″ × 4″ Full Front 12″ × 16″ Full Back 12″ × 16″ Jumbo Front 14″ × 18″ Jumbo Back 14″ × 18″",
+        "hwToggle": "",
+        "resLocSummary": "LEFT CHEST",
+        "resTier": "TIER 24–47",
+        "unitPrice": "5.50",
+        "unitSub": "Left Chest @ $5.50/pc",
+        "ppBreakdownList": "Left Chest $5.50 Per-piece total $5.50",
+        "orderTotalNote": "24 × $5.50",
+        "orderTotal": "$132.00",
+        "aiDraftBtn": "✨ Draft Email Quote with AI",
+        "effectiveSublabel": "PER PIECE",
+        "tableLtmNote": "LTM fee $50 on orders 1–23 pcs · adds $50 ÷ qty per piece",
+        "aiChatClose": "",
+        "aiChatContextPill": "24 pcs · Left Chest · $5.50/pc · Total $132.00",
+        "aiChatMessages": "Synthetic quote assistant. Please provide the customer details.",
+        "aiChatTextarea": "",
+        "aiChatSend": "",
+        "shareToastText": "Quote link copied — paste into your email or chat"
+      },
+      "fields": [
+        {
+          "id": "qty",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "hwToggle",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "aiChatTextarea",
+          "type": "textarea",
+          "value": "",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "tel:+12539225793,119",
+          "text": "Direct 253-922-5793 ext. 119"
+        },
+        {
+          "href": "mailto:ruth@nwcustomapparel.com",
+          "text": "Email ruth@nwcustomapparel.com"
+        }
+      ],
+      "tables": [
+        "LOCATION 1–23 24–47 48–71 72+ Left Chest $6.25 $5.50 $4.75 $4.00 Full Front $8.25 $7.50 $6.75 $6.00 Full Back $10.25 $9.50 $8.75 $8.00 Jumbo Front $12.25 $11.50 $10.75 $10.00 Jumbo Back $14.25 $13.50 $12.75 $12.00 Your effective rate PER PIECE $6.25/pc $5.50/pc $4.75/pc $4.00/pc"
+      ],
+      "headings": [
+        "Contract DTG 2026.",
+        "Quick price calculator",
+        "Pricing table",
+        "Contract DTG — per location",
+        "Ruthie Nhoung"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".fact:nth-child(1) > .k"
+            ],
+            [
+              ".fact:nth-child(2) > .k"
+            ],
+            [
+              ".fact:nth-child(3) > .k"
+            ],
+            [
+              ".meta"
+            ],
+            [
+              ".field-hint"
+            ],
+            [
+              ".loc[data-loc=\"FF\"] > .loc-body > .loc-size"
+            ],
+            [
+              ".loc[data-loc=\"FB\"] > .loc-body > .loc-size"
+            ],
+            [
+              ".loc[data-loc=\"JF\"] > .loc-body > .loc-size"
+            ],
+            [
+              ".loc[data-loc=\"JB\"] > .loc-body > .loc-size"
+            ],
+            [
+              ".footnote"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Contract DTG Pricing 2026 — Northwest Custom Apparel",
+      "url": "/calculators/dtg-contract/index.html?locs=LC&qty=24",
+      "ids": {
+        "qty": "",
+        "locGrid": "Left Chest 4″ × 4″ Full Front 12″ × 16″ Full Back 12″ × 16″ Jumbo Front 14″ × 18″ Jumbo Back 14″ × 18″",
+        "hwToggle": "",
+        "resLocSummary": "LEFT CHEST",
+        "resTier": "TIER 24–47",
+        "unitPrice": "5.50",
+        "unitSub": "Left Chest @ $5.50/pc",
+        "ppBreakdownList": "Left Chest $5.50 Per-piece total $5.50",
+        "orderTotalNote": "24 × $5.50",
+        "orderTotal": "$132.00",
+        "aiDraftBtn": "✨ Draft Email Quote with AI",
+        "effectiveSublabel": "PER PIECE",
+        "tableLtmNote": "LTM fee $50 on orders 1–23 pcs · adds $50 ÷ qty per piece",
+        "aiChatClose": "",
+        "aiChatContextPill": "24 pcs · Left Chest · $5.50/pc · Total $132.00",
+        "aiChatMessages": "Synthetic quote assistant. Please provide the customer details.",
+        "aiChatTextarea": "",
+        "aiChatSend": "",
+        "shareToastText": "Quote link copied — paste into your email or chat"
+      },
+      "fields": [
+        {
+          "id": "qty",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "hwToggle",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "aiChatTextarea",
+          "type": "textarea",
+          "value": "",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "tel:+12539225793,119",
+          "text": "Direct 253-922-5793 ext. 119"
+        },
+        {
+          "href": "mailto:ruth@nwcustomapparel.com",
+          "text": "Email ruth@nwcustomapparel.com"
+        }
+      ],
+      "tables": [
+        "LOCATION 1–23 24–47 48–71 72+ Left Chest $6.25 $5.50 $4.75 $4.00 Full Front $8.25 $7.50 $6.75 $6.00 Full Back $10.25 $9.50 $8.75 $8.00 Jumbo Front $12.25 $11.50 $10.75 $10.00 Jumbo Back $14.25 $13.50 $12.75 $12.00 Your effective rate PER PIECE $6.25/pc $5.50/pc $4.75/pc $4.00/pc"
+      ],
+      "headings": [
+        "Contract DTG 2026.",
+        "Quick price calculator",
+        "Pricing table",
+        "Contract DTG — per location",
+        "Ruthie Nhoung"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".fact:nth-child(1) > .k"
+            ],
+            [
+              ".fact:nth-child(2) > .k"
+            ],
+            [
+              ".fact:nth-child(3) > .k"
+            ],
+            [
+              ".meta"
+            ],
+            [
+              ".field-hint"
+            ],
+            [
+              ".loc[data-loc=\"FF\"] > .loc-body > .loc-size"
+            ],
+            [
+              ".loc[data-loc=\"FB\"] > .loc-body > .loc-size"
+            ],
+            [
+              ".loc[data-loc=\"JF\"] > .loc-body > .loc-size"
+            ],
+            [
+              ".loc[data-loc=\"JB\"] > .loc-body > .loc-size"
+            ],
+            [
+              ".footnote"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Contract DTG Pricing 2026 — Northwest Custom Apparel",
+      "url": "/calculators/dtg-contract/index.html?locs=LC&qty=24",
+      "ids": {
+        "qty": "",
+        "locGrid": "Left Chest 4″ × 4″ Full Front 12″ × 16″ Full Back 12″ × 16″ Jumbo Front 14″ × 18″ Jumbo Back 14″ × 18″",
+        "hwToggle": "",
+        "resLocSummary": "LEFT CHEST",
+        "resTier": "TIER 24–47",
+        "unitPrice": "5.50",
+        "unitSub": "Left Chest @ $5.50/pc",
+        "ppBreakdownList": "Left Chest $5.50 Per-piece total $5.50",
+        "orderTotalNote": "24 × $5.50",
+        "orderTotal": "$132.00",
+        "aiDraftBtn": "✨ Draft Email Quote with AI",
+        "effectiveSublabel": "PER PIECE",
+        "tableLtmNote": "LTM fee $50 on orders 1–23 pcs · adds $50 ÷ qty per piece",
+        "aiChatClose": "",
+        "aiChatContextPill": "24 pcs · Left Chest · $5.50/pc · Total $132.00",
+        "aiChatMessages": "Synthetic quote assistant. Please provide the customer details.",
+        "aiChatTextarea": "",
+        "aiChatSend": "",
+        "shareToastText": "Quote link copied — paste into your email or chat"
+      },
+      "fields": [
+        {
+          "id": "qty",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "hwToggle",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "aiChatTextarea",
+          "type": "textarea",
+          "value": "",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "tel:+12539225793,119",
+          "text": "Direct 253-922-5793 ext. 119"
+        },
+        {
+          "href": "mailto:ruth@nwcustomapparel.com",
+          "text": "Email ruth@nwcustomapparel.com"
+        }
+      ],
+      "tables": [
+        "LOCATION 1–23 24–47 48–71 72+ Left Chest $6.25 $5.50 $4.75 $4.00 Full Front $8.25 $7.50 $6.75 $6.00 Full Back $10.25 $9.50 $8.75 $8.00 Jumbo Front $12.25 $11.50 $10.75 $10.00 Jumbo Back $14.25 $13.50 $12.75 $12.00 Your effective rate PER PIECE $6.25/pc $5.50/pc $4.75/pc $4.00/pc"
+      ],
+      "headings": [
+        "Contract DTG 2026.",
+        "Quick price calculator",
+        "Pricing table",
+        "Contract DTG — per location",
+        "Ruthie Nhoung"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".fact:nth-child(1) > .k"
+            ],
+            [
+              ".fact:nth-child(2) > .k"
+            ],
+            [
+              ".fact:nth-child(3) > .k"
+            ],
+            [
+              ".meta"
+            ],
+            [
+              ".field-hint"
+            ],
+            [
+              ".loc[data-loc=\"FF\"] > .loc-body > .loc-size"
+            ],
+            [
+              ".loc[data-loc=\"FB\"] > .loc-body > .loc-size"
+            ],
+            [
+              ".loc[data-loc=\"JF\"] > .loc-body > .loc-size"
+            ],
+            [
+              ".loc[data-loc=\"JB\"] > .loc-body > .loc-size"
+            ],
+            [
+              ".footnote"
+            ]
+          ]
+        },
+        {
+          "id": "scrollable-region-focusable",
+          "nodes": [
+            [
+              "#priceTable"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Contract DTG Pricing 2026 — Northwest Custom Apparel",
+      "url": "/calculators/dtg-contract/index.html?locs=LC&qty=24",
+      "ids": {
+        "qty": "",
+        "locGrid": "Left Chest 4″ × 4″ Full Front 12″ × 16″ Full Back 12″ × 16″ Jumbo Front 14″ × 18″ Jumbo Back 14″ × 18″",
+        "hwToggle": "",
+        "resLocSummary": "LEFT CHEST",
+        "resTier": "TIER 24–47",
+        "unitPrice": "5.50",
+        "unitSub": "Left Chest @ $5.50/pc",
+        "ppBreakdownList": "Left Chest $5.50 Per-piece total $5.50",
+        "orderTotalNote": "24 × $5.50",
+        "orderTotal": "$132.00",
+        "aiDraftBtn": "✨ Draft Email Quote with AI",
+        "effectiveSublabel": "PER PIECE",
+        "tableLtmNote": "LTM fee $50 on orders 1–23 pcs · adds $50 ÷ qty per piece",
+        "aiChatClose": "",
+        "aiChatContextPill": "24 pcs · Left Chest · $5.50/pc · Total $132.00",
+        "aiChatMessages": "Synthetic quote assistant. Please provide the customer details.",
+        "aiChatTextarea": "",
+        "aiChatSend": "",
+        "shareToastText": "Quote link copied — paste into your email or chat"
+      },
+      "fields": [
+        {
+          "id": "qty",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "hwToggle",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "aiChatTextarea",
+          "type": "textarea",
+          "value": "",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "tel:+12539225793,119",
+          "text": "Direct 253-922-5793 ext. 119"
+        },
+        {
+          "href": "mailto:ruth@nwcustomapparel.com",
+          "text": "Email ruth@nwcustomapparel.com"
+        }
+      ],
+      "tables": [
+        "LOCATION 1–23 24–47 48–71 72+ Left Chest $6.25 $5.50 $4.75 $4.00 Full Front $8.25 $7.50 $6.75 $6.00 Full Back $10.25 $9.50 $8.75 $8.00 Jumbo Front $12.25 $11.50 $10.75 $10.00 Jumbo Back $14.25 $13.50 $12.75 $12.00 Your effective rate PER PIECE $6.25/pc $5.50/pc $4.75/pc $4.00/pc"
+      ],
+      "headings": [
+        "Contract DTG 2026.",
+        "Quick price calculator",
+        "Pricing table",
+        "Contract DTG — per location",
+        "Ruthie Nhoung"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".fact:nth-child(1) > .k"
+            ],
+            [
+              ".fact:nth-child(2) > .k"
+            ],
+            [
+              ".fact:nth-child(3) > .k"
+            ],
+            [
+              ".meta"
+            ],
+            [
+              ".field-hint"
+            ],
+            [
+              ".loc[data-loc=\"FF\"] > .loc-body > .loc-size"
+            ],
+            [
+              ".loc[data-loc=\"FB\"] > .loc-body > .loc-size"
+            ],
+            [
+              ".loc[data-loc=\"JF\"] > .loc-body > .loc-size"
+            ],
+            [
+              ".loc[data-loc=\"JB\"] > .loc-body > .loc-size"
+            ],
+            [
+              ".footnote"
+            ]
+          ]
+        },
+        {
+          "id": "scrollable-region-focusable",
+          "nodes": [
+            [
+              "#priceTable"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "dialogs": []
+}

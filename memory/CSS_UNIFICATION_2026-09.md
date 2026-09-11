@@ -1,5 +1,23 @@
 # CSS unification — design direction and implementation plan
 
+## RELEASE CANDIDATE — v2026.09.11.6 three contract calculators
+
+Full-suite compatibility check: the historical printable-sheet test now verifies the canonical components.css hidden utility and token/component/page stylesheet order. The removed page-local !important copy is intentionally absent. Both affected suites passed all 47 checks; full release gates restart on the correction commit. No application or original-fixture content changed.
+
+Reviewed source 4f793212a25530918d1045c2bbf647aa6c30177d is integrated with verified .5 history at e23f892888633587c800abc3d05af11c7d451d6c. Eleven references version seven changed assets, with 44 reversible mappings preserving14 source originals. All28 focused browser cases,279 source/ownership guards,72 full-page screens and20 paper pages in18 documents are reviewed. Eleven financial function bodies, the entire Embroidery controller and DST parser/math remain unchanged.
+
+Candidate207/225 reviewed,18pending. Verified LIVE remains.5/Heroku2108/93fe1568 at204/225,21pending. Run all full local and actual four-job exact-source CI checks before rollout; verify actual Heroku slug, source/compiled assets and anonymous access afterward. Next families remain isolated during release checks. No real business writes, email, uploads, payments, env copying or device printing; never recursively delete the node_modules junction.
+
+## REVIEWED — three contract calculators, 2026-09-11
+
+Contract DTG, Contract Embroidery and its printable price sheet now use Public Sans, shared canonical controls and four scoped, token-based style owners. Reviewed all 72 full-page captures across 1440/768/390/320 using 50 detail sheets, plus all 20 current paper pages in 18 documents (35 original pages). A second PDF renderer confirmed complete headings. The price sheet fits one landscape page; full-back and multiple-stitch-file cases retain two complete pages.
+
+All 28 focused browser checks passed; the 18 affected paper scenarios passed again after the final print-only refinement. Nineteen source guards preserve 14 original hashes through 33 reversible mappings, 11 financial function bodies, the entire Embroidery controller, DST parser and quote math. UI fixes cover keyboard product selection/table scrolling, assistant focus trapping/Escape/restoration, hidden notices/toasts, API-backed DTG fee/heavyweight labels and the printable order-minimum footer. Staff costs stay out of public views and print. No price, fee, tier, date, quantity or rounding calculation changed.
+
+Verified LIVE: v2026.09.11.5 / Heroku2108 / 93fe1568983cc232f169cb354b777117e67d6949, 204/225 reviewed and 21 pending. Core source/main/develop CI is green and both branches synchronized. This contract candidate reaches 207/225 reviewed, 18 pending, only after its own full local and exact-source CI gates and verified rollout. Next: commit and back up this reviewed batch, merge verified .5 history, integrate clean develop, version changed assets, run all full gates, deploy and verify. Remaining 18: twelve other calculators/served archive, garment-designer and five quote builders. Read quote-builder-architecture.md before builders.
+
+Evidence: contract-calculators-reviewed-record.json and active-css-resume-state.json in the private artifact directory; review images/logs in the 2026/09/08 workspace. LESSONS_LEARNED and shared-JS GUIDE updated. No business writes, customer messages, uploads, payments or device printing. Never copy .env, rerun consumed helpers or recursively delete the node_modules junction.
+
 ## RELEASE CANDIDATE — v2026.09.11.5 five core calculators
 
 DTG, DTF, Embroidery, Cap Embroidery and Screen Print are reviewed and integrated with the verified .4 release at 8a180aa67829a414f24fb2d220e3b088bfda0ac8. This candidate versions 22 references for fourteen changed assets. All79 original source hashes are preserved through 114 reversible mappings; six financial services and31 controller financial functions remain unchanged.
@@ -1659,6 +1677,12 @@ CI 34597016238 passed all four actual jobs on 911f21ddea15963000b156da7fbe1d0ae9
 ## Core calculator full-suite compatibility correction
 
 The first integrated full run passed build/lint/types and243 unit suites. Eleven assertions in three historical test files still required removed override files or duplicated hidden-state rules. They now verify canonical shared ownership, hidden behavior and asset order; all36 checks in the three suites pass. No application code, immutable price evidence or accessibility requirement changed. The corrected exact Deploy source must pass the complete local and CI gates before .5 rollout.
+
+## Contract original review complete
+
+20 focused original browser cases pass, with20 immutable contracts and14 original source hashes. All35 pages in18 original PDFs were visually reviewed (26 unique rendered pages, nine byte-identical duplicates). Desktop/phone normal states were visually reviewed; all four widths captured for18 scenarios. Stitch-file cases use only synthetic local buffers; staff margins remain absent from printed customer copies.
+
+Observed original defects to repair with explicit contracts: hidden embroidery fee facts still appear because author display rules override hidden; contract headings/table edges clip in print; the standalone sheet spills only its footer onto an extra page; phone tables/contact content clip; DTG static policy labels retain $50/$1 while its API-backed calculation uses the fixture $37/$1.75. Preserve financial functions and calculator totals; only policy presentation should follow existing fetched settings. Next: finish targeted keyboard/print/label defect proofs, then implement scoped canonical owners. No application changes or migration credit yet.
 
 ## Core calculator release record — v2026.09.11.5
 

@@ -1,0 +1,590 @@
+{
+  "name": "dtg-failed",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Contract DTG Pricing 2026 — Northwest Custom Apparel",
+      "url": "/calculators/dtg-contract/index.html",
+      "ids": {
+        "pricingError": "Unable to load contract pricing. Refresh the page or contact Ruthie directly if this persists.",
+        "qty": "",
+        "locGrid": "Left Chest 4″ × 4″ Full Front 12″ × 16″ Full Back 12″ × 16″ Jumbo Front 14″ × 18″ Jumbo Back 14″ × 18″",
+        "hwToggle": "",
+        "resLocSummary": "NO LOCATION SELECTED",
+        "resTier": "—",
+        "unitPrice": "—",
+        "unitSub": "Pricing unavailable — refresh or contact Ruth",
+        "orderTotalNote": "—",
+        "orderTotal": "$—",
+        "aiDraftBtn": "✨ Draft Email Quote with AI",
+        "tableLtmNote": "LTM fee $50 on orders 1–23 pcs · adds $50 ÷ qty per piece",
+        "shareToastText": "Quote link copied — paste into your email or chat"
+      },
+      "fields": [
+        {
+          "id": "qty",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "hwToggle",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "tel:+12539225793,119",
+          "text": "Direct 253-922-5793 ext. 119"
+        },
+        {
+          "href": "mailto:ruth@nwcustomapparel.com",
+          "text": "Email ruth@nwcustomapparel.com"
+        }
+      ],
+      "tables": [
+        "LOCATION 1–23 24–47 48–71 72+ Left Chest — — — — Full Front — — — — Full Back — — — — Jumbo Front — — — — Jumbo Back — — — —"
+      ],
+      "headings": [
+        "Contract DTG 2026.",
+        "Quick price calculator",
+        "Pricing table",
+        "Contract DTG — per location",
+        "Ruthie Nhoung"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".fact:nth-child(1) > .k"
+            ],
+            [
+              ".fact:nth-child(2) > .k"
+            ],
+            [
+              ".fact:nth-child(3) > .k"
+            ],
+            [
+              "#pricingError"
+            ],
+            [
+              "#pricingError > strong"
+            ],
+            [
+              ".meta"
+            ],
+            [
+              ".field-hint"
+            ],
+            [
+              ".loc[data-loc=\"LC\"] > .loc-body > .loc-size"
+            ],
+            [
+              ".loc[data-loc=\"FF\"] > .loc-body > .loc-size"
+            ],
+            [
+              ".loc[data-loc=\"FB\"] > .loc-body > .loc-size"
+            ],
+            [
+              ".loc[data-loc=\"JF\"] > .loc-body > .loc-size"
+            ],
+            [
+              ".loc[data-loc=\"JB\"] > .loc-body > .loc-size"
+            ],
+            [
+              ".footnote"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Contract DTG Pricing 2026 — Northwest Custom Apparel",
+      "url": "/calculators/dtg-contract/index.html",
+      "ids": {
+        "pricingError": "Unable to load contract pricing. Refresh the page or contact Ruthie directly if this persists.",
+        "qty": "",
+        "locGrid": "Left Chest 4″ × 4″ Full Front 12″ × 16″ Full Back 12″ × 16″ Jumbo Front 14″ × 18″ Jumbo Back 14″ × 18″",
+        "hwToggle": "",
+        "resLocSummary": "NO LOCATION SELECTED",
+        "resTier": "—",
+        "unitPrice": "—",
+        "unitSub": "Pricing unavailable — refresh or contact Ruth",
+        "orderTotalNote": "—",
+        "orderTotal": "$—",
+        "aiDraftBtn": "✨ Draft Email Quote with AI",
+        "tableLtmNote": "LTM fee $50 on orders 1–23 pcs · adds $50 ÷ qty per piece",
+        "shareToastText": "Quote link copied — paste into your email or chat"
+      },
+      "fields": [
+        {
+          "id": "qty",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "hwToggle",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "tel:+12539225793,119",
+          "text": "Direct 253-922-5793 ext. 119"
+        },
+        {
+          "href": "mailto:ruth@nwcustomapparel.com",
+          "text": "Email ruth@nwcustomapparel.com"
+        }
+      ],
+      "tables": [
+        "LOCATION 1–23 24–47 48–71 72+ Left Chest — — — — Full Front — — — — Full Back — — — — Jumbo Front — — — — Jumbo Back — — — —"
+      ],
+      "headings": [
+        "Contract DTG 2026.",
+        "Quick price calculator",
+        "Pricing table",
+        "Contract DTG — per location",
+        "Ruthie Nhoung"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".fact:nth-child(1) > .k"
+            ],
+            [
+              ".fact:nth-child(2) > .k"
+            ],
+            [
+              ".fact:nth-child(3) > .k"
+            ],
+            [
+              "#pricingError"
+            ],
+            [
+              "#pricingError > strong"
+            ],
+            [
+              ".meta"
+            ],
+            [
+              ".field-hint"
+            ],
+            [
+              ".loc[data-loc=\"LC\"] > .loc-body > .loc-size"
+            ],
+            [
+              ".loc[data-loc=\"FF\"] > .loc-body > .loc-size"
+            ],
+            [
+              ".loc[data-loc=\"FB\"] > .loc-body > .loc-size"
+            ],
+            [
+              ".loc[data-loc=\"JF\"] > .loc-body > .loc-size"
+            ],
+            [
+              ".loc[data-loc=\"JB\"] > .loc-body > .loc-size"
+            ],
+            [
+              ".footnote"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Contract DTG Pricing 2026 — Northwest Custom Apparel",
+      "url": "/calculators/dtg-contract/index.html",
+      "ids": {
+        "pricingError": "Unable to load contract pricing. Refresh the page or contact Ruthie directly if this persists.",
+        "qty": "",
+        "locGrid": "Left Chest 4″ × 4″ Full Front 12″ × 16″ Full Back 12″ × 16″ Jumbo Front 14″ × 18″ Jumbo Back 14″ × 18″",
+        "hwToggle": "",
+        "resLocSummary": "NO LOCATION SELECTED",
+        "resTier": "—",
+        "unitPrice": "—",
+        "unitSub": "Pricing unavailable — refresh or contact Ruth",
+        "orderTotalNote": "—",
+        "orderTotal": "$—",
+        "aiDraftBtn": "✨ Draft Email Quote with AI",
+        "tableLtmNote": "LTM fee $50 on orders 1–23 pcs · adds $50 ÷ qty per piece",
+        "shareToastText": "Quote link copied — paste into your email or chat"
+      },
+      "fields": [
+        {
+          "id": "qty",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "hwToggle",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "tel:+12539225793,119",
+          "text": "Direct 253-922-5793 ext. 119"
+        },
+        {
+          "href": "mailto:ruth@nwcustomapparel.com",
+          "text": "Email ruth@nwcustomapparel.com"
+        }
+      ],
+      "tables": [
+        "LOCATION 1–23 24–47 48–71 72+ Left Chest — — — — Full Front — — — — Full Back — — — — Jumbo Front — — — — Jumbo Back — — — —"
+      ],
+      "headings": [
+        "Contract DTG 2026.",
+        "Quick price calculator",
+        "Pricing table",
+        "Contract DTG — per location",
+        "Ruthie Nhoung"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".fact:nth-child(1) > .k"
+            ],
+            [
+              ".fact:nth-child(2) > .k"
+            ],
+            [
+              ".fact:nth-child(3) > .k"
+            ],
+            [
+              "#pricingError"
+            ],
+            [
+              "#pricingError > strong"
+            ],
+            [
+              ".meta"
+            ],
+            [
+              ".field-hint"
+            ],
+            [
+              ".loc[data-loc=\"LC\"] > .loc-body > .loc-size"
+            ],
+            [
+              ".loc[data-loc=\"FF\"] > .loc-body > .loc-size"
+            ],
+            [
+              ".loc[data-loc=\"FB\"] > .loc-body > .loc-size"
+            ],
+            [
+              ".loc[data-loc=\"JF\"] > .loc-body > .loc-size"
+            ],
+            [
+              ".loc[data-loc=\"JB\"] > .loc-body > .loc-size"
+            ],
+            [
+              ".footnote"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Contract DTG Pricing 2026 — Northwest Custom Apparel",
+      "url": "/calculators/dtg-contract/index.html",
+      "ids": {
+        "pricingError": "Unable to load contract pricing. Refresh the page or contact Ruthie directly if this persists.",
+        "qty": "",
+        "locGrid": "Left Chest 4″ × 4″ Full Front 12″ × 16″ Full Back 12″ × 16″ Jumbo Front 14″ × 18″ Jumbo Back 14″ × 18″",
+        "hwToggle": "",
+        "resLocSummary": "NO LOCATION SELECTED",
+        "resTier": "—",
+        "unitPrice": "—",
+        "unitSub": "Pricing unavailable — refresh or contact Ruth",
+        "orderTotalNote": "—",
+        "orderTotal": "$—",
+        "aiDraftBtn": "✨ Draft Email Quote with AI",
+        "tableLtmNote": "LTM fee $50 on orders 1–23 pcs · adds $50 ÷ qty per piece",
+        "shareToastText": "Quote link copied — paste into your email or chat"
+      },
+      "fields": [
+        {
+          "id": "qty",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "hwToggle",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "tel:+12539225793,119",
+          "text": "Direct 253-922-5793 ext. 119"
+        },
+        {
+          "href": "mailto:ruth@nwcustomapparel.com",
+          "text": "Email ruth@nwcustomapparel.com"
+        }
+      ],
+      "tables": [
+        "LOCATION 1–23 24–47 48–71 72+ Left Chest — — — — Full Front — — — — Full Back — — — — Jumbo Front — — — — Jumbo Back — — — —"
+      ],
+      "headings": [
+        "Contract DTG 2026.",
+        "Quick price calculator",
+        "Pricing table",
+        "Contract DTG — per location",
+        "Ruthie Nhoung"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".fact:nth-child(1) > .k"
+            ],
+            [
+              ".fact:nth-child(2) > .k"
+            ],
+            [
+              ".fact:nth-child(3) > .k"
+            ],
+            [
+              "#pricingError"
+            ],
+            [
+              "#pricingError > strong"
+            ],
+            [
+              ".meta"
+            ],
+            [
+              ".field-hint"
+            ],
+            [
+              ".loc[data-loc=\"LC\"] > .loc-body > .loc-size"
+            ],
+            [
+              ".loc[data-loc=\"FF\"] > .loc-body > .loc-size"
+            ],
+            [
+              ".loc[data-loc=\"FB\"] > .loc-body > .loc-size"
+            ],
+            [
+              ".loc[data-loc=\"JF\"] > .loc-body > .loc-size"
+            ],
+            [
+              ".loc[data-loc=\"JB\"] > .loc-body > .loc-size"
+            ],
+            [
+              ".footnote"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "dialogs": []
+}

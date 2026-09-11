@@ -5,6 +5,12 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## Contract calculators need one policy and visibility owner (2026-09-11)
+
+- Problem/root cause: explanatory DTG fee labels and the reference footer stayed hardcoded after API policy changed; author display rules exposed contradictory hidden notices. Assistant focus escaped, and clipped screen-reader-only elements damaged printed headings.
+- Solution: render labels from the existing loaded policy, preserve all price math, use canonical hidden controls and scoped shared styles, confine assistant focus, and omit screen-reader-only live regions from print. Compact row spacing keeps contacts with short price lists.
+- Prevention: immutable source/value evidence; alternate API fees/minimums and failed reads; native keyboard and focus restoration; exact financial function bodies; actual paper review with nonzero synthetic staff costs that must never print. Use literal split/join or replacement callbacks when source edits contain dollar signs.
+
 ## Core calculator state and paper boundaries (2026-09-11)
 
 - Problem/root cause: DTG/DTF color handlers read an undeclared currentStyleNumber; inline presentation duplicated CSS; fixed print headers covered prices, and the Embroidery product wrapper also contained pricing/inventory. Screen Print errors disappeared after10 seconds without recovery. Native arrow scroll began after an inventory refresh had replaced its region; search ARIA targeted an empty placeholder.
@@ -77,9 +83,7 @@ Exercise state transitions and verify complete printed content. Full entry in LE
 
 Native storefront menu focus and paper migration (2026-09-09) is archived in LESSONS_LEARNED_ARCHIVE.md; existing keyboard/browser guards retain the contract.
 
-### Staff reference data and paper need explicit failure states (2026-09-09)
-
-Problem: partial service rows looked fully live, invalid bonus figures could render, malformed form lists looked empty, and screen breakpoints/large unbreakable cards wasted paper. Root cause: optimistic response shapes, fallback labels at response rather than row level, borrowed page CSS and screen rules applied to print. Solution: validate data, visibly distinguish API/mixed/fallback states, retry only dependent content, retain checklists, escape external labels/destinations, use focusable scrolling tables and screen-only breakpoints with compact print layouts. Prevention: preserve original prose/actions, test real existing page access, four widths/axe and failed/malformed/retry states, compare actual paper text including warnings, and keep retry controls off paper. Multiline tooling edits must normalize CRLF or assert replacements; check the resulting code.
+Staff reference failure-state findings (2026-09-09) are preserved in LESSONS_LEARNED_ARCHIVE.md.
 
 ### Sign-in and confirmation owners need honest state and paper checks (2026-09-09)
 

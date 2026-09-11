@@ -1,0 +1,550 @@
+{
+  "name": "emb-dst-staff",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Contract Embroidery Pricing 2026 — Northwest Custom Apparel",
+      "url": "/calculators/embroidery-contract/index.html",
+      "ids": {
+        "ledeOrderMin": "$250.00",
+        "factOrderMin": "$250.00",
+        "factNoFee": "SMALL-ORDER FEE None — the order minimum covers small runs",
+        "factLtmFee": "$0.00",
+        "factLtmBand": "1–23",
+        "factFbLtm": "$0.00",
+        "factFbBand": "1–23",
+        "segItemTypeLabel": "ITEM TYPE",
+        "segItemType": "Garment CTR-Garmt Cap CTR-Cap Full Back DECG-FB",
+        "qty": "",
+        "stitch": "",
+        "dstFieldLabel": "STITCH FILE · optional",
+        "dstDropHint": "Left chest + full back on the same garments? Drop the second file.",
+        "dstStatus": "Example-back.dst — 10,200 stitches read from the file · location 2. Quote is now $19.39 per piece.",
+        "dstLines": "LOCATION 1 Example-front.dst Design: EXAMPLE $9.09 STITCHES 9,000 SIZE 0\" × 0\" COLORS 1 TRIMS 0 LOCATION 2 Example-back.dst Design: EXAMPLE $10.30 STITCHES 10,200 SIZE 0\" × 0\" COLORS 1 TRIMS 0 Garment Cap Full Back STITCHES",
+        "dstMarginAsOf": "model synthetic · $63.00/hr + $47 order",
+        "dstMarginGrid": "REVENUE $465.41 EST. COST $742.52 MARGIN −$277.11 MARGIN % -59.5%",
+        "dstTime": "11.0 hr single-head machine time for 24 pcs across 2 locations · not a delivery date",
+        "dstRisks": "No production flags Stitch length, density, trims and colour changes all read normal.",
+        "resProductLabel": "2 LOCATIONS",
+        "resTier": "TIER 24–47",
+        "unitPrice": "19.39",
+        "unitSub": "$19.39 across 2 locations",
+        "resLines": "Example-front.dst Garment · 9K $9.09 Example-back.dst Garment · 10.2K $10.30",
+        "orderTotalNote": "24 × $19.39",
+        "orderTotal": "$465.41",
+        "aiDraftBtn": "✨ Draft Email Quote with AI",
+        "tableTabs": "Garments CTR-Garmt Caps CTR-Cap Full Back DECG-FB",
+        "cardIcon": "",
+        "cardTitle": "Contract Garments",
+        "cardSubtitle": "Flat embroidery on shirts, jackets, bags & soft goods",
+        "cardCode": "CTR-Garmt",
+        "priceTable": "STITCHES 1–7 8–23 24–47 48–71 72+ 8K $9.84 $8.96 $8.08 $7.20 $6.32 9K $11.07 $10.08 $9.09 $8.10 $7.11 10K $12.30 $11.20 $10.10 $9.00 $7.90 11K $13.53 $12.32 $11.11 $9.90 $8.69 12K $14.76 $13.44 $12.12 $10.80 $9.48 13K $15.99 $14.56 $13.13 $11.70 $10.27 14K $17.22 $15.68 $14.14 $12.60 $11.06 15K $18.45 $16.80 $15.15 $13.50 $11.85 16K $19.68 $17.92 $16.16 $14.40 $12.64 17K $20.91 $19.04 $17.17 $15.30 $13.43 18K $22.14 $20.16 $18.18 $16.20 $14.22 19K $23.37 $21.28 $19.19 $17.10 $15.01 20K $24.60 $22.40 $20.20 $18.00 $15.80 $ / 1,000 STITCHES $1.23 $1.12 $1.01 $0.90 $0.79",
+        "cardMins": "Min stitches 8K No small-order fee Order minimum $250.00",
+        "shareToastText": "2 of 2 files loaded as locations"
+      },
+      "fields": [
+        {
+          "id": "qty",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "stitch",
+          "type": "number",
+          "value": "9000",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "number",
+          "value": "10200",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "/pages/embroidery-contract-pricing.html",
+          "text": "Print price list (PDF) ↗"
+        },
+        {
+          "href": "tel:+12539225793,119",
+          "text": "Direct 253-922-5793 ext. 119"
+        },
+        {
+          "href": "mailto:ruth@nwcustomapparel.com",
+          "text": "Email ruth@nwcustomapparel.com"
+        }
+      ],
+      "tables": [
+        "STITCHES 1–7 8–23 24–47 48–71 72+ 8K $9.84 $8.96 $8.08 $7.20 $6.32 9K $11.07 $10.08 $9.09 $8.10 $7.11 10K $12.30 $11.20 $10.10 $9.00 $7.90 11K $13.53 $12.32 $11.11 $9.90 $8.69 12K $14.76 $13.44 $12.12 $10.80 $9.48 13K $15.99 $14.56 $13.13 $11.70 $10.27 14K $17.22 $15.68 $14.14 $12.60 $11.06 15K $18.45 $16.80 $15.15 $13.50 $11.85 16K $19.68 $17.92 $16.16 $14.40 $12.64 17K $20.91 $19.04 $17.17 $15.30 $13.43 18K $22.14 $20.16 $18.18 $16.20 $14.22 19K $23.37 $21.28 $19.19 $17.10 $15.01 20K $24.60 $22.40 $20.20 $18.00 $15.80 $ / 1,000 STITCHES $1.23 $1.12 $1.01 $0.90 $0.79"
+      ],
+      "headings": [
+        "Contract Embroidery 2026.",
+        "Quick price calculator",
+        "Pricing tables",
+        "Contract Garments",
+        "Ruthie Nhoung"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".fact:nth-child(1) > .k"
+            ],
+            [
+              ".fact:nth-child(2) > .k"
+            ],
+            [
+              "#factNoFee > .k"
+            ],
+            [
+              "#factLtm > .k"
+            ],
+            [
+              "#factFb > .k"
+            ],
+            [
+              ".meta"
+            ],
+            [
+              "button[data-product=\"cap\"][role=\"tab\"][type=\"button\"] > .code"
+            ],
+            [
+              "button[data-product=\"fullback\"][role=\"tab\"][type=\"button\"] > .code"
+            ],
+            [
+              ".footnote"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Contract Embroidery Pricing 2026 — Northwest Custom Apparel",
+      "url": "/calculators/embroidery-contract/index.html",
+      "ids": {
+        "ledeOrderMin": "$250.00",
+        "factOrderMin": "$250.00",
+        "factNoFee": "SMALL-ORDER FEE None — the order minimum covers small runs",
+        "factLtmFee": "$0.00",
+        "factLtmBand": "1–23",
+        "factFbLtm": "$0.00",
+        "factFbBand": "1–23",
+        "segItemTypeLabel": "ITEM TYPE",
+        "segItemType": "Garment CTR-Garmt Cap CTR-Cap Full Back DECG-FB",
+        "qty": "",
+        "stitch": "",
+        "dstFieldLabel": "STITCH FILE · optional",
+        "dstDropHint": "Left chest + full back on the same garments? Drop the second file.",
+        "dstStatus": "Example-back.dst — 10,200 stitches read from the file · location 2. Quote is now $19.39 per piece.",
+        "dstLines": "LOCATION 1 Example-front.dst Design: EXAMPLE $9.09 STITCHES 9,000 SIZE 0\" × 0\" COLORS 1 TRIMS 0 LOCATION 2 Example-back.dst Design: EXAMPLE $10.30 STITCHES 10,200 SIZE 0\" × 0\" COLORS 1 TRIMS 0 Garment Cap Full Back STITCHES",
+        "dstMarginAsOf": "model synthetic · $63.00/hr + $47 order",
+        "dstMarginGrid": "REVENUE $465.41 EST. COST $742.52 MARGIN −$277.11 MARGIN % -59.5%",
+        "dstTime": "11.0 hr single-head machine time for 24 pcs across 2 locations · not a delivery date",
+        "dstRisks": "No production flags Stitch length, density, trims and colour changes all read normal.",
+        "resProductLabel": "2 LOCATIONS",
+        "resTier": "TIER 24–47",
+        "unitPrice": "19.39",
+        "unitSub": "$19.39 across 2 locations",
+        "resLines": "Example-front.dst Garment · 9K $9.09 Example-back.dst Garment · 10.2K $10.30",
+        "orderTotalNote": "24 × $19.39",
+        "orderTotal": "$465.41",
+        "aiDraftBtn": "✨ Draft Email Quote with AI",
+        "tableTabs": "Garments CTR-Garmt Caps CTR-Cap Full Back DECG-FB",
+        "cardIcon": "",
+        "cardTitle": "Contract Garments",
+        "cardSubtitle": "Flat embroidery on shirts, jackets, bags & soft goods",
+        "cardCode": "CTR-Garmt",
+        "priceTable": "STITCHES 1–7 8–23 24–47 48–71 72+ 8K $9.84 $8.96 $8.08 $7.20 $6.32 9K $11.07 $10.08 $9.09 $8.10 $7.11 10K $12.30 $11.20 $10.10 $9.00 $7.90 11K $13.53 $12.32 $11.11 $9.90 $8.69 12K $14.76 $13.44 $12.12 $10.80 $9.48 13K $15.99 $14.56 $13.13 $11.70 $10.27 14K $17.22 $15.68 $14.14 $12.60 $11.06 15K $18.45 $16.80 $15.15 $13.50 $11.85 16K $19.68 $17.92 $16.16 $14.40 $12.64 17K $20.91 $19.04 $17.17 $15.30 $13.43 18K $22.14 $20.16 $18.18 $16.20 $14.22 19K $23.37 $21.28 $19.19 $17.10 $15.01 20K $24.60 $22.40 $20.20 $18.00 $15.80 $ / 1,000 STITCHES $1.23 $1.12 $1.01 $0.90 $0.79",
+        "cardMins": "Min stitches 8K No small-order fee Order minimum $250.00",
+        "shareToastText": "2 of 2 files loaded as locations"
+      },
+      "fields": [
+        {
+          "id": "qty",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "stitch",
+          "type": "number",
+          "value": "9000",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "number",
+          "value": "10200",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "/pages/embroidery-contract-pricing.html",
+          "text": "Print price list (PDF) ↗"
+        },
+        {
+          "href": "tel:+12539225793,119",
+          "text": "Direct 253-922-5793 ext. 119"
+        },
+        {
+          "href": "mailto:ruth@nwcustomapparel.com",
+          "text": "Email ruth@nwcustomapparel.com"
+        }
+      ],
+      "tables": [
+        "STITCHES 1–7 8–23 24–47 48–71 72+ 8K $9.84 $8.96 $8.08 $7.20 $6.32 9K $11.07 $10.08 $9.09 $8.10 $7.11 10K $12.30 $11.20 $10.10 $9.00 $7.90 11K $13.53 $12.32 $11.11 $9.90 $8.69 12K $14.76 $13.44 $12.12 $10.80 $9.48 13K $15.99 $14.56 $13.13 $11.70 $10.27 14K $17.22 $15.68 $14.14 $12.60 $11.06 15K $18.45 $16.80 $15.15 $13.50 $11.85 16K $19.68 $17.92 $16.16 $14.40 $12.64 17K $20.91 $19.04 $17.17 $15.30 $13.43 18K $22.14 $20.16 $18.18 $16.20 $14.22 19K $23.37 $21.28 $19.19 $17.10 $15.01 20K $24.60 $22.40 $20.20 $18.00 $15.80 $ / 1,000 STITCHES $1.23 $1.12 $1.01 $0.90 $0.79"
+      ],
+      "headings": [
+        "Contract Embroidery 2026.",
+        "Quick price calculator",
+        "Pricing tables",
+        "Contract Garments",
+        "Ruthie Nhoung"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".fact:nth-child(1) > .k"
+            ],
+            [
+              ".fact:nth-child(2) > .k"
+            ],
+            [
+              "#factNoFee > .k"
+            ],
+            [
+              "#factLtm > .k"
+            ],
+            [
+              "#factFb > .k"
+            ],
+            [
+              ".meta"
+            ],
+            [
+              "button[data-product=\"cap\"][role=\"tab\"][type=\"button\"] > .code"
+            ],
+            [
+              "button[data-product=\"fullback\"][role=\"tab\"][type=\"button\"] > .code"
+            ],
+            [
+              ".footnote"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Contract Embroidery Pricing 2026 — Northwest Custom Apparel",
+      "url": "/calculators/embroidery-contract/index.html",
+      "ids": {
+        "ledeOrderMin": "$250.00",
+        "factOrderMin": "$250.00",
+        "factNoFee": "SMALL-ORDER FEE None — the order minimum covers small runs",
+        "factLtmFee": "$0.00",
+        "factLtmBand": "1–23",
+        "factFbLtm": "$0.00",
+        "factFbBand": "1–23",
+        "segItemTypeLabel": "ITEM TYPE",
+        "segItemType": "Garment CTR-Garmt Cap CTR-Cap Full Back DECG-FB",
+        "qty": "",
+        "stitch": "",
+        "dstFieldLabel": "STITCH FILE · optional",
+        "dstDropHint": "Left chest + full back on the same garments? Drop the second file.",
+        "dstStatus": "Example-back.dst — 10,200 stitches read from the file · location 2. Quote is now $19.39 per piece.",
+        "dstLines": "LOCATION 1 Example-front.dst Design: EXAMPLE $9.09 STITCHES 9,000 SIZE 0\" × 0\" COLORS 1 TRIMS 0 LOCATION 2 Example-back.dst Design: EXAMPLE $10.30 STITCHES 10,200 SIZE 0\" × 0\" COLORS 1 TRIMS 0 Garment Cap Full Back STITCHES",
+        "dstMarginAsOf": "model synthetic · $63.00/hr + $47 order",
+        "dstMarginGrid": "REVENUE $465.41 EST. COST $742.52 MARGIN −$277.11 MARGIN % -59.5%",
+        "dstTime": "11.0 hr single-head machine time for 24 pcs across 2 locations · not a delivery date",
+        "dstRisks": "No production flags Stitch length, density, trims and colour changes all read normal.",
+        "resProductLabel": "2 LOCATIONS",
+        "resTier": "TIER 24–47",
+        "unitPrice": "19.39",
+        "unitSub": "$19.39 across 2 locations",
+        "resLines": "Example-front.dst Garment · 9K $9.09 Example-back.dst Garment · 10.2K $10.30",
+        "orderTotalNote": "24 × $19.39",
+        "orderTotal": "$465.41",
+        "aiDraftBtn": "✨ Draft Email Quote with AI",
+        "tableTabs": "Garments CTR-Garmt Caps CTR-Cap Full Back DECG-FB",
+        "cardIcon": "",
+        "cardTitle": "Contract Garments",
+        "cardSubtitle": "Flat embroidery on shirts, jackets, bags & soft goods",
+        "cardCode": "CTR-Garmt",
+        "priceTable": "STITCHES 1–7 8–23 24–47 48–71 72+ 8K $9.84 $8.96 $8.08 $7.20 $6.32 9K $11.07 $10.08 $9.09 $8.10 $7.11 10K $12.30 $11.20 $10.10 $9.00 $7.90 11K $13.53 $12.32 $11.11 $9.90 $8.69 12K $14.76 $13.44 $12.12 $10.80 $9.48 13K $15.99 $14.56 $13.13 $11.70 $10.27 14K $17.22 $15.68 $14.14 $12.60 $11.06 15K $18.45 $16.80 $15.15 $13.50 $11.85 16K $19.68 $17.92 $16.16 $14.40 $12.64 17K $20.91 $19.04 $17.17 $15.30 $13.43 18K $22.14 $20.16 $18.18 $16.20 $14.22 19K $23.37 $21.28 $19.19 $17.10 $15.01 20K $24.60 $22.40 $20.20 $18.00 $15.80 $ / 1,000 STITCHES $1.23 $1.12 $1.01 $0.90 $0.79",
+        "cardMins": "Min stitches 8K No small-order fee Order minimum $250.00",
+        "shareToastText": "2 of 2 files loaded as locations"
+      },
+      "fields": [
+        {
+          "id": "qty",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "stitch",
+          "type": "number",
+          "value": "9000",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "number",
+          "value": "10200",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "/pages/embroidery-contract-pricing.html",
+          "text": "Print price list (PDF) ↗"
+        },
+        {
+          "href": "tel:+12539225793,119",
+          "text": "Direct 253-922-5793 ext. 119"
+        },
+        {
+          "href": "mailto:ruth@nwcustomapparel.com",
+          "text": "Email ruth@nwcustomapparel.com"
+        }
+      ],
+      "tables": [
+        "STITCHES 1–7 8–23 24–47 48–71 72+ 8K $9.84 $8.96 $8.08 $7.20 $6.32 9K $11.07 $10.08 $9.09 $8.10 $7.11 10K $12.30 $11.20 $10.10 $9.00 $7.90 11K $13.53 $12.32 $11.11 $9.90 $8.69 12K $14.76 $13.44 $12.12 $10.80 $9.48 13K $15.99 $14.56 $13.13 $11.70 $10.27 14K $17.22 $15.68 $14.14 $12.60 $11.06 15K $18.45 $16.80 $15.15 $13.50 $11.85 16K $19.68 $17.92 $16.16 $14.40 $12.64 17K $20.91 $19.04 $17.17 $15.30 $13.43 18K $22.14 $20.16 $18.18 $16.20 $14.22 19K $23.37 $21.28 $19.19 $17.10 $15.01 20K $24.60 $22.40 $20.20 $18.00 $15.80 $ / 1,000 STITCHES $1.23 $1.12 $1.01 $0.90 $0.79"
+      ],
+      "headings": [
+        "Contract Embroidery 2026.",
+        "Quick price calculator",
+        "Pricing tables",
+        "Contract Garments",
+        "Ruthie Nhoung"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".fact:nth-child(1) > .k"
+            ],
+            [
+              ".fact:nth-child(2) > .k"
+            ],
+            [
+              "#factNoFee > .k"
+            ],
+            [
+              "#factLtm > .k"
+            ],
+            [
+              "#factFb > .k"
+            ],
+            [
+              ".meta"
+            ],
+            [
+              "button[data-product=\"cap\"][role=\"tab\"][type=\"button\"] > .code"
+            ],
+            [
+              "button[data-product=\"fullback\"][role=\"tab\"][type=\"button\"] > .code"
+            ],
+            [
+              ".footnote"
+            ]
+          ]
+        },
+        {
+          "id": "scrollable-region-focusable",
+          "nodes": [
+            [
+              "#priceTable"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Contract Embroidery Pricing 2026 — Northwest Custom Apparel",
+      "url": "/calculators/embroidery-contract/index.html",
+      "ids": {
+        "ledeOrderMin": "$250.00",
+        "factOrderMin": "$250.00",
+        "factNoFee": "SMALL-ORDER FEE None — the order minimum covers small runs",
+        "factLtmFee": "$0.00",
+        "factLtmBand": "1–23",
+        "factFbLtm": "$0.00",
+        "factFbBand": "1–23",
+        "segItemTypeLabel": "ITEM TYPE",
+        "segItemType": "Garment CTR-Garmt Cap CTR-Cap Full Back DECG-FB",
+        "qty": "",
+        "stitch": "",
+        "dstFieldLabel": "STITCH FILE · optional",
+        "dstDropHint": "Left chest + full back on the same garments? Drop the second file.",
+        "dstStatus": "Example-back.dst — 10,200 stitches read from the file · location 2. Quote is now $19.39 per piece.",
+        "dstLines": "LOCATION 1 Example-front.dst Design: EXAMPLE $9.09 STITCHES 9,000 SIZE 0\" × 0\" COLORS 1 TRIMS 0 LOCATION 2 Example-back.dst Design: EXAMPLE $10.30 STITCHES 10,200 SIZE 0\" × 0\" COLORS 1 TRIMS 0 Garment Cap Full Back STITCHES",
+        "dstMarginAsOf": "model synthetic · $63.00/hr + $47 order",
+        "dstMarginGrid": "REVENUE $465.41 EST. COST $742.52 MARGIN −$277.11 MARGIN % -59.5%",
+        "dstTime": "11.0 hr single-head machine time for 24 pcs across 2 locations · not a delivery date",
+        "dstRisks": "No production flags Stitch length, density, trims and colour changes all read normal.",
+        "resProductLabel": "2 LOCATIONS",
+        "resTier": "TIER 24–47",
+        "unitPrice": "19.39",
+        "unitSub": "$19.39 across 2 locations",
+        "resLines": "Example-front.dst Garment · 9K $9.09 Example-back.dst Garment · 10.2K $10.30",
+        "orderTotalNote": "24 × $19.39",
+        "orderTotal": "$465.41",
+        "aiDraftBtn": "✨ Draft Email Quote with AI",
+        "tableTabs": "Garments CTR-Garmt Caps CTR-Cap Full Back DECG-FB",
+        "cardIcon": "",
+        "cardTitle": "Contract Garments",
+        "cardSubtitle": "Flat embroidery on shirts, jackets, bags & soft goods",
+        "cardCode": "CTR-Garmt",
+        "priceTable": "STITCHES 1–7 8–23 24–47 48–71 72+ 8K $9.84 $8.96 $8.08 $7.20 $6.32 9K $11.07 $10.08 $9.09 $8.10 $7.11 10K $12.30 $11.20 $10.10 $9.00 $7.90 11K $13.53 $12.32 $11.11 $9.90 $8.69 12K $14.76 $13.44 $12.12 $10.80 $9.48 13K $15.99 $14.56 $13.13 $11.70 $10.27 14K $17.22 $15.68 $14.14 $12.60 $11.06 15K $18.45 $16.80 $15.15 $13.50 $11.85 16K $19.68 $17.92 $16.16 $14.40 $12.64 17K $20.91 $19.04 $17.17 $15.30 $13.43 18K $22.14 $20.16 $18.18 $16.20 $14.22 19K $23.37 $21.28 $19.19 $17.10 $15.01 20K $24.60 $22.40 $20.20 $18.00 $15.80 $ / 1,000 STITCHES $1.23 $1.12 $1.01 $0.90 $0.79",
+        "cardMins": "Min stitches 8K No small-order fee Order minimum $250.00",
+        "shareToastText": "2 of 2 files loaded as locations"
+      },
+      "fields": [
+        {
+          "id": "qty",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "stitch",
+          "type": "number",
+          "value": "9000",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "number",
+          "value": "10200",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "/pages/embroidery-contract-pricing.html",
+          "text": "Print price list (PDF) ↗"
+        },
+        {
+          "href": "tel:+12539225793,119",
+          "text": "Direct 253-922-5793 ext. 119"
+        },
+        {
+          "href": "mailto:ruth@nwcustomapparel.com",
+          "text": "Email ruth@nwcustomapparel.com"
+        }
+      ],
+      "tables": [
+        "STITCHES 1–7 8–23 24–47 48–71 72+ 8K $9.84 $8.96 $8.08 $7.20 $6.32 9K $11.07 $10.08 $9.09 $8.10 $7.11 10K $12.30 $11.20 $10.10 $9.00 $7.90 11K $13.53 $12.32 $11.11 $9.90 $8.69 12K $14.76 $13.44 $12.12 $10.80 $9.48 13K $15.99 $14.56 $13.13 $11.70 $10.27 14K $17.22 $15.68 $14.14 $12.60 $11.06 15K $18.45 $16.80 $15.15 $13.50 $11.85 16K $19.68 $17.92 $16.16 $14.40 $12.64 17K $20.91 $19.04 $17.17 $15.30 $13.43 18K $22.14 $20.16 $18.18 $16.20 $14.22 19K $23.37 $21.28 $19.19 $17.10 $15.01 20K $24.60 $22.40 $20.20 $18.00 $15.80 $ / 1,000 STITCHES $1.23 $1.12 $1.01 $0.90 $0.79"
+      ],
+      "headings": [
+        "Contract Embroidery 2026.",
+        "Quick price calculator",
+        "Pricing tables",
+        "Contract Garments",
+        "Ruthie Nhoung"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".fact:nth-child(1) > .k"
+            ],
+            [
+              ".fact:nth-child(2) > .k"
+            ],
+            [
+              "#factNoFee > .k"
+            ],
+            [
+              "#factLtm > .k"
+            ],
+            [
+              "#factFb > .k"
+            ],
+            [
+              ".meta"
+            ],
+            [
+              "button[data-product=\"cap\"][role=\"tab\"][type=\"button\"] > .code"
+            ],
+            [
+              "button[data-product=\"fullback\"][role=\"tab\"][type=\"button\"] > .code"
+            ],
+            [
+              ".footnote"
+            ]
+          ]
+        },
+        {
+          "id": "scrollable-region-focusable",
+          "nodes": [
+            [
+              "#priceTable"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "dialogs": []
+}

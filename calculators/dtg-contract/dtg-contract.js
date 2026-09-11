@@ -115,6 +115,15 @@
         return null;
     }
 
+    // Presentation uses the same policy values as the existing calculation.
+    function renderPolicyLabels() {
+        document.querySelectorAll('[data-contract-hw]').forEach(function (el) { el.textContent = '$' + fmtMoney(HEAVYWEIGHT_UPCHARGE); });
+        document.querySelectorAll('[data-contract-ltm]').forEach(function (el) { el.textContent = '$' + fmtMoney(LTM_FEE); });
+        document.querySelectorAll('[data-contract-ltm-band]').forEach(function (el) { el.textContent = '1–' + fmtInt(LTM_THRESHOLD); });
+        var note = document.getElementById('tableLtmNote');
+        if (note) note.textContent = 'LTM fee $' + fmtMoney(LTM_FEE) + ' on orders 1–' + fmtInt(LTM_THRESHOLD) + ' pcs · adds $' + fmtMoney(LTM_FEE) + ' ÷ qty per piece';
+    }
+
     function fetchContractDtgPricing() {
         return fetch(API_BASE_URL + '/api/contract-dtg/print-costs')
             .then(function (r) {
@@ -234,7 +243,7 @@
             subBits.push(base.locRates.length + ' locations · base ' +
                 '<b>$' + fmtMoney(base.locSubtotal) + '/pc</b>');
         }
-        if (state.heavyweight) subBits.push('+ HW <b>$1.00</b>');
+        if (state.heavyweight) subBits.push('+ HW <b>$' + fmtMoney(HEAVYWEIGHT_UPCHARGE) + '</b>');
         if (ltmCalc.hasLtm) {
             subBits.push('+ LTM <b>$' + fmtMoney(ltmCalc.ltmPerPiece) + '/pc</b>');
         }
@@ -255,7 +264,7 @@
                 rows += '<li>' +
                     '<span class="pp-label">Heavyweight upcharge' +
                     '<span class="pp-sublabel">hoodies, fleece, etc.</span></span>' +
-                    '<span class="pp-val">$1.00</span>' +
+                    '<span class="pp-val">$' + fmtMoney(HEAVYWEIGHT_UPCHARGE) + '</span>' +
                     '</li>';
             }
             if (ltmCalc.hasLtm) {
@@ -346,7 +355,7 @@
                     ' = adds <b>+$' + fmtMoney(ltmPerPc) + '/pc</b> on this order';
             } else {
                 ltmNoteEl.innerHTML =
-                    'LTM fee <b>$50</b> on orders 1–23 pcs · adds <b>$50 ÷ qty</b> per piece';
+                    'LTM fee <b>$' + fmtMoney(LTM_FEE) + '</b> on orders 1–' + fmtInt(LTM_THRESHOLD) + ' pcs · adds <b>$' + fmtMoney(LTM_FEE) + ' ÷ qty</b> per piece';
             }
         }
 
@@ -674,7 +683,7 @@ var AI_ENDPOINT = '/api/contract-dtg-ai/chat';
         }
 
         var notesLines = ['Contract DTG quote · ' + locationLabel +
-            (calcContext.heavyweight ? ' · Heavyweight (+$1/pc)' : '')];
+            (calcContext.heavyweight ? ' · Heavyweight (+$' + fmtMoney(calcContext.heavyweightCharge) + '/pc)' : '')];
         if (cfBundle && !taxable) {
             notesLines.push('Tax-exempt · WA Reseller Permit on file (verify)');
         }
@@ -1327,6 +1336,7 @@ var AI_ENDPOINT = '/api/contract-dtg-ai/chat';
                 LTM_FEE = data.ltm.fee;
                 LTM_THRESHOLD = data.ltm.threshold;
                 HEAVYWEIGHT_UPCHARGE = data.heavyweight.upcharge;
+                renderPolicyLabels();
                 var errBanner = document.getElementById('pricingError');
                 if (errBanner) errBanner.hidden = true;
                 renderCalculator();

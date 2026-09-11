@@ -54,7 +54,16 @@ describe('content pages — specifics', () => {
         expect(html).toMatch(/id="pricingContent" hidden>/);
         expect(js).toMatch(/getElementById\('ecp-print'\)/);
         expect(js).not.toMatch(/\.style\.display/);
-        expect(read('pages/embroidery-contract-pricing.css')).toMatch(/\[hidden\] \{ display: none !important; \}/);
+        expect(html).toContain('data-ui="unified"');
+        const styles = [...html.matchAll(/<link\b[^>]*href="(\/[^"?]+)\?[^"]+"/g)].map((match) => match[1]);
+        expect(styles).toEqual([
+            '/shared_components/css/tokens.css',
+            '/shared_components/css/components.css',
+            '/shared_components/css/contract-pricing-2026.css',
+            '/pages/embroidery-contract-pricing.css'
+        ]);
+        expect(read('shared_components/css/components.css')).toMatch(/:where\(\[data-ui="unified"\]\) \[hidden\]\s*\{\s*display: none;/);
+        expect(read('pages/embroidery-contract-pricing.css')).not.toMatch(/!important/);
     });
     test('resources + sale share one extracted stylesheet and have ONE h1', () => {
         for (const p of ['pages/resources.html', 'pages/sale.html']) {

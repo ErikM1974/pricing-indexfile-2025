@@ -917,3 +917,52 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - tests/fixtures/core-calculators-original-defects.json — recorded original DTG/DTF color-selection failures; current browser checks require zero errors.
 
 - shared_components/css/core-calculators.css — common five-calculator product, header, control arrangement, inventory and complete paper layout. Existing per-method sheets now own only method layout.
+
+- tests/e2e/helpers/contract-calculators-browser.js — contract calculator original evidence and guarded CSS migration checks.
+- tests/e2e/css-unification-contract-calculators.spec.js — contract calculator original evidence and guarded CSS migration checks.
+- tests/unit/contract-calculators-content.test.js — contract calculator original evidence and guarded CSS migration checks.
+- tests/fixtures/contract-calculators-original-content.json — contract calculator original evidence and guarded CSS migration checks.
+
+- tests/fixtures/contract-calculators-dtg-normal-original-browser.json — immutable synthetic contract-pricing browser evidence.
+
+- tests/fixtures/contract-calculators-dtg-failed-original-browser.json — immutable synthetic contract-pricing browser evidence.
+
+- tests/fixtures/contract-calculators-emb-normal-original-browser.json — immutable synthetic contract-pricing browser evidence.
+
+- tests/fixtures/contract-calculators-emb-failed-original-browser.json — immutable synthetic contract-pricing browser evidence.
+
+- tests/fixtures/contract-calculators-sheet-normal-original-browser.json — immutable synthetic contract-pricing browser evidence.
+
+- tests/fixtures/contract-calculators-sheet-failed-original-browser.json — immutable synthetic contract-pricing browser evidence.
+
+- tests/fixtures/contract-calculators-dtg-url-options-original-browser.json — immutable synthetic contract-pricing browser evidence.
+
+- tests/fixtures/contract-calculators-emb-url-cap-original-browser.json — immutable synthetic contract-pricing browser evidence.
+
+- tests/fixtures/contract-calculators-emb-url-fullback-original-browser.json — immutable synthetic contract-pricing browser evidence.
+
+- tests/fixtures/contract-calculators-emb-fee-original-browser.json — immutable synthetic contract-pricing browser evidence.
+
+- tests/fixtures/contract-calculators-emb-failedMin-original-browser.json — immutable synthetic contract-pricing browser evidence.
+
+- tests/fixtures/contract-calculators-sheet-fee-original-browser.json — immutable synthetic contract-pricing browser evidence.
+
+- tests/fixtures/contract-calculators-sheet-failedMin-original-browser.json — immutable synthetic contract-pricing browser evidence.
+
+- tests/fixtures/contract-calculators-dtg-tiers-original-browser.json — immutable synthetic contract-pricing browser evidence.
+
+- tests/fixtures/contract-calculators-emb-tiers-original-browser.json — immutable synthetic contract-pricing browser evidence.
+
+- tests/fixtures/contract-calculators-dtg-assistant-original-browser.json — immutable synthetic contract-pricing browser evidence.
+
+- tests/fixtures/contract-calculators-emb-assistant-original-browser.json — immutable synthetic contract-pricing browser evidence.
+
+- tests/fixtures/contract-calculators-emb-dst-public-original-browser.json — immutable synthetic contract-pricing browser evidence.
+
+- tests/fixtures/contract-calculators-emb-dst-staff-original-browser.json — immutable synthetic contract-pricing browser evidence.
+
+- tests/fixtures/contract-calculators-emb-dst-invalid-original-browser.json — immutable synthetic contract-pricing browser evidence.
+
+- shared_components/js/contract-calculator-ui.js — contract-family controls, accessible product selectors, scrollable price tables and assistant focus handling.
+
+- tests/e2e/css-unification-contract-calculator-controls.spec.js — contract policy-label, assistant-focus, product-keyboard and horizontal-table regression checks with intercepted service requests.

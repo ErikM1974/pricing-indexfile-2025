@@ -1,0 +1,514 @@
+{
+  "name": "emb-failed",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Contract Embroidery Pricing 2026 — Northwest Custom Apparel",
+      "url": "/calculators/embroidery-contract/index.html",
+      "ids": {
+        "ledeOrderMin": "$250.00",
+        "factOrderMin": "—",
+        "factNoFee": "SMALL-ORDER FEE None — the order minimum covers small runs",
+        "factLtmFee": "—",
+        "factLtmBand": "1–23",
+        "factFbLtm": "—",
+        "factFbBand": "1–7",
+        "pricingError": "Unable to load contract pricing. Refresh the page or contact Ruthie directly if this persists.",
+        "segItemTypeLabel": "ITEM TYPE",
+        "segItemType": "Garment CTR-Garmt Cap CTR-Cap Full Back DECG-FB",
+        "qty": "",
+        "stitch": "",
+        "dstFieldLabel": "STITCH FILE · optional",
+        "dstDropHint": "Reads the exact stitch count in your browser — the file never leaves your computer",
+        "dstStatus": "",
+        "dstLines": "",
+        "resProductLabel": "GARMENT",
+        "resTier": "—",
+        "unitPrice": "—",
+        "unitSub": "Pricing unavailable",
+        "orderTotalNote": "",
+        "orderTotal": "—",
+        "aiDraftBtn": "✨ Draft Email Quote with AI",
+        "tableTabs": "Garments CTR-Garmt Caps CTR-Cap Full Back DECG-FB",
+        "cardIcon": "",
+        "cardTitle": "Contract Garments",
+        "cardSubtitle": "Flat embroidery on shirts, jackets, bags & soft goods",
+        "cardCode": "CTR-Garmt",
+        "priceTable": "STITCHES 1–7 8–23 24–47 48–71 72+ $ / 1,000 STITCHES",
+        "cardMinStitches": "8K",
+        "shareToastText": "Quote link copied — paste into your email or chat"
+      },
+      "fields": [
+        {
+          "id": "qty",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "stitch",
+          "type": "number",
+          "value": "8000",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "/pages/embroidery-contract-pricing.html",
+          "text": "Print price list (PDF) ↗"
+        },
+        {
+          "href": "tel:+12539225793,119",
+          "text": "Direct 253-922-5793 ext. 119"
+        },
+        {
+          "href": "mailto:ruth@nwcustomapparel.com",
+          "text": "Email ruth@nwcustomapparel.com"
+        }
+      ],
+      "tables": [
+        "STITCHES 1–7 8–23 24–47 48–71 72+ $ / 1,000 STITCHES"
+      ],
+      "headings": [
+        "Contract Embroidery 2026.",
+        "Quick price calculator",
+        "Pricing tables",
+        "Contract Garments",
+        "Ruthie Nhoung"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".fact:nth-child(1) > .k"
+            ],
+            [
+              ".fact:nth-child(2) > .k"
+            ],
+            [
+              "#factNoFee > .k"
+            ],
+            [
+              "#factLtm > .k"
+            ],
+            [
+              "#factFb > .k"
+            ],
+            [
+              "#pricingError"
+            ],
+            [
+              "#pricingError > strong"
+            ],
+            [
+              ".meta"
+            ],
+            [
+              "button[data-product=\"cap\"][role=\"tab\"][type=\"button\"] > .code"
+            ],
+            [
+              "button[data-product=\"fullback\"][role=\"tab\"][type=\"button\"] > .code"
+            ],
+            [
+              ".footnote"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Contract Embroidery Pricing 2026 — Northwest Custom Apparel",
+      "url": "/calculators/embroidery-contract/index.html",
+      "ids": {
+        "ledeOrderMin": "$250.00",
+        "factOrderMin": "—",
+        "factNoFee": "SMALL-ORDER FEE None — the order minimum covers small runs",
+        "factLtmFee": "—",
+        "factLtmBand": "1–23",
+        "factFbLtm": "—",
+        "factFbBand": "1–7",
+        "pricingError": "Unable to load contract pricing. Refresh the page or contact Ruthie directly if this persists.",
+        "segItemTypeLabel": "ITEM TYPE",
+        "segItemType": "Garment CTR-Garmt Cap CTR-Cap Full Back DECG-FB",
+        "qty": "",
+        "stitch": "",
+        "dstFieldLabel": "STITCH FILE · optional",
+        "dstDropHint": "Reads the exact stitch count in your browser — the file never leaves your computer",
+        "dstStatus": "",
+        "dstLines": "",
+        "resProductLabel": "GARMENT",
+        "resTier": "—",
+        "unitPrice": "—",
+        "unitSub": "Pricing unavailable",
+        "orderTotalNote": "",
+        "orderTotal": "—",
+        "aiDraftBtn": "✨ Draft Email Quote with AI",
+        "tableTabs": "Garments CTR-Garmt Caps CTR-Cap Full Back DECG-FB",
+        "cardIcon": "",
+        "cardTitle": "Contract Garments",
+        "cardSubtitle": "Flat embroidery on shirts, jackets, bags & soft goods",
+        "cardCode": "CTR-Garmt",
+        "priceTable": "STITCHES 1–7 8–23 24–47 48–71 72+ $ / 1,000 STITCHES",
+        "cardMinStitches": "8K",
+        "shareToastText": "Quote link copied — paste into your email or chat"
+      },
+      "fields": [
+        {
+          "id": "qty",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "stitch",
+          "type": "number",
+          "value": "8000",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "/pages/embroidery-contract-pricing.html",
+          "text": "Print price list (PDF) ↗"
+        },
+        {
+          "href": "tel:+12539225793,119",
+          "text": "Direct 253-922-5793 ext. 119"
+        },
+        {
+          "href": "mailto:ruth@nwcustomapparel.com",
+          "text": "Email ruth@nwcustomapparel.com"
+        }
+      ],
+      "tables": [
+        "STITCHES 1–7 8–23 24–47 48–71 72+ $ / 1,000 STITCHES"
+      ],
+      "headings": [
+        "Contract Embroidery 2026.",
+        "Quick price calculator",
+        "Pricing tables",
+        "Contract Garments",
+        "Ruthie Nhoung"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".fact:nth-child(1) > .k"
+            ],
+            [
+              ".fact:nth-child(2) > .k"
+            ],
+            [
+              "#factNoFee > .k"
+            ],
+            [
+              "#factLtm > .k"
+            ],
+            [
+              "#factFb > .k"
+            ],
+            [
+              "#pricingError"
+            ],
+            [
+              "#pricingError > strong"
+            ],
+            [
+              ".meta"
+            ],
+            [
+              "button[data-product=\"cap\"][role=\"tab\"][type=\"button\"] > .code"
+            ],
+            [
+              "button[data-product=\"fullback\"][role=\"tab\"][type=\"button\"] > .code"
+            ],
+            [
+              ".footnote"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Contract Embroidery Pricing 2026 — Northwest Custom Apparel",
+      "url": "/calculators/embroidery-contract/index.html",
+      "ids": {
+        "ledeOrderMin": "$250.00",
+        "factOrderMin": "—",
+        "factNoFee": "SMALL-ORDER FEE None — the order minimum covers small runs",
+        "factLtmFee": "—",
+        "factLtmBand": "1–23",
+        "factFbLtm": "—",
+        "factFbBand": "1–7",
+        "pricingError": "Unable to load contract pricing. Refresh the page or contact Ruthie directly if this persists.",
+        "segItemTypeLabel": "ITEM TYPE",
+        "segItemType": "Garment CTR-Garmt Cap CTR-Cap Full Back DECG-FB",
+        "qty": "",
+        "stitch": "",
+        "dstFieldLabel": "STITCH FILE · optional",
+        "dstDropHint": "Reads the exact stitch count in your browser — the file never leaves your computer",
+        "dstStatus": "",
+        "dstLines": "",
+        "resProductLabel": "GARMENT",
+        "resTier": "—",
+        "unitPrice": "—",
+        "unitSub": "Pricing unavailable",
+        "orderTotalNote": "",
+        "orderTotal": "—",
+        "aiDraftBtn": "✨ Draft Email Quote with AI",
+        "tableTabs": "Garments CTR-Garmt Caps CTR-Cap Full Back DECG-FB",
+        "cardIcon": "",
+        "cardTitle": "Contract Garments",
+        "cardSubtitle": "Flat embroidery on shirts, jackets, bags & soft goods",
+        "cardCode": "CTR-Garmt",
+        "priceTable": "STITCHES 1–7 8–23 24–47 48–71 72+ $ / 1,000 STITCHES",
+        "cardMinStitches": "8K",
+        "shareToastText": "Quote link copied — paste into your email or chat"
+      },
+      "fields": [
+        {
+          "id": "qty",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "stitch",
+          "type": "number",
+          "value": "8000",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "/pages/embroidery-contract-pricing.html",
+          "text": "Print price list (PDF) ↗"
+        },
+        {
+          "href": "tel:+12539225793,119",
+          "text": "Direct 253-922-5793 ext. 119"
+        },
+        {
+          "href": "mailto:ruth@nwcustomapparel.com",
+          "text": "Email ruth@nwcustomapparel.com"
+        }
+      ],
+      "tables": [
+        "STITCHES 1–7 8–23 24–47 48–71 72+ $ / 1,000 STITCHES"
+      ],
+      "headings": [
+        "Contract Embroidery 2026.",
+        "Quick price calculator",
+        "Pricing tables",
+        "Contract Garments",
+        "Ruthie Nhoung"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".fact:nth-child(1) > .k"
+            ],
+            [
+              ".fact:nth-child(2) > .k"
+            ],
+            [
+              "#factNoFee > .k"
+            ],
+            [
+              "#factLtm > .k"
+            ],
+            [
+              "#factFb > .k"
+            ],
+            [
+              "#pricingError"
+            ],
+            [
+              "#pricingError > strong"
+            ],
+            [
+              ".meta"
+            ],
+            [
+              "button[data-product=\"cap\"][role=\"tab\"][type=\"button\"] > .code"
+            ],
+            [
+              "button[data-product=\"fullback\"][role=\"tab\"][type=\"button\"] > .code"
+            ],
+            [
+              ".footnote"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Contract Embroidery Pricing 2026 — Northwest Custom Apparel",
+      "url": "/calculators/embroidery-contract/index.html",
+      "ids": {
+        "ledeOrderMin": "$250.00",
+        "factOrderMin": "—",
+        "factNoFee": "SMALL-ORDER FEE None — the order minimum covers small runs",
+        "factLtmFee": "—",
+        "factLtmBand": "1–23",
+        "factFbLtm": "—",
+        "factFbBand": "1–7",
+        "pricingError": "Unable to load contract pricing. Refresh the page or contact Ruthie directly if this persists.",
+        "segItemTypeLabel": "ITEM TYPE",
+        "segItemType": "Garment CTR-Garmt Cap CTR-Cap Full Back DECG-FB",
+        "qty": "",
+        "stitch": "",
+        "dstFieldLabel": "STITCH FILE · optional",
+        "dstDropHint": "Reads the exact stitch count in your browser — the file never leaves your computer",
+        "dstStatus": "",
+        "dstLines": "",
+        "resProductLabel": "GARMENT",
+        "resTier": "—",
+        "unitPrice": "—",
+        "unitSub": "Pricing unavailable",
+        "orderTotalNote": "",
+        "orderTotal": "—",
+        "aiDraftBtn": "✨ Draft Email Quote with AI",
+        "tableTabs": "Garments CTR-Garmt Caps CTR-Cap Full Back DECG-FB",
+        "cardIcon": "",
+        "cardTitle": "Contract Garments",
+        "cardSubtitle": "Flat embroidery on shirts, jackets, bags & soft goods",
+        "cardCode": "CTR-Garmt",
+        "priceTable": "STITCHES 1–7 8–23 24–47 48–71 72+ $ / 1,000 STITCHES",
+        "cardMinStitches": "8K",
+        "shareToastText": "Quote link copied — paste into your email or chat"
+      },
+      "fields": [
+        {
+          "id": "qty",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "stitch",
+          "type": "number",
+          "value": "8000",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "/pages/embroidery-contract-pricing.html",
+          "text": "Print price list (PDF) ↗"
+        },
+        {
+          "href": "tel:+12539225793,119",
+          "text": "Direct 253-922-5793 ext. 119"
+        },
+        {
+          "href": "mailto:ruth@nwcustomapparel.com",
+          "text": "Email ruth@nwcustomapparel.com"
+        }
+      ],
+      "tables": [
+        "STITCHES 1–7 8–23 24–47 48–71 72+ $ / 1,000 STITCHES"
+      ],
+      "headings": [
+        "Contract Embroidery 2026.",
+        "Quick price calculator",
+        "Pricing tables",
+        "Contract Garments",
+        "Ruthie Nhoung"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".fact:nth-child(1) > .k"
+            ],
+            [
+              ".fact:nth-child(2) > .k"
+            ],
+            [
+              "#factNoFee > .k"
+            ],
+            [
+              "#factLtm > .k"
+            ],
+            [
+              "#factFb > .k"
+            ],
+            [
+              "#pricingError"
+            ],
+            [
+              "#pricingError > strong"
+            ],
+            [
+              ".meta"
+            ],
+            [
+              "button[data-product=\"cap\"][role=\"tab\"][type=\"button\"] > .code"
+            ],
+            [
+              "button[data-product=\"fullback\"][role=\"tab\"][type=\"button\"] > .code"
+            ],
+            [
+              ".footnote"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "dialogs": []
+}
