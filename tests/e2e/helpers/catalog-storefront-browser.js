@@ -6,6 +6,11 @@ const tees=require('../../fixtures/custom-apparel-api-fixtures.json').tees;
 // Declared synthetic API data: real canonical totals and browser ladder,
 // without sending a real quote request. FF/FB use the fixture's jumbo costs.
 const dtgBundle={product:{styleNumber:'PC61',title:'Core Cotton Tee'},pricing:{tiers:tees.tiersR,costs:[...tees.allDtgCostsR,...tees.allDtgCostsR.filter(r=>['JF','JB'].includes(r.PrintLocationCode)).map(r=>({...r,PrintLocationCode:r.PrintLocationCode==='JF'?'FF':'FB'}))],sizes:tees.sizes,upcharges:tees.sellingPriceDisplayAddOns}};
+// An additional complete synthetic ladder covers the low-quantity costs missing
+// from the inherited apparel fixture, without changing its immutable contracts.
+const completeDtgBundle=JSON.parse(JSON.stringify(dtgBundle));
+completeDtgBundle.pricing.costs=completeDtgBundle.pricing.costs.filter(r=>!['FF','FB'].includes(r.PrintLocationCode));
+for(const PrintLocationCode of ['FF','FB'])for(const [TierLabel,PrintCost]of [['1-11',12],['12-23',11],['24-47',10],['48-71',9],['72+',8]])completeDtgBundle.pricing.costs.push({PrintLocationCode,TierLabel,PrintCost});
 const colors=[{name:'Jet Black',catalog:'JetBlack'},{name:'Brilliant Orange',catalog:'BrillOrng'}],sizes=['S','M','L','XL','2XL','3XL'];
 const garment='<svg xmlns="http://www.w3.org/2000/svg" width="600" height="720"><rect width="600" height="720" fill="white"/><path d="M175 80L235 60Q300 125 365 60L425 80L545 200L455 285L415 240L425 640L175 640L185 240L145 285L55 200Z" fill="#263b46"/></svg>';
 const image='/__catalog-fixture/garment.svg';
@@ -14,6 +19,7 @@ function products(){return ['PC61','PC54','K500','C112'].map((styleNumber,i)=>({
 function details(style){const p=products().find(p=>p.styleNumber===style)||products()[0];return colors.map(c=>({STYLE:style,PRODUCT_TITLE:p.productName,BRAND_NAME:p.brand,CATEGORY_NAME:p.category,SUBCATEGORY_NAME:p.subcategory,PRODUCT_DESCRIPTION:p.description,PRODUCT_STATUS:'Active',CATALOG_COLOR:c.catalog,COLOR_NAME:c.name,COLOR_SQUARE_IMAGE:image,FRONT_MODEL:image,BACK_MODEL:image,FRONT_FLAT:image,BACK_FLAT:image,PRODUCT_IMAGE:image}));}
 async function open(page,state={}){
  const events={errors:[],writes:[],unknown:[],missing:[],reads:[],actions:[],dialogs:[]};
+ const dtgData=state.completeDtg?completeDtgBundle:dtgBundle;
  await page.clock.setFixedTime(new Date('2026-09-11T18:30:00.000Z'));
  await page.context().addInitScript(()=>{window.print=()=>{window.__printCalls=(window.__printCalls||0)+1;};Math.random=()=>0.375;});
  page.on('pageerror',e=>events.errors.push(e.message));
@@ -22,7 +28,7 @@ async function open(page,state={}){
   const req=route.request(),u=new URL(req.url()),p=u.pathname,method=req.method(),local=['localhost','127.0.0.1'].includes(u.hostname);
   if(p==='/api/dtg/quote-pricing'&&method==='POST'){
    const body=req.postDataJSON();events.reads.push({path:p,method,body});
-   return route.fulfill({status:state.pricingFailed?503:200,json:dtgCanonical.priceLines({...body,bundlesByStyle:Object.fromEntries(body.lines.map(l=>[l.styleNumber,dtgBundle]))})});
+   return route.fulfill({status:state.pricingFailed?503:200,json:dtgCanonical.priceLines({...body,bundlesByStyle:Object.fromEntries(body.lines.map(l=>[l.styleNumber,dtgData]))})});
   }
   if(!['GET','HEAD'].includes(method)||/quote-sequence|logout/.test(p)){events.writes.push({path:p,method});return route.fulfill({status:503});}
   if(p.startsWith('/api/'))events.reads.push({path:p,query:u.search});
@@ -46,7 +52,7 @@ async function open(page,state={}){
   if(p==='/api/stylesearch')return route.fulfill({json:products().filter(r=>r.styleNumber.toLowerCase().includes((u.searchParams.get('term')||'').toLowerCase())).map(r=>({value:r.styleNumber,label:r.productName,thumb:image}))});
   if(p==='/api/product-details')return route.fulfill({status:state.productFailed?503:200,json:state.productEmpty?[]:details(u.searchParams.get('styleNumber')||'PC61')});
   if(p.startsWith('/api/sanmar/inventory/'))return route.fulfill({status:state.stockFailed?503:200,json:{inventory:colors.flatMap(c=>(p.includes('C112')?['OSFA']:sizes).map(size=>({color:c.catalog,size,totalQty:state.out?0:500}))) }});
-  if(p==='/api/dtg/product-bundle')return route.fulfill({status:state.pricingFailed?503:200,json:dtgBundle});
+  if(p==='/api/dtg/product-bundle')return route.fulfill({status:state.pricingFailed?503:200,json:dtgData});
   if(p==='/api/service-codes')return route.fulfill({json:pricing('service-codes.json')});
   if(p==='/api/al-pricing'){
    const category=(file,stitches)=>({baseStitches:stitches,basePrices:Object.fromEntries(pricing(file).allEmbroideryCostsR.filter(r=>r.StitchCount===stitches).map(r=>[r.TierLabel,r.EmbroideryCost])),perThousandUpcharge:stitches===5000?1:1.25,ltmThreshold:7,ltmFee:50});

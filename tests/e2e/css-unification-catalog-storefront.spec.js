@@ -6,6 +6,15 @@ async function evidence(page,name,events,{paper=true}={}){
  const states=[];fs.mkdirSync(out,{recursive:true});
  for(const width of [1440,768,390,320]){
   await page.setViewportSize({width,height:1000});await page.evaluate(()=>document.fonts.ready);
+  if(!capture){
+   await page.evaluate(async()=>{const images=[...document.images];for(const img of images)img.loading='eager';await Promise.all(images.map(img=>img.decode().catch(()=>{})));});
+   expect(await page.locator('body').evaluate(node=>node.getBoundingClientRect().width)).toBeGreaterThan(width-25);
+   if(await page.locator('.catalog-shell').count()){
+    const gap=await page.locator('.catalog-shell').evaluate(shell=>shell.querySelector('.catalog-results').getBoundingClientRect().top-shell.getBoundingClientRect().top);
+    expect(gap,'catalog results start directly below the heading and promotion').toBeLessThan(50);
+    if(width<=960)await expect(page.locator('#filtersRail')).toHaveCSS('position','fixed');
+   }
+  }
   const state=await snapshot(page),axe=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
   states.push({width,...state,violations:axe.violations.map(v=>({id:v.id,impact:v.impact,nodes:v.nodes.map(n=>n.target)}))});
   if(!capture){expect(state.overflow).toBe(false);expect(axe.violations.map(v=>({id:v.id,nodes:v.nodes.map(n=>n.target)}))).toEqual([]);}
@@ -14,7 +23,24 @@ async function evidence(page,name,events,{paper=true}={}){
  check(expect,events);
  const file='tests/fixtures/catalog-storefront-'+name+'-original-browser.json',record={name,states,actions:events.actions,dialogs:events.dialogs};
  if(capture){if(fs.existsSync(path.join(root,file)))expect(record).toEqual(JSON.parse(fs.readFileSync(path.join(root,file),'utf8')));else{fs.writeFileSync(path.join(root,file),JSON.stringify(record,null,2)+'\n');fs.appendFileSync(path.join(root,'ACTIVE_FILES.md'),'\n- '+file+' — immutable original synthetic home/catalog/product browser contract.\n');}}
- else{const before=JSON.parse(fs.readFileSync(path.join(root,file),'utf8'));for(let i=0;i<states.length;i++)for(const k of ['title','url','ids','fields','links','selection'])expect(states[i][k],name+' '+k).toEqual(before.states[i][k]);expect(events.actions).toEqual(before.actions);}
+ else{
+  const before=JSON.parse(fs.readFileSync(path.join(root,file),'utf8'));
+  // Native dialogs remove closed off-canvas links from visible output. The masthead
+  // also wraps at different widths. Preserve those destinations in the DOM contract
+  // below, while comparing every remaining visible content link without changes.
+  const navigation=await page.locator('.util-strip a[href],.nav-bar a[href],.sidebar a[href]').evaluateAll(nodes=>nodes.map(n=>JSON.stringify({href:n.getAttribute('href'),text:n.textContent.replace(/\s+/g,' ').trim()})));
+  const contentLinks=links=>links.filter(link=>!navigation.includes(JSON.stringify(link)));
+  for(let i=0;i<states.length;i++){
+   const expectedIds={...before.states[i].ids};
+   // The legacy sample-drawer stylesheet exposed the mobile-only filter close
+   // button on desktop. Its repaired visibility is checked explicitly below.
+   if(states[i].width===1440)delete expectedIds.filtersClose;
+   expect(states[i].ids,name+' ids').toEqual(expectedIds);
+   for(const k of ['title','url','fields','selection'])expect(states[i][k],name+' '+k).toEqual(before.states[i][k]);
+   expect(contentLinks(states[i].links),name+' content links').toEqual(contentLinks(before.states[i].links));
+  }
+  expect(events.actions).toEqual(before.actions);
+ }
  if(paper){await page.setViewportSize({width:1440,height:1000});await page.pdf({path:path.join(out,'catalog-storefront-'+name+'-'+phase+'.pdf'),format:'Letter',printBackground:true});}
 }
 for(const [name,url]of [['home','/'],['catalog','/catalog'],['product','/product.html?style=PC61']])test('CSS catalog storefront original: '+name,async({page})=>{
@@ -25,7 +51,10 @@ for(const [name,url]of [['home','/'],['catalog','/catalog'],['product','/product
 });
 
 async function productReady(page,method,qty){
- await page.waitForFunction(({method,qty})=>{const s=window.PdpConfigurator?.getSelection();return s?.status==='ok'&&s.price&&(!method||s.methodId===method)&&(!qty||s.qty===qty);},{method,qty});
+ await page.waitForFunction(({method,qty})=>{const s=window.PdpConfigurator?.getSelection();return s?.status==='ok'&&s.price&&(!method||s.methodId===method)&&(!qty||s.qty===qty&&Object.values(s.sizes||{}).reduce((a,b)=>a+b,0)===qty);},{method,qty});
+ // Every method reprices independently; a settled selected method does not mean
+ // the other method cards are ready for the immutable visible-content snapshot.
+ await expect(page.locator('#cfgMethods')).not.toContainText('Getting your live price…');
 }
 async function remember(page,events,label){events.actions.push({label,selection:await page.evaluate(()=>window.PdpConfigurator?.getSelection()||null),url:new URL(page.url()).pathname+new URL(page.url()).search});}
 
@@ -110,4 +139,65 @@ test('CSS catalog storefront: DTF minimum is visible and can recover',async({pag
  await page.waitForFunction(()=>window.PdpConfigurator?.getSelection()?.status==='belowmin');await expect(page.locator('#cfgAddToQuote')).toBeDisabled();
  await evidence(page,'product-dtf-minimum',events);
  await page.locator('#cfgQtyPlus').click();await productReady(page,'dtf',12);await expect(page.locator('#cfgAddToQuote')).toBeEnabled();check(expect,events);
+});
+
+test('CSS catalog storefront: DTG complete synthetic cost ladder',async({page})=>{
+ const events=await open(page,{url:'/product.html?style=PC61',allMethods:true,completeDtg:true,original:capture});await productReady(page);
+ await page.locator('[data-method="dtg"]').click();await page.locator('[data-loc="frontBack"]').click();
+ await page.locator('#cfgQtyInput').fill('12');await page.locator('#cfgQtyInput').blur();await productReady(page,'dtg',12);
+ await remember(page,events,'complete DTG cost ladder');await evidence(page,'product-dtg-complete-cost-ladder-settled',events);
+});
+
+test('CSS catalog storefront: original quantity edit exposes the previous price',async({page})=>{
+ const events=await open(page,{url:'/product.html?style=PC61',allMethods:true,completeDtg:true,original:true});await productReady(page);
+ const result=await page.evaluate(()=>{
+  const input=document.getElementById('cfgQtyInput');input.value='12';input.dispatchEvent(new Event('input',{bubbles:true}));
+  const selection=window.PdpConfigurator.getSelection();return {selection,addDisabled:document.getElementById('cfgAddToQuote').disabled};
+ });
+ expect(result.selection.qty).toBe(12);expect(result.selection.status).toBe('ok');expect(Object.values(result.selection.sizes).reduce((a,b)=>a+b,0)).toBe(24);expect(result.addDisabled).toBe(false);check(expect,events);
+});
+
+test('CSS catalog storefront: changed quantity withholds the old price and handoff',async({page})=>{
+ test.skip(capture,'Regression for the demonstrated stale-price state.');
+ const events=await open(page,{url:'/product.html?style=PC61',allMethods:true,completeDtg:true});await productReady(page);
+ await page.locator('[data-method="dtg"]').click();await page.locator('[data-loc="frontBack"]').click();await productReady(page,'dtg',24);
+ const result=await page.evaluate(()=>{
+  const input=document.getElementById('cfgQtyInput');input.value='12';input.dispatchEvent(new Event('input',{bubbles:true}));
+  return {selection:window.PdpConfigurator.getSelection(),addDisabled:document.getElementById('cfgAddToQuote').disabled,email:decodeURIComponent(document.getElementById('cfgEmailQuote').href)};
+ });
+ expect(result.selection.status).toBe('loading');expect(result.selection.price).toBe(null);expect(result.addDisabled).toBe(true);expect(result.email).toContain('Quantity: 12');expect(result.email).not.toContain('Online price:');
+ await productReady(page,'dtg',12);await expect(page.locator('#cfgTotal')).toContainText('$330.96');await expect(page.locator('#cfgAddToQuote')).toBeEnabled();check(expect,events);
+});
+
+for(const [name,url]of [['home','/'],['catalog','/catalog'],['product','/product.html?style=PC61']])test('CSS catalog storefront: native menu keyboard and original destinations '+name,async({page})=>{
+ test.skip(capture,'Current keyboard repair; original DOM is independently reconstructed below.');
+ const events=await open(page,{url});
+ if(name==='catalog')await expect(page.locator('.pcard')).toHaveCount(4);
+ if(name==='product')await productReady(page);
+ const before=await page.context().newPage(),originalEvents=await open(before,{url,original:true});
+ if(name==='catalog')await expect(before.locator('.pcard')).toHaveCount(4);
+ if(name==='product')await productReady(before);
+ const navigation=p=>p.locator('.util-strip a[href],.nav-bar a[href],.sidebar a[href]').evaluateAll(nodes=>nodes.map(n=>({href:n.getAttribute('href'),text:n.textContent.replace(/\s+/g,' ').trim()})));
+ await expect.poll(()=>navigation(page)).toEqual(await navigation(before));check(expect,originalEvents);await before.close();
+ await page.setViewportSize({width:390,height:900});await page.locator('#mobileMenuBtn').focus();await page.keyboard.press('Enter');
+ await expect(page.locator('#sidebar')).toHaveJSProperty('open',true);await expect(page.locator('#drawerClose')).toBeFocused();
+ await page.keyboard.press('Shift+Tab');expect(await page.evaluate(()=>document.activeElement.closest('#sidebar')!==null)).toBe(true);
+ await page.keyboard.press('Escape');await expect(page.locator('#sidebar')).toHaveJSProperty('open',false);await expect(page.locator('#mobileMenuBtn')).toBeFocused();
+ check(expect,events);
+});
+
+test('CSS catalog storefront: filter close is mobile only and sample colors work with keys',async({page})=>{
+ test.skip(capture,'Current accessibility repair.');
+ const events=await open(page,{url:'/catalog'});await expect(page.locator('.pcard')).toHaveCount(4);
+ await page.setViewportSize({width:1440,height:1000});await expect(page.locator('#filtersClose')).toBeHidden();
+ await page.setViewportSize({width:390,height:900});await page.locator('#filtersOpen').click();await expect(page.locator('#filtersClose')).toBeFocused();
+ await page.keyboard.press('Shift+Tab');expect(await page.evaluate(()=>!!document.activeElement.closest('#filtersRail'))).toBe(true);
+ await page.keyboard.press('Tab');await expect(page.locator('#filtersClose')).toBeFocused();
+ await page.keyboard.press('Escape');await expect(page.locator('#filtersOpen')).toBeFocused();check(expect,events);
+ const productEvents=await open(page,{url:'/product.html?style=PC61'});await productReady(page);
+ await page.locator('#ctaSample').click();await expect(page.locator('#drawer-close')).toBeFocused();
+ const drawerAxe=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
+ expect(drawerAxe.violations.map(v=>({id:v.id,nodes:v.nodes.map(n=>n.target)}))).toEqual([]);
+ const color=page.locator('#drawer-color-swatches button').first();await color.focus();await page.keyboard.press('Space');await expect(color).toHaveAttribute('aria-pressed','true');
+ await page.keyboard.press('Escape');await expect(page.locator('#cart-drawer')).toHaveJSProperty('open',false);await expect(page.locator('#ctaSample')).toBeFocused();check(expect,productEvents);
 });

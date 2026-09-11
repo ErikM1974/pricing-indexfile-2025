@@ -278,3 +278,5 @@ Instant storefront: banner/sticker configurators use scoped instant-quote/custom
 Draft design family: shared_components/css/design-libraries.css owns local design/archive shells, record cards and dialogs; shared_components/js/design-library-ui.js decorates existing provider fields without changing data or submit handlers. Provider integration and browser review pending; no new review credit.
 
 - custom-apparel-print.js: loaded by Custom Tees/Caps; prints full entered field values using textContent, temporarily keeps the contact footer beside the letterhead, and restores its position and removes mirrors after printing.
+
+- catalog-storefront-navigation.js — native navigation for home, catalog and product, compatible with their existing category hooks.

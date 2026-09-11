@@ -48,7 +48,7 @@ class CartDrawer {
             <div id="drawer-overlay" class="drawer-overlay"></div>
 
             <!-- Cart Drawer -->
-            <div id="cart-drawer" class="cart-drawer">
+            <dialog id="cart-drawer" class="cart-drawer" aria-label="Your Sample Cart">
                 <!-- Drawer Header -->
                 <div class="drawer-header">
                     <h3 class="drawer-title">Your Sample Cart</h3>
@@ -87,7 +87,7 @@ class CartDrawer {
                         </div>
 
                         <!-- Add to Cart Button -->
-                        <button type="button" class="btn-add-to-cart" id="drawer-add-to-cart" disabled>
+                        <button type="button" class="btn btn-primary btn-add-to-cart" id="drawer-add-to-cart" disabled>
                             Add to Cart
                         </button>
                     </div>
@@ -103,14 +103,14 @@ class CartDrawer {
 
                 <!-- Drawer Footer -->
                 <div class="drawer-footer">
-                    <button type="button" class="btn-continue-shopping" id="continue-shopping">
+                    <button type="button" class="btn btn-ghost btn-continue-shopping" id="continue-shopping">
                         Continue Shopping
                     </button>
-                    <button type="button" class="btn-checkout" id="proceed-to-checkout" disabled>
+                    <button type="button" class="btn btn-primary btn-checkout" id="proceed-to-checkout" disabled>
                         Checkout (<span id="checkout-count">0</span>)
                     </button>
                 </div>
-            </div>
+            </dialog>
         `;
 
         document.body.insertAdjacentHTML('beforeend', drawerHTML);
@@ -127,6 +127,14 @@ class CartDrawer {
 
         // Checkout button
         document.getElementById('proceed-to-checkout').addEventListener('click', () => this.goToCheckout());
+
+        const drawer = document.getElementById('cart-drawer');
+        drawer.addEventListener('cancel', event => { event.preventDefault(); this.close(); });
+        drawer.addEventListener('click', event => {
+            if (event.target !== drawer) return;
+            const box = drawer.getBoundingClientRect();
+            if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) this.close();
+        });
 
         // ESC key to close
         document.addEventListener('keydown', (e) => {
@@ -146,7 +154,11 @@ class CartDrawer {
         this.selectedSize = null;
 
         // Show drawer and overlay
-        document.getElementById('cart-drawer').classList.add('open');
+        const drawer = document.getElementById('cart-drawer');
+        this.opener = document.activeElement;
+        if (!drawer.open) drawer.showModal();
+        drawer.classList.add('open');
+        document.getElementById('drawer-close').focus();
         document.getElementById('drawer-overlay').classList.add('open');
         document.body.style.overflow = 'hidden'; // Prevent background scrolling
 
@@ -170,7 +182,10 @@ class CartDrawer {
         this.selectedColor = null;
         this.selectedSize = null;
 
-        document.getElementById('cart-drawer').classList.remove('open');
+        const drawer = document.getElementById('cart-drawer');
+        drawer.classList.remove('open');
+        if (drawer.open) drawer.close();
+        if (this.opener?.isConnected) this.opener.focus();
         document.getElementById('drawer-overlay').classList.remove('open');
         document.body.style.overflow = ''; // Restore scrolling
     }
@@ -209,8 +224,11 @@ class CartDrawer {
         container.innerHTML = '';
 
         colors.forEach(color => {
-            const swatch = document.createElement('div');
+            const swatch = document.createElement('button');
+            swatch.type = 'button';
             swatch.className = 'color-swatch';
+            swatch.setAttribute('aria-label', color.name);
+            swatch.setAttribute('aria-pressed', 'false');
             swatch.setAttribute('data-color', color.name);
             swatch.setAttribute('data-color-code', color.code);
             swatch.setAttribute('data-catalog-color', color.catalogColor || color.name);
@@ -253,10 +271,14 @@ class CartDrawer {
 
     selectColor(color, swatchElement) {
         // Remove previous selection
-        document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+        document.querySelectorAll('#drawer-color-swatches .color-swatch').forEach(s => {
+            s.classList.remove('selected');
+            s.setAttribute('aria-pressed', 'false');
+        });
 
         // Add selection to clicked swatch
         swatchElement.classList.add('selected');
+        swatchElement.setAttribute('aria-pressed', 'true');
 
         this.selectedColor = {
             name: color.name,

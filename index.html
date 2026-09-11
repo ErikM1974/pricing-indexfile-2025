@@ -28,19 +28,21 @@
     <link rel="icon" href="/favicon.png" type="image/png" sizes="48x48">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
-    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/catalog-search.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/nwca-2026-core.css?v=2026.09.07.8">
+    <!-- Styles consolidated into the scoped home layout owner (/catalog-search.css). -->
+    <link rel="stylesheet" href="/shared_components/css/components.css">
+    <link rel="stylesheet" href="/shared_components/css/storefront-shell.css">
+    <link rel="stylesheet" href="/shared_components/css/catalog-storefront.css">
     <link rel="stylesheet" href="/shared_components/css/nwca-2026.css?v=2026.09.07.20">
-    <link rel="stylesheet" href="/shared_components/css/blog.css?v=2026.09.07.8">
+    <!-- Styles consolidated into the scoped home layout owner (/shared_components/css/blog.css). -->
 
     <!-- Entity stitching (2026-07-12): sameAs ties this domain and
          nwcustomapparel.net into ONE business in Google's knowledge graph.
          The WordPress site carries the mirror-image schema pointing here. -->
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Northwest Custom Apparel","url":"https://www.teamnwca.com/","logo":"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png","telephone":"253-922-5793","address":{"@type":"PostalAddress","streetAddress":"2025 Freeman Rd E","addressLocality":"Milton","addressRegion":"WA","postalCode":"98354","addressCountry":"US"},"sameAs":["https://nwcustomapparel.net/"]}</script>
 </head>
-<body>
+<body data-ui="unified" data-storefront data-catalog-storefront="home">
     <a class="skip-link" href="#main">Skip to content</a>
 
     <!-- Utility strip -->
@@ -166,7 +168,7 @@
     </header>
 
     <!-- Drawer (mobile menu + category browse) -->
-    <aside class="sidebar" id="sidebar" aria-label="Browse menu">
+    <dialog class="sidebar" id="sidebar" aria-label="Browse menu">
         <div class="drawer-head">
             <span class="drawer-head-title">Browse NWCA</span>
             <button class="drawer-close" id="drawerClose" type="button" aria-label="Close menu">
@@ -222,7 +224,7 @@
             <a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a><br>
             2025 Freeman Rd E, Milton, WA 98354
         </div>
-    </aside>
+    </dialog>
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <main id="main">
@@ -237,7 +239,7 @@
                     <h1>Custom apparel your crew will <span class="hero-underline">actually wear</span>.</h1>
                     <p class="hero-sub">Embroidery, screen print, and DTG on brands you know — Port &amp; Company, Carhartt, Nike, Richardson. Fair pricing, real proofs before production, and one local shop handling it start to finish.</p>
                     <div class="hero-ctas">
-                        <a href="/catalog" class="btn btn-hero">Shop the catalog</a>
+                        <a href="/catalog" class="btn btn-primary btn-hero">Shop the catalog</a>
                         <a href="/custom-tees" class="btn btn-ghost">Design custom tees online</a>
                     </div>
                     <ul class="hero-trust">
@@ -710,5 +712,6 @@
     <!-- Quote-cart badge auto-wires from the stored cart (self-init on [data-quote-badge]). -->
     <script src="/shared_components/js/quote-cart-store.js?v=2026.08.19.5" defer></script>
     <script src="/shared_components/js/blog-teaser.js?v=2026.07.12.4" defer></script>
+    <script src="/shared_components/js/catalog-storefront-navigation.js" defer></script>
 </body>
 </html>

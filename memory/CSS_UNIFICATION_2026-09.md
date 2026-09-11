@@ -1,17 +1,14 @@
 # CSS unification — design direction and implementation plan
 
-## NEXT — Home, Catalog and Product original review
 
-Custom apparel is verified live as v2026.09.11.2, Heroku2105, ae3a8276. All local release gates, four actual exact-source CI jobs, deployed slug, six source/compiled assets and29 live access checks passed. Primary main/develop and origin are synchronized. Live193/225 reviewed,32pending. This isolated codex/catalog-storefront branch contains the next family’s original evidence only; application code is unchanged.
 
-Original home/catalog/product review is complete:47 source hashes,27 immutable browser contracts at1440/768/390/320,48 source/financial guards and90 paper pages across24 PDFs (80 unique images reviewed on20 contact sheets,10 pixel-identical pages). Original horizontal overflow, promo-label contrast, keyboard-scroll/group ARIA, drawer focus and print-overlay/card-splitting issues are documented. Synthetic DTG fixtures have limited full-front/back cost tiers; their recorded amounts are fixture behavior, not customer pricing. Preserve all canonical financial functions. Next: back up this baseline, merge the verified release, then consolidate scoped styles and repair these demonstrated UI issues. Catalog remains pending until current browser and paper review finishes.
+## REVIEWED — Home, Catalog and Product
 
-- [x] Freeze original HTML, styles, controllers and pricing/cart dependencies for index.html, pages/catalog.html and product.html.
-- [x] Capture original navigation, search/filter/sort/pagination, quick view/color links, stock states, all decoration methods/tier prices and sample/quote-cart handoffs using synthetic APIs. Review four widths, keyboard access and all paper pages before changing application code.
-- [ ] Share existing storefront navigation and canonical controls; remove competing layout owners while retaining imagery, offer copy and distinct product configuration. Preserve calculations, quantities, successful cart payloads, stock keys and navigation destinations.
-- [ ] Compare current rendered output and immutable source/contracts, then grant migration credit and complete a separate release.
+All three pages share Public Sans, canonical controls, the storefront shell and scoped page owners. All 34 focused browser tests pass at 1440/768/390/320, followed by the final empty-catalog print checks and open sample-drawer accessibility check. All 57 current paper pages across 25 documents and 62 full-page screen panels were visually reviewed; 16 final control previews verify mobile labels, browse, quick view and sample controls. Print retains full pricing ladders, fees, totals and failure states.
 
-Design: existing Public Sans, NWCA green, white panels, gray canvas and readable existing warning tokens. No new global palette or competing button definitions. Reuse the reviewed storefront shell where its structure fits; the product configurator keeps its shared pricing authorities. No real saves, orders, payments, emails, uploads, logout or device printing.
+Forty-seven original source hashes, 29 immutable browser records (28 active) and 100 reviewed original paper pages are preserved. All 48 source/financial guards pass; the 16 financial functions remain byte-identical. A demonstrated quantity-edit defect now immediately withholds old prices and Add to quote while recalculation runs, including the email summary. Native dialog/filter focus, keyboard colors, mobile filter flow and readable empty-cart text are repaired.
+
+Reviewed candidate: 196 of 225 pages, 29 pending. Live remains v2026.09.11.2 / Heroku 2105 / ae3a8276 at 193 reviewed, 32 pending until rollout verifies. Next: commit/back up this family, integrate clean develop, run all application/browser/parity checks and all four actual exact-source CI jobs, then deploy and verify source/compiled assets and access. Evidence: catalog-storefront-reviewed-record.json and active-css-resume-state.json. No real business writes or device printing; never rerun consumed helpers.
 
 ## RELEASE CANDIDATE — v2026.09.11.2 Custom Tees and Custom Caps
 

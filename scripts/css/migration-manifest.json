@@ -5898,6 +5898,116 @@
         "rawCssBytes": 68094,
         "localCssRequests": 2
       }
+    },
+    {
+      "source": "index.html",
+      "family": "catalog-storefront",
+      "status": "reviewed",
+      "route": "/",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/storefront-shell.css",
+        "shared_components/css/catalog-storefront.css",
+        "shared_components/css/nwca-2026.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "1440-768-390-320",
+        "original-navigation-destinations",
+        "native-menu-keyboard-focus-return",
+        "search-and-filter-paging-history",
+        "quick-view",
+        "stock-failure-retry",
+        "all-decoration-methods",
+        "quantity-pending-price-withheld",
+        "exact-synthetic-cart-payloads",
+        "sample-dialog-keyboard-and-axe",
+        "complete-letter-print"
+      ],
+      "test": "tests/e2e/css-unification-catalog-storefront.spec.js",
+      "maxCssBytes": 187222,
+      "measuredRawCssBytes": 185174,
+      "baseline": {
+        "commit": "7ce2f00c6d25de153358a3754bf16ba649e83766",
+        "rawCssBytes": 131546,
+        "localCssRequests": 5
+      }
+    },
+    {
+      "source": "pages/catalog.html",
+      "family": "catalog-storefront",
+      "status": "reviewed",
+      "route": "/catalog",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/storefront-shell.css",
+        "shared_components/css/catalog-storefront.css",
+        "pages/css/catalog-2026.css",
+        "shared_components/css/cart-drawer.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "1440-768-390-320",
+        "original-navigation-destinations",
+        "native-menu-keyboard-focus-return",
+        "search-and-filter-paging-history",
+        "quick-view",
+        "stock-failure-retry",
+        "all-decoration-methods",
+        "quantity-pending-price-withheld",
+        "exact-synthetic-cart-payloads",
+        "sample-dialog-keyboard-and-axe",
+        "complete-letter-print"
+      ],
+      "test": "tests/e2e/css-unification-catalog-storefront.spec.js",
+      "maxCssBytes": 140552,
+      "measuredRawCssBytes": 138504,
+      "baseline": {
+        "commit": "7ce2f00c6d25de153358a3754bf16ba649e83766",
+        "rawCssBytes": 190195,
+        "localCssRequests": 4
+      }
+    },
+    {
+      "source": "product.html",
+      "family": "catalog-storefront",
+      "status": "reviewed",
+      "route": "/product.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/storefront-shell.css",
+        "shared_components/css/catalog-storefront.css",
+        "product/css/product-2026.css",
+        "shared_components/css/cart-drawer.css"
+      ],
+      "dynamicStyles": [],
+      "dynamicTokens": [
+        "--swatch"
+      ],
+      "states": [
+        "1440-768-390-320",
+        "original-navigation-destinations",
+        "native-menu-keyboard-focus-return",
+        "search-and-filter-paging-history",
+        "quick-view",
+        "stock-failure-retry",
+        "all-decoration-methods",
+        "quantity-pending-price-withheld",
+        "exact-synthetic-cart-payloads",
+        "sample-dialog-keyboard-and-axe",
+        "complete-letter-print"
+      ],
+      "test": "tests/e2e/css-unification-catalog-storefront.spec.js",
+      "maxCssBytes": 145729,
+      "measuredRawCssBytes": 143681,
+      "baseline": {
+        "commit": "7ce2f00c6d25de153358a3754bf16ba649e83766",
+        "rawCssBytes": 195159,
+        "localCssRequests": 6
+      }
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",

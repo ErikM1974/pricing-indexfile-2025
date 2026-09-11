@@ -21,14 +21,16 @@
 
     <link rel="icon" href="/favicon.png" type="image/png">
 
-    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/nwca-2026-core.css?v=2026.09.07.8">
+    <link rel="stylesheet" href="/shared_components/css/components.css">
+    <link rel="stylesheet" href="/shared_components/css/storefront-shell.css">
+    <link rel="stylesheet" href="/shared_components/css/catalog-storefront.css">
     <link rel="stylesheet" href="/pages/css/catalog-2026.css?v=2026.09.07.8">
     <link rel="stylesheet" href="/shared_components/css/cart-drawer.css?v=2026.09.07.20">
     <script src="/config/app.config.js"></script>
 </head>
-<body>
+<body data-ui="unified" data-storefront data-catalog-storefront="catalog">
     <a class="skip-link" href="#main">Skip to content</a>
 
     <!-- Utility strip (chrome copied from index.html — shared component is a later refactor) -->
@@ -163,7 +165,7 @@
     </header>
 
     <!-- Drawer (mobile menu + category browse) -->
-    <aside class="sidebar" id="sidebar" aria-label="Browse menu">
+    <dialog class="sidebar" id="sidebar" aria-label="Browse menu">
         <div class="drawer-head">
             <span class="drawer-head-title">Browse NWCA</span>
             <button class="drawer-close" id="drawerClose" type="button" aria-label="Close menu">
@@ -198,7 +200,7 @@
             <a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a><br>
             2025 Freeman Rd E, Milton, WA 98354
         </div>
-    </aside>
+    </dialog>
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <main id="main">
@@ -242,7 +244,7 @@
                         </svg>
                     </button>
                 </div>
-                <div id="filterGroups">
+                <div id="filterGroups" class="filter-groups">
                     <!-- Facet groups rendered by catalog-2026.js -->
                     <div class="fgroup" aria-hidden="true">
                         <div class="skeleton skeleton-title"></div>
@@ -374,5 +376,6 @@
     <script src="/pages/js/catalog-samples.js?v=2026.08.26.9" defer></script>
     <script src="/shared_components/js/express-eligibility.js?v=2026.08.25.4" defer></script>
     <script src="/pages/js/catalog-2026.js?v=2026.08.26.9" defer></script>
+    <script src="/shared_components/js/catalog-storefront-navigation.js" defer></script>
 </body>
 </html>

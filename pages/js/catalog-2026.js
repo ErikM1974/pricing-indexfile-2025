@@ -425,7 +425,7 @@
         var label = colorCount > 1 ? formatCount(colorCount) + ' colors' : '';
         if (!shown) return '<p class="pcard-colors">' + (label || ' ') + '</p>';
         var extra = colorCount > shown ? '<span class="pcard-swatch-more">+' + formatCount(colorCount - shown) + '</span>' : '';
-        return '<div class="pcard-swatches" aria-label="' + escapeHtml(label || 'colors') + '">' + dots + extra + '</div>';
+        return '<div class="pcard-swatches" role="group" aria-label="' + escapeHtml(label || 'colors') + '">' + dots + extra + '</div>';
     }
 
     function buildCard(product) {

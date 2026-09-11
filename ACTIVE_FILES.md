@@ -805,3 +805,11 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - tests/fixtures/catalog-storefront-home-search-original-browser.json — immutable original synthetic home/catalog/product browser contract.
 
 - tests/fixtures/catalog-storefront-product-dtf-minimum-original-browser.json — immutable original synthetic home/catalog/product browser contract.
+
+- shared_components/css/catalog-storefront.css — shared scoped commerce patterns for the home, catalog and product family.
+
+- shared_components/js/catalog-storefront-navigation.js — native home/catalog/product browse navigation with focus containment and trigger restoration.
+
+- tests/fixtures/catalog-storefront-product-dtg-complete-cost-ladder-original-browser.json — immutable original synthetic home/catalog/product browser contract.
+
+- tests/fixtures/catalog-storefront-product-dtg-complete-cost-ladder-settled-original-browser.json — immutable original synthetic home/catalog/product browser contract.

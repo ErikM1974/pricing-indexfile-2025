@@ -20,15 +20,17 @@
 
     <link rel="icon" href="/favicon.png" type="image/png">
 
-    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/nwca-2026-core.css?v=2026.09.07.8">
+    <link rel="stylesheet" href="/shared_components/css/components.css">
+    <link rel="stylesheet" href="/shared_components/css/storefront-shell.css">
+    <link rel="stylesheet" href="/shared_components/css/catalog-storefront.css">
     <link rel="stylesheet" href="/product/css/product-2026.css?v=2026.09.07.20">
-    <link rel="stylesheet" href="/shared_components/css/safety-stripe-recs.css?v=2026.09.07.20">
+    <!-- Styles consolidated into the scoped product layout owner (/shared_components/css/safety-stripe-recs.css). -->
     <link rel="stylesheet" href="/shared_components/css/cart-drawer.css?v=2026.09.07.20">
-    <link rel="stylesheet" href="/shared_components/css/embroidery-quote-pricing.css?v=2026.09.07.8">
+    <!-- Styles consolidated into the scoped product layout owner (/shared_components/css/embroidery-quote-pricing.css). -->
 </head>
-<body>
+<body data-ui="unified" data-storefront data-catalog-storefront="product">
     <a class="skip-link" href="#main">Skip to content</a>
 
     <!-- Utility strip -->
@@ -122,7 +124,7 @@
     </header>
 
     <!-- Drawer (mobile menu + category browse) -->
-    <aside class="sidebar" id="sidebar" aria-label="Browse menu">
+    <dialog class="sidebar" id="sidebar" aria-label="Browse menu">
         <div class="drawer-head">
             <span class="drawer-head-title">Browse NWCA</span>
             <button class="drawer-close" id="drawerClose" type="button" aria-label="Close menu">
@@ -163,7 +165,7 @@
             <a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a><br>
             2025 Freeman Rd E, Milton, WA 98354
         </div>
-    </aside>
+    </dialog>
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <main id="main">
@@ -246,7 +248,7 @@
                             <div class="pdp-cta-card">
                                 <h2>Ready to outfit your crew?</h2>
                                 <p>Tell us the style, color, and quantity — a real person quotes it, usually same day.</p>
-                                <a class="btn btn-cta" id="ctaQuote" href="#pricingHeading">Price it &amp; add to quote</a>
+                                <a class="btn btn-primary btn-cta" id="ctaQuote" href="#pricingHeading">Price it &amp; add to quote</a>
                                 <div id="expressLane" hidden>
                                     <p class="pdp-express-note" id="expressLaneNote"></p>
                                     <a class="express-lane-link" id="expressLaneLink" href="#" aria-label="Express lane"></a>
@@ -274,7 +276,7 @@
                             <h3 class="pdp-cfg-q-title"><span class="pdp-cfg-q-num" aria-hidden="true">1</span> How many do you need?</h3>
                             <div class="pdp-cfg-stepper">
                                 <button class="pdp-cfg-step" id="cfgQtyMinus" type="button" aria-label="6 fewer">&minus;</button>
-                                <input type="number" id="cfgQtyInput" inputmode="numeric" min="1" max="9999" step="1" value="24" aria-label="Quantity">
+                                <input type="number" class="field-input" id="cfgQtyInput" inputmode="numeric" min="1" max="9999" step="1" value="24" aria-label="Quantity">
                                 <button class="pdp-cfg-step" id="cfgQtyPlus" type="button" aria-label="6 more">+</button>
                             </div>
                             <span class="pdp-cfg-hint">Bigger runs unlock lower per-piece prices.</span>
@@ -286,7 +288,7 @@
                                 <label for="cfgInkInput">Ink colors in your design</label>
                                 <div class="pdp-cfg-stepper pdp-cfg-stepper-sm">
                                     <button class="pdp-cfg-step" id="cfgInkMinus" type="button" aria-label="One fewer ink color">&minus;</button>
-                                    <input type="number" id="cfgInkInput" inputmode="numeric" min="1" max="4" step="1" value="1" aria-label="Ink colors">
+                                    <input type="number" class="field-input" id="cfgInkInput" inputmode="numeric" min="1" max="4" step="1" value="1" aria-label="Ink colors">
                                     <button class="pdp-cfg-step" id="cfgInkPlus" type="button" aria-label="One more ink color">+</button>
                                 </div>
                                 <span class="pdp-cfg-hint">Screen print only — counts for the front and back.</span>
@@ -312,7 +314,7 @@
                         <!-- Recommended hi-vis styles for safety stripes — shown when screen print is an available method -->
                         <div id="cfgSafetyStripesRecs" hidden></div>
                         <div class="pdp-cfg-actions">
-                            <button class="btn btn-cta" id="cfgAddToQuote" type="button" disabled>Add to quote</button>
+                            <button class="btn btn-primary btn-cta" id="cfgAddToQuote" type="button" disabled>Add to quote</button>
                             <a class="btn btn-ghost" id="cfgEmailQuote" href="mailto:sales@nwcustomapparel.com">or email us directly</a>
                             <span class="pdp-cfg-add-reason" id="cfgAddReason" aria-live="polite"></span>
                         </div>
@@ -357,7 +359,7 @@
         <!-- Mobile sticky CTA bar (live price line filled by pdp-configurator.js renderMobileBar) -->
         <div class="pdp-mobile-cta" id="mobileCtaBar" hidden>
             <span class="pdp-mobile-cta-price" id="cfgMobilePrice" aria-live="polite" hidden></span>
-            <a class="btn btn-cta" id="ctaQuoteMobile" href="#pricingHeading">Price it</a>
+            <a class="btn btn-primary btn-cta" id="ctaQuoteMobile" href="#pricingHeading">Price it</a>
             <a class="btn btn-ghost" href="tel:253-922-5793">Call us</a>
             <a class="btn btn-ghost" id="ctaSampleMobile" href="/catalog?topSellers=1">Sample</a>
         </div>
@@ -436,5 +438,6 @@
     <script src="/shared_components/js/express-eligibility.js?v=2026.08.25.4" defer></script>
     <script src="/product/js/product-2026.js?v=2026.09.06.31" defer></script>
     <script src="/product/js/related-posts.js?v=2026.07.12.11" defer></script>
+    <script src="/shared_components/js/catalog-storefront-navigation.js" defer></script>
 </body>
 </html>
