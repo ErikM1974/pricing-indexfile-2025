@@ -1,5 +1,11 @@
 # Handover follow-ups — 2026-09-07
 
+## RELEASE CANDIDATE — v2026.09.11.1 Sample and Quote Carts
+
+Reviewed source7498f6fc and verified account releaseefc4471f are integrated at77bc80d490118b1f674c5c7543abba3e9b6fbf79. Complete local gates are running on that unchanged checkout. This candidate adds only release cache references and their reversible mappings; the six application CSS/JS assets are unchanged. Require every local gate and all four exact-source CI jobs, including actual CSS and live money/calculator parity, before release.
+
+Cart review:40 distinct browser cases,39 visually reviewed current paper pages across13 documents,34 immutable browser contracts,21 original source hashes,24 source/financial guards and268 ownership checks. Four demonstrated markup/storage/pending-save faults repaired. Live remains .11/2103 with189/225 reviewed and36pending. This candidate brings191 reviewed,34pending after verified rollout. No real business writes or printing.
+
 ## CURRENT — account release verified; carts ready for full gates
 
 Customer Account/Product is live as v2026.09.10.11, Heroku2103, efc4471f05b20a397bf275e63786e96dbbb60eeb. Exact source880bc6eb passed CI34569384599 with all four actual jobs. Actual deployed slug, health, six source assets, five compiled assets/source maps, two page shells, fourteen prior access contracts and four regression routes verified. Primary main/develop and origin are synchronized. Live189/225,36pending.

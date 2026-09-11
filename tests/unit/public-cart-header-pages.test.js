@@ -49,7 +49,9 @@ describe('sample cart', () => {
         expect(js).not.toMatch(BARE);
         expect(js).not.toMatch(/console\.log\(/);
         expect(read('pages/sample-cart.html')).toMatch(/id="shipping-section" class="form-block shipping-address-section" hidden>/);
-        expect(read('pages/css/sample-cart.css')).toMatch(/\[hidden\] \{ display: none !important; \}/);
+        expect(read('pages/sample-cart.html')).toContain('/shared_components/css/components.css?v=');
+        expect(read('shared_components/css/components.css')).toMatch(/\[hidden\]\s*\{[^}]*display:\s*none;/);
+        expect(read('pages/css/sample-cart.css')).not.toContain('!important');
         expect(read('pages/css/sample-cart.css')).toMatch(/\.sc-render-error \{/);
     });
 });
