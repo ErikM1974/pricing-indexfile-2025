@@ -1,0 +1,210 @@
+{
+  "name": "menu-empty-rep",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Shop Menu | Northwest Custom Apparel",
+      "url": "/calculators/service-price-cheat-sheet.html",
+      "ids": {
+        "printCustomerBtn": "Print customer menu",
+        "printRepBtn": "Print rep copy",
+        "errorBanner": "Could not load prices from Caspio (empty catalogue). Shop-services prices are not shown; do not quote from memory. Refresh to try again.",
+        "menuDate": "September 2026",
+        "courses": "Shop services on customer goods Unavailable until Caspio answers. No prices shown. Setup & Art Documented prices — badged as fallback until Caspio answers. Digitizing, new logo $100.00per design Sets up your logo for the embroidery machines. Yours to keep. DD fallback price — Caspio unreachable Digitizing, edit an existing design $50.00per design DDE fallback price — Caspio unreachable Digitizing, text only $50.00per design DDT fallback price — Caspio unreachable Logo mockup & print review $50.00per order GRT-50 fallback price — Caspio unreachable Art and graphic design (Steve) $75.00per hour Billed in quarter hours. GRT-75 fallback price — Caspio unreachable Small-order fee on orders where we supply the garments $50.00per order Orders of 7 pieces or fewer, spread across the pieces. Not a shop-services charge. LTM fallback price — Caspio unreachable Rush 25% of the order RUSH",
+        "loadTimestamp": "9/11/2026, 11:30:00 AM"
+      },
+      "fields": [],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        }
+      ],
+      "tables": [],
+      "menu": [
+        "Shop services on customer goods Unavailable until Caspio answers. No prices shown.",
+        "Setup & Art Documented prices — badged as fallback until Caspio answers. Digitizing, new logo $100.00per design Sets up your logo for the embroidery machines. Yours to keep. DD fallback price — Caspio unreachable Digitizing, edit an existing design $50.00per design DDE fallback price — Caspio unreachable Digitizing, text only $50.00per design DDT fallback price — Caspio unreachable Logo mockup & print review $50.00per order GRT-50 fallback price — Caspio unreachable Art and graphic design (Steve) $75.00per hour Billed in quarter hours. GRT-75 fallback price — Caspio unreachable Small-order fee on orders where we supply the garments $50.00per order Orders of 7 pieces or fewer, spread across the pieces. Not a shop-services charge. LTM fallback price — Caspio unreachable Rush 25% of the order RUSH"
+      ],
+      "rules": [
+        [
+          "min",
+          "75"
+        ],
+        [
+          "min",
+          "75"
+        ],
+        [
+          "bench",
+          "25"
+        ],
+        [
+          "machine",
+          "37.50"
+        ],
+        [
+          "denom",
+          "0.53"
+        ]
+      ],
+      "itemType": null,
+      "cost": null,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "width": 768,
+      "title": "Shop Menu | Northwest Custom Apparel",
+      "url": "/calculators/service-price-cheat-sheet.html",
+      "ids": {
+        "printCustomerBtn": "Print customer menu",
+        "printRepBtn": "Print rep copy",
+        "errorBanner": "Could not load prices from Caspio (empty catalogue). Shop-services prices are not shown; do not quote from memory. Refresh to try again.",
+        "menuDate": "September 2026",
+        "courses": "Shop services on customer goods Unavailable until Caspio answers. No prices shown. Setup & Art Documented prices — badged as fallback until Caspio answers. Digitizing, new logo $100.00per design Sets up your logo for the embroidery machines. Yours to keep. DD fallback price — Caspio unreachable Digitizing, edit an existing design $50.00per design DDE fallback price — Caspio unreachable Digitizing, text only $50.00per design DDT fallback price — Caspio unreachable Logo mockup & print review $50.00per order GRT-50 fallback price — Caspio unreachable Art and graphic design (Steve) $75.00per hour Billed in quarter hours. GRT-75 fallback price — Caspio unreachable Small-order fee on orders where we supply the garments $50.00per order Orders of 7 pieces or fewer, spread across the pieces. Not a shop-services charge. LTM fallback price — Caspio unreachable Rush 25% of the order RUSH",
+        "loadTimestamp": "9/11/2026, 11:30:00 AM"
+      },
+      "fields": [],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        }
+      ],
+      "tables": [],
+      "menu": [
+        "Shop services on customer goods Unavailable until Caspio answers. No prices shown.",
+        "Setup & Art Documented prices — badged as fallback until Caspio answers. Digitizing, new logo $100.00per design Sets up your logo for the embroidery machines. Yours to keep. DD fallback price — Caspio unreachable Digitizing, edit an existing design $50.00per design DDE fallback price — Caspio unreachable Digitizing, text only $50.00per design DDT fallback price — Caspio unreachable Logo mockup & print review $50.00per order GRT-50 fallback price — Caspio unreachable Art and graphic design (Steve) $75.00per hour Billed in quarter hours. GRT-75 fallback price — Caspio unreachable Small-order fee on orders where we supply the garments $50.00per order Orders of 7 pieces or fewer, spread across the pieces. Not a shop-services charge. LTM fallback price — Caspio unreachable Rush 25% of the order RUSH"
+      ],
+      "rules": [
+        [
+          "min",
+          "75"
+        ],
+        [
+          "min",
+          "75"
+        ],
+        [
+          "bench",
+          "25"
+        ],
+        [
+          "machine",
+          "37.50"
+        ],
+        [
+          "denom",
+          "0.53"
+        ]
+      ],
+      "itemType": null,
+      "cost": null,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "width": 390,
+      "title": "Shop Menu | Northwest Custom Apparel",
+      "url": "/calculators/service-price-cheat-sheet.html",
+      "ids": {
+        "printCustomerBtn": "Print customer menu",
+        "printRepBtn": "Print rep copy",
+        "errorBanner": "Could not load prices from Caspio (empty catalogue). Shop-services prices are not shown; do not quote from memory. Refresh to try again.",
+        "menuDate": "September 2026",
+        "courses": "Shop services on customer goods Unavailable until Caspio answers. No prices shown. Setup & Art Documented prices — badged as fallback until Caspio answers. Digitizing, new logo $100.00per design Sets up your logo for the embroidery machines. Yours to keep. DD fallback price — Caspio unreachable Digitizing, edit an existing design $50.00per design DDE fallback price — Caspio unreachable Digitizing, text only $50.00per design DDT fallback price — Caspio unreachable Logo mockup & print review $50.00per order GRT-50 fallback price — Caspio unreachable Art and graphic design (Steve) $75.00per hour Billed in quarter hours. GRT-75 fallback price — Caspio unreachable Small-order fee on orders where we supply the garments $50.00per order Orders of 7 pieces or fewer, spread across the pieces. Not a shop-services charge. LTM fallback price — Caspio unreachable Rush 25% of the order RUSH",
+        "loadTimestamp": "9/11/2026, 11:30:00 AM"
+      },
+      "fields": [],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        }
+      ],
+      "tables": [],
+      "menu": [
+        "Shop services on customer goods Unavailable until Caspio answers. No prices shown.",
+        "Setup & Art Documented prices — badged as fallback until Caspio answers. Digitizing, new logo $100.00per design Sets up your logo for the embroidery machines. Yours to keep. DD fallback price — Caspio unreachable Digitizing, edit an existing design $50.00per design DDE fallback price — Caspio unreachable Digitizing, text only $50.00per design DDT fallback price — Caspio unreachable Logo mockup & print review $50.00per order GRT-50 fallback price — Caspio unreachable Art and graphic design (Steve) $75.00per hour Billed in quarter hours. GRT-75 fallback price — Caspio unreachable Small-order fee on orders where we supply the garments $50.00per order Orders of 7 pieces or fewer, spread across the pieces. Not a shop-services charge. LTM fallback price — Caspio unreachable Rush 25% of the order RUSH"
+      ],
+      "rules": [
+        [
+          "min",
+          "75"
+        ],
+        [
+          "min",
+          "75"
+        ],
+        [
+          "bench",
+          "25"
+        ],
+        [
+          "machine",
+          "37.50"
+        ],
+        [
+          "denom",
+          "0.53"
+        ]
+      ],
+      "itemType": null,
+      "cost": null,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "width": 320,
+      "title": "Shop Menu | Northwest Custom Apparel",
+      "url": "/calculators/service-price-cheat-sheet.html",
+      "ids": {
+        "printCustomerBtn": "Print customer menu",
+        "printRepBtn": "Print rep copy",
+        "errorBanner": "Could not load prices from Caspio (empty catalogue). Shop-services prices are not shown; do not quote from memory. Refresh to try again.",
+        "menuDate": "September 2026",
+        "courses": "Shop services on customer goods Unavailable until Caspio answers. No prices shown. Setup & Art Documented prices — badged as fallback until Caspio answers. Digitizing, new logo $100.00per design Sets up your logo for the embroidery machines. Yours to keep. DD fallback price — Caspio unreachable Digitizing, edit an existing design $50.00per design DDE fallback price — Caspio unreachable Digitizing, text only $50.00per design DDT fallback price — Caspio unreachable Logo mockup & print review $50.00per order GRT-50 fallback price — Caspio unreachable Art and graphic design (Steve) $75.00per hour Billed in quarter hours. GRT-75 fallback price — Caspio unreachable Small-order fee on orders where we supply the garments $50.00per order Orders of 7 pieces or fewer, spread across the pieces. Not a shop-services charge. LTM fallback price — Caspio unreachable Rush 25% of the order RUSH",
+        "loadTimestamp": "9/11/2026, 11:30:00 AM"
+      },
+      "fields": [],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        }
+      ],
+      "tables": [],
+      "menu": [
+        "Shop services on customer goods Unavailable until Caspio answers. No prices shown.",
+        "Setup & Art Documented prices — badged as fallback until Caspio answers. Digitizing, new logo $100.00per design Sets up your logo for the embroidery machines. Yours to keep. DD fallback price — Caspio unreachable Digitizing, edit an existing design $50.00per design DDE fallback price — Caspio unreachable Digitizing, text only $50.00per design DDT fallback price — Caspio unreachable Logo mockup & print review $50.00per order GRT-50 fallback price — Caspio unreachable Art and graphic design (Steve) $75.00per hour Billed in quarter hours. GRT-75 fallback price — Caspio unreachable Small-order fee on orders where we supply the garments $50.00per order Orders of 7 pieces or fewer, spread across the pieces. Not a shop-services charge. LTM fallback price — Caspio unreachable Rush 25% of the order RUSH"
+      ],
+      "rules": [
+        [
+          "min",
+          "75"
+        ],
+        [
+          "min",
+          "75"
+        ],
+        [
+          "bench",
+          "25"
+        ],
+        [
+          "machine",
+          "37.50"
+        ],
+        [
+          "denom",
+          "0.53"
+        ]
+      ],
+      "itemType": null,
+      "cost": null,
+      "overflow": false,
+      "violations": []
+    }
+  ],
+  "dialogs": []
+}

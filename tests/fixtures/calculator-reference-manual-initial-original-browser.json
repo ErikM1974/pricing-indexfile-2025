@@ -1,0 +1,214 @@
+{
+  "name": "manual-initial",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Manual Pricing Calculator 2026 | Northwest Custom Apparel",
+      "url": "/calculators/manual-pricing.html",
+      "ids": {
+        "blankCost": "",
+        "calculateBtn": "Calculate"
+      },
+      "fields": [
+        {
+          "id": "blankCost",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        }
+      ],
+      "tables": [],
+      "menu": [],
+      "rules": [],
+      "itemType": "garment",
+      "cost": null,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a"
+            ],
+            [
+              ".page-subtitle"
+            ],
+            [
+              ".active"
+            ],
+            [
+              "button[data-type=\"cap\"]"
+            ],
+            [
+              "#calculateBtn"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Manual Pricing Calculator 2026 | Northwest Custom Apparel",
+      "url": "/calculators/manual-pricing.html",
+      "ids": {
+        "blankCost": "",
+        "calculateBtn": "Calculate"
+      },
+      "fields": [
+        {
+          "id": "blankCost",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        }
+      ],
+      "tables": [],
+      "menu": [],
+      "rules": [],
+      "itemType": "garment",
+      "cost": null,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a"
+            ],
+            [
+              ".page-subtitle"
+            ],
+            [
+              ".active"
+            ],
+            [
+              "button[data-type=\"cap\"]"
+            ],
+            [
+              "#calculateBtn"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Manual Pricing Calculator 2026 | Northwest Custom Apparel",
+      "url": "/calculators/manual-pricing.html",
+      "ids": {
+        "blankCost": "",
+        "calculateBtn": "Calculate"
+      },
+      "fields": [
+        {
+          "id": "blankCost",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        }
+      ],
+      "tables": [],
+      "menu": [],
+      "rules": [],
+      "itemType": "garment",
+      "cost": null,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a"
+            ],
+            [
+              ".page-subtitle"
+            ],
+            [
+              ".active"
+            ],
+            [
+              "button[data-type=\"cap\"]"
+            ],
+            [
+              "#calculateBtn"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Manual Pricing Calculator 2026 | Northwest Custom Apparel",
+      "url": "/calculators/manual-pricing.html",
+      "ids": {
+        "blankCost": "",
+        "calculateBtn": "Calculate"
+      },
+      "fields": [
+        {
+          "id": "blankCost",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        }
+      ],
+      "tables": [],
+      "menu": [],
+      "rules": [],
+      "itemType": "garment",
+      "cost": null,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a"
+            ],
+            [
+              ".page-subtitle"
+            ],
+            [
+              ".active"
+            ],
+            [
+              "button[data-type=\"cap\"]"
+            ],
+            [
+              "#calculateBtn"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "dialogs": []
+}

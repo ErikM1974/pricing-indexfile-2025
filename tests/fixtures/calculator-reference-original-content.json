@@ -1,0 +1,234 @@
+{
+  "base": "99db3fd9d6af43dddae384b9f48a12c6f49d5ed1",
+  "pages": [
+    {
+      "file": "calculators/manual-pricing.html",
+      "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <meta name=\"robots\" content=\"noindex, nofollow\">\n    <title>Manual Pricing Calculator 2026 | Northwest Custom Apparel</title>\n    <link rel=\"icon\" href=\"/favicon.png\" type=\"image/png\">\n\n    <!-- Font Awesome -->\n    <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css\">\n    <!-- Google Fonts -->\n    <link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap\" rel=\"stylesheet\">\n\n    <!-- Base calculator styles + page-specific styles -->\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link rel=\"stylesheet\" href=\"/calculators/manual-calculator-styles.css?v=2026.09.07.19\">\n    <link rel=\"stylesheet\" href=\"/calculators/manual-pricing.css?v=2026.09.07.19\">\n    <script src=\"/config/app.config.js\"></script>\n</head>\n<body>\n    <!-- Global Error Banner -->\n    <div id=\"apiErrorBanner\" class=\"api-error-banner hidden\">\n        <i class=\"fas fa-exclamation-triangle\" aria-hidden=\"true\"></i>\n        <span id=\"apiErrorMessage\">Unable to load pricing data. Please refresh the page.</span>\n    </div>\n\n    <main class=\"main-container\">\n        <!-- Header -->\n        <header class=\"header\">\n            <div class=\"header-container\">\n                <div class=\"header-left\">\n                    <div class=\"breadcrumb\">\n                        <a href=\"/staff-dashboard.html\">Staff Dashboard</a>\n                        <span>/</span>\n                        <span>Manual Pricing</span>\n                    </div>\n                </div>\n            </div>\n        </header>\n\n        <!-- Page Title -->\n        <h1 class=\"page-title\">\n            <i class=\"fas fa-calculator\" aria-hidden=\"true\"></i> Manual Pricing Calculator 2026\n        </h1>\n        <p class=\"page-subtitle\">Embroidered Garments, Embroidered Caps, Screen Print, DTG and DTF. Enter the blank cost from your supplier.</p>\n\n        <!-- Input Section -->\n        <div class=\"input-section\">\n            <div class=\"input-row\">\n                <div class=\"cost-input-group\">\n                    <label for=\"blankCost\">Blank Cost</label>\n                    <div class=\"cost-input-wrapper\">\n                        <span class=\"dollar-sign\">$</span>\n                        <input type=\"number\"\n                               id=\"blankCost\"\n                               class=\"cost-input\"\n                               step=\"0.01\"\n                               min=\"0.01\"\n                               max=\"999.99\"\n                               placeholder=\"e.g. 6.25\"\n                               data-enter-clicks=\"calculateBtn\">\n                    </div>\n                </div>\n\n                <div class=\"item-type-group\">\n                    <label>Item Type</label>\n                    <div class=\"toggle-buttons\">\n                        <button class=\"toggle-btn active\" data-type=\"garment\" data-call=\"manualCalc.setItemType\" data-args='[\"garment\"]'>\n                            <i class=\"fas fa-tshirt\" aria-hidden=\"true\"></i> Garment\n                        </button>\n                        <button class=\"toggle-btn\" data-type=\"cap\" data-call=\"manualCalc.setItemType\" data-args='[\"cap\"]'>\n                            <i class=\"fas fa-hat-cowboy\" aria-hidden=\"true\"></i> Cap\n                        </button>\n                    </div>\n                </div>\n\n                <div class=\"calculate-group\">\n                    <label>&nbsp;</label>\n                    <button id=\"calculateBtn\" class=\"btn-calculate\" data-call=\"manualCalc.calculate\">\n                        <i class=\"fas fa-calculator\" aria-hidden=\"true\"></i> Calculate\n                    </button>\n                </div>\n            </div>\n            <p class=\"input-hint\">Enter the blank garment/cap cost from your supplier (S&S Active Wear, etc.)</p>\n            <div id=\"inputError\" class=\"input-error\">\n                <i class=\"fas fa-exclamation-circle\" aria-hidden=\"true\"></i>\n                <span id=\"inputErrorText\"></span>\n            </div>\n        </div>\n\n        <!-- Method Cards Container -->\n        <div id=\"methodCards\" class=\"methods-container\" style=\"display: none;\">\n\n            <!-- GARMENT MODE CARDS -->\n            <div id=\"garmentCards\">\n\n                <!-- DTG Card -->\n                <div class=\"method-card\" id=\"dtgCard\">\n                    <div class=\"method-card-header\">\n                        <h3 class=\"method-card-title\">\n                            <span class=\"method-icon dtg\"><i class=\"fas fa-print\" aria-hidden=\"true\"></i></span>\n                            DTG (Direct-to-Garment)\n                        </h3>\n                        <div class=\"method-card-controls\">\n                            <select id=\"dtgLocation\" aria-label=\"DTG print location\" class=\"method-select\" data-change=\"manualCalc.onDTGLocationChange\">\n                                <!-- Populated by JS: front locations only (LC, FF, JF) -->\n                            </select>\n                            <div class=\"ltm-qty-picker\">\n                                <label for=\"dtgLtmQty\">LTM qty:</label>\n                                <input type=\"number\" id=\"dtgLtmQty\" class=\"method-select ltm-qty-input\"\n                                       min=\"1\" max=\"23\" value=\"12\"\n                                       data-change=\"manualCalc.onDTGLtmQtyChange\">\n                            </div>\n                            <div class=\"sp-extra-controls\">\n                                <label class=\"sp-toggle-label\">\n                                    <input type=\"checkbox\" id=\"dtgSecondLocation\" data-change=\"manualCalc.onDTGSecondLocationChange\">\n                                    + Back location:\n                                </label>\n                                <select id=\"dtgSecondLocationSelect\" class=\"method-select\" aria-label=\"DTG second print location\" style=\"display:none\"\n                                        data-change=\"manualCalc.onDTGSecondLocationSelectChange\">\n                                    <!-- Populated by JS: back locations only (FB, JB) -->\n                                </select>\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"method-card-body\" id=\"dtgBody\">\n                        <div class=\"card-placeholder\">Enter a cost and click Calculate</div>\n                    </div>\n                </div>\n\n                <!-- DTF Card -->\n                <div class=\"method-card\" id=\"dtfCard\">\n                    <div class=\"method-card-header\">\n                        <h3 class=\"method-card-title\">\n                            <span class=\"method-icon dtf\"><i class=\"fas fa-film\" aria-hidden=\"true\"></i></span>\n                            DTF (Direct-to-Film)\n                        </h3>\n                        <div class=\"method-card-controls\">\n                            <select id=\"dtfTransferSize\" aria-label=\"DTF transfer size\" class=\"method-select\" data-change=\"manualCalc.onDTFSizeChange\">\n                                <option value=\"small\">Small (5\" x 5\")</option>\n                                <option value=\"medium\" selected>Medium (9\" x 12\")</option>\n                                <option value=\"large\">Large (12\" x 16.5\")</option>\n                            </select>\n                            <div class=\"ltm-qty-picker\">\n                                <label for=\"dtfLtmQty\">LTM qty:</label>\n                                <input type=\"number\" id=\"dtfLtmQty\" class=\"method-select ltm-qty-input\"\n                                       min=\"10\" max=\"23\" value=\"12\"\n                                       data-change=\"manualCalc.onDTFLtmQtyChange\">\n                            </div>\n                            <div class=\"sp-extra-controls\">\n                                <label class=\"sp-toggle-label\">\n                                    <input type=\"checkbox\" id=\"dtfSecondLocation\" data-change=\"manualCalc.onDTFSecondLocationChange\">\n                                    2nd location:\n                                </label>\n                                <select id=\"dtfSecondTransferSize\" class=\"method-select\" aria-label=\"DTF second transfer size\" style=\"display:none\"\n                                        data-change=\"manualCalc.onDTFSecondLocationChange\">\n                                    <option value=\"small\">Small (5\" x 5\")</option>\n                                    <option value=\"medium\" selected>Medium (9\" x 12\")</option>\n                                    <option value=\"large\">Large (12\" x 16.5\")</option>\n                                </select>\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"method-card-body\" id=\"dtfBody\">\n                        <div class=\"card-placeholder\">Enter a cost and click Calculate</div>\n                    </div>\n                </div>\n\n                <!-- Embroidery Card -->\n                <div class=\"method-card\" id=\"embCard\">\n                    <div class=\"method-card-header\">\n                        <h3 class=\"method-card-title\">\n                            <span class=\"method-icon emb\"><i class=\"fas fa-needle\" aria-hidden=\"true\"></i></span>\n                            Embroidery\n                        </h3>\n                        <div class=\"method-card-controls\">\n                            <div class=\"ltm-qty-picker\">\n                                <label for=\"embLtmQty\">1-7 qty:</label>\n                                <select id=\"embLtmQty\" class=\"method-select ltm-select\" data-change=\"manualCalc.onEmbLTMQtyChange\">\n                                    <option value=\"1\">1 pc</option>\n                                    <option value=\"2\">2 pcs</option>\n                                    <option value=\"3\" selected>3 pcs</option>\n                                    <option value=\"4\">4 pcs</option>\n                                    <option value=\"5\">5 pcs</option>\n                                    <option value=\"6\">6 pcs</option>\n                                    <option value=\"7\">7 pcs</option>\n                                </select>\n                                <span class=\"text-muted stitch-note\">8K stitches</span>\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"method-card-body\" id=\"embBody\">\n                        <div class=\"card-placeholder\">Enter a cost and click Calculate</div>\n                    </div>\n                </div>\n\n                <!-- Screen Print Card -->\n                <div class=\"method-card\" id=\"spCard\">\n                    <div class=\"method-card-header\">\n                        <h3 class=\"method-card-title\">\n                            <span class=\"method-icon sp\"><i class=\"fas fa-palette\" aria-hidden=\"true\"></i></span>\n                            Screen Print\n                        </h3>\n                        <div class=\"method-card-controls\">\n                            <select id=\"spColors\" aria-label=\"Screen print colors\" class=\"method-select\" data-change=\"manualCalc.onSPColorChange\">\n                                <!-- Populated by JS with available color counts -->\n                            </select>\n                            <div class=\"ltm-qty-picker\">\n                                <label for=\"spLtmQty\">LTM qty:</label>\n                                <input type=\"number\" id=\"spLtmQty\" class=\"method-select ltm-qty-input\"\n                                       min=\"24\" max=\"71\" value=\"36\"\n                                       data-change=\"manualCalc.onSPLtmQtyChange\">\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"method-card-body\" id=\"spBody\">\n                        <div class=\"card-placeholder\">Enter a cost and click Calculate</div>\n                    </div>\n                </div>\n            </div>\n\n            <!-- CAP MODE CARDS -->\n            <div id=\"capCards\" style=\"display: none;\">\n\n                <!-- Cap Embroidery Card -->\n                <div class=\"method-card\" id=\"capEmbCard\">\n                    <div class=\"method-card-header\">\n                        <h3 class=\"method-card-title\">\n                            <span class=\"method-icon cap\"><i class=\"fas fa-hat-cowboy\" aria-hidden=\"true\"></i></span>\n                            Cap Embroidery\n                        </h3>\n                        <div class=\"method-card-controls\">\n                            <div class=\"ltm-qty-picker\">\n                                <label for=\"capEmbLtmQty\">1-7 qty:</label>\n                                <select id=\"capEmbLtmQty\" class=\"method-select ltm-select\" data-change=\"manualCalc.onCapEmbLTMQtyChange\">\n                                    <option value=\"1\">1 pc</option>\n                                    <option value=\"2\">2 pcs</option>\n                                    <option value=\"3\" selected>3 pcs</option>\n                                    <option value=\"4\">4 pcs</option>\n                                    <option value=\"5\">5 pcs</option>\n                                    <option value=\"6\">6 pcs</option>\n                                    <option value=\"7\">7 pcs</option>\n                                </select>\n                                <span class=\"text-muted stitch-note\">8K stitches</span>\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"method-card-body\" id=\"capEmbBody\">\n                        <div class=\"card-placeholder\">Enter a cost and click Calculate</div>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </main>\n\n    <!-- Pricing Service Dependencies -->\n    <!-- Canonical DTG engine (Batch 6) - MUST precede dtg-pricing-service.js -->\n    <script src=\"/shared_components/js/dtg-canonical-pricing.js?v=2026.07.11.6\"></script>\n    <script src=\"/shared_components/js/dtg-pricing-service.js?v=2026.09.06.37\"></script>\n    <script src=\"/shared_components/js/dtf-pricing-service.js?v=2026.09.06.37\"></script>\n    <script src=\"/shared_components/js/embroidery-pricing-service.js?v=2026.09.06.31\"></script>\n    <script src=\"/shared_components/js/data-call-delegator.js?v=2026.09.06.27\"></script>\n    <script src=\"/shared_components/js/cap-embroidery-pricing-service.js?v=2026.09.06.31\"></script>\n    <script src=\"/shared_components/js/screenprint-pricing-service.js?v=2026.09.06.44\"></script>\n\n    <!-- Page Logic -->\n    <script src=\"/calculators/manual-pricing.js?v=2026.09.06.16\"></script>\n</body>\n</html>\n",
+      "title": "Manual Pricing Calculator 2026 | Northwest Custom Apparel",
+      "bodyTextSha": "2efbe5c98e315b213b0daff7e0f37c66c5d1d14d5fd2c1f130539b586926b28c",
+      "ids": [
+        "apiErrorBanner",
+        "apiErrorMessage",
+        "blankCost",
+        "calculateBtn",
+        "inputError",
+        "inputErrorText",
+        "methodCards",
+        "garmentCards",
+        "dtgCard",
+        "dtgLocation",
+        "dtgLtmQty",
+        "dtgSecondLocation",
+        "dtgSecondLocationSelect",
+        "dtgBody",
+        "dtfCard",
+        "dtfTransferSize",
+        "dtfLtmQty",
+        "dtfSecondLocation",
+        "dtfSecondTransferSize",
+        "dtfBody",
+        "embCard",
+        "embLtmQty",
+        "embBody",
+        "spCard",
+        "spColors",
+        "spLtmQty",
+        "spBody",
+        "capCards",
+        "capEmbCard",
+        "capEmbLtmQty",
+        "capEmbBody"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        }
+      ],
+      "fields": [
+        {
+          "id": "blankCost",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false
+        },
+        {
+          "id": "dtgLocation",
+          "name": "",
+          "type": "select-one",
+          "value": ""
+        },
+        {
+          "id": "dtgLtmQty",
+          "name": "",
+          "type": "number",
+          "value": "12",
+          "checked": false
+        },
+        {
+          "id": "dtgSecondLocation",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false
+        },
+        {
+          "id": "dtgSecondLocationSelect",
+          "name": "",
+          "type": "select-one",
+          "value": ""
+        },
+        {
+          "id": "dtfTransferSize",
+          "name": "",
+          "type": "select-one",
+          "value": "medium"
+        },
+        {
+          "id": "dtfLtmQty",
+          "name": "",
+          "type": "number",
+          "value": "12",
+          "checked": false
+        },
+        {
+          "id": "dtfSecondLocation",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false
+        },
+        {
+          "id": "dtfSecondTransferSize",
+          "name": "",
+          "type": "select-one",
+          "value": "medium"
+        },
+        {
+          "id": "embLtmQty",
+          "name": "",
+          "type": "select-one",
+          "value": "3"
+        },
+        {
+          "id": "spColors",
+          "name": "",
+          "type": "select-one",
+          "value": ""
+        },
+        {
+          "id": "spLtmQty",
+          "name": "",
+          "type": "number",
+          "value": "36",
+          "checked": false
+        },
+        {
+          "id": "capEmbLtmQty",
+          "name": "",
+          "type": "select-one",
+          "value": "3"
+        }
+      ],
+      "styles": [
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
+        "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+        "/shared_components/css/tokens.css?v=2026.09.08.2",
+        "/calculators/manual-calculator-styles.css?v=2026.09.07.19",
+        "/calculators/manual-pricing.css?v=2026.09.07.19"
+      ],
+      "scripts": [
+        "/config/app.config.js",
+        "/shared_components/js/dtg-canonical-pricing.js?v=2026.07.11.6",
+        "/shared_components/js/dtg-pricing-service.js?v=2026.09.06.37",
+        "/shared_components/js/dtf-pricing-service.js?v=2026.09.06.37",
+        "/shared_components/js/embroidery-pricing-service.js?v=2026.09.06.31",
+        "/shared_components/js/data-call-delegator.js?v=2026.09.06.27",
+        "/shared_components/js/cap-embroidery-pricing-service.js?v=2026.09.06.31",
+        "/shared_components/js/screenprint-pricing-service.js?v=2026.09.06.44",
+        "/calculators/manual-pricing.js?v=2026.09.06.16"
+      ],
+      "cssBytes": 42882
+    },
+    {
+      "file": "calculators/laser-manual-pricing.html",
+      "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <meta name=\"robots\" content=\"noindex, nofollow\">\n    <title>Manual Laser Pricing Calculator - Northwest Custom Apparel</title>\n    <link rel=\"icon\" href=\"/favicon.png\" type=\"image/png\">\n    <link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap\" rel=\"stylesheet\">\n    <link href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css\" rel=\"stylesheet\">\n    \n    <!-- Shared Calculator Styles -->\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link href=\"/calculators/manual-calculator-styles.css?v=2026.09.07.19\" rel=\"stylesheet\">\n    \n    <link rel=\"stylesheet\" href=\"/calculators/css/laser-manual-pricing.css?v=2026.09.07.12\">\n</head>\n<body>\n    <!-- Header -->\n    <header class=\"header\">\n        <div class=\"header-container\">\n            <div class=\"header-left\">\n                <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\" \n                     alt=\"Northwest Custom Apparel\" class=\"logo\">\n                <nav class=\"breadcrumb\">\n                    <a href=\"/staff-dashboard.html\">Dashboard</a>\n                    <span>/</span>\n                    <span>Manual Laser Pricing</span>\n                </nav>\n            </div>\n        </div>\n    </header>\n\n    <!-- Main Content -->\n    <main class=\"main-container\">\n        <div class=\"calculator-title text-center\">\n            <h1>Manual Laser Pricing Calculator</h1>\n            <p>Calculate pricing for laser engraving on customer-supplied items</p>\n        </div>\n\n        <!-- Product Showcase Section -->\n        <div class=\"product-showcase\">\n            <div class=\"product-showcase-inner\">\n                <div class=\"product-showcase-image\">\n                    <img src=\"https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9094664\" \n                         alt=\"Laser Engraved Leatherette Patches and Richardson Cap\" \n                         title=\"Professional Laser Engraving Services\">\n                </div>\n                <div class=\"product-showcase-content\">\n                    <h3><i class=\"fas fa-star\" aria-hidden=\"true\"></i> Premium Laser Engraving Services</h3>\n                    <p class=\"lm-intro\">\n                        Transform ordinary items into extraordinary keepsakes with our precision laser engraving. \n                        From leatherette patches on Richardson caps to custom awards and promotional products, \n                        our state-of-the-art laser technology delivers crisp, permanent designs that make a lasting impression.\n                    </p>\n                    <div class=\"product-features\">\n                        <div class=\"feature-item\">\n                            <i class=\"fas fa-check-circle\" aria-hidden=\"true\"></i>\n                            <span>Leatherette patches</span>\n                        </div>\n                        <div class=\"feature-item\">\n                            <i class=\"fas fa-check-circle\" aria-hidden=\"true\"></i>\n                            <span>Richardson caps</span>\n                        </div>\n                        <div class=\"feature-item\">\n                            <i class=\"fas fa-check-circle\" aria-hidden=\"true\"></i>\n                            <span>Awards & trophies</span>\n                        </div>\n                        <div class=\"feature-item\">\n                            <i class=\"fas fa-check-circle\" aria-hidden=\"true\"></i>\n                            <span>Promotional items</span>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        </div>\n\n        <!-- Coming Soon Notice -->\n        <div class=\"coming-soon\">\n            <i class=\"fas fa-cube coming-soon-icon\" aria-hidden=\"true\"></i>\n            <h2>Coming Soon!</h2>\n            <p>The Manual Laser Pricing Calculator is currently under development. Check back soon!</p>\n        </div>\n\n        <!-- Calculator Grid (Placeholder) -->\n        <div class=\"calculator-grid\">\n            <!-- Input Section -->\n            <div class=\"card\">\n                <h2 class=\"card-title\">\n                    <i class=\"fas fa-laser-pointer lm-icon-primary\" aria-hidden=\"true\"></i>\n                    Laser Engraving Details\n                </h2>\n                \n                <div class=\"placeholder-section\">\n                    <i class=\"fas fa-cog fa-3x mb-3 lm-icon-muted\" aria-hidden=\"true\"></i>\n                    <p>Input fields for manual laser pricing will appear here</p>\n                    <p class=\"mt-2 text-muted\">Features will include:</p>\n                    <ul class=\"lm-plain-list\">\n                        <li>• Manual item cost input</li>\n                        <li>• Engraving area size</li>\n                        <li>• Material type selection</li>\n                        <li>• Setup and runtime calculation</li>\n                        <li>• Quantity-based pricing</li>\n                    </ul>\n                </div>\n            </div>\n\n            <!-- Results Section -->\n            <div class=\"card\">\n                <div class=\"results-section\">\n                    <div class=\"results-header\">\n                        <h3 class=\"card-title\">Your Quote</h3>\n                        <div class=\"price-display prompt\">\n                            <i class=\"fas fa-calculator\" aria-hidden=\"true\"></i>\n                            Calculator Loading...\n                        </div>\n                    </div>\n                    \n                    <div class=\"placeholder-section mt-3\">\n                        <i class=\"fas fa-file-invoice-dollar fa-3x mb-3 lm-icon-muted\" aria-hidden=\"true\"></i>\n                        <p>Pricing breakdown will appear here</p>\n                    </div>\n                </div>\n            </div>\n        </div>\n\n        <!-- Information Section -->\n        <div class=\"card\">\n            <h3 class=\"card-title\">\n                <i class=\"fas fa-info-circle lm-icon-primary\" aria-hidden=\"true\"></i>\n                About Manual Laser Pricing\n            </h3>\n            <div class=\"alert alert-info\">\n                <i class=\"fas fa-lightbulb alert-icon\" aria-hidden=\"true\"></i>\n                <div>\n                    <p><strong>What is Manual Laser Pricing?</strong></p>\n                    <p>This calculator will help you price laser engraving services for customer-supplied items such as tumblers, awards, promotional products, and more. It will account for engraving size, material type, and quantity to provide accurate pricing.</p>\n                </div>\n            </div>\n        </div>\n    </main>\n</body>\n</html>",
+      "title": "Manual Laser Pricing Calculator - Northwest Custom Apparel",
+      "bodyTextSha": "c70946d26b9145d38008ad1e18dbdc1cf0f186abe6057365c728fe34d71d9005",
+      "ids": [],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        }
+      ],
+      "fields": [],
+      "styles": [
+        "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
+        "/shared_components/css/tokens.css?v=2026.09.08.2",
+        "/calculators/manual-calculator-styles.css?v=2026.09.07.19",
+        "/calculators/css/laser-manual-pricing.css?v=2026.09.07.12"
+      ],
+      "scripts": [],
+      "cssBytes": 31047
+    },
+    {
+      "file": "calculators/service-price-cheat-sheet.html",
+      "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <meta name=\"robots\" content=\"noindex, nofollow\">\n    <title>Shop Menu | Northwest Custom Apparel</title>\n    <link rel=\"icon\" href=\"/favicon.png\" type=\"image/png\">\n    <!-- Menu typography: Bodoni Moda for the masthead and course titles, Libre Franklin for items and codes -->\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    <link href=\"https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,600;0,6..96,700;1,6..96,400&family=Libre+Franklin:ital,wght@0,400;0,500;0,600;1,400&display=swap\" rel=\"stylesheet\">\n    <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css\">\n    <!-- Page styles -->\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link rel=\"stylesheet\" href=\"/calculators/service-price-cheat-sheet.css?v=2026.09.07.12\">\n</head>\n<body class=\"view-rep\">\n    <!-- Staff bar: never prints -->\n    <header class=\"topbar\">\n        <a href=\"/staff-dashboard.html\" class=\"topbar-link\"><i class=\"fas fa-arrow-left\" aria-hidden=\"true\"></i> Staff Dashboard</a>\n        <div class=\"topbar-spacer\"></div>\n        <div class=\"view-toggle\" role=\"group\" aria-label=\"Menu view\">\n            <button type=\"button\" class=\"view-btn is-active\" data-view=\"rep\" aria-pressed=\"true\">Rep view <small>codes &amp; book times</small></button>\n            <button type=\"button\" class=\"view-btn\" data-view=\"customer\" aria-pressed=\"false\">Customer view <small>prices only</small></button>\n        </div>\n        <button type=\"button\" class=\"topbar-link topbar-link--solid\" id=\"printCustomerBtn\" title=\"Prints the customer copy: prices only, no codes or book times\"><i class=\"fas fa-print\" aria-hidden=\"true\"></i> Print customer menu</button>\n        <button type=\"button\" class=\"topbar-link\" id=\"printRepBtn\" title=\"Prints the rep copy with ShopWorks codes and book times\"><i class=\"fas fa-print\" aria-hidden=\"true\"></i> Print rep copy</button>\n    </header>\n\n    <div id=\"errorBanner\" class=\"error-banner\" role=\"alert\"></div>\n\n    <main class=\"menu\" id=\"menu\">\n        <header class=\"masthead\">\n            <div class=\"masthead-rule\"></div>\n            <p class=\"masthead-eyebrow\">Northwest Custom Apparel &middot; Milton, Washington</p>\n            <h1 class=\"masthead-title\">Shop Menu</h1>\n            <p class=\"masthead-sub\"><span class=\"est\">Est. 1977</span> &middot; embroidery, sewing, DTF, finishing &amp; laser, priced by the piece &middot; <span id=\"menuDate\">2026</span></p>\n            <div class=\"masthead-rule\"></div>\n            <div class=\"minimum-stamp\" role=\"note\" aria-label=\"Job minimum\">\n                <span class=\"minimum-amount\">$<span data-rule=\"min\">75</span></span>\n                <span class=\"minimum-text\"><strong>minimum per job</strong><br>one hour of bench time &mdash; any service on this menu, one minimum per ticket<span class=\"rep-only\"> &middot; bill the difference on <code>LTM</code></span></span>\n            </div>\n        </header>\n\n        <section class=\"house-rules\" aria-label=\"House rules\">\n            <h2 class=\"house-rules-title\">House Rules</h2>\n            <ol class=\"house-rules-list\">\n                <li><strong>Bring us your goods, we price by the piece.</strong> Price &times; quantity, with a <strong>$<span data-rule=\"min\">75</span> minimum per job</strong><span class=\"rep-only\"> &mdash; bill the difference on <code>LTM</code></span>.</li>\n                <li><strong>Not on the menu?</strong> We quote the time: <strong>$<span data-rule=\"bench\">25</span></strong> per quarter hour at the <strong>bench</strong> (sewing, finishing, hand work) or <strong>$<span data-rule=\"machine\">37.50</span></strong> per quarter hour on a <strong>machine</strong> (embroidery heads, heat press, laser)<span class=\"rep-only\"> &mdash; bench $100/h, machine $150/h; on <code>DECG</code>, <code>DECC</code> or <code>Laser</code>; Erik or Ruthie approves the estimate</span>.</li>\n                <li><strong>Supplies we provide</strong> (transfers, labels, bags, special thread) are priced the same way as our garments<span class=\"rep-only\"> &mdash; our cost &divide; <span data-rule=\"denom\">0.53</span>, never a garment: $1 &rarr; $1.89 &middot; $2 &rarr; $3.77 &middot; $5 &rarr; $9.43 &middot; $10 &rarr; $18.87</span>. Goods you supply are worked at your risk.<span class=\"rep-only\"> <strong>We supply the garment?</strong> Use the quote builder; names, patches and puff are add-ons there at the same prices.</span></li>\n            </ol>\n        </section>\n\n        <div class=\"courses\" id=\"courses\">\n            <p class=\"loading\"><i class=\"fas fa-spinner fa-spin\" aria-hidden=\"true\"></i> Setting the table&hellip;</p>\n        </div>\n\n        <footer class=\"colophon\">\n            <p>2025 Freeman Road East, Milton, WA 98354 &middot; 253-922-5793 &middot; sales@nwcustomapparel.com</p>\n            <p class=\"rep-only\">Prices load from Caspio <code>Service_Codes</code> &mdash; change it there, the menu follows. Loaded <span id=\"loadTimestamp\">&mdash;</span>. Subject to change; sales tax extra.</p>\n            <p class=\"customer-only\">Prices subject to change without notice. Sales tax extra.</p>\n        </footer>\n    </main>\n\n    <script src=\"/shared_components/js/app-config.js?v=2026.09.06.15\"></script>\n    <script src=\"/calculators/service-price-cheat-sheet.js?v=2026.09.06.16\"></script>\n</body>\n</html>\n",
+      "title": "Shop Menu | Northwest Custom Apparel",
+      "bodyTextSha": "f731f583232a202174151080509233b5e707cee8b06fcb6611ee08da334b1608",
+      "ids": [
+        "printCustomerBtn",
+        "printRepBtn",
+        "errorBanner",
+        "menu",
+        "menuDate",
+        "courses",
+        "loadTimestamp"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        }
+      ],
+      "fields": [],
+      "styles": [
+        "https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,600;0,6..96,700;1,6..96,400&family=Libre+Franklin:ital,wght@0,400;0,500;0,600;1,400&display=swap",
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
+        "/shared_components/css/tokens.css?v=2026.09.08.2",
+        "/calculators/service-price-cheat-sheet.css?v=2026.09.07.12"
+      ],
+      "scripts": [
+        "/shared_components/js/app-config.js?v=2026.09.06.15",
+        "/calculators/service-price-cheat-sheet.js?v=2026.09.06.16"
+      ],
+      "cssBytes": 28525
+    }
+  ],
+  "hashes": {
+    "calculators/manual-pricing.html": "a31330a5298198b2df67b15650c452ebdfe983294ea64e7bb8b601a4e232bfb3",
+    "shared_components/css/tokens.css": "2b3ab556bb9eaf40765a5c84683777cb64d50a6c42d1b4e82bc6beff33a127b6",
+    "calculators/manual-calculator-styles.css": "a67579263749481a40d63ec0fdd91c4e55ee7550992627a23204bc2bd4396e70",
+    "calculators/manual-pricing.css": "cc79ab2ff9c7f6ec7ec04ae72869c9257f59829f8f97b7e2c57fd252c96e36e6",
+    "config/app.config.js": "fe83e4329ce3eee97e48dd68dab81d9d5eb6ec94511d9650e2c9ebbb1528d6ea",
+    "shared_components/js/dtg-canonical-pricing.js": "de8a80c0bbed8ddaea62ecb2bcf7d62afc60788701ede23d41fcd7ade372d1f3",
+    "shared_components/js/dtg-pricing-service.js": "524822dab43e63a3c45868a0df9b14b00dc28a8eb43958a027c99fa9e9d0ac36",
+    "shared_components/js/dtf-pricing-service.js": "949255ae38db6f51d494f78f07ebc8f484e5288035fe1d13b3af7c6fea2391ab",
+    "shared_components/js/embroidery-pricing-service.js": "cb5ead0d8b9059ca640993e331e075d87b86016d993aec403179260f4c0b0dff",
+    "shared_components/js/data-call-delegator.js": "50e836385b6804b2b52fd8c549744277fe69ff701c232b7badf4fdcb09f343f6",
+    "shared_components/js/cap-embroidery-pricing-service.js": "eaee03cfb727abb775532e37078bd41a9da94814602899eba14b611a855e1506",
+    "shared_components/js/screenprint-pricing-service.js": "695a740f845263741fee5a9aa91816d9643a5dd24fa28cfc3850a9a2785300b7",
+    "calculators/manual-pricing.js": "97c170d2e703f73e3e700429edfe8a842c3402b38bd312ce730454b4664bce44",
+    "calculators/laser-manual-pricing.html": "807a617b78aa0d260a253d823addba2b2ba0988e23ff9ef3b35a89836f13858e",
+    "calculators/css/laser-manual-pricing.css": "e29167307e8fa7007ea2b002b434f1f02efbcb0c1bc51e527a2d66fcfc10e3a7",
+    "calculators/service-price-cheat-sheet.html": "a042a972f86181a648d846e5b499474ce93966cfd0f60342a1b0c856a295dee4",
+    "calculators/service-price-cheat-sheet.css": "4b6cda324353d16e633fe0da6a7c5158315ffbf08883ab28876c2bcd143766f3",
+    "shared_components/js/app-config.js": "fffd8cd7d934fcb67ea5165373f870cc20cd14a6c3dd62b1c36fe8ab2be44311",
+    "calculators/service-price-cheat-sheet.js": "69e9b77eab7e78334e8b1bee09b1fffb15ad39d0d668fc1443473ea3173628d9"
+  },
+  "changes": [],
+  "retiredStyles": []
+}
