@@ -221,6 +221,8 @@
 
     // ── Boot ────────────────────────────────────────────────────────
     async function boot() {
+        // Retry must be available even when the first config request fails.
+        $('caps-fatal-retry').onclick = () => location.reload();
         try {
             // Channel config (Caspio CAPS-SHIP-*), the CAP-AL add-on bundle
             // and the curated catalog load first — ALL fail-closed (fatal
@@ -346,7 +348,7 @@
     function renderGallery() {
         const grid = $('gallery-grid');
         grid.innerHTML = S.gallery.items.map((it) => `
-            <article class="gallery-card" role="button" tabindex="0"
+            <article class="gallery-card"
                      data-style="${escapeHTML(it.style)}"
                      aria-label="Customize ${escapeHTML(it.title)}">
                 <div class="gallery-card-hero" id="card-hero-${escapeHTML(it.style)}">
@@ -359,19 +361,14 @@
                     <small class="gallery-card-colors">${it.colors.length} stocked color${it.colors.length === 1 ? '' : 's'}</small>
                     <div class="gallery-card-foot">
                         <span class="gallery-card-price" id="card-price-${escapeHTML(it.style)}"><span class="skel">$00 /cap</span></span>
-                        <span class="gallery-card-cta">Customize <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+                        <button type="button" class="btn btn-primary gallery-card-cta">Customize <i class="fas fa-arrow-right" aria-hidden="true"></i></button>
                     </div>
                 </div>
             </article>`).join('');
 
         grid.querySelectorAll('.gallery-card').forEach((card) => {
             card.addEventListener('click', () => selectProduct(card.dataset.style));
-            card.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    selectProduct(card.dataset.style);
-                }
-            });
+            // Native Customize and swatch buttons provide their own keyboard activation.
         });
 
         S.gallery.items.forEach((it) => hydrateGalleryCard(it));
@@ -1136,12 +1133,12 @@
             : `<p class="review-empty">${q.belowMin ? 'Below the 8-cap minimum — add more caps.' : 'Nothing yet — add your logo and quantities.'}</p>`;
         $('sheet-totals').innerHTML = hasLines ? '<div class="review-totals">' + buildTotalsHtml(q) + '</div>' : '';
         $('sheet-promise').textContent = hasLines ? shipPromiseCopy() : '';
-        $('summary-sheet').hidden = false;
-        $('sheet-backdrop').hidden = false;
+        const sheet = $('summary-sheet');
+        if (!sheet.open) sheet.showModal();
     }
     function closeSheet() {
-        $('summary-sheet').hidden = true;
-        $('sheet-backdrop').hidden = true;
+        const sheet = $('summary-sheet');
+        if (sheet.open) sheet.close();
     }
 
     // ── Checkout pipeline ───────────────────────────────────────────
@@ -1394,7 +1391,14 @@
         };
     }
     function persistNow() {
-        try { sessionStorage.setItem(PERSIST_KEY, JSON.stringify(snapshot())); } catch (_) { /* quota */ }
+        const notice = $('storage-notice');
+        try {
+            sessionStorage.setItem(PERSIST_KEY, JSON.stringify(snapshot()));
+            notice.hidden = true;
+        } catch (_) {
+            notice.textContent = 'Your changes are available on this page, but this browser could not save them. Keep this page open until you finish your order.';
+            notice.hidden = false;
+        }
     }
     const persistSoon = debounce(persistNow, 400);
 
@@ -1509,7 +1513,7 @@
         $('hero-cta').addEventListener('click', () => {
             document.querySelector('#stage-gallery').scrollIntoView({ behavior: 'smooth' });
         });
-        $('caps-fatal-retry').addEventListener('click', () => location.reload());
+        // Initial-failure Retry is wired before the boot requests.
         $('gallery-retry').addEventListener('click', () => location.reload());
         $('change-product').addEventListener('click', backToGallery);
 
@@ -1589,9 +1593,12 @@
         // Order bar + sheet
         $('order-bar-summary').addEventListener('click', openSheet);
         $('sheet-close').addEventListener('click', closeSheet);
-        $('sheet-backdrop').addEventListener('click', closeSheet);
+        $('summary-sheet').addEventListener('cancel', (event) => {
+            event.preventDefault();
+            closeSheet();
+        });
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && !$('summary-sheet').hidden) closeSheet();
+            if (e.key === 'Escape' && $('summary-sheet').open) closeSheet();
         });
 
         // Pay

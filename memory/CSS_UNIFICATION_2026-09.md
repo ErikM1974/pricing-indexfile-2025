@@ -1,16 +1,12 @@
 # CSS unification — design direction and implementation plan
 
-## NEXT — Custom Tees and Custom Caps original review
+## REVIEWED — Custom Tees and Custom Caps ready for release checks
 
-Cart v2026.09.11.1/Heroku2104/2463ce82 is verified LIVE191/225,34pending. All4 exact-source CI34572654837 jobs and full local242suites/5666tests,1244CSS,16live browser/84quote parity gates passed. The Custom Tees/Caps branch has no application edits:35 original scenarios passed and36 immutable contracts preserve every successful price/payload. Art-enabled tees use the existing complete24-piece fixture tier. Original paper review is underway. Synthetic original probes prove unwired initial failure Retry, silent storage quota and escaping summary focus; the tee Escape key also leaves the summary open.
+The pair now shares Public Sans, canonical controls and a scoped layout owner with222 previously duplicated rules. Forty-four browser scenarios pass at1440/768/390/320; the final22 affected print cases also pass. All78 current paper pages across22 documents were visually inspected, including complete long notes, front/back artwork, mixed sizes/colors, taxes, pickup, rush and checkout failure. No blank sheets remain; the contact footer moves beside the printed letterhead and returns after printing.
 
-- [x] Freeze original HTML, page CSS, controllers, pure pricing engines, shipping calendar, calibration and designer sources.
-- [ ] Capture original gallery/search/filter/sort, product/color/quantity tiers, front/back art, proof/designer, rush/delivery/tax, notes, consent, refresh/session and mock checkout states at1440/768/390/320. Unknown business reads/writes fail closed in fixtures.
-- [ ] Review original screens and every printed page before editing. Demonstrate any storage/request/focus defects with synthetic fixtures first.
-- [ ] Share layout and canonical controls while retaining the distinct shirt designer and cap proof workflow. Preserve all API financial transforms, input payloads, quantities, stock keys, shipping dates and offer copy.
-- [ ] Compare current screens/axe/keyboard/paper and source contracts; update migration credit only after all pass. Complete separate full application/CI/deploy gates.
+Fourteen original source hashes and36 immutable browser contracts remain preserved through42 reversible UI mappings. The original134 paper pages were reviewed before editing. Pricing engines, date/quantity functions and successful checkout payloads remain unchanged. Initial-failure Retry, visible storage quota errors, native gallery keyboard controls and summary-dialog focus/Escape are repaired. No real orders, uploads, payments, messages or device printing occurred.
 
-Design: Public Sans; NWCA green #2e5827, white #ffffff, gray canvas #f3f4f6, ink #1f2937, muted #4b5563, warning ink #92400e through existing tokens. Left-aligned product gallery leads into the actual customization workspace; preview and artwork controls sit beside quantity and order details on desktop and stack on phones. Existing product imagery carries the identity. Consolidate duplicated header, gallery, fields, order summary and paper rules into one scoped owner; keep canvas geometry and cap-specific proof controls separately owned. Retain every offer and price label. No new global palette, live order, upload, payment or email.
+Reviewed candidate193/225,32pending; live remains v2026.09.11.1/Heroku2104/2463ce82 at191/225,34pending until rollout verifies. Next: commit/back up the reviewed pair, integrate clean develop, run complete application/browser/parity checks and exact-source CI, then deploy and verify the actual slug, assets and access. Evidence: custom-apparel-reviewed-record.json and active-css-resume-state.json in the external artifact directory. Never rerun consumed one-shot helpers.
 
 ## RELEASE CANDIDATE — v2026.09.11.1 Sample and Quote Carts
 
@@ -1567,3 +1563,5 @@ Original capture correction: the first cap-gallery observer invoked currentQuote
 ## Sample and Quote Cart release record — v2026.09.11.1
 
 Exact-source CI 34572654837 passed all four jobs on 88526ec0e1b89c7ab3b98bc48ebad4b824b7bc64, including actual CSS and live money/calculator parity. Full local gates passed on the exact source 88526ec0e1b89c7ab3b98bc48ebad4b824b7bc64. Shared controls and three scoped cart style owners;40 focused browser cases,39 visually reviewed current paper pages across13 documents,21 immutable original source hashes,34 original browser contracts and96 reversible mappings. Original prices, quantities and successful payloads preserved. Four demonstrated stored-text, checkout-error, storage-removal and duplicate-save defects repaired. Counts become191/225 reviewed,34 pending after verified rollout. Separate Custom Tees/Custom Caps original-capture work is excluded.
+
+Release-check preparation: all 387 focused source, pricing, ownership and legacy storefront checks pass. The prior status source lock now reconstructs the independently reviewed apparel stylesheet while retaining its original hash; the zoom guard verifies the scoped overflow rule. The full application suite remains a separate release gate.

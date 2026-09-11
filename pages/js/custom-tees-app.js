@@ -323,6 +323,8 @@
     }
 
     async function boot() {
+        // Retry must be available even when the first config request fails.
+        $('tdt-fatal-retry').onclick = () => location.reload();
         try {
             // Service-code config + the curated 20-style catalog load first;
             // everything style-specific loads in selectProduct/loadProduct.
@@ -904,7 +906,7 @@
                     : '<span class="gallery-swatch-blank"></span>'}
             </button>`).join('');
         return `
-            <article class="gallery-card" role="button" tabindex="0"
+            <article class="gallery-card"
                      data-style="${escapeHTML(it.style)}" data-cc="${escapeHTML(def ? def.catalog_color : '')}"
                      aria-label="Customize ${escapeHTML(name)}">
                 <div class="gallery-card-hero">
@@ -927,7 +929,7 @@
                     ${galleryPriceHtml(it)}
                     <div class="gallery-card-foot">
                         <span class="gallery-card-proof"><i class="fas fa-fire" aria-hidden="true"></i> ${fmtInt(it.total_units_sold)} printed</span>
-                        <span class="gallery-card-cta">Customize <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+                        <button type="button" class="btn btn-primary gallery-card-cta">Customize <i class="fas fa-arrow-right" aria-hidden="true"></i></button>
                     </div>
                 </div>
             </article>`;
@@ -944,12 +946,7 @@
         grid.innerHTML = items.map((it) => galleryCardHtml(it, heroBy[it.style])).join('');
         grid.querySelectorAll('.gallery-card').forEach((card) => {
             card.addEventListener('click', () => selectProduct(card.dataset.style, card.dataset.cc || null));
-            card.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    selectProduct(card.dataset.style, card.dataset.cc || null);
-                }
-            });
+            // Native Customize and swatch buttons provide their own keyboard activation.
         });
         grid.querySelectorAll('.gallery-swatch').forEach((sw) => {
             sw.addEventListener('click', (e) => {
@@ -2057,12 +2054,12 @@
             : '<p class="review-empty">Nothing yet — add artwork and quantities.</p>';
         $('sheet-totals').innerHTML = q.lines.length ? '<div class="review-totals">' + buildTotalsHtml(q) + '</div>' : '';
         $('sheet-promise').textContent = q.lines.length ? shipPromise().long : '';
-        $('summary-sheet').hidden = false;
-        $('sheet-backdrop').hidden = false;
+        const sheet = $('summary-sheet');
+        if (!sheet.open) sheet.showModal();
     }
     function closeSheet() {
-        $('summary-sheet').hidden = true;
-        $('sheet-backdrop').hidden = true;
+        const sheet = $('summary-sheet');
+        if (sheet.open) sheet.close();
     }
 
     // ── Checkout pipeline ───────────────────────────────────────────
@@ -2375,7 +2372,14 @@
         };
     }
     function persistNow() {
-        try { sessionStorage.setItem(PERSIST_KEY, JSON.stringify(snapshot())); } catch (_) { /* quota */ }
+        const notice = $('storage-notice');
+        try {
+            sessionStorage.setItem(PERSIST_KEY, JSON.stringify(snapshot()));
+            notice.hidden = true;
+        } catch (_) {
+            notice.textContent = 'Your changes are available on this page, but this browser could not save them. Keep this page open until you finish your order.';
+            notice.hidden = false;
+        }
     }
     const persistSoon = debounce(persistNow, 400);
 
@@ -2470,7 +2474,7 @@
             document.querySelector('#stage-design').scrollIntoView({ behavior: 'smooth' });
             setTimeout(() => $('art-input').click(), 400);
         });
-        $('tdt-fatal-retry').addEventListener('click', () => location.reload());
+        // Initial-failure Retry is wired before the boot requests.
 
         // Gallery search
         $('gallery-search').addEventListener('input', debounce((e) => {
@@ -2687,7 +2691,10 @@
         // Order bar + sheet
         $('order-bar-summary').addEventListener('click', openSheet);
         $('sheet-close').addEventListener('click', closeSheet);
-        $('sheet-backdrop').addEventListener('click', closeSheet);
+        $('summary-sheet').addEventListener('cancel', (event) => {
+            event.preventDefault();
+            closeSheet();
+        });
 
         // Pay
         $('pay-btn').addEventListener('click', runCheckout);

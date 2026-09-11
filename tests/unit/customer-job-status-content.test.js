@@ -62,6 +62,17 @@ test.each(Object.keys(original.hashes).filter(f => !f.endsWith('.html')))('%s re
         return;
     }
     let s = fs.readFileSync(path.join(root, file), 'utf8').replace(/\r\n/g, '\n');
+    // This sheet was retained during the status-page cut, then migrated by its own storefront.
+    // Reconstruct that verified baseline before applying this suite's original source lock.
+    if (file === 'pages/css/custom-tees.css') {
+        const apparel = require('../fixtures/custom-apparel-original-content.json');
+        expect(apparel.hashes[file]).toBe(original.hashes[file]);
+        for (const change of apparel.changes.filter(c => c.file === file).reverse()) {
+            expect(change.after).not.toBe('');
+            expect(s.split(change.after).length - 1).toBe(change.count);
+            s = s.split(change.after).join(change.before);
+        }
+    }
     for (const change of original.changes.filter(c => c.file === file).reverse()) {
         expect(change.after).not.toBe('');
         expect(s.split(change.after).length - 1).toBe(change.count);

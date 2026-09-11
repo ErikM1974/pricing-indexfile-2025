@@ -5820,6 +5820,84 @@
         "rawCssBytes": 71646,
         "localCssRequests": 3
       }
+    },
+    {
+      "source": "pages/custom-caps.html",
+      "family": "custom-apparel",
+      "status": "reviewed",
+      "route": "/pages/custom-caps.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/custom-apparel-studio.css",
+        "pages/css/custom-caps.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "gallery-search-filter-sort",
+        "selected-product-and-colors",
+        "front-and-back-artwork",
+        "all-quantities-and-price-tiers",
+        "delivery-tax-and-pickup",
+        "original-successful-checkout-payload",
+        "failed-checkout-retains-draft",
+        "initial-load-retry",
+        "storage-quota-warning-and-recovery",
+        "native-summary-keyboard-escape-and-focus-return",
+        "four-widths",
+        "axe",
+        "complete-print-and-long-notes",
+        "print-restores-contact-footer",
+        "below-minimum"
+      ],
+      "test": "tests/e2e/css-unification-custom-apparel.spec.js",
+      "maxCssBytes": 124467,
+      "measuredRawCssBytes": 122419,
+      "baseline": {
+        "commit": "88526ec0e1b89c7ab3b98bc48ebad4b824b7bc64",
+        "rawCssBytes": 58194,
+        "localCssRequests": 2
+      }
+    },
+    {
+      "source": "pages/custom-tees.html",
+      "family": "custom-apparel",
+      "status": "reviewed",
+      "route": "/pages/custom-tees.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/custom-apparel-studio.css",
+        "pages/css/custom-tees.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "gallery-search-filter-sort",
+        "selected-product-and-colors",
+        "front-and-back-artwork",
+        "all-quantities-and-price-tiers",
+        "delivery-tax-and-pickup",
+        "original-successful-checkout-payload",
+        "failed-checkout-retains-draft",
+        "initial-load-retry",
+        "storage-quota-warning-and-recovery",
+        "native-summary-keyboard-escape-and-focus-return",
+        "four-widths",
+        "axe",
+        "complete-print-and-long-notes",
+        "print-restores-contact-footer",
+        "canvas-placement-and-width",
+        "rush-dates-and-pricing",
+        "keyboard-color-swatch"
+      ],
+      "test": "tests/e2e/css-unification-custom-apparel.spec.js",
+      "maxCssBytes": 144536,
+      "measuredRawCssBytes": 142487,
+      "baseline": {
+        "commit": "88526ec0e1b89c7ab3b98bc48ebad4b824b7bc64",
+        "rawCssBytes": 68094,
+        "localCssRequests": 2
+      }
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",

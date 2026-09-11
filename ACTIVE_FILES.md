@@ -742,3 +742,7 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - tests/fixtures/custom-apparel-tees-rush-original-browser.json — immutable synthetic original custom apparel browser contract.
 
 - tests/fixtures/custom-apparel-original-defects.json — synthetic original retry/storage/summary focus defect observations.
+
+- shared_components/css/custom-apparel-studio.css — shared scoped Custom Tees/Caps storefront, gallery, order and print layout.
+
+- shared_components/js/custom-apparel-print.js — shared print-only form value mirrors; no order writes.

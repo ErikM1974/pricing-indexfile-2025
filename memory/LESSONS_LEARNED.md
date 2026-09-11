@@ -239,3 +239,8 @@ Control-class follow-up: regex word boundaries treat hyphens as separators, so s
 
 ### Heroku Git must use the trust store that verifies its certificate (2026-09-11)
 - Problem/root cause: the corporate OpenSSL CA verified GitHub but rejected git.heroku.com before upload. Solution: verify ls-remote with the Windows schannel backend, then use the same backend and sslVerify=true for the push. Prevention: never disable verification; prove the prior slug is unchanged after a transport failure, then verify the actual release, source assets and access after resuming.
+
+### Custom storefront recovery and paper must preserve the draft (2026-09-11)
+- Problem/root cause: Retry was registered only after successful boot, storage quota failures were silent, nested gallery controls swallowed keyboard activation, and custom summary sheets let focus escape. Fixed bars and trailing layout space broke paper.
+- Solution: wire Retry before requests, expose storage failure while retaining values, use native buttons/dialogs, mirror complete entered fields for print, and move contact information beside the letterhead with exact afterprint restoration.
+- Prevention: compare immutable prices/payloads, exercise first-load failure and quota recovery, verify background focus is inert (native Tab may reach browser chrome), and inspect every actual PDF page for missing notes, split totals and blank trailing sheets.
