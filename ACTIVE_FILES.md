@@ -1064,3 +1064,5 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - tests/fixtures/specialty-calculators-polar-camel-tiers-colors-original-browser.json — immutable synthetic Polar Camel browser and native financial evidence.
 
 - tests/fixtures/specialty-calculators-polar-camel-cached-policy-original-browser.json — immutable synthetic Polar Camel browser and native financial evidence.
+
+- shared_components/css/laser-tumbler-simple.css — reviewed scoped Polar Camel owner; canonical storefront controls, responsive logo preview and two-page print layout.

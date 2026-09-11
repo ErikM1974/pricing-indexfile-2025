@@ -1,5 +1,13 @@
 # Handover follow-ups — 2026-09-07
 
+## REVIEWED CHECKPOINT — Polar Camel tumbler, 2026-09-11
+
+Polar Camel now uses the canonical storefront, shared specialty controls and scoped page styles. All 20 focused browser checks pass, including 64 original financial states, byte-identical 1800×1800 logo download, changed live policy with cached products, keyboard dialogs/radios, failed/incomplete reads and latest-request ownership. All 36 screen captures and 17 pages across nine PDFs are reviewed (26 screen-detail sheets and three paper sheets). Prices and engraving math remain unchanged; unavailable data is visible. The four JDS financial methods and original successful quote calculation are source-locked; all 96 reversible mappings retain the 37 original source hashes.
+
+Candidate now 211/225 reviewed, 14 pending. Live remains verified v2026.09.11.6 / Heroku2109 / 75ef80194384912f4c644e9b868898aa5d62de28, 207/225 reviewed and 18 pending. No specialty deployment yet. This status supersedes historical notes below.
+
+All 373 source, ownership, token, lint, lessons-cap and runtime checks pass; four shared-control browser regressions pass, and scoped JavaScript lint is clean. This reviewed checkpoint is saved separately from deployment. Next: capture and review Safety Stripe Creator originals before migrating it; customer-supplied screen printing follows. Full unit, CSS browser, e2e, pricing parity and actual exact-source CI are required before releasing the six-page specialty batch. Do not copy .env, delete the dependency junction, or allow business requests/device printing through the synthetic harness.
+
 ## Polar Camel originals reviewed — 2026-09-11
 
 Twelve original checks pass across focused runs: nine visual states,64 native quantity/color boundaries, real logo edits/errors and the unchanged1800px PNG download, plus cached products with altered live policy. All36 full-page screens and51 paper pages in9 documents reviewed via25 screen and8 paper sheets. Product records/images are explicitly synthetic; the native pricing and engraving pipeline runs unchanged.

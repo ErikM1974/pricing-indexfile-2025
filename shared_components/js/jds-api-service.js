@@ -42,6 +42,7 @@ class JDSApiService {
      * fallbacks and surfaces a visible warning (never a silent wrong price).
      */
     async loadServicePrices() {
+        this.pricingWarnings = [];
         try {
             const resp = await fetch(`${this.proxyBase}/api/service-codes`);
             if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
@@ -51,9 +52,12 @@ class JDSApiService {
 
             const live = (code, current) => {
                 const sc = map[code];
-                if (!sc || sc.IsActive === false) return current;
-                const sell = parseFloat(sc.SellPrice);
-                return Number.isFinite(sell) && sell >= 0 ? sell : current;
+                const sell = sc && parseFloat(sc.SellPrice);
+                if (!sc || sc.IsActive === false || !Number.isFinite(sell) || sell < 0 || (code === 'JDS-MARGIN' && sell === 0)) {
+                    this.pricingWarnings.push(code);
+                    return current;
+                }
+                return sell;
             };
 
             this.MARGIN_DENOMINATOR = live('JDS-MARGIN', this.MARGIN_DENOMINATOR);
@@ -62,6 +66,7 @@ class JDSApiService {
             this.SECOND_LOGO_PRICE = live('JDS-LOGO2', this.SECOND_LOGO_PRICE);
             this.SMALL_ORDER_HANDLING_FEE = live('JDS-LTM', this.SMALL_ORDER_HANDLING_FEE);
         } catch (error) {
+            this.pricingWarnings = ['JDS-MARGIN', 'JDS-LABOR', 'JDS-SETUP', 'JDS-LOGO2', 'JDS-LTM'];
             console.error('[JDSApiService] Could not load live JDS prices from /api/service-codes — using built-in fallbacks:', error);
             if (typeof showToast === 'function') {
                 showToast("Couldn't reach the pricing service — using default JDS prices", 'warning', 5000);

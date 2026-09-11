@@ -74,6 +74,13 @@ const LEGACY_ESM = [
 ];
 
 export default [
+    { files: ['shared_components/js/laser-tumbler-simple.js'], languageOptions: { globals: { JDSApiService: 'readonly' } } },
+    {
+        // Existing tumbler controllers now have explicit browser globals and zero unused bindings.
+        files: ['shared_components/js/jds-api-service.js', 'shared_components/js/laser-tumbler-simple.js', 'shared_components/js/laser-tumbler-mockup.js'],
+        languageOptions: { sourceType: 'script', globals: { ...globals.browser, ManageOrdersInventoryService: 'readonly', showToast: 'readonly' } },
+        rules: { 'no-undef': 'error', 'no-unused-vars': ['error', { argsIgnorePattern: '^_', caughtErrors: 'none', vars: 'local' }] },
+    },
     {
         // Global ignores — what `eslint .` never reads: build output, deps, tests, Node-side scripts
         // (except the two in STRICT_FILES), docs/memory, vendored + archived code.

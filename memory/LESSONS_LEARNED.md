@@ -5,6 +5,12 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## Product caches and previews must describe current pricing and selection (2026-09-11)
+
+- Problem/root cause: cached products retained old calculated prices and renewed their own age; failed inventory looked like zero stock, and delayed color/image responses could replace the latest selection. Failed product reads left placeholder prices visible.
+- Solution: preserve the original cache timestamp, await current validated policy and recompute prices; distinguish pending/unknown stock, guard request generations, and show persistent failure or fallback notices. Native dialogs and radio controls retain keyboard focus; compact the printed contact block so it does not create a footer-only page.
+- Prevention: compare all 64 original color/quantity results and exact financial bodies, byte-compare the downloaded logo, test cached policy changes with an explicit timestamp relative to the fixed browser clock, retry and response races, and review every screen and paper page. Keep the shared engraving renderer unchanged.
+
 ## Richardson selections and policy labels must describe the current quote (2026-09-11)
 
 - Problem/root cause: typing a new style retained the old quote; suggestions required a mouse, delayed blur hid focused results, API failures silently used defaults, and fee captions stayed hardcoded. A new top-level CSS layer defeated canonical hidden utilities.
@@ -96,12 +102,6 @@ Exercise state transitions and verify complete printed content. Full entry in LE
 Native storefront menu focus and paper migration (2026-09-09) is archived in LESSONS_LEARNED_ARCHIVE.md; existing keyboard/browser guards retain the contract.
 
 Staff reference failure-state findings (2026-09-09) are preserved in LESSONS_LEARNED_ARCHIVE.md.
-
-### Campaign inquiries must be received before confirming success (2026-09-09)
-
-Problem: the golf form cleared entered details and sent a customer confirmation even when saving and sales notification both failed; malformed catalog data could also leave sample pricing loading forever. Root cause: all-settled delivery results were logged but never gated the receipt, and initial response shape/loading regions were unchecked. Solution: show success only after storage or sales notification accepts the request, send customer confirmation afterward, preserve inputs on total failure, show confirmation-email failures separately, and stop both catalog/sample loaders on invalid data. Prevention: exercise storage/lead/customer failure combinations and retry with the same values; preserve financial helpers and underlying services. For CSS, validate every token against actual page owners and inspect rendered paper: white text can survive PDF extraction while being invisible, narrow grids can wrap money, and flex list text can split into unintended columns.
-
-Campaign verification follow-up: a runtime census timed out under the full suite. Reuse one inert DOM parser for attribute-only HTML inventory; compare the entire report before/after and keep the deadline/coverage unchanged.304 documents produced a byte-identical531123-byte report,18.31s to13.51s in the measured standalone runs.
 
 ### Shared CSS migration must preserve responsive and interaction ownership (2026-09-09)
 

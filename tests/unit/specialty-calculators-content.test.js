@@ -10,3 +10,13 @@ test.each(['getTier','getSelectedEmbellishment','updateQuantityTier','updatePric
  const file='calculators/richardson-factory-direct.js',current=fs.readFileSync(path.join(root,file),'utf8').replace(/\r\n/g,'\n');let prior=current;for(const c of original.changes.filter(c=>c.file===file).reverse())prior=prior.split(c.after).join(c.before);
  const body=source=>{const ast=require('acorn').parse(source,{ecmaVersion:'latest'}),cls=ast.body.find(n=>n.type==='ClassDeclaration'&&n.id.name==='RichardsonPricingLookup'),fn=cls.body.body.find(n=>n.key.name===name);return source.slice(fn.value.body.start,fn.value.body.end);};expect(body(current)).toBe(body(prior));
 });
+
+test.each(['calculatePrice','getWholesalePriceForQuantity','halfDollarUp','getPricingTiers'])('Polar Camel %s retains its exact financial body',name=>{
+ const file='shared_components/js/jds-api-service.js',current=fs.readFileSync(path.join(root,file),'utf8').replace(/\r\n/g,'\n');let prior=current;for(const c of original.changes.filter(c=>c.file===file).reverse())prior=prior.split(c.after).join(c.before);
+ const body=source=>{const ast=require('acorn').parse(source,{ecmaVersion:'latest'}),cls=ast.body.find(n=>n.type==='ClassDeclaration'&&n.id.name==='JDSApiService'),fn=cls.body.body.find(n=>n.key.name===name);return source.slice(fn.value.body.start,fn.value.body.end);};expect(body(current)).toBe(body(prior));
+});
+test('Polar Camel quote arithmetic and engraving template stay exact',()=>{
+ const file='shared_components/js/laser-tumbler-mockup.js',current=fs.readFileSync(path.join(root,file),'utf8').replace(/\r\n/g,'\n');let prior=current;for(const c of original.changes.filter(c=>c.file===file).reverse())prior=prior.split(c.after).join(c.before);
+ const tail=source=>source.slice(source.indexOf('        var svc = page.apiService;'),source.indexOf('    // ── Misc helpers'));expect(tail(current)).toBe(tail(prior));
+ expect(original.changes.filter(c=>c.file==='shared_components/js/jds-tumbler-template.js')).toEqual([]);
+});

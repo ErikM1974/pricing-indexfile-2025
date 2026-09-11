@@ -6467,6 +6467,39 @@
         "rawCssBytes": 71413,
         "localCssRequests": 4
       }
+    },
+    {
+      "source": "calculators/laser-tumbler-polarcamel.html",
+      "family": "specialty-calculators",
+      "status": "reviewed",
+      "route": "/calculators/laser-tumbler-polarcamel.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/storefront-shell.css",
+        "shared_components/css/specialty-pricing.css",
+        "shared_components/css/laser-tumbler-simple.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "1440-768-390-320",
+        "64-original-quantity-color-financial-and-request-contracts",
+        "original-logo-download-byte-identical",
+        "native-color-arrow-keys-and-latest-response-ownership",
+        "native-drawer-and-image-dialog-with-focus-restoration",
+        "fresh-cache-retains-age-and-awaits-current-pricing-policy",
+        "failed-and-incomplete-pricing-product-inventory-and-image-reads",
+        "retained-print-warnings-without-dialog-overlays",
+        "all-36-screens-and-17-pages-in-nine-paper-documents-reviewed"
+      ],
+      "test": "tests/e2e/css-unification-specialty-polar-camel.spec.js",
+      "maxCssBytes": 97491,
+      "measuredRawCssBytes": 95443,
+      "baseline": {
+        "commit": "97cc05080d4689785bc0885b6a4223c0f1356cbf",
+        "rawCssBytes": 84072,
+        "localCssRequests": 3
+      }
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",
