@@ -1,0 +1,206 @@
+{
+  "name": "menu-failed-customer",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Shop Menu | Northwest Custom Apparel",
+      "url": "/calculators/service-price-cheat-sheet.html",
+      "ids": {
+        "printCustomerBtn": "Print customer menu",
+        "printRepBtn": "Print rep copy",
+        "errorBanner": "Could not load prices from Caspio (HTTP 503). Shop-services prices are not shown; do not quote from memory. Refresh to try again.",
+        "menuDate": "September 2026",
+        "courses": "Shop services on customer goods Unavailable until Caspio answers. No prices shown. Setup & Art Documented prices — badged as fallback until Caspio answers. Digitizing, new logo $100.00per design Sets up your logo for the embroidery machines. Yours to keep. Digitizing, edit an existing design $50.00per design Digitizing, text only $50.00per design Logo mockup & print review $50.00per order Art and graphic design (Steve) $75.00per hour Billed in quarter hours. Rush 25% of the order"
+      },
+      "fields": [],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        }
+      ],
+      "tables": [],
+      "menu": [
+        "Shop services on customer goods Unavailable until Caspio answers. No prices shown.",
+        "Setup & Art Documented prices — badged as fallback until Caspio answers. Digitizing, new logo $100.00per design Sets up your logo for the embroidery machines. Yours to keep. Digitizing, edit an existing design $50.00per design Digitizing, text only $50.00per design Logo mockup & print review $50.00per order Art and graphic design (Steve) $75.00per hour Billed in quarter hours. Rush 25% of the order"
+      ],
+      "rules": [
+        [
+          "min",
+          "75"
+        ],
+        [
+          "min",
+          "75"
+        ],
+        [
+          "bench",
+          "25"
+        ],
+        [
+          "machine",
+          "37.50"
+        ],
+        [
+          "denom",
+          "0.53"
+        ]
+      ],
+      "itemType": null,
+      "cost": null,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "width": 768,
+      "title": "Shop Menu | Northwest Custom Apparel",
+      "url": "/calculators/service-price-cheat-sheet.html",
+      "ids": {
+        "printCustomerBtn": "Print customer menu",
+        "printRepBtn": "Print rep copy",
+        "errorBanner": "Could not load prices from Caspio (HTTP 503). Shop-services prices are not shown; do not quote from memory. Refresh to try again.",
+        "menuDate": "September 2026",
+        "courses": "Shop services on customer goods Unavailable until Caspio answers. No prices shown. Setup & Art Documented prices — badged as fallback until Caspio answers. Digitizing, new logo $100.00per design Sets up your logo for the embroidery machines. Yours to keep. Digitizing, edit an existing design $50.00per design Digitizing, text only $50.00per design Logo mockup & print review $50.00per order Art and graphic design (Steve) $75.00per hour Billed in quarter hours. Rush 25% of the order"
+      },
+      "fields": [],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        }
+      ],
+      "tables": [],
+      "menu": [
+        "Shop services on customer goods Unavailable until Caspio answers. No prices shown.",
+        "Setup & Art Documented prices — badged as fallback until Caspio answers. Digitizing, new logo $100.00per design Sets up your logo for the embroidery machines. Yours to keep. Digitizing, edit an existing design $50.00per design Digitizing, text only $50.00per design Logo mockup & print review $50.00per order Art and graphic design (Steve) $75.00per hour Billed in quarter hours. Rush 25% of the order"
+      ],
+      "rules": [
+        [
+          "min",
+          "75"
+        ],
+        [
+          "min",
+          "75"
+        ],
+        [
+          "bench",
+          "25"
+        ],
+        [
+          "machine",
+          "37.50"
+        ],
+        [
+          "denom",
+          "0.53"
+        ]
+      ],
+      "itemType": null,
+      "cost": null,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "width": 390,
+      "title": "Shop Menu | Northwest Custom Apparel",
+      "url": "/calculators/service-price-cheat-sheet.html",
+      "ids": {
+        "printCustomerBtn": "Print customer menu",
+        "printRepBtn": "Print rep copy",
+        "errorBanner": "Could not load prices from Caspio (HTTP 503). Shop-services prices are not shown; do not quote from memory. Refresh to try again.",
+        "menuDate": "September 2026",
+        "courses": "Shop services on customer goods Unavailable until Caspio answers. No prices shown. Setup & Art Documented prices — badged as fallback until Caspio answers. Digitizing, new logo $100.00per design Sets up your logo for the embroidery machines. Yours to keep. Digitizing, edit an existing design $50.00per design Digitizing, text only $50.00per design Logo mockup & print review $50.00per order Art and graphic design (Steve) $75.00per hour Billed in quarter hours. Rush 25% of the order"
+      },
+      "fields": [],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        }
+      ],
+      "tables": [],
+      "menu": [
+        "Shop services on customer goods Unavailable until Caspio answers. No prices shown.",
+        "Setup & Art Documented prices — badged as fallback until Caspio answers. Digitizing, new logo $100.00per design Sets up your logo for the embroidery machines. Yours to keep. Digitizing, edit an existing design $50.00per design Digitizing, text only $50.00per design Logo mockup & print review $50.00per order Art and graphic design (Steve) $75.00per hour Billed in quarter hours. Rush 25% of the order"
+      ],
+      "rules": [
+        [
+          "min",
+          "75"
+        ],
+        [
+          "min",
+          "75"
+        ],
+        [
+          "bench",
+          "25"
+        ],
+        [
+          "machine",
+          "37.50"
+        ],
+        [
+          "denom",
+          "0.53"
+        ]
+      ],
+      "itemType": null,
+      "cost": null,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "width": 320,
+      "title": "Shop Menu | Northwest Custom Apparel",
+      "url": "/calculators/service-price-cheat-sheet.html",
+      "ids": {
+        "printCustomerBtn": "Print customer menu",
+        "printRepBtn": "Print rep copy",
+        "errorBanner": "Could not load prices from Caspio (HTTP 503). Shop-services prices are not shown; do not quote from memory. Refresh to try again.",
+        "menuDate": "September 2026",
+        "courses": "Shop services on customer goods Unavailable until Caspio answers. No prices shown. Setup & Art Documented prices — badged as fallback until Caspio answers. Digitizing, new logo $100.00per design Sets up your logo for the embroidery machines. Yours to keep. Digitizing, edit an existing design $50.00per design Digitizing, text only $50.00per design Logo mockup & print review $50.00per order Art and graphic design (Steve) $75.00per hour Billed in quarter hours. Rush 25% of the order"
+      },
+      "fields": [],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        }
+      ],
+      "tables": [],
+      "menu": [
+        "Shop services on customer goods Unavailable until Caspio answers. No prices shown.",
+        "Setup & Art Documented prices — badged as fallback until Caspio answers. Digitizing, new logo $100.00per design Sets up your logo for the embroidery machines. Yours to keep. Digitizing, edit an existing design $50.00per design Digitizing, text only $50.00per design Logo mockup & print review $50.00per order Art and graphic design (Steve) $75.00per hour Billed in quarter hours. Rush 25% of the order"
+      ],
+      "rules": [
+        [
+          "min",
+          "75"
+        ],
+        [
+          "min",
+          "75"
+        ],
+        [
+          "bench",
+          "25"
+        ],
+        [
+          "machine",
+          "37.50"
+        ],
+        [
+          "denom",
+          "0.53"
+        ]
+      ],
+      "itemType": null,
+      "cost": null,
+      "overflow": false,
+      "violations": []
+    }
+  ],
+  "dialogs": []
+}

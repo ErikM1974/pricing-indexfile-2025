@@ -813,3 +813,46 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - tests/fixtures/catalog-storefront-product-dtg-complete-cost-ladder-original-browser.json — immutable original synthetic home/catalog/product browser contract.
 
 - tests/fixtures/catalog-storefront-product-dtg-complete-cost-ladder-settled-original-browser.json — immutable original synthetic home/catalog/product browser contract.
+
+- tests/fixtures/calculator-reference-original-content.json — immutable original calculator/reference content and local source hashes.
+- tests/unit/calculator-reference-content.test.js — source and financial-controller preservation checks.
+- tests/e2e/helpers/calculator-reference-browser.js — intercepted synthetic pricing/services and original-source harness.
+- tests/e2e/css-unification-calculator-reference.spec.js — original/current manual calculator, laser page and shop menu behavior and paper review.
+
+- tests/fixtures/calculator-reference-manual-initial-original-browser.json — immutable original synthetic calculator/reference browser contract.
+
+- tests/fixtures/calculator-reference-manual-invalid-zero-original-browser.json — immutable original synthetic calculator/reference browser contract.
+
+- tests/fixtures/calculator-reference-manual-invalid-high-original-browser.json — immutable original synthetic calculator/reference browser contract.
+
+- tests/fixtures/calculator-reference-manual-garment-original-browser.json — immutable original synthetic calculator/reference browser contract.
+
+- tests/fixtures/calculator-reference-manual-options-original-browser.json — immutable original synthetic calculator/reference browser contract.
+
+- tests/fixtures/calculator-reference-manual-cap-original-browser.json — immutable original synthetic calculator/reference browser contract.
+
+- tests/fixtures/calculator-reference-manual-cap-three-original-browser.json — immutable original synthetic calculator/reference browser contract.
+
+- tests/fixtures/calculator-reference-manual-failed-all-original-browser.json — immutable original synthetic calculator/reference browser contract.
+
+- tests/fixtures/calculator-reference-manual-failed-DTG-original-browser.json — immutable original synthetic calculator/reference browser contract.
+
+- tests/fixtures/calculator-reference-laser-original-browser.json — immutable original synthetic calculator/reference browser contract.
+
+- tests/fixtures/calculator-reference-menu-normal-rep-original-browser.json — immutable original synthetic calculator/reference browser contract.
+
+- tests/fixtures/calculator-reference-menu-normal-customer-original-browser.json — immutable original synthetic calculator/reference browser contract.
+
+- tests/fixtures/calculator-reference-menu-long-rep-original-browser.json — immutable original synthetic calculator/reference browser contract.
+
+- tests/fixtures/calculator-reference-menu-long-customer-original-browser.json — immutable original synthetic calculator/reference browser contract.
+
+- tests/fixtures/calculator-reference-menu-failed-rep-original-browser.json — immutable original synthetic calculator/reference browser contract.
+
+- tests/fixtures/calculator-reference-menu-failed-customer-original-browser.json — immutable original synthetic calculator/reference browser contract.
+
+- tests/fixtures/calculator-reference-menu-empty-rep-original-browser.json — immutable original synthetic calculator/reference browser contract.
+
+- tests/fixtures/calculator-reference-menu-empty-customer-original-browser.json — immutable original synthetic calculator/reference browser contract.
+
+- shared_components/css/calculator-reference.css — shared scoped chrome for Manual Pricing, Manual Laser and Shop Menu.

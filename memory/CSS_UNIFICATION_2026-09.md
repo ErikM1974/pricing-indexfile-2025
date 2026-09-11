@@ -1,5 +1,31 @@
 # CSS unification — design direction and implementation plan
 
+## RELEASE CANDIDATE — v2026.09.11.4 Manual Pricing, Manual Laser and Shop Menu
+
+Reviewed source 40483ec8fb6e3e24abcf33d26eaf09f3ecad3246 is integrated with the verified catalog release on clean develop. This candidate versions 7 references for five changed assets and preserves every original source through explicit reversible mappings. Sixteen focused browser cases, 23 visually reviewed current paper pages and 274 source/ownership guards passed.
+
+The menu controller and all pricing services are unchanged; the manual controller differs only by two literal accessibility additions. Canonical fields, keyboard-scrollable size tables, complete price columns, visible failures and compact menu printing are reviewed. Candidate199/225 reviewed,26pending; live remains .3/Heroku2106 at196/225,29pending until full local application/browser/parity checks and all four actual exact-source CI jobs pass, followed by verified rollout. No real business writes, emails, uploads or device printing.
+
+## REVIEWED — Manual Pricing, Manual Laser and Shop Menu
+
+Three pages now use Public Sans, canonical fields/buttons and scoped style owners. Sixteen focused browser cases cover four widths, exact original prices/content, keyboard access to all size columns, selected garment/cap state, validation and load failures, rep/customer visibility and print restoration. All 23 current paper pages across 18 documents and 46 screen panels are visually reviewed; six final screen sheets confirm the corrected quantity fields. Ordinary menus fit one sheet and long lists fit two; every original price, rule and contact detail remains present. The existing laser Coming Soon content is preserved.
+
+Nineteen immutable source hashes and 18 browser contracts remain backed up. The menu controller and all pricing services are byte-identical. The manual controller differs only by two literal accessibility additions; all calculation, rounding, API and row-generation logic is unchanged. Existing manual-calculator-styles.css now has no live consumer; it is flagged here, retained unchanged per the dead-code policy.
+
+Candidate: 199 of 225 pages reviewed, 26 pending. Live: v2026.09.11.3 / Heroku2106 / bf0a27f3,196 reviewed,29 pending until this group passes full local/CI release checks and verified rollout. Evidence: calculator-reference-reviewed-record.json and active-css-resume-state.json.
+
+## NEXT BATCH — Manual Calculator, Laser Pricing and Shop Menu
+
+Catalog v2026.09.11.3 candidate 99db3fd9 is running full local and exact-source CI gates on primary develop. It is separate from this branch. Live remains .2 / Heroku 2105, 193/225; reviewed catalog candidate is 196/225, 29 pending.
+
+- [ ] Capture original source, rendered values, all five manual pricing methods, validation, API failures, rep/customer menu views and print restoration at 1440/768/390/320; visually review every original paper page.
+- [ ] Adopt Public Sans, shared components and scoped page owners. Preserve current calculator inputs, API-derived pricing, service codes and customer/rep visibility. Retain the laser page as its existing Coming Soon information page.
+- [ ] Verify exact prices/fees/tiers and all controls against originals; review mobile, keyboard, axe and complete print. Only then grant migration credit.
+- [ ] Commit/back up and run full local/exact-source release gates before deployment.
+
+No application edits yet. Shared manual-calculator styles must be checked for other consumers before retirement. Canonical pricing services stay byte-identical; all network calls and print actions use synthetic fixtures/intercepts. New tests and baseline are listed in ACTIVE_FILES.md. No business writes, payments, emails, uploads or device printing.
+
+
 ## RELEASE CANDIDATE — v2026.09.11.3 Home, Catalog and Product
 
 Reviewed source a1a136333d3eef7f978e60cd39c2a48fd928bf67 is integrated on clean develop. This candidate adds 15 cache references for nine changed application assets, plus six versioned imports of the existing shared components/shell, with all reversible mappings. All 34 focused browser cases, 57 visually reviewed current paper pages and 298 source/ownership guards passed. All 47 original sources and 29 original browser records remain preserved. The 16 financial functions remain byte-identical; quantity edits immediately withhold stale prices while recalculating.
@@ -1592,6 +1618,18 @@ Release-check preparation: all 387 focused source, pricing, ownership and legacy
 
 Exact-source CI 34581412644 passed all four actual jobs on 7ce2f00c6d25de153358a3754bf16ba649e83766, including CSS and live money/calculator parity. All local checks passed on the identical source. Custom Tees and Caps share canonical controls and a scoped style owner, removing222 duplicate rules.44 focused browser cases,78 visually reviewed current paper pages,14 immutable original sources,36 original browser contracts and50 reversible mappings. Pricing/date/quantity functions and successful checkout payloads stay unchanged. Initial Retry, visible draft-storage failures, native gallery controls and summary dialog keyboard recovery are repaired. Counts become193/225 reviewed,32 pending after verified rollout. Separate home/catalog/product original work is excluded.
 
+## Calculator/reference original review
+
+Original calculator/reference baseline is reviewed: 19 source hashes, 18 immutable browser records and 13 passing scenarios; 21 source/financial guards pass. All 29 original paper pages across 18 documents were inspected (26 unique rendered pages on seven contact sheets). Existing manual printouts clip rightmost size prices; normal rep menu emits a footer-only second sheet, and failed menu hides its error banner on paper. Manual and laser text/button contrast fails. No application source is changed yet. Next: shared controls/Public Sans/scoped layout owners, readable errors and complete print columns; preserve original financial/data transformations.
+
+Calculator/reference implementation started from reviewed baseline 7d4ea4de51ed297de18fe5fb9e295f422bce366d: shared controls and Public Sans, scoped page owners, readable error/fee colors and complete print table sizing. The original manual shared stylesheet and canonical pricing services stay byte-identical. The menu controller is unchanged; the manual controller differs only by a named focusable table wrapper and aria-pressed on selected item type. No migration credit until current source/browser/paper review passes.
+
+Catalog .3 is verified live: Heroku2106/bf0a27f3,196/225 reviewed,29pending. All1,322 CSS browser cases,16 remaining browser checks/three existing optional skips,244unit suites/5735tests/four existing skips,84parity and actual four-job CI34591727152 passed. Nine source/compiled assets and38 live checks verified. Calculator/reference drafts remain excluded pending final visual/paper review.
+
 ## Catalog storefront release record — v2026.09.11.3
 
 Exact-source CI 34591727152 passed all four actual jobs on 99db3fd9d6af43dddae384b9f48a12c6f49d5ed1, including CSS and live money/calculator parity. Full local checks passed on that identical source. Home, Catalog and Product share canonical controls and scoped style owners.34 focused browser cases,57 visually reviewed current paper pages,47 original sources,29 original browser records and64 reversible mappings preserve the original behavior. The 16 financial functions remain byte-identical; the demonstrated quantity-edit defect now withholds stale totals and Add to quote immediately while recalculating. Native browse/sample dialogs, keyboard colors, mobile filtering and complete printed price ladders are reviewed. Counts become196/225 reviewed,29pending only after verified rollout. Next calculator/reference baseline is separate and excluded.
+
+### Calculator reference full-suite correction
+
+The first full local run found a stale laser extraction lock plus two resource-contention timeouts. The laser guard now verifies its canonical shared hidden rule and both linked style owners. No application code changed. All 23 tests in the three affected suites passed sequentially without changing timeouts or assertions. Full local checks and exact-source CI must pass again on the resulting commit; the earlier failed run is not release evidence.

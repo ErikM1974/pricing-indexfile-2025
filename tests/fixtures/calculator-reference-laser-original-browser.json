@@ -1,0 +1,242 @@
+{
+  "name": "laser",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Manual Laser Pricing Calculator - Northwest Custom Apparel",
+      "url": "/calculators/laser-manual-pricing.html",
+      "ids": {},
+      "fields": [],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        }
+      ],
+      "tables": [],
+      "menu": [],
+      "rules": [],
+      "itemType": null,
+      "cost": null,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a"
+            ],
+            [
+              ".product-showcase-content > h3"
+            ],
+            [
+              ".coming-soon > p"
+            ],
+            [
+              ".card:nth-child(1) > .placeholder-section > p:nth-child(2)"
+            ],
+            [
+              ".mt-2"
+            ],
+            [
+              "li:nth-child(1)"
+            ],
+            [
+              "li:nth-child(2)"
+            ],
+            [
+              "li:nth-child(3)"
+            ],
+            [
+              "li:nth-child(4)"
+            ],
+            [
+              "li:nth-child(5)"
+            ],
+            [
+              ".mt-3 > p"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Manual Laser Pricing Calculator - Northwest Custom Apparel",
+      "url": "/calculators/laser-manual-pricing.html",
+      "ids": {},
+      "fields": [],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        }
+      ],
+      "tables": [],
+      "menu": [],
+      "rules": [],
+      "itemType": null,
+      "cost": null,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a"
+            ],
+            [
+              ".product-showcase-content > h3"
+            ],
+            [
+              ".coming-soon > p"
+            ],
+            [
+              ".card:nth-child(1) > .placeholder-section > p:nth-child(2)"
+            ],
+            [
+              ".mt-2"
+            ],
+            [
+              "li:nth-child(1)"
+            ],
+            [
+              "li:nth-child(2)"
+            ],
+            [
+              "li:nth-child(3)"
+            ],
+            [
+              "li:nth-child(4)"
+            ],
+            [
+              "li:nth-child(5)"
+            ],
+            [
+              ".mt-3 > p"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Manual Laser Pricing Calculator - Northwest Custom Apparel",
+      "url": "/calculators/laser-manual-pricing.html",
+      "ids": {},
+      "fields": [],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        }
+      ],
+      "tables": [],
+      "menu": [],
+      "rules": [],
+      "itemType": null,
+      "cost": null,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a"
+            ],
+            [
+              ".product-showcase-content > h3"
+            ],
+            [
+              ".coming-soon > p"
+            ],
+            [
+              ".card:nth-child(1) > .placeholder-section > p:nth-child(2)"
+            ],
+            [
+              ".mt-2"
+            ],
+            [
+              "li:nth-child(1)"
+            ],
+            [
+              "li:nth-child(2)"
+            ],
+            [
+              "li:nth-child(3)"
+            ],
+            [
+              "li:nth-child(4)"
+            ],
+            [
+              "li:nth-child(5)"
+            ],
+            [
+              ".mt-3 > p"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Manual Laser Pricing Calculator - Northwest Custom Apparel",
+      "url": "/calculators/laser-manual-pricing.html",
+      "ids": {},
+      "fields": [],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        }
+      ],
+      "tables": [],
+      "menu": [],
+      "rules": [],
+      "itemType": null,
+      "cost": null,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a"
+            ],
+            [
+              ".product-showcase-content > h3"
+            ],
+            [
+              ".coming-soon > p"
+            ],
+            [
+              ".card:nth-child(1) > .placeholder-section > p:nth-child(2)"
+            ],
+            [
+              ".mt-2"
+            ],
+            [
+              "li:nth-child(1)"
+            ],
+            [
+              "li:nth-child(2)"
+            ],
+            [
+              "li:nth-child(3)"
+            ],
+            [
+              "li:nth-child(4)"
+            ],
+            [
+              "li:nth-child(5)"
+            ],
+            [
+              ".mt-3 > p"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "dialogs": []
+}

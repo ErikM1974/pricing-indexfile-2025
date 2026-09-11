@@ -1,0 +1,254 @@
+{
+  "name": "manual-cap-three",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Manual Pricing Calculator 2026 | Northwest Custom Apparel",
+      "url": "/calculators/manual-pricing.html?manualCost=4&type=cap",
+      "ids": {
+        "blankCost": "",
+        "calculateBtn": "Calculate",
+        "capEmbLtmQty": "1 pc 2 pcs 3 pcs 4 pcs 5 pcs 6 pcs 7 pcs",
+        "capEmbBody": "QTY SELL PRICE 1-7 LTM +$16.67/EA $41.17 8-23 $25.00 24-47 $21.00 48-71 $19.00 72+ $17.50 1-7 prices include $50 LTM fee (3 pcs). Tiers 8+ are standard pricing (no LTM)."
+      },
+      "fields": [
+        {
+          "id": "blankCost",
+          "type": "number",
+          "value": "4.00",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "capEmbLtmQty",
+          "type": "select-one",
+          "value": "3",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        }
+      ],
+      "tables": [
+        "QTY SELL PRICE 1-7 LTM +$16.67/EA $41.17 8-23 $25.00 24-47 $21.00 48-71 $19.00 72+ $17.50"
+      ],
+      "menu": [],
+      "rules": [],
+      "itemType": "cap",
+      "cost": 4,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a"
+            ],
+            [
+              ".page-subtitle"
+            ],
+            [
+              "button[data-type=\"garment\"]"
+            ],
+            [
+              ".active"
+            ],
+            [
+              "#calculateBtn"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Manual Pricing Calculator 2026 | Northwest Custom Apparel",
+      "url": "/calculators/manual-pricing.html?manualCost=4&type=cap",
+      "ids": {
+        "blankCost": "",
+        "calculateBtn": "Calculate",
+        "capEmbLtmQty": "1 pc 2 pcs 3 pcs 4 pcs 5 pcs 6 pcs 7 pcs",
+        "capEmbBody": "QTY SELL PRICE 1-7 LTM +$16.67/EA $41.17 8-23 $25.00 24-47 $21.00 48-71 $19.00 72+ $17.50 1-7 prices include $50 LTM fee (3 pcs). Tiers 8+ are standard pricing (no LTM)."
+      },
+      "fields": [
+        {
+          "id": "blankCost",
+          "type": "number",
+          "value": "4.00",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "capEmbLtmQty",
+          "type": "select-one",
+          "value": "3",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        }
+      ],
+      "tables": [
+        "QTY SELL PRICE 1-7 LTM +$16.67/EA $41.17 8-23 $25.00 24-47 $21.00 48-71 $19.00 72+ $17.50"
+      ],
+      "menu": [],
+      "rules": [],
+      "itemType": "cap",
+      "cost": 4,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a"
+            ],
+            [
+              ".page-subtitle"
+            ],
+            [
+              "button[data-type=\"garment\"]"
+            ],
+            [
+              ".active"
+            ],
+            [
+              "#calculateBtn"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Manual Pricing Calculator 2026 | Northwest Custom Apparel",
+      "url": "/calculators/manual-pricing.html?manualCost=4&type=cap",
+      "ids": {
+        "blankCost": "",
+        "calculateBtn": "Calculate",
+        "capEmbLtmQty": "1 pc 2 pcs 3 pcs 4 pcs 5 pcs 6 pcs 7 pcs",
+        "capEmbBody": "QTY SELL PRICE 1-7 LTM +$16.67/EA $41.17 8-23 $25.00 24-47 $21.00 48-71 $19.00 72+ $17.50 1-7 prices include $50 LTM fee (3 pcs). Tiers 8+ are standard pricing (no LTM)."
+      },
+      "fields": [
+        {
+          "id": "blankCost",
+          "type": "number",
+          "value": "4.00",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "capEmbLtmQty",
+          "type": "select-one",
+          "value": "3",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        }
+      ],
+      "tables": [
+        "QTY SELL PRICE 1-7 LTM +$16.67/EA $41.17 8-23 $25.00 24-47 $21.00 48-71 $19.00 72+ $17.50"
+      ],
+      "menu": [],
+      "rules": [],
+      "itemType": "cap",
+      "cost": 4,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a"
+            ],
+            [
+              ".page-subtitle"
+            ],
+            [
+              "button[data-type=\"garment\"]"
+            ],
+            [
+              ".active"
+            ],
+            [
+              "#calculateBtn"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Manual Pricing Calculator 2026 | Northwest Custom Apparel",
+      "url": "/calculators/manual-pricing.html?manualCost=4&type=cap",
+      "ids": {
+        "blankCost": "",
+        "calculateBtn": "Calculate",
+        "capEmbLtmQty": "1 pc 2 pcs 3 pcs 4 pcs 5 pcs 6 pcs 7 pcs",
+        "capEmbBody": "QTY SELL PRICE 1-7 LTM +$16.67/EA $41.17 8-23 $25.00 24-47 $21.00 48-71 $19.00 72+ $17.50 1-7 prices include $50 LTM fee (3 pcs). Tiers 8+ are standard pricing (no LTM)."
+      },
+      "fields": [
+        {
+          "id": "blankCost",
+          "type": "number",
+          "value": "4.00",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "capEmbLtmQty",
+          "type": "select-one",
+          "value": "3",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        }
+      ],
+      "tables": [
+        "QTY SELL PRICE 1-7 LTM +$16.67/EA $41.17 8-23 $25.00 24-47 $21.00 48-71 $19.00 72+ $17.50"
+      ],
+      "menu": [],
+      "rules": [],
+      "itemType": "cap",
+      "cost": 4,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a"
+            ],
+            [
+              ".page-subtitle"
+            ],
+            [
+              "button[data-type=\"garment\"]"
+            ],
+            [
+              ".active"
+            ],
+            [
+              "#calculateBtn"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "dialogs": []
+}

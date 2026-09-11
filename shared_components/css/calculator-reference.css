@@ -1,0 +1,45 @@
+@layer components.patterns {
+/* Shared calculator/reference chrome. Page owners keep all workflow layout rules. */
+:where([data-ui="unified"][data-calculator-reference]) .main-container { max-width: 1280px; margin: 0 auto; padding: 24px 32px 48px; }
+:where([data-ui="unified"][data-calculator-reference]) .header { background: var(--ui-surface); border-bottom: 1px solid var(--ui-line); }
+:where([data-ui="unified"][data-calculator-reference]) .header-container { max-width: 1280px; margin: 0 auto; padding: 16px 32px; }
+:where([data-ui="unified"][data-calculator-reference]) .main-container .header { margin: -24px -32px 28px; }
+:where([data-ui="unified"][data-calculator-reference]) .header-left, :where([data-ui="unified"][data-calculator-reference]) .breadcrumb { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+:where([data-ui="unified"][data-calculator-reference]) .logo { width: 96px; height: 48px; object-fit: contain; }
+:where([data-ui="unified"][data-calculator-reference]) .breadcrumb { font-size: 14px; color: var(--ui-muted); }
+:where([data-ui="unified"][data-calculator-reference]) .breadcrumb a { font-weight: 600; }
+:where([data-ui="unified"][data-calculator-reference]) .page-title, :where([data-ui="unified"][data-calculator-reference]) .calculator-title h1 { font-size: 32px; margin: 0 0 8px; letter-spacing: -.025em; }
+:where([data-ui="unified"][data-calculator-reference]) .page-subtitle, :where([data-ui="unified"][data-calculator-reference]) .calculator-title p { color: var(--ui-muted); margin: 0 0 28px; max-width: 78ch; }
+:where([data-ui="unified"][data-calculator-reference]) .calculator-title { text-align: left; }
+:where([data-ui="unified"][data-calculator-reference]) .card { background: var(--ui-surface); border: 1px solid var(--ui-line); border-radius: var(--radius-md); padding: 24px; margin: 24px 0; }
+:where([data-ui="unified"][data-calculator-reference]) .card-title { font-size: 20px; margin: 0 0 16px; }
+:where([data-ui="unified"][data-calculator-reference]) .text-muted { color: var(--ui-muted); }
+:where([data-ui="unified"][data-calculator-reference]) .alert { display: flex; align-items: flex-start; gap: 12px; padding: 16px; border: 1px solid var(--ui-line); border-radius: var(--radius-sm); }
+:where([data-ui="unified"][data-calculator-reference]) .alert-info { background: var(--gray-50); }
+:where([data-ui="unified"][data-calculator-reference]) .alert p { margin: 0 0 8px; }
+:where([data-ui="unified"][data-calculator-reference]) .alert p:last-child { margin: 0; }
+:where([data-ui="unified"][data-calculator-reference]) .alert-icon { color: var(--ui-accent); margin-top: 4px; }
+
+@media (width <= 720px) {
+ :where([data-ui="unified"][data-calculator-reference]) .main-container { padding: 20px 16px 32px; }
+ :where([data-ui="unified"][data-calculator-reference]) .header-container { padding: 16px; }
+ :where([data-ui="unified"][data-calculator-reference]) .main-container .header { margin: -20px -16px 24px; }
+ :where([data-ui="unified"][data-calculator-reference]) .page-title, :where([data-ui="unified"][data-calculator-reference]) .calculator-title h1 { font-size: 26px; }
+ :where([data-ui="unified"][data-calculator-reference]) .card { padding: 20px; }
+}
+
+@media print {
+ @page { size: letter portrait; margin: .42in; }
+ :where([data-ui="unified"][data-calculator-reference]) { color: var(--print-ink); background: var(--ui-surface); font-size: 9pt; }
+ :where([data-ui="unified"][data-calculator-reference]) .main-container { max-width: none; padding: 0; margin: 0; }
+ :where([data-ui="unified"][data-calculator-reference]) .header, :where([data-ui="unified"][data-calculator-reference]) .main-container .header { position: static; margin: 0 0 12px; }
+ :where([data-ui="unified"][data-calculator-reference]) .header-container { padding: 0 0 8px; }
+ :where([data-ui="unified"][data-calculator-reference]) .breadcrumb { font-size: 9pt; }
+ :where([data-ui="unified"][data-calculator-reference]) .page-title, :where([data-ui="unified"][data-calculator-reference]) .calculator-title h1 { font-size: 20pt; }
+ :where([data-ui="unified"][data-calculator-reference]) .page-subtitle, :where([data-ui="unified"][data-calculator-reference]) .calculator-title p { margin-bottom: 12px; }
+ :where([data-ui="unified"][data-calculator-reference]) .card { padding: 12px; margin: 12px 0; box-shadow: none; break-inside: avoid; }
+ :where([data-ui="unified"][data-calculator-reference]) .card-title { font-size: 12pt; margin-bottom: 8px; }
+ :where([data-ui="unified"][data-calculator-reference]) .alert { padding: 8px; }
+}
+
+}

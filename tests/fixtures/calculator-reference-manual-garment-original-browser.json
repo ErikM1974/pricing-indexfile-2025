@@ -1,0 +1,550 @@
+{
+  "name": "manual-garment",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Manual Pricing Calculator 2026 | Northwest Custom Apparel",
+      "url": "/calculators/manual-pricing.html",
+      "ids": {
+        "blankCost": "",
+        "calculateBtn": "Calculate",
+        "dtgLocation": "Left Chest Full Front Jumbo Front",
+        "dtgLtmQty": "",
+        "dtgSecondLocation": "",
+        "dtgBody": "QTY S M L XL 2XL 3XL 4XL 1-11 LTM +$4.16/EA $23.16 $23.16 $23.16 $23.16 $25.16 $26.16 $23.16 12-23 LTM +$4.16/EA $22.16 $22.16 $22.16 $22.16 $24.16 $25.16 $22.16 24-47 $17.00 $17.00 $17.00 $17.00 $19.00 $20.00 $17.00 48-71 $16.00 $16.00 $16.00 $16.00 $18.00 $19.00 $16.00 72+ $15.00 $15.00 $15.00 $15.00 $17.00 $18.00 $15.00 1-23 prices include $50 LTM fee (12 pcs). Tiers 24+ are standard pricing (no LTM).",
+        "dtfTransferSize": "Small (5\" x 5\") Medium (9\" x 12\") Large (12\" x 16.5\")",
+        "dtfLtmQty": "",
+        "dtfSecondLocation": "",
+        "dtfBody": "QTY SELL PRICE 10-23 LTM +$4.16/EA $24.66 24-47 $19.50 48-71 $18.00 72+ $16.00 10-23 prices include $50 LTM fee (12 pcs). Tiers 24+ are standard pricing (no LTM).",
+        "embLtmQty": "1 pc 2 pcs 3 pcs 4 pcs 5 pcs 6 pcs 7 pcs",
+        "embBody": "QTY S M L XL 2XL 3XL 4XL 1-7 LTM +$16.67/EA $42.17 $42.17 $42.17 $42.17 $44.17 $45.17 $46.17 8-23 $26.00 $26.00 $26.00 $26.00 $28.00 $29.00 $30.00 24-47 $22.00 $22.00 $22.00 $22.00 $24.00 $25.00 $26.00 48-71 $21.00 $21.00 $21.00 $21.00 $23.00 $24.00 $25.00 72+ $20.00 $20.00 $20.00 $20.00 $22.00 $23.00 $24.00 1-7 prices include $50 LTM fee (3 pcs). Tiers 8+ are standard pricing (no LTM).",
+        "spColors": "1 Color 2 Colors 3 Colors 4 Colors 5 Colors 6 Colors",
+        "spLtmQty": "",
+        "spBody": "QTY S M L XL 2XL 3XL 4XL 24-47 LTM +$1.38/EA $14.88 $14.88 $14.88 $14.88 $16.88 $17.88 $18.88 48-71 $13.00 $13.00 $13.00 $13.00 $15.00 $16.00 $17.00 72-144 $12.50 $12.50 $12.50 $12.50 $14.50 $15.50 $16.50 145-576 $12.50 $12.50 $12.50 $12.50 $14.50 $15.50 $16.50 24-47 prices include $50 LTM fee (36 pcs). Tiers 72+ are standard pricing (no LTM)."
+      },
+      "fields": [
+        {
+          "id": "blankCost",
+          "type": "number",
+          "value": "4.00",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgLocation",
+          "type": "select-one",
+          "value": "LC",
+          "disabled": false
+        },
+        {
+          "id": "dtgLtmQty",
+          "type": "number",
+          "value": "12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgSecondLocation",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtfTransferSize",
+          "type": "select-one",
+          "value": "medium",
+          "disabled": false
+        },
+        {
+          "id": "dtfLtmQty",
+          "type": "number",
+          "value": "12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtfSecondLocation",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "embLtmQty",
+          "type": "select-one",
+          "value": "3",
+          "disabled": false
+        },
+        {
+          "id": "spColors",
+          "type": "select-one",
+          "value": "1",
+          "disabled": false
+        },
+        {
+          "id": "spLtmQty",
+          "type": "number",
+          "value": "36",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        }
+      ],
+      "tables": [
+        "QTY S M L XL 2XL 3XL 4XL 1-11 LTM +$4.16/EA $23.16 $23.16 $23.16 $23.16 $25.16 $26.16 $23.16 12-23 LTM +$4.16/EA $22.16 $22.16 $22.16 $22.16 $24.16 $25.16 $22.16 24-47 $17.00 $17.00 $17.00 $17.00 $19.00 $20.00 $17.00 48-71 $16.00 $16.00 $16.00 $16.00 $18.00 $19.00 $16.00 72+ $15.00 $15.00 $15.00 $15.00 $17.00 $18.00 $15.00",
+        "QTY SELL PRICE 10-23 LTM +$4.16/EA $24.66 24-47 $19.50 48-71 $18.00 72+ $16.00",
+        "QTY S M L XL 2XL 3XL 4XL 1-7 LTM +$16.67/EA $42.17 $42.17 $42.17 $42.17 $44.17 $45.17 $46.17 8-23 $26.00 $26.00 $26.00 $26.00 $28.00 $29.00 $30.00 24-47 $22.00 $22.00 $22.00 $22.00 $24.00 $25.00 $26.00 48-71 $21.00 $21.00 $21.00 $21.00 $23.00 $24.00 $25.00 72+ $20.00 $20.00 $20.00 $20.00 $22.00 $23.00 $24.00",
+        "QTY S M L XL 2XL 3XL 4XL 24-47 LTM +$1.38/EA $14.88 $14.88 $14.88 $14.88 $16.88 $17.88 $18.88 48-71 $13.00 $13.00 $13.00 $13.00 $15.00 $16.00 $17.00 72-144 $12.50 $12.50 $12.50 $12.50 $14.50 $15.50 $16.50 145-576 $12.50 $12.50 $12.50 $12.50 $14.50 $15.50 $16.50"
+      ],
+      "menu": [],
+      "rules": [],
+      "itemType": "garment",
+      "cost": 4,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a"
+            ],
+            [
+              ".page-subtitle"
+            ],
+            [
+              ".active"
+            ],
+            [
+              "button[data-type=\"cap\"]"
+            ],
+            [
+              "#calculateBtn"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Manual Pricing Calculator 2026 | Northwest Custom Apparel",
+      "url": "/calculators/manual-pricing.html",
+      "ids": {
+        "blankCost": "",
+        "calculateBtn": "Calculate",
+        "dtgLocation": "Left Chest Full Front Jumbo Front",
+        "dtgLtmQty": "",
+        "dtgSecondLocation": "",
+        "dtgBody": "QTY S M L XL 2XL 3XL 4XL 1-11 LTM +$4.16/EA $23.16 $23.16 $23.16 $23.16 $25.16 $26.16 $23.16 12-23 LTM +$4.16/EA $22.16 $22.16 $22.16 $22.16 $24.16 $25.16 $22.16 24-47 $17.00 $17.00 $17.00 $17.00 $19.00 $20.00 $17.00 48-71 $16.00 $16.00 $16.00 $16.00 $18.00 $19.00 $16.00 72+ $15.00 $15.00 $15.00 $15.00 $17.00 $18.00 $15.00 1-23 prices include $50 LTM fee (12 pcs). Tiers 24+ are standard pricing (no LTM).",
+        "dtfTransferSize": "Small (5\" x 5\") Medium (9\" x 12\") Large (12\" x 16.5\")",
+        "dtfLtmQty": "",
+        "dtfSecondLocation": "",
+        "dtfBody": "QTY SELL PRICE 10-23 LTM +$4.16/EA $24.66 24-47 $19.50 48-71 $18.00 72+ $16.00 10-23 prices include $50 LTM fee (12 pcs). Tiers 24+ are standard pricing (no LTM).",
+        "embLtmQty": "1 pc 2 pcs 3 pcs 4 pcs 5 pcs 6 pcs 7 pcs",
+        "embBody": "QTY S M L XL 2XL 3XL 4XL 1-7 LTM +$16.67/EA $42.17 $42.17 $42.17 $42.17 $44.17 $45.17 $46.17 8-23 $26.00 $26.00 $26.00 $26.00 $28.00 $29.00 $30.00 24-47 $22.00 $22.00 $22.00 $22.00 $24.00 $25.00 $26.00 48-71 $21.00 $21.00 $21.00 $21.00 $23.00 $24.00 $25.00 72+ $20.00 $20.00 $20.00 $20.00 $22.00 $23.00 $24.00 1-7 prices include $50 LTM fee (3 pcs). Tiers 8+ are standard pricing (no LTM).",
+        "spColors": "1 Color 2 Colors 3 Colors 4 Colors 5 Colors 6 Colors",
+        "spLtmQty": "",
+        "spBody": "QTY S M L XL 2XL 3XL 4XL 24-47 LTM +$1.38/EA $14.88 $14.88 $14.88 $14.88 $16.88 $17.88 $18.88 48-71 $13.00 $13.00 $13.00 $13.00 $15.00 $16.00 $17.00 72-144 $12.50 $12.50 $12.50 $12.50 $14.50 $15.50 $16.50 145-576 $12.50 $12.50 $12.50 $12.50 $14.50 $15.50 $16.50 24-47 prices include $50 LTM fee (36 pcs). Tiers 72+ are standard pricing (no LTM)."
+      },
+      "fields": [
+        {
+          "id": "blankCost",
+          "type": "number",
+          "value": "4.00",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgLocation",
+          "type": "select-one",
+          "value": "LC",
+          "disabled": false
+        },
+        {
+          "id": "dtgLtmQty",
+          "type": "number",
+          "value": "12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgSecondLocation",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtfTransferSize",
+          "type": "select-one",
+          "value": "medium",
+          "disabled": false
+        },
+        {
+          "id": "dtfLtmQty",
+          "type": "number",
+          "value": "12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtfSecondLocation",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "embLtmQty",
+          "type": "select-one",
+          "value": "3",
+          "disabled": false
+        },
+        {
+          "id": "spColors",
+          "type": "select-one",
+          "value": "1",
+          "disabled": false
+        },
+        {
+          "id": "spLtmQty",
+          "type": "number",
+          "value": "36",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        }
+      ],
+      "tables": [
+        "QTY S M L XL 2XL 3XL 4XL 1-11 LTM +$4.16/EA $23.16 $23.16 $23.16 $23.16 $25.16 $26.16 $23.16 12-23 LTM +$4.16/EA $22.16 $22.16 $22.16 $22.16 $24.16 $25.16 $22.16 24-47 $17.00 $17.00 $17.00 $17.00 $19.00 $20.00 $17.00 48-71 $16.00 $16.00 $16.00 $16.00 $18.00 $19.00 $16.00 72+ $15.00 $15.00 $15.00 $15.00 $17.00 $18.00 $15.00",
+        "QTY SELL PRICE 10-23 LTM +$4.16/EA $24.66 24-47 $19.50 48-71 $18.00 72+ $16.00",
+        "QTY S M L XL 2XL 3XL 4XL 1-7 LTM +$16.67/EA $42.17 $42.17 $42.17 $42.17 $44.17 $45.17 $46.17 8-23 $26.00 $26.00 $26.00 $26.00 $28.00 $29.00 $30.00 24-47 $22.00 $22.00 $22.00 $22.00 $24.00 $25.00 $26.00 48-71 $21.00 $21.00 $21.00 $21.00 $23.00 $24.00 $25.00 72+ $20.00 $20.00 $20.00 $20.00 $22.00 $23.00 $24.00",
+        "QTY S M L XL 2XL 3XL 4XL 24-47 LTM +$1.38/EA $14.88 $14.88 $14.88 $14.88 $16.88 $17.88 $18.88 48-71 $13.00 $13.00 $13.00 $13.00 $15.00 $16.00 $17.00 72-144 $12.50 $12.50 $12.50 $12.50 $14.50 $15.50 $16.50 145-576 $12.50 $12.50 $12.50 $12.50 $14.50 $15.50 $16.50"
+      ],
+      "menu": [],
+      "rules": [],
+      "itemType": "garment",
+      "cost": 4,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a"
+            ],
+            [
+              ".page-subtitle"
+            ],
+            [
+              ".active"
+            ],
+            [
+              "button[data-type=\"cap\"]"
+            ],
+            [
+              "#calculateBtn"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Manual Pricing Calculator 2026 | Northwest Custom Apparel",
+      "url": "/calculators/manual-pricing.html",
+      "ids": {
+        "blankCost": "",
+        "calculateBtn": "Calculate",
+        "dtgLocation": "Left Chest Full Front Jumbo Front",
+        "dtgLtmQty": "",
+        "dtgSecondLocation": "",
+        "dtgBody": "QTY S M L XL 2XL 3XL 4XL 1-11 LTM +$4.16/EA $23.16 $23.16 $23.16 $23.16 $25.16 $26.16 $23.16 12-23 LTM +$4.16/EA $22.16 $22.16 $22.16 $22.16 $24.16 $25.16 $22.16 24-47 $17.00 $17.00 $17.00 $17.00 $19.00 $20.00 $17.00 48-71 $16.00 $16.00 $16.00 $16.00 $18.00 $19.00 $16.00 72+ $15.00 $15.00 $15.00 $15.00 $17.00 $18.00 $15.00 1-23 prices include $50 LTM fee (12 pcs). Tiers 24+ are standard pricing (no LTM).",
+        "dtfTransferSize": "Small (5\" x 5\") Medium (9\" x 12\") Large (12\" x 16.5\")",
+        "dtfLtmQty": "",
+        "dtfSecondLocation": "",
+        "dtfBody": "QTY SELL PRICE 10-23 LTM +$4.16/EA $24.66 24-47 $19.50 48-71 $18.00 72+ $16.00 10-23 prices include $50 LTM fee (12 pcs). Tiers 24+ are standard pricing (no LTM).",
+        "embLtmQty": "1 pc 2 pcs 3 pcs 4 pcs 5 pcs 6 pcs 7 pcs",
+        "embBody": "QTY S M L XL 2XL 3XL 4XL 1-7 LTM +$16.67/EA $42.17 $42.17 $42.17 $42.17 $44.17 $45.17 $46.17 8-23 $26.00 $26.00 $26.00 $26.00 $28.00 $29.00 $30.00 24-47 $22.00 $22.00 $22.00 $22.00 $24.00 $25.00 $26.00 48-71 $21.00 $21.00 $21.00 $21.00 $23.00 $24.00 $25.00 72+ $20.00 $20.00 $20.00 $20.00 $22.00 $23.00 $24.00 1-7 prices include $50 LTM fee (3 pcs). Tiers 8+ are standard pricing (no LTM).",
+        "spColors": "1 Color 2 Colors 3 Colors 4 Colors 5 Colors 6 Colors",
+        "spLtmQty": "",
+        "spBody": "QTY S M L XL 2XL 3XL 4XL 24-47 LTM +$1.38/EA $14.88 $14.88 $14.88 $14.88 $16.88 $17.88 $18.88 48-71 $13.00 $13.00 $13.00 $13.00 $15.00 $16.00 $17.00 72-144 $12.50 $12.50 $12.50 $12.50 $14.50 $15.50 $16.50 145-576 $12.50 $12.50 $12.50 $12.50 $14.50 $15.50 $16.50 24-47 prices include $50 LTM fee (36 pcs). Tiers 72+ are standard pricing (no LTM)."
+      },
+      "fields": [
+        {
+          "id": "blankCost",
+          "type": "number",
+          "value": "4.00",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgLocation",
+          "type": "select-one",
+          "value": "LC",
+          "disabled": false
+        },
+        {
+          "id": "dtgLtmQty",
+          "type": "number",
+          "value": "12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgSecondLocation",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtfTransferSize",
+          "type": "select-one",
+          "value": "medium",
+          "disabled": false
+        },
+        {
+          "id": "dtfLtmQty",
+          "type": "number",
+          "value": "12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtfSecondLocation",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "embLtmQty",
+          "type": "select-one",
+          "value": "3",
+          "disabled": false
+        },
+        {
+          "id": "spColors",
+          "type": "select-one",
+          "value": "1",
+          "disabled": false
+        },
+        {
+          "id": "spLtmQty",
+          "type": "number",
+          "value": "36",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        }
+      ],
+      "tables": [
+        "QTY S M L XL 2XL 3XL 4XL 1-11 LTM +$4.16/EA $23.16 $23.16 $23.16 $23.16 $25.16 $26.16 $23.16 12-23 LTM +$4.16/EA $22.16 $22.16 $22.16 $22.16 $24.16 $25.16 $22.16 24-47 $17.00 $17.00 $17.00 $17.00 $19.00 $20.00 $17.00 48-71 $16.00 $16.00 $16.00 $16.00 $18.00 $19.00 $16.00 72+ $15.00 $15.00 $15.00 $15.00 $17.00 $18.00 $15.00",
+        "QTY SELL PRICE 10-23 LTM +$4.16/EA $24.66 24-47 $19.50 48-71 $18.00 72+ $16.00",
+        "QTY S M L XL 2XL 3XL 4XL 1-7 LTM +$16.67/EA $42.17 $42.17 $42.17 $42.17 $44.17 $45.17 $46.17 8-23 $26.00 $26.00 $26.00 $26.00 $28.00 $29.00 $30.00 24-47 $22.00 $22.00 $22.00 $22.00 $24.00 $25.00 $26.00 48-71 $21.00 $21.00 $21.00 $21.00 $23.00 $24.00 $25.00 72+ $20.00 $20.00 $20.00 $20.00 $22.00 $23.00 $24.00",
+        "QTY S M L XL 2XL 3XL 4XL 24-47 LTM +$1.38/EA $14.88 $14.88 $14.88 $14.88 $16.88 $17.88 $18.88 48-71 $13.00 $13.00 $13.00 $13.00 $15.00 $16.00 $17.00 72-144 $12.50 $12.50 $12.50 $12.50 $14.50 $15.50 $16.50 145-576 $12.50 $12.50 $12.50 $12.50 $14.50 $15.50 $16.50"
+      ],
+      "menu": [],
+      "rules": [],
+      "itemType": "garment",
+      "cost": 4,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a"
+            ],
+            [
+              ".page-subtitle"
+            ],
+            [
+              ".active"
+            ],
+            [
+              "button[data-type=\"cap\"]"
+            ],
+            [
+              "#calculateBtn"
+            ]
+          ]
+        },
+        {
+          "id": "scrollable-region-focusable",
+          "nodes": [
+            [
+              "#dtgBody > .pricing-table-wrapper"
+            ],
+            [
+              "#embBody > .pricing-table-wrapper"
+            ],
+            [
+              "#spBody > .pricing-table-wrapper"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Manual Pricing Calculator 2026 | Northwest Custom Apparel",
+      "url": "/calculators/manual-pricing.html",
+      "ids": {
+        "blankCost": "",
+        "calculateBtn": "Calculate",
+        "dtgLocation": "Left Chest Full Front Jumbo Front",
+        "dtgLtmQty": "",
+        "dtgSecondLocation": "",
+        "dtgBody": "QTY S M L XL 2XL 3XL 4XL 1-11 LTM +$4.16/EA $23.16 $23.16 $23.16 $23.16 $25.16 $26.16 $23.16 12-23 LTM +$4.16/EA $22.16 $22.16 $22.16 $22.16 $24.16 $25.16 $22.16 24-47 $17.00 $17.00 $17.00 $17.00 $19.00 $20.00 $17.00 48-71 $16.00 $16.00 $16.00 $16.00 $18.00 $19.00 $16.00 72+ $15.00 $15.00 $15.00 $15.00 $17.00 $18.00 $15.00 1-23 prices include $50 LTM fee (12 pcs). Tiers 24+ are standard pricing (no LTM).",
+        "dtfTransferSize": "Small (5\" x 5\") Medium (9\" x 12\") Large (12\" x 16.5\")",
+        "dtfLtmQty": "",
+        "dtfSecondLocation": "",
+        "dtfBody": "QTY SELL PRICE 10-23 LTM +$4.16/EA $24.66 24-47 $19.50 48-71 $18.00 72+ $16.00 10-23 prices include $50 LTM fee (12 pcs). Tiers 24+ are standard pricing (no LTM).",
+        "embLtmQty": "1 pc 2 pcs 3 pcs 4 pcs 5 pcs 6 pcs 7 pcs",
+        "embBody": "QTY S M L XL 2XL 3XL 4XL 1-7 LTM +$16.67/EA $42.17 $42.17 $42.17 $42.17 $44.17 $45.17 $46.17 8-23 $26.00 $26.00 $26.00 $26.00 $28.00 $29.00 $30.00 24-47 $22.00 $22.00 $22.00 $22.00 $24.00 $25.00 $26.00 48-71 $21.00 $21.00 $21.00 $21.00 $23.00 $24.00 $25.00 72+ $20.00 $20.00 $20.00 $20.00 $22.00 $23.00 $24.00 1-7 prices include $50 LTM fee (3 pcs). Tiers 8+ are standard pricing (no LTM).",
+        "spColors": "1 Color 2 Colors 3 Colors 4 Colors 5 Colors 6 Colors",
+        "spLtmQty": "",
+        "spBody": "QTY S M L XL 2XL 3XL 4XL 24-47 LTM +$1.38/EA $14.88 $14.88 $14.88 $14.88 $16.88 $17.88 $18.88 48-71 $13.00 $13.00 $13.00 $13.00 $15.00 $16.00 $17.00 72-144 $12.50 $12.50 $12.50 $12.50 $14.50 $15.50 $16.50 145-576 $12.50 $12.50 $12.50 $12.50 $14.50 $15.50 $16.50 24-47 prices include $50 LTM fee (36 pcs). Tiers 72+ are standard pricing (no LTM)."
+      },
+      "fields": [
+        {
+          "id": "blankCost",
+          "type": "number",
+          "value": "4.00",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgLocation",
+          "type": "select-one",
+          "value": "LC",
+          "disabled": false
+        },
+        {
+          "id": "dtgLtmQty",
+          "type": "number",
+          "value": "12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgSecondLocation",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtfTransferSize",
+          "type": "select-one",
+          "value": "medium",
+          "disabled": false
+        },
+        {
+          "id": "dtfLtmQty",
+          "type": "number",
+          "value": "12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtfSecondLocation",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "embLtmQty",
+          "type": "select-one",
+          "value": "3",
+          "disabled": false
+        },
+        {
+          "id": "spColors",
+          "type": "select-one",
+          "value": "1",
+          "disabled": false
+        },
+        {
+          "id": "spLtmQty",
+          "type": "number",
+          "value": "36",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        }
+      ],
+      "tables": [
+        "QTY S M L XL 2XL 3XL 4XL 1-11 LTM +$4.16/EA $23.16 $23.16 $23.16 $23.16 $25.16 $26.16 $23.16 12-23 LTM +$4.16/EA $22.16 $22.16 $22.16 $22.16 $24.16 $25.16 $22.16 24-47 $17.00 $17.00 $17.00 $17.00 $19.00 $20.00 $17.00 48-71 $16.00 $16.00 $16.00 $16.00 $18.00 $19.00 $16.00 72+ $15.00 $15.00 $15.00 $15.00 $17.00 $18.00 $15.00",
+        "QTY SELL PRICE 10-23 LTM +$4.16/EA $24.66 24-47 $19.50 48-71 $18.00 72+ $16.00",
+        "QTY S M L XL 2XL 3XL 4XL 1-7 LTM +$16.67/EA $42.17 $42.17 $42.17 $42.17 $44.17 $45.17 $46.17 8-23 $26.00 $26.00 $26.00 $26.00 $28.00 $29.00 $30.00 24-47 $22.00 $22.00 $22.00 $22.00 $24.00 $25.00 $26.00 48-71 $21.00 $21.00 $21.00 $21.00 $23.00 $24.00 $25.00 72+ $20.00 $20.00 $20.00 $20.00 $22.00 $23.00 $24.00",
+        "QTY S M L XL 2XL 3XL 4XL 24-47 LTM +$1.38/EA $14.88 $14.88 $14.88 $14.88 $16.88 $17.88 $18.88 48-71 $13.00 $13.00 $13.00 $13.00 $15.00 $16.00 $17.00 72-144 $12.50 $12.50 $12.50 $12.50 $14.50 $15.50 $16.50 145-576 $12.50 $12.50 $12.50 $12.50 $14.50 $15.50 $16.50"
+      ],
+      "menu": [],
+      "rules": [],
+      "itemType": "garment",
+      "cost": 4,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a"
+            ],
+            [
+              ".page-subtitle"
+            ],
+            [
+              ".active"
+            ],
+            [
+              "button[data-type=\"cap\"]"
+            ],
+            [
+              "#calculateBtn"
+            ]
+          ]
+        },
+        {
+          "id": "scrollable-region-focusable",
+          "nodes": [
+            [
+              "#dtgBody > .pricing-table-wrapper"
+            ],
+            [
+              "#embBody > .pricing-table-wrapper"
+            ],
+            [
+              "#spBody > .pricing-table-wrapper"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "dialogs": []
+}

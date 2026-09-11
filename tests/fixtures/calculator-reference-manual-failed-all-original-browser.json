@@ -1,0 +1,502 @@
+{
+  "name": "manual-failed-all",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Manual Pricing Calculator 2026 | Northwest Custom Apparel",
+      "url": "/calculators/manual-pricing.html",
+      "ids": {
+        "blankCost": "",
+        "calculateBtn": "Calculate",
+        "dtgLocation": "",
+        "dtgLtmQty": "",
+        "dtgSecondLocation": "",
+        "dtgBody": "Unable to load DTG pricing. Please refresh.",
+        "dtfTransferSize": "Small (5\" x 5\") Medium (9\" x 12\") Large (12\" x 16.5\")",
+        "dtfLtmQty": "",
+        "dtfSecondLocation": "",
+        "dtfBody": "Unable to load DTF pricing. Please refresh.",
+        "embLtmQty": "1 pc 2 pcs 3 pcs 4 pcs 5 pcs 6 pcs 7 pcs",
+        "embBody": "Unable to load Embroidery pricing. Please refresh.",
+        "spColors": "",
+        "spLtmQty": "",
+        "spBody": "Unable to load Screen Print pricing. Please refresh."
+      },
+      "fields": [
+        {
+          "id": "blankCost",
+          "type": "number",
+          "value": "4.00",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgLocation",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "dtgLtmQty",
+          "type": "number",
+          "value": "12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgSecondLocation",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtfTransferSize",
+          "type": "select-one",
+          "value": "medium",
+          "disabled": false
+        },
+        {
+          "id": "dtfLtmQty",
+          "type": "number",
+          "value": "12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtfSecondLocation",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "embLtmQty",
+          "type": "select-one",
+          "value": "3",
+          "disabled": false
+        },
+        {
+          "id": "spColors",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "spLtmQty",
+          "type": "number",
+          "value": "36",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        }
+      ],
+      "tables": [],
+      "menu": [],
+      "rules": [],
+      "itemType": "garment",
+      "cost": 4,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a"
+            ],
+            [
+              ".page-subtitle"
+            ],
+            [
+              ".active"
+            ],
+            [
+              "button[data-type=\"cap\"]"
+            ],
+            [
+              "#calculateBtn"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Manual Pricing Calculator 2026 | Northwest Custom Apparel",
+      "url": "/calculators/manual-pricing.html",
+      "ids": {
+        "blankCost": "",
+        "calculateBtn": "Calculate",
+        "dtgLocation": "",
+        "dtgLtmQty": "",
+        "dtgSecondLocation": "",
+        "dtgBody": "Unable to load DTG pricing. Please refresh.",
+        "dtfTransferSize": "Small (5\" x 5\") Medium (9\" x 12\") Large (12\" x 16.5\")",
+        "dtfLtmQty": "",
+        "dtfSecondLocation": "",
+        "dtfBody": "Unable to load DTF pricing. Please refresh.",
+        "embLtmQty": "1 pc 2 pcs 3 pcs 4 pcs 5 pcs 6 pcs 7 pcs",
+        "embBody": "Unable to load Embroidery pricing. Please refresh.",
+        "spColors": "",
+        "spLtmQty": "",
+        "spBody": "Unable to load Screen Print pricing. Please refresh."
+      },
+      "fields": [
+        {
+          "id": "blankCost",
+          "type": "number",
+          "value": "4.00",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgLocation",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "dtgLtmQty",
+          "type": "number",
+          "value": "12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgSecondLocation",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtfTransferSize",
+          "type": "select-one",
+          "value": "medium",
+          "disabled": false
+        },
+        {
+          "id": "dtfLtmQty",
+          "type": "number",
+          "value": "12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtfSecondLocation",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "embLtmQty",
+          "type": "select-one",
+          "value": "3",
+          "disabled": false
+        },
+        {
+          "id": "spColors",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "spLtmQty",
+          "type": "number",
+          "value": "36",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        }
+      ],
+      "tables": [],
+      "menu": [],
+      "rules": [],
+      "itemType": "garment",
+      "cost": 4,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a"
+            ],
+            [
+              ".page-subtitle"
+            ],
+            [
+              ".active"
+            ],
+            [
+              "button[data-type=\"cap\"]"
+            ],
+            [
+              "#calculateBtn"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Manual Pricing Calculator 2026 | Northwest Custom Apparel",
+      "url": "/calculators/manual-pricing.html",
+      "ids": {
+        "blankCost": "",
+        "calculateBtn": "Calculate",
+        "dtgLocation": "",
+        "dtgLtmQty": "",
+        "dtgSecondLocation": "",
+        "dtgBody": "Unable to load DTG pricing. Please refresh.",
+        "dtfTransferSize": "Small (5\" x 5\") Medium (9\" x 12\") Large (12\" x 16.5\")",
+        "dtfLtmQty": "",
+        "dtfSecondLocation": "",
+        "dtfBody": "Unable to load DTF pricing. Please refresh.",
+        "embLtmQty": "1 pc 2 pcs 3 pcs 4 pcs 5 pcs 6 pcs 7 pcs",
+        "embBody": "Unable to load Embroidery pricing. Please refresh.",
+        "spColors": "",
+        "spLtmQty": "",
+        "spBody": "Unable to load Screen Print pricing. Please refresh."
+      },
+      "fields": [
+        {
+          "id": "blankCost",
+          "type": "number",
+          "value": "4.00",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgLocation",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "dtgLtmQty",
+          "type": "number",
+          "value": "12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgSecondLocation",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtfTransferSize",
+          "type": "select-one",
+          "value": "medium",
+          "disabled": false
+        },
+        {
+          "id": "dtfLtmQty",
+          "type": "number",
+          "value": "12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtfSecondLocation",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "embLtmQty",
+          "type": "select-one",
+          "value": "3",
+          "disabled": false
+        },
+        {
+          "id": "spColors",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "spLtmQty",
+          "type": "number",
+          "value": "36",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        }
+      ],
+      "tables": [],
+      "menu": [],
+      "rules": [],
+      "itemType": "garment",
+      "cost": 4,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a"
+            ],
+            [
+              ".page-subtitle"
+            ],
+            [
+              ".active"
+            ],
+            [
+              "button[data-type=\"cap\"]"
+            ],
+            [
+              "#calculateBtn"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Manual Pricing Calculator 2026 | Northwest Custom Apparel",
+      "url": "/calculators/manual-pricing.html",
+      "ids": {
+        "blankCost": "",
+        "calculateBtn": "Calculate",
+        "dtgLocation": "",
+        "dtgLtmQty": "",
+        "dtgSecondLocation": "",
+        "dtgBody": "Unable to load DTG pricing. Please refresh.",
+        "dtfTransferSize": "Small (5\" x 5\") Medium (9\" x 12\") Large (12\" x 16.5\")",
+        "dtfLtmQty": "",
+        "dtfSecondLocation": "",
+        "dtfBody": "Unable to load DTF pricing. Please refresh.",
+        "embLtmQty": "1 pc 2 pcs 3 pcs 4 pcs 5 pcs 6 pcs 7 pcs",
+        "embBody": "Unable to load Embroidery pricing. Please refresh.",
+        "spColors": "",
+        "spLtmQty": "",
+        "spBody": "Unable to load Screen Print pricing. Please refresh."
+      },
+      "fields": [
+        {
+          "id": "blankCost",
+          "type": "number",
+          "value": "4.00",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgLocation",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "dtgLtmQty",
+          "type": "number",
+          "value": "12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgSecondLocation",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtfTransferSize",
+          "type": "select-one",
+          "value": "medium",
+          "disabled": false
+        },
+        {
+          "id": "dtfLtmQty",
+          "type": "number",
+          "value": "12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtfSecondLocation",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "embLtmQty",
+          "type": "select-one",
+          "value": "3",
+          "disabled": false
+        },
+        {
+          "id": "spColors",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "spLtmQty",
+          "type": "number",
+          "value": "36",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        }
+      ],
+      "tables": [],
+      "menu": [],
+      "rules": [],
+      "itemType": "garment",
+      "cost": 4,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a"
+            ],
+            [
+              ".page-subtitle"
+            ],
+            [
+              ".active"
+            ],
+            [
+              "button[data-type=\"cap\"]"
+            ],
+            [
+              "#calculateBtn"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "dialogs": []
+}
