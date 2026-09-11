@@ -1,5 +1,11 @@
 # CSS unification — design direction and implementation plan
 
+## CURRENT — account release verified; carts ready for full gates
+
+Customer Account/Product is live as v2026.09.10.11, Heroku2103, efc4471f05b20a397bf275e63786e96dbbb60eeb. Exact source880bc6eb passed CI34569384599 with all four actual jobs. Actual deployed slug, health, six source assets, five compiled assets/source maps, two page shells, fourteen prior access contracts and four regression routes verified. Primary main/develop and origin are synchronized. Live189/225,36pending.
+
+Cart review7498f6fc is committed and backed up:191/225 reviewed candidate,34pending. Forty distinct browser cases and every current paper page (39 across13 documents) are reviewed;268 ownership/source guards pass. The latest account test corrections are now merged. Next: integrate this exact reviewed cart history, run complete local application/browser/live-pricing gates, prepare one cache version and require all four exact-source CI jobs before deployment. No cart deploy yet.
+
 ## REVIEWED NEXT — Sample Cart and Quote Cart
 
 The cart pair is reviewed:40 distinct current browser cases pass (39-case full run plus the new checkout-error regression), with all affected paper refinements and the final stock-border cases passing. All39 current PDF pages across13 documents are visually reviewed, including complete long notes and chosen artwork filenames. Four widths1440/768/390/320, axe, exact successful checkout/free-request/quote/email payloads, five decoration groups, all quantities and withheld failed totals remain verified. All268 source/ownership checks pass:24 preserve original sources and financial/group/quantity functions; the rest enforce the shared CSS ownership manifest.
@@ -1521,3 +1527,13 @@ Exact-source CI 34561449204 passed all four jobs on 0091eff76524acfc16ce3f5f401d
 Live remains.10/2102/44cc187/225. Account .11 is separately gated on source4e763b26/CI34567159048 and full local3297. Cart gets no migration credit; reviewed candidate remains189/225,36pending. No .env copies, real orders/payments/emails or device printing.
 
 Cart implementation started after7257164c original review: existing shell/native navigation and canonical fields/buttons replace legacy core on only these two pages. Their scoped owners and shared cart print rules are a draft; visual/behavior/axe/source checks and fault probes still required. No migration credit or deploy yet.
+
+### Account release test timing correction — 2026-09-10
+The full local1,204-case CSS sweep completed1,203 passes and one confirmation-toast wait timeout under three-worker load. The real page retains the toast4.2 seconds; the test allowed only5 seconds including scheduling. No application or fixture source changed. The test now allows10 seconds but still requires the real timer to dismiss the toast. Five repeated failing-case runs passed under three-worker load; all affected account cases and the remaining local browser/pricing suites must pass before release. Exact-source CI must be rerun on this test correction; the earlier9eb6e2a2 run is not final-source evidence.
+
+Release-gate scheduling: the ordinary test-correction push89e5f9aa intentionally skips CI browser jobs under this repository's quota policy. This Deploy commit schedules all four gates on the exact corrected source, including actual CSS and live money/calculator parity. No application source changed.
+The exact-source run34567159048 passed1,203 CSS cases and failed only the product401 fixture: its font wait evaluated the departing document during the intentional login navigation. The helper now waits for the expected login document before inspecting fonts. Application assets and immutable originals remain unchanged. This corrected source requires a fresh full CI run before the release proceeds.
+
+## Customer Account and Product release record — v2026.09.10.11
+
+Exact-source CI 34569384599 passed all four jobs on 880bc6ebb75ca891f07f342e56f96249b99f9811, including actual CSS and live money/calculator parity. Full local gates passed on identical application assets at da6c23738011d4f6d2e55aaf57dd3112d9083b1c. Shared controls and three scoped style owners;54 focused browser cases plus final paper refinements,23 visually reviewed current paper pages,17 immutable original source hashes and106 reversible mappings. Nine important flags removed. Original values, engine inputs and successful request payloads preserved; eight demonstrated focus, stale-response and storage faults repaired. Counts become189/225 reviewed,36 pending after verified rollout. Separate Sample Cart/Quote Cart original-capture work is excluded.

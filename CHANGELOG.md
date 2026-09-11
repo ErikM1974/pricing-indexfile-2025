@@ -1,3 +1,17 @@
+## v2026.09.10.11 (2026.09.10)
+
+- test: preserve customer account and product source before CSS migration
+- test: prepare customer account browser source capture
+- test: lock customer account money dates and quantity transformations
+- Preserve reviewed customer account and product originals
+- Unify customer account and product pages with reliable reorder state
+- Merge verified status release into customer account review
+- Integrate reviewed customer account and product layouts
+- Deploy v2026.09.10.11: unify customer account and product pages
+- Allow confirmation timers to settle under browser test load
+- Deploy v2026.09.10.11: verify corrected account browser timing
+- Deploy v2026.09.10.11: wait for the expected customer login redirect
+
 ## v2026.09.10.10 (2026.09.10)
 
 - Capture Order Status and vendor portal sources for CSS review

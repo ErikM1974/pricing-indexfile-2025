@@ -89,7 +89,9 @@ for(const kind of ['quote','logo','logo-change'])test('CSS customer account: ori
  if(kind==='quote'){await page.locator('#cp-gen-method').selectOption('Embroidery');await page.locator('#cp-gen-qty').fill('36');}
  await evidence(page,'account-'+kind+'-dialog',events);
  await page.locator('#cp-gen-submit').click();await expect.poll(()=>events.actions.length).toBe(1);await expect(page.locator('#cp-gen-modal')).toBeHidden();
- await expect(page.locator('#cp-toast')).not.toHaveClass(/show/);
+ // The page keeps confirmations for 4.2 seconds. Allow shared-runner scheduling
+ // beyond that interval while still requiring the real UI timer to dismiss it.
+ await expect(page.locator('#cp-toast')).not.toHaveClass(/show/,{timeout:10000});
  await evidence(page,'account-'+kind+'-sent',events);
 });
 test('CSS customer account: order drawer and reorder body',async({page})=>{
@@ -98,7 +100,7 @@ test('CSS customer account: order drawer and reorder body',async({page})=>{
  await evidence(page,'account-order-drawer',events,{paper:true});
  await page.locator('#cp-drawer-reorder').click();await expect(page.locator('#cp-req-modal')).toBeVisible();
  await page.locator('#cp-req-note').fill('Preserve this reorder note');await evidence(page,'account-reorder-dialog',events);
- await page.locator('#cp-req-submit').click();await expect.poll(()=>events.actions.length).toBe(1);await expect(page.locator('#cp-req-modal')).toBeHidden();await expect(page.locator('#cp-toast')).not.toHaveClass(/show/);
+ await page.locator('#cp-req-submit').click();await expect.poll(()=>events.actions.length).toBe(1);await expect(page.locator('#cp-req-modal')).toBeHidden();await expect(page.locator('#cp-toast')).not.toHaveClass(/show/,{timeout:10000});
  await evidence(page,'account-reorder-sent',events);
 });
 test('CSS customer account: statement and reward request',async({page})=>{
@@ -107,7 +109,7 @@ test('CSS customer account: statement and reward request',async({page})=>{
  await evidence(page,'account-statement',events,{paper:true});await page.locator('#cp-statement-close').click();
  await page.setViewportSize({width:1440,height:1000});await page.locator('#cp-nav a[data-tab="overview"]').click();await page.locator('#cp-redeem-btn').click();await expect(page.locator('#cp-redeem-modal')).toBeVisible();
  await evidence(page,'account-reward-dialog',events);await page.locator('#cp-redeem-submit').click();await expect.poll(()=>events.actions.length).toBe(1);
- await expect(page.locator('#cp-redeem-modal')).toBeHidden();await expect(page.locator('#cp-toast')).not.toHaveClass(/show/);await evidence(page,'account-reward-sent',events);
+ await expect(page.locator('#cp-redeem-modal')).toBeHidden();await expect(page.locator('#cp-toast')).not.toHaveClass(/show/,{timeout:10000});await evidence(page,'account-reward-sent',events);
 });
 for(const mode of ['single','batch','upgrade'])test('CSS customer product: original '+mode+' request body',async({page})=>{
  const state={page:'product',mode:mode==='upgrade'?'upgrade':'normal',original:capture},events=await open(page,state);await ready(page,state);await expect(page.locator('#pp-methods .pp-method')).toHaveCount(4);
@@ -121,7 +123,7 @@ for(const mode of ['single','batch','upgrade'])test('CSS customer product: origi
    await evidence(page,'product-batch-drawer',events);await page.locator('#rl-send').click();
   }
  }
- await expect.poll(()=>events.actions.length).toBe(1);await expect(page.locator('#cp-toast')).not.toHaveClass(/show/);await evidence(page,'product-'+mode+'-sent',events);
+ await expect.poll(()=>events.actions.length).toBe(1);await expect(page.locator('#cp-toast')).not.toHaveClass(/show/,{timeout:10000});await evidence(page,'product-'+mode+'-sent',events);
 });
 
 if(!capture){

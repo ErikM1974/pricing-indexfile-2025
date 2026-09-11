@@ -52,7 +52,11 @@ async function open(page,state={}){
   }
   if(['font','image','stylesheet'].includes(request.resourceType())||(url.hostname==='fonts.googleapis.com'&&p==='/css2'))return route.continue();events.unknown.push(request.url());return route.abort();
  });
- await page.goto(base+(isProduct?'/product/'+style:'#tab='+(state.tab||'overview')));await page.evaluate(()=>document.fonts.ready);return events;
+ await page.goto(base+(isProduct?'/product/'+style:'#tab='+(state.tab||'overview')));
+ // A product 401 intentionally navigates away. Inspect fonts only after that
+ // destination loads, so this helper never evaluates in the departing document.
+ if(isProduct&&state.statuses&&state.statuses['/product/'+style]===401)await page.waitForURL(/\/customer\/login$/, {waitUntil:'load'});
+ await page.evaluate(()=>document.fonts.ready);return events;
 }
 async function snapshot(page){return page.evaluate(()=>{const norm=s=>String(s||'').replace(/\s+/g,' ').trim(),visible=n=>!!n.getClientRects().length&&getComputedStyle(n).visibility!=='hidden';return {title:document.title,text:norm(document.body.innerText),ids:Object.fromEntries([...document.querySelectorAll('[id]')].filter(n=>visible(n)&&!n.querySelector('[id]')).map(n=>[n.id,norm(n.innerText)])),links:[...document.querySelectorAll('a[href]')].filter(visible).map(n=>({href:n.getAttribute('href'),text:norm(n.innerText),label:n.getAttribute('aria-label')})),rows:[...document.querySelectorAll('tbody tr')].filter(visible).map(n=>[...n.children].map(c=>norm(c.innerText))),fields:[...document.querySelectorAll('input,select,textarea')].filter(visible).map(n=>({id:n.id,size:n.dataset.size,value:n.value})),engineCalls:window.__accountEngineCalls||[],overflow:document.documentElement.scrollWidth>innerWidth+1};});}
 function check(expect,events){for(const key of ['errors','writes','unknown','missing'])expect(events[key],key).toEqual([]);}

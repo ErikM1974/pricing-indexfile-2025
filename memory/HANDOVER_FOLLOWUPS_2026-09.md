@@ -1,5 +1,11 @@
 # Handover follow-ups — 2026-09-07
 
+## CURRENT — account release verified; carts ready for full gates
+
+Customer Account/Product is live as v2026.09.10.11, Heroku2103, efc4471f05b20a397bf275e63786e96dbbb60eeb. Exact source880bc6eb passed CI34569384599 with all four actual jobs. Actual deployed slug, health, six source assets, five compiled assets/source maps, two page shells, fourteen prior access contracts and four regression routes verified. Primary main/develop and origin are synchronized. Live189/225,36pending.
+
+Cart review7498f6fc is committed and backed up:191/225 reviewed candidate,34pending. Forty distinct browser cases and every current paper page (39 across13 documents) are reviewed;268 ownership/source guards pass. The latest account test corrections are now merged. Next: integrate this exact reviewed cart history, run complete local application/browser/live-pricing gates, prepare one cache version and require all four exact-source CI jobs before deployment. No cart deploy yet.
+
 ## NEXT — Sample Cart and Quote Cart original review
 
 This isolated branch starts at the prepared .11 source9eb6e2a2. Account pair bba4306d/da6c2373 is frozen separately:54 browser cases,23 paper pages and261 post-cache guards passed. Full local1204-case CSS/money checks run on primaryda6c2373; exact-source CI34565556223 is running. Live remains .10/2102/44ccf020 at187/225; account candidate189/225,36pending. No account release yet.
@@ -880,3 +886,6 @@ Status .10/2102/44ccf020 is verified live with24 checks and all source/main/deve
 - [ ] Adopt existing storefront-shell/navigation and canonical buttons/fields; keep shared legacy core unchanged for its unreviewed consumers. Scoped cart owners, no new override stack.
 - [ ] Demonstrate and repair focus/storage/late-response faults; preserve exact successful request/email/checkout bodies and original financial transforms. Review current screens, axe/keyboard and complete paper before migration credit.
 Live remains.10/2102/44cc187/225. Account .11 is separately gated on source4e763b26/CI34567159048 and full local3297. Cart gets no migration credit; reviewed candidate remains189/225,36pending. No .env copies, real orders/payments/emails or device printing.
+
+### Account release test timing correction — 2026-09-10
+The full local1,204-case CSS sweep completed1,203 passes and one confirmation-toast wait timeout under three-worker load. The real page retains the toast4.2 seconds; the test allowed only5 seconds including scheduling. No application or fixture source changed. The test now allows10 seconds but still requires the real timer to dismiss the toast. Five repeated failing-case runs passed under three-worker load; all affected account cases and the remaining local browser/pricing suites must pass before release. Exact-source CI must be rerun on this test correction; the earlier9eb6e2a2 run is not final-source evidence.
