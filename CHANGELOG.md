@@ -1,3 +1,14 @@
+## v2026.09.10.10 (2026.09.10)
+
+- Capture Order Status and vendor portal sources for CSS review
+- Capture original customer status and vendor workflows and paper
+- docs: save CSS shutdown checkpoint and remaining work
+- Unify customer order status and vendor job portal styles and recovery
+- Integrate reviewed customer order status and vendor portal CSS
+- test: align status portal guards with shared controls
+- Deploy v2026.09.10.10: unify customer order status and vendor job portal
+- Deploy v2026.09.10.10: verify the monogram error confirmation before release
+
 ## v2026.09.10.9 (2026.09.10)
 
 - Capture employee bundle source contracts before shared CSS migration

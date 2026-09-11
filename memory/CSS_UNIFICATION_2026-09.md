@@ -1477,3 +1477,7 @@ Exact-source CI 34525732554 passed all four jobs on 8546e9ddbeb3b24e8b09734f75ec
 ## Employee and customer document release record — v2026.09.10.9
 
 Exact-source CI 34543191741 passed all four jobs on 0b271bb2ae12b083936a1add6c86d32ca41c3bab, including actual1,104-case CSS sweep and live money/calculator parity. Employee bundles, Customer Portal Invoice, compact Invoice and Quote View share canonical controls and scoped styles;147 focused browser cases/33 reviewed current paper pages/28 distinct original sources/217 reversible mappings. Three old stylesheets retired;161 important flags removed. Counts become185/225 reviewed,40pending only after verified rollout. Next Order Status/vendor Job Portal branch is separate and excluded.
+
+## Order Status and Job Portal release record — v2026.09.10.10
+
+Exact-source CI 34561449204 passed all four jobs on 0091eff76524acfc16ce3f5f401d3b8bbb057aa8, including actual CSS and live money/calculator parity. Full local gates passed on identical application assets atf03b9117f3213b033795fbd4f8346559ae0ca14c. Canonical controls/scoped layouts,46 focused browser cases,10 reviewed paper pages,10 original source hashes/74 reversible mappings. Three important flags removed; successful payloads, money and date rendering preserved. Counts become187/225 reviewed,38 pending after verified rollout. Separate Customer Account/Product originals atd3a5efff are excluded.
