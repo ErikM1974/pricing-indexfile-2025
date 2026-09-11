@@ -31,6 +31,8 @@ LIVE remains.5/Heroku2108/93fe1568 at204/225 reviewed,21pending. Contract candid
 
 ## RELEASE CANDIDATE — v2026.09.11.6 three contract calculators
 
+Full-suite compatibility check: the historical printable-sheet test now verifies the canonical components.css hidden utility and token/component/page stylesheet order. The removed page-local !important copy is intentionally absent. Both affected suites passed all 47 checks; full release gates restart on the correction commit. No application or original-fixture content changed.
+
 Reviewed source 4f793212a25530918d1045c2bbf647aa6c30177d is integrated with verified .5 history at e23f892888633587c800abc3d05af11c7d451d6c. Eleven references version seven changed assets, with 44 reversible mappings preserving14 source originals. All28 focused browser cases,279 source/ownership guards,72 full-page screens and20 paper pages in18 documents are reviewed. Eleven financial function bodies, the entire Embroidery controller and DST parser/math remain unchanged.
 
 Candidate207/225 reviewed,18pending. Verified LIVE remains.5/Heroku2108/93fe1568 at204/225,21pending. Run all full local and actual four-job exact-source CI checks before rollout; verify actual Heroku slug, source/compiled assets and anonymous access afterward. Next families remain isolated during release checks. No real business writes, email, uploads, payments, env copying or device printing; never recursively delete the node_modules junction.
