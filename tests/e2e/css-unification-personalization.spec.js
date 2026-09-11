@@ -501,8 +501,16 @@ test('CSS personalization: monogram color and custom-location controls preserve 
 test('CSS personalization: monogram bulk names and stitch-check fixes preserve spelling and prevent an unapproved print',async({page})=>{
  const events=await open(page,'monogram-form',{monogram:validMonogram()});await expect(page.locator('#companyName')).toHaveValue('Synthetic Cedar Outfitters');await page.locator('#pasteNamesInput').fill("Avery\nJordan\nO'Neil");await page.locator('#importNamesBtn').click();await expect(page.locator('#unassignedNamesList')).toContainText("O'Neil");
  await page.locator('#namesTableBody .name-input').first().fill(' Avery  Example ');await page.evaluate(()=>window.monogramController.runStitchCheck());await expect(page.locator('.btn-fix-finding').first()).toBeVisible();await page.locator('.btn-fix-finding').first().click();await expect(page.locator('#namesTableBody .name-input').first()).toHaveValue('Avery Example');
- await page.locator('#namesTableBody .row-thread-color').first().selectOption('');await page.evaluate(()=>{window.printCalls=0;window.print=()=>window.printCalls++;window.monogramController.runStitchCheck();});
- page.once('dialog',dialog=>dialog.dismiss());await page.locator('#printProofBtn').click();expect(await page.evaluate(()=>window.printCalls)).toBe(0);await axe(page);clean(events);
+ // Missing thread is only a warning. Use a required size to exercise the error gate;
+ // otherwise this assertion can pass before the asynchronous proof actually prints.
+ await page.locator('#namesTableBody .size-input').first().selectOption('');
+ const errors=await page.evaluate(()=>{window.printCalls=0;window.print=()=>window.printCalls++;return window.monogramController.runStitchCheck().summary.errors;});
+ expect(errors).toBeGreaterThan(0);
+ await Promise.all([
+  page.waitForEvent('dialog').then(async dialog=>{expect(dialog.type()).toBe('confirm');expect(dialog.message()).toContain('error(s)');await dialog.dismiss();}),
+  page.locator('#printProofBtn').click(),
+ ]);
+ expect(await page.evaluate(()=>window.printCalls)).toBe(0);await axe(page);clean(events);
 });
 test('CSS personalization: a delayed monogram load cannot replace a cleared or newer form',async({page})=>{
  const state={monogram:validMonogram()},events=await open(page,'monogram-form',state);await expect(page.locator('#companyName')).toHaveValue('Synthetic Cedar Outfitters');let release;state.respond=async u=>u.pathname==='/api/monograms/88002'?new Promise(resolve=>{release=resolve;}):null;

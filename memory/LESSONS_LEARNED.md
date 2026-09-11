@@ -9,7 +9,7 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 - Problem/root cause: disabling Post did not guard Ctrl+Enter; late job errors escaped into the list, and pending note completion could reopen a prior job. Shared shell print rules hid branding; prefix class edits accidentally styled count labels as buttons.
 - Solution: guard the pending note in the controller, retain drafts per job, use request generations and verify the selected job before updating UI. Native job buttons share one activation path. Reuse scoped components and preserve print headers, whole rows and complete totals.
-- Migration guards must follow shared visibility/focus ownership and native controls; assert DOM semantics instead of class order or removed custom key handlers, while retaining real-browser hidden/keyboard/phone checks.
+- Migration guards must follow shared visibility/focus ownership and native controls; assert DOM semantics instead of class order or removed custom key handlers, while retaining real-browser hidden/keyboard/phone checks. A print-cancellation test must create an actual QA error (missing size), assert the confirmation and await its dismissal; missing-thread warnings do not block printing, and checking before an asynchronous print finishes is a false pass.
 - Prevention: synthetic delayed/failure/retry/keyboard/late-navigation tests with exact original request bodies; compare class tokens exactly, preserve source hashes and fixed label-case exceptions, and visually inspect every paper page. Remove empty-space margins without changing preserved empty element contracts.
 
 ## Quote lists must retain failure and action ownership (2026-09-10)

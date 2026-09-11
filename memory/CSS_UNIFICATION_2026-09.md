@@ -1,5 +1,9 @@
 # CSS unification — design direction and implementation plan
 
+## RELEASE CHECK CORRECTION — existing monogram cancellation test
+
+All local status gates passed:240 unit suites/5,619 tests,88 DOM,four accessibility unit,84 quote parity,1,150 CSS checks and16 remaining browser checks including all five live calculators. Exact-source CI34559320512 passed three jobs and1,149 CSS cases, but its existing monogram print-cancellation case failed. It used a missing-thread warning, which intentionally does not invoke the error-only confirmation, then asserted before asynchronous printing finished locally. The corrected test uses a missing required size, asserts QA errors and explicitly awaits/dismisses the confirmation. Five consecutive focused browser repeats passed (22.2 seconds). Application code and assets are unchanged. Require a fresh exact-source CI before releasing .10; old9f021460 is superseded by this correction. Live remains .9/2101/0f518982; no .10 release merge/tag/deploy has occurred.
+
 ## RELEASE CANDIDATE — v2026.09.10.10 Order Status and Job Portal
 
 Reviewed pair a878bceb is integrated at73cc615a with the legacy guard correction atf03b9117f3213b033795fbd4f8346559ae0ca14c. All240 unit suites/5,619 tests,88 DOM,four accessibility unit and84 quote parity checks pass; build/lint/types/routes/boot passed. The full1,150-case CSS browser sweep and remaining live pricing/browser checks are still running on that application SHA. This candidate changes only four HTML cache references, their reversible mappings and release notes; all four application CSS/JS assets remain identical. The exact candidate CI can run in parallel, but deployment requires both the complete local gate record and successful actual CSS/live-pricing CI steps.
