@@ -425,6 +425,55 @@
       "after": ".course-title { font-size: 11pt; padding-bottom: 2px; margin-bottom: 2px; }",
       "count": 1,
       "reason": "Remove surplus printed heading spacing."
+    },
+    {
+      "file": "calculators/laser-manual-pricing.html",
+      "before": "/shared_components/css/calculator-reference.css?v=2026.09.11.3",
+      "after": "/shared_components/css/calculator-reference.css?v=2026.09.11.4",
+      "count": 1,
+      "reason": "Refetch the reviewed calculator reference asset at this release version."
+    },
+    {
+      "file": "calculators/laser-manual-pricing.html",
+      "before": "/calculators/css/laser-manual-pricing.css?v=2026.09.07.12",
+      "after": "/calculators/css/laser-manual-pricing.css?v=2026.09.11.4",
+      "count": 1,
+      "reason": "Refetch the reviewed calculator reference asset at this release version."
+    },
+    {
+      "file": "calculators/manual-pricing.html",
+      "before": "/shared_components/css/calculator-reference.css?v=2026.09.11.3",
+      "after": "/shared_components/css/calculator-reference.css?v=2026.09.11.4",
+      "count": 1,
+      "reason": "Refetch the reviewed calculator reference asset at this release version."
+    },
+    {
+      "file": "calculators/manual-pricing.html",
+      "before": "/calculators/manual-pricing.css?v=2026.09.07.19",
+      "after": "/calculators/manual-pricing.css?v=2026.09.11.4",
+      "count": 1,
+      "reason": "Refetch the reviewed calculator reference asset at this release version."
+    },
+    {
+      "file": "calculators/manual-pricing.html",
+      "before": "/calculators/manual-pricing.js?v=2026.09.06.16",
+      "after": "/calculators/manual-pricing.js?v=2026.09.11.4",
+      "count": 1,
+      "reason": "Refetch the reviewed calculator reference asset at this release version."
+    },
+    {
+      "file": "calculators/service-price-cheat-sheet.html",
+      "before": "/shared_components/css/calculator-reference.css?v=2026.09.11.3",
+      "after": "/shared_components/css/calculator-reference.css?v=2026.09.11.4",
+      "count": 1,
+      "reason": "Refetch the reviewed calculator reference asset at this release version."
+    },
+    {
+      "file": "calculators/service-price-cheat-sheet.html",
+      "before": "/calculators/service-price-cheat-sheet.css?v=2026.09.07.12",
+      "after": "/calculators/service-price-cheat-sheet.css?v=2026.09.11.4",
+      "count": 1,
+      "reason": "Refetch the reviewed calculator reference asset at this release version."
     }
   ],
   "retiredStyles": []

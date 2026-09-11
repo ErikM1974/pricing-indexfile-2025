@@ -1,5 +1,11 @@
 # Handover follow-ups — 2026-09-07
 
+## RELEASE CANDIDATE — v2026.09.11.4 Manual Pricing, Manual Laser and Shop Menu
+
+Reviewed source 40483ec8fb6e3e24abcf33d26eaf09f3ecad3246 is integrated with the verified catalog release on clean develop. This candidate versions 7 references for five changed assets and preserves every original source through explicit reversible mappings. Sixteen focused browser cases, 23 visually reviewed current paper pages and 274 source/ownership guards passed.
+
+The menu controller and all pricing services are unchanged; the manual controller differs only by two literal accessibility additions. Canonical fields, keyboard-scrollable size tables, complete price columns, visible failures and compact menu printing are reviewed. Candidate199/225 reviewed,26pending; live remains .3/Heroku2106 at196/225,29pending until full local application/browser/parity checks and all four actual exact-source CI jobs pass, followed by verified rollout. No real business writes, emails, uploads or device printing.
+
 ## REVIEWED — Manual Pricing, Manual Laser and Shop Menu
 
 Three pages now use Public Sans, canonical fields/buttons and scoped style owners. Sixteen focused browser cases cover four widths, exact original prices/content, keyboard access to all size columns, selected garment/cap state, validation and load failures, rep/customer visibility and print restoration. All 23 current paper pages across 18 documents and 46 screen panels are visually reviewed; six final screen sheets confirm the corrected quantity fields. Ordinary menus fit one sheet and long lists fit two; every original price, rule and contact detail remains present. The existing laser Coming Soon content is preserved.
