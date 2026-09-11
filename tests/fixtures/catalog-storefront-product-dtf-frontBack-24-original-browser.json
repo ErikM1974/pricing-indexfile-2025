@@ -1,0 +1,1370 @@
+{
+  "name": "product-dtf-frontBack-24",
+  "states": [
+    {
+      "width": 1440,
+      "title": "PC61 Core Cotton Tee — Custom Apparel | Northwest Custom Apparel",
+      "url": "/product.html?style=PC61&color=Brilliant+Orange",
+      "ids": {
+        "crumbCategory": "T-Shirts",
+        "crumbStyle": "PC61",
+        "productTitle": "Core Cotton Tee",
+        "productSub": "Port & Company · Style PC61",
+        "productBlurb": "Comfortable, durable 100% cotton apparel for the whole team.",
+        "galleryMainImg": "",
+        "galleryThumbs": "Front Back Flat front Flat back",
+        "colorCount": "(2)",
+        "swatchGrid": "Jet Black Brilliant Orange",
+        "selectedColorName": "Brilliant Orange",
+        "invColorName": "— Brilliant Orange",
+        "inventoryBody": "S IN STOCK M IN STOCK L IN STOCK XL IN STOCK 2XL IN STOCK 3XL IN STOCK Live supplier warehouse stock — about 3,000 pieces available across all sizes.",
+        "ctaQuote": "Price it & add to quote",
+        "expressLaneNote": "Need fewer than 24, fast? Full-color print, no minimum — checkout in minutes.",
+        "expressLaneLink": "Buy online now →",
+        "ctaSample": "Order a sample",
+        "pricingHeading": "Decoration pricing",
+        "methodAlert": "",
+        "cfgQtyMinus": "−",
+        "cfgQtyInput": "",
+        "cfgQtyPlus": "+",
+        "cfgLocations": "Left chest Logo size Center front Medium print ≤9×12 Full front Big center print Back Full back Center back Medium print ≤9×12 Front + back Left chest + full back",
+        "cfgInkMinus": "−",
+        "cfgInkInput": "",
+        "cfgInkPlus": "+",
+        "cfgStripeInput": "",
+        "cfgAlert": "",
+        "cfgMethods": "EMBROIDERY $29.00/pc Two stitched logos — 10K each DTG PRINT $23.50/pc Full color — no color limits SCREEN PRINT $20.08/pc 1-color ink, both sides DTF TRANSFER $31.50/pc Full-color transfer — great on blends",
+        "cfgNudgeJump": "At 48+ pieces: $28.00/piece — save $3.50/piece",
+        "cfgAddToQuote": "Add to quote",
+        "cfgEmailQuote": "or email us directly",
+        "cfgMatrixToggle": "Hide the full price table ▴",
+        "cfgMatrix": "Per-piece price includes the garment plus full-color DTF transfer(s) — left chest + full back. Great on blends and dark garments. Orders under 24 pieces add a one-time $50.00 small-order fee. QUANTITY 10-23 24-47 48-71 72+ Price per piece $34.17 $31.50 $27.50 $24.50 Small-order fee +$50.00 per order No fee No fee No fee Prices shown for size S — extended sizes carry a small upcharge. Other placements and transfer sizes are quoted per design. Final pricing confirmed with your free proof.",
+        "relatedHeading": "You might also like",
+        "relatedGrid": "PORT & COMPANY · PC54 Essential Cotton Tee",
+        "toastStack": "Added — 24 pieces · DTF Transfer Set sizes & view quote (1) ×"
+      },
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "cfgQtyInput",
+          "name": "",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "cfgInkInput",
+          "name": "",
+          "type": "number",
+          "value": "1",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "cfgStripeInput",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#main",
+          "text": "Skip to content"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/catalog",
+          "text": "Products"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "text": "Fall Catalog '26 New"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom Tees New"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats New"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "text": "Get a Quote"
+        },
+        {
+          "href": "/quote-cart",
+          "text": "Quote 1"
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts New"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats New"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers & Free Samples"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/catalog",
+          "text": "Catalog"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "text": "Fall Catalog '26"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "Custom Stickers"
+        },
+        {
+          "href": "/custom-banners",
+          "text": "Vinyl Banners"
+        },
+        {
+          "href": "/blog",
+          "text": "Blog"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "text": "Get a Quote"
+        },
+        {
+          "href": "/catalog?category=T-Shirts",
+          "text": "T-Shirts"
+        },
+        {
+          "href": "/catalog?category=Polos%2FKnits",
+          "text": "Polos & Knits"
+        },
+        {
+          "href": "/catalog?category=Sweatshirts%2FFleece",
+          "text": "Sweatshirts & Fleece"
+        },
+        {
+          "href": "/catalog?category=Caps",
+          "text": "Caps"
+        },
+        {
+          "href": "/catalog?category=Outerwear",
+          "text": "Outerwear"
+        },
+        {
+          "href": "/catalog?category=Workwear",
+          "text": "Workwear"
+        },
+        {
+          "href": "/catalog?category=Bags",
+          "text": "Bags"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/catalog?category=T-Shirts",
+          "text": "T-Shirts"
+        },
+        {
+          "href": "#pricingHeading",
+          "text": "Price it & add to quote"
+        },
+        {
+          "href": "/custom-tees?style=PC61&color=Brilliant%20Orange",
+          "text": "Buy online now →"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Order a sample"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "https://maps.google.com/?cid=4107380119454186786",
+          "text": "★★★★★ Google review · 4.9 from 185+"
+        },
+        {
+          "href": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/Erik%20Modeling%20Hoodie%20Front%20and%20Back.png?ver=1",
+          "text": ""
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com?subject=Quote%20request%20%E2%80%94%20PC61%20Core%20Cotton%20Tee&body=Hi%20NWCA%2C%0A%0AI'd%20like%20a%20quote%20for%3A%0A%0AStyle%3A%20PC61%20%E2%80%94%20Core%20Cotton%20Tee%0AColor%3A%20Brilliant%20Orange%0AQuantity%3A%2024%0APlacement%3A%20Front%20%2B%20back%0AMethod%3A%20DTF%20Transfer%0AOnline%20price%3A%20%24756.00%20total%20%E2%80%94%20%2431.50%2Fpc%20(24-47%20tier)%0A%0AMy%20name%3A%0ACompany%3A%0APhone%3A%0A",
+          "text": "or email us directly"
+        },
+        {
+          "href": "/product.html?style=PC54",
+          "text": "Port & Company · PC54Essential Cotton Tee"
+        },
+        {
+          "href": "/quote-cart",
+          "text": "Set sizes & view quote (1)"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free Sample Program"
+        },
+        {
+          "href": "/pages/golf-tournaments-2026.html?utm_source=product&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "text": "Tournament Packages"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "Laser-Engraved Tumblers"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Portal"
+        }
+      ],
+      "selection": {
+        "qty": 24,
+        "locationKey": "frontBack",
+        "locationLabel": "Front + back",
+        "methodId": "dtf",
+        "methodLabel": "DTF Transfer",
+        "engineMethod": "DTF",
+        "isCap": false,
+        "inkColors": null,
+        "safetyStripes": false,
+        "status": "ok",
+        "price": {
+          "total": 756,
+          "perPiece": 31.5,
+          "tierLabel": "24-47",
+          "oneTimeFees": []
+        },
+        "sizes": {
+          "S": 24
+        },
+        "belowMin": false
+      },
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".pdp-cfg-total-tier"
+            ],
+            [
+              ".is-active-tier > .tier-fee-no"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "PC61 Core Cotton Tee — Custom Apparel | Northwest Custom Apparel",
+      "url": "/product.html?style=PC61&color=Brilliant+Orange",
+      "ids": {
+        "crumbCategory": "T-Shirts",
+        "crumbStyle": "PC61",
+        "productTitle": "Core Cotton Tee",
+        "productSub": "Port & Company · Style PC61",
+        "productBlurb": "Comfortable, durable 100% cotton apparel for the whole team.",
+        "galleryMainImg": "",
+        "galleryThumbs": "Front Back Flat front Flat back",
+        "colorCount": "(2)",
+        "swatchGrid": "Jet Black Brilliant Orange",
+        "selectedColorName": "Brilliant Orange",
+        "invColorName": "— Brilliant Orange",
+        "inventoryBody": "S IN STOCK M IN STOCK L IN STOCK XL IN STOCK 2XL IN STOCK 3XL IN STOCK Live supplier warehouse stock — about 3,000 pieces available across all sizes.",
+        "expressLaneNote": "Need fewer than 24, fast? Full-color print, no minimum — checkout in minutes.",
+        "expressLaneLink": "Buy online now →",
+        "ctaSample": "Order a sample",
+        "pricingHeading": "Decoration pricing",
+        "methodAlert": "",
+        "cfgQtyMinus": "−",
+        "cfgQtyInput": "",
+        "cfgQtyPlus": "+",
+        "cfgLocations": "Left chest Logo size Center front Medium print ≤9×12 Full front Big center print Back Full back Center back Medium print ≤9×12 Front + back Left chest + full back",
+        "cfgInkMinus": "−",
+        "cfgInkInput": "",
+        "cfgInkPlus": "+",
+        "cfgStripeInput": "",
+        "cfgAlert": "",
+        "cfgMethods": "EMBROIDERY $29.00/pc Two stitched logos — 10K each DTG PRINT $23.50/pc Full color — no color limits SCREEN PRINT $20.08/pc 1-color ink, both sides DTF TRANSFER $31.50/pc Full-color transfer — great on blends",
+        "cfgNudgeJump": "At 48+ pieces: $28.00/piece — save $3.50/piece",
+        "cfgAddToQuote": "Add to quote",
+        "cfgEmailQuote": "or email us directly",
+        "cfgMatrixToggle": "Hide the full price table ▴",
+        "cfgMatrix": "Per-piece price includes the garment plus full-color DTF transfer(s) — left chest + full back. Great on blends and dark garments. Orders under 24 pieces add a one-time $50.00 small-order fee. QUANTITY 10-23 24-47 48-71 72+ Price per piece $34.17 $31.50 $27.50 $24.50 Small-order fee +$50.00 per order No fee No fee No fee Prices shown for size S — extended sizes carry a small upcharge. Other placements and transfer sizes are quoted per design. Final pricing confirmed with your free proof.",
+        "relatedHeading": "You might also like",
+        "relatedGrid": "PORT & COMPANY · PC54 Essential Cotton Tee",
+        "toastStack": "Added — 24 pieces · DTF Transfer Set sizes & view quote (1) ×",
+        "cfgMobilePrice": "24 × DTF · $31.50/pc · $756.00",
+        "ctaQuoteMobile": "Add to quote",
+        "ctaSampleMobile": "Sample"
+      },
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "cfgQtyInput",
+          "name": "",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "cfgInkInput",
+          "name": "",
+          "type": "number",
+          "value": "1",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "cfgStripeInput",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#main",
+          "text": "Skip to content"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/quote-cart",
+          "text": "Quote 1"
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts New"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats New"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers & Free Samples"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/catalog",
+          "text": "Catalog"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "text": "Fall Catalog '26"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "Custom Stickers"
+        },
+        {
+          "href": "/custom-banners",
+          "text": "Vinyl Banners"
+        },
+        {
+          "href": "/blog",
+          "text": "Blog"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "text": "Get a Quote"
+        },
+        {
+          "href": "/catalog?category=T-Shirts",
+          "text": "T-Shirts"
+        },
+        {
+          "href": "/catalog?category=Polos%2FKnits",
+          "text": "Polos & Knits"
+        },
+        {
+          "href": "/catalog?category=Sweatshirts%2FFleece",
+          "text": "Sweatshirts & Fleece"
+        },
+        {
+          "href": "/catalog?category=Caps",
+          "text": "Caps"
+        },
+        {
+          "href": "/catalog?category=Outerwear",
+          "text": "Outerwear"
+        },
+        {
+          "href": "/catalog?category=Workwear",
+          "text": "Workwear"
+        },
+        {
+          "href": "/catalog?category=Bags",
+          "text": "Bags"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/catalog?category=T-Shirts",
+          "text": "T-Shirts"
+        },
+        {
+          "href": "/custom-tees?style=PC61&color=Brilliant%20Orange",
+          "text": "Buy online now →"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Order a sample"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "https://maps.google.com/?cid=4107380119454186786",
+          "text": "★★★★★ Google review · 4.9 from 185+"
+        },
+        {
+          "href": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/Erik%20Modeling%20Hoodie%20Front%20and%20Back.png?ver=1",
+          "text": ""
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com?subject=Quote%20request%20%E2%80%94%20PC61%20Core%20Cotton%20Tee&body=Hi%20NWCA%2C%0A%0AI'd%20like%20a%20quote%20for%3A%0A%0AStyle%3A%20PC61%20%E2%80%94%20Core%20Cotton%20Tee%0AColor%3A%20Brilliant%20Orange%0AQuantity%3A%2024%0APlacement%3A%20Front%20%2B%20back%0AMethod%3A%20DTF%20Transfer%0AOnline%20price%3A%20%24756.00%20total%20%E2%80%94%20%2431.50%2Fpc%20(24-47%20tier)%0A%0AMy%20name%3A%0ACompany%3A%0APhone%3A%0A",
+          "text": "or email us directly"
+        },
+        {
+          "href": "/product.html?style=PC54",
+          "text": "Port & Company · PC54Essential Cotton Tee"
+        },
+        {
+          "href": "/quote-cart",
+          "text": "Set sizes & view quote (1)"
+        },
+        {
+          "href": "#pricingHeading",
+          "text": "Add to quote"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "Call us"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Sample"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free Sample Program"
+        },
+        {
+          "href": "/pages/golf-tournaments-2026.html?utm_source=product&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "text": "Tournament Packages"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "Laser-Engraved Tumblers"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Portal"
+        }
+      ],
+      "selection": {
+        "qty": 24,
+        "locationKey": "frontBack",
+        "locationLabel": "Front + back",
+        "methodId": "dtf",
+        "methodLabel": "DTF Transfer",
+        "engineMethod": "DTF",
+        "isCap": false,
+        "inkColors": null,
+        "safetyStripes": false,
+        "status": "ok",
+        "price": {
+          "total": 756,
+          "perPiece": 31.5,
+          "tierLabel": "24-47",
+          "oneTimeFees": []
+        },
+        "sizes": {
+          "S": 24
+        },
+        "belowMin": false
+      },
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".pdp-cfg-total-tier"
+            ],
+            [
+              ".is-active-tier > .tier-fee-no"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "PC61 Core Cotton Tee — Custom Apparel | Northwest Custom Apparel",
+      "url": "/product.html?style=PC61&color=Brilliant+Orange",
+      "ids": {
+        "crumbCategory": "T-Shirts",
+        "crumbStyle": "PC61",
+        "productTitle": "Core Cotton Tee",
+        "productSub": "Port & Company · Style PC61",
+        "productBlurb": "Comfortable, durable 100% cotton apparel for the whole team.",
+        "galleryMainImg": "",
+        "galleryThumbs": "Front Back Flat front Flat back",
+        "colorCount": "(2)",
+        "swatchGrid": "Jet Black Brilliant Orange",
+        "selectedColorName": "Brilliant Orange",
+        "invColorName": "— Brilliant Orange",
+        "inventoryBody": "S IN STOCK M IN STOCK L IN STOCK XL IN STOCK 2XL IN STOCK 3XL IN STOCK Live supplier warehouse stock — about 3,000 pieces available across all sizes.",
+        "expressLaneNote": "Need fewer than 24, fast? Full-color print, no minimum — checkout in minutes.",
+        "expressLaneLink": "Buy online now →",
+        "ctaSample": "Order a sample",
+        "pricingHeading": "Decoration pricing",
+        "methodAlert": "",
+        "cfgQtyMinus": "−",
+        "cfgQtyInput": "",
+        "cfgQtyPlus": "+",
+        "cfgLocations": "Left chest Logo size Center front Medium print ≤9×12 Full front Big center print Back Full back Center back Medium print ≤9×12 Front + back Left chest + full back",
+        "cfgInkMinus": "−",
+        "cfgInkInput": "",
+        "cfgInkPlus": "+",
+        "cfgStripeInput": "",
+        "cfgAlert": "",
+        "cfgMethods": "EMBROIDERY $29.00/pc Two stitched logos — 10K each DTG PRINT $23.50/pc Full color — no color limits SCREEN PRINT $20.08/pc 1-color ink, both sides DTF TRANSFER $31.50/pc Full-color transfer — great on blends",
+        "cfgNudgeJump": "At 48+ pieces: $28.00/piece — save $3.50/piece",
+        "cfgAddToQuote": "Add to quote",
+        "cfgEmailQuote": "or email us directly",
+        "cfgMatrixToggle": "Hide the full price table ▴",
+        "cfgMatrix": "Per-piece price includes the garment plus full-color DTF transfer(s) — left chest + full back. Great on blends and dark garments. Orders under 24 pieces add a one-time $50.00 small-order fee. QUANTITY 10-23 24-47 48-71 72+ Price per piece $34.17 $31.50 $27.50 $24.50 Small-order fee +$50.00 per order No fee No fee No fee Prices shown for size S — extended sizes carry a small upcharge. Other placements and transfer sizes are quoted per design. Final pricing confirmed with your free proof.",
+        "relatedHeading": "You might also like",
+        "relatedGrid": "PORT & COMPANY · PC54 Essential Cotton Tee",
+        "toastStack": "Added — 24 pieces · DTF Transfer Set sizes & view quote (1) ×",
+        "cfgMobilePrice": "24 × DTF · $31.50/pc · $756.00",
+        "ctaQuoteMobile": "Add to quote",
+        "ctaSampleMobile": "Sample"
+      },
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "cfgQtyInput",
+          "name": "",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "cfgInkInput",
+          "name": "",
+          "type": "number",
+          "value": "1",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "cfgStripeInput",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#main",
+          "text": "Skip to content"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/quote-cart",
+          "text": "Quote 1"
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts New"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats New"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers & Free Samples"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/catalog",
+          "text": "Catalog"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "text": "Fall Catalog '26"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "Custom Stickers"
+        },
+        {
+          "href": "/custom-banners",
+          "text": "Vinyl Banners"
+        },
+        {
+          "href": "/blog",
+          "text": "Blog"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "text": "Get a Quote"
+        },
+        {
+          "href": "/catalog?category=T-Shirts",
+          "text": "T-Shirts"
+        },
+        {
+          "href": "/catalog?category=Polos%2FKnits",
+          "text": "Polos & Knits"
+        },
+        {
+          "href": "/catalog?category=Sweatshirts%2FFleece",
+          "text": "Sweatshirts & Fleece"
+        },
+        {
+          "href": "/catalog?category=Caps",
+          "text": "Caps"
+        },
+        {
+          "href": "/catalog?category=Outerwear",
+          "text": "Outerwear"
+        },
+        {
+          "href": "/catalog?category=Workwear",
+          "text": "Workwear"
+        },
+        {
+          "href": "/catalog?category=Bags",
+          "text": "Bags"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/catalog?category=T-Shirts",
+          "text": "T-Shirts"
+        },
+        {
+          "href": "/custom-tees?style=PC61&color=Brilliant%20Orange",
+          "text": "Buy online now →"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Order a sample"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "https://maps.google.com/?cid=4107380119454186786",
+          "text": "★★★★★ Google review · 4.9 from 185+"
+        },
+        {
+          "href": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/Erik%20Modeling%20Hoodie%20Front%20and%20Back.png?ver=1",
+          "text": ""
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com?subject=Quote%20request%20%E2%80%94%20PC61%20Core%20Cotton%20Tee&body=Hi%20NWCA%2C%0A%0AI'd%20like%20a%20quote%20for%3A%0A%0AStyle%3A%20PC61%20%E2%80%94%20Core%20Cotton%20Tee%0AColor%3A%20Brilliant%20Orange%0AQuantity%3A%2024%0APlacement%3A%20Front%20%2B%20back%0AMethod%3A%20DTF%20Transfer%0AOnline%20price%3A%20%24756.00%20total%20%E2%80%94%20%2431.50%2Fpc%20(24-47%20tier)%0A%0AMy%20name%3A%0ACompany%3A%0APhone%3A%0A",
+          "text": "or email us directly"
+        },
+        {
+          "href": "/product.html?style=PC54",
+          "text": "Port & Company · PC54Essential Cotton Tee"
+        },
+        {
+          "href": "/quote-cart",
+          "text": "Set sizes & view quote (1)"
+        },
+        {
+          "href": "#pricingHeading",
+          "text": "Add to quote"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "Call us"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Sample"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free Sample Program"
+        },
+        {
+          "href": "/pages/golf-tournaments-2026.html?utm_source=product&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "text": "Tournament Packages"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "Laser-Engraved Tumblers"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Portal"
+        }
+      ],
+      "selection": {
+        "qty": 24,
+        "locationKey": "frontBack",
+        "locationLabel": "Front + back",
+        "methodId": "dtf",
+        "methodLabel": "DTF Transfer",
+        "engineMethod": "DTF",
+        "isCap": false,
+        "inkColors": null,
+        "safetyStripes": false,
+        "status": "ok",
+        "price": {
+          "total": 756,
+          "perPiece": 31.5,
+          "tierLabel": "24-47",
+          "oneTimeFees": []
+        },
+        "sizes": {
+          "S": 24
+        },
+        "belowMin": false
+      },
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".pdp-cfg-total-tier"
+            ],
+            [
+              ".is-active-tier > .tier-fee-no"
+            ]
+          ]
+        },
+        {
+          "id": "scrollable-region-focusable",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".table-wrap"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "PC61 Core Cotton Tee — Custom Apparel | Northwest Custom Apparel",
+      "url": "/product.html?style=PC61&color=Brilliant+Orange",
+      "ids": {
+        "crumbCategory": "T-Shirts",
+        "crumbStyle": "PC61",
+        "productTitle": "Core Cotton Tee",
+        "productSub": "Port & Company · Style PC61",
+        "productBlurb": "Comfortable, durable 100% cotton apparel for the whole team.",
+        "galleryMainImg": "",
+        "galleryThumbs": "Front Back Flat front Flat back",
+        "colorCount": "(2)",
+        "swatchGrid": "Jet Black Brilliant Orange",
+        "selectedColorName": "Brilliant Orange",
+        "invColorName": "— Brilliant Orange",
+        "inventoryBody": "S IN STOCK M IN STOCK L IN STOCK XL IN STOCK 2XL IN STOCK 3XL IN STOCK Live supplier warehouse stock — about 3,000 pieces available across all sizes.",
+        "expressLaneNote": "Need fewer than 24, fast? Full-color print, no minimum — checkout in minutes.",
+        "expressLaneLink": "Buy online now →",
+        "ctaSample": "Order a sample",
+        "pricingHeading": "Decoration pricing",
+        "methodAlert": "",
+        "cfgQtyMinus": "−",
+        "cfgQtyInput": "",
+        "cfgQtyPlus": "+",
+        "cfgLocations": "Left chest Logo size Center front Medium print ≤9×12 Full front Big center print Back Full back Center back Medium print ≤9×12 Front + back Left chest + full back",
+        "cfgInkMinus": "−",
+        "cfgInkInput": "",
+        "cfgInkPlus": "+",
+        "cfgStripeInput": "",
+        "cfgAlert": "",
+        "cfgMethods": "EMBROIDERY $29.00/pc Two stitched logos — 10K each DTG PRINT $23.50/pc Full color — no color limits SCREEN PRINT $20.08/pc 1-color ink, both sides DTF TRANSFER $31.50/pc Full-color transfer — great on blends",
+        "cfgNudgeJump": "At 48+ pieces: $28.00/piece — save $3.50/piece",
+        "cfgAddToQuote": "Add to quote",
+        "cfgEmailQuote": "or email us directly",
+        "cfgMatrixToggle": "Hide the full price table ▴",
+        "cfgMatrix": "Per-piece price includes the garment plus full-color DTF transfer(s) — left chest + full back. Great on blends and dark garments. Orders under 24 pieces add a one-time $50.00 small-order fee. QUANTITY 10-23 24-47 48-71 72+ Price per piece $34.17 $31.50 $27.50 $24.50 Small-order fee +$50.00 per order No fee No fee No fee Prices shown for size S — extended sizes carry a small upcharge. Other placements and transfer sizes are quoted per design. Final pricing confirmed with your free proof.",
+        "relatedHeading": "You might also like",
+        "relatedGrid": "PORT & COMPANY · PC54 Essential Cotton Tee",
+        "toastStack": "Added — 24 pieces · DTF Transfer Set sizes & view quote (1) ×",
+        "cfgMobilePrice": "24 × DTF · $31.50/pc · $756.00",
+        "ctaQuoteMobile": "Add to quote",
+        "ctaSampleMobile": "Sample"
+      },
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "cfgQtyInput",
+          "name": "",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "cfgInkInput",
+          "name": "",
+          "type": "number",
+          "value": "1",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "cfgStripeInput",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#main",
+          "text": "Skip to content"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/quote-cart",
+          "text": "Quote 1"
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts New"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats New"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers & Free Samples"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/catalog",
+          "text": "Catalog"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "text": "Fall Catalog '26"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "Custom Stickers"
+        },
+        {
+          "href": "/custom-banners",
+          "text": "Vinyl Banners"
+        },
+        {
+          "href": "/blog",
+          "text": "Blog"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "text": "Get a Quote"
+        },
+        {
+          "href": "/catalog?category=T-Shirts",
+          "text": "T-Shirts"
+        },
+        {
+          "href": "/catalog?category=Polos%2FKnits",
+          "text": "Polos & Knits"
+        },
+        {
+          "href": "/catalog?category=Sweatshirts%2FFleece",
+          "text": "Sweatshirts & Fleece"
+        },
+        {
+          "href": "/catalog?category=Caps",
+          "text": "Caps"
+        },
+        {
+          "href": "/catalog?category=Outerwear",
+          "text": "Outerwear"
+        },
+        {
+          "href": "/catalog?category=Workwear",
+          "text": "Workwear"
+        },
+        {
+          "href": "/catalog?category=Bags",
+          "text": "Bags"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/catalog?category=T-Shirts",
+          "text": "T-Shirts"
+        },
+        {
+          "href": "/custom-tees?style=PC61&color=Brilliant%20Orange",
+          "text": "Buy online now →"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Order a sample"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "https://maps.google.com/?cid=4107380119454186786",
+          "text": "★★★★★ Google review · 4.9 from 185+"
+        },
+        {
+          "href": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/Erik%20Modeling%20Hoodie%20Front%20and%20Back.png?ver=1",
+          "text": ""
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com?subject=Quote%20request%20%E2%80%94%20PC61%20Core%20Cotton%20Tee&body=Hi%20NWCA%2C%0A%0AI'd%20like%20a%20quote%20for%3A%0A%0AStyle%3A%20PC61%20%E2%80%94%20Core%20Cotton%20Tee%0AColor%3A%20Brilliant%20Orange%0AQuantity%3A%2024%0APlacement%3A%20Front%20%2B%20back%0AMethod%3A%20DTF%20Transfer%0AOnline%20price%3A%20%24756.00%20total%20%E2%80%94%20%2431.50%2Fpc%20(24-47%20tier)%0A%0AMy%20name%3A%0ACompany%3A%0APhone%3A%0A",
+          "text": "or email us directly"
+        },
+        {
+          "href": "/product.html?style=PC54",
+          "text": "Port & Company · PC54Essential Cotton Tee"
+        },
+        {
+          "href": "/quote-cart",
+          "text": "Set sizes & view quote (1)"
+        },
+        {
+          "href": "#pricingHeading",
+          "text": "Add to quote"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "Call us"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Sample"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free Sample Program"
+        },
+        {
+          "href": "/pages/golf-tournaments-2026.html?utm_source=product&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "text": "Tournament Packages"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "Laser-Engraved Tumblers"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Portal"
+        }
+      ],
+      "selection": {
+        "qty": 24,
+        "locationKey": "frontBack",
+        "locationLabel": "Front + back",
+        "methodId": "dtf",
+        "methodLabel": "DTF Transfer",
+        "engineMethod": "DTF",
+        "isCap": false,
+        "inkColors": null,
+        "safetyStripes": false,
+        "status": "ok",
+        "price": {
+          "total": 756,
+          "perPiece": 31.5,
+          "tierLabel": "24-47",
+          "oneTimeFees": []
+        },
+        "sizes": {
+          "S": 24
+        },
+        "belowMin": false
+      },
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".pdp-cfg-total-tier"
+            ],
+            [
+              ".is-active-tier > .tier-fee-no"
+            ]
+          ]
+        },
+        {
+          "id": "scrollable-region-focusable",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".table-wrap"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "label": "configured",
+      "selection": {
+        "qty": 24,
+        "locationKey": "frontBack",
+        "locationLabel": "Front + back",
+        "methodId": "dtf",
+        "methodLabel": "DTF Transfer",
+        "engineMethod": "DTF",
+        "isCap": false,
+        "inkColors": null,
+        "safetyStripes": false,
+        "status": "ok",
+        "price": {
+          "total": 756,
+          "perPiece": 31.5,
+          "tierLabel": "24-47",
+          "oneTimeFees": []
+        },
+        "sizes": {
+          "S": 24
+        },
+        "belowMin": false
+      },
+      "url": "/product.html?style=PC61&color=Brilliant+Orange"
+    },
+    {
+      "label": "successful quote cart payload",
+      "items": [
+        {
+          "id": "qc_mtxajrk0_di",
+          "style": "PC61",
+          "productTitle": "Core Cotton Tee",
+          "color": "Brilliant Orange",
+          "catalogColor": "BrillOrng",
+          "qty": 24,
+          "sizes": {
+            "S": 24
+          },
+          "method": "DTF",
+          "placement": "frontBack",
+          "placementLabel": "Front + back",
+          "methodLabel": "DTF Transfer",
+          "inkColors": null,
+          "safetyStripes": false,
+          "isCap": false,
+          "addedAt": 1789151400000
+        }
+      ]
+    }
+  ],
+  "dialogs": []
+}

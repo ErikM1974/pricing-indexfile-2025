@@ -746,3 +746,62 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - shared_components/css/custom-apparel-studio.css — shared scoped Custom Tees/Caps storefront, gallery, order and print layout.
 
 - shared_components/js/custom-apparel-print.js — shared print-only form value mirrors; no order writes.
+
+- tests/fixtures/catalog-storefront-original-content.json — immutable original home/catalog/product content, fields and style/script hashes.
+- tests/unit/catalog-storefront-content.test.js — original source and product pricing transformation guards for storefront CSS migration.
+- tests/e2e/helpers/catalog-storefront-browser.js — isolated synthetic catalog API and original-source browser harness.
+- tests/e2e/css-unification-catalog-storefront.spec.js — original and migrated home/catalog/product workflow and rendered layout contracts.
+
+- tests/fixtures/catalog-storefront-home-original-browser.json — immutable original synthetic home/catalog/product browser contract.
+
+- tests/fixtures/catalog-storefront-catalog-original-browser.json — immutable original synthetic home/catalog/product browser contract.
+
+- tests/fixtures/catalog-storefront-product-original-browser.json — immutable original synthetic home/catalog/product browser contract.
+
+- tests/fixtures/catalog-storefront-catalog-quick-view-original-browser.json — immutable original synthetic home/catalog/product browser contract.
+
+- tests/fixtures/catalog-storefront-catalog-brand-original-browser.json — immutable original synthetic home/catalog/product browser contract.
+
+- tests/fixtures/catalog-storefront-catalog-final-page-original-browser.json — immutable original synthetic home/catalog/product browser contract.
+
+- tests/fixtures/catalog-storefront-catalog-empty-original-browser.json — immutable original synthetic home/catalog/product browser contract.
+
+- tests/fixtures/catalog-storefront-catalog-rulesFailed-original-browser.json — immutable original synthetic home/catalog/product browser contract.
+
+- tests/fixtures/catalog-storefront-catalog-mobile-filter-original-browser.json — immutable original synthetic home/catalog/product browser contract.
+
+- tests/fixtures/catalog-storefront-home-browse-original-browser.json — immutable original synthetic home/catalog/product browser contract.
+
+- tests/fixtures/catalog-storefront-product-productFailed-original-browser.json — immutable original synthetic home/catalog/product browser contract.
+
+- tests/fixtures/catalog-storefront-product-productEmpty-original-browser.json — immutable original synthetic home/catalog/product browser contract.
+
+- tests/fixtures/catalog-storefront-product-missing-original-browser.json — immutable original synthetic home/catalog/product browser contract.
+
+- tests/fixtures/catalog-storefront-product-pricingFailed-original-browser.json — immutable original synthetic home/catalog/product browser contract.
+
+- tests/fixtures/catalog-storefront-catalog-searchFailed-original-browser.json — immutable original synthetic home/catalog/product browser contract.
+
+- tests/fixtures/catalog-storefront-product-stockFailed-original-browser.json — immutable original synthetic home/catalog/product browser contract.
+
+- tests/fixtures/catalog-storefront-product-out-original-browser.json — immutable original synthetic home/catalog/product browser contract.
+
+- tests/fixtures/catalog-storefront-product-emb-frontBack-6-original-browser.json — immutable original synthetic home/catalog/product browser contract.
+
+- tests/fixtures/catalog-storefront-product-dtg-fullFront-12-original-browser.json — immutable original synthetic home/catalog/product browser contract.
+
+- tests/fixtures/catalog-storefront-product-dtg-frontBack-24-original-browser.json — immutable original synthetic home/catalog/product browser contract.
+
+- tests/fixtures/catalog-storefront-product-scp-frontBack-48-original-browser.json — immutable original synthetic home/catalog/product browser contract.
+
+- tests/fixtures/catalog-storefront-product-dtf-leftChest-24-original-browser.json — immutable original synthetic home/catalog/product browser contract.
+
+- tests/fixtures/catalog-storefront-product-dtf-frontBack-24-original-browser.json — immutable original synthetic home/catalog/product browser contract.
+
+- tests/fixtures/catalog-storefront-product-sample-original-browser.json — immutable original synthetic home/catalog/product browser contract.
+
+- tests/fixtures/catalog-storefront-product-capemb-frontBack-24-original-browser.json — immutable original synthetic home/catalog/product browser contract.
+
+- tests/fixtures/catalog-storefront-home-search-original-browser.json — immutable original synthetic home/catalog/product browser contract.
+
+- tests/fixtures/catalog-storefront-product-dtf-minimum-original-browser.json — immutable original synthetic home/catalog/product browser contract.

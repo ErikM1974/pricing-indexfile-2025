@@ -1,0 +1,2087 @@
+{
+  "name": "home-browse",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Custom Embroidery, Screen Printing & DTG — Northwest Custom Apparel | Milton, WA",
+      "url": "/",
+      "ids": {
+        "express-order": "⚡ EXPRESS ORDER — ORDER ONLINE Design and pay online in minutes — our team proofs every order and confirms the details with you before production. Perfect for events and quick one-time orders. FULL-COLOR DTG · NO MINIMUMS Custom T-Shirts Pick a style, upload your art, see it on a real shirt, and check out in minutes. Ships in 7–10 business days — 3-day rush available. Start your t-shirt order → EMBROIDERED · 8-CAP MINIMUM Custom Hats Pick a cap, upload your logo, and approve a digital proof. Free setup and free shipping — ships 7–10 business days after you approve. Start your cap order →",
+        "allCategoriesTile": "All categories →"
+      },
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#main",
+          "text": "Skip to content"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "https://nwcustomapparel.net/",
+          "text": "Corporate site ↗"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/catalog",
+          "text": "Products"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "text": "Fall Catalog '26 New"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom Tees New"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats New"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Webstores"
+        },
+        {
+          "href": "/blog",
+          "text": "Blog"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "Stickers"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "text": "Get a Quote"
+        },
+        {
+          "href": "/customer/login",
+          "text": "Sign In"
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "text": "Fall Catalog '26 New"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts New"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "Custom Stickers New"
+        },
+        {
+          "href": "/custom-banners",
+          "text": "Vinyl Banners New"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats New"
+        },
+        {
+          "href": "/custom-carhartt",
+          "text": "Custom Carhartt New"
+        },
+        {
+          "href": "/custom-richardson",
+          "text": "Custom Richardson New"
+        },
+        {
+          "href": "/custom-nike",
+          "text": "Custom Nike New"
+        },
+        {
+          "href": "/custom-new-era",
+          "text": "Custom New Era New"
+        },
+        {
+          "href": "/custom-sport-tek",
+          "text": "Custom Sport-Tek New"
+        },
+        {
+          "href": "/custom-ogio",
+          "text": "Custom OGIO New"
+        },
+        {
+          "href": "/custom-district",
+          "text": "Custom District New"
+        },
+        {
+          "href": "/custom-port-authority",
+          "text": "Custom Port Authority New"
+        },
+        {
+          "href": "/custom-port-and-company",
+          "text": "Custom Port & Company New"
+        },
+        {
+          "href": "/custom-cornerstone",
+          "text": "Custom CornerStone New"
+        },
+        {
+          "href": "/custom-north-face",
+          "text": "Custom The North Face New"
+        },
+        {
+          "href": "/custom-gildan",
+          "text": "Custom Gildan New"
+        },
+        {
+          "href": "/custom-eddie-bauer",
+          "text": "Custom Eddie Bauer New"
+        },
+        {
+          "href": "/custom-travismathew",
+          "text": "Custom TravisMathew New"
+        },
+        {
+          "href": "/custom-bella-canvas",
+          "text": "Custom Bella+Canvas New"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers & Free Samples"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/blog",
+          "text": "Blog"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "text": "Get a Quote"
+        },
+        {
+          "href": "https://nwcustomapparel.net/",
+          "text": "Corporate site ↗"
+        },
+        {
+          "href": "/catalog",
+          "text": "Catalog"
+        },
+        {
+          "href": "#",
+          "text": "T-Shirts"
+        },
+        {
+          "href": "#",
+          "text": "Polos/Knits"
+        },
+        {
+          "href": "#",
+          "text": "Sweatshirts/Fleece"
+        },
+        {
+          "href": "#",
+          "text": "Caps"
+        },
+        {
+          "href": "#",
+          "text": "Activewear"
+        },
+        {
+          "href": "#",
+          "text": "Outerwear"
+        },
+        {
+          "href": "#",
+          "text": "Bags"
+        },
+        {
+          "href": "#",
+          "text": "Accessories"
+        },
+        {
+          "href": "#",
+          "text": "Workwear"
+        },
+        {
+          "href": "#",
+          "text": "Woven Shirts"
+        },
+        {
+          "href": "#",
+          "text": "Ladies"
+        },
+        {
+          "href": "#",
+          "text": "Youth"
+        },
+        {
+          "href": "#",
+          "text": "Infant & Toddler"
+        },
+        {
+          "href": "#",
+          "text": "Tall"
+        },
+        {
+          "href": "#",
+          "text": "Juniors & Young Men"
+        },
+        {
+          "href": "#",
+          "text": "Personal Protection"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/catalog",
+          "text": "Shop the catalog"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Design custom tees online"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Full-color DTG · No minimums Custom T-Shirts Pick a style, upload your art, see it on a real shirt, and check out in minutes. Ships in 7–10 business days — 3-day rush available. Start your t-shirt order →"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Embroidered · 8-cap minimum Custom Hats Pick a cap, upload your logo, and approve a digital proof. Free setup and free shipping — ships 7–10 business days after you approve. Start your cap order →"
+        },
+        {
+          "href": "https://maps.google.com/?cid=4107380119454186786",
+          "text": "★★★★★ 4.9 from 185+ Google reviews"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "text": "🍂 New · Fall 2026 Fall Catalog '26 is here 170+ brand-new styles — from our newest brand MiiR to The North Face, Carhartt, Nike & Port Authority. Fresh apparel, bags and accessories, ready to decorate with your logo. Explore the collection"
+        },
+        {
+          "href": "/golf-tournament-apparel?utm_source=homepage&utm_campaign=golf-2026-q2&utm_medium=hero",
+          "text": "⛳ Summer 2026 Tournament outfitting, concierge-style Free $100 logo digitizing plus a free OGIO Vision 2.0 golf bag ($239 value) on tournament orders of $2,000+. TravisMathew, Nike & OGIO — we handle every detail. See tournament apparel →"
+        },
+        {
+          "href": "/custom-safety-apparel?utm_source=homepage&utm_campaign=safety-2026&utm_medium=hero",
+          "text": "🦺 Hi-Vis & Safety Custom safety stripe apparel High-visibility safety stripes screen-printed on hi-vis tees, hoodies & vests — with your logo. Pick from Steve's stripe layouts or go fully custom. See safety apparel →"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "New Custom T-Shirts, online Design full-color DTG tees on real product photos — upload art, see it live, check out in minutes. Ships in 7–10 business days, 3-day rush available. Design yours →"
+        },
+        {
+          "href": "/golf-tournament-apparel?utm_source=homepage&utm_campaign=golf-2026-q2&utm_medium=card",
+          "text": "Tournament packages Embroidered TravisMathew, Nike & OGIO for company golf tournaments. Free digitizing and a free OGIO golf bag on $2,000+ orders. View tournament gear →"
+        },
+        {
+          "href": "/custom-safety-apparel?utm_source=homepage&utm_campaign=safety-2026&utm_medium=card",
+          "text": "Safety stripe apparel High-visibility safety stripes screen-printed on hi-vis tees, hoodies & vests with your logo. Choose a stripe layout or go custom. See safety apparel →"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom webstores Run an online store for your team, company swag, or fundraiser. We handle production, fulfillment, and order tracking. Learn more →"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free sample program See it before you order it. Free samples on 60+ best sellers, shipped in 2–3 days — no minimum order required. Request samples →"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Browse all 60 →"
+        },
+        {
+          "href": "/product.html?style=PC61&color=Jet+Black",
+          "text": "View product →"
+        },
+        {
+          "href": "/custom-tees?style=PC61&color=Jet%20Black",
+          "text": "Buy online →"
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "View product →"
+        },
+        {
+          "href": "/product.html?style=PC90H&color=Royal",
+          "text": "View product →"
+        },
+        {
+          "href": "/product.html?style=CT103828&color=Carhartt+Brown",
+          "text": "View product →"
+        },
+        {
+          "href": "/catalog?category=T-Shirts",
+          "text": "01T-Shirts→"
+        },
+        {
+          "href": "/catalog?category=Polos%2FKnits",
+          "text": "02Polos & Knits→"
+        },
+        {
+          "href": "/catalog?category=Sweatshirts%2FFleece",
+          "text": "03Sweatshirts & Fleece→"
+        },
+        {
+          "href": "/catalog?category=Caps",
+          "text": "04Caps→"
+        },
+        {
+          "href": "/catalog?category=Outerwear",
+          "text": "05Outerwear→"
+        },
+        {
+          "href": "/catalog?category=Workwear",
+          "text": "06Workwear→"
+        },
+        {
+          "href": "/catalog?category=Bags",
+          "text": "07Bags→"
+        },
+        {
+          "href": "/catalog?category=Ladies",
+          "text": "08Ladies→"
+        },
+        {
+          "href": "/catalog?category=Activewear",
+          "text": "09Activewear→"
+        },
+        {
+          "href": "/catalog?category=Woven%20Shirts",
+          "text": "10Woven Shirts→"
+        },
+        {
+          "href": "/catalog",
+          "text": "All categories →"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "/blog",
+          "text": "All posts →"
+        },
+        {
+          "href": "/blog/example-team-guide",
+          "text": "Apparel guidesChoosing apparel for your teamA synthetic article preview for the original layout review.August 31, 2026"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/custom-carhartt",
+          "text": "Custom Carhartt"
+        },
+        {
+          "href": "/custom-richardson",
+          "text": "Custom Richardson"
+        },
+        {
+          "href": "/custom-nike",
+          "text": "Custom Nike"
+        },
+        {
+          "href": "/custom-new-era",
+          "text": "Custom New Era"
+        },
+        {
+          "href": "/custom-sport-tek",
+          "text": "Custom Sport-Tek"
+        },
+        {
+          "href": "/custom-ogio",
+          "text": "Custom OGIO"
+        },
+        {
+          "href": "/custom-district",
+          "text": "Custom District"
+        },
+        {
+          "href": "/custom-port-authority",
+          "text": "Custom Port Authority"
+        },
+        {
+          "href": "/custom-port-and-company",
+          "text": "Custom Port & Company"
+        },
+        {
+          "href": "/custom-cornerstone",
+          "text": "Custom CornerStone"
+        },
+        {
+          "href": "/custom-north-face",
+          "text": "Custom The North Face"
+        },
+        {
+          "href": "/custom-gildan",
+          "text": "Custom Gildan"
+        },
+        {
+          "href": "/custom-eddie-bauer",
+          "text": "Custom Eddie Bauer"
+        },
+        {
+          "href": "/custom-travismathew",
+          "text": "Custom TravisMathew"
+        },
+        {
+          "href": "/custom-bella-canvas",
+          "text": "Custom Bella+Canvas"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free Sample Program"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "text": "Request a Quote"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "Die-Cut Stickers"
+        },
+        {
+          "href": "/custom-banners",
+          "text": "Vinyl Banners"
+        },
+        {
+          "href": "/golf-tournament-apparel?utm_source=homepage&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "text": "Tournament Packages"
+        },
+        {
+          "href": "/custom-safety-apparel?utm_source=homepage&utm_campaign=safety-2026&utm_medium=footer",
+          "text": "Safety & Hi-Vis Apparel"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/pages/webstore-inquiry.html",
+          "text": "Start a Company Store"
+        },
+        {
+          "href": "/pages/forms/team-roster-form.html",
+          "text": "Team Roster — Names & Numbers"
+        },
+        {
+          "href": "/blog",
+          "text": "Blog"
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "Laser-Engraved Tumblers"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Portal"
+        }
+      ],
+      "selection": null,
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".fall26-band-body > .duo-badge"
+            ],
+            [
+              ".blog-teaser-all"
+            ],
+            [
+              ".blog-card-meta"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Custom Embroidery, Screen Printing & DTG — Northwest Custom Apparel | Milton, WA",
+      "url": "/",
+      "ids": {
+        "express-order": "⚡ EXPRESS ORDER — ORDER ONLINE Design and pay online in minutes — our team proofs every order and confirms the details with you before production. Perfect for events and quick one-time orders. FULL-COLOR DTG · NO MINIMUMS Custom T-Shirts Pick a style, upload your art, see it on a real shirt, and check out in minutes. Ships in 7–10 business days — 3-day rush available. Start your t-shirt order → EMBROIDERED · 8-CAP MINIMUM Custom Hats Pick a cap, upload your logo, and approve a digital proof. Free setup and free shipping — ships 7–10 business days after you approve. Start your cap order →",
+        "allCategoriesTile": "All categories →"
+      },
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#main",
+          "text": "Skip to content"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/customer/login",
+          "text": "Sign In"
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "text": "Fall Catalog '26 New"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts New"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "Custom Stickers New"
+        },
+        {
+          "href": "/custom-banners",
+          "text": "Vinyl Banners New"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats New"
+        },
+        {
+          "href": "/custom-carhartt",
+          "text": "Custom Carhartt New"
+        },
+        {
+          "href": "/custom-richardson",
+          "text": "Custom Richardson New"
+        },
+        {
+          "href": "/custom-nike",
+          "text": "Custom Nike New"
+        },
+        {
+          "href": "/custom-new-era",
+          "text": "Custom New Era New"
+        },
+        {
+          "href": "/custom-sport-tek",
+          "text": "Custom Sport-Tek New"
+        },
+        {
+          "href": "/custom-ogio",
+          "text": "Custom OGIO New"
+        },
+        {
+          "href": "/custom-district",
+          "text": "Custom District New"
+        },
+        {
+          "href": "/custom-port-authority",
+          "text": "Custom Port Authority New"
+        },
+        {
+          "href": "/custom-port-and-company",
+          "text": "Custom Port & Company New"
+        },
+        {
+          "href": "/custom-cornerstone",
+          "text": "Custom CornerStone New"
+        },
+        {
+          "href": "/custom-north-face",
+          "text": "Custom The North Face New"
+        },
+        {
+          "href": "/custom-gildan",
+          "text": "Custom Gildan New"
+        },
+        {
+          "href": "/custom-eddie-bauer",
+          "text": "Custom Eddie Bauer New"
+        },
+        {
+          "href": "/custom-travismathew",
+          "text": "Custom TravisMathew New"
+        },
+        {
+          "href": "/custom-bella-canvas",
+          "text": "Custom Bella+Canvas New"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers & Free Samples"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/blog",
+          "text": "Blog"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "text": "Get a Quote"
+        },
+        {
+          "href": "https://nwcustomapparel.net/",
+          "text": "Corporate site ↗"
+        },
+        {
+          "href": "/catalog",
+          "text": "Catalog"
+        },
+        {
+          "href": "#",
+          "text": "T-Shirts"
+        },
+        {
+          "href": "#",
+          "text": "Polos/Knits"
+        },
+        {
+          "href": "#",
+          "text": "Sweatshirts/Fleece"
+        },
+        {
+          "href": "#",
+          "text": "Caps"
+        },
+        {
+          "href": "#",
+          "text": "Activewear"
+        },
+        {
+          "href": "#",
+          "text": "Outerwear"
+        },
+        {
+          "href": "#",
+          "text": "Bags"
+        },
+        {
+          "href": "#",
+          "text": "Accessories"
+        },
+        {
+          "href": "#",
+          "text": "Workwear"
+        },
+        {
+          "href": "#",
+          "text": "Woven Shirts"
+        },
+        {
+          "href": "#",
+          "text": "Ladies"
+        },
+        {
+          "href": "#",
+          "text": "Youth"
+        },
+        {
+          "href": "#",
+          "text": "Infant & Toddler"
+        },
+        {
+          "href": "#",
+          "text": "Tall"
+        },
+        {
+          "href": "#",
+          "text": "Juniors & Young Men"
+        },
+        {
+          "href": "#",
+          "text": "Personal Protection"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/catalog",
+          "text": "Shop the catalog"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Design custom tees online"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Full-color DTG · No minimums Custom T-Shirts Pick a style, upload your art, see it on a real shirt, and check out in minutes. Ships in 7–10 business days — 3-day rush available. Start your t-shirt order →"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Embroidered · 8-cap minimum Custom Hats Pick a cap, upload your logo, and approve a digital proof. Free setup and free shipping — ships 7–10 business days after you approve. Start your cap order →"
+        },
+        {
+          "href": "https://maps.google.com/?cid=4107380119454186786",
+          "text": "★★★★★ 4.9 from 185+ Google reviews"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "text": "🍂 New · Fall 2026 Fall Catalog '26 is here 170+ brand-new styles — from our newest brand MiiR to The North Face, Carhartt, Nike & Port Authority. Fresh apparel, bags and accessories, ready to decorate with your logo. Explore the collection"
+        },
+        {
+          "href": "/golf-tournament-apparel?utm_source=homepage&utm_campaign=golf-2026-q2&utm_medium=hero",
+          "text": "⛳ Summer 2026 Tournament outfitting, concierge-style Free $100 logo digitizing plus a free OGIO Vision 2.0 golf bag ($239 value) on tournament orders of $2,000+. TravisMathew, Nike & OGIO — we handle every detail. See tournament apparel →"
+        },
+        {
+          "href": "/custom-safety-apparel?utm_source=homepage&utm_campaign=safety-2026&utm_medium=hero",
+          "text": "🦺 Hi-Vis & Safety Custom safety stripe apparel High-visibility safety stripes screen-printed on hi-vis tees, hoodies & vests — with your logo. Pick from Steve's stripe layouts or go fully custom. See safety apparel →"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "New Custom T-Shirts, online Design full-color DTG tees on real product photos — upload art, see it live, check out in minutes. Ships in 7–10 business days, 3-day rush available. Design yours →"
+        },
+        {
+          "href": "/golf-tournament-apparel?utm_source=homepage&utm_campaign=golf-2026-q2&utm_medium=card",
+          "text": "Tournament packages Embroidered TravisMathew, Nike & OGIO for company golf tournaments. Free digitizing and a free OGIO golf bag on $2,000+ orders. View tournament gear →"
+        },
+        {
+          "href": "/custom-safety-apparel?utm_source=homepage&utm_campaign=safety-2026&utm_medium=card",
+          "text": "Safety stripe apparel High-visibility safety stripes screen-printed on hi-vis tees, hoodies & vests with your logo. Choose a stripe layout or go custom. See safety apparel →"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom webstores Run an online store for your team, company swag, or fundraiser. We handle production, fulfillment, and order tracking. Learn more →"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free sample program See it before you order it. Free samples on 60+ best sellers, shipped in 2–3 days — no minimum order required. Request samples →"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Browse all 60 →"
+        },
+        {
+          "href": "/product.html?style=PC61&color=Jet+Black",
+          "text": "View product →"
+        },
+        {
+          "href": "/custom-tees?style=PC61&color=Jet%20Black",
+          "text": "Buy online →"
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "View product →"
+        },
+        {
+          "href": "/product.html?style=PC90H&color=Royal",
+          "text": "View product →"
+        },
+        {
+          "href": "/product.html?style=CT103828&color=Carhartt+Brown",
+          "text": "View product →"
+        },
+        {
+          "href": "/catalog?category=T-Shirts",
+          "text": "01T-Shirts→"
+        },
+        {
+          "href": "/catalog?category=Polos%2FKnits",
+          "text": "02Polos & Knits→"
+        },
+        {
+          "href": "/catalog?category=Sweatshirts%2FFleece",
+          "text": "03Sweatshirts & Fleece→"
+        },
+        {
+          "href": "/catalog?category=Caps",
+          "text": "04Caps→"
+        },
+        {
+          "href": "/catalog?category=Outerwear",
+          "text": "05Outerwear→"
+        },
+        {
+          "href": "/catalog?category=Workwear",
+          "text": "06Workwear→"
+        },
+        {
+          "href": "/catalog?category=Bags",
+          "text": "07Bags→"
+        },
+        {
+          "href": "/catalog?category=Ladies",
+          "text": "08Ladies→"
+        },
+        {
+          "href": "/catalog?category=Activewear",
+          "text": "09Activewear→"
+        },
+        {
+          "href": "/catalog?category=Woven%20Shirts",
+          "text": "10Woven Shirts→"
+        },
+        {
+          "href": "/catalog",
+          "text": "All categories →"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "/blog",
+          "text": "All posts →"
+        },
+        {
+          "href": "/blog/example-team-guide",
+          "text": "Apparel guidesChoosing apparel for your teamA synthetic article preview for the original layout review.August 31, 2026"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/custom-carhartt",
+          "text": "Custom Carhartt"
+        },
+        {
+          "href": "/custom-richardson",
+          "text": "Custom Richardson"
+        },
+        {
+          "href": "/custom-nike",
+          "text": "Custom Nike"
+        },
+        {
+          "href": "/custom-new-era",
+          "text": "Custom New Era"
+        },
+        {
+          "href": "/custom-sport-tek",
+          "text": "Custom Sport-Tek"
+        },
+        {
+          "href": "/custom-ogio",
+          "text": "Custom OGIO"
+        },
+        {
+          "href": "/custom-district",
+          "text": "Custom District"
+        },
+        {
+          "href": "/custom-port-authority",
+          "text": "Custom Port Authority"
+        },
+        {
+          "href": "/custom-port-and-company",
+          "text": "Custom Port & Company"
+        },
+        {
+          "href": "/custom-cornerstone",
+          "text": "Custom CornerStone"
+        },
+        {
+          "href": "/custom-north-face",
+          "text": "Custom The North Face"
+        },
+        {
+          "href": "/custom-gildan",
+          "text": "Custom Gildan"
+        },
+        {
+          "href": "/custom-eddie-bauer",
+          "text": "Custom Eddie Bauer"
+        },
+        {
+          "href": "/custom-travismathew",
+          "text": "Custom TravisMathew"
+        },
+        {
+          "href": "/custom-bella-canvas",
+          "text": "Custom Bella+Canvas"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free Sample Program"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "text": "Request a Quote"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "Die-Cut Stickers"
+        },
+        {
+          "href": "/custom-banners",
+          "text": "Vinyl Banners"
+        },
+        {
+          "href": "/golf-tournament-apparel?utm_source=homepage&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "text": "Tournament Packages"
+        },
+        {
+          "href": "/custom-safety-apparel?utm_source=homepage&utm_campaign=safety-2026&utm_medium=footer",
+          "text": "Safety & Hi-Vis Apparel"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/pages/webstore-inquiry.html",
+          "text": "Start a Company Store"
+        },
+        {
+          "href": "/pages/forms/team-roster-form.html",
+          "text": "Team Roster — Names & Numbers"
+        },
+        {
+          "href": "/blog",
+          "text": "Blog"
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "Laser-Engraved Tumblers"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Portal"
+        }
+      ],
+      "selection": null,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".fall26-band-body > .duo-badge"
+            ],
+            [
+              ".blog-teaser-all"
+            ],
+            [
+              ".blog-card-meta"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Custom Embroidery, Screen Printing & DTG — Northwest Custom Apparel | Milton, WA",
+      "url": "/",
+      "ids": {
+        "express-order": "⚡ EXPRESS ORDER — ORDER ONLINE Design and pay online in minutes — our team proofs every order and confirms the details with you before production. Perfect for events and quick one-time orders. FULL-COLOR DTG · NO MINIMUMS Custom T-Shirts Pick a style, upload your art, see it on a real shirt, and check out in minutes. Ships in 7–10 business days — 3-day rush available. Start your t-shirt order → EMBROIDERED · 8-CAP MINIMUM Custom Hats Pick a cap, upload your logo, and approve a digital proof. Free setup and free shipping — ships 7–10 business days after you approve. Start your cap order →",
+        "allCategoriesTile": "All categories →"
+      },
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#main",
+          "text": "Skip to content"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/customer/login",
+          "text": "Sign In"
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "text": "Fall Catalog '26 New"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts New"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "Custom Stickers New"
+        },
+        {
+          "href": "/custom-banners",
+          "text": "Vinyl Banners New"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats New"
+        },
+        {
+          "href": "/custom-carhartt",
+          "text": "Custom Carhartt New"
+        },
+        {
+          "href": "/custom-richardson",
+          "text": "Custom Richardson New"
+        },
+        {
+          "href": "/custom-nike",
+          "text": "Custom Nike New"
+        },
+        {
+          "href": "/custom-new-era",
+          "text": "Custom New Era New"
+        },
+        {
+          "href": "/custom-sport-tek",
+          "text": "Custom Sport-Tek New"
+        },
+        {
+          "href": "/custom-ogio",
+          "text": "Custom OGIO New"
+        },
+        {
+          "href": "/custom-district",
+          "text": "Custom District New"
+        },
+        {
+          "href": "/custom-port-authority",
+          "text": "Custom Port Authority New"
+        },
+        {
+          "href": "/custom-port-and-company",
+          "text": "Custom Port & Company New"
+        },
+        {
+          "href": "/custom-cornerstone",
+          "text": "Custom CornerStone New"
+        },
+        {
+          "href": "/custom-north-face",
+          "text": "Custom The North Face New"
+        },
+        {
+          "href": "/custom-gildan",
+          "text": "Custom Gildan New"
+        },
+        {
+          "href": "/custom-eddie-bauer",
+          "text": "Custom Eddie Bauer New"
+        },
+        {
+          "href": "/custom-travismathew",
+          "text": "Custom TravisMathew New"
+        },
+        {
+          "href": "/custom-bella-canvas",
+          "text": "Custom Bella+Canvas New"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers & Free Samples"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/blog",
+          "text": "Blog"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "text": "Get a Quote"
+        },
+        {
+          "href": "https://nwcustomapparel.net/",
+          "text": "Corporate site ↗"
+        },
+        {
+          "href": "/catalog",
+          "text": "Catalog"
+        },
+        {
+          "href": "#",
+          "text": "T-Shirts"
+        },
+        {
+          "href": "#",
+          "text": "Polos/Knits"
+        },
+        {
+          "href": "#",
+          "text": "Sweatshirts/Fleece"
+        },
+        {
+          "href": "#",
+          "text": "Caps"
+        },
+        {
+          "href": "#",
+          "text": "Activewear"
+        },
+        {
+          "href": "#",
+          "text": "Outerwear"
+        },
+        {
+          "href": "#",
+          "text": "Bags"
+        },
+        {
+          "href": "#",
+          "text": "Accessories"
+        },
+        {
+          "href": "#",
+          "text": "Workwear"
+        },
+        {
+          "href": "#",
+          "text": "Woven Shirts"
+        },
+        {
+          "href": "#",
+          "text": "Ladies"
+        },
+        {
+          "href": "#",
+          "text": "Youth"
+        },
+        {
+          "href": "#",
+          "text": "Infant & Toddler"
+        },
+        {
+          "href": "#",
+          "text": "Tall"
+        },
+        {
+          "href": "#",
+          "text": "Juniors & Young Men"
+        },
+        {
+          "href": "#",
+          "text": "Personal Protection"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/catalog",
+          "text": "Shop the catalog"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Design custom tees online"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Full-color DTG · No minimums Custom T-Shirts Pick a style, upload your art, see it on a real shirt, and check out in minutes. Ships in 7–10 business days — 3-day rush available. Start your t-shirt order →"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Embroidered · 8-cap minimum Custom Hats Pick a cap, upload your logo, and approve a digital proof. Free setup and free shipping — ships 7–10 business days after you approve. Start your cap order →"
+        },
+        {
+          "href": "https://maps.google.com/?cid=4107380119454186786",
+          "text": "★★★★★ 4.9 from 185+ Google reviews"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "text": "🍂 New · Fall 2026 Fall Catalog '26 is here 170+ brand-new styles — from our newest brand MiiR to The North Face, Carhartt, Nike & Port Authority. Fresh apparel, bags and accessories, ready to decorate with your logo. Explore the collection"
+        },
+        {
+          "href": "/golf-tournament-apparel?utm_source=homepage&utm_campaign=golf-2026-q2&utm_medium=hero",
+          "text": "⛳ Summer 2026 Tournament outfitting, concierge-style Free $100 logo digitizing plus a free OGIO Vision 2.0 golf bag ($239 value) on tournament orders of $2,000+. TravisMathew, Nike & OGIO — we handle every detail. See tournament apparel →"
+        },
+        {
+          "href": "/custom-safety-apparel?utm_source=homepage&utm_campaign=safety-2026&utm_medium=hero",
+          "text": "🦺 Hi-Vis & Safety Custom safety stripe apparel High-visibility safety stripes screen-printed on hi-vis tees, hoodies & vests — with your logo. Pick from Steve's stripe layouts or go fully custom. See safety apparel →"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "New Custom T-Shirts, online Design full-color DTG tees on real product photos — upload art, see it live, check out in minutes. Ships in 7–10 business days, 3-day rush available. Design yours →"
+        },
+        {
+          "href": "/golf-tournament-apparel?utm_source=homepage&utm_campaign=golf-2026-q2&utm_medium=card",
+          "text": "Tournament packages Embroidered TravisMathew, Nike & OGIO for company golf tournaments. Free digitizing and a free OGIO golf bag on $2,000+ orders. View tournament gear →"
+        },
+        {
+          "href": "/custom-safety-apparel?utm_source=homepage&utm_campaign=safety-2026&utm_medium=card",
+          "text": "Safety stripe apparel High-visibility safety stripes screen-printed on hi-vis tees, hoodies & vests with your logo. Choose a stripe layout or go custom. See safety apparel →"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom webstores Run an online store for your team, company swag, or fundraiser. We handle production, fulfillment, and order tracking. Learn more →"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free sample program See it before you order it. Free samples on 60+ best sellers, shipped in 2–3 days — no minimum order required. Request samples →"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Browse all 60 →"
+        },
+        {
+          "href": "/product.html?style=PC61&color=Jet+Black",
+          "text": "View product →"
+        },
+        {
+          "href": "/custom-tees?style=PC61&color=Jet%20Black",
+          "text": "Buy online →"
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "View product →"
+        },
+        {
+          "href": "/product.html?style=PC90H&color=Royal",
+          "text": "View product →"
+        },
+        {
+          "href": "/product.html?style=CT103828&color=Carhartt+Brown",
+          "text": "View product →"
+        },
+        {
+          "href": "/catalog?category=T-Shirts",
+          "text": "01T-Shirts→"
+        },
+        {
+          "href": "/catalog?category=Polos%2FKnits",
+          "text": "02Polos & Knits→"
+        },
+        {
+          "href": "/catalog?category=Sweatshirts%2FFleece",
+          "text": "03Sweatshirts & Fleece→"
+        },
+        {
+          "href": "/catalog?category=Caps",
+          "text": "04Caps→"
+        },
+        {
+          "href": "/catalog?category=Outerwear",
+          "text": "05Outerwear→"
+        },
+        {
+          "href": "/catalog?category=Workwear",
+          "text": "06Workwear→"
+        },
+        {
+          "href": "/catalog?category=Bags",
+          "text": "07Bags→"
+        },
+        {
+          "href": "/catalog?category=Ladies",
+          "text": "08Ladies→"
+        },
+        {
+          "href": "/catalog?category=Activewear",
+          "text": "09Activewear→"
+        },
+        {
+          "href": "/catalog?category=Woven%20Shirts",
+          "text": "10Woven Shirts→"
+        },
+        {
+          "href": "/catalog",
+          "text": "All categories →"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "/blog",
+          "text": "All posts →"
+        },
+        {
+          "href": "/blog/example-team-guide",
+          "text": "Apparel guidesChoosing apparel for your teamA synthetic article preview for the original layout review.August 31, 2026"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/custom-carhartt",
+          "text": "Custom Carhartt"
+        },
+        {
+          "href": "/custom-richardson",
+          "text": "Custom Richardson"
+        },
+        {
+          "href": "/custom-nike",
+          "text": "Custom Nike"
+        },
+        {
+          "href": "/custom-new-era",
+          "text": "Custom New Era"
+        },
+        {
+          "href": "/custom-sport-tek",
+          "text": "Custom Sport-Tek"
+        },
+        {
+          "href": "/custom-ogio",
+          "text": "Custom OGIO"
+        },
+        {
+          "href": "/custom-district",
+          "text": "Custom District"
+        },
+        {
+          "href": "/custom-port-authority",
+          "text": "Custom Port Authority"
+        },
+        {
+          "href": "/custom-port-and-company",
+          "text": "Custom Port & Company"
+        },
+        {
+          "href": "/custom-cornerstone",
+          "text": "Custom CornerStone"
+        },
+        {
+          "href": "/custom-north-face",
+          "text": "Custom The North Face"
+        },
+        {
+          "href": "/custom-gildan",
+          "text": "Custom Gildan"
+        },
+        {
+          "href": "/custom-eddie-bauer",
+          "text": "Custom Eddie Bauer"
+        },
+        {
+          "href": "/custom-travismathew",
+          "text": "Custom TravisMathew"
+        },
+        {
+          "href": "/custom-bella-canvas",
+          "text": "Custom Bella+Canvas"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free Sample Program"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "text": "Request a Quote"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "Die-Cut Stickers"
+        },
+        {
+          "href": "/custom-banners",
+          "text": "Vinyl Banners"
+        },
+        {
+          "href": "/golf-tournament-apparel?utm_source=homepage&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "text": "Tournament Packages"
+        },
+        {
+          "href": "/custom-safety-apparel?utm_source=homepage&utm_campaign=safety-2026&utm_medium=footer",
+          "text": "Safety & Hi-Vis Apparel"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/pages/webstore-inquiry.html",
+          "text": "Start a Company Store"
+        },
+        {
+          "href": "/pages/forms/team-roster-form.html",
+          "text": "Team Roster — Names & Numbers"
+        },
+        {
+          "href": "/blog",
+          "text": "Blog"
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "Laser-Engraved Tumblers"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Portal"
+        }
+      ],
+      "selection": null,
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".fall26-band-body > .duo-badge"
+            ],
+            [
+              ".blog-teaser-all"
+            ],
+            [
+              ".blog-card-meta"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Custom Embroidery, Screen Printing & DTG — Northwest Custom Apparel | Milton, WA",
+      "url": "/",
+      "ids": {
+        "express-order": "⚡ EXPRESS ORDER — ORDER ONLINE Design and pay online in minutes — our team proofs every order and confirms the details with you before production. Perfect for events and quick one-time orders. FULL-COLOR DTG · NO MINIMUMS Custom T-Shirts Pick a style, upload your art, see it on a real shirt, and check out in minutes. Ships in 7–10 business days — 3-day rush available. Start your t-shirt order → EMBROIDERED · 8-CAP MINIMUM Custom Hats Pick a cap, upload your logo, and approve a digital proof. Free setup and free shipping — ships 7–10 business days after you approve. Start your cap order →",
+        "allCategoriesTile": "All categories →"
+      },
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#main",
+          "text": "Skip to content"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/customer/login",
+          "text": "Sign In"
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "text": "Fall Catalog '26 New"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts New"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "Custom Stickers New"
+        },
+        {
+          "href": "/custom-banners",
+          "text": "Vinyl Banners New"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats New"
+        },
+        {
+          "href": "/custom-carhartt",
+          "text": "Custom Carhartt New"
+        },
+        {
+          "href": "/custom-richardson",
+          "text": "Custom Richardson New"
+        },
+        {
+          "href": "/custom-nike",
+          "text": "Custom Nike New"
+        },
+        {
+          "href": "/custom-new-era",
+          "text": "Custom New Era New"
+        },
+        {
+          "href": "/custom-sport-tek",
+          "text": "Custom Sport-Tek New"
+        },
+        {
+          "href": "/custom-ogio",
+          "text": "Custom OGIO New"
+        },
+        {
+          "href": "/custom-district",
+          "text": "Custom District New"
+        },
+        {
+          "href": "/custom-port-authority",
+          "text": "Custom Port Authority New"
+        },
+        {
+          "href": "/custom-port-and-company",
+          "text": "Custom Port & Company New"
+        },
+        {
+          "href": "/custom-cornerstone",
+          "text": "Custom CornerStone New"
+        },
+        {
+          "href": "/custom-north-face",
+          "text": "Custom The North Face New"
+        },
+        {
+          "href": "/custom-gildan",
+          "text": "Custom Gildan New"
+        },
+        {
+          "href": "/custom-eddie-bauer",
+          "text": "Custom Eddie Bauer New"
+        },
+        {
+          "href": "/custom-travismathew",
+          "text": "Custom TravisMathew New"
+        },
+        {
+          "href": "/custom-bella-canvas",
+          "text": "Custom Bella+Canvas New"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers & Free Samples"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/blog",
+          "text": "Blog"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "text": "Get a Quote"
+        },
+        {
+          "href": "https://nwcustomapparel.net/",
+          "text": "Corporate site ↗"
+        },
+        {
+          "href": "/catalog",
+          "text": "Catalog"
+        },
+        {
+          "href": "#",
+          "text": "T-Shirts"
+        },
+        {
+          "href": "#",
+          "text": "Polos/Knits"
+        },
+        {
+          "href": "#",
+          "text": "Sweatshirts/Fleece"
+        },
+        {
+          "href": "#",
+          "text": "Caps"
+        },
+        {
+          "href": "#",
+          "text": "Activewear"
+        },
+        {
+          "href": "#",
+          "text": "Outerwear"
+        },
+        {
+          "href": "#",
+          "text": "Bags"
+        },
+        {
+          "href": "#",
+          "text": "Accessories"
+        },
+        {
+          "href": "#",
+          "text": "Workwear"
+        },
+        {
+          "href": "#",
+          "text": "Woven Shirts"
+        },
+        {
+          "href": "#",
+          "text": "Ladies"
+        },
+        {
+          "href": "#",
+          "text": "Youth"
+        },
+        {
+          "href": "#",
+          "text": "Infant & Toddler"
+        },
+        {
+          "href": "#",
+          "text": "Tall"
+        },
+        {
+          "href": "#",
+          "text": "Juniors & Young Men"
+        },
+        {
+          "href": "#",
+          "text": "Personal Protection"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/catalog",
+          "text": "Shop the catalog"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Design custom tees online"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Full-color DTG · No minimums Custom T-Shirts Pick a style, upload your art, see it on a real shirt, and check out in minutes. Ships in 7–10 business days — 3-day rush available. Start your t-shirt order →"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Embroidered · 8-cap minimum Custom Hats Pick a cap, upload your logo, and approve a digital proof. Free setup and free shipping — ships 7–10 business days after you approve. Start your cap order →"
+        },
+        {
+          "href": "https://maps.google.com/?cid=4107380119454186786",
+          "text": "★★★★★ 4.9 from 185+ Google reviews"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "text": "🍂 New · Fall 2026 Fall Catalog '26 is here 170+ brand-new styles — from our newest brand MiiR to The North Face, Carhartt, Nike & Port Authority. Fresh apparel, bags and accessories, ready to decorate with your logo. Explore the collection"
+        },
+        {
+          "href": "/golf-tournament-apparel?utm_source=homepage&utm_campaign=golf-2026-q2&utm_medium=hero",
+          "text": "⛳ Summer 2026 Tournament outfitting, concierge-style Free $100 logo digitizing plus a free OGIO Vision 2.0 golf bag ($239 value) on tournament orders of $2,000+. TravisMathew, Nike & OGIO — we handle every detail. See tournament apparel →"
+        },
+        {
+          "href": "/custom-safety-apparel?utm_source=homepage&utm_campaign=safety-2026&utm_medium=hero",
+          "text": "🦺 Hi-Vis & Safety Custom safety stripe apparel High-visibility safety stripes screen-printed on hi-vis tees, hoodies & vests — with your logo. Pick from Steve's stripe layouts or go fully custom. See safety apparel →"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "New Custom T-Shirts, online Design full-color DTG tees on real product photos — upload art, see it live, check out in minutes. Ships in 7–10 business days, 3-day rush available. Design yours →"
+        },
+        {
+          "href": "/golf-tournament-apparel?utm_source=homepage&utm_campaign=golf-2026-q2&utm_medium=card",
+          "text": "Tournament packages Embroidered TravisMathew, Nike & OGIO for company golf tournaments. Free digitizing and a free OGIO golf bag on $2,000+ orders. View tournament gear →"
+        },
+        {
+          "href": "/custom-safety-apparel?utm_source=homepage&utm_campaign=safety-2026&utm_medium=card",
+          "text": "Safety stripe apparel High-visibility safety stripes screen-printed on hi-vis tees, hoodies & vests with your logo. Choose a stripe layout or go custom. See safety apparel →"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom webstores Run an online store for your team, company swag, or fundraiser. We handle production, fulfillment, and order tracking. Learn more →"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free sample program See it before you order it. Free samples on 60+ best sellers, shipped in 2–3 days — no minimum order required. Request samples →"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Browse all 60 →"
+        },
+        {
+          "href": "/product.html?style=PC61&color=Jet+Black",
+          "text": "View product →"
+        },
+        {
+          "href": "/custom-tees?style=PC61&color=Jet%20Black",
+          "text": "Buy online →"
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "View product →"
+        },
+        {
+          "href": "/product.html?style=PC90H&color=Royal",
+          "text": "View product →"
+        },
+        {
+          "href": "/product.html?style=CT103828&color=Carhartt+Brown",
+          "text": "View product →"
+        },
+        {
+          "href": "/catalog?category=T-Shirts",
+          "text": "01T-Shirts→"
+        },
+        {
+          "href": "/catalog?category=Polos%2FKnits",
+          "text": "02Polos & Knits→"
+        },
+        {
+          "href": "/catalog?category=Sweatshirts%2FFleece",
+          "text": "03Sweatshirts & Fleece→"
+        },
+        {
+          "href": "/catalog?category=Caps",
+          "text": "04Caps→"
+        },
+        {
+          "href": "/catalog?category=Outerwear",
+          "text": "05Outerwear→"
+        },
+        {
+          "href": "/catalog?category=Workwear",
+          "text": "06Workwear→"
+        },
+        {
+          "href": "/catalog?category=Bags",
+          "text": "07Bags→"
+        },
+        {
+          "href": "/catalog?category=Ladies",
+          "text": "08Ladies→"
+        },
+        {
+          "href": "/catalog?category=Activewear",
+          "text": "09Activewear→"
+        },
+        {
+          "href": "/catalog?category=Woven%20Shirts",
+          "text": "10Woven Shirts→"
+        },
+        {
+          "href": "/catalog",
+          "text": "All categories →"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "/blog",
+          "text": "All posts →"
+        },
+        {
+          "href": "/blog/example-team-guide",
+          "text": "Apparel guidesChoosing apparel for your teamA synthetic article preview for the original layout review.August 31, 2026"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/custom-carhartt",
+          "text": "Custom Carhartt"
+        },
+        {
+          "href": "/custom-richardson",
+          "text": "Custom Richardson"
+        },
+        {
+          "href": "/custom-nike",
+          "text": "Custom Nike"
+        },
+        {
+          "href": "/custom-new-era",
+          "text": "Custom New Era"
+        },
+        {
+          "href": "/custom-sport-tek",
+          "text": "Custom Sport-Tek"
+        },
+        {
+          "href": "/custom-ogio",
+          "text": "Custom OGIO"
+        },
+        {
+          "href": "/custom-district",
+          "text": "Custom District"
+        },
+        {
+          "href": "/custom-port-authority",
+          "text": "Custom Port Authority"
+        },
+        {
+          "href": "/custom-port-and-company",
+          "text": "Custom Port & Company"
+        },
+        {
+          "href": "/custom-cornerstone",
+          "text": "Custom CornerStone"
+        },
+        {
+          "href": "/custom-north-face",
+          "text": "Custom The North Face"
+        },
+        {
+          "href": "/custom-gildan",
+          "text": "Custom Gildan"
+        },
+        {
+          "href": "/custom-eddie-bauer",
+          "text": "Custom Eddie Bauer"
+        },
+        {
+          "href": "/custom-travismathew",
+          "text": "Custom TravisMathew"
+        },
+        {
+          "href": "/custom-bella-canvas",
+          "text": "Custom Bella+Canvas"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free Sample Program"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "text": "Request a Quote"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "Die-Cut Stickers"
+        },
+        {
+          "href": "/custom-banners",
+          "text": "Vinyl Banners"
+        },
+        {
+          "href": "/golf-tournament-apparel?utm_source=homepage&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "text": "Tournament Packages"
+        },
+        {
+          "href": "/custom-safety-apparel?utm_source=homepage&utm_campaign=safety-2026&utm_medium=footer",
+          "text": "Safety & Hi-Vis Apparel"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/pages/webstore-inquiry.html",
+          "text": "Start a Company Store"
+        },
+        {
+          "href": "/pages/forms/team-roster-form.html",
+          "text": "Team Roster — Names & Numbers"
+        },
+        {
+          "href": "/blog",
+          "text": "Blog"
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "Laser-Engraved Tumblers"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Portal"
+        }
+      ],
+      "selection": null,
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            [
+              ".fall26-band-body > .duo-badge"
+            ],
+            [
+              ".blog-teaser-all"
+            ],
+            [
+              ".blog-card-meta"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "actions": [],
+  "dialogs": []
+}

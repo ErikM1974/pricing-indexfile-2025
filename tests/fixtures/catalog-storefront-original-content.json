@@ -1,0 +1,1236 @@
+{
+  "base": "7ce2f00c6d25de153358a3754bf16ba649e83766",
+  "pages": [
+    {
+      "file": "index.html",
+      "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <meta name=\"description\" content=\"Custom embroidery, screen printing, DTG, and DTF on quality apparel — family-owned in Milton, WA since 1977. Browse the catalog, request free samples, or design custom tees online.\">\n    <title>Custom Embroidery, Screen Printing &amp; DTG — Northwest Custom Apparel | Milton, WA</title>\n\n    <meta property=\"og:type\" content=\"website\">\n    <meta property=\"og:title\" content=\"Northwest Custom Apparel — Custom Embroidery &amp; Printing\">\n    <meta property=\"og:description\" content=\"Family-owned custom apparel decorator in Milton, WA since 1977. Embroidery, screen print, DTG, and DTF on brands you know.\">\n    <meta property=\"og:image\" content=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png\">\n\n    <!-- Preconnect to CDNs for faster resource loading -->\n    <link rel=\"preconnect\" href=\"https://cdn.caspio.com\">\n    <link rel=\"preconnect\" href=\"https://c3eku948.caspio.com\">\n    <link rel=\"preconnect\" href=\"https://cdnm.sanmar.com\" crossorigin=\"anonymous\">\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    <link rel=\"dns-prefetch\" href=\"https://cdn.caspio.com\">\n    <link rel=\"dns-prefetch\" href=\"https://c3eku948.caspio.com\">\n    <link rel=\"dns-prefetch\" href=\"https://cdnm.sanmar.com\">\n\n    <!-- Preload hero product image -->\n    <link rel=\"preload\" as=\"image\" href=\"https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9148464\" fetchpriority=\"high\">\n\n    <link rel=\"icon\" href=\"/favicon.ico\" sizes=\"48x48\">\n    <link rel=\"icon\" href=\"/favicon.png\" type=\"image/png\" sizes=\"48x48\">\n    <link rel=\"apple-touch-icon\" href=\"/apple-touch-icon.png\">\n\n    <link href=\"https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap\" rel=\"stylesheet\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link rel=\"stylesheet\" href=\"/catalog-search.css?v=2026.09.07.19\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/nwca-2026-core.css?v=2026.09.07.8\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/nwca-2026.css?v=2026.09.07.20\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/blog.css?v=2026.09.07.8\">\n\n    <!-- Entity stitching (2026-07-12): sameAs ties this domain and\n         nwcustomapparel.net into ONE business in Google's knowledge graph.\n         The WordPress site carries the mirror-image schema pointing here. -->\n    <script type=\"application/ld+json\">{\"@context\":\"https://schema.org\",\"@type\":\"Organization\",\"name\":\"Northwest Custom Apparel\",\"url\":\"https://www.teamnwca.com/\",\"logo\":\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png\",\"telephone\":\"253-922-5793\",\"address\":{\"@type\":\"PostalAddress\",\"streetAddress\":\"2025 Freeman Rd E\",\"addressLocality\":\"Milton\",\"addressRegion\":\"WA\",\"postalCode\":\"98354\",\"addressCountry\":\"US\"},\"sameAs\":[\"https://nwcustomapparel.net/\"]}</script>\n</head>\n<body>\n    <a class=\"skip-link\" href=\"#main\">Skip to content</a>\n\n    <!-- Utility strip -->\n    <div class=\"util-strip\">\n        <div class=\"util-inner\">\n            <p class=\"util-fam\"><strong>Northwest Custom Apparel</strong> — family-owned in Milton, WA since 1977</p>\n            <div class=\"util-contact\">\n                <span class=\"util-hours\">Mon–Fri 8:30–5:00 PT</span>\n                <a href=\"tel:253-922-5793\">253-922-5793</a>\n                <a class=\"util-mail\" href=\"mailto:sales@nwcustomapparel.com\">sales@nwcustomapparel.com</a>\n                <a class=\"util-corp\" href=\"https://nwcustomapparel.net/\" target=\"_blank\" rel=\"noopener\">Corporate site ↗</a>\n                <a href=\"/staff-dashboard.html\" title=\"Staff Portal\">Staff</a>\n            </div>\n        </div>\n    </div>\n\n    <!-- Masthead -->\n    <header class=\"nav-bar\">\n        <div class=\"nav-bar-inner\">\n            <button class=\"mobile-menu-btn\" id=\"mobileMenuBtn\" type=\"button\" aria-label=\"Open menu\" aria-controls=\"sidebar\">\n                <svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\">\n                    <line x1=\"3\" y1=\"6\" x2=\"21\" y2=\"6\"></line>\n                    <line x1=\"3\" y1=\"12\" x2=\"21\" y2=\"12\"></line>\n                    <line x1=\"3\" y1=\"18\" x2=\"21\" y2=\"18\"></line>\n                </svg>\n            </button>\n\n            <a href=\"/\" class=\"brand\" title=\"Northwest Custom Apparel — Home\">\n                <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\"\n                     alt=\"Northwest Custom Apparel\" class=\"brand-logo\" width=\"160\" height=\"46\">\n            </a>\n\n            <ul class=\"nav-menu\">\n<li class=\"nav-item\">\n                    <a href=\"/catalog\" class=\"nav-link nav-products\" aria-haspopup=\"true\" aria-expanded=\"false\">\n                        Products\n                        <svg class=\"nav-arrow\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" aria-hidden=\"true\"><polyline points=\"6 9 12 15 18 9\"></polyline></svg>\n                    </a>\n                    <div class=\"nav-dropdown mega-dropdown\">\n                        <div class=\"dropdown-content\">\n                            <div id=\"navDropdownSearch\"></div>\n                            <div class=\"dropdown-categories\" id=\"navCategories\">\n                                <!-- Categories populated by app-modern.js -->\n                            </div>\n                        </div>\n                    </div>\n                </li>\n<li class=\"nav-item brands-nav-item\" data-dropdown=\"brands\">\n                    <a href=\"/brands.html\" class=\"nav-link nav-brands\" aria-haspopup=\"true\" aria-expanded=\"false\">\n                        Brands\n                        <svg class=\"nav-arrow\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" aria-hidden=\"true\"><polyline points=\"6 9 12 15 18 9\"></polyline></svg>\n                    </a>\n                    <div class=\"nav-dropdown brands-dropdown mega-dropdown\">\n                        <div class=\"dropdown-content\">\n                            <div class=\"brands-grid\" id=\"navBrandsGrid\">\n                                <div class=\"brands-loading\">Loading brands…</div>\n                            </div>\n                            <div class=\"brands-footer\">\n                                <a href=\"/brands.html\" class=\"view-all-brands-link\">View all brands →</a>\n                            </div>\n                        </div>\n                    </div>\n                </li>\n                <li class=\"nav-item nav-item--p1\">\n                    <a href=\"/catalog?topSellers=1\" class=\"nav-link\">Top Sellers</a>\n                </li>\n                <li class=\"nav-item nav-item--p1\">\n                    <a href=\"/pages/fall-catalog-2026.html\" class=\"nav-link\">Fall Catalog '26 <span class=\"flag-new\">New</span></a>\n                </li>\n                <li class=\"nav-item nav-item--p1\">\n                    <a href=\"/custom-tees\" class=\"nav-link\">Custom Tees <span class=\"flag-new\">New</span></a>\n                </li>\n                <li class=\"nav-item nav-item--p1\">\n                    <a href=\"/custom-caps\" class=\"nav-link\">Custom Hats <span class=\"flag-new\">New</span></a>\n                </li>\n                <li class=\"nav-item nav-item--p2\">\n                    <a href=\"/company-webstores\" class=\"nav-link\">Webstores</a>\n                </li>\n                <li class=\"nav-item nav-item--p2\">\n                    <a href=\"/blog\" class=\"nav-link\">Blog</a>\n                </li>\n                <li class=\"nav-item nav-item--p2\">\n                    <a href=\"/custom-stickers\" class=\"nav-link\">Stickers</a>\n                </li>\n                <li class=\"nav-item\">\n                    <a href=\"/pages/request-a-quote.html\" class=\"nav-link\">Get a Quote</a>\n                </li>\n            </ul>\n\n            <div class=\"nav-search\" role=\"search\">\n                <input type=\"text\"\n                       id=\"navSearchInput\"\n                       class=\"nav-search-input\"\n                       placeholder=\"Search styles — PC61, hoodies, caps…\"\n                       autocomplete=\"off\"\n                       aria-label=\"Search products\">\n                <div id=\"navAutocompleteList\" class=\"nav-autocomplete-list\"></div>\n                <button id=\"navSearchBtn\" class=\"nav-search-btn\" type=\"button\" aria-label=\"Search\">\n                    <svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\">\n                        <circle cx=\"11\" cy=\"11\" r=\"8\"></circle>\n                        <path d=\"m21 21-4.35-4.35\"></path>\n                    </svg>\n                </button>\n            </div>\n\n            <!-- Quote-cart badge (count wired by quote-cart-store.js; hidden at 0) — so a\n                 customer mid-quote who lands back on the homepage still sees their cart. -->\n            <a class=\"quote-badge\" href=\"/quote-cart\" data-quote-badge hidden>\n                <svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\">\n                    <path d=\"M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2\"></path>\n                    <rect x=\"9\" y=\"3\" width=\"6\" height=\"4\" rx=\"1\"></rect>\n                    <path d=\"M9 12h6\"></path><path d=\"M9 16h6\"></path>\n                </svg>\n                <span class=\"quote-badge-label\">Quote</span>\n                <span class=\"quote-badge-count\" data-quote-badge-count>0</span>\n            </a>\n\n            <a href=\"/customer/login\" class=\"nav-signin\" title=\"Customer sign in — see your designs, orders, and invoices\">\n                <svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4\"></path><polyline points=\"10 17 15 12 10 7\"></polyline><line x1=\"15\" y1=\"12\" x2=\"3\" y2=\"12\"></line></svg>\n                <span>Sign In</span>\n            </a>\n        </div>\n    </header>\n\n    <!-- Drawer (mobile menu + category browse) -->\n    <aside class=\"sidebar\" id=\"sidebar\" aria-label=\"Browse menu\">\n        <div class=\"drawer-head\">\n            <span class=\"drawer-head-title\">Browse NWCA</span>\n            <button class=\"drawer-close\" id=\"drawerClose\" type=\"button\" aria-label=\"Close menu\">\n                <svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" aria-hidden=\"true\">\n                    <line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"></line>\n                    <line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"></line>\n                </svg>\n            </button>\n        </div>\n        <nav class=\"drawer-links\" aria-label=\"Quick links\">\n            <a href=\"/\">Home</a>\n            <a href=\"/pages/fall-catalog-2026.html\">Fall Catalog '26 <span class=\"flag-new\">New</span></a>\n            <a href=\"/custom-tees\">Custom T-Shirts <span class=\"flag-new\">New</span></a>\n            <a href=\"/custom-stickers\">Custom Stickers <span class=\"flag-new\">New</span></a>\n            <a href=\"/custom-banners\">Vinyl Banners <span class=\"flag-new\">New</span></a>\n            <a href=\"/custom-caps\">Custom Hats <span class=\"flag-new\">New</span></a>\n            <a href=\"/custom-carhartt\">Custom Carhartt <span class=\"flag-new\">New</span></a>\n            <a href=\"/custom-richardson\">Custom Richardson <span class=\"flag-new\">New</span></a>\n            <a href=\"/custom-nike\">Custom Nike <span class=\"flag-new\">New</span></a>\n            <a href=\"/custom-new-era\">Custom New Era <span class=\"flag-new\">New</span></a>\n            <a href=\"/custom-sport-tek\">Custom Sport-Tek <span class=\"flag-new\">New</span></a>\n            <a href=\"/custom-ogio\">Custom OGIO <span class=\"flag-new\">New</span></a>\n            <a href=\"/custom-district\">Custom District <span class=\"flag-new\">New</span></a>\n            <a href=\"/custom-port-authority\">Custom Port Authority <span class=\"flag-new\">New</span></a>\n            <a href=\"/custom-port-and-company\">Custom Port &amp; Company <span class=\"flag-new\">New</span></a>\n            <a href=\"/custom-cornerstone\">Custom CornerStone <span class=\"flag-new\">New</span></a>\n            <a href=\"/custom-north-face\">Custom The North Face <span class=\"flag-new\">New</span></a>\n            <a href=\"/custom-gildan\">Custom Gildan <span class=\"flag-new\">New</span></a>\n            <a href=\"/custom-eddie-bauer\">Custom Eddie Bauer <span class=\"flag-new\">New</span></a>\n            <a href=\"/custom-travismathew\">Custom TravisMathew <span class=\"flag-new\">New</span></a>\n            <a href=\"/custom-bella-canvas\">Custom Bella+Canvas <span class=\"flag-new\">New</span></a>\n            <a href=\"/catalog?topSellers=1\">Top Sellers &amp; Free Samples</a>\n            <a href=\"/brands.html\">Brands</a>\n            <a href=\"/company-webstores\">Custom Webstores</a>\n            <a href=\"/blog\">Blog</a>\n            <a href=\"/pages/request-a-quote.html\">Get a Quote</a>\n            <a href=\"https://nwcustomapparel.net/\" target=\"_blank\" rel=\"noopener\">Corporate site ↗</a>\n        \n            <a href=\"/catalog\">Catalog</a>\n        </nav>\n        <h3 class=\"drawer-subhead\">Shop by category</h3>\n        <ul class=\"category-list\" id=\"categoryList\">\n            <!-- Categories populated by app-modern.js -->\n        </ul>\n        <!-- Legacy filter hooks kept for catalog-search.js (hidden; superseded by the floating filter bar) -->\n        <div class=\"filters-section\" id=\"filtersSection\" style=\"display: none;\">\n            <div class=\"filter-options\" id=\"brandFilterOptions\"></div>\n            <button class=\"clear-filters-btn\" id=\"clearFiltersBtn\" style=\"display: none;\" type=\"button\">Clear All Filters</button>\n        </div>\n        <div class=\"drawer-contact\">\n            Questions? A human answers.<br>\n            <a href=\"tel:253-922-5793\">253-922-5793</a><br>\n            <a href=\"mailto:sales@nwcustomapparel.com\">sales@nwcustomapparel.com</a><br>\n            2025 Freeman Rd E, Milton, WA 98354\n        </div>\n    </aside>\n    <div class=\"sidebar-overlay\" id=\"sidebarOverlay\"></div>\n\n    <main id=\"main\">\n        <!-- Hero (hidden by catalog-search.js when results show) -->\n        <section class=\"hero-section\">\n            <div class=\"hero-grid\">\n                <div class=\"hero-copy\">\n                    <p class=\"hero-eyebrow\">\n                        <svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M12 2l2.4 7.2H22l-6 4.6 2.3 7.2-6.3-4.5-6.3 4.5L8 13.8 2 9.2h7.6z\"/></svg>\n                        Family-owned in Milton, WA — since 1977\n                    </p>\n                    <h1>Custom apparel your crew will <span class=\"hero-underline\">actually wear</span>.</h1>\n                    <p class=\"hero-sub\">Embroidery, screen print, and DTG on brands you know — Port &amp; Company, Carhartt, Nike, Richardson. Fair pricing, real proofs before production, and one local shop handling it start to finish.</p>\n                    <div class=\"hero-ctas\">\n                        <a href=\"/catalog\" class=\"btn btn-hero\">Shop the catalog</a>\n                        <a href=\"/custom-tees\" class=\"btn btn-ghost\">Design custom tees online</a>\n                    </div>\n                    <ul class=\"hero-trust\">\n                        <li><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" aria-hidden=\"true\"><polyline points=\"20 6 9 17 4 12\"></polyline></svg> Proof before production</li>\n                        <li><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" aria-hidden=\"true\"><polyline points=\"20 6 9 17 4 12\"></polyline></svg> Free samples on 60+ styles</li>\n                        <li class=\"is-rush\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M13 2L3 14h7l-1 8 10-12h-7l1-8z\"/></svg> Rush turnarounds available</li>\n                    </ul>\n                </div>\n                <div class=\"hero-stage\">\n                    <figure class=\"hero-shirt\">\n                        <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/Tilth%20Land%20Care.jpg?ver=1\"\n                             alt=\"Custom hi-vis hoodie for Tilth Land Care by Northwest Custom Apparel\"\n                             width=\"1200\" height=\"1000\" loading=\"eager\" fetchpriority=\"high\" class=\"is-active\">\n                        <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/south%20sound%20welding%20richardson%20laser%20patch.jpg?ver=1\"\n                             alt=\"Richardson laser-patch cap for South Sound Welding\"\n                             width=\"1200\" height=\"1000\" loading=\"lazy\">\n                        <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/Omega%20Morgan.jpg?ver=1\"\n                             alt=\"Custom embroidered Carhartt hi-vis hoodie for Omega Morgan\"\n                             width=\"1200\" height=\"1000\" loading=\"lazy\">\n                        <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/Fife%20History%20Museum.jpg?ver=1\"\n                             alt=\"Embroidered cap for Fife History Museum\"\n                             width=\"1200\" height=\"1000\" loading=\"lazy\">\n                        <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/lincoln%20High.jpg?ver=1\"\n                             alt=\"Custom Lincoln High School spirit wear by Northwest Custom Apparel\"\n                             width=\"1200\" height=\"1000\" loading=\"lazy\">\n                        <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/pro%20vac%20laser%20cap%20richardson%20112.jpg?ver=1\"\n                             alt=\"Richardson 112 laser cap for Pro Vac\"\n                             width=\"1200\" height=\"1000\" loading=\"lazy\">\n                        <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/new%20era.jpg?ver=1\"\n                             alt=\"Custom embroidered New Era caps by Northwest Custom Apparel\"\n                             width=\"1200\" height=\"1000\" loading=\"lazy\">\n                        <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/Gonnason%20Boats.jpg?ver=1\"\n                             alt=\"Richardson cap with leather patch for Gonnason Boats\"\n                             width=\"1200\" height=\"1000\" loading=\"lazy\">\n                        <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/Bethel%20All%20Stars%20Wrestling.jpg?ver=1\"\n                             alt=\"Embroidered cap for Bethel All Stars Wrestling\"\n                             width=\"1200\" height=\"1000\" loading=\"lazy\">\n                    </figure>\n                </div>\n            </div>\n\n            <div class=\"express-section\" id=\"express-order\">\n                <div class=\"express-head\">\n                    <p class=\"band-eyebrow\">⚡ Express Order — order online</p>\n                    <p class=\"express-sub\">Design and pay online in minutes — our team proofs every order and confirms the details with you before production. Perfect for events and quick one-time orders.</p>\n                </div>\n                <div class=\"express-grid\">\n                    <a class=\"express-card\" href=\"/custom-tees\">\n                        <div class=\"express-photo\">\n                            <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/teamnwca%20express%20order%20photo%20layout%20DTG.jpg?ver=1\"\n                                 alt=\"Custom full-color DTG printed t-shirt\" width=\"1800\" height=\"1200\" loading=\"lazy\">\n                        </div>\n                        <div class=\"express-body\">\n                            <span class=\"express-kicker\">Full-color DTG · No minimums</span>\n                            <h3>Custom T-Shirts</h3>\n                            <p>Pick a style, upload your art, see it on a real shirt, and check out in minutes. Ships in 7–10 business days — 3-day rush available.</p>\n                            <span class=\"express-cta\">Start your t-shirt order →</span>\n                        </div>\n                    </a>\n                    <a class=\"express-card\" href=\"/custom-caps\">\n                        <div class=\"express-photo\">\n                            <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/Cap%20Collage%20for%20Teamnwca%20homepageS.jpg?ver=1\"\n                                 alt=\"Custom embroidered caps with logos\" width=\"1800\" height=\"1200\" loading=\"lazy\">\n                        </div>\n                        <div class=\"express-body\">\n                            <span class=\"express-kicker\">Embroidered · 8-cap minimum</span>\n                            <h3>Custom Hats</h3>\n                            <p>Pick a cap, upload your logo, and approve a digital proof. Free setup and free shipping — ships 7–10 business days after you approve.</p>\n                            <span class=\"express-cta\">Start your cap order →</span>\n                        </div>\n                    </a>\n                </div>\n            </div>\n\n            <div class=\"trust-strip\">\n                <ul>\n                    <li><strong>Since 1977</strong> family-owned &amp; operated</li>\n                    <li><strong>500+</strong> Northwest businesses outfitted</li>\n                    <li><strong>60+</strong> styles with free samples</li>\n                    <li><strong>In-house</strong> embroidery · screen print · DTG · DTF</li>\n                </ul>\n            </div>\n        </section>\n\n        <!-- Marketing bands (hidden by catalog-search.js when results show) -->\n        <div class=\"homepage-sections\">\n            <section class=\"band reviews-band\" aria-label=\"Customer reviews\">\n                <div class=\"wrap\">\n                    <div class=\"reviews-band-head\">\n                        <a class=\"reviews-badge\" href=\"https://maps.google.com/?cid=4107380119454186786\" target=\"_blank\" rel=\"noopener\">\n                            <span class=\"reviews-stars\" aria-hidden=\"true\">★★★★★</span>\n                            <span class=\"reviews-score\">4.9</span>\n                            <span class=\"reviews-count\">from 185+ Google reviews</span>\n                        </a>\n                    </div>\n                    <div class=\"reviews-grid\">\n                        <blockquote class=\"review-quote\">\n                            <p>&ldquo;We use Northwest Custom Apparel to produce our uniform articles. Their work is always perfect and done in record time. I can&rsquo;t recommend them highly enough.&rdquo;</p>\n                            <footer><strong>Dave Lambing</strong> &middot; Quartermaster, Tacoma Fire Buff Battalion &middot; <span class=\"review-src\">Google review</span></footer>\n                        </blockquote>\n                        <blockquote class=\"review-quote\">\n                            <p>&ldquo;Their embroidery done in-house is very well done, identical to the proof of concept. &hellip; I&rsquo;d recommend them for any size program!&rdquo;</p>\n                            <footer><strong>Wyatt Smith</strong> &middot; webstore program customer &middot; <span class=\"review-src\">Google review</span></footer>\n                        </blockquote>\n                    </div>\n                </div>\n            </section>\n            <section class=\"band\">\n                <div class=\"wrap\">\n                    <a class=\"fall26-band\" href=\"/pages/fall-catalog-2026.html\">\n                        <div class=\"fall26-band-body\">\n                            <span class=\"duo-badge\">🍂 New · Fall 2026</span>\n                            <h3>Fall Catalog <span class=\"yr\">'26</span> is here</h3>\n                            <p>170+ brand-new styles — from our newest brand MiiR to The North Face, Carhartt, Nike &amp; Port Authority. Fresh apparel, bags and accessories, ready to decorate with your logo.</p>\n                            <span class=\"fall26-band-cta\">Explore the collection\n                                <svg viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" aria-hidden=\"true\"><polyline points=\"9 18 15 12 9 6\"></polyline></svg>\n                            </span>\n                        </div>\n                        <div class=\"fall26-band-strip\" aria-hidden=\"true\">\n                            <span class=\"fall26-thumb\"><img src=\"https://cdnm.sanmar.com/catalog/images/NF0A8JEV.jpg\" alt=\"\" width=\"120\" height=\"120\" loading=\"lazy\"></span>\n                            <span class=\"fall26-thumb\"><img src=\"https://cdnm.sanmar.com/catalog/images/CT106432.jpg\" alt=\"\" width=\"120\" height=\"120\" loading=\"lazy\"></span>\n                            <span class=\"fall26-thumb\"><img src=\"https://cdnm.sanmar.com/catalog/images/NKIO8126.jpg\" alt=\"\" width=\"120\" height=\"120\" loading=\"lazy\"></span>\n                            <span class=\"fall26-thumb\"><img src=\"https://cdnm.sanmar.com/catalog/images/MRB1002.jpg\" alt=\"\" width=\"120\" height=\"120\" loading=\"lazy\"></span>\n                            <span class=\"fall26-thumb\"><img src=\"https://cdnm.sanmar.com/catalog/images/TMA47413.jpg\" alt=\"\" width=\"120\" height=\"120\" loading=\"lazy\"></span>\n                        </div>\n                    </a>\n                </div>\n            </section>\n            <section class=\"band\">\n                <div class=\"wrap\">\n                    <a class=\"duo-golf\" href=\"/golf-tournament-apparel?utm_source=homepage&amp;utm_campaign=golf-2026-q2&amp;utm_medium=hero\">\n                        <img class=\"duo-golf-img\" src=\"https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9388098\"\n                             alt=\"\" width=\"720\" height=\"300\" loading=\"lazy\">\n                        <div class=\"duo-golf-body\">\n                            <span class=\"duo-badge\">⛳ Summer 2026</span>\n                            <h3>Tournament outfitting, concierge-style</h3>\n                            <p>Free $100 logo digitizing plus a free OGIO Vision 2.0 golf bag ($239 value) on tournament orders of $2,000+. TravisMathew, Nike &amp; OGIO — we handle every detail.</p>\n                            <span class=\"duo-golf-cta\">See tournament apparel →</span>\n                        </div>\n                    </a>\n                </div>\n            </section>\n\n            <section class=\"band\">\n                <div class=\"wrap\">\n                    <a class=\"duo-safety\" href=\"/custom-safety-apparel?utm_source=homepage&amp;utm_campaign=safety-2026&amp;utm_medium=hero\">\n                        <img class=\"duo-safety-img\" src=\"https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9454449\"\n                             alt=\"\" width=\"720\" height=\"300\" loading=\"lazy\">\n                        <div class=\"duo-safety-body\">\n                            <span class=\"duo-badge\">🦺 Hi-Vis &amp; Safety</span>\n                            <h3>Custom safety stripe apparel</h3>\n                            <p>High-visibility safety stripes screen-printed on hi-vis tees, hoodies &amp; vests — with your logo. Pick from Steve's stripe layouts or go fully custom.</p>\n                            <span class=\"duo-safety-cta\">See safety apparel →</span>\n                        </div>\n                    </a>\n                </div>\n            </section>\n\n            <section class=\"band\">\n                <div class=\"wrap\">\n                    <div class=\"band-head\">\n                        <p class=\"band-eyebrow\">What we do</p>\n                        <h2>Five ways to get outfitted</h2>\n                        <p class=\"band-sub\">From a single sample to a company-wide program — pick the lane that fits, or call and we'll point you to it.</p>\n                    </div>\n                    <div class=\"svc-grid\">\n                        <a class=\"svc-card svc-card--lead\" href=\"/custom-tees\">\n                            <span class=\"svc-flag flag-new\">New</span>\n                            <span class=\"svc-icon\" aria-hidden=\"true\">\n                                <svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\"><path d=\"M16 3l5 3-2 4-2-1v12H7V9L5 10 3 6l5-3a4 4 0 0 0 8 0z\"/></svg>\n                            </span>\n                            <h3>Custom T-Shirts, online</h3>\n                            <p>Design full-color DTG tees on real product photos — upload art, see it live, check out in minutes. Ships in 7–10 business days, 3-day rush available.</p>\n                            <span class=\"svc-cta\">Design yours →</span>\n                        </a>\n                        <a class=\"svc-card\" href=\"/golf-tournament-apparel?utm_source=homepage&amp;utm_campaign=golf-2026-q2&amp;utm_medium=card\">\n                            <span class=\"svc-icon\" aria-hidden=\"true\">\n                                <svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\"><path d=\"M12 18V2l7 4-7 4\"/><circle cx=\"12\" cy=\"20\" r=\"2\"/></svg>\n                            </span>\n                            <h3>Tournament packages</h3>\n                            <p>Embroidered TravisMathew, Nike &amp; OGIO for company golf tournaments. Free digitizing and a free OGIO golf bag on $2,000+ orders.</p>\n                            <span class=\"svc-cta\">View tournament gear →</span>\n                        </a>\n                        <a class=\"svc-card\" href=\"/custom-safety-apparel?utm_source=homepage&amp;utm_campaign=safety-2026&amp;utm_medium=card\">\n                            <span class=\"svc-icon\" aria-hidden=\"true\">\n                                <svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\"><path d=\"M12 2l8 3v6c0 5-3.4 8.7-8 11-4.6-2.3-8-6-8-11V5l8-3z\"/><path d=\"M9 12l2 2 4-4\"/></svg>\n                            </span>\n                            <h3>Safety stripe apparel</h3>\n                            <p>High-visibility safety stripes screen-printed on hi-vis tees, hoodies &amp; vests with your logo. Choose a stripe layout or go custom.</p>\n                            <span class=\"svc-cta\">See safety apparel →</span>\n                        </a>\n                        <a class=\"svc-card\" href=\"/company-webstores\">\n                            <span class=\"svc-icon\" aria-hidden=\"true\">\n                                <svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\"><circle cx=\"9\" cy=\"21\" r=\"1.6\"/><circle cx=\"19\" cy=\"21\" r=\"1.6\"/><path d=\"M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6\"/></svg>\n                            </span>\n                            <h3>Custom webstores</h3>\n                            <p>Run an online store for your team, company swag, or fundraiser. We handle production, fulfillment, and order tracking.</p>\n                            <span class=\"svc-cta\">Learn more →</span>\n                        </a>\n                        <a class=\"svc-card\" href=\"/catalog?topSellers=1\">\n                            <span class=\"svc-icon\" aria-hidden=\"true\">\n                                <svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\"><path d=\"M21 8v13H3V8M1 3h22v5H1zM10 12h4\"/></svg>\n                            </span>\n                            <h3>Free sample program</h3>\n                            <p>See it before you order it. Free samples on 60+ best sellers, shipped in 2–3 days — no minimum order required.</p>\n                            <span class=\"svc-cta\">Request samples →</span>\n                        </a>\n                    </div>\n                </div>\n            </section>\n\n            <section class=\"band\">\n                <div class=\"wrap\">\n                    <div class=\"band-head band-head-row\">\n                        <div>\n                            <p class=\"band-eyebrow\">Crowd favorites</p>\n                            <h2>2026 best sellers</h2>\n                            <p class=\"band-sub\">What 500+ Northwest businesses order most — every one available as a free or low-cost sample.</p>\n                        </div>\n                        <a class=\"band-more\" href=\"/catalog?topSellers=1\">Browse all 60 →</a>\n                    </div>\n                    <div class=\"shelf-grid\">\n                        <article class=\"shelf-card\">\n                            <div class=\"shelf-photo\">\n                                <img src=\"https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9148464\" alt=\"PC61 cotton t-shirt\" loading=\"lazy\" width=\"280\" height=\"230\">\n                            </div>\n                            <div class=\"shelf-body\">\n                                <span class=\"shelf-brand\"><img src=\"https://cdnm.sanmar.com/catalog/images/portandcompanyheader.jpg\" alt=\"Port & Company\" loading=\"lazy\"></span>\n                                <span class=\"shelf-style\">PC61</span>\n                                <h3 class=\"shelf-name\">Essential Cotton T-Shirt</h3>\n                                <p class=\"shelf-desc\">Classic 100% cotton tee — the workhorse for screen print, DTG, and everyday wear.</p>\n                                <a class=\"shelf-link\" href=\"/product.html?style=PC61&amp;color=Jet+Black\">View product →</a>\n                            </div>\n                        </article>\n                        <article class=\"shelf-card\">\n                            <div class=\"shelf-photo\">\n                                <img src=\"https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9171981\" alt=\"Polar Camel 16 oz pint\" loading=\"lazy\" width=\"280\" height=\"230\">\n                            </div>\n                            <div class=\"shelf-body\">\n                                <span class=\"shelf-brand\"><img src=\"https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9173436\" alt=\"Polar Camel\" loading=\"lazy\"></span>\n                                <span class=\"shelf-style\">LTM752</span>\n                                <h3 class=\"shelf-name\">Polar Camel 16 oz Pint</h3>\n                                <p class=\"shelf-desc\">Vacuum-insulated stainless pint, laser-engraved with your logo. Hot or cold.</p>\n                                <a class=\"shelf-link\" href=\"/calculators/laser-tumbler-polarcamel.html\">View product →</a>\n                            </div>\n                        </article>\n                        <article class=\"shelf-card\">\n                            <div class=\"shelf-photo\">\n                                <img src=\"https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9148462\" alt=\"PC90H fleece hoodie\" loading=\"lazy\" width=\"280\" height=\"230\">\n                            </div>\n                            <div class=\"shelf-body\">\n                                <span class=\"shelf-brand\"><img src=\"https://cdnm.sanmar.com/catalog/images/portandcompanyheader.jpg\" alt=\"Port & Company\" loading=\"lazy\"></span>\n                                <span class=\"shelf-style\">PC90H</span>\n                                <h3 class=\"shelf-name\">Ultimate Fleece Hoodie</h3>\n                                <p class=\"shelf-desc\">Heavyweight pullover hoodie with serious warmth. Great for crews and crews' families.</p>\n                                <a class=\"shelf-link\" href=\"/product.html?style=PC90H&amp;color=Royal\">View product →</a>\n                            </div>\n                        </article>\n                        <article class=\"shelf-card\">\n                            <div class=\"shelf-photo\">\n                                <img src=\"https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9148461\" alt=\"Carhartt Detroit duck jacket\" loading=\"lazy\" width=\"280\" height=\"230\">\n                            </div>\n                            <div class=\"shelf-body\">\n                                <span class=\"shelf-brand\"><img src=\"https://cdnm.sanmar.com/catalog/images/Carharttheader.jpg\" alt=\"Carhartt\" loading=\"lazy\"></span>\n                                <span class=\"shelf-style\">CT103828</span>\n                                <h3 class=\"shelf-name\">Detroit Duck Jacket</h3>\n                                <p class=\"shelf-desc\">Iconic blanket-lined workwear jacket — built for embroidered company logos.</p>\n                                <a class=\"shelf-link\" href=\"/product.html?style=CT103828&amp;color=Carhartt+Brown\">View product →</a>\n                            </div>\n                        </article>\n                    </div>\n                </div>\n            </section>\n\n            <section class=\"band\" id=\"shop-categories\">\n                <div class=\"wrap\">\n                    <div class=\"band-head\">\n                        <p class=\"band-eyebrow\">The catalog</p>\n                        <h2>Shop by category</h2>\n                        <p class=\"band-sub\">Thousands of styles, live from our supplier catalog — filter by brand, color, and price once you're in.</p>\n                    </div>\n                    <div class=\"cat-grid\">\n                        <a class=\"cat-tile\" href=\"/catalog?category=T-Shirts\"><span class=\"cat-num\">01</span><span class=\"cat-tile-name\">T-Shirts</span><span class=\"cat-tile-go\" aria-hidden=\"true\">→</span></a>\n                        <a class=\"cat-tile\" href=\"/catalog?category=Polos%2FKnits\"><span class=\"cat-num\">02</span><span class=\"cat-tile-name\">Polos &amp; Knits</span><span class=\"cat-tile-go\" aria-hidden=\"true\">→</span></a>\n                        <a class=\"cat-tile\" href=\"/catalog?category=Sweatshirts%2FFleece\"><span class=\"cat-num\">03</span><span class=\"cat-tile-name\">Sweatshirts &amp; Fleece</span><span class=\"cat-tile-go\" aria-hidden=\"true\">→</span></a>\n                        <a class=\"cat-tile\" href=\"/catalog?category=Caps\"><span class=\"cat-num\">04</span><span class=\"cat-tile-name\">Caps</span><span class=\"cat-tile-go\" aria-hidden=\"true\">→</span></a>\n                        <a class=\"cat-tile\" href=\"/catalog?category=Outerwear\"><span class=\"cat-num\">05</span><span class=\"cat-tile-name\">Outerwear</span><span class=\"cat-tile-go\" aria-hidden=\"true\">→</span></a>\n                        <a class=\"cat-tile\" href=\"/catalog?category=Workwear\"><span class=\"cat-num\">06</span><span class=\"cat-tile-name\">Workwear</span><span class=\"cat-tile-go\" aria-hidden=\"true\">→</span></a>\n                        <a class=\"cat-tile\" href=\"/catalog?category=Bags\"><span class=\"cat-num\">07</span><span class=\"cat-tile-name\">Bags</span><span class=\"cat-tile-go\" aria-hidden=\"true\">→</span></a>\n                        <a class=\"cat-tile\" href=\"/catalog?category=Ladies\"><span class=\"cat-num\">08</span><span class=\"cat-tile-name\">Ladies</span><span class=\"cat-tile-go\" aria-hidden=\"true\">→</span></a>\n                        <a class=\"cat-tile\" href=\"/catalog?category=Activewear\"><span class=\"cat-num\">09</span><span class=\"cat-tile-name\">Activewear</span><span class=\"cat-tile-go\" aria-hidden=\"true\">→</span></a>\n                        <a class=\"cat-tile\" href=\"/catalog?category=Woven%20Shirts\"><span class=\"cat-num\">10</span><span class=\"cat-tile-name\">Woven Shirts</span><span class=\"cat-tile-go\" aria-hidden=\"true\">→</span></a>\n                        <a class=\"cat-tile cat-all\" href=\"/catalog\" id=\"allCategoriesTile\">All categories →</a>\n                    </div>\n                </div>\n            </section>\n\n            <section class=\"band\">\n                <div class=\"wrap\">\n                    <div class=\"band-head\">\n                        <p class=\"band-eyebrow\">How it works</p>\n                        <h2>From logo to delivered, in three steps</h2>\n                    </div>\n                    <div class=\"how-grid\">\n                        <div class=\"how-step\">\n                            <span class=\"how-num\">1</span>\n                            <h3>Pick your gear</h3>\n                            <p>Browse the catalog or tell us the job — we'll spec the right styles, colors, and decoration method for your budget.</p>\n                        </div>\n                        <div class=\"how-step\">\n                            <span class=\"how-num\">2</span>\n                            <h3>Send your logo</h3>\n                            <p>We digitize your art and send a proof before anything gets stitched or pressed. No surprises on press day.</p>\n                        </div>\n                        <div class=\"how-step\">\n                            <span class=\"how-num\">3</span>\n                            <h3>We produce &amp; deliver</h3>\n                            <p>Embroidery, screen print, DTG, and DTF — all in-house in Milton, WA. Most orders ship in 7–10 business days.</p>\n                        </div>\n                    </div>\n                    <p class=\"how-call\">Rather talk it through? Call <a href=\"tel:253-922-5793\">253-922-5793</a> — a human answers.</p>\n                </div>\n            </section>\n        </div>\n\n        <!-- Floating filter bar (shown by catalog-search.js during search) -->\n        <div class=\"filters-bar-container\" id=\"filtersBarContainer\" style=\"display: none;\">\n            <div class=\"filters-bar\">\n                <div class=\"filters-bar-top-row\">\n                    <span class=\"filters-label\">Filters:</span>\n                    <div class=\"filter-controls\">\n                        <button class=\"filter-dropdown-btn\" id=\"brandFilterBtn\" data-filter=\"brand\" type=\"button\">\n                            <span>Brand</span>\n                            <svg class=\"filter-arrow\" width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\">\n                                <polyline points=\"6 9 12 15 18 9\"></polyline>\n                            </svg>\n                            <span class=\"filter-count\" id=\"brandCount\" style=\"display: none;\"></span>\n                        </button>\n                        <div class=\"filter-dropdown-panel\" id=\"brandFilterPanel\">\n                            <div class=\"filter-panel-header\">\n                                <h4>Filter by Brand</h4>\n                                <button class=\"filter-panel-close\" data-panel=\"brandFilterPanel\" type=\"button\">×</button>\n                            </div>\n                            <div class=\"filter-panel-search\">\n                                <input type=\"text\" id=\"brandSearchInput\" placeholder=\"Search brands…\" autocomplete=\"off\" aria-label=\"Search brands\">\n                            </div>\n                            <div class=\"filter-panel-options\" id=\"brandFilterOptionsNew\"></div>\n                            <div class=\"filter-panel-footer\">\n                                <button class=\"btn-apply-filter\" id=\"applyBrandFilter\" type=\"button\">Apply</button>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n                <div class=\"active-filters\" id=\"activeFilters\"></div>\n                <button class=\"clear-all-filters-btn\" id=\"clearAllFiltersBtn\" style=\"display: none;\" type=\"button\">\n                    <svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\">\n                        <line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"></line>\n                        <line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"></line>\n                    </svg>\n                    Clear All\n                </button>\n            </div>\n        </div>\n\n        <!-- Search / category results (shown by catalog-search.js) -->\n        <div class=\"results-section\" style=\"display: none;\">\n            <div class=\"results-header\">\n                <h2 class=\"results-title\">\n                    <span id=\"resultsTitle\">Products</span>\n                    <span id=\"categoryBreadcrumb\" class=\"breadcrumb-text\"></span>\n                </h2>\n                <span class=\"results-count\" id=\"resultsCount\">0 products</span>\n            </div>\n            <div class=\"results-grid\" id=\"resultsGrid\"></div>\n        </div>\n    </main>\n\n    <!-- From the Blog — client-fetched teaser (the SSR /blog pages carry the SEO);\n         stays hidden until posts load so an empty/failed fetch shows nothing -->\n    <section class=\"blog-teaser\" id=\"blogTeaser\" hidden>\n        <div class=\"blog-teaser-inner\">\n            <div class=\"blog-teaser-head\">\n                <h2>From the blog</h2>\n                <a href=\"/blog\" class=\"blog-teaser-all\">All posts →</a>\n            </div>\n            <div class=\"blog-grid\" id=\"blogTeaserGrid\"></div>\n        </div>\n    </section>\n\n    <footer class=\"site-footer\">\n        <div class=\"footer-inner\">\n            <div class=\"footer-brand\">\n                <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20White%20Text.png?ver=1\" alt=\"Northwest Custom Apparel\" width=\"180\" height=\"52\" loading=\"lazy\">\n                <p>Family-owned custom apparel decorator in Milton, Washington. Embroidery, screen printing, DTG, and DTF — done in-house since 1977.</p>\n                <span class=\"footer-est\">Est. 1977 · Milton, WA</span>\n            </div>\n            <div class=\"footer-col\">\n                <h3>Shop</h3>\n                <ul>\n                    <li><a href=\"/catalog?topSellers=1\">Top Sellers</a></li>\n                    <li><a href=\"/brands.html\">Brands</a></li>\n                    <li><a href=\"/custom-carhartt\">Custom Carhartt</a></li>\n                    <li><a href=\"/custom-richardson\">Custom Richardson</a></li>\n                    <li><a href=\"/custom-nike\">Custom Nike</a></li>\n                    <li><a href=\"/custom-new-era\">Custom New Era</a></li>\n                    <li><a href=\"/custom-sport-tek\">Custom Sport-Tek</a></li>\n                    <li><a href=\"/custom-ogio\">Custom OGIO</a></li>\n                    <li><a href=\"/custom-district\">Custom District</a></li>\n                    <li><a href=\"/custom-port-authority\">Custom Port Authority</a></li>\n                    <li><a href=\"/custom-port-and-company\">Custom Port &amp; Company</a></li>\n                    <li><a href=\"/custom-cornerstone\">Custom CornerStone</a></li>\n                    <li><a href=\"/custom-north-face\">Custom The North Face</a></li>\n                    <li><a href=\"/custom-gildan\">Custom Gildan</a></li>\n                    <li><a href=\"/custom-eddie-bauer\">Custom Eddie Bauer</a></li>\n                    <li><a href=\"/custom-travismathew\">Custom TravisMathew</a></li>\n                    <li><a href=\"/custom-bella-canvas\">Custom Bella+Canvas</a></li>\n                    <li><a href=\"/custom-tees\">Custom T-Shirts</a></li>\n                    <li><a href=\"/custom-caps\">Custom Hats</a></li>\n                    <li><a href=\"/catalog?topSellers=1\">Free Sample Program</a></li>\n                </ul>\n            </div>\n            <div class=\"footer-col\">\n                <h3>Services</h3>\n                <ul>\n                    <li><a href=\"/pages/request-a-quote.html\">Request a Quote</a></li>\n                    <li><a href=\"/custom-stickers\">Die-Cut Stickers</a></li>\n                    <li><a href=\"/custom-banners\">Vinyl Banners</a></li>\n                    <li><a href=\"/golf-tournament-apparel?utm_source=homepage&amp;utm_campaign=golf-2026-q2&amp;utm_medium=footer\">Tournament Packages</a></li>\n                    <li><a href=\"/custom-safety-apparel?utm_source=homepage&amp;utm_campaign=safety-2026&amp;utm_medium=footer\">Safety &amp; Hi-Vis Apparel</a></li>\n                    <li><a href=\"/company-webstores\">Custom Webstores</a></li>\n                    <li><a href=\"/pages/webstore-inquiry.html\">Start a Company Store</a></li>\n                    <li><a href=\"/pages/forms/team-roster-form.html\">Team Roster — Names &amp; Numbers</a></li>\n                    <li><a href=\"/blog\">Blog</a></li>\n                    <li><a href=\"/calculators/laser-tumbler-polarcamel.html\">Laser-Engraved Tumblers</a></li>\n                </ul>\n            </div>\n            <div class=\"footer-col\">\n                <h3>Contact</h3>\n                <address>\n                    2025 Freeman Rd E<br>\n                    Milton, WA 98354<br>\n                    <a href=\"tel:253-922-5793\">253-922-5793</a><br>\n                    <a href=\"mailto:sales@nwcustomapparel.com\">sales@nwcustomapparel.com</a><br>\n                    Mon–Fri 8:30–5:00 PT\n                </address>\n                <ul>\n                    <li><a href=\"/staff-dashboard.html\">Staff Portal</a></li>\n                </ul>\n            </div>\n        </div>\n        <div class=\"footer-bottom\">\n            <div class=\"footer-bottom-inner\">\n                <span>© 2026 Northwest Custom Apparel</span>\n                <span>Family-owned &amp; operated since 1977</span>\n            </div>\n        </div>\n    </footer>\n\n    <!-- Search + catalog machinery -->\n    <script src=\"/config/app.config.js\"></script>\n    <script src=\"/shared_components/js/brands-registry.js?v=2026.07.25.3\"></script>\n    <script src=\"/product-search-service.js?v=2026.09.06.37\"></script>\n    <script src=\"/autocomplete-new.js?v=2026.09.06.37\"></script>\n    <script src=\"/catalog-search.js?v=2026.09.06.40\"></script>\n    <script src=\"/brands-flyout.js?v=2026.09.06.31\"></script>\n    <script src=\"/shared_components/js/nav-dropdown.js?v=2026.07.13.4\" defer></script>\n    <script src=\"/app-modern.js?v=2026.09.09.7\" defer></script>\n    <script src=\"/shared_components/js/express-eligibility.js?v=2026.08.25.4\" defer></script>\n    <script src=\"/home-2026.js?v=2026.08.25.4\" defer></script>\n    <!-- Quote-cart badge auto-wires from the stored cart (self-init on [data-quote-badge]). -->\n    <script src=\"/shared_components/js/quote-cart-store.js?v=2026.08.19.5\" defer></script>\n    <script src=\"/shared_components/js/blog-teaser.js?v=2026.07.12.4\" defer></script>\n</body>\n</html>\n",
+      "title": "Custom Embroidery, Screen Printing & DTG — Northwest Custom Apparel | Milton, WA",
+      "bodyTextSha": "2da95fc8a55dac7195ad0211119aeee3ce1b96b607cd525e612ebc6a6fd8e882",
+      "ids": [
+        "mobileMenuBtn",
+        "navDropdownSearch",
+        "navCategories",
+        "navBrandsGrid",
+        "navSearchInput",
+        "navAutocompleteList",
+        "navSearchBtn",
+        "sidebar",
+        "drawerClose",
+        "categoryList",
+        "filtersSection",
+        "brandFilterOptions",
+        "clearFiltersBtn",
+        "sidebarOverlay",
+        "main",
+        "express-order",
+        "shop-categories",
+        "allCategoriesTile",
+        "filtersBarContainer",
+        "brandFilterBtn",
+        "brandCount",
+        "brandFilterPanel",
+        "brandSearchInput",
+        "brandFilterOptionsNew",
+        "applyBrandFilter",
+        "activeFilters",
+        "clearAllFiltersBtn",
+        "resultsTitle",
+        "categoryBreadcrumb",
+        "resultsCount",
+        "resultsGrid",
+        "blogTeaser",
+        "blogTeaserGrid"
+      ],
+      "links": [
+        {
+          "href": "#main",
+          "label": "Skip to content"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "label": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "https://nwcustomapparel.net/",
+          "label": "Corporate site ↗"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Staff"
+        },
+        {
+          "href": "/",
+          "label": ""
+        },
+        {
+          "href": "/catalog",
+          "label": "Products"
+        },
+        {
+          "href": "/brands.html",
+          "label": "Brands"
+        },
+        {
+          "href": "/brands.html",
+          "label": "View all brands →"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "label": "Top Sellers"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "label": "Fall Catalog '26 New"
+        },
+        {
+          "href": "/custom-tees",
+          "label": "Custom Tees New"
+        },
+        {
+          "href": "/custom-caps",
+          "label": "Custom Hats New"
+        },
+        {
+          "href": "/company-webstores",
+          "label": "Webstores"
+        },
+        {
+          "href": "/blog",
+          "label": "Blog"
+        },
+        {
+          "href": "/custom-stickers",
+          "label": "Stickers"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "label": "Get a Quote"
+        },
+        {
+          "href": "/quote-cart",
+          "label": "Quote 0"
+        },
+        {
+          "href": "/customer/login",
+          "label": "Sign In"
+        },
+        {
+          "href": "/",
+          "label": "Home"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "label": "Fall Catalog '26 New"
+        },
+        {
+          "href": "/custom-tees",
+          "label": "Custom T-Shirts New"
+        },
+        {
+          "href": "/custom-stickers",
+          "label": "Custom Stickers New"
+        },
+        {
+          "href": "/custom-banners",
+          "label": "Vinyl Banners New"
+        },
+        {
+          "href": "/custom-caps",
+          "label": "Custom Hats New"
+        },
+        {
+          "href": "/custom-carhartt",
+          "label": "Custom Carhartt New"
+        },
+        {
+          "href": "/custom-richardson",
+          "label": "Custom Richardson New"
+        },
+        {
+          "href": "/custom-nike",
+          "label": "Custom Nike New"
+        },
+        {
+          "href": "/custom-new-era",
+          "label": "Custom New Era New"
+        },
+        {
+          "href": "/custom-sport-tek",
+          "label": "Custom Sport-Tek New"
+        },
+        {
+          "href": "/custom-ogio",
+          "label": "Custom OGIO New"
+        },
+        {
+          "href": "/custom-district",
+          "label": "Custom District New"
+        },
+        {
+          "href": "/custom-port-authority",
+          "label": "Custom Port Authority New"
+        },
+        {
+          "href": "/custom-port-and-company",
+          "label": "Custom Port & Company New"
+        },
+        {
+          "href": "/custom-cornerstone",
+          "label": "Custom CornerStone New"
+        },
+        {
+          "href": "/custom-north-face",
+          "label": "Custom The North Face New"
+        },
+        {
+          "href": "/custom-gildan",
+          "label": "Custom Gildan New"
+        },
+        {
+          "href": "/custom-eddie-bauer",
+          "label": "Custom Eddie Bauer New"
+        },
+        {
+          "href": "/custom-travismathew",
+          "label": "Custom TravisMathew New"
+        },
+        {
+          "href": "/custom-bella-canvas",
+          "label": "Custom Bella+Canvas New"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "label": "Top Sellers & Free Samples"
+        },
+        {
+          "href": "/brands.html",
+          "label": "Brands"
+        },
+        {
+          "href": "/company-webstores",
+          "label": "Custom Webstores"
+        },
+        {
+          "href": "/blog",
+          "label": "Blog"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "label": "Get a Quote"
+        },
+        {
+          "href": "https://nwcustomapparel.net/",
+          "label": "Corporate site ↗"
+        },
+        {
+          "href": "/catalog",
+          "label": "Catalog"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "label": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/catalog",
+          "label": "Shop the catalog"
+        },
+        {
+          "href": "/custom-tees",
+          "label": "Design custom tees online"
+        },
+        {
+          "href": "/custom-tees",
+          "label": "Full-color DTG · No minimums Custom T-Shirts Pick a style, upload your art, see it on a real shirt, and check out in minutes. Ships in 7–10 business days — 3-day rush available. Start your t-shirt order →"
+        },
+        {
+          "href": "/custom-caps",
+          "label": "Embroidered · 8-cap minimum Custom Hats Pick a cap, upload your logo, and approve a digital proof. Free setup and free shipping — ships 7–10 business days after you approve. Start your cap order →"
+        },
+        {
+          "href": "https://maps.google.com/?cid=4107380119454186786",
+          "label": "★★★★★ 4.9 from 185+ Google reviews"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "label": "🍂 New · Fall 2026 Fall Catalog '26 is here 170+ brand-new styles — from our newest brand MiiR to The North Face, Carhartt, Nike & Port Authority. Fresh apparel, bags and accessories, ready to decorate with your logo. Explore the collection"
+        },
+        {
+          "href": "/golf-tournament-apparel?utm_source=homepage&utm_campaign=golf-2026-q2&utm_medium=hero",
+          "label": "⛳ Summer 2026 Tournament outfitting, concierge-style Free $100 logo digitizing plus a free OGIO Vision 2.0 golf bag ($239 value) on tournament orders of $2,000+. TravisMathew, Nike & OGIO — we handle every detail. See tournament apparel →"
+        },
+        {
+          "href": "/custom-safety-apparel?utm_source=homepage&utm_campaign=safety-2026&utm_medium=hero",
+          "label": "🦺 Hi-Vis & Safety Custom safety stripe apparel High-visibility safety stripes screen-printed on hi-vis tees, hoodies & vests — with your logo. Pick from Steve's stripe layouts or go fully custom. See safety apparel →"
+        },
+        {
+          "href": "/custom-tees",
+          "label": "New Custom T-Shirts, online Design full-color DTG tees on real product photos — upload art, see it live, check out in minutes. Ships in 7–10 business days, 3-day rush available. Design yours →"
+        },
+        {
+          "href": "/golf-tournament-apparel?utm_source=homepage&utm_campaign=golf-2026-q2&utm_medium=card",
+          "label": "Tournament packages Embroidered TravisMathew, Nike & OGIO for company golf tournaments. Free digitizing and a free OGIO golf bag on $2,000+ orders. View tournament gear →"
+        },
+        {
+          "href": "/custom-safety-apparel?utm_source=homepage&utm_campaign=safety-2026&utm_medium=card",
+          "label": "Safety stripe apparel High-visibility safety stripes screen-printed on hi-vis tees, hoodies & vests with your logo. Choose a stripe layout or go custom. See safety apparel →"
+        },
+        {
+          "href": "/company-webstores",
+          "label": "Custom webstores Run an online store for your team, company swag, or fundraiser. We handle production, fulfillment, and order tracking. Learn more →"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "label": "Free sample program See it before you order it. Free samples on 60+ best sellers, shipped in 2–3 days — no minimum order required. Request samples →"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "label": "Browse all 60 →"
+        },
+        {
+          "href": "/product.html?style=PC61&color=Jet+Black",
+          "label": "View product →"
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "label": "View product →"
+        },
+        {
+          "href": "/product.html?style=PC90H&color=Royal",
+          "label": "View product →"
+        },
+        {
+          "href": "/product.html?style=CT103828&color=Carhartt+Brown",
+          "label": "View product →"
+        },
+        {
+          "href": "/catalog?category=T-Shirts",
+          "label": "01T-Shirts→"
+        },
+        {
+          "href": "/catalog?category=Polos%2FKnits",
+          "label": "02Polos & Knits→"
+        },
+        {
+          "href": "/catalog?category=Sweatshirts%2FFleece",
+          "label": "03Sweatshirts & Fleece→"
+        },
+        {
+          "href": "/catalog?category=Caps",
+          "label": "04Caps→"
+        },
+        {
+          "href": "/catalog?category=Outerwear",
+          "label": "05Outerwear→"
+        },
+        {
+          "href": "/catalog?category=Workwear",
+          "label": "06Workwear→"
+        },
+        {
+          "href": "/catalog?category=Bags",
+          "label": "07Bags→"
+        },
+        {
+          "href": "/catalog?category=Ladies",
+          "label": "08Ladies→"
+        },
+        {
+          "href": "/catalog?category=Activewear",
+          "label": "09Activewear→"
+        },
+        {
+          "href": "/catalog?category=Woven%20Shirts",
+          "label": "10Woven Shirts→"
+        },
+        {
+          "href": "/catalog",
+          "label": "All categories →"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "/blog",
+          "label": "All posts →"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "label": "Top Sellers"
+        },
+        {
+          "href": "/brands.html",
+          "label": "Brands"
+        },
+        {
+          "href": "/custom-carhartt",
+          "label": "Custom Carhartt"
+        },
+        {
+          "href": "/custom-richardson",
+          "label": "Custom Richardson"
+        },
+        {
+          "href": "/custom-nike",
+          "label": "Custom Nike"
+        },
+        {
+          "href": "/custom-new-era",
+          "label": "Custom New Era"
+        },
+        {
+          "href": "/custom-sport-tek",
+          "label": "Custom Sport-Tek"
+        },
+        {
+          "href": "/custom-ogio",
+          "label": "Custom OGIO"
+        },
+        {
+          "href": "/custom-district",
+          "label": "Custom District"
+        },
+        {
+          "href": "/custom-port-authority",
+          "label": "Custom Port Authority"
+        },
+        {
+          "href": "/custom-port-and-company",
+          "label": "Custom Port & Company"
+        },
+        {
+          "href": "/custom-cornerstone",
+          "label": "Custom CornerStone"
+        },
+        {
+          "href": "/custom-north-face",
+          "label": "Custom The North Face"
+        },
+        {
+          "href": "/custom-gildan",
+          "label": "Custom Gildan"
+        },
+        {
+          "href": "/custom-eddie-bauer",
+          "label": "Custom Eddie Bauer"
+        },
+        {
+          "href": "/custom-travismathew",
+          "label": "Custom TravisMathew"
+        },
+        {
+          "href": "/custom-bella-canvas",
+          "label": "Custom Bella+Canvas"
+        },
+        {
+          "href": "/custom-tees",
+          "label": "Custom T-Shirts"
+        },
+        {
+          "href": "/custom-caps",
+          "label": "Custom Hats"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "label": "Free Sample Program"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "label": "Request a Quote"
+        },
+        {
+          "href": "/custom-stickers",
+          "label": "Die-Cut Stickers"
+        },
+        {
+          "href": "/custom-banners",
+          "label": "Vinyl Banners"
+        },
+        {
+          "href": "/golf-tournament-apparel?utm_source=homepage&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "label": "Tournament Packages"
+        },
+        {
+          "href": "/custom-safety-apparel?utm_source=homepage&utm_campaign=safety-2026&utm_medium=footer",
+          "label": "Safety & Hi-Vis Apparel"
+        },
+        {
+          "href": "/company-webstores",
+          "label": "Custom Webstores"
+        },
+        {
+          "href": "/pages/webstore-inquiry.html",
+          "label": "Start a Company Store"
+        },
+        {
+          "href": "/pages/forms/team-roster-form.html",
+          "label": "Team Roster — Names & Numbers"
+        },
+        {
+          "href": "/blog",
+          "label": "Blog"
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "label": "Laser-Engraved Tumblers"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "label": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Staff Portal"
+        }
+      ],
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "brandSearchInput",
+          "type": "text",
+          "value": ""
+        }
+      ],
+      "styles": [
+        "https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap",
+        "/shared_components/css/tokens.css?v=2026.09.08.2",
+        "/catalog-search.css?v=2026.09.07.19",
+        "/shared_components/css/nwca-2026-core.css?v=2026.09.07.8",
+        "/shared_components/css/nwca-2026.css?v=2026.09.07.20",
+        "/shared_components/css/blog.css?v=2026.09.07.8"
+      ],
+      "scripts": [
+        "/config/app.config.js",
+        "/shared_components/js/brands-registry.js?v=2026.07.25.3",
+        "/product-search-service.js?v=2026.09.06.37",
+        "/autocomplete-new.js?v=2026.09.06.37",
+        "/catalog-search.js?v=2026.09.06.40",
+        "/brands-flyout.js?v=2026.09.06.31",
+        "/shared_components/js/nav-dropdown.js?v=2026.07.13.4",
+        "/app-modern.js?v=2026.09.09.7",
+        "/shared_components/js/express-eligibility.js?v=2026.08.25.4",
+        "/home-2026.js?v=2026.08.25.4",
+        "/shared_components/js/quote-cart-store.js?v=2026.08.19.5",
+        "/shared_components/js/blog-teaser.js?v=2026.07.12.4"
+      ],
+      "cssBytes": 131546
+    },
+    {
+      "file": "pages/catalog.html",
+      "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <meta name=\"description\" content=\"Browse thousands of customizable apparel styles — t-shirts, polos, caps, outerwear, and more from brands you know. Filter by brand, color, size, and price. Northwest Custom Apparel, Milton, WA.\">\n    <title>Catalog — Northwest Custom Apparel</title>\n\n    <meta property=\"og:type\" content=\"website\">\n    <meta property=\"og:title\" content=\"Product Catalog — Northwest Custom Apparel\">\n    <meta property=\"og:description\" content=\"Thousands of customizable styles live from our supplier catalog. Embroidery, screen print, DTG, and DTF — family-owned in Milton, WA since 1977.\">\n    <meta property=\"og:image\" content=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png\">\n\n    <!-- Preconnect to CDNs for faster resource loading -->\n    <link rel=\"preconnect\" href=\"https://cdn.caspio.com\">\n    <link rel=\"preconnect\" href=\"https://cdnm.sanmar.com\" crossorigin=\"anonymous\">\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    <link rel=\"dns-prefetch\" href=\"https://cdn.caspio.com\">\n    <link rel=\"dns-prefetch\" href=\"https://cdnm.sanmar.com\">\n\n    <link rel=\"icon\" href=\"/favicon.png\" type=\"image/png\">\n\n    <link href=\"https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap\" rel=\"stylesheet\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/nwca-2026-core.css?v=2026.09.07.8\">\n    <link rel=\"stylesheet\" href=\"/pages/css/catalog-2026.css?v=2026.09.07.8\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/cart-drawer.css?v=2026.09.07.20\">\n    <script src=\"/config/app.config.js\"></script>\n</head>\n<body>\n    <a class=\"skip-link\" href=\"#main\">Skip to content</a>\n\n    <!-- Utility strip (chrome copied from index.html — shared component is a later refactor) -->\n    <div class=\"util-strip\">\n        <div class=\"util-inner\">\n            <p class=\"util-fam\"><strong>Northwest Custom Apparel</strong> — family-owned in Milton, WA since 1977</p>\n            <div class=\"util-contact\">\n                <span class=\"util-hours\">Mon–Fri 8:30–5:00 PT</span>\n                <a href=\"tel:253-922-5793\">253-922-5793</a>\n                <a class=\"util-mail\" href=\"mailto:sales@nwcustomapparel.com\">sales@nwcustomapparel.com</a>\n                <a href=\"/staff-dashboard.html\" title=\"Staff Portal\">Staff</a>\n            </div>\n        </div>\n    </div>\n\n    <!-- Masthead -->\n    <header class=\"nav-bar\">\n        <div class=\"nav-bar-inner\">\n            <button class=\"mobile-menu-btn\" id=\"mobileMenuBtn\" type=\"button\" aria-label=\"Open menu\" aria-controls=\"sidebar\">\n                <svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\">\n                    <line x1=\"3\" y1=\"6\" x2=\"21\" y2=\"6\"></line>\n                    <line x1=\"3\" y1=\"12\" x2=\"21\" y2=\"12\"></line>\n                    <line x1=\"3\" y1=\"18\" x2=\"21\" y2=\"18\"></line>\n                </svg>\n            </button>\n\n            <a href=\"/\" class=\"brand\" title=\"Northwest Custom Apparel — Home\">\n                <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\"\n                     alt=\"Northwest Custom Apparel\" class=\"brand-logo\" width=\"160\" height=\"46\">\n            </a>\n\n            <ul class=\"nav-menu\">\n<li class=\"nav-item\">\n                    <a href=\"/catalog\" class=\"nav-link nav-products\" aria-haspopup=\"true\" aria-expanded=\"false\">\n                        Products\n                        <svg class=\"nav-arrow\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" aria-hidden=\"true\"><polyline points=\"6 9 12 15 18 9\"></polyline></svg>\n                    </a>\n                    <div class=\"nav-dropdown mega-dropdown\">\n                        <div class=\"dropdown-content\">\n                            <div id=\"navDropdownSearch\"></div>\n                            <div class=\"dropdown-categories\" id=\"navCategories\">\n                                <!-- Categories populated by app-modern.js -->\n                            </div>\n                        </div>\n                    </div>\n                </li>\n<li class=\"nav-item brands-nav-item\" data-dropdown=\"brands\">\n                    <a href=\"/brands.html\" class=\"nav-link nav-brands\" aria-haspopup=\"true\" aria-expanded=\"false\">\n                        Brands\n                        <svg class=\"nav-arrow\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" aria-hidden=\"true\"><polyline points=\"6 9 12 15 18 9\"></polyline></svg>\n                    </a>\n                    <div class=\"nav-dropdown brands-dropdown mega-dropdown\">\n                        <div class=\"dropdown-content\">\n                            <div class=\"brands-grid\" id=\"navBrandsGrid\">\n                                <div class=\"brands-loading\">Loading brands…</div>\n                            </div>\n                            <div class=\"brands-footer\">\n                                <a href=\"/brands.html\" class=\"view-all-brands-link\">View all brands →</a>\n                            </div>\n                        </div>\n                    </div>\n                </li>\n                <li class=\"nav-item nav-item--p1\">\n                    <a href=\"/catalog?topSellers=1\" class=\"nav-link\">Top Sellers</a>\n                </li>\n                <li class=\"nav-item nav-item--p1\">\n                    <a href=\"/pages/fall-catalog-2026.html\" class=\"nav-link\">Fall Catalog '26 <span class=\"flag-new\">New</span></a>\n                </li>\n                <li class=\"nav-item nav-item--p1\">\n                    <a href=\"/custom-tees\" class=\"nav-link\">Custom Tees <span class=\"flag-new\">New</span></a>\n                </li>\n                <li class=\"nav-item nav-item--p1\">\n                    <a href=\"/custom-caps\" class=\"nav-link\">Custom Hats <span class=\"flag-new\">New</span></a>\n                </li>\n                <li class=\"nav-item nav-item--p2\">\n                    <a href=\"/company-webstores\" class=\"nav-link\">Webstores</a>\n                </li>\n                <li class=\"nav-item nav-item--p2\">\n                    <a href=\"/blog\" class=\"nav-link\">Blog</a>\n                </li>\n                <li class=\"nav-item nav-item--p2\">\n                    <a href=\"/custom-stickers\" class=\"nav-link\">Stickers</a>\n                </li>\n                <li class=\"nav-item\">\n                    <a href=\"/pages/request-a-quote.html\" class=\"nav-link\">Get a Quote</a>\n                </li>\n            </ul>\n\n            <div class=\"nav-search\" role=\"search\">\n                <input type=\"text\"\n                       id=\"navSearchInput\"\n                       class=\"nav-search-input\"\n                       placeholder=\"Search styles — PC61, hoodies, caps…\"\n                       autocomplete=\"off\"\n                       role=\"combobox\"\n                       aria-expanded=\"false\"\n                       aria-autocomplete=\"list\"\n                       aria-controls=\"navAutocompleteList\"\n                       aria-label=\"Search products\">\n                <div id=\"navAutocompleteList\" class=\"nav-autocomplete-list\" role=\"listbox\" aria-label=\"Product suggestions\"></div>\n                <button id=\"navSearchBtn\" class=\"nav-search-btn\" type=\"button\" aria-label=\"Search\">\n                    <svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\">\n                        <circle cx=\"11\" cy=\"11\" r=\"8\"></circle>\n                        <path d=\"m21 21-4.35-4.35\"></path>\n                    </svg>\n                </button>\n            </div>\n\n            <!-- Quote-cart badge (count wired by quote-cart-store.js; hidden at 0) -->\n            <a class=\"quote-badge\" href=\"/quote-cart\" data-quote-badge hidden>\n                <svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\">\n                    <path d=\"M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2\"></path>\n                    <rect x=\"9\" y=\"3\" width=\"6\" height=\"4\" rx=\"1\"></rect>\n                    <path d=\"M9 12h6\"></path><path d=\"M9 16h6\"></path>\n                </svg>\n                <span class=\"quote-badge-label\">Quote</span>\n                <span class=\"quote-badge-count\" data-quote-badge-count>0</span>\n            </a>\n\n            <!-- Sample-cart badge (count wired by catalog-samples.js; hidden at 0;\n                 click opens the drawer, href is the no-JS fallback) -->\n            <a class=\"quote-badge sample-badge\" href=\"/pages/sample-cart.html\" data-sample-badge hidden>\n                <svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\">\n                    <path d=\"M21 8v13H3V8\"></path>\n                    <path d=\"M1 3h22v5H1z\"></path>\n                    <path d=\"M10 12h4\"></path>\n                </svg>\n                <span class=\"quote-badge-label\">Samples</span>\n                <span class=\"quote-badge-count\" data-sample-badge-count>0</span>\n            </a>\n        </div>\n    </header>\n\n    <!-- Drawer (mobile menu + category browse) -->\n    <aside class=\"sidebar\" id=\"sidebar\" aria-label=\"Browse menu\">\n        <div class=\"drawer-head\">\n            <span class=\"drawer-head-title\">Browse NWCA</span>\n            <button class=\"drawer-close\" id=\"drawerClose\" type=\"button\" aria-label=\"Close menu\">\n                <svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" aria-hidden=\"true\">\n                    <line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"></line>\n                    <line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"></line>\n                </svg>\n            </button>\n        </div>\n        <nav class=\"drawer-links\" aria-label=\"Quick links\">\n            <a href=\"/\">Home</a>\n            <a href=\"/catalog\">Catalog</a>\n            <a href=\"/pages/fall-catalog-2026.html\">Fall Catalog '26 <span class=\"flag-new\">New</span></a>\n            <a href=\"/custom-tees\">Custom T-Shirts <span class=\"flag-new\">New</span></a>\n            <a href=\"/custom-caps\">Custom Hats <span class=\"flag-new\">New</span></a>\n            <a href=\"/custom-stickers\">Custom Stickers <span class=\"flag-new\">New</span></a>\n            <a href=\"/custom-banners\">Vinyl Banners <span class=\"flag-new\">New</span></a>\n            <a href=\"/catalog?topSellers=1\">Top Sellers &amp; Free Samples</a>\n            <a href=\"/brands.html\">Brands</a>\n            <a href=\"/company-webstores\">Custom Webstores</a>\n        \n            <a href=\"/blog\">Blog</a>\n            <a href=\"/pages/request-a-quote.html\">Get a Quote</a>\n        </nav>\n        <h3 class=\"drawer-subhead\">Shop by category</h3>\n        <ul class=\"category-list\" id=\"categoryList\">\n            <!-- Categories populated by app-modern.js -->\n        </ul>\n        <div class=\"drawer-contact\">\n            Questions? A human answers.<br>\n            <a href=\"tel:253-922-5793\">253-922-5793</a><br>\n            <a href=\"mailto:sales@nwcustomapparel.com\">sales@nwcustomapparel.com</a><br>\n            2025 Freeman Rd E, Milton, WA 98354\n        </div>\n    </aside>\n    <div class=\"sidebar-overlay\" id=\"sidebarOverlay\"></div>\n\n    <main id=\"main\">\n        <!-- Page header band (category landing mode swaps the title/breadcrumb) -->\n        <header class=\"page-head\">\n            <div class=\"wrap\">\n                <nav class=\"crumbs\" aria-label=\"Breadcrumb\" id=\"catalogCrumbs\">\n                    <a href=\"/\">Home</a><span class=\"crumbs-sep\">/</span>\n                    <span aria-current=\"page\">Catalog</span>\n                </nav>\n                <div class=\"page-head-row\">\n                    <div>\n                        <h1 class=\"page-title\" id=\"catalogTitle\">Product Catalog</h1>\n                        <p class=\"page-sub\" id=\"catalogSub\">Thousands of styles, live from our supplier catalog — filter by brand, color, size, and price.</p>\n                    </div>\n                </div>\n            </div>\n        </header>\n\n        <!-- Fall Catalog '26 promo — links to the new-arrivals landing page -->\n        <a class=\"fall26-promo wrap\" href=\"/pages/fall-catalog-2026.html\">\n            <span class=\"fall26-promo-badge\">New</span>\n            <span class=\"fall26-promo-copy\">\n                <strong>Fall Catalog '26 is here</strong>\n                <span>170+ new styles — MiiR, The North Face, Carhartt, Nike, Port Authority &amp; more</span>\n            </span>\n            <span class=\"fall26-promo-cta\"><span class=\"fall26-cta-label\">Explore the collection</span>\n                <svg viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" aria-hidden=\"true\"><polyline points=\"9 18 15 12 9 6\"></polyline></svg>\n            </span>\n        </a>\n\n        <div class=\"catalog-shell wrap\">\n            <!-- Filter rail (desktop) / slide-in drawer (mobile) -->\n            <aside class=\"filters-rail\" id=\"filtersRail\" aria-label=\"Filter products\">\n                <div class=\"filters-rail-head\">\n                    <h2 class=\"filters-rail-title\">Filters</h2>\n                    <button class=\"drawer-close filters-rail-close\" id=\"filtersClose\" type=\"button\" aria-label=\"Close filters\">\n                        <svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" aria-hidden=\"true\">\n                            <line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"></line>\n                            <line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"></line>\n                        </svg>\n                    </button>\n                </div>\n                <div id=\"filterGroups\">\n                    <!-- Facet groups rendered by catalog-2026.js -->\n                    <div class=\"fgroup\" aria-hidden=\"true\">\n                        <div class=\"skeleton skeleton-title\"></div>\n                        <div class=\"skeleton skeleton-text\"></div>\n                        <div class=\"skeleton skeleton-text\"></div>\n                        <div class=\"skeleton skeleton-text\"></div>\n                    </div>\n                </div>\n                <button class=\"btn btn-ghost filters-clear-btn\" id=\"clearAllFilters\" type=\"button\" hidden>Clear all filters</button>\n                <!-- Mobile drawer only: sticky apply bar with the live result count -->\n                <div class=\"filters-apply-bar\">\n                    <button class=\"btn btn-primary filters-apply-btn\" id=\"filtersApply\" type=\"button\">Show results</button>\n                </div>\n            </aside>\n            <div class=\"filters-overlay\" id=\"filtersOverlay\"></div>\n\n            <!-- Results -->\n            <section class=\"catalog-results\" aria-label=\"Search results\">\n                <div class=\"results-toolbar\">\n                    <button class=\"btn btn-ghost filters-open-btn\" id=\"filtersOpen\" type=\"button\" aria-controls=\"filtersRail\" aria-expanded=\"false\">\n                        <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\">\n                            <polygon points=\"22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3\"></polygon>\n                        </svg>\n                        Filters\n                        <span class=\"filters-open-count\" id=\"filtersOpenCount\" hidden></span>\n                    </button>\n                    <p class=\"results-status\" id=\"resultsStatus\" aria-live=\"polite\" role=\"status\">Loading catalog…</p>\n                    <div class=\"sort-wrap\">\n                        <label class=\"sort-label\" for=\"sortSelect\">Sort</label>\n                        <select class=\"field-select sort-select\" id=\"sortSelect\">\n                            <option value=\"\">Best match</option>\n                            <option value=\"price_asc\">Price: low to high</option>\n                            <option value=\"price_desc\">Price: high to low</option>\n                            <option value=\"name_asc\">Name: A–Z</option>\n                            <option value=\"name_desc\">Name: Z–A</option>\n                            <option value=\"style\">Style number</option>\n                            <option value=\"newest\">Newest</option>\n                        </select>\n                    </div>\n                </div>\n\n                <div class=\"active-chips\" id=\"activeChips\"></div>\n                <div class=\"alert-slot\" id=\"alertSlot\"></div>\n\n                <!-- Category tiles — unfiltered browse only (rendered by catalog-2026.js) -->\n                <nav class=\"cat-tiles\" id=\"catTiles\" aria-label=\"Shop by category\" hidden></nav>\n\n                <div class=\"catalog-grid\" id=\"resultsGrid\"></div>\n\n                <nav class=\"pager\" id=\"pager\" aria-label=\"Pagination\"></nav>\n            </section>\n        </div>\n    </main>\n\n    <footer class=\"site-footer\">\n        <div class=\"footer-inner\">\n            <div class=\"footer-brand\">\n                <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20White%20Text.png?ver=1\" alt=\"Northwest Custom Apparel\" width=\"180\" height=\"52\" loading=\"lazy\">\n                <p>Family-owned custom apparel decorator in Milton, Washington. Embroidery, screen printing, DTG, and DTF — done in-house since 1977.</p>\n                <span class=\"footer-est\">Est. 1977 · Milton, WA</span>\n            </div>\n            <div class=\"footer-col\">\n                <h3>Shop</h3>\n                <ul>\n                    <li><a href=\"/catalog\">Product Catalog</a></li>\n                    <li><a href=\"/catalog?topSellers=1\">Top Sellers</a></li>\n                    <li><a href=\"/brands.html\">Brands</a></li>\n                    <li><a href=\"/custom-tees\">Custom T-Shirts</a></li>\n                    <li><a href=\"/custom-caps\">Custom Hats</a></li>\n                    <li><a href=\"/catalog?topSellers=1\">Free Sample Program</a></li>\n                </ul>\n            </div>\n            <div class=\"footer-col\">\n                <h3>Services</h3>\n                <ul>\n                    <li><a href=\"/golf-tournament-apparel?utm_source=catalog&amp;utm_campaign=golf-2026-q2&amp;utm_medium=footer\">Tournament Packages</a></li>\n                    <li><a href=\"/company-webstores\">Custom Webstores</a></li>\n                    <li><a href=\"/custom-stickers\">Die-Cut Stickers</a></li>\n                    <li><a href=\"/custom-banners\">Vinyl Banners</a></li>\n                    <li><a href=\"/calculators/laser-tumbler-polarcamel.html\">Laser-Engraved Tumblers</a></li>\n                </ul>\n            </div>\n            <div class=\"footer-col\">\n                <h3>Contact</h3>\n                <address>\n                    2025 Freeman Rd E<br>\n                    Milton, WA 98354<br>\n                    <a href=\"tel:253-922-5793\">253-922-5793</a><br>\n                    <a href=\"mailto:sales@nwcustomapparel.com\">sales@nwcustomapparel.com</a><br>\n                    Mon–Fri 8:30–5:00 PT\n                </address>\n                <ul>\n                    <li><a href=\"/staff-dashboard.html\">Staff Portal</a></li>\n                </ul>\n            </div>\n        </div>\n        <div class=\"footer-bottom\">\n            <div class=\"footer-bottom-inner\">\n                <span>© 2026 Northwest Custom Apparel</span>\n                <span>Family-owned &amp; operated since 1977</span>\n            </div>\n        </div>\n    </footer>\n\n    <!-- Quick view modal (core .modal primitive; content filled by catalog-2026.js) -->\n    <div class=\"modal\" id=\"quickViewModal\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"qvTitle\" hidden>\n        <div class=\"modal-content modal-wide\">\n            <div class=\"modal-header\">\n                <h2 id=\"qvTitle\">Quick view</h2>\n                <button class=\"modal-close\" id=\"qvClose\" type=\"button\" aria-label=\"Close quick view\">&times;</button>\n            </div>\n            <div class=\"modal-body\" id=\"qvBody\"></div>\n        </div>\n    </div>\n\n    <!-- Search + catalog machinery (product-search-service is the shared data layer, read-only) -->\n    <script src=\"/shared_components/js/brands-registry.js?v=2026.07.25.3\"></script>\n    <script src=\"/product-search-service.js?v=2026.09.06.37\"></script>\n    <script src=\"/shared_components/js/decoration-methods.js?v=2026.09.06.31\"></script>\n    <script src=\"/brands-flyout.js?v=2026.09.06.31\"></script>\n    <script src=\"/shared_components/js/nav-dropdown.js?v=2026.07.13.4\" defer></script>\n    <script src=\"/app-modern.js?v=2026.09.09.7\" defer></script>\n    <script src=\"/shared_components/js/quote-cart-store.js?v=2026.08.19.5\" defer></script>\n    <!-- Sample program (Top Sellers view): shared engine + drawer + page layer -->\n    <script src=\"/shared_components/js/sample-inventory-service.js?v=2026.09.07.33\" defer></script>\n    <script src=\"/shared_components/js/sample-pricing.js?v=2026.07.06.8\" defer></script>\n    <script src=\"/shared_components/js/sample-cart-service.js?v=2026.09.06.31\" defer></script>\n    <script src=\"/shared_components/js/cart-drawer.js?v=2026.09.06.37\" defer></script>\n    <script src=\"/pages/js/catalog-samples.js?v=2026.08.26.9\" defer></script>\n    <script src=\"/shared_components/js/express-eligibility.js?v=2026.08.25.4\" defer></script>\n    <script src=\"/pages/js/catalog-2026.js?v=2026.08.26.9\" defer></script>\n</body>\n</html>\n",
+      "title": "Catalog — Northwest Custom Apparel",
+      "bodyTextSha": "32d752c7d744fc3b10870c87786d9ccbdaacc93bd9790d50c0cda692dcf2034e",
+      "ids": [
+        "mobileMenuBtn",
+        "navDropdownSearch",
+        "navCategories",
+        "navBrandsGrid",
+        "navSearchInput",
+        "navAutocompleteList",
+        "navSearchBtn",
+        "sidebar",
+        "drawerClose",
+        "categoryList",
+        "sidebarOverlay",
+        "main",
+        "catalogCrumbs",
+        "catalogTitle",
+        "catalogSub",
+        "filtersRail",
+        "filtersClose",
+        "filterGroups",
+        "clearAllFilters",
+        "filtersApply",
+        "filtersOverlay",
+        "filtersOpen",
+        "filtersOpenCount",
+        "resultsStatus",
+        "sortSelect",
+        "activeChips",
+        "alertSlot",
+        "catTiles",
+        "resultsGrid",
+        "pager",
+        "quickViewModal",
+        "qvTitle",
+        "qvClose",
+        "qvBody"
+      ],
+      "links": [
+        {
+          "href": "#main",
+          "label": "Skip to content"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "label": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Staff"
+        },
+        {
+          "href": "/",
+          "label": ""
+        },
+        {
+          "href": "/catalog",
+          "label": "Products"
+        },
+        {
+          "href": "/brands.html",
+          "label": "Brands"
+        },
+        {
+          "href": "/brands.html",
+          "label": "View all brands →"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "label": "Top Sellers"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "label": "Fall Catalog '26 New"
+        },
+        {
+          "href": "/custom-tees",
+          "label": "Custom Tees New"
+        },
+        {
+          "href": "/custom-caps",
+          "label": "Custom Hats New"
+        },
+        {
+          "href": "/company-webstores",
+          "label": "Webstores"
+        },
+        {
+          "href": "/blog",
+          "label": "Blog"
+        },
+        {
+          "href": "/custom-stickers",
+          "label": "Stickers"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "label": "Get a Quote"
+        },
+        {
+          "href": "/quote-cart",
+          "label": "Quote 0"
+        },
+        {
+          "href": "/pages/sample-cart.html",
+          "label": "Samples 0"
+        },
+        {
+          "href": "/",
+          "label": "Home"
+        },
+        {
+          "href": "/catalog",
+          "label": "Catalog"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "label": "Fall Catalog '26 New"
+        },
+        {
+          "href": "/custom-tees",
+          "label": "Custom T-Shirts New"
+        },
+        {
+          "href": "/custom-caps",
+          "label": "Custom Hats New"
+        },
+        {
+          "href": "/custom-stickers",
+          "label": "Custom Stickers New"
+        },
+        {
+          "href": "/custom-banners",
+          "label": "Vinyl Banners New"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "label": "Top Sellers & Free Samples"
+        },
+        {
+          "href": "/brands.html",
+          "label": "Brands"
+        },
+        {
+          "href": "/company-webstores",
+          "label": "Custom Webstores"
+        },
+        {
+          "href": "/blog",
+          "label": "Blog"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "label": "Get a Quote"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "label": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "label": "Home"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "label": "New Fall Catalog '26 is here 170+ new styles — MiiR, The North Face, Carhartt, Nike, Port Authority & more Explore the collection"
+        },
+        {
+          "href": "/catalog",
+          "label": "Product Catalog"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "label": "Top Sellers"
+        },
+        {
+          "href": "/brands.html",
+          "label": "Brands"
+        },
+        {
+          "href": "/custom-tees",
+          "label": "Custom T-Shirts"
+        },
+        {
+          "href": "/custom-caps",
+          "label": "Custom Hats"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "label": "Free Sample Program"
+        },
+        {
+          "href": "/golf-tournament-apparel?utm_source=catalog&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "label": "Tournament Packages"
+        },
+        {
+          "href": "/company-webstores",
+          "label": "Custom Webstores"
+        },
+        {
+          "href": "/custom-stickers",
+          "label": "Die-Cut Stickers"
+        },
+        {
+          "href": "/custom-banners",
+          "label": "Vinyl Banners"
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "label": "Laser-Engraved Tumblers"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "label": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Staff Portal"
+        }
+      ],
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "sortSelect",
+          "type": "select-one",
+          "value": ""
+        }
+      ],
+      "styles": [
+        "https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap",
+        "/shared_components/css/tokens.css?v=2026.09.08.2",
+        "/shared_components/css/nwca-2026-core.css?v=2026.09.07.8",
+        "/pages/css/catalog-2026.css?v=2026.09.07.8",
+        "/shared_components/css/cart-drawer.css?v=2026.09.07.20"
+      ],
+      "scripts": [
+        "/config/app.config.js",
+        "/shared_components/js/brands-registry.js?v=2026.07.25.3",
+        "/product-search-service.js?v=2026.09.06.37",
+        "/shared_components/js/decoration-methods.js?v=2026.09.06.31",
+        "/brands-flyout.js?v=2026.09.06.31",
+        "/shared_components/js/nav-dropdown.js?v=2026.07.13.4",
+        "/app-modern.js?v=2026.09.09.7",
+        "/shared_components/js/quote-cart-store.js?v=2026.08.19.5",
+        "/shared_components/js/sample-inventory-service.js?v=2026.09.07.33",
+        "/shared_components/js/sample-pricing.js?v=2026.07.06.8",
+        "/shared_components/js/sample-cart-service.js?v=2026.09.06.31",
+        "/shared_components/js/cart-drawer.js?v=2026.09.06.37",
+        "/pages/js/catalog-samples.js?v=2026.08.26.9",
+        "/shared_components/js/express-eligibility.js?v=2026.08.25.4",
+        "/pages/js/catalog-2026.js?v=2026.08.26.9"
+      ],
+      "cssBytes": 190195
+    },
+    {
+      "file": "product.html",
+      "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <meta name=\"description\" content=\"Custom apparel product details — live inventory and decoration pricing for embroidery, screen print, DTG, and DTF from Northwest Custom Apparel in Milton, WA.\">\n    <title>Product Details | Northwest Custom Apparel</title>\n\n    <meta property=\"og:type\" content=\"product\">\n    <meta property=\"og:title\" content=\"Product Details | Northwest Custom Apparel\">\n    <meta property=\"og:description\" content=\"Live inventory and decoration pricing for embroidery, screen print, DTG, and DTF.\">\n    <meta property=\"og:image\" content=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png\">\n    <link rel=\"canonical\" id=\"canonicalLink\" href=\"https://www.teamnwca.com/product.html\">\n\n    <link rel=\"preconnect\" href=\"https://cdnm.sanmar.com\" crossorigin=\"anonymous\">\n    <link rel=\"preconnect\" href=\"https://caspio-pricing-proxy-ab30a049961a.herokuapp.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    <link rel=\"dns-prefetch\" href=\"https://cdnm.sanmar.com\">\n\n    <link rel=\"icon\" href=\"/favicon.png\" type=\"image/png\">\n\n    <link href=\"https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap\" rel=\"stylesheet\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/nwca-2026-core.css?v=2026.09.07.8\">\n    <link rel=\"stylesheet\" href=\"/product/css/product-2026.css?v=2026.09.07.20\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/safety-stripe-recs.css?v=2026.09.07.20\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/cart-drawer.css?v=2026.09.07.20\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/embroidery-quote-pricing.css?v=2026.09.07.8\">\n</head>\n<body>\n    <a class=\"skip-link\" href=\"#main\">Skip to content</a>\n\n    <!-- Utility strip -->\n    <div class=\"util-strip\">\n        <div class=\"util-inner\">\n            <p class=\"util-fam\"><strong>Northwest Custom Apparel</strong> — family-owned in Milton, WA since 1977</p>\n            <div class=\"util-contact\">\n                <span class=\"util-hours\">Mon–Fri 8:30–5:00 PT</span>\n                <a href=\"tel:253-922-5793\">253-922-5793</a>\n                <a class=\"util-mail\" href=\"mailto:sales@nwcustomapparel.com\">sales@nwcustomapparel.com</a>\n                <a href=\"/staff-dashboard.html\" title=\"Staff Portal\">Staff</a>\n            </div>\n        </div>\n    </div>\n\n    <!-- Masthead -->\n    <header class=\"nav-bar\">\n        <div class=\"nav-bar-inner\">\n            <button class=\"mobile-menu-btn\" id=\"mobileMenuBtn\" type=\"button\" aria-label=\"Open menu\" aria-controls=\"sidebar\">\n                <svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\">\n                    <line x1=\"3\" y1=\"6\" x2=\"21\" y2=\"6\"></line>\n                    <line x1=\"3\" y1=\"12\" x2=\"21\" y2=\"12\"></line>\n                    <line x1=\"3\" y1=\"18\" x2=\"21\" y2=\"18\"></line>\n                </svg>\n            </button>\n\n            <a href=\"/\" class=\"brand\" title=\"Northwest Custom Apparel — Home\">\n                <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\"\n                     alt=\"Northwest Custom Apparel\" class=\"brand-logo\" width=\"160\" height=\"46\">\n            </a>\n\n            <ul class=\"nav-menu\">\n<li class=\"nav-item\">\n                    <a href=\"/catalog\" class=\"nav-link\">Products</a>\n                </li>\n<li class=\"nav-item\">\n                    <a href=\"/brands.html\" class=\"nav-link\">Brands</a>\n                </li>\n                <li class=\"nav-item nav-item--p1\">\n                    <a href=\"/catalog?topSellers=1\" class=\"nav-link\">Top Sellers</a>\n                </li>\n                <li class=\"nav-item nav-item--p1\">\n                    <a href=\"/pages/fall-catalog-2026.html\" class=\"nav-link\">Fall Catalog '26 <span class=\"flag-new\">New</span></a>\n                </li>\n                <li class=\"nav-item nav-item--p1\">\n                    <a href=\"/custom-tees\" class=\"nav-link\">Custom Tees <span class=\"flag-new\">New</span></a>\n                </li>\n                <li class=\"nav-item nav-item--p1\">\n                    <a href=\"/custom-caps\" class=\"nav-link\">Custom Hats <span class=\"flag-new\">New</span></a>\n                </li>\n                <li class=\"nav-item nav-item--p2\">\n                    <a href=\"/company-webstores\" class=\"nav-link\">Webstores</a>\n                </li>\n                <li class=\"nav-item nav-item--p2\">\n                    <a href=\"/blog\" class=\"nav-link\">Blog</a>\n                </li>\n                <li class=\"nav-item nav-item--p2\">\n                    <a href=\"/custom-stickers\" class=\"nav-link\">Stickers</a>\n                </li>\n                <li class=\"nav-item\">\n                    <a href=\"/pages/request-a-quote.html\" class=\"nav-link\">Get a Quote</a>\n                </li>\n            </ul>\n\n            <div class=\"nav-search\" role=\"search\">\n                <input type=\"text\"\n                       id=\"navSearchInput\"\n                       class=\"nav-search-input\"\n                       placeholder=\"Search styles — PC61, hoodies, caps…\"\n                       autocomplete=\"off\"\n                       aria-label=\"Search products\">\n                <button id=\"navSearchBtn\" class=\"nav-search-btn\" type=\"button\" aria-label=\"Search\">\n                    <svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\">\n                        <circle cx=\"11\" cy=\"11\" r=\"8\"></circle>\n                        <path d=\"m21 21-4.35-4.35\"></path>\n                    </svg>\n                </button>\n            </div>\n\n            <!-- Quote-cart badge (count wired by quote-cart-store.js; hidden at 0) -->\n            <a class=\"quote-badge\" href=\"/quote-cart\" data-quote-badge hidden>\n                <svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\">\n                    <path d=\"M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2\"></path>\n                    <rect x=\"9\" y=\"3\" width=\"6\" height=\"4\" rx=\"1\"></rect>\n                    <path d=\"M9 12h6\"></path><path d=\"M9 16h6\"></path>\n                </svg>\n                <span class=\"quote-badge-label\">Quote</span>\n                <span class=\"quote-badge-count\" data-quote-badge-count>0</span>\n            </a>\n        </div>\n    </header>\n\n    <!-- Drawer (mobile menu + category browse) -->\n    <aside class=\"sidebar\" id=\"sidebar\" aria-label=\"Browse menu\">\n        <div class=\"drawer-head\">\n            <span class=\"drawer-head-title\">Browse NWCA</span>\n            <button class=\"drawer-close\" id=\"drawerClose\" type=\"button\" aria-label=\"Close menu\">\n                <svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" aria-hidden=\"true\">\n                    <line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"></line>\n                    <line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"></line>\n                </svg>\n            </button>\n        </div>\n        <nav class=\"drawer-links\" aria-label=\"Quick links\">\n            <a href=\"/\">Home</a>\n            <a href=\"/custom-tees\">Custom T-Shirts <span class=\"flag-new\">New</span></a>\n            <a href=\"/custom-caps\">Custom Hats <span class=\"flag-new\">New</span></a>\n            <a href=\"/catalog?topSellers=1\">Top Sellers &amp; Free Samples</a>\n            <a href=\"/brands.html\">Brands</a>\n            <a href=\"/company-webstores\">Custom Webstores</a>\n        \n            <a href=\"/catalog\">Catalog</a>\n            <a href=\"/pages/fall-catalog-2026.html\">Fall Catalog '26</a>\n            <a href=\"/custom-stickers\">Custom Stickers</a>\n            <a href=\"/custom-banners\">Vinyl Banners</a>\n            <a href=\"/blog\">Blog</a>\n            <a href=\"/pages/request-a-quote.html\">Get a Quote</a>\n        </nav>\n        <h3 class=\"drawer-subhead\">Shop by category</h3>\n        <ul class=\"category-list\">\n            <li class=\"category-item\"><a class=\"category-link\" href=\"/catalog?category=T-Shirts\">T-Shirts</a></li>\n            <li class=\"category-item\"><a class=\"category-link\" href=\"/catalog?category=Polos%2FKnits\">Polos &amp; Knits</a></li>\n            <li class=\"category-item\"><a class=\"category-link\" href=\"/catalog?category=Sweatshirts%2FFleece\">Sweatshirts &amp; Fleece</a></li>\n            <li class=\"category-item\"><a class=\"category-link\" href=\"/catalog?category=Caps\">Caps</a></li>\n            <li class=\"category-item\"><a class=\"category-link\" href=\"/catalog?category=Outerwear\">Outerwear</a></li>\n            <li class=\"category-item\"><a class=\"category-link\" href=\"/catalog?category=Workwear\">Workwear</a></li>\n            <li class=\"category-item\"><a class=\"category-link\" href=\"/catalog?category=Bags\">Bags</a></li>\n        </ul>\n        <div class=\"drawer-contact\">\n            Questions? A human answers.<br>\n            <a href=\"tel:253-922-5793\">253-922-5793</a><br>\n            <a href=\"mailto:sales@nwcustomapparel.com\">sales@nwcustomapparel.com</a><br>\n            2025 Freeman Rd E, Milton, WA 98354\n        </div>\n    </aside>\n    <div class=\"sidebar-overlay\" id=\"sidebarOverlay\"></div>\n\n    <main id=\"main\">\n        <!-- Page header: breadcrumb + title block -->\n        <header class=\"page-head\">\n            <div class=\"wrap\">\n                <nav class=\"crumbs\" aria-label=\"Breadcrumb\">\n                    <a href=\"/\">Home</a><span class=\"crumbs-sep\">/</span>\n                    <a href=\"/catalog\" id=\"crumbCategory\">Catalog</a><span class=\"crumbs-sep\">/</span>\n                    <span aria-current=\"page\" id=\"crumbStyle\">Product</span>\n                </nav>\n                <div class=\"page-head-row\">\n                    <div>\n                        <h1 class=\"page-title\" id=\"productTitle\">Loading product…</h1>\n                        <p class=\"page-sub\" id=\"productSub\"></p>\n                        <p class=\"page-sub\" id=\"productBlurb\"></p>\n                    </div>\n                </div>\n            </div>\n        </header>\n\n        <!-- Loading skeleton -->\n        <section class=\"pdp-section\" id=\"pdpSkeleton\" aria-busy=\"true\" aria-label=\"Loading product\">\n            <div class=\"wrap\">\n                <div class=\"pdp-skeleton-grid\">\n                    <div>\n                        <div class=\"skeleton skeleton-block\"></div>\n                    </div>\n                    <div>\n                        <div class=\"skeleton skeleton-title\"></div>\n                        <div class=\"skeleton skeleton-text\"></div>\n                        <div class=\"skeleton skeleton-text\"></div>\n                        <div class=\"skeleton skeleton-block\"></div>\n                    </div>\n                </div>\n            </div>\n        </section>\n\n        <!-- Fatal error / product not found -->\n        <section class=\"pdp-section\" id=\"pdpFatal\" hidden>\n            <div class=\"wrap\">\n                <div class=\"empty-state\">\n                    <div class=\"empty-state-icon\" aria-hidden=\"true\">🧵</div>\n                    <h2 class=\"empty-state-title\" id=\"fatalTitle\">We couldn't load this product</h2>\n                    <p class=\"empty-state-sub\" id=\"fatalSub\">Something went wrong fetching product data.</p>\n                    <button class=\"btn btn-primary\" id=\"fatalRetry\" type=\"button\">Try again</button>\n                    <a class=\"btn btn-ghost\" href=\"/catalog\">Browse the catalog</a>\n                </div>\n            </div>\n        </section>\n\n        <!-- Product content -->\n        <div id=\"pdpContent\" hidden>\n            <section class=\"pdp-section\" aria-label=\"Product photos, colors, and availability\">\n                <div class=\"wrap\">\n                    <div class=\"pdp-grid\">\n                        <!-- Gallery -->\n                        <div>\n                            <figure class=\"pdp-stage\">\n                                <img id=\"galleryMainImg\" src=\"\" alt=\"\" fetchpriority=\"high\" decoding=\"async\">\n                            </figure>\n                            <div class=\"pdp-thumbs\" id=\"galleryThumbs\" role=\"group\" aria-label=\"Product views\"></div>\n                        </div>\n\n                        <!-- Side rail -->\n                        <div>\n                            <div class=\"pdp-block\">\n                                <h2 class=\"pdp-block-title\">Colors <span class=\"pdp-count\" id=\"colorCount\"></span></h2>\n                                <div class=\"pdp-swatches\" id=\"swatchGrid\" role=\"group\" aria-label=\"Color options\"></div>\n                                <p class=\"pdp-selected-color\">Selected: <strong id=\"selectedColorName\"></strong></p>\n                            </div>\n\n                            <div class=\"pdp-block\">\n                                <h2 class=\"pdp-block-title\">Availability <span class=\"pdp-count\" id=\"invColorName\"></span></h2>\n                                <div id=\"inventoryBody\" aria-live=\"polite\">\n                                    <div class=\"skeleton skeleton-block\" aria-hidden=\"true\"></div>\n                                </div>\n                            </div>\n\n                            <div class=\"pdp-cta-card\">\n                                <h2>Ready to outfit your crew?</h2>\n                                <p>Tell us the style, color, and quantity — a real person quotes it, usually same day.</p>\n                                <a class=\"btn btn-cta\" id=\"ctaQuote\" href=\"#pricingHeading\">Price it &amp; add to quote</a>\n                                <div id=\"expressLane\" hidden>\n                                    <p class=\"pdp-express-note\" id=\"expressLaneNote\"></p>\n                                    <a class=\"express-lane-link\" id=\"expressLaneLink\" href=\"#\" aria-label=\"Express lane\"></a>\n                                </div>\n                                <a class=\"btn btn-ghost\" id=\"ctaSample\" href=\"/catalog?topSellers=1\">Order a sample</a>\n                                <p class=\"pdp-cta-phone\">Or call <a href=\"tel:253-922-5793\">253-922-5793</a><br>Mon–Fri 8:30–5:00 PT</p>\n                                <blockquote class=\"pdp-review\">\n                                    <p>&ldquo;A special shoutout to Taneisha who just helped me complete a very large custom embroidery project for my organization. All of the products came out better than I could have expected.&rdquo;</p>\n                                    <footer><strong>Jed Rains</strong> &middot; <a href=\"https://maps.google.com/?cid=4107380119454186786\" target=\"_blank\" rel=\"noopener\">★★★★★ Google review &middot; 4.9 from 185+</a></footer>\n                                </blockquote>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </section>\n\n            <!-- Decoration pricing — 3-question configurator -->\n            <section class=\"pdp-section\" aria-labelledby=\"pricingHeading\">\n                <div class=\"wrap\">\n                    <h2 id=\"pricingHeading\">Decoration pricing</h2>\n                    <p class=\"pdp-panel-note\">Three quick questions, one live price — it <strong>includes the garment and decoration</strong>, straight from our pricing system.</p>\n                    <div id=\"methodAlert\" aria-live=\"polite\"></div>\n                    <div class=\"pdp-cfg\" id=\"pdpConfigurator\" hidden>\n                        <div class=\"pdp-cfg-q\">\n                            <h3 class=\"pdp-cfg-q-title\"><span class=\"pdp-cfg-q-num\" aria-hidden=\"true\">1</span> How many do you need?</h3>\n                            <div class=\"pdp-cfg-stepper\">\n                                <button class=\"pdp-cfg-step\" id=\"cfgQtyMinus\" type=\"button\" aria-label=\"6 fewer\">&minus;</button>\n                                <input type=\"number\" id=\"cfgQtyInput\" inputmode=\"numeric\" min=\"1\" max=\"9999\" step=\"1\" value=\"24\" aria-label=\"Quantity\">\n                                <button class=\"pdp-cfg-step\" id=\"cfgQtyPlus\" type=\"button\" aria-label=\"6 more\">+</button>\n                            </div>\n                            <span class=\"pdp-cfg-hint\">Bigger runs unlock lower per-piece prices.</span>\n                        </div>\n                        <div class=\"pdp-cfg-q\">\n                            <h3 class=\"pdp-cfg-q-title\"><span class=\"pdp-cfg-q-num\" aria-hidden=\"true\">2</span> Where does your design go?</h3>\n                            <div class=\"pdp-cfg-chiprow\" id=\"cfgLocations\"></div>\n                            <div class=\"pdp-cfg-ink\" id=\"cfgInkRow\" hidden>\n                                <label for=\"cfgInkInput\">Ink colors in your design</label>\n                                <div class=\"pdp-cfg-stepper pdp-cfg-stepper-sm\">\n                                    <button class=\"pdp-cfg-step\" id=\"cfgInkMinus\" type=\"button\" aria-label=\"One fewer ink color\">&minus;</button>\n                                    <input type=\"number\" id=\"cfgInkInput\" inputmode=\"numeric\" min=\"1\" max=\"4\" step=\"1\" value=\"1\" aria-label=\"Ink colors\">\n                                    <button class=\"pdp-cfg-step\" id=\"cfgInkPlus\" type=\"button\" aria-label=\"One more ink color\">+</button>\n                                </div>\n                                <span class=\"pdp-cfg-hint\">Screen print only — counts for the front and back.</span>\n                            </div>\n                            <div class=\"pdp-cfg-stripe\" id=\"cfgStripeRow\" hidden>\n                                <label class=\"pdp-cfg-stripe-label\">\n                                    <input type=\"checkbox\" id=\"cfgStripeInput\">\n                                    <span>Add safety stripes</span>\n                                </label>\n                                <span class=\"pdp-cfg-hint\">High-visibility striping — adds $2.00/piece per print location.</span>\n                                <a class=\"pdp-cfg-stripe-example\" href=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/Erik%20Modeling%20Hoodie%20Front%20and%20Back.png?ver=1\" target=\"_blank\" rel=\"noopener\" title=\"Safety stripes example — front &amp; back (click to enlarge)\" aria-label=\"Safety stripes example, front and back — opens full-size image in a new tab\">\n                                    <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/Erik%20Modeling%20Hoodie%20Front%20and%20Back.png?ver=1\" alt=\"Hoodie shown front and back with high-visibility safety stripes\" loading=\"lazy\">\n                                </a>\n                            </div>\n                        </div>\n                        <div class=\"pdp-cfg-q\">\n                            <h3 class=\"pdp-cfg-q-title\"><span class=\"pdp-cfg-q-num\" aria-hidden=\"true\">3</span> Pick a look</h3>\n                            <div id=\"cfgAlert\" aria-live=\"polite\"></div>\n                            <div class=\"pdp-cfg-methods\" id=\"cfgMethods\"></div>\n                        </div>\n                        <div class=\"pdp-cfg-total\" id=\"cfgTotal\" aria-live=\"polite\"></div>\n                        <p class=\"pdp-cfg-total-included\">Price shown is <strong>garment + decoration included</strong> — not a decoration-only add-on.</p>\n                        <!-- Recommended hi-vis styles for safety stripes — shown when screen print is an available method -->\n                        <div id=\"cfgSafetyStripesRecs\" hidden></div>\n                        <div class=\"pdp-cfg-actions\">\n                            <button class=\"btn btn-cta\" id=\"cfgAddToQuote\" type=\"button\" disabled>Add to quote</button>\n                            <a class=\"btn btn-ghost\" id=\"cfgEmailQuote\" href=\"mailto:sales@nwcustomapparel.com\">or email us directly</a>\n                            <span class=\"pdp-cfg-add-reason\" id=\"cfgAddReason\" aria-live=\"polite\"></span>\n                        </div>\n                        <div class=\"pdp-cfg-expand\">\n                            <button class=\"pdp-cfg-expand-btn\" id=\"cfgMatrixToggle\" type=\"button\" aria-expanded=\"true\" aria-controls=\"cfgMatrix\">Hide the full price table &#9652;</button>\n                            <div class=\"pdp-cfg-matrix\" id=\"cfgMatrix\"></div>\n                        </div>\n                        <p class=\"pdp-cfg-teaser\">Sleeves, names, or something special? Add it when you request your quote — your rep prices it on the proof.</p>\n                    </div>\n                </div>\n            </section>\n\n            <!-- Product details -->\n            <section class=\"pdp-section\" id=\"detailsSection\" aria-labelledby=\"detailsHeading\" hidden>\n                <div class=\"wrap\">\n                    <h2 id=\"detailsHeading\">Product details</h2>\n                    <ul class=\"pdp-details-list\" id=\"detailBullets\"></ul>\n                </div>\n            </section>\n\n            <!-- This style on our blog — posts featuring this style (related-posts.js;\n                 stays hidden unless /api/blog-product-map has entries for it) -->\n            <section class=\"pdp-section\" id=\"blogPostsSection\" aria-labelledby=\"blogPostsHeading\" hidden>\n                <div class=\"wrap\">\n                    <h2 id=\"blogPostsHeading\">This style on our blog</h2>\n                    <ul class=\"pdp-blog-links\" id=\"blogPostsList\"></ul>\n                </div>\n            </section>\n\n            <!-- Related products -->\n            <section class=\"pdp-section\" id=\"relatedSection\" aria-labelledby=\"relatedHeading\" hidden>\n                <div class=\"wrap\">\n                    <h2 id=\"relatedHeading\">You might also like</h2>\n                    <div class=\"pdp-related-grid\" id=\"relatedGrid\"></div>\n                </div>\n            </section>\n        </div>\n\n        <!-- Toast stack (core primitive) — add-to-quote confirmations -->\n        <div class=\"toast-stack\" id=\"toastStack\" aria-live=\"polite\"></div>\n\n        <!-- Mobile sticky CTA bar (live price line filled by pdp-configurator.js renderMobileBar) -->\n        <div class=\"pdp-mobile-cta\" id=\"mobileCtaBar\" hidden>\n            <span class=\"pdp-mobile-cta-price\" id=\"cfgMobilePrice\" aria-live=\"polite\" hidden></span>\n            <a class=\"btn btn-cta\" id=\"ctaQuoteMobile\" href=\"#pricingHeading\">Price it</a>\n            <a class=\"btn btn-ghost\" href=\"tel:253-922-5793\">Call us</a>\n            <a class=\"btn btn-ghost\" id=\"ctaSampleMobile\" href=\"/catalog?topSellers=1\">Sample</a>\n        </div>\n    </main>\n\n    <footer class=\"site-footer\">\n        <div class=\"footer-inner\">\n            <div class=\"footer-brand\">\n                <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20White%20Text.png?ver=1\" alt=\"Northwest Custom Apparel\" width=\"180\" height=\"52\" loading=\"lazy\">\n                <p>Family-owned custom apparel decorator in Milton, Washington. Embroidery, screen printing, DTG, and DTF — done in-house since 1977.</p>\n                <span class=\"footer-est\">Est. 1977 · Milton, WA</span>\n            </div>\n            <div class=\"footer-col\">\n                <h3>Shop</h3>\n                <ul>\n                    <li><a href=\"/catalog?topSellers=1\">Top Sellers</a></li>\n                    <li><a href=\"/brands.html\">Brands</a></li>\n                    <li><a href=\"/custom-tees\">Custom T-Shirts</a></li>\n                    <li><a href=\"/custom-caps\">Custom Hats</a></li>\n                    <li><a href=\"/catalog?topSellers=1\">Free Sample Program</a></li>\n                </ul>\n            </div>\n            <div class=\"footer-col\">\n                <h3>Services</h3>\n                <ul>\n                    <li><a href=\"/pages/golf-tournaments-2026.html?utm_source=product&amp;utm_campaign=golf-2026-q2&amp;utm_medium=footer\">Tournament Packages</a></li>\n                    <li><a href=\"/company-webstores\">Custom Webstores</a></li>\n                    <li><a href=\"/calculators/laser-tumbler-polarcamel.html\">Laser-Engraved Tumblers</a></li>\n                </ul>\n            </div>\n            <div class=\"footer-col\">\n                <h3>Contact</h3>\n                <address>\n                    2025 Freeman Rd E<br>\n                    Milton, WA 98354<br>\n                    <a href=\"tel:253-922-5793\">253-922-5793</a><br>\n                    <a href=\"mailto:sales@nwcustomapparel.com\">sales@nwcustomapparel.com</a><br>\n                    Mon–Fri 8:30–5:00 PT\n                </address>\n                <ul>\n                    <li><a href=\"/staff-dashboard.html\">Staff Portal</a></li>\n                </ul>\n            </div>\n        </div>\n        <div class=\"footer-bottom\">\n            <div class=\"footer-bottom-inner\">\n                <span>© 2026 Northwest Custom Apparel</span>\n                <span>Family-owned &amp; operated since 1977</span>\n            </div>\n        </div>\n    </footer>\n\n    <!-- Config + shared pricing services (the same formula sources the calculators and quote builders use) -->\n    <script src=\"/config/app.config.js?v=2026.09.03.11\" defer></script>\n    <script src=\"/shared_components/js/decoration-methods.js?v=2026.09.06.31\" defer></script>\n    <script src=\"/shared_components/js/embroidery-pricing-service.js?v=2026.09.06.31\" defer></script>\n    <script src=\"/shared_components/js/cap-embroidery-pricing-service.js?v=2026.09.06.31\" defer></script>\n    <!-- Canonical DTG engine (Batch 6) - MUST precede dtg-pricing-service.js (defer preserves order) -->\n    <script src=\"/shared_components/js/dtg-canonical-pricing.js?v=2026.07.11.6\" defer></script>\n    <script src=\"/shared_components/js/dtg-pricing-service.js?v=2026.09.06.37\" defer></script>\n    <script src=\"/shared_components/js/screenprint-pricing-service.js?v=2026.09.06.44\" defer></script>\n    <script src=\"/shared_components/js/dtf-pricing-service.js?v=2026.09.06.37\" defer></script>\n    <!-- Quote-cart engine + its staff authorities (EMB calculator class, DTF location config) -->\n    <script src=\"/shared_components/js/embroidery-quote-pricing.js?v=2026.09.07.33\" defer></script>\n    <script src=\"/shared_components/js/dtf-quote-pricing.js?v=2026.09.06.37\" defer></script>\n    <script src=\"/shared_components/js/quote-cart-engine.js?v=2026.07.07.7\" defer></script>\n    <script src=\"/shared_components/js/quote-cart-store.js?v=2026.08.19.5\" defer></script>\n    <script src=\"/shared_components/js/delivery-promise.js?v=2026.09.06.31\" defer></script>\n    <script src=\"/product/js/pdp-configurator.js?v=2026.08.18.4\" defer></script>\n    <script src=\"/shared_components/js/safety-stripe-recs.js?v=2026.09.06.31\" defer></script>\n    <!-- Sample program: shared engine + drawer (Order a sample CTA) -->\n    <script src=\"/shared_components/js/sample-inventory-service.js?v=2026.09.07.33\" defer></script>\n    <script src=\"/shared_components/js/sample-pricing.js?v=2026.07.06.8\" defer></script>\n    <script src=\"/shared_components/js/sample-cart-service.js?v=2026.09.06.31\" defer></script>\n    <script src=\"/shared_components/js/cart-drawer.js?v=2026.09.06.37\" defer></script>\n    <script src=\"/shared_components/js/express-eligibility.js?v=2026.08.25.4\" defer></script>\n    <script src=\"/product/js/product-2026.js?v=2026.09.06.31\" defer></script>\n    <script src=\"/product/js/related-posts.js?v=2026.07.12.11\" defer></script>\n</body>\n</html>\n",
+      "title": "Product Details | Northwest Custom Apparel",
+      "bodyTextSha": "c7e3543cf8a1bf9235f8bb496050c8e58e3c0c0f56a3ff1c9919439ba21bdbd9",
+      "ids": [
+        "canonicalLink",
+        "mobileMenuBtn",
+        "navSearchInput",
+        "navSearchBtn",
+        "sidebar",
+        "drawerClose",
+        "sidebarOverlay",
+        "main",
+        "crumbCategory",
+        "crumbStyle",
+        "productTitle",
+        "productSub",
+        "productBlurb",
+        "pdpSkeleton",
+        "pdpFatal",
+        "fatalTitle",
+        "fatalSub",
+        "fatalRetry",
+        "pdpContent",
+        "galleryMainImg",
+        "galleryThumbs",
+        "colorCount",
+        "swatchGrid",
+        "selectedColorName",
+        "invColorName",
+        "inventoryBody",
+        "ctaQuote",
+        "expressLane",
+        "expressLaneNote",
+        "expressLaneLink",
+        "ctaSample",
+        "pricingHeading",
+        "methodAlert",
+        "pdpConfigurator",
+        "cfgQtyMinus",
+        "cfgQtyInput",
+        "cfgQtyPlus",
+        "cfgLocations",
+        "cfgInkRow",
+        "cfgInkMinus",
+        "cfgInkInput",
+        "cfgInkPlus",
+        "cfgStripeRow",
+        "cfgStripeInput",
+        "cfgAlert",
+        "cfgMethods",
+        "cfgTotal",
+        "cfgSafetyStripesRecs",
+        "cfgAddToQuote",
+        "cfgEmailQuote",
+        "cfgAddReason",
+        "cfgMatrixToggle",
+        "cfgMatrix",
+        "detailsSection",
+        "detailsHeading",
+        "detailBullets",
+        "blogPostsSection",
+        "blogPostsHeading",
+        "blogPostsList",
+        "relatedSection",
+        "relatedHeading",
+        "relatedGrid",
+        "toastStack",
+        "mobileCtaBar",
+        "cfgMobilePrice",
+        "ctaQuoteMobile",
+        "ctaSampleMobile"
+      ],
+      "links": [
+        {
+          "href": "#main",
+          "label": "Skip to content"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "label": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Staff"
+        },
+        {
+          "href": "/",
+          "label": ""
+        },
+        {
+          "href": "/catalog",
+          "label": "Products"
+        },
+        {
+          "href": "/brands.html",
+          "label": "Brands"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "label": "Top Sellers"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "label": "Fall Catalog '26 New"
+        },
+        {
+          "href": "/custom-tees",
+          "label": "Custom Tees New"
+        },
+        {
+          "href": "/custom-caps",
+          "label": "Custom Hats New"
+        },
+        {
+          "href": "/company-webstores",
+          "label": "Webstores"
+        },
+        {
+          "href": "/blog",
+          "label": "Blog"
+        },
+        {
+          "href": "/custom-stickers",
+          "label": "Stickers"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "label": "Get a Quote"
+        },
+        {
+          "href": "/quote-cart",
+          "label": "Quote 0"
+        },
+        {
+          "href": "/",
+          "label": "Home"
+        },
+        {
+          "href": "/custom-tees",
+          "label": "Custom T-Shirts New"
+        },
+        {
+          "href": "/custom-caps",
+          "label": "Custom Hats New"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "label": "Top Sellers & Free Samples"
+        },
+        {
+          "href": "/brands.html",
+          "label": "Brands"
+        },
+        {
+          "href": "/company-webstores",
+          "label": "Custom Webstores"
+        },
+        {
+          "href": "/catalog",
+          "label": "Catalog"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "label": "Fall Catalog '26"
+        },
+        {
+          "href": "/custom-stickers",
+          "label": "Custom Stickers"
+        },
+        {
+          "href": "/custom-banners",
+          "label": "Vinyl Banners"
+        },
+        {
+          "href": "/blog",
+          "label": "Blog"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "label": "Get a Quote"
+        },
+        {
+          "href": "/catalog?category=T-Shirts",
+          "label": "T-Shirts"
+        },
+        {
+          "href": "/catalog?category=Polos%2FKnits",
+          "label": "Polos & Knits"
+        },
+        {
+          "href": "/catalog?category=Sweatshirts%2FFleece",
+          "label": "Sweatshirts & Fleece"
+        },
+        {
+          "href": "/catalog?category=Caps",
+          "label": "Caps"
+        },
+        {
+          "href": "/catalog?category=Outerwear",
+          "label": "Outerwear"
+        },
+        {
+          "href": "/catalog?category=Workwear",
+          "label": "Workwear"
+        },
+        {
+          "href": "/catalog?category=Bags",
+          "label": "Bags"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "label": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "label": "Home"
+        },
+        {
+          "href": "/catalog",
+          "label": "Catalog"
+        },
+        {
+          "href": "/catalog",
+          "label": "Browse the catalog"
+        },
+        {
+          "href": "#pricingHeading",
+          "label": "Price it & add to quote"
+        },
+        {
+          "href": "#",
+          "label": ""
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "label": "Order a sample"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "https://maps.google.com/?cid=4107380119454186786",
+          "label": "★★★★★ Google review · 4.9 from 185+"
+        },
+        {
+          "href": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/Erik%20Modeling%20Hoodie%20Front%20and%20Back.png?ver=1",
+          "label": ""
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "label": "or email us directly"
+        },
+        {
+          "href": "#pricingHeading",
+          "label": "Price it"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "Call us"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "label": "Sample"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "label": "Top Sellers"
+        },
+        {
+          "href": "/brands.html",
+          "label": "Brands"
+        },
+        {
+          "href": "/custom-tees",
+          "label": "Custom T-Shirts"
+        },
+        {
+          "href": "/custom-caps",
+          "label": "Custom Hats"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "label": "Free Sample Program"
+        },
+        {
+          "href": "/pages/golf-tournaments-2026.html?utm_source=product&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "label": "Tournament Packages"
+        },
+        {
+          "href": "/company-webstores",
+          "label": "Custom Webstores"
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "label": "Laser-Engraved Tumblers"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "label": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Staff Portal"
+        }
+      ],
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "cfgQtyInput",
+          "type": "number",
+          "value": "24"
+        },
+        {
+          "id": "cfgInkInput",
+          "type": "number",
+          "value": "1"
+        },
+        {
+          "id": "cfgStripeInput",
+          "type": "checkbox",
+          "value": "on"
+        }
+      ],
+      "styles": [
+        "https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap",
+        "/shared_components/css/tokens.css?v=2026.09.08.2",
+        "/shared_components/css/nwca-2026-core.css?v=2026.09.07.8",
+        "/product/css/product-2026.css?v=2026.09.07.20",
+        "/shared_components/css/safety-stripe-recs.css?v=2026.09.07.20",
+        "/shared_components/css/cart-drawer.css?v=2026.09.07.20",
+        "/shared_components/css/embroidery-quote-pricing.css?v=2026.09.07.8"
+      ],
+      "scripts": [
+        "/config/app.config.js?v=2026.09.03.11",
+        "/shared_components/js/decoration-methods.js?v=2026.09.06.31",
+        "/shared_components/js/embroidery-pricing-service.js?v=2026.09.06.31",
+        "/shared_components/js/cap-embroidery-pricing-service.js?v=2026.09.06.31",
+        "/shared_components/js/dtg-canonical-pricing.js?v=2026.07.11.6",
+        "/shared_components/js/dtg-pricing-service.js?v=2026.09.06.37",
+        "/shared_components/js/screenprint-pricing-service.js?v=2026.09.06.44",
+        "/shared_components/js/dtf-pricing-service.js?v=2026.09.06.37",
+        "/shared_components/js/embroidery-quote-pricing.js?v=2026.09.07.33",
+        "/shared_components/js/dtf-quote-pricing.js?v=2026.09.06.37",
+        "/shared_components/js/quote-cart-engine.js?v=2026.07.07.7",
+        "/shared_components/js/quote-cart-store.js?v=2026.08.19.5",
+        "/shared_components/js/delivery-promise.js?v=2026.09.06.31",
+        "/product/js/pdp-configurator.js?v=2026.08.18.4",
+        "/shared_components/js/safety-stripe-recs.js?v=2026.09.06.31",
+        "/shared_components/js/sample-inventory-service.js?v=2026.09.07.33",
+        "/shared_components/js/sample-pricing.js?v=2026.07.06.8",
+        "/shared_components/js/sample-cart-service.js?v=2026.09.06.31",
+        "/shared_components/js/cart-drawer.js?v=2026.09.06.37",
+        "/shared_components/js/express-eligibility.js?v=2026.08.25.4",
+        "/product/js/product-2026.js?v=2026.09.06.31",
+        "/product/js/related-posts.js?v=2026.07.12.11"
+      ],
+      "cssBytes": 195159
+    }
+  ],
+  "hashes": {
+    "app-modern.js": "62447ad6f860539f07f3d62c3189c2d280f34410b79c8cc2d9e03dcef5e4a4e6",
+    "autocomplete-new.js": "8509211510c4d9e31903126bd220228a5ad55beeed189aec138fd8ac437dcbce",
+    "brands-flyout.js": "5d05a53336fb4c8725b142490c1d88c190fe89187c093d0b689cba403a4480cf",
+    "catalog-search.css": "565be27e71c33d565ae2dc1f8c7ee0bb91196db43e2339bad3f69983a217e327",
+    "catalog-search.js": "ddd910bf30a07145bf294f97456d123921bb573e94865c5417a98f5073952e76",
+    "config/app.config.js": "fe83e4329ce3eee97e48dd68dab81d9d5eb6ec94511d9650e2c9ebbb1528d6ea",
+    "home-2026.js": "cfea161f0c8f29c6acc5a1fcc659cc4ac9d00161209517a8bb5ec359a4ded589",
+    "index.html": "3f295e10cc845efc709cdecbd7acac081fb8194a950cfaffbc4898b1b384b6e8",
+    "pages/catalog.html": "dcd3ee744b52b69fd82d7d731b7c9a6c41d6f897b2f330dd5ab8f75b83b930db",
+    "pages/css/catalog-2026.css": "f23ed1bc86b4a6b167272486f8583ade2e632e89ce45519312855eba4a508c8b",
+    "pages/js/catalog-2026.js": "05b38783ddaf21526adc18afb8d70cb6fd71a01d0a06a973aebfc1dfa535d5a6",
+    "pages/js/catalog-samples.js": "11d4a7dfc1bf92b60ee93a7658ddb8e6b03a4319e46751e2eaba2451e44819e5",
+    "product-search-service.js": "36c9df7e675182c05110e6776e25e116a5378d9201a40f3068a1786f05ad1491",
+    "product.html": "aa18f44ae2cebed74adf48cfa603cf09cb130c6e0c738640aa6c5229e2b92cf2",
+    "product/css/product-2026.css": "5fc108d212c15098f16e0680cf2fefa98ec0bb227b74bed86c4167d329081262",
+    "product/js/pdp-configurator.js": "81385ca96d934883ddebaea9c4dd4cd51ea7ba6c1d9431b6ff5e9874774492bc",
+    "product/js/product-2026.js": "8aafb3ecc1d3887c68f1a7cea38573136ad79b05fa9d1e1d7bb81b4f70541973",
+    "product/js/related-posts.js": "16565206e5e80771235af5d6a330264e75af0a496f23e84498780bd7ab1364bc",
+    "shared_components/css/blog.css": "08753efb1a7b3e37c00d985be5383ef8098eb72a80a6f1a0f2226af2fd336e8f",
+    "shared_components/css/cart-drawer.css": "78f718ab29c9cc307e7077f9457879f834bbd013c8d54a34527c99bb7518932a",
+    "shared_components/css/embroidery-quote-pricing.css": "d7e48a93fa554e0bf44cf5617a803069c942221458c191390f01ebc85a6779fa",
+    "shared_components/css/nwca-2026-core.css": "9041ba4e915446a5eb0c219f489565b2503533be59f5ac73a26de12766526e1c",
+    "shared_components/css/nwca-2026.css": "a6ae5e5f5ca4ea334d963d47660224ddca985c04e6d5b3463fa0a34652c554d1",
+    "shared_components/css/safety-stripe-recs.css": "4bf392dd1bddc01021d7346c6401de0bca8c7143aeafa33493b59127245052e1",
+    "shared_components/css/tokens.css": "2b3ab556bb9eaf40765a5c84683777cb64d50a6c42d1b4e82bc6beff33a127b6",
+    "shared_components/js/blog-teaser.js": "298ff1ca394a829ff8c07cfd47b9f32d9f6dad908db04c05de8ea919931ef4da",
+    "shared_components/js/brands-registry.js": "1d69df351e483ece316572554a5b8b6ed4abc5ea34eca74a844e9a459c125f62",
+    "shared_components/js/cap-embroidery-pricing-service.js": "eaee03cfb727abb775532e37078bd41a9da94814602899eba14b611a855e1506",
+    "shared_components/js/cart-drawer.js": "f5299b6552f2cf08302a979abcad1e844d698fe040b0b1a21c11f8f83a50d445",
+    "shared_components/js/decoration-methods.js": "27dc341efc94ece6d5a4eb061552c06fdf37754de43b27a4bc2a6f5c6f662b9b",
+    "shared_components/js/delivery-promise.js": "8eceedfd17128aa68146bd6c095142824d2575dc4f1716292cfb37a0ed9a45cd",
+    "shared_components/js/dtf-pricing-service.js": "949255ae38db6f51d494f78f07ebc8f484e5288035fe1d13b3af7c6fea2391ab",
+    "shared_components/js/dtf-quote-pricing.js": "af8443797219945d0b7618158dcd6c55bdd19be2c6f300693cb6bfe56543d9fb",
+    "shared_components/js/dtg-canonical-pricing.js": "de8a80c0bbed8ddaea62ecb2bcf7d62afc60788701ede23d41fcd7ade372d1f3",
+    "shared_components/js/dtg-pricing-service.js": "524822dab43e63a3c45868a0df9b14b00dc28a8eb43958a027c99fa9e9d0ac36",
+    "shared_components/js/embroidery-pricing-service.js": "cb5ead0d8b9059ca640993e331e075d87b86016d993aec403179260f4c0b0dff",
+    "shared_components/js/embroidery-quote-pricing.js": "50a142670e991983b9a7ff09b20f05c59edd5cd72f19cb37d322f3bcb14c3fb3",
+    "shared_components/js/express-eligibility.js": "66492ec5a4296c1d6a2560e7d658ff3235a6795d8e2b1cf50499fca44cf217c7",
+    "shared_components/js/nav-dropdown.js": "97f09b71b5051161e31facaf259e19019cc73a5a3b7b4ea5611591b4e93eeb09",
+    "shared_components/js/quote-cart-engine.js": "ae4d987c8a68b260c2acdc42e123883a12decc6b59c42359edb8c40ca348a7eb",
+    "shared_components/js/quote-cart-store.js": "593a33e72fe2dee151811b91aee4404c0a00db2d394ccf9ab27e7da2bc9ef7c0",
+    "shared_components/js/safety-stripe-recs.js": "d7ac61a0d47e3e1e79841e060fc7aad36cfed1a035a7bce8d738444f66da75f9",
+    "shared_components/js/sample-cart-service.js": "416460462be8cbd9ad9545496b79b0d004a9da1e1059a6dea86b5b6118d4c86f",
+    "shared_components/js/sample-inventory-service.js": "6a852360032e06636a921dad61e3e02d462156df90b1d0d367c6b883f2e828ba",
+    "shared_components/js/sample-pricing.js": "8a85dcb294f4c35ea54a239a42b32b78e312fe252d1f1db383fa119ae116d4d1",
+    "shared_components/js/screenprint-pricing-service.js": "695a740f845263741fee5a9aa91816d9643a5dd24fa28cfc3850a9a2785300b7",
+    "shared_components/vendor/fontawesome/css/all.min.css": "e5e202e3c899507992952533f57b634722b69b34241d271963559d31aa33ef81"
+  },
+  "changes": [],
+  "retiredStyles": []
+}

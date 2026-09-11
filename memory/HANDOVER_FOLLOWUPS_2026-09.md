@@ -1,5 +1,18 @@
 # Handover follow-ups — 2026-09-07
 
+## NEXT — Home, Catalog and Product original review
+
+Custom apparel is verified live as v2026.09.11.2, Heroku2105, ae3a8276. All local release gates, four actual exact-source CI jobs, deployed slug, six source/compiled assets and29 live access checks passed. Primary main/develop and origin are synchronized. Live193/225 reviewed,32pending. This isolated codex/catalog-storefront branch contains the next family’s original evidence only; application code is unchanged.
+
+Original home/catalog/product review is complete:47 source hashes,27 immutable browser contracts at1440/768/390/320,48 source/financial guards and90 paper pages across24 PDFs (80 unique images reviewed on20 contact sheets,10 pixel-identical pages). Original horizontal overflow, promo-label contrast, keyboard-scroll/group ARIA, drawer focus and print-overlay/card-splitting issues are documented. Synthetic DTG fixtures have limited full-front/back cost tiers; their recorded amounts are fixture behavior, not customer pricing. Preserve all canonical financial functions. Next: back up this baseline, merge the verified release, then consolidate scoped styles and repair these demonstrated UI issues. Catalog remains pending until current browser and paper review finishes.
+
+- [x] Freeze original HTML, styles, controllers and pricing/cart dependencies for index.html, pages/catalog.html and product.html.
+- [x] Capture original navigation, search/filter/sort/pagination, quick view/color links, stock states, all decoration methods/tier prices and sample/quote-cart handoffs using synthetic APIs. Review four widths, keyboard access and all paper pages before changing application code.
+- [ ] Share existing storefront navigation and canonical controls; remove competing layout owners while retaining imagery, offer copy and distinct product configuration. Preserve calculations, quantities, successful cart payloads, stock keys and navigation destinations.
+- [ ] Compare current rendered output and immutable source/contracts, then grant migration credit and complete a separate release.
+
+Design: existing Public Sans, NWCA green, white panels, gray canvas and readable existing warning tokens. No new global palette or competing button definitions. Reuse the reviewed storefront shell where its structure fits; the product configurator keeps its shared pricing authorities. No real saves, orders, payments, emails, uploads, logout or device printing.
+
 ## RELEASE CANDIDATE — v2026.09.11.2 Custom Tees and Custom Caps
 
 The reviewed pair 296b30e5 is integrated at c4a1ea4c058f6cf1300e5605a64b0df5549f17ba. This release adds eight cache references for the six changed application assets and their reversible mappings. All 44 focused browser scenarios, 78 visually reviewed current paper pages and 387 source/pricing/ownership guards passed before preparation. All 14 original source hashes and 36 browser contracts remain unchanged through 50 mappings.
