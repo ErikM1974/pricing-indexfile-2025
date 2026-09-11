@@ -1,0 +1,141 @@
+[
+  {
+    "tier": "10-23",
+    "ids": {
+      "products-breadcrumb": "Products",
+      "styleSearch": "",
+      "searchBtn": "",
+      "productImage": "",
+      "productTitle": "PC54",
+      "productDescription": "Comfortable, durable cotton apparel for the whole team.",
+      "currentColor": "Jet Black",
+      "currentStyle": "#PC54",
+      "currentBrand": "Port & Company",
+      "colorSwatches": "",
+      "dtf-location-toggles": "Up to 5\" x 5\" Small Left Chest Right Chest Left Sleeve Right Sleeve Back of Neck Up to 9\" x 12\" Medium Center Front Center Back Up to 12\" x 16.5\" Large Full Front Full Back",
+      "dtf-exact-quantity": "",
+      "dtf-ltm-fee-calc": "$50 ÷ 10 = $5.00/piece",
+      "dtf-live-price": "21.00",
+      "dtf-upcharge-info-icon": "",
+      "dtf-setup-fee-badge": "",
+      "dtf-quantity-display": "10",
+      "dtf-locations-display": "1",
+      "dtf-ltm-warning-amount": "setup",
+      "calculator-inventory-section": ""
+    },
+    "fields": [
+      {
+        "id": "styleSearch",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "dtf-exact-quantity",
+        "name": "",
+        "type": "number",
+        "value": "10",
+        "checked": false,
+        "disabled": false
+      }
+    ]
+  },
+  {
+    "tier": "24-47",
+    "ids": {
+      "products-breadcrumb": "Products",
+      "styleSearch": "",
+      "searchBtn": "",
+      "productImage": "",
+      "productTitle": "PC54",
+      "productDescription": "Comfortable, durable cotton apparel for the whole team.",
+      "currentColor": "Jet Black",
+      "currentStyle": "#PC54",
+      "currentBrand": "Port & Company",
+      "colorSwatches": "",
+      "dtf-location-toggles": "Up to 5\" x 5\" Small Left Chest Right Chest Left Sleeve Right Sleeve Back of Neck Up to 9\" x 12\" Medium Center Front Center Back Up to 12\" x 16.5\" Large Full Front Full Back",
+      "dtf-live-price": "15.50",
+      "dtf-upcharge-info-icon": "",
+      "dtf-setup-fee-badge": "",
+      "dtf-quantity-display": "24",
+      "dtf-locations-display": "1",
+      "calculator-inventory-section": ""
+    },
+    "fields": [
+      {
+        "id": "styleSearch",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      }
+    ]
+  },
+  {
+    "tier": "48-71",
+    "ids": {
+      "products-breadcrumb": "Products",
+      "styleSearch": "",
+      "searchBtn": "",
+      "productImage": "",
+      "productTitle": "PC54",
+      "productDescription": "Comfortable, durable cotton apparel for the whole team.",
+      "currentColor": "Jet Black",
+      "currentStyle": "#PC54",
+      "currentBrand": "Port & Company",
+      "colorSwatches": "",
+      "dtf-location-toggles": "Up to 5\" x 5\" Small Left Chest Right Chest Left Sleeve Right Sleeve Back of Neck Up to 9\" x 12\" Medium Center Front Center Back Up to 12\" x 16.5\" Large Full Front Full Back",
+      "dtf-live-price": "14.50",
+      "dtf-upcharge-info-icon": "",
+      "dtf-setup-fee-badge": "",
+      "dtf-quantity-display": "48",
+      "dtf-locations-display": "1",
+      "calculator-inventory-section": ""
+    },
+    "fields": [
+      {
+        "id": "styleSearch",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      }
+    ]
+  },
+  {
+    "tier": "72+",
+    "ids": {
+      "products-breadcrumb": "Products",
+      "styleSearch": "",
+      "searchBtn": "",
+      "productImage": "",
+      "productTitle": "PC54",
+      "productDescription": "Comfortable, durable cotton apparel for the whole team.",
+      "currentColor": "Jet Black",
+      "currentStyle": "#PC54",
+      "currentBrand": "Port & Company",
+      "colorSwatches": "",
+      "dtf-location-toggles": "Up to 5\" x 5\" Small Left Chest Right Chest Left Sleeve Right Sleeve Back of Neck Up to 9\" x 12\" Medium Center Front Center Back Up to 12\" x 16.5\" Large Full Front Full Back",
+      "dtf-live-price": "13.50",
+      "dtf-upcharge-info-icon": "",
+      "dtf-setup-fee-badge": "",
+      "dtf-quantity-display": "72",
+      "dtf-locations-display": "1",
+      "calculator-inventory-section": ""
+    },
+    "fields": [
+      {
+        "id": "styleSearch",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      }
+    ]
+  }
+]

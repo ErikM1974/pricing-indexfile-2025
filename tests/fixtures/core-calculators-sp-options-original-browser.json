@@ -1,0 +1,397 @@
+{
+  "states": [
+    {
+      "width": 1440,
+      "title": "Screen Print Pricing Calculator | Northwest Custom Apparel",
+      "url": "/calculators/screen-print-pricing.html?StyleNumber=PC54&COLOR=Jet%20Black",
+      "ids": {
+        "products-breadcrumb": "Products",
+        "styleSearch": "",
+        "searchBtn": "",
+        "search-results-live": "",
+        "productImage": "",
+        "imageThumbnails": "",
+        "productTitle": "Essential Cotton Tee",
+        "productDescription": "Comfortable, durable cotton apparel for the whole team.",
+        "currentColor": "Brilliant Orange",
+        "currentStyle": "#PC54",
+        "currentBrand": "Port & Company",
+        "colorSwatches": "",
+        "sp-dark-info-icon": "",
+        "sp-toggle-1color": "1 Color",
+        "sp-toggle-2color": "2 Colors",
+        "sp-toggle-3color": "3 Colors",
+        "sp-toggle-4color": "4 Colors",
+        "sp-toggle-5color": "5 Colors",
+        "sp-toggle-6color": "6 Colors",
+        "sp-safety-stripes-toggle": "Safety Stripes Design 4-color design: +$2.00 per piece",
+        "sp-tier-24-47": "24-47 pieces + $50 Small Batch Fee",
+        "sp-tier-48-71": "48-71 pieces",
+        "sp-tier-72-144": "72-144 pieces",
+        "sp-tier-145-576": "145+ pieces",
+        "sp-additional-locations-header": "Additional Print Locations Add up to 3 additional locations",
+        "sp-additional-locations-container": "LOCATION Back Left Sleeve Right Sleeve Other Location COLORS 1 Color 2 Colors 3 Colors 4 Colors 5 Colors 6 Colors 🦺 Safety (+$2.00)",
+        "sp-add-location": "Add Location",
+        "sp-pricing-tier-label": "145+ pieces",
+        "sp-live-price-amount": "$16.00",
+        "sp-upcharge-info-icon": "",
+        "sp-setup-fee-badge": "",
+        "sp-toggle-breakdown-text": "Hide Breakdown",
+        "sp-pricing-details-breakdown": "Front Location Shirt: $7.00 Print (2 colors): $5.00 Front Total: $12.00 Back Print (1 color): $4.00 Back Total: $4.00 Setup Fees (One-Time Charge) Front: 2 colors × $30.00 Front Setup: $60.00 Back: 1 colors × $30.00 Back Setup: $30.00 Total Setup: $90.00 Setup fees are charged once per order, not per shirt Price per Shirt: $16.00",
+        "calculator-inventory-section": "Brilliant Orange Warehouse Inventory 875 units Warehouse S M L XL 2XL 3XL 4XL Synthetic warehouse 125 125 125 125 125 125 125 TOTAL 125 125 125 125 125 125 125"
+      },
+      "fields": [
+        {
+          "id": "styleSearch",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "back",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "1",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/product.html?style=PC54",
+          "text": "Products"
+        }
+      ],
+      "tables": [
+        "Warehouse S M L XL 2XL 3XL 4XL Synthetic warehouse 125 125 125 125 125 125 125 TOTAL 125 125 125 125 125 125 125"
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Screen Print Pricing Calculator | Northwest Custom Apparel",
+      "url": "/calculators/screen-print-pricing.html?StyleNumber=PC54&COLOR=Jet%20Black",
+      "ids": {
+        "products-breadcrumb": "Products",
+        "styleSearch": "",
+        "searchBtn": "",
+        "search-results-live": "",
+        "productImage": "",
+        "imageThumbnails": "",
+        "productTitle": "Essential Cotton Tee",
+        "productDescription": "Comfortable, durable cotton apparel for the whole team.",
+        "currentColor": "Brilliant Orange",
+        "currentStyle": "#PC54",
+        "currentBrand": "Port & Company",
+        "colorSwatches": "",
+        "sp-dark-info-icon": "",
+        "sp-toggle-1color": "1 Color",
+        "sp-toggle-2color": "2 Colors",
+        "sp-toggle-3color": "3 Colors",
+        "sp-toggle-4color": "4 Colors",
+        "sp-toggle-5color": "5 Colors",
+        "sp-toggle-6color": "6 Colors",
+        "sp-safety-stripes-toggle": "Safety Stripes Design 4-color design: +$2.00 per piece",
+        "sp-tier-24-47": "24-47 pieces + $50 Small Batch Fee",
+        "sp-tier-48-71": "48-71 pieces",
+        "sp-tier-72-144": "72-144 pieces",
+        "sp-tier-145-576": "145+ pieces",
+        "sp-additional-locations-header": "Additional Print Locations Add up to 3 additional locations",
+        "sp-additional-locations-container": "LOCATION Back Left Sleeve Right Sleeve Other Location COLORS 1 Color 2 Colors 3 Colors 4 Colors 5 Colors 6 Colors 🦺 Safety (+$2.00)",
+        "sp-add-location": "Add Location",
+        "sp-pricing-tier-label": "145+ pieces",
+        "sp-live-price-amount": "$16.00",
+        "sp-upcharge-info-icon": "",
+        "sp-setup-fee-badge": "",
+        "sp-toggle-breakdown-text": "Hide Breakdown",
+        "sp-pricing-details-breakdown": "Front Location Shirt: $7.00 Print (2 colors): $5.00 Front Total: $12.00 Back Print (1 color): $4.00 Back Total: $4.00 Setup Fees (One-Time Charge) Front: 2 colors × $30.00 Front Setup: $60.00 Back: 1 colors × $30.00 Back Setup: $30.00 Total Setup: $90.00 Setup fees are charged once per order, not per shirt Price per Shirt: $16.00",
+        "calculator-inventory-section": "Brilliant Orange 875 units Warehouse S M L XL 2XL 3XL 4XL Synthetic warehouse 125 125 125 125 125 125 125 TOTAL 125 125 125 125 125 125 125"
+      },
+      "fields": [
+        {
+          "id": "styleSearch",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "back",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "1",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/product.html?style=PC54",
+          "text": "Products"
+        }
+      ],
+      "tables": [
+        "Warehouse S M L XL 2XL 3XL 4XL Synthetic warehouse 125 125 125 125 125 125 125 TOTAL 125 125 125 125 125 125 125"
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Screen Print Pricing Calculator | Northwest Custom Apparel",
+      "url": "/calculators/screen-print-pricing.html?StyleNumber=PC54&COLOR=Jet%20Black",
+      "ids": {
+        "products-breadcrumb": "Products",
+        "styleSearch": "",
+        "searchBtn": "",
+        "search-results-live": "",
+        "productImage": "",
+        "imageThumbnails": "",
+        "productTitle": "Essential Cotton Tee",
+        "productDescription": "Comfortable, durable cotton apparel for the whole team.",
+        "currentColor": "Brilliant Orange",
+        "currentStyle": "#PC54",
+        "currentBrand": "Port & Company",
+        "colorSwatches": "",
+        "sp-dark-info-icon": "",
+        "sp-toggle-1color": "1 Color",
+        "sp-toggle-2color": "2 Colors",
+        "sp-toggle-3color": "3 Colors",
+        "sp-toggle-4color": "4 Colors",
+        "sp-toggle-5color": "5 Colors",
+        "sp-toggle-6color": "6 Colors",
+        "sp-safety-stripes-toggle": "Safety Stripes Design 4-color design: +$2.00 per piece",
+        "sp-tier-24-47": "24-47 pieces + $50 Small Batch Fee",
+        "sp-tier-48-71": "48-71 pieces",
+        "sp-tier-72-144": "72-144 pieces",
+        "sp-tier-145-576": "145+ pieces",
+        "sp-additional-locations-header": "Additional Print Locations Add up to 3 additional locations",
+        "sp-additional-locations-container": "LOCATION Back Left Sleeve Right Sleeve Other Location COLORS 1 Color 2 Colors 3 Colors 4 Colors 5 Colors 6 Colors 🦺 Safety (+$2.00)",
+        "sp-add-location": "Add Location",
+        "sp-pricing-tier-label": "145+ pieces",
+        "sp-live-price-amount": "$16.00",
+        "sp-upcharge-info-icon": "",
+        "sp-setup-fee-badge": "",
+        "sp-toggle-breakdown-text": "Hide Breakdown",
+        "sp-pricing-details-breakdown": "Front Location Shirt: $7.00 Print (2 colors): $5.00 Front Total: $12.00 Back Print (1 color): $4.00 Back Total: $4.00 Setup Fees (One-Time Charge) Front: 2 colors × $30.00 Front Setup: $60.00 Back: 1 colors × $30.00 Back Setup: $30.00 Total Setup: $90.00 Setup fees are charged once per order, not per shirt Price per Shirt: $16.00",
+        "calculator-inventory-section": "Brilliant Orange 875 units Warehouse S M L XL 2XL 3XL 4XL Synthetic warehouse 125 125 125 125 125 125 125 TOTAL 125 125 125 125 125 125 125"
+      },
+      "fields": [
+        {
+          "id": "styleSearch",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "back",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "1",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/product.html?style=PC54",
+          "text": "Products"
+        }
+      ],
+      "tables": [
+        "Warehouse S M L XL 2XL 3XL 4XL Synthetic warehouse 125 125 125 125 125 125 125 TOTAL 125 125 125 125 125 125 125"
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Screen Print Pricing Calculator | Northwest Custom Apparel",
+      "url": "/calculators/screen-print-pricing.html?StyleNumber=PC54&COLOR=Jet%20Black",
+      "ids": {
+        "products-breadcrumb": "Products",
+        "styleSearch": "",
+        "searchBtn": "",
+        "search-results-live": "",
+        "productImage": "",
+        "imageThumbnails": "",
+        "productTitle": "Essential Cotton Tee",
+        "productDescription": "Comfortable, durable cotton apparel for the whole team.",
+        "currentColor": "Brilliant Orange",
+        "currentStyle": "#PC54",
+        "currentBrand": "Port & Company",
+        "colorSwatches": "",
+        "sp-dark-info-icon": "",
+        "sp-toggle-1color": "1 Color",
+        "sp-toggle-2color": "2 Colors",
+        "sp-toggle-3color": "3 Colors",
+        "sp-toggle-4color": "4 Colors",
+        "sp-toggle-5color": "5 Colors",
+        "sp-toggle-6color": "6 Colors",
+        "sp-safety-stripes-toggle": "Safety Stripes Design 4-color design: +$2.00 per piece",
+        "sp-tier-24-47": "24-47 pieces + $50 Small Batch Fee",
+        "sp-tier-48-71": "48-71 pieces",
+        "sp-tier-72-144": "72-144 pieces",
+        "sp-tier-145-576": "145+ pieces",
+        "sp-additional-locations-header": "Additional Print Locations Add up to 3 additional locations",
+        "sp-additional-locations-container": "LOCATION Back Left Sleeve Right Sleeve Other Location COLORS 1 Color 2 Colors 3 Colors 4 Colors 5 Colors 6 Colors 🦺 Safety (+$2.00)",
+        "sp-add-location": "Add Location",
+        "sp-pricing-tier-label": "145+ pieces",
+        "sp-live-price-amount": "$16.00",
+        "sp-upcharge-info-icon": "",
+        "sp-setup-fee-badge": "",
+        "sp-toggle-breakdown-text": "Hide Breakdown",
+        "sp-pricing-details-breakdown": "Front Location Shirt: $7.00 Print (2 colors): $5.00 Front Total: $12.00 Back Print (1 color): $4.00 Back Total: $4.00 Setup Fees (One-Time Charge) Front: 2 colors × $30.00 Front Setup: $60.00 Back: 1 colors × $30.00 Back Setup: $30.00 Total Setup: $90.00 Setup fees are charged once per order, not per shirt Price per Shirt: $16.00",
+        "calculator-inventory-section": "Brilliant Orange 875 units Warehouse S M L XL 2XL 3XL 4XL Synthetic warehouse 125 125 125 125 125 125 125 TOTAL 125 125 125 125 125 125 125"
+      },
+      "fields": [
+        {
+          "id": "styleSearch",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "back",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "1",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/product.html?style=PC54",
+          "text": "Products"
+        }
+      ],
+      "tables": [
+        "Warehouse S M L XL 2XL 3XL 4XL Synthetic warehouse 125 125 125 125 125 125 125 TOTAL 125 125 125 125 125 125 125"
+      ]
+    }
+  ],
+  "dialogs": []
+}

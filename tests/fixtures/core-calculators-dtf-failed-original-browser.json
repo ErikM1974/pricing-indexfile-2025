@@ -1,0 +1,213 @@
+{
+  "states": [
+    {
+      "width": 1440,
+      "title": "DTF Transfer Pricing | NWCA",
+      "url": "/calculators/dtf-pricing.html?StyleNumber=PC54&COLOR=Jet%20Black",
+      "ids": {
+        "products-breadcrumb": "Products",
+        "styleSearch": "",
+        "searchBtn": "",
+        "productImage": "",
+        "productTitle": "PC54",
+        "productDescription": "Comfortable, durable cotton apparel for the whole team.",
+        "currentColor": "Jet Black",
+        "currentStyle": "#PC54",
+        "currentBrand": "Port & Company",
+        "colorSwatches": "",
+        "dtf-calculator-container": "Error Unable to load pricing data. Please call 253-922-5793 Call Now",
+        "calculator-inventory-section": ""
+      },
+      "fields": [
+        {
+          "id": "styleSearch",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/product.html?StyleNumber=PC54",
+          "text": "Products"
+        }
+      ],
+      "tables": []
+    },
+    {
+      "width": 768,
+      "title": "DTF Transfer Pricing | NWCA",
+      "url": "/calculators/dtf-pricing.html?StyleNumber=PC54&COLOR=Jet%20Black",
+      "ids": {
+        "products-breadcrumb": "Products",
+        "styleSearch": "",
+        "searchBtn": "",
+        "productImage": "",
+        "productTitle": "PC54",
+        "productDescription": "Comfortable, durable cotton apparel for the whole team.",
+        "currentColor": "Jet Black",
+        "currentStyle": "#PC54",
+        "currentBrand": "Port & Company",
+        "colorSwatches": "",
+        "dtf-calculator-container": "Error Unable to load pricing data. Please call 253-922-5793 Call Now",
+        "calculator-inventory-section": ""
+      },
+      "fields": [
+        {
+          "id": "styleSearch",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/product.html?StyleNumber=PC54",
+          "text": "Products"
+        }
+      ],
+      "tables": []
+    },
+    {
+      "width": 390,
+      "title": "DTF Transfer Pricing | NWCA",
+      "url": "/calculators/dtf-pricing.html?StyleNumber=PC54&COLOR=Jet%20Black",
+      "ids": {
+        "products-breadcrumb": "Products",
+        "styleSearch": "",
+        "searchBtn": "",
+        "productImage": "",
+        "productTitle": "PC54",
+        "productDescription": "Comfortable, durable cotton apparel for the whole team.",
+        "currentColor": "Jet Black",
+        "currentStyle": "#PC54",
+        "currentBrand": "Port & Company",
+        "colorSwatches": "",
+        "dtf-calculator-container": "Error Unable to load pricing data. Please call 253-922-5793 Call Now",
+        "calculator-inventory-section": "Jet Black 875 units"
+      },
+      "fields": [
+        {
+          "id": "styleSearch",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/product.html?StyleNumber=PC54",
+          "text": "Products"
+        }
+      ],
+      "tables": []
+    },
+    {
+      "width": 320,
+      "title": "DTF Transfer Pricing | NWCA",
+      "url": "/calculators/dtf-pricing.html?StyleNumber=PC54&COLOR=Jet%20Black",
+      "ids": {
+        "products-breadcrumb": "Products",
+        "styleSearch": "",
+        "searchBtn": "",
+        "productImage": "",
+        "productTitle": "PC54",
+        "productDescription": "Comfortable, durable cotton apparel for the whole team.",
+        "currentColor": "Jet Black",
+        "currentStyle": "#PC54",
+        "currentBrand": "Port & Company",
+        "colorSwatches": "",
+        "dtf-calculator-container": "Error Unable to load pricing data. Please call 253-922-5793 Call Now",
+        "calculator-inventory-section": "Jet Black 875 units"
+      },
+      "fields": [
+        {
+          "id": "styleSearch",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/product.html?StyleNumber=PC54",
+          "text": "Products"
+        }
+      ],
+      "tables": []
+    }
+  ],
+  "dialogs": []
+}

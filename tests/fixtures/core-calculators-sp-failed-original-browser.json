@@ -1,0 +1,281 @@
+{
+  "states": [
+    {
+      "width": 1440,
+      "title": "Screen Print Pricing Calculator | Northwest Custom Apparel",
+      "url": "/calculators/screen-print-pricing.html?StyleNumber=PC54&COLOR=Jet%20Black",
+      "ids": {
+        "products-breadcrumb": "Products",
+        "styleSearch": "",
+        "searchBtn": "",
+        "search-results-live": "",
+        "productImage": "",
+        "imageThumbnails": "",
+        "productTitle": "Essential Cotton Tee",
+        "productDescription": "Comfortable, durable cotton apparel for the whole team.",
+        "currentColor": "Jet Black",
+        "currentStyle": "#PC54",
+        "currentBrand": "Port & Company",
+        "colorSwatches": "",
+        "sp-error-banner": "Failed to load pricing data. Please refresh the page. ×",
+        "sp-dark-info-icon": "",
+        "sp-toggle-1color": "1 Color",
+        "sp-toggle-2color": "2 Colors",
+        "sp-toggle-3color": "3 Colors",
+        "sp-toggle-4color": "4 Colors",
+        "sp-toggle-5color": "5 Colors",
+        "sp-toggle-6color": "6 Colors",
+        "sp-safety-stripes-toggle": "Safety Stripes Design 4-color design: +$2.00 per piece",
+        "sp-tier-list": "",
+        "sp-additional-locations-header": "Additional Print Locations Add up to 3 additional locations",
+        "sp-additional-locations-container": "",
+        "sp-add-location": "Add Location",
+        "sp-live-price-amount": "$0.00",
+        "sp-upcharge-info-icon": "",
+        "sp-setup-fee-badge": "",
+        "calculator-inventory-section": ""
+      },
+      "fields": [
+        {
+          "id": "styleSearch",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/product.html",
+          "text": "Products"
+        }
+      ],
+      "tables": []
+    },
+    {
+      "width": 768,
+      "title": "Screen Print Pricing Calculator | Northwest Custom Apparel",
+      "url": "/calculators/screen-print-pricing.html?StyleNumber=PC54&COLOR=Jet%20Black",
+      "ids": {
+        "products-breadcrumb": "Products",
+        "styleSearch": "",
+        "searchBtn": "",
+        "search-results-live": "",
+        "productImage": "",
+        "imageThumbnails": "",
+        "productTitle": "Essential Cotton Tee",
+        "productDescription": "Comfortable, durable cotton apparel for the whole team.",
+        "currentColor": "Jet Black",
+        "currentStyle": "#PC54",
+        "currentBrand": "Port & Company",
+        "colorSwatches": "",
+        "sp-error-banner": "Failed to load pricing data. Please refresh the page. ×",
+        "sp-dark-info-icon": "",
+        "sp-toggle-1color": "1 Color",
+        "sp-toggle-2color": "2 Colors",
+        "sp-toggle-3color": "3 Colors",
+        "sp-toggle-4color": "4 Colors",
+        "sp-toggle-5color": "5 Colors",
+        "sp-toggle-6color": "6 Colors",
+        "sp-safety-stripes-toggle": "Safety Stripes Design 4-color design: +$2.00 per piece",
+        "sp-tier-list": "",
+        "sp-additional-locations-header": "Additional Print Locations Add up to 3 additional locations",
+        "sp-additional-locations-container": "",
+        "sp-add-location": "Add Location",
+        "sp-live-price-amount": "$0.00",
+        "sp-upcharge-info-icon": "",
+        "sp-setup-fee-badge": "",
+        "calculator-inventory-section": ""
+      },
+      "fields": [
+        {
+          "id": "styleSearch",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/product.html",
+          "text": "Products"
+        }
+      ],
+      "tables": []
+    },
+    {
+      "width": 390,
+      "title": "Screen Print Pricing Calculator | Northwest Custom Apparel",
+      "url": "/calculators/screen-print-pricing.html?StyleNumber=PC54&COLOR=Jet%20Black",
+      "ids": {
+        "products-breadcrumb": "Products",
+        "styleSearch": "",
+        "searchBtn": "",
+        "search-results-live": "",
+        "productImage": "",
+        "imageThumbnails": "",
+        "productTitle": "Essential Cotton Tee",
+        "productDescription": "Comfortable, durable cotton apparel for the whole team.",
+        "currentColor": "Jet Black",
+        "currentStyle": "#PC54",
+        "currentBrand": "Port & Company",
+        "colorSwatches": "",
+        "sp-error-banner": "Failed to load pricing data. Please refresh the page. ×",
+        "sp-dark-info-icon": "",
+        "sp-toggle-1color": "1 Color",
+        "sp-toggle-2color": "2 Colors",
+        "sp-toggle-3color": "3 Colors",
+        "sp-toggle-4color": "4 Colors",
+        "sp-toggle-5color": "5 Colors",
+        "sp-toggle-6color": "6 Colors",
+        "sp-safety-stripes-toggle": "Safety Stripes Design 4-color design: +$2.00 per piece",
+        "sp-tier-list": "",
+        "sp-additional-locations-header": "Additional Print Locations Add up to 3 additional locations",
+        "sp-additional-locations-container": "",
+        "sp-add-location": "Add Location",
+        "sp-live-price-amount": "$0.00",
+        "sp-upcharge-info-icon": "",
+        "sp-setup-fee-badge": "",
+        "calculator-inventory-section": "Jet Black 875 units"
+      },
+      "fields": [
+        {
+          "id": "styleSearch",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/product.html",
+          "text": "Products"
+        }
+      ],
+      "tables": []
+    },
+    {
+      "width": 320,
+      "title": "Screen Print Pricing Calculator | Northwest Custom Apparel",
+      "url": "/calculators/screen-print-pricing.html?StyleNumber=PC54&COLOR=Jet%20Black",
+      "ids": {
+        "products-breadcrumb": "Products",
+        "styleSearch": "",
+        "searchBtn": "",
+        "search-results-live": "",
+        "productImage": "",
+        "imageThumbnails": "",
+        "productTitle": "Essential Cotton Tee",
+        "productDescription": "Comfortable, durable cotton apparel for the whole team.",
+        "currentColor": "Jet Black",
+        "currentStyle": "#PC54",
+        "currentBrand": "Port & Company",
+        "colorSwatches": "",
+        "sp-error-banner": "Failed to load pricing data. Please refresh the page. ×",
+        "sp-dark-info-icon": "",
+        "sp-toggle-1color": "1 Color",
+        "sp-toggle-2color": "2 Colors",
+        "sp-toggle-3color": "3 Colors",
+        "sp-toggle-4color": "4 Colors",
+        "sp-toggle-5color": "5 Colors",
+        "sp-toggle-6color": "6 Colors",
+        "sp-safety-stripes-toggle": "Safety Stripes Design 4-color design: +$2.00 per piece",
+        "sp-tier-list": "",
+        "sp-additional-locations-header": "Additional Print Locations Add up to 3 additional locations",
+        "sp-additional-locations-container": "",
+        "sp-add-location": "Add Location",
+        "sp-live-price-amount": "$0.00",
+        "sp-upcharge-info-icon": "",
+        "sp-setup-fee-badge": "",
+        "calculator-inventory-section": "Jet Black 875 units"
+      },
+      "fields": [
+        {
+          "id": "styleSearch",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/product.html",
+          "text": "Products"
+        }
+      ],
+      "tables": []
+    }
+  ],
+  "dialogs": []
+}

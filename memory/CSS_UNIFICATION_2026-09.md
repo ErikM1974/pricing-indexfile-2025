@@ -1,5 +1,20 @@
 # CSS unification — design direction and implementation plan
 
+## ACTIVE BATCH — Five public product calculators
+
+Separate branch codex/core-calculators starts from 5caf8bbb. Manual Pricing, Manual Laser and Shop Menu v2026.09.11.4 are running corrected full local and exact-source CI gates in the primary checkout. Live remains .3/Heroku2106,196/225 reviewed,29pending. The .4 candidate is199/225,26pending. No core calculator migration credit yet.
+
+- [x] Capture immutable originals for DTG, DTF, Embroidery, Cap Embroidery and Screen Print, including dynamic style owners. Review normal/options/manual/error behavior, all price tiers, colors, inventory, mobile and printed pages.
+- [ ] Use the established Public Sans typography and canonical tokens/components. Keep the garment and its color selection together, followed by method-specific options and clearly aligned price ladders. Shared structure has one scoped calculator owner; retain method-specific inputs and API pricing.
+- [ ] Remove redundant imports only from these five reviewed pages. Replace their CSS owners instead of adding overrides. Shared controllers may receive reversible presentation/accessibility changes only; all financial logic and data transformations must remain exact.
+- [ ] Compare every recorded value and fee, exercise keyboard and failure states, inspect screenshots at1440/768/390/320 and every paper page. Grant review credit only after passing.
+- [ ] Commit/back up and run full exact-source gates before deployment. Projected204/225,21pending only after verified rollout.
+
+Original capture:79 source hashes,20 browser states,5 full tier contracts and55 visually reviewed paper pages across20 documents. Existing DTG/DTF color-click ReferenceErrors are preserved in original-defects.json; current checks require zero errors. Fixed print headers cover price rows and DTG recommendation grids clip content. Evidence:core-calculators-original-reviewed-record.json. No application edits or migration credit yet.
+
+Design uses the application’s existing white surfaces, slate text, NWCA green action/selection color and muted divider tokens. Product imagery identifies each calculator; avoid new decorative panels, badges or marketing copy. Left-aligned labels and tabular numerals make garment/color/quantity changes easy to compare. All business requests use synthetic interception; no real saves, payments, emails, uploads or device printing.
+
+
 ## RELEASE CANDIDATE — v2026.09.11.4 Manual Pricing, Manual Laser and Shop Menu
 
 Reviewed source 40483ec8fb6e3e24abcf33d26eaf09f3ecad3246 is integrated with the verified catalog release on clean develop. This candidate versions 7 references for five changed assets and preserves every original source through explicit reversible mappings. Sixteen focused browser cases, 23 visually reviewed current paper pages and 274 source/ownership guards passed.
