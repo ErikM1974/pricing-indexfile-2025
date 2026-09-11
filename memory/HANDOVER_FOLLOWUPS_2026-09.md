@@ -1,5 +1,7 @@
 # Handover follow-ups — 2026-09-07
 
+> Current: Customer Account/Product is reviewed at bba4306d (189/225 candidate,36pending); live .10/2102/44ccf020 is verified at187/225. The live baseline is now merged, including shipped status/monogram test corrections. Earlier release-candidate entries below are historical. Next: complete full application and exact-source CI gates, then deploy and verify the account pair.
+
 ## NEXT — Customer Account and Product original source capture
 
 Isolated codex/customer-account-pages begins at73cc615a. The reviewed status pair is separately integrated on primary develop atf03b9117 with corrected full gates running; none of this next-family work belongs in its release. Live .9/2101 is185/225; reviewed candidate187/225,38 pending.
@@ -12,6 +14,16 @@ Isolated codex/customer-account-pages begins at73cc615a. The reviewed status pai
 - [ ] Current visual/axe/keyboard/paper, original-value and pricing evidence before migration credit; full release gates before deploy.
 
 Source capture is not migration credit. Do not overwrite immutable originals or rerun consumed helpers; no .env copying or recursive deletion of the node_modules junction.
+
+## RELEASE CANDIDATE — v2026.09.10.10 Order Status and Job Portal
+
+Reviewed pair a878bceb is integrated at73cc615a with the legacy guard correction atf03b9117f3213b033795fbd4f8346559ae0ca14c. All240 unit suites/5,619 tests,88 DOM,four accessibility unit and84 quote parity checks pass; build/lint/types/routes/boot passed. The full1,150-case CSS browser sweep and remaining live pricing/browser checks are still running on that application SHA. This candidate changes only four HTML cache references, their reversible mappings and release notes; all four application CSS/JS assets remain identical. The exact candidate CI can run in parallel, but deployment requires both the complete local gate record and successful actual CSS/live-pricing CI steps.
+
+Live .9/2101 remains185/225. The reviewed pair brings the candidate to187/225,38 pending. Forty-six focused browser cases,10 visually reviewed current paper pages,10 immutable original source hashes and74 mappings preserve dates, quantities, totals, successful note payloads and keyboard access. Three important flags removed. Customer Account/Product originals are backed up separately atd3a5efff and excluded from this release. No real business writes, emails or printing.
+
+## INTEGRATED — status pair awaiting complete release checks
+
+The reviewed Order Status/Job Portal pair a878bceb is integrated at73cc615a. Full build/lint/types passed; seven outdated structural assertions in two unit suites were updated for shared visibility/focus, native job buttons, canonical classes and the pending-note guard. Both corrected suites pass22 tests; application source and originals are unchanged. Continue full release gates before deploying. Live .9/2101 remains185/225; reviewed candidate187/225,38 pending. Customer account-page work is isolated on codex/customer-account-pages, initially unchanged at73cc615a.
 
 ## REVIEWED — Order Status and vendor Job Portal ready for integration
 

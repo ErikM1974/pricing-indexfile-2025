@@ -562,6 +562,30 @@
       "before": ".vp-mockup-img { max-height:80px; }",
       "after": ".vp-mockup-img { max-height:72px; }",
       "count": 1
+    },
+    {
+      "file": "pages/order-status.html",
+      "before": "/pages/css/order-status.css?v=2026.09.07.14",
+      "after": "/pages/css/order-status.css?v=2026.09.10.10",
+      "count": 1
+    },
+    {
+      "file": "pages/order-status.html",
+      "before": "/pages/js/order-status.js?v=2026.09.06.1",
+      "after": "/pages/js/order-status.js?v=2026.09.10.10",
+      "count": 1
+    },
+    {
+      "file": "pages/vendor-portal.html",
+      "before": "/pages/css/vendor-portal.css?v=2026.09.07.19",
+      "after": "/pages/css/vendor-portal.css?v=2026.09.10.10",
+      "count": 1
+    },
+    {
+      "file": "pages/vendor-portal.html",
+      "before": "/pages/js/vendor-portal.js?v=2026.09.05.29",
+      "after": "/pages/js/vendor-portal.js?v=2026.09.10.10",
+      "count": 1
     }
   ],
   "retiredStyles": []

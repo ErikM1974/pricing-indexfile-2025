@@ -1,5 +1,7 @@
 # CSS unification — design direction and implementation plan
 
+> Current: Customer Account/Product is reviewed at bba4306d (189/225 candidate,36pending); live .10/2102/44ccf020 is verified at187/225. The live baseline is now merged, including shipped status/monogram test corrections. Earlier release-candidate entries below are historical. Next: complete full application and exact-source CI gates, then deploy and verify the account pair.
+
 ## REVIEWED — Customer Account and Product pair
 
 Shared Public Sans/buttons/fields and three class-scoped single-layer page owners are reviewed.54 browser cases passed (5.3min), followed by11 final print/layout cases, the final order drawer spacing case and entered-note paper case. All49 original browser contracts and17 source hashes remain intact through97 reversible mappings;19 source/financial/date/quantity guards pass. Eight original workflow defects were demonstrated and repaired: storage-add failures, sent-batch cleanup failures, pending batches removing newer items, focus escaping drawers/modals, late availability, unknown minimums, and late general requests replacing new drafts. Failed requests retain exact retry payloads; shared pricing engines and financial/date/quantity functions remain byte-identical.
@@ -7,6 +9,20 @@ Shared Public Sans/buttons/fields and three class-scoped single-layer page owner
 All11 current PDFs/23 pages are visually reviewed, including30 orders,30 invoice rows,28 product-history rows, all garment sizes and price breaks/fees, statement1048.20total/698.80current/349.40pastdue, and the complete entered note. Dollar amounts remain unbroken, due dates are distinct from balances, and screen-only textarea focus decoration is absent from paper. Nine important flags removed; source graph tokens resolve and each page retains its own layout owner. No real customer request, order, email, redemption or device printing was sent.
 
 Reviewed candidate189/225,36pending; live remains .10/Heroku2102/44ccf020 at187/225,38pending. Next: commit/back up the reviewed pair, merge current live44ccf020 (which contains the already-fixed legacy status/monogram tests), preserve both release and account notes, run complete local and exact-source CI gates, then deploy and verify live assets/access. Evidence: customer-account-reviewed-record.json and active-css-resume-state.json. Do not repeat consumed helpers or delete the node_modules junction.
+
+## RELEASE CHECK CORRECTION — existing monogram cancellation test
+
+All local status gates passed:240 unit suites/5,619 tests,88 DOM,four accessibility unit,84 quote parity,1,150 CSS checks and16 remaining browser checks including all five live calculators. Exact-source CI34559320512 passed three jobs and1,149 CSS cases, but its existing monogram print-cancellation case failed. It used a missing-thread warning, which intentionally does not invoke the error-only confirmation, then asserted before asynchronous printing finished locally. The corrected test uses a missing required size, asserts QA errors and explicitly awaits/dismisses the confirmation. Five consecutive focused browser repeats passed (22.2 seconds). Application code and assets are unchanged. Require a fresh exact-source CI before releasing .10; old9f021460 is superseded by this correction. Live remains .9/2101/0f518982; no .10 release merge/tag/deploy has occurred.
+
+## RELEASE CANDIDATE — v2026.09.10.10 Order Status and Job Portal
+
+Reviewed pair a878bceb is integrated at73cc615a with the legacy guard correction atf03b9117f3213b033795fbd4f8346559ae0ca14c. All240 unit suites/5,619 tests,88 DOM,four accessibility unit and84 quote parity checks pass; build/lint/types/routes/boot passed. The full1,150-case CSS browser sweep and remaining live pricing/browser checks are still running on that application SHA. This candidate changes only four HTML cache references, their reversible mappings and release notes; all four application CSS/JS assets remain identical. The exact candidate CI can run in parallel, but deployment requires both the complete local gate record and successful actual CSS/live-pricing CI steps.
+
+Live .9/2101 remains185/225. The reviewed pair brings the candidate to187/225,38 pending. Forty-six focused browser cases,10 visually reviewed current paper pages,10 immutable original source hashes and74 mappings preserve dates, quantities, totals, successful note payloads and keyboard access. Three important flags removed. Customer Account/Product originals are backed up separately atd3a5efff and excluded from this release. No real business writes, emails or printing.
+
+## INTEGRATED — Order Status and Job Portal full regression checks
+
+Reviewed pair a878bceb is integrated and backed up on primary develop at73cc615a. The initial whole-app run passed build, lint and types; seven legacy source-format assertions failed in two unit suites because visibility/focus now belong to shared components, filter classes are canonical, job cards are native buttons and Post includes a pending guard. Updated those assertions while preserving all accessibility requirements; both suites now pass22 tests. No application source or original evidence changed in this correction. Resume the remaining full unit/DOM/accessibility/parity, boot, CSS browser, pricing browser and release gates on the corrected commit before release. Live remains .9/2101,185 reviewed; this pair brings the reviewed candidate to187,38 pending. The separate codex/customer-account-pages branch starts at73cc615a with no account-page edits yet.
 
 ## REVIEWED — Order Status and vendor Job Portal ready for integration
 
@@ -1475,3 +1491,7 @@ Exact-source CI 34543191741 passed all four jobs on 0b271bb2ae12b083936a1add6c86
 ## Customer Account/Product originals reviewed — 2026-09-10
 
 41 browser cases passed,49 immutable contracts at1440/768/390/320,17 original source hashes and19 source/function guards. All15 pages from10 original PDFs visually reviewed (six blank account views share an identical rendered image). Original statement preserves1048.20total/698.80current/349.40pastdue; product long history28 rows and complete upgrade price matrix retained. Baseline defects: widespread muted-text contrast failures and account320px overflow; ordinary account printing is blank. No application changes yet. Next: canonical controls/Public Sans/scoped token layouts, responsive and paper fixes, then demonstrate and cover delayed/failure/focus/reorder-state behavior. Artifact evidence: customer-account-original-review.json.
+
+## Order Status and Job Portal release record — v2026.09.10.10
+
+Exact-source CI 34561449204 passed all four jobs on 0091eff76524acfc16ce3f5f401d3b8bbb057aa8, including actual CSS and live money/calculator parity. Full local gates passed on identical application assets atf03b9117f3213b033795fbd4f8346559ae0ca14c. Canonical controls/scoped layouts,46 focused browser cases,10 reviewed paper pages,10 original source hashes/74 reversible mappings. Three important flags removed; successful payloads, money and date rendering preserved. Counts become187/225 reviewed,38 pending after verified rollout. Separate Customer Account/Product originals atd3a5efff are excluded.
