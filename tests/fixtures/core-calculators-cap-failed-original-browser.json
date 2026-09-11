@@ -1,0 +1,189 @@
+{
+  "states": [
+    {
+      "width": 1440,
+      "title": "Cap Embroidery Pricing | Northwest Custom Apparel",
+      "url": "/calculators/cap-embroidery-pricing-integrated.html?StyleNumber=C112&COLOR=Jet%20Black",
+      "ids": {
+        "products-breadcrumb": "Products",
+        "styleSearch": "",
+        "searchBtn": "",
+        "errorMessage": "Unable to load embroidery pricing. The pricing service may be temporarily unavailable. Please try again or contact support at 253-922-5793.",
+        "loadingState": "Search for a cap style to view pricing",
+        "calculator-inventory-section": ""
+      },
+      "fields": [
+        {
+          "id": "styleSearch",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/product.html",
+          "text": "Products"
+        }
+      ],
+      "tables": []
+    },
+    {
+      "width": 768,
+      "title": "Cap Embroidery Pricing | Northwest Custom Apparel",
+      "url": "/calculators/cap-embroidery-pricing-integrated.html?StyleNumber=C112&COLOR=Jet%20Black",
+      "ids": {
+        "products-breadcrumb": "Products",
+        "styleSearch": "",
+        "searchBtn": "",
+        "errorMessage": "Unable to load embroidery pricing. The pricing service may be temporarily unavailable. Please try again or contact support at 253-922-5793.",
+        "loadingState": "Search for a cap style to view pricing",
+        "calculator-inventory-section": ""
+      },
+      "fields": [
+        {
+          "id": "styleSearch",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/product.html",
+          "text": "Products"
+        }
+      ],
+      "tables": []
+    },
+    {
+      "width": 390,
+      "title": "Cap Embroidery Pricing | Northwest Custom Apparel",
+      "url": "/calculators/cap-embroidery-pricing-integrated.html?StyleNumber=C112&COLOR=Jet%20Black",
+      "ids": {
+        "products-breadcrumb": "Products",
+        "styleSearch": "",
+        "searchBtn": "",
+        "errorMessage": "Unable to load embroidery pricing. The pricing service may be temporarily unavailable. Please try again or contact support at 253-922-5793.",
+        "loadingState": "Search for a cap style to view pricing",
+        "calculator-inventory-section": ""
+      },
+      "fields": [
+        {
+          "id": "styleSearch",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/product.html",
+          "text": "Products"
+        }
+      ],
+      "tables": []
+    },
+    {
+      "width": 320,
+      "title": "Cap Embroidery Pricing | Northwest Custom Apparel",
+      "url": "/calculators/cap-embroidery-pricing-integrated.html?StyleNumber=C112&COLOR=Jet%20Black",
+      "ids": {
+        "products-breadcrumb": "Products",
+        "styleSearch": "",
+        "searchBtn": "",
+        "errorMessage": "Unable to load embroidery pricing. The pricing service may be temporarily unavailable. Please try again or contact support at 253-922-5793.",
+        "loadingState": "Search for a cap style to view pricing",
+        "calculator-inventory-section": "Jet Black 125 units"
+      },
+      "fields": [
+        {
+          "id": "styleSearch",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/product.html",
+          "text": "Products"
+        }
+      ],
+      "tables": []
+    }
+  ],
+  "dialogs": []
+}

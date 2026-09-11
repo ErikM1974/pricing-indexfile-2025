@@ -591,7 +591,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.warn('⚠️ [DTF] No image found');
         imageEl.style.display = 'none';
         placeholderEl.style.display = 'flex';
-        placeholderEl.innerHTML = '<i class="fas fa-tshirt" style="font-size: 48px; margin-bottom: 12px;" aria-hidden="true"></i><div>Image Not Available</div>';
+        placeholderEl.innerHTML = '<i class="fas fa-tshirt" aria-hidden="true"></i><div>Image Not Available</div>';
     }
 
     // Update color swatches
@@ -613,19 +613,7 @@ document.addEventListener('DOMContentLoaded', function() {
         colors.forEach((color) => {
             const swatch = document.createElement('div');
             swatch.className = 'color-swatch';
-            swatch.style.cssText = `
-                width: 40px;
-                height: 40px;
-                border-radius: 8px;
-                border: 2px solid #e5e7eb;
-                cursor: pointer;
-                display: inline-block;
-                margin-right: 8px;
-                margin-bottom: 8px;
-                position: relative;
-                overflow: hidden;
-                transition: all 0.2s;
-            `;
+            // Color geometry and selected state are owned by core-calculators.css.
 
             // Use color square image or hex code
             if (color.COLOR_SQUARE_IMAGE) {
@@ -639,16 +627,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
             swatch.title = color.COLOR_NAME || 'Color';
 
-            // Hover effect
-            swatch.addEventListener('mouseenter', () => {
-                swatch.style.transform = 'scale(1.1)';
-                swatch.style.borderColor = '#4cb354';  // Updated to match DTG green
-            });
-            swatch.addEventListener('mouseleave', () => {
-                swatch.style.transform = 'scale(1)';
-                swatch.style.borderColor = '#e5e7eb';
-            });
-
             // Click to change image
             swatch.addEventListener('click', () => {
                 const imageUrl = color.MAIN_IMAGE_URL || color.FRONT_MODEL || color.FRONT_FLAT;
@@ -660,14 +638,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     dtfLog(`✅ [DTF] Changed to ${color.COLOR_NAME}`);
 
                     // Highlight selected swatch
-                    document.querySelectorAll('.color-swatch').forEach(s => {
-                        s.style.border = '2px solid #e5e7eb';
-                    });
-                    swatch.style.border = '3px solid #4cb354';  // Updated to match DTG green
+                    document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+                    swatch.classList.add('selected');
                 }
                 // Load warehouse inventory
                 if (typeof loadCalculatorInventory === 'function') {
-                    loadCalculatorInventory(currentStyleNumber || window.currentStyleNumber, color.CATALOG_COLOR || color.COLOR_NAME, color.COLOR_NAME, color.COLOR_SQUARE_IMAGE);
+                    loadCalculatorInventory(product.styleNumber || product.STYLE || document.getElementById('currentStyle').textContent.replace('#', '').trim(), color.CATALOG_COLOR || color.COLOR_NAME, color.COLOR_NAME, color.COLOR_SQUARE_IMAGE);
                 }
             });
 

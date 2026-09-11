@@ -4306,3 +4306,13 @@ Problem: SAML staff lost comment controls, failed editor loads could save empty 
 Problem: borrowed campaign CSS hid navigation without its original controller, CSS byte audits missed a relative stylesheet link, and printed footers split onto a trailing page. Root cause: cross-page stylesheet dependencies and incomplete source/path/print accounting. Solution: one scoped family layout with native navigation and FAQs, resolve relative and root asset paths alike, preserve the entire original main text plus SEO/image/link data, and keep footer blocks together. Prevention: check every route alias, four widths and keyboard disclosures, then compare actual PDF offer/pricing/FAQ text and render paper samples.
 
 Webstore follow-up: full hygiene checks also require cache versions on every new local CSS/JS reference. Add the reserved candidate version before full gates, including unchanged shared components newly linked into a page.
+
+
+### Native storefront menus still need keyboard and layout ownership checks (2026-09-09)
+
+Problem: the inherited drawer had no focus boundary or return, and initial native-dialog review found reverse Tab leaving the menu. Root cause: hidden custom panels and relying on browser traversal alone. Solution: native modal with explicit first/last Tab wrap, Escape/backdrop/close-button dismissal, return focus, desktop-resize cleanup; scope every CSS rule to unified ownership and merge repeated selectors. Prevention: run all fifteen brand pages at four widths, test both search triggers and empty input, lock original brand/SEO/product text, and compare rendered PDF text allowing CSS text-transform case changes.
+
+
+## CRM UI recovery and print (2026-09-09)
+
+Use native disclosure buttons inside table cells; aria-expanded on ordinary table rows is invalid. Native dialogs must show operational errors inside their top layer and retain a usable retry. Guard delayed account/archive/quarter and category responses so a failed or newer view cannot regain stale figures. Search/view changes must preserve loading/error states. Test original card/table/detail/CSV hashes using exact page basenames (leads.html is also a suffix of unqualified-leads.html). Print must explicitly restore headings and summary counts hidden by generic shell rules.

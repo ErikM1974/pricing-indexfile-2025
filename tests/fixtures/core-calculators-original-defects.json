@@ -1,0 +1,8 @@
+{
+  "base": "5caf8bbb9aaa4c7759c6196de41102ba79dbc51f",
+  "colorSelection": [
+    {"source":"calculators/js/dtg-pricing-page.js","line":1293,"action":"Click the second rendered product color","error":"currentStyleNumber is not defined"},
+    {"source":"calculators/js/dtf-pricing-page.js","line":670,"action":"Click the second rendered product color","error":"currentStyleNumber is not defined"}
+  ],
+  "scope": "The original capture permits only these two exact observed errors in their color-selection cases. All current cases must have zero page errors. Pricing, fees and quantity calculations remain covered separately."
+}

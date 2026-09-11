@@ -1,0 +1,305 @@
+{
+  "states": [
+    {
+      "width": 1440,
+      "title": "Embroidery Pricing | Northwest Custom Apparel",
+      "url": "/calculators/embroidery-pricing.html?StyleNumber=PC54&COLOR=Jet%20Black",
+      "ids": {
+        "products-breadcrumb": "Products",
+        "styleSearch": "",
+        "searchBtn": "",
+        "search-results-live": "",
+        "productImage": "",
+        "imageThumbnails": "",
+        "productTitle": "Essential Cotton Tee",
+        "productDescription": "Comfortable, durable cotton apparel for the whole team.",
+        "currentColor": "Brilliant Orange",
+        "currentStyle": "#PC54",
+        "currentBrand": "Port & Company",
+        "colorSwatches": "",
+        "ltmQuantity": "1 piece 2 pieces 3 pieces 4 pieces 5 pieces 6 pieces 7 pieces",
+        "emb-al-1-7": "$10.00",
+        "emb-al-8-23": "$9.00",
+        "emb-al-24-47": "$8.00",
+        "emb-al-48-71": "$7.50",
+        "emb-al-72+": "$7.00",
+        "calculator-inventory-section": "Brilliant Orange Warehouse Inventory 875 units Warehouse S M L XL 2XL 3XL 4XL Synthetic warehouse 125 125 125 125 125 125 125 TOTAL 125 125 125 125 125 125 125",
+        "orderInfoSection": "Order Information Minimum Order 8+ pieces for standard pricing (setup included) Small Orders We accept orders as small as 1 piece Mix & Match Combine different styles and colors to meet quantity tiers for best pricing Custom Quotes Use the Additional Logo Calculator above to price additional logo positions. For complex multi-location designs, call 253-922-5793."
+      },
+      "fields": [
+        {
+          "id": "styleSearch",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "ltmQuantity",
+          "name": "",
+          "type": "select-one",
+          "value": "3",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/product.html?style=PC54",
+          "text": "Products"
+        },
+        {
+          "href": "?StyleNumber=CP90",
+          "text": "CP90"
+        }
+      ],
+      "tables": [
+        "Size Range 1-7 pieces (3 pcs) 8-23 pieces 24-47 pieces 48-71 pieces 72+ pieces S, M, L, XL $40.67 $24.00 $20.00 $19.00 $18.00 2XL $42.67 $26.00 $22.00 $21.00 $20.00 3XL $43.67 $27.00 $23.00 $22.00 $21.00 4XL $44.67 $28.00 $24.00 $23.00 $22.00 5XL $46.67 $30.00 $26.00 $25.00 $24.00 6XL $47.67 $31.00 $27.00 $26.00 $25.00",
+        "Quantity 1-7 pieces 8-23 pieces 24-47 pieces 48-71 pieces 72+ pieces Base Price (8,000 stitches) $10.00 $9.00 $8.00 $7.50 $7.00",
+        "Warehouse S M L XL 2XL 3XL 4XL Synthetic warehouse 125 125 125 125 125 125 125 TOTAL 125 125 125 125 125 125 125"
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Embroidery Pricing | Northwest Custom Apparel",
+      "url": "/calculators/embroidery-pricing.html?StyleNumber=PC54&COLOR=Jet%20Black",
+      "ids": {
+        "products-breadcrumb": "Products",
+        "styleSearch": "",
+        "searchBtn": "",
+        "search-results-live": "",
+        "productImage": "",
+        "imageThumbnails": "",
+        "productTitle": "Essential Cotton Tee",
+        "productDescription": "Comfortable, durable cotton apparel for the whole team.",
+        "currentColor": "Brilliant Orange",
+        "currentStyle": "#PC54",
+        "currentBrand": "Port & Company",
+        "colorSwatches": "",
+        "ltmQuantity": "1 piece 2 pieces 3 pieces 4 pieces 5 pieces 6 pieces 7 pieces",
+        "emb-al-1-7": "$10.00",
+        "emb-al-8-23": "$9.00",
+        "emb-al-24-47": "$8.00",
+        "emb-al-48-71": "$7.50",
+        "emb-al-72+": "$7.00",
+        "calculator-inventory-section": "Brilliant Orange 875 units Warehouse S M L XL 2XL 3XL 4XL Synthetic warehouse 125 125 125 125 125 125 125 TOTAL 125 125 125 125 125 125 125",
+        "orderInfoSection": "Order Information Minimum Order 8+ pieces for standard pricing (setup included) Small Orders We accept orders as small as 1 piece Mix & Match Combine different styles and colors to meet quantity tiers for best pricing Custom Quotes Use the Additional Logo Calculator above to price additional logo positions. For complex multi-location designs, call 253-922-5793."
+      },
+      "fields": [
+        {
+          "id": "styleSearch",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "ltmQuantity",
+          "name": "",
+          "type": "select-one",
+          "value": "3",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/product.html?style=PC54",
+          "text": "Products"
+        },
+        {
+          "href": "?StyleNumber=CP90",
+          "text": "CP90"
+        }
+      ],
+      "tables": [
+        "Size Range 1-7 pieces (3 pcs) 8-23 pieces 24-47 pieces 48-71 pieces 72+ pieces S, M, L, XL $40.67 $24.00 $20.00 $19.00 $18.00 2XL $42.67 $26.00 $22.00 $21.00 $20.00 3XL $43.67 $27.00 $23.00 $22.00 $21.00 4XL $44.67 $28.00 $24.00 $23.00 $22.00 5XL $46.67 $30.00 $26.00 $25.00 $24.00 6XL $47.67 $31.00 $27.00 $26.00 $25.00",
+        "Quantity 1-7 pieces 8-23 pieces 24-47 pieces 48-71 pieces 72+ pieces Base Price (8,000 stitches) $10.00 $9.00 $8.00 $7.50 $7.00",
+        "Warehouse S M L XL 2XL 3XL 4XL Synthetic warehouse 125 125 125 125 125 125 125 TOTAL 125 125 125 125 125 125 125"
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Embroidery Pricing | Northwest Custom Apparel",
+      "url": "/calculators/embroidery-pricing.html?StyleNumber=PC54&COLOR=Jet%20Black",
+      "ids": {
+        "products-breadcrumb": "Products",
+        "styleSearch": "",
+        "searchBtn": "",
+        "search-results-live": "",
+        "productImage": "",
+        "imageThumbnails": "",
+        "productTitle": "Essential Cotton Tee",
+        "productDescription": "Comfortable, durable cotton apparel for the whole team.",
+        "currentColor": "Brilliant Orange",
+        "currentStyle": "#PC54",
+        "currentBrand": "Port & Company",
+        "colorSwatches": "",
+        "ltmQuantity": "1 piece 2 pieces 3 pieces 4 pieces 5 pieces 6 pieces 7 pieces",
+        "emb-al-1-7": "$10.00",
+        "emb-al-8-23": "$9.00",
+        "emb-al-24-47": "$8.00",
+        "emb-al-48-71": "$7.50",
+        "emb-al-72+": "$7.00",
+        "calculator-inventory-section": "Brilliant Orange 875 units Warehouse S M L XL 2XL 3XL 4XL Synthetic warehouse 125 125 125 125 125 125 125 TOTAL 125 125 125 125 125 125 125",
+        "orderInfoSection": "Order Information Minimum Order 8+ pieces for standard pricing (setup included) Small Orders We accept orders as small as 1 piece Mix & Match Combine different styles and colors to meet quantity tiers for best pricing Custom Quotes Use the Additional Logo Calculator above to price additional logo positions. For complex multi-location designs, call 253-922-5793."
+      },
+      "fields": [
+        {
+          "id": "styleSearch",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "ltmQuantity",
+          "name": "",
+          "type": "select-one",
+          "value": "3",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/product.html?style=PC54",
+          "text": "Products"
+        },
+        {
+          "href": "?StyleNumber=CP90",
+          "text": "CP90"
+        }
+      ],
+      "tables": [
+        "Size Range 1-7 pieces (3 pcs) 8-23 pieces 24-47 pieces 48-71 pieces 72+ pieces S, M, L, XL $40.67 $24.00 $20.00 $19.00 $18.00 2XL $42.67 $26.00 $22.00 $21.00 $20.00 3XL $43.67 $27.00 $23.00 $22.00 $21.00 4XL $44.67 $28.00 $24.00 $23.00 $22.00 5XL $46.67 $30.00 $26.00 $25.00 $24.00 6XL $47.67 $31.00 $27.00 $26.00 $25.00",
+        "Quantity 1-7 pieces 8-23 pieces 24-47 pieces 48-71 pieces 72+ pieces Base Price (8,000 stitches) $10.00 $9.00 $8.00 $7.50 $7.00",
+        "Warehouse S M L XL 2XL 3XL 4XL Synthetic warehouse 125 125 125 125 125 125 125 TOTAL 125 125 125 125 125 125 125"
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Embroidery Pricing | Northwest Custom Apparel",
+      "url": "/calculators/embroidery-pricing.html?StyleNumber=PC54&COLOR=Jet%20Black",
+      "ids": {
+        "products-breadcrumb": "Products",
+        "styleSearch": "",
+        "searchBtn": "",
+        "search-results-live": "",
+        "productImage": "",
+        "imageThumbnails": "",
+        "productTitle": "Essential Cotton Tee",
+        "productDescription": "Comfortable, durable cotton apparel for the whole team.",
+        "currentColor": "Brilliant Orange",
+        "currentStyle": "#PC54",
+        "currentBrand": "Port & Company",
+        "colorSwatches": "",
+        "ltmQuantity": "1 piece 2 pieces 3 pieces 4 pieces 5 pieces 6 pieces 7 pieces",
+        "emb-al-1-7": "$10.00",
+        "emb-al-8-23": "$9.00",
+        "emb-al-24-47": "$8.00",
+        "emb-al-48-71": "$7.50",
+        "emb-al-72+": "$7.00",
+        "calculator-inventory-section": "Brilliant Orange 875 units Warehouse S M L XL 2XL 3XL 4XL Synthetic warehouse 125 125 125 125 125 125 125 TOTAL 125 125 125 125 125 125 125",
+        "orderInfoSection": "Order Information Minimum Order 8+ pieces for standard pricing (setup included) Small Orders We accept orders as small as 1 piece Mix & Match Combine different styles and colors to meet quantity tiers for best pricing Custom Quotes Use the Additional Logo Calculator above to price additional logo positions. For complex multi-location designs, call 253-922-5793."
+      },
+      "fields": [
+        {
+          "id": "styleSearch",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "ltmQuantity",
+          "name": "",
+          "type": "select-one",
+          "value": "3",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/product.html?style=PC54",
+          "text": "Products"
+        },
+        {
+          "href": "?StyleNumber=CP90",
+          "text": "CP90"
+        }
+      ],
+      "tables": [
+        "Size Range 1-7 pieces (3 pcs) 8-23 pieces 24-47 pieces 48-71 pieces 72+ pieces S, M, L, XL $40.67 $24.00 $20.00 $19.00 $18.00 2XL $42.67 $26.00 $22.00 $21.00 $20.00 3XL $43.67 $27.00 $23.00 $22.00 $21.00 4XL $44.67 $28.00 $24.00 $23.00 $22.00 5XL $46.67 $30.00 $26.00 $25.00 $24.00 6XL $47.67 $31.00 $27.00 $26.00 $25.00",
+        "Quantity 1-7 pieces 8-23 pieces 24-47 pieces 48-71 pieces 72+ pieces Base Price (8,000 stitches) $10.00 $9.00 $8.00 $7.50 $7.00",
+        "Warehouse S M L XL 2XL 3XL 4XL Synthetic warehouse 125 125 125 125 125 125 125 TOTAL 125 125 125 125 125 125 125"
+      ]
+    }
+  ],
+  "dialogs": []
+}

@@ -120,8 +120,14 @@ describe('consumer pages', () => {
             const i = html.indexOf('/shared_components/js/' + f);
             if (i > -1) expect(i).toBeGreaterThan(cfg);
         }
-        expect(html).toContain('/shared_components/css/calculator-inventory.css?v=');
-        expect(html).toContain('/shared_components/css/manual-mode-indicator.css?v=');
-        if (pg === 'screen-print-pricing') expect(html).toContain('/shared_components/css/screenprint-pricing-v2.css?v=');
+        expect(html).toContain('data-ui="unified"');
+        expect(html).toContain('/shared_components/css/components.css?v=');
+        expect(html).toContain('/shared_components/css/core-calculators.css?v=');
+        const common = read('shared_components/css/core-calculators.css');
+        expect(common).toMatch(/\.calc-inv-bar\s*\{/);
+        expect(common).toMatch(/\.manual-mode-banner\s*\{/);
+        for (const old of ['calculator-inventory.css', 'manual-mode-indicator.css', 'screenprint-pricing-v2.css']) {
+            expect(html).not.toContain('/shared_components/css/' + old);
+        }
     });
 });

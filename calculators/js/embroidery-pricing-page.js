@@ -100,10 +100,10 @@ function setupSearch() {
             if (capResults.length > 0 && flatResults.length === 0) {
                 // Only caps were found
                 resultsContainer.innerHTML = `
-                    <div class="search-no-results" style="padding: 15px; color: #92400e;">
-                        <i class="fas fa-info-circle" style="margin-right: 8px;" aria-hidden="true"></i>
+                    <div class="search-no-results">
+                        <i class="fas fa-info-circle" aria-hidden="true"></i>
                         Found ${capResults.length} cap item(s). Please use the 
-                        <a href="/pricing/cap-embroidery" style="color: #4cb354; font-weight: 600;">Cap Embroidery Pricing</a> 
+                        <a href="/pricing/cap-embroidery">Cap Embroidery Pricing</a>
                         page for structured caps.
                     </div>
                 `;
@@ -117,10 +117,10 @@ function setupSearch() {
                 // Add a note if caps were filtered out
                 if (capResults.length > 0) {
                     resultsHTML = `
-                        <div style="padding: 10px; background: #fef3c7; border-bottom: 1px solid #fbbf24; color: #92400e; font-size: 13px;">
-                            <i class="fas fa-info-circle" style="margin-right: 5px;" aria-hidden="true"></i>
+                        <div>
+                            <i class="fas fa-info-circle" aria-hidden="true"></i>
                             Found ${capResults.length} cap item(s). Please use the 
-                            <a href="/pricing/cap-embroidery" style="color: #4cb354; font-weight: 600;">Cap Embroidery Pricing</a> 
+                            <a href="/pricing/cap-embroidery">Cap Embroidery Pricing</a>
                             page for structured caps.
                         </div>
                     `;
@@ -681,8 +681,8 @@ function updatePricing(pricingData) {
         showApiError('Pricing data is incomplete. Please contact support at 253-922-5793.');
         tbody.innerHTML = `
             <tr>
-                <td colspan="${tiers.length + 1}" style="text-align: center; padding: 30px; color: #666;">
-                    <i class="fas fa-exclamation-triangle" style="color: #fbbf24; margin-right: 8px;" aria-hidden="true"></i>
+                <td colspan="${tiers.length + 1}">
+                    <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                     Pricing currently unavailable. Please contact sales for a quote.
                 </td>
             </tr>
@@ -854,7 +854,7 @@ function renderLtmFeeWarning(isFallback, fee) {
         el = document.createElement('p');
         el.id = 'ltmFeeWarning';
         el.setAttribute('role', 'status');
-        el.style.cssText = 'margin:.5rem 0 0;color:#92400e;background:#fef3c7;border:1px solid #fcd34d;border-radius:4px;padding:.4rem .6rem;font-size:.85rem;';
+        el.classList.add('core-fee-warning');
         host.appendChild(el);
     }
     el.textContent = `⚠ Small-order fee shown as an estimate ($${fee.toFixed(2)}) — live pricing didn't return it. Verify before quoting.`;

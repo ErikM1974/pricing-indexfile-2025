@@ -1,0 +1,271 @@
+@layer components.patterns {
+/* One owner for the shared product, calculator and paper structure. */
+:where([data-ui="unified"][data-core-calculator]) .enhanced-pricing-header { background: var(--ui-surface); border-bottom: 1px solid var(--ui-line); }
+:where([data-ui="unified"][data-core-calculator]) .contact-bar-content, :where([data-ui="unified"][data-core-calculator]) .nav-content, :where([data-ui="unified"][data-core-calculator]) .context-bar-content, :where([data-ui="unified"][data-core-calculator]) main { max-width: 1280px; margin: 0 auto; padding-inline: 32px; }
+:where([data-ui="unified"][data-core-calculator]) .header-contact-bar { background: var(--ui-tint); color: var(--ui-ink); font-size: 12px; }
+:where([data-ui="unified"][data-core-calculator]) .contact-bar-content, :where([data-ui="unified"][data-core-calculator]) .contact-info, :where([data-ui="unified"][data-core-calculator]) .contact-item { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+:where([data-ui="unified"][data-core-calculator]) .contact-bar-content { padding-block: 10px; justify-content: space-between; }
+:where([data-ui="unified"][data-core-calculator]) .contact-item { gap: 8px; }
+:where([data-ui="unified"][data-core-calculator]) .contact-link { color: inherit; }
+:where([data-ui="unified"][data-core-calculator]) .nav-content { padding-block: 16px; }
+:where([data-ui="unified"][data-core-calculator]) .logo-link { display: inline-flex; }
+:where([data-ui="unified"][data-core-calculator]) .logo-image { width: 132px; height: 58px; object-fit: contain; }
+:where([data-ui="unified"][data-core-calculator]) .pricing-context-bar { border-top: 1px solid var(--ui-line); }
+:where([data-ui="unified"][data-core-calculator]) .context-bar-content { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-block: 16px; }
+:where([data-ui="unified"][data-core-calculator]) .context-left { min-width: 0; }
+:where([data-ui="unified"][data-core-calculator]) .breadcrumb { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 8px; color: var(--ui-muted); font-size: 13px; }
+:where([data-ui="unified"][data-core-calculator]) .calculator-type-badge { display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 700; }
+:where([data-ui="unified"][data-core-calculator]) .calculator-type-badge > i { color: var(--ui-accent); }
+:where([data-ui="unified"][data-core-calculator]) .search-wrapper { position: relative; display: flex; gap: 8px; width: min(420px, 100%); }
+:where([data-ui="unified"][data-core-calculator]) .search-input { min-width: 0; flex: 1; }
+:where([data-ui="unified"][data-core-calculator]) .search-btn { flex-shrink: 0; }
+:where([data-ui="unified"][data-core-calculator]) .search-results { display: none; position: absolute; inset: calc(100% + 6px) 0 auto; z-index: 10; border: 1px solid var(--ui-line-strong); border-radius: var(--radius-sm); background: var(--ui-surface); box-shadow: var(--shadow-md); max-height: 360px; overflow: auto; }
+:where([data-ui="unified"][data-core-calculator]) .search-results.active { display: block; }
+:where([data-ui="unified"][data-core-calculator]) .search-result-item, :where([data-ui="unified"][data-core-calculator]) .search-loading, :where([data-ui="unified"][data-core-calculator]) .search-no-results { padding: 14px 16px; }
+:where([data-ui="unified"][data-core-calculator]) .search-result-item { cursor: pointer; border-bottom: 1px solid var(--ui-line); }
+:where([data-ui="unified"][data-core-calculator]) .search-result-item:hover, :where([data-ui="unified"][data-core-calculator]) .search-result-item:focus-visible, :where([data-ui="unified"][data-core-calculator]) .search-result-item[aria-selected="true"] { background: var(--ui-tint); outline: 2px solid var(--ui-accent); outline-offset: -2px; }
+:where([data-ui="unified"][data-core-calculator]) .search-result-style { font-weight: 700; }
+:where([data-ui="unified"][data-core-calculator]) .search-result-desc, :where([data-ui="unified"][data-core-calculator]) .search-result-name { font-size: 14px; color: var(--ui-muted); }
+:where([data-ui="unified"][data-core-calculator]) main { padding-block: 32px 48px; }
+:where([data-ui="unified"][data-core-calculator]) .product-content { display: grid; grid-template-columns: minmax(180px, 300px) minmax(0, 1fr); align-items: center; gap: 40px; }
+:where([data-ui="unified"][data-core-calculator]) .product-hero, :where([data-ui="unified"][data-core-calculator]) .pricing-section, :where([data-ui="unified"][data-core-calculator]) [id="dtf-calculator-container"], :where([data-ui="unified"][data-core-calculator]) .sp-calculator, :where([data-ui="unified"][data-core-calculator]) .order-info-section, :where([data-ui="unified"][data-core-calculator]) .dtg-recommendations-section { margin-bottom: 24px; padding: 28px; border: 1px solid var(--ui-line); border-radius: var(--radius-md); background: var(--ui-surface); min-width: 0; }
+:where([data-ui="unified"][data-core-calculator]) .product-image-section, :where([data-ui="unified"][data-core-calculator]) .product-info-section, :where([data-ui="unified"][data-core-calculator]) .product-interactive-column { min-width: 0; }
+:where([data-ui="unified"][data-core-calculator]) .main-image-container { background: var(--ui-surface); border: 1px solid var(--ui-line); border-radius: var(--radius-sm); display: grid; place-items: center; min-height: 240px; }
+:where([data-ui="unified"][data-core-calculator]) .product-image { width: 100%; height: 280px; object-fit: contain; }
+:where([data-ui="unified"][data-core-calculator]) .image-placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px; color: var(--ui-muted); text-align: center; }
+:where([data-ui="unified"][data-core-calculator]) .image-placeholder > i { font-size: 40px; margin-bottom: 12px; }
+:where([data-ui="unified"][data-core-calculator]) .image-thumbnails { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+:where([data-ui="unified"][data-core-calculator]) .image-thumbnail, :where([data-ui="unified"][data-core-calculator]) .thumbnail, :where([data-ui="unified"][data-core-calculator]) .thumbnail-image { width: 56px; height: 64px; object-fit: contain; border: 1px solid var(--ui-line-strong); border-radius: var(--radius-sm); cursor: pointer; }
+:where([data-ui="unified"][data-core-calculator]) .product-title { font-size: clamp(24px, 3vw, 32px); letter-spacing: -.025em; margin: 0 0 12px; }
+:where([data-ui="unified"][data-core-calculator]) .product-description { color: var(--ui-muted); margin: 0 0 20px; max-width: 75ch; }
+:where([data-ui="unified"][data-core-calculator]) .product-details { display: flex; flex-wrap: wrap; gap: 12px 24px; padding-block: 16px; border-block: 1px solid var(--ui-line); font-size: 14px; }
+:where([data-ui="unified"][data-core-calculator]) .product-detail-item { display: flex; align-items: center; gap: 8px; }
+:where([data-ui="unified"][data-core-calculator]) .product-detail-item > i { color: var(--ui-muted); }
+:where([data-ui="unified"][data-core-calculator]) .product-detail-value { font-weight: 600; }
+:where([data-ui="unified"][data-core-calculator]) .color-swatches-section { margin-top: 20px; }
+:where([data-ui="unified"][data-core-calculator]) .color-swatches-title { font-weight: 600; margin-bottom: 12px; }
+:where([data-ui="unified"][data-core-calculator]) .color-swatches { display: flex; flex-wrap: wrap; gap: 10px; }
+:where([data-ui="unified"][data-core-calculator]) .color-swatch { width: 44px; height: 44px; padding: 0; border: 2px solid var(--ui-line-strong); border-radius: var(--radius-sm); overflow: hidden; cursor: pointer; background-size: cover; }
+:where([data-ui="unified"][data-core-calculator]) .color-swatch img { width: 100%; height: 100%; object-fit: cover; }
+:where([data-ui="unified"][data-core-calculator]) .color-swatch.selected, :where([data-ui="unified"][data-core-calculator]) .color-swatch.active, :where([data-ui="unified"][data-core-calculator]) .color-swatch[aria-pressed="true"] { outline: 2px solid var(--ui-accent); outline-offset: 3px; }
+:where([data-ui="unified"][data-core-calculator]) .color-swatch:focus-visible { outline-offset: 5px; }
+:where([data-ui="unified"][data-core-calculator]) .info-boxes { margin-top: 20px; display: grid; gap: 12px; }
+:where([data-ui="unified"][data-core-calculator]) .info-box, :where([data-ui="unified"][data-core-calculator]) .dtf-info-box, :where([data-ui="unified"][data-core-calculator]) .dtg-disclaimer, :where([data-ui="unified"][data-core-calculator]) .manual-mode-product-warning { padding: 16px; border: 1px solid var(--ui-line); border-radius: var(--radius-sm); background: var(--ui-tint); font-size: 14px; }
+:where([data-ui="unified"][data-core-calculator]) .info-box.warning, :where([data-ui="unified"][data-core-calculator]) .dtg-disclaimer { background: var(--color-warning-bg); color: var(--color-warning-ink); }
+:where([data-ui="unified"][data-core-calculator]) .pricing-title, :where([data-ui="unified"][data-core-calculator]) .dtf-matrix-title, :where([data-ui="unified"][data-core-calculator]) .sp-title { font-size: 24px; margin: 0 0 8px; }
+:where([data-ui="unified"][data-core-calculator]) .pricing-subtitle, :where([data-ui="unified"][data-core-calculator]) .dtf-matrix-subtitle { margin: 0 0 28px; color: var(--ui-muted); }
+:where([data-ui="unified"][data-core-calculator]) .toggle-pricing-container, :where([data-ui="unified"][data-core-calculator]) .dtf-toggle-pricing-container, :where([data-ui="unified"][data-core-calculator]) .sp-toggle-pricing-container { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; }
+:where([data-ui="unified"][data-core-calculator]) .toggle-section, :where([data-ui="unified"][data-core-calculator]) .dtf-locations-column, :where([data-ui="unified"][data-core-calculator]) .dtf-tiers-column, :where([data-ui="unified"][data-core-calculator]) .sp-toggle-section { min-width: 0; }
+:where([data-ui="unified"][data-core-calculator]) .toggle-section-title, :where([data-ui="unified"][data-core-calculator]) .dtf-column-header, :where([data-ui="unified"][data-core-calculator]) .sp-toggle-section-title { font-size: 18px; font-weight: 700; margin: 0 0 8px; }
+:where([data-ui="unified"][data-core-calculator]) .toggle-section-subtitle, :where([data-ui="unified"][data-core-calculator]) .dtf-column-subtitle, :where([data-ui="unified"][data-core-calculator]) .sp-toggle-section-subtitle { color: var(--ui-muted); font-size: 14px; margin: 0 0 20px; }
+:where([data-ui="unified"][data-core-calculator]) .dtf-section-header { display: flex; align-items: flex-start; gap: 10px; }
+:where([data-ui="unified"][data-core-calculator]) .dtf-section-icon { color: var(--ui-accent); margin-top: 4px; }
+:where([data-ui="unified"][data-core-calculator]) .location-grid, :where([data-ui="unified"][data-core-calculator]) .dtf-location-list, :where([data-ui="unified"][data-core-calculator]) .sp-color-grid, :where([data-ui="unified"][data-core-calculator]) .dtg-tier-list, :where([data-ui="unified"][data-core-calculator]) [id="dtf-tier-buttons"], :where([data-ui="unified"][data-core-calculator]) .sp-tier-list { display: grid; gap: 10px; }
+:where([data-ui="unified"][data-core-calculator]) .location-grid, :where([data-ui="unified"][data-core-calculator]) .sp-color-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+:where([data-ui="unified"][data-core-calculator]) .toggle-item, :where([data-ui="unified"][data-core-calculator]) .dtf-toggle-item, :where([data-ui="unified"][data-core-calculator]) .sp-toggle-item { display: flex; justify-content: space-between; align-items: center; gap: 12px; text-align: left; }
+:where([data-ui="unified"][data-core-calculator]) .toggle-item.active, :where([data-ui="unified"][data-core-calculator]) .dtf-toggle-item.active, :where([data-ui="unified"][data-core-calculator]) .sp-toggle-item.active, :where([data-ui="unified"][data-core-calculator]) .tier-button.selected, :where([data-ui="unified"][data-core-calculator]) .dtf-tier-button.selected, :where([data-ui="unified"][data-core-calculator]) .sp-tier-button.selected { border-color: var(--ui-accent); background: var(--ui-tint); color: var(--ui-accent); }
+:where([data-ui="unified"][data-core-calculator]) .toggle-item-label { display: grid; gap: 2px; }
+:where([data-ui="unified"][data-core-calculator]) .toggle-item-size { color: var(--ui-muted); font-size: 12px; font-weight: 400; }
+:where([data-ui="unified"][data-core-calculator]) .toggle-switch, :where([data-ui="unified"][data-core-calculator]) .dtf-toggle-switch, :where([data-ui="unified"][data-core-calculator]) .sp-toggle-switch { flex: 0 0 32px; width: 32px; height: 20px; border-radius: 999px; background: var(--ui-line-strong); padding: 3px; }
+:where([data-ui="unified"][data-core-calculator]) .toggle-switch-slider, :where([data-ui="unified"][data-core-calculator]) .dtf-toggle-switch-slider, :where([data-ui="unified"][data-core-calculator]) .sp-toggle-switch-slider { width: 14px; height: 14px; border-radius: 50%; background: var(--ui-surface); }
+:where([data-ui="unified"][data-core-calculator]) .active > .toggle-switch, :where([data-ui="unified"][data-core-calculator]) .active > .dtf-toggle-switch, :where([data-ui="unified"][data-core-calculator]) .active > .sp-toggle-switch { background: var(--ui-accent); }
+:where([data-ui="unified"][data-core-calculator]) .active > .toggle-switch > *, :where([data-ui="unified"][data-core-calculator]) .active > .dtf-toggle-switch > *, :where([data-ui="unified"][data-core-calculator]) .active > .sp-toggle-switch > * { transform: translateX(12px); }
+:where([data-ui="unified"][data-core-calculator]) .tier-button, :where([data-ui="unified"][data-core-calculator]) .dtf-tier-button, :where([data-ui="unified"][data-core-calculator]) .sp-tier-button { display: block; width: 100%; text-align: left; }
+:where([data-ui="unified"][data-core-calculator]) .tier-button small, :where([data-ui="unified"][data-core-calculator]) .dtf-tier-button small, :where([data-ui="unified"][data-core-calculator]) .sp-tier-button small { font-size: 12px; font-weight: 400; }
+:where([data-ui="unified"][data-core-calculator]) .dtg-quantity-input-container, :where([data-ui="unified"][data-core-calculator]) .dtf-quantity-input-container, :where([data-ui="unified"][data-core-calculator]) .sp-quantity-input-container, :where([data-ui="unified"][data-core-calculator]) .ltm-calculator { margin-block: 16px; padding: 16px; border: 1px solid var(--ui-line); border-radius: var(--radius-sm); background: var(--gray-50); }
+:where([data-ui="unified"][data-core-calculator]) .dtf-quantity-input-container, :where([data-ui="unified"][data-core-calculator]) .sp-quantity-input-container { display: none; }
+:where([data-ui="unified"][data-core-calculator]) .dtf-quantity-input-container.show, :where([data-ui="unified"][data-core-calculator]) .sp-quantity-input-container.show { display: block; }
+:where([data-ui="unified"][data-core-calculator]) .dtg-quantity-input-label, :where([data-ui="unified"][data-core-calculator]) .dtf-quantity-input-label, :where([data-ui="unified"][data-core-calculator]) .sp-quantity-input-label, :where([data-ui="unified"][data-core-calculator]) .ltm-input-group label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+:where([data-ui="unified"][data-core-calculator]) .dtg-quantity-hint, :where([data-ui="unified"][data-core-calculator]) .dtf-quantity-hint, :where([data-ui="unified"][data-core-calculator]) .sp-quantity-hint { display: block; color: var(--ui-muted); margin-top: 10px; }
+:where([data-ui="unified"][data-core-calculator]) .live-price-display, :where([data-ui="unified"][data-core-calculator]) .dtf-live-price-display, :where([data-ui="unified"][data-core-calculator]) .sp-live-price-display { position: relative; margin-top: 28px; padding: 24px; border-block: 1px solid var(--ui-line); background: var(--ui-tint); color: var(--ui-ink); }
+:where([data-ui="unified"][data-core-calculator]) .live-price-amount-wrapper, :where([data-ui="unified"][data-core-calculator]) .dtf-price-amount, :where([data-ui="unified"][data-core-calculator]) .sp-price-amount-wrapper { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+:where([data-ui="unified"][data-core-calculator]) .live-price-amount, :where([data-ui="unified"][data-core-calculator]) [id="dtf-live-price"], :where([data-ui="unified"][data-core-calculator]) .sp-live-price-amount { font-size: 40px; font-weight: 700; letter-spacing: -.03em; line-height: 1.3; font-variant-numeric: tabular-nums; }
+:where([data-ui="unified"][data-core-calculator]) .live-price-label, :where([data-ui="unified"][data-core-calculator]) .dtf-price-label, :where([data-ui="unified"][data-core-calculator]) .sp-price-label { font-weight: 600; }
+:where([data-ui="unified"][data-core-calculator]) .live-price-detail, :where([data-ui="unified"][data-core-calculator]) .dtf-price-details, :where([data-ui="unified"][data-core-calculator]) .sp-price-average, :where([data-ui="unified"][data-core-calculator]) .live-price-fee, :where([data-ui="unified"][data-core-calculator]) .dtf-ltm-warning { margin-top: 8px; font-size: 14px; }
+:where([data-ui="unified"][data-core-calculator]) .core-info-button { min-width: 44px; min-height: 44px; }
+:where([data-ui="unified"][data-core-calculator]) .upcharge-tooltip, :where([data-ui="unified"][data-core-calculator]) .setup-fee-tooltip, :where([data-ui="unified"][data-core-calculator]) .dtf-upcharge-tooltip, :where([data-ui="unified"][data-core-calculator]) .sp-upcharge-tooltip, :where([data-ui="unified"][data-core-calculator]) .sp-setup-fee-tooltip, :where([data-ui="unified"][data-core-calculator]) .sp-dark-tooltip { position: relative; padding: 20px; margin-top: 16px; background: var(--ui-surface); border: 1px solid var(--ui-line-strong); border-radius: var(--radius-sm); color: var(--ui-ink); font-size: 14px; }
+:where([data-ui="unified"][data-core-calculator]) .sp-upcharge-tooltip { display: none; }
+:where([data-ui="unified"][data-core-calculator]) .sp-upcharge-tooltip.show { display: block; }
+:where([data-ui="unified"][data-core-calculator]) .upcharge-tooltip-header, :where([data-ui="unified"][data-core-calculator]) .setup-fee-tooltip-header, :where([data-ui="unified"][data-core-calculator]) .dtf-upcharge-tooltip-header, :where([data-ui="unified"][data-core-calculator]) .sp-upcharge-tooltip-header, :where([data-ui="unified"][data-core-calculator]) .sp-setup-fee-tooltip-header, :where([data-ui="unified"][data-core-calculator]) .sp-dark-tooltip-header { font-weight: 700; font-size: 16px; margin-bottom: 12px; }
+:where([data-ui="unified"][data-core-calculator]) .setup-fee-amount, :where([data-ui="unified"][data-core-calculator]) [id="dtf-setup-fee-amount"], :where([data-ui="unified"][data-core-calculator]) .sp-setup-fee-amount { font-size: 20px; font-weight: 700; }
+:where([data-ui="unified"][data-core-calculator]) .core-table-scroll { max-width: 100%; overflow-x: auto; overscroll-behavior-inline: contain; border: 1px solid var(--ui-line); border-radius: var(--radius-sm); }
+:where([data-ui="unified"][data-core-calculator]) table { width: 100%; border-collapse: collapse; background: var(--ui-surface); font-variant-numeric: tabular-nums; font-size: 14px; }
+:where([data-ui="unified"][data-core-calculator]) th, :where([data-ui="unified"][data-core-calculator]) td { padding: 13px 14px; text-align: right; border-bottom: 1px solid var(--ui-line); white-space: nowrap; }
+:where([data-ui="unified"][data-core-calculator]) th { background: var(--gray-50); font-size: 12px; font-weight: 700; color: var(--ui-muted); }
+:where([data-ui="unified"][data-core-calculator]) th:first-child, :where([data-ui="unified"][data-core-calculator]) td:first-child { text-align: left; }
+:where([data-ui="unified"][data-core-calculator]) .price-cell { font-weight: 600; }
+:where([data-ui="unified"][data-core-calculator]) .ltm-column { background: var(--ui-tint); }
+:where([data-ui="unified"][data-core-calculator]) .pricing-note, :where([data-ui="unified"][data-core-calculator]) .additional-logo-notes { color: var(--ui-muted); font-size: 13px; }
+:where([data-ui="unified"][data-core-calculator]) .additional-logo-pricing-section { margin-top: 28px; }
+:where([data-ui="unified"][data-core-calculator]) .additional-logo-title, :where([data-ui="unified"][data-core-calculator]) .order-info-title { font-size: 20px; margin: 0 0 16px; }
+:where([data-ui="unified"][data-core-calculator]) .ltm-calculator-header { display: flex; gap: 8px; align-items: center; }
+:where([data-ui="unified"][data-core-calculator]) .ltm-calculator-header h4 { margin: 0 0 12px; }
+:where([data-ui="unified"][data-core-calculator]) .ltm-calculator-header span { font-weight: 400; }
+:where([data-ui="unified"][data-core-calculator]) .ltm-input-group { max-width: 260px; }
+:where([data-ui="unified"][data-core-calculator]) .order-info-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+:where([data-ui="unified"][data-core-calculator]) .order-info-item { display: flex; align-items: flex-start; gap: 12px; }
+:where([data-ui="unified"][data-core-calculator]) .order-info-icon { color: var(--ui-accent); }
+:where([data-ui="unified"][data-core-calculator]) .order-info-label { font-weight: 600; margin-bottom: 4px; }
+:where([data-ui="unified"][data-core-calculator]) .order-info-text { color: var(--ui-muted); font-size: 14px; }
+:where([data-ui="unified"][data-core-calculator]) .calc-inventory-section { margin-block: 24px; }
+:where([data-ui="unified"][data-core-calculator]) .calc-inv-bar { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; padding: 16px; border: 1px solid var(--ui-line); border-radius: var(--radius-sm); background: var(--ui-surface); cursor: pointer; }
+:where([data-ui="unified"][data-core-calculator]) .calc-inv-swatch { width: 28px; height: 28px; object-fit: cover; border-radius: var(--radius-sm); }
+:where([data-ui="unified"][data-core-calculator]) .calc-inv-color-name { font-weight: 600; }
+:where([data-ui="unified"][data-core-calculator]) .calc-inv-body { display: none; border: 1px solid var(--ui-line); padding: 16px; background: var(--ui-surface); }
+:where([data-ui="unified"][data-core-calculator]) .calc-inv-body.show { display: block; }
+:where([data-ui="unified"][data-core-calculator]) .calc-inv-chevron { margin-left: auto; }
+:where([data-ui="unified"][data-core-calculator]) .calc-inv-chevron.open { transform: rotate(180deg); }
+:where([data-ui="unified"][data-core-calculator]) .calc-inv-error, :where([data-ui="unified"][data-core-calculator]) .api-error-notification, :where([data-ui="unified"][data-core-calculator]) [id="sp-error-banner"], :where([data-ui="unified"][data-core-calculator]) .pricing-error-banner { color: var(--color-danger-ink); background: var(--color-danger-bg); border: 1px solid var(--color-danger); padding: 16px; margin-block: 16px; }
+:where([data-ui="unified"][data-core-calculator]) .loading:not(td), :where([data-ui="unified"][data-core-calculator]) .dtf-calculator-loading { padding: 24px; color: var(--ui-muted); text-align: center; }
+:where([data-ui="unified"][data-core-calculator]) .manual-mode-banner { border-bottom: 1px solid var(--ui-line-strong); background: var(--color-warning-bg); color: var(--color-warning-ink); }
+:where([data-ui="unified"][data-core-calculator]) .manual-mode-content { max-width: 1280px; margin: auto; padding: 16px 32px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+:where([data-ui="unified"][data-core-calculator]) .manual-mode-info { flex: 1; }
+:where([data-ui="unified"][data-core-calculator]) .manual-mode-details { font-size: 13px; }
+:where([data-ui="unified"][data-core-calculator]) .manual-mode-product-warning { margin-block: 16px; }
+:where([data-ui="unified"][data-core-calculator]) .accordion-section { margin-top: 24px; }
+:where([data-ui="unified"][data-core-calculator]) .accordion-header { font-size: 16px; margin: 0; }
+:where([data-ui="unified"][data-core-calculator]) .accordion-button { width: 100%; justify-content: flex-start; }
+:where([data-ui="unified"][data-core-calculator]) .collapse:not(.show) { display: none; }
+:where([data-ui="unified"][data-core-calculator]) .collapsing { height: 0; overflow: hidden; transition: height var(--motion-fast); }
+:where([data-ui="unified"][data-core-calculator]) .accordion-body { padding: 16px; border: 1px solid var(--ui-line); }
+:where([data-ui="unified"][data-core-calculator]) .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+
+@media (width <= 900px) {
+ :where([data-ui="unified"][data-core-calculator]) .contact-bar-content, :where([data-ui="unified"][data-core-calculator]) .nav-content, :where([data-ui="unified"][data-core-calculator]) .context-bar-content, :where([data-ui="unified"][data-core-calculator]) main { padding-inline: 20px; }
+ :where([data-ui="unified"][data-core-calculator]) .context-bar-content { align-items: flex-start; flex-direction: column; gap: 16px; }
+ :where([data-ui="unified"][data-core-calculator]) .search-wrapper { width: 100%; }
+ :where([data-ui="unified"][data-core-calculator]) .product-content { grid-template-columns: 200px minmax(0, 1fr); gap: 24px; }
+ :where([data-ui="unified"][data-core-calculator]) .product-image { height: 240px; }
+ :where([data-ui="unified"][data-core-calculator]) .toggle-pricing-container, :where([data-ui="unified"][data-core-calculator]) .dtf-toggle-pricing-container, :where([data-ui="unified"][data-core-calculator]) .sp-toggle-pricing-container { gap: 24px; }
+ :where([data-ui="unified"][data-core-calculator]) .location-grid, :where([data-ui="unified"][data-core-calculator]) .sp-color-grid { grid-template-columns: 1fr; }
+}
+
+@media (width <= 600px) {
+ :where([data-ui="unified"][data-core-calculator]) .contact-bar-content, :where([data-ui="unified"][data-core-calculator]) .nav-content, :where([data-ui="unified"][data-core-calculator]) .context-bar-content, :where([data-ui="unified"][data-core-calculator]) main { padding-inline: 16px; }
+ :where([data-ui="unified"][data-core-calculator]) .contact-bar-content, :where([data-ui="unified"][data-core-calculator]) .contact-info { gap: 8px 16px; }
+ :where([data-ui="unified"][data-core-calculator]) main { padding-block: 20px 32px; }
+ :where([data-ui="unified"][data-core-calculator]) .product-content, :where([data-ui="unified"][data-core-calculator]) .toggle-pricing-container, :where([data-ui="unified"][data-core-calculator]) .dtf-toggle-pricing-container, :where([data-ui="unified"][data-core-calculator]) .sp-toggle-pricing-container, :where([data-ui="unified"][data-core-calculator]) .order-info-grid { grid-template-columns: 1fr; }
+ :where([data-ui="unified"][data-core-calculator]) .product-image { height: 240px; }
+ :where([data-ui="unified"][data-core-calculator]) .main-image-container { min-height: 180px; }
+ :where([data-ui="unified"][data-core-calculator]) .product-hero, :where([data-ui="unified"][data-core-calculator]) .pricing-section, :where([data-ui="unified"][data-core-calculator]) [id="dtf-calculator-container"], :where([data-ui="unified"][data-core-calculator]) .sp-calculator, :where([data-ui="unified"][data-core-calculator]) .order-info-section, :where([data-ui="unified"][data-core-calculator]) .dtg-recommendations-section { padding: 20px 16px; }
+ :where([data-ui="unified"][data-core-calculator]) .product-details { flex-direction: column; gap: 8px; }
+ :where([data-ui="unified"][data-core-calculator]) .live-price-display, :where([data-ui="unified"][data-core-calculator]) .dtf-live-price-display, :where([data-ui="unified"][data-core-calculator]) .sp-live-price-display { padding: 20px 16px; }
+ :where([data-ui="unified"][data-core-calculator]) .live-price-amount, :where([data-ui="unified"][data-core-calculator]) [id="dtf-live-price"], :where([data-ui="unified"][data-core-calculator]) .sp-live-price-amount { font-size: 34px; }
+ :where([data-ui="unified"][data-core-calculator]) .manual-mode-content { padding: 16px; }
+ :where([data-ui="unified"][data-core-calculator]) .calc-inv-body { padding: 12px; }
+}
+
+@media print {
+ @page { size: letter portrait; margin: .4in; }
+ :where([data-ui="unified"][data-core-calculator]) { background: var(--ui-surface); color: var(--print-ink); font-size: 9pt; }
+ :where([data-ui="unified"][data-core-calculator]) .enhanced-pricing-header { position: static; margin-bottom: 12px; display: grid; grid-template-columns: 100px minmax(0, 1fr); align-items: center; }
+ :where([data-ui="unified"][data-core-calculator]) .contact-bar-content, :where([data-ui="unified"][data-core-calculator]) .nav-content, :where([data-ui="unified"][data-core-calculator]) .context-bar-content, :where([data-ui="unified"][data-core-calculator]) main, :where([data-ui="unified"][data-core-calculator]) .manual-mode-content { max-width: none; padding: 0; }
+ :where([data-ui="unified"][data-core-calculator]) .contact-bar-content { font-size: 8pt; padding-block: 4px; }
+ :where([data-ui="unified"][data-core-calculator]) .nav-content { padding-block: 6px; }
+ :where([data-ui="unified"][data-core-calculator]) .logo-image { width: 90px; height: 36px; }
+ :where([data-ui="unified"][data-core-calculator]) .context-bar-content { padding-block: 6px; gap: 12px; }
+ :where([data-ui="unified"][data-core-calculator]) .calculator-type-badge { font-size: 12pt; }
+ :where([data-ui="unified"][data-core-calculator]) .breadcrumb { font-size: 8pt; margin-bottom: 4px; }
+ :where([data-ui="unified"][data-core-calculator]) .search-wrapper { width: 180px; }
+ :where([data-ui="unified"][data-core-calculator]) .search-input { min-height: 28px; font-size: 8pt; }
+ :where([data-ui="unified"][data-core-calculator]) .search-btn { min-height: 28px; padding: 4px 8px; }
+ :where([data-ui="unified"][data-core-calculator]) .product-hero, :where([data-ui="unified"][data-core-calculator]) .pricing-section, :where([data-ui="unified"][data-core-calculator]) [id="dtf-calculator-container"], :where([data-ui="unified"][data-core-calculator]) .sp-calculator, :where([data-ui="unified"][data-core-calculator]) .order-info-section, :where([data-ui="unified"][data-core-calculator]) .dtg-recommendations-section { padding: 12px; margin-bottom: 12px; box-shadow: none; }
+ :where([data-ui="unified"][data-core-calculator]) .product-content { grid-template-columns: 110px minmax(0, 1fr); gap: 20px; }
+ :where([data-ui="unified"][data-core-calculator]) .main-image-container { min-height: 0; }
+ :where([data-ui="unified"][data-core-calculator]) .product-image { height: 120px; }
+ :where([data-ui="unified"][data-core-calculator]) .product-title { font-size: 17pt; margin-bottom: 6px; }
+ :where([data-ui="unified"][data-core-calculator]) .product-description { margin-bottom: 8px; }
+ :where([data-ui="unified"][data-core-calculator]) .product-details { padding-block: 6px; gap: 8px 16px; font-size: 8pt; }
+ :where([data-ui="unified"][data-core-calculator]) .color-swatches-section { margin-top: 8px; }
+ :where([data-ui="unified"][data-core-calculator]) .color-swatches-title { margin-bottom: 6px; }
+ :where([data-ui="unified"][data-core-calculator]) .color-swatch { min-height: 0; }
+ :where([data-ui="unified"][data-core-calculator]) .pricing-title, :where([data-ui="unified"][data-core-calculator]) .dtf-matrix-title, :where([data-ui="unified"][data-core-calculator]) .sp-title { font-size: 15pt; }
+ :where([data-ui="unified"][data-core-calculator]) .pricing-subtitle, :where([data-ui="unified"][data-core-calculator]) .dtf-matrix-subtitle { margin-bottom: 12px; }
+ :where([data-ui="unified"][data-core-calculator]) .toggle-pricing-container, :where([data-ui="unified"][data-core-calculator]) .dtf-toggle-pricing-container, :where([data-ui="unified"][data-core-calculator]) .sp-toggle-pricing-container { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+ :where([data-ui="unified"][data-core-calculator]) .toggle-section-title, :where([data-ui="unified"][data-core-calculator]) .dtf-column-header, :where([data-ui="unified"][data-core-calculator]) .sp-toggle-section-title { font-size: 11pt; }
+ :where([data-ui="unified"][data-core-calculator]) .toggle-section-subtitle, :where([data-ui="unified"][data-core-calculator]) .dtf-column-subtitle, :where([data-ui="unified"][data-core-calculator]) .sp-toggle-section-subtitle { font-size: 8pt; margin-bottom: 8px; }
+ :where([data-ui="unified"][data-core-calculator]) .location-grid, :where([data-ui="unified"][data-core-calculator]) .sp-color-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+ :where([data-ui="unified"][data-core-calculator]) .location-grid, :where([data-ui="unified"][data-core-calculator]) .dtf-location-list, :where([data-ui="unified"][data-core-calculator]) .sp-color-grid, :where([data-ui="unified"][data-core-calculator]) .dtg-tier-list, :where([data-ui="unified"][data-core-calculator]) [id="dtf-tier-buttons"], :where([data-ui="unified"][data-core-calculator]) .sp-tier-list { gap: 6px; }
+ :where([data-ui="unified"][data-core-calculator]) .btn { min-height: 28px; padding: 6px 8px; font-size: 9pt; }
+ :where([data-ui="unified"][data-core-calculator]) .field-input, :where([data-ui="unified"][data-core-calculator]) .field-select { min-height: 28px; font-size: 9pt; }
+ :where([data-ui="unified"][data-core-calculator]) .live-price-display, :where([data-ui="unified"][data-core-calculator]) .dtf-live-price-display, :where([data-ui="unified"][data-core-calculator]) .sp-live-price-display { margin-top: 12px; padding: 12px; break-inside: avoid; }
+ :where([data-ui="unified"][data-core-calculator]) .live-price-amount, :where([data-ui="unified"][data-core-calculator]) [id="dtf-live-price"], :where([data-ui="unified"][data-core-calculator]) .sp-live-price-amount { font-size: 24pt; }
+ :where([data-ui="unified"][data-core-calculator]) .live-price-detail, :where([data-ui="unified"][data-core-calculator]) .dtf-price-details, :where([data-ui="unified"][data-core-calculator]) .live-price-fee, :where([data-ui="unified"][data-core-calculator]) .dtf-ltm-warning { font-size: 9pt; }
+ :where([data-ui="unified"][data-core-calculator]) .core-table-scroll { overflow: visible; border-radius: 0; }
+ :where([data-ui="unified"][data-core-calculator]) table { font-size: 9pt; table-layout: auto; }
+ :where([data-ui="unified"][data-core-calculator]) th, :where([data-ui="unified"][data-core-calculator]) td { white-space: normal; padding: 6px 8px; }
+ :where([data-ui="unified"][data-core-calculator]) th { font-size: 8pt; }
+ :where([data-ui="unified"][data-core-calculator]) thead { display: table-header-group; }
+ :where([data-ui="unified"][data-core-calculator]) tr, :where([data-ui="unified"][data-core-calculator]) .product-hero, :where([data-ui="unified"][data-core-calculator]) .ltm-calculator, :where([data-ui="unified"][data-core-calculator]) .additional-logo-pricing-section, :where([data-ui="unified"][data-core-calculator]) .order-info-item, :where([data-ui="unified"][data-core-calculator]) .manual-mode-banner { break-inside: avoid; }
+ :where([data-ui="unified"][data-core-calculator]) .ltm-calculator { padding: 8px 12px; margin-block: 12px; }
+ :where([data-ui="unified"][data-core-calculator]) .additional-logo-pricing-section { margin-top: 16px; }
+ :where([data-ui="unified"][data-core-calculator]) .additional-logo-title, :where([data-ui="unified"][data-core-calculator]) .order-info-title { font-size: 12pt; margin-bottom: 8px; }
+ :where([data-ui="unified"][data-core-calculator]) .pricing-note, :where([data-ui="unified"][data-core-calculator]) .additional-logo-notes { font-size: 8pt; }
+ :where([data-ui="unified"][data-core-calculator]) .info-boxes { margin-top: 12px; }
+ :where([data-ui="unified"][data-core-calculator]) .info-box, :where([data-ui="unified"][data-core-calculator]) .dtf-info-box, :where([data-ui="unified"][data-core-calculator]) .dtg-disclaimer { font-size: 8pt; padding: 10px; }
+ :where([data-ui="unified"][data-core-calculator]) .order-info-grid { gap: 12px; }
+ :where([data-ui="unified"][data-core-calculator]) .order-info-text { font-size: 8pt; }
+ :where([data-ui="unified"][data-core-calculator]) .calc-inventory-section { margin-block: 12px; }
+ :where([data-ui="unified"][data-core-calculator]) .calc-inv-bar, :where([data-ui="unified"][data-core-calculator]) .calc-inv-body { padding: 8px; }
+ :where([data-ui="unified"][data-core-calculator]) .manual-mode-content { padding-block: 8px; }
+ :where([data-ui="unified"][data-core-calculator]) .manual-mode-details { font-size: 8pt; }
+
+ :where([data-ui="unified"][data-core-calculator]) .header-contact-bar { grid-column: 1 / -1;
+
+}
+
+ :where([data-ui="unified"][data-core-calculator]) .header-nav { grid-column: 1; grid-row: 2;
+
+}
+
+ :where([data-ui="unified"][data-core-calculator]) .pricing-context-bar { grid-column: 2; grid-row: 2; border-top: 0;
+
+}
+
+ :where([data-ui="unified"][data-core-calculator]) .image-placeholder { padding: 12px;
+
+}
+
+ :where([data-ui="unified"][data-core-calculator]) .dtg-quantity-input-container, :where([data-ui="unified"][data-core-calculator]) .dtf-quantity-input-container, :where([data-ui="unified"][data-core-calculator]) .sp-quantity-input-container { padding: 8px 12px; margin-block: 10px; break-inside: avoid;
+
+}
+
+ :where([data-ui="unified"][data-core-calculator]) .dtg-quantity-hint, :where([data-ui="unified"][data-core-calculator]) .dtf-quantity-hint, :where([data-ui="unified"][data-core-calculator]) .sp-quantity-hint { margin-top: 6px; font-size: 8pt;
+
+}
+}
+
+:where([data-ui="unified"][data-core-calculator]) .calc-inv-bar-left, :where([data-ui="unified"][data-core-calculator]) .calc-inv-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+:where([data-ui="unified"][data-core-calculator]) .calc-inv-good { background: var(--ui-tint); color: var(--ui-accent); }
+:where([data-ui="unified"][data-core-calculator]) .calc-inv-low { background: var(--color-warning-bg); color: var(--color-warning-ink); }
+:where([data-ui="unified"][data-core-calculator]) .calc-inv-out { background: var(--color-danger-bg); color: var(--color-danger-ink); }
+:where([data-ui="unified"][data-core-calculator]) .calc-inline-alert { background: var(--color-danger-bg); color: var(--color-danger-ink); border: 1px solid var(--color-danger); padding: 16px; margin-bottom: 16px; }
+
+:where([data-ui="unified"][data-core-calculator]) .api-error-notification { flex-wrap: wrap; gap: 8px 12px; align-items: baseline;
+
+}
+:where([data-ui="unified"][data-core-calculator]) .core-combo-controls { margin-top: 20px; }
+:where([data-ui="unified"][data-core-calculator]) .upcharge-info { margin-top: 24px; padding: 16px; border: 1px solid var(--ui-line); border-radius: var(--radius-sm); }
+:where([data-ui="unified"][data-core-calculator]) .core-upcharge-title { font-size: 18px; margin-bottom: 12px; }
+:where([data-ui="unified"][data-core-calculator]) .core-fee-warning { color: var(--color-warning-ink); background: var(--color-warning-bg); border: 1px solid var(--color-warning); padding: 12px; margin-top: 8px; font-size: 14px; }
+:where([data-ui="unified"][data-core-calculator]) .core-pricing-host { position: relative; }
+:where([data-ui="unified"][data-core-calculator]) .core-pricing-loading { position: absolute; inset: 0; background: color-mix(in srgb, var(--ui-surface) 95%, transparent); align-items: center; justify-content: center; z-index: 10; }
+:where([data-ui="unified"][data-core-calculator]) .core-pricing-error { align-items: center; gap: 8px; }
+:where([data-ui="unified"][data-core-calculator]) .core-pricing-error .sp-error-dismiss { margin-left: auto; }
+
+@media print {
+:where([data-ui="unified"][data-core-calculator]) .context-bar-content { flex-direction: row; align-items: center; justify-content: space-between; }
+:where([data-ui="unified"][data-core-calculator]) .image-thumbnail { width: 28px; height: 32px; }
+:where([data-ui="unified"][data-core-calculator]) .image-thumbnail img { width: 100%; height: 100%; object-fit: contain; }
+:where([data-ui="unified"][data-core-calculator]) .image-thumbnails { gap: 6px; margin-top: 6px; }
+:where([data-ui="unified"][data-core-calculator]) .calc-inventory-section { break-inside: avoid; }
+:where([data-ui="unified"][data-core-calculator]) .color-swatch { width: 24px; height: 24px; }
+}
+
+@media (width <= 360px) {
+:where([data-ui="unified"][data-core-calculator]) .core-info-button { min-height: 36px; min-width: 36px; padding: 6px; }
+:where([data-ui="unified"][data-core-calculator]) .live-price-amount, :where([data-ui="unified"][data-core-calculator]) [id="dtf-live-price"] { font-size: 32px; }
+:where([data-ui="unified"][data-core-calculator]) .dtf-price-amount { column-gap: 4px; }
+}
+
+}

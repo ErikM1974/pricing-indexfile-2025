@@ -1,5 +1,7 @@
 # Active Files Registry
 
+- `shared_components/js/core-calculator-ui.js` — scoped canonical control classes, keyboard actions, state announcements and table scrolling for five public calculators; no pricing calculations.
+
 - `shared_components/css/employee-bundles.css` — shared Streich Bros./WCTTR wrapper, typography, instructions and navigation over tokens/components/hosted-workspace. Retires `employee-bundles/css/streich-bros-bundle.css` and `employee-bundles/css/wcttr-bundle.css`; original CSS is retained in the source fixture. Provider records remain externally owned.
 
 - Employee bundle browser contracts: tests/e2e/css-unification-employee-bundles.spec.js and tests/e2e/helpers/employee-bundles-browser.js; original four-width, provider-state and paper captures in tests/fixtures/employee-bundles-{streich-bros-bundle,wcttr-bundle}-original-browser.json. Synthetic provider responses; all business traffic blocked.
@@ -856,3 +858,62 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - tests/fixtures/calculator-reference-menu-empty-customer-original-browser.json — immutable original synthetic calculator/reference browser contract.
 
 - shared_components/css/calculator-reference.css — shared scoped chrome for Manual Pricing, Manual Laser and Shop Menu.
+
+- tests/fixtures/core-calculators-original-content.json — immutable original source, imports and dynamic style owners for the five public product calculators.
+- tests/e2e/helpers/core-calculators-browser.js — intercepted synthetic calculator, product and inventory responses.
+- tests/e2e/css-unification-core-calculators.spec.js — original/current responsive calculator contracts and print evidence.
+- tests/unit/core-calculators-content.test.js — reversible source and pricing-owner preservation checks.
+
+- tests/fixtures/core-calculators-dtg-normal-original-browser.json — immutable original synthetic public calculator browser contract.
+
+- tests/fixtures/core-calculators-dtg-tier-values-original-browser.json — immutable original synthetic public calculator browser contract.
+
+- tests/fixtures/core-calculators-dtf-normal-original-browser.json — immutable original synthetic public calculator browser contract.
+
+- tests/fixtures/core-calculators-dtf-tier-values-original-browser.json — immutable original synthetic public calculator browser contract.
+
+- tests/fixtures/core-calculators-dtf-manual-original-browser.json — immutable original synthetic public calculator browser contract.
+
+- tests/fixtures/core-calculators-dtf-failed-original-browser.json — immutable original synthetic public calculator browser contract.
+
+- tests/fixtures/core-calculators-emb-normal-original-browser.json — immutable original synthetic public calculator browser contract.
+
+- tests/fixtures/core-calculators-emb-tier-values-original-browser.json — immutable original synthetic public calculator browser contract.
+
+- tests/fixtures/core-calculators-emb-options-original-browser.json — immutable original synthetic public calculator browser contract.
+
+- tests/fixtures/core-calculators-emb-manual-original-browser.json — immutable original synthetic public calculator browser contract.
+
+- tests/fixtures/core-calculators-emb-failed-original-browser.json — immutable original synthetic public calculator browser contract.
+
+- tests/fixtures/core-calculators-cap-normal-original-browser.json — immutable original synthetic public calculator browser contract.
+
+- tests/fixtures/core-calculators-cap-tier-values-original-browser.json — immutable original synthetic public calculator browser contract.
+
+- tests/fixtures/core-calculators-cap-options-original-browser.json — immutable original synthetic public calculator browser contract.
+
+- tests/fixtures/core-calculators-cap-manual-original-browser.json — immutable original synthetic public calculator browser contract.
+
+- tests/fixtures/core-calculators-cap-failed-original-browser.json — immutable original synthetic public calculator browser contract.
+
+- tests/fixtures/core-calculators-sp-normal-original-browser.json — immutable original synthetic public calculator browser contract.
+
+- tests/fixtures/core-calculators-sp-tier-values-original-browser.json — immutable original synthetic public calculator browser contract.
+
+- tests/fixtures/core-calculators-sp-options-original-browser.json — immutable original synthetic public calculator browser contract.
+
+- tests/fixtures/core-calculators-sp-manual-original-browser.json — immutable original synthetic public calculator browser contract.
+
+- tests/fixtures/core-calculators-dtg-options-original-browser.json — immutable original synthetic public calculator browser contract.
+
+- tests/fixtures/core-calculators-dtg-manual-original-browser.json — immutable original synthetic public calculator browser contract.
+
+- tests/fixtures/core-calculators-dtf-options-original-browser.json — immutable original synthetic public calculator browser contract.
+
+- tests/fixtures/core-calculators-sp-failed-original-browser.json — immutable original synthetic public calculator browser contract.
+
+- tests/fixtures/core-calculators-dtg-failed-original-browser.json — immutable original synthetic public calculator browser contract.
+
+- tests/fixtures/core-calculators-original-defects.json — recorded original DTG/DTF color-selection failures; current browser checks require zero errors.
+
+- shared_components/css/core-calculators.css — common five-calculator product, header, control arrangement, inventory and complete paper layout. Existing per-method sheets now own only method layout.

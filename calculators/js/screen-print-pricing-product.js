@@ -68,7 +68,7 @@ if (!SP_API_BASE) console.error('[ScreenPrint] APP_CONFIG.API.BASE_URL missing â
 
             // Update product display for manual mode
             const manualProductData = {
-                title: 'Manual Pricing Mode',
+                name: 'Manual Pricing Mode',
                 description: `Base cost: $${manualCost.toFixed(2)} - No product images available in manual mode`,
                 styleNumber: 'MANUAL',
                 brand: 'Manual Entry',

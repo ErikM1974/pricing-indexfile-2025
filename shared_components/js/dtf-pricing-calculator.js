@@ -404,7 +404,7 @@ class DTFPricingCalculator {
                 <div class="dtf-price-amount">
                     $<span id="dtf-live-price">0.00</span>
                     <i class="fas fa-info-circle dtf-upcharge-info-icon" id="dtf-upcharge-info-icon" aria-hidden="true"></i>
-                    <i class="fas fa-palette setup-fee-badge" id="dtf-setup-fee-badge" style="font-size: 20px; color: white; opacity: 0.85; cursor: pointer;" aria-hidden="true"></i>
+                    <i class="fas fa-palette setup-fee-badge" id="dtf-setup-fee-badge" aria-hidden="true"></i>
                 </div>
                 <div class="dtf-price-details" id="dtf-price-details">
                     <span id="dtf-quantity-display">0</span> pieces + <span id="dtf-locations-display">0</span> location(s)
@@ -415,30 +415,30 @@ class DTFPricingCalculator {
                 </div>
 
                 <!-- Setup Fee Tooltip -->
-                <div id="dtf-setup-fee-tooltip" class="setup-fee-tooltip" style="display: none; position: absolute; bottom: calc(100% + 15px); left: 50%; transform: translateX(-50%); background: white; border: 2px solid #f59e0b; border-radius: 12px; box-shadow: 0 8px 24px rgba(245, 158, 11, 0.25); padding: 20px; min-width: 300px; z-index: 1000;">
-                    <div style="font-size: 16px; font-weight: 700; color: #92400e; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 2px solid #fef3c7; display: flex; align-items: center; gap: 8px;">
+                <div id="dtf-setup-fee-tooltip" class="setup-fee-tooltip" style="display: none;">
+                    <div>
                         <i class="fas fa-palette" aria-hidden="true"></i>
                         Art Setup Fee
                     </div>
-                    <div style="font-size: 14px; color: #78350f; line-height: 1.6;">
-                        <div style="font-size: 18px; font-weight: 700; color: #f59e0b; margin: 8px 0;" id="dtf-setup-fee-amount">Loading...</div>
+                    <div>
+                        <div id="dtf-setup-fee-amount">Loading...</div>
                         <p><strong>This one-time fee covers:</strong></p>
-                        <ul style="margin: 8px 0; padding-left: 20px;">
+                        <ul>
                             <li>Custom logo mockup on your products</li>
                             <li>Print readiness check for clarity & sizing</li>
                             <li>Up to 2 rounds of revisions</li>
                         </ul>
-                        <div style="font-size: 13px; color: #92400e; margin-top: 8px; padding-top: 8px; border-top: 1px solid #fef3c7;">
-                            <i class="fas fa-check-circle" style="color: #f59e0b;" aria-hidden="true"></i>
+                        <div>
+                            <i class="fas fa-check-circle" aria-hidden="true"></i>
                             One-time charge for new artwork
                         </div>
-                        <div style="font-size: 13px; color: #92400e; margin-top: 4px;">
-                            <i class="fas fa-check-circle" style="color: #f59e0b;" aria-hidden="true"></i>
+                        <div>
+                            <i class="fas fa-check-circle" aria-hidden="true"></i>
                             Applies to all new logos or designs
                         </div>
                     </div>
                     <!-- Tooltip arrow -->
-                    <div style="content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 10px solid transparent; border-top-color: #f59e0b;"></div>
+                    <div></div>
                 </div>
 
                 <!-- Size Upcharge Tooltip -->
@@ -562,7 +562,7 @@ class DTFPricingCalculator {
             html += `
                 <button class="dtf-tier-button universal-tier-button ${isSelected ? 'selected' : ''}" data-tier="${tier.value}">
                     ${tier.label}
-                    ${tier.isLTM ? `<br><small style="font-size: 11px; opacity: 0.9; margin-top: 4px; font-weight: 600;">${tier.ltmLabel}</small>` : ''}
+                    ${tier.isLTM ? `<br><small>${tier.ltmLabel}</small>` : ''}
                 </button>
             `;
         });
@@ -1081,11 +1081,11 @@ class DTFPricingCalculator {
 
         // If no upcharges found
         if (upchargeSizes.length === 0 && baseSizes.length === 0) {
-            html += '<div style="text-align: center; color: #6b7280; padding: 10px;">';
+            html += '<div>';
             html += 'Size information loading...';
             html += '</div>';
         } else if (upchargeSizes.length === 0) {
-            html += '<div style="text-align: center; color: #6b7280; padding: 10px;">';
+            html += '<div>';
             html += 'No size upcharges for this style';
             html += '</div>';
         }

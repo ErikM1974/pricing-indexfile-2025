@@ -5,32 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DTG Pricing | Northwest Custom Apparel</title>
     <link rel="icon" href="/favicon.png" type="image/png">
-
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
-
-    <!-- UNIVERSAL PRICING HEADER (New) -->
-    <!-- Phase 2d (2026-05-23): PNW palette tokens — must load BEFORE universal-pricing-header.css to uplift --primary-* tokens -->
-    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/quote-builder-shell.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/universal-pricing-header.css?v=2026.09.07.12">
-
-    <!-- Universal Toggle Pricing CSS -->
-    <link rel="stylesheet" href="/shared_components/css/universal-toggle-pricing.css?v=2026.09.07.12">
-    <!-- DTG LTM Quantity Input CSS -->
-    <link rel="stylesheet" href="/shared_components/css/dtg-ltm-quantity-input.css?v=2026.09.07.19">
-    <!-- Universal LTM Quantity Input CSS (shared across all calculators) -->
-    <link rel="stylesheet" href="/shared_components/css/universal-ltm-quantity-input.css?v=2026.09.07.19">
-
-    <link rel="stylesheet" href="/calculators/css/dtg-pricing.css?v=2026.09.07.19">
     <script src="/config/app.config.js"></script>
-    <link rel="stylesheet" href="/shared_components/css/calculator-inventory.css?v=2026.09.07.12">
-    <link rel="stylesheet" href="/shared_components/css/manual-mode-indicator.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/universal-pricing-grid.css?v=2026.09.07.19">
+    <!-- Canonical tokens and controls; one shared structure and one method owner. -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.11.3">
+    <link rel="stylesheet" href="/shared_components/css/core-calculators.css?v=2026.09.11.5">
+    <link rel="stylesheet" href="/calculators/css/dtg-pricing.css?v=2026.09.11.5">
 </head>
-<body class="pricing-calculator-page">
+<body class="pricing-calculator-page" data-ui="unified" data-core-calculator="dtg">
 
     <!-- ========================================
          UNIVERSAL PRICING CALCULATOR HEADER
@@ -141,7 +125,7 @@
                         <div class="main-image-container">
                             <img id="productImage" class="product-image" style="display: none;" alt="Product image">
                             <div id="imagePlaceholder" class="image-placeholder">
-                                <i class="fas fa-tshirt" aria-hidden="true" style="font-size: 48px; margin-bottom: 12px;"></i>
+                                <i class="fas fa-tshirt" aria-hidden="true"></i>
                                 <div>Product Image</div>
                             </div>
                         </div>
@@ -324,17 +308,17 @@
                         <div class="setup-fee-tooltip-body">
                             <div class="setup-fee-amount">$50.00 (GRT-50)</div>
                             <p><strong>This one-time fee covers:</strong></p>
-                            <ul style="margin: 8px 0; padding-left: 20px;">
+                            <ul>
                                 <li>Custom logo mockup on your products</li>
                                 <li>Print readiness check for clarity & sizing</li>
                                 <li>Up to 2 rounds of revisions</li>
                             </ul>
                             <div class="setup-fee-details">
-                                <i class="fas fa-check-circle" aria-hidden="true" style="color: #f59e0b;"></i>
+                                <i class="fas fa-check-circle" aria-hidden="true"></i>
                                 One-time charge for new artwork
                             </div>
                             <div class="setup-fee-details">
-                                <i class="fas fa-check-circle" aria-hidden="true" style="color: #f59e0b;"></i>
+                                <i class="fas fa-check-circle" aria-hidden="true"></i>
                                 Applies to all new logos or designs
                             </div>
                         </div>
@@ -350,7 +334,7 @@
         <!-- DTG Product Recommendations Section -->
         <div class="dtg-recommendations-section">
             <h3 class="dtg-rec-title">
-                <i class="fas fa-star" aria-hidden="true" style="color: #ffd700;"></i>
+                <i class="fas fa-star" aria-hidden="true"></i>
                 Best Products for DTG Printing
             </h3>
             <p class="dtg-rec-subtitle">Based on 50,000+ successful prints</p>
@@ -382,9 +366,10 @@
     <script src="/shared_components/js/dtg-pricing-service.js?v=2026.09.06.37"></script>
     <script src="/shared_components/js/universal-pricing-grid.js?v=2026.09.06.40"></script>
     <script src="/shared_components/js/manual-mode-indicator.js?v=2026.09.06.19"></script>
-    <script src="/calculators/js/dtg-pricing-page.js?v=2026.09.06.43"></script>
+    <script src="/calculators/js/dtg-pricing-page.js?v=2026.09.11.5"></script>
 
     <!-- DTG Product Recommendations (inline implementation) -->
 <script src="/shared_components/js/calculator-inventory.js?v=2026.09.06.40"></script>
+<script src="/shared_components/js/core-calculator-ui.js?v=2026.09.11.5"></script>
 </body>
 </html>

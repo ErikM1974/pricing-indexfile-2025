@@ -1,0 +1,345 @@
+{
+  "states": [
+    {
+      "width": 1440,
+      "title": "Screen Print Pricing Calculator | Northwest Custom Apparel",
+      "url": "/calculators/screen-print-pricing.html?StyleNumber=PC54&COLOR=Jet%20Black",
+      "ids": {
+        "products-breadcrumb": "Products",
+        "styleSearch": "",
+        "searchBtn": "",
+        "search-results-live": "",
+        "productImage": "",
+        "imageThumbnails": "",
+        "productTitle": "Essential Cotton Tee",
+        "productDescription": "Comfortable, durable cotton apparel for the whole team.",
+        "currentColor": "Jet Black",
+        "currentStyle": "#PC54",
+        "currentBrand": "Port & Company",
+        "colorSwatches": "",
+        "sp-dark-info-icon": "",
+        "sp-toggle-1color": "1 Color",
+        "sp-toggle-2color": "2 Colors",
+        "sp-toggle-3color": "3 Colors",
+        "sp-toggle-4color": "4 Colors",
+        "sp-toggle-5color": "5 Colors",
+        "sp-toggle-6color": "6 Colors",
+        "sp-safety-stripes-toggle": "Safety Stripes Design 4-color design: +$2.00 per piece",
+        "sp-tier-24-47": "24-47 pieces + $50 Small Batch Fee",
+        "sp-qty-24-47": "",
+        "sp-ltm-calc-24-47": "$50 ÷ 37 = $1.35/piece",
+        "sp-tier-48-71": "48-71 pieces",
+        "sp-tier-72-144": "72-144 pieces",
+        "sp-tier-145-576": "145+ pieces",
+        "sp-additional-locations-header": "Additional Print Locations Add up to 3 additional locations",
+        "sp-additional-locations-container": "",
+        "sp-add-location": "Add Location",
+        "sp-pricing-tier-label": "24-47 pieces (37 selected)",
+        "sp-live-price-amount": "$13.85",
+        "sp-upcharge-info-icon": "",
+        "sp-setup-fee-badge": "",
+        "sp-toggle-breakdown-text": "View Detailed Breakdown",
+        "calculator-inventory-section": "Jet Black Warehouse Inventory 875 units Warehouse S M L XL 2XL 3XL 4XL Synthetic warehouse 125 125 125 125 125 125 125 TOTAL 125 125 125 125 125 125 125"
+      },
+      "fields": [
+        {
+          "id": "styleSearch",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "sp-qty-24-47",
+          "name": "",
+          "type": "number",
+          "value": "37",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/product.html?style=PC54",
+          "text": "Products"
+        }
+      ],
+      "tables": [
+        "Warehouse S M L XL 2XL 3XL 4XL Synthetic warehouse 125 125 125 125 125 125 125 TOTAL 125 125 125 125 125 125 125"
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Screen Print Pricing Calculator | Northwest Custom Apparel",
+      "url": "/calculators/screen-print-pricing.html?StyleNumber=PC54&COLOR=Jet%20Black",
+      "ids": {
+        "products-breadcrumb": "Products",
+        "styleSearch": "",
+        "searchBtn": "",
+        "search-results-live": "",
+        "productImage": "",
+        "imageThumbnails": "",
+        "productTitle": "Essential Cotton Tee",
+        "productDescription": "Comfortable, durable cotton apparel for the whole team.",
+        "currentColor": "Jet Black",
+        "currentStyle": "#PC54",
+        "currentBrand": "Port & Company",
+        "colorSwatches": "",
+        "sp-dark-info-icon": "",
+        "sp-toggle-1color": "1 Color",
+        "sp-toggle-2color": "2 Colors",
+        "sp-toggle-3color": "3 Colors",
+        "sp-toggle-4color": "4 Colors",
+        "sp-toggle-5color": "5 Colors",
+        "sp-toggle-6color": "6 Colors",
+        "sp-safety-stripes-toggle": "Safety Stripes Design 4-color design: +$2.00 per piece",
+        "sp-tier-24-47": "24-47 pieces + $50 Small Batch Fee",
+        "sp-qty-24-47": "",
+        "sp-ltm-calc-24-47": "$50 ÷ 37 = $1.35/piece",
+        "sp-tier-48-71": "48-71 pieces",
+        "sp-tier-72-144": "72-144 pieces",
+        "sp-tier-145-576": "145+ pieces",
+        "sp-additional-locations-header": "Additional Print Locations Add up to 3 additional locations",
+        "sp-additional-locations-container": "",
+        "sp-add-location": "Add Location",
+        "sp-pricing-tier-label": "24-47 pieces (37 selected)",
+        "sp-live-price-amount": "$13.85",
+        "sp-upcharge-info-icon": "",
+        "sp-setup-fee-badge": "",
+        "sp-toggle-breakdown-text": "View Detailed Breakdown",
+        "calculator-inventory-section": "Jet Black 875 units Warehouse S M L XL 2XL 3XL 4XL Synthetic warehouse 125 125 125 125 125 125 125 TOTAL 125 125 125 125 125 125 125"
+      },
+      "fields": [
+        {
+          "id": "styleSearch",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "sp-qty-24-47",
+          "name": "",
+          "type": "number",
+          "value": "37",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/product.html?style=PC54",
+          "text": "Products"
+        }
+      ],
+      "tables": [
+        "Warehouse S M L XL 2XL 3XL 4XL Synthetic warehouse 125 125 125 125 125 125 125 TOTAL 125 125 125 125 125 125 125"
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Screen Print Pricing Calculator | Northwest Custom Apparel",
+      "url": "/calculators/screen-print-pricing.html?StyleNumber=PC54&COLOR=Jet%20Black",
+      "ids": {
+        "products-breadcrumb": "Products",
+        "styleSearch": "",
+        "searchBtn": "",
+        "search-results-live": "",
+        "productImage": "",
+        "imageThumbnails": "",
+        "productTitle": "Essential Cotton Tee",
+        "productDescription": "Comfortable, durable cotton apparel for the whole team.",
+        "currentColor": "Jet Black",
+        "currentStyle": "#PC54",
+        "currentBrand": "Port & Company",
+        "colorSwatches": "",
+        "sp-dark-info-icon": "",
+        "sp-toggle-1color": "1 Color",
+        "sp-toggle-2color": "2 Colors",
+        "sp-toggle-3color": "3 Colors",
+        "sp-toggle-4color": "4 Colors",
+        "sp-toggle-5color": "5 Colors",
+        "sp-toggle-6color": "6 Colors",
+        "sp-safety-stripes-toggle": "Safety Stripes Design 4-color design: +$2.00 per piece",
+        "sp-tier-24-47": "24-47 pieces + $50 Small Batch Fee",
+        "sp-qty-24-47": "",
+        "sp-ltm-calc-24-47": "$50 ÷ 37 = $1.35/piece",
+        "sp-tier-48-71": "48-71 pieces",
+        "sp-tier-72-144": "72-144 pieces",
+        "sp-tier-145-576": "145+ pieces",
+        "sp-additional-locations-header": "Additional Print Locations Add up to 3 additional locations",
+        "sp-additional-locations-container": "",
+        "sp-add-location": "Add Location",
+        "sp-pricing-tier-label": "24-47 pieces (37 selected)",
+        "sp-live-price-amount": "$13.85",
+        "sp-upcharge-info-icon": "",
+        "sp-setup-fee-badge": "",
+        "sp-toggle-breakdown-text": "View Detailed Breakdown",
+        "calculator-inventory-section": "Jet Black 875 units Warehouse S M L XL 2XL 3XL 4XL Synthetic warehouse 125 125 125 125 125 125 125 TOTAL 125 125 125 125 125 125 125"
+      },
+      "fields": [
+        {
+          "id": "styleSearch",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "sp-qty-24-47",
+          "name": "",
+          "type": "number",
+          "value": "37",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/product.html?style=PC54",
+          "text": "Products"
+        }
+      ],
+      "tables": [
+        "Warehouse S M L XL 2XL 3XL 4XL Synthetic warehouse 125 125 125 125 125 125 125 TOTAL 125 125 125 125 125 125 125"
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Screen Print Pricing Calculator | Northwest Custom Apparel",
+      "url": "/calculators/screen-print-pricing.html?StyleNumber=PC54&COLOR=Jet%20Black",
+      "ids": {
+        "products-breadcrumb": "Products",
+        "styleSearch": "",
+        "searchBtn": "",
+        "search-results-live": "",
+        "productImage": "",
+        "imageThumbnails": "",
+        "productTitle": "Essential Cotton Tee",
+        "productDescription": "Comfortable, durable cotton apparel for the whole team.",
+        "currentColor": "Jet Black",
+        "currentStyle": "#PC54",
+        "currentBrand": "Port & Company",
+        "colorSwatches": "",
+        "sp-dark-info-icon": "",
+        "sp-toggle-1color": "1 Color",
+        "sp-toggle-2color": "2 Colors",
+        "sp-toggle-3color": "3 Colors",
+        "sp-toggle-4color": "4 Colors",
+        "sp-toggle-5color": "5 Colors",
+        "sp-toggle-6color": "6 Colors",
+        "sp-safety-stripes-toggle": "Safety Stripes Design 4-color design: +$2.00 per piece",
+        "sp-tier-24-47": "24-47 pieces + $50 Small Batch Fee",
+        "sp-qty-24-47": "",
+        "sp-ltm-calc-24-47": "$50 ÷ 37 = $1.35/piece",
+        "sp-tier-48-71": "48-71 pieces",
+        "sp-tier-72-144": "72-144 pieces",
+        "sp-tier-145-576": "145+ pieces",
+        "sp-additional-locations-header": "Additional Print Locations Add up to 3 additional locations",
+        "sp-additional-locations-container": "",
+        "sp-add-location": "Add Location",
+        "sp-pricing-tier-label": "24-47 pieces (37 selected)",
+        "sp-live-price-amount": "$13.85",
+        "sp-upcharge-info-icon": "",
+        "sp-setup-fee-badge": "",
+        "sp-toggle-breakdown-text": "View Detailed Breakdown",
+        "calculator-inventory-section": "Jet Black 875 units Warehouse S M L XL 2XL 3XL 4XL Synthetic warehouse 125 125 125 125 125 125 125 TOTAL 125 125 125 125 125 125 125"
+      },
+      "fields": [
+        {
+          "id": "styleSearch",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "sp-qty-24-47",
+          "name": "",
+          "type": "number",
+          "value": "37",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/product.html?style=PC54",
+          "text": "Products"
+        }
+      ],
+      "tables": [
+        "Warehouse S M L XL 2XL 3XL 4XL Synthetic warehouse 125 125 125 125 125 125 125 TOTAL 125 125 125 125 125 125 125"
+      ]
+    }
+  ],
+  "dialogs": []
+}

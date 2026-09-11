@@ -1,5 +1,23 @@
 # Handover follow-ups — 2026-09-07
 
+## RELEASE CANDIDATE — v2026.09.11.5 five core calculators
+
+DTG, DTF, Embroidery, Cap Embroidery and Screen Print are reviewed and integrated with the verified .4 release at 8a180aa67829a414f24fb2d220e3b088bfda0ac8. This candidate versions 22 references for fourteen changed assets. All79 original source hashes are preserved through 114 reversible mappings; six financial services and31 controller financial functions remain unchanged.
+
+All80 full-page screens at1440/768/390/320 and all36 current paper pages in20 documents are visually reviewed. Forty main browser cases and ten added interaction cases passed in focused runs;345 source/ownership guards passed. The complete50-case group now joins the full release suite. Candidate204/225 reviewed,21pending; live remains .4/Heroku2107 at199/225,26pending until every full local gate, all four actual exact-source CI jobs and rollout verification pass.
+
+Next: run full application/CSS/browser/parity checks on this unchanged source, then release and verify the actual Heroku slug, source/compiled assets and anonymous access. No real business writes or device printing. Evidence: core-calculators-source-record.json and active-css-resume-state.json in the external artifact directory. Never rerun consumed helpers or recursively delete the node_modules junction.
+
+## REVIEWED — five core calculators, 2026-09-11
+
+DTG, DTF, Embroidery, Cap Embroidery and Screen Print now share Public Sans, canonical controls, scoped common CSS and five small page owners. Review covers 80 full-page screens at four widths, all 36 current pages in 20 print documents, search and help panels. All original prices, fees, quantities and tiers are compared with immutable contracts; six financial services and 31 controller financial function bodies remain unchanged. Fifty focused browser cases are defined: the main 40 passed, followed by all 10 added search/image/help checks; the complete set will run again in the full release gate. 340 source/ownership guards and CSS lint270 passed before adding these five manifest entries.
+
+Repairs include keyboard scroll surviving delayed inventory replacement; search bound to its actual results with arrow/Enter/Escape access; readable exact-quantity input; OSFA manual cap label; manual Screen Print heading; announced persistent failures; correct catalog-color inventory queries; restored Screen Print swatches; and compact complete print layouts. Original baseline caf0ddbe preserves79 source hashes,25 browser contracts and55 visually reviewed original paper pages. Current ledger has92 explicit reversible mappings.
+
+Candidate204/225 reviewed,21pending. Live remains v2026.09.11.4 / Heroku2107 / afc3678d at199/225,26pending until full local and exact-source CI release checks pass and rollout is verified. Merge the .4 release history into codex/core-calculators, then integrate on clean develop and version only changed assets before release. Remaining:14 other calculators/served archive, embroidery-contract-pricing, garment-designer and5 quote builders. Read memory/quote-builder-architecture.md before builders.
+
+Evidence: core-calculators-reviewed-record.json and active-css-resume-state.json in C:\Users\erik\.codex\visualizations\2026\09\07\01a07d90-9a4c-7e70-9e4e-c196377b7c6b. Final screen/control review evidence in C:\Users\erik\.codex\visualizations\2026\09\08\01a081d3-550f-7fc1-826b-bcdac1807b9a. Inventory failure diagnostic and search negative-control logs demonstrate the fixed defects. All old one-shot helpers are consumed; never rerun them. No business writes, emails, uploads, payments or device printing; node_modules is a junction and must never be recursively deleted.
+
 ## RELEASE CANDIDATE — v2026.09.11.4 Manual Pricing, Manual Laser and Shop Menu
 
 Reviewed source 40483ec8fb6e3e24abcf33d26eaf09f3ecad3246 is integrated with the verified catalog release on clean develop. This candidate versions 7 references for five changed assets and preserves every original source through explicit reversible mappings. Sixteen focused browser cases, 23 visually reviewed current paper pages and 274 source/ownership guards passed.
@@ -954,3 +972,7 @@ The full local1,204-case CSS sweep completed1,203 passes and one confirmation-to
 ## Verified cart release and next original captures — 2026-09-11
 
 Cart v2026.09.11.1/2104/2463ce82 is live191/225,34pending. All exact-source CI/full local gates and31 live checks passed. Custom Tees/Caps has35 passing original scenarios/36 immutable contracts,16 source guards; no application edits. Finish paper review and baseline backup before shared layout/focus/retry/storage repairs. API fixture prices are synthetic unit-fixture values, real engines unchanged.
+
+## Core calculator full-suite compatibility correction
+
+The first integrated full run passed build/lint/types and243 unit suites. Eleven assertions in three historical test files still required removed override files or duplicated hidden-state rules. They now verify canonical shared ownership, hidden behavior and asset order; all36 checks in the three suites pass. No application code, immutable price evidence or accessibility requirement changed. The corrected exact Deploy source must pass the complete local and CI gates before .5 rollout.

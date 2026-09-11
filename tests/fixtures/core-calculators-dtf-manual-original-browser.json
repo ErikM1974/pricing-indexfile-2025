@@ -1,0 +1,233 @@
+{
+  "states": [
+    {
+      "width": 1440,
+      "title": "DTF Transfer Pricing | NWCA",
+      "url": "/calculators/dtf-pricing.html?manualCost=4",
+      "ids": {
+        "products-breadcrumb": "Products",
+        "styleSearch": "",
+        "searchBtn": "",
+        "manual-mode-banner": "📋 Manual Pricing Calculator Base cost: $4.00 • Custom product pricing Back to Dashboard",
+        "imagePlaceholder": "Image Not Available",
+        "productTitle": "MANUAL",
+        "productDescription": "Base cost: $4.00 - No product images available in manual mode",
+        "currentColor": "Natural",
+        "currentStyle": "#MANUAL",
+        "currentBrand": "Manual Entry",
+        "dtf-location-toggles": "Up to 5\" x 5\" Small Left Chest Right Chest Left Sleeve Right Sleeve Back of Neck Up to 9\" x 12\" Medium Center Front Center Back Up to 12\" x 16.5\" Large Full Front Full Back",
+        "dtf-live-price": "16.50",
+        "dtf-upcharge-info-icon": "",
+        "dtf-setup-fee-badge": "",
+        "dtf-quantity-display": "24",
+        "dtf-locations-display": "1",
+        "calculator-inventory-section": ""
+      },
+      "fields": [
+        {
+          "id": "styleSearch",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/product.html?StyleNumber=MANUAL",
+          "text": "Products"
+        }
+      ],
+      "tables": []
+    },
+    {
+      "width": 768,
+      "title": "DTF Transfer Pricing | NWCA",
+      "url": "/calculators/dtf-pricing.html?manualCost=4",
+      "ids": {
+        "products-breadcrumb": "Products",
+        "styleSearch": "",
+        "searchBtn": "",
+        "manual-mode-banner": "📋 Manual Pricing Calculator Base cost: $4.00 • Custom product pricing Back to Dashboard",
+        "imagePlaceholder": "Image Not Available",
+        "productTitle": "MANUAL",
+        "productDescription": "Base cost: $4.00 - No product images available in manual mode",
+        "currentColor": "Natural",
+        "currentStyle": "#MANUAL",
+        "currentBrand": "Manual Entry",
+        "dtf-location-toggles": "Up to 5\" x 5\" Small Left Chest Right Chest Left Sleeve Right Sleeve Back of Neck Up to 9\" x 12\" Medium Center Front Center Back Up to 12\" x 16.5\" Large Full Front Full Back",
+        "dtf-live-price": "16.50",
+        "dtf-upcharge-info-icon": "",
+        "dtf-setup-fee-badge": "",
+        "dtf-quantity-display": "24",
+        "dtf-locations-display": "1",
+        "calculator-inventory-section": ""
+      },
+      "fields": [
+        {
+          "id": "styleSearch",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/product.html?StyleNumber=MANUAL",
+          "text": "Products"
+        }
+      ],
+      "tables": []
+    },
+    {
+      "width": 390,
+      "title": "DTF Transfer Pricing | NWCA",
+      "url": "/calculators/dtf-pricing.html?manualCost=4",
+      "ids": {
+        "products-breadcrumb": "Products",
+        "styleSearch": "",
+        "searchBtn": "",
+        "manual-mode-banner": "📋 Manual Pricing Calculator Base cost: $4.00 • Custom product pricing Back to Dashboard",
+        "imagePlaceholder": "Image Not Available",
+        "productTitle": "MANUAL",
+        "productDescription": "Base cost: $4.00 - No product images available in manual mode",
+        "currentColor": "Natural",
+        "currentStyle": "#MANUAL",
+        "currentBrand": "Manual Entry",
+        "dtf-location-toggles": "Up to 5\" x 5\" Small Left Chest Right Chest Left Sleeve Right Sleeve Back of Neck Up to 9\" x 12\" Medium Center Front Center Back Up to 12\" x 16.5\" Large Full Front Full Back",
+        "dtf-live-price": "16.50",
+        "dtf-upcharge-info-icon": "",
+        "dtf-setup-fee-badge": "",
+        "dtf-quantity-display": "24",
+        "dtf-locations-display": "1",
+        "calculator-inventory-section": ""
+      },
+      "fields": [
+        {
+          "id": "styleSearch",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/product.html?StyleNumber=MANUAL",
+          "text": "Products"
+        }
+      ],
+      "tables": []
+    },
+    {
+      "width": 320,
+      "title": "DTF Transfer Pricing | NWCA",
+      "url": "/calculators/dtf-pricing.html?manualCost=4",
+      "ids": {
+        "products-breadcrumb": "Products",
+        "styleSearch": "",
+        "searchBtn": "",
+        "manual-mode-banner": "📋 Manual Pricing Calculator Base cost: $4.00 • Custom product pricing Back to Dashboard",
+        "imagePlaceholder": "Image Not Available",
+        "productTitle": "MANUAL",
+        "productDescription": "Base cost: $4.00 - No product images available in manual mode",
+        "currentColor": "Natural",
+        "currentStyle": "#MANUAL",
+        "currentBrand": "Manual Entry",
+        "dtf-location-toggles": "Up to 5\" x 5\" Small Left Chest Right Chest Left Sleeve Right Sleeve Back of Neck Up to 9\" x 12\" Medium Center Front Center Back Up to 12\" x 16.5\" Large Full Front Full Back",
+        "dtf-live-price": "16.50",
+        "dtf-upcharge-info-icon": "",
+        "dtf-setup-fee-badge": "",
+        "dtf-quantity-display": "24",
+        "dtf-locations-display": "1",
+        "calculator-inventory-section": ""
+      },
+      "fields": [
+        {
+          "id": "styleSearch",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/product.html?StyleNumber=MANUAL",
+          "text": "Products"
+        }
+      ],
+      "tables": []
+    }
+  ],
+  "dialogs": []
+}

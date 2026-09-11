@@ -1,0 +1,189 @@
+{
+  "states": [
+    {
+      "width": 1440,
+      "title": "Embroidery Pricing | Northwest Custom Apparel",
+      "url": "/calculators/embroidery-pricing.html?StyleNumber=PC54&COLOR=Jet%20Black",
+      "ids": {
+        "products-breadcrumb": "Products",
+        "styleSearch": "",
+        "searchBtn": "",
+        "search-results-live": "",
+        "errorMessage": "API request failed: 503",
+        "loadingState": "No product selected. Please search for a product style number above."
+      },
+      "fields": [
+        {
+          "id": "styleSearch",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/product.html",
+          "text": "Products"
+        }
+      ],
+      "tables": []
+    },
+    {
+      "width": 768,
+      "title": "Embroidery Pricing | Northwest Custom Apparel",
+      "url": "/calculators/embroidery-pricing.html?StyleNumber=PC54&COLOR=Jet%20Black",
+      "ids": {
+        "products-breadcrumb": "Products",
+        "styleSearch": "",
+        "searchBtn": "",
+        "search-results-live": "",
+        "errorMessage": "API request failed: 503",
+        "loadingState": "No product selected. Please search for a product style number above."
+      },
+      "fields": [
+        {
+          "id": "styleSearch",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/product.html",
+          "text": "Products"
+        }
+      ],
+      "tables": []
+    },
+    {
+      "width": 390,
+      "title": "Embroidery Pricing | Northwest Custom Apparel",
+      "url": "/calculators/embroidery-pricing.html?StyleNumber=PC54&COLOR=Jet%20Black",
+      "ids": {
+        "products-breadcrumb": "Products",
+        "styleSearch": "",
+        "searchBtn": "",
+        "search-results-live": "",
+        "errorMessage": "API request failed: 503",
+        "loadingState": "No product selected. Please search for a product style number above."
+      },
+      "fields": [
+        {
+          "id": "styleSearch",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/product.html",
+          "text": "Products"
+        }
+      ],
+      "tables": []
+    },
+    {
+      "width": 320,
+      "title": "Embroidery Pricing | Northwest Custom Apparel",
+      "url": "/calculators/embroidery-pricing.html?StyleNumber=PC54&COLOR=Jet%20Black",
+      "ids": {
+        "products-breadcrumb": "Products",
+        "styleSearch": "",
+        "searchBtn": "",
+        "search-results-live": "",
+        "errorMessage": "API request failed: 503",
+        "loadingState": "No product selected. Please search for a product style number above."
+      },
+      "fields": [
+        {
+          "id": "styleSearch",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/product.html",
+          "text": "Products"
+        }
+      ],
+      "tables": []
+    }
+  ],
+  "dialogs": []
+}

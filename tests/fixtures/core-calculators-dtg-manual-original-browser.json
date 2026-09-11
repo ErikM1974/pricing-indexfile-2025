@@ -1,0 +1,277 @@
+{
+  "states": [
+    {
+      "width": 1440,
+      "title": "DTG Pricing | Northwest Custom Apparel",
+      "url": "/calculators/dtg-pricing.html?manualCost=4",
+      "ids": {
+        "products-breadcrumb": "Products",
+        "styleSearch": "",
+        "searchBtn": "",
+        "search-results-live": "",
+        "manual-mode-banner": "📋 Manual Pricing Calculator Base cost: $4.00 • Custom product pricing Back to Dashboard",
+        "imagePlaceholder": "Product Image",
+        "productTitle": "DTG Manual Pricing ($4.00 Base Cost)",
+        "productDescription": "Base cost: $4.00 - No product images available in manual mode",
+        "currentColor": "Natural",
+        "currentStyle": "Manual Mode",
+        "currentBrand": "Port & Company",
+        "toggle-LC": "Left Chest 4\"×4\"",
+        "toggle-BON": "Back of Neck 4\"×4\"",
+        "toggle-FF": "Full Front 12\"×16\"",
+        "toggle-FB": "Full Back 12\"×16\"",
+        "toggle-JF": "Jumbo Front 16\"×20\"",
+        "toggle-JB": "Jumbo Back 16\"×20\"",
+        "tier-1-11": "1-11 pieces + $25 Small Batch Fee",
+        "tier-12-23": "12-23 pieces + $25 Small Batch Fee",
+        "tier-24-47": "24-47 pieces",
+        "tier-48-71": "48-71 pieces",
+        "tier-72+": "72+ pieces",
+        "live-price-amount": "$17.00",
+        "upcharge-info-icon": "",
+        "setup-fee-badge": "",
+        "live-price-detail": "Left Chest • 24-47 pieces",
+        "calculator-inventory-section": "",
+        "dtg-recommendations-grid": ""
+      },
+      "fields": [
+        {
+          "id": "styleSearch",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/product.html",
+          "text": "Products"
+        }
+      ],
+      "tables": []
+    },
+    {
+      "width": 768,
+      "title": "DTG Pricing | Northwest Custom Apparel",
+      "url": "/calculators/dtg-pricing.html?manualCost=4",
+      "ids": {
+        "products-breadcrumb": "Products",
+        "styleSearch": "",
+        "searchBtn": "",
+        "search-results-live": "",
+        "manual-mode-banner": "📋 Manual Pricing Calculator Base cost: $4.00 • Custom product pricing Back to Dashboard",
+        "imagePlaceholder": "Product Image",
+        "productTitle": "DTG Manual Pricing ($4.00 Base Cost)",
+        "productDescription": "Base cost: $4.00 - No product images available in manual mode",
+        "currentColor": "Natural",
+        "currentStyle": "Manual Mode",
+        "currentBrand": "Port & Company",
+        "toggle-LC": "Left Chest 4\"×4\"",
+        "toggle-BON": "Back of Neck 4\"×4\"",
+        "toggle-FF": "Full Front 12\"×16\"",
+        "toggle-FB": "Full Back 12\"×16\"",
+        "toggle-JF": "Jumbo Front 16\"×20\"",
+        "toggle-JB": "Jumbo Back 16\"×20\"",
+        "tier-1-11": "1-11 pieces + $25 Small Batch Fee",
+        "tier-12-23": "12-23 pieces + $25 Small Batch Fee",
+        "tier-24-47": "24-47 pieces",
+        "tier-48-71": "48-71 pieces",
+        "tier-72+": "72+ pieces",
+        "live-price-amount": "$17.00",
+        "upcharge-info-icon": "",
+        "setup-fee-badge": "",
+        "live-price-detail": "Left Chest • 24-47 pieces",
+        "calculator-inventory-section": "",
+        "dtg-recommendations-grid": ""
+      },
+      "fields": [
+        {
+          "id": "styleSearch",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/product.html",
+          "text": "Products"
+        }
+      ],
+      "tables": []
+    },
+    {
+      "width": 390,
+      "title": "DTG Pricing | Northwest Custom Apparel",
+      "url": "/calculators/dtg-pricing.html?manualCost=4",
+      "ids": {
+        "products-breadcrumb": "Products",
+        "styleSearch": "",
+        "searchBtn": "",
+        "search-results-live": "",
+        "manual-mode-banner": "📋 Manual Pricing Calculator Base cost: $4.00 • Custom product pricing Back to Dashboard",
+        "imagePlaceholder": "Product Image",
+        "productTitle": "DTG Manual Pricing ($4.00 Base Cost)",
+        "productDescription": "Base cost: $4.00 - No product images available in manual mode",
+        "currentColor": "Natural",
+        "currentStyle": "Manual Mode",
+        "currentBrand": "Port & Company",
+        "toggle-LC": "Left Chest 4\"×4\"",
+        "toggle-BON": "Back of Neck 4\"×4\"",
+        "toggle-FF": "Full Front 12\"×16\"",
+        "toggle-FB": "Full Back 12\"×16\"",
+        "toggle-JF": "Jumbo Front 16\"×20\"",
+        "toggle-JB": "Jumbo Back 16\"×20\"",
+        "tier-1-11": "1-11 pieces + $25 Small Batch Fee",
+        "tier-12-23": "12-23 pieces + $25 Small Batch Fee",
+        "tier-24-47": "24-47 pieces",
+        "tier-48-71": "48-71 pieces",
+        "tier-72+": "72+ pieces",
+        "live-price-amount": "$17.00",
+        "upcharge-info-icon": "",
+        "setup-fee-badge": "",
+        "live-price-detail": "Left Chest • 24-47 pieces",
+        "calculator-inventory-section": "",
+        "dtg-recommendations-grid": ""
+      },
+      "fields": [
+        {
+          "id": "styleSearch",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/product.html",
+          "text": "Products"
+        }
+      ],
+      "tables": []
+    },
+    {
+      "width": 320,
+      "title": "DTG Pricing | Northwest Custom Apparel",
+      "url": "/calculators/dtg-pricing.html?manualCost=4",
+      "ids": {
+        "products-breadcrumb": "Products",
+        "styleSearch": "",
+        "searchBtn": "",
+        "search-results-live": "",
+        "manual-mode-banner": "📋 Manual Pricing Calculator Base cost: $4.00 • Custom product pricing Back to Dashboard",
+        "imagePlaceholder": "Product Image",
+        "productTitle": "DTG Manual Pricing ($4.00 Base Cost)",
+        "productDescription": "Base cost: $4.00 - No product images available in manual mode",
+        "currentColor": "Natural",
+        "currentStyle": "Manual Mode",
+        "currentBrand": "Port & Company",
+        "toggle-LC": "Left Chest 4\"×4\"",
+        "toggle-BON": "Back of Neck 4\"×4\"",
+        "toggle-FF": "Full Front 12\"×16\"",
+        "toggle-FB": "Full Back 12\"×16\"",
+        "toggle-JF": "Jumbo Front 16\"×20\"",
+        "toggle-JB": "Jumbo Back 16\"×20\"",
+        "tier-1-11": "1-11 pieces + $25 Small Batch Fee",
+        "tier-12-23": "12-23 pieces + $25 Small Batch Fee",
+        "tier-24-47": "24-47 pieces",
+        "tier-48-71": "48-71 pieces",
+        "tier-72+": "72+ pieces",
+        "live-price-amount": "$17.00",
+        "upcharge-info-icon": "",
+        "setup-fee-badge": "",
+        "live-price-detail": "Left Chest • 24-47 pieces",
+        "calculator-inventory-section": "",
+        "dtg-recommendations-grid": ""
+      },
+      "fields": [
+        {
+          "id": "styleSearch",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/product.html",
+          "text": "Products"
+        }
+      ],
+      "tables": []
+    }
+  ],
+  "dialogs": []
+}

@@ -1,0 +1,333 @@
+{
+  "states": [
+    {
+      "width": 1440,
+      "title": "DTG Pricing | Northwest Custom Apparel",
+      "url": "/calculators/dtg-pricing.html?StyleNumber=PC54&COLOR=Jet%20Black",
+      "ids": {
+        "products-breadcrumb": "Products",
+        "styleSearch": "",
+        "searchBtn": "",
+        "search-results-live": "",
+        "productImage": "",
+        "productTitle": "Essential Cotton Tee",
+        "productDescription": "Comfortable, durable cotton apparel for the whole team.",
+        "currentColor": "Brilliant Orange",
+        "currentStyle": "#PC54",
+        "currentBrand": "Port & Company",
+        "colorSwatches": "",
+        "toggle-LC": "Left Chest 4\"×4\"",
+        "toggle-BON": "Back of Neck 4\"×4\"",
+        "toggle-FF": "Full Front 12\"×16\"",
+        "toggle-FB": "Full Back 12\"×16\"",
+        "toggle-JF": "Jumbo Front 16\"×20\"",
+        "toggle-JB": "Jumbo Back 16\"×20\"",
+        "tier-1-11": "1-11 pieces + $25 Small Batch Fee",
+        "tier-12-23": "12-23 pieces + $25 Small Batch Fee",
+        "tier-24-47": "24-47 pieces",
+        "tier-48-71": "48-71 pieces",
+        "tier-72+": "72+ pieces",
+        "dtg-ltm-range": "1-11",
+        "dtg-ltm-quantity-input": "",
+        "dtg-ltm-fee-amount": "$25",
+        "dtg-ltm-fee-calc": "$25.00 ÷ 6 = $4.16/shirt",
+        "live-price-amount": "$35.16",
+        "upcharge-info-icon": "",
+        "setup-fee-badge": "",
+        "live-price-detail": "Left Chest + Full Back • 1-11 pieces",
+        "calculator-inventory-section": "Brilliant Orange Warehouse Inventory 875 units Warehouse S M L XL 2XL 3XL 4XL Synthetic warehouse 125 125 125 125 125 125 125 TOTAL 125 125 125 125 125 125 125",
+        "dtg-recommendations-grid": "T-Shirts ⭐ Top Seller PC54 Core Cotton Tee ★★★★★ Best Colors: Jet Black, Dk Hthr Grey... Load This Style ⭐ Top Seller PC61 Essential Tee ★★★★★ Best Colors: Jet Black, Navy... Load This Style ⭐ Top Seller PC450 Fan Favorite Tee ★★★★★ Best Colors: Jet Black, Heather Navy... Load This Style 👍 Popular PC55 Core Blend Tee ★★★★☆ Best Colors: Jet Black, Navy... Load This Style 👍 Popular BC3001 Unisex Jersey Tee ★★★★☆ Best Colors: Black, Navy... Load This Style Hoodies & Sweatshirts ⭐ Top Seller PC78H Core Fleece Pullover Hooded Sweatshirt ★★★★★ Best Colors: Jet Black, Dark Heather Grey... Load This Style ⭐ Top Seller PC850H Fan Favorite Fleece Pullover Hooded Sweatshirt ★★★★★ Best Colors: Black, Dark Heather Grey... Load This Style"
+      },
+      "fields": [
+        {
+          "id": "styleSearch",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtg-ltm-quantity-input",
+          "name": "",
+          "type": "number",
+          "value": "6",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/product.html?style=PC54",
+          "text": "Products"
+        }
+      ],
+      "tables": [
+        "Warehouse S M L XL 2XL 3XL 4XL Synthetic warehouse 125 125 125 125 125 125 125 TOTAL 125 125 125 125 125 125 125"
+      ]
+    },
+    {
+      "width": 768,
+      "title": "DTG Pricing | Northwest Custom Apparel",
+      "url": "/calculators/dtg-pricing.html?StyleNumber=PC54&COLOR=Jet%20Black",
+      "ids": {
+        "products-breadcrumb": "Products",
+        "styleSearch": "",
+        "searchBtn": "",
+        "search-results-live": "",
+        "productImage": "",
+        "productTitle": "Essential Cotton Tee",
+        "productDescription": "Comfortable, durable cotton apparel for the whole team.",
+        "currentColor": "Brilliant Orange",
+        "currentStyle": "#PC54",
+        "currentBrand": "Port & Company",
+        "colorSwatches": "",
+        "toggle-LC": "Left Chest 4\"×4\"",
+        "toggle-BON": "Back of Neck 4\"×4\"",
+        "toggle-FF": "Full Front 12\"×16\"",
+        "toggle-FB": "Full Back 12\"×16\"",
+        "toggle-JF": "Jumbo Front 16\"×20\"",
+        "toggle-JB": "Jumbo Back 16\"×20\"",
+        "tier-1-11": "1-11 pieces + $25 Small Batch Fee",
+        "tier-12-23": "12-23 pieces + $25 Small Batch Fee",
+        "tier-24-47": "24-47 pieces",
+        "tier-48-71": "48-71 pieces",
+        "tier-72+": "72+ pieces",
+        "dtg-ltm-range": "1-11",
+        "dtg-ltm-quantity-input": "",
+        "dtg-ltm-fee-amount": "$25",
+        "dtg-ltm-fee-calc": "$25.00 ÷ 6 = $4.16/shirt",
+        "live-price-amount": "$35.16",
+        "upcharge-info-icon": "",
+        "setup-fee-badge": "",
+        "live-price-detail": "Left Chest + Full Back • 1-11 pieces",
+        "calculator-inventory-section": "Brilliant Orange 875 units Warehouse S M L XL 2XL 3XL 4XL Synthetic warehouse 125 125 125 125 125 125 125 TOTAL 125 125 125 125 125 125 125",
+        "dtg-recommendations-grid": "T-Shirts ⭐ Top Seller PC54 Core Cotton Tee ★★★★★ Best Colors: Jet Black, Dk Hthr Grey... Load This Style ⭐ Top Seller PC61 Essential Tee ★★★★★ Best Colors: Jet Black, Navy... Load This Style ⭐ Top Seller PC450 Fan Favorite Tee ★★★★★ Best Colors: Jet Black, Heather Navy... Load This Style 👍 Popular PC55 Core Blend Tee ★★★★☆ Best Colors: Jet Black, Navy... Load This Style 👍 Popular BC3001 Unisex Jersey Tee ★★★★☆ Best Colors: Black, Navy... Load This Style Hoodies & Sweatshirts ⭐ Top Seller PC78H Core Fleece Pullover Hooded Sweatshirt ★★★★★ Best Colors: Jet Black, Dark Heather Grey... Load This Style ⭐ Top Seller PC850H Fan Favorite Fleece Pullover Hooded Sweatshirt ★★★★★ Best Colors: Black, Dark Heather Grey... Load This Style"
+      },
+      "fields": [
+        {
+          "id": "styleSearch",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtg-ltm-quantity-input",
+          "name": "",
+          "type": "number",
+          "value": "6",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/product.html?style=PC54",
+          "text": "Products"
+        }
+      ],
+      "tables": [
+        "Warehouse S M L XL 2XL 3XL 4XL Synthetic warehouse 125 125 125 125 125 125 125 TOTAL 125 125 125 125 125 125 125"
+      ]
+    },
+    {
+      "width": 390,
+      "title": "DTG Pricing | Northwest Custom Apparel",
+      "url": "/calculators/dtg-pricing.html?StyleNumber=PC54&COLOR=Jet%20Black",
+      "ids": {
+        "products-breadcrumb": "Products",
+        "styleSearch": "",
+        "searchBtn": "",
+        "search-results-live": "",
+        "productImage": "",
+        "productTitle": "Essential Cotton Tee",
+        "productDescription": "Comfortable, durable cotton apparel for the whole team.",
+        "currentColor": "Brilliant Orange",
+        "currentStyle": "#PC54",
+        "currentBrand": "Port & Company",
+        "colorSwatches": "",
+        "toggle-LC": "Left Chest 4\"×4\"",
+        "toggle-BON": "Back of Neck 4\"×4\"",
+        "toggle-FF": "Full Front 12\"×16\"",
+        "toggle-FB": "Full Back 12\"×16\"",
+        "toggle-JF": "Jumbo Front 16\"×20\"",
+        "toggle-JB": "Jumbo Back 16\"×20\"",
+        "tier-1-11": "1-11 pieces + $25 Small Batch Fee",
+        "tier-12-23": "12-23 pieces + $25 Small Batch Fee",
+        "tier-24-47": "24-47 pieces",
+        "tier-48-71": "48-71 pieces",
+        "tier-72+": "72+ pieces",
+        "dtg-ltm-range": "1-11",
+        "dtg-ltm-quantity-input": "",
+        "dtg-ltm-fee-amount": "$25",
+        "dtg-ltm-fee-calc": "$25.00 ÷ 6 = $4.16/shirt",
+        "live-price-amount": "$35.16",
+        "upcharge-info-icon": "",
+        "setup-fee-badge": "",
+        "live-price-detail": "Left Chest + Full Back • 1-11 pieces",
+        "calculator-inventory-section": "Brilliant Orange 875 units Warehouse S M L XL 2XL 3XL 4XL Synthetic warehouse 125 125 125 125 125 125 125 TOTAL 125 125 125 125 125 125 125",
+        "dtg-recommendations-grid": "T-Shirts ⭐ Top Seller PC54 Core Cotton Tee ★★★★★ Best Colors: Jet Black, Dk Hthr Grey... Load This Style ⭐ Top Seller PC61 Essential Tee ★★★★★ Best Colors: Jet Black, Navy... Load This Style ⭐ Top Seller PC450 Fan Favorite Tee ★★★★★ Best Colors: Jet Black, Heather Navy... Load This Style 👍 Popular PC55 Core Blend Tee ★★★★☆ Best Colors: Jet Black, Navy... Load This Style 👍 Popular BC3001 Unisex Jersey Tee ★★★★☆ Best Colors: Black, Navy... Load This Style Hoodies & Sweatshirts ⭐ Top Seller PC78H Core Fleece Pullover Hooded Sweatshirt ★★★★★ Best Colors: Jet Black, Dark Heather Grey... Load This Style ⭐ Top Seller PC850H Fan Favorite Fleece Pullover Hooded Sweatshirt ★★★★★ Best Colors: Black, Dark Heather Grey... Load This Style"
+      },
+      "fields": [
+        {
+          "id": "styleSearch",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtg-ltm-quantity-input",
+          "name": "",
+          "type": "number",
+          "value": "6",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/product.html?style=PC54",
+          "text": "Products"
+        }
+      ],
+      "tables": [
+        "Warehouse S M L XL 2XL 3XL 4XL Synthetic warehouse 125 125 125 125 125 125 125 TOTAL 125 125 125 125 125 125 125"
+      ]
+    },
+    {
+      "width": 320,
+      "title": "DTG Pricing | Northwest Custom Apparel",
+      "url": "/calculators/dtg-pricing.html?StyleNumber=PC54&COLOR=Jet%20Black",
+      "ids": {
+        "products-breadcrumb": "Products",
+        "styleSearch": "",
+        "searchBtn": "",
+        "search-results-live": "",
+        "productImage": "",
+        "productTitle": "Essential Cotton Tee",
+        "productDescription": "Comfortable, durable cotton apparel for the whole team.",
+        "currentColor": "Brilliant Orange",
+        "currentStyle": "#PC54",
+        "currentBrand": "Port & Company",
+        "colorSwatches": "",
+        "toggle-LC": "Left Chest 4\"×4\"",
+        "toggle-BON": "Back of Neck 4\"×4\"",
+        "toggle-FF": "Full Front 12\"×16\"",
+        "toggle-FB": "Full Back 12\"×16\"",
+        "toggle-JF": "Jumbo Front 16\"×20\"",
+        "toggle-JB": "Jumbo Back 16\"×20\"",
+        "tier-1-11": "1-11 pieces + $25 Small Batch Fee",
+        "tier-12-23": "12-23 pieces + $25 Small Batch Fee",
+        "tier-24-47": "24-47 pieces",
+        "tier-48-71": "48-71 pieces",
+        "tier-72+": "72+ pieces",
+        "dtg-ltm-range": "1-11",
+        "dtg-ltm-quantity-input": "",
+        "dtg-ltm-fee-amount": "$25",
+        "dtg-ltm-fee-calc": "$25.00 ÷ 6 = $4.16/shirt",
+        "live-price-amount": "$35.16",
+        "upcharge-info-icon": "",
+        "setup-fee-badge": "",
+        "live-price-detail": "Left Chest + Full Back • 1-11 pieces",
+        "calculator-inventory-section": "Brilliant Orange 875 units Warehouse S M L XL 2XL 3XL 4XL Synthetic warehouse 125 125 125 125 125 125 125 TOTAL 125 125 125 125 125 125 125",
+        "dtg-recommendations-grid": "T-Shirts ⭐ Top Seller PC54 Core Cotton Tee ★★★★★ Best Colors: Jet Black, Dk Hthr Grey... Load This Style ⭐ Top Seller PC61 Essential Tee ★★★★★ Best Colors: Jet Black, Navy... Load This Style ⭐ Top Seller PC450 Fan Favorite Tee ★★★★★ Best Colors: Jet Black, Heather Navy... Load This Style 👍 Popular PC55 Core Blend Tee ★★★★☆ Best Colors: Jet Black, Navy... Load This Style 👍 Popular BC3001 Unisex Jersey Tee ★★★★☆ Best Colors: Black, Navy... Load This Style Hoodies & Sweatshirts ⭐ Top Seller PC78H Core Fleece Pullover Hooded Sweatshirt ★★★★★ Best Colors: Jet Black, Dark Heather Grey... Load This Style ⭐ Top Seller PC850H Fan Favorite Fleece Pullover Hooded Sweatshirt ★★★★★ Best Colors: Black, Dark Heather Grey... Load This Style"
+      },
+      "fields": [
+        {
+          "id": "styleSearch",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtg-ltm-quantity-input",
+          "name": "",
+          "type": "number",
+          "value": "6",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/product.html?style=PC54",
+          "text": "Products"
+        }
+      ],
+      "tables": [
+        "Warehouse S M L XL 2XL 3XL 4XL Synthetic warehouse 125 125 125 125 125 125 125 TOTAL 125 125 125 125 125 125 125"
+      ]
+    }
+  ],
+  "dialogs": []
+}
