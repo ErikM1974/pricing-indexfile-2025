@@ -1637,6 +1637,48 @@
       "after": "/shared_components/js/catalog-storefront-navigation.js?v=2026.09.11.3",
       "count": 1,
       "reason": "Refetch the reviewed catalog storefront asset at this release version."
+    },
+    {
+      "file": "index.html",
+      "before": "href=\"/shared_components/css/components.css\"",
+      "after": "href=\"/shared_components/css/components.css?v=2026.09.11.3\"",
+      "count": 1,
+      "reason": "Version newly imported existing shared stylesheet for the release hygiene/cache contract."
+    },
+    {
+      "file": "index.html",
+      "before": "href=\"/shared_components/css/storefront-shell.css\"",
+      "after": "href=\"/shared_components/css/storefront-shell.css?v=2026.09.11.3\"",
+      "count": 1,
+      "reason": "Version newly imported existing shared stylesheet for the release hygiene/cache contract."
+    },
+    {
+      "file": "pages/catalog.html",
+      "before": "href=\"/shared_components/css/components.css\"",
+      "after": "href=\"/shared_components/css/components.css?v=2026.09.11.3\"",
+      "count": 1,
+      "reason": "Version newly imported existing shared stylesheet for the release hygiene/cache contract."
+    },
+    {
+      "file": "pages/catalog.html",
+      "before": "href=\"/shared_components/css/storefront-shell.css\"",
+      "after": "href=\"/shared_components/css/storefront-shell.css?v=2026.09.11.3\"",
+      "count": 1,
+      "reason": "Version newly imported existing shared stylesheet for the release hygiene/cache contract."
+    },
+    {
+      "file": "product.html",
+      "before": "href=\"/shared_components/css/components.css\"",
+      "after": "href=\"/shared_components/css/components.css?v=2026.09.11.3\"",
+      "count": 1,
+      "reason": "Version newly imported existing shared stylesheet for the release hygiene/cache contract."
+    },
+    {
+      "file": "product.html",
+      "before": "href=\"/shared_components/css/storefront-shell.css\"",
+      "after": "href=\"/shared_components/css/storefront-shell.css?v=2026.09.11.3\"",
+      "count": 1,
+      "reason": "Version newly imported existing shared stylesheet for the release hygiene/cache contract."
     }
   ],
   "retiredStyles": []
