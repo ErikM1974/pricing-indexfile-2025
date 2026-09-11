@@ -1,5 +1,13 @@
 # Handover follow-ups — 2026-09-07
 
+## Polar Camel originals reviewed — 2026-09-11
+
+Twelve original checks pass across focused runs: nine visual states,64 native quantity/color boundaries, real logo edits/errors and the unchanged1800px PNG download, plus cached products with altered live policy. All36 full-page screens and51 paper pages in9 documents reviewed via25 screen and8 paper sheets. Product records/images are explicitly synthetic; the native pricing and engraving pipeline runs unchanged.
+
+Confirmed defects: cached computed tiers can disagree with current policy, failed stock reads claim out-of-stock, pricing-policy failures are silent, mobile controls/spacing waste space, and drawer/lightbox overlays repeat over every printed page. Preserve all successful prices and exact financial methods; reuse the reviewed storefront shell, canonical controls and a scoped page owner. Additional-charge captions remain an independent policy question: existing $5 logo/$50 artwork copy is not part of the computed total and must not be replaced with unrelated JDS-SETUP values without evidence.
+
+Richardson reviewed checkpoint f4021d92 is backed up. Candidate210/225,15pending; live remains verified .6/Heroku2109/75ef8019 at207/225,18pending. Next complete Polar Camel, then Safety Stripes and customer-supplied screen printing before full batch release gates. No business writes/env copies/junction deletion.
+
 ## REVIEWED CHECKPOINT — Richardson factory direct, 2026-09-11
 
 Richardson now uses Public Sans, canonical controls and scoped shared specialty/page styles. All 25 focused browser checks pass: original text/fields/links/request contracts, 72 native price combinations, eight category result sets, keyboard selection and delayed focus, mobile targets, alternate policy labels, and all five failed/incomplete reads. All 48 screens and 12 one-page PDFs reviewed (18 screen sheets, three paper sheets). A transient CDN logo failure was caught visually; asset readiness is now asserted and the affected case was rerun successfully with original logos. All five financial method bodies remain byte-for-byte unchanged; 37 original source hashes and 43 reversible mappings pass. All 320 source, ownership, token, lint and runtime inventory checks passed across focused reruns; the runtime census passed alone in 15 seconds after timing out under concurrent load. Final 25 Richardson browser checks and four shared-control regressions pass on the final source.

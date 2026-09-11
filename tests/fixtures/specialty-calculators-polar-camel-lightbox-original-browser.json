@@ -1,0 +1,1078 @@
+{
+  "states": [
+    {
+      "width": 1440,
+      "title": "Polar Camel Black 16 oz Pint - Laser Engraved Tumblers | Northwest Custom Apparel",
+      "url": "/calculators/laser-tumbler-polarcamel.html",
+      "ids": {
+        "navSearchInput": "",
+        "navSearchBtn": "",
+        "drawerClose": "",
+        "product-name": "Polar Camel 16 oz Pint",
+        "product-sku": "LTM752",
+        "product-description": "16 oz. stainless steel vacuum insulated pint with clear slider lid. Synthetic product data for browser checks.",
+        "color-selector-legend": "Choose Your Color",
+        "color-LTM752": "",
+        "color-LTM763": "",
+        "color-LTM765": "",
+        "color-LTM761": "",
+        "inventory-status": "In Our Warehouse In Stock Available Now: 12 units Supplier Inventory In Stock Available: 250 units Nearby Stock: 80 units",
+        "pricing-table-body": "1-11 Small Order + $50 LTM fee $19.50 per unit Less than minimum (LTM) fee of $50.00 applies to orders under 12 pieces. This covers personalized service and setup time for very small orders. 12-23 Small Order $19.50 per unit 24-119 Standard Order $18.50 per unit 120-239 Volume Order $17.50 per unit 240+ Bulk Order $16.50 per unit",
+        "ltmk-color-name": "Black",
+        "ltmk-drop-zone": "Drop your logo here or click to browse — PNG, JPG, SVG",
+        "ltmk-qty": "",
+        "ltmk-quote-result": "24 × $18.50 per tumbler $444.00 Estimated total $444.00 Includes one-location laser engraving. Plus any applicable charges listed above and sales tax.",
+        "ltmk-canvas": "",
+        "product-gallery": ""
+      },
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "color-LTM752",
+          "type": "radio",
+          "value": "LTM752",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "color-LTM763",
+          "type": "radio",
+          "value": "LTM763",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "color-LTM765",
+          "type": "radio",
+          "value": "LTM765",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "color-LTM761",
+          "type": "radio",
+          "value": "LTM761",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "ltmk-qty",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#main",
+          "text": "Skip to content"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/catalog",
+          "text": "Products"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "text": "Fall Catalog '26 New"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom Tees New"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats New"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Webstores"
+        },
+        {
+          "href": "/blog",
+          "text": "Blog"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "Stickers"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "text": "Get a Quote"
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts New"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats New"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers & Free Samples"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/catalog",
+          "text": "Catalog"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "text": "Fall Catalog '26"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "Custom Stickers"
+        },
+        {
+          "href": "/custom-banners",
+          "text": "Vinyl Banners"
+        },
+        {
+          "href": "/blog",
+          "text": "Blog"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "text": "Get a Quote"
+        },
+        {
+          "href": "/catalog?category=T-Shirts",
+          "text": "T-Shirts"
+        },
+        {
+          "href": "/catalog?category=Polos%2FKnits",
+          "text": "Polos & Knits"
+        },
+        {
+          "href": "/catalog?category=Sweatshirts%2FFleece",
+          "text": "Sweatshirts & Fleece"
+        },
+        {
+          "href": "/catalog?category=Caps",
+          "text": "Caps"
+        },
+        {
+          "href": "/catalog?category=Outerwear",
+          "text": "Outerwear"
+        },
+        {
+          "href": "/catalog?category=Workwear",
+          "text": "Workwear"
+        },
+        {
+          "href": "/catalog?category=Bags",
+          "text": "Bags"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "Call Us: 253-922-5793"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free Sample Program"
+        },
+        {
+          "href": "/golf-tournament-apparel?utm_source=laser-tumbler&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "text": "Tournament Packages"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "Laser-Engraved Tumblers"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Portal"
+        }
+      ],
+      "tables": [
+        "Quantity Price Per Unit 1-11 Small Order + $50 LTM fee $19.50 per unit Less than minimum (LTM) fee of $50.00 applies to orders under 12 pieces. This covers personalized service and setup time for very small orders. 12-23 Small Order $19.50 per unit 24-119 Standard Order $18.50 per unit 120-239 Volume Order $17.50 per unit 240+ Bulk Order $16.50 per unit"
+      ],
+      "headings": [
+        "Shop by category",
+        "Polar Camel 16 oz Pint",
+        "Pricing",
+        "Preview Your Logo & Get a Price",
+        "1 Upload your logo",
+        "3 Get your price",
+        "Product Images",
+        "Ready to Order?",
+        "Shop",
+        "Services",
+        "Contact"
+      ],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".pricing-notes > h4"
+            ],
+            [
+              ".ltmk-quote-note"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Polar Camel Black 16 oz Pint - Laser Engraved Tumblers | Northwest Custom Apparel",
+      "url": "/calculators/laser-tumbler-polarcamel.html",
+      "ids": {
+        "mobileMenuBtn": "",
+        "navSearchInput": "",
+        "navSearchBtn": "",
+        "drawerClose": "",
+        "product-name": "Polar Camel 16 oz Pint",
+        "product-sku": "LTM752",
+        "product-description": "16 oz. stainless steel vacuum insulated pint with clear slider lid. Synthetic product data for browser checks.",
+        "color-selector-legend": "Choose Your Color",
+        "color-LTM752": "",
+        "color-LTM763": "",
+        "color-LTM765": "",
+        "color-LTM761": "",
+        "inventory-status": "In Our Warehouse In Stock Available Now: 12 units Supplier Inventory In Stock Available: 250 units Nearby Stock: 80 units",
+        "pricing-table-body": "1-11 Small Order + $50 LTM fee $19.50 per unit Less than minimum (LTM) fee of $50.00 applies to orders under 12 pieces. This covers personalized service and setup time for very small orders. 12-23 Small Order $19.50 per unit 24-119 Standard Order $18.50 per unit 120-239 Volume Order $17.50 per unit 240+ Bulk Order $16.50 per unit",
+        "ltmk-color-name": "Black",
+        "ltmk-drop-zone": "Drop your logo here or click to browse — PNG, JPG, SVG",
+        "ltmk-qty": "",
+        "ltmk-quote-result": "24 × $18.50 per tumbler $444.00 Estimated total $444.00 Includes one-location laser engraving. Plus any applicable charges listed above and sales tax.",
+        "ltmk-canvas": "",
+        "product-gallery": ""
+      },
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "color-LTM752",
+          "type": "radio",
+          "value": "LTM752",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "color-LTM763",
+          "type": "radio",
+          "value": "LTM763",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "color-LTM765",
+          "type": "radio",
+          "value": "LTM765",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "color-LTM761",
+          "type": "radio",
+          "value": "LTM761",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "ltmk-qty",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#main",
+          "text": "Skip to content"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts New"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats New"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers & Free Samples"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/catalog",
+          "text": "Catalog"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "text": "Fall Catalog '26"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "Custom Stickers"
+        },
+        {
+          "href": "/custom-banners",
+          "text": "Vinyl Banners"
+        },
+        {
+          "href": "/blog",
+          "text": "Blog"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "text": "Get a Quote"
+        },
+        {
+          "href": "/catalog?category=T-Shirts",
+          "text": "T-Shirts"
+        },
+        {
+          "href": "/catalog?category=Polos%2FKnits",
+          "text": "Polos & Knits"
+        },
+        {
+          "href": "/catalog?category=Sweatshirts%2FFleece",
+          "text": "Sweatshirts & Fleece"
+        },
+        {
+          "href": "/catalog?category=Caps",
+          "text": "Caps"
+        },
+        {
+          "href": "/catalog?category=Outerwear",
+          "text": "Outerwear"
+        },
+        {
+          "href": "/catalog?category=Workwear",
+          "text": "Workwear"
+        },
+        {
+          "href": "/catalog?category=Bags",
+          "text": "Bags"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "Call Us: 253-922-5793"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free Sample Program"
+        },
+        {
+          "href": "/golf-tournament-apparel?utm_source=laser-tumbler&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "text": "Tournament Packages"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "Laser-Engraved Tumblers"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Portal"
+        }
+      ],
+      "tables": [
+        "Quantity Price Per Unit 1-11 Small Order + $50 LTM fee $19.50 per unit Less than minimum (LTM) fee of $50.00 applies to orders under 12 pieces. This covers personalized service and setup time for very small orders. 12-23 Small Order $19.50 per unit 24-119 Standard Order $18.50 per unit 120-239 Volume Order $17.50 per unit 240+ Bulk Order $16.50 per unit"
+      ],
+      "headings": [
+        "Shop by category",
+        "Polar Camel 16 oz Pint",
+        "Pricing",
+        "Preview Your Logo & Get a Price",
+        "1 Upload your logo",
+        "3 Get your price",
+        "Product Images",
+        "Ready to Order?",
+        "Shop",
+        "Services",
+        "Contact"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".pricing-notes > h4"
+            ],
+            [
+              ".ltmk-quote-note"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Polar Camel Black 16 oz Pint - Laser Engraved Tumblers | Northwest Custom Apparel",
+      "url": "/calculators/laser-tumbler-polarcamel.html",
+      "ids": {
+        "mobileMenuBtn": "",
+        "navSearchInput": "",
+        "navSearchBtn": "",
+        "drawerClose": "",
+        "product-name": "Polar Camel 16 oz Pint",
+        "product-sku": "LTM752",
+        "product-description": "16 oz. stainless steel vacuum insulated pint with clear slider lid. Synthetic product data for browser checks.",
+        "color-selector-legend": "Choose Your Color",
+        "color-LTM752": "",
+        "color-LTM763": "",
+        "color-LTM765": "",
+        "color-LTM761": "",
+        "inventory-status": "In Our Warehouse In Stock Available Now: 12 units Supplier Inventory In Stock Available: 250 units Nearby Stock: 80 units",
+        "pricing-table-body": "1-11 Small Order + $50 LTM fee $19.50 per unit Less than minimum (LTM) fee of $50.00 applies to orders under 12 pieces. This covers personalized service and setup time for very small orders. 12-23 Small Order $19.50 per unit 24-119 Standard Order $18.50 per unit 120-239 Volume Order $17.50 per unit 240+ Bulk Order $16.50 per unit",
+        "ltmk-color-name": "Black",
+        "ltmk-drop-zone": "Drop your logo here or click to browse — PNG, JPG, SVG",
+        "ltmk-qty": "",
+        "ltmk-quote-result": "24 × $18.50 per tumbler $444.00 Estimated total $444.00 Includes one-location laser engraving. Plus any applicable charges listed above and sales tax.",
+        "ltmk-canvas": "",
+        "product-gallery": ""
+      },
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "color-LTM752",
+          "type": "radio",
+          "value": "LTM752",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "color-LTM763",
+          "type": "radio",
+          "value": "LTM763",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "color-LTM765",
+          "type": "radio",
+          "value": "LTM765",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "color-LTM761",
+          "type": "radio",
+          "value": "LTM761",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "ltmk-qty",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#main",
+          "text": "Skip to content"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts New"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats New"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers & Free Samples"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/catalog",
+          "text": "Catalog"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "text": "Fall Catalog '26"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "Custom Stickers"
+        },
+        {
+          "href": "/custom-banners",
+          "text": "Vinyl Banners"
+        },
+        {
+          "href": "/blog",
+          "text": "Blog"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "text": "Get a Quote"
+        },
+        {
+          "href": "/catalog?category=T-Shirts",
+          "text": "T-Shirts"
+        },
+        {
+          "href": "/catalog?category=Polos%2FKnits",
+          "text": "Polos & Knits"
+        },
+        {
+          "href": "/catalog?category=Sweatshirts%2FFleece",
+          "text": "Sweatshirts & Fleece"
+        },
+        {
+          "href": "/catalog?category=Caps",
+          "text": "Caps"
+        },
+        {
+          "href": "/catalog?category=Outerwear",
+          "text": "Outerwear"
+        },
+        {
+          "href": "/catalog?category=Workwear",
+          "text": "Workwear"
+        },
+        {
+          "href": "/catalog?category=Bags",
+          "text": "Bags"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "Call Us: 253-922-5793"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free Sample Program"
+        },
+        {
+          "href": "/golf-tournament-apparel?utm_source=laser-tumbler&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "text": "Tournament Packages"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "Laser-Engraved Tumblers"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Portal"
+        }
+      ],
+      "tables": [
+        "Quantity Price Per Unit 1-11 Small Order + $50 LTM fee $19.50 per unit Less than minimum (LTM) fee of $50.00 applies to orders under 12 pieces. This covers personalized service and setup time for very small orders. 12-23 Small Order $19.50 per unit 24-119 Standard Order $18.50 per unit 120-239 Volume Order $17.50 per unit 240+ Bulk Order $16.50 per unit"
+      ],
+      "headings": [
+        "Shop by category",
+        "Polar Camel 16 oz Pint",
+        "Pricing",
+        "Preview Your Logo & Get a Price",
+        "1 Upload your logo",
+        "3 Get your price",
+        "Product Images",
+        "Ready to Order?",
+        "Shop",
+        "Services",
+        "Contact"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".pricing-notes > h4"
+            ],
+            [
+              ".ltmk-quote-note"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Polar Camel Black 16 oz Pint - Laser Engraved Tumblers | Northwest Custom Apparel",
+      "url": "/calculators/laser-tumbler-polarcamel.html",
+      "ids": {
+        "mobileMenuBtn": "",
+        "navSearchInput": "",
+        "navSearchBtn": "",
+        "drawerClose": "",
+        "product-name": "Polar Camel 16 oz Pint",
+        "product-sku": "LTM752",
+        "product-description": "16 oz. stainless steel vacuum insulated pint with clear slider lid. Synthetic product data for browser checks.",
+        "color-selector-legend": "Choose Your Color",
+        "color-LTM752": "",
+        "color-LTM763": "",
+        "color-LTM765": "",
+        "color-LTM761": "",
+        "inventory-status": "In Our Warehouse In Stock Available Now: 12 units Supplier Inventory In Stock Available: 250 units Nearby Stock: 80 units",
+        "pricing-table-body": "1-11 Small Order + $50 LTM fee $19.50 per unit Less than minimum (LTM) fee of $50.00 applies to orders under 12 pieces. This covers personalized service and setup time for very small orders. 12-23 Small Order $19.50 per unit 24-119 Standard Order $18.50 per unit 120-239 Volume Order $17.50 per unit 240+ Bulk Order $16.50 per unit",
+        "ltmk-color-name": "Black",
+        "ltmk-drop-zone": "Drop your logo here or click to browse — PNG, JPG, SVG",
+        "ltmk-qty": "",
+        "ltmk-quote-result": "24 × $18.50 per tumbler $444.00 Estimated total $444.00 Includes one-location laser engraving. Plus any applicable charges listed above and sales tax.",
+        "ltmk-canvas": "",
+        "product-gallery": ""
+      },
+      "fields": [
+        {
+          "id": "navSearchInput",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "color-LTM752",
+          "type": "radio",
+          "value": "LTM752",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "color-LTM763",
+          "type": "radio",
+          "value": "LTM763",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "color-LTM765",
+          "type": "radio",
+          "value": "LTM765",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "color-LTM761",
+          "type": "radio",
+          "value": "LTM761",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "ltmk-qty",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#main",
+          "text": "Skip to content"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff"
+        },
+        {
+          "href": "/",
+          "text": ""
+        },
+        {
+          "href": "/",
+          "text": "Home"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts New"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats New"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers & Free Samples"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/catalog",
+          "text": "Catalog"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "text": "Fall Catalog '26"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "Custom Stickers"
+        },
+        {
+          "href": "/custom-banners",
+          "text": "Vinyl Banners"
+        },
+        {
+          "href": "/blog",
+          "text": "Blog"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "text": "Get a Quote"
+        },
+        {
+          "href": "/catalog?category=T-Shirts",
+          "text": "T-Shirts"
+        },
+        {
+          "href": "/catalog?category=Polos%2FKnits",
+          "text": "Polos & Knits"
+        },
+        {
+          "href": "/catalog?category=Sweatshirts%2FFleece",
+          "text": "Sweatshirts & Fleece"
+        },
+        {
+          "href": "/catalog?category=Caps",
+          "text": "Caps"
+        },
+        {
+          "href": "/catalog?category=Outerwear",
+          "text": "Outerwear"
+        },
+        {
+          "href": "/catalog?category=Workwear",
+          "text": "Workwear"
+        },
+        {
+          "href": "/catalog?category=Bags",
+          "text": "Bags"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "Call Us: 253-922-5793"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Top Sellers"
+        },
+        {
+          "href": "/brands.html",
+          "text": "Brands"
+        },
+        {
+          "href": "/custom-tees",
+          "text": "Custom T-Shirts"
+        },
+        {
+          "href": "/custom-caps",
+          "text": "Custom Hats"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "text": "Free Sample Program"
+        },
+        {
+          "href": "/golf-tournament-apparel?utm_source=laser-tumbler&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "text": "Tournament Packages"
+        },
+        {
+          "href": "/company-webstores",
+          "text": "Custom Webstores"
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "text": "Laser-Engraved Tumblers"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Portal"
+        }
+      ],
+      "tables": [
+        "Quantity Price Per Unit 1-11 Small Order + $50 LTM fee $19.50 per unit Less than minimum (LTM) fee of $50.00 applies to orders under 12 pieces. This covers personalized service and setup time for very small orders. 12-23 Small Order $19.50 per unit 24-119 Standard Order $18.50 per unit 120-239 Volume Order $17.50 per unit 240+ Bulk Order $16.50 per unit"
+      ],
+      "headings": [
+        "Shop by category",
+        "Polar Camel 16 oz Pint",
+        "Pricing",
+        "Preview Your Logo & Get a Price",
+        "1 Upload your logo",
+        "3 Get your price",
+        "Product Images",
+        "Ready to Order?",
+        "Shop",
+        "Services",
+        "Contact"
+      ],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".pricing-notes > h4"
+            ],
+            [
+              ".ltmk-quote-note"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "mocked": [
+    {
+      "path": "/api/service-codes",
+      "method": "GET"
+    },
+    {
+      "path": "/api/jds/products",
+      "method": "POST",
+      "body": {
+        "skus": [
+          "LTM752",
+          "LTM763",
+          "LTM765",
+          "LTM761"
+        ]
+      }
+    },
+    {
+      "path": "/api/manageorders/inventorylevels?PartNumber=LTM752&PartColor=Black",
+      "method": "GET"
+    },
+    {
+      "path": "/api/jds-catalog?category=Drinkware",
+      "method": "GET"
+    }
+  ],
+  "dialogs": []
+}

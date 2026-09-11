@@ -47,6 +47,7 @@ async function open(page, state = {}) {
     page.on('dialog', async (dialog) => { events.dialogs.push(dialog.message()); await dialog.dismiss(); });
     await page.context().route('**/*', async (route) => {
         const req = route.request(), url = new URL(req.url()), filePath = url.pathname, method = req.method();
+        if (state.route) { const mock = await state.route(route); if (mock) return route.fulfill(mock); }
         if (state.chat && filePath === '/api/quote-sequence/PATCH' && method === 'GET') {
             events.mocked.push({path: filePath, method});
             return route.fulfill({json: {prefix: 'PATCH', year: 2026, sequence: 901}});

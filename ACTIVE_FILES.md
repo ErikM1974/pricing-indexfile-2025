@@ -1038,3 +1038,29 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - tests/fixtures/specialty-calculators-richardson-tiers-categories-original-browser.json — immutable synthetic Richardson calculator evidence.
 
 - calculators/richardson-2025-styles.css — reviewed scoped Richardson owner using canonical specialty controls, responsive cap browsing and complete print output.
+
+- tests/e2e/helpers/polar-camel-browser.js — isolated synthetic product, inventory, native pricing and real local canvas checks for Polar Camel CSS review.
+
+- tests/e2e/css-unification-specialty-polar-camel.spec.js — isolated synthetic product, inventory, native pricing and real local canvas checks for Polar Camel CSS review.
+
+- tests/fixtures/specialty-calculators-polar-camel-normal-original-browser.json — immutable synthetic Polar Camel browser and native financial evidence.
+
+- tests/fixtures/specialty-calculators-polar-camel-zero-stock-original-browser.json — immutable synthetic Polar Camel browser and native financial evidence.
+
+- tests/fixtures/specialty-calculators-polar-camel-failed-product-original-browser.json — immutable synthetic Polar Camel browser and native financial evidence.
+
+- tests/fixtures/specialty-calculators-polar-camel-failed-policy-original-browser.json — immutable synthetic Polar Camel browser and native financial evidence.
+
+- tests/fixtures/specialty-calculators-polar-camel-failed-inventory-original-browser.json — immutable synthetic Polar Camel browser and native financial evidence.
+
+- tests/fixtures/specialty-calculators-polar-camel-logo-original-browser.json — immutable synthetic Polar Camel browser and native financial evidence.
+
+- tests/fixtures/specialty-calculators-polar-camel-artwork-warning-original-browser.json — immutable synthetic Polar Camel browser and native financial evidence.
+
+- tests/fixtures/specialty-calculators-polar-camel-lightbox-original-browser.json — immutable synthetic Polar Camel browser and native financial evidence.
+
+- tests/fixtures/specialty-calculators-polar-camel-drawer-original-browser.json — immutable synthetic Polar Camel browser and native financial evidence.
+
+- tests/fixtures/specialty-calculators-polar-camel-tiers-colors-original-browser.json — immutable synthetic Polar Camel browser and native financial evidence.
+
+- tests/fixtures/specialty-calculators-polar-camel-cached-policy-original-browser.json — immutable synthetic Polar Camel browser and native financial evidence.
