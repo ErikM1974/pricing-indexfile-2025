@@ -1,0 +1,207 @@
+{
+  "views": [
+    {
+      "width": 1440,
+      "title": "LNP-7401 · Unknown company | Job Portal — Northwest Custom Apparel",
+      "text": "Example Screen Printing — Job Portal Screen-print jobs from Northwest Custom Apparel River Sample Sign out All jobs LNP-7401 Unknown company Requested RUSH Work Order REQUESTED Sep 8, 2026 NEEDED BY — EST. SHIP — TRANSFER TYPE — FABRIC — # COLORS — PRIMARY COLOR — ADDITIONAL COLORS — Print Lines No print lines on this job. Artwork & Working Files No files attached yet. Mockup No mockup attached. Activity & Messages Message for NWCA Post Ctrl+Enter posts. NWCA sees your note on the job. No activity yet. Northwest Custom Apparel · Milton, WA · (253) 922-5793",
+      "ids": {
+        "vp-vendor-name": "Example Screen Printing — Job Portal",
+        "vp-user-email": "River Sample",
+        "vp-back-btn": "All jobs",
+        "vp-d-id": "LNP-7401",
+        "vp-d-company": "Unknown company",
+        "vp-d-sub": "",
+        "vp-d-badges": "Requested RUSH",
+        "vp-d-meta": "REQUESTED Sep 8, 2026 NEEDED BY — EST. SHIP — TRANSFER TYPE — FABRIC — # COLORS — PRIMARY COLOR — ADDITIONAL COLORS —",
+        "vp-d-lines-empty": "No print lines on this job.",
+        "vp-d-files": "",
+        "vp-d-files-empty": "No files attached yet.",
+        "vp-d-mockup": "No mockup attached.",
+        "vp-comment-input": "",
+        "vp-comment-btn": "Post",
+        "vp-comment-hint": "Ctrl+Enter posts. NWCA sees your note on the job.",
+        "vp-d-notes": "No activity yet."
+      },
+      "links": [
+        {
+          "href": "/auth/vendor/logout",
+          "text": "Sign out",
+          "label": null
+        }
+      ],
+      "rows": [],
+      "overflow": false,
+      "axe": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#vp-user-email"
+            ],
+            [
+              "#vp-d-badges > .vp-badge--rush.vp-badge"
+            ],
+            [
+              "footer"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "LNP-7401 · Unknown company | Job Portal — Northwest Custom Apparel",
+      "text": "Example Screen Printing — Job Portal Screen-print jobs from Northwest Custom Apparel River Sample Sign out All jobs LNP-7401 Unknown company Requested RUSH Work Order REQUESTED Sep 8, 2026 NEEDED BY — EST. SHIP — TRANSFER TYPE — FABRIC — # COLORS — PRIMARY COLOR — ADDITIONAL COLORS — Print Lines No print lines on this job. Artwork & Working Files No files attached yet. Mockup No mockup attached. Activity & Messages Message for NWCA Post Ctrl+Enter posts. NWCA sees your note on the job. No activity yet. Northwest Custom Apparel · Milton, WA · (253) 922-5793",
+      "ids": {
+        "vp-vendor-name": "Example Screen Printing — Job Portal",
+        "vp-user-email": "River Sample",
+        "vp-back-btn": "All jobs",
+        "vp-d-id": "LNP-7401",
+        "vp-d-company": "Unknown company",
+        "vp-d-sub": "",
+        "vp-d-badges": "Requested RUSH",
+        "vp-d-meta": "REQUESTED Sep 8, 2026 NEEDED BY — EST. SHIP — TRANSFER TYPE — FABRIC — # COLORS — PRIMARY COLOR — ADDITIONAL COLORS —",
+        "vp-d-lines-empty": "No print lines on this job.",
+        "vp-d-files": "",
+        "vp-d-files-empty": "No files attached yet.",
+        "vp-d-mockup": "No mockup attached.",
+        "vp-comment-input": "",
+        "vp-comment-btn": "Post",
+        "vp-comment-hint": "Ctrl+Enter posts. NWCA sees your note on the job.",
+        "vp-d-notes": "No activity yet."
+      },
+      "links": [
+        {
+          "href": "/auth/vendor/logout",
+          "text": "Sign out",
+          "label": null
+        }
+      ],
+      "rows": [],
+      "overflow": false,
+      "axe": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#vp-user-email"
+            ],
+            [
+              "#vp-d-badges > .vp-badge--rush.vp-badge"
+            ],
+            [
+              "footer"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "LNP-7401 · Unknown company | Job Portal — Northwest Custom Apparel",
+      "text": "Example Screen Printing — Job Portal River Sample Sign out All jobs LNP-7401 Unknown company Requested RUSH Work Order REQUESTED Sep 8, 2026 NEEDED BY — EST. SHIP — TRANSFER TYPE — FABRIC — # COLORS — PRIMARY COLOR — ADDITIONAL COLORS — Print Lines No print lines on this job. Artwork & Working Files No files attached yet. Mockup No mockup attached. Activity & Messages Message for NWCA Post Ctrl+Enter posts. NWCA sees your note on the job. No activity yet. Northwest Custom Apparel · Milton, WA · (253) 922-5793",
+      "ids": {
+        "vp-vendor-name": "Example Screen Printing — Job Portal",
+        "vp-user-email": "River Sample",
+        "vp-back-btn": "All jobs",
+        "vp-d-id": "LNP-7401",
+        "vp-d-company": "Unknown company",
+        "vp-d-sub": "",
+        "vp-d-badges": "Requested RUSH",
+        "vp-d-meta": "REQUESTED Sep 8, 2026 NEEDED BY — EST. SHIP — TRANSFER TYPE — FABRIC — # COLORS — PRIMARY COLOR — ADDITIONAL COLORS —",
+        "vp-d-lines-empty": "No print lines on this job.",
+        "vp-d-files": "",
+        "vp-d-files-empty": "No files attached yet.",
+        "vp-d-mockup": "No mockup attached.",
+        "vp-comment-input": "",
+        "vp-comment-btn": "Post",
+        "vp-comment-hint": "Ctrl+Enter posts. NWCA sees your note on the job.",
+        "vp-d-notes": "No activity yet."
+      },
+      "links": [
+        {
+          "href": "/auth/vendor/logout",
+          "text": "Sign out",
+          "label": null
+        }
+      ],
+      "rows": [],
+      "overflow": false,
+      "axe": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#vp-user-email"
+            ],
+            [
+              "#vp-d-badges > .vp-badge--rush.vp-badge"
+            ],
+            [
+              "footer"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "LNP-7401 · Unknown company | Job Portal — Northwest Custom Apparel",
+      "text": "Example Screen Printing — Job Portal River Sample Sign out All jobs LNP-7401 Unknown company Requested RUSH Work Order REQUESTED Sep 8, 2026 NEEDED BY — EST. SHIP — TRANSFER TYPE — FABRIC — # COLORS — PRIMARY COLOR — ADDITIONAL COLORS — Print Lines No print lines on this job. Artwork & Working Files No files attached yet. Mockup No mockup attached. Activity & Messages Message for NWCA Post Ctrl+Enter posts. NWCA sees your note on the job. No activity yet. Northwest Custom Apparel · Milton, WA · (253) 922-5793",
+      "ids": {
+        "vp-vendor-name": "Example Screen Printing — Job Portal",
+        "vp-user-email": "River Sample",
+        "vp-back-btn": "All jobs",
+        "vp-d-id": "LNP-7401",
+        "vp-d-company": "Unknown company",
+        "vp-d-sub": "",
+        "vp-d-badges": "Requested RUSH",
+        "vp-d-meta": "REQUESTED Sep 8, 2026 NEEDED BY — EST. SHIP — TRANSFER TYPE — FABRIC — # COLORS — PRIMARY COLOR — ADDITIONAL COLORS —",
+        "vp-d-lines-empty": "No print lines on this job.",
+        "vp-d-files": "",
+        "vp-d-files-empty": "No files attached yet.",
+        "vp-d-mockup": "No mockup attached.",
+        "vp-comment-input": "",
+        "vp-comment-btn": "Post",
+        "vp-comment-hint": "Ctrl+Enter posts. NWCA sees your note on the job.",
+        "vp-d-notes": "No activity yet."
+      },
+      "links": [
+        {
+          "href": "/auth/vendor/logout",
+          "text": "Sign out",
+          "label": null
+        }
+      ],
+      "rows": [],
+      "overflow": false,
+      "axe": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#vp-user-email"
+            ],
+            [
+              "#vp-d-badges > .vp-badge--rush.vp-badge"
+            ],
+            [
+              "footer"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "actions": [],
+  "reads": [
+    {
+      "path": "/api/vendor/jobs",
+      "query": ""
+    },
+    {
+      "path": "/api/vendor/jobs/LNP-7401",
+      "query": ""
+    }
+  ]
+}

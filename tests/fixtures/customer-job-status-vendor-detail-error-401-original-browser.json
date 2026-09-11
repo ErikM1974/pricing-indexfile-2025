@@ -1,0 +1,55 @@
+{
+  "views": [
+    {
+      "width": 1440,
+      "title": "Fixture sign in",
+      "text": "Vendor sign in",
+      "ids": {},
+      "links": [],
+      "rows": [],
+      "overflow": false,
+      "axe": []
+    },
+    {
+      "width": 768,
+      "title": "Fixture sign in",
+      "text": "Vendor sign in",
+      "ids": {},
+      "links": [],
+      "rows": [],
+      "overflow": false,
+      "axe": []
+    },
+    {
+      "width": 390,
+      "title": "Fixture sign in",
+      "text": "Vendor sign in",
+      "ids": {},
+      "links": [],
+      "rows": [],
+      "overflow": false,
+      "axe": []
+    },
+    {
+      "width": 320,
+      "title": "Fixture sign in",
+      "text": "Vendor sign in",
+      "ids": {},
+      "links": [],
+      "rows": [],
+      "overflow": false,
+      "axe": []
+    }
+  ],
+  "actions": [],
+  "reads": [
+    {
+      "path": "/api/vendor/jobs",
+      "query": ""
+    },
+    {
+      "path": "/api/vendor/jobs/LNP-7401",
+      "query": ""
+    }
+  ]
+}

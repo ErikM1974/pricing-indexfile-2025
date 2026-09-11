@@ -1,138 +1,94 @@
-/* order-status.css — customer order-status page (rides on custom-tees.css
-   tokens: paper ground, ink greens, Bricolage display type). */
+/* Order Status — shared primitives and a scoped fulfillment layout. */
+@layer components.pages {
+ :where([data-ui="unified"].status-body) .brand { display:flex; align-items:center; gap:var(--space-3); color:var(--ui-ink); text-decoration:none; min-width:0; }
+ :where([data-ui="unified"].status-body) .brand-text { display:grid; gap:var(--space-1); }
+ :where([data-ui="unified"].status-body) .brand-text strong { font-size:var(--font-size-md); }
+ :where([data-ui="unified"].status-body) .brand-text em { font-size:var(--font-size-sm); color:var(--ui-muted); font-style:normal; }
+ :where([data-ui="unified"].status-body) .head-contact { font-size:var(--font-size-md); }
+ :where([data-ui="unified"].status-body) .status-main { max-width:800px; }
+ :where([data-ui="unified"].status-body) .status-card { background:var(--ui-surface); border:1px solid var(--ui-line); border-radius:var(--radius-lg); padding:var(--space-6); overflow-wrap:anywhere; }
+ :where([data-ui="unified"].status-body) .status-card h1 { font-size:var(--font-size-2xl); margin:0 0 var(--space-2); }
+ :where([data-ui="unified"].status-body) .status-card > p { line-height:1.6; }
+ :where([data-ui="unified"].status-body) .status-kicker { margin:0 0 var(--space-2); color:var(--ui-accent); font-size:var(--font-size-md); font-weight:600; }
+ :where([data-ui="unified"].status-body) .status-style { margin:0; color:var(--ui-muted); }
+ :where([data-ui="unified"].status-body) .status-date { display:block; font-size:var(--font-size-sm); margin-top:var(--space-1); }
+ :where([data-ui="unified"].status-body) .status-rush { display:inline-block; margin:var(--space-1); padding:var(--space-1) var(--space-2); border-radius:var(--radius-pill); background:var(--color-warning-bg); color:var(--color-warning-ink); font-size:var(--font-size-sm); font-weight:700; }
+ :where([data-ui="unified"].status-body) .status-spin,:where([data-ui="unified"].status-body) .status-check { font-size:var(--font-size-display); color:var(--ui-accent); margin-bottom:var(--space-4); }
+ :where([data-ui="unified"].status-body) .status-check.is-amber { color:var(--color-warning-ink); }
+ :where([data-ui="unified"].status-body) .status-phone a { font-weight:600; }
+ :where([data-ui="unified"].status-body) .status-promise { background:var(--ui-tint); color:var(--ui-accent); border-left:3px solid var(--ui-accent); border-radius:var(--radius-sm); padding:var(--space-3) var(--space-4); margin:var(--space-5) 0; font-size:var(--font-size-md); }
+ :where([data-ui="unified"].status-body) .status-tracking { margin:var(--space-4) 0; }
+ :where([data-ui="unified"].status-body) .status-tracking .btn { white-space:normal; text-align:left; overflow-wrap:anywhere; }
+ :where([data-ui="unified"].status-body) .status-timeline { margin:var(--space-5) 0; }
+ :where([data-ui="unified"].status-body) .status-step { display:flex; gap:var(--space-4); align-items:flex-start; position:relative; padding-bottom:var(--space-5); }
+ :where([data-ui="unified"].status-body) .status-step:last-child { padding-bottom:0; }
+ :where([data-ui="unified"].status-body) .status-step:not(:last-child)::before { content:''; position:absolute; left:15px; top:32px; bottom:0; width:2px; background:var(--ui-line); }
+ :where([data-ui="unified"].status-body) .status-step.is-done::before { background:var(--ui-accent); }
+ :where([data-ui="unified"].status-body) .status-step-dot { flex:none; width:32px; height:32px; border:2px solid var(--ui-line); border-radius:50%; display:inline-flex; align-items:center; justify-content:center; background:var(--ui-surface); color:var(--ui-muted); font-size:var(--font-size-sm); }
+ :where([data-ui="unified"].status-body) .is-done .status-step-dot { background:var(--ui-accent); border-color:var(--ui-accent); color:var(--color-on-brand); }
+ :where([data-ui="unified"].status-body) .is-current .status-step-dot { border-color:var(--ui-accent); color:var(--ui-accent); background:var(--ui-tint); }
+ :where([data-ui="unified"].status-body) .status-step-body { min-width:0; }
+ :where([data-ui="unified"].status-body) .status-step-body strong { display:block; font-size:var(--font-size-md); }
+ :where([data-ui="unified"].status-body) .is-current .status-step-body strong { color:var(--ui-accent); }
+ :where([data-ui="unified"].status-body) .status-step-body small { display:block; margin-top:var(--space-1); color:var(--ui-muted); font-size:var(--font-size-sm); }
+ :where([data-ui="unified"].status-body) .status-pickup { display:flex; gap:var(--space-3); background:var(--ui-tint); border-radius:var(--radius-md); padding:var(--space-4); font-size:var(--font-size-md); }
+ :where([data-ui="unified"].status-body) .status-pickup strong { display:block; margin-bottom:var(--space-1); }
+ :where([data-ui="unified"].status-body) .status-pickup i { color:var(--ui-accent); }
+ :where([data-ui="unified"].status-body) .status-mockups { display:flex; gap:var(--space-4); flex-wrap:wrap; margin:var(--space-5) 0; }
+ :where([data-ui="unified"].status-body) .status-mockups:empty { margin:0; }
+ :where([data-ui="unified"].status-body) .status-mockups figure { margin:0; width:110px; }
+ :where([data-ui="unified"].status-body) .status-mockups img { width:100%; display:block; border:1px solid var(--ui-line); border-radius:var(--radius-sm); }
+ :where([data-ui="unified"].status-body) .status-mockups figcaption { font-size:var(--font-size-sm); color:var(--ui-muted); margin-top:var(--space-1); }
+ :where([data-ui="unified"].status-body) .status-h2 { margin:var(--space-5) 0 var(--space-3); padding-top:var(--space-5); border-top:1px solid var(--ui-line); font-size:var(--font-size-lg); }
+ :where([data-ui="unified"].status-body) .status-table { width:100%; border-collapse:collapse; table-layout:fixed; font-size:var(--font-size-md); text-align:left; }
+ :where([data-ui="unified"].status-body) .status-table th,:where([data-ui="unified"].status-body) .status-table td { padding:var(--space-3) var(--space-2); border-bottom:1px solid var(--ui-line); vertical-align:top; overflow-wrap:anywhere; }
+ :where([data-ui="unified"].status-body) .status-table th { color:var(--ui-muted); font-weight:600; }
+ :where([data-ui="unified"].status-body) .status-table th:first-child { width:38%; }
+ :where([data-ui="unified"].status-body) .status-table th:nth-child(3) { width:15%; }
+ :where([data-ui="unified"].status-body) .status-table th:nth-child(n+3),:where([data-ui="unified"].status-body) .status-table td:nth-child(n+3) { text-align:right; }
+ :where([data-ui="unified"].status-body) .status-summary { margin:var(--space-4) 0 0 auto; max-width:380px; }
+ :where([data-ui="unified"].status-body) .tot-row { display:flex; justify-content:space-between; gap:var(--space-4); padding:var(--space-2); font-size:var(--font-size-md); }
+ :where([data-ui="unified"].status-body) .tot-row span:last-child { flex:none; font-variant-numeric:tabular-nums; }
+ :where([data-ui="unified"].status-body) .tot-row.is-grand { border-top:2px solid var(--ui-ink); margin-top:var(--space-2); padding-top:var(--space-3); font-size:var(--font-size-lg); font-weight:700; }
+ :where([data-ui="unified"].status-body) .status-questions { margin:var(--space-5) 0 0; font-size:var(--font-size-md); color:var(--ui-muted); }
 
-.status-body { padding-bottom: 0; }
+ @media (width <= 560px) {
+  :where([data-ui="unified"].status-body) .page-main,:where([data-ui="unified"].status-body) .status-card,:where([data-ui="unified"].status-body) .page-header-inner { padding:var(--space-4); }
+  :where([data-ui="unified"].status-body) .page-header-logo { height:36px; }
+  :where([data-ui="unified"].status-body) .brand { align-items:flex-start; }
+  :where([data-ui="unified"].status-body) .brand-text { flex:1; }
+  :where([data-ui="unified"].status-body) .brand-text strong { font-size:var(--font-size-sm); }
+  :where([data-ui="unified"].status-body) .status-table th,:where([data-ui="unified"].status-body) .status-table td { padding:var(--space-2) var(--space-1); font-size:var(--font-size-sm); }
+ }
 
-.status-main {
-    max-width: 680px; margin: 0 auto; padding: 40px 18px 60px;
+ @media print {
+  @page { size:letter; margin:12mm; }
+  :where([data-ui="unified"].status-body) { background:var(--ui-surface); font-size:12px; }
+  :where([data-ui="unified"].status-body) .page-header { display:block; border-top:0; }
+  :where([data-ui="unified"].status-body) .page-header-inner { padding:0 0 10px; }
+  :where([data-ui="unified"].status-body) .page-header-logo { height:30px; }
+  :where([data-ui="unified"].status-body) .brand-text strong,:where([data-ui="unified"].status-body) .brand-text em,:where([data-ui="unified"].status-body) .head-contact { font-size:10px; }
+  :where([data-ui="unified"].status-body) .status-main { max-width:none; padding:12px 0 0; }
+  :where([data-ui="unified"].status-body) .status-card { padding:0; border:0; border-radius:0; }
+  :where([data-ui="unified"].status-body) .status-card h1 { font-size:20px; }
+  :where([data-ui="unified"].status-body) .status-style,:where([data-ui="unified"].status-body) .status-kicker { font-size:12px; }
+  :where([data-ui="unified"].status-body) .status-promise { margin:10px 0; padding:8px 10px; font-size:12px; }
+  :where([data-ui="unified"].status-body) .status-timeline { margin:12px 0; }
+  :where([data-ui="unified"].status-body) .status-step { padding-bottom:10px; break-inside:avoid; }
+  :where([data-ui="unified"].status-body) .status-step-body strong { font-size:12px; }
+  :where([data-ui="unified"].status-body) .status-step-body small { font-size:10px; margin-top:2px; }
+  :where([data-ui="unified"].status-body) .status-pickup { padding:8px 10px; font-size:11px; break-inside:avoid; }
+  :where([data-ui="unified"].status-body) .status-mockups { margin:10px 0; gap:10px; break-inside:avoid; }
+  :where([data-ui="unified"].status-body) .status-mockups figure { width:80px; }
+  :where([data-ui="unified"].status-body) .status-mockups figcaption { font-size:10px; }
+  :where([data-ui="unified"].status-body) .status-h2 { margin:12px 0 6px; padding-top:10px; font-size:14px; break-after:avoid; }
+  :where([data-ui="unified"].status-body) .status-table th,:where([data-ui="unified"].status-body) .status-table td { padding:5px 6px; font-size:11px; }
+  :where([data-ui="unified"].status-body) .status-table tr,:where([data-ui="unified"].status-body) .status-summary { break-inside:avoid; }
+  :where([data-ui="unified"].status-body) .status-summary { margin-top:8px; }
+  :where([data-ui="unified"].status-body) .tot-row { padding:4px 6px; font-size:11px; }
+  :where([data-ui="unified"].status-body) .tot-row.is-grand { margin-top:5px; padding-top:6px; font-size:14px; }
+  :where([data-ui="unified"].status-body) .status-questions { margin-top:12px; font-size:11px; break-inside:avoid; }
+  :where([data-ui="unified"].status-body) .page-footer { padding:10px 0 0; font-size:9px; break-inside:avoid; }
+  :where([data-ui="unified"].status-body) .status-tracking .btn { min-height:0; padding:6px 10px; font-size:11px; }
+ }
 }
-
-.status-card {
-    background: var(--card); border: 1px solid var(--line); border-radius: 16px;
-    box-shadow: var(--shadow-card); padding: 34px 28px; text-align: center;
-}
-.status-card h1 { font-size: 26px; font-weight: 800; margin-bottom: 6px; }
-.status-card > p { color: var(--ink-soft); }
-
-.status-kicker {
-    text-transform: uppercase; letter-spacing: 0.14em; font-size: 12px;
-    font-weight: 700; color: var(--green-700); margin-bottom: 4px;
-}
-.status-style { font-size: 15px; color: var(--ink-soft); }
-
-.status-style .status-rush {
-    display: inline-block; margin-left: 6px; padding: 2px 10px;
-    background: var(--rush-soft); color: var(--rush-deep);
-    border: 1px solid var(--rush); border-radius: 999px;
-    font-size: 12px; font-weight: 700;
-}
-
-.status-style .status-date {
-    display: block; font-size: 12.5px; color: var(--ink-faint); margin-top: 2px;
-}
-
-.status-spin { font-size: 34px; color: var(--green-700); margin-bottom: 14px; }
-.status-check { font-size: 46px; color: var(--green-700); margin-bottom: 14px; }
-.status-check.is-amber { color: var(--warn); }
-.status-phone a { font-weight: 700; }
-
-.status-promise {
-    display: inline-block; background: var(--green-50); color: var(--green-900);
-    border: 1px dashed var(--green-700); border-radius: 999px; padding: 8px 18px;
-    font-weight: 600; font-size: 14.5px; margin: 10px 0 4px;
-}
-.status-promise strong { font-family: var(--font-display); }
-
-.status-tracking { margin: 14px 0 4px; }
-.status-tracking .btn { text-decoration: none; }
-
-/* ── Timeline (4 steps) ──────────────────────────────────────────── */
-.status-timeline {
-    text-align: left; max-width: 460px; margin: 26px auto 6px;
-    display: grid; gap: 0; position: relative;
-}
-
-.status-step {
-    display: flex; gap: 14px; align-items: flex-start; position: relative;
-    padding-bottom: 22px;
-}
-.status-step:last-child { padding-bottom: 0; }
-
-/* connector line */
-.status-step:not(:last-child)::before {
-    content: ''; position: absolute; left: 15px; top: 32px; bottom: 0;
-    width: 2px; background: var(--line-strong);
-}
-.status-step.is-done:not(:last-child)::before { background: var(--green-700); }
-
-.status-step-dot {
-    flex: none; width: 32px; height: 32px; border-radius: 50%;
-    display: inline-flex; align-items: center; justify-content: center;
-    font-size: 13px; border: 2px solid var(--line-strong);
-    background: var(--card); color: var(--ink-faint); z-index: 1;
-}
-
-.status-step.is-done .status-step-dot {
-    background: var(--green-700); border-color: var(--green-700); color: var(--color-on-brand);
-}
-
-.status-step.is-current .status-step-dot {
-    background: var(--green-50); border-color: var(--green-700);
-    box-shadow: 0 0 0 4px var(--green-100);
-}
-.status-step-body strong { display: block; font-size: 15px; }
-.status-step.is-pending .status-step-body strong { color: var(--ink-faint); }
-.status-step.is-current .status-step-body strong { color: var(--green-900); }
-.status-step-body small { color: var(--ink-faint); font-size: 12.5px; }
-
-/* ── Pickup card ─────────────────────────────────────────────────── */
-.status-pickup {
-    display: flex; gap: 14px; align-items: flex-start; text-align: left;
-    max-width: 460px; margin: 18px auto 0;
-    background: var(--paper-deep); border: 1px solid var(--line);
-    border-radius: var(--radius); padding: 14px 16px;
-}
-.status-pickup i { color: var(--green-700); font-size: 20px; margin-top: 3px; }
-.status-pickup strong { display: block; font-size: 14.5px; }
-.status-pickup span { font-size: 13px; color: var(--ink-soft); }
-
-/* ── Mockups ─────────────────────────────────────────────────────── */
-.status-mockups { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin: 18px 0 4px; }
-.status-mockups figure { margin: 0; width: 110px; }
-.status-mockups img { width: 100%; border-radius: 10px; border: 1px solid var(--line); background: var(--paper-deep); }
-.status-mockups figcaption { font-size: 11px; color: var(--ink-faint); margin-top: 3px; }
-
-/* ── Order summary ───────────────────────────────────────────────── */
-.status-h2 {
-    font-size: 17px; margin-top: 26px; padding-top: 18px;
-    border-top: 1px solid var(--line);
-}
-.status-table-wrap { max-width: 460px; margin: 12px auto 0; overflow-x: auto; }
-.status-table { width: 100%; border-collapse: collapse; font-size: 14px; }
-
-.status-table th {
-    text-align: left; font-size: 11.5px; text-transform: uppercase;
-    letter-spacing: 0.06em; color: var(--ink-faint);
-    border-bottom: 1px solid var(--line-strong); padding: 4px 8px 6px;
-}
-.status-table td { padding: 6px 8px; border-bottom: 1px solid var(--line); }
-.status-table th:nth-child(n+3), .status-table td:nth-child(n+3) { text-align: right; }
-
-.status-summary { text-align: left; margin: 14px auto 0; max-width: 460px; }
-.status-summary .tot-row { display: flex; justify-content: space-between; font-size: 14px; padding: 3px 8px; }
-
-.status-summary .tot-row.is-grand {
-    font-family: var(--font-display); font-weight: 800; font-size: 18px;
-    border-top: 2px solid var(--ink); padding-top: 8px; margin-top: 6px;
-}
-
-.status-questions { margin-top: 22px; font-size: 13.5px; color: var(--ink-soft); }
-
-@media (width <= 560px) {
-    .status-card { padding: 26px 16px; }
-    .status-card h1 { font-size: 22px; }
-}
-
-/* 2026-09-05 review: the hidden attribute must beat any display rule */
-/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
-[hidden] { display: none !important; }

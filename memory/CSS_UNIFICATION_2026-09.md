@@ -1,5 +1,81 @@
 # CSS unification — design direction and implementation plan
 
+## RELEASE CHECK CORRECTION — existing monogram cancellation test
+
+All local status gates passed:240 unit suites/5,619 tests,88 DOM,four accessibility unit,84 quote parity,1,150 CSS checks and16 remaining browser checks including all five live calculators. Exact-source CI34559320512 passed three jobs and1,149 CSS cases, but its existing monogram print-cancellation case failed. It used a missing-thread warning, which intentionally does not invoke the error-only confirmation, then asserted before asynchronous printing finished locally. The corrected test uses a missing required size, asserts QA errors and explicitly awaits/dismisses the confirmation. Five consecutive focused browser repeats passed (22.2 seconds). Application code and assets are unchanged. Require a fresh exact-source CI before releasing .10; old9f021460 is superseded by this correction. Live remains .9/2101/0f518982; no .10 release merge/tag/deploy has occurred.
+
+## RELEASE CANDIDATE — v2026.09.10.10 Order Status and Job Portal
+
+Reviewed pair a878bceb is integrated at73cc615a with the legacy guard correction atf03b9117f3213b033795fbd4f8346559ae0ca14c. All240 unit suites/5,619 tests,88 DOM,four accessibility unit and84 quote parity checks pass; build/lint/types/routes/boot passed. The full1,150-case CSS browser sweep and remaining live pricing/browser checks are still running on that application SHA. This candidate changes only four HTML cache references, their reversible mappings and release notes; all four application CSS/JS assets remain identical. The exact candidate CI can run in parallel, but deployment requires both the complete local gate record and successful actual CSS/live-pricing CI steps.
+
+Live .9/2101 remains185/225. The reviewed pair brings the candidate to187/225,38 pending. Forty-six focused browser cases,10 visually reviewed current paper pages,10 immutable original source hashes and74 mappings preserve dates, quantities, totals, successful note payloads and keyboard access. Three important flags removed. Customer Account/Product originals are backed up separately atd3a5efff and excluded from this release. No real business writes, emails or printing.
+
+## INTEGRATED — Order Status and Job Portal full regression checks
+
+Reviewed pair a878bceb is integrated and backed up on primary develop at73cc615a. The initial whole-app run passed build, lint and types; seven legacy source-format assertions failed in two unit suites because visibility/focus now belong to shared components, filter classes are canonical, job cards are native buttons and Post includes a pending guard. Updated those assertions while preserving all accessibility requirements; both suites now pass22 tests. No application source or original evidence changed in this correction. Resume the remaining full unit/DOM/accessibility/parity, boot, CSS browser, pricing browser and release gates on the corrected commit before release. Live remains .9/2101,185 reviewed; this pair brings the reviewed candidate to187,38 pending. The separate codex/customer-account-pages branch starts at73cc615a with no account-page edits yet.
+
+## REVIEWED — Order Status and vendor Job Portal ready for integration
+
+Both pages adopt shared Public Sans/header/buttons/inputs and scoped page owners. Forty-six browser cases cover original values/links/rows at1440/768/390/320, all status/error modes, delayed retry, exact note payloads, duplicate keyboard submissions, separate job drafts, late responses, native card focus/history and failed image fallbacks. Seventy reversible mappings restore all10 original source hashes; the original38 browser JSONs remain immutable. Money/promise/render and vendor date/data functions stay byte-identical. Three important flags removed; shared custom-tees.css and CaspioDate unchanged.
+
+Seven current PDFs/10 pages visually reviewed: order paid1,pickup1,long2;vendor list1,normal detail1,dated detail1,long detail3. Every long row, size, quantity, dimension, note and order amount remains present; no footer-only extra sheets. Header branding survives shared print rules; editing controls are hidden on paper. Desktop and phone views reviewed. Initial comparison failures were fixed CSS uppercase labels becoming sentence case, with only exact interface labels normalized in comparison; customer data comparisons remain exact.
+
+Live .9/Heroku2101/0f518982 is185/225; reviewed candidate187/225,38pending. Next: commit/back up this exact branch, integrate into primary0f518982 preserving .7/.9 release history and cache mappings, run full local/exact-source release gates, then deploy and verify. Do not rerun consumed helpers. No real notes, orders, payments, emails, imports or device printing were sent.
+
+## RESUMED — Order Status and vendor Job Portal
+
+The five-page batch is now live as v2026.09.10.9 / Heroku 2101 / 0f518982c0b213f0c54e4eb41b5b2ef67b11c565. Exact-source CI34543191741 passed all four jobs including actual CSS and live calculator steps. The deployed slug, seven changed source assets, five page shells, prior anonymous access and retired styles passed 36 live checks. Live185/225 reviewed,40pending. This branch remains separate from the release.
+
+- [x] Resume from immutable original browser/paper evidence and verify prior release.
+- [ ] Demonstrate vendor pending-note duplicates and late detail errors with synthetic delayed responses.
+- [ ] Replace the two page owners using existing tokens/components, preserving all ten original hashes through reversible mappings.
+- [ ] Verify original values/actions, all four widths, keyboard/failure/retry/pending states, accessibility and complete Letter paper; update reviewed inventory only after these pass.
+- [ ] Integrate reviewed changes, run appropriate whole-app and exact-source release gates, deploy and verify live.
+
+Design: Public Sans throughout; existing white surface #ffffff, light gray canvas #f3f4f6, ink #1f2937, muted #4b5563, NWCA green #2e5827 and warning ink #92400e via shared tokens. Left-aligned branded header and customer order identity; the vertical fulfillment timeline remains the Order Status focus, with a quiet item summary below. The vendor list uses readable job cards; its detail view puts production instructions/lines beside artwork and activity. Phone rows retain every value, with wrapping labels. Print uses compact ink on white, complete rows and totals, and hides editing controls. Existing semantic header, button and input components provide the shared design; no new global stylesheet or palette is needed.
+
+## PAUSED — shutdown checkpoint, September 10, 2026
+
+**40 pages still need CSS migration; estimated 25–40 working hours including visual review, pricing checks and releases.** Five additional pages are finished and tested, awaiting deployment. This estimate covers the remaining app migration and its shared styles; complex calculators/builders may change the range.
+
+- Live remains **v2026.09.10.7 / Heroku 2100 / 1143ffdee13fac81a03dcba969dfb3f97082697a**: 180 of 225 pages reviewed, 45 not yet live. No .9 deployment, release merge or tag has started.
+- The five-page **v2026.09.10.9** candidate is frozen on primary `develop` at **0b271bb2ae12b083936a1add6c86d32ca41c3bab**, backed up to GitHub. It contains the Streich Bros and WCTTR employee bundles, Customer Portal Invoice, compact Invoice and Quote View. Candidate count: **185 reviewed / 40 pending**.
+- Full local gates passed: 239 unit suites / 5,604 tests, 88 DOM, four accessibility unit, 84 quote parity, 1,104 CSS browser checks, 16 remaining e2e including all five live calculators, build, lint, types, route lock, production audit and isolated test-mode boot. Existing skips: four unit and three optional builder screenshots. Focused batch evidence: 147 browser cases, 33 reviewed paper pages, 28 original hashes restored through 217 mappings.
+- Exact-source [GitHub CI run 34543191741](https://github.com/ErikM1974/pricing-indexfile-2025/actions/runs/34543191741) was still running at shutdown: lint, types and unit/parity/guards passed; the browser job remains pending completion. GitHub can finish while the laptop is off. The local watcher was stopped and port 3400 had no listener.
+- Next family is **Order Status and vendor Job Portal** on `codex/customer-job-status`, in `C:/Users/erik/.codex/visualizations/2026/09/07/01a07d90-9a4c-7e70-9e4e-c196377b7c6b/training-final-worktree`. Original review is committed and backed up at **f8b9c2046aeb843aaa14f9978d01893fd7d427db**: 38 immutable browser contracts, 16 visually reviewed original paper pages and 10 original source hashes. **No application edits or migration credit for these two pages yet.** This checkpoint commit adds only the two memory documents.
+- Primary develop intentionally remains at the frozen release source. The newest shutdown notes are on this isolated branch and in private MEMORY.md; do not mistake the older primary “ACTIVE” heading for a resumed task.
+
+### Resume in this order
+
+1. Inspect both working trees, refs, actual live release and CI run on the exact source SHA. Read `C:/Users/erik/.codex/visualizations/2026/09/07/01a07d90-9a4c-7e70-9e4e-c196377b7c6b/active-css-resume-state.json`. User authorization to edit and deploy persists.
+2. If exact-source CI is fully green, require all four jobs plus successful actual CSS and live money/calculator steps; then release the frozen .9 source and verify the real Heroku slug, HTML, compiled/source assets, retired CSS and prior anonymous-access responses. Do not include this advancing next-family branch. Prepared but NOT executed: `prepare-customer-documents-release.cjs` and `verify-customer-documents-live.cjs` in the artifact directory. Inspect their preconditions and any release records before execution; create fresh recovery logic if state moved. Never repeat a consumed one-shot helper.
+3. Continue the two-page scoped layout from the existing immutable originals. Review shared components before adding CSS; preserve custom-tees.css and shared Caspio date parsing for other consumers. Fix contrast, phone overflow, named keyboard regions and paper pagination. Demonstrate and test suspected note duplicate/pending and late-response issues before changing behavior. Original default vendor fixtures have bare date strings displayed as dashes; two dated fixtures separately cover actual Caspio timestamps.
+4. Continue remaining families with original/current value comparisons, mobile/accessibility/paper review and pricing parity where applicable. Update inventory only after review, and distinguish reviewed from deployed counts.
+
+All business actions in testing were intercepted. No real orders, payments, emails, imports, notes or device printing were sent. No background deployment or automation is scheduled. Do not recursively delete the node_modules junction, copy .env, overwrite original fixtures or rerun completed/failed one-shot helpers. Artifact logs, source ledgers, PDFs and release preparation records remain local; source, tests and these resume notes are backed up through GitHub.
+
+## ORIGINAL REVIEW — Order Status and vendor Job Portal ready for layout work
+
+Thirty-eight original browser contracts are frozen before application edits:16 Order Status states (five timeline states, rush, shipping/pickup, fees/tax/total, empty/escaped/long and five credential/error cases),22 vendor list/detail/filter/search/history/message/error/Caspio-date cases. Four widths per case, actual original labels/links/rows/values and exact note POST body. First run20passed/16 Order Status cases stopped because axe re-fetches external icon CSS; permitting that exact public stylesheet GET fixed the harness. Fresh18-case recovery passed, including two full Caspio-timestamp cases. The original default vendor fixtures used bare date strings (displayed as a dash by the shared parser); dated cases separately verify actual requested/needed/estimated dates and overdue badges. No application source has changed.
+
+Seven original PDFs /16 pages visually reviewed:Order Status paid2,pickup2,long3;vendor list1,normal detail2,dated detail2,long detail4. Short orders print a footer alone on page2; pickup totals split across pages; long order prints a footer alone on page3. Vendor detail prints editing controls, a large mockup and split rows/messages; one long row loses dimensions/notes at the page boundary. Original phone vendor cards/details overflow at320/390px. Both pages have contrast failures; long Order Status cells expose an unnamed keyboard scroll region.
+
+- Next: retain every credential/link/value/status/promise/request body; shared Public Sans and canonical controls, scoped page owners, wrapping phone job cards and labelled item cells, named keyboard regions and complete Letter paper. Keep custom-tees.css and CaspioDate sources unchanged for other consumers. Audit note pending/keyboard duplicates and late job responses before fixing demonstrated failures with mapped tests. All10 original source hashes remain authoritative.
+- Primary five-page release candidate v2026.09.10.9 /source0b271bb2 has passed all full local gates and three CI jobs; CI34543191741 browser job is running. Root source is frozen; this branch remains excluded. Live remains .7/Heroku2100,180/225; reviewed candidate185/225,40pending. No new migration credit for these two pages yet.
+- Do not rerun consumed helpers or successful original captures. Preserve all38 original JSONs. All writes/allocating reads are synthetic, no emails/imports/logouts/device printing. node_modules is a junction: never recursively delete it or copy .env.
+
+## NEXT — customer Order Status and vendor Job Portal source baseline
+
+Isolated branch codex/customer-job-status starts at reviewed ed70f0a8; the frozen five-page batch is separately integrated at primary c1d7cfb0 under full release gates. No code from this next batch belongs in that release. Live remains .7/Heroku2100,180/225; reviewed candidate185/225,40pending.
+
+- [x] Capture both original HTML/controller/style graphs and immutable hashes before application edits.
+- [ ] Order Status: capture every timeline state, shipping/pickup, promise labels, token/missing/404/429/500/network, escaped content, item/fee/tax/total values, tracking/mail links and complete paper. Preserve server-stamped promise and exact id/t URL credential.
+- [ ] Vendor Job Portal: capture verified vendor identity, expired session, job list filters/search/counts, active/completed/cancelled/past-due/rush, hash deep links/back/focus, detail/artwork/download links, empty/escaped/failure/retry and original note POST body. Intercept all writes before loading.
+- [ ] After original browser/paper review, adopt shared Public Sans/controls and scoped layouts, useful mobile cards and named regions. Keep customer Order Status read-only and vendor notes behind existing verified identity; repair only demonstrated UI failures with precise reversible mappings.
+- [ ] Four widths, keyboard/axe, delayed/error/retry/duplicate cases and every PDF page before migration credit. Preserve shared custom-tees CSS for the unreviewed Custom Tees consumer and CaspioDate helper semantics. Full app/exact CI before another deploy.
+
+The source snapshot alone is not reviewed migration credit. No live business writes, emails, imports, logout or device printing. Never rerun consumed helpers, copy .env or recursively delete node_modules (junction).
+
 ## ACTIVE — five-page release candidate v2026.09.10.9
 
 The frozen reviewed batch ed70f0a83878fc392884ce6c115fcebb9b4908f7 is integrated at c1d7cfb09adc3ce9ba1127ecaf543d07d34ea86b. All local checks passed:239 unit suites/5,604 passed/four existing skips,88 DOM,four accessibility unit,84 quote parity,1,104 mocked CSS browser checks,16 remaining e2e/three optional screenshot skips/all five calculator surfaces,423 built assets,266 CSS sheets,zero lint warnings/undefined names,types/routes485/24modules clean,boot HTTP200 and production audit zero.

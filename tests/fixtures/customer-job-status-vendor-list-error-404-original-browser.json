@@ -1,0 +1,143 @@
+{
+  "views": [
+    {
+      "width": 1440,
+      "title": "Job Portal — Northwest Custom Apparel",
+      "text": "Job Portal Screen-print jobs from Northwest Custom Apparel Sign out Synthetic jobs unavailable Retry Active Completed All Search jobs Northwest Custom Apparel · Milton, WA · (253) 922-5793",
+      "ids": {
+        "vp-vendor-name": "Job Portal",
+        "vp-user-email": "",
+        "vp-error-text": "Synthetic jobs unavailable",
+        "vp-error-retry": "Retry",
+        "vp-filters": "Active Completed All",
+        "vp-search": "",
+        "vp-job-grid": ""
+      },
+      "links": [
+        {
+          "href": "/auth/vendor/logout",
+          "text": "Sign out",
+          "label": null
+        }
+      ],
+      "rows": [],
+      "overflow": false,
+      "axe": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "footer"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Job Portal — Northwest Custom Apparel",
+      "text": "Job Portal Screen-print jobs from Northwest Custom Apparel Sign out Synthetic jobs unavailable Retry Active Completed All Search jobs Northwest Custom Apparel · Milton, WA · (253) 922-5793",
+      "ids": {
+        "vp-vendor-name": "Job Portal",
+        "vp-user-email": "",
+        "vp-error-text": "Synthetic jobs unavailable",
+        "vp-error-retry": "Retry",
+        "vp-filters": "Active Completed All",
+        "vp-search": "",
+        "vp-job-grid": ""
+      },
+      "links": [
+        {
+          "href": "/auth/vendor/logout",
+          "text": "Sign out",
+          "label": null
+        }
+      ],
+      "rows": [],
+      "overflow": false,
+      "axe": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "footer"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Job Portal — Northwest Custom Apparel",
+      "text": "Job Portal Sign out Synthetic jobs unavailable Retry Active Completed All Search jobs Northwest Custom Apparel · Milton, WA · (253) 922-5793",
+      "ids": {
+        "vp-vendor-name": "Job Portal",
+        "vp-user-email": "",
+        "vp-error-text": "Synthetic jobs unavailable",
+        "vp-error-retry": "Retry",
+        "vp-filters": "Active Completed All",
+        "vp-search": "",
+        "vp-job-grid": ""
+      },
+      "links": [
+        {
+          "href": "/auth/vendor/logout",
+          "text": "Sign out",
+          "label": null
+        }
+      ],
+      "rows": [],
+      "overflow": false,
+      "axe": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "footer"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Job Portal — Northwest Custom Apparel",
+      "text": "Job Portal Sign out Synthetic jobs unavailable Retry Active Completed All Search jobs Northwest Custom Apparel · Milton, WA · (253) 922-5793",
+      "ids": {
+        "vp-vendor-name": "Job Portal",
+        "vp-user-email": "",
+        "vp-error-text": "Synthetic jobs unavailable",
+        "vp-error-retry": "Retry",
+        "vp-filters": "Active Completed All",
+        "vp-search": "",
+        "vp-job-grid": ""
+      },
+      "links": [
+        {
+          "href": "/auth/vendor/logout",
+          "text": "Sign out",
+          "label": null
+        }
+      ],
+      "rows": [],
+      "overflow": false,
+      "axe": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "footer"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "actions": [],
+  "reads": [
+    {
+      "path": "/api/vendor/jobs",
+      "query": ""
+    }
+  ]
+}

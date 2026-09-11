@@ -12,6 +12,9 @@
     filter: 'active',
     search: '',
     currentJobId: null,
+    detailRequest: 0,
+    posting: false,
+    drafts: {},
     vendor: null,
     retry: null,          // what the error banner's Retry button re-runs
     lastCardId: null,     // card to re-focus when coming back to the list
@@ -87,7 +90,7 @@
     if (!img || img.tagName !== 'IMG' || !img.dataset || !img.dataset.onerror) return;
     var mode = img.dataset.onerror, ph;
     if (mode === 'job-thumb') {
-      ph = document.createElement('div'); ph.className = 'vp-job-thumb vp-job-thumb--placeholder';
+      ph = document.createElement('span'); ph.className = 'vp-job-thumb vp-job-thumb--placeholder';
       ph.innerHTML = '<i class="fas fa-tshirt" aria-hidden="true"></i>';
       img.replaceWith(ph);
     } else if (mode === 'file-thumb') {
@@ -138,22 +141,22 @@
     grid.innerHTML = jobs.map(function (job) {
       var thumb = job.mockupThumbnailUrl
         ? '<img class="vp-job-thumb" src="' + esc(job.mockupThumbnailUrl) + '" alt="" loading="lazy" data-onerror="job-thumb">'
-        : '<div class="vp-job-thumb vp-job-thumb--placeholder"><i class="fas fa-tshirt" aria-hidden="true"></i></div>';
+        : '<span class="vp-job-thumb vp-job-thumb--placeholder"><i class="fas fa-tshirt" aria-hidden="true"></i></span>';
       var pastDue = isPastDue(job);
-      return '<div class="vp-job-card' + (pastDue ? ' vp-job-card--pastdue' : '') + '" data-job="' + esc(job.id) + '" role="button" tabindex="0" aria-label="Open job ' + esc(job.id) + ', ' + esc(job.companyName || 'Unknown company') + '">' +
+      return '<button type="button" class="vp-job-card' + (pastDue ? ' vp-job-card--pastdue' : '') + '" data-job="' + esc(job.id) + '" aria-label="Open job ' + esc(job.id) + ', ' + esc(job.companyName || 'Unknown company') + '">' +
         thumb +
-        '<div class="vp-job-body">' +
-          '<div class="vp-job-id">' + esc(job.id) + '</div>' +
-          '<div class="vp-job-company">' + esc(job.companyName || 'Unknown company') + '</div>' +
-          '<div class="vp-job-meta">' +
+        '<span class="vp-job-body">' +
+          '<span class="vp-job-id">' + esc(job.id) + '</span>' +
+          '<span class="vp-job-company">' + esc(job.companyName || 'Unknown company') + '</span>' +
+          '<span class="vp-job-meta">' +
             (job.designNumber ? '<span><i class="fas fa-hashtag" aria-hidden="true"></i> Design ' + esc(job.designNumber) + '</span>' : '') +
             '<span><i class="far fa-calendar" aria-hidden="true"></i> ' + fmtDate(job.requestedAt) + '</span>' +
             (job.neededBy ? '<span' + (pastDue ? ' class="vp-overdue"' : '') + '><i class="far fa-clock" aria-hidden="true"></i> Needed ' + fmtDate(job.neededBy) + (pastDue ? ' · past due' : '') + '</span>' : '') +
             (job.fileCount ? '<span><i class="far fa-file" aria-hidden="true"></i> ' + esc(job.fileCount) + ' file' + (job.fileCount === 1 ? '' : 's') + '</span>' : '') +
-          '</div>' +
-          '<div class="vp-job-badges">' + statusBadge(job.status) + (job.isRush ? rushBadge() : '') + '</div>' +
-        '</div>' +
-      '</div>';
+          '</span>' +
+          '<span class="vp-job-badges">' + statusBadge(job.status) + (job.isRush ? rushBadge() : '') + '</span>' +
+        '</span>' +
+      '</button>';
     }).join('');
   }
 
@@ -180,6 +183,8 @@
 
   // ── detail view ───────────────────────────────────────────
   function showListView(fromHistory) {
+    if (state.currentJobId) state.drafts[state.currentJobId] = $('vp-comment-input').value;
+    state.detailRequest++;
     state.currentJobId = null;
     clearError();
     $('vp-detail-view').hidden = true;
@@ -242,11 +247,11 @@
         ? (l.widthIn != null ? l.widthIn : '?') + ' × ' + (l.heightIn != null ? l.heightIn : '?')
         : '—';
       return '<tr>' +
-        '<td>' + esc(l.quantity != null ? l.quantity : '—') + '</td>' +
-        '<td>' + esc(l.transferSize || '—') + '</td>' +
-        '<td>' + esc(wh) + '</td>' +
-        '<td>' + esc(l.pressCount != null ? l.pressCount : '—') + '</td>' +
-        '<td>' + esc(l.notes || '') + '</td>' +
+        '<td data-label="Qty">' + esc(l.quantity != null ? l.quantity : '—') + '</td>' +
+        '<td data-label="Size">' + esc(l.transferSize || '—') + '</td>' +
+        '<td data-label="W×H (in)">' + esc(wh) + '</td>' +
+        '<td data-label="Presses">' + esc(l.pressCount != null ? l.pressCount : '—') + '</td>' +
+        '<td data-label="Notes">' + esc(l.notes || '') + '</td>' +
       '</tr>';
     }).join('');
 
@@ -272,7 +277,7 @@
           '</div>' +
         '</div>' +
         (f.fileUrl
-          ? '<a class="vp-btn vp-btn--primary" href="' + esc(f.fileUrl) + '" target="_blank" rel="noopener noreferrer" aria-label="Download ' + esc(f.fileName || 'file') + '"><i class="fas fa-download" aria-hidden="true"></i> Download</a>'
+          ? '<a class="btn btn-primary vp-btn" href="' + esc(f.fileUrl) + '" target="_blank" rel="noopener noreferrer" aria-label="Download ' + esc(f.fileName || 'file') + '"><i class="fas fa-download" aria-hidden="true"></i> Download</a>'
           : '') +
       '</div>';
     }).join('');
@@ -302,6 +307,13 @@
   }
 
   function openJob(id, fromHistory) {
+    var request = ++state.detailRequest;
+    if (state.currentJobId !== id) {
+      if (state.currentJobId) state.drafts[state.currentJobId] = $('vp-comment-input').value;
+      $('vp-comment-input').value = state.drafts[id] || '';
+      $('vp-comment-status').hidden = true;
+      $('vp-comment-btn').disabled = state.posting || !$('vp-comment-input').value.trim();
+    }
     state.currentJobId = id;
     state.lastCardId = id;
     var hash = '#job=' + encodeURIComponent(id);
@@ -312,13 +324,13 @@
     $('vp-detail-loading').hidden = false;
     clearError();
     apiGet('/api/vendor/jobs/' + encodeURIComponent(id)).then(function (data) {
-      if (state.currentJobId !== id) return;   // user already moved on
+      if (state.currentJobId !== id || state.detailRequest !== request) return;   // user already moved on
       $('vp-detail-loading').hidden = true;
       $('vp-detail-main').hidden = false;
       renderDetail(data);
       $('vp-d-company').focus();
     }).catch(function (e) {
-      if (e.message === 'signed out') return;
+      if (e.message === 'signed out' || state.currentJobId !== id || state.detailRequest !== request) return;
       $('vp-detail-loading').hidden = true;
       var msg = e.status === 404
         ? 'This job is no longer available to you — it may have been removed or reassigned. Go back to All jobs.'
@@ -329,12 +341,15 @@
   }
 
   function postComment() {
+    if (state.posting) return;
     var input = $('vp-comment-input');
     var note = (input.value || '').trim();
     if (!state.currentJobId) return;
     if (!note) { input.focus(); return; }
     var btn = $('vp-comment-btn');
     var jobId = state.currentJobId;
+    state.posting = true;
+    input.readOnly = true;
     btn.disabled = true;
     btn.textContent = 'Posting…';
     fetch('/api/vendor/jobs/' + encodeURIComponent(jobId) + '/notes', {
@@ -344,14 +359,19 @@
       body: JSON.stringify({ note: note }),
     }).then(function (r) {
       if (!r.ok) throw new Error('HTTP ' + r.status);
+      state.drafts[jobId] = '';
+      if (state.currentJobId !== jobId) return;
       input.value = '';
       $('vp-comment-status').textContent = 'Posted — NWCA will see it on the job.';
       $('vp-comment-status').hidden = false;
       openJob(jobId, true); // reload to show the new note
     }).catch(function (e) {
+      if (state.currentJobId !== jobId) return;
       showError('Unable to post your note right now. Your text is still in the box — please try again.', function () { postComment(); });
       console.error('[vendor-portal] note post failed:', e);
     }).finally(function () {
+      state.posting = false;
+      input.readOnly = false;
       btn.innerHTML = '<i class="fas fa-paper-plane" aria-hidden="true"></i> Post';
       btn.disabled = !(input.value || '').trim();
     });
@@ -377,18 +397,12 @@
     var card = e.target.closest('.vp-job-card');
     if (card) openJob(card.dataset.job);
   });
-  $('vp-job-grid').addEventListener('keydown', function (e) {
-    if (e.key !== 'Enter' && e.key !== ' ') return;
-    var card = e.target.closest('.vp-job-card');
-    if (!card) return;
-    e.preventDefault();
-    openJob(card.dataset.job);
-  });
+  // Native job buttons handle Enter and Space through the delegated click listener.
   $('vp-back-btn').addEventListener('click', function () { showListView(false); });
   $('vp-error-retry').addEventListener('click', function () { var fn = state.retry; clearError(); if (fn) fn(); });
   $('vp-comment-btn').addEventListener('click', postComment);
   $('vp-comment-input').addEventListener('input', function (e) {
-    $('vp-comment-btn').disabled = !(e.target.value || '').trim();
+    $('vp-comment-btn').disabled = state.posting || !(e.target.value || '').trim();
     $('vp-comment-status').hidden = true;
   });
   $('vp-comment-input').addEventListener('keydown', function (e) {

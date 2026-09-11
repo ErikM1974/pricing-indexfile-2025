@@ -5,6 +5,13 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## Customer and vendor status views must own pending requests and paper (2026-09-10)
+
+- Problem/root cause: disabling Post did not guard Ctrl+Enter; late job errors escaped into the list, and pending note completion could reopen a prior job. Shared shell print rules hid branding; prefix class edits accidentally styled count labels as buttons.
+- Solution: guard the pending note in the controller, retain drafts per job, use request generations and verify the selected job before updating UI. Native job buttons share one activation path. Reuse scoped components and preserve print headers, whole rows and complete totals.
+- Migration guards must follow shared visibility/focus ownership and native controls; assert DOM semantics instead of class order or removed custom key handlers, while retaining real-browser hidden/keyboard/phone checks. A print-cancellation test must create an actual QA error (missing size), assert the confirmation and await its dismissal; missing-thread warnings do not block printing, and checking before an asynchronous print finishes is a false pass.
+- Prevention: synthetic delayed/failure/retry/keyboard/late-navigation tests with exact original request bodies; compare class tokens exactly, preserve source hashes and fixed label-case exceptions, and visually inspect every paper page. Remove empty-space margins without changing preserved empty element contracts.
+
 ## Quote lists must retain failure and action ownership (2026-09-10)
 
 - Problem/root cause: local filtering replaced failed-load feedback with an empty list; delayed inbound/date-window responses could restore obsolete rows. Native-dialog cancellation could not return focus to a trigger disabled before confirmation. Delete authentication recovery called a removed helper.
@@ -34,30 +41,10 @@ Exact-source CI must pass its actual browser/parity jobs, including credentials 
 
 Quote-operation access rollout (2026-09-07) is archived in LESSONS_LEARNED_ARCHIVE.md; caller/quote scope and live-mutation boundaries remain enforced by quote-sync-access.test.js.
 
-## Scoped CSS migration must replace every competing entry point (2026-09-08)
-- Problem/root cause: legacy unlayered sheets outrank layered components; print-form date helpers attach to the whole field, including its label.
-- Solution: opt in per consumer, remove its competing styles and anchor the calendar button to the input bottom. A later utilities layer owns hidden state without important flags.
-- Prevention: exercise loading/error/success and mobile states, assert the date button stays inside its input, and lock actual stylesheet owners plus unchanged billing content.
-
-## Shared workflow state must match its visibility owner (2026-09-08)
-- Problem/root cause: migrating hidden state left paste guards on inline display; queues showed success before awaiting refresh, and failed file links left a success icon.
-- Solution: keep visibility checks aligned with the migrated owner, centralize custom-dialog focus/scroll state, preserve keyboard focus when filters or expansion buttons are replaced, and update success indicators only after the operation settles.
-- Prevention: exercise populated, failed, retry and cancelled states with mocked writes; check old consumers when a shared helper opts into new presentation. Queue-age labels need semantic warning ink: amber-600 on white failed contrast only when a fixture crossed24 hours. Fix the CSS and lock fresh/warning/critical ages under a fixed date, retaining axe checks. A browser clock must be explicitly paused for exact polling-count tests; installation alone lets startup/network latency advance timers. Also wait for the application to register its next timer after an asynchronous response; an intercepted request count is not a timer-ready signal. Deliberately delayed fixtures and a no-more-polls assertion protect this boundary.
-
-## A visible quantity grid does not prove pricing is ready (2026-09-08)
-- Problem/root cause: DTG rendered sizes before its bundle request completed; Save accepted zero/partial prices, and an older request could overwrite edits. A six-second browser delay hid the readiness gap.
-- Solution: require every entered row/positive size to have current pricing; invalidate on edits, discard old responses, copy size maps, and use the same guard for Save and Print. Pending manual rows throw a visible error instead of falling back to AI data.
-- Prevention: controlled pending/failure/out-of-order tests plus browser assertions on actual readiness and posted money. Keep Save independent of customer/Push completeness; unused blank rows are allowed. EMB/SCP already recalculate before save; DTF computes from state.
-
 ## Dialog entrance contrast (2026-09-08, archived)
 Whole-dialog opacity blended text into its background; animate position/scale only and sample mid-animation. Full resolved entry in LESSONS_LEARNED_ARCHIVE.md.
 
 Transfer/Supacolor authentication migration (2026-09-08) is archived in LESSONS_LEARNED_ARCHIVE.md. Keep staff/vendor/customer boundaries and auth-before-large-parser checks; never infer identity from Origin.
-
-## Art-family themes and dialogs need runtime state coverage (2026-09-08)
-- Problem/root cause: department-scoped layout vanished in customer mode, guessed palette names had no definition, tablists mixed navigation links with tabs, and selection/toast opacity reduced text contrast. Icon-only controls also depended on an unloaded font.
-- Solution: stable page scope, actual shared aliases, separate tablists, opaque text, native named keyboard controls and a visible close glyph. Load ui-dialog.js before transfer-actions-shared.js on every unified consumer; a dependency guard and both sender browser paths lock this. Customer rush indicators are read-only; print keeps its existing staff-only job sheet.
-- Prevention: resolve tokens per real style graph, inspect screenshots as well as axe, and exercise intake/error/dialog/print states at four widths with writes mocked. Keep exact visibility exceptions rather than deleting important flags by script.
 
 ## Training controls and printed guides need state/output checks (2026-09-08, archived)
 

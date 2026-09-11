@@ -23,7 +23,9 @@ describe('lead forms + status + hub pages', () => {
         expect(read('pages/js/order-status.js')).not.toMatch(BARE);
         expect(read('pages/js/order-status.js')).not.toMatch(/<i class="fas \$\{[^}]+\}"><\/i>/);
         expect(read('pages/request-a-quote.js')).not.toMatch(BARE);
-        expect(read('pages/css/order-status.css')).toMatch(/\[hidden\] \{ display: none !important; \}/);
+        expect(read('pages/order-status.html')).toContain('data-ui="unified"');
+        expect(read('pages/order-status.html')).toContain('/shared_components/css/components.css');
+        expect(read('shared_components/css/components.css')).toMatch(/\[hidden\]\s*\{\s*display:\s*none;/);
     });
 });
 

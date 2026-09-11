@@ -1,445 +1,144 @@
-/* stylelint-disable no-duplicate-selectors -- legacy sheet: rules were appended over time; merging them would reorder the cascade (2026-09-07) */
+/* Vendor Job Portal — shared controls, scoped production details and paper. */
+@layer components.pages {
+ :where([data-ui="unified"].vendor-portal-page) { min-height:100vh; display:flex; flex-direction:column; }
+ :where([data-ui="unified"].vendor-portal-page) .vp-header-title { flex:1; min-width:min(250px,100%); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-header-title h1 { margin:0 0 var(--space-1); font-size:var(--font-size-xl); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-header-sub,:where([data-ui="unified"].vendor-portal-page) .vp-user-chip { font-size:var(--font-size-sm); color:var(--ui-muted); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-header-user { display:flex; gap:var(--space-3); align-items:center; flex-wrap:wrap; }
+ :where([data-ui="unified"].vendor-portal-page) .vp-container { flex:1; width:100%; }
+ :where([data-ui="unified"].vendor-portal-page) .vp-toolbar { display:flex; justify-content:space-between; align-items:center; gap:var(--space-4); flex-wrap:wrap; margin-bottom:var(--space-5); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-filters { display:flex; flex-wrap:wrap; gap:var(--space-2); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-chip { border-radius:var(--radius-pill); padding-inline:var(--space-3); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-chip--active,:where([data-ui="unified"].vendor-portal-page) .vp-chip--active:hover { background:var(--ui-accent); border-color:var(--ui-accent); color:var(--color-on-brand); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-chip-count { font-size:var(--font-size-sm); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-chip-count:empty { display:none; }
+ :where([data-ui="unified"].vendor-portal-page) .vp-search { position:relative; flex:0 1 360px; min-width:0; }
+ :where([data-ui="unified"].vendor-portal-page) .vp-search i { position:absolute; left:var(--space-3); top:50%; transform:translateY(-50%); color:var(--ui-muted); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-search input { padding-left:var(--space-6); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-loading,:where([data-ui="unified"].vendor-portal-page) .vp-empty { padding:var(--space-7) var(--space-4); text-align:center; color:var(--ui-muted); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-empty i { font-size:var(--font-size-2xl); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-empty-panel { color:var(--ui-muted); font-size:var(--font-size-md); padding:var(--space-2) 0; }
+ :where([data-ui="unified"].vendor-portal-page) .vp-error { display:flex; flex-wrap:wrap; align-items:center; gap:var(--space-3); padding:var(--space-4); margin-bottom:var(--space-5); background:var(--red-100); color:var(--red-800); border-left:3px solid var(--red-800); border-radius:var(--radius-sm); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-error .vp-btn { margin-left:auto; }
+ :where([data-ui="unified"].vendor-portal-page) .vp-job-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr)); gap:var(--space-4); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-job-card { display:flex; align-items:flex-start; gap:var(--space-4); text-align:left; width:100%; min-width:0; padding:var(--space-5); background:var(--ui-surface); color:var(--ui-ink); border:1px solid var(--ui-line); border-radius:var(--radius-md); cursor:pointer; }
+ :where([data-ui="unified"].vendor-portal-page) .vp-job-card:hover { border-color:var(--ui-accent); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-job-card--pastdue { border-left:3px solid var(--red-800); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-job-thumb { display:block; width:64px; height:64px; flex:none; object-fit:contain; border-radius:var(--radius-sm); background:var(--ui-tint); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-job-thumb--placeholder { display:flex; align-items:center; justify-content:center; color:var(--ui-accent); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-job-body { display:block; flex:1; min-width:0; }
+ :where([data-ui="unified"].vendor-portal-page) .vp-job-id,:where([data-ui="unified"].vendor-portal-page) .vp-detail-id { display:block; font-size:var(--font-size-sm); color:var(--ui-muted); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-job-company { display:block; margin:var(--space-1) 0 var(--space-2); font-size:var(--font-size-lg); font-weight:600; overflow-wrap:anywhere; }
+ :where([data-ui="unified"].vendor-portal-page) .vp-job-meta,:where([data-ui="unified"].vendor-portal-page) .vp-file-meta { display:flex; flex-wrap:wrap; gap:var(--space-2) var(--space-3); font-size:var(--font-size-sm); color:var(--ui-muted); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-job-badges,:where([data-ui="unified"].vendor-portal-page) .vp-detail-badges { display:flex; flex-wrap:wrap; align-items:flex-start; gap:var(--space-2); margin-top:var(--space-3); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-badge { display:inline-block; padding:var(--space-1) var(--space-2); border-radius:var(--radius-pill); font-size:var(--font-size-sm); font-weight:600; background:var(--ui-tint); color:var(--ui-accent); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-badge--rush,:where([data-ui="unified"].vendor-portal-page) .vp-badge--status-On_Hold { background:var(--red-100); color:var(--red-800); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-badge--status-Requested { background:var(--color-warning-bg); color:var(--color-warning-ink); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-badge--status-Ordered,:where([data-ui="unified"].vendor-portal-page) .vp-badge--status-In_Production { background:var(--color-info-bg); color:var(--color-info-ink); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-badge--status-PO_Created { background:var(--color-ruth-tint); color:var(--color-ruth-dark); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-badge--status-Cancelled { background:var(--gray-100); color:var(--ui-muted); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-overdue { color:var(--red-800); font-weight:600; }
+ :where([data-ui="unified"].vendor-portal-page) .vp-back { margin-bottom:var(--space-5); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-detail-header { display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:var(--space-4); margin-bottom:var(--space-5); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-detail-header > div { min-width:0; overflow-wrap:anywhere; }
+ :where([data-ui="unified"].vendor-portal-page) .vp-detail-company { margin:var(--space-1) 0 var(--space-2); font-size:var(--font-size-2xl); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-detail-sub { color:var(--ui-muted); font-size:var(--font-size-md); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-grid { display:grid; grid-template-columns:minmax(0,1.4fr) minmax(0,1fr); gap:var(--space-5); align-items:start; }
+ :where([data-ui="unified"].vendor-portal-page) .vp-col { display:flex; flex-direction:column; gap:var(--space-5); min-width:0; }
+ :where([data-ui="unified"].vendor-portal-page) .vp-card { border:1px solid var(--ui-line); border-radius:var(--radius-md); background:var(--ui-surface); min-width:0; }
+ :where([data-ui="unified"].vendor-portal-page) .vp-card-header { padding:var(--space-4) var(--space-5); border-bottom:1px solid var(--ui-line); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-card-header h3 { margin:0; font-size:var(--font-size-base); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-card-header i { margin-right:var(--space-2); color:var(--ui-accent); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-card-body { padding:var(--space-5); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-meta { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--space-4); margin:0; }
+ :where([data-ui="unified"].vendor-portal-page) .vp-meta dt { font-size:var(--font-size-sm); color:var(--ui-muted); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-meta dd { margin:var(--space-1) 0 0; font-size:var(--font-size-md); overflow-wrap:anywhere; }
+ :where([data-ui="unified"].vendor-portal-page) .vp-instructions { margin-top:var(--space-5); padding:var(--space-4); border-left:3px solid var(--color-warning-ink); background:var(--color-warning-bg); color:var(--ui-ink); white-space:pre-wrap; font-size:var(--font-size-md); overflow-wrap:anywhere; }
+ :where([data-ui="unified"].vendor-portal-page) .vp-table-scroll { overflow:auto; }
+ :where([data-ui="unified"].vendor-portal-page) .vp-table { width:100%; border-collapse:collapse; table-layout:fixed; font-size:var(--font-size-md); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-table th,:where([data-ui="unified"].vendor-portal-page) .vp-table td { padding:var(--space-3) var(--space-2); border-bottom:1px solid var(--ui-line); text-align:left; vertical-align:top; overflow-wrap:anywhere; }
+ :where([data-ui="unified"].vendor-portal-page) .vp-table th { color:var(--ui-muted); font-size:var(--font-size-sm); font-weight:600; }
+ :where([data-ui="unified"].vendor-portal-page) .vp-table th:first-child { width:12%; }
+ :where([data-ui="unified"].vendor-portal-page) .vp-table th:last-child { width:30%; }
+ :where([data-ui="unified"].vendor-portal-page) .vp-files { display:grid; gap:var(--space-3); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-file { display:flex; flex-wrap:wrap; align-items:center; gap:var(--space-3); padding:var(--space-3); border:1px solid var(--ui-line); border-radius:var(--radius-sm); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-file-thumb,:where([data-ui="unified"].vendor-portal-page) .vp-file-icon { width:40px; height:40px; flex:none; object-fit:contain; background:var(--ui-tint); border-radius:var(--radius-sm); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-file-icon { display:flex; align-items:center; justify-content:center; color:var(--ui-accent); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-file-info { flex:1; min-width:100px; }
+ :where([data-ui="unified"].vendor-portal-page) .vp-file-name { font-size:var(--font-size-md); font-weight:600; overflow-wrap:anywhere; }
+ :where([data-ui="unified"].vendor-portal-page) .vp-file-type { font-weight:600; color:var(--ui-accent); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-mockup-img { display:block; width:100%; max-height:320px; object-fit:contain; }
+ :where([data-ui="unified"].vendor-portal-page) .vp-comment-form { display:flex; gap:var(--space-3); align-items:flex-end; margin-bottom:var(--space-3); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-comment-form textarea { flex:1; min-width:0; }
+ :where([data-ui="unified"].vendor-portal-page) .vp-comment-hint { color:var(--ui-muted); font-size:var(--font-size-sm); margin-bottom:var(--space-5); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-comment-status { padding:var(--space-3); margin-bottom:var(--space-4); border-radius:var(--radius-sm); background:var(--ui-tint); color:var(--ui-accent); font-size:var(--font-size-md); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-timeline { display:grid; gap:var(--space-4); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-note { padding-left:var(--space-3); border-left:3px solid var(--ui-line); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-note--vendor { border-color:var(--ui-accent); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-note--status { border-color:var(--color-info-line); }
+ :where([data-ui="unified"].vendor-portal-page) .vp-note-head { margin-bottom:var(--space-1); font-size:var(--font-size-sm); color:var(--ui-muted); overflow-wrap:anywhere; }
+ :where([data-ui="unified"].vendor-portal-page) .vp-note-text { font-size:var(--font-size-md); white-space:pre-wrap; overflow-wrap:anywhere; }
+ :where([data-ui="unified"].vendor-portal-page) .vp-sr { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
 
-/* vendor-portal.css — L&P Screen Printing subcontractor job portal (/vendor).
-   Self-contained (vendor-facing page — deliberately does NOT pull staff dashboard CSS).
-   NWCA brand greens match the customer portal. */
+ @media (width <= 900px) { :where([data-ui="unified"].vendor-portal-page) .vp-grid { grid-template-columns:minmax(0,1fr); } }
 
-/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
-   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
-   raw hex is allowed ONLY in this block. */
-/* stylelint-disable color-no-hex */
-:root {
-    --vendor-portal-indigo: #5b21b6;
-    --vendor-portal-cyan: #93c5fd;
-  --vp-green-dark: var(--brand-800);
-  --vp-green: var(--brand-mid);
-  --vp-green-pale: var(--brand-100);
-  --vp-ink: var(--gray-800);
-  --vp-muted: var(--gray-500);
-  --vp-border: var(--gray-200);
-  --vp-bg: var(--gray-100);
-  --vp-card: var(--color-surface);
-  --vp-rush: var(--red-600);
-  --vp-radius: 10px;
-  --vp-shadow: 0 1px 3px rgb(0 0 0 / 8%);
-}
-/* stylelint-enable color-no-hex */
+ @media (width <= 560px) {
+  :where([data-ui="unified"].vendor-portal-page) .page-header-inner,:where([data-ui="unified"].vendor-portal-page) .vp-container { padding:var(--space-4); }
+  :where([data-ui="unified"].vendor-portal-page) .vp-header-title { min-width:0; flex-basis:calc(100% - 100px); }
+  :where([data-ui="unified"].vendor-portal-page) .vp-header-title h1 { font-size:var(--font-size-base); }
+  :where([data-ui="unified"].vendor-portal-page) .vp-header-user { width:100%; justify-content:space-between; }
+  :where([data-ui="unified"].vendor-portal-page) .vp-search { flex-basis:100%; }
+  :where([data-ui="unified"].vendor-portal-page) .vp-job-card { padding:var(--space-4); gap:var(--space-3); }
+  :where([data-ui="unified"].vendor-portal-page) .vp-job-thumb { width:48px; height:48px; }
+  :where([data-ui="unified"].vendor-portal-page) .vp-job-company { font-size:var(--font-size-base); }
+  :where([data-ui="unified"].vendor-portal-page) .vp-card-header,:where([data-ui="unified"].vendor-portal-page) .vp-card-body { padding:var(--space-4); }
+  :where([data-ui="unified"].vendor-portal-page) .vp-comment-form { flex-direction:column; align-items:stretch; }
+  :where([data-ui="unified"].vendor-portal-page) .vp-table thead { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
+  :where([data-ui="unified"].vendor-portal-page) .vp-table,:where([data-ui="unified"].vendor-portal-page) .vp-table tbody,:where([data-ui="unified"].vendor-portal-page) .vp-table tr { display:block; }
+  :where([data-ui="unified"].vendor-portal-page) .vp-table tr { padding-block:var(--space-2); border-bottom:1px solid var(--ui-line); }
+  :where([data-ui="unified"].vendor-portal-page) .vp-table td { display:grid; grid-template-columns:90px minmax(0,1fr); gap:var(--space-3); padding:var(--space-1) 0; border:0; }
+  :where([data-ui="unified"].vendor-portal-page) .vp-table td::before { content:attr(data-label); color:var(--ui-muted); font-size:var(--font-size-sm); font-weight:600; }
+ }
 
-* { box-sizing: border-box; }
-
-/* `hidden` must beat every display rule below (.vp-error is display:flex, .vp-btn inline-flex) -
-   without this the red error banner was visible on EVERY load (found 2026-09-05). */
-/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
-[hidden] { display: none !important; }
-
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  background: var(--vp-bg);
-  color: var(--vp-ink);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-/* ── Header ─────────────────────────────────────────────── */
-.vp-header {
-  background: var(--vp-card);
-  border-bottom: 3px solid var(--vp-green-dark);
-  box-shadow: var(--vp-shadow);
-}
-
-.vp-header-inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 12px 20px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-.vp-logo { height: 44px; width: auto; }
-.vp-header-title { flex: 1; min-width: 200px; }
-.vp-header-title h1 { margin: 0; font-size: 1.15rem; color: var(--vp-green-dark); }
-.vp-header-sub { font-size: 0.8rem; color: var(--vp-muted); }
-.vp-header-user { display: flex; align-items: center; gap: 10px; }
-
-.vp-user-chip {
-  font-size: 0.8rem;
-  color: var(--vp-muted);
-  background: var(--vp-green-pale);
-  padding: 5px 10px;
-  border-radius: 999px;
-}
-
-/* ── Layout ─────────────────────────────────────────────── */
-.vp-container {
-  max-width: 1200px;
-  width: 100%;
-  margin: 0 auto;
-  padding: 20px;
-  flex: 1;
-}
-
-.vp-footer {
-  text-align: center;
-  padding: 18px;
-  font-size: 0.8rem;
-  color: var(--vp-muted);
-}
-
-/* ── Buttons / chips ───────────────────────────────────── */
-.vp-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  border: 1px solid var(--vp-border);
-  background: var(--vp-card);
-  color: var(--vp-ink);
-  border-radius: 8px;
-  padding: 8px 14px;
-  font-size: 0.85rem;
-  cursor: pointer;
-  text-decoration: none;
-  transition: background 0.15s, color 0.15s;
-}
-.vp-btn--primary { background: var(--vp-green); border-color: var(--vp-green); color: var(--color-on-brand); }
-.vp-btn--primary:hover { background: var(--vp-green-dark); }
-.vp-btn--primary:disabled { opacity: 0.6; cursor: default; }
-.vp-btn--ghost:hover { background: var(--vp-green-pale); color: var(--vp-green-dark); }
-
-.vp-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-bottom: 16px;
-}
-.vp-filters { display: flex; gap: 8px; }
-
-.vp-chip {
-  border: 1px solid var(--vp-border);
-  background: var(--vp-card);
-  border-radius: 999px;
-  padding: 6px 16px;
-  font-size: 0.85rem;
-  cursor: pointer;
-  color: var(--vp-muted);
-}
-
-.vp-chip--active {
-  background: var(--vp-green-dark);
-  border-color: var(--vp-green-dark);
-  color: var(--color-on-brand);
-}
-
-.vp-search {
-  position: relative;
-  min-width: 240px;
-}
-
-.vp-search i {
-  position: absolute;
-  left: 11px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--vp-muted);
-  font-size: 0.8rem;
-}
-
-.vp-search input {
-  width: 100%;
-  padding: 8px 12px 8px 32px;
-  border: 1px solid var(--vp-border);
-  border-radius: 8px;
-  font-size: 0.85rem;
-}
-
-/* ── States ────────────────────────────────────────────── */
-.vp-loading { text-align: center; padding: 44px; color: var(--vp-muted); }
-.vp-empty { text-align: center; padding: 44px; color: var(--vp-muted); }
-.vp-empty i { font-size: 2rem; margin-bottom: 8px; }
-
-.vp-error {
-  background: var(--red-100);
-  border: 1px solid var(--red-200);
-  border-left: 4px solid var(--vp-rush);
-  color: var(--red-800);
-  border-radius: 8px;
-  padding: 12px 16px;
-  margin-bottom: 16px;
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-.vp-empty-panel { color: var(--vp-muted); font-size: 0.85rem; padding: 10px 0; }
-
-/* ── Job cards ─────────────────────────────────────────── */
-.vp-job-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 14px;
-}
-
-.vp-job-card {
-  background: var(--vp-card);
-  border: 1px solid var(--vp-border);
-  border-radius: var(--vp-radius);
-  box-shadow: var(--vp-shadow);
-  padding: 14px;
-  cursor: pointer;
-  display: flex;
-  gap: 12px;
-  transition: border-color 0.15s, transform 0.1s;
-}
-.vp-job-card:hover { border-color: var(--vp-green); transform: translateY(-1px); }
-
-.vp-job-thumb {
-  width: 72px;
-  height: 72px;
-  border-radius: 8px;
-  object-fit: contain;
-  background: var(--vp-green-pale);
-  flex-shrink: 0;
-}
-
-.vp-job-thumb--placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--vp-green);
-  font-size: 1.3rem;
-}
-.vp-job-body { flex: 1; min-width: 0; }
-.vp-job-id { font-size: 0.75rem; color: var(--vp-muted); font-family: ui-monospace, Menlo, Consolas, monospace; }
-
-.vp-job-company {
-  font-weight: 600;
-  margin: 2px 0 4px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.vp-job-meta { font-size: 0.78rem; color: var(--vp-muted); display: flex; gap: 10px; flex-wrap: wrap; }
-.vp-job-badges { margin-top: 7px; display: flex; gap: 6px; flex-wrap: wrap; }
-
-.vp-badge {
-  display: inline-block;
-  font-size: 0.7rem;
-  font-weight: 600;
-  border-radius: 999px;
-  padding: 2px 9px;
-  background: var(--vp-green-pale);
-  color: var(--vp-green-dark);
-}
-.vp-badge--rush { background: var(--red-100); color: var(--vp-rush); }
-.vp-badge--status-Requested { background: var(--amber-100); color: var(--amber-800); }
-.vp-badge--status-Ordered { background: var(--sky-100); color: var(--blue-800); }
-.vp-badge--status-PO_Created { background: var(--color-ruth-tint); color: var(--vendor-portal-indigo); }
-.vp-badge--status-Shipped { background: var(--emerald-100); color: var(--emerald-800); }
-.vp-badge--status-Received { background: var(--vp-green-pale); color: var(--vp-green-dark); }
-.vp-badge--status-Cancelled { background: var(--gray-100); color: var(--vp-muted); }
-.vp-badge--status-On_Hold { background: var(--red-100); color: var(--store-rush-deeper); }
-
-/* ── Detail view ───────────────────────────────────────── */
-.vp-back { margin-bottom: 14px; }
-
-.vp-detail-header {
-  background: var(--vp-card);
-  border: 1px solid var(--vp-border);
-  border-radius: var(--vp-radius);
-  box-shadow: var(--vp-shadow);
-  padding: 18px;
-  display: flex;
-  justify-content: space-between;
-  gap: 14px;
-  flex-wrap: wrap;
-  margin-bottom: 16px;
-}
-.vp-detail-id { font-family: ui-monospace, Menlo, Consolas, monospace; color: var(--vp-muted); font-size: 0.85rem; }
-.vp-detail-company { margin: 4px 0; font-size: 1.35rem; color: var(--vp-green-dark); }
-.vp-detail-sub { color: var(--vp-muted); font-size: 0.85rem; }
-.vp-detail-badges { display: flex; gap: 8px; align-items: flex-start; flex-wrap: wrap; }
-.vp-detail-badges .vp-badge { font-size: 0.8rem; padding: 4px 12px; }
-
-.vp-grid {
-  display: grid;
-  grid-template-columns: 1.4fr 1fr;
-  gap: 16px;
-  align-items: start;
-}
-
-@media (width <= 860px) { .vp-grid { grid-template-columns: 1fr; } }
-.vp-col { display: flex; flex-direction: column; gap: 16px; }
-
-.vp-card {
-  background: var(--vp-card);
-  border: 1px solid var(--vp-border);
-  border-radius: var(--vp-radius);
-  box-shadow: var(--vp-shadow);
-  overflow: hidden;
-}
-
-.vp-card-header {
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--vp-border);
-  background: var(--gray-50);
-}
-.vp-card-header h3 { margin: 0; font-size: 0.95rem; color: var(--vp-green-dark); }
-.vp-card-header h3 i { margin-right: 7px; }
-.vp-card-body { padding: 16px; }
-
-/* Work order meta grid */
-.vp-meta {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-  gap: 12px 18px;
-  margin: 0;
-}
-.vp-meta dt { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--vp-muted); }
-.vp-meta dd { margin: 2px 0 0; font-size: 0.9rem; font-weight: 500; overflow-wrap: anywhere; }
-
-.vp-instructions {
-  margin-top: 14px;
-  background: var(--store-paper);
-  border: 1px solid var(--amber-200);
-  border-left: 4px solid var(--amber-500);
-  border-radius: 8px;
-  padding: 10px 14px;
-  font-size: 0.88rem;
-  white-space: pre-wrap;
-}
-
-/* Lines table */
-.vp-table-scroll { overflow-x: auto; }
-.vp-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-
-.vp-table th {
-  text-align: left;
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--vp-muted);
-  padding: 6px 10px;
-  border-bottom: 1px solid var(--vp-border);
-}
-.vp-table td { padding: 8px 10px; border-bottom: 1px solid var(--vp-border); }
-.vp-table tr:last-child td { border-bottom: none; }
-
-/* Files */
-.vp-files { display: flex; flex-direction: column; gap: 10px; }
-
-.vp-file {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  border: 1px solid var(--vp-border);
-  border-radius: 8px;
-  padding: 10px 12px;
-}
-
-.vp-file-thumb {
-  width: 46px;
-  height: 46px;
-  border-radius: 6px;
-  object-fit: contain;
-  background: var(--vp-green-pale);
-  flex-shrink: 0;
-}
-
-.vp-file-icon {
-  width: 46px;
-  height: 46px;
-  border-radius: 6px;
-  background: var(--vp-green-pale);
-  color: var(--vp-green);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.1rem;
-  flex-shrink: 0;
-}
-.vp-file-info { flex: 1; min-width: 0; }
-
-.vp-file-name {
-  font-size: 0.85rem;
-  font-weight: 600;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.vp-file-meta { font-size: 0.72rem; color: var(--vp-muted); display: flex; gap: 8px; flex-wrap: wrap; }
-
-.vp-file-type {
-  font-size: 0.65rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  background: var(--vp-green-pale);
-  color: var(--vp-green-dark);
-  border-radius: 4px;
-  padding: 1px 6px;
-}
-.vp-file-type--mockup { background: var(--sky-100); color: var(--blue-800); }
-
-/* Mockup panel */
-.vp-mockup-img {
-  width: 100%;
-  max-height: 420px;
-  object-fit: contain;
-  border-radius: 8px;
-  background: var(--vp-green-pale);
-}
-
-/* Timeline */
-.vp-comment-form { display: flex; gap: 8px; margin-bottom: 14px; align-items: flex-end; }
-
-.vp-comment-form textarea {
-  flex: 1;
-  border: 1px solid var(--vp-border);
-  border-radius: 8px;
-  padding: 8px 10px;
-  font-size: 0.85rem;
-  font-family: inherit;
-  resize: vertical;
-}
-.vp-timeline { display: flex; flex-direction: column; gap: 12px; max-height: 460px; overflow-y: auto; }
-.vp-note { border-left: 3px solid var(--vp-green-pale); padding: 2px 0 2px 12px; }
-.vp-note--vendor { border-left-color: var(--vp-green); }
-.vp-note--status { border-left-color: var(--vendor-portal-cyan); }
-.vp-note-head { font-size: 0.72rem; color: var(--vp-muted); margin-bottom: 2px; }
-.vp-note-head strong { color: var(--vp-ink); }
-.vp-note-text { font-size: 0.85rem; white-space: pre-wrap; overflow-wrap: anywhere; }
-
-/* ── 2026-09-05 review ─────────────────────────────────────── */
-.vp-sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
-.vp-btn--sm { padding: 5px 10px; font-size: 0.78rem; }
-.vp-error { flex-wrap: wrap; }
-.vp-error #vp-error-retry { margin-left: auto; }
-.vp-chip-count { font-size: 0.72rem; opacity: 0.8; margin-left: 2px; }
-.vp-chip-count:empty { display: none; }
-
-.vp-chip:focus-visible, .vp-btn:focus-visible, .vp-job-card:focus-visible, .vp-search input:focus-visible,
-.vp-comment-form textarea:focus-visible, .vp-detail-company:focus-visible { outline: 3px solid var(--vp-green); outline-offset: 2px; }
-.vp-detail-company:focus { outline: none; }
-/* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
-.vp-overdue { color: var(--vp-rush) !important; font-weight: 600; }
-.vp-job-card--pastdue { border-left: 4px solid var(--vp-rush); }
-.vp-comment-hint { font-size: 0.72rem; color: var(--vp-muted); margin: -8px 0 12px; }
-.vp-comment-status { font-size: 0.8rem; color: var(--vp-green-dark); background: var(--vp-green-pale); border-radius: 6px; padding: 6px 10px; margin-bottom: 12px; }
-.vp-mockup-img { display: block; }
-
-@media (width <= 560px) {
-  .vp-header-inner { padding: 10px 14px; gap: 10px; }
-  .vp-logo { height: 36px; }
-  .vp-header-title h1 { font-size: 1rem; }
-  .vp-header-sub { display: none; }
-  .vp-header-user { width: 100%; justify-content: space-between; }
-  .vp-container { padding: 14px; }
-  .vp-search { flex: 1 1 100%; min-width: 0; }
-  .vp-job-grid { grid-template-columns: 1fr; }
-  .vp-detail-header { padding: 14px; }
-  .vp-card-body { padding: 12px; }
-  .vp-comment-form { flex-direction: column; align-items: stretch; }
-  .vp-timeline { max-height: none; }
+ @media print {
+  @page { size:letter; margin:12mm; }
+  :where([data-ui="unified"].vendor-portal-page) { display:block; min-height:0; background:var(--ui-surface); font-size:11px; }
+  :where([data-ui="unified"].vendor-portal-page) .page-header { display:block; border-top:0; }
+  :where([data-ui="unified"].vendor-portal-page) .page-header-inner { padding:0 0 10px; gap:10px; }
+  :where([data-ui="unified"].vendor-portal-page) .page-header-logo { height:30px; }
+  :where([data-ui="unified"].vendor-portal-page) .vp-header-title h1 { font-size:14px; }
+  :where([data-ui="unified"].vendor-portal-page) .vp-header-sub { font-size:10px; }
+  :where([data-ui="unified"].vendor-portal-page) .vp-header-user,:where([data-ui="unified"].vendor-portal-page) .vp-toolbar,:where([data-ui="unified"].vendor-portal-page) .vp-back,:where([data-ui="unified"].vendor-portal-page) .vp-comment-form,:where([data-ui="unified"].vendor-portal-page) .vp-comment-hint { display:none; }
+  :where([data-ui="unified"].vendor-portal-page) .vp-container { padding:12px 0 0; }
+  :where([data-ui="unified"].vendor-portal-page) .vp-detail-header { margin-bottom:12px; break-inside:avoid; }
+  :where([data-ui="unified"].vendor-portal-page) .vp-detail-company { font-size:18px; }
+  :where([data-ui="unified"].vendor-portal-page) .vp-detail-id,:where([data-ui="unified"].vendor-portal-page) .vp-detail-sub { font-size:11px; }
+  :where([data-ui="unified"].vendor-portal-page) .vp-grid,:where([data-ui="unified"].vendor-portal-page) .vp-col { display:block; }
+  :where([data-ui="unified"].vendor-portal-page) .vp-card { margin-bottom:6px; border:0; border-radius:0; overflow:visible; }
+  :where([data-ui="unified"].vendor-portal-page) .vp-card-header { padding:4px 0; break-after:avoid; }
+  :where([data-ui="unified"].vendor-portal-page) .vp-card-header h3 { font-size:13px; }
+  :where([data-ui="unified"].vendor-portal-page) .vp-card-body { padding:6px 0; }
+  :where([data-ui="unified"].vendor-portal-page) .vp-meta { grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px 12px; }
+  :where([data-ui="unified"].vendor-portal-page) .vp-meta dt,:where([data-ui="unified"].vendor-portal-page) .vp-meta dd { font-size:10px; }
+  :where([data-ui="unified"].vendor-portal-page) .vp-instructions { margin-top:10px; padding:8px; font-size:11px; }
+  :where([data-ui="unified"].vendor-portal-page) .vp-table-scroll { overflow:visible; }
+  :where([data-ui="unified"].vendor-portal-page) .vp-table { display:table; font-size:10px; }
+  :where([data-ui="unified"].vendor-portal-page) .vp-table thead { position:static; width:auto; height:auto; clip-path:none; display:table-header-group; }
+  :where([data-ui="unified"].vendor-portal-page) .vp-table tbody { display:table-row-group; }
+  :where([data-ui="unified"].vendor-portal-page) .vp-table tr { display:table-row; break-inside:avoid; }
+  :where([data-ui="unified"].vendor-portal-page) .vp-table th,:where([data-ui="unified"].vendor-portal-page) .vp-table td { display:table-cell; padding:5px; font-size:11px; }
+  :where([data-ui="unified"].vendor-portal-page) .vp-table td::before { display:none; }
+  :where([data-ui="unified"].vendor-portal-page) .vp-file,:where([data-ui="unified"].vendor-portal-page) .vp-note { break-inside:avoid; }
+  :where([data-ui="unified"].vendor-portal-page) .vp-file-name,:where([data-ui="unified"].vendor-portal-page) .vp-file-meta,:where([data-ui="unified"].vendor-portal-page) .vp-note-head,:where([data-ui="unified"].vendor-portal-page) .vp-note-text { font-size:11px; }
+  :where([data-ui="unified"].vendor-portal-page) .vp-file .btn { min-height:0; padding:4px 8px; font-size:10px; }
+  :where([data-ui="unified"].vendor-portal-page) .vp-mockup-img { max-height:72px; }
+  :where([data-ui="unified"].vendor-portal-page) .vp-timeline { display:block; overflow:visible; }
+  :where([data-ui="unified"].vendor-portal-page) .vp-note { margin-bottom:10px; }
+  :where([data-ui="unified"].vendor-portal-page) .vp-job-card { break-inside:avoid; padding:12px; }
+  :where([data-ui="unified"].vendor-portal-page) .vp-job-company { font-size:13px; }
+  :where([data-ui="unified"].vendor-portal-page) .vp-job-meta,:where([data-ui="unified"].vendor-portal-page) .vp-job-id,:where([data-ui="unified"].vendor-portal-page) .vp-badge { font-size:10px; }
+  :where([data-ui="unified"].vendor-portal-page) .page-footer { padding:10px 0 0; font-size:9px; }
+  :where([data-ui="unified"].vendor-portal-page) .vp-file { padding:4px; }
+  :where([data-ui="unified"].vendor-portal-page) :focus { outline:0; }
+ }
 }

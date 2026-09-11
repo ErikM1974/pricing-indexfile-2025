@@ -11,12 +11,15 @@
  */
 const fs = require('fs');
 const path = require('path');
+const { JSDOM } = require('jsdom');
 const ROOT = path.join(__dirname, '..', '..');
 const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 
 const html = read('pages/vendor-portal.html').replace(/<!--[\s\S]*?-->/g, '');
 const js = read('pages/js/vendor-portal.js');
 const css = read('pages/css/vendor-portal.css');
+const components = read('shared_components/css/components.css');
+const doc = new JSDOM(html).window.document;
 
 describe('vendor portal — Rule 3 and dependencies', () => {
     test('no inline handlers/styles/scripts, no CDN', () => {
@@ -37,11 +40,12 @@ describe('vendor portal — Rule 3 and dependencies', () => {
 });
 
 describe('vendor portal — failure and status surfaces', () => {
-    test('`hidden` beats the display rules - the banner is display:flex and was visible on every load', () => {
-        const hiddenIdx = css.indexOf('[hidden] { display: none !important; }');
-        expect(hiddenIdx).toBeGreaterThan(-1);
-        expect(css.indexOf('.vp-error {')).toBeGreaterThan(hiddenIdx);
-        expect(css.indexOf('.vp-btn {')).toBeGreaterThan(hiddenIdx);
+    test('the shared visibility layer owns hidden banners and controls', () => {
+        expect(doc.body.dataset.ui).toBe('unified');
+        expect(doc.querySelector('link[href^="/shared_components/css/components.css"]')).not.toBeNull();
+        expect(components).toMatch(/\[hidden\]\s*\{\s*display:\s*none;/);
+        expect(doc.getElementById('vp-error').hidden).toBe(true);
+        expect(doc.getElementById('vp-error-retry').hidden).toBe(true);
     });
     test('error banner is an alert with a Retry the controller drives', () => {
         expect(html).toMatch(/id="vp-error" class="vp-error" role="alert" hidden/);
@@ -66,12 +70,17 @@ describe('vendor portal — form and filter a11y', () => {
         expect(html).toMatch(/<label for="vp-search" class="vp-sr">Search jobs<\/label>/);
         expect(html).toMatch(/<label for="vp-comment-input" class="vp-sr">Message for NWCA<\/label>/);
         expect(html).toMatch(/id="vp-comment-btn" disabled/);
-        expect(js).toMatch(/\$\('vp-comment-btn'\)\.disabled = !\(e\.target\.value \|\| ''\)\.trim\(\)/);
+        expect(js).toMatch(/\$\('vp-comment-btn'\)\.disabled = state\.posting \|\| !\(e\.target\.value \|\| ''\)\.trim\(\)/);
         expect(js).toMatch(/e\.key === 'Enter' && \(e\.ctrlKey \|\| e\.metaKey\)/);
     });
     test('filter chips are pressed-state buttons with counts', () => {
         expect(html).toMatch(/id="vp-filters" role="group" aria-label="Filter jobs"/);
-        expect((html.match(/type="button" class="vp-chip[^"]*" data-filter="[a-z]+" aria-pressed="(true|false)"/g) || []).length).toBe(3);
+        const filters = [...doc.querySelectorAll('#vp-filters button.vp-chip')];
+        expect(filters.map(button => ({ type: button.type, filter: button.dataset.filter, pressed: button.getAttribute('aria-pressed') }))).toEqual([
+            { type: 'button', filter: 'active', pressed: 'true' },
+            { type: 'button', filter: 'completed', pressed: 'false' },
+            { type: 'button', filter: 'all', pressed: 'false' },
+        ]);
         expect(html).toMatch(/<span class="vp-chip-count" data-count="active"><\/span>/);
         expect(js).toMatch(/c\.setAttribute\('aria-pressed', on \? 'true' : 'false'\)/);
         expect(js).toMatch(/\.vp-chip-count\[data-count="' \+ f \+ '"\]/);
@@ -79,8 +88,10 @@ describe('vendor portal — form and filter a11y', () => {
 });
 
 describe('vendor portal — navigation', () => {
-    test('cards open on Enter and Space; history is pushed; popstate walks back', () => {
-        expect(js).toMatch(/if \(e\.key !== 'Enter' && e\.key !== ' '\) return;/);
+    test('native job buttons provide keyboard activation; history is pushed; popstate walks back', () => {
+        expect(js).toContain('<button type="button" class="vp-job-card');
+        // A second key handler would also synthesize a click on native buttons.
+        expect(js).not.toContain("if (e.key !== 'Enter' && e.key !== ' ') return;");
         expect(js).toMatch(/if \(!fromHistory && location\.hash !== hash\) history\.pushState\(null, '', hash\);/);
         expect(js).toMatch(/window\.addEventListener\('popstate'/);
         expect(js).not.toMatch(/history\.replaceState/);
@@ -106,12 +117,12 @@ describe('vendor portal — rendering', () => {
         expect(js).toMatch(/function isPastDue\(job\)/);
         expect(js).toMatch(/vp-job-card--pastdue/);
         expect(js).toMatch(/pastDue \? 'vp-overdue' : ''/);
-        expect(css).toMatch(/\.vp-overdue \{ color: var\(--vp-rush\)/);
+        expect(css).toMatch(/\.vp-overdue\s*\{\s*color:\s*var\(--red-800\)/);
     });
-    test('shared CSS: sr-only, focus-visible, phone block', () => {
-        expect(css).toMatch(/\.vp-sr \{ position: absolute; width: 1px/);
-        expect(css).toMatch(/\.vp-job-card:focus-visible/);
-        // the phone block collapses the job grid (either media-query syntax: stylelint's standard config writes the range form)
-        expect(css).toMatch(/@media \((?:max-width: 560px|width <= 560px)\) \{[\s\S]*\.vp-job-grid \{ grid-template-columns: 1fr; \}/);
+    test('shared keyboard focus, screen-reader labels and a fluid phone grid', () => {
+        expect(css).toMatch(/\.vp-sr\s*\{\s*position:\s*absolute;\s*width:\s*1px/);
+        expect(components).toMatch(/:where\(\[data-ui="unified"\]\) :focus-visible\s*\{/);
+        // Cards become one column without imposing a minimum wider than the phone.
+        expect(css).toMatch(/\.vp-job-grid\s*\{[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(320px,\s*100%\),\s*1fr\)\)/);
     });
 });

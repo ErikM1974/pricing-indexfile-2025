@@ -29,7 +29,9 @@
         ['st-loading', 'st-order', 'st-error'].forEach((x) => { $(x).hidden = x !== id; });
     }
 
-    function showError(msg) {
+    function showError(msg, retryable = false) {
+        $('st-retry').hidden = !retryable;
+        $('st-error-title').textContent = retryable ? 'Order status is temporarily unavailable' : 'We couldn’t find that order';
         if (msg) $('st-error-msg').textContent = msg;
         show('st-error');
     }
@@ -149,7 +151,11 @@
         show('st-order');
     }
 
+    let loading = false;
     async function load() {
+        if (loading) return;
+        loading = true;
+        show('st-loading');
         try {
             const res = await fetch(`/api/order-status/${encodeURIComponent(quoteID)}?t=${encodeURIComponent(token)}`);
             if (res.status === 404) {
@@ -157,17 +163,20 @@
                 return;
             }
             if (!res.ok) {
-                showError('Order status is temporarily unavailable. Please try again in a few minutes, or call us.');
+                showError('Order status is temporarily unavailable. Please try again in a few minutes, or call us.', true);
                 return;
             }
             render(await res.json());
         } catch (e) {
             console.error('[OrderStatus] Load failed:', e);
-            showError('Order status is temporarily unavailable. Please try again in a few minutes, or call us.');
+            showError('Order status is temporarily unavailable. Please try again in a few minutes, or call us.', true);
+        } finally {
+            loading = false;
         }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+        $('st-retry').addEventListener('click', load);
         if (!quoteID || !token) {
             showError('This page needs the full link from your confirmation email — the one ending in your order code.');
             return;
