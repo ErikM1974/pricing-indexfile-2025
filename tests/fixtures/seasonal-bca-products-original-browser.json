@@ -1,0 +1,310 @@
+{
+  "name": "products",
+  "diagnosticService": true,
+  "states": [
+    {
+      "width": 1440,
+      "text": "Breast Cancer Awareness Bundle Supporting the Fight & Making a Difference, Together. ⏰ ORDER BY SEPTEMBER 30TH for Early October Events! Only 19 days left to order for Breast Cancer Awareness Month 🚀 RUSH PRODUCTION AVAILABLE - Ships in 5-7 business days 1 PRODUCTS 2 SIZES 3 CONTACT 4 REVIEW Show Your Support with Style Join us in supporting breast cancer awareness with our specially designed bundle featuring premium embroidered caps and DTG printed t-shirts. Number of Bundles $360 8 Bundles × $45 = 8 T-Shirts + 8 Caps Minimum Order: 8 Bundles = $360.00 ⏰ Order by September 30th for Early October Events RUSH PRODUCTION • Ships in 5-7 business days What's Included in Each Bundle Port Authority Snapback Trucker Cap Style: C112 ✓ True Pink/White ✓ One Size Fits All ✓ Front Embroidered Logo Your Choice of Design Select in Step 3 Core Cotton Tee Style: PC54 ✓ Candy Pink ✓ Sizes S - 4XL Choice of 2 Designs Preview Your T-Shirt Design Options Our artist will incorporate your company logo into one of these beautiful breast cancer awareness designs. You'll make your selection in Step 3 when you upload your logo. Option 1: Classic Ribbon Features the iconic pink ribbon with your company logo. A timeless design that shows your support for breast cancer awareness. Default Option Option 2: Patriotic Flag Combines the American flag with the pink ribbon and your company logo. Perfect for showing both patriotic pride and breast cancer support. Patriotic Theme 3 Make your selection in Step 3 below Plus, Your Order Includes Over $150 in Free Extras! To make your campaign a success, we're including these professional services at no extra cost. Custom Logo Artwork Our artists will provide 30 minutes of design time to help create or refine your perfect breast cancer awareness logo. (A $50 Value) No Larger Size Upcharges We believe in inclusivity for everyone showing support. The price is the same for all t-shirt sizes, from Small to 4XL. Free Cap Digitizing We'll convert your logo into a stitch-ready file for high-quality cap embroidery, completely free of charge. (A $100 Value) Next",
+      "title": "Breast Cancer Awareness Bundle - Northwest Custom Apparel",
+      "fields": [
+        {
+          "id": "bundleQuantity",
+          "name": "",
+          "value": "8",
+          "checked": false
+        }
+      ],
+      "images": [
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "alt": "Northwest Custom Apparel Logo"
+        },
+        {
+          "src": "https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9109227",
+          "alt": "Woman wearing breast cancer awareness t-shirt and cap"
+        },
+        {
+          "src": "https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9130594",
+          "alt": "Port Authority Snapback Trucker Cap"
+        },
+        {
+          "src": "https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9131676",
+          "alt": "Classic Ribbon Design"
+        },
+        {
+          "src": "https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9131677",
+          "alt": "Patriotic Flag Design"
+        }
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "button-name",
+          "nodes": [
+            [
+              "button[onclick=\"adjustQuantity(-1)\"]"
+            ],
+            [
+              "button[onclick=\"adjustQuantity(1)\"]"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#step-indicator-1 > .-ml-10.w-32.uppercase"
+            ],
+            [
+              ".mb-10.max-w-2xl.mx-auto > strong"
+            ],
+            [
+              ".py-1.inline-block.bg-pink-100"
+            ],
+            [
+              ".bg-blue-100"
+            ]
+          ]
+        },
+        {
+          "id": "label",
+          "nodes": [
+            [
+              "#bundleQuantity"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "text": "Breast Cancer Awareness Bundle Supporting the Fight & Making a Difference, Together. ⏰ ORDER BY SEPTEMBER 30TH for Early October Events! Only 19 days left to order for Breast Cancer Awareness Month 🚀 RUSH PRODUCTION AVAILABLE - Ships in 5-7 business days 1 PRODUCTS 2 SIZES 3 CONTACT 4 REVIEW Show Your Support with Style Join us in supporting breast cancer awareness with our specially designed bundle featuring premium embroidered caps and DTG printed t-shirts. Number of Bundles $360 8 Bundles × $45 = 8 T-Shirts + 8 Caps Minimum Order: 8 Bundles = $360.00 ⏰ Order by September 30th for Early October Events RUSH PRODUCTION • Ships in 5-7 business days What's Included in Each Bundle Port Authority Snapback Trucker Cap Style: C112 ✓ True Pink/White ✓ One Size Fits All ✓ Front Embroidered Logo Your Choice of Design Select in Step 3 Core Cotton Tee Style: PC54 ✓ Candy Pink ✓ Sizes S - 4XL Choice of 2 Designs Preview Your T-Shirt Design Options Our artist will incorporate your company logo into one of these beautiful breast cancer awareness designs. You'll make your selection in Step 3 when you upload your logo. Option 1: Classic Ribbon Features the iconic pink ribbon with your company logo. A timeless design that shows your support for breast cancer awareness. Default Option Option 2: Patriotic Flag Combines the American flag with the pink ribbon and your company logo. Perfect for showing both patriotic pride and breast cancer support. Patriotic Theme 3 Make your selection in Step 3 below Plus, Your Order Includes Over $150 in Free Extras! To make your campaign a success, we're including these professional services at no extra cost. Custom Logo Artwork Our artists will provide 30 minutes of design time to help create or refine your perfect breast cancer awareness logo. (A $50 Value) No Larger Size Upcharges We believe in inclusivity for everyone showing support. The price is the same for all t-shirt sizes, from Small to 4XL. Free Cap Digitizing We'll convert your logo into a stitch-ready file for high-quality cap embroidery, completely free of charge. (A $100 Value) Next",
+      "title": "Breast Cancer Awareness Bundle - Northwest Custom Apparel",
+      "fields": [
+        {
+          "id": "bundleQuantity",
+          "name": "",
+          "value": "8",
+          "checked": false
+        }
+      ],
+      "images": [
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "alt": "Northwest Custom Apparel Logo"
+        },
+        {
+          "src": "https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9109227",
+          "alt": "Woman wearing breast cancer awareness t-shirt and cap"
+        },
+        {
+          "src": "https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9130594",
+          "alt": "Port Authority Snapback Trucker Cap"
+        },
+        {
+          "src": "https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9131676",
+          "alt": "Classic Ribbon Design"
+        },
+        {
+          "src": "https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9131677",
+          "alt": "Patriotic Flag Design"
+        }
+      ],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "button-name",
+          "nodes": [
+            [
+              "button[onclick=\"adjustQuantity(-1)\"]"
+            ],
+            [
+              "button[onclick=\"adjustQuantity(1)\"]"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#step-indicator-1 > .-ml-10.w-32.uppercase"
+            ],
+            [
+              ".mb-10.max-w-2xl.mx-auto > strong"
+            ],
+            [
+              ".py-1.inline-block.bg-pink-100"
+            ],
+            [
+              ".bg-blue-100"
+            ]
+          ]
+        },
+        {
+          "id": "label",
+          "nodes": [
+            [
+              "#bundleQuantity"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "text": "Breast Cancer Awareness Bundle Supporting the Fight & Making a Difference, Together. ⏰ ORDER BY SEPTEMBER 30TH for Early October Events! Only 19 days left to order for Breast Cancer Awareness Month 🚀 RUSH PRODUCTION AVAILABLE - Ships in 5-7 business days 1 PRODUCTS 2 SIZES 3 CONTACT 4 REVIEW Show Your Support with Style Join us in supporting breast cancer awareness with our specially designed bundle featuring premium embroidered caps and DTG printed t-shirts. Number of Bundles $360 8 Bundles × $45 = 8 T-Shirts + 8 Caps Minimum Order: 8 Bundles = $360.00 ⏰ Order by September 30th for Early October Events RUSH PRODUCTION • Ships in 5-7 business days What's Included in Each Bundle Port Authority Snapback Trucker Cap Style: C112 ✓ True Pink/White ✓ One Size Fits All ✓ Front Embroidered Logo Your Choice of Design Select in Step 3 Core Cotton Tee Style: PC54 ✓ Candy Pink ✓ Sizes S - 4XL Choice of 2 Designs Preview Your T-Shirt Design Options Our artist will incorporate your company logo into one of these beautiful breast cancer awareness designs. You'll make your selection in Step 3 when you upload your logo. Option 1: Classic Ribbon Features the iconic pink ribbon with your company logo. A timeless design that shows your support for breast cancer awareness. Default Option Option 2: Patriotic Flag Combines the American flag with the pink ribbon and your company logo. Perfect for showing both patriotic pride and breast cancer support. Patriotic Theme 3 Make your selection in Step 3 below Plus, Your Order Includes Over $150 in Free Extras! To make your campaign a success, we're including these professional services at no extra cost. Custom Logo Artwork Our artists will provide 30 minutes of design time to help create or refine your perfect breast cancer awareness logo. (A $50 Value) No Larger Size Upcharges We believe in inclusivity for everyone showing support. The price is the same for all t-shirt sizes, from Small to 4XL. Free Cap Digitizing We'll convert your logo into a stitch-ready file for high-quality cap embroidery, completely free of charge. (A $100 Value) Next",
+      "title": "Breast Cancer Awareness Bundle - Northwest Custom Apparel",
+      "fields": [
+        {
+          "id": "bundleQuantity",
+          "name": "",
+          "value": "8",
+          "checked": false
+        }
+      ],
+      "images": [
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "alt": "Northwest Custom Apparel Logo"
+        },
+        {
+          "src": "https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9109227",
+          "alt": "Woman wearing breast cancer awareness t-shirt and cap"
+        },
+        {
+          "src": "https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9130594",
+          "alt": "Port Authority Snapback Trucker Cap"
+        },
+        {
+          "src": "https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9131676",
+          "alt": "Classic Ribbon Design"
+        },
+        {
+          "src": "https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9131677",
+          "alt": "Patriotic Flag Design"
+        }
+      ],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "button-name",
+          "nodes": [
+            [
+              "button[onclick=\"adjustQuantity(-1)\"]"
+            ],
+            [
+              "button[onclick=\"adjustQuantity(1)\"]"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#step-indicator-1 > .-ml-10.w-32.uppercase"
+            ],
+            [
+              ".mb-10.max-w-2xl.mx-auto > strong"
+            ],
+            [
+              ".py-1.inline-block.bg-pink-100"
+            ],
+            [
+              ".bg-blue-100"
+            ]
+          ]
+        },
+        {
+          "id": "label",
+          "nodes": [
+            [
+              "#bundleQuantity"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "text": "Breast Cancer Awareness Bundle Supporting the Fight & Making a Difference, Together. ⏰ ORDER BY SEPTEMBER 30TH for Early October Events! Only 19 days left to order for Breast Cancer Awareness Month 🚀 RUSH PRODUCTION AVAILABLE - Ships in 5-7 business days 1 PRODUCTS 2 SIZES 3 CONTACT 4 REVIEW Show Your Support with Style Join us in supporting breast cancer awareness with our specially designed bundle featuring premium embroidered caps and DTG printed t-shirts. Number of Bundles $360 8 Bundles × $45 = 8 T-Shirts + 8 Caps Minimum Order: 8 Bundles = $360.00 ⏰ Order by September 30th for Early October Events RUSH PRODUCTION • Ships in 5-7 business days What's Included in Each Bundle Port Authority Snapback Trucker Cap Style: C112 ✓ True Pink/White ✓ One Size Fits All ✓ Front Embroidered Logo Your Choice of Design Select in Step 3 Core Cotton Tee Style: PC54 ✓ Candy Pink ✓ Sizes S - 4XL Choice of 2 Designs Preview Your T-Shirt Design Options Our artist will incorporate your company logo into one of these beautiful breast cancer awareness designs. You'll make your selection in Step 3 when you upload your logo. Option 1: Classic Ribbon Features the iconic pink ribbon with your company logo. A timeless design that shows your support for breast cancer awareness. Default Option Option 2: Patriotic Flag Combines the American flag with the pink ribbon and your company logo. Perfect for showing both patriotic pride and breast cancer support. Patriotic Theme 3 Make your selection in Step 3 below Plus, Your Order Includes Over $150 in Free Extras! To make your campaign a success, we're including these professional services at no extra cost. Custom Logo Artwork Our artists will provide 30 minutes of design time to help create or refine your perfect breast cancer awareness logo. (A $50 Value) No Larger Size Upcharges We believe in inclusivity for everyone showing support. The price is the same for all t-shirt sizes, from Small to 4XL. Free Cap Digitizing We'll convert your logo into a stitch-ready file for high-quality cap embroidery, completely free of charge. (A $100 Value) Next",
+      "title": "Breast Cancer Awareness Bundle - Northwest Custom Apparel",
+      "fields": [
+        {
+          "id": "bundleQuantity",
+          "name": "",
+          "value": "8",
+          "checked": false
+        }
+      ],
+      "images": [
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "alt": "Northwest Custom Apparel Logo"
+        },
+        {
+          "src": "https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9109227",
+          "alt": "Woman wearing breast cancer awareness t-shirt and cap"
+        },
+        {
+          "src": "https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9130594",
+          "alt": "Port Authority Snapback Trucker Cap"
+        },
+        {
+          "src": "https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9131676",
+          "alt": "Classic Ribbon Design"
+        },
+        {
+          "src": "https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9131677",
+          "alt": "Patriotic Flag Design"
+        }
+      ],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "button-name",
+          "nodes": [
+            [
+              "button[onclick=\"adjustQuantity(-1)\"]"
+            ],
+            [
+              "button[onclick=\"adjustQuantity(1)\"]"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#step-indicator-1 > .-ml-10.w-32.uppercase"
+            ],
+            [
+              ".mb-10.max-w-2xl.mx-auto > strong"
+            ],
+            [
+              ".py-1.inline-block.bg-pink-100"
+            ],
+            [
+              ".bg-blue-100"
+            ]
+          ]
+        },
+        {
+          "id": "label",
+          "nodes": [
+            [
+              "#bundleQuantity"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "events": {
+    "errors": [],
+    "missing": [],
+    "unknown": [],
+    "writes": [],
+    "dialogs": []
+  },
+  "emails": []
+}

@@ -1,0 +1,435 @@
+{
+  "name": "failed-email",
+  "diagnosticService": true,
+  "states": [
+    {
+      "width": 1440,
+      "text": "Breast Cancer Awareness Bundle Supporting the Fight & Making a Difference, Together. ⏰ ORDER BY SEPTEMBER 30TH for Early October Events! Only 19 days left to order for Breast Cancer Awareness Month 🚀 RUSH PRODUCTION AVAILABLE - Ships in 5-7 business days PRODUCTS SIZES CONTACT 4 REVIEW Order Submitted Successfully! Quote ID: BCA0911-1000 Thank you for supporting breast cancer awareness! Your order has been received and our sales team will contact you within 24 hours to finalize payment and delivery arrangements. You will receive a confirmation email shortly with your order details. Start New Order",
+      "title": "Breast Cancer Awareness Bundle - Northwest Custom Apparel",
+      "fields": [],
+      "images": [
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "alt": "Northwest Custom Apparel Logo"
+        }
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#step-indicator-1 > .text-green-600.-ml-10.w-32"
+            ],
+            [
+              "#step-indicator-2 > .text-green-600.-ml-10.w-32"
+            ],
+            [
+              "#step-indicator-3 > .text-green-600.-ml-10.w-32"
+            ],
+            [
+              "#step-indicator-4 > .-ml-10.w-32.uppercase"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "text": "Breast Cancer Awareness Bundle Supporting the Fight & Making a Difference, Together. ⏰ ORDER BY SEPTEMBER 30TH for Early October Events! Only 19 days left to order for Breast Cancer Awareness Month 🚀 RUSH PRODUCTION AVAILABLE - Ships in 5-7 business days PRODUCTS SIZES CONTACT 4 REVIEW Order Submitted Successfully! Quote ID: BCA0911-1000 Thank you for supporting breast cancer awareness! Your order has been received and our sales team will contact you within 24 hours to finalize payment and delivery arrangements. You will receive a confirmation email shortly with your order details. Start New Order",
+      "title": "Breast Cancer Awareness Bundle - Northwest Custom Apparel",
+      "fields": [],
+      "images": [
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "alt": "Northwest Custom Apparel Logo"
+        }
+      ],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#step-indicator-1 > .text-green-600.-ml-10.w-32"
+            ],
+            [
+              "#step-indicator-2 > .text-green-600.-ml-10.w-32"
+            ],
+            [
+              "#step-indicator-3 > .text-green-600.-ml-10.w-32"
+            ],
+            [
+              "#step-indicator-4 > .-ml-10.w-32.uppercase"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "text": "Breast Cancer Awareness Bundle Supporting the Fight & Making a Difference, Together. ⏰ ORDER BY SEPTEMBER 30TH for Early October Events! Only 19 days left to order for Breast Cancer Awareness Month 🚀 RUSH PRODUCTION AVAILABLE - Ships in 5-7 business days PRODUCTS SIZES CONTACT 4 REVIEW Order Submitted Successfully! Quote ID: BCA0911-1000 Thank you for supporting breast cancer awareness! Your order has been received and our sales team will contact you within 24 hours to finalize payment and delivery arrangements. You will receive a confirmation email shortly with your order details. Start New Order",
+      "title": "Breast Cancer Awareness Bundle - Northwest Custom Apparel",
+      "fields": [],
+      "images": [
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "alt": "Northwest Custom Apparel Logo"
+        }
+      ],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#step-indicator-1 > .text-green-600.-ml-10.w-32"
+            ],
+            [
+              "#step-indicator-2 > .text-green-600.-ml-10.w-32"
+            ],
+            [
+              "#step-indicator-3 > .text-green-600.-ml-10.w-32"
+            ],
+            [
+              "#step-indicator-4 > .-ml-10.w-32.uppercase"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "text": "Breast Cancer Awareness Bundle Supporting the Fight & Making a Difference, Together. ⏰ ORDER BY SEPTEMBER 30TH for Early October Events! Only 19 days left to order for Breast Cancer Awareness Month 🚀 RUSH PRODUCTION AVAILABLE - Ships in 5-7 business days PRODUCTS SIZES CONTACT 4 REVIEW Order Submitted Successfully! Quote ID: BCA0911-1000 Thank you for supporting breast cancer awareness! Your order has been received and our sales team will contact you within 24 hours to finalize payment and delivery arrangements. You will receive a confirmation email shortly with your order details. Start New Order",
+      "title": "Breast Cancer Awareness Bundle - Northwest Custom Apparel",
+      "fields": [],
+      "images": [
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "alt": "Northwest Custom Apparel Logo"
+        }
+      ],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#step-indicator-1 > .text-green-600.-ml-10.w-32"
+            ],
+            [
+              "#step-indicator-2 > .text-green-600.-ml-10.w-32"
+            ],
+            [
+              "#step-indicator-3 > .text-green-600.-ml-10.w-32"
+            ],
+            [
+              "#step-indicator-4 > .-ml-10.w-32.uppercase"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "events": {
+    "errors": [],
+    "missing": [],
+    "unknown": [],
+    "writes": [
+      {
+        "path": "/api/quote_sessions",
+        "body": {
+          "SessionID": "BCA0911-1000",
+          "QuoteID": "BCA0911-1000",
+          "CustomerName": "Example Customer",
+          "CustomerEmail": "example@example.invalid",
+          "CompanyName": "Example Company",
+          "Phone": "2535550100",
+          "TotalQuantity": 8,
+          "SubtotalAmount": 360,
+          "LTMFeeTotal": 0,
+          "TotalAmount": 360,
+          "Status": "Sample Request",
+          "ExpiresAt": "2026-10-11T18:30:00",
+          "Notes": "BCA Bundle: 8 bundles, Ship to Address, Sizes: M:3 L:5, Event: 2026-10-10, Instructions: Synthetic review only. No real order.",
+          "ShippingAddress": "123 Example Street, Example City, WA 98000",
+          "DeliveryMethod": "Ship"
+        }
+      },
+      {
+        "path": "/api/quote_items",
+        "body": {
+          "QuoteID": "BCA0911-1000",
+          "LineNumber": 1,
+          "StyleNumber": "BCA-BUNDLE",
+          "ProductName": "Breast Cancer Awareness Bundle - Size M",
+          "Quantity": 1,
+          "FinalUnitPrice": 45,
+          "LineTotal": 45,
+          "First": "Example",
+          "Last": "Customer",
+          "Email": "example@example.invalid",
+          "Phone": "2535550100",
+          "Company": "Example Company",
+          "EmbellishmentType": "bundle",
+          "PrintLocation": "Bundle Package",
+          "Color": "Candy Pink",
+          "ColorCode": "PINK",
+          "SizeBreakdown": "{\"M\":3,\"L\":5}",
+          "Image_Upload": "",
+          "DesignChoice": "Flag",
+          "DesignImageURL": "https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9131677",
+          "DeliveryMethod": "Ship",
+          "Shipping_Address": "123 Example Street",
+          "Shipping_City": "Example City",
+          "Shipping_State": "WA",
+          "Shipping_Zip": "98000",
+          "Notes": "Bundle contains: 1 PC54 Candy Pink T-Shirt (Flag design), 1 C112 True Pink/White Cap. Total: 8 bundles. Special Instructions: Synthetic review only. No real order."
+        }
+      },
+      {
+        "path": "/api/quote_items",
+        "body": {
+          "QuoteID": "BCA0911-1000",
+          "LineNumber": 2,
+          "StyleNumber": "BCA-BUNDLE",
+          "ProductName": "Breast Cancer Awareness Bundle - Size M",
+          "Quantity": 1,
+          "FinalUnitPrice": 45,
+          "LineTotal": 45,
+          "First": "Example",
+          "Last": "Customer",
+          "Email": "example@example.invalid",
+          "Phone": "2535550100",
+          "Company": "Example Company",
+          "EmbellishmentType": "bundle",
+          "PrintLocation": "Bundle Package",
+          "Color": "Candy Pink",
+          "ColorCode": "PINK",
+          "SizeBreakdown": "",
+          "Image_Upload": "",
+          "DesignChoice": "Flag",
+          "DesignImageURL": "https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9131677",
+          "DeliveryMethod": "Ship",
+          "Shipping_Address": "123 Example Street",
+          "Shipping_City": "Example City",
+          "Shipping_State": "WA",
+          "Shipping_Zip": "98000",
+          "Notes": "Bundle 2 of 8"
+        }
+      },
+      {
+        "path": "/api/quote_items",
+        "body": {
+          "QuoteID": "BCA0911-1000",
+          "LineNumber": 3,
+          "StyleNumber": "BCA-BUNDLE",
+          "ProductName": "Breast Cancer Awareness Bundle - Size M",
+          "Quantity": 1,
+          "FinalUnitPrice": 45,
+          "LineTotal": 45,
+          "First": "Example",
+          "Last": "Customer",
+          "Email": "example@example.invalid",
+          "Phone": "2535550100",
+          "Company": "Example Company",
+          "EmbellishmentType": "bundle",
+          "PrintLocation": "Bundle Package",
+          "Color": "Candy Pink",
+          "ColorCode": "PINK",
+          "SizeBreakdown": "",
+          "Image_Upload": "",
+          "DesignChoice": "Flag",
+          "DesignImageURL": "https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9131677",
+          "DeliveryMethod": "Ship",
+          "Shipping_Address": "123 Example Street",
+          "Shipping_City": "Example City",
+          "Shipping_State": "WA",
+          "Shipping_Zip": "98000",
+          "Notes": "Bundle 3 of 8"
+        }
+      },
+      {
+        "path": "/api/quote_items",
+        "body": {
+          "QuoteID": "BCA0911-1000",
+          "LineNumber": 4,
+          "StyleNumber": "BCA-BUNDLE",
+          "ProductName": "Breast Cancer Awareness Bundle - Size L",
+          "Quantity": 1,
+          "FinalUnitPrice": 45,
+          "LineTotal": 45,
+          "First": "Example",
+          "Last": "Customer",
+          "Email": "example@example.invalid",
+          "Phone": "2535550100",
+          "Company": "Example Company",
+          "EmbellishmentType": "bundle",
+          "PrintLocation": "Bundle Package",
+          "Color": "Candy Pink",
+          "ColorCode": "PINK",
+          "SizeBreakdown": "",
+          "Image_Upload": "",
+          "DesignChoice": "Flag",
+          "DesignImageURL": "https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9131677",
+          "DeliveryMethod": "Ship",
+          "Shipping_Address": "123 Example Street",
+          "Shipping_City": "Example City",
+          "Shipping_State": "WA",
+          "Shipping_Zip": "98000",
+          "Notes": "Bundle 4 of 8"
+        }
+      },
+      {
+        "path": "/api/quote_items",
+        "body": {
+          "QuoteID": "BCA0911-1000",
+          "LineNumber": 5,
+          "StyleNumber": "BCA-BUNDLE",
+          "ProductName": "Breast Cancer Awareness Bundle - Size L",
+          "Quantity": 1,
+          "FinalUnitPrice": 45,
+          "LineTotal": 45,
+          "First": "Example",
+          "Last": "Customer",
+          "Email": "example@example.invalid",
+          "Phone": "2535550100",
+          "Company": "Example Company",
+          "EmbellishmentType": "bundle",
+          "PrintLocation": "Bundle Package",
+          "Color": "Candy Pink",
+          "ColorCode": "PINK",
+          "SizeBreakdown": "",
+          "Image_Upload": "",
+          "DesignChoice": "Flag",
+          "DesignImageURL": "https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9131677",
+          "DeliveryMethod": "Ship",
+          "Shipping_Address": "123 Example Street",
+          "Shipping_City": "Example City",
+          "Shipping_State": "WA",
+          "Shipping_Zip": "98000",
+          "Notes": "Bundle 5 of 8"
+        }
+      },
+      {
+        "path": "/api/quote_items",
+        "body": {
+          "QuoteID": "BCA0911-1000",
+          "LineNumber": 6,
+          "StyleNumber": "BCA-BUNDLE",
+          "ProductName": "Breast Cancer Awareness Bundle - Size L",
+          "Quantity": 1,
+          "FinalUnitPrice": 45,
+          "LineTotal": 45,
+          "First": "Example",
+          "Last": "Customer",
+          "Email": "example@example.invalid",
+          "Phone": "2535550100",
+          "Company": "Example Company",
+          "EmbellishmentType": "bundle",
+          "PrintLocation": "Bundle Package",
+          "Color": "Candy Pink",
+          "ColorCode": "PINK",
+          "SizeBreakdown": "",
+          "Image_Upload": "",
+          "DesignChoice": "Flag",
+          "DesignImageURL": "https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9131677",
+          "DeliveryMethod": "Ship",
+          "Shipping_Address": "123 Example Street",
+          "Shipping_City": "Example City",
+          "Shipping_State": "WA",
+          "Shipping_Zip": "98000",
+          "Notes": "Bundle 6 of 8"
+        }
+      },
+      {
+        "path": "/api/quote_items",
+        "body": {
+          "QuoteID": "BCA0911-1000",
+          "LineNumber": 7,
+          "StyleNumber": "BCA-BUNDLE",
+          "ProductName": "Breast Cancer Awareness Bundle - Size L",
+          "Quantity": 1,
+          "FinalUnitPrice": 45,
+          "LineTotal": 45,
+          "First": "Example",
+          "Last": "Customer",
+          "Email": "example@example.invalid",
+          "Phone": "2535550100",
+          "Company": "Example Company",
+          "EmbellishmentType": "bundle",
+          "PrintLocation": "Bundle Package",
+          "Color": "Candy Pink",
+          "ColorCode": "PINK",
+          "SizeBreakdown": "",
+          "Image_Upload": "",
+          "DesignChoice": "Flag",
+          "DesignImageURL": "https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9131677",
+          "DeliveryMethod": "Ship",
+          "Shipping_Address": "123 Example Street",
+          "Shipping_City": "Example City",
+          "Shipping_State": "WA",
+          "Shipping_Zip": "98000",
+          "Notes": "Bundle 7 of 8"
+        }
+      },
+      {
+        "path": "/api/quote_items",
+        "body": {
+          "QuoteID": "BCA0911-1000",
+          "LineNumber": 8,
+          "StyleNumber": "BCA-BUNDLE",
+          "ProductName": "Breast Cancer Awareness Bundle - Size L",
+          "Quantity": 1,
+          "FinalUnitPrice": 45,
+          "LineTotal": 45,
+          "First": "Example",
+          "Last": "Customer",
+          "Email": "example@example.invalid",
+          "Phone": "2535550100",
+          "Company": "Example Company",
+          "EmbellishmentType": "bundle",
+          "PrintLocation": "Bundle Package",
+          "Color": "Candy Pink",
+          "ColorCode": "PINK",
+          "SizeBreakdown": "",
+          "Image_Upload": "",
+          "DesignChoice": "Flag",
+          "DesignImageURL": "https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9131677",
+          "DeliveryMethod": "Ship",
+          "Shipping_Address": "123 Example Street",
+          "Shipping_City": "Example City",
+          "Shipping_State": "WA",
+          "Shipping_Zip": "98000",
+          "Notes": "Bundle 8 of 8"
+        }
+      }
+    ],
+    "dialogs": []
+  },
+  "emails": [
+    {
+      "service": "service_jgrave3",
+      "template": "template_2rlgjio",
+      "data": {
+        "to_email": "example@example.invalid",
+        "customer_name": "Example Customer",
+        "quote_id": "BCA0911-1000",
+        "bundle_count": 8,
+        "total_shirts": 8,
+        "total_caps": 8,
+        "total_amount": "$360.00",
+        "size_breakdown": "M: 3, L: 5",
+        "design_choice": "Patriotic Flag",
+        "design_description": "American flag with pink ribbon and your company logo",
+        "delivery_method": "Ship",
+        "delivery_address": "123 Example Street, Example City, WA 98000",
+        "event_date": "2026-10-10",
+        "special_notes": "Synthetic review only. No real order.",
+        "company_name": "Example Company",
+        "phone": "2535550100",
+        "order_date": "9/11/2026"
+      }
+    }
+  ]
+}

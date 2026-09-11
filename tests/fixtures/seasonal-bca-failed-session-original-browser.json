@@ -1,0 +1,214 @@
+{
+  "name": "failed-session",
+  "diagnosticService": true,
+  "states": [
+    {
+      "width": 1440,
+      "text": "Breast Cancer Awareness Bundle Supporting the Fight & Making a Difference, Together. ⏰ ORDER BY SEPTEMBER 30TH for Early October Events! Only 19 days left to order for Breast Cancer Awareness Month 🚀 RUSH PRODUCTION AVAILABLE - Ships in 5-7 business days PRODUCTS SIZES CONTACT 4 REVIEW Review Your Order Order Details Bundles Ordered: 8 bundles T-Shirts (PC54 Candy Pink): 8 shirts Caps (C112 True Pink/White): 8 caps Total Amount: $360.00 Contact Information Name: Example Customer Company: Example Company Email: example@example.invalid Phone: (253) 555-0100 Delivery Method: Ship to Address Shipping Address: 123 Example Street, Example City, WA 98000 Event Date: 2026-10-10 Size Distribution M 3 L 5 T-Shirt Design Selection Patriotic Flag American flag with pink ribbon and company logo Selected Design Next Steps: After submitting your order, our sales team will contact you within 24 hours to finalize payment and delivery details. Previous Submit Order",
+      "title": "Breast Cancer Awareness Bundle - Northwest Custom Apparel",
+      "fields": [],
+      "images": [
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "alt": "Northwest Custom Apparel Logo"
+        },
+        {
+          "src": "https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9131677",
+          "alt": "Patriotic Flag"
+        }
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#step-indicator-1 > .text-green-600.-ml-10.w-32"
+            ],
+            [
+              "#step-indicator-2 > .text-green-600.-ml-10.w-32"
+            ],
+            [
+              "#step-indicator-3 > .text-green-600.-ml-10.w-32"
+            ],
+            [
+              "#step-indicator-4 > .-ml-10.w-32.uppercase"
+            ],
+            [
+              "#reviewTotalPrice"
+            ],
+            [
+              ".mt-1.text-xs.font-semibold"
+            ],
+            [
+              "#submitBtn"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "text": "Breast Cancer Awareness Bundle Supporting the Fight & Making a Difference, Together. ⏰ ORDER BY SEPTEMBER 30TH for Early October Events! Only 19 days left to order for Breast Cancer Awareness Month 🚀 RUSH PRODUCTION AVAILABLE - Ships in 5-7 business days PRODUCTS SIZES CONTACT 4 REVIEW Review Your Order Order Details Bundles Ordered: 8 bundles T-Shirts (PC54 Candy Pink): 8 shirts Caps (C112 True Pink/White): 8 caps Total Amount: $360.00 Contact Information Name: Example Customer Company: Example Company Email: example@example.invalid Phone: (253) 555-0100 Delivery Method: Ship to Address Shipping Address: 123 Example Street, Example City, WA 98000 Event Date: 2026-10-10 Size Distribution M 3 L 5 T-Shirt Design Selection Patriotic Flag American flag with pink ribbon and company logo Selected Design Next Steps: After submitting your order, our sales team will contact you within 24 hours to finalize payment and delivery details. Previous Submit Order",
+      "title": "Breast Cancer Awareness Bundle - Northwest Custom Apparel",
+      "fields": [],
+      "images": [
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "alt": "Northwest Custom Apparel Logo"
+        },
+        {
+          "src": "https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9131677",
+          "alt": "Patriotic Flag"
+        }
+      ],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#step-indicator-1 > .text-green-600.-ml-10.w-32"
+            ],
+            [
+              "#step-indicator-2 > .text-green-600.-ml-10.w-32"
+            ],
+            [
+              "#step-indicator-3 > .text-green-600.-ml-10.w-32"
+            ],
+            [
+              "#step-indicator-4 > .-ml-10.w-32.uppercase"
+            ],
+            [
+              "#reviewTotalPrice"
+            ],
+            [
+              ".mt-1.text-xs.font-semibold"
+            ],
+            [
+              "#submitBtn"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "text": "Breast Cancer Awareness Bundle Supporting the Fight & Making a Difference, Together. ⏰ ORDER BY SEPTEMBER 30TH for Early October Events! Only 19 days left to order for Breast Cancer Awareness Month 🚀 RUSH PRODUCTION AVAILABLE - Ships in 5-7 business days PRODUCTS SIZES CONTACT 4 REVIEW Review Your Order Order Details Bundles Ordered: 8 bundles T-Shirts (PC54 Candy Pink): 8 shirts Caps (C112 True Pink/White): 8 caps Total Amount: $360.00 Contact Information Name: Example Customer Company: Example Company Email: example@example.invalid Phone: (253) 555-0100 Delivery Method: Ship to Address Shipping Address: 123 Example Street, Example City, WA 98000 Event Date: 2026-10-10 Size Distribution M 3 L 5 T-Shirt Design Selection Patriotic Flag American flag with pink ribbon and company logo Selected Design Next Steps: After submitting your order, our sales team will contact you within 24 hours to finalize payment and delivery details. Previous Submit Order",
+      "title": "Breast Cancer Awareness Bundle - Northwest Custom Apparel",
+      "fields": [],
+      "images": [
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "alt": "Northwest Custom Apparel Logo"
+        },
+        {
+          "src": "https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9131677",
+          "alt": "Patriotic Flag"
+        }
+      ],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#step-indicator-1 > .text-green-600.-ml-10.w-32"
+            ],
+            [
+              "#step-indicator-2 > .text-green-600.-ml-10.w-32"
+            ],
+            [
+              "#step-indicator-3 > .text-green-600.-ml-10.w-32"
+            ],
+            [
+              "#step-indicator-4 > .-ml-10.w-32.uppercase"
+            ],
+            [
+              "#reviewTotalPrice"
+            ],
+            [
+              ".mt-1.text-xs.font-semibold"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "text": "Breast Cancer Awareness Bundle Supporting the Fight & Making a Difference, Together. ⏰ ORDER BY SEPTEMBER 30TH for Early October Events! Only 19 days left to order for Breast Cancer Awareness Month 🚀 RUSH PRODUCTION AVAILABLE - Ships in 5-7 business days PRODUCTS SIZES CONTACT 4 REVIEW Review Your Order Order Details Bundles Ordered: 8 bundles T-Shirts (PC54 Candy Pink): 8 shirts Caps (C112 True Pink/White): 8 caps Total Amount: $360.00 Contact Information Name: Example Customer Company: Example Company Email: example@example.invalid Phone: (253) 555-0100 Delivery Method: Ship to Address Shipping Address: 123 Example Street, Example City, WA 98000 Event Date: 2026-10-10 Size Distribution M 3 L 5 T-Shirt Design Selection Patriotic Flag American flag with pink ribbon and company logo Selected Design Next Steps: After submitting your order, our sales team will contact you within 24 hours to finalize payment and delivery details. Previous Submit Order",
+      "title": "Breast Cancer Awareness Bundle - Northwest Custom Apparel",
+      "fields": [],
+      "images": [
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "alt": "Northwest Custom Apparel Logo"
+        },
+        {
+          "src": "https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9131677",
+          "alt": "Patriotic Flag"
+        }
+      ],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#step-indicator-1 > .text-green-600.-ml-10.w-32"
+            ],
+            [
+              "#step-indicator-2 > .text-green-600.-ml-10.w-32"
+            ],
+            [
+              "#step-indicator-3 > .text-green-600.-ml-10.w-32"
+            ],
+            [
+              "#step-indicator-4 > .-ml-10.w-32.uppercase"
+            ],
+            [
+              "#reviewTotalPrice"
+            ],
+            [
+              ".mt-1.text-xs.font-semibold"
+            ],
+            [
+              "#submitBtn"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "events": {
+    "errors": [],
+    "missing": [],
+    "unknown": [],
+    "writes": [
+      {
+        "path": "/api/quote_sessions",
+        "body": {
+          "SessionID": "BCA0911-1000",
+          "QuoteID": "BCA0911-1000",
+          "CustomerName": "Example Customer",
+          "CustomerEmail": "example@example.invalid",
+          "CompanyName": "Example Company",
+          "Phone": "2535550100",
+          "TotalQuantity": 8,
+          "SubtotalAmount": 360,
+          "LTMFeeTotal": 0,
+          "TotalAmount": 360,
+          "Status": "Sample Request",
+          "ExpiresAt": "2026-10-11T18:30:00",
+          "Notes": "BCA Bundle: 8 bundles, Ship to Address, Sizes: M:3 L:5, Event: 2026-10-10, Instructions: Synthetic review only. No real order.",
+          "ShippingAddress": "123 Example Street, Example City, WA 98000",
+          "DeliveryMethod": "Ship"
+        }
+      }
+    ],
+    "dialogs": [
+      "There was an error processing your order. Please try again or contact support."
+    ]
+  },
+  "emails": []
+}

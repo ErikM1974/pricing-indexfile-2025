@@ -1129,3 +1129,29 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 
 - calculators/screenprint-customer/screenprint-customer-invoice.css — canonical external invoice stylesheet for immutable customer-supplied screen-print quotes.
 - calculators/screenprint-customer/screenprint-customer-fix.css — unloaded compatibility placeholder; its override stack is retired into the scoped screen-print owner.
+
+- tests/fixtures/seasonal-bundles-original-content.json — immutable original source hashes and reviewed UI mappings for seasonal bundles.
+- tests/e2e/helpers/seasonal-bundles-browser.js — context-wide blocked-write synthetic seasonal harness.
+- tests/e2e/css-unification-seasonal-bca.spec.js — original and current awareness-bundle screen, paper and mocked submission review.
+
+- tests/fixtures/seasonal-bca-broken-link-original-browser.json — immutable synthetic awareness-bundle browser evidence; service-link diagnostic labeled explicitly.
+
+- tests/fixtures/seasonal-bca-products-original-browser.json — immutable synthetic awareness-bundle browser evidence; service-link diagnostic labeled explicitly.
+
+- tests/fixtures/seasonal-bca-sizes-original-browser.json — immutable synthetic awareness-bundle browser evidence; service-link diagnostic labeled explicitly.
+
+- tests/fixtures/seasonal-bca-contact-original-browser.json — immutable synthetic awareness-bundle browser evidence; service-link diagnostic labeled explicitly.
+
+- tests/fixtures/seasonal-bca-review-ship-original-browser.json — immutable synthetic awareness-bundle browser evidence; service-link diagnostic labeled explicitly.
+
+- tests/fixtures/seasonal-bca-review-pickup-original-browser.json — immutable synthetic awareness-bundle browser evidence; service-link diagnostic labeled explicitly.
+
+- tests/fixtures/seasonal-bca-success-original-browser.json — immutable synthetic awareness-bundle browser evidence; service-link diagnostic labeled explicitly.
+
+- tests/fixtures/seasonal-bca-failed-session-original-browser.json — immutable synthetic awareness-bundle browser evidence; service-link diagnostic labeled explicitly.
+
+- tests/fixtures/seasonal-bca-failed-item-original-browser.json — immutable synthetic awareness-bundle browser evidence; service-link diagnostic labeled explicitly.
+
+- tests/fixtures/seasonal-bca-failed-email-original-browser.json — immutable synthetic awareness-bundle browser evidence; service-link diagnostic labeled explicitly.
+
+- tests/unit/seasonal-bundles-content.test.js — original-source preservation guards for seasonal bundle migrations.
