@@ -1200,3 +1200,30 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 
 - calculators/js/christmas-bundle-order.js — captured Christmas order payloads, staged persistence and independently retryable confirmation emails.
 - tests/e2e/seasonal-christmas-behavior.spec.js — synthetic stock, keyboard, date, upload, save, mail and print-restoration regression checks.
+
+- tests/fixtures/webstore-calculator-original-content.json — original webstore calculator source hashes and reversible CSS mappings.
+
+- tests/e2e/helpers/webstore-calculator-browser.js — mocked webstore assistant, source restoration and financial request capture.
+- tests/e2e/css-unification-webstore-calculator.spec.js — webstore calculator originals, responsive layouts and failed-service browser checks.
+
+- tests/fixtures/webstore-calculator-initial-original-browser.json — immutable synthetic webstore calculator browser and request evidence.
+
+- tests/fixtures/webstore-calculator-reference-original-browser.json — immutable synthetic webstore calculator browser and request evidence.
+
+- tests/fixtures/webstore-calculator-assistant-original-browser.json — immutable synthetic webstore calculator browser and request evidence.
+
+- tests/fixtures/webstore-calculator-setup-original-browser.json — immutable synthetic webstore calculator browser and request evidence.
+
+- tests/fixtures/webstore-calculator-on-demand-original-browser.json — immutable synthetic webstore calculator browser and request evidence.
+
+- tests/fixtures/webstore-calculator-fundraiser-original-browser.json — immutable synthetic webstore calculator browser and request evidence.
+
+- tests/fixtures/webstore-calculator-search-original-browser.json — immutable synthetic webstore calculator browser and request evidence.
+
+- tests/fixtures/webstore-calculator-chat-failed-original-browser.json — immutable synthetic webstore calculator browser and request evidence.
+
+- tests/fixtures/webstore-calculator-session-failed-original-browser.json — immutable synthetic webstore calculator browser and request evidence.
+
+- tests/fixtures/webstore-calculator-item-failed-original-browser.json — immutable synthetic webstore calculator browser and request evidence.
+
+- tests/unit/webstore-calculator-content.test.js — original-source locks and unchanged pricing, quote-card and email transformations.

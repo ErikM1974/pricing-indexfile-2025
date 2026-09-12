@@ -1,0 +1,404 @@
+{
+  "name": "search",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Custom Webstores — Northwest Custom Apparel",
+      "url": "/calculators/webstores.html",
+      "ids": {
+        "aiOpenBtn": "✨ Start a Quote with AI",
+        "autoOpenHint": "Chat opens automatically…",
+        "benefitsAccordion": "Key benefits & who needs one WHY CORPORATE CUSTOMERS BUY WEBSTORES",
+        "aiChatResetBtn": "",
+        "aiChatClose": "",
+        "aiChatContextPill": "WEB-2026-901 · saved ✓",
+        "aiChatMessages": "Example webstore quote ready. LIVE STORE QUOTE WEB-SETUP Open/Close Example branded store setup $300.00 Example logo digitization $200.00 Total setup $500.00 Per-item: $2.00 per item sold (built into supporter checkout) Volume: ~500 items/year expected · est annual surcharge $1,000.00 Minimum: $2,000.00/year annual sales minimum Heads up: Example annual sales minimum warning. EMAIL DRAFT Example store and fundraiser quote for your review. SEARCHED THE WEB — 1 RESULT SEARCHED: \"\" Example store reference example.invalid Example company store with two logos and 500 items annually. Example webstore quote ready. LIVE STORE QUOTE WEB-SETUP Open/Close Example branded store setup $300.00 Example logo digitization $200.00 Total setup $500.00 Per-item: $2.00 per item sold (built into supporter checkout) Volume: ~500 items/year expected · est annual surcharge $1,000.00 Minimum: $2,000.00/year annual sales minimum Heads up: Example annual sales minimum warning. EMAIL DRAFT Example store and fundraiser quote for your review. SEARCHED THE WEB — 1 RESULT SEARCHED: \"\" Example store reference example.invalid",
+        "aiOutlookBtn": "Open in Outlook",
+        "aiCopyEmailBtn": "Copy email",
+        "aiSaveQuoteBtn": "Copy share link",
+        "aiChatTextarea": "",
+        "aiChatSend": "",
+        "aiChatBackdrop": "",
+        "shareToastText": "Saved WEB-2026-901 — click again for share link"
+      },
+      "headings": [
+        "Branded company webstores & fundraiser pricing — quoted in 30 seconds",
+        "Key benefits",
+        "Two store models",
+        "Setup best practices",
+        "Live stores we operate"
+      ],
+      "fields": [
+        {
+          "id": "aiChatTextarea",
+          "value": "",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "(253) 922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "https://example.invalid/store",
+          "text": "Example store reference"
+        },
+        {
+          "href": "https://example.invalid/store",
+          "text": "Example store reference"
+        }
+      ],
+      "cards": [
+        "Live store quote WEB-SETUP Open/Close Example branded store setup $300.00 Example logo digitization $200.00 Total setup $500.00 Per-item: $2.00 per item sold (built into supporter checkout) Volume: ~500 items/year expected · est annual surcharge $1,000.00 Minimum: $2,000.00/year annual sales minimum Heads up: Example annual sales minimum warning.",
+        "Email draft Example store and fundraiser quote for your review.",
+        "Live store quote WEB-SETUP Open/Close Example branded store setup $300.00 Example logo digitization $200.00 Total setup $500.00 Per-item: $2.00 per item sold (built into supporter checkout) Volume: ~500 items/year expected · est annual surcharge $1,000.00 Minimum: $2,000.00/year annual sales minimum Heads up: Example annual sales minimum warning.",
+        "Email draft Example store and fundraiser quote for your review."
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "span:nth-child(3)"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Custom Webstores — Northwest Custom Apparel",
+      "url": "/calculators/webstores.html",
+      "ids": {
+        "aiOpenBtn": "✨ Start a Quote with AI",
+        "autoOpenHint": "Chat opens automatically…",
+        "benefitsAccordion": "Key benefits & who needs one WHY CORPORATE CUSTOMERS BUY WEBSTORES",
+        "aiChatResetBtn": "",
+        "aiChatClose": "",
+        "aiChatContextPill": "WEB-2026-901 · saved ✓",
+        "aiChatMessages": "Example webstore quote ready. LIVE STORE QUOTE WEB-SETUP Open/Close Example branded store setup $300.00 Example logo digitization $200.00 Total setup $500.00 Per-item: $2.00 per item sold (built into supporter checkout) Volume: ~500 items/year expected · est annual surcharge $1,000.00 Minimum: $2,000.00/year annual sales minimum Heads up: Example annual sales minimum warning. EMAIL DRAFT Example store and fundraiser quote for your review. SEARCHED THE WEB — 1 RESULT SEARCHED: \"\" Example store reference example.invalid Example company store with two logos and 500 items annually. Example webstore quote ready. LIVE STORE QUOTE WEB-SETUP Open/Close Example branded store setup $300.00 Example logo digitization $200.00 Total setup $500.00 Per-item: $2.00 per item sold (built into supporter checkout) Volume: ~500 items/year expected · est annual surcharge $1,000.00 Minimum: $2,000.00/year annual sales minimum Heads up: Example annual sales minimum warning. EMAIL DRAFT Example store and fundraiser quote for your review. SEARCHED THE WEB — 1 RESULT SEARCHED: \"\" Example store reference example.invalid",
+        "aiOutlookBtn": "Open in Outlook",
+        "aiCopyEmailBtn": "Copy email",
+        "aiSaveQuoteBtn": "Copy share link",
+        "aiChatTextarea": "",
+        "aiChatSend": "",
+        "aiChatBackdrop": "",
+        "shareToastText": "Saved WEB-2026-901 — click again for share link"
+      },
+      "headings": [
+        "Branded company webstores & fundraiser pricing — quoted in 30 seconds",
+        "Key benefits",
+        "Two store models",
+        "Setup best practices",
+        "Live stores we operate"
+      ],
+      "fields": [
+        {
+          "id": "aiChatTextarea",
+          "value": "",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "(253) 922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "https://example.invalid/store",
+          "text": "Example store reference"
+        },
+        {
+          "href": "https://example.invalid/store",
+          "text": "Example store reference"
+        }
+      ],
+      "cards": [
+        "Live store quote WEB-SETUP Open/Close Example branded store setup $300.00 Example logo digitization $200.00 Total setup $500.00 Per-item: $2.00 per item sold (built into supporter checkout) Volume: ~500 items/year expected · est annual surcharge $1,000.00 Minimum: $2,000.00/year annual sales minimum Heads up: Example annual sales minimum warning.",
+        "Email draft Example store and fundraiser quote for your review.",
+        "Live store quote WEB-SETUP Open/Close Example branded store setup $300.00 Example logo digitization $200.00 Total setup $500.00 Per-item: $2.00 per item sold (built into supporter checkout) Volume: ~500 items/year expected · est annual surcharge $1,000.00 Minimum: $2,000.00/year annual sales minimum Heads up: Example annual sales minimum warning.",
+        "Email draft Example store and fundraiser quote for your review."
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "span:nth-child(3)"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Custom Webstores — Northwest Custom Apparel",
+      "url": "/calculators/webstores.html",
+      "ids": {
+        "aiOpenBtn": "✨ Start a Quote with AI",
+        "autoOpenHint": "Chat opens automatically…",
+        "benefitsAccordion": "Key benefits & who needs one WHY CORPORATE CUSTOMERS BUY WEBSTORES",
+        "aiChatResetBtn": "",
+        "aiChatClose": "",
+        "aiChatContextPill": "WEB-2026-901 · saved ✓",
+        "aiChatMessages": "Example webstore quote ready. LIVE STORE QUOTE WEB-SETUP Open/Close Example branded store setup $300.00 Example logo digitization $200.00 Total setup $500.00 Per-item: $2.00 per item sold (built into supporter checkout) Volume: ~500 items/year expected · est annual surcharge $1,000.00 Minimum: $2,000.00/year annual sales minimum Heads up: Example annual sales minimum warning. EMAIL DRAFT Example store and fundraiser quote for your review. SEARCHED THE WEB — 1 RESULT SEARCHED: \"\" Example store reference example.invalid Example company store with two logos and 500 items annually. Example webstore quote ready. LIVE STORE QUOTE WEB-SETUP Open/Close Example branded store setup $300.00 Example logo digitization $200.00 Total setup $500.00 Per-item: $2.00 per item sold (built into supporter checkout) Volume: ~500 items/year expected · est annual surcharge $1,000.00 Minimum: $2,000.00/year annual sales minimum Heads up: Example annual sales minimum warning. EMAIL DRAFT Example store and fundraiser quote for your review. SEARCHED THE WEB — 1 RESULT SEARCHED: \"\" Example store reference example.invalid",
+        "aiOutlookBtn": "Open in Outlook",
+        "aiCopyEmailBtn": "Copy email",
+        "aiSaveQuoteBtn": "Copy share link",
+        "aiChatTextarea": "",
+        "aiChatSend": "",
+        "aiChatBackdrop": "",
+        "shareToastText": "Saved WEB-2026-901 — click again for share link"
+      },
+      "headings": [
+        "Branded company webstores & fundraiser pricing — quoted in 30 seconds",
+        "Key benefits",
+        "Two store models",
+        "Setup best practices",
+        "Live stores we operate"
+      ],
+      "fields": [
+        {
+          "id": "aiChatTextarea",
+          "value": "",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "(253) 922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "https://example.invalid/store",
+          "text": "Example store reference"
+        },
+        {
+          "href": "https://example.invalid/store",
+          "text": "Example store reference"
+        }
+      ],
+      "cards": [
+        "Live store quote WEB-SETUP Open/Close Example branded store setup $300.00 Example logo digitization $200.00 Total setup $500.00 Per-item: $2.00 per item sold (built into supporter checkout) Volume: ~500 items/year expected · est annual surcharge $1,000.00 Minimum: $2,000.00/year annual sales minimum Heads up: Example annual sales minimum warning.",
+        "Email draft Example store and fundraiser quote for your review.",
+        "Live store quote WEB-SETUP Open/Close Example branded store setup $300.00 Example logo digitization $200.00 Total setup $500.00 Per-item: $2.00 per item sold (built into supporter checkout) Volume: ~500 items/year expected · est annual surcharge $1,000.00 Minimum: $2,000.00/year annual sales minimum Heads up: Example annual sales minimum warning.",
+        "Email draft Example store and fundraiser quote for your review."
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "span:nth-child(3)"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Custom Webstores — Northwest Custom Apparel",
+      "url": "/calculators/webstores.html",
+      "ids": {
+        "aiOpenBtn": "✨ Start a Quote with AI",
+        "autoOpenHint": "Chat opens automatically…",
+        "benefitsAccordion": "Key benefits & who needs one WHY CORPORATE CUSTOMERS BUY WEBSTORES",
+        "aiChatResetBtn": "",
+        "aiChatClose": "",
+        "aiChatContextPill": "WEB-2026-901 · saved ✓",
+        "aiChatMessages": "Example webstore quote ready. LIVE STORE QUOTE WEB-SETUP Open/Close Example branded store setup $300.00 Example logo digitization $200.00 Total setup $500.00 Per-item: $2.00 per item sold (built into supporter checkout) Volume: ~500 items/year expected · est annual surcharge $1,000.00 Minimum: $2,000.00/year annual sales minimum Heads up: Example annual sales minimum warning. EMAIL DRAFT Example store and fundraiser quote for your review. SEARCHED THE WEB — 1 RESULT SEARCHED: \"\" Example store reference example.invalid Example company store with two logos and 500 items annually. Example webstore quote ready. LIVE STORE QUOTE WEB-SETUP Open/Close Example branded store setup $300.00 Example logo digitization $200.00 Total setup $500.00 Per-item: $2.00 per item sold (built into supporter checkout) Volume: ~500 items/year expected · est annual surcharge $1,000.00 Minimum: $2,000.00/year annual sales minimum Heads up: Example annual sales minimum warning. EMAIL DRAFT Example store and fundraiser quote for your review. SEARCHED THE WEB — 1 RESULT SEARCHED: \"\" Example store reference example.invalid",
+        "aiOutlookBtn": "Open in Outlook",
+        "aiCopyEmailBtn": "Copy email",
+        "aiSaveQuoteBtn": "Copy share link",
+        "aiChatTextarea": "",
+        "aiChatSend": "",
+        "aiChatBackdrop": "",
+        "shareToastText": "Saved WEB-2026-901 — click again for share link"
+      },
+      "headings": [
+        "Branded company webstores & fundraiser pricing — quoted in 30 seconds",
+        "Key benefits",
+        "Two store models",
+        "Setup best practices",
+        "Live stores we operate"
+      ],
+      "fields": [
+        {
+          "id": "aiChatTextarea",
+          "value": "",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "(253) 922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "https://example.invalid/store",
+          "text": "Example store reference"
+        },
+        {
+          "href": "https://example.invalid/store",
+          "text": "Example store reference"
+        }
+      ],
+      "cards": [
+        "Live store quote WEB-SETUP Open/Close Example branded store setup $300.00 Example logo digitization $200.00 Total setup $500.00 Per-item: $2.00 per item sold (built into supporter checkout) Volume: ~500 items/year expected · est annual surcharge $1,000.00 Minimum: $2,000.00/year annual sales minimum Heads up: Example annual sales minimum warning.",
+        "Email draft Example store and fundraiser quote for your review.",
+        "Live store quote WEB-SETUP Open/Close Example branded store setup $300.00 Example logo digitization $200.00 Total setup $500.00 Per-item: $2.00 per item sold (built into supporter checkout) Volume: ~500 items/year expected · est annual surcharge $1,000.00 Minimum: $2,000.00/year annual sales minimum Heads up: Example annual sales minimum warning.",
+        "Email draft Example store and fundraiser quote for your review."
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "span:nth-child(3)"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "mocked": [
+    {
+      "path": "/api/quote-sequence/WEB",
+      "method": "GET"
+    },
+    {
+      "path": "/api/contract-webstore-ai/chat",
+      "method": "POST",
+      "body": {
+        "messages": [
+          {
+            "role": "user",
+            "content": "(Open the chat — greet the rep briefly and ask whether they're drafting a store-setup quote or pricing a fundraiser item.)"
+          }
+        ],
+        "calcContext": {
+          "quoteID": "WEB-2026-901"
+        }
+      }
+    },
+    {
+      "path": "/api/contract-webstore-ai/chat",
+      "method": "POST",
+      "body": {
+        "messages": [
+          {
+            "role": "user",
+            "content": "(Open the chat — greet the rep briefly and ask whether they're drafting a store-setup quote or pricing a fundraiser item.)"
+          },
+          {
+            "role": "assistant",
+            "content": "Example webstore quote ready.\nPRICE_QUOTE START\n{\"productType\":\"webstore-setup\",\"partNumber\":\"WEB-SETUP\",\"lineItems\":[{\"partNumber\":\"WEB-SETUP\",\"description\":\"Example branded store setup\",\"quantity\":1,\"pricePerUnit\":300,\"totalPrice\":300},{\"partNumber\":\"DIG-100\",\"description\":\"Example logo digitization\",\"quantity\":2,\"pricePerUnit\":100,\"totalPrice\":200}],\"storeConfig\":{\"storeType\":\"Open/Close\",\"surchargePerItem\":2,\"expectedAnnualVolume\":500,\"minimumAnnualGuarantee\":2000},\"appliedRules\":{\"minimumRisk\":\"Example annual sales minimum warning.\"}}\nPRICE_QUOTE END\nCUSTOMER_FINAL START\n{\"name\":\"Example Customer\",\"email\":\"example@example.invalid\",\"company\":\"Example Company\",\"phone\":\"555-0100\"}\nCUSTOMER_FINAL END\nEMAIL DRAFT START\nTo: example@example.invalid\nSubject: Example webstore quote\n\nExample store and fundraiser quote for your review.\nEMAIL DRAFT END"
+          },
+          {
+            "role": "user",
+            "content": "Example company store with two logos and 500 items annually."
+          }
+        ],
+        "calcContext": {
+          "quoteID": "WEB-2026-901"
+        }
+      }
+    },
+    {
+      "path": "/api/quote_sessions",
+      "method": "POST",
+      "body": {
+        "QuoteID": "WEB-2026-901",
+        "SessionID": "webstore_1789237800000",
+        "Status": "Open",
+        "CustomerEmail": "example@example.invalid",
+        "CustomerName": "Example Customer",
+        "CompanyName": "Example Company",
+        "Phone": "555-0100",
+        "TotalQuantity": 3,
+        "SubtotalAmount": 500,
+        "LTMFeeTotal": 0,
+        "TotalAmount": 500,
+        "Notes": "{\"productType\":\"webstore-setup\",\"storeConfig\":{\"storeType\":\"Open/Close\",\"surchargePerItem\":2,\"expectedAnnualVolume\":500,\"minimumAnnualGuarantee\":2000},\"fundraiserPricing\":null,\"appliedRules\":{\"minimumRisk\":\"Example annual sales minimum warning.\"},\"customer\":{\"name\":\"Example Customer\",\"email\":\"example@example.invalid\",\"company\":\"Example Company\",\"phone\":\"555-0100\"},\"emailSubject\":\"Example webstore quote\"}"
+      }
+    },
+    {
+      "path": "/api/quote_items",
+      "method": "POST",
+      "body": {
+        "QuoteID": "WEB-2026-901",
+        "LineNumber": 1,
+        "StyleNumber": "WEB-SETUP",
+        "ProductName": "Example branded store setup",
+        "EmbellishmentType": "service",
+        "Quantity": 1,
+        "BaseUnitPrice": 300,
+        "FinalUnitPrice": 300,
+        "LineTotal": 300,
+        "HasLTM": "No",
+        "LTMPerUnit": 0,
+        "SizeBreakdown": "{\"storeType\":\"Open/Close\",\"surchargePerItem\":2,\"expectedAnnualVolume\":500,\"minimumAnnualGuarantee\":2000}",
+        "PricingTier": "Open/Close",
+        "AddedAt": "2026-09-12T18:30:00.000Z"
+      }
+    },
+    {
+      "path": "/api/quote_items",
+      "method": "POST",
+      "body": {
+        "QuoteID": "WEB-2026-901",
+        "LineNumber": 2,
+        "StyleNumber": "DIG-100",
+        "ProductName": "Example logo digitization",
+        "EmbellishmentType": "service",
+        "Quantity": 2,
+        "BaseUnitPrice": 100,
+        "FinalUnitPrice": 100,
+        "LineTotal": 200,
+        "HasLTM": "No",
+        "LTMPerUnit": 0,
+        "SizeBreakdown": "{\"storeType\":\"Open/Close\",\"surchargePerItem\":2,\"expectedAnnualVolume\":500,\"minimumAnnualGuarantee\":2000}",
+        "PricingTier": "Open/Close",
+        "AddedAt": "2026-09-12T18:30:00.000Z"
+      }
+    }
+  ],
+  "dialogs": []
+}

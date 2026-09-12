@@ -1,0 +1,11 @@
+{
+  "baseline": "ca07da800c88db4ca44784c618a97a6ba9d95ac4",
+  "capturedAt": "2026-09-12T17:37:56.873Z",
+  "hashes": {
+    "calculators/webstores.html": "0966655a57e6b891365e115938db7b8c2f1aad5879522e7f21884c0674b976ca",
+    "shared_components/css/webstore-pricing-page.css": "f3055e37f8363f810f4bf539fda1c10250cd98e5878d9509144f9932ffa3976f",
+    "shared_components/css/sticker-pricing-page.css": "aedc55e5a59483a62ab80127451b2801a01623a37c76c6b080e34fce0b4ea089",
+    "shared_components/js/webstore-pricing-page.js": "c0ecf576e1dd27ae8032880abb41cf74eba29e48b59981452606e679ec695be1"
+  },
+  "changes": []
+}

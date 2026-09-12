@@ -1,0 +1,283 @@
+{
+  "name": "assistant",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Custom Webstores — Northwest Custom Apparel",
+      "url": "/calculators/webstores.html",
+      "ids": {
+        "aiOpenBtn": "✨ Start a Quote with AI",
+        "autoOpenHint": "Chat opens automatically…",
+        "benefitsAccordion": "Key benefits & who needs one WHY CORPORATE CUSTOMERS BUY WEBSTORES",
+        "aiChatResetBtn": "",
+        "aiChatClose": "",
+        "aiChatContextPill": "WEB-2026-901 · drafting…",
+        "aiChatMessages": "Example webstore quote ready. LIVE STORE QUOTE WEB-SETUP Open/Close Example branded store setup $300.00 Example logo digitization $200.00 Total setup $500.00 Per-item: $2.00 per item sold (built into supporter checkout) Volume: ~500 items/year expected · est annual surcharge $1,000.00 Minimum: $2,000.00/year annual sales minimum Heads up: Example annual sales minimum warning. EMAIL DRAFT Example store and fundraiser quote for your review.",
+        "aiOutlookBtn": "Open in Outlook",
+        "aiCopyEmailBtn": "Copy email",
+        "aiSaveQuoteBtn": "Save & share link",
+        "aiChatTextarea": "",
+        "aiChatSend": "",
+        "aiChatBackdrop": "",
+        "shareToastText": "Quote link copied — paste into your email or chat"
+      },
+      "headings": [
+        "Branded company webstores & fundraiser pricing — quoted in 30 seconds",
+        "Key benefits",
+        "Two store models",
+        "Setup best practices",
+        "Live stores we operate"
+      ],
+      "fields": [
+        {
+          "id": "aiChatTextarea",
+          "value": "",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "(253) 922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        }
+      ],
+      "cards": [
+        "Live store quote WEB-SETUP Open/Close Example branded store setup $300.00 Example logo digitization $200.00 Total setup $500.00 Per-item: $2.00 per item sold (built into supporter checkout) Volume: ~500 items/year expected · est annual surcharge $1,000.00 Minimum: $2,000.00/year annual sales minimum Heads up: Example annual sales minimum warning.",
+        "Email draft Example store and fundraiser quote for your review."
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "span:nth-child(3)"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Custom Webstores — Northwest Custom Apparel",
+      "url": "/calculators/webstores.html",
+      "ids": {
+        "aiOpenBtn": "✨ Start a Quote with AI",
+        "autoOpenHint": "Chat opens automatically…",
+        "benefitsAccordion": "Key benefits & who needs one WHY CORPORATE CUSTOMERS BUY WEBSTORES",
+        "aiChatResetBtn": "",
+        "aiChatClose": "",
+        "aiChatContextPill": "WEB-2026-901 · drafting…",
+        "aiChatMessages": "Example webstore quote ready. LIVE STORE QUOTE WEB-SETUP Open/Close Example branded store setup $300.00 Example logo digitization $200.00 Total setup $500.00 Per-item: $2.00 per item sold (built into supporter checkout) Volume: ~500 items/year expected · est annual surcharge $1,000.00 Minimum: $2,000.00/year annual sales minimum Heads up: Example annual sales minimum warning. EMAIL DRAFT Example store and fundraiser quote for your review.",
+        "aiOutlookBtn": "Open in Outlook",
+        "aiCopyEmailBtn": "Copy email",
+        "aiSaveQuoteBtn": "Save & share link",
+        "aiChatTextarea": "",
+        "aiChatSend": "",
+        "aiChatBackdrop": "",
+        "shareToastText": "Quote link copied — paste into your email or chat"
+      },
+      "headings": [
+        "Branded company webstores & fundraiser pricing — quoted in 30 seconds",
+        "Key benefits",
+        "Two store models",
+        "Setup best practices",
+        "Live stores we operate"
+      ],
+      "fields": [
+        {
+          "id": "aiChatTextarea",
+          "value": "",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "(253) 922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        }
+      ],
+      "cards": [
+        "Live store quote WEB-SETUP Open/Close Example branded store setup $300.00 Example logo digitization $200.00 Total setup $500.00 Per-item: $2.00 per item sold (built into supporter checkout) Volume: ~500 items/year expected · est annual surcharge $1,000.00 Minimum: $2,000.00/year annual sales minimum Heads up: Example annual sales minimum warning.",
+        "Email draft Example store and fundraiser quote for your review."
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "span:nth-child(3)"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Custom Webstores — Northwest Custom Apparel",
+      "url": "/calculators/webstores.html",
+      "ids": {
+        "aiOpenBtn": "✨ Start a Quote with AI",
+        "autoOpenHint": "Chat opens automatically…",
+        "benefitsAccordion": "Key benefits & who needs one WHY CORPORATE CUSTOMERS BUY WEBSTORES",
+        "aiChatResetBtn": "",
+        "aiChatClose": "",
+        "aiChatContextPill": "WEB-2026-901 · drafting…",
+        "aiChatMessages": "Example webstore quote ready. LIVE STORE QUOTE WEB-SETUP Open/Close Example branded store setup $300.00 Example logo digitization $200.00 Total setup $500.00 Per-item: $2.00 per item sold (built into supporter checkout) Volume: ~500 items/year expected · est annual surcharge $1,000.00 Minimum: $2,000.00/year annual sales minimum Heads up: Example annual sales minimum warning. EMAIL DRAFT Example store and fundraiser quote for your review.",
+        "aiOutlookBtn": "Open in Outlook",
+        "aiCopyEmailBtn": "Copy email",
+        "aiSaveQuoteBtn": "Save & share link",
+        "aiChatTextarea": "",
+        "aiChatSend": "",
+        "aiChatBackdrop": "",
+        "shareToastText": "Quote link copied — paste into your email or chat"
+      },
+      "headings": [
+        "Branded company webstores & fundraiser pricing — quoted in 30 seconds",
+        "Key benefits",
+        "Two store models",
+        "Setup best practices",
+        "Live stores we operate"
+      ],
+      "fields": [
+        {
+          "id": "aiChatTextarea",
+          "value": "",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "(253) 922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        }
+      ],
+      "cards": [
+        "Live store quote WEB-SETUP Open/Close Example branded store setup $300.00 Example logo digitization $200.00 Total setup $500.00 Per-item: $2.00 per item sold (built into supporter checkout) Volume: ~500 items/year expected · est annual surcharge $1,000.00 Minimum: $2,000.00/year annual sales minimum Heads up: Example annual sales minimum warning.",
+        "Email draft Example store and fundraiser quote for your review."
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "span:nth-child(3)"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Custom Webstores — Northwest Custom Apparel",
+      "url": "/calculators/webstores.html",
+      "ids": {
+        "aiOpenBtn": "✨ Start a Quote with AI",
+        "autoOpenHint": "Chat opens automatically…",
+        "benefitsAccordion": "Key benefits & who needs one WHY CORPORATE CUSTOMERS BUY WEBSTORES",
+        "aiChatResetBtn": "",
+        "aiChatClose": "",
+        "aiChatContextPill": "WEB-2026-901 · drafting…",
+        "aiChatMessages": "Example webstore quote ready. LIVE STORE QUOTE WEB-SETUP Open/Close Example branded store setup $300.00 Example logo digitization $200.00 Total setup $500.00 Per-item: $2.00 per item sold (built into supporter checkout) Volume: ~500 items/year expected · est annual surcharge $1,000.00 Minimum: $2,000.00/year annual sales minimum Heads up: Example annual sales minimum warning. EMAIL DRAFT Example store and fundraiser quote for your review.",
+        "aiOutlookBtn": "Open in Outlook",
+        "aiCopyEmailBtn": "Copy email",
+        "aiSaveQuoteBtn": "Save & share link",
+        "aiChatTextarea": "",
+        "aiChatSend": "",
+        "aiChatBackdrop": "",
+        "shareToastText": "Quote link copied — paste into your email or chat"
+      },
+      "headings": [
+        "Branded company webstores & fundraiser pricing — quoted in 30 seconds",
+        "Key benefits",
+        "Two store models",
+        "Setup best practices",
+        "Live stores we operate"
+      ],
+      "fields": [
+        {
+          "id": "aiChatTextarea",
+          "value": "",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "(253) 922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        }
+      ],
+      "cards": [
+        "Live store quote WEB-SETUP Open/Close Example branded store setup $300.00 Example logo digitization $200.00 Total setup $500.00 Per-item: $2.00 per item sold (built into supporter checkout) Volume: ~500 items/year expected · est annual surcharge $1,000.00 Minimum: $2,000.00/year annual sales minimum Heads up: Example annual sales minimum warning.",
+        "Email draft Example store and fundraiser quote for your review."
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "span:nth-child(3)"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "mocked": [
+    {
+      "path": "/api/quote-sequence/WEB",
+      "method": "GET"
+    },
+    {
+      "path": "/api/contract-webstore-ai/chat",
+      "method": "POST",
+      "body": {
+        "messages": [
+          {
+            "role": "user",
+            "content": "(Open the chat — greet the rep briefly and ask whether they're drafting a store-setup quote or pricing a fundraiser item.)"
+          }
+        ],
+        "calcContext": {
+          "quoteID": "WEB-2026-901"
+        }
+      }
+    }
+  ],
+  "dialogs": []
+}

@@ -1,0 +1,7 @@
+const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto'),acorn=require('acorn');
+const original=require('../fixtures/webstore-calculator-original-content.json'),root=path.resolve(__dirname,'../..');
+function prior(file){let s=fs.readFileSync(path.join(root,file),'utf8').replace(/\r\n/g,'\n');for(const c of original.changes.filter(c=>c.file===file).reverse()){expect(s.split(c.after).length-1).toBe(c.count);s=s.split(c.after).join(c.before);}return s;}
+test.each(Object.entries(original.hashes))('%s retains original source behind reviewed mappings',(file,hash)=>{expect(crypto.createHash('sha256').update(prior(file)).digest('hex')).toBe(hash);});
+function declaration(source,name){let result;const visit=n=>{if(!n||typeof n!=='object')return;if(n.type==='FunctionDeclaration'&&n.id.name===name)result=source.slice(n.start,n.end);for(const v of Object.values(n))if(Array.isArray(v))v.forEach(visit);else if(v&&typeof v==='object')visit(v);};visit(acorn.parse(source,{ecmaVersion:'latest'}));expect(result).toBeDefined();return result;}
+test.each(['renderWebstoreQuoteCard','renderFundraiserQuoteCard','parsePriceQuote','parseCustomerFinal','parseEmailDraft','buildMailto'])('webstore %s retains its exact pricing, output and email transformation',name=>{const file='shared_components/js/webstore-pricing-page.js',now=fs.readFileSync(path.join(root,file),'utf8').replace(/\r\n/g,'\n');expect(declaration(now,name)).toBe(declaration(prior(file),name));});
+
