@@ -256,8 +256,8 @@
     :where([data-ui="unified"][data-art-intake]) .jds-input.jds-error,
     :where([data-ui="unified"][data-art-intake]) .jds-select.jds-error,
     :where([data-ui="unified"][data-art-intake]) .jds-textarea.jds-error {
-        border-color: var(--state-danger, var(--red-600));
-        background-color: var(--state-danger-bg, var(--red-50));
+        border-color: var(--red-700);
+        background-color: var(--color-danger-bg);
         box-shadow: none;
     }
 
@@ -267,7 +267,7 @@
         display: none;
         font-size: 12.5px;
         font-weight: 500;
-        color: var(--state-danger, var(--red-600));
+        color: var(--red-700);
         margin-top: 2px;
         line-height: 1.4;
     }
@@ -386,8 +386,8 @@
     :where([data-ui="unified"][data-art-intake]) .sbf-file-drop-dot--filled,
     :where([data-ui="unified"][data-art-intake]) .gsf-file-drop-dot--filled,
     :where([data-ui="unified"][data-art-intake]) .jds-file-drop-dot--filled {
-        background: var(--state-success, var(--emerald-600));
-        border-color: var(--state-success, var(--emerald-600));
+        background: var(--emerald-800);
+        border-color: var(--emerald-800);
         box-shadow: none;
         transform: scale(1.1);
     }
@@ -450,8 +450,8 @@
     :where([data-ui="unified"][data-art-intake]) .msf-rush-toggle:hover,
     :where([data-ui="unified"][data-art-intake]) .gsf-rush-toggle:hover,
     :where([data-ui="unified"][data-art-intake]) .jds-rush-toggle:hover {
-        border-color: var(--state-danger, var(--red-600));
-        background: var(--state-danger-bg, var(--red-50));
+        border-color: var(--red-700);
+        background: var(--color-danger-bg);
     }
 
     :where([data-ui="unified"][data-art-intake]) .msf-rush-icon,
@@ -603,7 +603,7 @@
         justify-content: center;
         font-size: 44px;
         line-height: 1;
-        background: var(--state-success-bg, var(--brand-50));
+        background: var(--color-success-bg);
         box-shadow: none;
         animation: msf-pop 0.55s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
@@ -654,7 +654,7 @@
         gap: 6px;
         padding: 11px 22px;
         margin: 0 8px 8px 0;
-        background: var(--state-success, var(--emerald-600));
+        background: var(--emerald-800);
         color: var(--color-on-brand);
         text-decoration: none;
         border-radius: 10px;
@@ -957,7 +957,7 @@
     }
 
     :where([data-ui="unified"][data-art-intake]) .msf-checkbox-group.msf-error {
-        border: 1px solid var(--state-danger, var(--red-600));
+        border: 1px solid var(--red-700);
         border-radius: 12px;
         padding: 6px;
         box-shadow: none;
@@ -1092,7 +1092,7 @@
     }
 
     :where([data-ui="unified"][data-art-intake]) .msf-thread-chip-remove:hover {
-        background: var(--state-danger, var(--red-600));
+        background: var(--red-700);
         color: var(--color-on-brand);
     }
 
@@ -1152,7 +1152,7 @@
     :where([data-ui="unified"][data-art-intake]) .sbf-file-remove:hover,
     :where([data-ui="unified"][data-art-intake]) .gsf-file-remove:hover,
     :where([data-ui="unified"][data-art-intake]) .jds-file-remove:hover {
-        background: var(--state-danger, var(--red-600));
+        background: var(--red-700);
         color: var(--color-on-brand);
     }
 
@@ -1222,7 +1222,7 @@
     }
 
     :where([data-ui="unified"][data-art-intake]) .msf-garment-remove:hover {
-        background: var(--state-danger, var(--red-600));
+        background: var(--red-700);
         color: var(--color-on-brand);
     }
 
@@ -1523,7 +1523,6 @@
     }
 
     :where([data-ui="unified"][data-art-intake]) .sbf-file-name,
-    :where([data-ui="unified"][data-art-intake]) .gsf-file-name,
     :where([data-ui="unified"][data-art-intake]) .jds-file-name {
         flex: 1;
         min-width: 0;
@@ -1532,6 +1531,17 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+    }
+
+    :where([data-ui="unified"][data-art-intake]) .gsf-file-name {
+        flex: 1;
+        min-width: 0;
+        color: var(--gray-800, var(--gray-800));
+        font-weight: 500;
+        white-space: normal;
+        overflow: visible;
+        overflow-wrap: anywhere;
+        text-overflow: clip;
     }
 
     :where([data-ui="unified"][data-art-intake]) .sbf-file-size,
@@ -1544,7 +1554,6 @@
     }
 
     :where([data-ui="unified"][data-art-intake]) .sbf-file-remove,
-    :where([data-ui="unified"][data-art-intake]) .gsf-file-remove,
     :where([data-ui="unified"][data-art-intake]) .jds-file-remove {
         width: 26px;
         height: 26px;
@@ -1564,10 +1573,31 @@
             color 0.15s ease;
     }
 
+    :where([data-ui="unified"][data-art-intake]) .gsf-file-remove {
+        border: none;
+        background: var(--gray-100, var(--gray-100));
+        color: var(--ui-muted);
+        cursor: pointer;
+        font-size: 15px;
+        line-height: 1;
+        flex: 0 0 auto;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition:
+            background 0.15s ease,
+            color 0.15s ease;
+        width: 44px;
+        height: 44px;
+        border-radius: 8px;
+        grid-column: 3;
+        grid-row: 1 / span 2;
+    }
+
     :where([data-ui="unified"][data-art-intake]) .sbf-rush-toggle:hover {
-        border-color: var(--state-danger, var(--red-600));
-        color: var(--state-danger, var(--red-600));
-        background: var(--state-danger-bg, var(--red-50));
+        border-color: var(--red-700);
+        color: var(--red-700);
+        background: var(--color-danger-bg);
     }
 
     :where([data-ui="unified"][data-art-intake]) .sbf-rush-toggle--active,
@@ -1601,7 +1631,7 @@
         justify-content: center;
         font-size: 44px;
         line-height: 1;
-        background: var(--state-success-bg, var(--brand-50));
+        background: var(--color-success-bg);
         box-shadow: none;
         animation: sbf-pop 0.55s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
@@ -1974,7 +2004,7 @@
         display: none;
         font-size: 12.5px;
         font-weight: 500;
-        color: var(--state-danger, var(--red-600));
+        color: var(--red-700);
         margin-top: 2px;
         line-height: 1.4;
     }
@@ -2010,7 +2040,7 @@
         justify-content: center;
         font-size: 44px;
         line-height: 1;
-        background: var(--state-success-bg, var(--brand-50));
+        background: var(--color-success-bg);
         box-shadow: none;
         animation: gsf-pop 0.55s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
@@ -2279,8 +2309,8 @@
     }
 
     :where([data-ui="unified"][data-art-intake]) .gsf-checkall:hover {
-        border-color: var(--state-success, var(--emerald-600));
-        background: var(--state-success-bg, var(--brand-50));
+        border-color: var(--emerald-800);
+        background: var(--color-success-bg);
     }
 
     :where([data-ui="unified"][data-art-intake]) .gsf-garment-row,
@@ -2395,9 +2425,9 @@
     :where([data-ui="unified"][data-art-intake]) .gsf-loc-grid {
         flex: 1;
         display: grid;
-        grid-template-columns: 1.3fr 0.55fr 0.55fr 1.8fr;
         gap: 12px;
         min-width: 0;
+        grid-template-columns: minmax(0, 1.3fr) minmax(88px, 0.55fr) minmax(88px, 0.55fr) minmax(0, 1.8fr);
     }
 
     :where([data-ui="unified"][data-art-intake]) .gsf-loc-grid .gsf-field {
@@ -2406,9 +2436,6 @@
     }
 
     :where([data-ui="unified"][data-art-intake]) .gsf-row-remove {
-        width: 26px;
-        height: 26px;
-        border-radius: 50%;
         border: none;
         background: var(--gray-100, var(--gray-100));
         color: var(--ui-muted);
@@ -2423,6 +2450,9 @@
         transition:
             background 0.15s ease,
             color 0.15s ease;
+        width: 44px;
+        height: 44px;
+        border-radius: 8px;
     }
 
     :where([data-ui="unified"][data-art-intake]) .gsf-location-row .gsf-row-remove {
@@ -2430,7 +2460,7 @@
     }
 
     :where([data-ui="unified"][data-art-intake]) .gsf-row-remove:hover {
-        background: var(--state-danger, var(--red-600));
+        background: var(--red-700);
         color: var(--color-on-brand);
     }
 
@@ -2467,6 +2497,8 @@
         background: var(--sky-100);
         border-radius: 999px;
         padding: 3px 9px;
+        grid-column: 2;
+        justify-self: start;
     }
 
     :where([data-ui="unified"][data-art-intake]) .gsf-carried-status {
@@ -2518,7 +2550,7 @@
         font-size: 12px;
         font-weight: 700;
         color: var(--color-on-brand);
-        background: var(--state-success, var(--emerald-600));
+        background: var(--emerald-800);
         border: none;
         border-radius: 6px;
         padding: 5px 10px;
@@ -2670,7 +2702,7 @@
 
     @media (width <= 760px) {
         :where([data-ui="unified"][data-art-intake]) .gsf-form-body {
-            padding: 4px 18px 22px;
+            padding: 4px 12px 120px;
         }
     }
 
@@ -2682,7 +2714,7 @@
 
     @media (width <= 760px) {
         :where([data-ui="unified"][data-art-intake]) .gsf-loc-grid {
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
         }
     }
 
@@ -2700,7 +2732,7 @@
 
     @media (width <= 760px) {
         :where([data-ui="unified"][data-art-intake]) .gsf-section {
-            padding-left: 42px;
+            padding-left: 0;
         }
     }
 
@@ -2841,7 +2873,7 @@
         justify-content: center;
         font-size: 44px;
         line-height: 1;
-        background: var(--state-success-bg, var(--brand-50));
+        background: var(--color-success-bg);
         box-shadow: none;
         animation: jds-pop 0.55s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
@@ -3463,5 +3495,96 @@
         min-height: var(--ui-control-height);
         border-radius: var(--radius-sm);
         font-size: var(--font-size-base);
+    }
+
+    :where([data-ui="unified"][data-art-intake]) .gsf-banner::before, :where([data-ui="unified"][data-art-intake]) .gsf-banner::after {
+        display: none;
+    }
+
+    :where([data-ui="unified"][data-art-intake]) .gsf-file-item {
+        display: grid;
+        grid-template-columns: 32px minmax(0, 1fr) auto;
+        align-items: center;
+    }
+
+    :where([data-ui="unified"][data-art-intake]) .gsf-field {
+        min-width: 0;
+    }
+
+    @media (width <= 760px) {
+        :where([data-ui="unified"][data-art-intake]) .gsf-section::before {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-art-intake]) .gsf-section-num, :where([data-ui="unified"][data-art-intake]) .gsf-patch-badge {
+            position: static;
+            flex-shrink: 0;
+        }
+
+        :where([data-ui="unified"][data-art-intake]) .gsf-section--required, :where([data-ui="unified"][data-art-intake]) .gsf-patch-section {
+            margin: 8px 0;
+            padding: 16px 12px;
+        }
+
+        :where([data-ui="unified"][data-art-intake]) .gsf-location-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 8px;
+        }
+
+        :where([data-ui="unified"][data-art-intake]) .gsf-location-row .gsf-row-badge, :where([data-ui="unified"][data-art-intake]) .gsf-location-row .gsf-row-remove {
+            margin-top: 0;
+        }
+
+        :where([data-ui="unified"][data-art-intake]) .gsf-loc-grid {
+            grid-column: 1 / -1;
+            grid-row: 2;
+        }
+
+        :where([data-ui="unified"][data-art-intake]) .gsf-loc-grid .gsf-field:first-child, :where([data-ui="unified"][data-art-intake]) .gsf-loc-grid .gsf-field:last-child {
+            grid-column: 1 / -1;
+        }
+
+        :where([data-ui="unified"][data-art-intake]) .gsf-progress {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 6px;
+        }
+
+        :where([data-ui="unified"][data-art-intake]) .gsf-progress__text, :where([data-ui="unified"][data-art-intake]) .gsf-progress__left {
+            white-space: normal;
+            overflow: visible;
+            text-overflow: clip;
+        }
+    }
+
+    @media print {
+        :where([data-ui="unified"][data-art-intake]) .gsf-progress, :where([data-ui="unified"][data-art-intake]) .gsf-submit-row, :where([data-ui="unified"][data-art-intake]) .gsf-add-btn, :where([data-ui="unified"][data-art-intake]) .gsf-row-remove, :where([data-ui="unified"][data-art-intake]) .gsf-file-remove, :where([data-ui="unified"][data-art-intake]) .gsf-checkall {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-art-intake]) .gsf-form-body {
+            padding: 0;
+        }
+
+        :where([data-ui="unified"][data-art-intake]) .gsf-section {
+            padding: 10px 0 10px 38px;
+            break-inside: avoid;
+        }
+
+        :where([data-ui="unified"][data-art-intake]) .gsf-section-num, :where([data-ui="unified"][data-art-intake]) .gsf-patch-badge {
+            position: absolute;
+            top: 10px;
+            left: 0;
+        }
+
+        :where([data-ui="unified"][data-art-intake]) .gsf-banner {
+            padding: 12px;
+            border-radius: 0;
+        }
+
+        :where([data-ui="unified"][data-art-intake]) .gsf-section-hint {
+            margin-bottom: 8px;
+        }
     }
 }

@@ -1,5 +1,11 @@
 # LESSONS LEARNED
 
+## Shared form resets and print dialogs need explicit ownership (2026-09-12)
+
+- Problem/root cause: an unlayered designer reset overrode layered form spacing; global keyboard shortcuts could consume modal field input, and timed print cleanup could remove content before the print dialog finished. Narrow size columns clipped fractional dimensions.
+- Solution: keep resets in the reset layer, scope shared form styles at every real mount, let field/native-picker keys reach their target, and restore print state on actual print completion. Give dimension columns enough space and keep mobile fields in an explicit grid.
+- Prevention: preserve original payload/artwork function bodies; exercise nested dialogs and native file chooser keyboard events, delayed print restoration, canvas resize/export, all four shared hosts, four widths, every scroll panel and all paper pages.
+
 ## Shared assistants must preserve complete-save and keyboard ownership (2026-09-12)
 
 - Problem/root cause: the webstore assistant swallowed failed quote-item responses, retained a saved link after revised prices, and its inherited stylesheet exposed hidden feedback. Scrollable conversation content was not keyboard reachable.

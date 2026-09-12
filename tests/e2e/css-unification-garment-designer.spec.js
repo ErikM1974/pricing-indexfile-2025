@@ -4,6 +4,10 @@ const root=path.resolve(__dirname,'../..'),out=path.join(__dirname,'screenshots/
 test.use({timezoneId:'America/Los_Angeles',locale:'en-US',reducedMotion:'reduce'});
 async function evidence(page,name,e){
  fs.mkdirSync(out,{recursive:true});const states=[];
+ // Scroll positions change with layout; discard only this case's generated
+ // images so old panels cannot be mistaken for evidence from the latest run.
+ const prefix='garment-designer-'+name+'-';
+ for(const file of fs.readdirSync(out))if(file.startsWith(prefix)&&file.includes('-'+phase+'-')&&file.endsWith('.png'))fs.unlinkSync(path.join(out,file));
  for(const width of [1440,768,390,320]){
   await page.setViewportSize({width,height:1000});await page.evaluate(()=>document.fonts.ready);
   const s=await snapshot(page),axe=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();

@@ -234,6 +234,9 @@ var GarmentSubmitForm = (function () {
     function renderForm() {
         var container = document.getElementById(containerId);
         if (!container) return;
+        // The same shared style owner applies in the dashboard and lazy dialogs.
+        container.setAttribute('data-ui', 'unified');
+        container.setAttribute('data-art-intake', '');
         // Fresh form = fresh similar-request state (the card host is rebuilt).
         lastSimilarKey = '';
         if (similarTimer) { clearTimeout(similarTimer); similarTimer = null; }

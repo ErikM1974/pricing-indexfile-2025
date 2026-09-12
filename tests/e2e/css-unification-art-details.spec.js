@@ -19,6 +19,7 @@ const mockupRows = requestRows.map((row, i) => ({
 }));
 
 async function fixture(page, file, routePath, options = {}) {
+    if (process.env.GARMENT_FORM_REVIEW_PHASE) await page.clock.setFixedTime(new Date('2026-09-12T21:00:00Z'));
     const state = { requests: requestRows.map(row => ({ ...row })), mockups: mockupRows.map(row => ({ ...row })), calls: [], writes: [], errors: [], failure: false, ...options };
     page.on('pageerror', error => state.errors.push(error.message));
     await page.route('**/*', route => ['GET', 'HEAD'].includes(route.request().method()) ? route.continue() : route.fulfill({ status: 503, json: { error: 'Fixture blocks all external writes' } }));
@@ -146,6 +147,7 @@ for (const type of ['Garment', 'Sticker', 'Banner', 'JDS', 'Ruth']) {
    await expect(page.locator('#jds-form-body')).toBeVisible();
   }
   await review(page,'ae-intake-'+type.toLowerCase());
+  if(type==='Garment')await require('./helpers/garment-form-review').captureForm(page,'ae',expect);
   expect(state.errors).toEqual([]);
  });
 }

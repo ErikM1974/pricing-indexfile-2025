@@ -35,7 +35,7 @@ async function addArt(page,{side='front',multiple=false,dst=false}={}){
   await page.locator('#fileInput').setInputFiles({name:'example-square.dst',mimeType:'application/octet-stream',buffer:Buffer.concat([header,stitches])});
  }else{
   const buffer=Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="480" height="240" viewBox="0 0 480 240"><rect width="480" height="240" fill="white"/><path d="M40 180V60h90v40H85v80z" fill="#153d2b"/><circle cx="240" cy="120" r="64" fill="#d59a32"/><path d="M350 50h60v140h-60z" fill="#153d2b"/></svg>');
-  if(!multiple){await page.evaluate(side=>openPlacementChooser(side),side);await page.evaluate(loc=>{pendingPlacement=loc;$('placementChooser').classList.remove('visible');},side==='back'?'Full Back':'Left Chest');}
+  if(!multiple){await page.evaluate(side=>openPlacementChooser(side),side);await page.evaluate(loc=>{pendingPlacement=loc;if(document.body.dataset.ui==='unified')document.dispatchEvent(new CustomEvent('garment:close-dialog',{detail:{modal:$('placementChooser')}}));else $('placementChooser').classList.remove('visible');},side==='back'?'Full Back':'Left Chest');}
   await page.locator('#fileInput').setInputFiles({name:multiple?'example-secondary.svg':'example-logo.svg',mimeType:'image/svg+xml',buffer});
  }
  await page.waitForFunction(()=>current()?.status==='ready');

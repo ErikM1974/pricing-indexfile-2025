@@ -1,5 +1,7 @@
 # shared_components/js/ — File Guide
 
+- `garment-submit-form.js` — shared artwork intake in AE dashboard, lead, Quote View and garment designer. Adds a scoped data-art-intake mount for art-intake.css; the legacy garment-submit-form.css URL imports that owner for lazy callers. Original successful submission payloads remain unchanged.
+
 - `core-calculator-ui.js` — shared presentation/keyboard adapter for DTG, DTF, Embroidery, Cap Embroidery and Screen Print public calculators. Reads controller state; never computes pricing.
 
 **124 JavaScript files** organized by function. Updated 2026-02-27.

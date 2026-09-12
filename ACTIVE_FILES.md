@@ -315,7 +315,7 @@ Next: integrate this exact reviewed SHA into clean develop, preserve the .18 liv
 
 - `tests/unit/lead-records-content.test.js` — lead records original contracts, synthetic browser fixtures and focused preservation/recovery checks.
 
-CRM records lifecycle review: dashboards/lead.html, dashboards/form-submissions.html and dashboards/marketing-shipments.html now use shared_components/css/crm-records.css with canonical components and the unchanged CRM pipeline owner. Retired dashboards/css/leads.css, dashboards/css/lead-workspace.css, dashboards/css/form-submissions.css, dashboards/css/marketing-shipments.css. The three tests/ui previews (test-lead-workspace, test-form-submissions, test-leads) mirror current production markup and retain API stubs; Inbox stubs now block unknown API traffic. Runtime art-module trigger reviewed; shared garment-submit-form.css/js remain original and pending modernization. The manifest records direct and triggered graph costs separately. Original content and 17 source hashes are retained in tests/fixtures/lead-records-original-content.json with 93 reversible controller edits and explicit retirement provenance. This is reviewed source preparation, not a production completion claim; live remains .19, 155/225 pages, 70 pending until verified deployment.
+CRM records lifecycle review: dashboards/lead.html, dashboards/form-submissions.html and dashboards/marketing-shipments.html now use shared_components/css/crm-records.css with canonical components and the unchanged CRM pipeline owner. Retired dashboards/css/leads.css, dashboards/css/lead-workspace.css, dashboards/css/form-submissions.css, dashboards/css/marketing-shipments.css. The three tests/ui previews (test-lead-workspace, test-form-submissions, test-leads) mirror current production markup and retain API stubs; Inbox stubs now block unknown API traffic. Shared garment form now reviewed across AE, lead, Quote View and designer. garment-submit-form.css retains the compatibility URL and imports scoped art-intake.css; original successful payloads are preserved. The manifest records direct and triggered graph costs separately. Original content and 17 source hashes are retained in tests/fixtures/lead-records-original-content.json with 93 reversible controller edits and explicit retirement provenance. This is reviewed source preparation, not a production completion claim; live remains .19, 155/225 pages, 70 pending until verified deployment.
 
 Personalization work in progress: shared_components/css/personalization-workspaces.css now owns reviewed layouts for both dashboards, pages/names-numbers.html and quote-builders/monogram-form.html. The roster adopts existing shared_components/js/ui-dialog.js; monogram-form-controller.js restores saved catalog/custom styles correctly. Four old CSS owners are retired with complete source/hash provenance; all four consumers are registered. Live credit waits for verified deployment.
 
@@ -1374,3 +1374,15 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - tests/fixtures/garment-designer-spec-original-browser.json — original garment designer synthetic workflow evidence.
 
 - tests/fixtures/garment-designer-thread-colors-original-browser.json — original garment designer synthetic workflow evidence.
+
+- pages/js/garment-designer-ui.js — garment designer dialog focus, resize and print presentation lifecycle; no artwork or submission calculations.
+- tests/e2e/css-unification-garment-designer-controls.spec.js — real keyboard, resize, nested dialogs, original proof/spec content, print restoration and PNG export regression coverage with synthetic artwork.
+- tests/e2e/helpers/garment-form-review.js — shared form review of every section at four widths in actual dashboard, lead and quote hosts; immutable field/content comparisons and paper captures.
+
+- tests/fixtures/garment-form-ae-original-browser.json — original shared garment form fields and complete content in its real host.
+
+- tests/fixtures/garment-form-lead-original-browser.json — original shared garment form fields and complete content in its real host.
+
+- tests/fixtures/garment-form-quote-original-browser.json — original shared garment form fields and complete content in its real host.
+
+Garment designer completion: page styles are scoped to the unified designer; art-intake.css owns the shared garment form and contact picker. company-contact-picker.css has no remaining direct HTML consumer and is flagged for the later runtime/dead-file audit, not deleted. Four hosts retain original field/payload contracts, and every current screen and paper page has been reviewed.

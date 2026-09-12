@@ -155,6 +155,7 @@ test.describe('CSS Quote View: migrated recovery and keyboard behavior',()=>{
  });
  test('real artwork form closes by keyboard and restores staff action focus',async({page})=>{
   const events=await open(page,{mode:'artwork',artForm:true});await ready(page);await page.locator('#sw-action-send-steve').click();await expect(page.locator('#sts-modal-close')).toBeFocused();await expect(page.locator('#gsf-prelim')).toBeEnabled();await expect.poll(()=>events.actions.length).toBe(3);
+  await require('./helpers/garment-form-review').captureForm(page,'quote',expect);
   await page.keyboard.press('Escape');await expect(page.locator('#sts-modal')).toBeHidden();await expect(page.locator('#sw-action-send-steve')).toBeFocused();compareActions('lazy-art-form',events);check(expect,events);
  });
 });

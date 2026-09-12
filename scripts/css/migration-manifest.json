@@ -513,8 +513,8 @@
         "rawCssBytes": 352636,
         "localCssRequests": 12
       },
-      "measuredRawCssBytes": 278859,
-      "maxCssBytes": 280907,
+      "measuredRawCssBytes": 282594,
+      "maxCssBytes": 284642,
       "estimatedGzipCssBytes": 37576
     },
     {
@@ -4528,17 +4528,17 @@
         "populated-customer-orders-quote-and-paper"
       ],
       "test": "tests/e2e/css-unification-lead-records.spec.js",
-      "maxCssBytes": 130493,
-      "measuredRawCssBytes": 129469,
-      "measuredTriggeredCssBytes": 165253,
+      "maxCssBytes": 131624,
+      "measuredRawCssBytes": 129576,
+      "measuredTriggeredCssBytes": 248147,
       "baseline": {
         "commit": "d44f7551fc1d3a251c12599314f8c23b94fadea4",
         "rawCssBytes": 186763,
         "localCssRequests": 5
       },
       "runtimeBoundary": {
-        "status": "shared-module-migration-pending",
-        "note": "Original garment art module retained byte-for-byte; its lead trigger, four-width prefill, keyboard containment and close are reviewed. Shared art-module styling remains on the runtime-owner backlog."
+        "status": "reviewed",
+        "note": "Shared garment form uses scoped art-intake.css through the existing compatibility import. AE, lead, Quote View and designer reviewed at four widths with original prefill, complete scrolling, keyboard/focus and every print page. Original successful payloads preserved; no business writes."
       }
     },
     {
@@ -4568,9 +4568,9 @@
         "populated-customer-orders-quote-and-paper"
       ],
       "test": "tests/e2e/css-unification-lead-records.spec.js",
-      "maxCssBytes": 130493,
-      "measuredRawCssBytes": 129469,
-      "measuredTriggeredCssBytes": 129469,
+      "maxCssBytes": 131624,
+      "measuredRawCssBytes": 129576,
+      "measuredTriggeredCssBytes": 129576,
       "baseline": {
         "commit": "d44f7551fc1d3a251c12599314f8c23b94fadea4",
         "rawCssBytes": 167810,
@@ -4604,9 +4604,9 @@
         "populated-customer-orders-quote-and-paper"
       ],
       "test": "tests/e2e/css-unification-lead-records.spec.js",
-      "maxCssBytes": 130493,
-      "measuredRawCssBytes": 129469,
-      "measuredTriggeredCssBytes": 129469,
+      "maxCssBytes": 131624,
+      "measuredRawCssBytes": 129576,
+      "measuredTriggeredCssBytes": 129576,
       "baseline": {
         "commit": "d44f7551fc1d3a251c12599314f8c23b94fadea4",
         "rawCssBytes": 177211,
@@ -5529,12 +5529,17 @@
         "print"
       ],
       "test": "tests/e2e/css-unification-quote-view.spec.js",
-      "maxCssBytes": 130091,
+      "maxCssBytes": 131115,
       "measuredRawCssBytes": 129067,
       "baseline": {
         "commit": "85eba439",
         "rawCssBytes": 159871,
         "localCssRequests": 4
+      },
+      "measuredTriggeredCssBytes": 247638,
+      "runtimeBoundary": {
+        "status": "reviewed",
+        "note": "Shared garment form uses scoped art-intake.css through the existing compatibility import. AE, lead, Quote View and designer reviewed at four widths with original prefill, complete scrolling, keyboard/focus and every print page. Original successful payloads preserved; no business writes."
       }
     },
     {
@@ -6762,6 +6767,38 @@
         "rawCssBytes": 71847,
         "localCssRequests": 2
       }
+    },
+    {
+      "source": "pages/garment-designer.html",
+      "family": "specialty-calculators",
+      "status": "reviewed",
+      "route": "/pages/garment-designer.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/utilities.css",
+        "pages/css/garment-designer.css",
+        "shared_components/css/art-intake.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "1440-768-390-320",
+        "original-artwork-canvas-placement-decoders-and-successful-payloads",
+        "front-back-polo-multiple-artwork-text-and-thread-colors",
+        "art-details-and-shared-form-complete-scroll-panels",
+        "nested-dialog-focus-escape-and-native-upload-keyboard",
+        "persistent-invalid-customer-unavailable-fees-and-upload-failure",
+        "resize-fit-and-png-export",
+        "complete-proof-specification-form-and-ordinary-paper-restoration"
+      ],
+      "test": "tests/e2e/css-unification-garment-designer.spec.js",
+      "measuredRawCssBytes": 273917,
+      "maxCssBytes": 275965,
+      "baseline": {
+        "commit": "8763d6dba64bec28ea82a3bf4887cf5625ca4033",
+        "rawCssBytes": 107251,
+        "localCssRequests": 3
+      }
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",
@@ -6769,11 +6806,9 @@
     {
       "kind": "dynamic-css",
       "owners": [
-        "shared_components/js/sample-cart-service.js",
-        "dashboards/js/lead-workspace.js",
-        "pages/js/quote-view.js"
+        "shared_components/js/sample-cart-service.js"
       ],
-      "note": "The lead workspace and Quote View lazy triggers are reviewed at four widths with original prefill, keyboard close/focus, and intercepted reference-import bodies. garment-submit-form.css/js remain original; shared-module modernization stays pending across all consumers."
+      "note": "Shared garment form and its AE, lead, Quote View and designer hosts are reviewed. The sample-cart service handoff and any other generated styles remain separately tracked."
     },
     {
       "kind": "generated-document",
