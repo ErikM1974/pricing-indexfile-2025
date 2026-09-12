@@ -36,10 +36,28 @@ test('CSS specialty Polar Camel: all four colors and native tier boundaries',asy
  for(const [sku] of variants){if(sku!=='LTM752')await page.locator('label[for="color-'+sku+'"]').click();await expect(page.locator('#product-sku')).toHaveText(sku);await page.locator('#ltmk-preview-loading').waitFor({state:'hidden'});if(!original)await page.waitForFunction(()=>!window.laserTumblerPage.inventoryPending);const table=await page.locator('.pricing-table').innerText(),inventory=await page.locator('#inventory-status').innerText();for(const qty of [1,11,12,23,24,119,120,239,240,479,480,959,960,9999,0,-1]){await page.locator('#ltmk-qty').fill(String(qty));values.push({sku,qty,table,inventory,quote:await page.locator('#ltmk-quote-result').innerText()});}}
  check(expect,events);record('tiers-colors',{values,mocked:events.mocked});
 });
-test('CSS specialty Polar Camel: real logo editing, errors and local PNG download',async({page})=>{
+test('CSS specialty Polar Camel: real logo editing, errors and local PNG download',async({page,browser},testInfo)=>{
  const events=await ready(page,{original});await page.locator('#ltmk-file-input').setInputFiles(logo());await expect(page.locator('#ltmk-download-step')).toBeVisible();
  const canvas=page.locator('#ltmk-canvas'),before=await canvas.evaluate(n=>n.toDataURL());await canvas.focus();await page.keyboard.press('ArrowRight');expect(await canvas.evaluate(n=>n.toDataURL())).not.toEqual(before);await page.locator('#ltmk-center-btn').click();expect(await canvas.evaluate(n=>n.toDataURL())).toEqual(before);
- await page.locator('#ltmk-size-slider').fill('90');await expect(page.locator('#ltmk-size-pct')).toHaveText('90');await page.locator('#ltmk-fit-btn').click();const downloadEvent=page.waitForEvent('download');await page.locator('#ltmk-download-btn').click();const download=await downloadEvent;expect(download.suggestedFilename()).toBe('LTM752-sample_mark.png');const file=path.join(out,'specialty-calculators-polar-camel-download-'+phase+'.png');await download.saveAs(file);const bytes=fs.readFileSync(file);expect([bytes.readUInt32BE(16),bytes.readUInt32BE(20)]).toEqual([1800,1800]);if(!original)expect(bytes.equals(fs.readFileSync(path.join(out,'specialty-calculators-polar-camel-download-original.png')))).toBe(true);
+ await page.locator('#ltmk-size-slider').fill('90');await expect(page.locator('#ltmk-size-pct')).toHaveText('90');await page.locator('#ltmk-fit-btn').click();const downloadEvent=page.waitForEvent('download');await page.locator('#ltmk-download-btn').click();const download=await downloadEvent;expect(download.suggestedFilename()).toBe('LTM752-sample_mark.png');const file=path.join(out,'specialty-calculators-polar-camel-download-'+phase+'.png');await download.saveAs(file);const bytes=fs.readFileSync(file);expect([bytes.readUInt32BE(16),bytes.readUInt32BE(20)]).toEqual([1800,1800]);if(!original) {
+  // Run the preserved original controller in the same browser so CI does not
+  // depend on ignored local screenshots or operating-system PNG encoding.
+  const originalContext=await browser.newContext({baseURL:testInfo.project.use.baseURL,timezoneId:'America/Los_Angeles',locale:'en-US',reducedMotion:'reduce'});
+  const originalPage=await originalContext.newPage();
+  try {
+   const originalEvents=await ready(originalPage,{original:true});
+   await originalPage.locator('#ltmk-file-input').setInputFiles(logo());
+   await expect(originalPage.locator('#ltmk-download-step')).toBeVisible();
+   await originalPage.locator('#ltmk-size-slider').fill('90');
+   await originalPage.locator('#ltmk-fit-btn').click();
+   const originalEvent=originalPage.waitForEvent('download');
+   await originalPage.locator('#ltmk-download-btn').click();
+   const originalDownload=await originalEvent,originalFile=testInfo.outputPath('polar-camel-original.png');
+   await originalDownload.saveAs(originalFile);
+   expect(bytes.equals(fs.readFileSync(originalFile))).toBe(true);
+   check(expect,originalEvents);
+  } finally { await originalContext.close(); }
+ }
  await page.locator('#ltmk-logo-remove').click();await expect(page.locator('#ltmk-size-step')).toBeHidden();await expect(page.locator('#ltmk-download-step')).toBeHidden();await page.locator('#ltmk-file-input').setInputFiles({name:'invalid.png',mimeType:'image/png',buffer:Buffer.from('synthetic invalid image')});await expect(page.locator('#ltmk-preview-error')).toContainText("couldn't read");check(expect,events);
 });
 test('CSS specialty Polar Camel: cached product prices with altered live policy',async({page})=>{

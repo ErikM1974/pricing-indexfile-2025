@@ -207,6 +207,12 @@ Problem/root cause: incomplete invoices looked empty, failed import logs were cl
 
 **Personalization recovery follow-up:** Validate roster arrays before replacing current data; obsolete load/search/OCR/save responses must not change a newer view. Keep failed loads inert with visible retry, clear canceled OCR UI and preserve keyboard file access. Save success must match the API envelope; lock duplicate submissions and scope acknowledgments/navigation to the originating roster. Original native CSV and payload comparisons plus rejection/race tests prevent silent drift. Validate Excel groups/rows before replacing data; ignore obsolete files/views and imports preceding a save. Collect unsaved cells before adding a group; keep required-input errors inside native dialogs. Monogram ItemsJSON and save IDs/HTTP status must be validated before replacing names or clearing dirty state. Picker label clicks already dispatch native checkbox clicks; never toggle both. Return focus after Done/Escape, keep retry errors in place and preserve original proof fonts/colors when removing global print overrides.
 
+## 2026-09-12: Background calculator rendering must not move keyboard focus
+
+Problem: screen-print price initialization could steal focus from thumbnails or another control. Root cause: rendering the small-order quantity field scheduled a delayed focus callback, just like explicit tier selection. Solution: render the field without focusing during refresh, and focus synchronously for explicit tier selection. Prevention: preserve keyboard focus through initialization and check the correct quantity field after choosing a small-order tier.
+
+Browser baselines must work from a fresh checkout. The tumbler export test previously depended on an ignored local original PNG. It now renders the preserved original controller in an isolated browser context and compares the actual download in the same browser, without changing immutable fixtures.
+
 ## Quick Quote must distinguish unavailable stock and fresh print state (2026-09-12)
 
 - Problem/root cause: inventory errors disappeared; old async replies and cached rate-card markup could outlive the current selection. Layout rules exposed native hidden controls, and touch-height defaults orphaned paper footers.
