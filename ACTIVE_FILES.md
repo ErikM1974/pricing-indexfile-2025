@@ -1331,3 +1331,46 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - tests/fixtures/embroidery-reference-contract-print-original-browser.json — immutable embroidery reference synthetic browser evidence.
 
 - calculators/embroidery-pricing-all/embroidery-reference-ui.js — keyboard semantics, native dialog and print-state restoration for the embroidery reference.
+
+- tests/fixtures/garment-designer-original-content.json — original designer, submit-form, picker and text-engine source hashes.
+- tests/e2e/helpers/garment-designer-browser.js — local synthetic artwork and mocked API harness; blocks all business writes.
+- tests/e2e/css-unification-garment-designer.spec.js — designer responsive, artwork, modal, unavailable and print workflow review.
+- tests/unit/garment-designer-content.test.js — preserve the original artwork, canvas, export, form and typography sources through explicit migration mappings.
+
+- tests/fixtures/garment-designer-landing-original-browser.json — original garment designer synthetic workflow evidence.
+
+- tests/fixtures/garment-designer-front-placement-original-browser.json — original garment designer synthetic workflow evidence.
+
+- tests/fixtures/garment-designer-back-placement-original-browser.json — original garment designer synthetic workflow evidence.
+
+- tests/fixtures/garment-designer-shirt-colors-original-browser.json — original garment designer synthetic workflow evidence.
+
+- tests/fixtures/garment-designer-front-art-original-browser.json — original garment designer synthetic workflow evidence.
+
+- tests/fixtures/garment-designer-back-art-original-browser.json — original garment designer synthetic workflow evidence.
+
+- tests/fixtures/garment-designer-multiple-art-original-browser.json — original garment designer synthetic workflow evidence.
+
+- tests/fixtures/garment-designer-polo-original-browser.json — original garment designer synthetic workflow evidence.
+
+- tests/fixtures/garment-designer-art-details-original-browser.json — original garment designer synthetic workflow evidence.
+
+- tests/fixtures/garment-designer-text-editor-original-browser.json — original garment designer synthetic workflow evidence.
+
+- tests/fixtures/garment-designer-unsupported-file-original-browser.json — original garment designer synthetic workflow evidence.
+
+- tests/fixtures/garment-designer-art-form-original-browser.json — original garment designer synthetic workflow evidence.
+
+- tests/fixtures/garment-designer-art-fees-failure-original-browser.json — original garment designer synthetic workflow evidence.
+
+- tests/fixtures/garment-designer-customer-dialog-original-browser.json — original garment designer synthetic workflow evidence.
+
+- tests/fixtures/garment-designer-customer-invalid-original-browser.json — original garment designer synthetic workflow evidence.
+
+- tests/fixtures/garment-designer-upload-failure-original-browser.json — original garment designer synthetic workflow evidence.
+
+- tests/fixtures/garment-designer-proof-original-browser.json — original garment designer synthetic workflow evidence.
+
+- tests/fixtures/garment-designer-spec-original-browser.json — original garment designer synthetic workflow evidence.
+
+- tests/fixtures/garment-designer-thread-colors-original-browser.json — original garment designer synthetic workflow evidence.

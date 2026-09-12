@@ -1,0 +1,749 @@
+{
+  "name": "art-details",
+  "states": [
+    {
+      "width": 1440,
+      "title": "T-Shirt Designer — Northwest Custom Apparel",
+      "ids": {
+        "thumb-1": "",
+        "advice-1": "Screen Print Usable · 100 DPI 3,500–5,500 st",
+        "badge-1": "SVG",
+        "pcStatusChip": "Front only",
+        "pcFrontBtn": "Front",
+        "pcBackBtn": "Back",
+        "pcBothBtn": "Both",
+        "pcLeftChestBtn": "Left Chest",
+        "pcFullFrontBtn": "Full Front",
+        "pcUpperBackBtn": "Upper Back",
+        "pcFullBackBtn": "Full Back",
+        "pcCenterBtn": "Center Art",
+        "pcWidthLabel": "3.75 in",
+        "pcWidthRange": "",
+        "pcWidthNumber": "",
+        "pcXLabel": "-42",
+        "pcXRange": "",
+        "pcXNumber": "",
+        "pcYLabel": "-6",
+        "pcYRange": "",
+        "pcYNumber": "",
+        "addTextBtn": "➕ Add Text",
+        "palBtn": "🎨 Shirt Color",
+        "garmentStyleSelect": "Crew Tee Polo Hoodie Long Sleeve Ladies Tee",
+        "removeBgBtn": "✓ White BG Removed",
+        "artDetailsBtn": "ℹ️ Art Details",
+        "threadColorsBtn": "🧵 Thread Colors",
+        "modelViewBtn": "👕 Model View",
+        "spinBtn": "🔄 Spin",
+        "proofBtn": "🖨 Customer Proof",
+        "dlBtn": "⬇ Download PNG",
+        "sendSteveBtn": "🧵 Send to Steve",
+        "sendCustomerBtn": "📧 Send to Customer",
+        "contrastWarn": "⚠ Low art/shirt contrast — the print may be hard to see",
+        "canvasHolder": "",
+        "advisorMethodPill": "Screen Print",
+        "advisorMain": "Screen print looks possible.",
+        "advisorCopy": "Artwork appears within the 6-color screen print limit.",
+        "advisorColors": "4 total incl. base",
+        "advisorQuality": "Usable · 100 DPI",
+        "advisorFabric": "Cotton",
+        "advisorScreen": "4 / 6",
+        "fabricSelect": "Cotton shirt Cotton/poly blend Polyester Nylon Fabric unknown",
+        "embStatusPill": "Embroidery OK",
+        "embMain": "Embroidery looks possible.",
+        "embCopy": "This estimate is based on the visible artwork only, not the transparent/background canvas. Thread color count is in the preferred embroidery range.",
+        "embStitches": "3,500–5,500",
+        "embThreads": "3 estimated",
+        "embSize": "3.8\" × 1.4\"",
+        "embBestUse": "Left chest",
+        "embNote": "Estimate only. The app now estimates stitches from visible design pixels only. Final stitch count still depends on digitizing, small text, outlines, gradients, fabric, and sew-out quality.",
+        "artDetailsInfo": "FILE NAME example-logo.svg TYPE Image (SVG) DIMENSIONS 480 × 240 px FILE SIZE 283 B PLACEMENT Front LOCATION Left Chest PRINT WIDTH 3.75\" POSITION X -42 / Y -6",
+        "artDetailsColors": "Recommended print method: Screen Print Artwork appears within the 6-color screen print limit. Embroidery estimate: 3,500–5,500 stitches · 3 estimated This estimate is based on the visible artwork only, not the transparent/background canvas. Thread color count is in the preferred embroidery range. #153D2B · 54% ≈ PMS Black C #D59A32 · 44% ≈ PMS 1235 C #DFB263 · 2% ≈ PMS 584 C PMS matches are screen approximations. Final color should be confirmed by the art department. ✓ Transparent background detected. Screen print rule: Northwest Custom Apparel can screen print up to 6 total colors, including the base/underbase. This artwork estimates 4 total incl. base. Logo clarity: 100 DPI. Usable for some jobs, but not ideal for fine detail. Embroidery estimate: approximately 3,500–5,500 stitches. Final stitch count requires digitizing. Visible artwork used: about 54% of the artwork bounding area. Transparent or solid background space is excluded from the estimate. Thread colors: 3 estimated. Preferred range is 3–4 colors. 4–6 is workable. Up to 10 colors may be possible with review."
+      },
+      "fields": [
+        {
+          "id": "pcWidthRange",
+          "type": "range",
+          "value": "4",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcWidthNumber",
+          "type": "number",
+          "value": "3.75",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcXRange",
+          "type": "range",
+          "value": "-42",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcXNumber",
+          "type": "number",
+          "value": "-42",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcYRange",
+          "type": "range",
+          "value": "-6",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcYNumber",
+          "type": "number",
+          "value": "-6",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "garmentStyleSelect",
+          "type": "select-one",
+          "value": "tee",
+          "disabled": false
+        },
+        {
+          "id": "fabricSelect",
+          "type": "select-one",
+          "value": "cotton",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/pages/mockup-library.html",
+          "text": "📚 Saved Mockups"
+        }
+      ],
+      "headings": [
+        "NWCA Easy Shirt Designer",
+        "Artwork Details",
+        "File Info",
+        "Ink Colors / Print Check"
+      ],
+      "entries": [
+        {
+          "name": "example-logo.svg",
+          "kind": "canvas",
+          "status": "ready",
+          "printLoc": "Left Chest",
+          "printW": 3.75,
+          "onShirt": true,
+          "textModel": null,
+          "dst": null
+        }
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".side-head > span"
+            ],
+            [
+              ".fsize"
+            ],
+            [
+              ".detail-row:nth-child(1) > b"
+            ],
+            [
+              ".detail-row:nth-child(2) > b"
+            ],
+            [
+              ".detail-row:nth-child(3) > b"
+            ],
+            [
+              ".detail-row:nth-child(4) > b"
+            ],
+            [
+              ".detail-row:nth-child(5) > b"
+            ],
+            [
+              ".detail-row:nth-child(6) > b"
+            ],
+            [
+              ".detail-row:nth-child(7) > b"
+            ],
+            [
+              ".detail-row:nth-child(8) > b"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "T-Shirt Designer — Northwest Custom Apparel",
+      "ids": {
+        "thumb-1": "",
+        "advice-1": "Screen Print Usable · 100 DPI 3,500–5,500 st",
+        "badge-1": "SVG",
+        "pcStatusChip": "Front only",
+        "pcFrontBtn": "Front",
+        "pcBackBtn": "Back",
+        "pcBothBtn": "Both",
+        "pcLeftChestBtn": "Left Chest",
+        "pcFullFrontBtn": "Full Front",
+        "pcUpperBackBtn": "Upper Back",
+        "pcFullBackBtn": "Full Back",
+        "pcCenterBtn": "Center Art",
+        "pcWidthLabel": "3.75 in",
+        "pcWidthRange": "",
+        "pcWidthNumber": "",
+        "pcXLabel": "-42",
+        "pcXRange": "",
+        "pcXNumber": "",
+        "pcYLabel": "-6",
+        "pcYRange": "",
+        "pcYNumber": "",
+        "addTextBtn": "➕ Add Text",
+        "palBtn": "🎨 Shirt Color",
+        "garmentStyleSelect": "Crew Tee Polo Hoodie Long Sleeve Ladies Tee",
+        "removeBgBtn": "✓ White BG Removed",
+        "artDetailsBtn": "ℹ️ Art Details",
+        "threadColorsBtn": "🧵 Thread Colors",
+        "modelViewBtn": "👕 Model View",
+        "spinBtn": "🔄 Spin",
+        "proofBtn": "🖨 Customer Proof",
+        "dlBtn": "⬇ Download PNG",
+        "sendSteveBtn": "🧵 Send to Steve",
+        "sendCustomerBtn": "📧 Send to Customer",
+        "contrastWarn": "⚠ Low art/shirt contrast — the print may be hard to see",
+        "canvasHolder": "",
+        "advisorMethodPill": "Screen Print",
+        "advisorMain": "Screen print looks possible.",
+        "advisorCopy": "Artwork appears within the 6-color screen print limit.",
+        "advisorColors": "4 total incl. base",
+        "advisorQuality": "Usable · 100 DPI",
+        "advisorFabric": "Cotton",
+        "advisorScreen": "4 / 6",
+        "fabricSelect": "Cotton shirt Cotton/poly blend Polyester Nylon Fabric unknown",
+        "embStatusPill": "Embroidery OK",
+        "embMain": "Embroidery looks possible.",
+        "embCopy": "This estimate is based on the visible artwork only, not the transparent/background canvas. Thread color count is in the preferred embroidery range.",
+        "embStitches": "3,500–5,500",
+        "embThreads": "3 estimated",
+        "embSize": "3.8\" × 1.4\"",
+        "embBestUse": "Left chest",
+        "embNote": "Estimate only. The app now estimates stitches from visible design pixels only. Final stitch count still depends on digitizing, small text, outlines, gradients, fabric, and sew-out quality.",
+        "artDetailsInfo": "FILE NAME example-logo.svg TYPE Image (SVG) DIMENSIONS 480 × 240 px FILE SIZE 283 B PLACEMENT Front LOCATION Left Chest PRINT WIDTH 3.75\" POSITION X -42 / Y -6",
+        "artDetailsColors": "Recommended print method: Screen Print Artwork appears within the 6-color screen print limit. Embroidery estimate: 3,500–5,500 stitches · 3 estimated This estimate is based on the visible artwork only, not the transparent/background canvas. Thread color count is in the preferred embroidery range. #153D2B · 54% ≈ PMS Black C #D59A32 · 44% ≈ PMS 1235 C #DFB263 · 2% ≈ PMS 584 C PMS matches are screen approximations. Final color should be confirmed by the art department. ✓ Transparent background detected. Screen print rule: Northwest Custom Apparel can screen print up to 6 total colors, including the base/underbase. This artwork estimates 4 total incl. base. Logo clarity: 100 DPI. Usable for some jobs, but not ideal for fine detail. Embroidery estimate: approximately 3,500–5,500 stitches. Final stitch count requires digitizing. Visible artwork used: about 54% of the artwork bounding area. Transparent or solid background space is excluded from the estimate. Thread colors: 3 estimated. Preferred range is 3–4 colors. 4–6 is workable. Up to 10 colors may be possible with review."
+      },
+      "fields": [
+        {
+          "id": "pcWidthRange",
+          "type": "range",
+          "value": "4",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcWidthNumber",
+          "type": "number",
+          "value": "3.75",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcXRange",
+          "type": "range",
+          "value": "-42",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcXNumber",
+          "type": "number",
+          "value": "-42",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcYRange",
+          "type": "range",
+          "value": "-6",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcYNumber",
+          "type": "number",
+          "value": "-6",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "garmentStyleSelect",
+          "type": "select-one",
+          "value": "tee",
+          "disabled": false
+        },
+        {
+          "id": "fabricSelect",
+          "type": "select-one",
+          "value": "cotton",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/pages/mockup-library.html",
+          "text": "📚 Saved Mockups"
+        }
+      ],
+      "headings": [
+        "NWCA Easy Shirt Designer",
+        "Artwork Details",
+        "File Info",
+        "Ink Colors / Print Check"
+      ],
+      "entries": [
+        {
+          "name": "example-logo.svg",
+          "kind": "canvas",
+          "status": "ready",
+          "printLoc": "Left Chest",
+          "printW": 3.75,
+          "onShirt": true,
+          "textModel": null,
+          "dst": null
+        }
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".side-head > span"
+            ],
+            [
+              ".fsize"
+            ],
+            [
+              "#threadColorsBtn"
+            ],
+            [
+              ".detail-row:nth-child(1) > b"
+            ],
+            [
+              ".detail-row:nth-child(2) > b"
+            ],
+            [
+              ".detail-row:nth-child(3) > b"
+            ],
+            [
+              ".detail-row:nth-child(4) > b"
+            ],
+            [
+              ".detail-row:nth-child(5) > b"
+            ],
+            [
+              ".detail-row:nth-child(6) > b"
+            ],
+            [
+              ".detail-row:nth-child(7) > b"
+            ],
+            [
+              ".detail-row:nth-child(8) > b"
+            ],
+            [
+              "p:nth-child(4)"
+            ]
+          ]
+        },
+        {
+          "id": "scrollable-region-focusable",
+          "nodes": [
+            [
+              "#artDetailsBody"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "T-Shirt Designer — Northwest Custom Apparel",
+      "ids": {
+        "thumb-1": "",
+        "advice-1": "Screen Print Usable · 100 DPI 3,500–5,500 st",
+        "badge-1": "SVG",
+        "pcStatusChip": "Front only",
+        "pcFrontBtn": "Front",
+        "pcBackBtn": "Back",
+        "pcBothBtn": "Both",
+        "pcLeftChestBtn": "Left Chest",
+        "pcFullFrontBtn": "Full Front",
+        "pcUpperBackBtn": "Upper Back",
+        "pcFullBackBtn": "Full Back",
+        "pcCenterBtn": "Center Art",
+        "pcWidthLabel": "3.75 in",
+        "pcWidthRange": "",
+        "pcWidthNumber": "",
+        "pcXLabel": "-42",
+        "pcXRange": "",
+        "pcXNumber": "",
+        "pcYLabel": "-6",
+        "pcYRange": "",
+        "pcYNumber": "",
+        "addTextBtn": "➕ Add Text",
+        "palBtn": "🎨 Shirt Color",
+        "garmentStyleSelect": "Crew Tee Polo Hoodie Long Sleeve Ladies Tee",
+        "removeBgBtn": "✓ White BG Removed",
+        "artDetailsBtn": "ℹ️ Art Details",
+        "threadColorsBtn": "🧵 Thread Colors",
+        "modelViewBtn": "👕 Model View",
+        "spinBtn": "🔄 Spin",
+        "proofBtn": "🖨 Customer Proof",
+        "dlBtn": "⬇ Download PNG",
+        "sendSteveBtn": "🧵 Send to Steve",
+        "sendCustomerBtn": "📧 Send to Customer",
+        "contrastWarn": "⚠ Low art/shirt contrast — the print may be hard to see",
+        "canvasHolder": "",
+        "advisorMethodPill": "Screen Print",
+        "advisorMain": "Screen print looks possible.",
+        "advisorCopy": "Artwork appears within the 6-color screen print limit.",
+        "advisorColors": "4 total incl. base",
+        "advisorQuality": "Usable · 100 DPI",
+        "advisorFabric": "Cotton",
+        "advisorScreen": "4 / 6",
+        "fabricSelect": "Cotton shirt Cotton/poly blend Polyester Nylon Fabric unknown",
+        "embStatusPill": "Embroidery OK",
+        "embMain": "Embroidery looks possible.",
+        "embCopy": "This estimate is based on the visible artwork only, not the transparent/background canvas. Thread color count is in the preferred embroidery range.",
+        "embStitches": "3,500–5,500",
+        "embThreads": "3 estimated",
+        "embSize": "3.8\" × 1.4\"",
+        "embBestUse": "Left chest",
+        "embNote": "Estimate only. The app now estimates stitches from visible design pixels only. Final stitch count still depends on digitizing, small text, outlines, gradients, fabric, and sew-out quality.",
+        "artDetailsInfo": "FILE NAME example-logo.svg TYPE Image (SVG) DIMENSIONS 480 × 240 px FILE SIZE 283 B PLACEMENT Front LOCATION Left Chest PRINT WIDTH 3.75\" POSITION X -42 / Y -6",
+        "artDetailsColors": "Recommended print method: Screen Print Artwork appears within the 6-color screen print limit. Embroidery estimate: 3,500–5,500 stitches · 3 estimated This estimate is based on the visible artwork only, not the transparent/background canvas. Thread color count is in the preferred embroidery range. #153D2B · 54% ≈ PMS Black C #D59A32 · 44% ≈ PMS 1235 C #DFB263 · 2% ≈ PMS 584 C PMS matches are screen approximations. Final color should be confirmed by the art department. ✓ Transparent background detected. Screen print rule: Northwest Custom Apparel can screen print up to 6 total colors, including the base/underbase. This artwork estimates 4 total incl. base. Logo clarity: 100 DPI. Usable for some jobs, but not ideal for fine detail. Embroidery estimate: approximately 3,500–5,500 stitches. Final stitch count requires digitizing. Visible artwork used: about 54% of the artwork bounding area. Transparent or solid background space is excluded from the estimate. Thread colors: 3 estimated. Preferred range is 3–4 colors. 4–6 is workable. Up to 10 colors may be possible with review."
+      },
+      "fields": [
+        {
+          "id": "pcWidthRange",
+          "type": "range",
+          "value": "4",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcWidthNumber",
+          "type": "number",
+          "value": "3.75",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcXRange",
+          "type": "range",
+          "value": "-42",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcXNumber",
+          "type": "number",
+          "value": "-42",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcYRange",
+          "type": "range",
+          "value": "-6",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcYNumber",
+          "type": "number",
+          "value": "-6",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "garmentStyleSelect",
+          "type": "select-one",
+          "value": "tee",
+          "disabled": false
+        },
+        {
+          "id": "fabricSelect",
+          "type": "select-one",
+          "value": "cotton",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/pages/mockup-library.html",
+          "text": "📚 Saved Mockups"
+        }
+      ],
+      "headings": [
+        "NWCA Easy Shirt Designer",
+        "Artwork Details",
+        "File Info",
+        "Ink Colors / Print Check"
+      ],
+      "entries": [
+        {
+          "name": "example-logo.svg",
+          "kind": "canvas",
+          "status": "ready",
+          "printLoc": "Left Chest",
+          "printW": 3.75,
+          "onShirt": true,
+          "textModel": null,
+          "dst": null
+        }
+      ],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".side-head > span"
+            ],
+            [
+              ".fsize"
+            ],
+            [
+              ".detail-row:nth-child(1) > b"
+            ],
+            [
+              ".detail-row:nth-child(2) > b"
+            ],
+            [
+              ".detail-row:nth-child(3) > b"
+            ],
+            [
+              ".detail-row:nth-child(4) > b"
+            ],
+            [
+              ".detail-row:nth-child(5) > b"
+            ],
+            [
+              ".detail-row:nth-child(6) > b"
+            ],
+            [
+              ".detail-row:nth-child(7) > b"
+            ],
+            [
+              ".detail-row:nth-child(8) > b"
+            ],
+            [
+              "p:nth-child(4)"
+            ]
+          ]
+        },
+        {
+          "id": "scrollable-region-focusable",
+          "nodes": [
+            [
+              "#artDetailsBody"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "T-Shirt Designer — Northwest Custom Apparel",
+      "ids": {
+        "thumb-1": "",
+        "advice-1": "Screen Print Usable · 100 DPI 3,500–5,500 st",
+        "badge-1": "SVG",
+        "pcStatusChip": "Front only",
+        "pcFrontBtn": "Front",
+        "pcBackBtn": "Back",
+        "pcBothBtn": "Both",
+        "pcLeftChestBtn": "Left Chest",
+        "pcFullFrontBtn": "Full Front",
+        "pcUpperBackBtn": "Upper Back",
+        "pcFullBackBtn": "Full Back",
+        "pcCenterBtn": "Center Art",
+        "pcWidthLabel": "3.75 in",
+        "pcWidthRange": "",
+        "pcWidthNumber": "",
+        "pcXLabel": "-42",
+        "pcXRange": "",
+        "pcXNumber": "",
+        "pcYLabel": "-6",
+        "pcYRange": "",
+        "pcYNumber": "",
+        "addTextBtn": "➕ Add Text",
+        "palBtn": "🎨 Shirt Color",
+        "garmentStyleSelect": "Crew Tee Polo Hoodie Long Sleeve Ladies Tee",
+        "removeBgBtn": "✓ White BG Removed",
+        "artDetailsBtn": "ℹ️ Art Details",
+        "threadColorsBtn": "🧵 Thread Colors",
+        "modelViewBtn": "👕 Model View",
+        "spinBtn": "🔄 Spin",
+        "proofBtn": "🖨 Customer Proof",
+        "dlBtn": "⬇ Download PNG",
+        "sendSteveBtn": "🧵 Send to Steve",
+        "sendCustomerBtn": "📧 Send to Customer",
+        "contrastWarn": "⚠ Low art/shirt contrast — the print may be hard to see",
+        "canvasHolder": "",
+        "advisorMethodPill": "Screen Print",
+        "advisorMain": "Screen print looks possible.",
+        "advisorCopy": "Artwork appears within the 6-color screen print limit.",
+        "advisorColors": "4 total incl. base",
+        "advisorQuality": "Usable · 100 DPI",
+        "advisorFabric": "Cotton",
+        "advisorScreen": "4 / 6",
+        "fabricSelect": "Cotton shirt Cotton/poly blend Polyester Nylon Fabric unknown",
+        "embStatusPill": "Embroidery OK",
+        "embMain": "Embroidery looks possible.",
+        "embCopy": "This estimate is based on the visible artwork only, not the transparent/background canvas. Thread color count is in the preferred embroidery range.",
+        "embStitches": "3,500–5,500",
+        "embThreads": "3 estimated",
+        "embSize": "3.8\" × 1.4\"",
+        "embBestUse": "Left chest",
+        "embNote": "Estimate only. The app now estimates stitches from visible design pixels only. Final stitch count still depends on digitizing, small text, outlines, gradients, fabric, and sew-out quality.",
+        "artDetailsInfo": "FILE NAME example-logo.svg TYPE Image (SVG) DIMENSIONS 480 × 240 px FILE SIZE 283 B PLACEMENT Front LOCATION Left Chest PRINT WIDTH 3.75\" POSITION X -42 / Y -6",
+        "artDetailsColors": "Recommended print method: Screen Print Artwork appears within the 6-color screen print limit. Embroidery estimate: 3,500–5,500 stitches · 3 estimated This estimate is based on the visible artwork only, not the transparent/background canvas. Thread color count is in the preferred embroidery range. #153D2B · 54% ≈ PMS Black C #D59A32 · 44% ≈ PMS 1235 C #DFB263 · 2% ≈ PMS 584 C PMS matches are screen approximations. Final color should be confirmed by the art department. ✓ Transparent background detected. Screen print rule: Northwest Custom Apparel can screen print up to 6 total colors, including the base/underbase. This artwork estimates 4 total incl. base. Logo clarity: 100 DPI. Usable for some jobs, but not ideal for fine detail. Embroidery estimate: approximately 3,500–5,500 stitches. Final stitch count requires digitizing. Visible artwork used: about 54% of the artwork bounding area. Transparent or solid background space is excluded from the estimate. Thread colors: 3 estimated. Preferred range is 3–4 colors. 4–6 is workable. Up to 10 colors may be possible with review."
+      },
+      "fields": [
+        {
+          "id": "pcWidthRange",
+          "type": "range",
+          "value": "4",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcWidthNumber",
+          "type": "number",
+          "value": "3.75",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcXRange",
+          "type": "range",
+          "value": "-42",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcXNumber",
+          "type": "number",
+          "value": "-42",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcYRange",
+          "type": "range",
+          "value": "-6",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcYNumber",
+          "type": "number",
+          "value": "-6",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "garmentStyleSelect",
+          "type": "select-one",
+          "value": "tee",
+          "disabled": false
+        },
+        {
+          "id": "fabricSelect",
+          "type": "select-one",
+          "value": "cotton",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/pages/mockup-library.html",
+          "text": "📚 Saved Mockups"
+        }
+      ],
+      "headings": [
+        "NWCA Easy Shirt Designer",
+        "Artwork Details",
+        "File Info",
+        "Ink Colors / Print Check"
+      ],
+      "entries": [
+        {
+          "name": "example-logo.svg",
+          "kind": "canvas",
+          "status": "ready",
+          "printLoc": "Left Chest",
+          "printW": 3.75,
+          "onShirt": true,
+          "textModel": null,
+          "dst": null
+        }
+      ],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".side-head > span"
+            ],
+            [
+              ".fsize"
+            ],
+            [
+              ".detail-row:nth-child(1) > b"
+            ],
+            [
+              ".detail-row:nth-child(2) > b"
+            ],
+            [
+              ".detail-row:nth-child(3) > b"
+            ],
+            [
+              ".detail-row:nth-child(4) > b"
+            ],
+            [
+              ".detail-row:nth-child(5) > b"
+            ],
+            [
+              ".detail-row:nth-child(6) > b"
+            ],
+            [
+              ".detail-row:nth-child(7) > b"
+            ],
+            [
+              ".detail-row:nth-child(8) > b"
+            ]
+          ]
+        },
+        {
+          "id": "scrollable-region-focusable",
+          "nodes": [
+            [
+              "#artDetailsBody"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "reads": [],
+  "writes": [],
+  "dialogs": []
+}

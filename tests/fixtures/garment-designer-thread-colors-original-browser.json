@@ -1,0 +1,776 @@
+{
+  "name": "thread-colors",
+  "states": [
+    {
+      "width": 1440,
+      "title": "T-Shirt Designer — Northwest Custom Apparel",
+      "ids": {
+        "thumb-1": "",
+        "advice-1": "Embroidery DST Production file DST 16 st",
+        "badge-1": "DST",
+        "pcStatusChip": "Front only",
+        "pcFrontBtn": "Front",
+        "pcBackBtn": "Back",
+        "pcBothBtn": "Both",
+        "pcLeftChestBtn": "Left Chest",
+        "pcFullFrontBtn": "Full Front",
+        "pcUpperBackBtn": "Upper Back",
+        "pcFullBackBtn": "Full Back",
+        "pcCenterBtn": "Center Art",
+        "pcWidthLabel": "2.25 in",
+        "pcWidthRange": "",
+        "pcWidthNumber": "",
+        "pcXLabel": "-42",
+        "pcXRange": "",
+        "pcXNumber": "",
+        "pcYLabel": "-6",
+        "pcYRange": "",
+        "pcYNumber": "",
+        "addTextBtn": "➕ Add Text",
+        "palBtn": "🎨 Shirt Color",
+        "garmentStyleSelect": "Crew Tee Polo Hoodie Long Sleeve Ladies Tee",
+        "removeBgBtn": "⬜ Remove White BG",
+        "artDetailsBtn": "ℹ️ Art Details",
+        "threadColorsBtn": "🧵 Thread Colors",
+        "modelViewBtn": "👕 Model View",
+        "spinBtn": "🔄 Spin",
+        "proofBtn": "🖨 Customer Proof",
+        "dlBtn": "⬇ Download PNG",
+        "sendSteveBtn": "🧵 Send to Steve",
+        "sendCustomerBtn": "📧 Send to Customer",
+        "canvasHolder": "",
+        "advisorMethodPill": "Embroidery DST",
+        "advisorMain": "Exact DST embroidery file loaded.",
+        "advisorCopy": "The app can use the DST file stitch count directly and place the stitch preview on the shirt.",
+        "advisorColors": "2 thread stops",
+        "advisorQuality": "Production file",
+        "advisorFabric": "Cotton",
+        "advisorScreen": "N/A",
+        "fabricSelect": "Cotton shirt Cotton/poly blend Polyester Nylon Fabric unknown",
+        "embStatusPill": "Exact DST",
+        "embMain": "Exact DST stitch count loaded.",
+        "embCopy": "This is no longer an estimate. The stitch count is read from the DST embroidery file. Thread colors are color stops that can be assigned to Robison-Anton Poly colors.",
+        "embStitches": "16",
+        "embThreads": "2 stops",
+        "embSize": "0.00\" × 0.00\"",
+        "embBestUse": "Left chest / embroidery",
+        "embNote": "DST files provide stitches and color stops. They do not reliably store the actual thread color names, so choose the Robison-Anton Poly colors for mockup/proofing.",
+        "threadColorsSummary": "FILE example-square.dst EXACT STITCHES 16 THREAD STOPS 2 DESIGN SIZE 0.00\" × 0.00\"",
+        "threadColorsBody": "Robison-Anton Poly thread colors: Choose screen-preview thread colors for each DST color stop. You can also label what each stop runs, such as outline, fill, text, or accent. Stop 1 2297 · Snow White 2568 · Eggshell 2310 · Cream 2255 · Khaki 2378 · Brown 2335 · Dark Brown 2296 · Black 2332 · Silver Gray 2293 · Charcoal 2301 · Light Gray 2267 · Red 2291 · Ruby Red 2240 · Burgundy 2292 · Orange 2554 · Burnt Orange 2583 · Gold 2285 · Yellow 2306 · Lemon Yellow 2557 · Kelly Green 2289 · Forest Green 2561 · Lime Green 2308 · Mint 2287 · Teal 2263 · Sky Blue 2299 · Royal Blue 2585 · Navy 2565 · Columbia Blue 2258 · Turquoise 2479 · Purple 2318 · Lavender 2300 · Hot Pink 2326 · Light Pink 2320 · Fuchsia 2315 · Peach 2316 · Coral 2312 · Maroon 2342 · Olive 2348 · Neon Green 2351 · Neon Yellow 2353 · Neon Orange 2355 · Neon Pink 2360 · Light Navy 2365 · Aqua 2370 · Denim Blue 2380 · Sand 2384 · Taupe 2390 · Emerald 2395 · Dark Teal 2401 · Violet 2408 · Magenta 2267 · Red ELEMENT / RUN #C8102E Stop 2 2297 · Snow White 2568 · Eggshell 2310 · Cream 2255 · Khaki 2378 · Brown 2335 · Dark Brown 2296 · Black 2332 · Silver Gray 2293 · Charcoal 2301 · Light Gray 2267 · Red 2291 · Ruby Red 2240 · Burgundy 2292 · Orange 2554 · Burnt Orange 2583 · Gold 2285 · Yellow 2306 · Lemon Yellow 2557 · Kelly Green 2289 · Forest Green 2561 · Lime Green 2308 · Mint 2287 · Teal 2263 · Sky Blue 2299 · Royal Blue 2585 · Navy 2565 · Columbia Blue 2258 · Turquoise 2479 · Purple 2318 · Lavender 2300 · Hot Pink 2326 · Light Pink 2320 · Fuchsia 2315 · Peach 2316 · Coral 2312 · Maroon 2342 · Olive 2348 · Neon Green 2351 · Neon Yellow 2353 · Neon Orange 2355 · Neon Pink 2360 · Light Navy 2365 · Aqua 2370 · Denim Blue 2380 · Sand 2384 · Taupe 2390 · Emerald 2395 · Dark Teal 2401 · Violet 2408 · Magenta 2297 · Snow White ELEMENT / RUN #FFFFFF",
+        "threadColorsSelected": "Selected thread names and elements: Stop 1: 2267 Red · Stop 2: 2297 Snow White Thread assignments Stop 1: 2267 Red (#C8102E) Stop 2: 2297 Snow White (#FFFFFF)"
+      },
+      "fields": [
+        {
+          "id": "pcWidthRange",
+          "type": "range",
+          "value": "2.5",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcWidthNumber",
+          "type": "number",
+          "value": "2.25",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcXRange",
+          "type": "range",
+          "value": "-42",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcXNumber",
+          "type": "number",
+          "value": "-42",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcYRange",
+          "type": "range",
+          "value": "-6",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcYNumber",
+          "type": "number",
+          "value": "-6",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "garmentStyleSelect",
+          "type": "select-one",
+          "value": "tee",
+          "disabled": false
+        },
+        {
+          "id": "fabricSelect",
+          "type": "select-one",
+          "value": "cotton",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "select-one",
+          "value": "10",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "select-one",
+          "value": "0",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/pages/mockup-library.html",
+          "text": "📚 Saved Mockups"
+        }
+      ],
+      "headings": [
+        "NWCA Easy Shirt Designer",
+        "DST Thread Colors"
+      ],
+      "entries": [
+        {
+          "name": "example-square.dst",
+          "kind": "dst",
+          "status": "ready",
+          "printLoc": "Left Chest",
+          "printW": 2.25,
+          "onShirt": true,
+          "textModel": null,
+          "dst": {
+            "threadStops": 2,
+            "widthIn": 0.003937007874015749,
+            "heightIn": 0.003937007874015749
+          }
+        }
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".side-head > span"
+            ],
+            [
+              ".fsize"
+            ]
+          ]
+        },
+        {
+          "id": "select-name",
+          "nodes": [
+            [
+              "select[data-change-args=\"[1,0,\\\"$this.value\\\"]\"]"
+            ],
+            [
+              "select[data-change-args=\"[1,1,\\\"$this.value\\\"]\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "T-Shirt Designer — Northwest Custom Apparel",
+      "ids": {
+        "thumb-1": "",
+        "advice-1": "Embroidery DST Production file DST 16 st",
+        "badge-1": "DST",
+        "pcStatusChip": "Front only",
+        "pcFrontBtn": "Front",
+        "pcBackBtn": "Back",
+        "pcBothBtn": "Both",
+        "pcLeftChestBtn": "Left Chest",
+        "pcFullFrontBtn": "Full Front",
+        "pcUpperBackBtn": "Upper Back",
+        "pcFullBackBtn": "Full Back",
+        "pcCenterBtn": "Center Art",
+        "pcWidthLabel": "2.25 in",
+        "pcWidthRange": "",
+        "pcWidthNumber": "",
+        "pcXLabel": "-42",
+        "pcXRange": "",
+        "pcXNumber": "",
+        "pcYLabel": "-6",
+        "pcYRange": "",
+        "pcYNumber": "",
+        "addTextBtn": "➕ Add Text",
+        "palBtn": "🎨 Shirt Color",
+        "garmentStyleSelect": "Crew Tee Polo Hoodie Long Sleeve Ladies Tee",
+        "removeBgBtn": "⬜ Remove White BG",
+        "artDetailsBtn": "ℹ️ Art Details",
+        "threadColorsBtn": "🧵 Thread Colors",
+        "modelViewBtn": "👕 Model View",
+        "spinBtn": "🔄 Spin",
+        "proofBtn": "🖨 Customer Proof",
+        "dlBtn": "⬇ Download PNG",
+        "sendSteveBtn": "🧵 Send to Steve",
+        "sendCustomerBtn": "📧 Send to Customer",
+        "canvasHolder": "",
+        "advisorMethodPill": "Embroidery DST",
+        "advisorMain": "Exact DST embroidery file loaded.",
+        "advisorCopy": "The app can use the DST file stitch count directly and place the stitch preview on the shirt.",
+        "advisorColors": "2 thread stops",
+        "advisorQuality": "Production file",
+        "advisorFabric": "Cotton",
+        "advisorScreen": "N/A",
+        "fabricSelect": "Cotton shirt Cotton/poly blend Polyester Nylon Fabric unknown",
+        "embStatusPill": "Exact DST",
+        "embMain": "Exact DST stitch count loaded.",
+        "embCopy": "This is no longer an estimate. The stitch count is read from the DST embroidery file. Thread colors are color stops that can be assigned to Robison-Anton Poly colors.",
+        "embStitches": "16",
+        "embThreads": "2 stops",
+        "embSize": "0.00\" × 0.00\"",
+        "embBestUse": "Left chest / embroidery",
+        "embNote": "DST files provide stitches and color stops. They do not reliably store the actual thread color names, so choose the Robison-Anton Poly colors for mockup/proofing.",
+        "threadColorsSummary": "FILE example-square.dst EXACT STITCHES 16 THREAD STOPS 2 DESIGN SIZE 0.00\" × 0.00\"",
+        "threadColorsBody": "Robison-Anton Poly thread colors: Choose screen-preview thread colors for each DST color stop. You can also label what each stop runs, such as outline, fill, text, or accent. Stop 1 2297 · Snow White 2568 · Eggshell 2310 · Cream 2255 · Khaki 2378 · Brown 2335 · Dark Brown 2296 · Black 2332 · Silver Gray 2293 · Charcoal 2301 · Light Gray 2267 · Red 2291 · Ruby Red 2240 · Burgundy 2292 · Orange 2554 · Burnt Orange 2583 · Gold 2285 · Yellow 2306 · Lemon Yellow 2557 · Kelly Green 2289 · Forest Green 2561 · Lime Green 2308 · Mint 2287 · Teal 2263 · Sky Blue 2299 · Royal Blue 2585 · Navy 2565 · Columbia Blue 2258 · Turquoise 2479 · Purple 2318 · Lavender 2300 · Hot Pink 2326 · Light Pink 2320 · Fuchsia 2315 · Peach 2316 · Coral 2312 · Maroon 2342 · Olive 2348 · Neon Green 2351 · Neon Yellow 2353 · Neon Orange 2355 · Neon Pink 2360 · Light Navy 2365 · Aqua 2370 · Denim Blue 2380 · Sand 2384 · Taupe 2390 · Emerald 2395 · Dark Teal 2401 · Violet 2408 · Magenta 2267 · Red ELEMENT / RUN #C8102E Stop 2 2297 · Snow White 2568 · Eggshell 2310 · Cream 2255 · Khaki 2378 · Brown 2335 · Dark Brown 2296 · Black 2332 · Silver Gray 2293 · Charcoal 2301 · Light Gray 2267 · Red 2291 · Ruby Red 2240 · Burgundy 2292 · Orange 2554 · Burnt Orange 2583 · Gold 2285 · Yellow 2306 · Lemon Yellow 2557 · Kelly Green 2289 · Forest Green 2561 · Lime Green 2308 · Mint 2287 · Teal 2263 · Sky Blue 2299 · Royal Blue 2585 · Navy 2565 · Columbia Blue 2258 · Turquoise 2479 · Purple 2318 · Lavender 2300 · Hot Pink 2326 · Light Pink 2320 · Fuchsia 2315 · Peach 2316 · Coral 2312 · Maroon 2342 · Olive 2348 · Neon Green 2351 · Neon Yellow 2353 · Neon Orange 2355 · Neon Pink 2360 · Light Navy 2365 · Aqua 2370 · Denim Blue 2380 · Sand 2384 · Taupe 2390 · Emerald 2395 · Dark Teal 2401 · Violet 2408 · Magenta 2297 · Snow White ELEMENT / RUN #FFFFFF",
+        "threadColorsSelected": "Selected thread names and elements: Stop 1: 2267 Red · Stop 2: 2297 Snow White Thread assignments Stop 1: 2267 Red (#C8102E) Stop 2: 2297 Snow White (#FFFFFF)"
+      },
+      "fields": [
+        {
+          "id": "pcWidthRange",
+          "type": "range",
+          "value": "2.5",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcWidthNumber",
+          "type": "number",
+          "value": "2.25",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcXRange",
+          "type": "range",
+          "value": "-42",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcXNumber",
+          "type": "number",
+          "value": "-42",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcYRange",
+          "type": "range",
+          "value": "-6",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcYNumber",
+          "type": "number",
+          "value": "-6",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "garmentStyleSelect",
+          "type": "select-one",
+          "value": "tee",
+          "disabled": false
+        },
+        {
+          "id": "fabricSelect",
+          "type": "select-one",
+          "value": "cotton",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "select-one",
+          "value": "10",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "select-one",
+          "value": "0",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/pages/mockup-library.html",
+          "text": "📚 Saved Mockups"
+        }
+      ],
+      "headings": [
+        "NWCA Easy Shirt Designer",
+        "DST Thread Colors"
+      ],
+      "entries": [
+        {
+          "name": "example-square.dst",
+          "kind": "dst",
+          "status": "ready",
+          "printLoc": "Left Chest",
+          "printW": 2.25,
+          "onShirt": true,
+          "textModel": null,
+          "dst": {
+            "threadStops": 2,
+            "widthIn": 0.003937007874015749,
+            "heightIn": 0.003937007874015749
+          }
+        }
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".side-head > span"
+            ],
+            [
+              ".fsize"
+            ]
+          ]
+        },
+        {
+          "id": "select-name",
+          "nodes": [
+            [
+              "select[data-change-args=\"[1,0,\\\"$this.value\\\"]\"]"
+            ],
+            [
+              "select[data-change-args=\"[1,1,\\\"$this.value\\\"]\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "T-Shirt Designer — Northwest Custom Apparel",
+      "ids": {
+        "thumb-1": "",
+        "advice-1": "Embroidery DST Production file DST 16 st",
+        "badge-1": "DST",
+        "pcStatusChip": "Front only",
+        "pcFrontBtn": "Front",
+        "pcBackBtn": "Back",
+        "pcBothBtn": "Both",
+        "pcLeftChestBtn": "Left Chest",
+        "pcFullFrontBtn": "Full Front",
+        "pcUpperBackBtn": "Upper Back",
+        "pcFullBackBtn": "Full Back",
+        "pcCenterBtn": "Center Art",
+        "pcWidthLabel": "2.25 in",
+        "pcWidthRange": "",
+        "pcWidthNumber": "",
+        "pcXLabel": "-42",
+        "pcXRange": "",
+        "pcXNumber": "",
+        "pcYLabel": "-6",
+        "pcYRange": "",
+        "pcYNumber": "",
+        "addTextBtn": "➕ Add Text",
+        "palBtn": "🎨 Shirt Color",
+        "garmentStyleSelect": "Crew Tee Polo Hoodie Long Sleeve Ladies Tee",
+        "removeBgBtn": "⬜ Remove White BG",
+        "artDetailsBtn": "ℹ️ Art Details",
+        "threadColorsBtn": "🧵 Thread Colors",
+        "modelViewBtn": "👕 Model View",
+        "spinBtn": "🔄 Spin",
+        "proofBtn": "🖨 Customer Proof",
+        "dlBtn": "⬇ Download PNG",
+        "sendSteveBtn": "🧵 Send to Steve",
+        "sendCustomerBtn": "📧 Send to Customer",
+        "canvasHolder": "",
+        "advisorMethodPill": "Embroidery DST",
+        "advisorMain": "Exact DST embroidery file loaded.",
+        "advisorCopy": "The app can use the DST file stitch count directly and place the stitch preview on the shirt.",
+        "advisorColors": "2 thread stops",
+        "advisorQuality": "Production file",
+        "advisorFabric": "Cotton",
+        "advisorScreen": "N/A",
+        "fabricSelect": "Cotton shirt Cotton/poly blend Polyester Nylon Fabric unknown",
+        "embStatusPill": "Exact DST",
+        "embMain": "Exact DST stitch count loaded.",
+        "embCopy": "This is no longer an estimate. The stitch count is read from the DST embroidery file. Thread colors are color stops that can be assigned to Robison-Anton Poly colors.",
+        "embStitches": "16",
+        "embThreads": "2 stops",
+        "embSize": "0.00\" × 0.00\"",
+        "embBestUse": "Left chest / embroidery",
+        "embNote": "DST files provide stitches and color stops. They do not reliably store the actual thread color names, so choose the Robison-Anton Poly colors for mockup/proofing.",
+        "threadColorsSummary": "FILE example-square.dst EXACT STITCHES 16 THREAD STOPS 2 DESIGN SIZE 0.00\" × 0.00\"",
+        "threadColorsBody": "Robison-Anton Poly thread colors: Choose screen-preview thread colors for each DST color stop. You can also label what each stop runs, such as outline, fill, text, or accent. Stop 1 2297 · Snow White 2568 · Eggshell 2310 · Cream 2255 · Khaki 2378 · Brown 2335 · Dark Brown 2296 · Black 2332 · Silver Gray 2293 · Charcoal 2301 · Light Gray 2267 · Red 2291 · Ruby Red 2240 · Burgundy 2292 · Orange 2554 · Burnt Orange 2583 · Gold 2285 · Yellow 2306 · Lemon Yellow 2557 · Kelly Green 2289 · Forest Green 2561 · Lime Green 2308 · Mint 2287 · Teal 2263 · Sky Blue 2299 · Royal Blue 2585 · Navy 2565 · Columbia Blue 2258 · Turquoise 2479 · Purple 2318 · Lavender 2300 · Hot Pink 2326 · Light Pink 2320 · Fuchsia 2315 · Peach 2316 · Coral 2312 · Maroon 2342 · Olive 2348 · Neon Green 2351 · Neon Yellow 2353 · Neon Orange 2355 · Neon Pink 2360 · Light Navy 2365 · Aqua 2370 · Denim Blue 2380 · Sand 2384 · Taupe 2390 · Emerald 2395 · Dark Teal 2401 · Violet 2408 · Magenta 2267 · Red ELEMENT / RUN #C8102E Stop 2 2297 · Snow White 2568 · Eggshell 2310 · Cream 2255 · Khaki 2378 · Brown 2335 · Dark Brown 2296 · Black 2332 · Silver Gray 2293 · Charcoal 2301 · Light Gray 2267 · Red 2291 · Ruby Red 2240 · Burgundy 2292 · Orange 2554 · Burnt Orange 2583 · Gold 2285 · Yellow 2306 · Lemon Yellow 2557 · Kelly Green 2289 · Forest Green 2561 · Lime Green 2308 · Mint 2287 · Teal 2263 · Sky Blue 2299 · Royal Blue 2585 · Navy 2565 · Columbia Blue 2258 · Turquoise 2479 · Purple 2318 · Lavender 2300 · Hot Pink 2326 · Light Pink 2320 · Fuchsia 2315 · Peach 2316 · Coral 2312 · Maroon 2342 · Olive 2348 · Neon Green 2351 · Neon Yellow 2353 · Neon Orange 2355 · Neon Pink 2360 · Light Navy 2365 · Aqua 2370 · Denim Blue 2380 · Sand 2384 · Taupe 2390 · Emerald 2395 · Dark Teal 2401 · Violet 2408 · Magenta 2297 · Snow White ELEMENT / RUN #FFFFFF",
+        "threadColorsSelected": "Selected thread names and elements: Stop 1: 2267 Red · Stop 2: 2297 Snow White Thread assignments Stop 1: 2267 Red (#C8102E) Stop 2: 2297 Snow White (#FFFFFF)"
+      },
+      "fields": [
+        {
+          "id": "pcWidthRange",
+          "type": "range",
+          "value": "2.5",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcWidthNumber",
+          "type": "number",
+          "value": "2.25",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcXRange",
+          "type": "range",
+          "value": "-42",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcXNumber",
+          "type": "number",
+          "value": "-42",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcYRange",
+          "type": "range",
+          "value": "-6",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcYNumber",
+          "type": "number",
+          "value": "-6",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "garmentStyleSelect",
+          "type": "select-one",
+          "value": "tee",
+          "disabled": false
+        },
+        {
+          "id": "fabricSelect",
+          "type": "select-one",
+          "value": "cotton",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "select-one",
+          "value": "10",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "select-one",
+          "value": "0",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/pages/mockup-library.html",
+          "text": "📚 Saved Mockups"
+        }
+      ],
+      "headings": [
+        "NWCA Easy Shirt Designer",
+        "DST Thread Colors"
+      ],
+      "entries": [
+        {
+          "name": "example-square.dst",
+          "kind": "dst",
+          "status": "ready",
+          "printLoc": "Left Chest",
+          "printW": 2.25,
+          "onShirt": true,
+          "textModel": null,
+          "dst": {
+            "threadStops": 2,
+            "widthIn": 0.003937007874015749,
+            "heightIn": 0.003937007874015749
+          }
+        }
+      ],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".side-head > span"
+            ],
+            [
+              ".fsize"
+            ]
+          ]
+        },
+        {
+          "id": "select-name",
+          "nodes": [
+            [
+              "select[data-change-args=\"[1,0,\\\"$this.value\\\"]\"]"
+            ],
+            [
+              "select[data-change-args=\"[1,1,\\\"$this.value\\\"]\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "T-Shirt Designer — Northwest Custom Apparel",
+      "ids": {
+        "thumb-1": "",
+        "advice-1": "Embroidery DST Production file DST 16 st",
+        "badge-1": "DST",
+        "pcStatusChip": "Front only",
+        "pcFrontBtn": "Front",
+        "pcBackBtn": "Back",
+        "pcBothBtn": "Both",
+        "pcLeftChestBtn": "Left Chest",
+        "pcFullFrontBtn": "Full Front",
+        "pcUpperBackBtn": "Upper Back",
+        "pcFullBackBtn": "Full Back",
+        "pcCenterBtn": "Center Art",
+        "pcWidthLabel": "2.25 in",
+        "pcWidthRange": "",
+        "pcWidthNumber": "",
+        "pcXLabel": "-42",
+        "pcXRange": "",
+        "pcXNumber": "",
+        "pcYLabel": "-6",
+        "pcYRange": "",
+        "pcYNumber": "",
+        "addTextBtn": "➕ Add Text",
+        "palBtn": "🎨 Shirt Color",
+        "garmentStyleSelect": "Crew Tee Polo Hoodie Long Sleeve Ladies Tee",
+        "removeBgBtn": "⬜ Remove White BG",
+        "artDetailsBtn": "ℹ️ Art Details",
+        "threadColorsBtn": "🧵 Thread Colors",
+        "modelViewBtn": "👕 Model View",
+        "spinBtn": "🔄 Spin",
+        "proofBtn": "🖨 Customer Proof",
+        "dlBtn": "⬇ Download PNG",
+        "sendSteveBtn": "🧵 Send to Steve",
+        "sendCustomerBtn": "📧 Send to Customer",
+        "canvasHolder": "",
+        "advisorMethodPill": "Embroidery DST",
+        "advisorMain": "Exact DST embroidery file loaded.",
+        "advisorCopy": "The app can use the DST file stitch count directly and place the stitch preview on the shirt.",
+        "advisorColors": "2 thread stops",
+        "advisorQuality": "Production file",
+        "advisorFabric": "Cotton",
+        "advisorScreen": "N/A",
+        "fabricSelect": "Cotton shirt Cotton/poly blend Polyester Nylon Fabric unknown",
+        "embStatusPill": "Exact DST",
+        "embMain": "Exact DST stitch count loaded.",
+        "embCopy": "This is no longer an estimate. The stitch count is read from the DST embroidery file. Thread colors are color stops that can be assigned to Robison-Anton Poly colors.",
+        "embStitches": "16",
+        "embThreads": "2 stops",
+        "embSize": "0.00\" × 0.00\"",
+        "embBestUse": "Left chest / embroidery",
+        "embNote": "DST files provide stitches and color stops. They do not reliably store the actual thread color names, so choose the Robison-Anton Poly colors for mockup/proofing.",
+        "threadColorsSummary": "FILE example-square.dst EXACT STITCHES 16 THREAD STOPS 2 DESIGN SIZE 0.00\" × 0.00\"",
+        "threadColorsBody": "Robison-Anton Poly thread colors: Choose screen-preview thread colors for each DST color stop. You can also label what each stop runs, such as outline, fill, text, or accent. Stop 1 2297 · Snow White 2568 · Eggshell 2310 · Cream 2255 · Khaki 2378 · Brown 2335 · Dark Brown 2296 · Black 2332 · Silver Gray 2293 · Charcoal 2301 · Light Gray 2267 · Red 2291 · Ruby Red 2240 · Burgundy 2292 · Orange 2554 · Burnt Orange 2583 · Gold 2285 · Yellow 2306 · Lemon Yellow 2557 · Kelly Green 2289 · Forest Green 2561 · Lime Green 2308 · Mint 2287 · Teal 2263 · Sky Blue 2299 · Royal Blue 2585 · Navy 2565 · Columbia Blue 2258 · Turquoise 2479 · Purple 2318 · Lavender 2300 · Hot Pink 2326 · Light Pink 2320 · Fuchsia 2315 · Peach 2316 · Coral 2312 · Maroon 2342 · Olive 2348 · Neon Green 2351 · Neon Yellow 2353 · Neon Orange 2355 · Neon Pink 2360 · Light Navy 2365 · Aqua 2370 · Denim Blue 2380 · Sand 2384 · Taupe 2390 · Emerald 2395 · Dark Teal 2401 · Violet 2408 · Magenta 2267 · Red ELEMENT / RUN #C8102E Stop 2 2297 · Snow White 2568 · Eggshell 2310 · Cream 2255 · Khaki 2378 · Brown 2335 · Dark Brown 2296 · Black 2332 · Silver Gray 2293 · Charcoal 2301 · Light Gray 2267 · Red 2291 · Ruby Red 2240 · Burgundy 2292 · Orange 2554 · Burnt Orange 2583 · Gold 2285 · Yellow 2306 · Lemon Yellow 2557 · Kelly Green 2289 · Forest Green 2561 · Lime Green 2308 · Mint 2287 · Teal 2263 · Sky Blue 2299 · Royal Blue 2585 · Navy 2565 · Columbia Blue 2258 · Turquoise 2479 · Purple 2318 · Lavender 2300 · Hot Pink 2326 · Light Pink 2320 · Fuchsia 2315 · Peach 2316 · Coral 2312 · Maroon 2342 · Olive 2348 · Neon Green 2351 · Neon Yellow 2353 · Neon Orange 2355 · Neon Pink 2360 · Light Navy 2365 · Aqua 2370 · Denim Blue 2380 · Sand 2384 · Taupe 2390 · Emerald 2395 · Dark Teal 2401 · Violet 2408 · Magenta 2297 · Snow White ELEMENT / RUN #FFFFFF",
+        "threadColorsSelected": "Selected thread names and elements: Stop 1: 2267 Red · Stop 2: 2297 Snow White Thread assignments Stop 1: 2267 Red (#C8102E) Stop 2: 2297 Snow White (#FFFFFF)"
+      },
+      "fields": [
+        {
+          "id": "pcWidthRange",
+          "type": "range",
+          "value": "2.5",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcWidthNumber",
+          "type": "number",
+          "value": "2.25",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcXRange",
+          "type": "range",
+          "value": "-42",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcXNumber",
+          "type": "number",
+          "value": "-42",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcYRange",
+          "type": "range",
+          "value": "-6",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcYNumber",
+          "type": "number",
+          "value": "-6",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "garmentStyleSelect",
+          "type": "select-one",
+          "value": "tee",
+          "disabled": false
+        },
+        {
+          "id": "fabricSelect",
+          "type": "select-one",
+          "value": "cotton",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "select-one",
+          "value": "10",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "select-one",
+          "value": "0",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/pages/mockup-library.html",
+          "text": "📚 Saved Mockups"
+        }
+      ],
+      "headings": [
+        "NWCA Easy Shirt Designer",
+        "DST Thread Colors"
+      ],
+      "entries": [
+        {
+          "name": "example-square.dst",
+          "kind": "dst",
+          "status": "ready",
+          "printLoc": "Left Chest",
+          "printW": 2.25,
+          "onShirt": true,
+          "textModel": null,
+          "dst": {
+            "threadStops": 2,
+            "widthIn": 0.003937007874015749,
+            "heightIn": 0.003937007874015749
+          }
+        }
+      ],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".side-head > span"
+            ],
+            [
+              ".fsize"
+            ]
+          ]
+        },
+        {
+          "id": "select-name",
+          "nodes": [
+            [
+              "select[data-change-args=\"[1,0,\\\"$this.value\\\"]\"]"
+            ],
+            [
+              "select[data-change-args=\"[1,1,\\\"$this.value\\\"]\"]"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "reads": [],
+  "writes": [],
+  "dialogs": []
+}

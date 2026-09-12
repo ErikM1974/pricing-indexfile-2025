@@ -1,0 +1,2181 @@
+{
+  "name": "art-fees-failure",
+  "states": [
+    {
+      "width": 1440,
+      "title": "T-Shirt Designer — Northwest Custom Apparel",
+      "ids": {
+        "thumb-1": "",
+        "advice-1": "Screen Print Usable · 100 DPI 3,500–5,500 st",
+        "badge-1": "SVG",
+        "pcStatusChip": "Front only",
+        "pcFrontBtn": "Front",
+        "pcBackBtn": "Back",
+        "pcBothBtn": "Both",
+        "pcLeftChestBtn": "Left Chest",
+        "pcFullFrontBtn": "Full Front",
+        "pcUpperBackBtn": "Upper Back",
+        "pcFullBackBtn": "Full Back",
+        "pcCenterBtn": "Center Art",
+        "pcWidthLabel": "3.75 in",
+        "pcWidthRange": "",
+        "pcWidthNumber": "",
+        "pcXLabel": "-42",
+        "pcXRange": "",
+        "pcXNumber": "",
+        "pcYLabel": "-6",
+        "pcYRange": "",
+        "pcYNumber": "",
+        "addTextBtn": "➕ Add Text",
+        "palBtn": "🎨 Shirt Color",
+        "garmentStyleSelect": "Crew Tee Polo Hoodie Long Sleeve Ladies Tee",
+        "removeBgBtn": "✓ White BG Removed",
+        "artDetailsBtn": "ℹ️ Art Details",
+        "threadColorsBtn": "🧵 Thread Colors",
+        "modelViewBtn": "👕 Model View",
+        "spinBtn": "🔄 Spin",
+        "proofBtn": "🖨 Customer Proof",
+        "dlBtn": "⬇ Download PNG",
+        "sendSteveBtn": "🧵 Send to Steve",
+        "sendCustomerBtn": "📧 Send to Customer",
+        "contrastWarn": "⚠ Low art/shirt contrast — the print may be hard to see",
+        "canvasHolder": "",
+        "advisorMethodPill": "Screen Print",
+        "advisorMain": "Screen print looks possible.",
+        "advisorCopy": "Artwork appears within the 6-color screen print limit.",
+        "advisorColors": "4 total incl. base",
+        "advisorQuality": "Usable · 100 DPI",
+        "advisorFabric": "Cotton",
+        "advisorScreen": "4 / 6",
+        "fabricSelect": "Cotton shirt Cotton/poly blend Polyester Nylon Fabric unknown",
+        "embStatusPill": "Embroidery OK",
+        "embMain": "Embroidery looks possible.",
+        "embCopy": "This estimate is based on the visible artwork only, not the transparent/background canvas. Thread color count is in the preferred embroidery range.",
+        "embStitches": "3,500–5,500",
+        "embThreads": "3 estimated",
+        "embSize": "3.8\" × 1.4\"",
+        "embBestUse": "Left chest",
+        "embNote": "Estimate only. The app now estimates stitches from visible design pixels only. Final stitch count still depends on digitizing, small text, outlines, gradients, fabric, and sew-out quality.",
+        "steveModalTitle": "🧵 Send to Steve — complete the art request",
+        "steveModalClose": "×",
+        "gsf-company": "",
+        "gsf-cust-num": "",
+        "gsf-contact-name": "",
+        "gsf-contact-email": "",
+        "gsf-sales-rep": "",
+        "gsf-due-date": "",
+        "gsf-design-num": "",
+        "gsf-order-num": "",
+        "gsf-prelim": "- art fees unavailable -",
+        "gsf-prelim-warning": "Could not load the art fee list from Caspio (HTTP 503). Leave this blank — Steve will set the fee — or refresh to retry.",
+        "gsf-rush-toggle": "🔥 Rush Order Tick if Steve needs this ASAP",
+        "gsf-artwork-status": "- select - New artwork from scratch Mockup only Revision to existing proof Repeat from previous order Final approved / production ready",
+        "gsf-approval-status": "- select - Not approved — Steve to create proof Customer reviewing proof Customer approved — ready for production Internal revision only Post-approval change order",
+        "gsf-style-0": "",
+        "gsf-color-0": "- enter style first -",
+        "gsf-add-garment": "+ Add another garment",
+        "gsf-similar-requests": "",
+        "gsf-loc-place-0": "- placement - Left Chest Right Chest Full Front Full Back Left Sleeve Right Sleeve Cap Front Cap Back Cap Side (Left) Cap Side (Right) Pocket Yoke / Upper Back Nape of Neck Pant Leg Tote / Bag Other (describe in notes)",
+        "gsf-loc-w-0": "",
+        "gsf-loc-h-0": "",
+        "gsf-loc-n-0": "",
+        "gsf-add-location": "+ Add another location",
+        "gsf-color-mode": "- select - Use exact PMS colors Use closest match Match previous order Black only White only Full color AE/customer doesn't know — Steve to recommend",
+        "gsf-underbase": "- select - Yes No Steve to decide",
+        "gsf-pms": "",
+        "gsf-thread": "",
+        "gsf-exact-text": "",
+        "gsf-no-text": "",
+        "gsf-prev-order": "",
+        "gsf-prev-design": "",
+        "gsf-keep-same": "",
+        "gsf-change": "",
+        "gsf-file-type": "- select - Customer vector file (AI, EPS, PDF, SVG) Customer raster file (PNG / JPG) Customer screenshot only Logo from a previous order No usable artwork provided — Steve must recreate",
+        "gsf-file-drop-cta": "Add another file",
+        "gsf-file-drop-sub": "3 more can be added",
+        "gsf-file-drop-dots": "",
+        "gsf-file-preview-area": "designer-mockup-1789246800000.png 798 KB ×",
+        "gsf-notes": "",
+        "gsf-check-all": "Check all",
+        "gsf-submit-btn": "Submit Art Request",
+        "gsf-submit-status": "",
+        "gsf-progress-where": "SECTION 11 OF 11",
+        "gsf-progress-left": "11 required left · next: Company",
+        "gsf-progress-submit": "Submit Art Request"
+      },
+      "fields": [
+        {
+          "id": "pcWidthRange",
+          "type": "range",
+          "value": "4",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcWidthNumber",
+          "type": "number",
+          "value": "3.75",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcXRange",
+          "type": "range",
+          "value": "-42",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcXNumber",
+          "type": "number",
+          "value": "-42",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcYRange",
+          "type": "range",
+          "value": "-6",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcYNumber",
+          "type": "number",
+          "value": "-6",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "garmentStyleSelect",
+          "type": "select-one",
+          "value": "tee",
+          "disabled": false
+        },
+        {
+          "id": "fabricSelect",
+          "type": "select-one",
+          "value": "cotton",
+          "disabled": false
+        },
+        {
+          "id": "gsf-company",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-cust-num",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-contact-name",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-contact-email",
+          "type": "email",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-sales-rep",
+          "type": "text",
+          "value": "Example Rep",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-due-date",
+          "type": "date",
+          "value": "2026-09-16",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-design-num",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-order-num",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-prelim",
+          "type": "select-one",
+          "value": "",
+          "disabled": true
+        },
+        {
+          "id": "gsf-artwork-status",
+          "type": "select-one",
+          "value": "Mockup only",
+          "disabled": false
+        },
+        {
+          "id": "gsf-approval-status",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "Screen Print",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "DTG",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "Embroidery",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "Transfer",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "Sticker",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "Banner",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "JDS Product",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "Laser Leatherette Patch",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "Not sure — Steve to advise",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-style-0",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-color-0",
+          "type": "select-one",
+          "value": "",
+          "disabled": true
+        },
+        {
+          "id": "gsf-loc-place-0",
+          "type": "select-one",
+          "value": "Left Chest",
+          "disabled": false
+        },
+        {
+          "id": "gsf-loc-w-0",
+          "type": "number",
+          "value": "3.75",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-loc-h-0",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-loc-n-0",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-color-mode",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "gsf-underbase",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "gsf-pms",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-thread",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-exact-text",
+          "type": "textarea",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "gsf-no-text",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-prev-order",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-prev-design",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-keep-same",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-change",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-file-type",
+          "type": "select-one",
+          "value": "Customer raster file (PNG / JPG)",
+          "disabled": false
+        },
+        {
+          "id": "gsf-notes",
+          "type": "textarea",
+          "value": "Mockup built in the NWCA Shirt Designer (cleaned art attached). Shown on a PC61 crew tee for placement reference.",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/pages/mockup-library.html",
+          "text": "📚 Saved Mockups"
+        }
+      ],
+      "headings": [
+        "NWCA Easy Shirt Designer",
+        "🧵 Send to Steve — complete the art request",
+        "Garment Art Request to Steve"
+      ],
+      "entries": [
+        {
+          "name": "example-logo.svg",
+          "kind": "canvas",
+          "status": "ready",
+          "printLoc": "Left Chest",
+          "printW": 3.75,
+          "onShirt": true,
+          "textModel": null,
+          "dst": null
+        }
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".side-head > span"
+            ],
+            [
+              ".fsize"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "T-Shirt Designer — Northwest Custom Apparel",
+      "ids": {
+        "thumb-1": "",
+        "advice-1": "Screen Print Usable · 100 DPI 3,500–5,500 st",
+        "badge-1": "SVG",
+        "pcStatusChip": "Front only",
+        "pcFrontBtn": "Front",
+        "pcBackBtn": "Back",
+        "pcBothBtn": "Both",
+        "pcLeftChestBtn": "Left Chest",
+        "pcFullFrontBtn": "Full Front",
+        "pcUpperBackBtn": "Upper Back",
+        "pcFullBackBtn": "Full Back",
+        "pcCenterBtn": "Center Art",
+        "pcWidthLabel": "3.75 in",
+        "pcWidthRange": "",
+        "pcWidthNumber": "",
+        "pcXLabel": "-42",
+        "pcXRange": "",
+        "pcXNumber": "",
+        "pcYLabel": "-6",
+        "pcYRange": "",
+        "pcYNumber": "",
+        "addTextBtn": "➕ Add Text",
+        "palBtn": "🎨 Shirt Color",
+        "garmentStyleSelect": "Crew Tee Polo Hoodie Long Sleeve Ladies Tee",
+        "removeBgBtn": "✓ White BG Removed",
+        "artDetailsBtn": "ℹ️ Art Details",
+        "threadColorsBtn": "🧵 Thread Colors",
+        "modelViewBtn": "👕 Model View",
+        "spinBtn": "🔄 Spin",
+        "proofBtn": "🖨 Customer Proof",
+        "dlBtn": "⬇ Download PNG",
+        "sendSteveBtn": "🧵 Send to Steve",
+        "sendCustomerBtn": "📧 Send to Customer",
+        "contrastWarn": "⚠ Low art/shirt contrast — the print may be hard to see",
+        "canvasHolder": "",
+        "advisorMethodPill": "Screen Print",
+        "advisorMain": "Screen print looks possible.",
+        "advisorCopy": "Artwork appears within the 6-color screen print limit.",
+        "advisorColors": "4 total incl. base",
+        "advisorQuality": "Usable · 100 DPI",
+        "advisorFabric": "Cotton",
+        "advisorScreen": "4 / 6",
+        "fabricSelect": "Cotton shirt Cotton/poly blend Polyester Nylon Fabric unknown",
+        "embStatusPill": "Embroidery OK",
+        "embMain": "Embroidery looks possible.",
+        "embCopy": "This estimate is based on the visible artwork only, not the transparent/background canvas. Thread color count is in the preferred embroidery range.",
+        "embStitches": "3,500–5,500",
+        "embThreads": "3 estimated",
+        "embSize": "3.8\" × 1.4\"",
+        "embBestUse": "Left chest",
+        "embNote": "Estimate only. The app now estimates stitches from visible design pixels only. Final stitch count still depends on digitizing, small text, outlines, gradients, fabric, and sew-out quality.",
+        "steveModalTitle": "🧵 Send to Steve — complete the art request",
+        "steveModalClose": "×",
+        "gsf-company": "",
+        "gsf-cust-num": "",
+        "gsf-contact-name": "",
+        "gsf-contact-email": "",
+        "gsf-sales-rep": "",
+        "gsf-due-date": "",
+        "gsf-design-num": "",
+        "gsf-order-num": "",
+        "gsf-prelim": "- art fees unavailable -",
+        "gsf-prelim-warning": "Could not load the art fee list from Caspio (HTTP 503). Leave this blank — Steve will set the fee — or refresh to retry.",
+        "gsf-rush-toggle": "🔥 Rush Order Tick if Steve needs this ASAP",
+        "gsf-artwork-status": "- select - New artwork from scratch Mockup only Revision to existing proof Repeat from previous order Final approved / production ready",
+        "gsf-approval-status": "- select - Not approved — Steve to create proof Customer reviewing proof Customer approved — ready for production Internal revision only Post-approval change order",
+        "gsf-style-0": "",
+        "gsf-color-0": "- enter style first -",
+        "gsf-add-garment": "+ Add another garment",
+        "gsf-similar-requests": "",
+        "gsf-loc-place-0": "- placement - Left Chest Right Chest Full Front Full Back Left Sleeve Right Sleeve Cap Front Cap Back Cap Side (Left) Cap Side (Right) Pocket Yoke / Upper Back Nape of Neck Pant Leg Tote / Bag Other (describe in notes)",
+        "gsf-loc-w-0": "",
+        "gsf-loc-h-0": "",
+        "gsf-loc-n-0": "",
+        "gsf-add-location": "+ Add another location",
+        "gsf-color-mode": "- select - Use exact PMS colors Use closest match Match previous order Black only White only Full color AE/customer doesn't know — Steve to recommend",
+        "gsf-underbase": "- select - Yes No Steve to decide",
+        "gsf-pms": "",
+        "gsf-thread": "",
+        "gsf-exact-text": "",
+        "gsf-no-text": "",
+        "gsf-prev-order": "",
+        "gsf-prev-design": "",
+        "gsf-keep-same": "",
+        "gsf-change": "",
+        "gsf-file-type": "- select - Customer vector file (AI, EPS, PDF, SVG) Customer raster file (PNG / JPG) Customer screenshot only Logo from a previous order No usable artwork provided — Steve must recreate",
+        "gsf-file-drop-cta": "Add another file",
+        "gsf-file-drop-sub": "3 more can be added",
+        "gsf-file-drop-dots": "",
+        "gsf-file-preview-area": "designer-mockup-1789246800000.png 798 KB ×",
+        "gsf-notes": "",
+        "gsf-check-all": "Check all",
+        "gsf-submit-btn": "Submit Art Request",
+        "gsf-submit-status": "",
+        "gsf-progress-where": "SECTION 11 OF 11",
+        "gsf-progress-left": "11 required left · next: Company",
+        "gsf-progress-submit": "Submit Art Request"
+      },
+      "fields": [
+        {
+          "id": "pcWidthRange",
+          "type": "range",
+          "value": "4",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcWidthNumber",
+          "type": "number",
+          "value": "3.75",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcXRange",
+          "type": "range",
+          "value": "-42",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcXNumber",
+          "type": "number",
+          "value": "-42",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcYRange",
+          "type": "range",
+          "value": "-6",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcYNumber",
+          "type": "number",
+          "value": "-6",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "garmentStyleSelect",
+          "type": "select-one",
+          "value": "tee",
+          "disabled": false
+        },
+        {
+          "id": "fabricSelect",
+          "type": "select-one",
+          "value": "cotton",
+          "disabled": false
+        },
+        {
+          "id": "gsf-company",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-cust-num",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-contact-name",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-contact-email",
+          "type": "email",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-sales-rep",
+          "type": "text",
+          "value": "Example Rep",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-due-date",
+          "type": "date",
+          "value": "2026-09-16",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-design-num",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-order-num",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-prelim",
+          "type": "select-one",
+          "value": "",
+          "disabled": true
+        },
+        {
+          "id": "gsf-artwork-status",
+          "type": "select-one",
+          "value": "Mockup only",
+          "disabled": false
+        },
+        {
+          "id": "gsf-approval-status",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "Screen Print",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "DTG",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "Embroidery",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "Transfer",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "Sticker",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "Banner",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "JDS Product",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "Laser Leatherette Patch",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "Not sure — Steve to advise",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-style-0",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-color-0",
+          "type": "select-one",
+          "value": "",
+          "disabled": true
+        },
+        {
+          "id": "gsf-loc-place-0",
+          "type": "select-one",
+          "value": "Left Chest",
+          "disabled": false
+        },
+        {
+          "id": "gsf-loc-w-0",
+          "type": "number",
+          "value": "3.75",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-loc-h-0",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-loc-n-0",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-color-mode",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "gsf-underbase",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "gsf-pms",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-thread",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-exact-text",
+          "type": "textarea",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "gsf-no-text",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-prev-order",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-prev-design",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-keep-same",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-change",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-file-type",
+          "type": "select-one",
+          "value": "Customer raster file (PNG / JPG)",
+          "disabled": false
+        },
+        {
+          "id": "gsf-notes",
+          "type": "textarea",
+          "value": "Mockup built in the NWCA Shirt Designer (cleaned art attached). Shown on a PC61 crew tee for placement reference.",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/pages/mockup-library.html",
+          "text": "📚 Saved Mockups"
+        }
+      ],
+      "headings": [
+        "NWCA Easy Shirt Designer",
+        "🧵 Send to Steve — complete the art request",
+        "Garment Art Request to Steve"
+      ],
+      "entries": [
+        {
+          "name": "example-logo.svg",
+          "kind": "canvas",
+          "status": "ready",
+          "printLoc": "Left Chest",
+          "printW": 3.75,
+          "onShirt": true,
+          "textModel": null,
+          "dst": null
+        }
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".side-head > span"
+            ],
+            [
+              ".fsize"
+            ],
+            [
+              "#threadColorsBtn"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "T-Shirt Designer — Northwest Custom Apparel",
+      "ids": {
+        "thumb-1": "",
+        "advice-1": "Screen Print Usable · 100 DPI 3,500–5,500 st",
+        "badge-1": "SVG",
+        "pcStatusChip": "Front only",
+        "pcFrontBtn": "Front",
+        "pcBackBtn": "Back",
+        "pcBothBtn": "Both",
+        "pcLeftChestBtn": "Left Chest",
+        "pcFullFrontBtn": "Full Front",
+        "pcUpperBackBtn": "Upper Back",
+        "pcFullBackBtn": "Full Back",
+        "pcCenterBtn": "Center Art",
+        "pcWidthLabel": "3.75 in",
+        "pcWidthRange": "",
+        "pcWidthNumber": "",
+        "pcXLabel": "-42",
+        "pcXRange": "",
+        "pcXNumber": "",
+        "pcYLabel": "-6",
+        "pcYRange": "",
+        "pcYNumber": "",
+        "addTextBtn": "➕ Add Text",
+        "palBtn": "🎨 Shirt Color",
+        "garmentStyleSelect": "Crew Tee Polo Hoodie Long Sleeve Ladies Tee",
+        "removeBgBtn": "✓ White BG Removed",
+        "artDetailsBtn": "ℹ️ Art Details",
+        "threadColorsBtn": "🧵 Thread Colors",
+        "modelViewBtn": "👕 Model View",
+        "spinBtn": "🔄 Spin",
+        "proofBtn": "🖨 Customer Proof",
+        "dlBtn": "⬇ Download PNG",
+        "sendSteveBtn": "🧵 Send to Steve",
+        "sendCustomerBtn": "📧 Send to Customer",
+        "contrastWarn": "⚠ Low art/shirt contrast — the print may be hard to see",
+        "canvasHolder": "",
+        "advisorMethodPill": "Screen Print",
+        "advisorMain": "Screen print looks possible.",
+        "advisorCopy": "Artwork appears within the 6-color screen print limit.",
+        "advisorColors": "4 total incl. base",
+        "advisorQuality": "Usable · 100 DPI",
+        "advisorFabric": "Cotton",
+        "advisorScreen": "4 / 6",
+        "fabricSelect": "Cotton shirt Cotton/poly blend Polyester Nylon Fabric unknown",
+        "embStatusPill": "Embroidery OK",
+        "embMain": "Embroidery looks possible.",
+        "embCopy": "This estimate is based on the visible artwork only, not the transparent/background canvas. Thread color count is in the preferred embroidery range.",
+        "embStitches": "3,500–5,500",
+        "embThreads": "3 estimated",
+        "embSize": "3.8\" × 1.4\"",
+        "embBestUse": "Left chest",
+        "embNote": "Estimate only. The app now estimates stitches from visible design pixels only. Final stitch count still depends on digitizing, small text, outlines, gradients, fabric, and sew-out quality.",
+        "steveModalTitle": "🧵 Send to Steve — complete the art request",
+        "steveModalClose": "×",
+        "gsf-company": "",
+        "gsf-cust-num": "",
+        "gsf-contact-name": "",
+        "gsf-contact-email": "",
+        "gsf-sales-rep": "",
+        "gsf-due-date": "",
+        "gsf-design-num": "",
+        "gsf-order-num": "",
+        "gsf-prelim": "- art fees unavailable -",
+        "gsf-prelim-warning": "Could not load the art fee list from Caspio (HTTP 503). Leave this blank — Steve will set the fee — or refresh to retry.",
+        "gsf-rush-toggle": "🔥 Rush Order Tick if Steve needs this ASAP",
+        "gsf-artwork-status": "- select - New artwork from scratch Mockup only Revision to existing proof Repeat from previous order Final approved / production ready",
+        "gsf-approval-status": "- select - Not approved — Steve to create proof Customer reviewing proof Customer approved — ready for production Internal revision only Post-approval change order",
+        "gsf-style-0": "",
+        "gsf-color-0": "- enter style first -",
+        "gsf-add-garment": "+ Add another garment",
+        "gsf-similar-requests": "",
+        "gsf-loc-place-0": "- placement - Left Chest Right Chest Full Front Full Back Left Sleeve Right Sleeve Cap Front Cap Back Cap Side (Left) Cap Side (Right) Pocket Yoke / Upper Back Nape of Neck Pant Leg Tote / Bag Other (describe in notes)",
+        "gsf-loc-w-0": "",
+        "gsf-loc-h-0": "",
+        "gsf-loc-n-0": "",
+        "gsf-add-location": "+ Add another location",
+        "gsf-color-mode": "- select - Use exact PMS colors Use closest match Match previous order Black only White only Full color AE/customer doesn't know — Steve to recommend",
+        "gsf-underbase": "- select - Yes No Steve to decide",
+        "gsf-pms": "",
+        "gsf-thread": "",
+        "gsf-exact-text": "",
+        "gsf-no-text": "",
+        "gsf-prev-order": "",
+        "gsf-prev-design": "",
+        "gsf-keep-same": "",
+        "gsf-change": "",
+        "gsf-file-type": "- select - Customer vector file (AI, EPS, PDF, SVG) Customer raster file (PNG / JPG) Customer screenshot only Logo from a previous order No usable artwork provided — Steve must recreate",
+        "gsf-file-drop-cta": "Add another file",
+        "gsf-file-drop-sub": "3 more can be added",
+        "gsf-file-drop-dots": "",
+        "gsf-file-preview-area": "designer-mockup-1789246800000.png 798 KB ×",
+        "gsf-notes": "",
+        "gsf-check-all": "Check all",
+        "gsf-submit-btn": "Submit Art Request",
+        "gsf-submit-status": "",
+        "gsf-progress-left": "11 required left · next: Company",
+        "gsf-progress-submit": "Submit Art Request"
+      },
+      "fields": [
+        {
+          "id": "pcWidthRange",
+          "type": "range",
+          "value": "4",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcWidthNumber",
+          "type": "number",
+          "value": "3.75",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcXRange",
+          "type": "range",
+          "value": "-42",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcXNumber",
+          "type": "number",
+          "value": "-42",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcYRange",
+          "type": "range",
+          "value": "-6",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcYNumber",
+          "type": "number",
+          "value": "-6",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "garmentStyleSelect",
+          "type": "select-one",
+          "value": "tee",
+          "disabled": false
+        },
+        {
+          "id": "fabricSelect",
+          "type": "select-one",
+          "value": "cotton",
+          "disabled": false
+        },
+        {
+          "id": "gsf-company",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-cust-num",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-contact-name",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-contact-email",
+          "type": "email",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-sales-rep",
+          "type": "text",
+          "value": "Example Rep",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-due-date",
+          "type": "date",
+          "value": "2026-09-16",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-design-num",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-order-num",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-prelim",
+          "type": "select-one",
+          "value": "",
+          "disabled": true
+        },
+        {
+          "id": "gsf-artwork-status",
+          "type": "select-one",
+          "value": "Mockup only",
+          "disabled": false
+        },
+        {
+          "id": "gsf-approval-status",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "Screen Print",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "DTG",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "Embroidery",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "Transfer",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "Sticker",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "Banner",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "JDS Product",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "Laser Leatherette Patch",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "Not sure — Steve to advise",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-style-0",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-color-0",
+          "type": "select-one",
+          "value": "",
+          "disabled": true
+        },
+        {
+          "id": "gsf-loc-place-0",
+          "type": "select-one",
+          "value": "Left Chest",
+          "disabled": false
+        },
+        {
+          "id": "gsf-loc-w-0",
+          "type": "number",
+          "value": "3.75",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-loc-h-0",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-loc-n-0",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-color-mode",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "gsf-underbase",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "gsf-pms",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-thread",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-exact-text",
+          "type": "textarea",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "gsf-no-text",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-prev-order",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-prev-design",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-keep-same",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-change",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-file-type",
+          "type": "select-one",
+          "value": "Customer raster file (PNG / JPG)",
+          "disabled": false
+        },
+        {
+          "id": "gsf-notes",
+          "type": "textarea",
+          "value": "Mockup built in the NWCA Shirt Designer (cleaned art attached). Shown on a PC61 crew tee for placement reference.",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/pages/mockup-library.html",
+          "text": "📚 Saved Mockups"
+        }
+      ],
+      "headings": [
+        "NWCA Easy Shirt Designer",
+        "🧵 Send to Steve — complete the art request",
+        "Garment Art Request to Steve"
+      ],
+      "entries": [
+        {
+          "name": "example-logo.svg",
+          "kind": "canvas",
+          "status": "ready",
+          "printLoc": "Left Chest",
+          "printW": 3.75,
+          "onShirt": true,
+          "textModel": null,
+          "dst": null
+        }
+      ],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".side-head > span"
+            ],
+            [
+              ".fsize"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "T-Shirt Designer — Northwest Custom Apparel",
+      "ids": {
+        "thumb-1": "",
+        "advice-1": "Screen Print Usable · 100 DPI 3,500–5,500 st",
+        "badge-1": "SVG",
+        "pcStatusChip": "Front only",
+        "pcFrontBtn": "Front",
+        "pcBackBtn": "Back",
+        "pcBothBtn": "Both",
+        "pcLeftChestBtn": "Left Chest",
+        "pcFullFrontBtn": "Full Front",
+        "pcUpperBackBtn": "Upper Back",
+        "pcFullBackBtn": "Full Back",
+        "pcCenterBtn": "Center Art",
+        "pcWidthLabel": "3.75 in",
+        "pcWidthRange": "",
+        "pcWidthNumber": "",
+        "pcXLabel": "-42",
+        "pcXRange": "",
+        "pcXNumber": "",
+        "pcYLabel": "-6",
+        "pcYRange": "",
+        "pcYNumber": "",
+        "addTextBtn": "➕ Add Text",
+        "palBtn": "🎨 Shirt Color",
+        "garmentStyleSelect": "Crew Tee Polo Hoodie Long Sleeve Ladies Tee",
+        "removeBgBtn": "✓ White BG Removed",
+        "artDetailsBtn": "ℹ️ Art Details",
+        "threadColorsBtn": "🧵 Thread Colors",
+        "modelViewBtn": "👕 Model View",
+        "spinBtn": "🔄 Spin",
+        "proofBtn": "🖨 Customer Proof",
+        "dlBtn": "⬇ Download PNG",
+        "sendSteveBtn": "🧵 Send to Steve",
+        "sendCustomerBtn": "📧 Send to Customer",
+        "contrastWarn": "⚠ Low art/shirt contrast — the print may be hard to see",
+        "canvasHolder": "",
+        "advisorMethodPill": "Screen Print",
+        "advisorMain": "Screen print looks possible.",
+        "advisorCopy": "Artwork appears within the 6-color screen print limit.",
+        "advisorColors": "4 total incl. base",
+        "advisorQuality": "Usable · 100 DPI",
+        "advisorFabric": "Cotton",
+        "advisorScreen": "4 / 6",
+        "fabricSelect": "Cotton shirt Cotton/poly blend Polyester Nylon Fabric unknown",
+        "embStatusPill": "Embroidery OK",
+        "embMain": "Embroidery looks possible.",
+        "embCopy": "This estimate is based on the visible artwork only, not the transparent/background canvas. Thread color count is in the preferred embroidery range.",
+        "embStitches": "3,500–5,500",
+        "embThreads": "3 estimated",
+        "embSize": "3.8\" × 1.4\"",
+        "embBestUse": "Left chest",
+        "embNote": "Estimate only. The app now estimates stitches from visible design pixels only. Final stitch count still depends on digitizing, small text, outlines, gradients, fabric, and sew-out quality.",
+        "steveModalTitle": "🧵 Send to Steve — complete the art request",
+        "steveModalClose": "×",
+        "gsf-company": "",
+        "gsf-cust-num": "",
+        "gsf-contact-name": "",
+        "gsf-contact-email": "",
+        "gsf-sales-rep": "",
+        "gsf-due-date": "",
+        "gsf-design-num": "",
+        "gsf-order-num": "",
+        "gsf-prelim": "- art fees unavailable -",
+        "gsf-prelim-warning": "Could not load the art fee list from Caspio (HTTP 503). Leave this blank — Steve will set the fee — or refresh to retry.",
+        "gsf-rush-toggle": "🔥 Rush Order Tick if Steve needs this ASAP",
+        "gsf-artwork-status": "- select - New artwork from scratch Mockup only Revision to existing proof Repeat from previous order Final approved / production ready",
+        "gsf-approval-status": "- select - Not approved — Steve to create proof Customer reviewing proof Customer approved — ready for production Internal revision only Post-approval change order",
+        "gsf-style-0": "",
+        "gsf-color-0": "- enter style first -",
+        "gsf-add-garment": "+ Add another garment",
+        "gsf-similar-requests": "",
+        "gsf-loc-place-0": "- placement - Left Chest Right Chest Full Front Full Back Left Sleeve Right Sleeve Cap Front Cap Back Cap Side (Left) Cap Side (Right) Pocket Yoke / Upper Back Nape of Neck Pant Leg Tote / Bag Other (describe in notes)",
+        "gsf-loc-w-0": "",
+        "gsf-loc-h-0": "",
+        "gsf-loc-n-0": "",
+        "gsf-add-location": "+ Add another location",
+        "gsf-color-mode": "- select - Use exact PMS colors Use closest match Match previous order Black only White only Full color AE/customer doesn't know — Steve to recommend",
+        "gsf-underbase": "- select - Yes No Steve to decide",
+        "gsf-pms": "",
+        "gsf-thread": "",
+        "gsf-exact-text": "",
+        "gsf-no-text": "",
+        "gsf-prev-order": "",
+        "gsf-prev-design": "",
+        "gsf-keep-same": "",
+        "gsf-change": "",
+        "gsf-file-type": "- select - Customer vector file (AI, EPS, PDF, SVG) Customer raster file (PNG / JPG) Customer screenshot only Logo from a previous order No usable artwork provided — Steve must recreate",
+        "gsf-file-drop-cta": "Add another file",
+        "gsf-file-drop-sub": "3 more can be added",
+        "gsf-file-drop-dots": "",
+        "gsf-file-preview-area": "designer-mockup-1789246800000.png 798 KB ×",
+        "gsf-notes": "",
+        "gsf-check-all": "Check all",
+        "gsf-submit-btn": "Submit Art Request",
+        "gsf-submit-status": "",
+        "gsf-progress-left": "11 required left · next: Company",
+        "gsf-progress-submit": "Submit Art Request"
+      },
+      "fields": [
+        {
+          "id": "pcWidthRange",
+          "type": "range",
+          "value": "4",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcWidthNumber",
+          "type": "number",
+          "value": "3.75",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcXRange",
+          "type": "range",
+          "value": "-42",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcXNumber",
+          "type": "number",
+          "value": "-42",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcYRange",
+          "type": "range",
+          "value": "-6",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcYNumber",
+          "type": "number",
+          "value": "-6",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "garmentStyleSelect",
+          "type": "select-one",
+          "value": "tee",
+          "disabled": false
+        },
+        {
+          "id": "fabricSelect",
+          "type": "select-one",
+          "value": "cotton",
+          "disabled": false
+        },
+        {
+          "id": "gsf-company",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-cust-num",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-contact-name",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-contact-email",
+          "type": "email",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-sales-rep",
+          "type": "text",
+          "value": "Example Rep",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-due-date",
+          "type": "date",
+          "value": "2026-09-16",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-design-num",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-order-num",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-prelim",
+          "type": "select-one",
+          "value": "",
+          "disabled": true
+        },
+        {
+          "id": "gsf-artwork-status",
+          "type": "select-one",
+          "value": "Mockup only",
+          "disabled": false
+        },
+        {
+          "id": "gsf-approval-status",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "Screen Print",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "DTG",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "Embroidery",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "Transfer",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "Sticker",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "Banner",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "JDS Product",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "Laser Leatherette Patch",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "Not sure — Steve to advise",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-style-0",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-color-0",
+          "type": "select-one",
+          "value": "",
+          "disabled": true
+        },
+        {
+          "id": "gsf-loc-place-0",
+          "type": "select-one",
+          "value": "Left Chest",
+          "disabled": false
+        },
+        {
+          "id": "gsf-loc-w-0",
+          "type": "number",
+          "value": "3.75",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-loc-h-0",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-loc-n-0",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-color-mode",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "gsf-underbase",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "gsf-pms",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-thread",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-exact-text",
+          "type": "textarea",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "gsf-no-text",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-prev-order",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-prev-design",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-keep-same",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-change",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "gsf-file-type",
+          "type": "select-one",
+          "value": "Customer raster file (PNG / JPG)",
+          "disabled": false
+        },
+        {
+          "id": "gsf-notes",
+          "type": "textarea",
+          "value": "Mockup built in the NWCA Shirt Designer (cleaned art attached). Shown on a PC61 crew tee for placement reference.",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/pages/mockup-library.html",
+          "text": "📚 Saved Mockups"
+        }
+      ],
+      "headings": [
+        "NWCA Easy Shirt Designer",
+        "🧵 Send to Steve — complete the art request",
+        "Garment Art Request to Steve"
+      ],
+      "entries": [
+        {
+          "name": "example-logo.svg",
+          "kind": "canvas",
+          "status": "ready",
+          "printLoc": "Left Chest",
+          "printW": 3.75,
+          "onShirt": true,
+          "textModel": null,
+          "dst": null
+        }
+      ],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".side-head > span"
+            ],
+            [
+              ".fsize"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "reads": [],
+  "writes": [],
+  "dialogs": []
+}

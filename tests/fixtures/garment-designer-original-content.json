@@ -1,0 +1,41 @@
+{
+  "commit": "8763d6dba64bec28ea82a3bf4887cf5625ca4033",
+  "hashes": {
+    "pages/garment-designer.html": "467545e660d5141a5e630ef2f2babd85523a7e4d291c0771eaeb2f9fb6da0bca",
+    "pages/css/garment-designer.css": "0f21a2575347a95fede03cedb99a3da2f76081bc67c5ce9f05d56f75b03a33e3",
+    "pages/js/garment-designer.js": "5140339e41252196aefe143380b2bb81bb4c662f5817453e85cf2e328d25c03d",
+    "shared_components/css/garment-submit-form.css": "e377447718644932cebce1e59aab6a1044065768eae0868877a2795421255814",
+    "shared_components/js/garment-submit-form.js": "eecc509073fc1cf52cf780e5811480ea0408bbdf1f8af5604a27891577ebdebf",
+    "shared_components/css/company-contact-picker.css": "0cad62c05dd7e5099f539c2d14e56adb66850c2eaf2eaf95e93d9441375e38ee",
+    "shared_components/js/company-contact-picker.js": "b63bd29a8d17fdf68dfed3f08a34877bbc70e14bd96adc696f2fda75bebc48c7",
+    "shared_components/js/garment-text-engine.js": "1ae44bd4e1f429a97cf11f7370bdcabe419745a3a3e1c2f83d4c82f50fb456e9"
+  },
+  "changes": [],
+  "notes": "Original sources before garment designer migration; real embedded model photos preserved in source, synthetic artwork and contacts in browser fixtures.",
+  "artworkFunctions": {
+    "owner": "pages/js/garment-designer.js",
+    "hashes": {
+      "parseDSTHeader": "98b85c38e6125fcfaefdcf640dd9ef94282cc0b7816d39b66b0c0d0ea891007e",
+      "decodeDSTMove": "ea743d057bf867e914e22f6ab6fd7ea69ecb16c0c8f52162ba547567e0b7937d",
+      "parseDSTArrayBuffer": "c7f4cd01709ac8afd97aa02aaf6d01f21951096f53cae94cb892350ca9a92ca9",
+      "renderDSTCanvas": "9f80e4cf2736e86692be00899cd3db0fb11b3a3b8b057542e29d0d7c3fe8f05c",
+      "openDST": "f91dd28b8ae5c011962469ccfbfa557563d9d8df583dee32055b77c91cbce170",
+      "openPSD": "9ccb2572a622cdf3390f91efaef5d73472e4acdc9388063a0fa42f1c929e96bb",
+      "openAIorPDF": "87700f15cf4d3d90ce534245bf43ffed2819ee90e371235265c68c0b42b9ea53",
+      "renderPdfPage": "da0a9c908317c8dd296e9754b528035ad0483449345dd27ed2adfe19147bd308",
+      "openEPS": "2af9ac35d28dd020582586739fa00ecf3c58867a1caeae11e24f9b2d6beae55e",
+      "openCDR": "2ffde109f53cc0115053b70d2a749570f053f46413539b7ed5dbea35a4375f1b",
+      "openImage": "b651c6b1b30527dd1d0d6c22885a197f74d9106e09e62d6d0bab3af0e4c12b98",
+      "placementDefaults": "36e514e17bee9ba5a4b47533ea8b39e83ee4575dd187b030ec1b94f70720ce17",
+      "applyRecommendedPlacement": "e40412fc1b461f3d1b21c17fe571d725e4ada2ace46fbf6e5eb432af964c0b66",
+      "renderTextCanvas": "29341ae7f5121aca2fe2f5b0f4b9b1e18877a5a94bf20a853c438cc3fce80b5a",
+      "_txtStraight": "5a57c32b6da617817a798ac22b6169399c606cb25a5be33a32c8ac767e307fbe",
+      "_txtArc": "69fbcee14985ee6278d8b1c8b500ecdc5a5c14ed22602bc231790c3fccd84d2f",
+      "_txtRotate": "12aa84820ee352849a1c402c0c960f2a597f4a8174f84a5fa7549d9e14f5a867",
+      "cleanMockBlob": "a820f43e3fbe69b13a8ff7c36eb6f37eab1e716c832c222ef0626aa5fac12e3c",
+      "buildStevePrefill": "62095ab87f7e185771b45551a87f6d791d989008468d78e63c9b469f407c8277",
+      "downloadPNG": "46816f0fb8300e5953c9ddc2e0312303bdcf8d3e60f098d30414332f31d35eb6",
+      "getCleanMock": "6d5aa20ba6871ed629e63c9fda0ba4b3038577db934bce650ddf20c42b42acda"
+    }
+  }
+}
