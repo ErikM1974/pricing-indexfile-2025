@@ -1,3 +1,22 @@
+## v2026.09.12.1 (2026.09.12)
+
+- Preserve specialty calculator originals and review decal and emblem behavior
+- Unify decal and emblem pricing layouts with complete mobile and print references
+- Merge verified contract release into specialty calculator work
+- Preserve Richardson calculator pricing, category and original presentation contracts
+- Unify Richardson pricing with reliable selection and visible policy warnings
+- Preserve Polar Camel original pricing, previews and print references
+- Unify Polar Camel storefront with current pricing and reliable previews
+- Preserve Safety Stripe design choices and original dialog defects
+- Unify Safety Stripe controls and make design saves and retries reliable
+- Preserve customer-supplied screen print pricing and original quote behavior
+- Unify customer screen print layout and preserve quote delivery ownership
+- Capture seasonal awareness bundle originals and submission defects
+- Unify awareness bundle layout and save reviewed CSS checkpoint
+- Renew Christmas gift boxes for 2026 with reliable orders and staff links
+- Deploy v2026.09.12.1: unify eight specialty and seasonal pages
+- Deploy v2026.09.12.1: correct release browser integration and keyboard focus
+
 ## v2026.09.11.6 (2026.09.11)
 
 - Capture contract calculator behavior and original print review
