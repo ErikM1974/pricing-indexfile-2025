@@ -6,21 +6,20 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Richardson Pricing Factory Direct 2026 - Northwest Custom Apparel</title>
     <link rel="icon" href="/favicon.png" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
-    <!-- Shared Calculator Styles -->
+    <!-- Canonical controls, shared specialty layout and the Richardson owner. -->
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link href="/shared_components/css/calculator-base.css?v=2026.09.07.19" rel="stylesheet">
-    <link href="/shared_components/css/calculator-modern-enhancements.css?v=2026.09.07.19" rel="stylesheet">
-    <!-- Richardson Factory Direct Styles -->
-    <link href="/calculators/richardson-2025-styles.css?v=2026.09.07.19" rel="stylesheet">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.11.6">
+    <link rel="stylesheet" href="/shared_components/css/specialty-pricing.css?v=2026.09.12.1">
+    <link rel="stylesheet" href="/calculators/richardson-2025-styles.css?v=2026.09.12.1">
 
     <!-- Calculator Utilities -->
     <script src="/config/app.config.js"></script>
     <script src="/shared_components/js/calculator-utilities.js?v=2026.09.06.36"></script>
 </head>
-<body>
+<body data-ui="unified" data-specialty-calculator="richardson">
     <!-- Header -->
     <header class="header">
         <div class="header-container">
@@ -50,7 +49,7 @@
             <div class="notice-header">
                 <i class="fas fa-info-circle" aria-hidden="true"></i>
                 <div class="notice-text">
-                    <strong>Order these 23 Richardson Styles from SanMar</strong>
+                    <strong>Order these Richardson styles from SanMar</strong>
                 </div>
             </div>
             <div class="notice-styles" id="sanmarStylesList">
@@ -79,6 +78,8 @@
             </div>
         </div>
 
+        <p id="richardsonDataWarning" class="pricing-error" role="alert" hidden></p>
+
         <!-- Price Lookup Card -->
         <div class="pricing-card">
             <h2 class="section-title">
@@ -92,8 +93,8 @@
                     <label class="form-label" for="capStyle">Cap Style</label>
                     <div class="autocomplete-wrapper">
                         <input type="text" id="capStyle" class="form-input"
-                               placeholder="Search style number..." autocomplete="off">
-                        <div class="autocomplete-list hidden" id="styleAutocomplete"></div>
+                               placeholder="Search style number..." autocomplete="off" role="combobox" aria-haspopup="dialog" aria-controls="styleAutocomplete" aria-expanded="false">
+                        <div class="autocomplete-list hidden" id="styleAutocomplete" role="dialog" aria-label="Matching cap styles"></div>
                         <span class="validation-indicator" id="styleValidation"></span>
                     </div>
                     <div class="style-description" id="styleDescription"></div>
@@ -110,18 +111,18 @@
                 <!-- Embellishment Type -->
                 <div class="form-group">
                     <label class="form-label">Embellishment Type</label>
-                    <div class="embellishment-options">
+                    <div class="embellishment-options" role="group" aria-label="Embellishment type">
                         <label class="radio-option">
                             <input type="radio" name="embellishment" value="embroidery" checked>
                             <span>Embroidery (8K stitches)</span>
                         </label>
                         <label class="radio-option">
                             <input type="radio" name="embellishment" value="leatherette">
-                            <span>Leatherette Patch (+$5/cap)</span>
+                            <span data-richardson-upcharge="patch">Leatherette Patch (+$5/cap)</span>
                         </label>
                         <label class="radio-option">
                             <input type="radio" name="embellishment" value="puff">
-                            <span>3D Puff (+$5/cap)</span>
+                            <span data-richardson-upcharge="puff">3D Puff (+$5/cap)</span>
                         </label>
                     </div>
                     <label class="setup-toggle">
@@ -209,6 +210,7 @@
     </main>
 
     <!-- Richardson Factory Direct Calculator -->
-    <script src="/calculators/richardson-factory-direct.js?v=2026.09.06.37"></script>
+    <script src="/calculators/richardson-factory-direct.js?v=2026.09.12.1"></script>
+    <script src="/shared_components/js/specialty-calculator-ui.js?v=2026.09.12.1"></script>
 </body>
 </html>

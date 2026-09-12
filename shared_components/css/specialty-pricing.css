@@ -1,0 +1,71 @@
+/* Shared specialty layout; controllers retain prices, tiers and requests. */
+@layer components.patterns {
+:where([data-ui="unified"][data-specialty-calculator]) .header { background: var(--ui-surface); border-bottom: 1px solid var(--ui-line); }
+:where([data-ui="unified"][data-specialty-calculator]) .header-container { max-width: 1248px; padding: 18px 32px; margin: auto; }
+:where([data-ui="unified"][data-specialty-calculator]) .header-left { display: flex; align-items: center; gap: 24px; }
+:where([data-ui="unified"][data-specialty-calculator]) .logo { width: 130px; height: 52px; object-fit: contain; }
+:where([data-ui="unified"][data-specialty-calculator]) .breadcrumb { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 14px; }
+:where([data-ui="unified"][data-specialty-calculator]) .main-container { max-width: 1248px; padding: 40px 32px 24px; margin: auto; }
+:where([data-ui="unified"][data-specialty-calculator]) .page-hero { display: grid; grid-template-columns: minmax(0, 1fr); gap: 32px; align-items: center; margin-bottom: 28px; }
+:where([data-ui="unified"][data-specialty-calculator]) .page-hero-content { min-width: 0; }
+:where([data-ui="unified"][data-specialty-calculator]) .page-eyebrow { margin-bottom: 12px; color: var(--ui-accent); font-size: 13px; font-weight: 600; }
+:where([data-ui="unified"][data-specialty-calculator]) .page-hero h1 { max-width: 26ch; font-size: clamp(28px, 3.5vw, 44px); letter-spacing: -0.025em; line-height: 1.12; margin: 0 0 20px; }
+:where([data-ui="unified"][data-specialty-calculator]) .page-hero-hint { max-width: 76ch; margin-top: 16px; color: var(--ui-muted); line-height: 1.65; }
+:where([data-ui="unified"][data-specialty-calculator]) .quick-facts { display: flex; flex-wrap: wrap; gap: 10px 24px; margin: 24px 0; padding: 20px 0; border-block: 1px solid var(--ui-line); }
+:where([data-ui="unified"][data-specialty-calculator]) .quick-fact { display: flex; align-items: baseline; gap: 10px; font-size: 14px; }
+:where([data-ui="unified"][data-specialty-calculator]) .quick-fact > i { color: var(--ui-accent); }
+:where([data-ui="unified"][data-specialty-calculator]) .pricing-error { border: 1px solid var(--red-600); background: var(--red-50); color: var(--red-800); border-radius: var(--radius-sm); padding: 16px; margin-block: 20px; }
+:where([data-ui="unified"][data-specialty-calculator]) .pricing-loading { padding: 24px; color: var(--ui-muted); }
+:where([data-ui="unified"][data-specialty-calculator]) .specialty-table-scroll { overflow: auto; max-width: 100%; overscroll-behavior-x: contain; }
+:where([data-ui="unified"][data-specialty-calculator]) .specialty-table-scroll:focus-visible { outline-offset: -3px; }
+:where([data-ui="unified"][data-specialty-calculator]) table { border-collapse: collapse; width: 100%; font-size: 14px; font-variant-numeric: tabular-nums; background: var(--ui-surface); }
+:where([data-ui="unified"][data-specialty-calculator]) th, :where([data-ui="unified"][data-specialty-calculator]) td { text-align: right; padding: 12px 16px; border-bottom: 1px solid var(--ui-line); }
+:where([data-ui="unified"][data-specialty-calculator]) th:first-child, :where([data-ui="unified"][data-specialty-calculator]) td:first-child { text-align: left; }
+:where([data-ui="unified"][data-specialty-calculator]) th { color: var(--ui-muted); background: var(--ui-canvas); font-size: 13px; font-weight: 600; }
+:where([data-ui="unified"][data-specialty-calculator]) .price-highlight { color: var(--ui-accent); font-weight: 700; }
+:where([data-ui="unified"][data-specialty-calculator]) .banner-formula, :where([data-ui="unified"][data-specialty-calculator]) .decal-note { padding: 20px; border-left: 3px solid var(--ui-line-strong); margin-block: 20px; background: var(--ui-surface); font-size: 14px; line-height: 1.65; }
+:where([data-ui="unified"][data-specialty-calculator]) .cta-compact { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 24px; padding: 24px 0; margin-top: 32px; border-top: 1px solid var(--ui-line); }
+:where([data-ui="unified"][data-specialty-calculator]) .cta-text { font-weight: 600; }
+:where([data-ui="unified"][data-specialty-calculator]) .cta-links { display: flex; flex-wrap: wrap; gap: 12px 24px; }
+:where([data-ui="unified"][data-specialty-calculator]) .cta-links a { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; overflow-wrap: anywhere; }
+:where([data-ui="unified"][data-specialty-calculator]) .pricing-footer { border-top: 1px solid var(--ui-line); margin-top: 16px; padding-top: 20px; font-size: 12px; color: var(--ui-muted); }
+
+@media (width <= 640px) {
+ :where([data-ui="unified"][data-specialty-calculator]) .header-container { padding: 16px; }
+ :where([data-ui="unified"][data-specialty-calculator]) .header-left { align-items: start; gap: 16px; }
+ :where([data-ui="unified"][data-specialty-calculator]) .logo { width: 90px; height: 40px; }
+ :where([data-ui="unified"][data-specialty-calculator]) .breadcrumb { font-size: 12px; }
+ :where([data-ui="unified"][data-specialty-calculator]) .main-container { padding: 28px 16px 20px; }
+ :where([data-ui="unified"][data-specialty-calculator]) .page-hero { gap: 20px; }
+ :where([data-ui="unified"][data-specialty-calculator]) .quick-facts { gap: 12px; }
+ :where([data-ui="unified"][data-specialty-calculator]) .quick-fact { width: 100%; }
+ :where([data-ui="unified"][data-specialty-calculator]) .banner-formula, :where([data-ui="unified"][data-specialty-calculator]) .decal-note { padding: 16px; }
+ :where([data-ui="unified"][data-specialty-calculator]) .cta-links { display: grid; gap: 4px; font-size: 14px; min-width: 0; }
+}
+
+@media print {
+ @page { size: letter; margin: 10mm; }
+ :where([data-ui="unified"][data-specialty-calculator]) { background: var(--ui-surface); color: var(--gray-900); font-size: 9pt; }
+ :where([data-ui="unified"][data-specialty-calculator]) .header-container { padding: 0 0 8px; }
+ :where([data-ui="unified"][data-specialty-calculator]) .logo { width: 88px; height: 34px; }
+ :where([data-ui="unified"][data-specialty-calculator]) .breadcrumb { font-size: 9pt; }
+ :where([data-ui="unified"][data-specialty-calculator]) .main-container { padding: 12px 0 0; max-width: none; }
+ :where([data-ui="unified"][data-specialty-calculator]) .page-hero { margin-bottom: 12px; gap: 12px; }
+ :where([data-ui="unified"][data-specialty-calculator]) .page-eyebrow { margin-bottom: 6px; font-size: 8pt; }
+ :where([data-ui="unified"][data-specialty-calculator]) .page-hero h1 { font-size: 21pt; max-width: none; margin-bottom: 8px; }
+ :where([data-ui="unified"][data-specialty-calculator]) .page-hero-hint { margin: 0; max-width: none; font-size: 9pt; line-height: 1.4; }
+ :where([data-ui="unified"][data-specialty-calculator]) .quick-facts { margin: 12px 0; padding: 8px 0; gap: 6px 14px; }
+ :where([data-ui="unified"][data-specialty-calculator]) .quick-fact { width: auto; font-size: 8pt; }
+ :where([data-ui="unified"][data-specialty-calculator]) .specialty-table-scroll { overflow: visible; }
+ :where([data-ui="unified"][data-specialty-calculator]) table { font-size: 8pt; }
+ :where([data-ui="unified"][data-specialty-calculator]) th, :where([data-ui="unified"][data-specialty-calculator]) td { padding: 4px 8px; }
+ :where([data-ui="unified"][data-specialty-calculator]) th { font-size: 8pt; }
+ :where([data-ui="unified"][data-specialty-calculator]) tr { break-inside: avoid; }
+ :where([data-ui="unified"][data-specialty-calculator]) .banner-formula, :where([data-ui="unified"][data-specialty-calculator]) .decal-note { font-size: 8pt; line-height: 1.4; padding: 8px 12px; margin: 10px 0; break-inside: avoid; }
+ :where([data-ui="unified"][data-specialty-calculator]) .cta-compact { margin-top: 12px; padding: 10px 0 0; gap: 4px 12px; font-size: 8pt; break-inside: avoid; }
+ :where([data-ui="unified"][data-specialty-calculator]) .cta-links { display: flex; gap: 4px 14px; font-size: 8pt; }
+ :where([data-ui="unified"][data-specialty-calculator]) .cta-links a { min-height: 0; }
+ :where([data-ui="unified"][data-specialty-calculator]) .pricing-footer { margin-top: 10px; padding-top: 8px; font-size: 7pt; break-inside: avoid; }
+ :where([data-ui="unified"][data-specialty-calculator]) .pricing-error { padding: 10px; margin: 10px 0; }
+}
+}

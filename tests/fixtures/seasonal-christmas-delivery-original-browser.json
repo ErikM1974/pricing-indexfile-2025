@@ -1,0 +1,350 @@
+{
+  "mode": "delivery",
+  "states": [
+    {
+      "width": 1440,
+      "text": "❄ ❅ ❆ 🎅 Offer Expires In 🎅 00 DAYS : 00 HOURS : 00 MINUTES : 00 SECONDS 🎅 Offer Has Ended - Contact Us for Current Promotions! 🎅 Gift Box Value: $295 Your Cost: FREE! You Save: $295 🎄 Christmas Bundle Pricing 2025 Rain Defender: $213 | Detroit: $258 | Storm Defender: $295 Each bundle includes: Jacket • Hoodie • Beanie • Gloves • Gift Box with custom embroidery Volume pricing available for 8+ bundles 1 Select Jacket 2 Select Hoodie 3 Select Beanie 4 Select Gloves 5 Customize 6 Delivery Info 7 Review Delivery Information Tell us where to send your free gift box First Name * Last Name * Company Name * Email Address * Phone Number * Preferred Delivery Date Minimum 2 weeks production time required (excludes weekends) Delivery Method * Ship to Address Factory Pickup Shipping Address * City * State * Select State Washington Oregon California Idaho Montana Nevada Arizona Utah Colorado Wyoming ZIP Code * Rush Order This is a rush order (expedited processing) Back Review Order Your Gift Box This is a FREE promotional gift box! Carhartt Storm Defender Shoreline Jacket CT104670 CT104670 • L • Black Carhartt Midweight Hooded Sweatshirt CTK121 • L • Heather Grey Carhartt Watch Cap 2 CT104597 • OSFA • Coal Heather Carhartt Work Gloves CTGD0794 • L • Black Barley",
+      "fields": [
+        {
+          "id": "firstName",
+          "value": "Example",
+          "checked": false
+        },
+        {
+          "id": "lastName",
+          "value": "Customer",
+          "checked": false
+        },
+        {
+          "id": "companyName",
+          "value": "Example Company",
+          "checked": false
+        },
+        {
+          "id": "email",
+          "value": "example@example.invalid",
+          "checked": false
+        },
+        {
+          "id": "phone",
+          "value": "(253) 555-0100",
+          "checked": false
+        },
+        {
+          "id": "deliveryDate",
+          "value": "2026-10-16",
+          "checked": false
+        },
+        {
+          "id": "address1",
+          "value": "123 Example Street",
+          "checked": false
+        },
+        {
+          "id": "address2",
+          "value": "Suite 2",
+          "checked": false
+        },
+        {
+          "id": "city",
+          "value": "Example City",
+          "checked": false
+        },
+        {
+          "id": "state",
+          "value": "WA"
+        },
+        {
+          "id": "zipCode",
+          "value": "98000",
+          "checked": false
+        },
+        {
+          "id": "rushOrder",
+          "value": "on",
+          "checked": false
+        }
+      ],
+      "totals": {
+        "quantity": 4,
+        "retail": 320,
+        "unit": 320
+      },
+      "overflow": false,
+      "missingImages": [],
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "div[data-step=\"7\"] > .step-title"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "text": "❄ ❅ ❆ 🎅 Offer Expires In 🎅 00 DAYS : 00 HOURS : 00 MINUTES : 00 SECONDS 🎅 Offer Has Ended - Contact Us for Current Promotions! 🎅 Gift Box Value: $295 Your Cost: FREE! You Save: $295 🎄 Christmas Bundle Pricing 2025 Rain Defender: $213 | Detroit: $258 | Storm Defender: $295 Each bundle includes: Jacket • Hoodie • Beanie • Gloves • Gift Box with custom embroidery Volume pricing available for 8+ bundles 1 Select Jacket 2 Select Hoodie 3 Select Beanie 4 Select Gloves 5 Customize 6 Delivery Info 7 Review Delivery Information Tell us where to send your free gift box First Name * Last Name * Company Name * Email Address * Phone Number * Preferred Delivery Date Minimum 2 weeks production time required (excludes weekends) Delivery Method * Ship to Address Factory Pickup Shipping Address * City * State * Select State Washington Oregon California Idaho Montana Nevada Arizona Utah Colorado Wyoming ZIP Code * Rush Order This is a rush order (expedited processing) Back Review Order Your Gift Box This is a FREE promotional gift box! Carhartt Storm Defender Shoreline Jacket CT104670 CT104670 • L • Black Carhartt Midweight Hooded Sweatshirt CTK121 • L • Heather Grey Carhartt Watch Cap 2 CT104597 • OSFA • Coal Heather Carhartt Work Gloves CTGD0794 • L • Black Barley",
+      "fields": [
+        {
+          "id": "firstName",
+          "value": "Example",
+          "checked": false
+        },
+        {
+          "id": "lastName",
+          "value": "Customer",
+          "checked": false
+        },
+        {
+          "id": "companyName",
+          "value": "Example Company",
+          "checked": false
+        },
+        {
+          "id": "email",
+          "value": "example@example.invalid",
+          "checked": false
+        },
+        {
+          "id": "phone",
+          "value": "(253) 555-0100",
+          "checked": false
+        },
+        {
+          "id": "deliveryDate",
+          "value": "2026-10-16",
+          "checked": false
+        },
+        {
+          "id": "address1",
+          "value": "123 Example Street",
+          "checked": false
+        },
+        {
+          "id": "address2",
+          "value": "Suite 2",
+          "checked": false
+        },
+        {
+          "id": "city",
+          "value": "Example City",
+          "checked": false
+        },
+        {
+          "id": "state",
+          "value": "WA"
+        },
+        {
+          "id": "zipCode",
+          "value": "98000",
+          "checked": false
+        },
+        {
+          "id": "rushOrder",
+          "value": "on",
+          "checked": false
+        }
+      ],
+      "totals": {
+        "quantity": 4,
+        "retail": 320,
+        "unit": 320
+      },
+      "overflow": false,
+      "missingImages": [],
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "div[data-step=\"7\"] > .step-title"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "text": "❄ ❅ ❆ 🎅 Offer Expires In 🎅 00 DAYS : 00 HOURS : 00 MINUTES : 00 SECONDS 🎅 Offer Has Ended - Contact Us for Current Promotions! 🎅 Gift Box Value: $295 Your Cost: FREE! You Save: $295 🎄 Christmas Bundle Pricing 2025 Rain Defender: $213 | Detroit: $258 | Storm Defender: $295 Each bundle includes: Jacket • Hoodie • Beanie • Gloves • Gift Box with custom embroidery Volume pricing available for 8+ bundles 1 Select Jacket 2 Select Hoodie 3 Select Beanie 4 Select Gloves 5 Customize 6 Delivery Info 7 Review Delivery Information Tell us where to send your free gift box First Name * Last Name * Company Name * Email Address * Phone Number * Preferred Delivery Date Minimum 2 weeks production time required (excludes weekends) Delivery Method * Ship to Address Factory Pickup Shipping Address * City * State * Select State Washington Oregon California Idaho Montana Nevada Arizona Utah Colorado Wyoming ZIP Code * Rush Order This is a rush order (expedited processing) Back Review Order Your Gift Box This is a FREE promotional gift box! Carhartt Storm Defender Shoreline Jacket CT104670 CT104670 • L • Black Carhartt Midweight Hooded Sweatshirt CTK121 • L • Heather Grey Carhartt Watch Cap 2 CT104597 • OSFA • Coal Heather Carhartt Work Gloves CTGD0794 • L • Black Barley",
+      "fields": [
+        {
+          "id": "firstName",
+          "value": "Example",
+          "checked": false
+        },
+        {
+          "id": "lastName",
+          "value": "Customer",
+          "checked": false
+        },
+        {
+          "id": "companyName",
+          "value": "Example Company",
+          "checked": false
+        },
+        {
+          "id": "email",
+          "value": "example@example.invalid",
+          "checked": false
+        },
+        {
+          "id": "phone",
+          "value": "(253) 555-0100",
+          "checked": false
+        },
+        {
+          "id": "deliveryDate",
+          "value": "2026-10-16",
+          "checked": false
+        },
+        {
+          "id": "address1",
+          "value": "123 Example Street",
+          "checked": false
+        },
+        {
+          "id": "address2",
+          "value": "Suite 2",
+          "checked": false
+        },
+        {
+          "id": "city",
+          "value": "Example City",
+          "checked": false
+        },
+        {
+          "id": "state",
+          "value": "WA"
+        },
+        {
+          "id": "zipCode",
+          "value": "98000",
+          "checked": false
+        },
+        {
+          "id": "rushOrder",
+          "value": "on",
+          "checked": false
+        }
+      ],
+      "totals": {
+        "quantity": 4,
+        "retail": 320,
+        "unit": 320
+      },
+      "overflow": false,
+      "missingImages": [],
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "div[data-step=\"7\"] > .step-title"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "text": "❄ ❅ ❆ 🎅 Offer Expires In 🎅 00 DAYS : 00 HOURS : 00 MINUTES : 00 SECONDS 🎅 Offer Has Ended - Contact Us for Current Promotions! 🎅 Gift Box Value: $295 Your Cost: FREE! You Save: $295 🎄 Christmas Bundle Pricing 2025 Rain Defender: $213 | Detroit: $258 | Storm Defender: $295 Each bundle includes: Jacket • Hoodie • Beanie • Gloves • Gift Box with custom embroidery Volume pricing available for 8+ bundles 1 Select Jacket 2 Select Hoodie 3 Select Beanie 4 Select Gloves 5 Customize 6 Delivery Info 7 Review Delivery Information Tell us where to send your free gift box First Name * Last Name * Company Name * Email Address * Phone Number * Preferred Delivery Date Minimum 2 weeks production time required (excludes weekends) Delivery Method * Ship to Address Factory Pickup Shipping Address * City * State * Select State Washington Oregon California Idaho Montana Nevada Arizona Utah Colorado Wyoming ZIP Code * Rush Order This is a rush order (expedited processing) Back Review Order Your Gift Box This is a FREE promotional gift box! Carhartt Storm Defender Shoreline Jacket CT104670 CT104670 • L • Black Carhartt Midweight Hooded Sweatshirt CTK121 • L • Heather Grey Carhartt Watch Cap 2 CT104597 • OSFA • Coal Heather Carhartt Work Gloves CTGD0794 • L • Black Barley",
+      "fields": [
+        {
+          "id": "firstName",
+          "value": "Example",
+          "checked": false
+        },
+        {
+          "id": "lastName",
+          "value": "Customer",
+          "checked": false
+        },
+        {
+          "id": "companyName",
+          "value": "Example Company",
+          "checked": false
+        },
+        {
+          "id": "email",
+          "value": "example@example.invalid",
+          "checked": false
+        },
+        {
+          "id": "phone",
+          "value": "(253) 555-0100",
+          "checked": false
+        },
+        {
+          "id": "deliveryDate",
+          "value": "2026-10-16",
+          "checked": false
+        },
+        {
+          "id": "address1",
+          "value": "123 Example Street",
+          "checked": false
+        },
+        {
+          "id": "address2",
+          "value": "Suite 2",
+          "checked": false
+        },
+        {
+          "id": "city",
+          "value": "Example City",
+          "checked": false
+        },
+        {
+          "id": "state",
+          "value": "WA"
+        },
+        {
+          "id": "zipCode",
+          "value": "98000",
+          "checked": false
+        },
+        {
+          "id": "rushOrder",
+          "value": "on",
+          "checked": false
+        }
+      ],
+      "totals": {
+        "quantity": 4,
+        "retail": 320,
+        "unit": 320
+      },
+      "overflow": false,
+      "missingImages": [],
+      "violations": [
+        {
+          "id": "scrollable-region-focusable",
+          "nodes": [
+            [
+              ".progress-steps"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "events": {
+    "errors": [],
+    "writes": [],
+    "unknown": [
+      "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+      "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
+      "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+      "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
+      "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+      "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
+      "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+      "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    ],
+    "dialogs": []
+  },
+  "emails": [],
+  "diagnostic": "Original swatch pointer interception is preserved in christmas-original-flow.log. Dispatch swatch click and use native keyboard buttons to inspect the original deeper flow without changing CSS."
+}

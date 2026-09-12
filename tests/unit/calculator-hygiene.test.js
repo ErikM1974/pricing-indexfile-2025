@@ -38,7 +38,8 @@ describe('calculator page scripts', () => {
         expect(js).not.toMatch(/console\.log\(/);
     });
     test('christmas-bundles + cheat sheet: host from APP_CONFIG, visible when missing', () => {
-        expect(read('calculators/js/christmas-bundles.js')).toMatch(/var CB_API_BASE = \(window\.APP_CONFIG/);
+        expect(read('calculators/js/christmas-bundles.js')).toContain("const CB_API_BASE = window.APP_CONFIG?.API?.BASE_URL || '';");
+        expect(read('calculators/js/christmas-bundles.js')).toContain('if (!CB_API_BASE)');
         expect(read('calculators/christmas-bundles.html')).toMatch(/<script src="\/config\/app\.config\.js"><\/script>/);
         expect(read('calculators/service-price-cheat-sheet.js')).toMatch(/APP_CONFIG\.API\.BASE_URL missing/);
     });
@@ -47,10 +48,11 @@ describe('calculator page scripts', () => {
 describe('delegated handlers', () => {
     test('safety-stripe-creator: tiles are keyboard buttons through the delegator', () => {
         const html = read('calculators/safety-stripe-creator.html');
-        expect((html.match(/data-call="selectStripeStyle" data-args='\["\w+"\]' role="button" tabindex="0"/g) || []).length).toBe(4);
+        const document = new (require("jsdom").JSDOM)(html).window.document;
+        expect(document.querySelectorAll('button[type="button"][data-call="selectStripeStyle"][aria-pressed="false"]')).toHaveLength(4);
+        expect(document.querySelectorAll("dialog[aria-labelledby]")).toHaveLength(2);
         expect(html).toMatch(/data-call="openSendModal"/);
         expect(html).toMatch(/data-call-delegator\.js\?v=/);
-        expect(read('calculators/safety-stripe-calculator.js')).toMatch(/closest\('\.stripe-option\[data-style\]'\)/);
     });
     test('webstores hero image fallback via data-onerror', () => {
         expect(read('calculators/webstores.html')).toMatch(/data-onerror="hide"/);

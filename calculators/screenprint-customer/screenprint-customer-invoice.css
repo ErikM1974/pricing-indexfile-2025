@@ -1,0 +1,41 @@
+/* Printed customer quote, using the same semantic palette as the calculator. */
+@layer components.pages {
+:where(.screenprint-invoice) { max-width: 1000px; margin: 0 auto; padding: 32px; background: var(--ui-surface); color: var(--ui-ink); font-size: 14px; line-height: 1.4; }
+:where(.screenprint-invoice) .invoice-header { display: flex; justify-content: space-between; gap: 24px; margin-bottom: 20px; }
+:where(.screenprint-invoice) .company-logo { width: 160px; height: 64px; object-fit: contain; object-position: left; margin-bottom: 8px; }
+:where(.screenprint-invoice) .company-info, :where(.screenprint-invoice) .invoice-details { font-size: 12px; color: var(--ui-muted); }
+:where(.screenprint-invoice) .invoice-section { text-align: right; }
+:where(.screenprint-invoice) .invoice-title { font-size: 36px; font-weight: 700; letter-spacing: -.03em; color: var(--ui-accent); margin-bottom: 8px; }
+:where(.screenprint-invoice) .bill-to-section { padding: 16px; background: var(--ui-canvas); border: 1px solid var(--ui-line); margin-block: 20px; overflow-wrap: anywhere; }
+:where(.screenprint-invoice) .bill-to-title, :where(.screenprint-invoice) .notes-title, :where(.screenprint-invoice) .terms-title { font-weight: 700; margin-bottom: 6px; }
+:where(.screenprint-invoice) .invoice-table { width: 100%; border-collapse: collapse; margin-block: 20px; font-variant-numeric: tabular-nums; }
+:where(.screenprint-invoice) .invoice-table th, :where(.screenprint-invoice) .invoice-table td { padding: 10px; border-bottom: 1px solid var(--ui-line); text-align: right; vertical-align: top; }
+:where(.screenprint-invoice) .invoice-table th:first-child, :where(.screenprint-invoice) .invoice-table td:first-child { text-align: left; }
+:where(.screenprint-invoice) .invoice-table thead { background: var(--ui-tint); color: var(--ui-ink); }
+:where(.screenprint-invoice) .description-detail { display: block; color: var(--ui-muted); font-size: 12px; margin-top: 4px; }
+:where(.screenprint-invoice) .totals-section { width: min(100%, 340px); margin-left: auto; font-variant-numeric: tabular-nums; }
+:where(.screenprint-invoice) .total-row { display: flex; justify-content: space-between; gap: 20px; padding-block: 8px; border-bottom: 1px solid var(--ui-line); }
+:where(.screenprint-invoice) .total-value { white-space: nowrap; }
+:where(.screenprint-invoice) .grand-total { font-weight: 700; color: var(--ui-accent); font-size: 18px; border-top: 2px solid var(--ui-accent); }
+:where(.screenprint-invoice) .notes-section, :where(.screenprint-invoice) .terms-section { margin-top: 20px; padding: 14px; background: var(--color-warning-bg); color: var(--color-warning-ink); border: 1px solid var(--amber-500); overflow-wrap: anywhere; }
+:where(.screenprint-invoice) .notes-content { white-space: pre-wrap; }
+:where(.screenprint-invoice) .invoice-footer { margin-top: 20px; padding-top: 12px; border-top: 1px solid var(--ui-line); text-align: center; font-size: 12px; color: var(--ui-muted); }
+
+@media print {
+ @page { size: letter; margin: 10mm; }
+ :where(.screenprint-invoice) { max-width: none; padding: 0; font-size: 9pt; }
+ :where(.screenprint-invoice) .invoice-header { margin-bottom: 12px; }
+ :where(.screenprint-invoice) .company-logo { width: 130px; height: 52px; }
+ :where(.screenprint-invoice) .company-info, :where(.screenprint-invoice) .invoice-details { font-size: 8pt; }
+ :where(.screenprint-invoice) .invoice-title { font-size: 26pt; }
+ :where(.screenprint-invoice) .bill-to-section { margin-block: 12px; padding: 10px; }
+ :where(.screenprint-invoice) .invoice-table { margin-block: 14px; }
+ :where(.screenprint-invoice) .invoice-table th, :where(.screenprint-invoice) .invoice-table td { padding: 7px 8px; }
+ :where(.screenprint-invoice) .description-detail { font-size: 8pt; }
+ :where(.screenprint-invoice) .total-row { padding-block: 6px; }
+ :where(.screenprint-invoice) .grand-total { font-size: 12pt; }
+ :where(.screenprint-invoice) .notes-section, :where(.screenprint-invoice) .terms-section { margin-top: 14px; padding: 10px; font-size: 8pt; }
+ :where(.screenprint-invoice) .invoice-footer { font-size: 8pt; margin-top: 14px; }
+ :where(.screenprint-invoice) tr, :where(.screenprint-invoice) .bill-to-section, :where(.screenprint-invoice) .totals-section, :where(.screenprint-invoice) .terms-section, :where(.screenprint-invoice) .invoice-footer { break-inside: avoid; }
+}
+}

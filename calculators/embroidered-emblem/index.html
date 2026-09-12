@@ -6,16 +6,17 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Embroidered Emblem Patches — Northwest Custom Apparel</title>
     <link rel="icon" href="/favicon.png" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
-    <!-- Shared chat/page CSS (sticker is the canonical pattern) + emblem overrides -->
+    <!-- Canonical controls, common specialty layout, then the page owner. -->
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/sticker-pricing-page.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/emblem-pricing-page.css?v=2026.09.07.12">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.11.6">
+    <link rel="stylesheet" href="/shared_components/css/specialty-pricing.css?v=2026.09.12.1">
+    <link rel="stylesheet" href="/calculators/embroidered-emblem/embroidered-emblem.css?v=2026.09.12.1">
     <script src="/config/app.config.js"></script>
 </head>
-<body>
+<body data-ui="unified" data-specialty-calculator="emblem">
     <!-- ========== Header ========== -->
     <header class="header">
         <div class="header-container">
@@ -68,7 +69,7 @@
         </section>
 
         <!-- Loading-error banner -->
-        <div id="pricingError" class="pricing-error" hidden>
+        <div id="pricingError" class="pricing-error" role="alert" hidden>
             <strong>Unable to load emblem pricing.</strong> Refresh the page, or contact Erik if this persists.
         </div>
 
@@ -88,7 +89,7 @@
                     <div id="emblemGridWrap" class="emblem-grid-wrap">
                         <div class="pricing-loading"><i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Loading pricing grid…</div>
                     </div>
-                    <div class="banner-formula" style="margin-top:12px;">
+                    <div class="banner-formula">
                         <strong>How prices work:</strong> Size tier = (width + height) ÷ 2, rounded up to next standard size.
                         Quantity stays at the largest tier ≤ your order — ordering up to the next break saves more per patch.
                         Modifiers stack: <em>metallic +25%</em>, <em>velcro +25%</em>, <em>extra thread colors +10% each (over 7)</em>.
@@ -210,7 +211,7 @@
         <!-- Dedicated polite status region — announced once per completed turn
              (not per streamed token) so screen readers aren't flooded. -->
         <div class="sr-only" id="aiChatStatus" role="status" aria-live="polite"></div>
-        <div class="ai-chat-messages" id="aiChatMessages"></div>
+        <div class="ai-chat-messages" id="aiChatMessages" tabindex="0" role="region" aria-label="Emblem quote conversation"></div>
         <div class="ai-chat-actions" id="aiChatActions" hidden>
             <button type="button" class="ai-action-btn primary" id="aiOutlookBtn" disabled>
                 <i class="fas fa-envelope-open-text" aria-hidden="true"></i> Open in Outlook
@@ -241,6 +242,7 @@
     </div>
 
     <!-- ========== Scripts ========== -->
-    <script src="/shared_components/js/emblem-pricing-page.js?v=2026.09.06.31"></script>
+    <script src="/shared_components/js/emblem-pricing-page.js?v=2026.09.12.1"></script>
+    <script src="/shared_components/js/specialty-calculator-ui.js?v=2026.09.12.1"></script>
 </body>
 </html>

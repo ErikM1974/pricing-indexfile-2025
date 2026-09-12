@@ -1,0 +1,148 @@
+{
+  "mode": "bonus",
+  "states": [
+    {
+      "width": 1440,
+      "text": "❄ ❅ ❆ 🎅 Offer Expires In 🎅 00 DAYS : 00 HOURS : 00 MINUTES : 00 SECONDS 🎅 Offer Has Ended - Contact Us for Current Promotions! 🎅 Gift Box Value: $295 Your Cost: FREE! You Save: $295 🎄 Christmas Bundle Pricing 2025 Rain Defender: $213 | Detroit: $258 | Storm Defender: $295 Each bundle includes: Jacket • Hoodie • Beanie • Gloves • Gift Box with custom embroidery Volume pricing available for 8+ bundles 1 Select Jacket 2 Select Hoodie 3 Select Beanie 4 Select Gloves 5 Customize 6 Delivery Info 7 Review 🎁 Santa's Workshop Bonus Every Bundle Includes a Mystery Gift! We'll surprise you with custom promotional items featuring YOUR company logo $25-50 value • Absolutely FREE Custom made Your logo Ready to use A special surprise from Santa's Workshop Team Continue to Customize Your Gift Box This is a FREE promotional gift box! Carhartt Storm Defender Shoreline Jacket CT104670 CT104670 • L • Black Carhartt Midweight Hooded Sweatshirt CTK121 • L • Heather Grey Carhartt Watch Cap 2 CT104597 • OSFA • Coal Heather Carhartt Work Gloves CTGD0794 • L • Black Barley",
+      "fields": [],
+      "totals": {
+        "quantity": 4,
+        "retail": 320,
+        "unit": 320
+      },
+      "overflow": false,
+      "missingImages": [],
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "div[data-step=\"5\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"6\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"7\"] > .step-title"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "text": "❄ ❅ ❆ 🎅 Offer Expires In 🎅 00 DAYS : 00 HOURS : 00 MINUTES : 00 SECONDS 🎅 Offer Has Ended - Contact Us for Current Promotions! 🎅 Gift Box Value: $295 Your Cost: FREE! You Save: $295 🎄 Christmas Bundle Pricing 2025 Rain Defender: $213 | Detroit: $258 | Storm Defender: $295 Each bundle includes: Jacket • Hoodie • Beanie • Gloves • Gift Box with custom embroidery Volume pricing available for 8+ bundles 1 Select Jacket 2 Select Hoodie 3 Select Beanie 4 Select Gloves 5 Customize 6 Delivery Info 7 Review 🎁 Santa's Workshop Bonus Every Bundle Includes a Mystery Gift! We'll surprise you with custom promotional items featuring YOUR company logo $25-50 value • Absolutely FREE Custom made Your logo Ready to use A special surprise from Santa's Workshop Team Continue to Customize Your Gift Box This is a FREE promotional gift box! Carhartt Storm Defender Shoreline Jacket CT104670 CT104670 • L • Black Carhartt Midweight Hooded Sweatshirt CTK121 • L • Heather Grey Carhartt Watch Cap 2 CT104597 • OSFA • Coal Heather Carhartt Work Gloves CTGD0794 • L • Black Barley",
+      "fields": [],
+      "totals": {
+        "quantity": 4,
+        "retail": 320,
+        "unit": 320
+      },
+      "overflow": false,
+      "missingImages": [],
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "div[data-step=\"5\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"6\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"7\"] > .step-title"
+            ],
+            [
+              "button[data-call=\"proceedFromBonus\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "text": "❄ ❅ ❆ 🎅 Offer Expires In 🎅 00 DAYS : 00 HOURS : 00 MINUTES : 00 SECONDS 🎅 Offer Has Ended - Contact Us for Current Promotions! 🎅 Gift Box Value: $295 Your Cost: FREE! You Save: $295 🎄 Christmas Bundle Pricing 2025 Rain Defender: $213 | Detroit: $258 | Storm Defender: $295 Each bundle includes: Jacket • Hoodie • Beanie • Gloves • Gift Box with custom embroidery Volume pricing available for 8+ bundles 1 Select Jacket 2 Select Hoodie 3 Select Beanie 4 Select Gloves 5 Customize 6 Delivery Info 7 Review 🎁 Santa's Workshop Bonus Every Bundle Includes a Mystery Gift! We'll surprise you with custom promotional items featuring YOUR company logo $25-50 value • Absolutely FREE Custom made Your logo Ready to use A special surprise from Santa's Workshop Team Continue to Customize Your Gift Box This is a FREE promotional gift box! Carhartt Storm Defender Shoreline Jacket CT104670 CT104670 • L • Black Carhartt Midweight Hooded Sweatshirt CTK121 • L • Heather Grey Carhartt Watch Cap 2 CT104597 • OSFA • Coal Heather Carhartt Work Gloves CTGD0794 • L • Black Barley",
+      "fields": [],
+      "totals": {
+        "quantity": 4,
+        "retail": 320,
+        "unit": 320
+      },
+      "overflow": false,
+      "missingImages": [],
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "div[data-step=\"5\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"6\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"7\"] > .step-title"
+            ],
+            [
+              "button[data-call=\"proceedFromBonus\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "text": "❄ ❅ ❆ 🎅 Offer Expires In 🎅 00 DAYS : 00 HOURS : 00 MINUTES : 00 SECONDS 🎅 Offer Has Ended - Contact Us for Current Promotions! 🎅 Gift Box Value: $295 Your Cost: FREE! You Save: $295 🎄 Christmas Bundle Pricing 2025 Rain Defender: $213 | Detroit: $258 | Storm Defender: $295 Each bundle includes: Jacket • Hoodie • Beanie • Gloves • Gift Box with custom embroidery Volume pricing available for 8+ bundles 1 Select Jacket 2 Select Hoodie 3 Select Beanie 4 Select Gloves 5 Customize 6 Delivery Info 7 Review 🎁 Santa's Workshop Bonus Every Bundle Includes a Mystery Gift! We'll surprise you with custom promotional items featuring YOUR company logo $25-50 value • Absolutely FREE Custom made Your logo Ready to use A special surprise from Santa's Workshop Team Continue to Customize Your Gift Box This is a FREE promotional gift box! Carhartt Storm Defender Shoreline Jacket CT104670 CT104670 • L • Black Carhartt Midweight Hooded Sweatshirt CTK121 • L • Heather Grey Carhartt Watch Cap 2 CT104597 • OSFA • Coal Heather Carhartt Work Gloves CTGD0794 • L • Black Barley",
+      "fields": [],
+      "totals": {
+        "quantity": 4,
+        "retail": 320,
+        "unit": 320
+      },
+      "overflow": false,
+      "missingImages": [],
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "div[data-step=\"5\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"6\"] > .step-title"
+            ],
+            [
+              "button[data-call=\"proceedFromBonus\"]"
+            ]
+          ]
+        },
+        {
+          "id": "scrollable-region-focusable",
+          "nodes": [
+            [
+              ".progress-steps"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "events": {
+    "errors": [],
+    "writes": [],
+    "unknown": [
+      "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+      "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
+      "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+      "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
+      "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+      "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
+      "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+      "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    ],
+    "dialogs": []
+  },
+  "emails": [],
+  "diagnostic": "Original swatch pointer interception is preserved in christmas-original-flow.log. Dispatch swatch click and use native keyboard buttons to inspect the original deeper flow without changing CSS."
+}

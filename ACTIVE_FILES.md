@@ -1,5 +1,7 @@
 # Active Files Registry
 
+- tests/e2e/seasonal-christmas-behavior.spec.js — synthetic 2026 catalog, inventory, keyboard, delivery, captured order, upload and email retry checks.
+
 - `shared_components/js/core-calculator-ui.js` — scoped canonical control classes, keyboard actions, state announcements and table scrolling for five public calculators; no pricing calculations.
 
 - `shared_components/css/employee-bundles.css` — shared Streich Bros./WCTTR wrapper, typography, instructions and navigation over tokens/components/hosted-workspace. Retires `employee-bundles/css/streich-bros-bundle.css` and `employee-bundles/css/wcttr-bundle.css`; original CSS is retained in the source fixture. Provider records remain externally owned.
@@ -966,3 +968,235 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - shared_components/js/contract-calculator-ui.js — contract-family controls, accessible product selectors, scrollable price tables and assistant focus handling.
 
 - tests/e2e/css-unification-contract-calculator-controls.spec.js — contract policy-label, assistant-focus, product-keyboard and horizontal-table regression checks with intercepted service requests.
+
+- tests/fixtures/specialty-calculators-original-content.json — original hashes and reversible mappings for six specialty calculators.
+- tests/unit/specialty-calculators-content.test.js — guards original specialty-calculator source and later reviewed edits.
+
+- tests/e2e/helpers/specialty-calculators-browser.js — synthetic specialty calculator presentation and immutable behavior capture.
+
+- tests/e2e/css-unification-specialty-decal-emblem.spec.js — synthetic specialty calculator presentation and immutable behavior capture.
+
+- tests/fixtures/specialty-calculators-decal-tiers-original-browser.json — immutable synthetic specialty calculator browser evidence.
+
+- tests/fixtures/specialty-calculators-decal-empty-original-browser.json — immutable synthetic specialty calculator browser evidence.
+
+- tests/fixtures/specialty-calculators-decal-mixed-original-browser.json — immutable synthetic specialty calculator browser evidence.
+
+- tests/fixtures/specialty-calculators-decal-waived-original-browser.json — immutable synthetic specialty calculator browser evidence.
+
+- tests/fixtures/specialty-calculators-decal-oversize-original-browser.json — immutable synthetic specialty calculator browser evidence.
+
+- tests/fixtures/specialty-calculators-decal-invalid-original-browser.json — immutable synthetic specialty calculator browser evidence.
+
+- tests/fixtures/specialty-calculators-decal-failed-original-browser.json — immutable synthetic specialty calculator browser evidence.
+
+- tests/fixtures/specialty-calculators-emblem-normal-original-browser.json — immutable synthetic specialty calculator browser evidence.
+
+- tests/fixtures/specialty-calculators-emblem-reference-original-browser.json — immutable synthetic specialty calculator browser evidence.
+
+- tests/fixtures/specialty-calculators-emblem-failed-original-browser.json — immutable synthetic specialty calculator browser evidence.
+
+- tests/fixtures/specialty-calculators-emblem-assistant-original-browser.json — immutable synthetic specialty calculator browser evidence.
+
+- tests/fixtures/specialty-calculators-emblem-quote-original-browser.json — immutable synthetic specialty calculator browser evidence.
+
+- tests/fixtures/specialty-calculators-emblem-chat-failed-original-browser.json — immutable synthetic specialty calculator browser evidence.
+
+- tests/fixtures/specialty-calculators-emblem-save-retry-original-browser.json — immutable synthetic specialty calculator browser evidence.
+
+- shared_components/css/specialty-pricing.css — scoped specialty calculator presentation.
+- calculators/custom-decal-pricing.css — scoped specialty calculator presentation.
+- calculators/embroidered-emblem/embroidered-emblem.css — scoped specialty calculator presentation.
+- shared_components/js/specialty-calculator-ui.js — scoped specialty calculator presentation.
+
+- tests/e2e/css-unification-specialty-controls.spec.js — canonical decal target sizes, full mobile emblem grid, dialog focus and print disclosure restoration.
+
+- tests/e2e/css-unification-specialty-richardson.spec.js — native Richardson tier/fee/category, error and presentation contracts with synthetic APIs.
+
+- tests/fixtures/specialty-calculators-richardson-empty-original-browser.json — immutable synthetic Richardson calculator evidence.
+
+- tests/fixtures/specialty-calculators-richardson-normal-original-browser.json — immutable synthetic Richardson calculator evidence.
+
+- tests/fixtures/specialty-calculators-richardson-ltm-original-browser.json — immutable synthetic Richardson calculator evidence.
+
+- tests/fixtures/specialty-calculators-richardson-patch-original-browser.json — immutable synthetic Richardson calculator evidence.
+
+- tests/fixtures/specialty-calculators-richardson-puff-original-browser.json — immutable synthetic Richardson calculator evidence.
+
+- tests/fixtures/specialty-calculators-richardson-existing-original-browser.json — immutable synthetic Richardson calculator evidence.
+
+- tests/fixtures/specialty-calculators-richardson-autocomplete-original-browser.json — immutable synthetic Richardson calculator evidence.
+
+- tests/fixtures/specialty-calculators-richardson-browse-original-browser.json — immutable synthetic Richardson calculator evidence.
+
+- tests/fixtures/specialty-calculators-richardson-no-results-original-browser.json — immutable synthetic Richardson calculator evidence.
+
+- tests/fixtures/specialty-calculators-richardson-failed-original-browser.json — immutable synthetic Richardson calculator evidence.
+
+- tests/fixtures/specialty-calculators-richardson-alternate-api-original-browser.json — immutable synthetic Richardson calculator evidence.
+
+- tests/fixtures/specialty-calculators-richardson-changed-style-original-browser.json — immutable synthetic Richardson calculator evidence.
+
+- tests/fixtures/specialty-calculators-richardson-tiers-categories-original-browser.json — immutable synthetic Richardson calculator evidence.
+
+- calculators/richardson-2025-styles.css — reviewed scoped Richardson owner using canonical specialty controls, responsive cap browsing and complete print output.
+
+- tests/e2e/helpers/polar-camel-browser.js — isolated synthetic product, inventory, native pricing and real local canvas checks for Polar Camel CSS review.
+
+- tests/e2e/css-unification-specialty-polar-camel.spec.js — isolated synthetic product, inventory, native pricing and real local canvas checks for Polar Camel CSS review.
+
+- tests/fixtures/specialty-calculators-polar-camel-normal-original-browser.json — immutable synthetic Polar Camel browser and native financial evidence.
+
+- tests/fixtures/specialty-calculators-polar-camel-zero-stock-original-browser.json — immutable synthetic Polar Camel browser and native financial evidence.
+
+- tests/fixtures/specialty-calculators-polar-camel-failed-product-original-browser.json — immutable synthetic Polar Camel browser and native financial evidence.
+
+- tests/fixtures/specialty-calculators-polar-camel-failed-policy-original-browser.json — immutable synthetic Polar Camel browser and native financial evidence.
+
+- tests/fixtures/specialty-calculators-polar-camel-failed-inventory-original-browser.json — immutable synthetic Polar Camel browser and native financial evidence.
+
+- tests/fixtures/specialty-calculators-polar-camel-logo-original-browser.json — immutable synthetic Polar Camel browser and native financial evidence.
+
+- tests/fixtures/specialty-calculators-polar-camel-artwork-warning-original-browser.json — immutable synthetic Polar Camel browser and native financial evidence.
+
+- tests/fixtures/specialty-calculators-polar-camel-lightbox-original-browser.json — immutable synthetic Polar Camel browser and native financial evidence.
+
+- tests/fixtures/specialty-calculators-polar-camel-drawer-original-browser.json — immutable synthetic Polar Camel browser and native financial evidence.
+
+- tests/fixtures/specialty-calculators-polar-camel-tiers-colors-original-browser.json — immutable synthetic Polar Camel browser and native financial evidence.
+
+- tests/fixtures/specialty-calculators-polar-camel-cached-policy-original-browser.json — immutable synthetic Polar Camel browser and native financial evidence.
+
+- shared_components/css/laser-tumbler-simple.css — reviewed scoped Polar Camel owner; canonical storefront controls, responsive logo preview and two-page print layout.
+
+- tests/e2e/helpers/safety-stripe-browser.js — Safety Stripe original/current browser contracts with synthetic saves; business writes blocked.
+
+- tests/e2e/css-unification-specialty-safety-stripe.spec.js — Safety Stripe original/current browser contracts with synthetic saves; business writes blocked.
+
+- tests/fixtures/specialty-calculators-safety-stripe-empty-original-browser.json — immutable synthetic Safety Stripe selection, presentation and save evidence.
+
+- tests/fixtures/specialty-calculators-safety-stripe-Standard-original-browser.json — immutable synthetic Safety Stripe selection, presentation and save evidence.
+
+- tests/fixtures/specialty-calculators-safety-stripe-Warning-original-browser.json — immutable synthetic Safety Stripe selection, presentation and save evidence.
+
+- tests/fixtures/specialty-calculators-safety-stripe-DiamondPlate-original-browser.json — immutable synthetic Safety Stripe selection, presentation and save evidence.
+
+- tests/fixtures/specialty-calculators-safety-stripe-ConstructionZone-original-browser.json — immutable synthetic Safety Stripe selection, presentation and save evidence.
+
+- tests/fixtures/specialty-calculators-safety-stripe-form-original-browser.json — immutable synthetic Safety Stripe selection, presentation and save evidence.
+
+- tests/fixtures/specialty-calculators-safety-stripe-success-original-browser.json — immutable synthetic Safety Stripe selection, presentation and save evidence.
+
+- tests/fixtures/specialty-calculators-safety-stripe-failed-session-original-browser.json — immutable synthetic Safety Stripe selection, presentation and save evidence.
+
+- tests/fixtures/specialty-calculators-safety-stripe-failed-item-original-browser.json — immutable synthetic Safety Stripe selection, presentation and save evidence.
+
+- tests/fixtures/specialty-calculators-safety-stripe-all-combinations-original-browser.json — immutable synthetic Safety Stripe selection, presentation and save evidence.
+
+- shared_components/css/safety-stripe-creator.css — reviewed scoped Safety Stripe owner; canonical shared controls, native save dialogs, complete phone design previews and single-page paper layouts.
+
+- tests/e2e/helpers/screenprint-customer-browser.js — synthetic customer-supplied screen-print original/current browser and workflow checks; real pricing engine with fixture-backed APIs, no live saves or emails.
+
+- tests/e2e/css-unification-specialty-screenprint-customer.spec.js — synthetic customer-supplied screen-print original/current browser and workflow checks; real pricing engine with fixture-backed APIs, no live saves or emails.
+
+- tests/fixtures/specialty-calculators-screenprint-customer-empty-original-browser.json — immutable synthetic customer-supplied screen-print presentation, financial and request evidence.
+
+- tests/fixtures/specialty-calculators-screenprint-customer-minimum-original-browser.json — immutable synthetic customer-supplied screen-print presentation, financial and request evidence.
+
+- tests/fixtures/specialty-calculators-screenprint-customer-priced-original-browser.json — immutable synthetic customer-supplied screen-print presentation, financial and request evidence.
+
+- tests/fixtures/specialty-calculators-screenprint-customer-form-original-browser.json — immutable synthetic customer-supplied screen-print presentation, financial and request evidence.
+
+- tests/fixtures/specialty-calculators-screenprint-customer-success-original-browser.json — immutable synthetic customer-supplied screen-print presentation, financial and request evidence.
+
+- tests/fixtures/specialty-calculators-screenprint-customer-failed-pricing-original-browser.json — immutable synthetic customer-supplied screen-print presentation, financial and request evidence.
+
+- tests/fixtures/specialty-calculators-screenprint-customer-failed-session-original-browser.json — immutable synthetic customer-supplied screen-print presentation, financial and request evidence.
+
+- tests/fixtures/specialty-calculators-screenprint-customer-failed-item-original-browser.json — immutable synthetic customer-supplied screen-print presentation, financial and request evidence.
+
+- tests/fixtures/specialty-calculators-screenprint-customer-failed-setup-original-browser.json — immutable synthetic customer-supplied screen-print presentation, financial and request evidence.
+
+- tests/fixtures/specialty-calculators-screenprint-customer-failed-email-original-browser.json — immutable synthetic customer-supplied screen-print presentation, financial and request evidence.
+
+- tests/fixtures/specialty-calculators-screenprint-customer-failed-both-original-browser.json — immutable synthetic customer-supplied screen-print presentation, financial and request evidence.
+
+- tests/fixtures/specialty-calculators-screenprint-customer-all-combinations-original-browser.json — immutable synthetic customer-supplied screen-print presentation, financial and request evidence.
+
+- tests/fixtures/specialty-calculators-screenprint-customer-invoice-24-original-browser.json — immutable synthetic customer-supplied screen-print presentation, financial and request evidence.
+
+- tests/fixtures/specialty-calculators-screenprint-customer-invoice-145-original-browser.json — immutable synthetic customer-supplied screen-print presentation, financial and request evidence.
+
+- tests/fixtures/specialty-calculators-screenprint-customer-stale-input-original-browser.json — immutable synthetic customer-supplied screen-print presentation, financial and request evidence.
+
+- calculators/screenprint-customer/screenprint-customer-invoice.css — canonical external invoice stylesheet for immutable customer-supplied screen-print quotes.
+- calculators/screenprint-customer/screenprint-customer-fix.css — unloaded compatibility placeholder; its override stack is retired into the scoped screen-print owner.
+
+- tests/fixtures/seasonal-bundles-original-content.json — immutable original source hashes and reviewed UI mappings for seasonal bundles.
+- tests/e2e/helpers/seasonal-bundles-browser.js — context-wide blocked-write synthetic seasonal harness.
+- tests/e2e/css-unification-seasonal-bca.spec.js — original and current awareness-bundle screen, paper and mocked submission review.
+
+- tests/fixtures/seasonal-bca-broken-link-original-browser.json — immutable synthetic awareness-bundle browser evidence; service-link diagnostic labeled explicitly.
+
+- tests/fixtures/seasonal-bca-products-original-browser.json — immutable synthetic awareness-bundle browser evidence; service-link diagnostic labeled explicitly.
+
+- tests/fixtures/seasonal-bca-sizes-original-browser.json — immutable synthetic awareness-bundle browser evidence; service-link diagnostic labeled explicitly.
+
+- tests/fixtures/seasonal-bca-contact-original-browser.json — immutable synthetic awareness-bundle browser evidence; service-link diagnostic labeled explicitly.
+
+- tests/fixtures/seasonal-bca-review-ship-original-browser.json — immutable synthetic awareness-bundle browser evidence; service-link diagnostic labeled explicitly.
+
+- tests/fixtures/seasonal-bca-review-pickup-original-browser.json — immutable synthetic awareness-bundle browser evidence; service-link diagnostic labeled explicitly.
+
+- tests/fixtures/seasonal-bca-success-original-browser.json — immutable synthetic awareness-bundle browser evidence; service-link diagnostic labeled explicitly.
+
+- tests/fixtures/seasonal-bca-failed-session-original-browser.json — immutable synthetic awareness-bundle browser evidence; service-link diagnostic labeled explicitly.
+
+- tests/fixtures/seasonal-bca-failed-item-original-browser.json — immutable synthetic awareness-bundle browser evidence; service-link diagnostic labeled explicitly.
+
+- tests/fixtures/seasonal-bca-failed-email-original-browser.json — immutable synthetic awareness-bundle browser evidence; service-link diagnostic labeled explicitly.
+
+- tests/unit/seasonal-bundles-content.test.js — original-source preservation guards for seasonal bundle migrations.
+
+- calculators/breast-cancer-awareness-bundle.js — extracted awareness-bundle controller with accessible steps and explicit submission outcomes.
+- calculators/breast-cancer-awareness-bundle.css — scoped awareness-bundle layout over canonical tokens and controls; replaces inline and CDN-generated CSS.
+
+- tests/unit/seasonal-bundles-orders.test.js — original/current order payload parity and confirmed-stage retry tests; synthetic data only.
+
+- calculators/breast-cancer-bundle-service.js — reviewed public awareness ordering service; archived original remains frozen behind the 410 boundary.
+
+- tests/fixtures/seasonal-christmas-products.json — public product image/color fixture for synthetic 2026 gift-box verification.
+- tests/e2e/helpers/seasonal-christmas-browser.js — deterministic original/current gift-box browser fixture; blocks all real writes.
+- tests/e2e/css-unification-seasonal-christmas.spec.js — gift-box source, visual, pricing, and request regression coverage.
+
+- tests/fixtures/seasonal-christmas-products-original-browser.json — immutable synthetic Christmas gift-box browser and request evidence.
+
+- tests/fixtures/seasonal-christmas-financial-source.json — original Christmas financial and persistence/email source contracts.
+
+- tests/fixtures/seasonal-christmas-review-ship-original-browser.json — immutable synthetic Christmas gift-box browser and request evidence.
+
+- tests/fixtures/seasonal-christmas-success-original-browser.json — immutable synthetic Christmas gift-box browser and request evidence.
+
+- tests/fixtures/seasonal-christmas-hoodie-original-browser.json — immutable synthetic Christmas gift-box browser and request evidence.
+
+- tests/fixtures/seasonal-christmas-beanie-original-browser.json — immutable synthetic Christmas gift-box browser and request evidence.
+
+- tests/fixtures/seasonal-christmas-gloves-original-browser.json — immutable synthetic Christmas gift-box browser and request evidence.
+
+- tests/fixtures/seasonal-christmas-bonus-original-browser.json — immutable synthetic Christmas gift-box browser and request evidence.
+
+- tests/fixtures/seasonal-christmas-customize-original-browser.json — immutable synthetic Christmas gift-box browser and request evidence.
+
+- tests/fixtures/seasonal-christmas-delivery-original-browser.json — immutable synthetic Christmas gift-box browser and request evidence.
+- tests/unit/seasonal-christmas-orders.test.js — original/new order payload and partial retry contracts; all requests synthetic.
+
+- tests/fixtures/seasonal-christmas-failed-session-original-browser.json — immutable synthetic Christmas gift-box browser and request evidence.
+
+- tests/fixtures/seasonal-christmas-failed-item-original-browser.json — immutable synthetic Christmas gift-box browser and request evidence.
+
+- tests/fixtures/seasonal-christmas-failed-email-original-browser.json — immutable synthetic Christmas gift-box browser and request evidence.
+
+- tests/fixtures/seasonal-christmas-review-pickup-original-browser.json — immutable synthetic Christmas gift-box browser and request evidence.
+
+- calculators/js/christmas-bundle-order.js — captured Christmas order payloads, staged persistence and independently retryable confirmation emails.
+- tests/e2e/seasonal-christmas-behavior.spec.js — synthetic stock, keyboard, date, upload, save, mail and print-restoration regression checks.

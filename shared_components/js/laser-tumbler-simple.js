@@ -27,6 +27,8 @@ class LaserTumblerPage {
         this.currentSKU = null;         // Currently selected SKU
         this.pricingTiers = null;       // Pricing tiers for current product
         this.localInventory = null;     // Local warehouse inventory
+        this.selectionVersion = 0;
+        this.inventoryPending = false;
 
         lasetumbsimpLog('[LaserTumblerPage] Initialized with multi-color support');
     }
@@ -57,6 +59,7 @@ class LaserTumblerPage {
 
             // Populate page content for selected product
             this.displayProductInfo();
+            this.updateColorLegend();
             this.displayPricingTable();
             this.displayInventory();
             this.displayImages();
@@ -80,36 +83,27 @@ class LaserTumblerPage {
      * Load local warehouse inventory for current product
      */
     async loadLocalInventory() {
-        if (!this.currentSKU) {
-            console.warn('[LaserTumblerPage] No current SKU, skipping inventory check');
-            return;
-        }
-
+        if (!this.currentSKU) return;
+        const version = this.selectionVersion;
+        const sku = this.currentSKU;
+        const color = this.extractColorFromName(this.currentProduct.name);
+        this.inventoryPending = true;
+        this.localInventory = null;
+        this.showWarning('tumblerInventoryWarning', 'Checking warehouse stock for ' + color + '…');
         try {
-            // Extract color name from current product (e.g., "Black" from "Polar Camel Black 16 oz Pint")
-            const colorName = this.currentProduct ? this.extractColorFromName(this.currentProduct.name) : null;
-
-            lasetumbsimpLog('[LaserTumblerPage] Loading local inventory for', this.currentSKU, 'Color:', colorName);
-
-            // Query ManageOrders API for local warehouse stock (filtered by color)
-            const inventory = await this.inventoryService.checkInventory(this.currentSKU, colorName);
-
-            // Store inventory data
+            const inventory = await this.inventoryService.checkInventory(sku, color);
+            if (version !== this.selectionVersion) return;
             this.localInventory = inventory;
-
-            lasetumbsimpLog('[LaserTumblerPage] Local inventory loaded:',
-                inventory.totalStock, 'units',
-                inventory.available ? 'in stock' : 'out of stock'
-            );
-
         } catch (error) {
+            if (version !== this.selectionVersion) return;
             console.error('[LaserTumblerPage] Error loading local inventory:', error);
-            // Set empty inventory on error (don't fail the page)
-            this.localInventory = {
-                available: false,
-                totalStock: 0,
-                message: 'Unable to check local inventory'
-            };
+            this.localInventory = { available: false, totalStock: 0, error: true };
+        } finally {
+            if (version === this.selectionVersion) {
+                this.inventoryPending = false;
+                this.showWarning('tumblerInventoryWarning', this.localInventory?.error
+                    ? 'Unable to verify warehouse stock for ' + color + '. Small orders need confirmation. Refresh to retry, or call 253-922-5793.' : '');
+            }
         }
     }
 
@@ -117,122 +111,75 @@ class LaserTumblerPage {
      * Load all color variants using batch API call
      */
     async loadAllColorVariants() {
-        lasetumbsimpLog('[LaserTumblerPage] Loading all color variants...');
-
+        const cacheKey = 'polar_camel_16oz_variants_v2';
+        let products;
+        let timestamp = Date.now();
         try {
-            // Check sessionStorage cache first (v2: tiers computed from live JDS
-            // wholesale + Caspio JDS-MARGIN/JDS-LABOR, not hardcoded prices)
-            const cacheKey = 'polar_camel_16oz_variants_v2';
             const cached = sessionStorage.getItem(cacheKey);
-
             if (cached) {
-                const cacheData = JSON.parse(cached);
-                const cacheAge = Date.now() - cacheData.timestamp;
-                const cacheMaxAge = 60 * 60 * 1000; // 1 hour
-
-                if (cacheAge < cacheMaxAge) {
-                    lasetumbsimpLog('[LaserTumblerPage] Using cached color variants');
-                    this.allProducts = cacheData.products;
-                    return;
-                }
+                const data = JSON.parse(cached);
+                const age = Date.now() - data.timestamp;
+                if (age >= 0 && age < 60 * 60 * 1000 && Array.isArray(data.products) && data.products.length) { products = data.products; timestamp = data.timestamp; }
             }
-
-            // Make batch API call
-            const response = await fetch(LASER_API_BASE + '/api/jds/products', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    skus: this.POLAR_CAMEL_16OZ_SKUS
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error(`Batch API request failed: ${response.status}`);
-            }
-
-            const data = await response.json();
-
-            // Live JDS pricing config (Caspio Service_Codes JDS-* rows) must be
-            // loaded before computing prices — never price off stale defaults.
-            await this.apiService.ready;
-
-            // Process products with pricing calculations — tiers are computed from
-            // each product's live JDS wholesale prices (throws if wholesale missing,
-            // which lands in init()'s error state rather than showing a wrong price)
-            this.allProducts = data.result.map(product => ({
-                ...product,
-                tiers: this.apiService.getPricingTiers(product)
-            }));
-
-            // Cache the results
-            sessionStorage.setItem(cacheKey, JSON.stringify({
-                products: this.allProducts,
-                timestamp: Date.now()
-            }));
-
-            lasetumbsimpLog('[LaserTumblerPage] Loaded', this.allProducts.length, 'color variants');
-
         } catch (error) {
-            console.error('[LaserTumblerPage] Error loading color variants:', error);
-            throw error;
+            console.warn('[LaserTumblerPage] Product cache unavailable:', error);
+            this.showWarning('tumblerCacheWarning', 'Saved product data could not be read. Fetching fresh product information.');
         }
+        if (!products) {
+            const response = await fetch(LASER_API_BASE + '/api/jds/products', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ skus: this.POLAR_CAMEL_16OZ_SKUS })
+            });
+            if (!response.ok) throw new Error('Batch API request failed: ' + response.status);
+            const data = await response.json();
+            products = data.result;
+        }
+        if (!Array.isArray(products) || !products.length) throw new Error('No tumbler products returned');
+        // Cached wholesale records still use today's live policy; never reuse cached tiers.
+        await this.apiService.ready;
+        this.showWarning('tumblerPolicyWarning', this.apiService.pricingWarnings?.length
+            ? 'Some live pricing settings are unavailable. Displayed estimates use default settings. Please confirm pricing with us before ordering; refresh to retry.' : '');
+        this.allProducts = products.map(product => ({ ...product, tiers: this.apiService.getPricingTiers(product) }));
+        try {
+            sessionStorage.setItem(cacheKey, JSON.stringify({ products, timestamp }));
+        } catch (error) {
+            console.warn('[LaserTumblerPage] Product cache could not be saved:', error);
+            this.showWarning('tumblerCacheWarning', 'Product information loaded, but could not be saved in this browser. Refreshing will fetch it again.');
+        }
+    }
+
+    showWarning(id, message) {
+        const element = document.getElementById(id);
+        if (!element) return;
+        element.textContent = message;
+        element.hidden = !message;
     }
 
     /**
      * Render color swatch selector
      */
     renderColorSwatches() {
-        const colorGrid = document.querySelector('.color-grid');
-        if (!colorGrid) {
-            console.warn('[LaserTumblerPage] Color grid element not found');
-            return;
-        }
-
-        colorGrid.innerHTML = '';
-
-        this.allProducts.forEach((product, index) => {
-            const colorName = this.extractColorFromName(product.name);
-            const colorSlug = this.createColorSlug(colorName);
-            const isSelected = product.sku === this.currentSKU;
-
-            const swatchContainer = document.createElement('div');
-            swatchContainer.className = 'color-swatch-container';
-
-            swatchContainer.innerHTML = `
-                <input
-                    type="radio"
-                    id="color-${product.sku}"
-                    name="tumbler-color"
-                    value="${product.sku}"
-                    class="color-swatch-input"
-                    ${isSelected ? 'checked' : ''}
-                    aria-label="${colorName} - ${product.sku}"
-                >
-                <label for="color-${product.sku}" class="color-swatch">
-                    <div
-                        class="color-preview"
-                        style="background-image: url('${product.images.thumbnail}')"
-                        role="img"
-                        aria-label="${colorName} tumbler preview"
-                    ></div>
-                    <span class="color-name">${colorName}</span>
-                </label>
-            `;
-
-            colorGrid.appendChild(swatchContainer);
-
-            // Add click handler
-            const input = swatchContainer.querySelector('input');
-            input.addEventListener('change', () => {
-                this.selectColor(product.sku);
-            });
+        const grid = document.querySelector('.color-grid');
+        if (!grid) return;
+        grid.replaceChildren();
+        this.allProducts.forEach(product => {
+            const color = this.extractColorFromName(product.name);
+            const container = document.createElement('div');
+            container.className = 'color-swatch-container';
+            const input = document.createElement('input');
+            input.type = 'radio'; input.id = 'color-' + product.sku;
+            input.name = 'tumbler-color'; input.value = product.sku;
+            input.className = 'color-swatch-input'; input.checked = product.sku === this.currentSKU;
+            input.setAttribute('aria-label', color + ' - ' + product.sku);
+            const label = document.createElement('label');
+            label.htmlFor = input.id; label.className = 'color-swatch';
+            const image = document.createElement('img');
+            image.className = 'color-preview'; image.src = product.images.thumbnail; image.alt = '';
+            const name = document.createElement('span');
+            name.className = 'color-name'; name.textContent = color;
+            label.append(image, name); container.append(input, label); grid.append(container);
+            input.addEventListener('change', () => { this.selectColor(product.sku); });
         });
-
-        lasetumbsimpLog('[LaserTumblerPage] Rendered', this.allProducts.length, 'color swatches');
-
-        // Add keyboard navigation
         this.addKeyboardNavigation();
     }
 
@@ -293,6 +240,8 @@ class LaserTumblerPage {
             // Move focus to new swatch
             if (newIndex !== currentIndex) {
                 swatchInputs[newIndex].focus();
+                swatchInputs[newIndex].checked = true;
+                swatchInputs[newIndex].dispatchEvent(new Event('change', { bubbles: true }));
             }
         });
 
@@ -303,51 +252,25 @@ class LaserTumblerPage {
      * Select a color variant
      */
     async selectColor(sku, skipURLUpdate = false) {
-        lasetumbsimpLog('[LaserTumblerPage] Selecting color:', sku);
-
-        // Find product in allProducts array
         const product = this.allProducts.find(p => p.sku === sku);
-
-        if (!product) {
-            console.error('[LaserTumblerPage] Product not found for SKU:', sku);
-            return;
-        }
-
-        // Update current selection
+        if (!product) return;
+        const version = ++this.selectionVersion;
         this.currentProduct = product;
         this.currentSKU = sku;
         this.pricingTiers = product.tiers;
-
-        // Update URL without reload (unless this is initial load)
-        if (!skipURLUpdate) {
-            const colorName = this.extractColorFromName(product.name);
-            const colorSlug = this.createColorSlug(colorName);
-            this.updateURL(colorSlug);
-
-            // Update checked state on color swatches
-            document.querySelectorAll('.color-swatch-input').forEach(input => {
-                input.checked = (input.value === sku);
-            });
-
-            // Load local inventory for new color
-            await this.loadLocalInventory();
-
-            // Update page content
-            this.displayProductInfo();
-            this.displayPricingTable();
-            this.displayInventory();
-            this.displayImages();
-            this.updateColorLegend();
-            this.updateSKUDisplay();
-
-            // Announce to screen readers
-            this.announceColorChange(colorName);
-
-            // Keep the logo mockup + quote in sync with the chosen color
-            window.laserTumblerMockup?.onColorChanged();
-        }
-
-        lasetumbsimpLog('[LaserTumblerPage] Color selected:', product.name);
+        if (skipURLUpdate) return;
+        const color = this.extractColorFromName(product.name);
+        this.updateURL(this.createColorSlug(color));
+        document.querySelectorAll('.color-swatch-input').forEach(input => { input.checked = input.value === sku; });
+        const inventory = this.loadLocalInventory();
+        this.displayProductInfo(); this.updateColorLegend(); this.displayImages();
+        this.displayPricingTable(); this.displayInventory();
+        window.laserTumblerMockup?.onColorChanged();
+        await inventory;
+        if (version !== this.selectionVersion) return;
+        this.displayPricingTable(); this.displayInventory();
+        this.announceColorChange(color);
+        window.laserTumblerMockup?.updateQuote();
     }
 
     /**
@@ -421,7 +344,7 @@ class LaserTumblerPage {
         if (!legend) return;
 
         const colorName = this.extractColorFromName(this.currentProduct.name);
-        legend.innerHTML = `Choose Your Color: <span class="selected-color-name">${colorName}</span>`;
+        legend.textContent = 'Choose Your Color: ' + colorName;
     }
 
     /**
@@ -516,7 +439,7 @@ class LaserTumblerPage {
                 warningRow.innerHTML = `
                     <td colspan="2" class="pricing-warning">
                         <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
-                        <span>Unavailable - No local inventory. Minimum 24 pieces when ordering from supplier.</span>
+                        <span>${this.inventoryPending ? 'Checking local inventory…' : this.localInventory?.error ? 'Unable to verify local inventory. Please confirm availability for orders under 24 pieces.' : 'Unavailable - No local inventory. Minimum 24 pieces when ordering from supplier.'}</span>
                     </td>
                 `;
                 tableBody.appendChild(warningRow);
@@ -571,6 +494,12 @@ class LaserTumblerPage {
             localStatusIcon = 'fa-times-circle';
         }
 
+        const unknown = this.inventoryPending || this.localInventory?.error;
+        if (unknown) {
+            localStatusClass = 'stock-unknown';
+            localStatusText = this.inventoryPending ? 'Checking stock…' : 'Unable to verify';
+            localStatusIcon = 'fa-exclamation-triangle';
+        }
         inventoryEl.innerHTML = `
             <div class="inventory-grid">
                 <!-- Local Warehouse (highlight first) -->
@@ -586,7 +515,7 @@ class LaserTumblerPage {
                     <div class="inventory-details">
                         <div class="inventory-item">
                             <span class="inventory-label">Available Now:</span>
-                            <span class="inventory-value">${localStock.toLocaleString()} units</span>
+                            <span class="inventory-value">${unknown ? (this.inventoryPending ? 'Checking…' : 'Unknown') : localStock.toLocaleString() + ' units'}</span>
                         </div>
                     </div>
                 </div>
@@ -620,33 +549,21 @@ class LaserTumblerPage {
      * Display product images from API
      */
     displayImages() {
-        // Update main hero image
-        const heroImage = document.querySelector('.hero-image img.product-image-main');
-        if (heroImage) {
-            heroImage.src = this.currentProduct.images.full;
-            heroImage.alt = this.currentProduct.name;
-        }
-
-        // Update gallery section
-        const galleryEl = document.getElementById('product-gallery');
-        if (!galleryEl) return;
-
-        const images = this.currentProduct.images;
-
-        galleryEl.innerHTML = `
-            <div class="gallery-item">
-                <img src="${images.thumbnail}" alt="${this.currentProduct.name}" class="gallery-thumbnail">
-            </div>
-            <div class="gallery-item">
-                <img src="${images.full}" alt="${this.currentProduct.name} - Full" class="gallery-thumbnail">
-            </div>
-        `;
-
-        // Add click handlers for lightbox (simple version)
-        galleryEl.querySelectorAll('.gallery-thumbnail').forEach(img => {
-            img.addEventListener('click', () => {
-                this.openLightbox(img.src);
-            });
+        const hero = document.querySelector('.hero-image img.product-image-main');
+        if (hero) { hero.src = this.currentProduct.images.full; hero.alt = this.currentProduct.name; }
+        const gallery = document.getElementById('product-gallery');
+        if (!gallery) return;
+        gallery.replaceChildren();
+        ['thumbnail', 'full'].forEach((size, index) => {
+            const button = document.createElement('button');
+            button.type = 'button'; button.className = 'gallery-item';
+            button.setAttribute('aria-label', 'View ' + this.currentProduct.name + (index ? ' full image' : ' thumbnail'));
+            const image = document.createElement('img');
+            image.src = this.currentProduct.images[size];
+            image.alt = this.currentProduct.name + (index ? ' - Full' : '');
+            image.className = 'gallery-thumbnail';
+            button.append(image); gallery.append(button);
+            button.addEventListener('click', () => { this.openLightbox(image.src); });
         });
     }
 
@@ -654,23 +571,23 @@ class LaserTumblerPage {
      * Open image lightbox
      */
     openLightbox(imageSrc) {
-        const lightbox = document.createElement('div');
-        lightbox.className = 'lightbox';
-        lightbox.innerHTML = `
-            <div class="lightbox-content">
-                <span class="lightbox-close">&times;</span>
-                <img src="${imageSrc}" alt="Product Image">
-            </div>
-        `;
-
-        document.body.appendChild(lightbox);
-
-        // Close on click
-        lightbox.addEventListener('click', (e) => {
-            if (e.target === lightbox || e.target.classList.contains('lightbox-close')) {
-                lightbox.remove();
-            }
+        const lightbox = document.createElement('dialog');
+        lightbox.className = 'lightbox'; lightbox.setAttribute('aria-label', 'Product image');
+        const content = document.createElement('div'); content.className = 'lightbox-content';
+        const close = document.createElement('button');
+        close.type = 'button'; close.className = 'btn btn-secondary lightbox-close'; close.textContent = 'Close';
+        close.setAttribute('aria-label', 'Close product image');
+        const image = document.createElement('img'); image.src = imageSrc; image.alt = 'Product Image';
+        content.append(close, image); lightbox.append(content); document.body.append(lightbox);
+        close.addEventListener('click', () => lightbox.close());
+        lightbox.addEventListener('close', () => lightbox.remove());
+        lightbox.addEventListener('keydown', event => { if (event.key === 'Tab') { event.preventDefault(); close.focus(); } });
+        lightbox.addEventListener('click', event => {
+            if (event.target !== lightbox) return;
+            const box = lightbox.getBoundingClientRect();
+            if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) lightbox.close();
         });
+        lightbox.showModal();
     }
 
     /**
@@ -680,6 +597,7 @@ class LaserTumblerPage {
         const contentEl = document.getElementById('page-content');
         if (contentEl) {
             contentEl.classList.add('loading');
+            contentEl.hidden = true;
         }
 
         // Show loading spinner
@@ -696,6 +614,7 @@ class LaserTumblerPage {
         const contentEl = document.getElementById('page-content');
         if (contentEl) {
             contentEl.classList.remove('loading');
+            contentEl.hidden = false;
         }
 
         // Hide loading spinner
@@ -716,6 +635,8 @@ class LaserTumblerPage {
         }
 
         this.hideLoading();
+        document.getElementById('page-content').hidden = true;
+        document.getElementById('tumblerErrorPanel').hidden = false;
     }
 
     /**
@@ -762,6 +683,7 @@ function wireChrome() {
 // Initialize page when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
     wireChrome();
+    document.getElementById('tumblerRetry')?.addEventListener('click', () => window.location.reload());
     window.laserTumblerPage = new LaserTumblerPage();
     window.laserTumblerPage.init();
 });

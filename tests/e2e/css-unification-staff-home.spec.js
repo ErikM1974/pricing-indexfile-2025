@@ -32,6 +32,15 @@ function stateFor(original, role='admin', mode='populated') {
 function save(name, data) { fs.writeFileSync(path.join(output,'staff-final-tools-dashboard-'+name+'.json'),JSON.stringify(data,null,2)+'\n'); }
 function clean(events) { for (const key of ['errors','unknown','missing','writes']) expect(events[key],key).toEqual([]); }
 async function settled(page) { await expect(page.locator('#loadingOverlay')).toBeHidden(); await expect(page.locator('#goalCurrent')).not.toHaveText('Loading…'); await page.waitForLoadState('networkidle'); }
+// Preserve the original dashboard contract with only the requested seasonal label update.
+function currentDashboardContract(original) {
+    const value=structuredClone(original);
+    for (const link of value.links) if (link.href === '/christmas-bundles.html') {
+        expect(link.text).toBe('Christmas Gift Boxesseasonal Carhartt gift-box builder');
+        link.text='Christmas Gift Boxes 2026build this year’s Carhartt gift box';
+    }
+    return value;
+}
 async function snapshot(page) { return page.evaluate(()=>({active:document.querySelector('.ws-panel.is-on')?.dataset.ws,tabs:[...document.querySelectorAll('.ws-tab')].map(n=>({id:n.dataset.ws,text:n.textContent.replace(/\s+/g,' ').trim(),selected:n.getAttribute('aria-selected')})),goal:['goalCurrent','goalPercent','goalOf'].map(id=>({id,text:document.getElementById(id).textContent})),counts:['teamActiveCount','teamBdayCount','teamAnnivCount'].map(id=>({id,text:document.getElementById(id).textContent})),links:[...document.querySelectorAll('.ws-panel a[href]')].map(n=>({href:n.getAttribute('href'),text:n.textContent.replace(/\s+/g,' ').trim()}))})); }
 for (const original of [false]) {
     const edition=original?'original':'current';
@@ -42,7 +51,7 @@ for (const original of [false]) {
         await expect(page.locator('#teamActiveCount')).toHaveText('3');
         const initial=await snapshot(page), views=[], directories=[];
         const baseline=require('../fixtures/staff-final-tools-dashboard-original-browser.json');
-        if (!original) expect(initial).toEqual(baseline.initial);
+        if (!original) expect(initial).toEqual(currentDashboardContract(baseline.initial));
         for (const ws of ['sales','production','art','office','company','everything','admin']) {
             await page.locator('#ws-tab-'+ws).click(); await expect(page.locator('#ws-'+ws)).toHaveClass(/is-on/);
             for (const width of [1440,768,390,320]) {
@@ -77,7 +86,7 @@ for (const original of [false]) {
     });
     for (const [role,expected] of [['sales','sales'],['art','art'],['production','production'],['staff','office'],['','everything']]) test('CSS final staff tools: Staff home '+edition+' role '+(role||'anonymous'),async({page})=>{
         const state=stateFor(original,role),events=await open(page,'staff-dashboard-v3/index.html',state); await settled(page); await expect(page.locator('#ws-'+expected)).toHaveClass(/is-on/); await expect(page.locator('#ws-tab-admin')).toHaveCount(0);
-        const data=await snapshot(page); if (!original) expect(data).toEqual(require('../fixtures/staff-final-tools-dashboard-original-'+(role||'anonymous')+'.json').data);
+        const data=await snapshot(page); if (!original) expect(data).toEqual(currentDashboardContract(require('../fixtures/staff-final-tools-dashboard-original-'+(role||'anonymous')+'.json').data));
         save(edition+'-'+(role||'anonymous'),{data,events}); clean(events);
     });
     for (const mode of ['empty','failure']) test('CSS final staff tools: Staff home '+edition+' '+mode,async({page})=>{

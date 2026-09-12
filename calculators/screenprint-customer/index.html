@@ -1,26 +1,26 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>Customer Supplied Screen Print Calculator - Northwest Custom Apparel</title>
     <link rel="icon" href="/favicon.png" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
+
     <!-- Shared Calculator Styles -->
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link href="/shared_components/css/calculator-base.css?v=2026.09.07.19" rel="stylesheet">
+    <link href="/shared_components/css/components.css?v=2026.09.11.6" rel="stylesheet">
+    <link rel="stylesheet" href="/shared_components/css/specialty-pricing.css?v=2026.09.12.1">
     <!-- Screen Print Customer-Specific Styles -->
-    <link href="/calculators/screenprint-customer/screenprint-customer-styles.css?v=2026.09.07.19" rel="stylesheet">
+    <link href="/calculators/screenprint-customer/screenprint-customer-styles.css?v=2026.09.12.1" rel="stylesheet">
     <!-- Screen Print Customer Fix CSS - Professional styling with NWCA green theme -->
-    <link href="/calculators/screenprint-customer/screenprint-customer-fix.css?v=2026.09.07.19" rel="stylesheet">
-    
+
+
     <!-- EmailJS SDK -->
     <script src="/config/app.config.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    
+
     <!-- Base Quote Service -->
     <script src="/shared_components/js/base-quote-service.js?v=2026.09.06.37"></script>
     <!-- Calculator Utilities -->
@@ -32,19 +32,18 @@
     <script src="/shared_components/js/quote-cart-engine.js?v=2026.09.06.26"></script>
     <!-- Customer Screen Print Quote Service -->
     <script src="/shared_components/js/data-call-delegator.js?v=2026.09.06.27"></script>
-    <script src="/calculators/screenprint-customer/screenprint-customer-quote-service.js?v=2026.09.06.37"></script>
+    <script src="/calculators/screenprint-customer/screenprint-customer-quote-service.js?v=2026.09.12.1"></script>
     <!-- Screen Print Calculator Class -->
-    <script src="/calculators/screenprint-customer/screenprint-customer-calculator.js?v=2026.09.07.33"></script>
+    <script src="/calculators/screenprint-customer/screenprint-customer-calculator.js?v=2026.09.12.1"></script>
 </head>
-<body>
+<body data-ui="unified" data-specialty-calculator="screenprint-customer">
     <!-- Header -->
-    <header class="header no-print">
+    <header class="header">
         <div class="header-container">
             <div class="header-left">
-                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
-                     alt="Northwest Custom Apparel" class="logo">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel" class="logo">
             </div>
-            <nav class="breadcrumb">
+            <nav class="breadcrumb" aria-label="Breadcrumb">
                 <a href="/staff-dashboard.html">Staff Dashboard</a>
                 <span>/</span>
                 <span>Customer Supplied Screen Print</span>
@@ -53,23 +52,21 @@
     </header>
 
     <!-- Main Content -->
-    <main class="container">
+    <main class="container main-container">
         <div class="section">
-            <h1>Customer Supplied Screen Print Calculator</h1>
-            
+            <h1 class="page-title">Customer Supplied Screen Print Calculator</h1>
+
             <!-- Product Showcase Section -->
             <div class="product-showcase">
                 <div class="product-showcase-inner">
                     <div class="product-showcase-image">
-                        <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9094661" 
-                             alt="Customer Supplied Screen Printing" 
-                             title="Professional Screen Printing on Your Garments">
+                        <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9094661" alt="Customer Supplied Screen Printing" title="Professional Screen Printing on Your Garments">
                     </div>
                     <div class="product-showcase-content">
-                        <h3><i class="fas fa-star" aria-hidden="true"></i> Screen Printing on Your Items</h3>
-                        <p style="color: var(--text-secondary); margin-bottom: 1rem;">
-                            Bring us your garments and we'll apply professional screen printing that makes your brand pop. 
-                            Perfect for teams with existing apparel, special events, or when you need to match specific 
+                        <h2><i class="fas fa-star" aria-hidden="true"></i> Screen Printing on Your Items</h2>
+                        <p>
+                            Bring us your garments and we'll apply professional screen printing that makes your brand pop.
+                            Perfect for teams with existing apparel, special events, or when you need to match specific
                             garments. Our high-quality inks and expert technique ensure vibrant, long-lasting prints.
                         </p>
                         <div class="product-features">
@@ -93,18 +90,18 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="calculator-grid">
-                <div class="input-section">
+                <div class="input-section"><h2>Print details</h2>
                     <div class="form-group">
                         <label for="quantity" class="form-label">Quantity</label>
-                        <input type="number" id="quantity" class="form-control" placeholder="Minimum 24" min="24">
+                        <input type="number" id="quantity" class="field-input" placeholder="Minimum 24" min="24">
                     </div>
-                    
+
                     <div class="input-grid">
                         <div class="form-group">
                             <label for="frontColors" class="form-label">Front Print Colors</label>
-                            <select id="frontColors" class="form-control">
+                            <select id="frontColors" class="field-select">
                                 <option value="1">1</option>
                                 <option value="2">2</option>
                                 <option value="3">3</option>
@@ -115,7 +112,7 @@
                         </div>
                         <div class="form-group">
                             <label for="backColors" class="form-label">Back Print Colors</label>
-                            <select id="backColors" class="form-control">
+                            <select id="backColors" class="field-select">
                                 <option value="0">0</option>
                                 <option value="1">1</option>
                                 <option value="2">2</option>
@@ -127,40 +124,27 @@
                         </div>
                     </div>
 
-                    <div class="switch-container">
-                        <label for="darkShirtToggle">Dark Garment? (Adds white base)</label>
-                        <label class="switch">
-                            <input type="checkbox" id="darkShirtToggle">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
+                    <label class="check-option switch"><input type="checkbox" id="darkShirtToggle"><span>Dark Garment? (Adds white base)</span></label>
 
-                    <div class="switch-container">
-                        <label for="safetyStripesToggle">Safety Stripes? (Pocket/Shoulder)</label>
-                        <label class="switch">
-                            <input type="checkbox" id="safetyStripesToggle">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
+                    <label class="check-option switch"><input type="checkbox" id="safetyStripesToggle"><span>Safety Stripes? (Pocket/Shoulder)</span></label>
 
-                    <div id="safetyStripesNotice" class="safety-notice" style="display: none;">
+                    <div id="safetyStripesNotice" class="safety-notice" hidden="">
                         <strong>Safety Stripes:</strong> Available in pocket or shoulder placement. Contact sales for specific requirements.
                     </div>
                 </div>
 
                 <div class="results-section">
-                    <h3>Your Quote</h3>
-                    <div id="pricingError" class="pricing-error-banner" style="display:none;"></div>
-                    <div class="price-display prompt" id="priceDisplay">Enter Details</div>
+                    <h2>Your Quote</h2>
+                    <div id="pricingError" class="pricing-error" hidden="" role="alert"></div>
+                    <button type="button" id="retryPricingBtn" class="btn" hidden>Retry pricing</button>
+                    <div class="price-display prompt" id="priceDisplay" role="status">Enter Details</div>
                     <div class="price-display-label">Price per Shirt</div>
-                    <hr style="border:none; border-top:1px solid #bbf7d0; margin: 1.5rem 0;">
-                    <div class="order-summary" id="orderSummary"></div>
-                    <div class="tier-ladder" id="tierLadder" style="display:none;"></div>
-                    <div class="quote-actions" id="quoteActions" style="display: none;">
-                        <button type="button" class="btn btn-secondary" data-call="printQuote">
-                            <i class="fas fa-print" aria-hidden="true"></i>
-                            Print Quote
-                        </button>
+
+                    <p id="printSelection" class="print-selection"></p><div class="order-summary" id="orderSummary"></div>
+                    <div class="tier-ladder" id="tierLadder" hidden=""></div>
+                    <div class="quote-actions" id="quoteActions" hidden="">
+                        <button type="button" class="btn btn-secondary" data-call="printEstimate">
+                            <i class="fas fa-print" aria-hidden="true"></i>Print Estimate</button>
                         <button type="button" class="btn btn-primary" id="sendQuoteBtn">
                             <i class="fas fa-paper-plane" aria-hidden="true"></i>
                             Send Quote
@@ -177,44 +161,44 @@
     </main>
 
     <!-- Quote Modal -->
-    <div class="modal-overlay" id="quoteModal">
+    <dialog id="quoteModal" class="ui-dialog scp-dialog" aria-labelledby="quoteFormTitle">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Send Screen Print Quote</h3>
+                <h2 id="quoteFormTitle">Send Screen Print Quote</h2>
             </div>
             <div class="modal-body">
                 <form id="quoteForm">
                     <div class="form-grid">
                         <div class="form-group">
-                            <label class="form-label">Customer Name <span style="color: red;">*</span></label>
-                            <input type="text" class="form-control" id="customerName" aria-label="Customer name" required>
+                            <label class="form-label" for="customerName">Customer Name <span class="required">*</span></label>
+                            <input type="text" class="field-input" id="customerName" required="" autofocus="">
                         </div>
-                        
+
                         <div class="form-group">
-                            <label class="form-label">Email <span style="color: red;">*</span></label>
-                            <input type="email" class="form-control" id="customerEmail" aria-label="Customer email" required>
+                            <label class="form-label" for="customerEmail">Email <span class="required">*</span></label>
+                            <input type="email" class="field-input" id="customerEmail" required="">
                         </div>
-                        
+
                         <div class="form-group">
-                            <label class="form-label">Phone (Optional)</label>
-                            <input type="tel" class="form-control" id="customerPhone" aria-label="Customer phone" placeholder="(555) 123-4567">
+                            <label class="form-label" for="customerPhone">Phone (Optional)</label>
+                            <input type="tel" class="field-input" id="customerPhone" placeholder="(555) 123-4567">
                         </div>
-                        
+
                         <div class="form-group">
-                            <label class="form-label">Company (Optional)</label>
-                            <input type="text" class="form-control" id="companyName" aria-label="Company">
+                            <label class="form-label" for="companyName">Company (Optional)</label>
+                            <input type="text" class="field-input" id="companyName">
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">Project Name (Optional)</label>
-                        <input type="text" class="form-control" id="projectName" aria-label="Project name" placeholder="Project or order description">
+                        <label class="form-label" for="projectName">Project Name (Optional)</label>
+                        <input type="text" class="field-input" id="projectName" placeholder="Project or order description">
                     </div>
 
 
                     <div class="form-group">
-                        <label class="form-label">Sales Representative <span style="color: red;">*</span></label>
-                        <select class="form-control" id="salesRep" aria-label="Sales rep" required>
+                        <label class="form-label" for="salesRep">Sales Representative <span class="required">*</span></label>
+                        <select class="field-select" id="salesRep" required="">
                             <option value="sales@nwcustomapparel.com">General Sales</option>
                             <option value="ruth@nwcustomapparel.com">Ruth Nhong</option>
                             <option value="taylar@nwcustomapparel.com">Taylar</option>
@@ -227,17 +211,18 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">Notes (Optional)</label>
-                        <textarea class="form-control" id="notes" rows="3" aria-label="Notes" placeholder="Special instructions or notes"></textarea>
+                        <label class="form-label" for="notes">Notes (Optional)</label>
+                        <textarea class="field-textarea" id="notes" rows="3" placeholder="Special instructions or notes"></textarea>
                     </div>
 
-                    <div class="checkbox-group">
-                        <input type="checkbox" class="checkbox-input" id="saveToDatabase" checked>
+                    <div class="checkbox-group check-option">
+                        <input type="checkbox" class="checkbox-input" id="saveToDatabase" checked="">
                         <label for="saveToDatabase">Save quote to database</label>
                     </div>
 
-                    <div class="quote-preview" id="quotePreview"></div>
-                </form>
+                    <p class="quote-table-hint" id="quoteTableHint">Scroll sideways to see all quote columns.</p>
+                    <div class="quote-preview specialty-table-scroll" id="quotePreview" role="region" aria-label="Quote summary" aria-describedby="quoteTableHint" tabindex="0"></div>
+                <p id="quoteSubmitStatus" class="quote-feedback" role="alert" hidden=""></p></form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-call="closeQuoteModal">Cancel</button>
@@ -247,42 +232,42 @@
                 </button>
             </div>
         </div>
-    </div>
+    </dialog>
 
     <!-- Success Modal -->
-    <div class="modal-overlay" id="successModal">
+    <dialog id="successModal" class="ui-dialog scp-dialog" aria-labelledby="quoteSuccessTitle">
         <div class="modal-content">
             <div class="modal-header success">
-                <i class="fas fa-check-circle success-icon" aria-hidden="true"></i>
-                <h2 style="color: var(--success-text); margin-top: 1rem;">Quote Sent Successfully!</h2>
+
+                <h2 id="quoteSuccessTitle" tabindex="-1" autofocus="">Quote Sent Successfully!</h2>
             </div>
             <div class="modal-body">
-                <div style="text-align: center; margin-bottom: 2rem;">
-                    <p style="font-size: 1.125rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                <div class="quote-recipient">
+                    <p id="quoteRecipientLabel">
                         Your quote has been sent to:
                     </p>
-                    <p style="font-weight: 600;" id="modalCustomerName"></p>
-                    <p style="color: var(--text-secondary);" id="modalCustomerEmail"></p>
+                    <p id="modalCustomerName"></p>
+                    <p id="modalCustomerEmail"></p>
                 </div>
-                
-                <div class="quote-id-display">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                        <span style="font-weight: 600;">Quote ID:</span>
+
+                <div class="quote-reference">
+                    <div class="quote-reference-row">
+                        <span>Quote ID:</span>
                         <span class="quote-id" id="modalQuoteId"></span>
                     </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-weight: 600;">Total Amount:</span>
-                        <span style="font-size: 1.25rem; color: var(--primary-color); font-weight: 600;" id="modalTotalAmount"></span>
+                    <div class="quote-reference-row">
+                        <span>Total Amount:</span>
+                        <span id="modalTotalAmount"></span>
                     </div>
                 </div>
-                
-                <div style="text-align: center;">
+
+                <div>
                     <button type="button" class="btn btn-secondary" data-call="copyQuoteId">
                         <i class="fas fa-copy" aria-hidden="true"></i>
                         Copy Quote ID
                     </button>
                 </div>
-            </div>
+            <p id="quoteDeliveryStatus" class="quote-feedback" role="alert" hidden=""></p><p id="quoteCopyStatus" class="copy-status" role="status" hidden=""></p><button type="button" id="retryQuoteBtn" class="btn btn-primary" hidden="">Retry</button></div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-call="printQuote">
                     <i class="fas fa-print" aria-hidden="true"></i>
@@ -294,8 +279,8 @@
                 </button>
             </div>
         </div>
-    </div>
+    </dialog>
 
     <script src="/calculators/screenprint-customer/screenprint-customer.js?v=2026.09.05.8"></script>
-</body>
-</html>
+
+</body></html>

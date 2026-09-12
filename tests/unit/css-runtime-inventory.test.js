@@ -11,7 +11,7 @@ test('runtime CSS census includes aliases, dynamic styles and explicitly served 
     expect(sources.size).toBe(tracked.length);
     expect(sources.get('pages/catalog.html').aliases).toEqual(expect.arrayContaining(['/catalog', '/catalog.html']));
     expect(sources.get('staff-dashboard-v3/index.html').aliases).toEqual(expect.arrayContaining(['/staff-dashboard.html','/staff-dashboard-v3/']));
-    expect(sources.get('calculators/archive/seasonal-2025/breast-cancer-awareness-bundle.html')).toMatchObject({ kind: 'served-archive', status: 'pending' });
+    expect(sources.get('calculators/archive/seasonal-2025/breast-cancer-awareness-bundle.html')).toMatchObject({ kind: 'served-archive', status: 'verified-migration' });
     expect(sources.get('pages/golf-tournament-customer-emailjs-template.html').kind).toBe('email');
     expect(sources.get('training/lead-email-templates.html').kind).toBe('application');
     expect(sources.get('pages/quote-view.html').dynamicStyles).toContain('shared_components/css/garment-submit-form.css');

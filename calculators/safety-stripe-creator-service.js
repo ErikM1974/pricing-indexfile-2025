@@ -9,6 +9,7 @@ class SafetyStripeQuoteService {
     constructor() {
         this.baseURL = ''; // same-origin since the 2026-08-26 quote-plane lockdown (rate-limited public relays)
         this.quotePrefix = 'SSC'; // Safety Stripe Creator
+        this.pendingSave = null;
     }
 
     /**
@@ -56,16 +57,20 @@ class SafetyStripeQuoteService {
      * Save safety stripe design to database
      */
     async saveDesign(designData) {
+        let quoteID;
         try {
-            const quoteID = this.generateQuoteID();
-            const sessionID = this.generateSessionID();
-            
+            const key = JSON.stringify(designData);
+            if (this.pendingSave && this.pendingSave.key !== key) this.pendingSave = null;
+            const pending = this.pendingSave;
+            quoteID = pending ? pending.quoteID : this.generateQuoteID();
+            const sessionID = pending ? pending.sessionID : this.generateSessionID();
+
             safestricreaLog('[SafetyStripeQuoteService] Saving design with ID:', quoteID);
 
             // Step 1: Create quote session
             const expiresAtDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
             const formattedExpiresAt = expiresAtDate.toISOString().replace(/\.\d{3}Z$/, '');
-            
+
             const sessionData = {
                 QuoteID: quoteID,
                 SessionID: sessionID,
@@ -84,34 +89,38 @@ class SafetyStripeQuoteService {
 
             safestricreaLog('[SafetyStripeQuoteService] Session data:', sessionData);
 
-            const sessionResponse = await fetch(`${this.baseURL}/api/quote_sessions`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(sessionData)
-            });
+            if (!pending) {
+                const sessionResponse = await fetch(`${this.baseURL}/api/quote_sessions`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(sessionData)
+                });
 
-            const responseText = await sessionResponse.text();
-            safestricreaLog('[SafetyStripeQuoteService] Session response:', sessionResponse.status, responseText);
+                const responseText = await sessionResponse.text();
+                safestricreaLog('[SafetyStripeQuoteService] Session response:', sessionResponse.status, responseText);
 
-            if (!sessionResponse.ok) {
-                let errorMessage = `Session creation failed: ${sessionResponse.status}`;
-                try {
-                    const errorData = JSON.parse(responseText);
-                    errorMessage = errorData.message || errorData.error || errorMessage;
-                } catch (e) {
-                    errorMessage += ` - ${responseText}`;
+                if (!sessionResponse.ok) {
+                    let errorMessage = `Session creation failed: ${sessionResponse.status}`;
+                    try {
+                        const errorData = JSON.parse(responseText);
+                        errorMessage = errorData.message || errorData.error || errorMessage;
+                    } catch (e) {
+                        errorMessage += ` - ${responseText}`;
+                    }
+                    throw new Error(errorMessage);
                 }
-                throw new Error(errorMessage);
+
+                this.pendingSave = {key, quoteID, sessionID};
             }
 
             // Step 2: Add design details to quote_items
             const addedAt = new Date().toISOString().replace(/\.\d{3}Z$/, '');
-            
+
             // Format option names for display
             const formatOption = (opt) => opt.replace(/([A-Z])/g, ' $1').trim();
-            
+
             const itemData = {
                 QuoteID: quoteID,
                 LineNumber: 1,
@@ -136,6 +145,7 @@ class SafetyStripeQuoteService {
                     frontImage: designData.frontImage,
                     backImage: designData.backImage,
                     sentBy: designData.salesRepEmail,
+                    message: designData.message || '',
                     sentAt: new Date().toISOString()
                 }),
                 PricingTier: 'Design Only',
@@ -158,9 +168,10 @@ class SafetyStripeQuoteService {
 
             if (!itemResponse.ok) {
                 console.error('Failed to save design details:', itemResponseText);
-                // Don't throw - session was created successfully
+                throw new Error('Design details could not be saved');
             }
 
+            this.pendingSave = null;
             return {
                 success: true,
                 quoteID: quoteID,
@@ -169,11 +180,11 @@ class SafetyStripeQuoteService {
 
         } catch (error) {
             console.error('[SafetyStripeQuoteService] Error saving design:', error);
-            // Still return a quote ID even if database save failed
-            // This ensures the customer gets their design
+            // Keep the accepted session for an exact retry of its missing item.
             return {
                 success: false,
-                quoteID: this.generateQuoteID(),
+                quoteID: quoteID,
+                sessionSaved: !!this.pendingSave,
                 error: error.message
             };
         }

@@ -28,6 +28,7 @@ const MAGIC_LINK_FILES = ['pages/js/customer-login.js', 'pages/js/vendor-login.j
 const CATALOG_DISCOVERY_FILES = ['brands.js', 'pages/js/fall-catalog-2026.js'];
 const CONTRACT_UI_FILES = ['shared_components/js/contract-calculator-ui.js'];
 const STRICT_FILES = [
+    'shared_components/js/specialty-calculator-ui.js',
     ...CONTRACT_UI_FILES,
     ...CATALOG_DISCOVERY_FILES,
     ...MAGIC_LINK_FILES,
@@ -73,6 +74,21 @@ const LEGACY_ESM = [
 ];
 
 export default [
+    { files: ['calculators/js/christmas-bundles.js', 'calculators/js/christmas-bundle-order.js'], languageOptions: { sourceType: 'script', globals: { ...globals.browser, module: 'readonly' } }, rules: { ...js.configs.recommended.rules, 'no-undef': 'error', 'no-unused-vars': ['error', { vars: 'local', argsIgnorePattern: '^_', caughtErrors: 'none' }] } },
+    { files: ['calculators/js/christmas-bundles.js'], languageOptions: { globals: { ChristmasBundleQuoteService: 'readonly' } } },
+    { files: ['calculators/breast-cancer-awareness-bundle.js', 'calculators/breast-cancer-bundle-service.js'], languageOptions: { sourceType: 'script', globals: { ...globals.browser, emailjs: 'readonly' } }, rules: { 'no-undef': 'error', 'no-unused-vars': ['error', { vars: 'local', argsIgnorePattern: '^_', caughtErrors: 'none' }] } },
+    { files: ['calculators/screenprint-customer/screenprint-customer-calculator.js'], languageOptions: { globals: { CustomerScreenPrintQuoteService: 'readonly' } } },
+    { files: ['calculators/screenprint-customer/screenprint-customer.js'], languageOptions: { globals: { CustomerScreenPrintCalculator: 'readonly' } } },
+    { files: ['calculators/screenprint-customer/*.js'], languageOptions: { sourceType: 'script', globals: { ...globals.browser, emailjs: 'readonly', BaseQuoteService: 'readonly', escapeHTML: 'readonly' } }, rules: { 'no-undef': 'error', 'no-unused-vars': ['error', { vars: 'local', argsIgnorePattern: '^_', caughtErrors: 'none' }] } },
+    { files: ['calculators/safety-stripe-calculator.js', 'calculators/safety-stripe-creator-service.js'], languageOptions: { sourceType: 'script', globals: { ...globals.browser } }, rules: { 'no-undef': 'error', 'no-unused-vars': ['error', { vars: 'local', argsIgnorePattern: '^_', caughtErrors: 'none' }] } },
+    { files: ['calculators/safety-stripe-calculator.js'], languageOptions: { globals: { SafetyStripeQuoteService: 'readonly' } } },
+    { files: ['shared_components/js/laser-tumbler-simple.js'], languageOptions: { globals: { JDSApiService: 'readonly' } } },
+    {
+        // Existing tumbler controllers now have explicit browser globals and zero unused bindings.
+        files: ['shared_components/js/jds-api-service.js', 'shared_components/js/laser-tumbler-simple.js', 'shared_components/js/laser-tumbler-mockup.js'],
+        languageOptions: { sourceType: 'script', globals: { ...globals.browser, ManageOrdersInventoryService: 'readonly', showToast: 'readonly' } },
+        rules: { 'no-undef': 'error', 'no-unused-vars': ['error', { argsIgnorePattern: '^_', caughtErrors: 'none', vars: 'local' }] },
+    },
     {
         // Global ignores — what `eslint .` never reads: build output, deps, tests, Node-side scripts
         // (except the two in STRICT_FILES), docs/memory, vendored + archived code.
@@ -99,7 +115,7 @@ export default [
     {
         // LEGACY browser scope (2026-09-07) — see the header.
         files: ['**/*.js'],
-        ignores: [...STRICT_FILES, 'shared_components/js/quote-builder-utils.js'],
+        ignores: [...STRICT_FILES, 'shared_components/js/quote-builder-utils.js', 'calculators/breast-cancer-awareness-bundle.js', 'calculators/breast-cancer-bundle-service.js', 'calculators/js/christmas-bundles.js', 'calculators/js/christmas-bundle-order.js'],
         languageOptions: {
             ecmaVersion: 2022,
             sourceType: 'script',
@@ -181,7 +197,7 @@ export default [
         },
     },
     {
-        files: [...CONTRACT_UI_FILES, ...CATALOG_DISCOVERY_FILES, ...MAGIC_LINK_FILES, ...STAFF_REFERENCE_FILES, 'shared_components/js/storefront-navigation.js', 'shared_components/js/catalog-storefront-navigation.js', 'shared_components/js/campaign-storefront.js', ...POLICY_UI_FILES, 'shared_components/js/webstore-guide.js'],
+        files: ['shared_components/js/specialty-calculator-ui.js', ...CONTRACT_UI_FILES, ...CATALOG_DISCOVERY_FILES, ...MAGIC_LINK_FILES, ...STAFF_REFERENCE_FILES, 'shared_components/js/storefront-navigation.js', 'shared_components/js/catalog-storefront-navigation.js', 'shared_components/js/campaign-storefront.js', ...POLICY_UI_FILES, 'shared_components/js/webstore-guide.js'],
         languageOptions: { sourceType: 'script', globals: { ...globals.browser } },
     },
     {

@@ -36,6 +36,7 @@
     var page = null;                   // window.laserTumblerPage instance
     var catalogBySku = {};             // SKU → {EngraveColor,...} from /api/jds-catalog
     var tumblerImage = null;
+    var imageRequest = 0;
     var logoImage = null;
     var logoFileName = '';
     var logoOffset = { dx: 0, dy: 0 };
@@ -49,6 +50,7 @@
     window.laserTumblerMockup = {
         onPageReady: onPageReady,
         onColorChanged: onColorChanged,
+        updateQuote: updateQuote,
         // exposed for automated tests — not used by page code
         _handleLogoFile: handleLogoFile
     };
@@ -83,12 +85,14 @@
         fetch(API_BASE + '/api/jds-catalog?category=Drinkware')
             .then(function (r) { return r.ok ? r.json() : Promise.reject(r); })
             .then(function (data) {
-                ((data && data.result) || []).forEach(function (row) {
+                if (!data || !Array.isArray(data.result) || !data.result.length) throw new Error('No engraving metadata returned');
+                data.result.forEach(function (row) {
                     if (row.SKU) catalogBySku[row.SKU] = row;
                 });
                 if (logoImage) { engravedCache = {}; render(); }
             })
             .catch(function (err) {
+                page.showWarning('tumblerPreviewWarning', 'Unable to verify the engraving color. This preview uses approximate silver; confirm artwork with us before production. Refresh to retry.');
                 console.warn('[laser-tumbler-mockup] jds-catalog meta unavailable — using default engrave color:', err);
             });
     }
@@ -121,15 +125,20 @@
 
     function loadTumblerImage() {
         if (!page || !page.currentSKU) return;
+        var request = ++imageRequest;
+        tumblerImage = null;
+        render();
         showLoading(true);
         showError('');
         ensureImage(page.currentSKU)
             .then(function (img) {
+                if (request !== imageRequest) return;
                 tumblerImage = img;
                 showLoading(false);
                 render();
             })
             .catch(function (err) {
+                if (request !== imageRequest) return;
                 showLoading(false);
                 console.error('[laser-tumbler-mockup] Tumbler image load failed:', err);
                 showError('We couldn\'t load the tumbler preview image. Refresh to try again, or call us at 253-922-5793.');
@@ -512,6 +521,14 @@
 
         var qty = parseInt(qtyEl.value, 10);
         if (!Number.isFinite(qty) || qty < 1) { box.innerHTML = ''; return; }
+
+        if (page.inventoryPending || (qty < SUPPLIER_MIN && page.localInventory && page.localInventory.error)) {
+            box.replaceChildren();
+            var warning = document.createElement('div'); warning.className = 'ltmk-quote-warning';
+            warning.textContent = page.inventoryPending ? 'Checking stock for this color…' : 'Warehouse stock is unavailable. Please confirm availability for orders under 24 pieces: 253-922-5793.';
+            box.append(warning);
+            return;
+        }
 
         var localStock = (page.localInventory && page.localInventory.totalStock) || 0;
         if (qty < SUPPLIER_MIN && localStock <= 0) {

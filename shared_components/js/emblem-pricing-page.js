@@ -262,7 +262,7 @@ const AI_ENDPOINT = '/api/contract-emblem-ai/chat';
 
         setTimeout(() => {
             const ta = document.getElementById('aiChatTextarea');
-            if (ta) ta.focus();
+            if (ta && aiState.opened && !panel.contains(document.activeElement)) ta.focus();
         }, 320);
     }
 

@@ -1,0 +1,267 @@
+{
+  "mode": "products",
+  "states": [
+    {
+      "width": 1440,
+      "text": "❄ ❅ ❆ 🎅 Offer Expires In 🎅 00 DAYS : 00 HOURS : 00 MINUTES : 00 SECONDS 🎅 Offer Has Ended - Contact Us for Current Promotions! 🎅 🎄 Christmas Bundle Pricing 2025 Rain Defender: $213 | Detroit: $258 | Storm Defender: $295 Each bundle includes: Jacket • Hoodie • Beanie • Gloves • Gift Box with custom embroidery Volume pricing available for 8+ bundles 1 Select Jacket 2 Select Hoodie 3 Select Beanie 4 Select Gloves 5 Customize 6 Delivery Info 7 Review Choose Your Jacket Select from our premium Carhartt jacket collection CT104670 Carhartt Storm Defender Shoreline Jacket CT104670 $174 value FREE! Our best-selling Shoreline Jacket has been updated. 7.3-ounce 100% nylon oxford shell Storm... SELECT COLOR:* SELECT SIZE:* S M L XL 2XL 3XL 4XL Select This Jacket CT100617 Carhartt Rain Defender Paxton Heavyweight Hooded Zip Mock Sweatshirt $92 value FREE! Rain Defender durable water-repellent technology has your back all day every day in this rugged moc... SELECT COLOR:* SELECT SIZE:* S M L XL 2XL 3XL 4XL Select This Jacket CT103828 Carhartt Duck Detroit Jacket CT103828 $137 value FREE! The original Detroit Jacket built a reputation for toughness on the backs of warehouse workers farm... SELECT COLOR:* SELECT SIZE:* S M L XL 2XL 3XL 4XL Select This Jacket Continue Your Gift Box This is a FREE promotional gift box! Start building your gift box",
+      "fields": [],
+      "totals": {
+        "quantity": 0,
+        "retail": 34,
+        "unit": 34
+      },
+      "overflow": false,
+      "missingImages": [],
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".scroll-indicator-text"
+            ],
+            [
+              "div[data-step=\"2\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"3\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"4\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"5\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"6\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"7\"] > .step-title"
+            ],
+            [
+              "div[data-product-id=\"CT104670\"] > .product-info > .product-price > .retail-value"
+            ],
+            [
+              "div[data-product-id=\"CT104670\"] > .product-info > .product-price > .free-badge"
+            ],
+            [
+              "div[data-product-id=\"CT100617\"] > .product-info > .product-price > .retail-value"
+            ],
+            [
+              "div[data-product-id=\"CT100617\"] > .product-info > .product-price > .free-badge"
+            ],
+            [
+              "div[data-product-id=\"CT103828\"] > .product-info > .product-price > .retail-value"
+            ],
+            [
+              "div[data-product-id=\"CT103828\"] > .product-info > .product-price > .free-badge"
+            ],
+            [
+              ".summary-empty > div:nth-child(2)"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "text": "❄ ❅ ❆ 🎅 Offer Expires In 🎅 00 DAYS : 00 HOURS : 00 MINUTES : 00 SECONDS 🎅 Offer Has Ended - Contact Us for Current Promotions! 🎅 🎄 Christmas Bundle Pricing 2025 Rain Defender: $213 | Detroit: $258 | Storm Defender: $295 Each bundle includes: Jacket • Hoodie • Beanie • Gloves • Gift Box with custom embroidery Volume pricing available for 8+ bundles 1 Select Jacket 2 Select Hoodie 3 Select Beanie 4 Select Gloves 5 Customize 6 Delivery Info 7 Review Choose Your Jacket Select from our premium Carhartt jacket collection CT104670 Carhartt Storm Defender Shoreline Jacket CT104670 $174 value FREE! Our best-selling Shoreline Jacket has been updated. 7.3-ounce 100% nylon oxford shell Storm... SELECT COLOR:* SELECT SIZE:* S M L XL 2XL 3XL 4XL Select This Jacket CT100617 Carhartt Rain Defender Paxton Heavyweight Hooded Zip Mock Sweatshirt $92 value FREE! Rain Defender durable water-repellent technology has your back all day every day in this rugged moc... SELECT COLOR:* SELECT SIZE:* S M L XL 2XL 3XL 4XL Select This Jacket CT103828 Carhartt Duck Detroit Jacket CT103828 $137 value FREE! The original Detroit Jacket built a reputation for toughness on the backs of warehouse workers farm... SELECT COLOR:* SELECT SIZE:* S M L XL 2XL 3XL 4XL Select This Jacket Continue Your Gift Box This is a FREE promotional gift box! Start building your gift box",
+      "fields": [],
+      "totals": {
+        "quantity": 0,
+        "retail": 34,
+        "unit": 34
+      },
+      "overflow": false,
+      "missingImages": [],
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".scroll-indicator-text"
+            ],
+            [
+              "div[data-step=\"2\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"3\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"4\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"5\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"6\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"7\"] > .step-title"
+            ],
+            [
+              "div[data-product-id=\"CT104670\"] > .product-info > .product-price > .retail-value"
+            ],
+            [
+              "div[data-product-id=\"CT104670\"] > .product-info > .product-price > .free-badge"
+            ],
+            [
+              "div[data-product-id=\"CT100617\"] > .product-info > .product-price > .retail-value"
+            ],
+            [
+              "div[data-product-id=\"CT100617\"] > .product-info > .product-price > .free-badge"
+            ],
+            [
+              "div[data-product-id=\"CT103828\"] > .product-info > .product-price > .retail-value"
+            ],
+            [
+              "div[data-product-id=\"CT103828\"] > .product-info > .product-price > .free-badge"
+            ],
+            [
+              ".summary-empty > div:nth-child(2)"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "text": "❄ ❅ ❆ 🎅 Offer Expires In 🎅 00 DAYS : 00 HOURS : 00 MINUTES : 00 SECONDS 🎅 Offer Has Ended - Contact Us for Current Promotions! 🎅 🎄 Christmas Bundle Pricing 2025 Rain Defender: $213 | Detroit: $258 | Storm Defender: $295 Each bundle includes: Jacket • Hoodie • Beanie • Gloves • Gift Box with custom embroidery Volume pricing available for 8+ bundles 1 Select Jacket 2 Select Hoodie 3 Select Beanie 4 Select Gloves 5 Customize 6 Delivery Info 7 Review Choose Your Jacket Select from our premium Carhartt jacket collection CT104670 Carhartt Storm Defender Shoreline Jacket CT104670 $174 value FREE! Our best-selling Shoreline Jacket has been updated. 7.3-ounce 100% nylon oxford shell Storm... SELECT COLOR:* SELECT SIZE:* S M L XL 2XL 3XL 4XL Select This Jacket CT100617 Carhartt Rain Defender Paxton Heavyweight Hooded Zip Mock Sweatshirt $92 value FREE! Rain Defender durable water-repellent technology has your back all day every day in this rugged moc... SELECT COLOR:* SELECT SIZE:* S M L XL 2XL 3XL 4XL Select This Jacket CT103828 Carhartt Duck Detroit Jacket CT103828 $137 value FREE! The original Detroit Jacket built a reputation for toughness on the backs of warehouse workers farm... SELECT COLOR:* SELECT SIZE:* S M L XL 2XL 3XL 4XL Select This Jacket Continue Your Gift Box This is a FREE promotional gift box! Start building your gift box",
+      "fields": [],
+      "totals": {
+        "quantity": 0,
+        "retail": 34,
+        "unit": 34
+      },
+      "overflow": false,
+      "missingImages": [],
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".scroll-indicator-text"
+            ],
+            [
+              "div[data-step=\"2\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"3\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"4\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"5\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"6\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"7\"] > .step-title"
+            ],
+            [
+              "div[data-product-id=\"CT104670\"] > .product-info > .product-price > .retail-value"
+            ],
+            [
+              "div[data-product-id=\"CT104670\"] > .product-info > .product-price > .free-badge"
+            ],
+            [
+              "div[data-product-id=\"CT100617\"] > .product-info > .product-price > .retail-value"
+            ],
+            [
+              "div[data-product-id=\"CT100617\"] > .product-info > .product-price > .free-badge"
+            ],
+            [
+              "div[data-product-id=\"CT103828\"] > .product-info > .product-price > .retail-value"
+            ],
+            [
+              "div[data-product-id=\"CT103828\"] > .product-info > .product-price > .free-badge"
+            ],
+            [
+              ".summary-empty > div:nth-child(2)"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "text": "❄ ❅ ❆ 🎅 Offer Expires In 🎅 00 DAYS : 00 HOURS : 00 MINUTES : 00 SECONDS 🎅 Offer Has Ended - Contact Us for Current Promotions! 🎅 🎄 Christmas Bundle Pricing 2025 Rain Defender: $213 | Detroit: $258 | Storm Defender: $295 Each bundle includes: Jacket • Hoodie • Beanie • Gloves • Gift Box with custom embroidery Volume pricing available for 8+ bundles 1 Select Jacket 2 Select Hoodie 3 Select Beanie 4 Select Gloves 5 Customize 6 Delivery Info 7 Review Choose Your Jacket Select from our premium Carhartt jacket collection CT104670 Carhartt Storm Defender Shoreline Jacket CT104670 $174 value FREE! Our best-selling Shoreline Jacket has been updated. 7.3-ounce 100% nylon oxford shell Storm... SELECT COLOR:* SELECT SIZE:* S M L XL 2XL 3XL 4XL Select This Jacket CT100617 Carhartt Rain Defender Paxton Heavyweight Hooded Zip Mock Sweatshirt $92 value FREE! Rain Defender durable water-repellent technology has your back all day every day in this rugged moc... SELECT COLOR:* SELECT SIZE:* S M L XL 2XL 3XL 4XL Select This Jacket CT103828 Carhartt Duck Detroit Jacket CT103828 $137 value FREE! The original Detroit Jacket built a reputation for toughness on the backs of warehouse workers farm... SELECT COLOR:* SELECT SIZE:* S M L XL 2XL 3XL 4XL Select This Jacket Continue Your Gift Box This is a FREE promotional gift box! Start building your gift box",
+      "fields": [],
+      "totals": {
+        "quantity": 0,
+        "retail": 34,
+        "unit": 34
+      },
+      "overflow": false,
+      "missingImages": [],
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "div[data-step=\"2\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"3\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"4\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"5\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"6\"] > .step-title"
+            ],
+            [
+              "div[data-product-id=\"CT104670\"] > .product-info > .product-price > .retail-value"
+            ],
+            [
+              "div[data-product-id=\"CT104670\"] > .product-info > .product-price > .free-badge"
+            ],
+            [
+              "div[data-product-id=\"CT100617\"] > .product-info > .product-price > .retail-value"
+            ],
+            [
+              "div[data-product-id=\"CT100617\"] > .product-info > .product-price > .free-badge"
+            ],
+            [
+              "div[data-product-id=\"CT103828\"] > .product-info > .product-price > .retail-value"
+            ],
+            [
+              "div[data-product-id=\"CT103828\"] > .product-info > .product-price > .free-badge"
+            ],
+            [
+              ".summary-empty > div:nth-child(2)"
+            ]
+          ]
+        },
+        {
+          "id": "scrollable-region-focusable",
+          "nodes": [
+            [
+              ".progress-steps"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "events": {
+    "errors": [],
+    "writes": [],
+    "unknown": [
+      "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+      "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
+      "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+      "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
+      "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+      "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
+      "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+      "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    ],
+    "dialogs": []
+  },
+  "emails": []
+}

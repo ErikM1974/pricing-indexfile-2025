@@ -16,24 +16,26 @@
     <!-- Styles (2026 chrome first; page styles second) -->
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/nwca-2026-core.css?v=2026.09.07.8">
-    <link href="/shared_components/css/laser-tumbler-simple.css?v=2026.09.07.19" rel="stylesheet">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.11.6">
+    <link rel="stylesheet" href="/shared_components/css/storefront-shell.css?v=2026.09.11.6">
+    <link rel="stylesheet" href="/shared_components/css/specialty-pricing.css?v=2026.09.12.1">
+    <link href="/shared_components/css/laser-tumbler-simple.css?v=2026.09.12.1" rel="stylesheet">
 
     <!-- JDS API Service -->
     <script src="/config/app.config.js"></script>
-    <script src="/shared_components/js/jds-api-service.js?v=2026.09.06.31"></script>
+    <script src="/shared_components/js/jds-api-service.js?v=2026.09.12.1"></script>
 
     <!-- ManageOrders Inventory Service -->
     <script src="/shared_components/js/manageorders-inventory-service.js?v=2026.09.06.37"></script>
 
     <!-- Page Logic -->
-    <script src="/shared_components/js/laser-tumbler-simple.js?v=2026.09.06.37"></script>
+    <script src="/shared_components/js/laser-tumbler-simple.js?v=2026.09.12.1"></script>
 
     <!-- Logo mockup + instant quote (shared engraving pipeline + customer module) -->
     <script src="/shared_components/js/jds-tumbler-template.js?v=2026.06.11"></script>
-    <script src="/shared_components/js/laser-tumbler-mockup.js?v=2026.09.06.31"></script>
+    <script src="/shared_components/js/laser-tumbler-mockup.js?v=2026.09.12.1"></script>
 </head>
-<body>
+<body data-ui="unified" data-storefront data-specialty-calculator="polar-camel">
     <a class="skip-link" href="#main">Skip to content</a>
 
     <!-- Utility strip -->
@@ -127,7 +129,7 @@
     </header>
 
     <!-- Drawer (mobile menu + category browse) -->
-    <aside class="sidebar" id="sidebar" aria-label="Browse menu">
+    <dialog class="sidebar" id="sidebar" aria-label="Browse menu">
         <div class="drawer-head">
             <span class="drawer-head-title">Browse NWCA</span>
             <button class="drawer-close" id="drawerClose" type="button" aria-label="Close menu">
@@ -167,20 +169,28 @@
             <a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a><br>
             2025 Freeman Rd E, Milton, WA 98354
         </div>
-    </aside>
+    </dialog>
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <main id="main">
     <!-- Loading Spinner -->
-    <div id="loading-spinner" hidden>
-        <div class="spinner"></div>
+    <div id="loading-spinner" class="tumbler-loading" role="status">
+        <div class="spinner" aria-hidden="true"></div>
+        <p>Loading tumbler colors, pricing and stock…</p>
     </div>
 
     <!-- Error Message -->
-    <div id="error-message" role="alert" hidden></div>
+    <section id="tumblerErrorPanel" class="tumbler-error" hidden>
+        <h1>Polar Camel tumblers</h1>
+        <p id="error-message" role="alert" hidden></p>
+        <button type="button" id="tumblerRetry" class="btn btn-primary">Try again</button>
+    </section>
 
     <!-- Main Content -->
-    <div id="page-content">
+    <div id="page-content" hidden>
+        <p id="tumblerPolicyWarning" class="tumbler-data-warning" role="alert" hidden></p>
+        <p id="tumblerCacheWarning" class="tumbler-data-warning" role="alert" hidden></p>
+        <p id="tumblerInventoryWarning" class="tumbler-data-warning" role="alert" hidden></p>
         <!-- Hero Section -->
         <section class="hero-section">
             <div class="container">
@@ -290,10 +300,10 @@
                                 <h4 id="ltmk-warning-title"></h4>
                                 <p id="ltmk-warning-body"></p>
                                 <div class="ltmk-warning-actions">
-                                    <button type="button" id="ltmk-warning-continue" class="ltmk-btn ltmk-btn--secondary">
+                                    <button type="button" id="ltmk-warning-continue" class="btn btn-secondary ltmk-btn ltmk-btn--secondary">
                                         Preview it anyway
                                     </button>
-                                    <button type="button" id="ltmk-warning-reupload" class="ltmk-btn">
+                                    <button type="button" id="ltmk-warning-reupload" class="btn btn-secondary ltmk-btn">
                                         Choose a different file
                                     </button>
                                 </div>
@@ -308,8 +318,8 @@
                             </label>
                             <input type="range" id="ltmk-size-slider" min="30" max="110" step="2" value="70">
                             <div class="ltmk-size-actions">
-                                <button type="button" id="ltmk-fit-btn" class="ltmk-btn ltmk-btn--secondary">Auto-fit</button>
-                                <button type="button" id="ltmk-center-btn" class="ltmk-btn ltmk-btn--secondary">Re-center</button>
+                                <button type="button" id="ltmk-fit-btn" class="btn btn-secondary ltmk-btn ltmk-btn--secondary">Auto-fit</button>
+                                <button type="button" id="ltmk-center-btn" class="btn btn-secondary ltmk-btn ltmk-btn--secondary">Re-center</button>
                             </div>
                             <p class="ltmk-hint">Drag the logo on the preview to reposition it.</p>
                         </div>
@@ -318,13 +328,13 @@
                         <div class="mockup-step">
                             <h3><span class="mockup-step-num">3</span> Get your price</h3>
                             <label class="ltmk-qty-label" for="ltmk-qty">How many tumblers?</label>
-                            <input type="number" id="ltmk-qty" min="1" max="9999" step="1" value="24" inputmode="numeric">
+                            <input type="number" id="ltmk-qty" class="field-input ltmk-quantity" min="1" max="9999" step="1" value="24" inputmode="numeric">
                             <div id="ltmk-quote-result" class="ltmk-quote-result" aria-live="polite"></div>
                         </div>
 
                         <!-- Step 4: download -->
-                        <div class="mockup-step" id="ltmk-download-step" hidden>
-                            <button type="button" id="ltmk-download-btn" class="ltmk-btn ltmk-btn--primary">
+                        <div class="mockup-step ltmk-download-step" id="ltmk-download-step" hidden>
+                            <button type="button" id="ltmk-download-btn" class="btn btn-primary ltmk-btn ltmk-btn--primary">
                                 <i class="fas fa-download" aria-hidden="true"></i> Download your mockup
                             </button>
                             <p class="ltmk-hint">Attach it when you call or email us and we'll take it from there.</p>
@@ -332,6 +342,7 @@
                     </div>
 
                     <div class="mockup-preview">
+                        <p id="tumblerPreviewWarning" class="tumbler-data-warning" role="alert" hidden></p>
                         <canvas id="ltmk-canvas" tabindex="0"
                                 aria-label="Tumbler mockup preview — drag or use arrow keys to position your logo"></canvas>
                         <div id="ltmk-preview-empty" class="ltmk-preview-empty">
@@ -365,7 +376,7 @@
             <div class="container">
                 <h2>Ready to Order?</h2>
                 <p>Contact us for custom quotes, bulk pricing, or questions about our laser engraving services.</p>
-                <a href="tel:253-922-5793" class="cta-button">
+                <a href="tel:253-922-5793" class="btn btn-primary cta-button">
                     <i class="fas fa-phone" aria-hidden="true"></i>
                     Call Us: 253-922-5793
                 </a>
@@ -421,6 +432,7 @@
         </div>
     </footer>
 
+    <script src="/shared_components/js/catalog-storefront-navigation.js?v=2026.09.11.6" defer></script>
     <script src="/shared_components/js/quote-cart-store.js?v=2026.08.19.5" defer></script>
 </body>
 </html>

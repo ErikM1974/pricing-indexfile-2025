@@ -284,3 +284,11 @@ Draft design family: shared_components/css/design-libraries.css owns local desig
 - catalog-storefront-navigation.js — native navigation for home, catalog and product, compatible with their existing category hooks.
 
 - `contract-calculator-ui.js`: presentation and keyboard access for the DTG/embroidery contract calculators and printable contract price list; controllers retain pricing and request ownership.
+
+### Specialty calculator presentation
+
+`specialty-calculator-ui.js` opts in only on `data-ui="unified" data-specialty-calculator`. It adds canonical controls and keyboard table regions to generated content, keeps the closed assistant inert, wraps dialog Tab focus, and temporarily opens reference details for print before restoring their prior state. Existing page controllers own every request, price and business action. Strict ESLint scope. The decal controller is byte-for-byte unchanged; the emblem controller changes only its delayed focus callback, which now respects a closed panel and focus already inside it. Reversible source guards preserve both originals and every financial/request path.
+
+Richardson factory-direct opts into specialty-calculator-ui.js: its existing hidden classes are mirrored to native hidden attributes. Pricing calculations stay in its original controller; only failed-read warnings, current selection and keyboard presentation changed.
+
+Polar Camel: laser-tumbler-simple.js owns latest color/inventory state, live-policy recalculation of age-preserved product caches and persistent failure feedback; laser-tumbler-mockup.js owns current-image requests and quote availability. jds-api-service.js adds validated pricingWarnings metadata (also available to its existing AE consumer); successful financial methods and the shared jds-tumbler-template.js engraving renderer remain unchanged. catalog-storefront-navigation.js supplies the native drawer bridge.

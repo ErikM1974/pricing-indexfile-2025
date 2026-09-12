@@ -1,0 +1,216 @@
+{
+  "states": [
+    {
+      "width": 1440,
+      "title": "Safety Stripe Creator - Northwest Custom Apparel",
+      "url": "/calculators/safety-stripe-creator.html",
+      "ids": {
+        "frontPreview": "",
+        "frontOptions": "Just Stripes Left Chest Logo Front Center Logo Built In Image",
+        "backPreview": "",
+        "backOptions": "Just Stripes Back Center Logo Back Between Lines Text Back Built In Image",
+        "actionSection": "Send Design to Customer"
+      },
+      "fields": [],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        }
+      ],
+      "tables": [],
+      "headings": [
+        "Safety Stripe Creator",
+        "Step 1: Choose Your Stripe Style",
+        "Standard",
+        "Warning",
+        "Diamond Plate",
+        "Construction Zone",
+        "Step 2: Select Front Design",
+        "Step 3: Select Back Design"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a"
+            ],
+            [
+              ".title-section > p"
+            ],
+            [
+              ".send-button"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Safety Stripe Creator - Northwest Custom Apparel",
+      "url": "/calculators/safety-stripe-creator.html",
+      "ids": {
+        "frontPreview": "",
+        "frontOptions": "Just Stripes Left Chest Logo Front Center Logo Built In Image",
+        "backPreview": "",
+        "backOptions": "Just Stripes Back Center Logo Back Between Lines Text Back Built In Image",
+        "actionSection": "Send Design to Customer"
+      },
+      "fields": [],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        }
+      ],
+      "tables": [],
+      "headings": [
+        "Safety Stripe Creator",
+        "Step 1: Choose Your Stripe Style",
+        "Standard",
+        "Warning",
+        "Diamond Plate",
+        "Construction Zone",
+        "Step 2: Select Front Design",
+        "Step 3: Select Back Design"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a"
+            ],
+            [
+              ".title-section > p"
+            ],
+            [
+              ".send-button"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Safety Stripe Creator - Northwest Custom Apparel",
+      "url": "/calculators/safety-stripe-creator.html",
+      "ids": {
+        "frontPreview": "",
+        "frontOptions": "Just Stripes Left Chest Logo Front Center Logo Built In Image",
+        "backPreview": "",
+        "backOptions": "Just Stripes Back Center Logo Back Between Lines Text Back Built In Image",
+        "actionSection": "Send Design to Customer"
+      },
+      "fields": [],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        }
+      ],
+      "tables": [],
+      "headings": [
+        "Safety Stripe Creator",
+        "Step 1: Choose Your Stripe Style",
+        "Standard",
+        "Warning",
+        "Diamond Plate",
+        "Construction Zone",
+        "Step 2: Select Front Design",
+        "Step 3: Select Back Design"
+      ],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a"
+            ],
+            [
+              ".title-section > p"
+            ],
+            [
+              ".send-button"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Safety Stripe Creator - Northwest Custom Apparel",
+      "url": "/calculators/safety-stripe-creator.html",
+      "ids": {
+        "frontPreview": "",
+        "frontOptions": "Just Stripes Left Chest Logo Front Center Logo Built In Image",
+        "backPreview": "",
+        "backOptions": "Just Stripes Back Center Logo Back Between Lines Text Back Built In Image",
+        "actionSection": "Send Design to Customer"
+      },
+      "fields": [],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        }
+      ],
+      "tables": [],
+      "headings": [
+        "Safety Stripe Creator",
+        "Step 1: Choose Your Stripe Style",
+        "Standard",
+        "Warning",
+        "Diamond Plate",
+        "Construction Zone",
+        "Step 2: Select Front Design",
+        "Step 3: Select Back Design"
+      ],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a"
+            ],
+            [
+              ".title-section > p"
+            ],
+            [
+              ".send-button"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "mocked": [
+    {
+      "path": "/api/quote_sessions",
+      "method": "POST",
+      "body": {
+        "QuoteID": "SSC0911-1",
+        "SessionID": "<generated-session-id>",
+        "CustomerEmail": "example@example.invalid",
+        "CustomerName": "Example Customer",
+        "CompanyName": "Example Company",
+        "Phone": "555-0100",
+        "TotalQuantity": 0,
+        "SubtotalAmount": 0,
+        "LTMFeeTotal": 0,
+        "TotalAmount": 0,
+        "Status": "Design Sent",
+        "ExpiresAt": "2026-10-11T18:30:00",
+        "Notes": "Safety Stripe Design - Standard\nFront: LeftChestLogo, Back: BackBetweenLinesText"
+      }
+    }
+  ],
+  "dialogs": [
+    "Unable to submit the design. Please try again or call (253) 922-5793."
+  ]
+}

@@ -5,6 +5,49 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## Seasonal renewal must keep stock, saved orders and confirmation separate (2026-09-12)
+
+- Problem/root cause: Christmas color changes retained old sizes, floating controls hid selections, failed item saves reported success, and email fields dropped address line2 and thread colors.
+- Solution: use canonical scoped styles and native controls; invalidate stock choices immediately and ignore obsolete responses. Capture one order before upload, track confirmed persistence and each email separately, retain failed drafts and retry unfinished stages. Save address2 and map the existing thread-color field.
+- Prevention: compare original financial functions and successful payloads over24 combinations; mock every write and exercise stock failures, racing colors, upload/save/mail retries and duplicate pending calls. Review four widths and all paper pages; print native confirmations through an in-flow copy and restore the draft after printing.
+- Limit: retry ownership skips acknowledged saves, but the legacy POST API has no idempotency contract for a lost acknowledgment. Do not claim exactly-once delivery. Campaign year is2026;2025 Freeman Road East remains the street address.
+
+## Seasonal assets and order confirmations need real serving and persistence checks (2026-09-11)
+
+- Problem/root cause: the awareness page pointed at a missing service; placing replacements beside its archived HTML would hit the intentional archive410 gate. The original order service swallowed item failures and claimed email delivery after rejection.
+- Solution: keep the existing public HTML alias and archive tombstone; place the page assets in the public calculator mount. Capture one order, track confirmed session/items and both emails independently, retain partial progress for explicit retry, and expose upload/service failures. Preserve successful payloads and all original prices.
+- Prevention: route current browser assets through the real local Express server; assert public asset bytes and archive410 responses. Keep filesystem-only original diagnostics separate. Compare original/current payloads, exercise partial failures and duplicates, and inspect all mobile/print states.
+
+## Customer quotes need a captured calculation and independent delivery states (2026-09-11)
+
+- Problem/root cause: customer-supplied screen print kept stale amounts actionable during debounce, mixed current prices into an older saved invoice/email, silently swallowed setup-item failures and claimed email success after failed delivery.
+- Solution: invalidate on edit before any debounce/early return; scope price and tier responses; capture immutable financial/customer data for submission and print. Track confirmed session/item/setup stages and email independently so manual retries repeat only unfinished operations. A completed quote frees its identity for the next intentional submission. Native dialogs retain drafts and block duplicate pending submissions.
+- Prevention: 396 immutable financial cases and exact shared engine/method locks; original request/email/invoice contents; retry each failure stage, delayed price/tier results, cancelled dialogs and short phones. External invoice CSS keeps notes and waiver together in a complete one-page quote. Captured HTML is rendered without opening the operating-system print dialog.
+
+## Design saves must report complete persistence and keep retry ownership (2026-09-11)
+
+- Problem/root cause: Safety Stripe used a modal class its CSS never opened, swallowed item-save failure as success, dropped the design note, and still claimed email delivery after email had been removed. Empty image sources also look failed before a choice is selected.
+- Solution: native named dialogs and buttons, pending-save guards, persistent errors with retained drafts, reuse an accepted session when only its item needs retry, and save the note in the existing design detail. Say Design saved only after both writes succeed. Ignore empty image sources and clearly label genuinely missing previews.
+- Prevention: capture original hidden-dialog and false-success defects without changing original CSS, compare all 64 design combinations and original request values, exercise partial retries, keyboard focus, clipboard failure and short phone dialogs, and review every paper page with warning/reference retention.
+
+## Product caches and previews must describe current pricing and selection (2026-09-11)
+
+- Problem/root cause: cached products retained old calculated prices and renewed their own age; failed inventory looked like zero stock, and delayed color/image responses could replace the latest selection. Failed product reads left placeholder prices visible.
+- Solution: preserve the original cache timestamp, await current validated policy and recompute prices; distinguish pending/unknown stock, guard request generations, and show persistent failure or fallback notices. Native dialogs and radio controls retain keyboard focus; compact the printed contact block so it does not create a footer-only page.
+- Prevention: compare all 64 original color/quantity results and exact financial bodies, byte-compare the downloaded logo, test cached policy changes with an explicit timestamp relative to the fixed browser clock, retry and response races, and review every screen and paper page. Keep the shared engraving renderer unchanged.
+
+## Richardson selections and policy labels must describe the current quote (2026-09-11)
+
+- Problem/root cause: typing a new style retained the old quote; suggestions required a mouse, delayed blur hid focused results, API failures silently used defaults, and fee captions stayed hardcoded. A new top-level CSS layer defeated canonical hidden utilities.
+- Solution: clear selection immediately, use native suggestion buttons inside a named combobox dialog popup, retain focus ownership, validate all five reads and persist fallback warnings through print, and render captions from loaded fees. Keep page styles inside components.pages and allow natural paper pagination.
+- Prevention: immutable 72-state financial/category contracts, independent exact financial method bodies, failed/incomplete reads, keyboard focus after the real delay, four widths, loaded branding checks and every paper page. Do not introduce a layer after utilities or accept broken-image captures as complete review.
+
+## Specialty pricing references must remain usable in every state (2026-09-11)
+
+- Problem/root cause: legacy phone CSS hid every emblem price; closed chat actions and idle confirmation appeared prematurely. A delayed textarea-focus callback moved focus after keyboard navigation or panel close. Print omitted collapsed references.
+- Solution: preserve the full grid in a named keyboard scroll region, use canonical hidden/inert state, guard delayed focus against current panel ownership, and open/restore references only around print. Separate reference sections into complete paper pages.
+- Prevention: exact original prices and intercepted request bodies, native Tab/Shift+Tab/Escape followed by the real delay, phone horizontal scrolling, hidden-state checks, and visual review of every PDF page.
+
 ## Contract calculators need one policy and visibility owner (2026-09-11)
 
 - Problem/root cause: explanatory DTG fee labels and the reference footer stayed hardcoded after API policy changed; author display rules exposed contradictory hidden notices. Assistant focus escaped, and clipped screen-reader-only elements damaged printed headings.
@@ -85,28 +128,6 @@ Native storefront menu focus and paper migration (2026-09-09) is archived in LES
 
 Staff reference failure-state findings (2026-09-09) are preserved in LESSONS_LEARNED_ARCHIVE.md.
 
-### Sign-in and confirmation owners need honest state and paper checks (2026-09-09)
-
-Problem: shared form arrangements initially omitted canonical field styles, infrastructure failures falsely displayed an email-sent state, and artwork pushed receipt contact details onto a trailing sheet. Root cause: class ownership, treating all HTTP responses as success, and screen spacing inherited by print. Solution: canonical fields/shared access shell, generic outage errors preserving the email for retry while keeping successful known/unknown accounts identical, and compact print spacing with empty artwork regions hidden. Fulfillment controllers, totals and server shipping promises remain unchanged and hash-locked. Prevention: exercise keyboard/invalid/pending/rate/network/outage/sent states with all writes and emails blocked, inspect paper with actual artwork fixtures and compare every content block. Preserve line endings in scripted registry edits so removing a line cannot merge an adjacent entry into a comment.
-
-### Catalog discovery must distinguish failed data from absent products (2026-09-09)
-
-Problem: missing logos left unnamed tiles, failed product batches could appear as verified absent products, and intrinsic grid images overlapped card labels on paper. Root cause: image-only interaction, unchecked response shape, and print grid intrinsic sizing. Solution: named native links, validated batches with explicit retry preserving filters, server price labels retained verbatim, and contained images with separate label flow. Move shared navigation without duplicating it; preserve every curated style/category/brand description. Prevention: test keyboard, malformed/partial/empty/retry states and escaped server labels; assert image-to-body print geometry and compare every PDF text block. Browser review blocks all business writes and emails.
-
-### Campaign inquiries must be received before confirming success (2026-09-09)
-
-Problem: the golf form cleared entered details and sent a customer confirmation even when saving and sales notification both failed; malformed catalog data could also leave sample pricing loading forever. Root cause: all-settled delivery results were logged but never gated the receipt, and initial response shape/loading regions were unchecked. Solution: show success only after storage or sales notification accepts the request, send customer confirmation afterward, preserve inputs on total failure, show confirmation-email failures separately, and stop both catalog/sample loaders on invalid data. Prevention: exercise storage/lead/customer failure combinations and retry with the same values; preserve financial helpers and underlying services. For CSS, validate every token against actual page owners and inspect rendered paper: white text can survive PDF extraction while being invisible, narrow grids can wrap money, and flex list text can split into unintended columns.
-
-Campaign verification follow-up: a runtime census timed out under the full suite. Reuse one inert DOM parser for attribute-only HTML inventory; compare the entire report before/after and keep the deadline/coverage unchanged.304 documents produced a byte-identical531123-byte report,18.31s to13.51s in the measured standalone runs.
-
-### Shared CSS migration must preserve responsive and interaction ownership (2026-09-09)
-
-Problem: consolidating repeated .stk-card selectors moved desktop grid placement after the mobile media query, making tiny phone columns; legacy and shared menu handlers also toggled the same disclosure twice. Root cause: deduplication ignored cascade order, and both controllers owned aria-expanded/visibility. Solution: base geometry precedes responsive rules; the instant pages bypass legacy disclosure/mobile adapters and use existing shared native owners. Financial/submission/artwork code remains source locked. Prevention: real four-width geometry/axe and open/close/resize keyboard checks, every published sticker row and banner preset, retained upload/draft retry, and full paper text plus visual inspection. A clipped screen-reader caption needs an explicit visible print arrangement; shrink optional paper chrome without dropping original content.
-
-## Paper-like form layouts need a separate phone arrangement (2026-09-09)
-
-Problem: the quote request inherited line-oriented paper styling that pushed the project textarea beyond the phone viewport. Root cause: its legacy field row and width rules survived in an online customer form. Solution: canonical vertical fields and bounded grid columns; shared hosted-form wrappers, native keyboard upload and explicit page landmark names. Prevention: check actual control bounds at320/390/768/1440, source-lock serialization and lookup/upload helpers, exercise blocked embeds and retained draft retries, inspect every reference-PDF page. The lookup helper floats popups only on printable forms; anchor the public form menu absolutely to its input and assert its coordinates, not just visibility. Keep mock routes installed across fixture-state transitions: removing them between navigations can allow in-flight requests to reach a live API. Keep department colors tied to ownership: monogram is shop-floor blue, digitizing Ruth purple, purchasing Bradley slate.
-
 ## A reviewed page wrapper is not a reviewed external app (2026-09-09)
 
 Problem: the CSS census omitted Jotform scripts and its external-owner backlog named only three Caspio pages. Root cause: provider recognition did not match the currently loaded embeds. Solution: recognize Jotform and explicitly retain vendor-owned UI as pending even after its surrounding page is reviewed. Prevention: lock live embed IDs/URLs, test wrapper boundaries with login/table/empty/failure fixtures and block all real provider writes; do not describe synthetic fixture coverage as validation of a vendor app. Check DESIGN_COLOUR_CODE before mapping an inherited palette: announcement admin tools are neutral; legacy maroon does not make them AE-owned.
@@ -179,78 +200,8 @@ Problem/root cause: incomplete invoices looked empty, failed import logs were cl
 
 **Personalization recovery follow-up:** Validate roster arrays before replacing current data; obsolete load/search/OCR/save responses must not change a newer view. Keep failed loads inert with visible retry, clear canceled OCR UI and preserve keyboard file access. Save success must match the API envelope; lock duplicate submissions and scope acknowledgments/navigation to the originating roster. Original native CSV and payload comparisons plus rejection/race tests prevent silent drift. Validate Excel groups/rows before replacing data; ignore obsolete files/views and imports preceding a save. Collect unsaved cells before adding a group; keep required-input errors inside native dialogs. Monogram ItemsJSON and save IDs/HTTP status must be validated before replacing names or clearing dirty state. Picker label clicks already dispatch native checkbox clicks; never toggle both. Return focus after Done/Escape, keep retry errors in place and preserve original proof fonts/colors when removing global print overrides.
 
-## Staff tools must capture saves and distinguish failed refreshes (2026-09-10)
+## 2026-09-12: Background calculator rendering must not move keyboard focus
 
-- Problem/root cause: late pricing/stock and image uploads could apply to a newer editor; product filtering hid failed loads, and unknown stored categories disappeared from the select.
-- Solution: bind async reads to the current record/selection, capture save payloads before awaiting, hold editing controls while saving, retain freeform stored categories and show explicit list retry with unknown counts. A failed refresh after a successful save is a load error; an uncertain write must not claim nothing changed.
-- Prevention: compare original price tables, successful payloads and PDF text; mock delayed reads/uploads and every write, test pending double-submit, preserve locked fields after failure, and verify vendor arrays against the builders. Inspect actual phone controls and every paper page; source comments naming tests are not evidence those tests exist.
+Problem: screen-print price initialization could steal focus from thumbnails or another control. Root cause: rendering the small-order quantity field scheduled a delayed focus callback, just like explicit tier selection. Solution: render the field without focusing during refresh, and focus synchronously for explicit tier selection. Prevention: preserve keyboard focus through initialization and check the correct quantity field after choosing a small-order tier.
 
-Staff-tool follow-up: distinguish successful blog writes from failed canonical reloads and retain published slug locks; previews must belong to the latest body text. Reversal ledgers need unique full tags, not generic replacements such as hidden. Normalize selector whitespace when consolidating duplicate CSS, and inspect PDF backgrounds/focus rings as well as extracted text.
-
-Portal follow-up: scope delayed ledgers/calculations to their customer and invalidate each loop after a view change. Hold pending financial actions and display feedback inside the active dialog. Printing closed details can omit lines; render a plain paper copy, preserve screen disclosure state and keep modal print flow block-based. Repeated monetary values can conceal missing columns in whole-document text checks: verify amounts per page and inspect freshly named PNGs tied to the PDF hash. Read UTF-8 fixtures explicitly in Windows Python.
-
-Mailing/Past Due follow-up: failed or incomplete lists must remain unknown through filtering; missing rep groups cannot imply all clear. Hold form and outreach controls during pending requests, keep uncertain-write wording honest, and fail closed in preview stubs. Compare native CSV/label markup and per-page money; carry omission warnings from the board into repeated printed headings. Canonical visibility comes from components.css, and native file buttons/shared UiDialog replace legacy label/overlay mechanics: update structural guards while retaining browser behavior checks.
-
-### Drain-Pro tab ownership (2026-09-10)
-- Problem/root cause: switchTab relied on the browser global event, so a direct call could fail or clear both panels. Solution: resolve the target by tab ID before changing state; explicit selected/hidden semantics and arrow/Home/End navigation. Prevention: synthetic click, keyboard, direct-call and invalid-target browser checks; provider URLs stay unchanged.
-
-### Production schedule controls and paper (2026-09-10)
-- Problem/root cause: mobile rule cards kept a 240px minimum, header ghost links lost contrast on navy, detail dialogs did not contain focus, and 44px screen buttons expanded paper rows. Solution: bounded responsive grids, shared solid controls, inert/focus/scroll restoration and separate print row heights. Prevention: original/current ten-employee and four-department comparisons, four-width axe/scroll checks, modal keyboard tests and one-page PDF locks. Preserve data.js and policy prose; CSS case changes are presentation only.
-
-### Payroll upload ownership and cut-apart slips (2026-09-10)
-- Problem/root cause: changing the document while its upload/poll was in flight allowed a late response to restart the abandoned read. Solution: a generation and job check at every async boundary, with busy state beginning before file reading. Prevention: delayed synthetic upload/poll cancellation tests and unchanged import payload locks.
-- Shared screen line-height overflowed slip footnotes, while legacy 3.333in rows plus a border pushed six slots onto two pages. Keep paper line-height explicit and rows at 3.32in; verify all values, flags and footnotes plus six slots on one Letter sheet.
-
-Release-check follow-up (2026-09-10): update legacy integration expectations when a shared consumer adopts native dialogs, export/import failure-fixture constants explicitly, and give each local browser run exclusive ownership of its server. A reused server dies when its owning suite exits. Size CI from measured end-to-end duration while retaining short setup timeouts.
-
-Build-verification follow-up (2026-09-10): ESM bundle hashes can differ across Windows and Linux even when compiled code matches, because their linked source maps differ. Read the deployed asset manifest; verify compiled bodies after only source-map-reference/line-ending normalization, and validate every mapped source against the exact release commit. Do not treat a guessed local bundle filename404 as a broken live page.
-
-Calibration follow-up (2026-09-10): keep saved-layout failures visible while allowing copy-only review, bind late photos to the selected view, and hold editing during writes. Size the overlay as fractions of a shared photo frame: pixel offsets from screen layout drift when paper resizes the image. Check actual paper alignment as well as saved-coordinate equality; only use declared palette tokens and canonical field classes.
-
-Records Admin follow-up (2026-09-10): record original successful writes/CSV before changing controls; a saved session plus a failed item write is partial success, never complete. Retain load failure through filtering, hold pending actions and use saved data for status rollback. Native dialogs need explicit Tab containment. Give phone dates enough width and avoid shared heading aliases that hide print titles. Use split/join or a replacement callback for literal source rewrites: String.replace replacement strings interpret double dollar signs and can remove visible currency from template literals; original content locks catch this.
-
-Box-label follow-up (2026-09-10): a failed/new lookup must clear old printable data. Capture a draft key and serialized payload before a lookup changes state, flush it on pagehide, and warn if local storage fails. Hold the arrangement while refreshing/printing, scope Print anyway to its lookup, and reject incomplete refreshes. Repacking invalidates affected verification marks; provide a keyboard move for one-piece lines as well as multi-piece splits. Compare every paper page and original allocation, not only aggregate totals.
-
-### Staff home visibility and keyboard ownership (2026-09-10)
-- Problem/root cause: a display rule defeated Everything's hidden rows; welcome cleared inline display but retained hidden; Directory rendered an old search before clearing it, and a pending roster looked empty.
-- Solution: one scoped layout plus canonical hidden state, explicit welcome visibility, clear-before-filter ordering, and render open roster views when the read settles. Keep a separate library link outside summary, focusable directory scrolling and a real active descendant for palette selection.
-- Prevention: preserve original roles/links/values, distinguish loading/empty/failure, exercise reload/pins/disclosures and keyboard search at four widths. Historical UI fixtures still consume the legacy dashboard sheets; remove production links without breaking those fixtures.
-
-### Hosted employee lists need a bounded page and usable fallback (2026-09-10)
-- Problem/root cause: a wide provider table expanded the whole phone page; shared controls were duplicated by Bootstrap and two local sheets, and failed embeds left blank space.
-- Solution: share the wrapper owner and canonical controls, give the provider a labelled keyboard-scroll region plus an always-available direct destination, and keep provider markup/approval behavior externally owned. Remove focus outlines only on paper.
-- Prevention: original source/provider locks, wide DOM and iframe fixtures, delayed/failed/login/empty states, narrow-screen axe and every PDF page. Allow exact static font/icon CSS reads before rejecting other fetches in axe-aware mock handlers; use declared tokens such as radius-pill.
-
-### Customer invoice PDF exports need their own geometry and failure cleanup (2026-09-10)
-- Problem/root cause: PDF action was enabled before loading and failed silently; resized capture viewports clipped exports, scrolled phone captures were blank, and html2pdf kept an invisible blocking overlay after rendering failed.
-- Solution: enable after successful render, offer visible load/PDF retry, use an independent paper clone with explicit canvas scrollX/scrollY zero, and remove only the failed worker’s overlay. Keep financial values and date-only parsing unchanged.
-- Prevention: record original fields/amounts/links, test actual desktop and scrolled-phone downloads, raster ink/logo checks, real library failure/retry and every rendered PDF page. A successful download event is not proof that the invoice is visible. CSS scale tokens are not uniform multiples: space-8 is64px, not32px; validate every variable against the actual token file.
-
-### Compact invoice state must survive refresh and print (2026-09-10)
-- Problem/root cause: share links lost k, URL/storage flags exposed staff controls, one-way hiding and cached storefront blobs kept stale addresses/art, carrier overrides preceded terminal shipment state, and print display rules forced RUSH onto every invoice.
-- Solution: verify server identity, preserve quote tokens, reset optional fields/caches per full load, separate tracking links from send controls, guard pending actions and terminal shipments, use shared hidden state and named native dialogs with explicit trigger-focus restoration.
-- Prevention: original source/money/payload locks, fresh-versus-refreshed fixtures, delayed/failure/retry/duplicate cases, actual rush/cancelled paper, radio-group keyboard order and visual service-label review. Native showModal moves focus before shared helpers can capture the trigger; capture the trigger beforehand.
-
-### Quote documents need calendar dates, server identity and complete paper (2026-09-10)
-- Problem/root cause: invoice links dropped quote tokens, stale storage exposed staff controls, UTC parsing shifted requested calendar dates, and failed supplemental/sync reads left silent stale information. Wide tables hid money/sizes on phones and whole-table print avoidance created empty paper.
-- Solution: retain k through navigation, verify current server identity, format only calendar business dates locally, retain refresh warnings through print/retry, use labelled mobile cells, row-level paper pagination and native named dialogs with explicit focus return. Pending financial actions reject duplicates and expose errors inside the active dialog.
-- Prevention: freeze original values, request bodies and source hashes; compare rendered totals (the renderer replaces initial placeholder IDs), all four widths/axe, delayed/error/retry/keyboard paths, actual lazy art imports and every PDF page. Keep shared builder-print and garment-form owners unchanged until their other consumers migrate.
-
-Control-class follow-up: regex word boundaries treat hyphens as separators, so sw-action-btn falsely matches a check for the canonical btn class. Compare whitespace-delimited class tokens, assert real rendered target sizes, and inspect staff toolbars as well as public actions.
-
-### Cart text, storage and pending saves need explicit boundaries (2026-09-10)
-- Problem/root cause: stored garment names and checkout errors rendered as HTML, failed removals threw without a visible message, and the save trigger reopened a form while its previous save was pending.
-- Solution: escape rendered text/attributes without changing payload values; retain the cart with a focused storage error; guard and disable pending save entry points.
-- Prevention: immutable pricing/payload contracts plus harmless stored-markup, quota-error/retry and delayed duplicate-save browser probes. Artwork fieldsets need min-width:0 on phones; printed fields need matching control specificity, complete text/file references and review of every PDF page.
-
-### Confirmation timers need scheduling room in browser checks (2026-09-10)
-- Problem/root cause: a4.2-second UI toast occasionally exceeded a5-second test wait with three browsers active. Solution: allow10 seconds while still asserting the real dismissal; application timing stays unchanged. Prevention: compare immutable values after transient confirmation clears and repeat the failed case under the original worker load.
-- Redirect follow-up: a product401 navigates to sign-in while the harness waits for fonts. Wait for the expected login document to load before page evaluation; catching a destroyed execution context or retrying the whole test hides the race.
-
-### Heroku Git must use the trust store that verifies its certificate (2026-09-11)
-- Problem/root cause: the corporate OpenSSL CA verified GitHub but rejected git.heroku.com before upload. Solution: verify ls-remote with the Windows schannel backend, then use the same backend and sslVerify=true for the push. Prevention: never disable verification; prove the prior slug is unchanged after a transport failure, then verify the actual release, source assets and access after resuming.
-
-### Custom storefront recovery and paper must preserve the draft (2026-09-11)
-- Problem/root cause: Retry was registered only after successful boot, storage quota failures were silent, nested gallery controls swallowed keyboard activation, and custom summary sheets let focus escape. Fixed bars and trailing layout space broke paper.
-- Solution: wire Retry before requests, expose storage failure while retaining values, use native buttons/dialogs, mirror complete entered fields for print, and move contact information beside the letterhead with exact afterprint restoration.
-- Prevention: compare immutable prices/payloads, exercise first-load failure and quota recovery, verify background focus is inert (native Tab may reach browser chrome), and inspect every actual PDF page for missing notes, split totals and blank trailing sheets.
+Browser baselines must work from a fresh checkout. The tumbler export test previously depended on an ignored local original PNG. It now renders the preserved original controller in an isolated browser context and compares the actual download in the same browser, without changing immutable fixtures.

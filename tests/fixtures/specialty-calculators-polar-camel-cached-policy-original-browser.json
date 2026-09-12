@@ -1,0 +1,18 @@
+{
+  "table": "Quantity\tPrice Per Unit\n\n1-11\nSmall Order + $50 LTM fee\n\t\n$19.50\nper unit\n\n Less than minimum (LTM) fee of $50.00 applies to orders under 12 pieces. This covers personalized service and setup time for very small orders.\n\n12-23\nSmall Order\n\t\n$19.50\nper unit\n\n\n24-119\nStandard Order\n\t\n$18.50\nper unit\n\n\n120-239\nVolume Order\n\t\n$17.50\nper unit\n\n\n240+\nBulk Order\n\t\n$16.50\nper unit",
+  "quote": "8 × $19.00 per tumbler\n$152.00\nSmall-order fee (under 12 pieces)\n$65.00\nEstimated total\n$217.00\n\nIncludes one-location laser engraving. Plus any applicable charges listed above and sales tax.",
+  "mocked": [
+    {
+      "path": "/api/service-codes",
+      "method": "GET"
+    },
+    {
+      "path": "/api/manageorders/inventorylevels?PartNumber=LTM752&PartColor=Black",
+      "method": "GET"
+    },
+    {
+      "path": "/api/jds-catalog?category=Drinkware",
+      "method": "GET"
+    }
+  ]
+}

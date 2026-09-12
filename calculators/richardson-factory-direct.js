@@ -202,101 +202,63 @@ const CAP_LTM_FEE = 50.00;
 // API Initialization
 // ============================================================================
 
+function showRichardsonWarning(label) {
+    const warning = document.getElementById('richardsonDataWarning');
+    if (!warning) return;
+    const messages = warning.dataset.unavailable ? warning.dataset.unavailable.split('|') : [];
+    if (!messages.includes(label)) messages.push(label);
+    warning.dataset.unavailable = messages.join('|');
+    warning.textContent = `Unable to verify live ${messages.join(', ')}. Built-in values may be used. Refresh the page or contact your sales representative before quoting.`;
+    warning.hidden = false;
+}
+
+async function readRichardsonData(endpoint, label, validate) {
+    try {
+        const response = await fetch(`${RICHARDSON_API_BASE}${endpoint}`);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        if (!validate(data)) throw new Error('Incomplete pricing response');
+        return data;
+    } catch (error) {
+        console.error(`[Richardson] Unable to load ${label}:`, error);
+        showRichardsonWarning(label);
+        return null;
+    }
+}
+
 async function initializeRichardsonData() {
     if (richardsonDataInitialized) return;
-
-    richfactdireLog('[Richardson] Initializing data from API...');
-
-    try {
-        // Fetch SanMar Richardson styles (to filter out)
-        const sanmarResponse = await fetch(`${RICHARDSON_API_BASE}/api/decorated-cap-prices?brand=Richardson&tier=72%2B`);
-        if (sanmarResponse.ok) {
-            const sanmarData = await sanmarResponse.json();
-            sanmarRichardsonStyles = Object.keys(sanmarData.prices || {});
-            richfactdireLog(`[Richardson] Found ${sanmarRichardsonStyles.length} SanMar Richardson styles to filter out`);
-
-            // Filter capData to only show Richardson-direct styles
-            const originalCount = capData.length;
-            capData = allRichardsonCaps.filter(cap => !sanmarRichardsonStyles.includes(cap.style));
-            richfactdireLog(`[Richardson] Filtered caps: ${originalCount} -> ${capData.length}`);
-        }
-
-        // Fetch embroidery costs + cap margin from API
-        const embResponse = await fetch(`${RICHARDSON_API_BASE}/api/pricing-bundle?method=CAP&styleNumber=112`);
-        if (embResponse.ok) {
-            const embData = await embResponse.json();
-            if (embData.allEmbroideryCostsR && embData.allEmbroideryCostsR.length > 0) {
-                const apiCosts = {};
-                embData.allEmbroideryCostsR.forEach(cost => {
-                    const stitch = cost.StitchCount?.toString() || '8000';
-                    const tier = cost.TierLabel;
-                    if (!apiCosts[stitch]) apiCosts[stitch] = {};
-                    apiCosts[stitch][tier] = parseFloat(cost.EmbroideryCost);
-                });
-                if (Object.keys(apiCosts).length > 0) {
-                    embroideryCosts = apiCosts;
-                    richfactdireLog('[Richardson] Embroidery costs loaded from API');
-                }
-            }
-            // Cap margin denominator — mirror the Embroidery Quote Builder (tiersR[0].MarginDenominator)
-            if (embData.tiersR && embData.tiersR[0] && embData.tiersR[0].MarginDenominator) {
-                capMarginDenominator = parseFloat(embData.tiersR[0].MarginDenominator);
-                richfactdireLog(`[Richardson] Cap margin denominator loaded from API: ${capMarginDenominator}`);
-            }
-        }
-
-        // Fetch laser/leatherette patch upcharge ($5/cap) — method=PATCH, ItemType='Patch'
-        try {
-            const patchResponse = await fetch(`${RICHARDSON_API_BASE}/api/pricing-bundle?method=PATCH`);
-            if (patchResponse.ok) {
-                const patchData = await patchResponse.json();
-                const patchRecord = (patchData.allPatchCostsR || []).find(c => c.ItemType === 'Patch');
-                if (patchRecord && patchRecord.EmbroideryCost != null) {
-                    patchUpchargePerCap = parseFloat(patchRecord.EmbroideryCost);
-                    richfactdireLog(`[Richardson] Patch upcharge loaded from API: $${patchUpchargePerCap}`);
-                }
-            }
-        } catch (patchError) {
-            console.error('[Richardson] Patch upcharge load failed (using fallback):', patchError);
-        }
-
-        // Fetch 3D Puff upcharge ($5/cap) — method=CAP-PUFF, ItemType='3D-Puff'
-        try {
-            const puffResponse = await fetch(`${RICHARDSON_API_BASE}/api/pricing-bundle?method=CAP-PUFF`);
-            if (puffResponse.ok) {
-                const puffData = await puffResponse.json();
-                const puffRecord = (puffData.allEmbroideryCostsR || []).find(c => c.ItemType === '3D-Puff');
-                if (puffRecord && puffRecord.EmbroideryCost != null) {
-                    puffUpchargePerCap = parseFloat(puffRecord.EmbroideryCost);
-                    richfactdireLog(`[Richardson] 3D Puff upcharge loaded from API: $${puffUpchargePerCap}`);
-                }
-            }
-        } catch (puffError) {
-            console.error('[Richardson] 3D Puff upcharge load failed (using fallback):', puffError);
-        }
-
-        // Fetch patch setup fee (GRT-50, $50 one-time) — mirror the Embroidery Quote Builder
-        try {
-            const codesResponse = await fetch(`${RICHARDSON_API_BASE}/api/service-codes`);
-            if (codesResponse.ok) {
-                const codesData = await codesResponse.json();
-                const grt50 = (codesData.data || []).find(c => c.ServiceCode === 'GRT-50');
-                if (grt50 && grt50.SellPrice != null) {
-                    patchSetupFee = parseFloat(grt50.SellPrice);
-                    richfactdireLog(`[Richardson] Patch setup fee (GRT-50) loaded from API: $${patchSetupFee}`);
-                }
-            }
-        } catch (codesError) {
-            console.error('[Richardson] GRT-50 setup fee load failed (using fallback):', codesError);
-        }
-
-        richardsonDataInitialized = true;
-        richfactdireLog('[Richardson] Data initialization complete');
-
-    } catch (error) {
-        console.error('[Richardson] Error initializing data:', error);
-        richardsonDataInitialized = true;
+    const positive = value => Number.isFinite(parseFloat(value)) && parseFloat(value) > 0;
+    const nonnegative = value => Number.isFinite(parseFloat(value)) && parseFloat(value) >= 0;
+    const sanmarData = await readRichardsonData('/api/decorated-cap-prices?brand=Richardson&tier=72%2B', 'SanMar style availability', data => data && data.prices && typeof data.prices === 'object' && !Array.isArray(data.prices));
+    if (sanmarData) {
+        sanmarRichardsonStyles = Object.keys(sanmarData.prices);
+        capData = allRichardsonCaps.filter(cap => !sanmarRichardsonStyles.includes(cap.style));
     }
+    const embData = await readRichardsonData('/api/pricing-bundle?method=CAP&styleNumber=112', 'cap embroidery prices', data =>
+        data && Array.isArray(data.allEmbroideryCostsR) && positive(data.tiersR?.[0]?.MarginDenominator) &&
+        ['1-7', '8-23', '24-47', '48-71', '72+'].every(tier => data.allEmbroideryCostsR.some(cost => String(cost.StitchCount) === '8000' && cost.TierLabel === tier && positive(cost.EmbroideryCost))));
+    if (embData) {
+        const apiCosts = {};
+        embData.allEmbroideryCostsR.forEach(cost => {
+            const stitch = cost.StitchCount?.toString() || '8000';
+            if (!apiCosts[stitch]) apiCosts[stitch] = {};
+            apiCosts[stitch][cost.TierLabel] = parseFloat(cost.EmbroideryCost);
+        });
+        embroideryCosts = apiCosts;
+        capMarginDenominator = parseFloat(embData.tiersR[0].MarginDenominator);
+    }
+    const patchData = await readRichardsonData('/api/pricing-bundle?method=PATCH', 'patch upcharge', data => Array.isArray(data?.allPatchCostsR) && data.allPatchCostsR.some(row => row.ItemType === 'Patch' && nonnegative(row.EmbroideryCost)));
+    if (patchData) patchUpchargePerCap = parseFloat(patchData.allPatchCostsR.find(row => row.ItemType === 'Patch').EmbroideryCost);
+    const puffData = await readRichardsonData('/api/pricing-bundle?method=CAP-PUFF', 'puff upcharge', data => Array.isArray(data?.allEmbroideryCostsR) && data.allEmbroideryCostsR.some(row => row.ItemType === '3D-Puff' && nonnegative(row.EmbroideryCost)));
+    if (puffData) puffUpchargePerCap = parseFloat(puffData.allEmbroideryCostsR.find(row => row.ItemType === '3D-Puff').EmbroideryCost);
+    const codesData = await readRichardsonData('/api/service-codes', 'patch setup fee', data => Array.isArray(data?.data) && data.data.some(row => row.ServiceCode === 'GRT-50' && nonnegative(row.SellPrice)));
+    if (codesData) patchSetupFee = parseFloat(codesData.data.find(row => row.ServiceCode === 'GRT-50').SellPrice);
+    const patchLabel = document.querySelector('[data-richardson-upcharge="patch"]');
+    const puffLabel = document.querySelector('[data-richardson-upcharge="puff"]');
+    if (patchLabel) patchLabel.textContent = `Leatherette Patch (+$${patchUpchargePerCap.toFixed(2)}/cap)`;
+    if (puffLabel) puffLabel.textContent = `3D Puff (+$${puffUpchargePerCap.toFixed(2)}/cap)`;
+    richardsonDataInitialized = true;
 }
 
 // ============================================================================
@@ -353,8 +315,25 @@ class RichardsonPricingLookup {
     bindEvents() {
         // Style input with autocomplete
         this.capStyleInput.addEventListener('input', () => this.handleStyleInput());
-        this.capStyleInput.addEventListener('blur', () => {
-            setTimeout(() => this.styleAutocomplete.classList.add('hidden'), 200);
+        this.capStyleInput.closest('.autocomplete-wrapper').addEventListener('focusout', () => {
+            setTimeout(() => {
+                if (document.activeElement !== this.capStyleInput && !this.styleAutocomplete.contains(document.activeElement)) this.closeAutocomplete();
+            }, 0);
+        });
+        this.capStyleInput.closest('.autocomplete-wrapper').addEventListener('keydown', event => {
+            if (event.key === 'Escape') { this.closeAutocomplete(); this.capStyleInput.focus(); return; }
+            if (this.styleAutocomplete.classList.contains('hidden')) return;
+            const items = [...this.styleAutocomplete.querySelectorAll('button')];
+            if (!items.length || !['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
+            if (event.target === this.capStyleInput && ['Home', 'End'].includes(event.key)) return;
+            event.preventDefault();
+            const current = items.indexOf(document.activeElement);
+            const next = event.key === 'Home' ? 0 : event.key === 'End' ? items.length - 1 : (current + (event.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length;
+            items[next].focus();
+        });
+        this.capGrid.addEventListener('click', event => {
+            const button = event.target.closest('[data-select-cap]');
+            if (button) this.quickSelectCap(button.dataset.selectCap);
         });
 
         // Quantity input - real-time update
@@ -410,9 +389,11 @@ class RichardsonPricingLookup {
     handleStyleInput() {
         const value = this.capStyleInput.value.trim().toUpperCase();
         this.styleAutocomplete.innerHTML = '';
+        this.clearSelection();
+        this.capStyleInput.removeAttribute('aria-invalid');
 
         if (!value) {
-            this.styleAutocomplete.classList.add('hidden');
+            this.closeAutocomplete();
             this.clearSelection();
             return;
         }
@@ -424,25 +405,29 @@ class RichardsonPricingLookup {
         ).slice(0, 10);
 
         if (matches.length === 0) {
-            this.styleAutocomplete.classList.add('hidden');
+            this.closeAutocomplete();
             this.styleValidation.textContent = '';
             this.styleValidation.className = 'validation-indicator';
+            this.capStyleInput.setAttribute('aria-invalid', 'true');
+            this.styleDescription.textContent = 'No matching factory-direct style. Choose a matching cap to see pricing.';
             return;
         }
 
         // Show autocomplete
         matches.forEach(cap => {
-            const item = document.createElement('div');
+            const item = document.createElement('button');
+            item.type = 'button';
             item.className = 'autocomplete-item';
             item.innerHTML = `
                 <span class="autocomplete-style">${cap.style}</span>
                 <span class="autocomplete-description">${cap.description}</span>
             `;
-            item.addEventListener('click', () => this.selectCap(cap));
+            item.addEventListener('click', () => { this.selectCap(cap); this.quantityInput.focus(); });
             this.styleAutocomplete.appendChild(item);
         });
 
         this.styleAutocomplete.classList.remove('hidden');
+        this.capStyleInput.setAttribute('aria-expanded', 'true');
 
         // Check for exact match
         const exactMatch = capData.find(cap => cap.style.toUpperCase() === value);
@@ -452,6 +437,7 @@ class RichardsonPricingLookup {
     }
 
     selectCap(cap, hideAutocomplete = true) {
+        this.capStyleInput.removeAttribute('aria-invalid');
         this.selectedCap = cap;
         this.capStyleInput.value = cap.style;
         this.styleDescription.textContent = `${cap.description} - $${cap.price.toFixed(2)} blank`;
@@ -459,10 +445,15 @@ class RichardsonPricingLookup {
         this.styleValidation.className = 'validation-indicator valid';
 
         if (hideAutocomplete) {
-            this.styleAutocomplete.classList.add('hidden');
+            this.closeAutocomplete();
         }
 
         this.updatePricing();
+    }
+
+    closeAutocomplete() {
+        this.styleAutocomplete.classList.add('hidden');
+        this.capStyleInput.setAttribute('aria-expanded', 'false');
     }
 
     clearSelection() {
@@ -686,7 +677,7 @@ class RichardsonPricingLookup {
                         <p class="cap-description">${cap.description}</p>
                         <p class="cap-price">$${cap.price.toFixed(2)} blank</p>
                     </div>
-                    <button type="button" class="quick-select-btn" onclick="window.richardsonPricing.quickSelectCap('${cap.style}')">
+                    <button type="button" class="quick-select-btn btn-primary" data-select-cap="${cap.style}">
                         <i class="fas fa-check" aria-hidden="true"></i> Select
                     </button>
                 </div>
@@ -705,10 +696,8 @@ class RichardsonPricingLookup {
 
         // Scroll to top and focus quantity
         window.scrollTo({ top: 0, behavior: 'smooth' });
-        setTimeout(() => {
-            this.quantityInput.focus();
-            this.quantityInput.select();
-        }, 300);
+        this.quantityInput.focus();
+        this.quantityInput.select();
     }
 }
 

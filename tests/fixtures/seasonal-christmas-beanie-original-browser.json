@@ -1,0 +1,205 @@
+{
+  "mode": "beanie",
+  "states": [
+    {
+      "width": 1440,
+      "text": "❄ ❅ ❆ 🎅 Offer Expires In 🎅 00 DAYS : 00 HOURS : 00 MINUTES : 00 SECONDS 🎅 Offer Has Ended - Contact Us for Current Promotions! 🎅 Gift Box Value: $241 Your Cost: FREE! You Save: $241 🎄 Christmas Bundle Pricing 2025 Rain Defender: $213 | Detroit: $258 | Storm Defender: $295 Each bundle includes: Jacket • Hoodie • Beanie • Gloves • Gift Box with custom embroidery Volume pricing available for 8+ bundles 1 Select Jacket 2 Select Hoodie 3 Select Beanie 4 Select Gloves 5 Customize 6 Delivery Info 7 Review Choose Your Beanie Select your winter beanie CT104597 Carhartt Watch Cap 2 $35 value FREE! Soft to the touch this timeless cap is stretchy rib knit for a stay-put fit. 100% acrylic stre... SELECT COLOR:* SELECT SIZE:* One Size Select This Beanie Back Continue Your Gift Box This is a FREE promotional gift box! Carhartt Storm Defender Shoreline Jacket CT104670 CT104670 • L • Black Carhartt Midweight Hooded Sweatshirt CTK121 • L • Heather Grey Carhartt Work Gloves CTGD0794 • Size not selected • Included",
+      "fields": [],
+      "totals": {
+        "quantity": 2,
+        "retail": 266,
+        "unit": 266
+      },
+      "overflow": false,
+      "missingImages": [],
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "div[data-step=\"4\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"5\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"6\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"7\"] > .step-title"
+            ],
+            [
+              "div[data-product-id=\"CT104597\"] > .product-info > .product-price > .retail-value"
+            ],
+            [
+              "div[data-product-id=\"CT104597\"] > .product-info > .product-price > .free-badge"
+            ],
+            [
+              "button[data-size=\"One Size\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "text": "❄ ❅ ❆ 🎅 Offer Expires In 🎅 00 DAYS : 00 HOURS : 00 MINUTES : 00 SECONDS 🎅 Offer Has Ended - Contact Us for Current Promotions! 🎅 Gift Box Value: $241 Your Cost: FREE! You Save: $241 🎄 Christmas Bundle Pricing 2025 Rain Defender: $213 | Detroit: $258 | Storm Defender: $295 Each bundle includes: Jacket • Hoodie • Beanie • Gloves • Gift Box with custom embroidery Volume pricing available for 8+ bundles 1 Select Jacket 2 Select Hoodie 3 Select Beanie 4 Select Gloves 5 Customize 6 Delivery Info 7 Review Choose Your Beanie Select your winter beanie CT104597 Carhartt Watch Cap 2 $35 value FREE! Soft to the touch this timeless cap is stretchy rib knit for a stay-put fit. 100% acrylic stre... SELECT COLOR:* SELECT SIZE:* One Size Select This Beanie Back Continue Your Gift Box This is a FREE promotional gift box! Carhartt Storm Defender Shoreline Jacket CT104670 CT104670 • L • Black Carhartt Midweight Hooded Sweatshirt CTK121 • L • Heather Grey Carhartt Work Gloves CTGD0794 • Size not selected • Included",
+      "fields": [],
+      "totals": {
+        "quantity": 2,
+        "retail": 266,
+        "unit": 266
+      },
+      "overflow": false,
+      "missingImages": [],
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "div[data-step=\"4\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"5\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"6\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"7\"] > .step-title"
+            ],
+            [
+              "div[data-product-id=\"CT104597\"] > .product-info > .product-price > .retail-value"
+            ],
+            [
+              "div[data-product-id=\"CT104597\"] > .product-info > .product-price > .free-badge"
+            ],
+            [
+              "button[data-size=\"One Size\"]"
+            ],
+            [
+              ".summary-item:nth-child(3) > .summary-item-details > .summary-item-name"
+            ],
+            [
+              ".summary-item:nth-child(3) > .summary-item-details > .summary-item-specs"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "text": "❄ ❅ ❆ 🎅 Offer Expires In 🎅 00 DAYS : 00 HOURS : 00 MINUTES : 00 SECONDS 🎅 Offer Has Ended - Contact Us for Current Promotions! 🎅 Gift Box Value: $241 Your Cost: FREE! You Save: $241 🎄 Christmas Bundle Pricing 2025 Rain Defender: $213 | Detroit: $258 | Storm Defender: $295 Each bundle includes: Jacket • Hoodie • Beanie • Gloves • Gift Box with custom embroidery Volume pricing available for 8+ bundles 1 Select Jacket 2 Select Hoodie 3 Select Beanie 4 Select Gloves 5 Customize 6 Delivery Info 7 Review Choose Your Beanie Select your winter beanie CT104597 Carhartt Watch Cap 2 $35 value FREE! Soft to the touch this timeless cap is stretchy rib knit for a stay-put fit. 100% acrylic stre... SELECT COLOR:* SELECT SIZE:* One Size Select This Beanie Back Continue Your Gift Box This is a FREE promotional gift box! Carhartt Storm Defender Shoreline Jacket CT104670 CT104670 • L • Black Carhartt Midweight Hooded Sweatshirt CTK121 • L • Heather Grey Carhartt Work Gloves CTGD0794 • Size not selected • Included",
+      "fields": [],
+      "totals": {
+        "quantity": 2,
+        "retail": 266,
+        "unit": 266
+      },
+      "overflow": false,
+      "missingImages": [],
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "div[data-step=\"4\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"5\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"6\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"7\"] > .step-title"
+            ],
+            [
+              "div[data-product-id=\"CT104597\"] > .product-info > .product-price > .retail-value"
+            ],
+            [
+              "div[data-product-id=\"CT104597\"] > .product-info > .product-price > .free-badge"
+            ],
+            [
+              "button[data-size=\"One Size\"]"
+            ],
+            [
+              ".summary-item:nth-child(3) > .summary-item-details > .summary-item-name"
+            ],
+            [
+              ".summary-item:nth-child(3) > .summary-item-details > .summary-item-specs"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "text": "❄ ❅ ❆ 🎅 Offer Expires In 🎅 00 DAYS : 00 HOURS : 00 MINUTES : 00 SECONDS 🎅 Offer Has Ended - Contact Us for Current Promotions! 🎅 Gift Box Value: $241 Your Cost: FREE! You Save: $241 🎄 Christmas Bundle Pricing 2025 Rain Defender: $213 | Detroit: $258 | Storm Defender: $295 Each bundle includes: Jacket • Hoodie • Beanie • Gloves • Gift Box with custom embroidery Volume pricing available for 8+ bundles 1 Select Jacket 2 Select Hoodie 3 Select Beanie 4 Select Gloves 5 Customize 6 Delivery Info 7 Review Choose Your Beanie Select your winter beanie CT104597 Carhartt Watch Cap 2 $35 value FREE! Soft to the touch this timeless cap is stretchy rib knit for a stay-put fit. 100% acrylic stre... SELECT COLOR:* SELECT SIZE:* One Size Select This Beanie Back Continue Your Gift Box This is a FREE promotional gift box! Carhartt Storm Defender Shoreline Jacket CT104670 CT104670 • L • Black Carhartt Midweight Hooded Sweatshirt CTK121 • L • Heather Grey Carhartt Work Gloves CTGD0794 • Size not selected • Included",
+      "fields": [],
+      "totals": {
+        "quantity": 2,
+        "retail": 266,
+        "unit": 266
+      },
+      "overflow": false,
+      "missingImages": [],
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "div[data-step=\"4\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"5\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"6\"] > .step-title"
+            ],
+            [
+              "div[data-product-id=\"CT104597\"] > .product-info > .product-price > .retail-value"
+            ],
+            [
+              "div[data-product-id=\"CT104597\"] > .product-info > .product-price > .free-badge"
+            ],
+            [
+              "button[data-size=\"One Size\"]"
+            ],
+            [
+              ".summary-item:nth-child(3) > .summary-item-details > .summary-item-name"
+            ],
+            [
+              ".summary-item:nth-child(3) > .summary-item-details > .summary-item-specs"
+            ]
+          ]
+        },
+        {
+          "id": "scrollable-region-focusable",
+          "nodes": [
+            [
+              ".progress-steps"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "events": {
+    "errors": [],
+    "writes": [],
+    "unknown": [
+      "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+      "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
+      "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+      "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
+      "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+      "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
+      "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+      "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    ],
+    "dialogs": []
+  },
+  "emails": [],
+  "diagnostic": "Original swatch pointer interception is preserved in christmas-original-flow.log. Dispatch swatch click and use native keyboard buttons to inspect the original deeper flow without changing CSS."
+}

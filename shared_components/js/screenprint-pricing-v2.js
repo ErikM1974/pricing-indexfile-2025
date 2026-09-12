@@ -773,13 +773,13 @@ class ScreenPrintPricing {
     /**
      * Expand the exact-quantity input of an LTM tier (rendered by renderTierButtons)
      */
-    expandLTMTier(tier, defaultQty) {
+    expandLTMTier(tier, defaultQty, focusInput = true) {
         const container = document.querySelector(`[data-tier-container="${tier}"]`);
         if (!container) return;
         container.classList.add('show');
         const input = document.getElementById(`sp-qty-${tier}`);
         if (input && !input.value) input.value = defaultQty;
-        setTimeout(() => { if (input) { input.focus(); input.select(); } }, 100);
+        if (focusInput && input) { input.focus(); input.select(); }
         this.state.expandedLTMTier = tier;
     }
 
@@ -982,7 +982,7 @@ class ScreenPrintPricing {
         this.state.selectedTier = current;
         this.updateTierButtons();
         if (tier && tier.LTM_Fee > 0) {
-            this.expandLTMTier(current, tier.MinQuantity);
+            this.expandLTMTier(current, tier.MinQuantity, false);
             const input = document.getElementById(`sp-qty-${current}`);
             if (input) { input.value = this.state.quantity; this.renderLtmCalc(current, this.state.quantity, tier.LTM_Fee); }
         }

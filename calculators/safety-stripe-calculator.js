@@ -72,8 +72,7 @@ let currentDesign = {
     backImage: ''
 };
 
-// Initialize EmailJS
-emailjs.init(((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.EMAIL && window.APP_CONFIG.EMAIL.PUBLIC_KEY) || ''));
+// The design save is the only delivery action on this page.
 
 // Initialize quote service
 const quoteService = new SafetyStripeQuoteService();
@@ -85,11 +84,14 @@ function formatOptionName(option) {
 
 // Select stripe style
 function selectStripeStyle(style) {
+    if (savingDesign) return;
     // Update selection state
     document.querySelectorAll('.stripe-option').forEach(el => {
         el.classList.remove('selected');
+        el.setAttribute('aria-pressed', 'false');
     });
     document.querySelector(`[data-style="${style}"]`).classList.add('selected');
+    document.querySelector(`[data-style="${style}"]`).setAttribute('aria-pressed', 'true');
     
     // Update current design
     currentDesign.style = style;
@@ -97,28 +99,28 @@ function selectStripeStyle(style) {
     currentDesign.back = 'JustStripes';
     
     // Show design area
-    document.getElementById('designArea').style.display = 'grid';
-    document.getElementById('actionSection').style.display = 'block';
+    document.getElementById('designArea').hidden = false;
+    document.getElementById('actionSection').hidden = false;
     
     // Load options for this style
     loadOptions('front', style);
     loadOptions('back', style);
     
     // Scroll to design area
-    document.getElementById('designArea').scrollIntoView({ behavior: 'smooth' });
+    document.getElementById('designArea').scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
 }
 
 // Load placement options
 function loadOptions(side, style) {
     const container = document.getElementById(`${side}Options`);
-    const preview = document.getElementById(`${side}Preview`);
     const options = STRIPE_IMAGES[style][side];
     
     container.innerHTML = '';
     
     Object.entries(options).forEach(([option, imageUrl]) => {
-        const optionEl = document.createElement('div');
-        optionEl.className = 'placement-option';
+        const optionEl = document.createElement('button');
+        optionEl.type = 'button';
+        optionEl.className = 'btn placement-option';
         optionEl.dataset.option = option;
         optionEl.onclick = () => selectOption(side, option);
         
@@ -136,14 +138,20 @@ function loadOptions(side, style) {
 
 // Select placement option
 function selectOption(side, option) {
+    if (savingDesign) return;
+    document.getElementById('stripePaperStatus').textContent = '';
+    document.getElementById('stripeSaveStatus').textContent = '';
+    document.getElementById('stripeSaveStatus').hidden = true;
     const container = document.getElementById(`${side}Options`);
     const preview = document.getElementById(`${side}Preview`);
     
     // Update selection state
     container.querySelectorAll('.placement-option').forEach(el => {
         el.classList.remove('selected');
+        el.setAttribute('aria-pressed', 'false');
     });
     container.querySelector(`[data-option="${option}"]`).classList.add('selected');
+    container.querySelector(`[data-option="${option}"]`).setAttribute('aria-pressed', 'true');
     
     // Update preview and state
     const imageUrl = STRIPE_IMAGES[currentDesign.style][side][option];
@@ -152,195 +160,147 @@ function selectOption(side, option) {
     currentDesign[`${side}Image`] = imageUrl;
 }
 
-// Open send modal
+let savingDesign = false;
+let copyGeneration = 0;
+
+// Dialogs retain drafts on cancel and own focus through the native browser lifecycle.
 function openSendModal() {
-    if (!currentDesign.style) {
-        alert('Please select a stripe style first');
-        return;
-    }
-    
-    // Update summary
+    if (savingDesign || !currentDesign.style) return;
     document.getElementById('summaryStyle').textContent = currentDesign.style;
     document.getElementById('summaryFront').textContent = formatOptionName(currentDesign.front);
     document.getElementById('summaryBack').textContent = formatOptionName(currentDesign.back);
-    
-    // Show modal
-    document.getElementById('sendModal').classList.add('show');
+    const modal = document.getElementById('sendModal');
+    if (!modal.open) modal.showModal();
 }
-
-// Close send modal
 function closeSendModal() {
-    document.getElementById('sendModal').classList.remove('show');
-    document.getElementById('sendForm').reset();
+    if (!savingDesign) document.getElementById('sendModal').close();
 }
-
-// Get sales rep name from email
-function getSalesRepName(email) {
-    const reps = {
-        'ruth@nwcustomapparel.com': 'Ruth Nhong',
-        'taylar@nwcustomapparel.com': 'Taylar',
-        'nika@nwcustomapparel.com': 'Nika',
-        'erik@nwcustomapparel.com': 'Erik',
-        'adriyella@nwcustomapparel.com': 'Adriyella',
-        'bradley@nwcustomapparel.com': 'Bradley',
-        'jim@nwcustomapparel.com': 'Jim',
-        'art@nwcustomapparel.com': 'Steve (Artist)'
-    };
-    return reps[email] || 'Sales Team';
+function showSaveFailure(message) {
+    const status = document.getElementById('stripeSaveStatus');
+    status.textContent = message;
+    document.getElementById('stripePaperStatus').textContent = message;
+    status.hidden = false;
 }
-
-// Handle form submission
+function setSaving(saving) {
+    savingDesign = saving;
+    const form = document.getElementById('sendForm');
+    form.setAttribute('aria-busy', String(saving));
+    form.querySelectorAll('input, select, textarea, button').forEach(node => { node.disabled = saving; });
+    document.getElementById('sendButton').textContent = saving ? 'Saving design…' : 'Save Design';
+}
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('sendForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const sendButton = document.getElementById('sendButton');
-        const originalContent = sendButton.innerHTML;
-        
+    const form = document.getElementById('sendForm');
+    const modal = document.getElementById('sendModal');
+    modal.addEventListener('cancel', event => { if (savingDesign) event.preventDefault(); });
+    for (const dialog of document.querySelectorAll('.stripe-dialog')) {
+        dialog.addEventListener('keydown', event => {
+            if (event.key !== 'Tab') return;
+            const controls = [...dialog.querySelectorAll('button, input, select, textarea, a[href]')].filter(node => !node.disabled && node.getClientRects().length);
+            const first = controls[0], last = controls.at(-1);
+            if (controls.length && (event.shiftKey ? document.activeElement === first : document.activeElement === last)) {
+                event.preventDefault();
+                (event.shiftKey ? last : first).focus();
+            }
+        });
+    }
+
+    form.addEventListener('submit', async event => {
+        event.preventDefault();
+        if (savingDesign || !form.reportValidity()) return;
+        const designData = {
+            customerName: document.getElementById('customerName').value.trim(),
+            customerEmail: document.getElementById('customerEmail').value.trim(),
+            customerPhone: document.getElementById('customerPhone').value.trim(),
+            companyName: document.getElementById('companyName').value.trim(),
+            salesRepEmail: document.getElementById('salesRep').value,
+            message: document.getElementById('customMessage').value.trim(),
+            stripeStyle: currentDesign.style,
+            frontOption: currentDesign.front,
+            backOption: currentDesign.back,
+            frontImage: currentDesign.frontImage,
+            backImage: currentDesign.backImage
+        };
+        setSaving(true);
+        document.getElementById('stripeSaveStatus').hidden = true;
         try {
-            // Show loading state
-            sendButton.disabled = true;
-            sendButton.innerHTML = '<span class="loading"></span> Sending...';
-            
-            // Get form data
-            const designData = {
-                customerName: document.getElementById('customerName').value.trim(),
-                customerEmail: document.getElementById('customerEmail').value.trim(),
-                customerPhone: document.getElementById('customerPhone').value.trim(),
-                companyName: document.getElementById('companyName').value.trim(),
-                salesRepEmail: document.getElementById('salesRep').value,
-                message: document.getElementById('customMessage').value.trim(),
-                
-                // Design details
-                stripeStyle: currentDesign.style,
-                frontOption: currentDesign.front,
-                backOption: currentDesign.back,
-                frontImage: currentDesign.frontImage,
-                backImage: currentDesign.backImage
-            };
-            
-            // Save to database. The save and the confirmation email are INDEPENDENT
-            // operations — an email failure must never mask a saved design
-            // (2026-07-01, same fix as the SCP calculator). Especially important here
-            // because the EmailJS template below is still a placeholder, so the email
-            // currently fails on every submit even though the design saves fine.
-            const saveResult = await quoteService.saveDesign(designData);
-            const quoteID = saveResult.quoteID;
-            const saved = !!saveResult.success;
-
-            if (!saved) {
-                console.error('Database save warning:', saveResult.error);
-            }
-
-            // Send email - ALL variables must have values (never empty)
-            const emailData = {
-                // Email routing
-                to_email: designData.customerEmail,
-                from_name: 'Northwest Custom Apparel',
-                reply_to: designData.salesRepEmail,
-                
-                // Quote details
-                quote_id: quoteID,
-                quote_type: 'Safety Stripe Design',
-                quote_date: new Date().toLocaleDateString(),
-                
-                // Customer info
-                customer_name: designData.customerName,
-                customer_email: designData.customerEmail,
-                company_name: designData.companyName || 'Not Provided',
-                customer_phone: designData.customerPhone || 'Not Provided',
-                
-                // Design details
-                stripe_style: designData.stripeStyle,
-                front_option: formatOptionName(designData.frontOption),
-                back_option: formatOptionName(designData.backOption),
-                
-                // Image URLs
-                front_image_url: designData.frontImage,
-                back_image_url: designData.backImage,
-                
-                // Message - NEVER empty string to avoid EmailJS corruption
-                custom_message: designData.message || 'Thank you for your interest in our safety stripe shirts! I look forward to helping you with your order.',
-                
-                // Sales rep
-                sales_rep_email: designData.salesRepEmail,
-                sales_rep_name: getSalesRepName(designData.salesRepEmail),
-                sales_rep_phone: '253-922-5793',
-                
-                // Company
-                company_year: '1977'
-            };
-            
-            // Confirmation email removed 2026-07-05: the 'template_stripe' EmailJS template was
-            // never created (placeholder stub with a TODO), so this send always silently 400'd.
-            // The design save is the source of truth for a successful submission.
-            if (saved) {
-                showSuccess(quoteID);
-                closeSendModal();
+            const result = await quoteService.saveDesign(designData);
+            if (result.success) {
+                form.reset();
+                modal.close();
+                showSuccess(result.quoteID);
             } else {
-                alert('Unable to submit the design. Please try again or call (253) 922-5793.');
+                const reference = result.sessionSaved ? ' Reference: ' + result.quoteID + '.' : '';
+                showSaveFailure('Unable to save the complete design. Your information is still here. Try Save Design again or call (253) 922-5793.' + reference);
             }
-
         } catch (error) {
-            console.error('Error sending design:', error);
-            alert('Failed to send design. Please try again.');
+            console.error('Unable to save design:', error);
+            showSaveFailure('Unable to save the design. Your information is still here. Please try again.');
         } finally {
-            sendButton.disabled = false;
-            sendButton.innerHTML = originalContent;
+            setSaving(false);
         }
     });
+    function markUnavailable(img) {
+        if (!(img instanceof HTMLImageElement) || !img.getAttribute('src')) return;
+        img.hidden = true;
+        img.dataset.previewUnavailable = 'true';
+        if (!img.parentElement.querySelector('.stripe-image-placeholder')) {
+            const placeholder = document.createElement('span');
+            placeholder.className = 'stripe-image-placeholder';
+            placeholder.textContent = img.closest('.shirt-preview') ? 'Preview unavailable' : 'Image unavailable';
+            img.before(placeholder);
+        }
+        const warning = document.getElementById('stripeImageWarning');
+        warning.textContent = 'A design preview could not load. Refresh the page to check the artwork before saving.';
+        warning.hidden = false;
+    }
+    document.addEventListener('error', event => markUnavailable(event.target), true);
+    document.addEventListener('load', event => {
+        const img = event.target;
+        if (!(img instanceof HTMLImageElement) || !img.dataset.previewUnavailable) return;
+        img.hidden = false;
+        delete img.dataset.previewUnavailable;
+        img.parentElement.querySelector('.stripe-image-placeholder')?.remove();
+        document.getElementById('stripeImageWarning').hidden = !document.querySelector('img[data-preview-unavailable]');
+    }, true);
+    document.querySelectorAll('img[src]').forEach(img => {
+        if (img.getAttribute('src') && img.complete && !img.naturalWidth) markUnavailable(img);
+    });
 });
-
-// Show success modal
 function showSuccess(quoteID) {
+    copyGeneration++;
     document.getElementById('quoteIdDisplay').textContent = quoteID;
-    document.getElementById('successModal').classList.add('show');
+    document.getElementById('stripeCopyStatus').textContent = '';
+    document.getElementById('stripePaperStatus').textContent = 'Design saved. Reference: ' + quoteID + '. No customer email has been sent.';
+    document.getElementById('successModal').showModal();
 }
-
-// Close success modal
 function closeSuccessModal() {
-    document.getElementById('successModal').classList.remove('show');
+    copyGeneration++;
+    document.getElementById('successModal').close();
 }
-
-// Copy quote ID
-function copyQuoteId() {
+async function copyQuoteId() {
+    const generation = ++copyGeneration;
     const quoteId = document.getElementById('quoteIdDisplay').textContent;
-    navigator.clipboard.writeText(quoteId).then(() => {
-        const btn = event.target.closest('button');
-        const originalText = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i> Copied!';
-        setTimeout(() => {
-            btn.innerHTML = originalText;
-        }, 2000);
-    });
+    const modal = document.getElementById('successModal');
+    try {
+        await navigator.clipboard.writeText(quoteId);
+        if (generation === copyGeneration && modal.open) document.getElementById('stripeCopyStatus').textContent = 'Reference copied.';
+    } catch (error) {
+        if (generation === copyGeneration && modal.open) document.getElementById('stripeCopyStatus').textContent = 'Unable to copy. Select the reference number and copy it manually.';
+    }
 }
-
-// Start new design
 function startNewDesign() {
-    // Reset everything
-    currentDesign = {
-        style: '',
-        front: '',
-        back: '',
-        frontImage: '',
-        backImage: ''
-    };
-    
-    // Reset UI
-    document.querySelectorAll('.stripe-option').forEach(el => {
-        el.classList.remove('selected');
+    if (savingDesign) return;
+    currentDesign = {style: '', front: '', back: '', frontImage: '', backImage: ''};
+    document.querySelectorAll('.stripe-option').forEach(node => {
+        node.classList.remove('selected');
+        node.setAttribute('aria-pressed', 'false');
     });
-    document.getElementById('designArea').style.display = 'none';
-    document.getElementById('actionSection').style.display = 'none';
-    
-    // Close modal and scroll to top
+    document.getElementById('designArea').hidden = true;
+    document.getElementById('actionSection').hidden = true;
+    document.getElementById('sendForm').reset();
+    document.getElementById('stripeSaveStatus').hidden = true;
     closeSuccessModal();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.getElementById('stripePaperStatus').textContent = '';
+    document.querySelector('.stripe-option').focus();
+    window.scrollTo({top: 0, behavior: 'instant'});
 }
-
-// Stripe tiles are role=button (were inline onclick= divs); Enter/Space selects like a click
-document.addEventListener('keydown', function (e) {
-    if (e.key !== 'Enter' && e.key !== ' ') return;
-    var tile = e.target && e.target.closest && e.target.closest('.stripe-option[data-style]');
-    if (tile) { e.preventDefault(); selectStripeStyle(tile.dataset.style); }
-});

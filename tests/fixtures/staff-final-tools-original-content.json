@@ -2640,6 +2640,13 @@
       "before": "/tools/custom-tees-calibrate.js?v=2026.09.06.31",
       "after": "/tools/custom-tees-calibrate.js?v=2026.09.10.7",
       "count": 1
+    },
+    {
+      "file": "staff-dashboard-v3/index.html",
+      "before": "Christmas Gift Boxes</span><span class=\"ws-d\">seasonal Carhartt gift-box builder",
+      "after": "Christmas Gift Boxes 2026</span><span class=\"ws-d\">build this year’s Carhartt gift box",
+      "count": 1,
+      "reason": "User requested 2026 gift-box staff-dashboard link. Renew existing entry, preserving its destination."
     }
   ],
   "retiredStyles": [

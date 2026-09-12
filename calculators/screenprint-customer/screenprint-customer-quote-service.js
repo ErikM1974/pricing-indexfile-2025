@@ -13,6 +13,7 @@ class CustomerScreenPrintQuoteService extends BaseQuoteService {
             storagePrefix: 'customer_screenprint',
             sessionPrefix: 'spc_sess'
         });
+        this.savedStages = new Map();
     }
 
     /**
@@ -37,14 +38,21 @@ class CustomerScreenPrintQuoteService extends BaseQuoteService {
                 throw new Error('saveQuote() requires quoteData.quoteId (the ID already shown to the customer).');
             }
             const quoteID = quoteData.quoteId;
-            const sessionID = this.generateSessionID();
-            
+            const key = JSON.stringify(quoteData);
+            let progress = this.savedStages.get(quoteID);
+            if (progress && progress.key !== key) throw new Error('A quote ID cannot be reused for changed details.');
+            if (!progress) {
+                progress = {key, sessionID: this.generateSessionID()};
+                this.savedStages.set(quoteID, progress);
+            }
+            const sessionID = progress.sessionID;
+
             screcustquotLog('[CustomerScreenPrintQuoteService] Saving quote with ID:', quoteID);
 
             // Step 1: Create quote session
             const expiresAtDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
             const formattedExpiresAt = expiresAtDate.toISOString().replace(/\.\d{3}Z$/, '');
-            
+
             const sessionData = {
                 QuoteID: quoteID,
                 SessionID: sessionID,
@@ -63,44 +71,49 @@ class CustomerScreenPrintQuoteService extends BaseQuoteService {
 
             screcustquotLog('[CustomerScreenPrintQuoteService] Session data:', sessionData);
 
-            const sessionResponse = await fetch(`${this.baseURL}/api/quote_sessions`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(sessionData)
-            });
+            if (!progress.sessionSaved) {
+                const sessionResponse = await fetch(`${this.baseURL}/api/quote_sessions`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(sessionData)
+                });
 
-            // Get response text first to see error details
-            const responseText = await sessionResponse.text();
-            screcustquotLog('[CustomerScreenPrintQuoteService] Session response status:', sessionResponse.status);
-            screcustquotLog('[CustomerScreenPrintQuoteService] Session response text:', responseText);
+                // Get response text first to see error details
+                const responseText = await sessionResponse.text();
+                screcustquotLog('[CustomerScreenPrintQuoteService] Session response status:', sessionResponse.status);
+                screcustquotLog('[CustomerScreenPrintQuoteService] Session response text:', responseText);
 
-            if (!sessionResponse.ok) {
-                let errorMessage = `Session creation failed: ${sessionResponse.status}`;
-                try {
-                    const errorData = JSON.parse(responseText);
-                    errorMessage = errorData.message || errorData.error || errorMessage;
-                } catch (e) {
-                    errorMessage += ` - ${responseText}`;
+                if (!sessionResponse.ok) {
+                    let errorMessage = `Session creation failed: ${sessionResponse.status}`;
+                    try {
+                        const errorData = JSON.parse(responseText);
+                        errorMessage = errorData.message || errorData.error || errorMessage;
+                    } catch (e) {
+                        errorMessage += ` - ${responseText}`;
+                    }
+                    throw new Error(errorMessage);
                 }
-                throw new Error(errorMessage);
-            }
 
-            // Parse successful response
-            let sessionResult;
-            try {
-                sessionResult = JSON.parse(responseText);
-            } catch (e) {
-                console.error('[CustomerScreenPrintQuoteService] Failed to parse success response:', e);
-                sessionResult = { success: true, message: responseText };
+                // Parse successful response
+                let sessionResult;
+                try {
+                    sessionResult = JSON.parse(responseText);
+                } catch (e) {
+                    console.error('[CustomerScreenPrintQuoteService] Failed to parse success response:', e);
+                    sessionResult = { success: true, message: responseText };
+                }
+
+                screcustquotLog('[CustomerScreenPrintQuoteService] Session created:', sessionResult);
+
+                progress.sessionSaved = true;
+                progress.sessionResult = sessionResult;
             }
-            
-            screcustquotLog('[CustomerScreenPrintQuoteService] Session created:', sessionResult);
 
             // Step 2: Add item to quote
             const addedAt = new Date().toISOString().replace(/\.\d{3}Z$/, '');
-            
+
             // Build product description
             let productName = 'Customer Supplied Screen Print';
             if (quoteData.isDarkGarment) {
@@ -144,27 +157,31 @@ class CustomerScreenPrintQuoteService extends BaseQuoteService {
 
             screcustquotLog('[CustomerScreenPrintQuoteService] Item data:', itemData);
 
-            const itemResponse = await fetch(`${this.baseURL}/api/quote_items`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(itemData)
-            });
+            if (!progress.itemSaved) {
+                const itemResponse = await fetch(`${this.baseURL}/api/quote_items`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(itemData)
+                });
 
-            const itemResponseText = await itemResponse.text();
-            screcustquotLog('[CustomerScreenPrintQuoteService] Item response status:', itemResponse.status);
-            screcustquotLog('[CustomerScreenPrintQuoteService] Item response text:', itemResponseText);
+                const itemResponseText = await itemResponse.text();
+                screcustquotLog('[CustomerScreenPrintQuoteService] Item response status:', itemResponse.status);
+                screcustquotLog('[CustomerScreenPrintQuoteService] Item response text:', itemResponseText);
 
-            if (!itemResponse.ok) {
-                let errorMessage = `Item creation failed: ${itemResponse.status}`;
-                try {
-                    const errorData = JSON.parse(itemResponseText);
-                    errorMessage = errorData.message || errorData.error || errorMessage;
-                } catch (e) {
-                    errorMessage += ` - ${itemResponseText}`;
+                if (!itemResponse.ok) {
+                    let errorMessage = `Item creation failed: ${itemResponse.status}`;
+                    try {
+                        const errorData = JSON.parse(itemResponseText);
+                        errorMessage = errorData.message || errorData.error || errorMessage;
+                    } catch (e) {
+                        errorMessage += ` - ${itemResponseText}`;
+                    }
+                    throw new Error(errorMessage);
                 }
-                throw new Error(errorMessage);
+
+                progress.itemSaved = true;
             }
 
             // Step 3: itemize the one-time screen-setup fee as its OWN quote_items line
@@ -173,64 +190,52 @@ class CustomerScreenPrintQuoteService extends BaseQuoteService {
             // unexplained gap (SubtotalAmount + LTMFeeTotal ≠ TotalAmount). Mirrors the
             // staff builder's fee-line convention (screenprint-quote-service.js
             // _saveShipFeeItem: EmbellishmentType='fee', Quantity 1, fee in *UnitPrice/
-            // LineTotal). Best-effort: a failure here must not fail the whole save (the
-            // product line + session already persisted with the correct TotalAmount).
+            // LineTotal). Report an incomplete save if this line fails; keep the
+            // confirmed session and product line for a manual retry of the missing fee.
             const setupFee = parseFloat((quoteData.setupFee || 0).toFixed(2));
-            if (setupFee > 0) {
-                try {
-                    const setupItemData = {
-                        QuoteID: quoteID,
-                        LineNumber: 2,
-                        StyleNumber: 'SETUP',
-                        ProductName: 'Screen Setup Fee',
-                        Color: '',
-                        ColorCode: '',
-                        EmbellishmentType: 'fee',
-                        PrintLocation: '',
-                        PrintLocationName: '',
-                        Quantity: 1,
-                        HasLTM: 'No',
-                        BaseUnitPrice: setupFee,
-                        LTMPerUnit: 0,
-                        FinalUnitPrice: setupFee,
-                        LineTotal: setupFee,
-                        SizeBreakdown: '{}',
-                        PricingTier: quoteData.tierLabel || '',
-                        ImageURL: '',
-                        AddedAt: new Date().toISOString().replace(/\.\d{3}Z$/, '')
-                    };
-                    const setupResponse = await fetch(`${this.baseURL}/api/quote_items`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(setupItemData)
-                    });
-                    if (!setupResponse.ok) {
-                        console.warn('[CustomerScreenPrintQuoteService] Setup-fee line save failed:', setupResponse.status, await setupResponse.text());
-                    }
-                } catch (setupErr) {
-                    console.warn('[CustomerScreenPrintQuoteService] Setup-fee line save threw:', setupErr);
+            if (setupFee > 0 && !progress.setupSaved) {
+                const setupItemData = {
+                    QuoteID: quoteID,
+                    LineNumber: 2,
+                    StyleNumber: 'SETUP',
+                    ProductName: 'Screen Setup Fee',
+                    Color: '',
+                    ColorCode: '',
+                    EmbellishmentType: 'fee',
+                    PrintLocation: '',
+                    PrintLocationName: '',
+                    Quantity: 1,
+                    HasLTM: 'No',
+                    BaseUnitPrice: setupFee,
+                    LTMPerUnit: 0,
+                    FinalUnitPrice: setupFee,
+                    LineTotal: setupFee,
+                    SizeBreakdown: '{}',
+                    PricingTier: quoteData.tierLabel || '',
+                    ImageURL: '',
+                    AddedAt: new Date().toISOString().replace(/\.\d{3}Z$/, '')
+                };
+                const setupResponse = await fetch(`${this.baseURL}/api/quote_items`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(setupItemData)
+                });
+                if (!setupResponse.ok) {
+                    throw new Error('Setup-fee line save failed: ' + setupResponse.status);
                 }
+                progress.setupSaved = true;
             }
 
             return {
                 success: true,
                 quoteID: quoteID,
-                sessionData: sessionResult
+                sessionData: progress.sessionResult
             };
 
         } catch (error) {
             console.error('[CustomerScreenPrintQuoteService] Error saving quote:', error);
-            // Still return the SAME quote ID the customer was already shown, even
-            // though the database save failed — minting a NEW id here would be a
-            // second id nobody can look anything up by.
-            if (error.message.includes('Session creation failed') || error.message.includes('Item creation failed')) {
-                return {
-                    success: false,
-                    quoteID: quoteData.quoteId,
-                    error: error.message
-                };
-            }
-            throw error;
+            const progress = this.savedStages.get(quoteData.quoteId);
+            return {success: false, quoteID: quoteData.quoteId, sessionSaved: !!(progress && progress.sessionSaved), itemSaved: !!(progress && progress.itemSaved), error: error.message};
         }
     }
 }

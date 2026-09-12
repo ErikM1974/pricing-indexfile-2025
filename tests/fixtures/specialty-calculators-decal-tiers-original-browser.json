@@ -1,0 +1,36 @@
+{
+  "records": [
+    {
+      "quantity": 1,
+      "output": "Total finished area\n1.00 sq ft\nRate (Up to 10 sq ft)\n$18.00 / sq ft\nMaterial (tier minimum)\n$90.00\nArt setup (GRT-50)\n$50.00\nSubtotal\n$140.00\nSales tax (10.2%)\n$14.28\nTotal quote\n$154.28"
+    },
+    {
+      "quantity": 5,
+      "output": "Total finished area\n5.00 sq ft\nRate (Up to 10 sq ft)\n$18.00 / sq ft\nMaterial\n$90.00\nArt setup (GRT-50)\n$50.00\nSubtotal\n$140.00\nSales tax (10.2%)\n$14.28\nTotal quote\n$154.28"
+    },
+    {
+      "quantity": 10,
+      "output": "Total finished area\n10.00 sq ft\nRate (Up to 10 sq ft)\n$18.00 / sq ft\nMaterial\n$180.00\nArt setup (GRT-50)\n$50.00\nSubtotal\n$230.00\nSales tax (10.2%)\n$23.46\nTotal quote\n$253.46"
+    },
+    {
+      "quantity": 11,
+      "output": "Total finished area\n11.00 sq ft\nRate (10–50 sq ft)\n$12.00 / sq ft\nMaterial (tier minimum)\n$180.00\nArt setup (GRT-50)\n$50.00\nSubtotal\n$230.00\nSales tax (10.2%)\n$23.46\nTotal quote\n$253.46"
+    },
+    {
+      "quantity": 15,
+      "output": "Total finished area\n15.00 sq ft\nRate (10–50 sq ft)\n$12.00 / sq ft\nMaterial\n$180.00\nArt setup (GRT-50)\n$50.00\nSubtotal\n$230.00\nSales tax (10.2%)\n$23.46\nTotal quote\n$253.46"
+    },
+    {
+      "quantity": 50,
+      "output": "Total finished area\n50.00 sq ft\nRate (10–50 sq ft)\n$12.00 / sq ft\nMaterial\n$600.00\nArt setup (GRT-50)\n$50.00\nSubtotal\n$650.00\nSales tax (10.2%)\n$66.30\nTotal quote\n$716.30"
+    },
+    {
+      "quantity": 51,
+      "output": "Total finished area\n51.00 sq ft\nRate (Over 50 sq ft)\n$9.00 / sq ft\nMaterial (tier minimum)\n$600.00\nArt setup (GRT-50)\n$50.00\nSubtotal\n$650.00\nSales tax (10.2%)\n$66.30\nTotal quote\n$716.30"
+    },
+    {
+      "quantity": 67,
+      "output": "Total finished area\n67.00 sq ft\nRate (Over 50 sq ft)\n$9.00 / sq ft\nMaterial\n$603.00\nArt setup (GRT-50)\n$50.00\nSubtotal\n$653.00\nSales tax (10.2%)\n$66.61\nTotal quote\n$719.61"
+    }
+  ]
+}

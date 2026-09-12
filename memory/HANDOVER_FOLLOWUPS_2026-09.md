@@ -1,5 +1,100 @@
 # Handover follow-ups — 2026-09-07
 
+## RELEASE CANDIDATE — v2026.09.12.1 specialty and seasonal pages
+
+User explicitly authorized deployment and publication of this reviewed batch on 2026-09-12. Earlier pending-publication notes below are historical and superseded. Eight reviewed pages bring the candidate to 215/225 with 10 pending; live remains 75ef80194384912f4c644e9b868898aa5d62de28 / v2026.09.11.6 / Heroku2109 until verified rollout. Christmas gift boxes now target 2026 and have staff-dashboard links. Thirty-one browser asset references are versioned with reversible preservation mappings. Source checkpoint 78f2dfe3fb6faf451abef41f101f39441fec3271. Full local and exact-source CI gates, actual Heroku release and live asset verification remain required before claiming deployment.
+
+## REVIEWED CHECKPOINT — Customer supplied screen print, 2026-09-11
+
+The sixth specialty calculator now uses canonical controls, native named dialogs, one scoped page stylesheet and external invoice styling. Current coverage: 30 distinct browser checks (29 full-suite checks plus the final new-submission case; all 16 ownership/retry checks repeated after the last behavior edit), one original-only defect capture skipped. All 396 original financial combinations, successful session/item/setup payloads, email HTML and printed customer/fee/waiver contents stay exact. All 47 screenshots and 13 single-page PDFs reviewed (16 sheets; duplicates tracked). Original PDFs needed 26 pages. Stale-price/ladder responses, duplicate pending submits, false success, incomplete saves and mixed-price invoices are fixed; exact retries keep accepted stages. No live business write or customer email occurred.
+
+Candidate now 213/225 reviewed, 12 pending. Live remains v2026.09.11.6 / Heroku2109 / 75ef80194384912f4c644e9b868898aa5d62de28, 207 reviewed / 18 pending. This supersedes historical counts below. The six-page specialty batch is still local.
+
+Next: finish final CSS/source ownership checks and save the local reviewed checkpoint, then full batch unit, DOM, accessibility, CSS-browser, e2e, pricing-parity, build and lint gates. GitHub publication remains blocked by automatic review pending explicit consent for the public repository; no push or deploy until answered. Remaining page groups: seasonal/Christmas bundles; embroidery-pricing-all, Quick Quote and its DTF prototype, webstores calculator, garment designer, and five quote-builder pages. Preserve that remaining work independently while checking this completed batch.
+
+## ORIGINALS REVIEWED — Customer supplied screen print, 2026-09-11
+
+Before application edits, all 15 browser checks pass: 396 original financial combinations, original successful and failed mocked save/email requests, all 46 screenshots and 26 paper pages in 13 PDFs reviewed (17 sheets; exact duplicates accounted for). Original defects are preserved as evidence: old prices stay actionable during debounce, unsaved Print does nothing, failed delivery can claim success, setup-item failure is swallowed, narrow quote forms clip totals, and print layouts split customer notes and waiver onto a second page. No actual email or business write occurred.
+
+Plan: canonical shared controls and Public Sans, compact product introduction, two-column desktop calculator with complete phone layout, native named dialogs, persistent failure feedback, immutable quote snapshots and guarded partial retries. Keep the exact shared pricing engine, priceOrder financial behavior, 396 original amounts, successful payloads, email contents and printed customer/waiver text. Externalize the invoice styling and verify every paper page. Capture baseline before changing any application code.
+
+Candidate remains 212/225 reviewed, 13 pending; this page has not yet migrated. Live remains v2026.09.11.6 / Heroku2109 / 207 reviewed, 18 pending. Safety Stripe local reviewed checkpoint is 73443967. Automatic review blocked public GitHub publication; the explicit question is unanswered. No push/deploy until answered, and full batch gates remain required.
+
+## REVIEWED CHECKPOINT — Safety Stripe Creator, 2026-09-11
+
+Safety Stripe now uses canonical controls, native keyboard choices and save dialogs, scoped responsive CSS and complete single-page print layouts. All 21 current focused browser checks pass; one original-only defect capture is intentionally skipped. All 64 original design combinations and image mappings remain exact. The original service identifier/read functions remain source-locked; the session/item payloads retain their values with the previously dropped design note added to item details. Failed item saves no longer claim success, exact retries reuse an accepted session, pending writes reject duplicate submission, and clipboard/image failures stay visible. All 44 screenshots and ten pages in ten PDFs are reviewed (14 screen sheets, three paper sheets; duplicate views are recorded). No live business write or customer email was sent.
+
+Candidate now 212/225 reviewed, 13 pending. Live remains verified v2026.09.11.6 / Heroku2109 / 75ef80194384912f4c644e9b868898aa5d62de28, 207/225 reviewed and 18 pending. No specialty deployment yet. This status supersedes historical notes below.
+
+Final checks: 356 source/ownership/token/lint/lessons/runtime tests and four shared-control browser regressions pass; scoped JavaScript and CSS lint are clean. All 75 affected source checks were repeated after clearing obsolete saved references when design choices change. This local checkpoint is complete. Next: capture/review customer-supplied screen-print originals and migrate that last page of the six-page specialty batch. Full unit, CSS browser, e2e, pricing parity and actual exact-source CI remain required before release. GitHub publication is pending explicit public-repository consent after automatic review rejected the push; do not retry without the answer. Local checkpoints remain preserved.
+
+## ORIGINALS REVIEWED — Safety Stripe Creator, 2026-09-11
+
+Before application edits: all 11 original browser checks pass, including 64 native style/front/back combinations and intercepted session/item request bodies. All 36 screen captures and 17 pages across nine PDFs reviewed (ten screen sheets and three paper sheets; exact duplicates accounted for). The actual original UI cannot open either dialog: JavaScript adds .show, CSS expects .active. To diagnose persistence, tests populate its unreachable fields and dispatch the original form handler without changing the original CSS. Failed item saves falsely report success; phone previews overflow. These are preserved defects, not successful original interactions.
+
+Design plan: reuse Public Sans and the existing neutral/green canonical tokens; let the actual orange shirt artwork be the visual focus. Four full, uncropped pattern choices lead to front/back previews, stacked on phones. Use native named dialogs and buttons, visible retained failures, truthful Save wording and complete paper output. Preserve all 32 source image mappings, 64 combinations, original successful payload values and quote IDs. Verify partial-save retry and pending-state ownership with synthetic requests before release.
+
+Candidate remains 211/225 reviewed, 14 pending; Safety Stripe is not migrated yet. Polar Camel local reviewed commit f0ff040b is complete. GitHub push was rejected by automatic review because the destination is public; an explicit publication question is pending. Do not bypass that restriction. Live remains v2026.09.11.6 / Heroku2109. Next apply this page migration, then customer-supplied screen printing; full batch gates before deployment.
+
+## REVIEWED CHECKPOINT — Polar Camel tumbler, 2026-09-11
+
+Polar Camel now uses the canonical storefront, shared specialty controls and scoped page styles. All 20 focused browser checks pass, including 64 original financial states, byte-identical 1800×1800 logo download, changed live policy with cached products, keyboard dialogs/radios, failed/incomplete reads and latest-request ownership. All 36 screen captures and 17 pages across nine PDFs are reviewed (26 screen-detail sheets and three paper sheets). Prices and engraving math remain unchanged; unavailable data is visible. The four JDS financial methods and original successful quote calculation are source-locked; all 96 reversible mappings retain the 37 original source hashes.
+
+Candidate now 211/225 reviewed, 14 pending. Live remains verified v2026.09.11.6 / Heroku2109 / 75ef80194384912f4c644e9b868898aa5d62de28, 207/225 reviewed and 18 pending. No specialty deployment yet. This status supersedes historical notes below.
+
+All 373 source, ownership, token, lint, lessons-cap and runtime checks pass; four shared-control browser regressions pass, and scoped JavaScript lint is clean. This reviewed checkpoint is saved separately from deployment. Next: capture and review Safety Stripe Creator originals before migrating it; customer-supplied screen printing follows. Full unit, CSS browser, e2e, pricing parity and actual exact-source CI are required before releasing the six-page specialty batch. Do not copy .env, delete the dependency junction, or allow business requests/device printing through the synthetic harness.
+
+## Polar Camel originals reviewed — 2026-09-11
+
+Twelve original checks pass across focused runs: nine visual states,64 native quantity/color boundaries, real logo edits/errors and the unchanged1800px PNG download, plus cached products with altered live policy. All36 full-page screens and51 paper pages in9 documents reviewed via25 screen and8 paper sheets. Product records/images are explicitly synthetic; the native pricing and engraving pipeline runs unchanged.
+
+Confirmed defects: cached computed tiers can disagree with current policy, failed stock reads claim out-of-stock, pricing-policy failures are silent, mobile controls/spacing waste space, and drawer/lightbox overlays repeat over every printed page. Preserve all successful prices and exact financial methods; reuse the reviewed storefront shell, canonical controls and a scoped page owner. Additional-charge captions remain an independent policy question: existing $5 logo/$50 artwork copy is not part of the computed total and must not be replaced with unrelated JDS-SETUP values without evidence.
+
+Richardson reviewed checkpoint f4021d92 is backed up. Candidate210/225,15pending; live remains verified .6/Heroku2109/75ef8019 at207/225,18pending. Next complete Polar Camel, then Safety Stripes and customer-supplied screen printing before full batch release gates. No business writes/env copies/junction deletion.
+
+## REVIEWED CHECKPOINT — Richardson factory direct, 2026-09-11
+
+Richardson now uses Public Sans, canonical controls and scoped shared specialty/page styles. All 25 focused browser checks pass: original text/fields/links/request contracts, 72 native price combinations, eight category result sets, keyboard selection and delayed focus, mobile targets, alternate policy labels, and all five failed/incomplete reads. All 48 screens and 12 one-page PDFs reviewed (18 screen sheets, three paper sheets). A transient CDN logo failure was caught visually; asset readiness is now asserted and the affected case was rerun successfully with original logos. All five financial method bodies remain byte-for-byte unchanged; 37 original source hashes and 43 reversible mappings pass. All 320 source, ownership, token, lint and runtime inventory checks passed across focused reruns; the runtime census passed alone in 15 seconds after timing out under concurrent load. Final 25 Richardson browser checks and four shared-control regressions pass on the final source.
+
+Candidate now 210/225 reviewed, 15 pending. Decal/emblem checkpoint 019ec200 and Richardson original checkpoint a599be98 are backed up. Live remains verified v2026.09.11.6 / Heroku2109 / 75ef80194384912f4c644e9b868898aa5d62de28, 207/225 reviewed and 18 pending. No specialty deployment yet. This status supersedes historical notes below.
+
+Next: capture and review Polar Camel originals, then unify that page; Safety Stripe Creator and customer-supplied screen printing follow. This reviewed Richardson checkpoint is saved and backed up separately from deployment. Do not copy .env, delete the dependency junction, or allow business requests/device printing through the synthetic harness. Full unit, CSS browser, e2e, pricing parity and actual exact-source CI are required before releasing the complete specialty batch.
+
+## Richardson originals reviewed — 2026-09-11
+
+All13 original cases pass: twelve visual states plus72 native price/quantity/design combinations and all eight category result sets. All48 full-page screens and12 paper pages in12 documents reviewed (17 screen detail sheets, three paper sheets). Original source remains unchanged. Defects confirmed: failed pricing reads silently use defaults; changing a selected style can retain its old quote; autocomplete requires a mouse; mobile categories clip and desktop inputs stretch; paper loses brand/navigation and browsed caps. The API-altered patch fee computes correctly but its radio caption remains hardcoded. Preserve every successful financial result while correcting these presentation/state defects.
+
+Decal/emblem reviewed checkpoint019ec2008a0e69b960af7b317429e6ce2147876b is backed up. Verified .6 history merged cleanly at2b7800a8f00c424b137b74acf287098f83e665be and backed up. Live207/225 reviewed,18pending; candidate209/225,16pending. Next complete Richardson, then Polar Camel, Safety Stripes and customer-supplied screen printing.
+
+## REVIEWED CHECKPOINT — decals and embroidered emblems, 2026-09-11
+
+The first two specialty calculators now use Public Sans, canonical controls, one scoped shared layout and two small page owners. All316 focused source/pricing/ownership checks and scoped CSS/JS lint pass. All18 focused browser checks pass, including immutable prices/requests, failure/retry, full phone price grids, keyboard scrolling, dialog focus through the delayed callback, and print disclosure restoration. Reviewed all52 full-page screens at1440/768/390/320 (28 detail sheets) and all26 current paper pages in13 documents (11 unique renders and15 exact duplicates). Originals:14 immutable browser contracts,52 screens and23 paper pages.
+
+The decal controller remains byte-for-byte unchanged. The emblem controller changes only its delayed focus guard; pricing, saved-quote payloads, taxes, fees and every financial transformation remain unchanged. The source ledger has37 original hashes and14 reversible presentation/version mappings. Shared JS GUIDE, lint scope and migration manifest include only these two reviewed pages. Candidate209/225 reviewed,16pending; no specialty deployment yet.
+
+Verified LIVE is v2026.09.11.6 / Heroku2109 / 75ef80194384912f4c644e9b868898aa5d62de28,207/225 reviewed and18pending. Source CI34628828613 and release main/develop CI34633028735/34633354446 are green; full247 unit suites,1416 CSS browser checks,16 e2e and both parity gates passed. Primary develop is clean and synchronized. This replaces historical live/candidate statements below.
+
+Next: save this reviewed partial batch, merge verified .6 history, then capture/review originals for Polar Camel, Richardson factory direct, Safety Stripe Creator and customer-supplied screen printing. Finish their presentation and full batch gates before rollout. Business requests, allocating GETs, clipboard and printing remain synthetic/local artifacts. No .env copying or dependency-junction deletion. Updated LESSONS_LEARNED and shared-JS GUIDE.
+
+## Specialty original review — decals and emblems
+
+All14 original browser cases pass with14 immutable contracts. Reviewed all52 full-page screens at1440/768/390/320 using29 detail sheets, and all23 paper pages in13 documents (15 unique renders, eight exact duplicates). All37 original source guards pass. The other four specialty pages still need their original browser/paper review; no application edits or migration credit yet.
+
+Defects to repair: decal introductory text is broken by inherited flex layout, cramped controls and incomplete print headings; emblem hero image overlaps the heading, phone CSS removes all160 price cells, the idle copied-link toast and hidden quote actions appear prematurely, and most emblem print states contain only the footer. Use shared canonical controls, scoped owners, accessible full price grids, complete print content and robust dialog focus. Preserve both calculator controllers and immutable financial/request contracts. Business requests, allocating GETs, clipboard and printing are synthetic or local artifacts only.
+
+Contract .6 source is now8ab22de7a98b3726a3a26509742c10831bc5b990 after correcting an obsolete test to check canonical shared hidden styling. Its full release checks continue on primary develop; live remains.5/2108/93fe1568 (204/225 reviewed,21pending).
+
+## NEXT — six specialty calculators, 2026-09-11
+
+Isolated codex/specialty-calculators starts at 97cc05080d4689785bc0885b6a4223c0f1356cbf while contract .6 passes its own release gates on primary develop. Pages: custom decals, embroidered emblems, Polar Camel tumblers, Richardson factory direct, Safety Stripe Creator and customer-supplied screen printing. Captured 37 original source hashes; no application changes or migration credit.
+
+- [ ] Capture original successful and failed API states, complete prices/fees/tiers, all controls, keyboard behavior and paper. Intercept quote allocation, saved quotes, messages and all business writes with synthetic responses.
+- [ ] Inspect all original paper and representative desktop/phone layouts before replacing shared legacy owners. Audit every consuming page before changing a shared stylesheet or helper.
+- [ ] Use canonical typography/controls, one scoped specialty layout owner and small page-specific owners. Keep every financial function and successful request unchanged; test images, previews, warnings, chat and modal states.
+- [ ] Complete visual/source checks and the manifest, then integrate only after the contract release is live. Require full local and exact-source CI checks before deployment.
+
+LIVE remains.5/Heroku2108/93fe1568 at204/225 reviewed,21pending. Contract candidate.6 is207/225,18pending and is fixed at97cc05080d4689785bc0885b6a4223c0f1356cbf for full verification. No business writes, messages, uploads, payments, env copies or device printing. Never recursively delete the node_modules junction.
+
 ## RELEASE CANDIDATE — v2026.09.11.6 three contract calculators
 
 Full-suite compatibility check: the historical printable-sheet test now verifies the canonical components.css hidden utility and token/component/page stylesheet order. The removed page-local !important copy is intentionally absent. Both affected suites passed all 47 checks; full release gates restart on the correction commit. No application or original-fixture content changed.
@@ -1000,3 +1095,18 @@ The first integrated full run passed build/lint/types and243 unit suites. Eleven
 20 focused original browser cases pass, with20 immutable contracts and14 original source hashes. All35 pages in18 original PDFs were visually reviewed (26 unique rendered pages, nine byte-identical duplicates). Desktop/phone normal states were visually reviewed; all four widths captured for18 scenarios. Stitch-file cases use only synthetic local buffers; staff margins remain absent from printed customer copies.
 
 Observed original defects to repair with explicit contracts: hidden embroidery fee facts still appear because author display rules override hidden; contract headings/table edges clip in print; the standalone sheet spills only its footer onto an extra page; phone tables/contact content clip; DTG static policy labels retain $50/$1 while its API-backed calculation uses the fixture $37/$1.75. Preserve financial functions and calculator totals; only policy presentation should follow existing fetched settings. Next: finish targeted keyboard/print/label defect proofs, then implement scoped canonical owners. No application changes or migration credit yet.
+
+## Seasonal bundles — original awareness page reviewed, September 11, 2026
+
+- [x] Preserve six original seasonal source hashes. Ten synthetic awareness browser cases pass; all40 screens and30 pages in10 PDFs visually reviewed (23 deduplicated review sheets).
+- [x] Record the real broken relative service link. Nine diagnostic flows load the unchanged service at that otherwise-missing URL; they are not proof the live submission works. Existing item/email failures falsely show success; repeated fixed chrome obscures paper content and the contact page is excessively tall.
+- [ ] Adopt existing Public Sans and canonical tokens/components with one scoped seasonal owner. Retain all real product/design photos, campaign prose, $45 bundle amounts, eight-bundle minimum, size choices, delivery options and successful order/email payloads.
+- [ ] Layout: left-aligned compact title and campaign note; original model/product image beside the order quantity; readable product comparison rows; four actual process steps; two-column contact fields becoming one column on phones; compact paper summary. Use shared neutral white/canvas/ink/line and brand-green controls; the original pink garments/ribbon convey campaign identity.
+- [ ] Externalize the archived inline style/script and native accessible actions. Repair the verified broken script link, missing labels/focus and false-success handling; keep API access gates unchanged. Explicit pending/partial ownership and retry checks must pass before any migration credit.
+- [ ] Review current screens/paper, preservation/amounts, keyboard/accessibility/fault checks, then Christmas gift boxes. Full application/release gates follow both pages.
+
+Working branch codex/seasonal-bundle-layout forks b66a5252. No application edits or migration credit at this baseline: candidate213/225,12pending; live207/225,v2026.09.11.6/2109/75ef8019. Six-specialty full gates run separately on frozen b66a5252. GitHub public publication remains awaiting explicit user consent; no push or deployment.
+
+## September12 release integration corrections
+
+The first exact-source full browser run on ca07da80 failed:1555 passed,9 failed,3 intentionally skipped. CI34708639505 also failed; neither is green evidence. Staff-home contracts now apply only the authorized2026 gift-link label change to preserved original expectations. Tumbler PNG comparison runs the preserved original in an isolated context and no longer requires ignored screenshots. Screen-print background tier rendering no longer steals keyboard focus; explicit small-order tier selection focuses its exact-quantity input synchronously. Focus and unchanged financial implementation guards pass. Original fixtures remain unchanged except reversible source mappings. Full local and exact-source CI gates must pass again before release.

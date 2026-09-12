@@ -1,0 +1,150 @@
+{
+  "note": "Public product titles, descriptions and image/color fields captured for deterministic gift-box UI checks; inventory and all order writes are synthetic.",
+  "products": {
+    "CT104670": {
+      "productTitle": "Carhartt Storm Defender Shoreline Jacket CT104670",
+      "PRODUCT_DESCRIPTION": "Our best-selling Shoreline Jacket has been updated.     7.3-ounce  100% nylon oxford shell     Storm Defender waterproof  breathable technology     Wind Fighter technology tames wind     10K/10K waterproof/breathable protection rating     Fully taped waterproof seams     Polyester mesh lining     Taffeta lining in sleeves and hood for easy on/off     Adjustable  removable roll-away hood     Full-zip front with inner and outer storm flaps     Two interior pockets with hook and loop closures     Left chest pocket with secure waterproof zipper and storm flap     Two lower front pockets with zippered closures and storm flaps     Adjustable cuffs with hook and loop closures and inner sleeve storm cuffs     Adjustable drop tail hem     Carhartt-strong  triple-stitched main seams     Carhartt label sewn on chest pocket     Loose fit",
+      "colors": [
+        {
+          "COLOR_NAME": "Black",
+          "CATALOG_COLOR": "Black",
+          "COLOR_SQUARE_IMAGE": "https://cdnm.sanmar.com/swatch/gifs/Carhartt_CT104670_black_swatch.gif",
+          "MAIN_IMAGE_URL": "https://cdnm.sanmar.com/imglib/mresjpg/2022/f6/CT104670_black_model_front.jpg",
+          "FRONT_MODEL": "https://cdnm.sanmar.com/imglib/mresjpg/2022/f6/CT104670_black_model_front.jpg",
+          "FRONT_FLAT": "https://cdnm.sanmar.com/imglib/mresjpg/2022/f4/CT104670_black_flat_front.jpg"
+        },
+        {
+          "COLOR_NAME": "Moss",
+          "CATALOG_COLOR": "Moss",
+          "COLOR_SQUARE_IMAGE": "https://cdnm.sanmar.com/swatch/gifs/Carhartt_CT104670_moss_swatch.gif",
+          "MAIN_IMAGE_URL": "https://cdnm.sanmar.com/imglib/mresjpg/2022/f6/CT104670_moss_model_front.jpg",
+          "FRONT_MODEL": "https://cdnm.sanmar.com/imglib/mresjpg/2022/f6/CT104670_moss_model_front.jpg",
+          "FRONT_FLAT": "https://cdnm.sanmar.com/imglib/mresjpg/2022/f4/CT104670_moss_flat_front.jpg"
+        }
+      ]
+    },
+    "CT100617": {
+      "productTitle": "Carhartt Rain Defender Paxton Heavyweight Hooded Zip Mock Sweatshirt. CT100617",
+      "PRODUCT_DESCRIPTION": "Rain Defender durable water-repellent technology has your back all day  every day in this rugged mock sweatshirt that stands up to weather and tough jobs.     13-ounce  75/25 cotton/poly blend or 55/45 cotton/poly blend with Rain Defender durable water-repellent finish (Black  New Navy)*     55/45 cotton/poly blend with Rain Defender durable water-repellent finish (Carbon Heather)     Attached jersey-lined three-piece hood with drawcord closure     Mock neck collar with 8-inch antique-finish brass zipper     Front hand warmer pocket with hidden security pocket inside     Stretchable  spandex-reinforced  rib knit cuffs and waistband     Carhartt label sewn on hand warmer pocket     *Please note: Select colors in Carhartt fleece are currently transitioning from a 75/25 cotton/poly blend to a 55/45 cotton/poly blend. Weight and fabric properties remain the same. Your order may contain a combination of both fabrics.",
+      "colors": [
+        {
+          "COLOR_NAME": "Carbon Heather",
+          "CATALOG_COLOR": "Carbon Heather",
+          "COLOR_SQUARE_IMAGE": "https://cdnm.sanmar.com/swatch/gifs/CT100617_CarbonHeather_0726.gif",
+          "MAIN_IMAGE_URL": "https://cdnm.sanmar.com/imglib/mresjpg/2024/f13/CT100617_carbonheather_model_front.jpg",
+          "FRONT_MODEL": "https://cdnm.sanmar.com/imglib/mresjpg/2024/f13/CT100617_carbonheather_model_front.jpg",
+          "FRONT_FLAT": "https://cdnm.sanmar.com/imglib/mresjpg/2024/f3/CT100617_carbonheather_flat_front.jpg"
+        },
+        {
+          "COLOR_NAME": "New Navy",
+          "CATALOG_COLOR": "New Navy",
+          "COLOR_SQUARE_IMAGE": "https://cdnm.sanmar.com/swatch/gifs/CT100617_NewNavy_0726.gif",
+          "MAIN_IMAGE_URL": "https://cdnm.sanmar.com/imglib/mresjpg/2024/f13/CT100617_newnavy_model_front.jpg",
+          "FRONT_MODEL": "https://cdnm.sanmar.com/imglib/mresjpg/2024/f13/CT100617_newnavy_model_front.jpg",
+          "FRONT_FLAT": "https://cdnm.sanmar.com/imglib/mresjpg/2018/f12/CT100617_newnavy_flat_front.jpg"
+        }
+      ]
+    },
+    "CT103828": {
+      "productTitle": "Carhartt Duck Detroit Jacket CT103828",
+      "PRODUCT_DESCRIPTION": "The original Detroit Jacket built a reputation for toughness on the backs of warehouse workers  farmhands and ranchers across America. With its signature corduroy collar and heavyweight fabric  this updated Detroit jacket is a rugged layer worthy of any job.     12-ounce  firm hand  100% ring spun cotton duck canvas     100% polyester filling     Wind Fighter technology tames wind     Blanket-lined body for warmth     Quilted nylon sleeve lining for easy on-and-off     Corduroy-trimmed collar with hidden snaps for optional hood     Two-way brass center-front zipper     Left chest pocket with zipper closure     Two interior pockets     Two lower-front pockets     Pleated bi-swing back     Snap adjustable cuffs     Carhartt-strong  triple-stitched main seams     Carhartt label sewn on left pocket     Relaxed fit",
+      "colors": [
+        {
+          "COLOR_NAME": "Carhartt Brown",
+          "CATALOG_COLOR": "Carhartt Brown",
+          "COLOR_SQUARE_IMAGE": "https://cdnm.sanmar.com/swatch/gifs/CT_CarharttBrown.gif",
+          "MAIN_IMAGE_URL": "https://cdnm.sanmar.com/imglib/mresjpg/2020/f4/CT103828_carharttbrown_model_front.jpg",
+          "FRONT_MODEL": "https://cdnm.sanmar.com/imglib/mresjpg/2020/f4/CT103828_carharttbrown_model_front.jpg",
+          "FRONT_FLAT": "https://cdnm.sanmar.com/imglib/mresjpg/2020/f4/CT103828_carharttbrown_flat_front.jpg"
+        },
+        {
+          "COLOR_NAME": "Black",
+          "CATALOG_COLOR": "Black",
+          "COLOR_SQUARE_IMAGE": "https://cdnm.sanmar.com/swatch/gifs/CT_Black.gif",
+          "MAIN_IMAGE_URL": "https://cdnm.sanmar.com/imglib/mresjpg/2020/f4/CT103828_black_model_front.jpg",
+          "FRONT_MODEL": "https://cdnm.sanmar.com/imglib/mresjpg/2020/f4/CT103828_black_model_front.jpg",
+          "FRONT_FLAT": "https://cdnm.sanmar.com/imglib/mresjpg/2020/f4/CT103828_black_flat_front.jpg"
+        }
+      ]
+    },
+    "CTK121": {
+      "productTitle": "Carhartt Midweight Hooded Sweatshirt. CTK121",
+      "PRODUCT_DESCRIPTION": "Sometimes Mother Nature can't make up her mind. This sweatshirt works perfectly as a layer or by itself  allowing you to adapt with the weather.     10.5-ounce  50/50 cotton/poly blend or 59/41 cotton/poly blend (Black  Carbon Heather  Moss  New Navy)*     50/50 cotton/poly blend (Brite Lime  Brite Orange)     70/30 cotton/poly blend (Heather Grey)     Attached three-piece hood with drawcord closure     Front hand warmer pocket     Stretchable  spandex-reinforced  rib knit cuffs and waistband     Carhartt-strong  triple-stitched main seams     Carhartt label sewn on hand warmer pocket     Loose fit     *Please note: Select colors in Carhartt fleece are currently transitioning from a 50/50 cotton/poly blend to a 59/41 cotton/poly blend. Weight and fabric properties remain the same. Your order may contain a combination of both fabrics.",
+      "colors": [
+        {
+          "COLOR_NAME": "Heather Grey",
+          "CATALOG_COLOR": "Heather Grey",
+          "COLOR_SQUARE_IMAGE": "https://cdnm.sanmar.com/swatch/gifs/CT_HeatherGrey.gif",
+          "MAIN_IMAGE_URL": "https://cdnm.sanmar.com/imglib/mresjpg/2024/f11/CTK121_heathergrey_model_front.jpg",
+          "FRONT_MODEL": "https://cdnm.sanmar.com/imglib/mresjpg/2024/f11/CTK121_heathergrey_model_front.jpg",
+          "FRONT_FLAT": "https://cdnm.sanmar.com/imglib/mresjpg/2018/f12/CTK121_hthrgrey_flat_front.jpg"
+        },
+        {
+          "COLOR_NAME": "Moss",
+          "CATALOG_COLOR": "Moss",
+          "COLOR_SQUARE_IMAGE": "https://cdnm.sanmar.com/swatch/gifs/CT_Moss.gif",
+          "MAIN_IMAGE_URL": "https://cdnm.sanmar.com/imglib/mresjpg/2024/f11/CTK121_moss_model_front.jpg",
+          "FRONT_MODEL": "https://cdnm.sanmar.com/imglib/mresjpg/2024/f11/CTK121_moss_model_front.jpg",
+          "FRONT_FLAT": "https://cdnm.sanmar.com/imglib/mresjpg/2018/f12/CTK121_moss_flat_front.jpg"
+        }
+      ]
+    },
+    "F281": {
+      "productTitle": "Sport-Tek Super Heavyweight Pullover Hooded Sweatshirt. F281",
+      "PRODUCT_DESCRIPTION": "On or off the field  it's the most warmth you can get out of a sweatshirt. Weighing in at a hefty 12 ounces  our super heavyweight fleece is constructed for durability and comfort.     12-ounce  cross-grain 80/20 ring spun combed cotton/poly fleece     100% ring spun combed cotton face     Twill-taped neck     Self-fabric hood lining     Dyed-to-match drawcords     2x2 rib knit cuffs  hem and side gussets with spandex     Front pouch pocket     *Please note: This product is transitioning from woven labels to tag-free labels. Your order may contain a combination of both labels",
+      "colors": [
+        {
+          "COLOR_NAME": "Maroon",
+          "CATALOG_COLOR": "Maroon",
+          "COLOR_SQUARE_IMAGE": "https://cdnm.sanmar.com/swatch/gifs/SportTek_maroon.gif",
+          "MAIN_IMAGE_URL": "https://cdnm.sanmar.com/imglib/mresjpg/2020/f12/F281_maroon_model_front.jpg",
+          "FRONT_MODEL": "https://cdnm.sanmar.com/imglib/mresjpg/2020/f12/F281_maroon_model_front.jpg",
+          "FRONT_FLAT": "https://cdnm.sanmar.com/imglib/mresjpg/2020/f12/F281_maroon_form_front.jpg"
+        },
+        {
+          "COLOR_NAME": "Orange",
+          "CATALOG_COLOR": "Orange",
+          "COLOR_SQUARE_IMAGE": "https://cdnm.sanmar.com/swatch/gifs/SportTek_orange.gif",
+          "MAIN_IMAGE_URL": "https://cdnm.sanmar.com/imglib/mresjpg/2020/f12/F281_orange_model_front.jpg",
+          "FRONT_MODEL": "https://cdnm.sanmar.com/imglib/mresjpg/2020/f12/F281_orange_model_front.jpg",
+          "FRONT_FLAT": "https://cdnm.sanmar.com/imglib/mresjpg/2020/f12/F281_orange_form_front.jpg"
+        }
+      ]
+    },
+    "CT104597": {
+      "productTitle": "Carhartt Watch Cap 2.0 CT104597",
+      "PRODUCT_DESCRIPTION": "Soft to the touch  this timeless cap is stretchy rib knit for a stay-put fit.     100% acrylic  stretchable  rib knit fabric     Carhartt label sewn on left side     An updated version of the classic CTA18     Offered in the same colors previously offered in the CTA18",
+      "colors": [
+        {
+          "COLOR_NAME": "Coal Heather",
+          "CATALOG_COLOR": "Coal Heather",
+          "COLOR_SQUARE_IMAGE": "https://cdnm.sanmar.com/swatch/gifs/Carhartt_104597_CoalHeather_swatch.gif",
+          "MAIN_IMAGE_URL": "https://cdnm.sanmar.com/imglib/mresjpg/2020/f4/CT104597_coalheather_flat_front.jpg",
+          "FRONT_MODEL": "https://cdnm.sanmar.com/imglib/mresjpg/2020/f4/CT104597_coalheather_flat_front.jpg",
+          "FRONT_FLAT": "https://cdnm.sanmar.com/imglib/mresjpg/2020/f4/CT104597_coalheather_flat_front.jpg"
+        },
+        {
+          "COLOR_NAME": "Dark Brown/ Sandstone",
+          "CATALOG_COLOR": "Dk Brn/Sandstn",
+          "COLOR_SQUARE_IMAGE": "https://cdnm.sanmar.com/swatch/gifs/Carhartt_104597_DarkBrownSandstone_swatch.gif",
+          "MAIN_IMAGE_URL": "https://cdnm.sanmar.com/imglib/mresjpg/2020/f4/CT104597_darkbrownsandstone_flat_front.jpg",
+          "FRONT_MODEL": "https://cdnm.sanmar.com/imglib/mresjpg/2020/f4/CT104597_darkbrownsandstone_flat_front.jpg",
+          "FRONT_FLAT": "https://cdnm.sanmar.com/imglib/mresjpg/2020/f4/CT104597_darkbrownsandstone_flat_front.jpg"
+        }
+      ]
+    },
+    "CTGD0794": {
+      "productTitle": "Carhartt High-Dexterity Open-Cuff Glove CTGD0794",
+      "PRODUCT_DESCRIPTION": "Dexterity gets the work done. These gloves offer protection with high dexterity which allows natural movement without feeling restricted. They excel at any job that requires handling tools and equipment.     Padded  breathable 3D mesh shell     Synthetic suede palm     Side vent cuff for breathability     Wrist pull tab for easy on and off     Reinforced thumb saddle for increased durability     Carhartt logo heat transfer on center front     Medium: 8.5-inch hand circumference     Large: 9 to 9.5-inch hand circumference     X-Large: 10 to 10.5-inch hand circumference",
+      "colors": [
+        {
+          "COLOR_NAME": "Black Barley",
+          "CATALOG_COLOR": "BlkBarley",
+          "COLOR_SQUARE_IMAGE": "https://cdnm.sanmar.com/swatch/gifs/CTGD0794_BlackBarley.gif",
+          "MAIN_IMAGE_URL": "https://cdnm.sanmar.com/imglib/mresjpg/2024/f5/CTGD0794_blackbarley_glove_main.jpg",
+          "FRONT_MODEL": "https://cdnm.sanmar.com/imglib/mresjpg/2024/f5/CTGD0794_blackbarley_glove_main.jpg"
+        }
+      ]
+    }
+  }
+}

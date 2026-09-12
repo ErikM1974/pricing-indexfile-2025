@@ -110,3 +110,28 @@ The code-grade implementation is complete. Exact-source CI34193800629 passed onb
 - Housekeeping: ACTIVE_FILES is now a25-line index over14 docs/active-files area files; all1337 annotated row keys retained, including five repaired portal rows. Historical counts are explicitly labeled. Five remaining marker dispositions are tracked in HANDOVER_FOLLOWUPS_2026-09.md. Memory index named no current superseded deletion candidate.
 
 - Final local gates:203unit suites/4875passed (4existing skips), DOM88, accessibility4, quote parity84, browser15passed/3optional skips including5calculator surfaces; build/lint0/types/CSS283/route456/undefined0/boot200 passed. Payment release main/develop CI34192741076/34192896564 both passed.
+
+
+## Awareness seasonal bundle — local review, September 11, 2026
+
+- [x] Original source checkpoint efa9012a: 6 seasonal source hashes and 10 immutable awareness-browser records; original broken service URL distinguished from diagnostics using the unchanged service.
+- [x] Canonical controls and tokens, Public Sans, scoped page stylesheet, external controller, labeled inputs, native product dialog, and compact print layouts replace CDN-generated/inline CSS. The root seasonal route is still served and stays in scope.
+- [x] Static text, original product images, destinations and initial field values match. Sixteen real original/current service combinations preserve every successful database and email payload; six retry/ownership cases pass. No pricing or API gate changes.
+- [x] Twenty current browser cases pass plus the final contact print check; four widths, zero tested accessibility violations/overflow, keyboard dialog focus, logo image/PDF replacement/removal, missing provider, pending edits and independent session/item/upload/email retries. All 36 screens and ten paper pages across nine PDFs reviewed; contact/review/success now fit one page, product catalog two complete pages.
+- [ ] Final integration/whole-application gates and publication remain separate. The public GitHub publication question is unanswered. Live remains v2026.09.11.6 / Heroku 2109, 207/225 reviewed; local candidate 214/225 reviewed, 11 pending. Christmas is next and remains untouched.
+
+Specialty batch gate follow-up: the full 1,532-case sweep on b66a5252 had 1,528 passes, two original-only skips, and two test defects (fixed preview port and expiring notification). Test-only commit 1c7ce288 corrects these without changing application assets; all 31 affected browser checks pass. Original failure logs are retained. Remaining end-to-end/live calculator gate results are tracked in the local artifact record; exact-source CI is still required before deployment.
+
+## Shutdown checkpoint — September 11, 2026
+
+User requested a saved stopping point. Stop here; resume with the Christmas gift-box page. Seasonal awareness is locally reviewed and final verification has passed:311 guards in six suites, zero ESLint warnings, CSS lint clean across275 files,21 actual-server browser cases passed and one original-only case skipped. The final browser run uses the actual Express mounts, verifies all three public asset responses byte-for-byte, and retains410 for both archived paths. No route registrations or access gates changed.
+
+Final awareness assets are calculators/breast-cancer-awareness-bundle.css, calculators/breast-cancer-awareness-bundle.js, and calculators/breast-cancer-bundle-service.js. The HTML keeps its existing archived source and public root alias. The archived original service is unchanged. Six source hashes, one reversible HTML mapping,16 successful original/current service combinations, six retry/concurrency cases,36 reviewed screens and10 reviewed paper pages preserve the original evidence. Final recaptured visual review is recorded in the local resume artifact.
+
+Local candidate:214/225 page surfaces reviewed,11 remaining (Christmas; embroidery-pricing-all; quick-quote index and DTF prototype; webstores calculator; garment designer; five quote builders). Shared runtime/generated-document/provider cleanup and final whole-application/CI/deploy verification are additional work, not extra page credits. Planning estimate:16–24 active working hours including those checks; elapsed time while the laptop is off is excluded.
+
+Previous six-specialty batch: b66a5252 application assets are fully verified with test-only correction1c7ce288. Initial CSS run1528passed/2failed/2original-only skipped; both test defects corrected and31 affected cases passed. Remaining e2e16passed/3optional screenshot skips, all5 calculator parity surfaces passed. Full unit composite5925passed/4 existing skips after cross-project checks. Original failure logs remain, and exact-source CI is still required.
+
+Live remains v2026.09.11.6 / Heroku2109 /75ef8019,207/225 reviewed. Nothing from this local checkpoint has been deployed. Automatic approval review rejected public GitHub publication; explicit publication consent remains pending. Last remote checkpoint bcbe080e; do not push/deploy or reroute the push while unanswered. No environment/credential files copied and no real order, upload, email or printer action performed.
+
+Resume: read the active-css-resume-state.json and CSS_RESUME.md artifact pointers, inspect worktree status, then capture untouched Christmas originals before edits. That page still advertises an expired2025 offer and its old products endpoint is deliberately removed; inspect the existing retirement decisions before altering behavior. Do not invent new dates/offers or reopen endpoints. The two test-only corrections from1c7ce288 are included in this seasonal tree; retain that evidence when integrating branches. Never rerun consumed one-shot migration helpers.

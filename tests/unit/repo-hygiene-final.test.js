@@ -69,7 +69,9 @@ const PENDING = new Set(PENDING_DELETION);
 
 // Not served pages: build output, tests, Node-side code, documentation, email/HTML templates, archives, vendored code.
 const HTML_SKIP = /^(dist|tests|node_modules|memory|docs|scripts|templates|reference|email-templates|richardson-caps)\/|\/archive\/|archive-working-files\/|\/vendor\//;
-const PAGES = tracked.filter((f) => f.endsWith('.html') && !HTML_SKIP.test(f) && !DELETED.has(f));
+// This archived source is still explicitly served at /breast-cancer-awareness-bundle.html.
+const SERVED_ARCHIVE_PAGES = new Set(['calculators/archive/seasonal-2025/breast-cancer-awareness-bundle.html']);
+const PAGES = tracked.filter((f) => f.endsWith('.html') && (!HTML_SKIP.test(f) || SERVED_ARCHIVE_PAGES.has(f)) && !DELETED.has(f));
 
 const strip = (h) => h.replace(/<!--[\s\S]*?-->/g, '').replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/g, '');
 const BARE_ICON = /<i\b(?![^>]*aria-hidden)(?![^>]*aria-label)[^>]*\bclass="(?:fa[sr]|fab|fa-solid|fa-regular) [^"]*"[^>]*><\/i>/;
@@ -95,7 +97,7 @@ describe('every served HTML page is Rule-3 clean (2026-09-06 census)', () => {
 const JS_SKIP = /^routes\/|^(dist|tests|node_modules|memory|docs|scripts|templates|lib|config|\.claude|richardson-caps)\/|^server\.js$|^tools\/seed-top-sellers\.js$|\/vendor\/|\/archive\/|archive-working-files\//;
 const BROWSER_JS = tracked.filter((f) => f.endsWith('.js') && !JS_SKIP.test(f));
 // Referrers that count: served pages, browser scripts, server.js and the build. Not: tests, one-off Node scripts, archives.
-const CORPUS = tracked.filter((f) => (f.endsWith('.html') || f.endsWith('.js') || f.endsWith('.jsx')) && !/^(dist|node_modules|tests)\/|\/archive\/|archive-working-files\//.test(f) && (!f.startsWith('scripts/') || f === 'scripts/build.js'));
+const CORPUS = tracked.filter((f) => (f.endsWith('.html') || f.endsWith('.js') || f.endsWith('.jsx')) && (!/^(dist|node_modules|tests)\/|\/archive\/|archive-working-files\//.test(f) || SERVED_ARCHIVE_PAGES.has(f)) && (!f.startsWith('scripts/') || f === 'scripts/build.js'));
 const TEXT = new Map(CORPUS.map((f) => [f, readSource(f)]));
 // A basename shared by two tracked scripts (utils.js, dp5-helper.js, pricing-matrix-api.js…) hid stale root-level
 // copies from the first census: for those, a referrer must name the file by its directory ("shared_components/js/utils.js")
@@ -133,7 +135,7 @@ function a11yFindings(html, file) {
     const h = html.replace(/<!--[\s\S]*?-->/g, '');
     const out = [];
     for (const m of h.matchAll(/<img\b[^>]*>/g)) if (!/\balt=/.test(m[0])) out.push('img without alt: ' + m[0].slice(0, 80));
-    for (const m of h.matchAll(/<button\b([^>]*)>([\s\S]*?)<\/button>/g)) if (!innerText(m[2]) && !NAMED.test(m[1])) out.push('unnamed button: ' + m[0].slice(0, 80));
+    for (const m of h.matchAll(/<button\b([^>]*)>([\s\S]*?)<\/button>/g)) if (!innerText(m[2]) && !NAMED.test(m[1]) && !/<img[^>]*\balt="[^"]+"/.test(m[2])) out.push('unnamed button: ' + m[0].slice(0, 80));
     for (const m of h.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/g)) if (!innerText(m[2]) && !NAMED.test(m[1]) && !/<img[^>]*\balt="[^"]+"/.test(m[2])) out.push('unnamed link: ' + m[0].slice(0, 80));
     const labelsFor = new Set([...h.matchAll(/<label\b[^>]*\bfor="([^"]+)"/g)].map((m) => m[1]));
     for (const m of h.matchAll(/<(input|select|textarea)\b([^>]*)>/g)) {

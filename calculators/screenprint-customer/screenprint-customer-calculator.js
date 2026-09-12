@@ -22,7 +22,7 @@ class CustomerScreenPrintCalculator {
         this.initializeElements();
 
         // Initialize EmailJS
-        emailjs.init(((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.EMAIL && window.APP_CONFIG.EMAIL.PUBLIC_KEY) || ''));
+        if (typeof emailjs !== 'undefined') emailjs.init(((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.EMAIL && window.APP_CONFIG.EMAIL.PUBLIC_KEY) || ''));
         this.emailConfig = {
             serviceId: ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.EMAIL && window.APP_CONFIG.EMAIL.SERVICE_ID) || ''),
             templateId: 'template_igd6jtm'
@@ -80,6 +80,63 @@ class CustomerScreenPrintCalculator {
         this.submitQuoteBtn = document.getElementById('submitQuoteBtn');
     }
 
+    openDialog(id) {
+        const dialog = document.getElementById(id);
+        if (dialog.open) return;
+        dialog.returnFocus = document.activeElement;
+        dialog.showModal();
+    }
+
+    closeDialog(id) {
+        if (this.submitting) return;
+        const dialog = document.getElementById(id);
+        if (!dialog.open) return;
+        dialog.close();
+        if (dialog.returnFocus && dialog.returnFocus.isConnected) dialog.returnFocus.focus();
+    }
+
+    setFeedback(id, message) {
+        const node = document.getElementById(id);
+        node.textContent = message;
+        node.hidden = !message;
+    }
+
+    async submitCapturedQuote() {
+        if (this.submitting || !this.submission) return;
+        const submission = this.submission;
+        this.showLoading();
+        this.setFeedback('quoteSubmitStatus', '');
+        this.setFeedback('quoteDeliveryStatus', '');
+        try {
+            if (submission.saveRequested && !submission.saved) {
+                try {
+                    submission.saveResult = await this.quoteService.saveQuote(submission.quoteData);
+                    submission.saved = !!submission.saveResult.success;
+                } catch (error) {
+                    console.error('[ScreenPrintCustomer] Save not confirmed:', error);
+                    submission.saveResult = {success: false};
+                }
+            }
+            if (!submission.emailed) {
+                try {
+                    await emailjs.send(this.emailConfig.serviceId, this.emailConfig.templateId, this.buildEmailData(submission.quoteData));
+                    submission.emailed = true;
+                } catch (error) {
+                    console.error('[ScreenPrintCustomer] Email not confirmed:', error);
+                }
+            }
+        } finally {
+            this.hideLoading();
+        }
+        if (submission.saved || submission.emailed) {
+            this.closeQuoteModal();
+            this.showSuccessModal(submission.quoteData.quoteId, submission.quoteData);
+            if (submission.emailed && (!submission.saveRequested || submission.saved)) this.quoteForm.reset();
+        } else {
+            this.setFeedback('quoteSubmitStatus', 'Quote delivery and saving were not confirmed. Your details are retained. Retry or call (253) 922-5793.');
+        }
+    }
+
     attachEventListeners() {
         // Calculator inputs (debounced — each keystroke would otherwise fire a live API call)
         this.quantity.addEventListener('input', () => this.scheduleCalculate());
@@ -87,28 +144,49 @@ class CustomerScreenPrintCalculator {
         this.backColors.addEventListener('change', () => this.scheduleCalculate());
         this.darkShirtToggle.addEventListener('change', () => this.scheduleCalculate());
         this.safetyStripesToggle.addEventListener('change', () => {
-            this.safetyStripesNotice.style.display = this.safetyStripesToggle.checked ? 'block' : 'none';
+            this.safetyStripesNotice.hidden = !this.safetyStripesToggle.checked;
             this.scheduleCalculate();
         });
 
+        // Native dialogs own keyboard focus; pending requests keep their captured draft.
+        for (const id of ['quoteModal', 'successModal']) {
+            const dialog = document.getElementById(id);
+            dialog.addEventListener('cancel', e => { e.preventDefault(); this.closeDialog(id); });
+            dialog.addEventListener('keydown', e => {
+                if (e.key !== 'Tab') return;
+                const nodes = [...dialog.querySelectorAll('input, select, textarea, button, [tabindex="0"]')].filter(n => !n.disabled && n.getClientRects().length);
+                if (!nodes.length) { e.preventDefault(); return; }
+                const first = nodes[0], last = nodes[nodes.length - 1];
+                if (e.shiftKey && (document.activeElement === first || !nodes.includes(document.activeElement))) { e.preventDefault(); last.focus(); }
+                else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+            });
+        }
+        document.getElementById('retryQuoteBtn').addEventListener('click', () => this.submitCapturedQuote());
+
         // Quote form
+        document.getElementById('retryPricingBtn').addEventListener('click', () => this.calculatePrice());
         this.sendQuoteBtn.addEventListener('click', () => this.openQuoteModal());
         this.quoteForm.addEventListener('submit', (e) => this.handleQuoteSubmit(e));
     }
 
     scheduleCalculate() {
+        if (this.submitting) return;
         clearTimeout(this.debounceTimer);
+        ++this.requestSeq;
+        this.resetDisplay('Updating quote…');
         this.debounceTimer = setTimeout(() => this.calculatePrice(), 300);
     }
 
     async calculatePrice() {
+        if (this.submitting) return;
+        clearTimeout(this.debounceTimer);
+        const requestId = ++this.requestSeq;
+        this.resetDisplay('Pricing…');
         const quantity = parseInt(this.quantity.value, 10) || 0;
         const frontColors = parseInt(this.frontColors.value, 10) || 0;
         const backColors = parseInt(this.backColors.value, 10) || 0;
         const isDarkGarment = this.darkShirtToggle.checked;
         const hasSafetyStripes = this.safetyStripesToggle.checked;
-
-        this.hidePricingError();
 
         if (quantity <= 0) {
             this.resetDisplay("Enter Quantity");
@@ -119,7 +197,6 @@ class CustomerScreenPrintCalculator {
             return;
         }
 
-        const requestId = ++this.requestSeq;
         this.priceDisplay.classList.remove('prompt');
         this.priceDisplay.textContent = 'Pricing…';
 
@@ -140,18 +217,20 @@ class CustomerScreenPrintCalculator {
             if (code === 'BELOW_MINIMUM') {
                 this.resetDisplay(`Min ${result.error.minQuantity} pieces`);
             } else {
-                this.showPricingError((result.error && result.error.message) || 'Pricing unavailable for this combination. Please call (253) 922-5793.');
+                this.showPricingError('Live pricing is unavailable for this selection. Retry pricing or call (253) 922-5793.');
                 this.resetDisplay('Pricing unavailable');
             }
             return;
         }
 
+        this.hidePricingError();
         this.renderResult(quantity, frontColors, backColors, isDarkGarment, hasSafetyStripes, result);
 
         // Tier ladder is a nice-to-have preview — its failure must never block the main price.
-        this.renderTierLadder(frontColors, backColors, isDarkGarment, hasSafetyStripes, result).catch((error) => {
+        this.renderTierLadder(frontColors, backColors, isDarkGarment, hasSafetyStripes, result, requestId).catch((error) => {
+            if (requestId !== this.requestSeq) return;
             console.error('[ScreenPrintCustomer] Tier ladder failed:', error);
-            this.tierLadder.style.display = 'none';
+            this.tierLadder.textContent = 'Price breaks are unavailable. Your current quote above remains valid.';
         });
     }
 
@@ -256,7 +335,8 @@ class CustomerScreenPrintCalculator {
             </div>`;
 
         this.orderSummary.innerHTML = summaryHtml;
-        this.quoteActions.style.display = 'flex';
+        this.quoteActions.hidden = false;
+        document.getElementById('printSelection').textContent = quantity + ' garments · Front: ' + frontColors + ' colors · Back: ' + backColors + ' colors · Dark garment: ' + (isDarkGarment ? 'Yes' : 'No') + ' · Safety stripes: ' + (hasSafetyStripes ? 'Yes' : 'No');
     }
 
     /**
@@ -274,7 +354,7 @@ class CustomerScreenPrintCalculator {
             const note = document.createElement('div');
             note.className = 'price-display-smallbatch';
             note.id = 'priceSmallBatchNote';
-            note.style.cssText = 'font-size:0.85rem;color:#166534;margin-top:0.15rem;';
+            // Typography and color belong to the page stylesheet.
             if (this.priceDisplay && this.priceDisplay.parentNode) {
                 this.priceDisplay.insertAdjacentElement('afterend', note);
             }
@@ -282,10 +362,10 @@ class CustomerScreenPrintCalculator {
         }
         if (fee > 0) {
             this._smallBatchNote.textContent = `+ $${fee.toFixed(2)} small-batch fee`;
-            this._smallBatchNote.style.display = '';
+            this._smallBatchNote.hidden = false;
         } else {
             this._smallBatchNote.textContent = '';
-            this._smallBatchNote.style.display = 'none';
+            this._smallBatchNote.hidden = true;
         }
     }
 
@@ -295,11 +375,11 @@ class CustomerScreenPrintCalculator {
      * representative quantity per live Caspio tier through the SAME engine call, so
      * it can never drift from the headline price above.
      */
-    async renderTierLadder(frontColors, backColors, isDarkGarment, hasSafetyStripes, currentResult) {
+    async renderTierLadder(frontColors, backColors, isDarkGarment, hasSafetyStripes, currentResult, requestId = this.requestSeq) {
         const engine = window.QuoteCartEngine;
         const probeQtys = [24, 48, 72, 145]; // one qty per current live SCP tier boundary
         const ladder = this.tierLadder;
-        ladder.style.display = 'block';
+        ladder.hidden = false;
         ladder.innerHTML = '<div class="tier-ladder-title">Loading price breaks…</div>';
 
         const probes = await Promise.all(probeQtys.map(async (qty) => {
@@ -330,6 +410,12 @@ class CustomerScreenPrintCalculator {
             }
         }));
 
+        if (requestId !== this.requestSeq) return;
+        if (probes.some(row => !row)) {
+            ladder.textContent = 'Price breaks are unavailable. Your current quote above remains valid.';
+            return;
+        }
+
         // De-dupe consecutive probes landing in the same tier (dark-garment screens don't move
         // the tier boundary, so this is just about the 4 probe qtys occasionally collapsing).
         const seen = new Set();
@@ -340,7 +426,7 @@ class CustomerScreenPrintCalculator {
         });
 
         if (!rows.length) {
-            ladder.style.display = 'none';
+            ladder.hidden = true;
             return;
         }
 
@@ -362,11 +448,13 @@ class CustomerScreenPrintCalculator {
 
     showPricingError(message) {
         this.pricingError.textContent = message;
-        this.pricingError.style.display = 'block';
+        this.pricingError.hidden = false;
+        document.getElementById('retryPricingBtn').hidden = false;
     }
 
     hidePricingError() {
-        this.pricingError.style.display = 'none';
+        this.pricingError.hidden = true;
+        document.getElementById('retryPricingBtn').hidden = true;
         this.pricingError.textContent = '';
     }
 
@@ -374,20 +462,18 @@ class CustomerScreenPrintCalculator {
         this.priceDisplay.textContent = promptText;
         this.priceDisplay.classList.add('prompt');
         this.orderSummary.innerHTML = '';
-        this.quoteActions.style.display = 'none';
-        this.tierLadder.style.display = 'none';
+        this.quoteActions.hidden = true;
+        this.tierLadder.hidden = true;
         this._setSmallBatchNote(0); // clear the "+ small-batch fee" note
         this.currentCalculation = null;
+        document.getElementById('printSelection').textContent = 'Estimate unavailable — enter valid print details.';
     }
 
     openQuoteModal() {
-        if (!this.currentCalculation) return;
-
-        // Update quote preview
+        if (!this.currentCalculation || this.submitting) return;
         this.updateQuotePreview();
-
-        // Show modal
-        document.getElementById('quoteModal').classList.add('active');
+        this.setFeedback('quoteSubmitStatus', '');
+        this.openDialog('quoteModal');
     }
 
     updateQuotePreview() {
@@ -395,31 +481,31 @@ class CustomerScreenPrintCalculator {
 
         const calc = this.currentCalculation;
         let previewHtml = `
-            <h4 style="margin-top: 0;">Quote Summary</h4>
-            <table style="width: 100%;">
+            <h3>Quote Summary</h3>
+            <table>
                 <tr>
-                    <th style="background: var(--primary-color); color: white; padding: 8px;">Description</th>
-                    <th style="background: var(--primary-color); color: white; padding: 8px; text-align: center;">Qty</th>
-                    <th style="background: var(--primary-color); color: white; padding: 8px; text-align: right;">Price</th>
-                    <th style="background: var(--primary-color); color: white; padding: 8px; text-align: right;">Total</th>
+                    <th>Description</th>
+                    <th>Qty</th>
+                    <th>Price</th>
+                    <th>Total</th>
                 </tr>`;
 
         previewHtml += `
                 <tr>
-                    <td style="padding: 8px;">Front Print - ${calc.frontColors} color${calc.frontColors > 1 ? 's' : ''}${calc.isDarkGarment ? ' <br><small style="color:#666;">(dark garment — white underbase screen in setup fee below)</small>' : ''}</td>
-                    <td style="padding: 8px; text-align: center;">${calc.quantity}</td>
-                    <td style="padding: 8px; text-align: right;">$${calc.frontPerPiece.toFixed(2)}</td>
-                    <td style="padding: 8px; text-align: right;">$${(calc.frontPerPiece * calc.quantity).toFixed(2)}</td>
+                    <td>Front Print - ${calc.frontColors} color${calc.frontColors > 1 ? 's' : ''}${calc.isDarkGarment ? ' <br><small>(dark garment — white underbase screen in setup fee below)</small>' : ''}</td>
+                    <td>${calc.quantity}</td>
+                    <td>$${calc.frontPerPiece.toFixed(2)}</td>
+                    <td>$${(calc.frontPerPiece * calc.quantity).toFixed(2)}</td>
                 </tr>`;
 
         // Show back print if applicable
         if (calc.backColors > 0) {
             previewHtml += `
                 <tr>
-                    <td style="padding: 8px;">Back Print - ${calc.backColors} color${calc.backColors > 1 ? 's' : ''}</td>
-                    <td style="padding: 8px; text-align: center;">${calc.quantity}</td>
-                    <td style="padding: 8px; text-align: right;">$${calc.addlPerPiece.toFixed(2)}</td>
-                    <td style="padding: 8px; text-align: right;">$${(calc.addlPerPiece * calc.quantity).toFixed(2)}</td>
+                    <td>Back Print - ${calc.backColors} color${calc.backColors > 1 ? 's' : ''}</td>
+                    <td>${calc.quantity}</td>
+                    <td>$${calc.addlPerPiece.toFixed(2)}</td>
+                    <td>$${(calc.addlPerPiece * calc.quantity).toFixed(2)}</td>
                 </tr>`;
         }
 
@@ -427,29 +513,29 @@ class CustomerScreenPrintCalculator {
         if (calc.hasSafetyStripes) {
             previewHtml += `
                 <tr>
-                    <td style="padding: 8px;">Safety Stripes</td>
-                    <td style="padding: 8px; text-align: center;">${calc.quantity}</td>
-                    <td style="padding: 8px; text-align: right;">$${calc.stripesPerPiece.toFixed(2)}</td>
-                    <td style="padding: 8px; text-align: right;">$${(calc.stripesPerPiece * calc.quantity).toFixed(2)}</td>
+                    <td>Safety Stripes</td>
+                    <td>${calc.quantity}</td>
+                    <td>$${calc.stripesPerPiece.toFixed(2)}</td>
+                    <td>$${(calc.stripesPerPiece * calc.quantity).toFixed(2)}</td>
                 </tr>`;
         }
 
         if (calc.ltmFeeTotal > 0) {
             previewHtml += `
                 <tr>
-                    <td style="padding: 8px;" colspan="3">Less Than Minimum Fee</td>
-                    <td style="padding: 8px; text-align: right;">$${calc.ltmFeeTotal.toFixed(2)}</td>
+                    <td colspan="3">Less Than Minimum Fee</td>
+                    <td>$${calc.ltmFeeTotal.toFixed(2)}</td>
                 </tr>`;
         }
 
         previewHtml += `
                 <tr>
-                    <td style="padding: 8px;" colspan="3">${escapeHTML(calc.setupFeeLabel)}</td>
-                    <td style="padding: 8px; text-align: right;">$${calc.totalSetupFee.toFixed(2)}</td>
+                    <td colspan="3">${escapeHTML(calc.setupFeeLabel)}</td>
+                    <td>$${calc.totalSetupFee.toFixed(2)}</td>
                 </tr>
-                <tr style="font-weight: bold; border-top: 2px solid var(--primary-color);">
-                    <td style="padding: 8px;" colspan="3">Total</td>
-                    <td style="padding: 8px; text-align: right;">$${calc.finalTotal.toFixed(2)}</td>
+                <tr>
+                    <td colspan="3">Total</td>
+                    <td>$${calc.finalTotal.toFixed(2)}</td>
                 </tr>
             </table>`;
 
@@ -458,93 +544,39 @@ class CustomerScreenPrintCalculator {
 
     async handleQuoteSubmit(e) {
         e.preventDefault();
-
-        if (!this.validateQuoteForm()) return;
-        if (!this.currentCalculation) return;
-
-        try {
-            this.showLoading();
-
-            // Build quote data
-            const quoteData = {
-                // Customer info
-                customerName: this.customerName.value.trim(),
-                customerEmail: this.customerEmail.value.trim(),
-                customerPhone: this.customerPhone.value.trim(),
-                companyName: this.companyName.value.trim(),
-                projectName: this.projectName.value.trim(),
-
-                // Order details
-                quantity: this.currentCalculation.quantity,
-                frontColors: this.currentCalculation.frontColors,
-                backColors: this.currentCalculation.backColors,
-                isDarkGarment: this.currentCalculation.isDarkGarment,
-                safetyStripes: this.currentCalculation.hasSafetyStripes,
-
-                // Pricing (live, from QuoteCartEngine — never locally computed)
-                pricePerShirt: this.currentCalculation.pricePerShirt,
-                orderSubtotal: this.currentCalculation.orderSubtotal,
-                ltmFeeTotal: this.currentCalculation.ltmFeeTotal,
-                setupFee: this.currentCalculation.totalSetupFee,
-                finalTotal: this.currentCalculation.finalTotal,
-                tierLabel: this.currentCalculation.tierLabel,
-
-                // Options
-                notes: this.notes.value.trim(),
-
-                // Sales rep
-                salesRepEmail: this.salesRep.value,
-                salesRepName: this.getSalesRepName(this.salesRep.value)
-            };
-
-            // Generate quote ID
-            const quoteId = this.quoteService.generateQuoteID();
-            quoteData.quoteId = quoteId;
-
-            // Save to database if enabled. The Caspio save and the confirmation
-            // email are two INDEPENDENT operations — one failing must never mask
-            // the other succeeding (2026-07-01: previously any email failure
-            // showed "Failed to send quote" even when the quote had already
-            // saved with a valid ID).
-            let saved = false;
-            if (this.saveToDatabase.checked) {
-                try {
-                    const saveResult = await this.quoteService.saveQuote(quoteData);
-                    saved = !!saveResult.success;
-                    if (!saved) console.error('Database save failed:', saveResult.error);
-                } catch (saveError) {
-                    console.error('Database save threw:', saveError);
-                }
-            }
-
-            let emailed = false;
-            try {
-                const emailData = this.buildEmailData(quoteData);
-                await emailjs.send(this.emailConfig.serviceId, this.emailConfig.templateId, emailData);
-                emailed = true;
-            } catch (emailError) {
-                console.error('Confirmation email failed:', emailError);
-            }
-
-            // The quote is real to the customer if EITHER path produced a durable
-            // record: a Caspio row a rep can look up, or the emailed copy itself.
-            if (saved || emailed) {
-                if (this.saveToDatabase.checked && !saved) {
-                    console.warn('Quote emailed but NOT saved to the database — no rep-visible record exists for', quoteId);
-                }
-                this.showSuccessModal(quoteId, quoteData);
-                this.closeQuoteModal();
-                this.quoteForm.reset();
-            } else {
-                alert('Failed to submit quote. Please try again or call (253) 922-5793.');
-            }
-
-        } catch (error) {
-            console.error('Quote submission error:', error);
-            alert('Failed to submit quote. Please try again or call (253) 922-5793.');
-        } finally {
-            this.hideLoading();
+        if (this.submitting || !this.currentCalculation || !this.validateQuoteForm()) return;
+        const calc = { ...this.currentCalculation };
+        const quoteData = {
+            customerName: this.customerName.value.trim(),
+            customerEmail: this.customerEmail.value.trim(),
+            customerPhone: this.customerPhone.value.trim(),
+            companyName: this.companyName.value.trim(),
+            projectName: this.projectName.value.trim(),
+            quantity: calc.quantity,
+            frontColors: calc.frontColors,
+            backColors: calc.backColors,
+            isDarkGarment: calc.isDarkGarment,
+            safetyStripes: calc.hasSafetyStripes,
+            pricePerShirt: calc.pricePerShirt,
+            orderSubtotal: calc.orderSubtotal,
+            ltmFeeTotal: calc.ltmFeeTotal,
+            setupFee: calc.totalSetupFee,
+            finalTotal: calc.finalTotal,
+            tierLabel: calc.tierLabel,
+            notes: this.notes.value.trim(),
+            salesRepEmail: this.salesRep.value,
+            salesRepName: this.getSalesRepName(this.salesRep.value),
+            calculation: calc
+        };
+        const saveRequested = this.saveToDatabase.checked;
+        const key = JSON.stringify({quoteData, saveRequested});
+        // An exact retry keeps its quote ID and only repeats the unfinished operation.
+        if (!this.submission || this.submission.key !== key || (this.submission.emailed && (!this.submission.saveRequested || this.submission.saved))) {
+            quoteData.quoteId = this.quoteService.generateQuoteID();
+            quoteData.createdAt = Date.now();
+            this.submission = {key, quoteData, saveRequested, saved: false, emailed: false};
         }
+        await this.submitCapturedQuote();
     }
 
     buildEmailData(quoteData) {
@@ -584,7 +616,7 @@ class CustomerScreenPrintCalculator {
     }
 
     generateQuoteHTML(quoteData) {
-        const calc = this.currentCalculation;
+        const calc = quoteData.calculation || this.currentCalculation;
 
         let html = `
             <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
@@ -657,21 +689,11 @@ class CustomerScreenPrintCalculator {
     }
 
     validateQuoteForm() {
-        const errors = [];
-
-        if (!this.customerName.value.trim()) {
-            errors.push('Customer name is required');
-        }
-
-        if (!this.validateEmail(this.customerEmail.value)) {
-            errors.push('Valid email is required');
-        }
-
-        if (errors.length > 0) {
-            alert(errors.join('\n'));
+        if (!this.quoteForm.reportValidity()) return false;
+        if (!this.customerName.value.trim() || !this.validateEmail(this.customerEmail.value.trim())) {
+            this.setFeedback('quoteSubmitStatus', 'Enter a customer name and valid email address.');
             return false;
         }
-
         return true;
     }
 
@@ -695,48 +717,66 @@ class CustomerScreenPrintCalculator {
     }
 
     showSuccessModal(quoteId, quoteData) {
+        const {saved, emailed, saveRequested, saveResult} = this.submission;
         document.getElementById('modalQuoteId').textContent = quoteId;
         document.getElementById('modalCustomerName').textContent = quoteData.customerName;
         document.getElementById('modalCustomerEmail').textContent = quoteData.customerEmail;
         document.getElementById('modalTotalAmount').textContent = `$${quoteData.finalTotal.toFixed(2)}`;
-
+        document.getElementById('quoteSuccessTitle').textContent = emailed ? 'Quote sent' : 'Quote saved';
+        document.getElementById('quoteRecipientLabel').textContent = emailed ? 'Your quote has been sent to:' : 'Your quote is saved for:';
+        let message = '';
+        if (!emailed) message = 'Email delivery was not confirmed. Retry email or share the saved quote ID with your sales representative.';
+        else if (saveRequested && !saved) message = saveResult && saveResult.sessionSaved ? 'Email sent. The saved quote is incomplete. Retry saving the missing details.' : 'Email sent. Saving was not confirmed. Retry saving for your sales representative.';
+        this.setFeedback('quoteDeliveryStatus', message);
+        const retry = document.getElementById('retryQuoteBtn');
+        retry.hidden = !message;
+        retry.textContent = !emailed ? 'Retry email' : 'Retry saving';
         this.lastQuoteData = quoteData;
-
-        document.getElementById('successModal').classList.add('active');
+        this.copyGeneration = (this.copyGeneration || 0) + 1;
+        this.setFeedback('quoteCopyStatus', '');
+        this.openDialog('successModal');
+        document.getElementById('quoteSuccessTitle').focus();
     }
 
     closeQuoteModal() {
-        document.getElementById('quoteModal').classList.remove('active');
+        this.closeDialog('quoteModal');
     }
 
     showLoading() {
-        this.submitQuoteBtn.disabled = true;
-        this.submitQuoteBtn.innerHTML = '<span class="loading"></span> Sending...';
+        this.submitting = true;
+        this.pendingControls = [...document.querySelectorAll('input, select, textarea, button')].map(node => ({node, disabled: node.disabled}));
+        this.pendingControls.forEach(({node}) => { node.disabled = true; });
+        this.submitQuoteBtn.textContent = 'Sending…';
+        const retry = document.getElementById('retryQuoteBtn');
+        this.retryLabel = retry.textContent;
+        retry.textContent = 'Completing quote…';
+        document.getElementById('quoteForm').setAttribute('aria-busy', 'true');
     }
 
     hideLoading() {
-        this.submitQuoteBtn.disabled = false;
-        this.submitQuoteBtn.innerHTML = '<i class="fas fa-paper-plane" aria-hidden="true"></i> Send Quote';
+        this.submitting = false;
+        (this.pendingControls || []).forEach(({node, disabled}) => { node.disabled = disabled; });
+        this.pendingControls = [];
+        this.submitQuoteBtn.textContent = 'Send Quote';
+        document.getElementById('retryQuoteBtn').textContent = this.retryLabel || 'Retry';
+        document.getElementById('quoteForm').setAttribute('aria-busy', 'false');
     }
 }
 
-// Modal functions
-function closeQuoteModal() {
-    document.getElementById('quoteModal').classList.remove('active');
-}
-
-function closeSuccessModal() {
-    document.getElementById('successModal').classList.remove('active');
-}
-
-function copyQuoteId() {
+// Page actions remain compatible with the shared data-call delegator.
+function closeQuoteModal() { window.calculator.closeQuoteModal(); }
+function closeSuccessModal() { window.calculator.closeDialog('successModal'); }
+function printEstimate() { if (window.calculator.currentCalculation && !window.calculator.submitting) window.print(); }
+async function copyQuoteId() {
+    const calculator = window.calculator;
+    const generation = calculator.copyGeneration;
     const quoteId = document.getElementById('modalQuoteId').textContent;
-    navigator.clipboard.writeText(quoteId).then(() => {
-        alert('Quote ID copied to clipboard!');
-    }).catch(err => {
-        console.error('Failed to copy:', err);
-        alert('Failed to copy Quote ID');
-    });
+    try {
+        await navigator.clipboard.writeText(quoteId);
+        if (generation === calculator.copyGeneration) calculator.setFeedback('quoteCopyStatus', 'Quote ID copied.');
+    } catch (error) {
+        if (generation === calculator.copyGeneration) calculator.setFeedback('quoteCopyStatus', 'Copy failed. Select and copy quote ID ' + quoteId + '.');
+    }
 }
 
 function printQuote() {
@@ -744,253 +784,32 @@ function printQuote() {
     if (!calculator.lastQuoteData) return;
 
     const data = calculator.lastQuoteData;
-    const calc = calculator.currentCalculation;
+    const calc = data.calculation;
     const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+        calculator.setFeedback('quoteCopyStatus', 'The print window could not open. Allow pop-ups for this page and try again.');
+        return;
+    }
+    const assetRoot = window.location.origin;
+    printWindow.addEventListener('load', async () => {
+        await printWindow.document.fonts.ready;
+        await Promise.all([...printWindow.document.images].map(img => img.decode().catch(() => {})));
+        printWindow.print();
+    }, {once: true});
 
     // Build clean invoice HTML
     const printHTML = `
         <!DOCTYPE html>
-        <html>
+        <html lang="en">
         <head>
             <title>Quote ${data.quoteId} - Northwest Custom Apparel</title>
-            <style>
-                @page {
-                    margin: 0.5in;
-                    size: letter;
-                }
-
-                * {
-                    margin: 0;
-                    padding: 0;
-                    box-sizing: border-box;
-                }
-
-                body {
-                    font-family: Arial, Helvetica, sans-serif;
-                    font-size: 12pt;
-                    line-height: 1.4;
-                    color: #000;
-                    background: white;
-                }
-
-                /* Header */
-                .invoice-header {
-                    display: table;
-                    width: 100%;
-                    margin-bottom: 30px;
-                }
-
-                .company-section {
-                    display: table-cell;
-                    vertical-align: top;
-                    width: 60%;
-                }
-
-                .invoice-section {
-                    display: table-cell;
-                    vertical-align: top;
-                    width: 40%;
-                    text-align: right;
-                }
-
-                .company-logo {
-                    max-width: 220px;
-                    height: auto;
-                    margin-bottom: 10px;
-                }
-
-                .company-info {
-                    font-size: 10pt;
-                    color: #555;
-                    line-height: 1.3;
-                }
-
-                .invoice-title {
-                    font-size: 32pt;
-                    font-weight: bold;
-                    color: #4cb354;
-                    margin-bottom: 10px;
-                }
-
-                .invoice-details {
-                    font-size: 10pt;
-                    line-height: 1.5;
-                }
-
-                .invoice-details strong {
-                    display: inline-block;
-                    width: 80px;
-                    text-align: right;
-                    margin-right: 10px;
-                }
-
-                /* Bill To Section */
-                .bill-to-section {
-                    margin: 30px 0;
-                    padding: 15px;
-                    border: 1px solid #ddd;
-                    background: #f9f9f9;
-                }
-
-                .bill-to-title {
-                    font-size: 11pt;
-                    font-weight: bold;
-                    color: #4cb354;
-                    margin-bottom: 10px;
-                }
-
-                .bill-to-content {
-                    font-size: 11pt;
-                    line-height: 1.5;
-                }
-
-                /* Main Table */
-                .invoice-table {
-                    width: 100%;
-                    border-collapse: collapse;
-                    margin: 30px 0;
-                    font-size: 11pt;
-                }
-
-                .invoice-table thead {
-                    background: #4cb354;
-                    color: white;
-                }
-
-                .invoice-table th {
-                    padding: 10px;
-                    text-align: left;
-                    font-weight: bold;
-                    border: 1px solid #4cb354;
-                }
-
-                .invoice-table th:nth-child(2),
-                .invoice-table th:nth-child(3),
-                .invoice-table th:nth-child(4) {
-                    text-align: right;
-                    width: 100px;
-                }
-
-                .invoice-table tbody td {
-                    padding: 8px 10px;
-                    border: 1px solid #ddd;
-                    vertical-align: top;
-                }
-
-                .invoice-table tbody td:nth-child(2),
-                .invoice-table tbody td:nth-child(3),
-                .invoice-table tbody td:nth-child(4) {
-                    text-align: right;
-                }
-
-                .description-detail {
-                    font-size: 9pt;
-                    color: #666;
-                    display: block;
-                    margin-top: 2px;
-                }
-
-                /* Totals Section */
-                .totals-section {
-                    margin-left: auto;
-                    width: 300px;
-                    margin-top: 20px;
-                }
-
-                .total-row {
-                    display: table;
-                    width: 100%;
-                    padding: 5px 0;
-                    border-bottom: 1px solid #eee;
-                }
-
-                .total-label {
-                    display: table-cell;
-                    text-align: right;
-                    padding-right: 20px;
-                    font-size: 11pt;
-                }
-
-                .total-value {
-                    display: table-cell;
-                    text-align: right;
-                    width: 100px;
-                    font-size: 11pt;
-                }
-
-                .grand-total {
-                    border-top: 2px solid #4cb354;
-                    border-bottom: 2px solid #4cb354;
-                    padding: 8px 0;
-                    margin-top: 5px;
-                    font-weight: bold;
-                    font-size: 12pt;
-                }
-
-                .grand-total .total-value {
-                    color: #4cb354;
-                    font-size: 14pt;
-                }
-
-                /* Notes Section */
-                .notes-section {
-                    margin: 30px 0;
-                    padding: 15px;
-                    background: #fff7ed;
-                    border: 1px solid #fbbf24;
-                }
-
-                .notes-title {
-                    font-weight: bold;
-                    margin-bottom: 5px;
-                    color: #92400e;
-                }
-
-                .notes-content {
-                    color: #78350f;
-                    font-size: 10pt;
-                }
-
-                /* Terms Section */
-                .terms-section {
-                    margin-top: 40px;
-                    padding: 15px;
-                    background: #fee2e2;
-                    border: 1px solid #f87171;
-                }
-
-                .terms-title {
-                    font-weight: bold;
-                    color: #991b1b;
-                    margin-bottom: 8px;
-                    font-size: 11pt;
-                }
-
-                .terms-content {
-                    font-size: 10pt;
-                    line-height: 1.4;
-                    color: #7f1d1d;
-                }
-
-                /* Footer */
-                .invoice-footer {
-                    margin-top: 40px;
-                    padding-top: 20px;
-                    border-top: 2px solid #e5e7eb;
-                    text-align: center;
-                    font-size: 9pt;
-                    color: #666;
-                }
-
-                @media print {
-                    body {
-                        print-color-adjust: exact;
-                        -webkit-print-color-adjust: exact;
-                    }
-                }
-            </style>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <link rel="stylesheet" href="${assetRoot}/shared_components/css/tokens.css?v=2026.09.11.6">
+            <link rel="stylesheet" href="${assetRoot}/shared_components/css/components.css?v=2026.09.11.6">
+            <link rel="stylesheet" href="${assetRoot}/calculators/screenprint-customer/screenprint-customer-invoice.css?v=2026.09.11.6">
         </head>
-        <body>
+        <body data-ui="unified" class="screenprint-invoice">
             <!-- Invoice Header -->
             <div class="invoice-header">
                 <div class="company-section">
@@ -1008,8 +827,8 @@ function printQuote() {
                     <div class="invoice-title">QUOTE</div>
                     <div class="invoice-details">
                         <div><strong>Quote #:</strong> ${data.quoteId}</div>
-                        <div><strong>Date:</strong> ${new Date().toLocaleDateString()}</div>
-                        <div><strong>Valid Until:</strong> ${new Date(Date.now() + 30*24*60*60*1000).toLocaleDateString()}</div>
+                        <div><strong>Date:</strong> ${new Date(data.createdAt).toLocaleDateString()}</div>
+                        <div><strong>Valid Until:</strong> ${new Date(data.createdAt + 30*24*60*60*1000).toLocaleDateString()}</div>
                     </div>
                 </div>
             </div>
@@ -1122,12 +941,7 @@ function printQuote() {
                 Thank you for your business!
             </div>
 
-            <script>
-                window.onload = () => {
-                    window.print();
-                    setTimeout(() => window.close(), 500);
-                };
-            </script>
+            <!-- Printing is requested by the opener once this document and its images are ready. -->
         </body>
         </html>
     `;

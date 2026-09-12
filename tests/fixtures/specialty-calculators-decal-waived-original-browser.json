@@ -1,0 +1,537 @@
+{
+  "name": "decal-waived",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Custom & Oversize Decal Pricing — Northwest Custom Apparel",
+      "url": "/calculators/custom-decal-pricing.html",
+      "ids": {
+        "decalSizeRows": "20.00 × 14.00 ×",
+        "decalAddRow": "Add another size",
+        "decalArtOnFile": "",
+        "decalTaxRate": "",
+        "decalWarnings": "",
+        "decalOutput": "Total finished area 34.00 sq ft Rate (10–50 sq ft) $12.00 / sq ft Material $408.00 Art setup (GRT-50) — waived $0.00 Subtotal $408.00 Sales tax (0%) $0.00 Total quote $408.00",
+        "decalRateGrid": "TOTAL FINISHED SQ FT RATE TIER MINIMUM Up to 10 sq ft $18.00 / sq ft $90.00 min 10–50 sq ft $12.00 / sq ft never < $180.00 Over 50 sq ft $9.00 / sq ft never < $600.00",
+        "decalMinNote": "$90.00 material"
+      },
+      "fields": [
+        {
+          "id": "",
+          "type": "number",
+          "value": "12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "number",
+          "value": "10",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "number",
+          "value": "12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "number",
+          "value": "12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "number",
+          "value": "14",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "decalArtOnFile",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "decalTaxRate",
+          "type": "number",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "the customer sticker page"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "(253) 922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "/custom-stickers"
+        },
+        {
+          "href": "/custom-banners",
+          "text": "/custom-banners"
+        }
+      ],
+      "tables": [
+        "TOTAL FINISHED SQ FT RATE TIER MINIMUM Up to 10 sq ft $18.00 / sq ft $90.00 min 10–50 sq ft $12.00 / sq ft never < $180.00 Over 50 sq ft $9.00 / sq ft never < $600.00",
+        "SIZE SQ FT EACH 6\" × 6\" 0.25 6\" × 12\" 0.50 8\" × 8\" 0.44 8\" × 12\" 0.67 10\" × 10\" 0.69 12\" × 12\" 1.00 12\" × 18\" 1.50 12\" × 24\" 2.00 15\" × 15\" 1.56 18\" × 18\" 2.25 18\" × 24\" 3.00 24\" × 24\" 4.00 24\" × 36\" 6.00 24\" × 48\" 8.00 30\" × 30\" 6.25 36\" × 36\" 9.00 36\" × 48\" 12.00 48\" × 48\" 16.00 48\" × 96\" 32.00"
+      ],
+      "headings": [
+        "Price a decal the sticker grid can't",
+        "Square-foot rate card",
+        "Square-foot cheat sheet"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "nav > span:nth-child(3)"
+            ],
+            [
+              ".page-hero-hint"
+            ],
+            [
+              ".decal-rows-head > span:nth-child(1)"
+            ],
+            [
+              ".decal-rows-head > span:nth-child(2)"
+            ],
+            [
+              ".decal-rows-head > span:nth-child(3)"
+            ],
+            [
+              ".decal-rows-head > span:nth-child(4)"
+            ],
+            [
+              "small"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Custom & Oversize Decal Pricing — Northwest Custom Apparel",
+      "url": "/calculators/custom-decal-pricing.html",
+      "ids": {
+        "decalSizeRows": "20.00 × 14.00 ×",
+        "decalAddRow": "Add another size",
+        "decalArtOnFile": "",
+        "decalTaxRate": "",
+        "decalWarnings": "",
+        "decalOutput": "Total finished area 34.00 sq ft Rate (10–50 sq ft) $12.00 / sq ft Material $408.00 Art setup (GRT-50) — waived $0.00 Subtotal $408.00 Sales tax (0%) $0.00 Total quote $408.00",
+        "decalRateGrid": "TOTAL FINISHED SQ FT RATE TIER MINIMUM Up to 10 sq ft $18.00 / sq ft $90.00 min 10–50 sq ft $12.00 / sq ft never < $180.00 Over 50 sq ft $9.00 / sq ft never < $600.00",
+        "decalMinNote": "$90.00 material"
+      },
+      "fields": [
+        {
+          "id": "",
+          "type": "number",
+          "value": "12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "number",
+          "value": "10",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "number",
+          "value": "12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "number",
+          "value": "12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "number",
+          "value": "14",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "decalArtOnFile",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "decalTaxRate",
+          "type": "number",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "the customer sticker page"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "(253) 922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "/custom-stickers"
+        },
+        {
+          "href": "/custom-banners",
+          "text": "/custom-banners"
+        }
+      ],
+      "tables": [
+        "TOTAL FINISHED SQ FT RATE TIER MINIMUM Up to 10 sq ft $18.00 / sq ft $90.00 min 10–50 sq ft $12.00 / sq ft never < $180.00 Over 50 sq ft $9.00 / sq ft never < $600.00",
+        "SIZE SQ FT EACH 6\" × 6\" 0.25 6\" × 12\" 0.50 8\" × 8\" 0.44 8\" × 12\" 0.67 10\" × 10\" 0.69 12\" × 12\" 1.00 12\" × 18\" 1.50 12\" × 24\" 2.00 15\" × 15\" 1.56 18\" × 18\" 2.25 18\" × 24\" 3.00 24\" × 24\" 4.00 24\" × 36\" 6.00 24\" × 48\" 8.00 30\" × 30\" 6.25 36\" × 36\" 9.00 36\" × 48\" 12.00 48\" × 48\" 16.00 48\" × 96\" 32.00"
+      ],
+      "headings": [
+        "Price a decal the sticker grid can't",
+        "Square-foot rate card",
+        "Square-foot cheat sheet"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "nav > span:nth-child(3)"
+            ],
+            [
+              ".page-hero-hint"
+            ],
+            [
+              ".decal-row:nth-child(1) > .decal-row-sqft"
+            ],
+            [
+              ".decal-row:nth-child(2) > .decal-row-sqft"
+            ],
+            [
+              "small"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Custom & Oversize Decal Pricing — Northwest Custom Apparel",
+      "url": "/calculators/custom-decal-pricing.html",
+      "ids": {
+        "decalSizeRows": "20.00 × 14.00 ×",
+        "decalAddRow": "Add another size",
+        "decalArtOnFile": "",
+        "decalTaxRate": "",
+        "decalWarnings": "",
+        "decalOutput": "Total finished area 34.00 sq ft Rate (10–50 sq ft) $12.00 / sq ft Material $408.00 Art setup (GRT-50) — waived $0.00 Subtotal $408.00 Sales tax (0%) $0.00 Total quote $408.00",
+        "decalRateGrid": "TOTAL FINISHED SQ FT RATE TIER MINIMUM Up to 10 sq ft $18.00 / sq ft $90.00 min 10–50 sq ft $12.00 / sq ft never < $180.00 Over 50 sq ft $9.00 / sq ft never < $600.00",
+        "decalMinNote": "$90.00 material"
+      },
+      "fields": [
+        {
+          "id": "",
+          "type": "number",
+          "value": "12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "number",
+          "value": "10",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "number",
+          "value": "12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "number",
+          "value": "12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "number",
+          "value": "14",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "decalArtOnFile",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "decalTaxRate",
+          "type": "number",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "the customer sticker page"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "(253) 922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "/custom-stickers"
+        },
+        {
+          "href": "/custom-banners",
+          "text": "/custom-banners"
+        }
+      ],
+      "tables": [
+        "TOTAL FINISHED SQ FT RATE TIER MINIMUM Up to 10 sq ft $18.00 / sq ft $90.00 min 10–50 sq ft $12.00 / sq ft never < $180.00 Over 50 sq ft $9.00 / sq ft never < $600.00",
+        "SIZE SQ FT EACH 6\" × 6\" 0.25 6\" × 12\" 0.50 8\" × 8\" 0.44 8\" × 12\" 0.67 10\" × 10\" 0.69 12\" × 12\" 1.00 12\" × 18\" 1.50 12\" × 24\" 2.00 15\" × 15\" 1.56 18\" × 18\" 2.25 18\" × 24\" 3.00 24\" × 24\" 4.00 24\" × 36\" 6.00 24\" × 48\" 8.00 30\" × 30\" 6.25 36\" × 36\" 9.00 36\" × 48\" 12.00 48\" × 48\" 16.00 48\" × 96\" 32.00"
+      ],
+      "headings": [
+        "Price a decal the sticker grid can't",
+        "Square-foot rate card",
+        "Square-foot cheat sheet"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "nav > span:nth-child(3)"
+            ],
+            [
+              ".page-hero-hint"
+            ],
+            [
+              ".decal-row:nth-child(1) > .decal-row-sqft"
+            ],
+            [
+              ".decal-row:nth-child(2) > .decal-row-sqft"
+            ],
+            [
+              "small"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Custom & Oversize Decal Pricing — Northwest Custom Apparel",
+      "url": "/calculators/custom-decal-pricing.html",
+      "ids": {
+        "decalSizeRows": "20.00 × 14.00 ×",
+        "decalAddRow": "Add another size",
+        "decalArtOnFile": "",
+        "decalTaxRate": "",
+        "decalWarnings": "",
+        "decalOutput": "Total finished area 34.00 sq ft Rate (10–50 sq ft) $12.00 / sq ft Material $408.00 Art setup (GRT-50) — waived $0.00 Subtotal $408.00 Sales tax (0%) $0.00 Total quote $408.00",
+        "decalRateGrid": "TOTAL FINISHED SQ FT RATE TIER MINIMUM Up to 10 sq ft $18.00 / sq ft $90.00 min 10–50 sq ft $12.00 / sq ft never < $180.00 Over 50 sq ft $9.00 / sq ft never < $600.00",
+        "decalMinNote": "$90.00 material"
+      },
+      "fields": [
+        {
+          "id": "",
+          "type": "number",
+          "value": "12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "number",
+          "value": "10",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "number",
+          "value": "12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "number",
+          "value": "12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "type": "number",
+          "value": "14",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "decalArtOnFile",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "decalTaxRate",
+          "type": "number",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "the customer sticker page"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "(253) 922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/custom-stickers",
+          "text": "/custom-stickers"
+        },
+        {
+          "href": "/custom-banners",
+          "text": "/custom-banners"
+        }
+      ],
+      "tables": [
+        "TOTAL FINISHED SQ FT RATE TIER MINIMUM Up to 10 sq ft $18.00 / sq ft $90.00 min 10–50 sq ft $12.00 / sq ft never < $180.00 Over 50 sq ft $9.00 / sq ft never < $600.00",
+        "SIZE SQ FT EACH 6\" × 6\" 0.25 6\" × 12\" 0.50 8\" × 8\" 0.44 8\" × 12\" 0.67 10\" × 10\" 0.69 12\" × 12\" 1.00 12\" × 18\" 1.50 12\" × 24\" 2.00 15\" × 15\" 1.56 18\" × 18\" 2.25 18\" × 24\" 3.00 24\" × 24\" 4.00 24\" × 36\" 6.00 24\" × 48\" 8.00 30\" × 30\" 6.25 36\" × 36\" 9.00 36\" × 48\" 12.00 48\" × 48\" 16.00 48\" × 96\" 32.00"
+      ],
+      "headings": [
+        "Price a decal the sticker grid can't",
+        "Square-foot rate card",
+        "Square-foot cheat sheet"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "nav > span:nth-child(3)"
+            ],
+            [
+              ".page-hero-hint"
+            ],
+            [
+              ".decal-row:nth-child(1) > .decal-row-sqft"
+            ],
+            [
+              ".decal-row:nth-child(2) > .decal-row-sqft"
+            ],
+            [
+              "small"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "dialogs": [],
+  "mocked": []
+}

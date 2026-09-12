@@ -139,6 +139,9 @@ for (const [file, method] of [['bradley-transfers.html', 'Supacolor'], ['bradley
         expect(state.errors).toEqual([]);
     });
     test(`CSS Bradley: ${method} queue failure and recovery`, async ({ page }) => {
+        // Hold notification expiry while inspecting both animation phases.
+        await page.clock.install({time: new Date('2026-09-11T18:30:00Z')});
+        await page.clock.pauseAt(new Date('2026-09-11T18:30:01Z'));
         const state = await fixture(page, 'dashboards/' + file, { failure: true, record: { ...transfer, Method: method } });
         await page.goto('/dashboards/' + file);
         await expect(page.locator('.bt-error')).toBeVisible();
@@ -157,6 +160,7 @@ for (const [file, method] of [['bradley-transfers.html', 'Supacolor'], ['bradley
             }, leaving);
             expect(opacity).toBe('1');
         }
+        await page.clock.resume();
         await layouts(page, method + '-queue-error');
         state.failure = false;
         await page.locator('.bt-error button').click();

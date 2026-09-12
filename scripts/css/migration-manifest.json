@@ -6372,6 +6372,266 @@
         "rawCssBytes": 28097,
         "localCssRequests": 2
       }
+    },
+    {
+      "source": "calculators/custom-decal-pricing.html",
+      "family": "specialty-calculators",
+      "status": "reviewed",
+      "route": "/calculators/custom-decal-pricing.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/specialty-pricing.css",
+        "calculators/custom-decal-pricing.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "1440-768-390-320",
+        "original-text-fields-links-prices-tiers-and-request-bodies",
+        "normal-failed-invalid-and-retry",
+        "44-pixel-controls-and-keyboard-table-scroll",
+        "all-160-emblem-prices-on-phones",
+        "closed-assistant-inert-and-native-tab-focus-restoration",
+        "delayed-focus-does-not-steal-the-selected-action",
+        "all-paper-pages-and-print-disclosure-restoration"
+      ],
+      "test": "tests/e2e/css-unification-specialty-decal-emblem.spec.js",
+      "maxCssBytes": 74267,
+      "measuredRawCssBytes": 72219,
+      "baseline": {
+        "commit": "97cc05080d4689785bc0885b6a4223c0f1356cbf",
+        "rawCssBytes": 77693,
+        "localCssRequests": 2
+      }
+    },
+    {
+      "source": "calculators/embroidered-emblem/index.html",
+      "family": "specialty-calculators",
+      "status": "reviewed",
+      "route": "/calculators/embroidered-emblem/index.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/specialty-pricing.css",
+        "calculators/embroidered-emblem/embroidered-emblem.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "1440-768-390-320",
+        "original-text-fields-links-prices-tiers-and-request-bodies",
+        "normal-failed-invalid-and-retry",
+        "44-pixel-controls-and-keyboard-table-scroll",
+        "all-160-emblem-prices-on-phones",
+        "closed-assistant-inert-and-native-tab-focus-restoration",
+        "delayed-focus-does-not-steal-the-selected-action",
+        "all-paper-pages-and-print-disclosure-restoration"
+      ],
+      "test": "tests/e2e/css-unification-specialty-decal-emblem.spec.js",
+      "maxCssBytes": 80519,
+      "measuredRawCssBytes": 78471,
+      "baseline": {
+        "commit": "97cc05080d4689785bc0885b6a4223c0f1356cbf",
+        "rawCssBytes": 89181,
+        "localCssRequests": 3
+      }
+    },
+    {
+      "source": "calculators/richardson-2025.html",
+      "family": "specialty-calculators",
+      "status": "reviewed",
+      "route": "/calculators/richardson-2025.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/specialty-pricing.css",
+        "calculators/richardson-2025-styles.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "1440-768-390-320",
+        "original-values-fields-navigation-and-five-request-contracts",
+        "72-native-price-quantity-decoration-and-design-states",
+        "eight-category-result-sets-and-quick-selection",
+        "keyboard-combobox-with-native-dialog-popup-and-focus-restoration",
+        "44-pixel-controls-and-visible-mobile-categories",
+        "stale-style-price-cleared-immediately",
+        "all-five-failed-and-incomplete-live-reads-warn-on-screen-and-paper",
+        "live-patch-puff-and-setup-labels",
+        "all-48-screens-and-12-complete-paper-documents-reviewed"
+      ],
+      "test": "tests/e2e/css-unification-specialty-richardson.spec.js",
+      "maxCssBytes": 82292,
+      "measuredRawCssBytes": 80250,
+      "baseline": {
+        "commit": "97cc05080d4689785bc0885b6a4223c0f1356cbf",
+        "rawCssBytes": 71413,
+        "localCssRequests": 4
+      }
+    },
+    {
+      "source": "calculators/laser-tumbler-polarcamel.html",
+      "family": "specialty-calculators",
+      "status": "reviewed",
+      "route": "/calculators/laser-tumbler-polarcamel.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/storefront-shell.css",
+        "shared_components/css/specialty-pricing.css",
+        "shared_components/css/laser-tumbler-simple.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "1440-768-390-320",
+        "64-original-quantity-color-financial-and-request-contracts",
+        "original-logo-download-byte-identical",
+        "native-color-arrow-keys-and-latest-response-ownership",
+        "native-drawer-and-image-dialog-with-focus-restoration",
+        "fresh-cache-retains-age-and-awaits-current-pricing-policy",
+        "failed-and-incomplete-pricing-product-inventory-and-image-reads",
+        "retained-print-warnings-without-dialog-overlays",
+        "all-36-screens-and-17-pages-in-nine-paper-documents-reviewed"
+      ],
+      "test": "tests/e2e/css-unification-specialty-polar-camel.spec.js",
+      "maxCssBytes": 97491,
+      "measuredRawCssBytes": 95443,
+      "baseline": {
+        "commit": "97cc05080d4689785bc0885b6a4223c0f1356cbf",
+        "rawCssBytes": 84072,
+        "localCssRequests": 3
+      }
+    },
+    {
+      "source": "calculators/safety-stripe-creator.html",
+      "family": "specialty-calculators",
+      "status": "reviewed",
+      "route": "/calculators/safety-stripe-creator.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/specialty-pricing.css",
+        "shared_components/css/safety-stripe-creator.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "1440-768-390-320",
+        "64-original-style-and-placement-combinations",
+        "native-keyboard-choices-and-dialog-focus",
+        "saved-design-note-and-original-session-item-contracts",
+        "partial-save-retry-reuses-accepted-session",
+        "pending-save-blocks-duplicate-submit-and-closing",
+        "clipboard-success-and-failure",
+        "empty-previews-do-not-warn-and-failed-images-use-visible-placeholders",
+        "short-phone-dialog-save-and-retry-controls-reachable",
+        "all-44-screens-and-ten-single-page-print-documents-reviewed",
+        "changed-design-clears-obsolete-saved-or-failed-reference"
+      ],
+      "test": "tests/e2e/css-unification-specialty-safety-stripe.spec.js",
+      "maxCssBytes": 78657,
+      "measuredRawCssBytes": 76609,
+      "baseline": {
+        "commit": "97cc05080d4689785bc0885b6a4223c0f1356cbf",
+        "rawCssBytes": 45671,
+        "localCssRequests": 3
+      }
+    },
+    {
+      "source": "calculators/screenprint-customer/index.html",
+      "family": "specialty-calculators",
+      "status": "reviewed",
+      "route": "/calculators/screenprint-customer/index.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/specialty-pricing.css",
+        "calculators/screenprint-customer/screenprint-customer-styles.css"
+      ],
+      "dynamicStyles": [
+        "calculators/screenprint-customer/screenprint-customer-invoice.css"
+      ],
+      "states": [
+        "1440-768-390-320",
+        "396-original-financial-combinations",
+        "original-successful-save-payloads-and-email-contents",
+        "native-dialog-keyboard-focus-and-retained-draft",
+        "short-phone-horizontal-quote-scroll-and-submit-reachability",
+        "pending-request-and-stale-price-and-tier-ownership",
+        "partial-session-item-setup-and-email-retries",
+        "new-completed-submission-retains-new-quote-identity",
+        "immutable-saved-invoice-after-later-input-edit",
+        "pricing-retry-clipboard-and-popup-failures",
+        "47-screen-captures-and-13-complete-single-page-pdfs-reviewed"
+      ],
+      "test": "tests/e2e/css-unification-specialty-screenprint-customer.spec.js",
+      "maxCssBytes": 80299,
+      "measuredRawCssBytes": 78251,
+      "baseline": {
+        "commit": "97cc05080d4689785bc0885b6a4223c0f1356cbf",
+        "rawCssBytes": 49682,
+        "localCssRequests": 4
+      }
+    },
+    {
+      "source": "calculators/archive/seasonal-2025/breast-cancer-awareness-bundle.html",
+      "family": "seasonal-bundles",
+      "status": "reviewed",
+      "route": "/breast-cancer-awareness-bundle.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "calculators/breast-cancer-awareness-bundle.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "1440-768-390-320",
+        "original-products-fields-links-images-and-prices",
+        "16-original-order-payload-combinations",
+        "keyboard-product-dialog-and-focus-return",
+        "image-pdf-upload-replace-remove-and-escaped-file-names",
+        "failed-session-item-upload-and-email-recovery",
+        "pending-request-freezes-captured-order-and-prevents-duplicate-writes",
+        "confirmed-stage-retries-keep-original-reference",
+        "36-screens-and-ten-paper-pages-reviewed"
+      ],
+      "test": "tests/e2e/css-unification-seasonal-bca.spec.js",
+      "maxCssBytes": 89990,
+      "measuredRawCssBytes": 87942,
+      "baseline": {
+        "commit": "efa9012ae3b5b77ad8612da53f986024155ce77b",
+        "note": "Original runtime Tailwind CDN; exact original styles and content retained in source fixture. Broken service-link evidence labeled separately."
+      }
+    },
+    {
+      "source": "calculators/christmas-bundles.html",
+      "family": "seasonal-bundles",
+      "status": "reviewed",
+      "route": "/christmas-bundles.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "calculators/css/christmas-bundles.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "1440-768-390-320",
+        "2026-campaign-and-bidirectional-staff-dashboard-link",
+        "24-original-successful-order-and-email-combinations",
+        "24-original-controller-financial-combinations",
+        "catalog-stock-errors-retries-and-color-response-ownership",
+        "keyboard-product-details-and-native-image-dialog",
+        "captured-order-and-pending-duplicate-guard",
+        "independent-session-item-logo-and-email-retry-stages",
+        "address2-thread-colors-and-delivery-date-validation",
+        "52-screens-and-19-paper-pages-in-13-documents-reviewed",
+        "print-restores-confirmation-and-draft-until-explicit-done"
+      ],
+      "test": "tests/e2e/css-unification-seasonal-christmas.spec.js",
+      "maxCssBytes": 90582,
+      "measuredRawCssBytes": 88534,
+      "baseline": {
+        "commit": "c01ffc2058a0725d3df12c9181c8022776b4ab26",
+        "note": "Six original seasonal source hashes and thirteen original Christmas browser contracts retained; original pointer and false-success defects are labeled diagnostics."
+      }
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",
@@ -6384,13 +6644,6 @@
         "pages/js/quote-view.js"
       ],
       "note": "The lead workspace and Quote View lazy triggers are reviewed at four widths with original prefill, keyboard close/focus, and intercepted reference-import bodies. garment-submit-form.css/js remain original; shared-module modernization stays pending across all consumers."
-    },
-    {
-      "kind": "style-injection",
-      "owners": [
-        "calculators/js/christmas-bundles.js"
-      ],
-      "note": "Error and inventory states."
     },
     {
       "kind": "generated-document",
