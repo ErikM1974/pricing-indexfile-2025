@@ -1209,6 +1209,34 @@
       "after": "/shared_components/js/core-calculator-ui.js?v=2026.09.11.5",
       "count": 1,
       "reason": "Refetch the reviewed core calculator asset at this release version."
+    },
+    {
+      "file": "shared_components/js/screenprint-pricing-v2.js",
+      "before": "expandLTMTier(tier, defaultQty) {",
+      "after": "expandLTMTier(tier, defaultQty, focusInput = true) {",
+      "count": 1,
+      "reason": "Only explicit tier selection moves focus to the exact quantity input."
+    },
+    {
+      "file": "shared_components/js/screenprint-pricing-v2.js",
+      "before": "setTimeout(() => { if (input) { input.focus(); input.select(); } }, 100);",
+      "after": "if (focusInput && input) { input.focus(); input.select(); }",
+      "count": 1,
+      "reason": "Focus the displayed quantity immediately without a delayed callback stealing later keyboard focus."
+    },
+    {
+      "file": "shared_components/js/screenprint-pricing-v2.js",
+      "before": "this.expandLTMTier(current, tier.MinQuantity);",
+      "after": "this.expandLTMTier(current, tier.MinQuantity, false);",
+      "count": 1,
+      "reason": "Background price initialization retains the current keyboard control."
+    },
+    {
+      "file": "calculators/screen-print-pricing.html",
+      "before": "/shared_components/js/screenprint-pricing-v2.js?v=2026.09.11.5",
+      "after": "/shared_components/js/screenprint-pricing-v2.js?v=2026.09.12.1",
+      "count": 1,
+      "reason": "Refetch the focus correction with the seasonal release."
     }
   ],
   "retiredStyles": []

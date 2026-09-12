@@ -1106,3 +1106,7 @@ Observed original defects to repair with explicit contracts: hidden embroidery f
 - [ ] Review current screens/paper, preservation/amounts, keyboard/accessibility/fault checks, then Christmas gift boxes. Full application/release gates follow both pages.
 
 Working branch codex/seasonal-bundle-layout forks b66a5252. No application edits or migration credit at this baseline: candidate213/225,12pending; live207/225,v2026.09.11.6/2109/75ef8019. Six-specialty full gates run separately on frozen b66a5252. GitHub public publication remains awaiting explicit user consent; no push or deployment.
+
+## September12 release integration corrections
+
+The first exact-source full browser run on ca07da80 failed:1555 passed,9 failed,3 intentionally skipped. CI34708639505 also failed; neither is green evidence. Staff-home contracts now apply only the authorized2026 gift-link label change to preserved original expectations. Tumbler PNG comparison runs the preserved original in an isolated context and no longer requires ignored screenshots. Screen-print background tier rendering no longer steals keyboard focus; explicit small-order tier selection focuses its exact-quantity input synchronously. Focus and unchanged financial implementation guards pass. Original fixtures remain unchanged except reversible source mappings. Full local and exact-source CI gates must pass again before release.

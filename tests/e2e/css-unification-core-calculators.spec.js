@@ -80,7 +80,9 @@ for(const key of ['dtg','dtf','sp']){
  test('CSS core calculators: '+key+' keyboard selection and fee information',async({page})=>{
   const e=await start(page,key);await priced(page,key);
   const selector=key==='dtg'?'[id="tier-1-11"]':key==='dtf'?'#dtf-tier-buttons [data-tier="10-23"]':'[id="sp-tier-24-47"]';
-  const tier=page.locator(selector);await tier.focus();await tier.press('Enter');await expect(tier).toHaveAttribute('aria-pressed','true');await expect(tier).toBeFocused();
+  const tier=page.locator(selector);await tier.focus();await tier.press('Enter');await expect(tier).toHaveAttribute('aria-pressed','true');
+  // Screen print opens its exact-quantity field for this small-order tier.
+  await expect(key==='sp'?page.locator('[id="sp-qty-24-47"]'):tier).toBeFocused();
   const id=key==='dtg'?'setup-fee-badge':key==='dtf'?'dtf-setup-fee-badge':'sp-setup-fee-badge',button=page.locator('#'+id);
   await button.focus();await button.press('Enter');await expect(button).toHaveAttribute('aria-expanded','true');
   const panel=page.locator('#'+await button.getAttribute('aria-controls'));await expect(panel).toContainText('Art Setup Fee');
