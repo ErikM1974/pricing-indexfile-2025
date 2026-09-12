@@ -1,0 +1,4 @@
+const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto'),original=require('../fixtures/quick-quote-original-content.json');
+const root=path.resolve(__dirname,'../..');
+test.each(Object.entries(original.hashes))('Quick Quote original source remains recoverable: %s',(file,hash)=>{let text=fs.readFileSync(path.join(root,file),'utf8').replace(/\r\n/g,'\n');for(const c of original.changes.filter(c=>c.file===file).reverse()){expect(text.split(c.after).length-1).toBe(c.count);text=text.split(c.after).join(c.before);}expect(crypto.createHash('sha256').update(text).digest('hex')).toBe(hash);});
+test.each(['quick-quote.js','dtf-prints-prototype.js'])('Quick Quote financial controller remains unchanged: %s',name=>{const file='calculators/quick-quote/'+name;expect(crypto.createHash('sha256').update(fs.readFileSync(path.join(root,file),'utf8').replace(/\r\n/g,'\n')).digest('hex')).toBe(original.hashes[file]);});

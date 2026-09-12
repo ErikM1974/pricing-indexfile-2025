@@ -1229,3 +1229,51 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - tests/unit/webstore-calculator-content.test.js — original-source locks and unchanged pricing, quote-card and email transformations.
 
 - shared_components/css/specialty-assistant.css — shared reference accordions, responsive assistant drawer, messages and controls for emblem and webstore calculators.
+
+- tests/fixtures/quick-quote-original-content.json — preserves Quick Quote/prototype originals and mocked browser behavior.
+
+- tests/e2e/helpers/quick-quote-browser.js — preserves Quick Quote/prototype originals and mocked browser behavior.
+
+- tests/unit/quick-quote-original-content.test.js — preserves Quick Quote/prototype originals and mocked browser behavior.
+
+- tests/e2e/css-unification-quick-quote.spec.js — preserves Quick Quote/prototype originals and mocked browser behavior.
+
+- tests/fixtures/quick-quote-prototype-dtf-original-browser.json — immutable Quick Quote synthetic browser evidence.
+
+- tests/fixtures/quick-quote-line-empty-original-browser.json — immutable Quick Quote synthetic browser evidence.
+
+- tests/fixtures/quick-quote-prototype-dtg-original-browser.json — immutable Quick Quote synthetic browser evidence.
+
+- tests/fixtures/quick-quote-prototype-emb-original-browser.json — immutable Quick Quote synthetic browser evidence.
+
+- tests/fixtures/quick-quote-prototype-scp-original-browser.json — immutable Quick Quote synthetic browser evidence.
+
+- tests/fixtures/quick-quote-prototype-cap-original-browser.json — immutable Quick Quote synthetic browser evidence.
+
+- tests/fixtures/quick-quote-prototype-parts-original-browser.json — immutable Quick Quote synthetic browser evidence.
+
+- tests/fixtures/quick-quote-prototype-sizes-original-browser.json — immutable Quick Quote synthetic browser evidence.
+
+- tests/fixtures/quick-quote-prototype-ratecard-original-browser.json — immutable Quick Quote synthetic browser evidence.
+
+- tests/fixtures/quick-quote-prototype-pricing-failed-original-browser.json — immutable Quick Quote synthetic browser evidence.
+
+- tests/fixtures/quick-quote-prototype-stock-failed-original-browser.json — immutable Quick Quote synthetic browser evidence.
+
+- tests/fixtures/quick-quote-quick-product-failed-original-browser.json — immutable Quick Quote synthetic browser evidence.
+
+- tests/fixtures/quick-quote-line-emb-original-browser.json — immutable Quick Quote synthetic browser evidence.
+
+- tests/fixtures/quick-quote-quick-normal-original-browser.json — immutable Quick Quote synthetic browser evidence.
+
+- tests/fixtures/quick-quote-quick-cap-original-browser.json — immutable Quick Quote synthetic browser evidence.
+
+- tests/fixtures/quick-quote-quick-sizes-original-browser.json — immutable Quick Quote synthetic browser evidence.
+
+- tests/fixtures/quick-quote-quick-screenprint-original-browser.json — immutable Quick Quote synthetic browser evidence.
+
+- tests/fixtures/quick-quote-quick-pricing-failed-original-browser.json — immutable Quick Quote synthetic browser evidence.
+
+- tests/fixtures/quick-quote-quick-stock-failed-original-browser.json — immutable Quick Quote synthetic browser evidence.
+
+- tests/fixtures/quick-quote-line-dtg-original-browser.json — immutable Quick Quote synthetic browser evidence.

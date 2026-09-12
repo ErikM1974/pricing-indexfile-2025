@@ -1,0 +1,456 @@
+{
+  "name": "prototype-parts",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Decoration pricing — prototype (DTF · DTG · Embroidery) · Northwest Custom Apparel",
+      "url": "/calculators/quick-quote/dtf-prints-prototype.html",
+      "ids": {
+        "methodToggle": "DTF DTG Embroidery Screen print",
+        "style": "",
+        "styleStatus": "PC61 · base garment $3.53",
+        "color": "Jet Black Brilliant Orange",
+        "inventory": "In stock · JetBlack · 875 total S 125 M 125 L 125 XL 125 2XL 125 3XL 125 4XL 125",
+        "qty": "",
+        "printsLabel": "Prints · each one priced by its size",
+        "printsList": "1 Small (≤ 5×5\") Medium (≤ 9×12\") Large (≤ 12×16.5\") Jumbo — DTG only +$9.50/pc × 2 Small (≤ 5×5\") Medium (≤ 9×12\") Large (≤ 12×16.5\") Jumbo — DTG only +$18.00/pc × 3 Small (≤ 5×5\") Medium (≤ 9×12\") Large (≤ 12×16.5\") Jumbo — DTG only +$18.00/pc ×",
+        "addPrint": "+ Add print",
+        "resultSub": "for 12 shirts · PC61 · DTF",
+        "result": "$56.16/pc $673.92 total Blank + margin $6.50/pc Print 1 · Small ≤ 5×5\" +$9.50/pc Print 2 · Large ≤ 12×16.5\" +$18.00/pc Print 3 · Large ≤ 12×16.5\" +$18.00/pc Small-batch fee ($50 ÷ 12 shirts) +$4.16/pc Price per shirt $56.16/pc Blank + each print are rounded to $0.50, so they add up by hand. The small-batch fee ($50 ÷ 12 shirts) is the one line with odd cents. The shirt price is all-in (tier 10-23).",
+        "protoMatrix": "Price by quantity · PC61 · DTF · your selected prints Qty Blank Small Large Large Small-batch Per shirt Order 12 $6.50 +$9.50 +$18.00 +$18.00 +$4.16 $56.16 $673.92 24 $7.00 +$9.00 +$16.00 +$16.00 — $48.00 $1152.00 48 $7.00 +$7.50 +$13.50 +$13.50 — $41.50 $1992.00 72 $7.00 +$7.00 +$11.50 +$11.50 — $37.00 $2664.00 Each row is the full per-shirt build at that quantity — blank + each print + small-batch all add across. Click a row to make it the active quantity.",
+        "rateCardBtn": "Download rate card (PDF)"
+      },
+      "fields": [
+        {
+          "id": "style",
+          "name": "",
+          "type": "text",
+          "value": "PC61",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "color",
+          "name": "",
+          "type": "select-one",
+          "value": "JetBlack",
+          "disabled": false
+        },
+        {
+          "id": "qty",
+          "name": "",
+          "type": "number",
+          "value": "12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "small",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "large",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "large",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/calculators/quick-quote/",
+          "text": "Quick Quote"
+        }
+      ],
+      "tables": [
+        "Qty Blank Small Large Large Small-batch Per shirt Order 12 $6.50 +$9.50 +$18.00 +$18.00 +$4.16 $56.16 $673.92 24 $7.00 +$9.00 +$16.00 +$16.00 — $48.00 $1152.00 48 $7.00 +$7.50 +$13.50 +$13.50 — $41.50 $1992.00 72 $7.00 +$7.00 +$11.50 +$11.50 — $37.00 $2664.00"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".lede"
+            ],
+            [
+              ".lede > strong:nth-child(1)"
+            ],
+            [
+              "strong:nth-child(2)"
+            ],
+            [
+              "strong:nth-child(3)"
+            ],
+            [
+              "strong:nth-child(4)"
+            ],
+            [
+              ".proto-rc-hint"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Decoration pricing — prototype (DTF · DTG · Embroidery) · Northwest Custom Apparel",
+      "url": "/calculators/quick-quote/dtf-prints-prototype.html",
+      "ids": {
+        "methodToggle": "DTF DTG Embroidery Screen print",
+        "style": "",
+        "styleStatus": "PC61 · base garment $3.53",
+        "color": "Jet Black Brilliant Orange",
+        "inventory": "In stock · JetBlack · 875 total S 125 M 125 L 125 XL 125 2XL 125 3XL 125 4XL 125",
+        "qty": "",
+        "printsLabel": "Prints · each one priced by its size",
+        "printsList": "1 Small (≤ 5×5\") Medium (≤ 9×12\") Large (≤ 12×16.5\") Jumbo — DTG only +$9.50/pc × 2 Small (≤ 5×5\") Medium (≤ 9×12\") Large (≤ 12×16.5\") Jumbo — DTG only +$18.00/pc × 3 Small (≤ 5×5\") Medium (≤ 9×12\") Large (≤ 12×16.5\") Jumbo — DTG only +$18.00/pc ×",
+        "addPrint": "+ Add print",
+        "resultSub": "for 12 shirts · PC61 · DTF",
+        "result": "$56.16/pc $673.92 total Blank + margin $6.50/pc Print 1 · Small ≤ 5×5\" +$9.50/pc Print 2 · Large ≤ 12×16.5\" +$18.00/pc Print 3 · Large ≤ 12×16.5\" +$18.00/pc Small-batch fee ($50 ÷ 12 shirts) +$4.16/pc Price per shirt $56.16/pc Blank + each print are rounded to $0.50, so they add up by hand. The small-batch fee ($50 ÷ 12 shirts) is the one line with odd cents. The shirt price is all-in (tier 10-23).",
+        "protoMatrix": "Price by quantity · PC61 · DTF · your selected prints Qty Blank Small Large Large Small-batch Per shirt Order 12 $6.50 +$9.50 +$18.00 +$18.00 +$4.16 $56.16 $673.92 24 $7.00 +$9.00 +$16.00 +$16.00 — $48.00 $1152.00 48 $7.00 +$7.50 +$13.50 +$13.50 — $41.50 $1992.00 72 $7.00 +$7.00 +$11.50 +$11.50 — $37.00 $2664.00 Each row is the full per-shirt build at that quantity — blank + each print + small-batch all add across. Click a row to make it the active quantity.",
+        "rateCardBtn": "Download rate card (PDF)"
+      },
+      "fields": [
+        {
+          "id": "style",
+          "name": "",
+          "type": "text",
+          "value": "PC61",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "color",
+          "name": "",
+          "type": "select-one",
+          "value": "JetBlack",
+          "disabled": false
+        },
+        {
+          "id": "qty",
+          "name": "",
+          "type": "number",
+          "value": "12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "small",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "large",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "large",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/calculators/quick-quote/",
+          "text": "Quick Quote"
+        }
+      ],
+      "tables": [
+        "Qty Blank Small Large Large Small-batch Per shirt Order 12 $6.50 +$9.50 +$18.00 +$18.00 +$4.16 $56.16 $673.92 24 $7.00 +$9.00 +$16.00 +$16.00 — $48.00 $1152.00 48 $7.00 +$7.50 +$13.50 +$13.50 — $41.50 $1992.00 72 $7.00 +$7.00 +$11.50 +$11.50 — $37.00 $2664.00"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".lede"
+            ],
+            [
+              ".lede > strong:nth-child(1)"
+            ],
+            [
+              "strong:nth-child(2)"
+            ],
+            [
+              "strong:nth-child(3)"
+            ],
+            [
+              "strong:nth-child(4)"
+            ],
+            [
+              ".proto-rc-hint"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Decoration pricing — prototype (DTF · DTG · Embroidery) · Northwest Custom Apparel",
+      "url": "/calculators/quick-quote/dtf-prints-prototype.html",
+      "ids": {
+        "methodToggle": "DTF DTG Embroidery Screen print",
+        "style": "",
+        "styleStatus": "PC61 · base garment $3.53",
+        "color": "Jet Black Brilliant Orange",
+        "inventory": "In stock · JetBlack · 875 total S 125 M 125 L 125 XL 125 2XL 125 3XL 125 4XL 125",
+        "qty": "",
+        "printsLabel": "Prints · each one priced by its size",
+        "printsList": "1 Small (≤ 5×5\") Medium (≤ 9×12\") Large (≤ 12×16.5\") Jumbo — DTG only +$9.50/pc × 2 Small (≤ 5×5\") Medium (≤ 9×12\") Large (≤ 12×16.5\") Jumbo — DTG only +$18.00/pc × 3 Small (≤ 5×5\") Medium (≤ 9×12\") Large (≤ 12×16.5\") Jumbo — DTG only +$18.00/pc ×",
+        "addPrint": "+ Add print",
+        "resultSub": "for 12 shirts · PC61 · DTF",
+        "result": "$56.16/pc $673.92 total Blank + margin $6.50/pc Print 1 · Small ≤ 5×5\" +$9.50/pc Print 2 · Large ≤ 12×16.5\" +$18.00/pc Print 3 · Large ≤ 12×16.5\" +$18.00/pc Small-batch fee ($50 ÷ 12 shirts) +$4.16/pc Price per shirt $56.16/pc Blank + each print are rounded to $0.50, so they add up by hand. The small-batch fee ($50 ÷ 12 shirts) is the one line with odd cents. The shirt price is all-in (tier 10-23).",
+        "protoMatrix": "Price by quantity · PC61 · DTF · your selected prints Qty Blank Small Large Large Small-batch Per shirt Order 12 $6.50 +$9.50 +$18.00 +$18.00 +$4.16 $56.16 $673.92 24 $7.00 +$9.00 +$16.00 +$16.00 — $48.00 $1152.00 48 $7.00 +$7.50 +$13.50 +$13.50 — $41.50 $1992.00 72 $7.00 +$7.00 +$11.50 +$11.50 — $37.00 $2664.00 Each row is the full per-shirt build at that quantity — blank + each print + small-batch all add across. Click a row to make it the active quantity.",
+        "rateCardBtn": "Download rate card (PDF)"
+      },
+      "fields": [
+        {
+          "id": "style",
+          "name": "",
+          "type": "text",
+          "value": "PC61",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "color",
+          "name": "",
+          "type": "select-one",
+          "value": "JetBlack",
+          "disabled": false
+        },
+        {
+          "id": "qty",
+          "name": "",
+          "type": "number",
+          "value": "12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "small",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "large",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "large",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/calculators/quick-quote/",
+          "text": "Quick Quote"
+        }
+      ],
+      "tables": [
+        "Qty Blank Small Large Large Small-batch Per shirt Order 12 $6.50 +$9.50 +$18.00 +$18.00 +$4.16 $56.16 $673.92 24 $7.00 +$9.00 +$16.00 +$16.00 — $48.00 $1152.00 48 $7.00 +$7.50 +$13.50 +$13.50 — $41.50 $1992.00 72 $7.00 +$7.00 +$11.50 +$11.50 — $37.00 $2664.00"
+      ],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".lede"
+            ],
+            [
+              ".lede > strong:nth-child(1)"
+            ],
+            [
+              "strong:nth-child(2)"
+            ],
+            [
+              "strong:nth-child(3)"
+            ],
+            [
+              "strong:nth-child(4)"
+            ],
+            [
+              ".proto-rc-hint"
+            ]
+          ]
+        },
+        {
+          "id": "scrollable-region-focusable",
+          "nodes": [
+            [
+              ".proto-mx-scroll"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Decoration pricing — prototype (DTF · DTG · Embroidery) · Northwest Custom Apparel",
+      "url": "/calculators/quick-quote/dtf-prints-prototype.html",
+      "ids": {
+        "methodToggle": "DTF DTG Embroidery Screen print",
+        "style": "",
+        "styleStatus": "PC61 · base garment $3.53",
+        "color": "Jet Black Brilliant Orange",
+        "inventory": "In stock · JetBlack · 875 total S 125 M 125 L 125 XL 125 2XL 125 3XL 125 4XL 125",
+        "qty": "",
+        "printsLabel": "Prints · each one priced by its size",
+        "printsList": "1 Small (≤ 5×5\") Medium (≤ 9×12\") Large (≤ 12×16.5\") Jumbo — DTG only +$9.50/pc × 2 Small (≤ 5×5\") Medium (≤ 9×12\") Large (≤ 12×16.5\") Jumbo — DTG only +$18.00/pc × 3 Small (≤ 5×5\") Medium (≤ 9×12\") Large (≤ 12×16.5\") Jumbo — DTG only +$18.00/pc ×",
+        "addPrint": "+ Add print",
+        "resultSub": "for 12 shirts · PC61 · DTF",
+        "result": "$56.16/pc $673.92 total Blank + margin $6.50/pc Print 1 · Small ≤ 5×5\" +$9.50/pc Print 2 · Large ≤ 12×16.5\" +$18.00/pc Print 3 · Large ≤ 12×16.5\" +$18.00/pc Small-batch fee ($50 ÷ 12 shirts) +$4.16/pc Price per shirt $56.16/pc Blank + each print are rounded to $0.50, so they add up by hand. The small-batch fee ($50 ÷ 12 shirts) is the one line with odd cents. The shirt price is all-in (tier 10-23).",
+        "protoMatrix": "Price by quantity · PC61 · DTF · your selected prints Qty Blank Small Large Large Small-batch Per shirt Order 12 $6.50 +$9.50 +$18.00 +$18.00 +$4.16 $56.16 $673.92 24 $7.00 +$9.00 +$16.00 +$16.00 — $48.00 $1152.00 48 $7.00 +$7.50 +$13.50 +$13.50 — $41.50 $1992.00 72 $7.00 +$7.00 +$11.50 +$11.50 — $37.00 $2664.00 Each row is the full per-shirt build at that quantity — blank + each print + small-batch all add across. Click a row to make it the active quantity.",
+        "rateCardBtn": "Download rate card (PDF)"
+      },
+      "fields": [
+        {
+          "id": "style",
+          "name": "",
+          "type": "text",
+          "value": "PC61",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "color",
+          "name": "",
+          "type": "select-one",
+          "value": "JetBlack",
+          "disabled": false
+        },
+        {
+          "id": "qty",
+          "name": "",
+          "type": "number",
+          "value": "12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "small",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "large",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "large",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/calculators/quick-quote/",
+          "text": "Quick Quote"
+        }
+      ],
+      "tables": [
+        "Qty Blank Small Large Large Small-batch Per shirt Order 12 $6.50 +$9.50 +$18.00 +$18.00 +$4.16 $56.16 $673.92 24 $7.00 +$9.00 +$16.00 +$16.00 — $48.00 $1152.00 48 $7.00 +$7.50 +$13.50 +$13.50 — $41.50 $1992.00 72 $7.00 +$7.00 +$11.50 +$11.50 — $37.00 $2664.00"
+      ],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".lede"
+            ],
+            [
+              ".lede > strong:nth-child(1)"
+            ],
+            [
+              "strong:nth-child(2)"
+            ],
+            [
+              "strong:nth-child(3)"
+            ],
+            [
+              "strong:nth-child(4)"
+            ],
+            [
+              ".proto-rc-hint"
+            ]
+          ]
+        },
+        {
+          "id": "scrollable-region-focusable",
+          "nodes": [
+            [
+              ".proto-mx-scroll"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "reads": [
+    {
+      "path": "/api/pricing-bundle",
+      "query": "?method=DTF&styleNumber=PC61"
+    },
+    {
+      "path": "/api/product-colors",
+      "query": "?styleNumber=PC61"
+    },
+    {
+      "path": "/api/inventory",
+      "query": "?styleNumber=PC61&color=JetBlack"
+    }
+  ],
+  "dialogs": []
+}

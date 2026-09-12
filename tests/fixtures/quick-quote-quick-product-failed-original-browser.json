@@ -1,0 +1,360 @@
+{
+  "name": "quick-product-failed",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Quick Quote — Northwest Custom Apparel",
+      "url": "/calculators/quick-quote/index.html?mode=quick&style=PC54&qty=24",
+      "ids": {
+        "qqModeToggle": "Line Sheet Quick Price",
+        "qqStyle": "",
+        "qqStyleStatus": "Couldn't find “PC54” — check the style number.",
+        "qqThumb": "",
+        "qqProductName": "",
+        "qqColorSelected": "",
+        "qqInventory": "",
+        "qqQty": "",
+        "qqSizesToggle": "+ Add sizes (2XL upcharges)",
+        "qqQtyPresets": "24 48 72 144",
+        "qqPlacementLabel": "Where does the print go? · DTG / screen print / DTF",
+        "qqPlacePresets": "Left chest Front + back Full front",
+        "qqFront": "None Left chest Center front Full front Jumbo front",
+        "qqBack": "None Center back Full back Jumbo back",
+        "qqSleeveLabel": "Sleeves",
+        "qqSleeveL": "",
+        "qqSleeveR": "",
+        "qqResultsTitle": "Price",
+        "qqResultsSub": "Enter a style to begin",
+        "qqResults": "Enter a style number to see pricing.",
+        "qqMatrix": ""
+      },
+      "fields": [
+        {
+          "id": "qqStyle",
+          "name": "",
+          "type": "text",
+          "value": "PC54",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqQty",
+          "name": "",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqSleeveL",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqSleeveR",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".lede"
+            ],
+            [
+              "button[data-mode=\"linesheet\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Quick Quote — Northwest Custom Apparel",
+      "url": "/calculators/quick-quote/index.html?mode=quick&style=PC54&qty=24",
+      "ids": {
+        "qqModeToggle": "Line Sheet Quick Price",
+        "qqStyle": "",
+        "qqStyleStatus": "Couldn't find “PC54” — check the style number.",
+        "qqThumb": "",
+        "qqProductName": "",
+        "qqColorSelected": "",
+        "qqInventory": "",
+        "qqQty": "",
+        "qqSizesToggle": "+ Add sizes (2XL upcharges)",
+        "qqQtyPresets": "24 48 72 144",
+        "qqPlacementLabel": "Where does the print go? · DTG / screen print / DTF",
+        "qqPlacePresets": "Left chest Front + back Full front",
+        "qqFront": "None Left chest Center front Full front Jumbo front",
+        "qqBack": "None Center back Full back Jumbo back",
+        "qqSleeveLabel": "Sleeves",
+        "qqSleeveL": "",
+        "qqSleeveR": "",
+        "qqResultsTitle": "Price",
+        "qqResultsSub": "Enter a style to begin",
+        "qqResults": "Enter a style number to see pricing.",
+        "qqMatrix": ""
+      },
+      "fields": [
+        {
+          "id": "qqStyle",
+          "name": "",
+          "type": "text",
+          "value": "PC54",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqQty",
+          "name": "",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqSleeveL",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqSleeveR",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".lede"
+            ],
+            [
+              "button[data-mode=\"linesheet\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Quick Quote — Northwest Custom Apparel",
+      "url": "/calculators/quick-quote/index.html?mode=quick&style=PC54&qty=24",
+      "ids": {
+        "qqModeToggle": "Line Sheet Quick Price",
+        "qqStyle": "",
+        "qqStyleStatus": "Couldn't find “PC54” — check the style number.",
+        "qqThumb": "",
+        "qqProductName": "",
+        "qqColorSelected": "",
+        "qqInventory": "",
+        "qqQty": "",
+        "qqSizesToggle": "+ Add sizes (2XL upcharges)",
+        "qqQtyPresets": "24 48 72 144",
+        "qqPlacementLabel": "Where does the print go? · DTG / screen print / DTF",
+        "qqPlacePresets": "Left chest Front + back Full front",
+        "qqFront": "None Left chest Center front Full front Jumbo front",
+        "qqBack": "None Center back Full back Jumbo back",
+        "qqSleeveLabel": "Sleeves",
+        "qqSleeveL": "",
+        "qqSleeveR": "",
+        "qqResultsTitle": "Price",
+        "qqResultsSub": "Enter a style to begin",
+        "qqResults": "Enter a style number to see pricing.",
+        "qqMatrix": ""
+      },
+      "fields": [
+        {
+          "id": "qqStyle",
+          "name": "",
+          "type": "text",
+          "value": "PC54",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqQty",
+          "name": "",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqSleeveL",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqSleeveR",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".lede"
+            ],
+            [
+              "button[data-mode=\"linesheet\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Quick Quote — Northwest Custom Apparel",
+      "url": "/calculators/quick-quote/index.html?mode=quick&style=PC54&qty=24",
+      "ids": {
+        "qqModeToggle": "Line Sheet Quick Price",
+        "qqStyle": "",
+        "qqStyleStatus": "Couldn't find “PC54” — check the style number.",
+        "qqThumb": "",
+        "qqProductName": "",
+        "qqColorSelected": "",
+        "qqInventory": "",
+        "qqQty": "",
+        "qqSizesToggle": "+ Add sizes (2XL upcharges)",
+        "qqQtyPresets": "24 48 72 144",
+        "qqPlacementLabel": "Where does the print go? · DTG / screen print / DTF",
+        "qqPlacePresets": "Left chest Front + back Full front",
+        "qqFront": "None Left chest Center front Full front Jumbo front",
+        "qqBack": "None Center back Full back Jumbo back",
+        "qqSleeveLabel": "Sleeves",
+        "qqSleeveL": "",
+        "qqSleeveR": "",
+        "qqResultsTitle": "Price",
+        "qqResultsSub": "Enter a style to begin",
+        "qqResults": "Enter a style number to see pricing.",
+        "qqMatrix": ""
+      },
+      "fields": [
+        {
+          "id": "qqStyle",
+          "name": "",
+          "type": "text",
+          "value": "PC54",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqQty",
+          "name": "",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqSleeveL",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqSleeveR",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        }
+      ],
+      "tables": [],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".lede"
+            ],
+            [
+              "button[data-mode=\"linesheet\"]"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "reads": [
+    {
+      "path": "/api/product-details",
+      "query": "?styleNumber=PC54"
+    }
+  ],
+  "dialogs": []
+}

@@ -1,0 +1,468 @@
+{
+  "name": "line-emb",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Quick Quote — Northwest Custom Apparel",
+      "url": "/calculators/quick-quote/index.html",
+      "ids": {
+        "qqModeToggle": "Line Sheet Quick Price",
+        "qqLineMethodChips": "Embroidery Cap embroidery DTG print Screen print DTF transfer",
+        "qqEmbLabel": "Embroidery logos",
+        "qqCapEmbType": "",
+        "qqEmbLogos": "Logo 1 Left chest stitches",
+        "qqEmbAddBtn": "+ Add another logo",
+        "qqEmbDigitizing": "",
+        "qqEmbHint": "Up to 10,000 stitches included. Each additional logo priced at our additional-logo (AL) rate. Typical stitches — left chest ~8K · full front ~15–30K · jacket back ~25–40K (add a back/front as its own logo).",
+        "qqlc-1": "Essential Cotton Tee Jet Black Brilliant Orange from $19.00/pc",
+        "qqlc-2": "Essential Cotton Tee Jet Black Brilliant Orange from $19.00/pc",
+        "qqLineAdd": "+ Add style",
+        "qqLineDownload": "Download PDF",
+        "qqLinePrint": "Print",
+        "qqSheet": "Northwest Custom Apparel Line Sheet · Embroidery · 1 logo PC54 · Essential Cotton TeeColor: Jet Black Qty 1–7 8–23 24–47 48–71 72+ Per pc $25.00 $25.00 $21.00 $20.00 $19.00 Small-batch +$50.00 — — — — PC61 · Essential Cotton TeeColor: Jet Black Qty 1–7 8–23 24–47 48–71 72+ Per pc $25.00 $25.00 $21.00 $20.00 $19.00 Small-batch +$50.00 — — — — Estimate only · pricing valid 30 days · confirm stock & sizes at order time. Northwest Custom Apparel · (253) 922-5793 · sales@nwcustomapparel.com"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "8000",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqEmbDigitizing",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "PC54",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "JetBlack",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "PC61",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "JetBlack",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        }
+      ],
+      "tables": [
+        "Qty 1–7 8–23 24–47 48–71 72+ Per pc $25.00 $25.00 $21.00 $20.00 $19.00 Small-batch +$50.00 — — — —",
+        "Qty 1–7 8–23 24–47 48–71 72+ Per pc $25.00 $25.00 $21.00 $20.00 $19.00 Small-batch +$50.00 — — — —"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".lede"
+            ],
+            [
+              "button[data-mode=\"quick\"]"
+            ]
+          ]
+        },
+        {
+          "id": "label",
+          "nodes": [
+            [
+              ".qq-emb-stitch"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Quick Quote — Northwest Custom Apparel",
+      "url": "/calculators/quick-quote/index.html",
+      "ids": {
+        "qqModeToggle": "Line Sheet Quick Price",
+        "qqLineMethodChips": "Embroidery Cap embroidery DTG print Screen print DTF transfer",
+        "qqEmbLabel": "Embroidery logos",
+        "qqCapEmbType": "",
+        "qqEmbLogos": "Logo 1 Left chest stitches",
+        "qqEmbAddBtn": "+ Add another logo",
+        "qqEmbDigitizing": "",
+        "qqEmbHint": "Up to 10,000 stitches included. Each additional logo priced at our additional-logo (AL) rate. Typical stitches — left chest ~8K · full front ~15–30K · jacket back ~25–40K (add a back/front as its own logo).",
+        "qqlc-1": "Essential Cotton Tee Jet Black Brilliant Orange from $19.00/pc",
+        "qqlc-2": "Essential Cotton Tee Jet Black Brilliant Orange from $19.00/pc",
+        "qqLineAdd": "+ Add style",
+        "qqLineDownload": "Download PDF",
+        "qqLinePrint": "Print",
+        "qqSheet": "Northwest Custom Apparel Line Sheet · Embroidery · 1 logo PC54 · Essential Cotton TeeColor: Jet Black Qty 1–7 8–23 24–47 48–71 72+ Per pc $25.00 $25.00 $21.00 $20.00 $19.00 Small-batch +$50.00 — — — — PC61 · Essential Cotton TeeColor: Jet Black Qty 1–7 8–23 24–47 48–71 72+ Per pc $25.00 $25.00 $21.00 $20.00 $19.00 Small-batch +$50.00 — — — — Estimate only · pricing valid 30 days · confirm stock & sizes at order time. Northwest Custom Apparel · (253) 922-5793 · sales@nwcustomapparel.com"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "8000",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqEmbDigitizing",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "PC54",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "JetBlack",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "PC61",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "JetBlack",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        }
+      ],
+      "tables": [
+        "Qty 1–7 8–23 24–47 48–71 72+ Per pc $25.00 $25.00 $21.00 $20.00 $19.00 Small-batch +$50.00 — — — —",
+        "Qty 1–7 8–23 24–47 48–71 72+ Per pc $25.00 $25.00 $21.00 $20.00 $19.00 Small-batch +$50.00 — — — —"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".lede"
+            ],
+            [
+              "button[data-mode=\"quick\"]"
+            ]
+          ]
+        },
+        {
+          "id": "label",
+          "nodes": [
+            [
+              ".qq-emb-stitch"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Quick Quote — Northwest Custom Apparel",
+      "url": "/calculators/quick-quote/index.html",
+      "ids": {
+        "qqModeToggle": "Line Sheet Quick Price",
+        "qqLineMethodChips": "Embroidery Cap embroidery DTG print Screen print DTF transfer",
+        "qqEmbLabel": "Embroidery logos",
+        "qqCapEmbType": "",
+        "qqEmbLogos": "Logo 1 Left chest stitches",
+        "qqEmbAddBtn": "+ Add another logo",
+        "qqEmbDigitizing": "",
+        "qqEmbHint": "Up to 10,000 stitches included. Each additional logo priced at our additional-logo (AL) rate. Typical stitches — left chest ~8K · full front ~15–30K · jacket back ~25–40K (add a back/front as its own logo).",
+        "qqlc-1": "Essential Cotton Tee Jet Black Brilliant Orange from $19.00/pc",
+        "qqlc-2": "Essential Cotton Tee Jet Black Brilliant Orange from $19.00/pc",
+        "qqLineAdd": "+ Add style",
+        "qqLineDownload": "Download PDF",
+        "qqLinePrint": "Print",
+        "qqSheet": "Northwest Custom Apparel Line Sheet · Embroidery · 1 logo PC54 · Essential Cotton TeeColor: Jet Black Qty 1–7 8–23 24–47 48–71 72+ Per pc $25.00 $25.00 $21.00 $20.00 $19.00 Small-batch +$50.00 — — — — PC61 · Essential Cotton TeeColor: Jet Black Qty 1–7 8–23 24–47 48–71 72+ Per pc $25.00 $25.00 $21.00 $20.00 $19.00 Small-batch +$50.00 — — — — Estimate only · pricing valid 30 days · confirm stock & sizes at order time. Northwest Custom Apparel · (253) 922-5793 · sales@nwcustomapparel.com"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "8000",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqEmbDigitizing",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "PC54",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "JetBlack",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "PC61",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "JetBlack",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        }
+      ],
+      "tables": [
+        "Qty 1–7 8–23 24–47 48–71 72+ Per pc $25.00 $25.00 $21.00 $20.00 $19.00 Small-batch +$50.00 — — — —",
+        "Qty 1–7 8–23 24–47 48–71 72+ Per pc $25.00 $25.00 $21.00 $20.00 $19.00 Small-batch +$50.00 — — — —"
+      ],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".lede"
+            ],
+            [
+              "button[data-mode=\"quick\"]"
+            ]
+          ]
+        },
+        {
+          "id": "label",
+          "nodes": [
+            [
+              ".qq-emb-stitch"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Quick Quote — Northwest Custom Apparel",
+      "url": "/calculators/quick-quote/index.html",
+      "ids": {
+        "qqModeToggle": "Line Sheet Quick Price",
+        "qqLineMethodChips": "Embroidery Cap embroidery DTG print Screen print DTF transfer",
+        "qqEmbLabel": "Embroidery logos",
+        "qqCapEmbType": "",
+        "qqEmbLogos": "Logo 1 Left chest stitches",
+        "qqEmbAddBtn": "+ Add another logo",
+        "qqEmbDigitizing": "",
+        "qqEmbHint": "Up to 10,000 stitches included. Each additional logo priced at our additional-logo (AL) rate. Typical stitches — left chest ~8K · full front ~15–30K · jacket back ~25–40K (add a back/front as its own logo).",
+        "qqlc-1": "Essential Cotton Tee Jet Black Brilliant Orange from $19.00/pc",
+        "qqlc-2": "Essential Cotton Tee Jet Black Brilliant Orange from $19.00/pc",
+        "qqLineAdd": "+ Add style",
+        "qqLineDownload": "Download PDF",
+        "qqLinePrint": "Print",
+        "qqSheet": "Northwest Custom Apparel Line Sheet · Embroidery · 1 logo PC54 · Essential Cotton TeeColor: Jet Black Qty 1–7 8–23 24–47 48–71 72+ Per pc $25.00 $25.00 $21.00 $20.00 $19.00 Small-batch +$50.00 — — — — PC61 · Essential Cotton TeeColor: Jet Black Qty 1–7 8–23 24–47 48–71 72+ Per pc $25.00 $25.00 $21.00 $20.00 $19.00 Small-batch +$50.00 — — — — Estimate only · pricing valid 30 days · confirm stock & sizes at order time. Northwest Custom Apparel · (253) 922-5793 · sales@nwcustomapparel.com"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "8000",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqEmbDigitizing",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "PC54",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "JetBlack",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "PC61",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "JetBlack",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        }
+      ],
+      "tables": [
+        "Qty 1–7 8–23 24–47 48–71 72+ Per pc $25.00 $25.00 $21.00 $20.00 $19.00 Small-batch +$50.00 — — — —",
+        "Qty 1–7 8–23 24–47 48–71 72+ Per pc $25.00 $25.00 $21.00 $20.00 $19.00 Small-batch +$50.00 — — — —"
+      ],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".lede"
+            ],
+            [
+              "button[data-mode=\"quick\"]"
+            ]
+          ]
+        },
+        {
+          "id": "label",
+          "nodes": [
+            [
+              ".qq-emb-stitch"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "reads": [
+    {
+      "path": "/api/product-details",
+      "query": "?styleNumber=PC54"
+    },
+    {
+      "path": "/api/pricing-bundle",
+      "query": "?method=BLANK&styleNumber=PC54"
+    },
+    {
+      "path": "/api/pricing-bundle",
+      "query": "?method=EMB&styleNumber=PC54"
+    },
+    {
+      "path": "/api/decg-pricing",
+      "query": ""
+    },
+    {
+      "path": "/api/pricing-bundle",
+      "query": "?method=EMB-AL"
+    },
+    {
+      "path": "/api/service-codes",
+      "query": ""
+    },
+    {
+      "path": "/api/size-pricing",
+      "query": "?styleNumber=PC54"
+    },
+    {
+      "path": "/api/product-details",
+      "query": "?styleNumber=PC61"
+    },
+    {
+      "path": "/api/pricing-bundle",
+      "query": "?method=BLANK&styleNumber=PC61"
+    },
+    {
+      "path": "/api/size-pricing",
+      "query": "?styleNumber=PC61"
+    }
+  ],
+  "dialogs": []
+}

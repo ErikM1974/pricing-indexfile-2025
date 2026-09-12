@@ -1860,3 +1860,11 @@ Plan: reuse canonical controls and share the existing emblem assistant presentat
 Local candidate216/225 reviewed,9 pending: embroidery-pricing-all, quick-quote, its DTF prints prototype, garment-designer and five quote builders. Shared/generated/provider/email surfaces remain separately tracked. This next family is isolated on codex/remaining-calculators and is not included in the eight-page v2026.09.12.1 release candidate ca07da80.
 
 User authorized publication/deployment on September12; earlier unanswered-publication notes are historical. Exact-source release CI34708639505 and the full local browser gates are running separately; do not claim the candidate live until Heroku and live bytes are verified.
+
+## Quick Quote family plan — September12
+
+- [ ] Preserve original source hashes and actual browser pricing, line sheets, prototype methods, rate card, size and failure states using synthetic services. Review all screens and paper before layout edits.
+- [ ] Replace the shared legacy theme with canonical Public Sans, neutral/green tokens and scoped controls; retain complete pricing and original contents. Quick Quote and the prototype share an owner and must migrate together.
+- [ ] Check four widths, keyboard, accessibility, all print surfaces and original financial results before adding migration credit. No credit or application edits at this baseline.
+
+Quick Quote original review complete (2026-09-12): 20 synthetic states, 80 screens across 320/390/768/1440, 20 PDFs / 35 paper pages, 46 contact sheets visually inspected. Preserve seven source hashes and all original browser records before migration. Reviewed defects: narrow control overflow, floating error banner, blank prototype ordinary printing, long Quick Price print output, and silent inventory errors. Application source is still unchanged at this checkpoint.

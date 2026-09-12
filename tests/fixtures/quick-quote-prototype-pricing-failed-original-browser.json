@@ -1,0 +1,408 @@
+{
+  "name": "prototype-pricing-failed",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Decoration pricing — prototype (DTF · DTG · Embroidery) · Northwest Custom Apparel",
+      "url": "/calculators/quick-quote/dtf-prints-prototype.html",
+      "ids": {
+        "protoError": "Couldn’t load DTF pricing for PC61. API request failed: 503",
+        "methodToggle": "DTF DTG Embroidery Screen print",
+        "style": "",
+        "styleStatus": "",
+        "color": "Jet Black Brilliant Orange",
+        "inventory": "In stock · JetBlack · 875 total S 125 M 125 L 125 XL 125 2XL 125 3XL 125 4XL 125",
+        "qty": "",
+        "printsLabel": "Prints · each one priced by its size",
+        "printsList": "1 Small (≤ 5×5\") Medium (≤ 9×12\") Large (≤ 12×16.5\") Jumbo — DTG only × 2 Small (≤ 5×5\") Medium (≤ 9×12\") Large (≤ 12×16.5\") Jumbo — DTG only ×",
+        "addPrint": "+ Add print",
+        "resultSub": "Enter a style to begin",
+        "result": "",
+        "protoMatrix": "",
+        "rateCardBtn": "Download rate card (PDF)"
+      },
+      "fields": [
+        {
+          "id": "style",
+          "name": "",
+          "type": "text",
+          "value": "PC61",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "color",
+          "name": "",
+          "type": "select-one",
+          "value": "JetBlack",
+          "disabled": false
+        },
+        {
+          "id": "qty",
+          "name": "",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "small",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "large",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/calculators/quick-quote/",
+          "text": "Quick Quote"
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".lede"
+            ],
+            [
+              ".lede > strong:nth-child(1)"
+            ],
+            [
+              "strong:nth-child(2)"
+            ],
+            [
+              "strong:nth-child(3)"
+            ],
+            [
+              "strong:nth-child(4)"
+            ],
+            [
+              ".proto-rc-hint"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Decoration pricing — prototype (DTF · DTG · Embroidery) · Northwest Custom Apparel",
+      "url": "/calculators/quick-quote/dtf-prints-prototype.html",
+      "ids": {
+        "protoError": "Couldn’t load DTF pricing for PC61. API request failed: 503",
+        "methodToggle": "DTF DTG Embroidery Screen print",
+        "style": "",
+        "styleStatus": "",
+        "color": "Jet Black Brilliant Orange",
+        "inventory": "In stock · JetBlack · 875 total S 125 M 125 L 125 XL 125 2XL 125 3XL 125 4XL 125",
+        "qty": "",
+        "printsLabel": "Prints · each one priced by its size",
+        "printsList": "1 Small (≤ 5×5\") Medium (≤ 9×12\") Large (≤ 12×16.5\") Jumbo — DTG only × 2 Small (≤ 5×5\") Medium (≤ 9×12\") Large (≤ 12×16.5\") Jumbo — DTG only ×",
+        "addPrint": "+ Add print",
+        "resultSub": "Enter a style to begin",
+        "result": "",
+        "protoMatrix": "",
+        "rateCardBtn": "Download rate card (PDF)"
+      },
+      "fields": [
+        {
+          "id": "style",
+          "name": "",
+          "type": "text",
+          "value": "PC61",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "color",
+          "name": "",
+          "type": "select-one",
+          "value": "JetBlack",
+          "disabled": false
+        },
+        {
+          "id": "qty",
+          "name": "",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "small",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "large",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/calculators/quick-quote/",
+          "text": "Quick Quote"
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".lede"
+            ],
+            [
+              ".lede > strong:nth-child(1)"
+            ],
+            [
+              "strong:nth-child(2)"
+            ],
+            [
+              "strong:nth-child(3)"
+            ],
+            [
+              "strong:nth-child(4)"
+            ],
+            [
+              ".proto-rc-hint"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Decoration pricing — prototype (DTF · DTG · Embroidery) · Northwest Custom Apparel",
+      "url": "/calculators/quick-quote/dtf-prints-prototype.html",
+      "ids": {
+        "protoError": "Couldn’t load DTF pricing for PC61. API request failed: 503",
+        "methodToggle": "DTF DTG Embroidery Screen print",
+        "style": "",
+        "styleStatus": "",
+        "color": "Jet Black Brilliant Orange",
+        "inventory": "In stock · JetBlack · 875 total S 125 M 125 L 125 XL 125 2XL 125 3XL 125 4XL 125",
+        "qty": "",
+        "printsLabel": "Prints · each one priced by its size",
+        "printsList": "1 Small (≤ 5×5\") Medium (≤ 9×12\") Large (≤ 12×16.5\") Jumbo — DTG only × 2 Small (≤ 5×5\") Medium (≤ 9×12\") Large (≤ 12×16.5\") Jumbo — DTG only ×",
+        "addPrint": "+ Add print",
+        "resultSub": "Enter a style to begin",
+        "result": "",
+        "protoMatrix": "",
+        "rateCardBtn": "Download rate card (PDF)"
+      },
+      "fields": [
+        {
+          "id": "style",
+          "name": "",
+          "type": "text",
+          "value": "PC61",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "color",
+          "name": "",
+          "type": "select-one",
+          "value": "JetBlack",
+          "disabled": false
+        },
+        {
+          "id": "qty",
+          "name": "",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "small",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "large",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/calculators/quick-quote/",
+          "text": "Quick Quote"
+        }
+      ],
+      "tables": [],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".lede"
+            ],
+            [
+              ".lede > strong:nth-child(1)"
+            ],
+            [
+              "strong:nth-child(2)"
+            ],
+            [
+              "strong:nth-child(3)"
+            ],
+            [
+              "strong:nth-child(4)"
+            ],
+            [
+              ".proto-rc-hint"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Decoration pricing — prototype (DTF · DTG · Embroidery) · Northwest Custom Apparel",
+      "url": "/calculators/quick-quote/dtf-prints-prototype.html",
+      "ids": {
+        "protoError": "Couldn’t load DTF pricing for PC61. API request failed: 503",
+        "methodToggle": "DTF DTG Embroidery Screen print",
+        "style": "",
+        "styleStatus": "",
+        "color": "Jet Black Brilliant Orange",
+        "inventory": "In stock · JetBlack · 875 total S 125 M 125 L 125 XL 125 2XL 125 3XL 125 4XL 125",
+        "qty": "",
+        "printsLabel": "Prints · each one priced by its size",
+        "printsList": "1 Small (≤ 5×5\") Medium (≤ 9×12\") Large (≤ 12×16.5\") Jumbo — DTG only × 2 Small (≤ 5×5\") Medium (≤ 9×12\") Large (≤ 12×16.5\") Jumbo — DTG only ×",
+        "addPrint": "+ Add print",
+        "resultSub": "Enter a style to begin",
+        "result": "",
+        "protoMatrix": "",
+        "rateCardBtn": "Download rate card (PDF)"
+      },
+      "fields": [
+        {
+          "id": "style",
+          "name": "",
+          "type": "text",
+          "value": "PC61",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "color",
+          "name": "",
+          "type": "select-one",
+          "value": "JetBlack",
+          "disabled": false
+        },
+        {
+          "id": "qty",
+          "name": "",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "small",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "large",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/calculators/quick-quote/",
+          "text": "Quick Quote"
+        }
+      ],
+      "tables": [],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".lede"
+            ],
+            [
+              ".lede > strong:nth-child(1)"
+            ],
+            [
+              "strong:nth-child(2)"
+            ],
+            [
+              "strong:nth-child(3)"
+            ],
+            [
+              "strong:nth-child(4)"
+            ],
+            [
+              ".proto-rc-hint"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "reads": [
+    {
+      "path": "/api/pricing-bundle",
+      "query": "?method=DTF&styleNumber=PC61"
+    },
+    {
+      "path": "/api/product-colors",
+      "query": "?styleNumber=PC61"
+    },
+    {
+      "path": "/api/inventory",
+      "query": "?styleNumber=PC61&color=JetBlack"
+    }
+  ],
+  "dialogs": []
+}

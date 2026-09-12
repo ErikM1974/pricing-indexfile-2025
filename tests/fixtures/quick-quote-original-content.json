@@ -1,0 +1,21 @@
+{
+  "base": "583372dbe92d15c29dc05a43aa6e7766a7bfaba9",
+  "hashes": {
+    "calculators/quick-quote/index.html": "0ff549a3a2b42434195af42d4f17321abe04e625a0937f076b4a156ab8b8ac8d",
+    "calculators/quick-quote/dtf-prints-prototype.html": "cc2e4954deee83d1255d7ba804a2928d88e09b710c923eb53f1df3094f2b3c9a",
+    "calculators/quick-quote/quick-quote.css": "72f7c222086bfd4a9d7a8deb30c0869de40e7473329587a36d3c68f540161941",
+    "calculators/quick-quote/dtf-prints-prototype.css": "c2f7878c925897beb316c479dfc8d0b91458aeb2578570b860ce27bdb12e48ff",
+    "calculators/quick-quote/linesheet-print.css": "34319d14be02c3cd77c343891b5ffb92c990da82e8fb21a394fd14b1c5ece2da",
+    "calculators/quick-quote/quick-quote.js": "f1119d2c747b598d2cbe3bac38608f233b9576f0fe7cbb000e649d9dc3dd0b12",
+    "calculators/quick-quote/dtf-prints-prototype.js": "bced96731c33694325ebeebdf53acf97194ae458694f346c18b14481a4737e55"
+  },
+  "changes": [],
+  "financialOwnership": {
+    "file": "calculators/quick-quote/quick-quote.js",
+    "excludedFunctions": [
+      "loadInventory",
+      "renderInventory"
+    ],
+    "sha256": "0eef72f212b0bf12df155722acf5f5f718e7bc10bbcf905f1fb5548467cca576"
+  }
+}
