@@ -1,5 +1,9 @@
 # CSS unification — design direction and implementation plan
 
+## RELEASE CANDIDATE — v2026.09.12.1 specialty and seasonal pages
+
+User explicitly authorized deployment and publication of this reviewed batch on 2026-09-12. Earlier pending-publication notes below are historical and superseded. Eight reviewed pages bring the candidate to 215/225 with 10 pending; live remains 75ef80194384912f4c644e9b868898aa5d62de28 / v2026.09.11.6 / Heroku2109 until verified rollout. Christmas gift boxes now target 2026 and have staff-dashboard links. Thirty-one browser asset references are versioned with reversible preservation mappings. Source checkpoint 78f2dfe3fb6faf451abef41f101f39441fec3271. Full local and exact-source CI gates, actual Heroku release and live asset verification remain required before claiming deployment.
+
 ## REVIEWED CHECKPOINT — Customer supplied screen print, 2026-09-11
 
 The sixth specialty calculator now uses canonical controls, native named dialogs, one scoped page stylesheet and external invoice styling. Current coverage: 30 distinct browser checks (29 full-suite checks plus the final new-submission case; all 16 ownership/retry checks repeated after the last behavior edit), one original-only defect capture skipped. All 396 original financial combinations, successful session/item/setup payloads, email HTML and printed customer/fee/waiver contents stay exact. All 47 screenshots and 13 single-page PDFs reviewed (16 sheets; duplicates tracked). Original PDFs needed 26 pages. Stale-price/ladder responses, duplicate pending submits, false success, incomplete saves and mixed-price invoices are fixed; exact retries keep accepted stages. No live business write or customer email occurred.

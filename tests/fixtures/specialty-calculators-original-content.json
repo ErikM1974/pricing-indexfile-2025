@@ -45,7 +45,8 @@
     "shared_components/js/quote-cart-engine.js": "ae4d987c8a68b260c2acdc42e123883a12decc6b59c42359edb8c40ca348a7eb",
     "calculators/screenprint-customer/screenprint-customer-quote-service.js": "6f8b38a099352a03ba41977da30bfbd36ad4d40f400d05cc48d24e5b9c1bd74f",
     "calculators/screenprint-customer/screenprint-customer-calculator.js": "4cbdfad1954c345ce4cb19d2b0d8d6cc49397140f6ccd2c02c207d648f4916d9",
-    "calculators/screenprint-customer/screenprint-customer.js": "fef61eecb32d41228db1c65a68ce9b5b0b3957fedf33dd2157a761c97c676a9b"
+    "calculators/screenprint-customer/screenprint-customer.js": "fef61eecb32d41228db1c65a68ce9b5b0b3957fedf33dd2157a761c97c676a9b",
+    "dashboards/ae-dashboard.html": "b734e333381b06628df85b50f52a490d3783a53b22799d83c1c3e00c67b84d72"
   },
   "changes": [
     {
@@ -1200,6 +1201,181 @@
       "before": "/**\n * Customer Screen Print Quote Service\n * Handles saving Customer Supplied Screen Print quotes to Caspio database\n * Extends BaseQuoteService for common functionality\n */\n\nvar SCRECUSTQUOT_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));\nvar screcustquotLog = SCRECUSTQUOT_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)\nclass CustomerScreenPrintQuoteService extends BaseQuoteService {\n    constructor() {\n        super({\n            prefix: 'SPC',\n            storagePrefix: 'customer_screenprint',\n            sessionPrefix: 'spc_sess'\n        });\n    }\n\n    /**\n     * Get embellishment type for screen print\n     */\n    getEmbellishmentType() {\n        return 'screenprint';\n    }\n\n    /**\n     * Save Customer Screen Print quote\n     */\n    async saveQuote(quoteData) {\n        try {\n            // Use the ID the caller already generated and showed the customer\n            // (handleQuoteSubmit) — calling generateQuoteID() again here produced\n            // a SECOND, different sequential ID, so the quote saved to Caspio\n            // never matched what the customer was told (2026-07-01 bug: customer\n            // sees SPC0701-1, the saved row is SPC0701-2 — a rep searching by the\n            // customer's ID finds nothing).\n            if (!quoteData.quoteId) {\n                throw new Error('saveQuote() requires quoteData.quoteId (the ID already shown to the customer).');\n            }\n            const quoteID = quoteData.quoteId;\n            const sessionID = this.generateSessionID();\n            \n            screcustquotLog('[CustomerScreenPrintQuoteService] Saving quote with ID:', quoteID);\n\n            // Step 1: Create quote session\n            const expiresAtDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);\n            const formattedExpiresAt = expiresAtDate.toISOString().replace(/\\.\\d{3}Z$/, '');\n            \n            const sessionData = {\n                QuoteID: quoteID,\n                SessionID: sessionID,\n                CustomerEmail: quoteData.customerEmail,\n                CustomerName: quoteData.customerName || 'Guest',\n                CompanyName: quoteData.companyName || 'Not Provided',\n                Phone: quoteData.customerPhone || '',\n                TotalQuantity: parseInt(quoteData.quantity || 0),\n                SubtotalAmount: parseFloat((quoteData.orderSubtotal || 0).toFixed(2)),\n                LTMFeeTotal: parseFloat((quoteData.ltmFeeTotal || 0).toFixed(2)),\n                TotalAmount: parseFloat((quoteData.finalTotal || 0).toFixed(2)),\n                Status: 'Open',\n                ExpiresAt: formattedExpiresAt,\n                Notes: quoteData.notes || ''\n            };\n\n            screcustquotLog('[CustomerScreenPrintQuoteService] Session data:', sessionData);\n\n            const sessionResponse = await fetch(`${this.baseURL}/api/quote_sessions`, {\n                method: 'POST',\n                headers: {\n                    'Content-Type': 'application/json'\n                },\n                body: JSON.stringify(sessionData)\n            });\n\n            // Get response text first to see error details\n            const responseText = await sessionResponse.text();\n            screcustquotLog('[CustomerScreenPrintQuoteService] Session response status:', sessionResponse.status);\n            screcustquotLog('[CustomerScreenPrintQuoteService] Session response text:', responseText);\n\n            if (!sessionResponse.ok) {\n                let errorMessage = `Session creation failed: ${sessionResponse.status}`;\n                try {\n                    const errorData = JSON.parse(responseText);\n                    errorMessage = errorData.message || errorData.error || errorMessage;\n                } catch (e) {\n                    errorMessage += ` - ${responseText}`;\n                }\n                throw new Error(errorMessage);\n            }\n\n            // Parse successful response\n            let sessionResult;\n            try {\n                sessionResult = JSON.parse(responseText);\n            } catch (e) {\n                console.error('[CustomerScreenPrintQuoteService] Failed to parse success response:', e);\n                sessionResult = { success: true, message: responseText };\n            }\n            \n            screcustquotLog('[CustomerScreenPrintQuoteService] Session created:', sessionResult);\n\n            // Step 2: Add item to quote\n            const addedAt = new Date().toISOString().replace(/\\.\\d{3}Z$/, '');\n            \n            // Build product description\n            let productName = 'Customer Supplied Screen Print';\n            if (quoteData.isDarkGarment) {\n                productName += ' (Dark Garment)';\n            }\n            if (quoteData.safetyStripes) {\n                productName += ' [Safety Stripes]';\n            }\n\n            // Build print location description\n            const locations = [];\n            if (quoteData.frontColors > 0) {\n                locations.push(`Front: ${quoteData.frontColors} color${quoteData.frontColors > 1 ? 's' : ''}`);\n            }\n            if (quoteData.backColors > 0) {\n                locations.push(`Back: ${quoteData.backColors} color${quoteData.backColors > 1 ? 's' : ''}`);\n            }\n            const printLocation = locations.join(', ') || 'No Print';\n\n            const itemData = {\n                QuoteID: quoteID,\n                LineNumber: 1,\n                StyleNumber: 'CUSTOMER-SP',\n                ProductName: productName,\n                Color: 'Customer Supplied',\n                ColorCode: '',\n                EmbellishmentType: 'screenprint',\n                PrintLocation: printLocation,\n                PrintLocationName: printLocation,\n                Quantity: parseInt(quoteData.quantity || 0),\n                HasLTM: quoteData.ltmFeeTotal > 0 ? 'Yes' : 'No',\n                BaseUnitPrice: parseFloat((quoteData.pricePerShirt || 0).toFixed(2)),\n                LTMPerUnit: 0, // LTM is applied as a flat fee, not per unit\n                FinalUnitPrice: parseFloat((quoteData.pricePerShirt || 0).toFixed(2)),\n                LineTotal: parseFloat((quoteData.orderSubtotal || 0).toFixed(2)),\n                SizeBreakdown: '{}',\n                PricingTier: quoteData.tierLabel || '',\n                ImageURL: '',\n                AddedAt: addedAt\n            };\n\n            screcustquotLog('[CustomerScreenPrintQuoteService] Item data:', itemData);\n\n            const itemResponse = await fetch(`${this.baseURL}/api/quote_items`, {\n                method: 'POST',\n                headers: {\n                    'Content-Type': 'application/json'\n                },\n                body: JSON.stringify(itemData)\n            });\n\n            const itemResponseText = await itemResponse.text();\n            screcustquotLog('[CustomerScreenPrintQuoteService] Item response status:', itemResponse.status);\n            screcustquotLog('[CustomerScreenPrintQuoteService] Item response text:', itemResponseText);\n\n            if (!itemResponse.ok) {\n                let errorMessage = `Item creation failed: ${itemResponse.status}`;\n                try {\n                    const errorData = JSON.parse(itemResponseText);\n                    errorMessage = errorData.message || errorData.error || errorMessage;\n                } catch (e) {\n                    errorMessage += ` - ${itemResponseText}`;\n                }\n                throw new Error(errorMessage);\n            }\n\n            // Step 3: itemize the one-time screen-setup fee as its OWN quote_items line\n            // so the saved record reconciles: Subtotal (line 1) + LTM (session) + this\n            // setup line === TotalAmount. Without it, Quote Management shows an\n            // unexplained gap (SubtotalAmount + LTMFeeTotal ≠ TotalAmount). Mirrors the\n            // staff builder's fee-line convention (screenprint-quote-service.js\n            // _saveShipFeeItem: EmbellishmentType='fee', Quantity 1, fee in *UnitPrice/\n            // LineTotal). Best-effort: a failure here must not fail the whole save (the\n            // product line + session already persisted with the correct TotalAmount).\n            const setupFee = parseFloat((quoteData.setupFee || 0).toFixed(2));\n            if (setupFee > 0) {\n                try {\n                    const setupItemData = {\n                        QuoteID: quoteID,\n                        LineNumber: 2,\n                        StyleNumber: 'SETUP',\n                        ProductName: 'Screen Setup Fee',\n                        Color: '',\n                        ColorCode: '',\n                        EmbellishmentType: 'fee',\n                        PrintLocation: '',\n                        PrintLocationName: '',\n                        Quantity: 1,\n                        HasLTM: 'No',\n                        BaseUnitPrice: setupFee,\n                        LTMPerUnit: 0,\n                        FinalUnitPrice: setupFee,\n                        LineTotal: setupFee,\n                        SizeBreakdown: '{}',\n                        PricingTier: quoteData.tierLabel || '',\n                        ImageURL: '',\n                        AddedAt: new Date().toISOString().replace(/\\.\\d{3}Z$/, '')\n                    };\n                    const setupResponse = await fetch(`${this.baseURL}/api/quote_items`, {\n                        method: 'POST',\n                        headers: { 'Content-Type': 'application/json' },\n                        body: JSON.stringify(setupItemData)\n                    });\n                    if (!setupResponse.ok) {\n                        console.warn('[CustomerScreenPrintQuoteService] Setup-fee line save failed:', setupResponse.status, await setupResponse.text());\n                    }\n                } catch (setupErr) {\n                    console.warn('[CustomerScreenPrintQuoteService] Setup-fee line save threw:', setupErr);\n                }\n            }\n\n            return {\n                success: true,\n                quoteID: quoteID,\n                sessionData: sessionResult\n            };\n\n        } catch (error) {\n            console.error('[CustomerScreenPrintQuoteService] Error saving quote:', error);\n            // Still return the SAME quote ID the customer was already shown, even\n            // though the database save failed — minting a NEW id here would be a\n            // second id nobody can look anything up by.\n            if (error.message.includes('Session creation failed') || error.message.includes('Item creation failed')) {\n                return {\n                    success: false,\n                    quoteID: quoteData.quoteId,\n                    error: error.message\n                };\n            }\n            throw error;\n        }\n    }\n}\n\n// Make available globally\nwindow.CustomerScreenPrintQuoteService = CustomerScreenPrintQuoteService;",
       "after": "/**\n * Customer Screen Print Quote Service\n * Handles saving Customer Supplied Screen Print quotes to Caspio database\n * Extends BaseQuoteService for common functionality\n */\n\nvar SCRECUSTQUOT_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));\nvar screcustquotLog = SCRECUSTQUOT_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)\nclass CustomerScreenPrintQuoteService extends BaseQuoteService {\n    constructor() {\n        super({\n            prefix: 'SPC',\n            storagePrefix: 'customer_screenprint',\n            sessionPrefix: 'spc_sess'\n        });\n        this.savedStages = new Map();\n    }\n\n    /**\n     * Get embellishment type for screen print\n     */\n    getEmbellishmentType() {\n        return 'screenprint';\n    }\n\n    /**\n     * Save Customer Screen Print quote\n     */\n    async saveQuote(quoteData) {\n        try {\n            // Use the ID the caller already generated and showed the customer\n            // (handleQuoteSubmit) — calling generateQuoteID() again here produced\n            // a SECOND, different sequential ID, so the quote saved to Caspio\n            // never matched what the customer was told (2026-07-01 bug: customer\n            // sees SPC0701-1, the saved row is SPC0701-2 — a rep searching by the\n            // customer's ID finds nothing).\n            if (!quoteData.quoteId) {\n                throw new Error('saveQuote() requires quoteData.quoteId (the ID already shown to the customer).');\n            }\n            const quoteID = quoteData.quoteId;\n            const key = JSON.stringify(quoteData);\n            let progress = this.savedStages.get(quoteID);\n            if (progress && progress.key !== key) throw new Error('A quote ID cannot be reused for changed details.');\n            if (!progress) {\n                progress = {key, sessionID: this.generateSessionID()};\n                this.savedStages.set(quoteID, progress);\n            }\n            const sessionID = progress.sessionID;\n\n            screcustquotLog('[CustomerScreenPrintQuoteService] Saving quote with ID:', quoteID);\n\n            // Step 1: Create quote session\n            const expiresAtDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);\n            const formattedExpiresAt = expiresAtDate.toISOString().replace(/\\.\\d{3}Z$/, '');\n\n            const sessionData = {\n                QuoteID: quoteID,\n                SessionID: sessionID,\n                CustomerEmail: quoteData.customerEmail,\n                CustomerName: quoteData.customerName || 'Guest',\n                CompanyName: quoteData.companyName || 'Not Provided',\n                Phone: quoteData.customerPhone || '',\n                TotalQuantity: parseInt(quoteData.quantity || 0),\n                SubtotalAmount: parseFloat((quoteData.orderSubtotal || 0).toFixed(2)),\n                LTMFeeTotal: parseFloat((quoteData.ltmFeeTotal || 0).toFixed(2)),\n                TotalAmount: parseFloat((quoteData.finalTotal || 0).toFixed(2)),\n                Status: 'Open',\n                ExpiresAt: formattedExpiresAt,\n                Notes: quoteData.notes || ''\n            };\n\n            screcustquotLog('[CustomerScreenPrintQuoteService] Session data:', sessionData);\n\n            if (!progress.sessionSaved) {\n                const sessionResponse = await fetch(`${this.baseURL}/api/quote_sessions`, {\n                    method: 'POST',\n                    headers: {\n                        'Content-Type': 'application/json'\n                    },\n                    body: JSON.stringify(sessionData)\n                });\n\n                // Get response text first to see error details\n                const responseText = await sessionResponse.text();\n                screcustquotLog('[CustomerScreenPrintQuoteService] Session response status:', sessionResponse.status);\n                screcustquotLog('[CustomerScreenPrintQuoteService] Session response text:', responseText);\n\n                if (!sessionResponse.ok) {\n                    let errorMessage = `Session creation failed: ${sessionResponse.status}`;\n                    try {\n                        const errorData = JSON.parse(responseText);\n                        errorMessage = errorData.message || errorData.error || errorMessage;\n                    } catch (e) {\n                        errorMessage += ` - ${responseText}`;\n                    }\n                    throw new Error(errorMessage);\n                }\n\n                // Parse successful response\n                let sessionResult;\n                try {\n                    sessionResult = JSON.parse(responseText);\n                } catch (e) {\n                    console.error('[CustomerScreenPrintQuoteService] Failed to parse success response:', e);\n                    sessionResult = { success: true, message: responseText };\n                }\n\n                screcustquotLog('[CustomerScreenPrintQuoteService] Session created:', sessionResult);\n\n                progress.sessionSaved = true;\n                progress.sessionResult = sessionResult;\n            }\n\n            // Step 2: Add item to quote\n            const addedAt = new Date().toISOString().replace(/\\.\\d{3}Z$/, '');\n\n            // Build product description\n            let productName = 'Customer Supplied Screen Print';\n            if (quoteData.isDarkGarment) {\n                productName += ' (Dark Garment)';\n            }\n            if (quoteData.safetyStripes) {\n                productName += ' [Safety Stripes]';\n            }\n\n            // Build print location description\n            const locations = [];\n            if (quoteData.frontColors > 0) {\n                locations.push(`Front: ${quoteData.frontColors} color${quoteData.frontColors > 1 ? 's' : ''}`);\n            }\n            if (quoteData.backColors > 0) {\n                locations.push(`Back: ${quoteData.backColors} color${quoteData.backColors > 1 ? 's' : ''}`);\n            }\n            const printLocation = locations.join(', ') || 'No Print';\n\n            const itemData = {\n                QuoteID: quoteID,\n                LineNumber: 1,\n                StyleNumber: 'CUSTOMER-SP',\n                ProductName: productName,\n                Color: 'Customer Supplied',\n                ColorCode: '',\n                EmbellishmentType: 'screenprint',\n                PrintLocation: printLocation,\n                PrintLocationName: printLocation,\n                Quantity: parseInt(quoteData.quantity || 0),\n                HasLTM: quoteData.ltmFeeTotal > 0 ? 'Yes' : 'No',\n                BaseUnitPrice: parseFloat((quoteData.pricePerShirt || 0).toFixed(2)),\n                LTMPerUnit: 0, // LTM is applied as a flat fee, not per unit\n                FinalUnitPrice: parseFloat((quoteData.pricePerShirt || 0).toFixed(2)),\n                LineTotal: parseFloat((quoteData.orderSubtotal || 0).toFixed(2)),\n                SizeBreakdown: '{}',\n                PricingTier: quoteData.tierLabel || '',\n                ImageURL: '',\n                AddedAt: addedAt\n            };\n\n            screcustquotLog('[CustomerScreenPrintQuoteService] Item data:', itemData);\n\n            if (!progress.itemSaved) {\n                const itemResponse = await fetch(`${this.baseURL}/api/quote_items`, {\n                    method: 'POST',\n                    headers: {\n                        'Content-Type': 'application/json'\n                    },\n                    body: JSON.stringify(itemData)\n                });\n\n                const itemResponseText = await itemResponse.text();\n                screcustquotLog('[CustomerScreenPrintQuoteService] Item response status:', itemResponse.status);\n                screcustquotLog('[CustomerScreenPrintQuoteService] Item response text:', itemResponseText);\n\n                if (!itemResponse.ok) {\n                    let errorMessage = `Item creation failed: ${itemResponse.status}`;\n                    try {\n                        const errorData = JSON.parse(itemResponseText);\n                        errorMessage = errorData.message || errorData.error || errorMessage;\n                    } catch (e) {\n                        errorMessage += ` - ${itemResponseText}`;\n                    }\n                    throw new Error(errorMessage);\n                }\n\n                progress.itemSaved = true;\n            }\n\n            // Step 3: itemize the one-time screen-setup fee as its OWN quote_items line\n            // so the saved record reconciles: Subtotal (line 1) + LTM (session) + this\n            // setup line === TotalAmount. Without it, Quote Management shows an\n            // unexplained gap (SubtotalAmount + LTMFeeTotal ≠ TotalAmount). Mirrors the\n            // staff builder's fee-line convention (screenprint-quote-service.js\n            // _saveShipFeeItem: EmbellishmentType='fee', Quantity 1, fee in *UnitPrice/\n            // LineTotal). Report an incomplete save if this line fails; keep the\n            // confirmed session and product line for a manual retry of the missing fee.\n            const setupFee = parseFloat((quoteData.setupFee || 0).toFixed(2));\n            if (setupFee > 0 && !progress.setupSaved) {\n                const setupItemData = {\n                    QuoteID: quoteID,\n                    LineNumber: 2,\n                    StyleNumber: 'SETUP',\n                    ProductName: 'Screen Setup Fee',\n                    Color: '',\n                    ColorCode: '',\n                    EmbellishmentType: 'fee',\n                    PrintLocation: '',\n                    PrintLocationName: '',\n                    Quantity: 1,\n                    HasLTM: 'No',\n                    BaseUnitPrice: setupFee,\n                    LTMPerUnit: 0,\n                    FinalUnitPrice: setupFee,\n                    LineTotal: setupFee,\n                    SizeBreakdown: '{}',\n                    PricingTier: quoteData.tierLabel || '',\n                    ImageURL: '',\n                    AddedAt: new Date().toISOString().replace(/\\.\\d{3}Z$/, '')\n                };\n                const setupResponse = await fetch(`${this.baseURL}/api/quote_items`, {\n                    method: 'POST',\n                    headers: { 'Content-Type': 'application/json' },\n                    body: JSON.stringify(setupItemData)\n                });\n                if (!setupResponse.ok) {\n                    throw new Error('Setup-fee line save failed: ' + setupResponse.status);\n                }\n                progress.setupSaved = true;\n            }\n\n            return {\n                success: true,\n                quoteID: quoteID,\n                sessionData: progress.sessionResult\n            };\n\n        } catch (error) {\n            console.error('[CustomerScreenPrintQuoteService] Error saving quote:', error);\n            const progress = this.savedStages.get(quoteData.quoteId);\n            return {success: false, quoteID: quoteData.quoteId, sessionSaved: !!(progress && progress.sessionSaved), itemSaved: !!(progress && progress.itemSaved), error: error.message};\n        }\n    }\n}\n\n// Make available globally\nwindow.CustomerScreenPrintQuoteService = CustomerScreenPrintQuoteService;",
       "count": 1
+    },
+    {
+      "file": "calculators/custom-decal-pricing.html",
+      "before": "/shared_components/css/specialty-pricing.css?v=2026.09.11.7",
+      "after": "/shared_components/css/specialty-pricing.css?v=2026.09.12.1",
+      "count": 1,
+      "reason": "Refetch the reviewed specialty and seasonal assets for this release."
+    },
+    {
+      "file": "calculators/custom-decal-pricing.html",
+      "before": "/calculators/custom-decal-pricing.css?v=2026.09.11.7",
+      "after": "/calculators/custom-decal-pricing.css?v=2026.09.12.1",
+      "count": 1,
+      "reason": "Refetch the reviewed specialty and seasonal assets for this release."
+    },
+    {
+      "file": "calculators/custom-decal-pricing.html",
+      "before": "/shared_components/js/specialty-calculator-ui.js?v=2026.09.11.7",
+      "after": "/shared_components/js/specialty-calculator-ui.js?v=2026.09.12.1",
+      "count": 1,
+      "reason": "Refetch the reviewed specialty and seasonal assets for this release."
+    },
+    {
+      "file": "calculators/embroidered-emblem/index.html",
+      "before": "/shared_components/css/specialty-pricing.css?v=2026.09.11.7",
+      "after": "/shared_components/css/specialty-pricing.css?v=2026.09.12.1",
+      "count": 1,
+      "reason": "Refetch the reviewed specialty and seasonal assets for this release."
+    },
+    {
+      "file": "calculators/embroidered-emblem/index.html",
+      "before": "/calculators/embroidered-emblem/embroidered-emblem.css?v=2026.09.11.7",
+      "after": "/calculators/embroidered-emblem/embroidered-emblem.css?v=2026.09.12.1",
+      "count": 1,
+      "reason": "Refetch the reviewed specialty and seasonal assets for this release."
+    },
+    {
+      "file": "calculators/embroidered-emblem/index.html",
+      "before": "/shared_components/js/emblem-pricing-page.js?v=2026.09.11.7",
+      "after": "/shared_components/js/emblem-pricing-page.js?v=2026.09.12.1",
+      "count": 1,
+      "reason": "Refetch the reviewed specialty and seasonal assets for this release."
+    },
+    {
+      "file": "calculators/embroidered-emblem/index.html",
+      "before": "/shared_components/js/specialty-calculator-ui.js?v=2026.09.11.7",
+      "after": "/shared_components/js/specialty-calculator-ui.js?v=2026.09.12.1",
+      "count": 1,
+      "reason": "Refetch the reviewed specialty and seasonal assets for this release."
+    },
+    {
+      "file": "calculators/laser-tumbler-polarcamel.html",
+      "before": "/shared_components/css/specialty-pricing.css?v=2026.09.11.6",
+      "after": "/shared_components/css/specialty-pricing.css?v=2026.09.12.1",
+      "count": 1,
+      "reason": "Refetch the reviewed specialty and seasonal assets for this release."
+    },
+    {
+      "file": "calculators/laser-tumbler-polarcamel.html",
+      "before": "/shared_components/css/laser-tumbler-simple.css?v=2026.09.11.6",
+      "after": "/shared_components/css/laser-tumbler-simple.css?v=2026.09.12.1",
+      "count": 1,
+      "reason": "Refetch the reviewed specialty and seasonal assets for this release."
+    },
+    {
+      "file": "calculators/laser-tumbler-polarcamel.html",
+      "before": "/shared_components/js/jds-api-service.js?v=2026.09.11.6",
+      "after": "/shared_components/js/jds-api-service.js?v=2026.09.12.1",
+      "count": 1,
+      "reason": "Refetch the reviewed specialty and seasonal assets for this release."
+    },
+    {
+      "file": "calculators/laser-tumbler-polarcamel.html",
+      "before": "/shared_components/js/laser-tumbler-simple.js?v=2026.09.11.6",
+      "after": "/shared_components/js/laser-tumbler-simple.js?v=2026.09.12.1",
+      "count": 1,
+      "reason": "Refetch the reviewed specialty and seasonal assets for this release."
+    },
+    {
+      "file": "calculators/laser-tumbler-polarcamel.html",
+      "before": "/shared_components/js/laser-tumbler-mockup.js?v=2026.09.11.6",
+      "after": "/shared_components/js/laser-tumbler-mockup.js?v=2026.09.12.1",
+      "count": 1,
+      "reason": "Refetch the reviewed specialty and seasonal assets for this release."
+    },
+    {
+      "file": "calculators/richardson-2025.html",
+      "before": "/shared_components/css/specialty-pricing.css?v=2026.09.11.7",
+      "after": "/shared_components/css/specialty-pricing.css?v=2026.09.12.1",
+      "count": 1,
+      "reason": "Refetch the reviewed specialty and seasonal assets for this release."
+    },
+    {
+      "file": "calculators/richardson-2025.html",
+      "before": "/calculators/richardson-2025-styles.css?v=2026.09.11.7",
+      "after": "/calculators/richardson-2025-styles.css?v=2026.09.12.1",
+      "count": 1,
+      "reason": "Refetch the reviewed specialty and seasonal assets for this release."
+    },
+    {
+      "file": "calculators/richardson-2025.html",
+      "before": "/calculators/richardson-factory-direct.js?v=2026.09.11.7",
+      "after": "/calculators/richardson-factory-direct.js?v=2026.09.12.1",
+      "count": 1,
+      "reason": "Refetch the reviewed specialty and seasonal assets for this release."
+    },
+    {
+      "file": "calculators/richardson-2025.html",
+      "before": "/shared_components/js/specialty-calculator-ui.js?v=2026.09.11.7",
+      "after": "/shared_components/js/specialty-calculator-ui.js?v=2026.09.12.1",
+      "count": 1,
+      "reason": "Refetch the reviewed specialty and seasonal assets for this release."
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "/calculators/safety-stripe-creator-service.js?v=2026.09.11.6",
+      "after": "/calculators/safety-stripe-creator-service.js?v=2026.09.12.1",
+      "count": 1,
+      "reason": "Refetch the reviewed specialty and seasonal assets for this release."
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "/calculators/safety-stripe-calculator.js?v=2026.09.11.6",
+      "after": "/calculators/safety-stripe-calculator.js?v=2026.09.12.1",
+      "count": 1,
+      "reason": "Refetch the reviewed specialty and seasonal assets for this release."
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "/shared_components/css/specialty-pricing.css?v=2026.09.11.6",
+      "after": "/shared_components/css/specialty-pricing.css?v=2026.09.12.1",
+      "count": 1,
+      "reason": "Refetch the reviewed specialty and seasonal assets for this release."
+    },
+    {
+      "file": "calculators/safety-stripe-creator.html",
+      "before": "/shared_components/css/safety-stripe-creator.css?v=2026.09.11.6",
+      "after": "/shared_components/css/safety-stripe-creator.css?v=2026.09.12.1",
+      "count": 1,
+      "reason": "Refetch the reviewed specialty and seasonal assets for this release."
+    },
+    {
+      "file": "calculators/screenprint-customer/index.html",
+      "before": "/shared_components/css/specialty-pricing.css?v=2026.09.11.6",
+      "after": "/shared_components/css/specialty-pricing.css?v=2026.09.12.1",
+      "count": 1,
+      "reason": "Refetch the reviewed specialty and seasonal assets for this release."
+    },
+    {
+      "file": "calculators/screenprint-customer/index.html",
+      "before": "/calculators/screenprint-customer/screenprint-customer-styles.css?v=2026.09.11.6",
+      "after": "/calculators/screenprint-customer/screenprint-customer-styles.css?v=2026.09.12.1",
+      "count": 1,
+      "reason": "Refetch the reviewed specialty and seasonal assets for this release."
+    },
+    {
+      "file": "calculators/screenprint-customer/index.html",
+      "before": "/calculators/screenprint-customer/screenprint-customer-quote-service.js?v=2026.09.06.37",
+      "after": "/calculators/screenprint-customer/screenprint-customer-quote-service.js?v=2026.09.12.1",
+      "count": 1,
+      "reason": "Refetch the reviewed specialty and seasonal assets for this release."
+    },
+    {
+      "file": "calculators/screenprint-customer/index.html",
+      "before": "/calculators/screenprint-customer/screenprint-customer-calculator.js?v=2026.09.07.33",
+      "after": "/calculators/screenprint-customer/screenprint-customer-calculator.js?v=2026.09.12.1",
+      "count": 1,
+      "reason": "Refetch the reviewed specialty and seasonal assets for this release."
+    },
+    {
+      "file": "dashboards/ae-dashboard.html",
+      "before": "/shared_components/js/jds-api-service.js?v=2026.09.06.31",
+      "after": "/shared_components/js/jds-api-service.js?v=2026.09.12.1",
+      "count": 1,
+      "reason": "Refetch the reviewed specialty and seasonal assets for this release."
     }
   ],
   "capturedAt": "2026-09-11T17:28:04.536Z"
