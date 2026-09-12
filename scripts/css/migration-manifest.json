@@ -6600,6 +6600,38 @@
         "commit": "efa9012ae3b5b77ad8612da53f986024155ce77b",
         "note": "Original runtime Tailwind CDN; exact original styles and content retained in source fixture. Broken service-link evidence labeled separately."
       }
+    },
+    {
+      "source": "calculators/christmas-bundles.html",
+      "family": "seasonal-bundles",
+      "status": "reviewed",
+      "route": "/christmas-bundles.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "calculators/css/christmas-bundles.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "1440-768-390-320",
+        "2026-campaign-and-bidirectional-staff-dashboard-link",
+        "24-original-successful-order-and-email-combinations",
+        "24-original-controller-financial-combinations",
+        "catalog-stock-errors-retries-and-color-response-ownership",
+        "keyboard-product-details-and-native-image-dialog",
+        "captured-order-and-pending-duplicate-guard",
+        "independent-session-item-logo-and-email-retry-stages",
+        "address2-thread-colors-and-delivery-date-validation",
+        "52-screens-and-19-paper-pages-in-13-documents-reviewed",
+        "print-restores-confirmation-and-draft-until-explicit-done"
+      ],
+      "test": "tests/e2e/css-unification-seasonal-christmas.spec.js",
+      "maxCssBytes": 90582,
+      "measuredRawCssBytes": 88534,
+      "baseline": {
+        "commit": "c01ffc2058a0725d3df12c9181c8022776b4ab26",
+        "note": "Six original seasonal source hashes and thirteen original Christmas browser contracts retained; original pointer and false-success defects are labeled diagnostics."
+      }
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",
@@ -6612,13 +6644,6 @@
         "pages/js/quote-view.js"
       ],
       "note": "The lead workspace and Quote View lazy triggers are reviewed at four widths with original prefill, keyboard close/focus, and intercepted reference-import bodies. garment-submit-form.css/js remain original; shared-module modernization stays pending across all consumers."
-    },
-    {
-      "kind": "style-injection",
-      "owners": [
-        "calculators/js/christmas-bundles.js"
-      ],
-      "note": "Error and inventory states."
     },
     {
       "kind": "generated-document",

@@ -5,6 +5,13 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## Seasonal renewal must keep stock, saved orders and confirmation separate (2026-09-12)
+
+- Problem/root cause: Christmas color changes retained old sizes, floating controls hid selections, failed item saves reported success, and email fields dropped address line2 and thread colors.
+- Solution: use canonical scoped styles and native controls; invalidate stock choices immediately and ignore obsolete responses. Capture one order before upload, track confirmed persistence and each email separately, retain failed drafts and retry unfinished stages. Save address2 and map the existing thread-color field.
+- Prevention: compare original financial functions and successful payloads over24 combinations; mock every write and exercise stock failures, racing colors, upload/save/mail retries and duplicate pending calls. Review four widths and all paper pages; print native confirmations through an in-flow copy and restore the draft after printing.
+- Limit: retry ownership skips acknowledged saves, but the legacy POST API has no idempotency contract for a lost acknowledgment. Do not claim exactly-once delivery. Campaign year is2026;2025 Freeman Road East remains the street address.
+
 ## Seasonal assets and order confirmations need real serving and persistence checks (2026-09-11)
 
 - Problem/root cause: the awareness page pointed at a missing service; placing replacements beside its archived HTML would hit the intentional archive410 gate. The original order service swallowed item failures and claimed email delivery after rejection.
@@ -251,11 +258,6 @@ Box-label follow-up (2026-09-10): a failed/new lookup must clear old printable d
 - Prevention: freeze original values, request bodies and source hashes; compare rendered totals (the renderer replaces initial placeholder IDs), all four widths/axe, delayed/error/retry/keyboard paths, actual lazy art imports and every PDF page. Keep shared builder-print and garment-form owners unchanged until their other consumers migrate.
 
 Control-class follow-up: regex word boundaries treat hyphens as separators, so sw-action-btn falsely matches a check for the canonical btn class. Compare whitespace-delimited class tokens, assert real rendered target sizes, and inspect staff toolbars as well as public actions.
-
-### Cart text, storage and pending saves need explicit boundaries (2026-09-10)
-- Problem/root cause: stored garment names and checkout errors rendered as HTML, failed removals threw without a visible message, and the save trigger reopened a form while its previous save was pending.
-- Solution: escape rendered text/attributes without changing payload values; retain the cart with a focused storage error; guard and disable pending save entry points.
-- Prevention: immutable pricing/payload contracts plus harmless stored-markup, quota-error/retry and delayed duplicate-save browser probes. Artwork fieldsets need min-width:0 on phones; printed fields need matching control specificity, complete text/file references and review of every PDF page.
 
 ### Heroku Git must use the trust store that verifies its certificate (2026-09-11)
 - Problem/root cause: the corporate OpenSSL CA verified GitHub but rejected git.heroku.com before upload. Solution: verify ls-remote with the Windows schannel backend, then use the same backend and sslVerify=true for the push. Prevention: never disable verification; prove the prior slug is unchanged after a transport failure, then verify the actual release, source assets and access after resuming.

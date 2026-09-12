@@ -38,7 +38,8 @@ describe('calculator page scripts', () => {
         expect(js).not.toMatch(/console\.log\(/);
     });
     test('christmas-bundles + cheat sheet: host from APP_CONFIG, visible when missing', () => {
-        expect(read('calculators/js/christmas-bundles.js')).toMatch(/var CB_API_BASE = \(window\.APP_CONFIG/);
+        expect(read('calculators/js/christmas-bundles.js')).toContain("const CB_API_BASE = window.APP_CONFIG?.API?.BASE_URL || '';");
+        expect(read('calculators/js/christmas-bundles.js')).toContain('if (!CB_API_BASE)');
         expect(read('calculators/christmas-bundles.html')).toMatch(/<script src="\/config\/app\.config\.js"><\/script>/);
         expect(read('calculators/service-price-cheat-sheet.js')).toMatch(/APP_CONFIG\.API\.BASE_URL missing/);
     });

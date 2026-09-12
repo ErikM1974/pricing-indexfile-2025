@@ -25,7 +25,7 @@ const EMAILJS_RE = /service_jgrave3|4qSbDO-SQs19TbP80/g;
 
 // Frozen 2026-07-07 (task 0.3 sweep complete). Only lower these.
 const HOST_BASELINE = 42; // 222 -> 42 (2026-09-06 S3 batch): every browser-side `|| HOST` fallback, direct fetch(HOST) and return-HOST accessor now reads APP_CONFIG.API.BASE_URL and logs a visible error when it is missing; what remains is Node-side (lib/, scripts/, tools/seed-top-sellers.js, templates/), the two sanctioned EXACT_ONE literals, and 3 <link rel=preconnect> hints
-const EMAILJS_BASELINE = 10; // 69 -> 10 (2026-09-06): every served script reads APP_CONFIG.EMAIL (tenant config) with a visible error when missing; the 10 left are all under calculators/archive/
+const EMAILJS_BASELINE = 9; // 69 -> 9 (2026-09-12): renewed seasonal service reads tenant configuration; remaining literals belong to archived sources.
 
 const SKIP_DIRS = new Set(['node_modules', '.claude', '.git', 'dist', 'tests', 'memory', 'docs', 'migrations', 'workflows']);
 

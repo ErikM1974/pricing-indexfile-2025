@@ -1,5 +1,7 @@
 # Active Files Registry
 
+- tests/e2e/seasonal-christmas-behavior.spec.js — synthetic 2026 catalog, inventory, keyboard, delivery, captured order, upload and email retry checks.
+
 - `shared_components/js/core-calculator-ui.js` — scoped canonical control classes, keyboard actions, state announcements and table scrolling for five public calculators; no pricing calculations.
 
 - `shared_components/css/employee-bundles.css` — shared Streich Bros./WCTTR wrapper, typography, instructions and navigation over tokens/components/hosted-workspace. Retires `employee-bundles/css/streich-bros-bundle.css` and `employee-bundles/css/wcttr-bundle.css`; original CSS is retained in the source fixture. Provider records remain externally owned.
@@ -1162,3 +1164,39 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - tests/unit/seasonal-bundles-orders.test.js — original/current order payload parity and confirmed-stage retry tests; synthetic data only.
 
 - calculators/breast-cancer-bundle-service.js — reviewed public awareness ordering service; archived original remains frozen behind the 410 boundary.
+
+- tests/fixtures/seasonal-christmas-products.json — public product image/color fixture for synthetic 2026 gift-box verification.
+- tests/e2e/helpers/seasonal-christmas-browser.js — deterministic original/current gift-box browser fixture; blocks all real writes.
+- tests/e2e/css-unification-seasonal-christmas.spec.js — gift-box source, visual, pricing, and request regression coverage.
+
+- tests/fixtures/seasonal-christmas-products-original-browser.json — immutable synthetic Christmas gift-box browser and request evidence.
+
+- tests/fixtures/seasonal-christmas-financial-source.json — original Christmas financial and persistence/email source contracts.
+
+- tests/fixtures/seasonal-christmas-review-ship-original-browser.json — immutable synthetic Christmas gift-box browser and request evidence.
+
+- tests/fixtures/seasonal-christmas-success-original-browser.json — immutable synthetic Christmas gift-box browser and request evidence.
+
+- tests/fixtures/seasonal-christmas-hoodie-original-browser.json — immutable synthetic Christmas gift-box browser and request evidence.
+
+- tests/fixtures/seasonal-christmas-beanie-original-browser.json — immutable synthetic Christmas gift-box browser and request evidence.
+
+- tests/fixtures/seasonal-christmas-gloves-original-browser.json — immutable synthetic Christmas gift-box browser and request evidence.
+
+- tests/fixtures/seasonal-christmas-bonus-original-browser.json — immutable synthetic Christmas gift-box browser and request evidence.
+
+- tests/fixtures/seasonal-christmas-customize-original-browser.json — immutable synthetic Christmas gift-box browser and request evidence.
+
+- tests/fixtures/seasonal-christmas-delivery-original-browser.json — immutable synthetic Christmas gift-box browser and request evidence.
+- tests/unit/seasonal-christmas-orders.test.js — original/new order payload and partial retry contracts; all requests synthetic.
+
+- tests/fixtures/seasonal-christmas-failed-session-original-browser.json — immutable synthetic Christmas gift-box browser and request evidence.
+
+- tests/fixtures/seasonal-christmas-failed-item-original-browser.json — immutable synthetic Christmas gift-box browser and request evidence.
+
+- tests/fixtures/seasonal-christmas-failed-email-original-browser.json — immutable synthetic Christmas gift-box browser and request evidence.
+
+- tests/fixtures/seasonal-christmas-review-pickup-original-browser.json — immutable synthetic Christmas gift-box browser and request evidence.
+
+- calculators/js/christmas-bundle-order.js — captured Christmas order payloads, staged persistence and independently retryable confirmation emails.
+- tests/e2e/seasonal-christmas-behavior.spec.js — synthetic stock, keyboard, date, upload, save, mail and print-restoration regression checks.

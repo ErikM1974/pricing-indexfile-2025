@@ -1,0 +1,393 @@
+{
+  "mode": "failed-session",
+  "states": [
+    {
+      "width": 1440,
+      "text": "❄ ❅ ❆ 🎅 Offer Expires In 🎅 00 DAYS : 00 HOURS : 00 MINUTES : 00 SECONDS 🎅 Offer Has Ended - Contact Us for Current Promotions! 🎅 Gift Box Value: $295 Your Cost: FREE! You Save: $295 🎄 Christmas Bundle Pricing 2025 Rain Defender: $213 | Detroit: $258 | Storm Defender: $295 Each bundle includes: Jacket • Hoodie • Beanie • Gloves • Gift Box with custom embroidery Volume pricing available for 8+ bundles 1 Select Jacket 2 Select Hoodie 3 Select Beanie 4 Select Gloves 5 Customize 6 Delivery Info 7 Review Review Your Christmas Bundle Order Please review all details before submitting Your Gift Box Items Carhartt Storm Defender Shoreline Jacket CT104670 Color: Black Size: L $174.00 FREE Carhartt Midweight Hooded Sweatshirt Color: Heather Grey Size: L $58.00 FREE Carhartt Watch Cap 2 Color: Coal Heather Size: One Size $35.00 FREE Carhartt High-Dexterity Open-Cuff Glove CTGD0794 Color: Black Barley Size: L $19.00 FREE Customization Details THREAD COLORS Green,, White JACKET EMBROIDERY right-chest HOODIE EMBROIDERY left-chest SPECIAL INSTRUCTIONS Synthetic gift-box review. No real order. Delivery Information Contact Example Customer Example Company Communication example@example.invalid (253) 555-0100 Delivery Ship By: Oct 15, 2026 Shipping Address 123 Example Street Suite 2 Example City, WA 98000 Order Summary Retail Value: $320.00 Your Price: FREE Santa's Bonus: FREE! You Save: $320.00 PROCESSING... Previous Step Your Gift Box This is a FREE promotional gift box! Carhartt Storm Defender Shoreline Jacket CT104670 CT104670 • L • Black Carhartt Midweight Hooded Sweatshirt CTK121 • L • Heather Grey Carhartt Watch Cap 2 CT104597 • OSFA • Coal Heather Carhartt Work Gloves CTGD0794 • L • Black Barley",
+      "fields": [],
+      "totals": {
+        "quantity": 4,
+        "retail": 320,
+        "unit": 320
+      },
+      "overflow": false,
+      "missingImages": [],
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".product-item-card:nth-child(1) > .product-item-price > .retail-price"
+            ],
+            [
+              ".product-item-card:nth-child(1) > .product-item-price > .free-tag"
+            ],
+            [
+              ".product-item-card:nth-child(2) > .product-item-price > .retail-price"
+            ],
+            [
+              ".product-item-card:nth-child(2) > .product-item-price > .free-tag"
+            ],
+            [
+              ".product-item-card:nth-child(3) > .product-item-price > .retail-price"
+            ],
+            [
+              ".product-item-card:nth-child(3) > .product-item-price > .free-tag"
+            ],
+            [
+              ".product-item-card:nth-child(4) > .product-item-price > .retail-price"
+            ],
+            [
+              ".product-item-card:nth-child(4) > .product-item-price > .free-tag"
+            ],
+            [
+              "#orderConfirmationDetails > div:nth-child(2) > span:nth-child(2)"
+            ],
+            [
+              "#orderConfirmationDetails > div:nth-child(3) > span:nth-child(2)"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "text": "❄ ❅ ❆ 🎅 Offer Expires In 🎅 00 DAYS : 00 HOURS : 00 MINUTES : 00 SECONDS 🎅 Offer Has Ended - Contact Us for Current Promotions! 🎅 Gift Box Value: $295 Your Cost: FREE! You Save: $295 🎄 Christmas Bundle Pricing 2025 Rain Defender: $213 | Detroit: $258 | Storm Defender: $295 Each bundle includes: Jacket • Hoodie • Beanie • Gloves • Gift Box with custom embroidery Volume pricing available for 8+ bundles 1 Select Jacket 2 Select Hoodie 3 Select Beanie 4 Select Gloves 5 Customize 6 Delivery Info 7 Review Review Your Christmas Bundle Order Please review all details before submitting Your Gift Box Items Carhartt Storm Defender Shoreline Jacket CT104670 Color: Black Size: L $174.00 FREE Carhartt Midweight Hooded Sweatshirt Color: Heather Grey Size: L $58.00 FREE Carhartt Watch Cap 2 Color: Coal Heather Size: One Size $35.00 FREE Carhartt High-Dexterity Open-Cuff Glove CTGD0794 Color: Black Barley Size: L $19.00 FREE Customization Details THREAD COLORS Green,, White JACKET EMBROIDERY right-chest HOODIE EMBROIDERY left-chest SPECIAL INSTRUCTIONS Synthetic gift-box review. No real order. Delivery Information Contact Example Customer Example Company Communication example@example.invalid (253) 555-0100 Delivery Ship By: Oct 15, 2026 Shipping Address 123 Example Street Suite 2 Example City, WA 98000 Order Summary Retail Value: $320.00 Your Price: FREE Santa's Bonus: FREE! You Save: $320.00 PROCESSING... Previous Step Your Gift Box This is a FREE promotional gift box! Carhartt Storm Defender Shoreline Jacket CT104670 CT104670 • L • Black Carhartt Midweight Hooded Sweatshirt CTK121 • L • Heather Grey Carhartt Watch Cap 2 CT104597 • OSFA • Coal Heather Carhartt Work Gloves CTGD0794 • L • Black Barley",
+      "fields": [],
+      "totals": {
+        "quantity": 4,
+        "retail": 320,
+        "unit": 320
+      },
+      "overflow": false,
+      "missingImages": [],
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".product-item-card:nth-child(1) > .product-item-price > .retail-price"
+            ],
+            [
+              ".product-item-card:nth-child(1) > .product-item-price > .free-tag"
+            ],
+            [
+              ".product-item-card:nth-child(2) > .product-item-price > .retail-price"
+            ],
+            [
+              ".product-item-card:nth-child(2) > .product-item-price > .free-tag"
+            ],
+            [
+              ".product-item-card:nth-child(3) > .product-item-price > .retail-price"
+            ],
+            [
+              ".product-item-card:nth-child(3) > .product-item-price > .free-tag"
+            ],
+            [
+              ".product-item-card:nth-child(4) > .product-item-price > .retail-price"
+            ],
+            [
+              ".product-item-card:nth-child(4) > .product-item-price > .free-tag"
+            ],
+            [
+              "#orderConfirmationDetails > div:nth-child(2) > span:nth-child(2)"
+            ],
+            [
+              "#orderConfirmationDetails > div:nth-child(3) > span:nth-child(2)"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "text": "❄ ❅ ❆ 🎅 Offer Expires In 🎅 00 DAYS : 00 HOURS : 00 MINUTES : 00 SECONDS 🎅 Offer Has Ended - Contact Us for Current Promotions! 🎅 Gift Box Value: $295 Your Cost: FREE! You Save: $295 🎄 Christmas Bundle Pricing 2025 Rain Defender: $213 | Detroit: $258 | Storm Defender: $295 Each bundle includes: Jacket • Hoodie • Beanie • Gloves • Gift Box with custom embroidery Volume pricing available for 8+ bundles 1 Select Jacket 2 Select Hoodie 3 Select Beanie 4 Select Gloves 5 Customize 6 Delivery Info 7 Review Choose Your Jacket Select from our premium Carhartt jacket collection CT104670 Carhartt Storm Defender Shoreline Jacket CT104670 $174 value FREE! Our best-selling Shoreline Jacket has been updated. 7.3-ounce 100% nylon oxford shell Storm... SELECT COLOR:* SELECT SIZE:* S M L XL 2XL 3XL 4XL Change Selection CT100617 Carhartt Rain Defender Paxton Heavyweight Hooded Zip Mock Sweatshirt $92 value FREE! Rain Defender durable water-repellent technology has your back all day every day in this rugged moc... SELECT COLOR:* SELECT SIZE:* S M L XL 2XL 3XL 4XL Select This Jacket CT103828 Carhartt Duck Detroit Jacket CT103828 $137 value FREE! The original Detroit Jacket built a reputation for toughness on the backs of warehouse workers farm... SELECT COLOR:* SELECT SIZE:* S M L XL 2XL 3XL 4XL Select This Jacket Continue Your Gift Box This is a FREE promotional gift box! Start building your gift box",
+      "fields": [],
+      "totals": {
+        "quantity": 0,
+        "retail": 34,
+        "unit": 34
+      },
+      "overflow": false,
+      "missingImages": [],
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "div[data-step=\"2\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"3\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"4\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"5\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"6\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"7\"] > .step-title"
+            ],
+            [
+              "div[data-product-id=\"CT104670\"] > .product-info > .product-style"
+            ],
+            [
+              "div[data-product-id=\"CT104670\"] > .product-info > .product-price > .retail-value[title=\"\"]"
+            ],
+            [
+              "div[data-product-id=\"CT104670\"] > .product-info > .product-price > .free-badge"
+            ],
+            [
+              "div[data-product-id=\"CT104670\"] > .product-info > .product-description"
+            ],
+            [
+              "div[data-product-id=\"CT104670\"] > .product-info > .selection-group:nth-child(5) > .selection-label"
+            ],
+            [
+              "div[data-product-id=\"CT104670\"] > .product-info > .selection-group:nth-child(6) > .selection-label"
+            ],
+            [
+              "div[data-product-id=\"CT100617\"] > .product-info > .product-style"
+            ],
+            [
+              "div[data-product-id=\"CT100617\"] > .product-info > .product-price > .retail-value"
+            ],
+            [
+              "div[data-product-id=\"CT100617\"] > .product-info > .product-price > .free-badge"
+            ],
+            [
+              "div[data-product-id=\"CT100617\"] > .product-info > .product-description"
+            ],
+            [
+              "div[data-product-id=\"CT100617\"] > .product-info > .selection-group:nth-child(5) > .selection-label"
+            ],
+            [
+              "div[data-product-id=\"CT100617\"] > .product-info > .selection-group:nth-child(6) > .selection-label"
+            ],
+            [
+              "div[data-product-id=\"CT103828\"] > .product-info > .product-style"
+            ],
+            [
+              "div[data-product-id=\"CT103828\"] > .product-info > .product-price > .retail-value"
+            ],
+            [
+              "div[data-product-id=\"CT103828\"] > .product-info > .product-price > .free-badge"
+            ],
+            [
+              "div[data-product-id=\"CT103828\"] > .product-info > .product-description"
+            ],
+            [
+              "div[data-product-id=\"CT103828\"] > .product-info > .selection-group:nth-child(5) > .selection-label"
+            ],
+            [
+              "div[data-product-id=\"CT103828\"] > .product-info > .selection-group:nth-child(6) > .selection-label"
+            ],
+            [
+              ".summary-empty > div:nth-child(2)"
+            ],
+            [
+              "#orderConfirmationDetails > div:nth-child(2) > span:nth-child(2)"
+            ],
+            [
+              "#orderConfirmationDetails > div:nth-child(3) > span:nth-child(2)"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "text": "❄ ❅ ❆ 🎅 Offer Expires In 🎅 00 DAYS : 00 HOURS : 00 MINUTES : 00 SECONDS 🎅 Offer Has Ended - Contact Us for Current Promotions! 🎅 Gift Box Value: $295 Your Cost: FREE! You Save: $295 🎄 Christmas Bundle Pricing 2025 Rain Defender: $213 | Detroit: $258 | Storm Defender: $295 Each bundle includes: Jacket • Hoodie • Beanie • Gloves • Gift Box with custom embroidery Volume pricing available for 8+ bundles 1 Select Jacket 2 Select Hoodie 3 Select Beanie 4 Select Gloves 5 Customize 6 Delivery Info 7 Review Choose Your Jacket Select from our premium Carhartt jacket collection CT104670 Carhartt Storm Defender Shoreline Jacket CT104670 $174 value FREE! Our best-selling Shoreline Jacket has been updated. 7.3-ounce 100% nylon oxford shell Storm... SELECT COLOR:* SELECT SIZE:* S M L XL 2XL 3XL 4XL Change Selection CT100617 Carhartt Rain Defender Paxton Heavyweight Hooded Zip Mock Sweatshirt $92 value FREE! Rain Defender durable water-repellent technology has your back all day every day in this rugged moc... SELECT COLOR:* SELECT SIZE:* S M L XL 2XL 3XL 4XL Select This Jacket CT103828 Carhartt Duck Detroit Jacket CT103828 $137 value FREE! The original Detroit Jacket built a reputation for toughness on the backs of warehouse workers farm... SELECT COLOR:* SELECT SIZE:* S M L XL 2XL 3XL 4XL Select This Jacket Continue Your Gift Box This is a FREE promotional gift box! Start building your gift box",
+      "fields": [],
+      "totals": {
+        "quantity": 0,
+        "retail": 34,
+        "unit": 34
+      },
+      "overflow": false,
+      "missingImages": [],
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "div[data-step=\"2\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"3\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"4\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"5\"] > .step-title"
+            ],
+            [
+              "div[data-step=\"6\"] > .step-title"
+            ],
+            [
+              "div[data-product-id=\"CT104670\"] > .product-info > .product-price > .retail-value[title=\"\"]"
+            ],
+            [
+              "div[data-product-id=\"CT104670\"] > .product-info > .product-price > .free-badge"
+            ],
+            [
+              "div[data-product-id=\"CT100617\"] > .product-info > .product-price > .retail-value"
+            ],
+            [
+              "div[data-product-id=\"CT100617\"] > .product-info > .product-price > .free-badge"
+            ],
+            [
+              "div[data-product-id=\"CT103828\"] > .product-info > .product-price > .retail-value"
+            ],
+            [
+              "div[data-product-id=\"CT103828\"] > .product-info > .product-price > .free-badge"
+            ],
+            [
+              ".summary-empty > div:nth-child(2)"
+            ],
+            [
+              "#orderConfirmationDetails > div:nth-child(2) > span:nth-child(2)"
+            ],
+            [
+              "#orderConfirmationDetails > div:nth-child(3) > span:nth-child(2)"
+            ]
+          ]
+        },
+        {
+          "id": "scrollable-region-focusable",
+          "nodes": [
+            [
+              ".progress-steps"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "events": {
+    "errors": [],
+    "writes": [
+      {
+        "path": "/api/quote_sessions",
+        "body": {
+          "QuoteID": "XMAS0912-1000",
+          "SessionID": "xmas_sess_1789237811000_3llllllll",
+          "Status": "Sample Request",
+          "CustomerName": "Example Customer",
+          "CompanyName": "Example Company",
+          "CustomerEmail": "example@example.invalid",
+          "Phone": "(253) 555-0100",
+          "TotalQuantity": 4,
+          "SubtotalAmount": 320,
+          "LTMFeeTotal": 0,
+          "TotalAmount": 320,
+          "ExpiresAt": "2026-10-12T18:30:11",
+          "Notes": "Christmas Gift Box Bundle Order"
+        }
+      },
+      {
+        "path": "/api/quote_items",
+        "body": {
+          "QuoteID": "XMAS0912-1000",
+          "LineNumber": 1,
+          "StyleNumber": "XMAS-BUNDLE",
+          "ProductName": "Christmas Gift Box Bundle",
+          "Quantity": 4,
+          "FinalUnitPrice": 320,
+          "LineTotal": 320,
+          "First": "Example",
+          "Last": "Customer",
+          "Email": "example@example.invalid",
+          "Phone": "(253) 555-0100",
+          "Company": "Example Company",
+          "DeliveryMethod": "Ship",
+          "Shipping_Address": "123 Example Street",
+          "Shipping_City": "Example City",
+          "Shipping_State": "WA",
+          "Shipping_Zip": "98000",
+          "EmbroideryLocation": "Jacket: right-chest, Hoodie: left-chest",
+          "Thread_Colors": "Green, White",
+          "Image_Upload": "",
+          "BundleConfiguration": "{\"jacket\":\"CT104670 - L - Black\",\"hoodie\":\"CTK121 - L - Heather Grey\",\"beanie\":\"CT104597 - Coal Heather\",\"gloves\":\"CTGD0794 - L - Black Barley\"}",
+          "Notes": "Synthetic gift-box review. No real order.",
+          "RushOrder": false,
+          "DeliveryDate": "2026-10-16"
+        }
+      }
+    ],
+    "unknown": [
+      "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+      "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
+      "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+      "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
+      "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+      "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
+      "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+      "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    ],
+    "dialogs": []
+  },
+  "emails": [
+    {
+      "service": "service_1c4k67j",
+      "template": "template_v80ysfp",
+      "data": {
+        "to_email": "example@example.invalid",
+        "customer_name": "Example Customer",
+        "company_name": "Example Company",
+        "quote_number": "XMAS0912-1000",
+        "quote_date": "9/12/2026",
+        "jacket_details": "Carhartt Storm Defender Shoreline Jacket CT104670, Color: Black, Size: L",
+        "hoodie_details": "Carhartt Midweight Hooded Sweatshirt, Color: Heather Grey, Size: L",
+        "beanie_details": "Carhartt Watch Cap 2, Color: Coal Heather, Size: OSFA",
+        "gloves_details": "Carhartt High-Dexterity Open-Cuff Glove CTGD0794, Color: Black Barley, Size: L",
+        "thread_color_1": "Not selected",
+        "thread_color_2": "Not selected",
+        "thread_color_3": "Not selected",
+        "embroidery_location": "Jacket Location: right-chest | Hoodie Location: left-chest",
+        "custom_text": "None",
+        "logo_upload": "No logo",
+        "phone": "(253) 555-0100",
+        "email": "example@example.invalid",
+        "delivery_type": "Ship",
+        "delivery_date": "2026-10-16",
+        "address_1": "123 Example Street",
+        "address_2": "",
+        "city": "Example City",
+        "state": "WA",
+        "zip": "98000",
+        "subtotal": "295.00",
+        "shipping": "25.00",
+        "gift_box": "9.00",
+        "total": "320.00",
+        "special_instructions": "Synthetic gift-box review. No real order.",
+        "quantity": "4",
+        "reply_to": "example@example.invalid",
+        "from_name": "Northwest Custom Apparel",
+        "company_phone": "253-922-5793",
+        "company_year": "1977",
+        "sales_rep": "Sales Team",
+        "valid_days": "30"
+      }
+    },
+    {
+      "service": "service_1c4k67j",
+      "template": "template_sales_xmas",
+      "data": {
+        "to_email": "nika@nwcustomapparel.com, taneisha@nwcustomapparel.com",
+        "quote_id": "XMAS0912-1000",
+        "order_date": "9/12/2026, 11:30:11 AM",
+        "customer_name": "Example Customer",
+        "customer_email": "example@example.invalid",
+        "customer_phone": "(253) 555-0100",
+        "customer_company": "Example Company"
+      }
+    }
+  ],
+  "diagnostic": "Original swatch pointer interception is preserved in christmas-original-flow.log. Dispatch swatch click and use native keyboard buttons to inspect the original deeper flow without changing CSS."
+}

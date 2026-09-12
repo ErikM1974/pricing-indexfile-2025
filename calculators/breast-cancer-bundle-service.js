@@ -5,10 +5,10 @@ class BreastCancerBundleService {
     constructor() {
         this.apiBase = window.APP_CONFIG.API.BASE_URL + '/api';
         this.savedOrders = new Map();
-        this.emailjsServiceId = 'service_jgrave3';
+        this.emailjsServiceId = window.APP_CONFIG.EMAIL.SERVICE_ID;
         this.emailjsTemplateId = 'template_2rlgjio'; // BCA Bundle Customer template
         this.emailjsSalesTemplateId = 'template_af6h6kh'; // BCA Bundle Sales Team template
-        this.emailjsPublicKey = '4qSbDO-SQs19TbP80';
+        this.emailjsPublicKey = window.APP_CONFIG.EMAIL.PUBLIC_KEY;
         this.quotePrefix = 'BCA';
     }
 

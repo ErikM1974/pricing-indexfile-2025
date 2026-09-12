@@ -9,7 +9,7 @@ function harness(source = current, state = {}) {
     const writes = [], emails = [];
     class Clock extends Date {constructor(...args) {super(...(args.length ? args : ['2026-09-11T18:30:00.000Z']));} static now() {return new Date('2026-09-11T18:30:00.000Z').valueOf();}}
     const math = Object.create(Math); let sequence = 0; math.random = () => 0.1 + sequence++ / 10000;
-    const context = {Date: Clock, Math: math, Intl, console: {log() {}, error() {}}, window: {APP_CONFIG: {API: {BASE_URL: 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com'}}},
+    const context = {Date: Clock, Math: math, Intl, console: {log() {}, error() {}}, window: {APP_CONFIG: {API: {BASE_URL: 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com'}, EMAIL: {SERVICE_ID: 'service_jgrave3', PUBLIC_KEY: '4qSbDO-SQs19TbP80'}}},
         fetch: async (url, options) => {
             const body = JSON.parse(options.body); writes.push({url, body});
             if (state.hold) await state.hold;

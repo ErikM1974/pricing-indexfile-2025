@@ -25,7 +25,7 @@ test('awareness content, product images, destinations, and initial field values 
     expect(fields(after)).toEqual(fields(before));
     expect(after.querySelector('script[src*="tailwind"]')).toBeNull();
     expect(after.querySelector('style,[style],[onclick],[onchange]')).toBeNull();
-    const paths = [...after.querySelectorAll('link[rel="stylesheet"]')].map(n => n.getAttribute('href'));
+    const paths = [...after.querySelectorAll('link[rel="stylesheet"]')].map(n => n.getAttribute('href').split('?')[0]);
     expect(paths.indexOf('/shared_components/css/tokens.css')).toBeLessThan(paths.indexOf('/shared_components/css/components.css'));
     expect(paths.at(-1)).toBe('/calculators/breast-cancer-awareness-bundle.css');
 });

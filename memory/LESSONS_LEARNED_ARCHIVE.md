@@ -4347,3 +4347,10 @@ Problem: the quote request inherited line-oriented paper styling that pushed the
 ### Confirmation timers need scheduling room in browser checks (2026-09-10)
 - Problem/root cause: a4.2-second UI toast occasionally exceeded a5-second test wait with three browsers active. Solution: allow10 seconds while still asserting the real dismissal; application timing stays unchanged. Prevention: compare immutable values after transient confirmation clears and repeat the failed case under the original worker load.
 - Redirect follow-up: a product401 navigates to sign-in while the harness waits for fonts. Wait for the expected login document to load before page evaluation; catching a destroyed execution context or retrying the whole test hides the race.
+
+## Archived 2026-09-12
+
+### Cart text, storage and pending saves need explicit boundaries (2026-09-10)
+- Problem/root cause: stored garment names and checkout errors rendered as HTML, failed removals threw without a visible message, and the save trigger reopened a form while its previous save was pending.
+- Solution: escape rendered text/attributes without changing payload values; retain the cart with a focused storage error; guard and disable pending save entry points.
+- Prevention: immutable pricing/payload contracts plus harmless stored-markup, quota-error/retry and delayed duplicate-save browser probes. Artwork fieldsets need min-width:0 on phones; printed fields need matching control specificity, complete text/file references and review of every PDF page.

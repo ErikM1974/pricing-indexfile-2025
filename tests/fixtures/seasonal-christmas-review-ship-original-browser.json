@@ -1,0 +1,202 @@
+{
+  "mode": "review-ship",
+  "states": [
+    {
+      "width": 1440,
+      "text": "❄ ❅ ❆ 🎅 Offer Expires In 🎅 00 DAYS : 00 HOURS : 00 MINUTES : 00 SECONDS 🎅 Offer Has Ended - Contact Us for Current Promotions! 🎅 Gift Box Value: $295 Your Cost: FREE! You Save: $295 🎄 Christmas Bundle Pricing 2025 Rain Defender: $213 | Detroit: $258 | Storm Defender: $295 Each bundle includes: Jacket • Hoodie • Beanie • Gloves • Gift Box with custom embroidery Volume pricing available for 8+ bundles 1 Select Jacket 2 Select Hoodie 3 Select Beanie 4 Select Gloves 5 Customize 6 Delivery Info 7 Review Review Your Christmas Bundle Order Please review all details before submitting Your Gift Box Items Carhartt Storm Defender Shoreline Jacket CT104670 Color: Black Size: L $174.00 FREE Carhartt Midweight Hooded Sweatshirt Color: Heather Grey Size: L $58.00 FREE Carhartt Watch Cap 2 Color: Coal Heather Size: One Size $35.00 FREE Carhartt High-Dexterity Open-Cuff Glove CTGD0794 Color: Black Barley Size: L $19.00 FREE Customization Details THREAD COLORS Green,, White JACKET EMBROIDERY right-chest HOODIE EMBROIDERY left-chest SPECIAL INSTRUCTIONS Synthetic gift-box review. No real order. Delivery Information Contact Example Customer Example Company Communication example@example.invalid (253) 555-0100 Delivery Ship By: Oct 15, 2026 Shipping Address 123 Example Street Suite 2 Example City, WA 98000 Order Summary Retail Value: $320.00 Your Price: FREE Santa's Bonus: FREE! You Save: $320.00 SUBMIT ORDER Previous Step Your Gift Box This is a FREE promotional gift box! Carhartt Storm Defender Shoreline Jacket CT104670 CT104670 • L • Black Carhartt Midweight Hooded Sweatshirt CTK121 • L • Heather Grey Carhartt Watch Cap 2 CT104597 • OSFA • Coal Heather Carhartt Work Gloves CTGD0794 • L • Black Barley",
+      "fields": [],
+      "totals": {
+        "quantity": 4,
+        "retail": 320,
+        "unit": 320
+      },
+      "overflow": false,
+      "missingImages": [],
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".product-item-card:nth-child(1) > .product-item-price > .retail-price"
+            ],
+            [
+              ".product-item-card:nth-child(1) > .product-item-price > .free-tag"
+            ],
+            [
+              ".product-item-card:nth-child(2) > .product-item-price > .retail-price"
+            ],
+            [
+              ".product-item-card:nth-child(2) > .product-item-price > .free-tag"
+            ],
+            [
+              ".product-item-card:nth-child(3) > .product-item-price > .retail-price"
+            ],
+            [
+              ".product-item-card:nth-child(3) > .product-item-price > .free-tag"
+            ],
+            [
+              ".product-item-card:nth-child(4) > .product-item-price > .retail-price"
+            ],
+            [
+              ".product-item-card:nth-child(4) > .product-item-price > .free-tag"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "text": "❄ ❅ ❆ 🎅 Offer Expires In 🎅 00 DAYS : 00 HOURS : 00 MINUTES : 00 SECONDS 🎅 Offer Has Ended - Contact Us for Current Promotions! 🎅 Gift Box Value: $295 Your Cost: FREE! You Save: $295 🎄 Christmas Bundle Pricing 2025 Rain Defender: $213 | Detroit: $258 | Storm Defender: $295 Each bundle includes: Jacket • Hoodie • Beanie • Gloves • Gift Box with custom embroidery Volume pricing available for 8+ bundles 1 Select Jacket 2 Select Hoodie 3 Select Beanie 4 Select Gloves 5 Customize 6 Delivery Info 7 Review Review Your Christmas Bundle Order Please review all details before submitting Your Gift Box Items Carhartt Storm Defender Shoreline Jacket CT104670 Color: Black Size: L $174.00 FREE Carhartt Midweight Hooded Sweatshirt Color: Heather Grey Size: L $58.00 FREE Carhartt Watch Cap 2 Color: Coal Heather Size: One Size $35.00 FREE Carhartt High-Dexterity Open-Cuff Glove CTGD0794 Color: Black Barley Size: L $19.00 FREE Customization Details THREAD COLORS Green,, White JACKET EMBROIDERY right-chest HOODIE EMBROIDERY left-chest SPECIAL INSTRUCTIONS Synthetic gift-box review. No real order. Delivery Information Contact Example Customer Example Company Communication example@example.invalid (253) 555-0100 Delivery Ship By: Oct 15, 2026 Shipping Address 123 Example Street Suite 2 Example City, WA 98000 Order Summary Retail Value: $320.00 Your Price: FREE Santa's Bonus: FREE! You Save: $320.00 SUBMIT ORDER Previous Step Your Gift Box This is a FREE promotional gift box! Carhartt Storm Defender Shoreline Jacket CT104670 CT104670 • L • Black Carhartt Midweight Hooded Sweatshirt CTK121 • L • Heather Grey Carhartt Watch Cap 2 CT104597 • OSFA • Coal Heather Carhartt Work Gloves CTGD0794 • L • Black Barley",
+      "fields": [],
+      "totals": {
+        "quantity": 4,
+        "retail": 320,
+        "unit": 320
+      },
+      "overflow": false,
+      "missingImages": [],
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".product-item-card:nth-child(1) > .product-item-price > .retail-price"
+            ],
+            [
+              ".product-item-card:nth-child(1) > .product-item-price > .free-tag"
+            ],
+            [
+              ".product-item-card:nth-child(2) > .product-item-price > .retail-price"
+            ],
+            [
+              ".product-item-card:nth-child(2) > .product-item-price > .free-tag"
+            ],
+            [
+              ".product-item-card:nth-child(3) > .product-item-price > .retail-price"
+            ],
+            [
+              ".product-item-card:nth-child(3) > .product-item-price > .free-tag"
+            ],
+            [
+              ".product-item-card:nth-child(4) > .product-item-price > .retail-price"
+            ],
+            [
+              ".product-item-card:nth-child(4) > .product-item-price > .free-tag"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "text": "❄ ❅ ❆ 🎅 Offer Expires In 🎅 00 DAYS : 00 HOURS : 00 MINUTES : 00 SECONDS 🎅 Offer Has Ended - Contact Us for Current Promotions! 🎅 Gift Box Value: $295 Your Cost: FREE! You Save: $295 🎄 Christmas Bundle Pricing 2025 Rain Defender: $213 | Detroit: $258 | Storm Defender: $295 Each bundle includes: Jacket • Hoodie • Beanie • Gloves • Gift Box with custom embroidery Volume pricing available for 8+ bundles 1 Select Jacket 2 Select Hoodie 3 Select Beanie 4 Select Gloves 5 Customize 6 Delivery Info 7 Review Review Your Christmas Bundle Order Please review all details before submitting Your Gift Box Items Carhartt Storm Defender Shoreline Jacket CT104670 Color: Black Size: L $174.00 FREE Carhartt Midweight Hooded Sweatshirt Color: Heather Grey Size: L $58.00 FREE Carhartt Watch Cap 2 Color: Coal Heather Size: One Size $35.00 FREE Carhartt High-Dexterity Open-Cuff Glove CTGD0794 Color: Black Barley Size: L $19.00 FREE Customization Details THREAD COLORS Green,, White JACKET EMBROIDERY right-chest HOODIE EMBROIDERY left-chest SPECIAL INSTRUCTIONS Synthetic gift-box review. No real order. Delivery Information Contact Example Customer Example Company Communication example@example.invalid (253) 555-0100 Delivery Ship By: Oct 15, 2026 Shipping Address 123 Example Street Suite 2 Example City, WA 98000 Order Summary Retail Value: $320.00 Your Price: FREE Santa's Bonus: FREE! You Save: $320.00 SUBMIT ORDER Previous Step Your Gift Box This is a FREE promotional gift box! Carhartt Storm Defender Shoreline Jacket CT104670 CT104670 • L • Black Carhartt Midweight Hooded Sweatshirt CTK121 • L • Heather Grey Carhartt Watch Cap 2 CT104597 • OSFA • Coal Heather Carhartt Work Gloves CTGD0794 • L • Black Barley",
+      "fields": [],
+      "totals": {
+        "quantity": 4,
+        "retail": 320,
+        "unit": 320
+      },
+      "overflow": false,
+      "missingImages": [],
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".product-item-card:nth-child(1) > .product-item-price > .retail-price"
+            ],
+            [
+              ".product-item-card:nth-child(1) > .product-item-price > .free-tag"
+            ],
+            [
+              ".product-item-card:nth-child(2) > .product-item-price > .retail-price"
+            ],
+            [
+              ".product-item-card:nth-child(2) > .product-item-price > .free-tag"
+            ],
+            [
+              ".product-item-card:nth-child(3) > .product-item-price > .retail-price"
+            ],
+            [
+              ".product-item-card:nth-child(3) > .product-item-price > .free-tag"
+            ],
+            [
+              ".product-item-card:nth-child(4) > .product-item-price > .retail-price"
+            ],
+            [
+              ".product-item-card:nth-child(4) > .product-item-price > .free-tag"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "text": "❄ ❅ ❆ 🎅 Offer Expires In 🎅 00 DAYS : 00 HOURS : 00 MINUTES : 00 SECONDS 🎅 Offer Has Ended - Contact Us for Current Promotions! 🎅 Gift Box Value: $295 Your Cost: FREE! You Save: $295 🎄 Christmas Bundle Pricing 2025 Rain Defender: $213 | Detroit: $258 | Storm Defender: $295 Each bundle includes: Jacket • Hoodie • Beanie • Gloves • Gift Box with custom embroidery Volume pricing available for 8+ bundles 1 Select Jacket 2 Select Hoodie 3 Select Beanie 4 Select Gloves 5 Customize 6 Delivery Info 7 Review Review Your Christmas Bundle Order Please review all details before submitting Your Gift Box Items Carhartt Storm Defender Shoreline Jacket CT104670 Color: Black Size: L $174.00 FREE Carhartt Midweight Hooded Sweatshirt Color: Heather Grey Size: L $58.00 FREE Carhartt Watch Cap 2 Color: Coal Heather Size: One Size $35.00 FREE Carhartt High-Dexterity Open-Cuff Glove CTGD0794 Color: Black Barley Size: L $19.00 FREE Customization Details THREAD COLORS Green,, White JACKET EMBROIDERY right-chest HOODIE EMBROIDERY left-chest SPECIAL INSTRUCTIONS Synthetic gift-box review. No real order. Delivery Information Contact Example Customer Example Company Communication example@example.invalid (253) 555-0100 Delivery Ship By: Oct 15, 2026 Shipping Address 123 Example Street Suite 2 Example City, WA 98000 Order Summary Retail Value: $320.00 Your Price: FREE Santa's Bonus: FREE! You Save: $320.00 SUBMIT ORDER Previous Step Your Gift Box This is a FREE promotional gift box! Carhartt Storm Defender Shoreline Jacket CT104670 CT104670 • L • Black Carhartt Midweight Hooded Sweatshirt CTK121 • L • Heather Grey Carhartt Watch Cap 2 CT104597 • OSFA • Coal Heather Carhartt Work Gloves CTGD0794 • L • Black Barley",
+      "fields": [],
+      "totals": {
+        "quantity": 4,
+        "retail": 320,
+        "unit": 320
+      },
+      "overflow": false,
+      "missingImages": [],
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".product-item-card:nth-child(1) > .product-item-price > .retail-price"
+            ],
+            [
+              ".product-item-card:nth-child(1) > .product-item-price > .free-tag"
+            ],
+            [
+              ".product-item-card:nth-child(2) > .product-item-price > .retail-price"
+            ],
+            [
+              ".product-item-card:nth-child(2) > .product-item-price > .free-tag"
+            ],
+            [
+              ".product-item-card:nth-child(3) > .product-item-price > .retail-price"
+            ],
+            [
+              ".product-item-card:nth-child(3) > .product-item-price > .free-tag"
+            ],
+            [
+              ".product-item-card:nth-child(4) > .product-item-price > .retail-price"
+            ],
+            [
+              ".product-item-card:nth-child(4) > .product-item-price > .free-tag"
+            ]
+          ]
+        },
+        {
+          "id": "scrollable-region-focusable",
+          "nodes": [
+            [
+              ".progress-steps"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "events": {
+    "errors": [],
+    "writes": [],
+    "unknown": [
+      "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+      "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
+      "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+      "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
+      "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+      "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
+      "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+      "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    ],
+    "dialogs": []
+  },
+  "emails": [],
+  "diagnostic": "Original swatch pointer interception is preserved in christmas-original-flow.log. Dispatch swatch click and use native keyboard buttons to inspect the original deeper flow without changing CSS."
+}
