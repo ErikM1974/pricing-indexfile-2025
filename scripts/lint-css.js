@@ -20,6 +20,7 @@ const CSS_LINT_SCOPE = [
     "shared_components/css/specialty-pricing.css",
     "calculators/custom-decal-pricing.css",
     "calculators/embroidered-emblem/embroidered-emblem.css",
+    "shared_components/css/specialty-assistant.css",
     'shared_components/css/crm-accounts.css',
     'shared_components/css/crm-pipeline.css',
     'shared_components/css/crm-records.css',

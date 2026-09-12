@@ -1227,3 +1227,5 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - tests/fixtures/webstore-calculator-item-failed-original-browser.json — immutable synthetic webstore calculator browser and request evidence.
 
 - tests/unit/webstore-calculator-content.test.js — original-source locks and unchanged pricing, quote-card and email transformations.
+
+- shared_components/css/specialty-assistant.css — shared reference accordions, responsive assistant drawer, messages and controls for emblem and webstore calculators.

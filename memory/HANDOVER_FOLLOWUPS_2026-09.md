@@ -1106,3 +1106,16 @@ Observed original defects to repair with explicit contracts: hidden embroidery f
 - [ ] Review current screens/paper, preservation/amounts, keyboard/accessibility/fault checks, then Christmas gift boxes. Full application/release gates follow both pages.
 
 Working branch codex/seasonal-bundle-layout forks b66a5252. No application edits or migration credit at this baseline: candidate213/225,12pending; live207/225,v2026.09.11.6/2109/75ef8019. Six-specialty full gates run separately on frozen b66a5252. GitHub public publication remains awaiting explicit user consent; no push or deployment.
+
+## Webstore calculator reviewed — September 12, 2026
+
+- [x] Preserved the dd8d94de original checkpoint: four source hashes, ten browser contracts, all original prices/content/links, six exact financial/email transformations and successful quote request payloads.
+- [x] Adopted canonical Public Sans, tokens and controls; extracted the reviewed emblem assistant presentation to specialty-assistant.css for both consumers. Webstores no longer loads the legacy sticker stylesheet. Emblem-specific quote styles remain local.
+- [x] Fixed hidden-state leaks, phone drawer sizing, keyboard conversation scrolling, focus containment/return and reference print omissions. Printed disclosures open for paper and restore afterward. Notices remain in the drawer flow and do not cover the input.
+- [x] Save failures stay visible; confirmed session/items are retained across retries. Pending saves block duplicate clicks and edits. Revised quotes clear old saved links and acquire a new quote ID. Confirmed-stage retry does not guarantee server-side idempotency after a lost response acknowledgment.
+- [x] Final15 browser cases pass, including setup, on-demand, fundraiser, search, AI/session/item faults, partial retries, pending ownership, revised amounts, keyboard and print restoration. Forty current screens at1440/768/390/320 and30 pages in10 PDFs reviewed; final14 contact sheets account for46 duplicate panels. The final notification changes were re-reviewed against the prior15-sheet pass. All writes and email remain synthetic.
+- [x] Shared-emblem/decal regression18 cases and62 checks across four source/inventory/lessons suites pass. Full CSS lint (276 files) and scoped JavaScript lint pass.
+
+Local candidate216/225 reviewed,9 pending: embroidery-pricing-all, quick-quote, its DTF prints prototype, garment-designer and five quote builders. Shared/generated/provider/email surfaces remain separately tracked. This next family is isolated on codex/remaining-calculators and is not included in the eight-page v2026.09.12.1 release candidate ca07da80.
+
+User authorized publication/deployment on September12; earlier unanswered-publication notes are historical. Exact-source release CI34708639505 and the full local browser gates are running separately; do not claim the candidate live until Heroku and live bytes are verified.

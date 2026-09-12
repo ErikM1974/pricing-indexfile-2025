@@ -6413,6 +6413,7 @@
         "shared_components/css/tokens.css",
         "shared_components/css/components.css",
         "shared_components/css/specialty-pricing.css",
+        "shared_components/css/specialty-assistant.css",
         "calculators/embroidered-emblem/embroidered-emblem.css"
       ],
       "dynamicStyles": [],
@@ -6428,7 +6429,7 @@
       ],
       "test": "tests/e2e/css-unification-specialty-decal-emblem.spec.js",
       "maxCssBytes": 80519,
-      "measuredRawCssBytes": 78471,
+      "measuredRawCssBytes": 79607,
       "baseline": {
         "commit": "97cc05080d4689785bc0885b6a4223c0f1356cbf",
         "rawCssBytes": 89181,
@@ -6631,6 +6632,37 @@
       "baseline": {
         "commit": "c01ffc2058a0725d3df12c9181c8022776b4ab26",
         "note": "Six original seasonal source hashes and thirteen original Christmas browser contracts retained; original pointer and false-success defects are labeled diagnostics."
+      }
+    },
+    {
+      "source": "calculators/webstores.html",
+      "family": "specialty-calculators",
+      "status": "reviewed",
+      "route": "/calculators/webstores.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/specialty-pricing.css",
+        "shared_components/css/specialty-assistant.css",
+        "shared_components/css/webstore-pricing-page.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "1440-768-390-320",
+        "original-content-prices-and-successful-quote-payloads",
+        "setup-on-demand-fundraiser-search-and-service-failure",
+        "persistent-partial-save-failure-and-accepted-stage-retry",
+        "pending-save-and-revised-quote-ownership",
+        "keyboard-conversation-scroll-focus-and-closed-inert",
+        "complete-three-page-reference-and-disclosure-restoration"
+      ],
+      "test": "tests/e2e/css-unification-webstore-calculator.spec.js",
+      "maxCssBytes": 82897,
+      "measuredRawCssBytes": 80849,
+      "baseline": {
+        "commit": "dd8d94de",
+        "rawCssBytes": 89528,
+        "localCssRequests": 3
       }
     }
   ],

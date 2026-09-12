@@ -6,16 +6,18 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Custom Webstores — Northwest Custom Apparel</title>
     <link rel="icon" href="/favicon.png" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
-    <!-- Shared chat/page CSS (sticker is canonical) + webstore overrides -->
+    <!-- Canonical controls, shared quote assistant and webstore details -->
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/sticker-pricing-page.css?v=2026.09.07.19">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=20260912">
+    <link rel="stylesheet" href="/shared_components/css/specialty-pricing.css?v=20260912">
+    <link rel="stylesheet" href="/shared_components/css/specialty-assistant.css?v=20260912">
     <link rel="stylesheet" href="/shared_components/css/webstore-pricing-page.css?v=2026.09.07.19">
     <script src="/config/app.config.js"></script>
 </head>
-<body>
+<body data-ui="unified" data-specialty-calculator="webstore" data-specialty-assistant>
     <!-- ========== Header ========== -->
     <header class="header">
         <div class="header-container">
@@ -252,7 +254,7 @@
     </button>
 
     <!-- ========== AI Quote Chat Panel ========== -->
-    <aside class="ai-chat-panel" id="aiChatPanel" aria-label="AI Quote Assistant" aria-hidden="true">
+    <aside role="dialog" aria-modal="true" class="ai-chat-panel" id="aiChatPanel" aria-label="AI Quote Assistant" aria-hidden="true">
         <header class="ai-chat-head">
             <div class="ai-chat-title">
                 <span class="ai-sparkle" aria-hidden="true">✨</span>
@@ -268,7 +270,8 @@
             </div>
         </header>
         <div class="ai-chat-context-pill" id="aiChatContextPill"></div>
-        <div class="ai-chat-messages" id="aiChatMessages" aria-live="polite"></div>
+        <div class="ai-chat-messages" id="aiChatMessages" aria-live="polite" tabindex="0" aria-label="Quote conversation"></div>
+        <p class="quote-save-status" id="quoteSaveStatus" role="status" hidden></p>
         <div class="ai-chat-actions" id="aiChatActions" hidden>
             <button type="button" class="ai-action-btn primary" id="aiOutlookBtn" disabled>
                 <i class="fas fa-envelope-open-text" aria-hidden="true"></i> Open in Outlook
@@ -280,6 +283,12 @@
                 <i class="fas fa-link" aria-hidden="true"></i> Save &amp; share link
             </button>
         </div>
+    <!-- Share-link toast -->
+    <div class="share-toast" id="shareToast" role="status" aria-live="polite">
+        <i class="fas fa-check-circle" aria-hidden="true"></i>
+        <span id="shareToastText">Quote link copied — paste into your email or chat</span>
+    </div>
+
         <form class="ai-chat-input" id="aiChatForm">
             <textarea id="aiChatTextarea" aria-label="Ask the pricing assistant" rows="3" placeholder="Type your reply… (e.g. 'On-Demand store for Acme, 2 logos, ~500 orders/year' or 'fundraiser pricing: blank $8, donation $5')" autocomplete="off"></textarea>
             <button type="submit" class="ai-chat-send" id="aiChatSend" aria-label="Send">
@@ -291,13 +300,8 @@
     <!-- Backdrop dimmer -->
     <div class="ai-chat-backdrop" id="aiChatBackdrop" aria-hidden="true"></div>
 
-    <!-- Share-link toast -->
-    <div class="share-toast" id="shareToast" role="status" aria-live="polite">
-        <i class="fas fa-check-circle" aria-hidden="true"></i>
-        <span id="shareToastText">Quote link copied — paste into your email or chat</span>
-    </div>
-
     <!-- ========== Scripts ========== -->
     <script src="/shared_components/js/webstore-pricing-page.js?v=2026.09.06.31"></script>
+    <script src="/shared_components/js/specialty-calculator-ui.js?v=20260912"></script>
 </body>
 </html>

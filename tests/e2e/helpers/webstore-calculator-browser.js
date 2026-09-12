@@ -9,21 +9,23 @@ async function open(page,state={}){
  await page.clock.setFixedTime(new Date('2026-09-12T18:30:00.000Z'));
  await page.context().addInitScript(()=>{window.__copied=[];Object.defineProperty(navigator,'clipboard',{value:{writeText:async s=>window.__copied.push(s)}});window.print=()=>{};});
  page.on('pageerror',e=>events.errors.push(e.message));page.on('dialog',async d=>{events.dialogs.push(d.message());await d.dismiss();});
- let itemFailure=false;
+ let itemFailure=false, sequence=900, replies=0;
  await page.context().route('**/*',async route=>{
   const req=route.request(),u=new URL(req.url()),p=u.pathname,method=req.method();
-  if(p==='/api/quote-sequence/WEB'&&method==='GET'){events.mocked.push({path:p,method});return route.fulfill({json:{prefix:'WEB',year:2026,sequence:901}});}
+  if(p==='/api/quote-sequence/WEB'&&method==='GET'){events.mocked.push({path:p,method});return route.fulfill({json:{prefix:'WEB',year:2026,sequence:++sequence}});}
   if(p==='/api/contract-webstore-ai/chat'&&method==='POST'){
    events.mocked.push({path:p,method,body:req.postDataJSON()});
    const price=state.fundraiser?fundraiser:setup(state.onDemand?'On-Demand':'Open/Close');
+   replies++; if(state.changedQuote&&replies>2){price.lineItems[0].pricePerUnit=600;price.lineItems[0].totalPrice=600;}
    const reply='Example webstore quote ready.\nPRICE_QUOTE START\n'+JSON.stringify(price)+'\nPRICE_QUOTE END\nCUSTOMER_FINAL START\n'+JSON.stringify(customer)+'\nCUSTOMER_FINAL END\nEMAIL DRAFT START\nTo: example@example.invalid\nSubject: Example webstore quote\n\nExample store and fundraiser quote for your review.\nEMAIL DRAFT END';
    const search={tool:'web_search',result:{results:[{title:'Example store reference',url:'https://example.invalid/store',content:'Synthetic reference for storefront planning.'}]}};
    return route.fulfill(state.chatFailed?{status:503}:{contentType:'text/event-stream',body:(state.search?'event: tool_result\ndata: '+JSON.stringify(search)+'\n\n':'')+'event: delta\ndata: '+JSON.stringify({text:reply})+'\n\nevent: done\ndata: {}\n\n'});
   }
   if(['/api/quote_sessions','/api/quote_items'].includes(p)&&method==='POST'){
    const body=req.postDataJSON();events.mocked.push({path:p,method,body});
+   if(state.holdSession&&p==='/api/quote_sessions')await state.holdSession;
    if(state.sessionFailed&&p==='/api/quote_sessions')return route.fulfill({status:503});
-   if(state.itemFailed&&p==='/api/quote_items'&&!itemFailure){itemFailure=true;return route.fulfill({status:503});}
+   if(state.itemFailed&&p==='/api/quote_items'&&(!state.itemFailedLine||body.LineNumber===state.itemFailedLine)&&!itemFailure){itemFailure=true;return route.fulfill({status:503});}
    return route.fulfill({json:{success:true}});
   }
   if(!['GET','HEAD'].includes(method)||/quote-sequence|logout/.test(p)){events.writes.push({path:p,method});return route.fulfill({status:503});}
@@ -46,4 +48,3 @@ async function snapshot(page){return page.evaluate(()=>{
  });}
 function check(expect,e){for(const key of ['errors','unknown','writes','missing'])expect(e[key],key).toEqual([]);}
 module.exports={open,snapshot,source,check};
-
