@@ -9,15 +9,17 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/calculators/quick-quote/quick-quote.css?v=2026.09.07.12">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.12.2">
+    <link rel="stylesheet" href="/shared_components/css/utilities.css?v=2026.09.12.2">
+    <link rel="stylesheet" href="/calculators/quick-quote/quick-quote.css?v=2026.09.12.2">
     <link rel="stylesheet" href="/shared_components/css/safety-stripe-recs.css?v=2026.09.07.20">
-    <link rel="stylesheet" href="/calculators/quick-quote/linesheet-print.css?v=2026.09.07.12" media="print">
+    <link rel="stylesheet" href="/calculators/quick-quote/linesheet-print.css?v=2026.09.12.2" media="print">
     <link rel="stylesheet" href="/shared_components/css/embroidery-quote-pricing.css?v=2026.09.07.8">
 </head>
-<body>
+<body data-ui="unified" data-quick-quote="quick">
 
     <!-- ========== Top bar ========== -->
     <header class="topbar">
@@ -26,7 +28,7 @@
         </a>
         <nav class="crumbs">
             <a href="/staff-dashboard.html">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(180deg)" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
                 Dashboard
             </a>
             <span class="sep">/</span>
@@ -165,8 +167,8 @@
 
                 <!-- SCP options — dark garment + safety stripes, surfaced inline; SCP-eligible only -->
                 <div class="qq-adv-group qq-scp-opts" id="qqScpOptsField" hidden>
-                    <label class="qq-check"><input type="checkbox" id="qqScpDark"> Dark garment <span class="muted">· adds a white underbase screen (+1 screen/location)</span></label>
-                    <label class="qq-check"><input type="checkbox" id="qqScpStripes"> Safety stripes <span class="muted">· +$2/pc per location</span></label>
+                    <label class="qq-check"><input type="checkbox" id="qqScpDark"> <span>Dark garment <span class="muted">· adds a white underbase screen (+1 screen/location)</span></span></label>
+                    <label class="qq-check"><input type="checkbox" id="qqScpStripes"> <span>Safety stripes <span class="muted">· +$2/pc per location</span></span></label>
                     <a class="qq-example-thumb" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/Erik%20Modeling%20Hoodie%20Front%20and%20Back.png?ver=1" target="_blank" rel="noopener noreferrer" title="Safety stripes example — front &amp; back (click to enlarge)" aria-label="Safety stripes example, front and back — opens full-size image in a new tab"><img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/Erik%20Modeling%20Hoodie%20Front%20and%20Back.png?ver=1" alt="Hoodie shown front and back with high-visibility safety stripes" loading="lazy" referrerpolicy="no-referrer"></a>
                     <p class="qq-adv-foot">Names/numbers, 3D puff, specialty inks and oversize prints are quoted on the proof — build those in the full Quote Builder.</p>
                 </div>
@@ -237,6 +239,7 @@
     <script src="/shared_components/js/quote-cart-engine.js?v=2026.07.07.7"></script>
     <!-- Page logic -->
     <script src="/shared_components/js/safety-stripe-recs.js?v=2026.09.06.31"></script>
-    <script src="/calculators/quick-quote/quick-quote.js?v=2026.07.11.8"></script>
+    <script src="/calculators/quick-quote/quick-quote-ui.js?v=2026.09.12.2"></script>
+    <script src="/calculators/quick-quote/quick-quote.js?v=2026.09.12.2"></script>
 </body>
 </html>

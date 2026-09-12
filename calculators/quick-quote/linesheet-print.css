@@ -1,60 +1,160 @@
-/* Quick Quote — Line Sheet print stylesheet (loaded media="print").
-   When the tool is in Line Sheet mode (body.qq-mode-line), strip all app chrome and
-   print ONLY #qqSheet as a clean one-page NWCA line sheet (Print / Save as PDF).
-   Scoped to body.qq-mode-line so a stray Ctrl+P in Quick Price mode still prints normally. */
-
-/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
-   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
-   every rule below uses var(). Raw hex is allowed ONLY in this block. */
-/* stylelint-disable color-no-hex */
-:root {
-    --linesheet-print-orange: #7a541a;
+/* Quick Quote family paper layout. Loaded after page styles, only for print. */
+@page {
+    size: letter portrait;
+    margin: 0.45in;
 }
-/* stylelint-enable color-no-hex */
 
-@page { size: letter portrait; margin: 0.5in; }
+@layer components.pages {
+    [data-ui="unified"][data-quick-quote] {
+        background: var(--ui-surface);
+        font-size: 11px;
+    }
 
-/* hide the app chrome */
-body.qq-mode-line .topbar,
-body.qq-mode-line .hero,
-body.qq-mode-line .qq-inputs,
-body.qq-mode-line #qqQuickResults,
-/* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
-body.qq-mode-line #qqEngineError { display: none !important; }
+    :where([data-ui="unified"][data-quick-quote]) .page {
+        margin: 0;
+        padding: 0;
+        max-width: none;
+    }
 
-/* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
-body.qq-mode-line .page { margin: 0 !important; padding: 0 !important; max-width: none !important; }
-/* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
-body.qq-mode-line .qq-grid { display: block !important; gap: 0 !important; }
+    :where([data-ui="unified"][data-quick-quote])
+        :is(
+            .topbar,
+            .qq-inputs,
+            .hero .eyebrow,
+            .hero .lede,
+            .proto-banner,
+            .proto-ratecard-bar,
+            .qq-open-builder,
+            .qq-show-breaks,
+            .qq-card-selhint,
+            .qq-use-price,
+            .qq-retry,
+            .qq-critical-error button
+        ) {
+        display: none;
+    }
 
-body.qq-mode-line .qq-results,
-/* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
-body.qq-mode-line .qq-panel { border: none !important; box-shadow: none !important; background: none !important; padding: 0 !important; margin: 0 !important; }
-/* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
-body.qq-mode-line #qqLineResults { display: block !important; }
+    :where([data-ui="unified"][data-quick-quote]) .qq-grid {
+        display: block;
+    }
 
-/* the sheet itself */
-body.qq-mode-line #qqSheet { color: var(--print-ink); font-family: Geist, system-ui, sans-serif; }
-body.qq-mode-line .qq-sheet-head { display: flex; align-items: center; gap: 16px; border-bottom: 2px solid var(--print-green); padding-bottom: 12px; margin-bottom: 14px; }
-body.qq-mode-line .qq-sheet-logo { height: 44px; width: auto; }
-body.qq-mode-line .qq-sheet-brand { font-size: 16px; font-weight: 700; }
-body.qq-mode-line .qq-sheet-sub { font-size: 12px; color: var(--print-ink-soft); margin-top: 2px; }
+    :where([data-ui="unified"][data-quick-quote]) :is(.qq-panel, .qq-sheet) {
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+    }
 
-body.qq-mode-line .qq-sheet-item { display: flex; gap: 16px; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid var(--gray-200); break-inside: avoid; }
-body.qq-mode-line .qq-sheet-img { width: 82px; height: 82px; object-fit: contain; border: 1px solid var(--gray-200); border-radius: 6px; background: var(--gray-50); flex: none; }
-body.qq-mode-line .qq-sheet-img.is-empty { display: inline-block; }
-body.qq-mode-line .qq-sheet-item-main { flex: 1; min-width: 0; }
-body.qq-mode-line .qq-sheet-item-head { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
-body.qq-mode-line .qq-sheet-style { font-family: "Geist Mono", monospace; }
-body.qq-mode-line .qq-sheet-color { color: var(--print-ink-soft); font-weight: 400; margin-left: 10px; }
+    :where([data-ui="unified"][data-quick-quote]) .page-title {
+        font-size: 22px;
+    }
 
-body.qq-mode-line .qq-sheet-ladder-wrap { overflow: visible; }
-body.qq-mode-line .qq-sheet-ladder { width: 100%; border-collapse: collapse; font-size: 12px; }
-body.qq-mode-line .qq-sheet-ladder th, body.qq-mode-line .qq-sheet-ladder td { border: 1px solid var(--gray-200); padding: 4px 8px; text-align: center; }
-body.qq-mode-line .qq-sheet-ladder .lbl { text-align: left; color: var(--print-ink-soft); font-weight: 500; }
-body.qq-mode-line .qq-sheet-ladder td { font-family: "Geist Mono", monospace; }
-body.qq-mode-line .qq-sheet-ladder .warn { color: var(--linesheet-print-orange); }
+    :where([data-ui="unified"][data-quick-quote]) .hero {
+        margin-bottom: 8px;
+    }
 
-body.qq-mode-line .qq-sheet-foot { margin-top: 16px; padding-top: 10px; border-top: 1px solid var(--gray-200); font-size: 10.5px; color: var(--print-ink-soft); line-height: 1.5; }
-/* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
-body.qq-mode-line .qq-sheet-placeholder { display: none !important; }
+    :where([data-ui="unified"][data-quick-quote]) .qq-print-summary {
+        display: block;
+        margin: 0 0 16px;
+        color: var(--ui-ink);
+        font-size: 12px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-cards {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-card {
+        padding: 12px;
+        break-inside: avoid;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-card-breakdown {
+        display: flex;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-card-nudge {
+        min-height: 0;
+        padding: 5px 9px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-card-price {
+        margin-left: auto;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-card-pp {
+        font-size: 20px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-matrix-box {
+        break-inside: avoid;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) :is(.qq-matrix-wrap, .qq-sheet-ladder-wrap, .proto-mx-scroll) {
+        overflow: visible;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-item {
+        flex-direction: row;
+        break-inside: avoid;
+        padding: 12px 0;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-img {
+        width: 72px;
+        height: 72px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-ladder {
+        font-size: 11px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-ladder :is(th, td) {
+        padding: 5px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) :is(.qq-foot, .qq-sheet-foot) {
+        font-size: 10px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .proto-matrix {
+        padding: 12px 0;
+        border: 0;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .proto-mx-table {
+        font-size: 11px;
+        white-space: normal;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .proto-mx-table :is(th, td) {
+        padding: 6px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-table-action {
+        min-height: 0;
+        padding: 0;
+        border: 0;
+        font-size: inherit;
+        background: transparent;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]).qq-mode-line :is(.hero, .qq-print-summary) {
+        display: none;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]).qq-print-ratecard
+        :is(.hero, .qq-print-summary, .qq-grid, .proto-matrix-wrap, [id="protoError"]) {
+        display: none;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]).qq-print-ratecard [id="rateCardSheet"] {
+        display: block;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) :is(.rc-table, .rc-head) {
+        break-inside: avoid;
+    }
+}

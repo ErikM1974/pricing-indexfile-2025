@@ -6658,10 +6658,78 @@
       ],
       "test": "tests/e2e/css-unification-webstore-calculator.spec.js",
       "maxCssBytes": 82897,
-      "measuredRawCssBytes": 80849,
+      "measuredRawCssBytes": 79154,
       "baseline": {
         "commit": "dd8d94de",
         "rawCssBytes": 89528,
+        "localCssRequests": 3
+      }
+    },
+    {
+      "source": "calculators/quick-quote/index.html",
+      "family": "quick-quote",
+      "status": "reviewed",
+      "route": "/calculators/quick-quote/index.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/utilities.css",
+        "calculators/quick-quote/quick-quote.css",
+        "shared_components/css/safety-stripe-recs.css",
+        "calculators/quick-quote/linesheet-print.css",
+        "shared_components/css/embroidery-quote-pricing.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "1440-768-390-320",
+        "original-prices-content-fields-and-links",
+        "line-sheet-and-quick-price-methods-sizes-and-failures",
+        "keyboard-price-selection-quantity-and-scroll",
+        "unknown-stock-visible-retry-and-stale-response-guard",
+        "complete-paper-output-and-fresh-rate-card-selection",
+        "shared-safety-panel-expanded-and-garment-handoff"
+      ],
+      "test": "tests/e2e/css-unification-quick-quote.spec.js",
+      "maxCssBytes": 126108,
+      "measuredRawCssBytes": 124099,
+      "baseline": {
+        "commit": "583372db",
+        "rawCssBytes": 60371,
+        "localCssRequests": 5
+      },
+      "dynamicTokens": [
+        "--swatch"
+      ]
+    },
+    {
+      "source": "calculators/quick-quote/dtf-prints-prototype.html",
+      "family": "quick-quote",
+      "status": "reviewed",
+      "route": "/calculators/quick-quote/dtf-prints-prototype.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/utilities.css",
+        "calculators/quick-quote/quick-quote.css",
+        "calculators/quick-quote/dtf-prints-prototype.css",
+        "calculators/quick-quote/linesheet-print.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "1440-768-390-320",
+        "original-prices-content-fields-and-links",
+        "line-sheet-and-quick-price-methods-sizes-and-failures",
+        "keyboard-price-selection-quantity-and-scroll",
+        "unknown-stock-visible-retry-and-stale-response-guard",
+        "complete-paper-output-and-fresh-rate-card-selection",
+        "shared-safety-panel-expanded-and-garment-handoff"
+      ],
+      "test": "tests/e2e/css-unification-quick-quote.spec.js",
+      "maxCssBytes": 135448,
+      "measuredRawCssBytes": 133400,
+      "baseline": {
+        "commit": "583372db",
+        "rawCssBytes": 61878,
         "localCssRequests": 3
       }
     }

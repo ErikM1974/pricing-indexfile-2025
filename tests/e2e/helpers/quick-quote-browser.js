@@ -12,8 +12,9 @@ function sizePricing(style){const template=pricing('size-pricing-'+(style==='C11
 function source(file){let s=fs.readFileSync(path.join(root,file),'utf8').replace(/\r\n/g,'\n');for(const c of original.changes.filter(c=>c.file===file).reverse()){if(s.split(c.after).length-1!==c.count)throw Error('Original mapping drift '+file);s=s.split(c.after).join(c.before);}return s;}
 async function open(page,state={}){
  const events={errors:[],writes:[],unknown:[],missing:[],reads:[],dialogs:[]};
+ if(state.safetyBuilder)await page.context().addInitScript(()=>{window.APP_CONFIG={API:{BASE_URL:location.origin}};});
  await page.clock.setFixedTime(new Date('2026-09-12T18:30:00.000Z'));
- await page.context().addInitScript(()=>{window.__printCalls=0;window.print=()=>{window.__printCalls++;};});
+ await page.context().addInitScript(()=>{window.__printCalls=0;window.print=()=>{window.__printCalls++;window.dispatchEvent(new Event('beforeprint'));};});
  page.on('pageerror',e=>events.errors.push(e.message));page.on('dialog',async d=>{events.dialogs.push(d.message());await d.dismiss();});
  await page.context().route('**/*',async route=>{
   const request=route.request(),u=new URL(request.url()),p=u.pathname,method=request.method(),style=u.searchParams.get('styleNumber')||'PC54';
@@ -25,7 +26,7 @@ async function open(page,state={}){
   if(!['GET','HEAD'].includes(method)||/quote-sequence|logout/.test(p)){events.writes.push({path:p,method});return route.fulfill({status:503});}
   if(p.startsWith('/api/'))events.reads.push({path:p,query:u.search});
   if(p==='/api/decoration-methods')return route.fulfill({json:{rules:['T-Shirts','Caps'].map(category=>({category,EMB:true,DTG:category==='T-Shirts',SCP:category==='T-Shirts',DTF:category==='T-Shirts'})),overrides:[]}});
-  if(p==='/api/safety-stripes/top-sellers/styles')return route.fulfill({json:{records:[]}});
+  if(p==='/api/safety-stripes/top-sellers/styles')return route.fulfill({json:{records:state.safetyRecs?['PC54','PC61'].map((style,i)=>({style,brand:'Port & Company',product_title:'Example safety garment '+(i+1),style_rank:i+1,main_image_url:image,best_for:'Team workwear',colors:[{color_name:'Safety Yellow',catalog_color:'SafetyYellow',front_image_url:image},{color_name:'Safety Orange',catalog_color:'SafetyOrange',front_image_url:image}]})):[]}});
   if(p.startsWith('/__core-fixture/')||p==='/api/image-proxy')return route.fulfill({contentType:'image/svg+xml',body:garment});
   if(p==='/api/inventory')return route.fulfill({status:state.stockFailed?503:200,json:['S','M','L','XL','2XL','3XL','4XL'].map(SIZE=>({SIZE,QTY:state.out?0:125}))});
   if(p==='/api/product-details'||p==='/api/color-swatches')return route.fulfill({status:state.productFailed?503:200,json:state.productEmpty?[]:details(style)});
@@ -53,6 +54,17 @@ async function open(page,state={}){
   if(p.startsWith('/api/')||['fetch','xhr'].includes(request.resourceType())){events.unknown.push(request.url());return route.fulfill({status:503});}
   if(['localhost','127.0.0.1'].includes(u.hostname)){
    const file=decodeURIComponent(p.slice(1)),absolute=path.resolve(root,file);if(!absolute.startsWith(root+path.sep)||!fs.existsSync(absolute)||!fs.statSync(absolute).isFile()){events.missing.push(p);return route.fulfill({status:404});}
+   if(state.safetyBuilder&&p===state.url){
+    // Exercise the component under each builder's actual stylesheet order without
+    // booting order workflows. Keep the mount's ancestry and all body attributes.
+    const {JSDOM}=require('jsdom'),dom=new JSDOM(fs.readFileSync(absolute,'utf8')),d=dom.window.document;
+    d.querySelectorAll('script').forEach(n=>n.remove());
+    let child=d.getElementById(state.safetyBuilder+'-safety-recs');
+    if(!child)throw Error('Builder safety mount missing');
+    while(child.parentElement){const parent=child.parentElement;parent.replaceChildren(child);if(parent===d.body)break;child=parent;}
+    const script=d.createElement('script');script.src='/shared_components/js/safety-stripe-recs.js';d.body.appendChild(script);
+    return route.fulfill({contentType:'text/html',body:dom.serialize()});
+   }
    return route.fulfill({contentType:{'.html':'text/html','.css':'text/css','.js':'application/javascript','.json':'application/json','.svg':'image/svg+xml','.png':'image/png','.woff2':'font/woff2'}[path.extname(absolute)]||'application/octet-stream',body:state.original&&original.hashes[file]?Buffer.from(source(file)):fs.readFileSync(absolute)});
   }
   const allowedScripts=['https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js','https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js','https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js'];
@@ -63,7 +75,7 @@ async function open(page,state={}){
 }
 async function snapshot(page){return page.evaluate(()=>{
  const visible=n=>!!n.getClientRects().length&&getComputedStyle(n).visibility!=='hidden',norm=s=>s.replace(/\s+/g,' ').trim(),ids={};
- for(const n of document.querySelectorAll('[id]'))if(visible(n)&&!n.querySelector('[id]')&&!['SCRIPT','STYLE'].includes(n.tagName))ids[n.id]=norm(n.innerText||n.textContent);
+ for(const n of document.querySelectorAll('[id]'))if(visible(n)&&!n.querySelector('[id]')&&!['SCRIPT','STYLE'].includes(n.tagName)){ let text=n.innerText||n.textContent;for(const control of n.querySelectorAll('[data-quick-quote-control]'))text=text.replace(control.innerText,'');ids[n.id]=norm(text); }
  return{title:document.title,url:location.pathname+location.search,ids,fields:[...document.querySelectorAll('input,select,textarea')].filter(visible).map(n=>({id:n.id,name:n.name,type:n.type,value:n.value,checked:n.checked,disabled:n.disabled})),links:[...document.querySelectorAll('a[href]')].filter(visible).map(n=>({href:n.getAttribute('href'),text:norm(n.textContent)})),tables:[...document.querySelectorAll('table')].filter(visible).map(n=>norm(n.innerText)),overflow:document.documentElement.scrollWidth>innerWidth+1};
 });}
 function check(expect,e){expect(e.errors).toEqual([]);expect(e.writes).toEqual([]);expect(e.unknown).toEqual([]);expect(e.missing).toEqual([]);}

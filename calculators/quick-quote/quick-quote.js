@@ -732,14 +732,14 @@
             if (state.color.name) keys.push(state.color.name);
             if (state.color.catalog && state.color.catalog !== state.color.name) keys.push(state.color.catalog);
         }
-        state.inventory = null; state.invStatus = null;
+        state.inventory = null; state.invStatus = null; state.invError = false;
+        var token = ++_invSeq;
         if (!style || !keys.length) { box.innerHTML = ''; return; }
         state.invLoading = true; renderInventory();
-        var token = ++_invSeq;
         (function tryKey(i) {
             if (i >= keys.length) { if (token === _invSeq) { state.inventory = {}; state.invLoading = false; renderInventory(); } return; }
             fetch(API_BASE + '/api/inventory?styleNumber=' + encodeURIComponent(style) + '&color=' + encodeURIComponent(keys[i]))
-                .then(function (r) { return r.ok ? r.json() : null; })
+                .then(function (r) { if (!r.ok) throw new Error("Inventory unavailable"); return r.json(); })
                 .then(function (data) {
                     if (token !== _invSeq) return;   // stale — color/style changed mid-flight
                     var rows = data ? (Array.isArray(data) ? data : Object.keys(data).map(function (k) { return data[k]; })) : [];
@@ -754,12 +754,17 @@
                     state.inventory = bySize; state.invStatus = status; state.invLoading = false;
                     renderInventory();
                 })
-                .catch(function () { if (token === _invSeq) tryKey(i + 1); });
+                .catch(function () { if (token !== _invSeq) return; state.invLoading = false; state.invError = true; renderInventory(); });
         })(0);
     }
     function renderInventory() {
         var box = $('qqInventory'); if (!box) return;
         if (state.invLoading) { box.innerHTML = '<div class="qq-inv-note">Checking stock…</div>'; return; }
+        if (state.invError) {
+            box.innerHTML = '<div class="qq-inv-error">Stock could not be checked. Confirm availability before ordering.<br><button type="button" class="btn qq-inv-retry">Retry stock check</button></div>';
+            box.querySelector('button').addEventListener('click', loadInventory);
+            return;
+        }
         if (!state.inventory || typeof state.inventory !== 'object') { box.innerHTML = ''; return; }
         var sizes = Object.keys(state.inventory);
         if (!sizes.length) { box.innerHTML = ''; return; }

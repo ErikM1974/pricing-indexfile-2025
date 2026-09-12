@@ -216,6 +216,7 @@
       if (collapsible && !(mid in _collapsed)) _collapsed[mid] = (opts.defaultCollapsed !== false);
       var isCollapsed = collapsible && _collapsed[mid];
 
+      root.setAttribute('data-ui', 'unified');
       root.classList.add('ssr-panel');
       root.classList.toggle('ssr-customer', opts.audience === 'customer');
       root.classList.toggle('ssr-collapsible', collapsible);

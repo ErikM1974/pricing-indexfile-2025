@@ -1277,3 +1277,9 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - tests/fixtures/quick-quote-quick-stock-failed-original-browser.json — immutable Quick Quote synthetic browser evidence.
 
 - tests/fixtures/quick-quote-line-dtg-original-browser.json — immutable Quick Quote synthetic browser evidence.
+
+- calculators/quick-quote/quick-quote-ui.js — shared controls, keyboard price-break actions and print selection for Quick Quote and its decoration preview; no pricing ownership.
+
+- tests/fixtures/quick-quote-safety-expanded-original-browser.json — immutable Quick Quote synthetic browser evidence.
+
+- tests/fixtures/quick-quote-safety-handoff-original-browser.json — immutable Quick Quote synthetic browser evidence.

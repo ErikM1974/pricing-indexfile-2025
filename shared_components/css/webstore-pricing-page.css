@@ -10,7 +10,7 @@
 :where([data-ui="unified"][data-specialty-calculator="webstore"]) .v { white-space: nowrap; font-variant-numeric: tabular-nums; }
 :where([data-ui="unified"][data-specialty-calculator="webstore"]) .total { font-weight: 700; border-top: 1px solid var(--ui-line); }
 :where([data-ui="unified"][data-specialty-calculator="webstore"]) .wsq-meta { border-top: 1px solid var(--ui-line); margin-top: 12px; padding-top: 12px; font-size: 13px; line-height: 1.6; }
-:where([data-ui="unified"][data-specialty-calculator="webstore"]) :is(.wsq-warn, .fqc-tax-warn) { margin-top: 12px; padding: 12px; border-left: 3px solid var(--amber-700); background: var(--amber-50); color: var(--amber-900); font-size: 13px; }
+:where([data-ui="unified"][data-specialty-calculator="webstore"]) :is(.wsq-warn, .fqc-tax-warn) { margin-top: 12px; padding: 12px; border-left: 3px solid var(--amber-700); background: var(--color-warning-bg); color: var(--amber-900); font-size: 13px; }
 :where([data-ui="unified"][data-specialty-calculator="webstore"]) .fqc-price { font-size: 28px; font-weight: 700; font-variant-numeric: tabular-nums; }
 :where([data-ui="unified"][data-specialty-calculator="webstore"]) .fqc-spec { font-size: 13px; color: var(--ui-muted); margin-block: 8px 12px; }
 :where([data-ui="unified"][data-specialty-calculator="webstore"]) .tool-chip { font-size: 13px; color: var(--ui-muted); line-height: 1.5; }
@@ -18,7 +18,7 @@
 :where([data-ui="unified"][data-specialty-calculator="webstore"]) .web-search-results a { overflow-wrap: anywhere; }
 :where([data-ui="unified"][data-specialty-calculator="webstore"]) .share-toast { position: static; display: none; flex-shrink: 0; margin: 0 20px; max-width: none; border-radius: var(--radius-sm); padding: 8px 12px; box-shadow: none; font-size: 13px; }
 :where([data-ui="unified"][data-specialty-calculator="webstore"]) .share-toast.show { display: block; }
-:where([data-ui="unified"][data-specialty-calculator="webstore"]) .quote-save-status { margin: 0; padding: 12px 20px; flex-shrink: 0; border-top: 1px solid var(--amber-700); background: var(--amber-50); color: var(--amber-900); font-size: 13px; }
+:where([data-ui="unified"][data-specialty-calculator="webstore"]) .quote-save-status { margin: 0; padding: 12px 20px; flex-shrink: 0; border-top: 1px solid var(--amber-700); background: var(--color-warning-bg); color: var(--amber-900); font-size: 13px; }
 
 @media print {
 :where([data-ui="unified"][data-specialty-calculator="webstore"]) .banner-section-header--gap { margin-top: 16px; }
