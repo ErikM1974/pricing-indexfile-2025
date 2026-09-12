@@ -1895,8 +1895,17 @@ Release integration checkpoint: verified production commit4b00f3ab has now been 
 
 - [x] Preserve four original source hashes; replace complete private account initializers with synthetic records before browser execution; never store real customers in fixtures or reversal ledgers.
 - [x] Review the original four pricing tabs, garments/caps/patches, extra stitches and small orders, account dialog/filter/sort, failures and paper output.
-- [ ] Adopt canonical tokens and controls in one scoped owner; retain financial functions and data, repair keyboard/dialog/failure/print presentation, then review all four widths and complete PDFs before migration credit.
+- [x] Adopt canonical tokens and controls in one scoped owner; retain financial functions and data, repair keyboard/dialog/failure/print presentation, then review all four widths and complete PDFs before migration credit.
 
 Local census remains218/225, seven pending. Webstore and Quick Quote are committed and backed up at efa277d6; production remains215/225 at v2026.09.12.1 / Heroku2110.
 
 Embroidery original baseline:20 browser cases and15 source/financial/privacy checks pass;80 original screens and20 paper pages reviewed through41 contact sheets. Private customer initializers are replaced before browser execution. Application files remain unchanged at this checkpoint; all pending UI fixes are listed in the external review report.
+
+
+## Embroidery reference completed — September 12, 2026
+
+The four-tab pricing reference now uses Public Sans, canonical tokens, scoped cards and native controls. It preserves all original pricing functions, amounts, content and customer initializers. Account disclosures, filters and sortable headings work by keyboard; the native dialog keeps focus and restores its opener. Missing required pricing clears defaults and disables quoting controls with a visible refresh message; the existing optional cap-upgrade fallback keeps its warning.
+
+All24 final browser cases pass. All80 current screens and33 complete paper pages in20 PDFs were visually reviewed through46 contact sheets;39 duplicate panels are accounted for. Original20 browser cases,80 screens,20 paper pages and four source hashes remain preserved, with ten exact financial-function guards. All preview customer records are synthetic before execution. Ordinary printing retains the active tab, title, policy disclosures and whole account cards; full-back prints on one portrait sheet, filtered customer lists and legacy contract pricing use landscape. Print restoration preserves the screen state. Source/ownership and lint gates are checked separately before committing.
+
+Local census219/225 reviewed, six pending: garment designer plus five quote builders. Production remains215/225 at v2026.09.12.1 / Heroku2110. The local webstore, Quick Quote and embroidery work awaits the remaining regression and release gates.

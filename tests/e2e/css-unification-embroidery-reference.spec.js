@@ -8,12 +8,16 @@ async function evidence(page,name,e){
   await page.setViewportSize({width,height:1000});await page.evaluate(async()=>{await document.fonts.ready;await Promise.all([...document.images].filter(n=>n.getAttribute('src')).map(n=>n.decode().catch(()=>{})));});
   const s=await snapshot(page),axe=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
   states.push({width,...s,violations:axe.violations.map(v=>({id:v.id,nodes:v.nodes.map(n=>n.target)}))});
-  if(!capture){expect(s.overflow).toBe(false);expect(axe.violations.map(v=>v.id)).toEqual([]);}
+  if(!capture){expect.soft(s.overflow,name+' '+width+' overflow').toBe(false);expect.soft(axe.violations.map(v=>({id:v.id,nodes:v.nodes.map(n=>n.target)})),name+' '+width+' accessibility').toEqual([]);}
   await page.screenshot({path:path.join(out,'embroidery-reference-'+name+'-'+phase+'-'+width+'.png'),fullPage:true});
  }
  check(expect,e);const record={name,states,reads:e.reads,dialogs:e.dialogs},file='tests/fixtures/embroidery-reference-'+name+'-original-browser.json';
  if(capture){if(fs.existsSync(path.join(root,file)))expect(record).toEqual(JSON.parse(fs.readFileSync(path.join(root,file),'utf8')));else{fs.writeFileSync(path.join(root,file),JSON.stringify(record,null,2)+'\n');fs.appendFileSync(path.join(root,'ACTIVE_FILES.md'),'\n- '+file+' — immutable embroidery reference synthetic browser evidence.\n');}}
- else{const before=JSON.parse(fs.readFileSync(path.join(root,file),'utf8'));for(let i=0;i<states.length;i++)for(const key of ['title','url','ids','fields','links','tables','headings'])expect(states[i][key],name+' '+key).toEqual(before.states[i][key]);}
+ else{const before=JSON.parse(fs.readFileSync(path.join(root,file),'utf8'));for(let i=0;i<states.length;i++)for(const key of ['title','url','ids','fields','links','tables','headings']){
+  if(key==='ids')delete states[i].ids.scModalTitle;
+  if(['failed','stitchesFailed'].includes(name)&&['ids','tables','fields'].includes(key))continue; // Explicit unavailable-state assertions below replace the original stale/default-price contract.
+  expect.soft(states[i][key],name+' '+key).toEqual(before.states[i][key]);
+ }}
  await page.setViewportSize({width:1440,height:1000});await page.pdf({path:path.join(out,'embroidery-reference-'+name+'-'+phase+'.pdf'),format:'Letter',printBackground:true});
 }
 for(const tab of ['al-retail','decg-retail','stitch-charges','fullback'])test('CSS embroidery reference: '+tab,async({page})=>{
@@ -45,4 +49,42 @@ for(const mode of ['failed','stitchesFailed','upgradesFailed'])test('CSS embroid
 test('CSS embroidery reference: existing contract print',async({page})=>{
  const e=await open(page,{original:capture,url:'/calculators/embroidery-pricing-all/index.html?tab=fullback'});await page.waitForLoadState('networkidle');
  await page.evaluate(()=>window.printContractPricing());await expect.poll(()=>page.evaluate(()=>window.__prints)).toBe(1);await evidence(page,'contract-print',e);
+});
+
+test('CSS embroidery reference: keyboard accounts, dialog focus, filters and table scroll',async({page})=>{
+ test.skip(capture,'New keyboard behavior is tested only on the migrated page');
+ const e=await open(page,{url:'/calculators/embroidery-pricing-all/index.html?tab=stitch-charges'});await page.waitForLoadState('networkidle');await page.setViewportSize({width:320,height:1000});
+ const header=page.locator('.es-account-hdr').first();await header.focus();await header.press('Enter');await expect(header).toHaveAttribute('aria-expanded','true');await header.press('Space');await expect(header).toHaveAttribute('aria-expanded','false');
+ const trigger=page.locator('#openSurchargeModal');await trigger.focus();await trigger.press('Enter');await expect(page.locator('#scSearch')).toBeFocused();
+ await page.keyboard.press('Shift+Tab');await expect(page.locator('#scModalClose')).toBeFocused();await page.keyboard.press('Shift+Tab');
+ expect(await page.evaluate(()=>document.activeElement.closest('#scModal')!==null)).toBe(true);
+ const filter=page.locator('#scTierFilters [data-filter="Mid"]');await filter.focus();await filter.press('Space');await expect(filter).toHaveAttribute('aria-pressed','true');await expect(page.locator('#scResultsCount')).toContainText('3 of 4');
+ const sort=page.locator('th[data-col="company"] button');await sort.focus();await sort.press('Enter');await expect(page.locator('#scTbody tr').first()).toContainText('Example Company D');
+ await page.keyboard.press('Escape');await expect(page.locator('#scModal')).not.toBeVisible();await expect(trigger).toBeFocused();
+ const tab=page.locator('.tab-btn[data-tab="fullback"]');await tab.focus();await tab.press('Enter');await expect(tab).toHaveAttribute('aria-pressed','true');
+ const scroll=page.locator('#tab-fullback .embroidery-table-scroll');await scroll.focus();await scroll.press('ArrowRight');await expect.poll(()=>scroll.evaluate(n=>n.scrollLeft)).toBeGreaterThan(0);check(expect,e);
+});
+
+for(const failure of ['failed','stitchesFailed'])test('CSS embroidery reference: '+failure+' clears default prices and recovers on reload',async({page})=>{
+ test.skip(capture,'New visible-failure behavior');const state={[failure]:true};const e=await open(page,state);await page.waitForLoadState('networkidle');
+ await expect(page.locator('#apiErrorBanner')).toBeVisible();await expect(page.locator('#alRetailQuantity')).toBeDisabled();await expect(page.locator('#alRetailFinalUnitPrice')).toHaveCount(0);
+ await expect(page.locator('#tab-al-retail .calc-results')).toContainText('Pricing unavailable');await expect(page.locator('#tab-stitch-charges .es-tiers')).not.toContainText('$');
+ await page.evaluate(()=>window.print());await page.emulateMedia({media:'print'});await expect(page.locator('#apiErrorBanner')).toBeVisible();await expect(page.locator('#print-contract-pricing')).toBeHidden();
+ await page.evaluate(()=>window.dispatchEvent(new Event('afterprint')));await page.emulateMedia({media:'screen'});state[failure]=false;await page.reload();await page.waitForLoadState('networkidle');
+ await expect(page.locator('#apiErrorBanner')).toBeHidden();await expect(page.locator('#alRetailFinalUnitPrice')).toHaveText('$12.75');await expect(page.locator('#alRetailQuantity')).toBeEnabled();check(expect,e);
+});
+
+test('CSS embroidery reference: print active pricing, filtered accounts and restore controls',async({page})=>{
+ test.skip(capture,'New ordinary-print behavior');const e=await open(page);await page.waitForLoadState('networkidle');
+ const detail=page.locator('#tab-al-retail details').first();await expect(detail).not.toHaveAttribute('open','');
+ await page.evaluate(()=>window.print());await page.emulateMedia({media:'print'});await expect(page.locator('.page-header h1')).toBeVisible();await expect(page.locator('#alRetailGarmentsMatrix')).toBeVisible();await expect(page.locator('#print-contract-pricing')).toBeHidden();await expect(detail).toHaveAttribute('open','');
+ await page.evaluate(()=>window.dispatchEvent(new Event('afterprint')));await page.emulateMedia({media:'screen'});await expect(detail).not.toHaveAttribute('open','');
+ await page.locator('.tab-btn[data-tab="fullback"]').click();await page.evaluate(()=>window.print());await page.emulateMedia({media:'print'});
+ await expect(page.locator('#esFbTableBody tr').last()).toBeVisible();await expect(page.locator('#alRetailGarmentsMatrix')).toBeHidden();
+ await page.evaluate(()=>window.dispatchEvent(new Event('afterprint')));await page.emulateMedia({media:'screen'});
+ await page.locator('.tab-btn[data-tab="stitch-charges"]').click();await page.locator('#openSurchargeModal').click();await page.locator('#scRepFilters [data-rep="unassigned"]').click();
+ await page.evaluate(()=>window.print());await page.emulateMedia({media:'print'});await expect(page.locator('#scTbody')).toContainText('Example Company C');await expect(page.locator('#scTbody')).not.toContainText('Example Company A');await expect(page.locator('main')).toBeHidden();
+ await page.evaluate(()=>window.dispatchEvent(new Event('afterprint')));await page.emulateMedia({media:'screen'});await expect(page.locator('#scModal')).toHaveJSProperty('open',true);await page.keyboard.press('Escape');
+ await page.evaluate(()=>window.printContractPricing());await page.emulateMedia({media:'print'});await expect(page.locator('#print-contract-pricing')).toBeVisible();await expect(page.locator('main')).toBeHidden();
+ await page.evaluate(()=>window.dispatchEvent(new Event('afterprint')));await page.emulateMedia({media:'screen'});await expect(page.locator('body')).not.toHaveAttribute('data-print-mode','contract');check(expect,e);
 });

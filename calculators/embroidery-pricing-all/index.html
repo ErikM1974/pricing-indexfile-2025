@@ -9,11 +9,13 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Page-specific styles -->
+    <!-- Canonical UI foundation and this page's scoped layout -->
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/calculators/embroidery-pricing-all/embroidery-pricing-all.css?v=2026.09.07.19">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.12.2">
+    <link rel="stylesheet" href="/shared_components/css/utilities.css?v=2026.09.12.2">
+    <link rel="stylesheet" href="/calculators/embroidery-pricing-all/embroidery-pricing-all.css?v=2026.09.12.2">
 
     <!-- Round 6 (2026-05-13): Contract Embroidery split off to its own
          standalone page. Redirect old ?tab=contract bookmarks BEFORE the
@@ -23,9 +25,9 @@
     <script src="/calculators/embroidery-pricing-all/embroidery-pricing-all-inline.js?v=2026.09.05.8"></script>
     <script src="/config/app.config.js"></script>
 </head>
-<body>
+<body data-ui="unified" data-embroidery-reference>
     <!-- Error Banner (hidden by default) -->
-    <div id="apiErrorBanner" class="api-error-banner hidden">
+    <div id="apiErrorBanner" class="api-error-banner hidden" role="alert">
         <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
         <span id="apiErrorMessage">Unable to load pricing data. Please refresh the page.</span>
     </div>
@@ -664,11 +666,11 @@
     </div>
 
     <!-- Surcharge Customer Modal -->
-    <div class="sc-modal-overlay" id="scModal">
+    <dialog class="sc-modal-overlay" id="scModal" aria-labelledby="scModalTitle">
         <div class="sc-modal">
             <div class="sc-modal-header">
                 <div class="sc-modal-title">
-                    <h2>Stitch Surcharge — All Customer Accounts</h2>
+                    <h2 id="scModalTitle">Stitch Surcharge — All Customer Accounts</h2>
                     <p class="sc-modal-subtitle">Excludes top 8 key accounts shown on main tab</p>
                 </div>
                 <div class="sc-modal-stats">
@@ -676,12 +678,12 @@
                     <div class="sc-stat"><span class="sc-stat-num sc-stat-mid" id="scStatMid">—</span><span class="sc-stat-label">Mid +$4</span></div>
                     <div class="sc-stat"><span class="sc-stat-num sc-stat-large" id="scStatLarge">—</span><span class="sc-stat-label">Large +$10</span></div>
                 </div>
-                <button class="sc-modal-close" id="scModalClose" title="Close">&times;</button>
+                <button class="sc-modal-close" id="scModalClose" title="Close" aria-label="Close surcharge accounts">&times;</button>
             </div>
             <div class="sc-modal-controls">
                 <div class="sc-search-wrap">
                     <i class="fas fa-search sc-search-icon" aria-hidden="true"></i>
-                    <input class="sc-search-input" id="scSearch" aria-label="Search service codes" type="text" placeholder="Search company, contact, or email...">
+                    <input class="sc-search-input" id="scSearch" aria-label="Search surcharge accounts" autofocus type="text" placeholder="Search company, contact, or email...">
                 </div>
                 <span class="sc-filter-label">Tier</span>
                 <div class="sc-filter-group" id="scTierFilters">
@@ -713,14 +715,15 @@
                     </thead>
                     <tbody id="scTbody"></tbody>
                 </table>
-                <div class="sc-empty-state" id="scEmptyState" style="display:none">
+                <div class="sc-empty-state" id="scEmptyState">
                     <h3>No matching accounts</h3>
                     <p>Try adjusting your search or filters</p>
                 </div>
             </div>
         </div>
-    </div>
+    </dialog>
 
-    <script src="/calculators/embroidery-pricing-all/embroidery-pricing-all.js?v=2026.09.06.31"></script>
+    <script src="/calculators/embroidery-pricing-all/embroidery-pricing-all.js?v=2026.09.12.2"></script>
+    <script src="/calculators/embroidery-pricing-all/embroidery-reference-ui.js?v=2026.09.12.2"></script>
 </body>
 </html>

@@ -284,8 +284,9 @@ async function fetchCapUpgrades() {
         const warningEl = document.getElementById('api-warning') || document.createElement('div');
         if (!warningEl.id) {
             warningEl.id = 'api-warning';
-            warningEl.style.cssText = 'background:#fff3cd;color:#856404;border:1px solid #ffc107;padding:8px 12px;margin:8px 0;border-radius:4px;font-size:13px;';
-            const container = document.querySelector('.calculator-container') || document.body;
+            warningEl.className = 'embroidery-api-warning';
+            warningEl.setAttribute('role', 'status');
+            const container = document.querySelector('.main-container') || document.body;
             container.prepend(warningEl);
         }
         warningEl.textContent = 'Cap upgrade pricing may be approximate — API unavailable. Refresh to retry.';
@@ -314,16 +315,24 @@ function buildCapUpgradesCard(cardId) {
 }
 
 function showLoadingState() {
+    document.body.dataset.pricingState = 'loading';
     document.querySelectorAll('.pricing-matrix tbody').forEach(tbody => {
         tbody.innerHTML = '<tr><td colspan="6" class="loading-cell">Loading pricing data...</td></tr>';
     });
 }
 
 function hideLoadingState() {
-    // Loading state is replaced when matrices are built
+    document.body.dataset.pricingState = 'ready';
 }
 
 function showErrorState(message) {
+    document.body.dataset.pricingState = 'failed';
+    document.getElementById('apiErrorMessage').textContent = message;
+    document.getElementById('apiErrorBanner').classList.remove('hidden');
+    document.querySelectorAll('.calc-form input, .calc-form select, #openSurchargeModal').forEach(control => { control.disabled = true; });
+    document.querySelectorAll('.calc-results, .ref-upgrades, .es-tiers, .es-account-list').forEach(region => { region.textContent = 'Pricing unavailable. Please refresh to retry.'; });
+    const fullBack = document.getElementById('esFbTableBody');
+    if (fullBack) { const row = fullBack.insertRow(); const cell = row.insertCell(); cell.colSpan = 6; cell.textContent = message; }
     const errorHtml = `<tr><td colspan="6" class="error-cell">${message}</td></tr>`;
     document.querySelectorAll('.pricing-matrix tbody').forEach(tbody => {
         tbody.innerHTML = errorHtml;
@@ -650,13 +659,14 @@ async function fetchStitchChargeData() {
         }
         const data = await response.json();
 
-        if (!data.allEmbroideryCostsR) return;
+        if (!Array.isArray(data.allEmbroideryCostsR)) throw new Error('Missing stitch surcharge tiers');
 
         // Sort by StitchCount ascending (same logic as embroidery-quote-pricing.js lines 163-178)
         const asGarmRows = data.allEmbroideryCostsR
             .filter(c => c.ItemType === 'AS-Garm')
             .sort((a, b) => a.StitchCount - b.StitchCount);
 
+        if (asGarmRows.length < 2 || asGarmRows.some(row => !Number.isFinite(row.EmbroideryCost) || !Number.isFinite(row.StitchCount))) throw new Error('Invalid stitch surcharge tiers');
         if (asGarmRows.length >= 2) {
             STITCH_CHARGE_DATA = {
                 midFee: asGarmRows[0].EmbroideryCost,
@@ -667,7 +677,7 @@ async function fetchStitchChargeData() {
         }
     } catch (error) {
         console.error('Failed to fetch AS-Garm stitch charge data:', error);
-        // Fallback: leave STITCH_CHARGE_DATA null, HTML defaults stay visible
+        throw error;
     }
 }
 
@@ -1018,13 +1028,17 @@ function scRender() {
 }
 
 function openSurchargeModal() {
-    document.getElementById('scModal').classList.add('open');
+    const dialog = document.getElementById('scModal');
+    dialog.classList.add('open');
+    if (!dialog.open) dialog.showModal();
     document.body.style.overflow = 'hidden';
     scRender();
 }
 
 function closeSurchargeModal() {
-    document.getElementById('scModal').classList.remove('open');
+    const dialog = document.getElementById('scModal');
+    dialog.classList.remove('open');
+    if (dialog.open) dialog.close();
     document.body.style.overflow = '';
 }
 
@@ -1556,6 +1570,7 @@ function printContractPricing() {
     document.title = 'NW Custom Apparel Contract Embroidery Pricing 2026';
 
     // Trigger browser print dialog
+    document.body.dataset.printMode = 'contract';
     window.print();
 
     // Restore original title after print dialog opens

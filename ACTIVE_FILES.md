@@ -1329,3 +1329,5 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - tests/fixtures/embroidery-reference-upgradesFailed-original-browser.json — immutable embroidery reference synthetic browser evidence.
 
 - tests/fixtures/embroidery-reference-contract-print-original-browser.json — immutable embroidery reference synthetic browser evidence.
+
+- calculators/embroidery-pricing-all/embroidery-reference-ui.js — keyboard semantics, native dialog and print-state restoration for the embroidery reference.

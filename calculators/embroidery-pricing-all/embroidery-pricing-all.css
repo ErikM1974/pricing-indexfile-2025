@@ -1,1543 +1,1381 @@
-/* stylelint-disable declaration-no-important -- override stack: this calculator page layers fix/override sheets and JS-injected styles; the flags come out together when the page is untangled (2026-09-07) */
+/* Embroidery reference: canonical tokens, scoped layout, native controls and complete paper output. */
 
-/* ==========================================================================
-   Embroidery Pricing 2026 — Corporate (Additional Logo / Customer Supplied /
-   Additional Stitches / Full Back) calculator page.
-
-   Design system: this page is self-contained (it does NOT link art-hub.css,
-   whose .tab-content / .tab-pane rules would collide). Instead the canonical
-   2026 design tokens are mirrored locally below, so the page stays visually
-   consistent with the staff dashboard while owning its own layout.
-   Keep the token VALUES in sync with shared_components/css/art-hub.css.
-
-   ---- Table of contents --------------------------------------------------
-     1.  Design tokens
-     2.  Base / reset
-     3.  Layout — container + page header
-     4.  API error banner
-     5.  Tab navigation (helper, divider, buttons, modifier variant)
-     6.  Tab content
-     7.  Info disclosure (collapsible <details>)
-     8.  Decision flowchart
-     9.  Banners — LTM, use-case, full-back cross-reference
-     10. Quick price calculator (card, form, results)
-     11. Pricing matrices (grid, card, table)
-     12. ShopWorks reference card + part badges
-     13. Sales-script card
-     14. Heavyweight surcharge card
-     15. Stitch-charges tab (.es-*) — header, parts, tiers
-     16. Full Back panel (.es-fb-*)
-     17. Key-account surcharge list (.es-account-* / .es-design-table)
-     18. View-all button
-     19. Surcharge customer modal (.sc-*)
-     20. Share-link button
-     21. Print container + @media print
-     22. Responsive
-     23. Reduced motion
-   ========================================================================== */
-
-/* ==========================================================================
-   1. DESIGN TOKENS
-   ========================================================================== */
-
-/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
-   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
-   raw hex is allowed ONLY in this block. */
-/* stylelint-disable color-no-hex */
-:root {
-    --embroidery-pricing-all-gray-dark: #333;
-    --embroidery-pricing-all-blue: #6366f1;
-    --embroidery-pricing-all-gray: #666;
-    --embroidery-pricing-all-yellow: #fde047;
-    --embroidery-pricing-all-yellow-2: #fef08a;
-    --embroidery-pricing-all-green: #86d98e;
-    --embroidery-pricing-all-blue-3: #1e3a8a;
-    --embroidery-pricing-all-magenta: #db2777;
-    --embroidery-pricing-all-red: #f87171;
-    --embroidery-pricing-all-indigo-tint: #c4b5fd;
-    --embroidery-pricing-all-yellow-6: #ca8a04;
-
-    /* ---- 2026 system (mirrors art-hub.css :root) ---- */
-
-    /* Surfaces (page → card → inset) */
-    --surface-page:     var(--gray-50);
-    --surface-card:     var(--color-surface);
-    --surface-elevated: var(--gray-50);
-    --surface-inset:    var(--gray-100);
-    --surface-hover:    var(--gray-50);
-    --surface-dark:     var(--gray-900);   /* gray-900 — dark headers / dark buttons */
-    --surface-dark-2:   var(--gray-800);   /* gray-800 — gradient partner for above   */
-
-    /* Neutral ramp — the single source of grays for the whole page */
-
-    /* Elevation — stacked, low-blur */
-    --shadow-sm: 0 1px 2px rgb(15 23 42 / 4%), 0 1px 1px rgb(15 23 42 / 3%);
-    --shadow-md: 0 2px 4px rgb(15 23 42 / 4%), 0 4px 12px rgb(15 23 42 / 6%);
-    --shadow-lg: 0 8px 24px -8px rgb(15 23 42 / 18%), 0 4px 10px -4px rgb(15 23 42 / 8%);
-
-    /* Spacing (4-base) */
-    --space-1: 4px;  --space-2: 8px;  --space-3: 12px;  --space-4: 16px;
-    --space-5: 20px; --space-6: 24px; --space-8: 32px;
-
-    /* Radius */
-    --radius-sm:   4px;
-    --radius-md:   8px;
-    --radius-lg:   12px;
-    --radius-xl:   16px;
-
-    /* Semantic state */
-    --state-info:    var(--blue-600); --state-info-bg:    var(--color-floor-tint);
-    --state-success: var(--emerald-600); --state-success-bg: var(--brand-50);
-    --state-warning: var(--amber-600); --state-warning-bg: var(--store-paper);
-    --state-danger:  var(--red-600); --state-danger-bg:  var(--red-50);
-    --state-violet:  var(--violet-600); --state-violet-bg:  var(--color-ruth-tint);
-
-    /* Motion */
-    --ease-out: cubic-bezier(.2,.8,.2,1);
-    --dur-fast: 120ms;
-    --dur-base: 200ms;
-
-    /* ---- Brand — NWCA calculator green ----
-       The accent shared across every pricing calculator. Intentionally the
-       lighter calculator green (#4cb354), distinct from the dashboard chrome
-       green (#009900). */
-    --brand:        var(--brand-500);
-    --brand-strong: var(--brand-600);   /* hover / pressed                       */
-    --brand-deep:   var(--store-green-700);   /* headings + text on light fills        */
-    --brand-tint:   var(--brand-100);   /* light fill (disclosures, active tabs) */
-    --brand-tint-2: var(--store-green-100);   /* deeper fill (part badges)             */
-    --brand-border: var(--embroidery-pricing-all-green);
-    --brand-glow:   0 0 0 4px color-mix(in srgb, var(--brand) 16%, transparent);
-    --success:      var(--green-600);   /* positive-price emphasis               */
-
-    /* LTM amber (distinct yellow semantic, softer than --state-warning) */
-    --ltm-bg:     var(--amber-100);
-    --ltm-border: var(--embroidery-pricing-all-yellow);
-    --ltm-text:   var(--amber-800);
-    --warn-amber-bg:     var(--amber-100);
-    --warn-amber-border: var(--amber-300);
-
-    /* Info blue (helper + cross-reference callouts) */
-    --info-blue:        var(--blue-600);
-    --info-blue-bg:     var(--color-floor-tint);
-    --info-blue-border: var(--blue-200);
-    --info-blue-text:   var(--blue-800);
-    --info-blue-strong: var(--embroidery-pricing-all-blue-3);
-
-    /* Best/positive tints (pricing-matrix highlights) */
-    --best-bg:     var(--store-green-100);
-    --best-border: var(--green-300);
-
-    /* Typography */
-    --font-sans:    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --font-display: 'Poppins', var(--font-sans);
-    --font-mono:    ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, Consolas, monospace;
-
-    /* ---- Readable semantic aliases (resolve to the system above) ---- */
-    --primary-color:  var(--brand);
-    --primary-dark:   var(--brand-strong);
-    --primary-light:  var(--brand-tint);
-    --bg-color:       var(--surface-page);
-    --card-bg:        var(--surface-card);
-    --border-color:   var(--gray-200);
-    --text-primary:   var(--gray-800);
-    --text-secondary: var(--gray-500);
-    --text-muted:     var(--gray-400);
-    --warning-text:   var(--ltm-text);
-    --error-bg:       var(--state-danger-bg);
-    --error-border:   var(--red-200);
-    --error-text:     var(--state-danger);
-    --info-bg:        var(--brand-tint);
-    --info-border:    var(--brand-border);
-    --info-text:      var(--brand-deep);
+/* Keyboard and overflow behavior belongs to this page's existing tables. */
+:where([data-ui="unified"][data-embroidery-reference]) :is(button, input, select, summary, [role="button"]) {
+    min-height: var(--ui-control-height);
+    font-family: var(--ui-font);
 }
-/* stylelint-enable color-no-hex */
 
-/* ==========================================================================
-   2. BASE / RESET
-   ========================================================================== */
-* {
+:where([data-ui="unified"][data-embroidery-reference]) :is(button, input, select, summary, [tabindex]):focus-visible {
+    outline: 3px solid var(--ui-accent);
+    outline-offset: 3px;
+}
+
+:where([data-ui="unified"][data-embroidery-reference]) .embroidery-table-scroll {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+:where([data-ui="unified"][data-embroidery-reference]) :is(.es-fb-table, .es-design-table) {
+    min-width: 600px;
+}
+
+:where([data-ui="unified"][data-embroidery-reference]) :is(.pricing-matrix .price-cell, .es-fb-table td, .result-row > span:last-child) {
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+:where([data-ui="unified"][data-embroidery-reference]) .embroidery-sort-button {
+    padding: 4px;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    text-transform: inherit;
+}
+
+:where([data-ui="unified"][data-embroidery-reference]) .embroidery-api-warning {
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    border: 1px solid var(--amber-300);
+    border-radius: var(--radius-md);
+    background: var(--color-warning-bg);
+    color: var(--amber-900);
+}
+
+:where([data-ui="unified"][data-embroidery-reference])[data-pricing-state="loading"] :is(.calc-results, .es-tiers) {
+    visibility: hidden;
+}
+
+:where([data-ui="unified"][data-embroidery-reference])[data-pricing-state="failed"] :is(.calc-results, .es-tiers, .ref-upgrades) {
+    color: var(--red-800);
+}
+
+:where([data-ui="unified"][data-embroidery-reference]) .sc-modal-overlay:not([open]) {
+    display: none;
+}
+
+:where([data-ui="unified"][data-embroidery-reference]) .sc-modal-overlay::backdrop {
+    background: rgb(17 24 39 / 50%);
+}
+
+:where([data-ui="unified"][data-embroidery-reference]) * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-body {
-    font-family: var(--font-sans);
+:where([data-ui="unified"][data-embroidery-reference]) {
+    font-family: var(--ui-font);
     font-feature-settings: 'cv11', 'ss01', 'ss03';
     -webkit-font-smoothing: antialiased;
-    background-color: var(--surface-page);
-    color: var(--text-primary);
+    background-color: var(--ui-canvas);
+    color: var(--ui-ink);
     line-height: 1.6;
 }
 
-/* ==========================================================================
-   3. LAYOUT — container + page header
-   ========================================================================== */
-.main-container {
-    max-width: 1200px;
+:where([data-ui="unified"][data-embroidery-reference]) .main-container {
     margin: 0 auto;
-    padding: var(--space-5);
+    max-width: 1200px;
+    padding: clamp(12px, 3vw, 32px);
 }
 
-.page-header {
-    background: var(--surface-card);
-    border: 1px solid var(--gray-200);
-    border-radius: var(--radius-lg);
-    padding: var(--space-6);
-    margin-bottom: var(--space-6);
-    box-shadow: var(--shadow-sm);
+:where([data-ui="unified"][data-embroidery-reference]) .page-header {
+    margin-bottom: 24px;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    padding: 0 0 20px;
+    border-bottom: 1px solid var(--ui-line-strong);
+    border-radius: 0;
 }
 
-.breadcrumb {
+:where([data-ui="unified"][data-embroidery-reference]) .breadcrumb {
     font-size: 0.875rem;
-    color: var(--text-secondary);
-    margin-bottom: var(--space-2);
+    color: var(--ui-muted);
+    margin-bottom: 8px;
 }
 
-.breadcrumb a {
-    color: var(--brand);
-    text-decoration: none;
+:where([data-ui="unified"][data-embroidery-reference]) .breadcrumb a {
+    color: var(--ui-accent);
+    text-decoration: underline;
 }
 
-.breadcrumb a:hover { text-decoration: underline; }
+:where([data-ui="unified"][data-embroidery-reference]) .breadcrumb a:hover { text-decoration: underline; }
 
-.breadcrumb .separator {
-    margin: 0 var(--space-2);
-    color: var(--gray-300);
+:where([data-ui="unified"][data-embroidery-reference]) .breadcrumb .separator {
+    margin: 0 8px;
+    color: var(--ui-muted);
 }
 
-.page-header h1 {
-    font-family: var(--font-display);
+:where([data-ui="unified"][data-embroidery-reference]) .page-header h1 {
+    font-family: var(--ui-font);
     font-size: 1.75rem;
     font-weight: 700;
     letter-spacing: -0.01em;
     color: var(--gray-900);
-    margin-bottom: var(--space-1);
+    margin-bottom: 4px;
 }
 
-.page-header h1 i {
-    color: var(--brand);
-    margin-right: var(--space-2);
+:where([data-ui="unified"][data-embroidery-reference]) .page-header h1 i {
+    color: var(--ui-accent);
+    margin-right: 8px;
 }
 
-.page-header .subtitle {
-    color: var(--text-secondary);
+:where([data-ui="unified"][data-embroidery-reference]) .page-header .subtitle {
+    color: var(--ui-muted);
     font-size: 0.95rem;
 }
 
-/* Cross-link to the pink Contract Embroidery page (replaces an inline style) */
-.page-header .subtitle .contract-link {
-    color: var(--embroidery-pricing-all-magenta);
+:where([data-ui="unified"][data-embroidery-reference]) .page-header .subtitle .contract-link {
+    color: var(--ui-accent);
     font-weight: 600;
-    text-decoration: none;
+    text-decoration: underline;
 }
-.page-header .subtitle .contract-link:hover { text-decoration: underline; }
+:where([data-ui="unified"][data-embroidery-reference]) .page-header .subtitle .contract-link:hover { text-decoration: underline; }
 
-.page-header .version-info {
+:where([data-ui="unified"][data-embroidery-reference]) .page-header .version-info {
     font-size: 0.85rem;
-    color: var(--text-muted);
-    margin-top: var(--space-1);
+    color: var(--ui-muted);
+    margin-top: 4px;
 }
 
-/* ==========================================================================
-   4. API ERROR BANNER
-   ========================================================================== */
-.api-error-banner {
-    position: fixed;
-    inset: 0 0 auto;
+:where([data-ui="unified"][data-embroidery-reference]) .api-error-banner {
     z-index: 1000;
     display: flex;
     align-items: center;
-    gap: var(--space-3);
-    padding: var(--space-3) var(--space-5);
-    background: var(--error-bg);
-    border-bottom: 2px solid var(--error-border);
-    color: var(--error-text);
+    gap: 12px;
+    padding: 12px 20px;
+    background: var(--red-50);
+    border-bottom: 2px solid var(--red-200);
+    color: var(--red-800);
     font-weight: 500;
+    position: static;
+    inset: auto;
+    max-width: 1160px;
+    margin: 16px auto 0;
+    border-radius: var(--radius-md);
 }
 
-.api-error-banner.hidden { display: none; }
+:where([data-ui="unified"][data-embroidery-reference]) .api-error-banner.hidden { display: none; }
 
-.api-error-banner i { font-size: 1.25rem; }
+:where([data-ui="unified"][data-embroidery-reference]) .api-error-banner i { font-size: 1.25rem; }
 
-/* ==========================================================================
-   5. TAB NAVIGATION
-   ========================================================================== */
-
-/* One-line decision helper above the tab bar (info-blue) */
-.tab-navigation-helper {
+:where([data-ui="unified"][data-embroidery-reference]) .tab-navigation-helper {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: var(--space-3);
-    padding: var(--space-3) var(--space-4);
-    margin-bottom: var(--space-3);
-    background: var(--info-blue-bg);
-    border: 1px solid var(--info-blue-border);
-    border-radius: var(--radius-md);
-    color: var(--info-blue-text);
+    gap: 12px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    background: var(--ui-surface);
+    border: 1px solid var(--ui-line);
+    border-radius: 8px;
+    color: var(--ui-ink);
     font-size: 0.9rem;
 }
-.tab-navigation-helper i { font-size: 1.1rem; color: var(--info-blue); }
-.tab-navigation-helper strong { color: var(--info-blue-strong); }
+:where([data-ui="unified"][data-embroidery-reference]) .tab-navigation-helper i { font-size: 1.1rem; color: var(--ui-accent); }
+:where([data-ui="unified"][data-embroidery-reference]) .tab-navigation-helper strong { color: var(--ui-ink); }
 
-.tab-navigation {
-    display: flex;
+:where([data-ui="unified"][data-embroidery-reference]) .tab-navigation {
     align-items: stretch;
-    gap: var(--space-2);
-    margin-bottom: var(--space-6);
+    gap: 8px;
+    margin-bottom: 24px;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
-/* Vertical divider between the price-tier tabs and the modifier tabs */
-.tab-divider {
+:where([data-ui="unified"][data-embroidery-reference]) .tab-divider {
     flex-shrink: 0;
     width: 2px;
-    margin: var(--space-2) var(--space-1);
+    margin: 8px 4px;
     background: var(--gray-300);
     border-radius: 1px;
+    display: none;
 }
 
-.tab-btn {
+:where([data-ui="unified"][data-embroidery-reference]) .tab-btn {
     flex: 1;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: var(--space-1);
-    padding: var(--space-4) var(--space-6);
-    background: var(--surface-card);
+    gap: 4px;
+    background: var(--ui-surface);
     border: 1.5px solid var(--gray-200);
-    border-radius: var(--radius-lg);
     cursor: pointer;
-    font-family: var(--font-sans);
-    font-size: 1rem;
+    font-family: var(--ui-font);
     font-weight: 600;
-    color: var(--text-secondary);
-    text-align: center;
-    transition: border-color var(--dur-base) var(--ease-out),
-                color var(--dur-base) var(--ease-out),
-                background var(--dur-base) var(--ease-out),
-                box-shadow var(--dur-base) var(--ease-out),
-                transform var(--dur-fast) var(--ease-out);
+    color: var(--ui-muted);
+    padding: 14px 12px;
+    align-items: flex-start;
+    text-align: left;
+    border-radius: var(--radius-md);
+    min-width: 0;
+    font-size: .9375rem;
 }
 
-.tab-btn:hover {
-    border-color: var(--brand);
-    color: var(--brand-strong);
-    box-shadow: var(--shadow-sm);
-    transform: translateY(-1px);
+:where([data-ui="unified"][data-embroidery-reference]) .tab-btn:hover {
+    border-color: var(--ui-accent);
+    color: var(--ui-accent);
+    box-shadow: 0 1px 2px rgb(15 23 42 / 4%), 0 1px 1px rgb(15 23 42 / 3%);
+    transform: none;
 }
 
-.tab-btn.active {
-    background: var(--brand-tint);
-    border-color: var(--brand);
-    color: var(--brand-deep);
-    box-shadow: var(--brand-glow);
+:where([data-ui="unified"][data-embroidery-reference]) .tab-btn.active {
+    background: var(--ui-tint);
+    border-color: var(--ui-accent);
+    color: var(--ui-accent);
+    box-shadow: inset 0 -3px var(--ui-accent);
 }
 
-.tab-btn i { font-size: 1.25rem; }
+:where([data-ui="unified"][data-embroidery-reference]) .tab-btn i { font-size: 1.25rem; }
 
-.tab-btn .tab-subtitle {
+:where([data-ui="unified"][data-embroidery-reference]) .tab-btn .tab-subtitle {
     font-size: 0.75rem;
     font-weight: 400;
-    color: var(--text-muted);
+    color: var(--ui-muted);
 }
-.tab-btn.active .tab-subtitle { color: var(--brand-deep); }
+:where([data-ui="unified"][data-embroidery-reference]) .tab-btn.active .tab-subtitle { color: var(--ui-accent); }
 
-/* Modifier tab — amber so reps see it adds to a tier rather than being one */
-.tab-btn--modifier {
-    background: var(--state-warning-bg);
-    border-color: var(--warn-amber-border);
-    color: var(--ltm-text);
+:where([data-ui="unified"][data-embroidery-reference]) .tab-btn--modifier {
+    background: var(--color-warning-bg);
+    border-color: var(--amber-300);
+    color: var(--amber-800);
 }
 
-.tab-btn--modifier:hover {
-    border-color: var(--state-warning);
+:where([data-ui="unified"][data-embroidery-reference]) .tab-btn--modifier:hover {
+    border-color: var(--amber-800);
     color: var(--amber-700);
 }
 
-.tab-btn--modifier.active {
-    background: var(--warn-amber-bg);
-    border-color: var(--state-warning);
-    color: var(--ltm-text);
-    box-shadow: 0 0 0 4px color-mix(in srgb, var(--state-warning) 14%, transparent);
+:where([data-ui="unified"][data-embroidery-reference]) .tab-btn--modifier.active {
+    background: var(--amber-100);
+    border-color: var(--amber-800);
+    color: var(--amber-800);
+    box-shadow: inset 0 -3px var(--amber-700);
 }
-.tab-btn--modifier.active .tab-subtitle { color: var(--amber-700); }
+:where([data-ui="unified"][data-embroidery-reference]) .tab-btn--modifier.active .tab-subtitle { color: var(--amber-700); }
+:where([data-ui="unified"][data-embroidery-reference]) .tab-content { display: none; }
 
-/* ==========================================================================
-   6. TAB CONTENT
-   ========================================================================== */
-.tab-content { display: none; }
-
-.tab-content.active {
+:where([data-ui="unified"][data-embroidery-reference]) .tab-content.active {
     display: block;
-    animation: fadeIn var(--dur-base) var(--ease-out);
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(6px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
-
-/* ==========================================================================
-   7. INFO DISCLOSURE (collapsible <details>/<summary>)
-   ========================================================================== */
-.info-disclosure {
-    background: var(--info-bg);
-    border: 1px solid var(--info-border);
-    border-radius: var(--radius-md);
-    margin-bottom: var(--space-4);
+:where([data-ui="unified"][data-embroidery-reference]) .info-disclosure {
+    background: var(--ui-tint);
+    border: 1px solid var(--ui-line-strong);
+    border-radius: 8px;
+    margin-bottom: 16px;
     overflow: hidden;
 }
 
-.info-disclosure summary {
+:where([data-ui="unified"][data-embroidery-reference]) .info-disclosure summary {
     display: flex;
     align-items: center;
-    gap: var(--space-3);
-    padding: var(--space-3) var(--space-4);
+    gap: 12px;
+    padding: 12px 16px;
     cursor: pointer;
     font-weight: 600;
-    color: var(--info-text);
+    color: var(--ui-accent);
     user-select: none;
     list-style: none;
-    transition: background var(--dur-fast) var(--ease-out);
 }
-.info-disclosure summary::-webkit-details-marker { display: none; }
+:where([data-ui="unified"][data-embroidery-reference]) .info-disclosure summary::-webkit-details-marker { display: none; }
 
-/* Custom expand/collapse caret */
-.info-disclosure summary::before {
+:where([data-ui="unified"][data-embroidery-reference]) .info-disclosure summary::before {
     content: '▶';
     font-size: 0.75rem;
-    transition: transform var(--dur-base) var(--ease-out);
 }
-.info-disclosure[open] summary::before { transform: rotate(90deg); }
+:where([data-ui="unified"][data-embroidery-reference]) .info-disclosure[open] summary::before { transform: rotate(90deg); }
 
-.info-disclosure summary:hover { background: rgb(0 0 0 / 3%); }
+:where([data-ui="unified"][data-embroidery-reference]) .info-disclosure summary:hover { background: rgb(0 0 0 / 3%); }
 
-.info-disclosure summary:focus-visible {
-    outline: 2px solid var(--brand);
+:where([data-ui="unified"][data-embroidery-reference]) .info-disclosure summary:focus-visible {
+    outline: 2px solid var(--ui-accent);
     outline-offset: -2px;
 }
 
-.info-disclosure .disclosure-hint {
+:where([data-ui="unified"][data-embroidery-reference]) .info-disclosure .disclosure-hint {
     margin-left: auto;
     font-size: 0.75rem;
     font-weight: 400;
-    color: var(--text-muted);
+    color: var(--ui-muted);
 }
 
-/* Animate open/close where supported (Chrome 131+) */
-.info-disclosure::details-content {
+:where([data-ui="unified"][data-embroidery-reference]) .info-disclosure::details-content {
     height: 0;
     opacity: 0;
     overflow: hidden;
-    transition: height var(--dur-base) var(--ease-out), opacity var(--dur-base) var(--ease-out);
 }
-.info-disclosure[open]::details-content { height: auto; opacity: 1; }
+:where([data-ui="unified"][data-embroidery-reference]) .info-disclosure[open]::details-content { height: auto; opacity: 1; }
 
-.info-disclosure .disclosure-content { padding: 0 var(--space-4) var(--space-4); }
+:where([data-ui="unified"][data-embroidery-reference]) .info-disclosure .disclosure-content { padding: 0 16px 16px; }
 
-.info-disclosure .disclosure-section { margin-bottom: var(--space-3); }
-.info-disclosure .disclosure-section:last-child { margin-bottom: 0; }
+:where([data-ui="unified"][data-embroidery-reference]) .info-disclosure .disclosure-section { margin-bottom: 12px; }
+:where([data-ui="unified"][data-embroidery-reference]) .info-disclosure .disclosure-section:last-child { margin-bottom: 0; }
 
-.info-disclosure .disclosure-section ul {
-    margin: var(--space-2) 0 0 var(--space-5);
-    color: var(--text-primary);
+:where([data-ui="unified"][data-embroidery-reference]) .info-disclosure .disclosure-section ul {
+    margin: 8px 0 0 20px;
+    color: var(--ui-ink);
 }
-.info-disclosure .disclosure-section li { margin-bottom: var(--space-1); }
+:where([data-ui="unified"][data-embroidery-reference]) .info-disclosure .disclosure-section li { margin-bottom: 4px; }
 
-.info-disclosure .disclosure-section.warning {
-    background: var(--state-danger-bg);
-    border: 1px solid var(--error-border);
-    border-radius: var(--radius-sm);
-    padding: var(--space-3);
-    margin-top: var(--space-3);
+:where([data-ui="unified"][data-embroidery-reference]) .info-disclosure .disclosure-section.warning {
+    background: var(--red-50);
+    border: 1px solid var(--red-200);
+    border-radius: 4px;
+    padding: 12px;
+    margin-top: 12px;
 }
-.info-disclosure .disclosure-section.warning strong { color: var(--state-danger); }
+:where([data-ui="unified"][data-embroidery-reference]) .info-disclosure .disclosure-section.warning strong { color: var(--red-800); }
 
-/* ==========================================================================
-   8. DECISION FLOWCHART (inside the "Which Tab Should I Use?" disclosure)
-   ========================================================================== */
-.decision-flowchart {
+:where([data-ui="unified"][data-embroidery-reference]) .decision-flowchart {
     display: flex;
     flex-direction: column;
-    gap: var(--space-3);
+    gap: 12px;
 }
 
-.decision-step {
-    background: var(--surface-card);
-    border-radius: var(--radius-md);
-    padding: var(--space-3) var(--space-4);
-    border-left: 4px solid var(--brand);
+:where([data-ui="unified"][data-embroidery-reference]) .decision-step {
+    background: var(--ui-surface);
+    border-radius: 8px;
+    padding: 12px 16px;
+    border-left: 4px solid var(--ui-accent);
 }
 
-.decision-question {
+:where([data-ui="unified"][data-embroidery-reference]) .decision-question {
     display: block;
     font-weight: 500;
-    color: var(--text-primary);
-    margin-bottom: var(--space-2);
+    color: var(--ui-ink);
+    margin-bottom: 8px;
 }
 
-.decision-answers {
+:where([data-ui="unified"][data-embroidery-reference]) .decision-answers {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-3);
+    gap: 12px;
     font-size: 0.9rem;
 }
 
-.decision-yes { color: var(--success); }
-.decision-no  { color: var(--state-danger); }
+:where([data-ui="unified"][data-embroidery-reference]) .decision-yes { color: var(--ui-accent); }
+:where([data-ui="unified"][data-embroidery-reference]) .decision-no  { color: var(--red-800); }
 
-.decision-yes i,
-.decision-no i { margin-right: var(--space-1); }
+:where([data-ui="unified"][data-embroidery-reference]) .decision-yes i,
+:where([data-ui="unified"][data-embroidery-reference]) .decision-no i { margin-right: 4px; }
 
-/* ==========================================================================
-   9. BANNERS
-   ========================================================================== */
-
-/* LTM pill — compact, repeated per tab */
-.ltm-banner {
+:where([data-ui="unified"][data-embroidery-reference]) .ltm-banner {
     display: inline-flex;
     align-items: center;
-    gap: var(--space-2);
+    gap: 8px;
     width: fit-content;
     max-width: 100%;
     margin-bottom: 18px;
-    padding: var(--space-1) var(--space-3);
-    background: var(--ltm-bg);
-    border: 1px solid var(--ltm-border);
+    padding: 4px 12px;
+    background: var(--amber-100);
+    border: 1px solid var(--amber-300);
     border-radius: var(--radius-pill);
-    color: var(--warning-text);
+    color: var(--amber-800);
     font-size: 0.8rem;
     font-weight: 600;
 }
-.ltm-banner i { font-size: 0.85rem; opacity: 0.85; }
+:where([data-ui="unified"][data-embroidery-reference]) .ltm-banner i { font-size: 0.85rem; opacity: 0.85; }
 
-/* Use-case banner (Full Back tab intro) */
-.use-case-banner {
+:where([data-ui="unified"][data-embroidery-reference]) .use-case-banner {
     display: flex;
     align-items: flex-start;
-    gap: var(--space-3);
-    margin-bottom: var(--space-4);
-    padding: var(--space-3) var(--space-4);
-    background: var(--surface-inset);
+    gap: 12px;
+    margin-bottom: 16px;
+    padding: 12px 16px;
+    background: var(--gray-50);
     border: 1px solid var(--gray-200);
-    border-left: 4px solid var(--brand);
-    border-radius: var(--radius-md);
+    border-left: 4px solid var(--ui-accent);
+    border-radius: 8px;
     color: var(--gray-700);
 }
-.use-case-banner i { font-size: 1.25rem; margin-top: 2px; color: var(--brand-deep); }
+:where([data-ui="unified"][data-embroidery-reference]) .use-case-banner i { font-size: 1.25rem; margin-top: 2px; color: var(--ui-accent); }
 
-/* Full-back cross-reference — points the other tabs at the canonical table */
-.fullback-crossref {
+:where([data-ui="unified"][data-embroidery-reference]) .fullback-crossref {
     display: flex;
     align-items: center;
-    gap: var(--space-3);
-    margin-bottom: var(--space-4);
-    padding: var(--space-3) 18px;
-    background: var(--info-blue-bg);
-    border: 1px solid var(--info-blue-border);
-    border-radius: var(--radius-md);
-    color: var(--info-blue-text);
+    gap: 12px;
+    margin-bottom: 16px;
+    padding: 12px 18px;
+    background: var(--ui-surface);
+    border: 1px solid var(--ui-line);
+    border-radius: 8px;
+    color: var(--ui-ink);
     font-size: 0.95rem;
 }
-.fullback-crossref i { flex-shrink: 0; font-size: 1rem; color: var(--info-blue); }
+:where([data-ui="unified"][data-embroidery-reference]) .fullback-crossref i { flex-shrink: 0; font-size: 1rem; color: var(--ui-accent); }
 
-.fullback-crossref a {
+:where([data-ui="unified"][data-embroidery-reference]) .fullback-crossref a {
     flex: 1;
-    color: var(--info-blue-text);
+    color: var(--ui-ink);
     text-decoration: none;
-    transition: color var(--dur-fast) var(--ease-out);
 }
-.fullback-crossref a:hover { color: var(--info-blue-strong); text-decoration: underline; }
-.fullback-crossref strong { color: var(--info-blue-strong); }
+:where([data-ui="unified"][data-embroidery-reference]) .fullback-crossref a:hover { color: var(--ui-ink); text-decoration: underline; }
+:where([data-ui="unified"][data-embroidery-reference]) .fullback-crossref strong { color: var(--ui-ink); }
 
-.fullback-crossref .crossref-tab-name {
-    padding: 1px var(--space-2);
-    background: var(--surface-card);
-    border: 1px solid var(--info-blue-border);
-    border-radius: var(--radius-sm);
-    color: var(--info-blue-strong);
+:where([data-ui="unified"][data-embroidery-reference]) .fullback-crossref .crossref-tab-name {
+    padding: 1px 8px;
+    background: var(--ui-surface);
+    border: 1px solid var(--ui-line);
+    border-radius: 4px;
+    color: var(--ui-ink);
     font-weight: 600;
 }
 
-/* ==========================================================================
-   10. QUICK PRICE CALCULATOR
-   ========================================================================== */
-.calculator-card {
-    background: var(--surface-card);
+:where([data-ui="unified"][data-embroidery-reference]) .calculator-card {
+    background: var(--ui-surface);
     border: 1px solid var(--gray-200);
-    border-radius: var(--radius-lg);
-    padding: var(--space-6);
-    margin-bottom: var(--space-6);
-    box-shadow: var(--shadow-sm);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 2px rgb(15 23 42 / 4%), 0 1px 1px rgb(15 23 42 / 3%);
 }
 
-/* Compact, emphasized variant pinned to the top of each tab */
-.calculator-card.compact {
-    background: linear-gradient(135deg, var(--surface-card) 0%, var(--brand-tint) 160%);
-    border: 1.5px solid var(--brand);
-    box-shadow: var(--shadow-md);
+:where([data-ui="unified"][data-embroidery-reference]) .calculator-card.compact {
+    background: var(--ui-surface);
+    border: 1px solid var(--ui-line);
+    box-shadow: none;
 }
-.calculator-card.compact h3 { font-size: 1rem; margin-bottom: var(--space-3); }
+:where([data-ui="unified"][data-embroidery-reference]) .calculator-card.compact h3 { font-size: 1rem; margin-bottom: 12px; }
 
-.calculator-card h3 {
+:where([data-ui="unified"][data-embroidery-reference]) .calculator-card h3 {
     font-size: 1.1rem;
     font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: var(--space-4);
+    color: var(--ui-ink);
+    margin-bottom: 16px;
 }
-.calculator-card h3 i { color: var(--brand); margin-right: var(--space-2); }
+:where([data-ui="unified"][data-embroidery-reference]) .calculator-card h3 i { color: var(--ui-accent); margin-right: 8px; }
 
-.calc-form {
+:where([data-ui="unified"][data-embroidery-reference]) .calc-form {
     display: flex;
     flex-direction: column;
-    gap: var(--space-4);
+    gap: 16px;
 }
 
-.form-row {
+:where([data-ui="unified"][data-embroidery-reference]) .form-row {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-4);
+    gap: 16px;
 }
 
-.form-group { flex: 1; min-width: 150px; }
+:where([data-ui="unified"][data-embroidery-reference]) .form-group { flex: 1; min-width: 150px; }
 
-.form-group label {
+:where([data-ui="unified"][data-embroidery-reference]) .form-group label {
     display: block;
-    margin-bottom: var(--space-2);
+    margin-bottom: 8px;
     font-size: 0.85rem;
     font-weight: 500;
-    color: var(--text-secondary);
+    color: var(--ui-muted);
 }
 
-.form-group select,
-.form-group input[type="number"] {
+:where([data-ui="unified"][data-embroidery-reference]) .form-group select,
+:where([data-ui="unified"][data-embroidery-reference]) .form-group input[type="number"] {
     width: 100%;
-    padding: 10px var(--space-3);
-    background: var(--surface-card);
+    padding: 10px 12px;
+    background: var(--ui-surface);
     border: 1px solid var(--gray-300);
-    border-radius: var(--radius-md);
+    border-radius: 8px;
     font-size: 0.95rem;
     font-family: inherit;
-    color: var(--text-primary);
-    transition: border-color var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out);
+    color: var(--ui-ink);
 }
 
-.form-group select:focus,
-.form-group input:focus {
+:where([data-ui="unified"][data-embroidery-reference]) .form-group select:focus,
+:where([data-ui="unified"][data-embroidery-reference]) .form-group input:focus {
     outline: none;
-    border-color: var(--brand);
-    box-shadow: var(--brand-glow);
+    border-color: var(--ui-accent);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--ui-accent) 16%, transparent);
 }
 
-.checkbox-group {
+:where([data-ui="unified"][data-embroidery-reference]) .checkbox-group {
     display: flex;
     flex-direction: column;
-    gap: var(--space-1);
+    gap: 4px;
 }
 
-.checkbox-group label {
+:where([data-ui="unified"][data-embroidery-reference]) .checkbox-group label {
     display: flex;
     align-items: center;
-    gap: var(--space-2);
+    gap: 8px;
     cursor: pointer;
     font-size: 0.95rem;
-    color: var(--text-primary);
+    color: var(--ui-ink);
 }
 
-.checkbox-group input[type="checkbox"] {
+:where([data-ui="unified"][data-embroidery-reference]) .checkbox-group input[type="checkbox"] {
     width: 18px;
     height: 18px;
-    accent-color: var(--brand);
+    accent-color: var(--ui-accent);
 }
 
-.checkbox-group small {
+:where([data-ui="unified"][data-embroidery-reference]) .checkbox-group small {
     margin-left: 26px;
     font-size: 0.8rem;
-    color: var(--text-muted);
+    color: var(--ui-muted);
 }
 
-/* General hidden helper for JS-toggled rows/groups */
-.result-row.hidden,
-.form-group.hidden,
-.checkbox-group.hidden { display: none; }
+:where([data-ui="unified"][data-embroidery-reference]) .result-row.hidden,
+:where([data-ui="unified"][data-embroidery-reference]) .form-group.hidden,
+:where([data-ui="unified"][data-embroidery-reference]) .checkbox-group.hidden { display: none; }
 
-/* Calculator results */
-.calc-results {
-    margin-top: var(--space-2);
-    padding: var(--space-4);
-    background: var(--surface-inset);
-    border-radius: var(--radius-md);
+:where([data-ui="unified"][data-embroidery-reference]) .calc-results {
+    margin-top: 8px;
+    padding: 16px;
+    border-radius: 8px;
+    background: var(--ui-tint);
 }
 
-.result-row {
+:where([data-ui="unified"][data-embroidery-reference]) .result-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: var(--space-2) 0;
+    padding: 8px 0;
     font-size: 0.95rem;
 }
 
-.result-row.breakdown {
-    padding: var(--space-1) 0;
+:where([data-ui="unified"][data-embroidery-reference]) .result-row.breakdown {
+    padding: 4px 0;
     font-size: 0.85rem;
-    color: var(--text-secondary);
+    color: var(--ui-muted);
 }
 
-/* Emphasized final unit-price row */
-.result-row.final {
-    margin-top: var(--space-2);
-    padding-top: var(--space-3);
-    border-top: 2px solid var(--brand);
+:where([data-ui="unified"][data-embroidery-reference]) .result-row.final {
+    margin-top: 8px;
+    padding-top: 12px;
+    border-top: 2px solid var(--ui-accent);
     font-weight: 700;
     font-size: 1.1rem;
 }
 
-.result-row .final-price {
+:where([data-ui="unified"][data-embroidery-reference]) .result-row .final-price {
     font-size: 1.5rem;
     font-weight: 700;
-    color: var(--brand-strong);
+    color: var(--ui-accent);
 }
-.result-row.error { color: var(--error-text); font-size: 0.9rem; }
+:where([data-ui="unified"][data-embroidery-reference]) .result-row.error { color: var(--red-800); font-size: 0.9rem; }
 
-/* ==========================================================================
-   11. PRICING MATRICES
-   ========================================================================== */
-.matrices-grid {
+:where([data-ui="unified"][data-embroidery-reference]) .matrices-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    gap: var(--space-6);
-    margin-bottom: var(--space-6);
+    gap: 24px;
+    margin-bottom: 24px;
 }
 
-.matrix-card {
-    background: var(--surface-card);
+:where([data-ui="unified"][data-embroidery-reference]) .matrix-card {
+    background: var(--ui-surface);
     border: 1px solid var(--gray-200);
-    border-radius: var(--radius-lg);
-    padding: var(--space-5);
-    box-shadow: var(--shadow-sm);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 1px 2px rgb(15 23 42 / 4%), 0 1px 1px rgb(15 23 42 / 3%);
 }
 
-.matrix-header {
+:where([data-ui="unified"][data-embroidery-reference]) .matrix-header {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
-    gap: var(--space-2);
-    margin-bottom: var(--space-4);
-    padding-bottom: var(--space-3);
+    gap: 8px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
     border-bottom: 1px solid var(--gray-200);
 }
 
-.matrix-header h3 {
+:where([data-ui="unified"][data-embroidery-reference]) .matrix-header h3 {
     font-size: 1.1rem;
     font-weight: 600;
-    color: var(--text-primary);
+    color: var(--ui-ink);
 }
-.matrix-header h3 i { color: var(--brand); margin-right: var(--space-2); }
+:where([data-ui="unified"][data-embroidery-reference]) .matrix-header h3 i { color: var(--ui-accent); margin-right: 8px; }
 
-.matrix-meta {
-    padding: var(--space-1) 10px;
-    background: var(--surface-inset);
+:where([data-ui="unified"][data-embroidery-reference]) .matrix-meta {
+    padding: 4px 10px;
+    background: var(--gray-50);
     border-radius: var(--radius-pill);
     font-size: 0.8rem;
-    color: var(--text-muted);
+    color: var(--ui-muted);
 }
 
-/* Loading + error states */
-.loading-cell {
-    padding: var(--space-6);
+:where([data-ui="unified"][data-embroidery-reference]) .loading-cell {
+    padding: 24px;
     text-align: center;
-    color: var(--text-muted);
+    color: var(--ui-muted);
     font-style: italic;
 }
 
-.loading-cell::before {
+:where([data-ui="unified"][data-embroidery-reference]) .loading-cell::before {
     content: '';
     display: inline-block;
     width: 16px;
     height: 16px;
-    margin-right: var(--space-2);
+    margin-right: 8px;
     vertical-align: middle;
     border: 2px solid var(--gray-200);
-    border-top-color: var(--brand);
+    border-top-color: var(--ui-accent);
     border-radius: 50%;
-    animation: spin 1s linear infinite;
 }
 
-@keyframes spin { to { transform: rotate(360deg); } }
-
-.error-cell {
-    padding: var(--space-6);
+:where([data-ui="unified"][data-embroidery-reference]) .error-cell {
+    padding: 24px;
     text-align: center;
-    color: var(--error-text);
-    background: var(--error-bg);
+    color: var(--red-800);
+    background: var(--red-50);
 }
 
-/* Table */
-.pricing-matrix {
+:where([data-ui="unified"][data-embroidery-reference]) .pricing-matrix {
     width: 100%;
     border-collapse: collapse;
     font-size: 0.9rem;
 }
 
-.pricing-matrix th,
-.pricing-matrix td {
-    padding: 10px var(--space-3);
+:where([data-ui="unified"][data-embroidery-reference]) .pricing-matrix th,
+:where([data-ui="unified"][data-embroidery-reference]) .pricing-matrix td {
+    padding: 10px 12px;
     text-align: center;
     border: 1px solid var(--gray-200);
 }
 
-.pricing-matrix th {
-    background: var(--surface-inset);
+:where([data-ui="unified"][data-embroidery-reference]) .pricing-matrix th {
+    background: var(--gray-50);
     font-size: 0.78rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    color: var(--text-secondary);
+    color: var(--ui-muted);
 }
 
-.pricing-matrix th:first-child,
-.pricing-matrix td:first-child {
+:where([data-ui="unified"][data-embroidery-reference]) .pricing-matrix th:first-child,
+:where([data-ui="unified"][data-embroidery-reference]) .pricing-matrix td:first-child {
     text-align: left;
     font-weight: 500;
-    background: var(--surface-inset);
-    color: var(--text-primary);
+    background: var(--gray-50);
+    color: var(--ui-ink);
     text-transform: none;
     letter-spacing: 0;
 }
-.pricing-matrix tbody tr { transition: background var(--dur-fast) var(--ease-out); }
-.pricing-matrix tbody tr:hover { background: var(--surface-hover); }
+:where([data-ui="unified"][data-embroidery-reference]) .pricing-matrix tbody tr:hover { background: var(--gray-50); }
 
-.pricing-matrix th.ltm-tier  { background: var(--ltm-bg);  color: var(--warning-text); }
-.pricing-matrix th.best-tier { background: var(--best-bg); color: var(--success); }
-.pricing-matrix td.ltm-col   { background: var(--state-warning-bg); }
-.pricing-matrix td.best-col  { background: var(--brand-50); font-weight: 600; color: var(--success); }
+:where([data-ui="unified"][data-embroidery-reference]) .pricing-matrix th.ltm-tier  { background: var(--amber-100);  color: var(--amber-800); }
+:where([data-ui="unified"][data-embroidery-reference]) .pricing-matrix th.best-tier { background: var(--store-green-100); color: var(--ui-accent); }
+:where([data-ui="unified"][data-embroidery-reference]) .pricing-matrix td.ltm-col   { background: var(--color-warning-bg); }
+:where([data-ui="unified"][data-embroidery-reference]) .pricing-matrix td.best-col  { background: var(--brand-50); font-weight: 600; color: var(--ui-accent); }
 
-/* Rate footer row */
-.pricing-matrix tr.rate-footer {
-    background: var(--surface-inset);
+:where([data-ui="unified"][data-embroidery-reference]) .pricing-matrix tr.rate-footer {
+    background: var(--gray-50);
     border-top: 2px solid var(--gray-200);
 }
 
-.pricing-matrix tr.rate-footer td {
-    padding: var(--space-2) var(--space-3);
+:where([data-ui="unified"][data-embroidery-reference]) .pricing-matrix tr.rate-footer td {
+    padding: 8px 12px;
     font-size: 0.85rem;
-    color: var(--text-secondary);
+    color: var(--ui-muted);
 }
 
-/* Simplified 2-column variant used on every tab */
-.pricing-matrix.simple { max-width: 350px; }
+:where([data-ui="unified"][data-embroidery-reference]) .pricing-matrix.simple {
+    max-width: none; }
 
-.pricing-matrix.simple td.price-cell {
+:where([data-ui="unified"][data-embroidery-reference]) .pricing-matrix.simple td.price-cell {
     font-weight: 600;
     font-size: 1rem;
-    color: var(--brand-deep);
+    color: var(--ui-accent);
 }
 
-.matrix-note {
-    margin-top: var(--space-3);
+:where([data-ui="unified"][data-embroidery-reference]) .matrix-note {
+    margin-top: 12px;
     font-size: 0.8rem;
     font-style: italic;
-    color: var(--text-muted);
+    color: var(--ui-muted);
 }
-.ltm-note { color: var(--warning-text); font-size: 0.75rem; }
+:where([data-ui="unified"][data-embroidery-reference]) .ltm-note { color: var(--amber-800); font-size: 0.75rem; }
 
-.ltm-badge-small {
-    padding: 2px var(--space-1);
-    background: var(--ltm-bg);
-    border-radius: var(--radius-sm);
-    color: var(--warning-text);
+:where([data-ui="unified"][data-embroidery-reference]) .ltm-badge-small {
+    padding: 2px 4px;
+    background: var(--amber-100);
+    border-radius: 4px;
+    color: var(--amber-800);
     font-size: 0.7rem;
     font-weight: 500;
 }
 
-/* ==========================================================================
-   12. SHOPWORKS REFERENCE CARD + PART BADGES
-   ========================================================================== */
-.part-number-badge {
+:where([data-ui="unified"][data-embroidery-reference]) .part-number-badge {
     display: inline-block;
-    margin-left: var(--space-2);
-    padding: 2px var(--space-2);
-    background: var(--brand-tint-2);
-    border: 1px solid var(--brand-border);
+    margin-left: 8px;
+    padding: 2px 8px;
+    background: var(--ui-tint);
+    border: 1px solid var(--ui-line-strong);
     border-radius: var(--radius-pill);
-    color: var(--brand-deep);
-    font-family: var(--font-mono);
+    color: var(--ui-accent);
+    font-family: ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, Consolas, monospace;
     font-size: 0.75rem;
     font-weight: 600;
 }
 
-.shopworks-ref-card {
+:where([data-ui="unified"][data-embroidery-reference]) .shopworks-ref-card {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: var(--space-3);
-    margin-bottom: var(--space-4);
-    padding: var(--space-3) var(--space-4);
-    background: var(--surface-inset);
+    gap: 12px;
+    margin-bottom: 16px;
+    padding: 12px 16px;
+    background: var(--gray-50);
     border: 1px solid var(--gray-200);
-    border-left: 4px solid var(--brand);
-    border-radius: var(--radius-md);
+    border-left: 4px solid var(--ui-accent);
+    border-radius: 8px;
 }
-.shopworks-ref-card .ref-title { font-weight: 600; color: var(--gray-800); }
+:where([data-ui="unified"][data-embroidery-reference]) .shopworks-ref-card .ref-title { font-weight: 600; color: var(--gray-800); }
 
-.shopworks-ref-card .ref-item {
+:where([data-ui="unified"][data-embroidery-reference]) .shopworks-ref-card .ref-item {
     display: inline-flex;
     align-items: center;
-    gap: var(--space-2);
+    gap: 8px;
     font-size: 0.85rem;
 }
 
-.shopworks-ref-card .ref-code {
-    padding: 2px var(--space-2);
-    background: var(--surface-card);
+:where([data-ui="unified"][data-embroidery-reference]) .shopworks-ref-card .ref-code {
+    padding: 2px 8px;
+    background: var(--ui-surface);
     border: 1px solid var(--gray-300);
-    border-radius: var(--radius-sm);
-    font-family: var(--font-mono);
+    border-radius: 4px;
+    font-family: ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, Consolas, monospace;
     font-weight: 600;
 }
-.shopworks-ref-card .ref-divider { margin: 0 var(--space-1); color: var(--text-muted); }
+:where([data-ui="unified"][data-embroidery-reference]) .shopworks-ref-card .ref-divider { margin: 0 4px; color: var(--ui-muted); }
 
-.shopworks-ref-card .ref-upgrades {
+:where([data-ui="unified"][data-embroidery-reference]) .shopworks-ref-card .ref-upgrades {
     display: inline-flex;
     align-items: center;
-    gap: var(--space-2);
+    gap: 8px;
     flex-wrap: wrap;
 }
 
-.shopworks-ref-card .ref-upgrades .loading-text {
-    color: var(--text-muted);
+:where([data-ui="unified"][data-embroidery-reference]) .shopworks-ref-card .ref-upgrades .loading-text {
+    color: var(--ui-muted);
     font-style: italic;
     font-size: 0.85rem;
 }
 
-.shopworks-ref-card .ref-upgrades .upgrade-item {
+:where([data-ui="unified"][data-embroidery-reference]) .shopworks-ref-card .ref-upgrades .upgrade-item {
     display: inline-flex;
     align-items: center;
-    gap: var(--space-1);
+    gap: 4px;
     font-size: 0.85rem;
 }
-.shopworks-ref-card .ref-upgrades .upgrade-price { font-weight: 600; color: var(--success); }
+:where([data-ui="unified"][data-embroidery-reference]) .shopworks-ref-card .ref-upgrades .upgrade-price { font-weight: 600; color: var(--ui-accent); }
 
-/* ==========================================================================
-   13. SALES-SCRIPT CARD
-   ========================================================================== */
-.script-card {
-    background: var(--surface-card);
+:where([data-ui="unified"][data-embroidery-reference]) .script-card {
+    background: var(--ui-surface);
     border: 1px solid var(--gray-200);
-    border-radius: var(--radius-lg);
-    padding: var(--space-6);
-    margin-bottom: var(--space-6);
-    box-shadow: var(--shadow-sm);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 2px rgb(15 23 42 / 4%), 0 1px 1px rgb(15 23 42 / 3%);
 }
 
-.script-card h3 {
+:where([data-ui="unified"][data-embroidery-reference]) .script-card h3 {
     font-size: 1.1rem;
     font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: var(--space-4);
+    color: var(--ui-ink);
+    margin-bottom: 16px;
 }
-.script-card h3 i { color: var(--brand); margin-right: var(--space-2); }
+:where([data-ui="unified"][data-embroidery-reference]) .script-card h3 i { color: var(--ui-accent); margin-right: 8px; }
 
-.script-example {
-    padding: var(--space-4);
-    background: var(--surface-hover);
-    border-left: 4px solid var(--brand);
-    border-radius: var(--radius-md);
+:where([data-ui="unified"][data-embroidery-reference]) .script-example {
+    padding: 16px;
+    background: var(--gray-50);
+    border-left: 4px solid var(--ui-accent);
+    border-radius: 8px;
 }
-.script-example p { margin-bottom: var(--space-3); }
-.script-example p:last-child { margin-bottom: 0; }
-.script-example strong { color: var(--text-primary); }
+:where([data-ui="unified"][data-embroidery-reference]) .script-example p { margin-bottom: 12px; }
+:where([data-ui="unified"][data-embroidery-reference]) .script-example p:last-child { margin-bottom: 0; }
+:where([data-ui="unified"][data-embroidery-reference]) .script-example strong { color: var(--ui-ink); }
 
-/* ==========================================================================
-   14. HEAVYWEIGHT SURCHARGE CARD
-   ========================================================================== */
-.surcharge-card {
-    margin-bottom: var(--space-6);
-    padding: var(--space-4) var(--space-6);
-    background: var(--ltm-bg);
-    border: 1px solid var(--ltm-border);
-    border-radius: var(--radius-lg);
+:where([data-ui="unified"][data-embroidery-reference]) .surcharge-card {
+    margin-bottom: 24px;
+    padding: 16px 24px;
+    background: var(--amber-100);
+    border: 1px solid var(--amber-300);
+    border-radius: 12px;
 }
 
-.surcharge-card h3 {
-    margin-bottom: var(--space-2);
+:where([data-ui="unified"][data-embroidery-reference]) .surcharge-card h3 {
+    margin-bottom: 8px;
     font-size: 1rem;
     font-weight: 600;
-    color: var(--warning-text);
+    color: var(--amber-800);
 }
-.surcharge-card h3 i { margin-right: var(--space-2); }
-.surcharge-card p { color: var(--warning-text); font-size: 0.95rem; }
+:where([data-ui="unified"][data-embroidery-reference]) .surcharge-card h3 i { margin-right: 8px; }
+:where([data-ui="unified"][data-embroidery-reference]) .surcharge-card p { color: var(--amber-800); font-size: 0.95rem; }
 
-/* ==========================================================================
-   15. ADDITIONAL STITCH CHARGES TAB (.es-*)
-   ========================================================================== */
-.es-container {
-    max-width: 780px;
+:where([data-ui="unified"][data-embroidery-reference]) .es-container {
     margin: 0 auto;
-    padding: var(--space-8) var(--space-6);
+    max-width: 1000px;
+    padding: 12px 0;
 }
 
-.es-header { text-align: center; margin-bottom: var(--space-6); }
-.es-header h2 { font-size: 1.75rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--space-1); }
-.es-header p  { font-size: 0.875rem; color: var(--text-secondary); }
+:where([data-ui="unified"][data-embroidery-reference]) .es-header { margin-bottom: 24px; text-align: left; }
+:where([data-ui="unified"][data-embroidery-reference]) .es-header h2 { font-size: 1.75rem; font-weight: 700; color: var(--ui-ink); margin-bottom: 4px; }
+:where([data-ui="unified"][data-embroidery-reference]) .es-header p  { font-size: 0.875rem; color: var(--ui-muted); }
+:where([data-ui="unified"][data-embroidery-reference]) .es-parts { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 24px; justify-content: flex-start; }
 
-/* Part numbers */
-.es-parts { display: flex; flex-wrap: wrap; gap: var(--space-3); justify-content: center; margin-bottom: var(--space-6); }
-
-.es-part {
-    display: inline-flex; align-items: center; gap: var(--space-2);
-    padding: var(--space-2) var(--space-4);
-    background: var(--surface-inset); border: 1px solid var(--gray-300);
-    border-radius: var(--radius-md);
+:where([data-ui="unified"][data-embroidery-reference]) .es-part {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 16px;
+    background: var(--gray-50); border: 1px solid var(--gray-300);
+    border-radius: 8px;
 }
-.es-part-label { font-size: 0.6875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray-500); }
-.es-part-num   { font-size: 0.9375rem; font-weight: 700; color: var(--brand-deep); font-family: var(--font-mono); }
-.es-part-desc  { font-size: 0.8125rem; color: var(--gray-500); }
+:where([data-ui="unified"][data-embroidery-reference]) .es-part-label { font-size: 0.6875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ui-muted); }
+:where([data-ui="unified"][data-embroidery-reference]) .es-part-num   { font-size: 0.9375rem; font-weight: 700; color: var(--ui-accent); font-family: ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, Consolas, monospace; }
+:where([data-ui="unified"][data-embroidery-reference]) .es-part-desc  { font-size: 0.8125rem; color: var(--ui-muted); }
 
-/* "10,000 included" callout */
-.es-included {
-    display: flex; align-items: center; justify-content: center; gap: var(--space-3);
-    margin-bottom: var(--space-6);
-    padding: var(--space-4) var(--space-6);
-    background: linear-gradient(135deg, var(--brand), var(--brand-strong));
-    border-radius: var(--radius-lg);
-    color: var(--color-on-brand); font-size: 1rem; font-weight: 700;
+:where([data-ui="unified"][data-embroidery-reference]) .es-included {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 24px;
+    padding: 16px 24px;
+    border-radius: 12px; font-size: 1rem; font-weight: 700; background: var(--ui-tint); color: var(--ui-accent); flex-wrap: wrap; justify-content: flex-start;
 }
-.es-included span { font-weight: 400; font-size: 0.875rem; opacity: 0.85; }
+:where([data-ui="unified"][data-embroidery-reference]) .es-included span { font-weight: 400; font-size: 0.875rem; opacity: 1; }
+:where([data-ui="unified"][data-embroidery-reference]) .es-tiers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 24px; }
 
-/* Tier cards */
-.es-tiers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: var(--space-6); }
-
-.es-tier {
-    padding: 22px var(--space-4); text-align: center;
-    background: var(--surface-card); border: 2px solid var(--gray-100);
-    border-radius: var(--radius-lg);
+:where([data-ui="unified"][data-embroidery-reference]) .es-tier {
+    padding: 22px 16px; text-align: center;
+    background: var(--ui-surface); border: 2px solid var(--gray-100);
+    border-radius: 12px;
 }
-.es-tier--standard { border-color: var(--brand);         background: linear-gradient(180deg, var(--brand-tint) 0%, var(--surface-card) 40%); }
-.es-tier--mid      { border-color: var(--state-warning); background: linear-gradient(180deg, var(--state-warning-bg) 0%, var(--surface-card) 40%); }
-.es-tier--large    { border-color: var(--state-danger);  background: linear-gradient(180deg, var(--state-danger-bg) 0%, var(--surface-card) 40%); }
+:where([data-ui="unified"][data-embroidery-reference]) .es-tier--standard { border-color: var(--ui-accent);         background: linear-gradient(180deg, var(--ui-tint) 0%, var(--ui-surface) 40%); }
+:where([data-ui="unified"][data-embroidery-reference]) .es-tier--mid      { border-color: var(--amber-800); background: linear-gradient(180deg, var(--color-warning-bg) 0%, var(--ui-surface) 40%); }
+:where([data-ui="unified"][data-embroidery-reference]) .es-tier--large    { border-color: var(--red-800);  background: linear-gradient(180deg, var(--red-50) 0%, var(--ui-surface) 40%); }
 
-.es-tier-label { margin-bottom: 2px; font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
-.es-tier--standard .es-tier-label { color: var(--brand-deep); }
-.es-tier--mid .es-tier-label      { color: var(--state-warning); }
-.es-tier--large .es-tier-label    { color: var(--state-danger); }
+:where([data-ui="unified"][data-embroidery-reference]) .es-tier-label { margin-bottom: 2px; font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+:where([data-ui="unified"][data-embroidery-reference]) .es-tier--standard .es-tier-label { color: var(--ui-accent); }
+:where([data-ui="unified"][data-embroidery-reference]) .es-tier--mid .es-tier-label      { color: var(--amber-800); }
+:where([data-ui="unified"][data-embroidery-reference]) .es-tier--large .es-tier-label    { color: var(--red-800); }
 
-.es-tier-range { margin-bottom: var(--space-3); font-size: 0.875rem; font-weight: 500; color: var(--text-primary); }
-.es-tier-price { margin-bottom: 2px; font-size: 2.25rem; font-weight: 700; line-height: 1; }
-.es-tier--standard .es-tier-price { color: var(--brand); }
-.es-tier--mid .es-tier-price      { color: var(--state-warning); }
-.es-tier--large .es-tier-price    { color: var(--state-danger); }
-.es-tier-unit { font-size: 0.75rem; color: var(--gray-500); }
+:where([data-ui="unified"][data-embroidery-reference]) .es-tier-range { margin-bottom: 12px; font-size: 0.875rem; font-weight: 500; color: var(--ui-ink); }
+:where([data-ui="unified"][data-embroidery-reference]) .es-tier-price { margin-bottom: 2px; font-size: 2.25rem; font-weight: 700; line-height: 1; }
+:where([data-ui="unified"][data-embroidery-reference]) .es-tier--standard .es-tier-price { color: var(--ui-accent); }
+:where([data-ui="unified"][data-embroidery-reference]) .es-tier--mid .es-tier-price      { color: var(--amber-800); }
+:where([data-ui="unified"][data-embroidery-reference]) .es-tier--large .es-tier-price    { color: var(--red-800); }
+:where([data-ui="unified"][data-embroidery-reference]) .es-tier-unit { font-size: 0.75rem; color: var(--ui-muted); }
 
-/* ==========================================================================
-   16. FULL BACK PANEL (.es-fb-*)
-   ========================================================================== */
-.es-fb-panel {
+:where([data-ui="unified"][data-embroidery-reference]) .es-fb-panel {
     max-height: 0;
     overflow: hidden;
     margin-top: -24px;
-    transition: max-height 0.4s var(--ease-out), margin 0.3s var(--ease-out);
 }
 
-.es-fb-panel.open {
-    max-height: 600px;
-    margin-top: -12px;
-    margin-bottom: var(--space-6);
+:where([data-ui="unified"][data-embroidery-reference]) .es-fb-panel.open {
+    margin-bottom: 24px;
+    max-height: none;
+    overflow: visible;
+    margin-top: 0;
 }
 
-.es-fb-inner {
-    padding: var(--space-6);
-    background: var(--surface-card);
-    border: 2px solid var(--gray-300);
+:where([data-ui="unified"][data-embroidery-reference]) .es-fb-inner {
+    background: var(--ui-surface);
     border-top: none;
-    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    border: 1px solid var(--ui-line);
+    border-radius: var(--radius-lg);
+    padding: 20px;
 }
 
-.es-fb-header {
+:where([data-ui="unified"][data-embroidery-reference]) .es-fb-header {
     display: flex; justify-content: space-between; align-items: baseline;
-    flex-wrap: wrap; gap: var(--space-2); margin-bottom: var(--space-4);
+    flex-wrap: wrap; gap: 8px; margin-bottom: 16px;
 }
-.es-fb-title { font-size: 1rem; font-weight: 700; color: var(--text-primary); }
+:where([data-ui="unified"][data-embroidery-reference]) .es-fb-title { font-size: 1rem; font-weight: 700; color: var(--ui-ink); }
 
-.es-fb-meta { display: flex; flex-wrap: wrap; gap: var(--space-4); }
+:where([data-ui="unified"][data-embroidery-reference]) .es-fb-meta { display: flex; flex-wrap: wrap; gap: 16px; }
 
-.es-fb-meta span {
-    padding: var(--space-1) 10px;
-    background: var(--surface-inset); border-radius: var(--radius-md);
-    font-size: 0.75rem; color: var(--gray-500);
+:where([data-ui="unified"][data-embroidery-reference]) .es-fb-meta span {
+    padding: 4px 10px;
+    background: var(--gray-50); border-radius: 8px;
+    font-size: 0.75rem; color: var(--ui-muted);
 }
-.es-fb-meta strong { color: var(--gray-700); }
+:where([data-ui="unified"][data-embroidery-reference]) .es-fb-meta strong { color: var(--gray-700); }
 
-.es-fb-table { width: 100%; border-collapse: collapse; font-size: 0.8125rem; }
-.es-fb-table thead { background: var(--surface-dark); color: var(--color-on-brand); }
+:where([data-ui="unified"][data-embroidery-reference]) .es-fb-table { width: 100%; border-collapse: collapse; font-size: 0.8125rem; }
+:where([data-ui="unified"][data-embroidery-reference]) .es-fb-table thead { background: var(--ui-tint); color: var(--ui-ink); }
 
-.es-fb-table th {
-    padding: 10px var(--space-3); text-align: center;
+:where([data-ui="unified"][data-embroidery-reference]) .es-fb-table th {
+    padding: 10px 12px; text-align: center;
     font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
 }
-.es-fb-table th:first-child { text-align: left; }
+:where([data-ui="unified"][data-embroidery-reference]) .es-fb-table th:first-child { text-align: left; }
 
-.es-fb-table td {
-    padding: 9px var(--space-3); text-align: center;
+:where([data-ui="unified"][data-embroidery-reference]) .es-fb-table td {
+    padding: 9px 12px; text-align: center;
     border-bottom: 1px solid var(--gray-100);
     font-variant-numeric: tabular-nums;
 }
-.es-fb-table td:first-child { text-align: left; font-weight: 700; color: var(--text-primary); }
-.es-fb-table tbody tr:nth-child(even) { background: var(--surface-hover); }
-.es-fb-table tbody tr:last-child td { border-bottom: none; }
-.es-fb-table .es-fb-rate-row { background: var(--brand-tint) !important; }
+:where([data-ui="unified"][data-embroidery-reference]) .es-fb-table td:first-child { text-align: left; font-weight: 700; color: var(--ui-ink); }
+:where([data-ui="unified"][data-embroidery-reference]) .es-fb-table tbody tr:nth-child(even) { background: var(--gray-50); }
+:where([data-ui="unified"][data-embroidery-reference]) .es-fb-table tbody tr:last-child td { border-bottom: none; }
+:where([data-ui="unified"][data-embroidery-reference]) .es-fb-table .es-fb-rate-row { background: var(--ui-tint); }
 
-.es-fb-table .es-fb-rate-row td {
-    font-weight: 700; color: var(--brand-deep); border-top: 2px solid var(--brand);
+:where([data-ui="unified"][data-embroidery-reference]) .es-fb-table .es-fb-rate-row td {
+    font-weight: 700; color: var(--ui-accent); border-top: 2px solid var(--ui-accent);
 }
 
-.es-fb-ltm {
-    margin-top: var(--space-3);
-    padding: 10px var(--space-4);
-    background: var(--state-warning-bg); border: 1px solid var(--amber-200);
-    border-radius: var(--radius-md);
-    font-size: 0.8125rem; color: var(--gray-500);
+:where([data-ui="unified"][data-embroidery-reference]) .es-fb-ltm {
+    margin-top: 12px;
+    padding: 10px 16px;
+    background: var(--color-warning-bg); border: 1px solid var(--amber-200);
+    border-radius: 8px;
+    font-size: 0.8125rem; color: var(--ui-muted);
 }
-.es-fb-ltm strong { color: var(--state-warning); }
+:where([data-ui="unified"][data-embroidery-reference]) .es-fb-ltm strong { color: var(--amber-800); }
 
-/* ==========================================================================
-   17. KEY-ACCOUNT SURCHARGE LIST (.es-account-* / .es-design-table)
-   ========================================================================== */
-.es-section-hdr {
+:where([data-ui="unified"][data-embroidery-reference]) .es-section-hdr {
     display: flex; align-items: center; justify-content: space-between;
-    margin: var(--space-8) 0 14px;
+    margin: 32px 0 14px;
 }
-.es-section-hdr-title { font-size: 0.9375rem; font-weight: 700; color: var(--text-primary); }
+:where([data-ui="unified"][data-embroidery-reference]) .es-section-hdr-title { font-size: 0.9375rem; font-weight: 700; color: var(--ui-ink); }
 
-.es-count-badge {
-    padding: 3px 11px;
-    background: var(--surface-dark); border-radius: var(--radius-pill);
-    color: var(--color-on-brand); font-size: 0.75rem; font-weight: 600;
+:where([data-ui="unified"][data-embroidery-reference]) .es-count-badge {
+    padding: 3px 11px; border-radius: var(--radius-pill); font-size: 0.75rem; font-weight: 600; background: var(--ui-tint); color: var(--ui-accent);
 }
 
-.es-account-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: var(--space-6); }
+:where([data-ui="unified"][data-embroidery-reference]) .es-account-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
 
-.es-account-card {
-    background: var(--surface-card); border: 1px solid var(--gray-200);
-    border-radius: var(--radius-lg); overflow: hidden;
-    box-shadow: var(--shadow-sm); transition: box-shadow var(--dur-base) var(--ease-out);
+:where([data-ui="unified"][data-embroidery-reference]) .es-account-card {
+    background: var(--ui-surface); border: 1px solid var(--gray-200);
+    border-radius: 12px; overflow: hidden;
+    box-shadow: 0 1px 2px rgb(15 23 42 / 4%), 0 1px 1px rgb(15 23 42 / 3%);
 }
-.es-account-card:hover { box-shadow: var(--shadow-md); }
+:where([data-ui="unified"][data-embroidery-reference]) .es-account-card:hover { box-shadow: 0 2px 4px rgb(15 23 42 / 4%), 0 4px 12px rgb(15 23 42 / 6%); }
 
-.es-account-hdr {
-    display: flex; align-items: center; justify-content: space-between; gap: var(--space-3);
-    padding: 13px 18px; background: var(--surface-dark);
-    cursor: pointer; user-select: none;
+:where([data-ui="unified"][data-embroidery-reference]) .es-account-hdr {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 13px 18px; background: var(--gray-50);
+    cursor: pointer; user-select: none; color: var(--ui-ink); flex-wrap: wrap;
 }
-.es-account-hdr-left { display: flex; align-items: center; gap: 11px; }
+:where([data-ui="unified"][data-embroidery-reference]) .es-account-hdr-left { display: flex; align-items: center; gap: 11px; }
 
-.es-acct-num {
+:where([data-ui="unified"][data-embroidery-reference]) .es-acct-num {
     width: 26px; height: 26px; flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
-    background: rgb(255 255 255 / 15%); border-radius: 50%;
-    font-size: 0.75rem; font-weight: 700; color: var(--color-on-brand);
+    display: flex; align-items: center; justify-content: center; border-radius: 50%;
+    font-size: 0.75rem; font-weight: 700; background: var(--ui-line); color: var(--ui-ink);
 }
-.es-acct-name { font-size: 0.9375rem; font-weight: 700; color: var(--color-on-brand); }
-.es-acct-rep  { margin-top: 1px; font-size: 0.71875rem; color: rgb(255 255 255 / 55%); }
+:where([data-ui="unified"][data-embroidery-reference]) .es-acct-name { font-size: 0.9375rem; font-weight: 700; color: var(--ui-ink); }
+:where([data-ui="unified"][data-embroidery-reference]) .es-acct-rep  { margin-top: 1px; font-size: 0.71875rem; color: var(--ui-muted); }
 
-.es-acct-hdr-right { display: flex; align-items: center; gap: 7px; }
-.es-tier-pill { padding: 3px 9px; border-radius: var(--radius-pill); font-size: 0.6875rem; font-weight: 600; }
-.es-tier-pill--mid   { background: var(--state-warning-bg); color: var(--state-warning); }
-.es-tier-pill--large { background: var(--state-danger-bg);  color: var(--state-danger); }
+:where([data-ui="unified"][data-embroidery-reference]) .es-acct-hdr-right { display: flex; align-items: center; gap: 7px; }
+:where([data-ui="unified"][data-embroidery-reference]) .es-tier-pill { padding: 3px 9px; border-radius: var(--radius-pill); font-size: 0.6875rem; font-weight: 600; }
+:where([data-ui="unified"][data-embroidery-reference]) .es-tier-pill--mid   { background: var(--color-warning-bg); color: var(--amber-800); }
+:where([data-ui="unified"][data-embroidery-reference]) .es-tier-pill--large { background: var(--red-50);  color: var(--red-800); }
 
-.es-chevron {
-    display: inline-block; color: rgb(255 255 255 / 40%);
-    font-size: 0.8125rem; transition: transform var(--dur-base) var(--ease-out);
+:where([data-ui="unified"][data-embroidery-reference]) .es-chevron {
+    display: inline-block;
+    font-size: 0.8125rem;
+    color: var(--ui-muted);
 }
-.es-account-card.open .es-chevron { transform: rotate(180deg); }
+:where([data-ui="unified"][data-embroidery-reference]) .es-account-card.open .es-chevron { transform: rotate(180deg); }
+:where([data-ui="unified"][data-embroidery-reference]) .es-design-wrap { display: none; overflow-x: auto; }
+:where([data-ui="unified"][data-embroidery-reference]) .es-account-card.open .es-design-wrap { display: block; }
 
-/* Collapsible design table */
-.es-design-wrap { display: none; overflow-x: auto; }
-.es-account-card.open .es-design-wrap { display: block; }
+:where([data-ui="unified"][data-embroidery-reference]) .es-design-table { width: 100%; border-collapse: collapse; }
+:where([data-ui="unified"][data-embroidery-reference]) .es-design-table thead tr { background: var(--gray-50); border-bottom: 2px solid var(--gray-200); }
 
-.es-design-table { width: 100%; border-collapse: collapse; }
-.es-design-table thead tr { background: var(--surface-hover); border-bottom: 2px solid var(--gray-200); }
-
-.es-design-table thead th {
+:where([data-ui="unified"][data-embroidery-reference]) .es-design-table thead th {
     padding: 9px 14px; white-space: nowrap;
     font-size: 0.65625rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em;
-    color: var(--gray-500);
+    color: var(--ui-muted);
 }
-.es-design-table .th-r { text-align: right; }
-.es-design-table .th-c { text-align: center; }
+:where([data-ui="unified"][data-embroidery-reference]) .es-design-table .th-r { text-align: right; }
+:where([data-ui="unified"][data-embroidery-reference]) .es-design-table .th-c { text-align: center; }
 
-.es-design-table tbody tr { border-bottom: 1px solid var(--gray-100); transition: background var(--dur-fast) var(--ease-out); }
-.es-design-table tbody tr:last-child { border-bottom: none; }
-.es-design-table tbody tr:hover { background: var(--surface-hover); }
-.es-design-table td { padding: 10px 14px; vertical-align: middle; }
-.es-design-table .td-r { text-align: right; }
-.es-design-table .td-c { text-align: center; }
+:where([data-ui="unified"][data-embroidery-reference]) .es-design-table tbody tr { border-bottom: 1px solid var(--gray-100); }
+:where([data-ui="unified"][data-embroidery-reference]) .es-design-table tbody tr:last-child { border-bottom: none; }
+:where([data-ui="unified"][data-embroidery-reference]) .es-design-table tbody tr:hover { background: var(--gray-50); }
+:where([data-ui="unified"][data-embroidery-reference]) .es-design-table td { padding: 10px 14px; vertical-align: middle; }
+:where([data-ui="unified"][data-embroidery-reference]) .es-design-table .td-r { text-align: right; }
+:where([data-ui="unified"][data-embroidery-reference]) .es-design-table .td-c { text-align: center; }
 
-.es-d-name { font-weight: 600; color: var(--text-primary); font-size: 0.84375rem; }
-.es-d-note { margin-top: 2px; font-size: 0.6875rem; color: var(--amber-500); }
+:where([data-ui="unified"][data-embroidery-reference]) .es-d-name { font-weight: 600; color: var(--ui-ink); font-size: 0.84375rem; }
+:where([data-ui="unified"][data-embroidery-reference]) .es-d-note { margin-top: 2px; font-size: 0.6875rem; color: var(--amber-800); }
 
-.es-d-no { font-family: var(--font-mono); font-size: 0.8125rem; font-weight: 500; color: var(--brand); }
-.es-d-no.blank { color: var(--gray-300); font-style: italic; }
-.es-d-ruthie { margin-top: 2px; font-size: 0.65625rem; font-weight: 500; color: var(--amber-500); }
+:where([data-ui="unified"][data-embroidery-reference]) .es-d-no { font-family: ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, Consolas, monospace; font-size: 0.8125rem; font-weight: 500; color: var(--ui-accent); }
+:where([data-ui="unified"][data-embroidery-reference]) .es-d-no.blank { color: var(--ui-muted); font-style: italic; }
+:where([data-ui="unified"][data-embroidery-reference]) .es-d-ruthie { margin-top: 2px; font-size: 0.65625rem; font-weight: 500; color: var(--amber-800); }
 
-.es-d-stitches { font-variant-numeric: tabular-nums; font-size: 0.84375rem; }
-.es-d-over { font-variant-numeric: tabular-nums; font-size: 0.8125rem; color: var(--gray-500); }
+:where([data-ui="unified"][data-embroidery-reference]) .es-d-stitches { font-variant-numeric: tabular-nums; font-size: 0.84375rem; }
+:where([data-ui="unified"][data-embroidery-reference]) .es-d-over { font-variant-numeric: tabular-nums; font-size: 0.8125rem; color: var(--ui-muted); }
 
-.es-part-chip {
+:where([data-ui="unified"][data-embroidery-reference]) .es-part-chip {
     display: inline-block; white-space: nowrap;
     padding: 3px 9px;
-    background: var(--brand-tint); border: 1px solid var(--brand-border);
-    border-radius: var(--radius-md);
-    font-family: var(--font-mono); font-size: 0.75rem; font-weight: 500; color: var(--brand-deep);
+    background: var(--ui-tint); border: 1px solid var(--ui-line-strong);
+    border-radius: 8px;
+    font-family: ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, Consolas, monospace; font-size: 0.75rem; font-weight: 500; color: var(--ui-accent);
 }
 
-.es-charge-val { font-weight: 700; font-size: 0.875rem; }
-.es-charge-val--mid   { color: var(--state-warning); }
-.es-charge-val--large { color: var(--state-danger); }
+:where([data-ui="unified"][data-embroidery-reference]) .es-charge-val { font-weight: 700; font-size: 0.875rem; }
+:where([data-ui="unified"][data-embroidery-reference]) .es-charge-val--mid   { color: var(--amber-800); }
+:where([data-ui="unified"][data-embroidery-reference]) .es-charge-val--large { color: var(--red-800); }
 
-/* ==========================================================================
-   18. VIEW-ALL SURCHARGE ACCOUNTS BUTTON
-   ========================================================================== */
-.es-view-all-btn {
+:where([data-ui="unified"][data-embroidery-reference]) .es-view-all-btn {
     display: flex; align-items: center; justify-content: center; gap: 10px;
     width: 100%;
-    margin-bottom: var(--space-5);
-    padding: 14px var(--space-5);
-    background: linear-gradient(135deg, var(--surface-dark) 0%, var(--surface-dark-2) 100%);
-    border: 2px solid var(--gray-700);
+    margin-bottom: 20px;
+    padding: 14px 20px;
     border-radius: 10px;
     color: var(--color-on-brand); font-family: inherit; font-size: 0.9375rem; font-weight: 600;
     cursor: pointer;
-    box-shadow: var(--shadow-md);
-    transition: background var(--dur-base) var(--ease-out),
-                border-color var(--dur-base) var(--ease-out),
-                box-shadow var(--dur-base) var(--ease-out),
-                transform var(--dur-fast) var(--ease-out);
+    background: var(--ui-accent);
+    border: 1px solid var(--ui-accent);
+    box-shadow: none;
 }
 
-.es-view-all-btn:hover {
-    background: linear-gradient(135deg, var(--surface-dark-2) 0%, var(--gray-700) 100%);
-    border-color: var(--brand);
-    box-shadow: 0 4px 12px color-mix(in srgb, var(--brand) 25%, transparent);
-    transform: translateY(-1px);
+:where([data-ui="unified"][data-embroidery-reference]) .es-view-all-btn:hover {
+    border-color: var(--ui-accent);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--ui-accent) 25%, transparent);
+    background: var(--ui-accent-hover);
+    transform: none;
 }
-.es-view-all-btn i { font-size: 1rem; color: var(--brand); }
+:where([data-ui="unified"][data-embroidery-reference]) .es-view-all-btn i { font-size: 1rem; color: inherit; }
 
-.es-view-all-count {
-    margin-left: var(--space-1);
+:where([data-ui="unified"][data-embroidery-reference]) .es-view-all-count {
+    margin-left: 4px;
     padding: 2px 10px;
-    background: var(--brand); border-radius: var(--radius-pill);
+    background: var(--ui-accent); border-radius: var(--radius-pill);
     color: var(--color-on-brand); font-size: 0.75rem; font-weight: 700;
 }
 
-/* ==========================================================================
-   19. SURCHARGE CUSTOMER MODAL (.sc-*)
-   ========================================================================== */
-.sc-modal-overlay {
-    display: none;
-    position: fixed; inset: 0; z-index: 9999;
+:where([data-ui="unified"][data-embroidery-reference]) .sc-modal-overlay {
+    display: none; z-index: 9999;
     align-items: center; justify-content: center;
-    background: rgb(17 24 39 / 60%);
-}
-.sc-modal-overlay.open { display: flex; }
-
-.sc-modal {
-    display: flex; flex-direction: column;
-    width: 95vw; max-width: 1200px; height: 90vh;
-    background: var(--surface-card);
+    position: fixed;
+    inset: 0;
+    margin: auto;
+    padding: 0;
+    border: 1px solid var(--ui-line-strong);
+    background: var(--ui-surface);
+    width: min(1200px, calc(100vw - 24px));
+    max-width: none;
+    height: min(850px, calc(100dvh - 24px));
+    max-height: none;
     border-radius: var(--radius-lg);
+    color: var(--ui-ink);
+}
+
+:where([data-ui="unified"][data-embroidery-reference]) .sc-modal-overlay.open {
+    display: block; }
+
+:where([data-ui="unified"][data-embroidery-reference]) .sc-modal {
+    display: flex; flex-direction: column;
+    background: var(--ui-surface);
+    border-radius: 12px;
     overflow: hidden;
-    box-shadow: var(--shadow-lg);
-}
-
-/* Header */
-.sc-modal-header {
-    display: flex; align-items: center; gap: var(--space-6); flex-shrink: 0;
-    padding: var(--space-5) var(--space-6);
-    background: var(--surface-dark); color: var(--color-on-brand);
-}
-.sc-modal-title h2 { margin: 0; font-size: 1.125rem; font-weight: 600; letter-spacing: -0.3px; }
-.sc-modal-subtitle { margin: 2px 0 0; font-size: 0.75rem; color: var(--gray-400); }
-.sc-modal-stats { display: flex; gap: var(--space-5); margin-left: auto; }
-.sc-stat { text-align: right; }
-.sc-stat-num { font-family: var(--font-mono); font-size: 1.375rem; font-weight: 500; line-height: 1; color: var(--color-on-brand); }
-.sc-stat-mid { color: var(--amber-400); }
-.sc-stat-large { color: var(--embroidery-pricing-all-red); }
-.sc-stat-label { margin-top: 2px; font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.8px; color: var(--gray-400); }
-
-.sc-modal-close {
-    flex-shrink: 0;
-    padding: 0 var(--space-1);
-    background: none; border: none;
-    color: var(--gray-400); font-size: 1.75rem; line-height: 1; cursor: pointer;
-    transition: color var(--dur-fast) var(--ease-out);
-}
-.sc-modal-close:hover { color: var(--color-on-brand); }
-
-/* Controls */
-.sc-modal-controls {
-    display: flex; align-items: center; gap: 10px; flex-wrap: wrap; flex-shrink: 0;
-    padding: var(--space-3) var(--space-6);
-    background: var(--surface-card); border-bottom: 1px solid var(--gray-200);
-}
-.sc-search-wrap { position: relative; flex: 1; min-width: 180px; max-width: 300px; }
-
-.sc-search-icon {
-    position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
-    color: var(--gray-400); font-size: 0.8125rem; pointer-events: none;
-}
-
-.sc-search-input {
+    box-shadow: 0 8px 24px -8px rgb(15 23 42 / 18%), 0 4px 10px -4px rgb(15 23 42 / 8%);
     width: 100%;
-    padding: var(--space-2) var(--space-3) var(--space-2) var(--space-8);
-    background: var(--surface-hover); border: 1px solid var(--gray-300);
-    border-radius: var(--radius-md);
-    font-family: inherit; font-size: 0.8125rem; color: var(--gray-800);
+    max-width: none;
+    height: 100%;
+    min-height: 0;
+}
+
+:where([data-ui="unified"][data-embroidery-reference]) .sc-modal-header {
+    display: flex; align-items: center; flex-shrink: 0;
+    padding: 20px 24px; background: var(--ui-surface); color: var(--ui-ink); flex-wrap: wrap; padding-right: 60px; position: relative; gap: 12px; border-bottom: 1px solid var(--ui-line);
+}
+:where([data-ui="unified"][data-embroidery-reference]) .sc-modal-title h2 { margin: 0; font-size: 1.125rem; font-weight: 600; letter-spacing: -0.3px; color: var(--ui-ink); font-family: var(--ui-font); }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-modal-subtitle { margin: 2px 0 0; font-size: 0.75rem; color: var(--ui-muted); }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-modal-stats { display: flex; gap: 20px; margin-left: auto; flex-wrap: wrap; }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-stat { text-align: right; display: grid; gap: 4px; }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-stat-num { font-family: ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, Consolas, monospace; font-size: 1.375rem; font-weight: 500; line-height: 1; color: var(--ui-ink); }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-stat-mid { color: var(--amber-800); }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-stat-large { color: var(--red-700); }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-stat-label { margin-top: 2px; font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.8px; color: var(--ui-muted); }
+
+:where([data-ui="unified"][data-embroidery-reference]) .sc-modal-close {
+    flex-shrink: 0;
+    padding: 0 4px; border: none; font-size: 1.75rem; line-height: 1; cursor: pointer; position: absolute; right: 10px; top: 10px; color: var(--ui-ink); background: var(--gray-50); width: 44px; height: 44px;
+}
+:where([data-ui="unified"][data-embroidery-reference]) .sc-modal-close:hover { color: var(--ui-ink); background: var(--ui-canvas); }
+
+:where([data-ui="unified"][data-embroidery-reference]) .sc-modal-controls {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap; flex-shrink: 0;
+    padding: 12px 24px;
+    background: var(--ui-surface); border-bottom: 1px solid var(--gray-200);
+}
+:where([data-ui="unified"][data-embroidery-reference]) .sc-search-wrap { position: relative; max-width: 300px; min-width: 200px; flex: 1 1 260px; }
+
+:where([data-ui="unified"][data-embroidery-reference]) .sc-search-icon {
+    position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+    color: var(--ui-muted); font-size: 0.8125rem; pointer-events: none;
+}
+
+:where([data-ui="unified"][data-embroidery-reference]) .sc-search-input {
+    width: 100%;
+    padding: 8px 12px 8px 32px;
+    background: var(--gray-50); border: 1px solid var(--gray-300);
+    border-radius: 8px;
+    font-family: inherit; color: var(--gray-800);
     outline: none;
-    transition: border-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out);
+    min-height: 44px;
+    font-size: .9375rem;
 }
-.sc-search-input:focus { border-color: var(--brand); box-shadow: var(--brand-glow); }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-search-input:focus { border-color: var(--ui-accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--ui-accent) 16%, transparent); }
 
-.sc-filter-label { font-size: 0.6875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: var(--gray-500); white-space: nowrap; }
-.sc-filter-group { display: flex; gap: var(--space-1); }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-filter-label { font-size: 0.6875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: var(--ui-muted); white-space: nowrap; }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-filter-group { display: flex; gap: 4px; }
 
-.sc-filter-btn {
-    padding: var(--space-1) 11px;
-    background: var(--surface-hover); border: 1px solid var(--gray-300);
-    border-radius: var(--radius-md);
-    font-family: inherit; font-size: 0.75rem; font-weight: 500; color: var(--gray-500);
-    white-space: nowrap; cursor: pointer;
-    transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+:where([data-ui="unified"][data-embroidery-reference]) .sc-filter-btn {
+    background: var(--gray-50); border: 1px solid var(--gray-300);
+    border-radius: 8px;
+    font-family: inherit; font-weight: 500; color: var(--ui-muted);
+    white-space: nowrap; cursor: pointer; padding: 10px 12px; min-height: 44px; font-size: .8125rem;
 }
-.sc-filter-btn:hover { border-color: var(--gray-800); }
-.sc-filter-btn.active { background: var(--gray-800); border-color: var(--gray-800); color: var(--color-on-brand); }
-.sc-filter-btn[data-filter="Mid"].active   { background: var(--state-warning); border-color: var(--state-warning); }
-.sc-filter-btn[data-filter="Large"].active  { background: var(--state-danger);  border-color: var(--state-danger); }
-.sc-filter-btn[data-filter="Both"].active   { background: var(--state-violet);  border-color: var(--state-violet); }
-.sc-filter-btn[data-rep="Nika Lao"].active       { background: var(--embroidery-pricing-all-blue); border-color: var(--embroidery-pricing-all-blue); }
-.sc-filter-btn[data-rep="Taneisha Clark"].active { background: var(--emerald-500); border-color: var(--emerald-500); }
-.sc-filter-btn[data-rep="unassigned"].active     { background: var(--gray-500); border-color: var(--gray-500); }
-.sc-results-count { margin-left: auto; font-family: var(--font-mono); font-size: 0.75rem; color: var(--gray-500); white-space: nowrap; }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-filter-btn:hover { border-color: var(--gray-800); }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-filter-btn.active { background: var(--gray-800); border-color: var(--gray-800); color: var(--color-on-brand); }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-filter-btn[data-filter="Mid"].active   { background: var(--amber-800); border-color: var(--amber-800); }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-filter-btn[data-filter="Large"].active  { background: var(--red-800);  border-color: var(--red-800); }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-filter-btn[data-filter="Both"].active   { background: var(--violet-600);  border-color: var(--violet-600); }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-filter-btn[data-rep="Nika Lao"].active       { background: var(--indigo-700); border-color: var(--indigo-700); }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-filter-btn[data-rep="Taneisha Clark"].active { background: var(--emerald-500); border-color: var(--emerald-500); }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-filter-btn[data-rep="unassigned"].active     { background: var(--gray-500); border-color: var(--gray-500); }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-results-count { margin-left: auto; font-family: ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, Consolas, monospace; font-size: 0.75rem; color: var(--ui-muted); white-space: nowrap; }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-modal-body { flex: 1; min-height: 0; overflow: auto; }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-table { width: 100%; border-collapse: collapse; font-size: 0.8125rem; }
 
-/* Body + table */
-.sc-modal-body { flex: 1; overflow-y: auto; }
-.sc-table { width: 100%; border-collapse: collapse; font-size: 0.8125rem; }
-
-.sc-table thead th {
+:where([data-ui="unified"][data-embroidery-reference]) .sc-table thead th {
     position: sticky; top: 0; z-index: 1;
     padding: 10px 14px; text-align: left; white-space: nowrap;
     background: var(--gray-100); border-bottom: 1px solid var(--gray-200);
-    font-size: 0.6875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: var(--gray-500);
+    font-size: 0.6875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: var(--ui-muted);
 }
-.sc-sortable { cursor: pointer; user-select: none; }
-.sc-sortable:hover { color: var(--gray-800); }
-.sc-sortable.sorted .sc-sort-arrow { opacity: 1; }
-.sc-sort-arrow { margin-left: 3px; opacity: 0.35; }
-.sc-table tbody tr { border-bottom: 1px solid var(--gray-200); transition: background var(--dur-fast) var(--ease-out); }
-.sc-table tbody tr:nth-child(even) { background: var(--surface-hover); }
-.sc-table tbody tr:hover { background: var(--brand-50); }
-.sc-table td { padding: 10px 14px; vertical-align: top; line-height: 1.4; }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-sortable { cursor: pointer; user-select: none; }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-sortable:hover { color: var(--gray-800); }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-sortable.sorted .sc-sort-arrow { opacity: 1; }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-sort-arrow { margin-left: 3px; opacity: 0.35; }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-table tbody tr { border-bottom: 1px solid var(--gray-200); }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-table tbody tr:nth-child(even) { background: var(--gray-50); }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-table tbody tr:hover { background: var(--brand-50); }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-table td { padding: 10px 14px; vertical-align: top; line-height: 1.4; }
 
-.sc-col-id { font-family: var(--font-mono); font-size: 0.75rem; color: var(--gray-400); white-space: nowrap; }
-.sc-col-company { min-width: 160px; font-size: 0.8125rem; font-weight: 600; }
-.sc-col-contact { min-width: 140px; }
-.sc-contact-name { font-weight: 500; }
-.sc-contact-email { margin-top: 2px; font-family: var(--font-mono); font-size: 0.6875rem; color: var(--gray-500); }
-.sc-contact-email a { color: var(--gray-500); text-decoration: none; }
-.sc-contact-email a:hover { color: var(--gray-800); text-decoration: underline; }
-.sc-contact-phone { margin-top: 1px; font-size: 0.75rem; color: var(--gray-400); }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-col-id { font-family: ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, Consolas, monospace; font-size: 0.75rem; color: var(--ui-muted); white-space: nowrap; }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-col-company { min-width: 160px; font-size: 0.8125rem; font-weight: 600; }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-col-contact { min-width: 140px; }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-contact-name { font-weight: 500; }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-contact-email { margin-top: 2px; font-family: ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, Consolas, monospace; font-size: 0.6875rem; color: var(--ui-muted); }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-contact-email a { color: var(--ui-muted); text-decoration: none; }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-contact-email a:hover { color: var(--gray-800); text-decoration: underline; }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-contact-phone { margin-top: 1px; font-size: 0.75rem; color: var(--ui-muted); }
 
-/* Tier badges */
-.sc-tier-badge {
+:where([data-ui="unified"][data-embroidery-reference]) .sc-tier-badge {
     display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;
-    padding: 3px 9px; border-radius: var(--radius-sm);
-    font-family: var(--font-mono); font-size: 0.6875rem; font-weight: 600;
+    padding: 3px 9px; border-radius: 4px;
+    font-family: ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, Consolas, monospace; font-size: 0.6875rem; font-weight: 600;
 }
-.sc-tier-mid   { background: var(--state-warning-bg); color: var(--state-warning); border: 1px solid var(--warn-amber-border); }
-.sc-tier-large { background: var(--red-50); color: var(--state-danger); border: 1px solid var(--red-300); }
-.sc-tier-both  { background: var(--state-violet-bg); color: var(--state-violet); border: 1px solid var(--embroidery-pricing-all-indigo-tint); }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-tier-mid   { background: var(--color-warning-bg); color: var(--amber-800); border: 1px solid var(--amber-300); }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-tier-large { background: var(--red-50); color: var(--red-800); border: 1px solid var(--red-300); }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-tier-both  { background: var(--color-ruth-tint); color: var(--violet-600); border: 1px solid var(--ui-line-strong); }
 
-/* Rep chips */
-.sc-rep-chip {
+:where([data-ui="unified"][data-embroidery-reference]) .sc-rep-chip {
     display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;
-    padding: 3px var(--space-2); border-radius: var(--radius-pill);
+    padding: 3px 8px; border-radius: var(--radius-pill);
     font-size: 0.75rem; font-weight: 500;
 }
-.sc-rep-dot { width: 7px; height: 7px; flex-shrink: 0; border-radius: 50%; }
-.sc-rep-nika { background: var(--color-floor-tint); color: var(--embroidery-pricing-all-blue); }
-.sc-rep-nika .sc-rep-dot { background: var(--embroidery-pricing-all-blue); }
-.sc-rep-taneisha { background: var(--brand-50); color: var(--emerald-500); }
-.sc-rep-taneisha .sc-rep-dot { background: var(--emerald-500); }
-.sc-rep-house { color: var(--gray-500); }
-.sc-rep-house .sc-rep-dot { background: var(--gray-500); }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-rep-dot { width: 7px; height: 7px; flex-shrink: 0; border-radius: 50%; }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-rep-nika { background: var(--color-floor-tint); color: var(--indigo-700); }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-rep-nika .sc-rep-dot { background: var(--indigo-700); }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-rep-taneisha { background: var(--brand-50); color: var(--ui-accent); }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-rep-taneisha .sc-rep-dot { background: var(--emerald-500); }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-rep-house { color: var(--ui-muted); }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-rep-house .sc-rep-dot { background: var(--gray-500); }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-col-designs { min-width: 260px; }
 
-/* Design details */
-.sc-col-designs { min-width: 260px; }
-
-.sc-design-item {
-    display: flex; align-items: flex-start; gap: var(--space-2);
+:where([data-ui="unified"][data-embroidery-reference]) .sc-design-item {
+    display: flex; align-items: flex-start; gap: 8px;
     padding: 3px 0; border-bottom: 1px solid var(--gray-100);
 }
-.sc-design-item:last-child { border-bottom: none; padding-bottom: 0; }
-.sc-design-item:first-child { padding-top: 0; }
-.sc-design-name { flex: 1; font-size: 0.75rem; line-height: 1.3; }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-design-item:last-child { border-bottom: none; padding-bottom: 0; }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-design-item:first-child { padding-top: 0; }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-design-name { flex: 1; font-size: 0.75rem; line-height: 1.3; }
 
-.sc-design-num {
+:where([data-ui="unified"][data-embroidery-reference]) .sc-design-num {
     margin-right: 3px; padding: 1px 5px;
     background: var(--gray-100); border-radius: 3px;
-    font-family: var(--font-mono); font-size: 0.65625rem; color: var(--gray-500);
+    font-family: ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, Consolas, monospace; font-size: 0.65625rem; color: var(--ui-muted);
 }
-.sc-design-meta { text-align: right; white-space: nowrap; }
-.sc-design-stitches { display: block; font-family: var(--font-mono); font-size: 0.6875rem; color: var(--gray-400); }
-.sc-design-charge { display: block; font-family: var(--font-mono); font-size: 0.6875rem; font-weight: 500; }
-.sc-charge-mid { color: var(--state-warning); }
-.sc-charge-large { color: var(--state-danger); }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-design-meta { text-align: right; white-space: nowrap; }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-design-stitches { display: block; font-family: ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, Consolas, monospace; font-size: 0.6875rem; color: var(--ui-muted); }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-design-charge { display: block; font-family: ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, Consolas, monospace; font-size: 0.6875rem; font-weight: 500; }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-charge-mid { color: var(--amber-800); }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-charge-large { color: var(--red-800); }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-empty-state { display: none; padding: 60px 20px; text-align: center; color: var(--ui-muted); }
+:where([data-ui="unified"][data-embroidery-reference]) .sc-empty-state h3 { margin-bottom: 4px; font-size: 1rem; color: var(--gray-800); }
 
-/* Empty state */
-.sc-empty-state { padding: 60px var(--space-5); text-align: center; color: var(--gray-500); }
-.sc-empty-state h3 { margin-bottom: var(--space-1); font-size: 1rem; color: var(--gray-800); }
-
-/* ==========================================================================
-   20. SHARE-LINK BUTTON
-   ========================================================================== */
-.share-link-btn {
-    display: flex; align-items: center; gap: var(--space-2);
+:where([data-ui="unified"][data-embroidery-reference]) .share-link-btn {
+    display: flex; align-items: center; gap: 8px;
     margin-left: auto;
-    padding: var(--space-2) var(--space-4);
-    background: var(--brand); border: 1px solid var(--brand);
-    border-radius: var(--radius-md);
+    padding: 8px 16px;
+    background: var(--ui-accent); border: 1px solid var(--ui-accent);
+    border-radius: 8px;
     color: var(--color-on-brand); font-size: 0.85rem; font-weight: 500; cursor: pointer;
-    transition: background var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out);
 }
-.share-link-btn:hover { background: var(--brand-deep); border-color: var(--brand-deep); }
-.share-link-btn i { font-size: 0.9rem; }
-.share-link-btn.copied { background: var(--success); border-color: var(--success); }
-
-/* ==========================================================================
-   21. PRINT CONTAINER + @media print
-   The on-screen #print-contract-pricing block is hidden; it only renders
-   when the contract pricing sheet is sent to the printer.
-   ========================================================================== */
-.print-only { display: none; }
+:where([data-ui="unified"][data-embroidery-reference]) .share-link-btn:hover { background: var(--ui-accent); border-color: var(--ui-accent); }
+:where([data-ui="unified"][data-embroidery-reference]) .share-link-btn i { font-size: 0.9rem; }
+:where([data-ui="unified"][data-embroidery-reference]) .share-link-btn.copied { background: var(--ui-accent); border-color: var(--ui-accent); }
+:where([data-ui="unified"][data-embroidery-reference]) .print-only { display: none; }
 
 @media print {
-    @page { size: landscape; margin: 0.25in; }
+    @page embroidery-contract { size: landscape; margin: 0.25in; }
 
-    body > *:not(#print-contract-pricing) { display: none !important; }
-    #print-contract-pricing { display: block !important; }
+    :where([data-ui="unified"][data-embroidery-reference])[data-print-mode="contract"] > *:not([id="print-contract-pricing"]) { display: none; }
+    :where([data-ui="unified"][data-embroidery-reference])[data-print-mode="contract"] [id="print-contract-pricing"] { display: block; page: embroidery-contract; }
 
-    .print-header {
+    :where([data-ui="unified"][data-embroidery-reference]) .print-header {
         display: flex; align-items: flex-start; gap: 12px;
-        margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--embroidery-pricing-all-gray-dark);
+        margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--ui-ink);
     }
-    .print-logo { width: 100px; height: auto; }
-    .print-title-block { flex: 1; }
-    .print-title-block h1, .print-title-block .print-company { font-family: Poppins, sans-serif; font-size: 18px; font-weight: 700; color: var(--embroidery-pricing-all-gray-dark); margin: 0 0 2px; }
-    .print-title-block h2 { font-family: Poppins, sans-serif; font-size: 14px; font-weight: 600; color: var(--brand-500); margin: 0 0 6px; }
-    .print-title-block p  { font-size: 11px; color: var(--embroidery-pricing-all-gray); margin: 0; line-height: 1.4; }
+    :where([data-ui="unified"][data-embroidery-reference]) .print-logo { width: 100px; height: auto; }
+    :where([data-ui="unified"][data-embroidery-reference]) .print-title-block { flex: 1; }
 
-    .print-contact-block { display: flex; flex-direction: column; align-items: flex-end; text-align: right; font-size: 10px; color: var(--embroidery-pricing-all-gray-dark); line-height: 1.5; }
-    .print-contact-block strong { font-size: 12px; color: var(--embroidery-pricing-all-gray-dark); }
-    .print-contact-block span { color: var(--embroidery-pricing-all-gray); }
+    :where([data-ui="unified"][data-embroidery-reference]) .print-title-block h1,
+:where([data-ui="unified"][data-embroidery-reference]) .print-title-block .print-company { font-family: var(--ui-font); font-size: 18px; font-weight: 700; color: var(--ui-ink); margin: 0 0 2px; }
+    :where([data-ui="unified"][data-embroidery-reference]) .print-title-block h2 { font-family: var(--ui-font); font-size: 14px; font-weight: 600; color: var(--brand-500); margin: 0 0 6px; }
+    :where([data-ui="unified"][data-embroidery-reference]) .print-title-block p  { font-size: 11px; color: var(--ui-muted); margin: 0; line-height: 1.4; }
 
-    .print-tables-row { display: flex; gap: 12px; margin-bottom: 8px; }
-    .print-table-wrapper { flex: 1; }
+    :where([data-ui="unified"][data-embroidery-reference]) .print-contact-block { display: flex; flex-direction: column; align-items: flex-end; text-align: right; font-size: 10px; color: var(--ui-ink); line-height: 1.5; }
+    :where([data-ui="unified"][data-embroidery-reference]) .print-contact-block strong { font-size: 12px; color: var(--ui-ink); }
+    :where([data-ui="unified"][data-embroidery-reference]) .print-contact-block span { color: var(--ui-muted); }
 
-    .print-table-wrapper h3 {
+    :where([data-ui="unified"][data-embroidery-reference]) .print-tables-row { display: flex; gap: 12px; margin-bottom: 8px; }
+    :where([data-ui="unified"][data-embroidery-reference]) .print-table-wrapper { flex: 1; }
+
+    :where([data-ui="unified"][data-embroidery-reference]) .print-table-wrapper h3 {
         display: flex; align-items: center; gap: 8px;
-        font-size: 12px; font-weight: 600; color: var(--embroidery-pricing-all-gray-dark);
+        font-size: 12px; font-weight: 600; color: var(--ui-ink);
         margin: 0 0 6px; padding-bottom: 4px; border-bottom: 1px solid var(--gray-300);
     }
 
-    .print-part-num {
-        font-family: Consolas, monospace; font-size: 9px; font-weight: 500; color: var(--embroidery-pricing-all-gray);
+    :where([data-ui="unified"][data-embroidery-reference]) .print-part-num {
+        font-family: Consolas, monospace; font-size: 9px; font-weight: 500; color: var(--ui-muted);
         background: var(--gray-100); padding: 2px 6px; border-radius: 3px; border: 1px solid var(--gray-300);
     }
 
-    .print-pricing-table { width: 100%; border-collapse: collapse; font-size: 9px; }
+    :where([data-ui="unified"][data-embroidery-reference]) .print-pricing-table { width: 100%; border-collapse: collapse; font-size: 9px; }
 
-    .print-pricing-table th,
-    .print-pricing-table td { padding: 2px 4px; text-align: center; border: 1px solid var(--gray-300); }
-    .print-pricing-table th { background: var(--gray-100); font-weight: 600; color: var(--embroidery-pricing-all-gray-dark); }
+    :where([data-ui="unified"][data-embroidery-reference]) .print-pricing-table th,
+:where([data-ui="unified"][data-embroidery-reference]) .print-pricing-table td { padding: 2px 4px; text-align: center; border: 1px solid var(--gray-300); }
+    :where([data-ui="unified"][data-embroidery-reference]) .print-pricing-table th { background: var(--gray-100); font-weight: 600; color: var(--ui-ink); }
 
-    .print-pricing-table th:first-child,
-    .print-pricing-table td:first-child { text-align: left; font-weight: 500; background: var(--gray-50); }
-    .print-pricing-table tbody tr:nth-child(even) { background: var(--gray-50); }
+    :where([data-ui="unified"][data-embroidery-reference]) .print-pricing-table th:first-child,
+:where([data-ui="unified"][data-embroidery-reference]) .print-pricing-table td:first-child { text-align: left; font-weight: 500; background: var(--gray-50); }
+    :where([data-ui="unified"][data-embroidery-reference]) .print-pricing-table tbody tr:nth-child(even) { background: var(--gray-50); }
 
-    .print-pricing-table tr.rate-row { background: var(--brand-100) !important; font-weight: 600; }
-    .print-pricing-table tr.rate-row td { border-top: 2px solid var(--brand-500); }
+    :where([data-ui="unified"][data-embroidery-reference]) .print-pricing-table tr.rate-row { background: var(--brand-100); font-weight: 600; }
+    :where([data-ui="unified"][data-embroidery-reference]) .print-pricing-table tr.rate-row td { border-top: 2px solid var(--brand-500); }
 
-    .print-pricing-table th.ltm-col,
-    .print-pricing-table td.ltm-col {
-        background-color: var(--embroidery-pricing-all-yellow-2) !important;
+    :where([data-ui="unified"][data-embroidery-reference]) .print-pricing-table th.ltm-col,
+:where([data-ui="unified"][data-embroidery-reference]) .print-pricing-table td.ltm-col {
+        background-color: var(--color-warning-bg);
         print-color-adjust: exact; -webkit-print-color-adjust: exact;
-        border-left: 3px solid var(--embroidery-pricing-all-yellow-6) !important;
+        border-left: 3px solid var(--amber-700);
     }
 
-    .print-pricing-table tr.rate-row td.ltm-col {
-        background-color: var(--embroidery-pricing-all-yellow-2) !important;
+    :where([data-ui="unified"][data-embroidery-reference]) .print-pricing-table tr.rate-row td.ltm-col {
+        background-color: var(--color-warning-bg);
         print-color-adjust: exact; -webkit-print-color-adjust: exact;
     }
 
-    .print-ltm-note {
+    :where([data-ui="unified"][data-embroidery-reference]) .print-ltm-note {
         font-size: 9px; color: var(--amber-800); background: var(--amber-100);
-        padding: 4px 8px; border-radius: 4px; margin: 6px 0; border-left: 3px solid var(--embroidery-pricing-all-yellow);
+        padding: 4px 8px; border-radius: 4px; margin: 6px 0; border-left: 3px solid var(--amber-300);
     }
-    .print-ltm-note strong { color: var(--amber-900); }
+    :where([data-ui="unified"][data-embroidery-reference]) .print-ltm-note strong { color: var(--amber-900); }
 
-    .print-laser-section { margin-top: 8px; padding-top: 6px; border-top: 1px dashed var(--gray-300); }
-    .print-laser-section h3 { font-size: 12px; font-weight: 600; color: var(--embroidery-pricing-all-gray-dark); margin: 0 0 4px; }
-    .print-laser-section .laser-patch-table { max-width: 250px; }
-    .print-notes { font-size: 9px; color: var(--embroidery-pricing-all-gray); margin-top: 10px; line-height: 1.5; }
+    :where([data-ui="unified"][data-embroidery-reference]) .print-laser-section { margin-top: 8px; padding-top: 6px; border-top: 1px dashed var(--gray-300); }
+    :where([data-ui="unified"][data-embroidery-reference]) .print-laser-section h3 { font-size: 12px; font-weight: 600; color: var(--ui-ink); margin: 0 0 4px; }
+    :where([data-ui="unified"][data-embroidery-reference]) .print-laser-section .laser-patch-table { max-width: 250px; }
+    :where([data-ui="unified"][data-embroidery-reference]) .print-notes { font-size: 9px; color: var(--ui-muted); margin-top: 10px; line-height: 1.5; }
 
-    .print-footer { margin-top: 8px; padding-top: 6px; border-top: 1px solid var(--gray-300); text-align: center; }
-    .print-footer p { font-size: 9px; color: var(--print-line); margin: 0; }
+    :where([data-ui="unified"][data-embroidery-reference]) .print-footer { margin-top: 8px; padding-top: 6px; border-top: 1px solid var(--gray-300); text-align: center; }
+    :where([data-ui="unified"][data-embroidery-reference]) .print-footer p { font-size: 9px; color: var(--print-line); margin: 0; }
 }
 
-@media screen {
-    .print-only { display: none !important; }
-}
-
-/* ==========================================================================
-   22. RESPONSIVE
-   ========================================================================== */
 @media (width <= 768px) {
-    .main-container { padding: var(--space-3); }
-    .matrices-grid { grid-template-columns: 1fr; }
-    .tab-navigation { flex-direction: column; }
-    .tab-btn { flex-direction: row; justify-content: center; }
-    .form-row { flex-direction: column; }
-    .form-group { min-width: 100%; }
-    .pricing-matrix { font-size: 0.8rem; }
+    :where([data-ui="unified"][data-embroidery-reference]) .main-container { padding: 12px; }
+    :where([data-ui="unified"][data-embroidery-reference]) .matrices-grid { grid-template-columns: 1fr; }
+    :where([data-ui="unified"][data-embroidery-reference]) .form-row { flex-direction: column; }
+    :where([data-ui="unified"][data-embroidery-reference]) .form-group { min-width: 100%; }
+    :where([data-ui="unified"][data-embroidery-reference]) .pricing-matrix { font-size: 0.8rem; }
 
-    .pricing-matrix th,
-    .pricing-matrix td { padding: 6px var(--space-2); }
+    :where([data-ui="unified"][data-embroidery-reference]) .pricing-matrix th,
+:where([data-ui="unified"][data-embroidery-reference]) .pricing-matrix td { padding: 6px 8px; }
 }
 
 @media (width <= 720px) {
-    /* Drop the vertical divider — tabs stack and the amber color already
-       distinguishes the modifier tabs. */
-    .tab-divider { display: none; }
-    .tab-navigation-helper { font-size: 0.85rem; padding: var(--space-2) var(--space-3); }
+    :where([data-ui="unified"][data-embroidery-reference]) .tab-divider { display: none; }
+    :where([data-ui="unified"][data-embroidery-reference]) .tab-navigation-helper { font-size: 0.85rem; padding: 8px 12px; }
 }
 
 @media (width <= 600px) {
-    .es-tiers { grid-template-columns: 1fr; }
+    :where([data-ui="unified"][data-embroidery-reference]) .es-tiers { grid-template-columns: 1fr; }
 }
 
-/* ==========================================================================
-   23. REDUCED MOTION
-   ========================================================================== */
-@media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-        animation-duration: 0.001ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.001ms !important;
-        scroll-behavior: auto !important;
-    }
+@media (width <= 900px) {
+ :where([data-ui="unified"][data-embroidery-reference]) .tab-navigation { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (width <= 480px) {
+ :where([data-ui="unified"][data-embroidery-reference]) .tab-navigation { grid-template-columns: 1fr; }
+ :where([data-ui="unified"][data-embroidery-reference]) .tab-btn { display: grid; grid-template-columns: 24px 1fr; text-align: left; align-items: center; }
+ :where([data-ui="unified"][data-embroidery-reference]) .tab-subtitle { grid-column: 2; }
+ :where([data-ui="unified"][data-embroidery-reference]) :is(.calculator-card, .matrix-card, .script-card, .es-fb-inner) { padding: 16px; min-width: 0; }
+ :where([data-ui="unified"][data-embroidery-reference]) .use-case-banner { flex-wrap: wrap; }
+ :where([data-ui="unified"][data-embroidery-reference]) .use-case-banner > div { flex: 1 1 190px; }
+ :where([data-ui="unified"][data-embroidery-reference]) .sc-modal-header { padding: 16px 60px 16px 16px; }
+ :where([data-ui="unified"][data-embroidery-reference]) .sc-modal-title { min-width: 0; }
+ :where([data-ui="unified"][data-embroidery-reference]) .sc-modal-controls { padding: 12px; gap: 8px; }
+ :where([data-ui="unified"][data-embroidery-reference]) .sc-filter-group { flex-wrap: wrap; }
+ :where([data-ui="unified"][data-embroidery-reference]) .sc-modal-stats { gap: 16px; }
+}
+
+@media print {
+ @page { size: portrait; margin: .35in; }
+
+ @page embroidery-accounts { size: landscape; margin: .35in; }
+ :where([data-ui="unified"][data-embroidery-reference]) { background: var(--ui-surface); font-size: 10pt; }
+ :where([data-ui="unified"][data-embroidery-reference]) .main-container { max-width: none; padding: 0; }
+ :where([data-ui="unified"][data-embroidery-reference]) :is(.tab-navigation, .tab-navigation-helper, .breadcrumb, .share-link-btn, .es-view-all-btn, .disclosure-hint, .sc-modal-close, .sc-modal-controls) { display: none; }
+ :where([data-ui="unified"][data-embroidery-reference]) .page-header { display: block; margin-bottom: 10px; padding-bottom: 8px; }
+ :where([data-ui="unified"][data-embroidery-reference]) .page-header h1 { font-size: 18pt; }
+ :where([data-ui="unified"][data-embroidery-reference]) .page-header .subtitle { font-size: 9pt; }
+ :where([data-ui="unified"][data-embroidery-reference]) :is(.calculator-card, .matrix-card, .script-card, .es-fb-inner) { padding: 10px; margin-bottom: 12px; box-shadow: none; }
+ :where([data-ui="unified"][data-embroidery-reference]) :is(.matrices-grid, .es-tiers) { gap: 12px; margin-bottom: 12px; }
+ :where([data-ui="unified"][data-embroidery-reference]) .matrices-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+ :where([data-ui="unified"][data-embroidery-reference]) :is(.info-disclosure, .es-account-card, .matrix-card, .calculator-card, .es-tier, .script-card, .shopworks-info) { break-inside: avoid; }
+ :where([data-ui="unified"][data-embroidery-reference]) :is(.embroidery-table-scroll, .es-design-wrap, .sc-modal-body) { overflow: visible; max-height: none; }
+ :where([data-ui="unified"][data-embroidery-reference]) :is(.es-fb-table, .es-design-table, .sc-table) { min-width: 0; width: 100%; }
+ :where([data-ui="unified"][data-embroidery-reference]) thead { display: table-header-group; }
+ :where([data-ui="unified"][data-embroidery-reference]) tr { break-inside: avoid; }
+ :where([data-ui="unified"][data-embroidery-reference]) :is(.es-fb-table, .es-design-table, .sc-table) :is(th, td) { padding: 6px; }
+ :where([data-ui="unified"][data-embroidery-reference]) .sc-table .sc-col-designs { min-width: 0; }
+ :where([data-ui="unified"][data-embroidery-reference]) .form-row { flex-direction: row; }
+ :where([data-ui="unified"][data-embroidery-reference]) .form-group { min-width: 0; }
+ :where([data-ui="unified"][data-embroidery-reference]) :is(input, select) { min-height: 0; }
+ :where([data-ui="unified"][data-embroidery-reference]) .result-row { padding: 2px 0; }
+ :where([data-ui="unified"][data-embroidery-reference])[data-print-mode="accounts"] > :not([id="scModal"]) { display: none; }
+ :where([data-ui="unified"][data-embroidery-reference])[data-print-mode="accounts"] .sc-modal-overlay { display: block; position: static; width: 100%; height: auto; max-height: none; margin: 0; border: 0; overflow: visible; page: embroidery-accounts; }
+ :where([data-ui="unified"][data-embroidery-reference])[data-print-mode="accounts"] .sc-modal { height: auto; overflow: visible; }
+ :where([data-ui="unified"][data-embroidery-reference])[data-print-mode="accounts"] .sc-modal-header { padding: 0 0 12px; }
+ :where([data-ui="unified"][data-embroidery-reference]) .sc-table th { position: static; }
+ :where([data-ui="unified"][data-embroidery-reference]) .sc-table :is(.sc-col-contact, .sc-col-company, .sc-col-id, .sc-col-rep) { min-width: 0; }
+ :where([data-ui="unified"][data-embroidery-reference]) :is(summary, button, [role="button"]) { min-height: 0; }
+ :where([data-ui="unified"][data-embroidery-reference]) :is(.info-disclosure, .use-case-banner, .fullback-crossref, .es-fb-header, .es-intro, .ltm-banner, .script-content, .shopworks-info, .calc-results, .form-row) { margin-bottom: 8px; }
+ :where([data-ui="unified"][data-embroidery-reference]) :is(.use-case-banner, .fullback-crossref, .script-content, .calc-results, .shopworks-info) { padding: 8px; }
+ :where([data-ui="unified"][data-embroidery-reference]) .decision-flowchart { gap: 6px; }
+ :where([data-ui="unified"][data-embroidery-reference]) .decision-step { padding: 6px 8px; }
+ :where([data-ui="unified"][data-embroidery-reference]) .info-disclosure summary { padding: 6px 8px; }
+ :where([data-ui="unified"][data-embroidery-reference]) .info-disclosure .disclosure-content { padding: 0 8px 8px; font-size: 9pt; }
+ :where([data-ui="unified"][data-embroidery-reference]) :is(.decision-answers, .decision-question, .use-case-banner, .fullback-crossref, .script-content, .matrix-notes, .es-fb-desc, .es-fb-table, .shopworks-info, .form-group label, .form-group input, .form-group select, .result-row, .sc-table) { font-size: 9pt; line-height: 1.4; }
+ :where([data-ui="unified"][data-embroidery-reference]) :is(.calculator-card h2, .matrix-card h2, .script-card h2, .es-fb-title) { font-size: 12pt; margin-bottom: 8px; }
+ :where([data-ui="unified"][data-embroidery-reference]) :is(.pricing-matrix, .es-fb-table) :is(th, td) { padding: 4px; font-size: 9pt; }
+ :where([data-ui="unified"][data-embroidery-reference]) .es-fb-table :is(th, td) { padding: 3px; }
+ :where([data-ui="unified"][data-embroidery-reference]) .form-group :is(input, select) { padding: 5px 8px; }
+ :where([data-ui="unified"][data-embroidery-reference]) :is(.sc-modal-overlay, .sc-modal) { box-shadow: none; }
+ :where([data-ui="unified"][data-embroidery-reference]) .shopworks-ref-card { break-inside: avoid; }
+ :where([data-ui="unified"][data-embroidery-reference]) :is(button, input, select, summary, [tabindex]):focus-visible { outline: none; box-shadow: none; }
 }

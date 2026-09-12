@@ -44,7 +44,7 @@ async function open(page,state={}){
 }
 async function snapshot(page){return page.evaluate(()=>{
  const visible=n=>!!n.getClientRects().length&&getComputedStyle(n).visibility!=='hidden',norm=s=>s.replace(/\s+/g,' ').trim(),ids={};
- for(const n of document.querySelectorAll('[id]'))if(visible(n)&&!n.querySelector('[id]')&&!['SCRIPT','STYLE'].includes(n.tagName))ids[n.id]=norm(n.innerText||n.textContent);
+ for(const n of document.querySelectorAll('[id]'))if(!n.id.startsWith('embroidery-account-')&&visible(n)&&!n.querySelector('[id]:not([id^="embroidery-account-"])')&&!['SCRIPT','STYLE'].includes(n.tagName))ids[n.id]=norm(n.innerText||n.textContent);
  return{title:document.title,url:location.pathname+location.search,ids,fields:[...document.querySelectorAll('input,select,textarea')].filter(visible).map(n=>({id:n.id,type:n.type,value:n.value,checked:n.checked,disabled:n.disabled})),links:[...document.querySelectorAll('a[href]')].filter(visible).map(n=>({href:n.getAttribute('href'),text:norm(n.textContent)})),tables:[...document.querySelectorAll('table')].filter(visible).map(n=>norm(n.innerText)),headings:[...document.querySelectorAll('h1,h2,h3')].filter(visible).map(n=>norm(n.textContent)),overflow:document.documentElement.scrollWidth>innerWidth+1};
 });}
 function check(expect,e){for(const k of ['errors','unknown','writes','missing'])expect(e[k],k).toEqual([]);}

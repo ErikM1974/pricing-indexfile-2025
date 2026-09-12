@@ -218,3 +218,10 @@ Browser baselines must work from a fresh checkout. The tumbler export test previ
 - Problem/root cause: inventory errors disappeared; old async replies and cached rate-card markup could outlive the current selection. Layout rules exposed native hidden controls, and touch-height defaults orphaned paper footers.
 - Solution: clear old stock before each lookup, check the request generation, show a persistent unknown-stock warning with retry, and print a rate card only after its content is rebuilt for the current request. Restore screen print state afterward; scope hidden, keyboard and paper rules to both Quick Quote pages.
 - Prevention: preserve financial controller hashes and browser amounts; test failed-stock retry, keyboard price/quantity selection, failed rate-card preparation and narrow table scrolling. Visually inspect complete PDFs and long phone layouts; text assertions alone miss split currency and orphaned footers.
+
+
+## Scoped reference pages need explicit print and failure modes (2026-09-12)
+
+- Problem/root cause: shared navigation print rules hid the reference title; an old blanket contract-print rule hid ordinary pricing; a missing stitch response silently retained default fees.
+- Solution: give the reference header an explicit paper display, distinguish active-tab/account/contract print modes, open and restore disclosures, keep reference cards together, and fail visibly when required pricing is missing.
+- Prevention: preserve exact financial functions, exercise API rejection and recovery, and review complete PDFs alongside keyboard/dialog checks. Replace private customer initializers with synthetic records before test execution; never copy private controller data into a reversal ledger.

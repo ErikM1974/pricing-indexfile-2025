@@ -6732,6 +6732,36 @@
         "rawCssBytes": 61878,
         "localCssRequests": 3
       }
+    },
+    {
+      "source": "calculators/embroidery-pricing-all/index.html",
+      "family": "specialty-calculators",
+      "status": "reviewed",
+      "route": "/calculators/embroidery-pricing-all/",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/utilities.css",
+        "calculators/embroidery-pricing-all/embroidery-pricing-all.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "1440-768-390-320",
+        "original-content-prices-links-and-private-data-source-protection",
+        "four-tabs-garment-cap-patch-extra-stitches-small-order-heavyweight",
+        "account-expansion-dialog-search-filters-sort-and-empty",
+        "keyboard-disclosure-dialog-focus-escape-and-table-scroll",
+        "visible-required-pricing-failure-inert-controls-and-reload-recovery",
+        "complete-active-tab-paper-account-landscape-and-contract-print-restoration"
+      ],
+      "test": "tests/e2e/css-unification-embroidery-reference.spec.js",
+      "maxCssBytes": 129467,
+      "measuredRawCssBytes": 127419,
+      "baseline": {
+        "commit": "efa277d6",
+        "rawCssBytes": 71847,
+        "localCssRequests": 2
+      }
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",
