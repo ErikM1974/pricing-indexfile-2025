@@ -1283,3 +1283,49 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - tests/fixtures/quick-quote-safety-expanded-original-browser.json — immutable Quick Quote synthetic browser evidence.
 
 - tests/fixtures/quick-quote-safety-handoff-original-browser.json — immutable Quick Quote synthetic browser evidence.
+
+- tests/fixtures/embroidery-reference-original-content.json — original embroidery reference source hashes only; no private customer values.
+
+- tests/e2e/helpers/embroidery-reference-browser.js — synthetic-only account and API browser harness.
+- tests/e2e/css-unification-embroidery-reference.spec.js — original/current embroidery reference screen, paper and financial checks.
+- tests/unit/embroidery-reference-content.test.js — original source hashes and private-initializer sanitization checks.
+
+- tests/fixtures/embroidery-reference-al-retail-original-browser.json — immutable embroidery reference synthetic browser evidence.
+
+- tests/fixtures/embroidery-reference-decg-retail-original-browser.json — immutable embroidery reference synthetic browser evidence.
+
+- tests/fixtures/embroidery-reference-stitch-charges-original-browser.json — immutable embroidery reference synthetic browser evidence.
+
+- tests/fixtures/embroidery-reference-fullback-original-browser.json — immutable embroidery reference synthetic browser evidence.
+
+- tests/fixtures/embroidery-reference-al-retail-cap-original-browser.json — immutable embroidery reference synthetic browser evidence.
+
+- tests/fixtures/embroidery-reference-al-retail-laser-patch-original-browser.json — immutable embroidery reference synthetic browser evidence.
+
+- tests/fixtures/embroidery-reference-al-retail-extras-original-browser.json — immutable embroidery reference synthetic browser evidence.
+
+- tests/fixtures/embroidery-reference-decg-retail-cap-original-browser.json — immutable embroidery reference synthetic browser evidence.
+
+- tests/fixtures/embroidery-reference-decg-retail-laser-patch-original-browser.json — immutable embroidery reference synthetic browser evidence.
+
+- tests/fixtures/embroidery-reference-decg-retail-extras-original-browser.json — immutable embroidery reference synthetic browser evidence.
+
+- tests/fixtures/embroidery-reference-information-original-browser.json — immutable embroidery reference synthetic browser evidence.
+
+- tests/fixtures/embroidery-reference-account-original-browser.json — immutable embroidery reference synthetic browser evidence.
+
+- tests/fixtures/embroidery-reference-dialog-all-original-browser.json — immutable embroidery reference synthetic browser evidence.
+
+- tests/fixtures/embroidery-reference-dialog-filter-original-browser.json — immutable embroidery reference synthetic browser evidence.
+
+- tests/fixtures/embroidery-reference-dialog-empty-original-browser.json — immutable embroidery reference synthetic browser evidence.
+
+- tests/fixtures/embroidery-reference-dialog-sort-original-browser.json — immutable embroidery reference synthetic browser evidence.
+
+- tests/fixtures/embroidery-reference-failed-original-browser.json — immutable embroidery reference synthetic browser evidence.
+
+- tests/fixtures/embroidery-reference-stitchesFailed-original-browser.json — immutable embroidery reference synthetic browser evidence.
+
+- tests/fixtures/embroidery-reference-upgradesFailed-original-browser.json — immutable embroidery reference synthetic browser evidence.
+
+- tests/fixtures/embroidery-reference-contract-print-original-browser.json — immutable embroidery reference synthetic browser evidence.

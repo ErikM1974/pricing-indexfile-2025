@@ -1890,3 +1890,13 @@ The final Quick Quote run passes all28 cases:22 presentation states, five behavi
 Final verification: all28 Quick Quote browser cases pass, with330 unique source/ownership/financial/hygiene/lessons checks verified across six suites. The final scope/source rerun passes282 checks after a formatter quote-style mismatch; the other48 checks passed unchanged. All276 CSS files and scoped JS lint are clean. Release integration and full regression gates remain separate from this local family review.
 
 Release integration checkpoint: verified production commit4b00f3ab has now been merged into codex/remaining-calculators, retaining both release corrections and the local webstore/Quick Quote work. The earlier release-gate failure and publication-pending notes are historical: v2026.09.12.1 / Heroku2110 is verified live, exact-source/main/develop CI is green, and69 live checks pass. Local218/225 remains separate from live215/225. Next: embroidery-pricing-all, garment designer, then five quote builders; final shared/runtime and whole-app release gates still required.
+
+## Embroidery reference plan — September 12, 2026
+
+- [x] Preserve four original source hashes; replace complete private account initializers with synthetic records before browser execution; never store real customers in fixtures or reversal ledgers.
+- [x] Review the original four pricing tabs, garments/caps/patches, extra stitches and small orders, account dialog/filter/sort, failures and paper output.
+- [ ] Adopt canonical tokens and controls in one scoped owner; retain financial functions and data, repair keyboard/dialog/failure/print presentation, then review all four widths and complete PDFs before migration credit.
+
+Local census remains218/225, seven pending. Webstore and Quick Quote are committed and backed up at efa277d6; production remains215/225 at v2026.09.12.1 / Heroku2110.
+
+Embroidery original baseline:20 browser cases and15 source/financial/privacy checks pass;80 original screens and20 paper pages reviewed through41 contact sheets. Private customer initializers are replaced before browser execution. Application files remain unchanged at this checkpoint; all pending UI fixes are listed in the external review report.

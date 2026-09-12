@@ -1,0 +1,30 @@
+{
+  "commit": "efa277d6353f2188489e62cd9c26d125a9e79637",
+  "hashes": {
+    "calculators/embroidery-pricing-all/index.html": "0ba59c4340af848d787eb4d06847f32adcb6c31af6fd9604b1d6d1f9fb5aaeda",
+    "calculators/embroidery-pricing-all/embroidery-pricing-all.css": "c4d86c789fd021608f1316b1eaa66ddd98b57657a6399a1298b7c27d31f3301e",
+    "calculators/embroidery-pricing-all/embroidery-pricing-all.js": "bfff8fb3e5fd5e4513cb6c6eedb7a0931df398c14b7bc8aac22787699fe5513e",
+    "calculators/embroidery-pricing-all/embroidery-pricing-all-inline.js": "ca7e2756722c95bd9aca20eace750c9e91ff0a153465c5bdef18a949006974f9"
+  },
+  "changes": [],
+  "privateInitializerNames": [
+    "KEY_ACCOUNT_SURCHARGES",
+    "SURCHARGE_CUSTOMERS"
+  ],
+  "notes": "Customer values are never recorded here. Browser harness replaces both complete AST initializer ranges with synthetic records before execution. Do not create full-controller reversal mappings.",
+  "financialFunctions": {
+    "owner": "calculators/embroidery-pricing-all/embroidery-pricing-all.js",
+    "hashes": {
+      "formatPrice": "7c1dd056520138dc813b7a8833359657e07ff4e1834f3d2240d2ef9ad3f429cb",
+      "getTierFromQuantity": "b6e0ff55e3ee70291b80cd1947b8b211b98857c6a16a195522efe8f8ba5619e8",
+      "getAlRetailTierFromQuantity": "cc17f03c19403c71da5928d9946b416ebc8bb66f1a470d2b608be1bfd1fa674c",
+      "calculateUnitPriceWithLTM": "7d3fc94c9aa3f9de3860444a971846f1ba1ad1292eaa434e865fdceab6edbdf9",
+      "calculateContractPrice": "4e5d06e8ae445c1b73a4a7ad0a13130c0b7c9cea297bc71113067827172afeb5",
+      "calculateAlRetailPrice": "5f218227b01ce4bb62540e74fe91dd32b68b8b9e2fb8a5f24630c4f845edd174",
+      "calculateDecgRetailPrice": "0a6313ca76bc116e3c903dec782ad2d7fc10c6ce47a7f3309485e04adf198a9c",
+      "buildPrintGarmentsTable": "b40546d92e8a5524c9e30d3ba4eaa53c631c524ef65161045d967512d49ffdf2",
+      "buildPrintCapsTable": "149fecdecb9f54d6c59e4dbf4ff785a6b377decbdb4980f72149f4faf3089e62",
+      "buildPrintLaserPatchTable": "4fe91b7030ceca528db3a7d7b81bd02e91ae938f6a3e5cd88fc6900effec9568"
+    }
+  }
+}

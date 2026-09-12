@@ -1,0 +1,550 @@
+{
+  "name": "al-retail-laser-patch",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Embroidery Pricing | Northwest Custom Apparel",
+      "url": "/calculators/embroidery-pricing-all/index.html?tab=al-retail",
+      "ids": {
+        "alRetailItemType": "Garment Cap Laser Patch",
+        "alRetailQuantity": "",
+        "alRetailBreakdownLabel": "Laser Patch:",
+        "alRetailBreakdownValue": "$21.00",
+        "alRetailLtmBreakdownLabel": "+ LTM ($50 ÷ 5):",
+        "alRetailLtmBreakdownValue": "+$10.00",
+        "alRetailFinalUnitPrice": "$31.00",
+        "alRetailCapUpgrades": "3D-EMB 3D Puff +$5.00 Laser Patch Patch +$5.00",
+        "alRetailGarmentsMatrix": "Quantity ADD LOGO PRICE 1-7 pcs +$50 LTM $16.00 each 8-23 pcs $14.25 each 24-47 pcs $12.75 each 48-71 pcs $11.75 each 72+ pcs $11.25 each",
+        "alRetailCapsMatrix": "Quantity ADD LOGO PRICE 1-7 pcs +$50 LTM $15.00 each 8-23 pcs $13.00 each 24-47 pcs $11.00 each 48-71 pcs $10.00 each 72+ pcs $9.00 each"
+      },
+      "fields": [
+        {
+          "id": "alRetailItemType",
+          "type": "select-one",
+          "value": "laser-patch",
+          "disabled": false
+        },
+        {
+          "id": "alRetailQuantity",
+          "type": "number",
+          "value": "5",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        },
+        {
+          "href": "/calculators/embroidery-contract/",
+          "text": "Looking for Contract Embroidery? →"
+        },
+        {
+          "href": "?tab=fullback",
+          "text": "Full Back Embroidery (25K+, DECG-FB)? Same rate when we supply the garment — see the dedicated Full Back Embroidery tab →"
+        }
+      ],
+      "tables": [
+        "Quantity ADD LOGO PRICE 1-7 pcs +$50 LTM $16.00 each 8-23 pcs $14.25 each 24-47 pcs $12.75 each 48-71 pcs $11.75 each 72+ pcs $11.25 each",
+        "Quantity ADD LOGO PRICE 1-7 pcs +$50 LTM $15.00 each 8-23 pcs $13.00 each 24-47 pcs $11.00 each 48-71 pcs $10.00 each 72+ pcs $9.00 each"
+      ],
+      "headings": [
+        "Embroidery Pricing 2026",
+        "Quick Price Calculator",
+        "Garment Additional Logo AL",
+        "Cap Additional Logo AL-CAP",
+        "Quick Quote Example"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a[href$=\"staff-dashboard.html\"]"
+            ],
+            [
+              ".version-info"
+            ],
+            [
+              "button[data-tab=\"decg-retail\"] > .tab-subtitle"
+            ],
+            [
+              "button[data-tab=\"stitch-charges\"] > .tab-subtitle"
+            ],
+            [
+              "button[data-tab=\"fullback\"] > .tab-subtitle"
+            ],
+            [
+              "#tab-al-retail > details:nth-child(1) > summary > .disclosure-hint"
+            ],
+            [
+              "details:nth-child(2) > summary > .disclosure-hint"
+            ],
+            [
+              "#alRetailBreakdownLabel"
+            ],
+            [
+              "#alRetailBreakdownValue"
+            ],
+            [
+              "#alRetailLtmBreakdownLabel"
+            ],
+            [
+              "#alRetailLtmBreakdownValue"
+            ],
+            [
+              "#alRetailCapUpgrades > .upgrade-item:nth-child(1) > .upgrade-price"
+            ],
+            [
+              "#alRetailCapUpgrades > .upgrade-item:nth-child(2) > .upgrade-price"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(1) > .matrix-header > h3 > .part-number-badge"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(1) > .matrix-header > .matrix-meta"
+            ],
+            [
+              "#alRetailGarmentsMatrix > thead > tr > th:nth-child(2)"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(1) > .matrix-note"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(2) > .matrix-header > h3 > .part-number-badge"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(2) > .matrix-header > .matrix-meta"
+            ],
+            [
+              "#alRetailCapsMatrix > thead > tr > th:nth-child(2)"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(2) > .matrix-note"
+            ]
+          ]
+        },
+        {
+          "id": "link-in-text-block",
+          "nodes": [
+            [
+              "a[href$=\"staff-dashboard.html\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Embroidery Pricing | Northwest Custom Apparel",
+      "url": "/calculators/embroidery-pricing-all/index.html?tab=al-retail",
+      "ids": {
+        "alRetailItemType": "Garment Cap Laser Patch",
+        "alRetailQuantity": "",
+        "alRetailBreakdownLabel": "Laser Patch:",
+        "alRetailBreakdownValue": "$21.00",
+        "alRetailLtmBreakdownLabel": "+ LTM ($50 ÷ 5):",
+        "alRetailLtmBreakdownValue": "+$10.00",
+        "alRetailFinalUnitPrice": "$31.00",
+        "alRetailCapUpgrades": "3D-EMB 3D Puff +$5.00 Laser Patch Patch +$5.00",
+        "alRetailGarmentsMatrix": "Quantity ADD LOGO PRICE 1-7 pcs +$50 LTM $16.00 each 8-23 pcs $14.25 each 24-47 pcs $12.75 each 48-71 pcs $11.75 each 72+ pcs $11.25 each",
+        "alRetailCapsMatrix": "Quantity ADD LOGO PRICE 1-7 pcs +$50 LTM $15.00 each 8-23 pcs $13.00 each 24-47 pcs $11.00 each 48-71 pcs $10.00 each 72+ pcs $9.00 each"
+      },
+      "fields": [
+        {
+          "id": "alRetailItemType",
+          "type": "select-one",
+          "value": "laser-patch",
+          "disabled": false
+        },
+        {
+          "id": "alRetailQuantity",
+          "type": "number",
+          "value": "5",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        },
+        {
+          "href": "/calculators/embroidery-contract/",
+          "text": "Looking for Contract Embroidery? →"
+        },
+        {
+          "href": "?tab=fullback",
+          "text": "Full Back Embroidery (25K+, DECG-FB)? Same rate when we supply the garment — see the dedicated Full Back Embroidery tab →"
+        }
+      ],
+      "tables": [
+        "Quantity ADD LOGO PRICE 1-7 pcs +$50 LTM $16.00 each 8-23 pcs $14.25 each 24-47 pcs $12.75 each 48-71 pcs $11.75 each 72+ pcs $11.25 each",
+        "Quantity ADD LOGO PRICE 1-7 pcs +$50 LTM $15.00 each 8-23 pcs $13.00 each 24-47 pcs $11.00 each 48-71 pcs $10.00 each 72+ pcs $9.00 each"
+      ],
+      "headings": [
+        "Embroidery Pricing 2026",
+        "Quick Price Calculator",
+        "Garment Additional Logo AL",
+        "Cap Additional Logo AL-CAP",
+        "Quick Quote Example"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a[href$=\"staff-dashboard.html\"]"
+            ],
+            [
+              ".version-info"
+            ],
+            [
+              "button[data-tab=\"decg-retail\"] > .tab-subtitle"
+            ],
+            [
+              "button[data-tab=\"stitch-charges\"] > .tab-subtitle"
+            ],
+            [
+              "button[data-tab=\"fullback\"] > .tab-subtitle"
+            ],
+            [
+              "#tab-al-retail > details:nth-child(1) > summary > .disclosure-hint"
+            ],
+            [
+              "details:nth-child(2) > summary > .disclosure-hint"
+            ],
+            [
+              "#alRetailBreakdownLabel"
+            ],
+            [
+              "#alRetailBreakdownValue"
+            ],
+            [
+              "#alRetailLtmBreakdownLabel"
+            ],
+            [
+              "#alRetailLtmBreakdownValue"
+            ],
+            [
+              "#alRetailCapUpgrades > .upgrade-item:nth-child(1) > .upgrade-price"
+            ],
+            [
+              "#alRetailCapUpgrades > .upgrade-item:nth-child(2) > .upgrade-price"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(1) > .matrix-header > h3 > .part-number-badge"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(1) > .matrix-header > .matrix-meta"
+            ],
+            [
+              "#alRetailGarmentsMatrix > thead > tr > th:nth-child(2)"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(1) > .matrix-note"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(2) > .matrix-header > h3 > .part-number-badge"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(2) > .matrix-header > .matrix-meta"
+            ],
+            [
+              "#alRetailCapsMatrix > thead > tr > th:nth-child(2)"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(2) > .matrix-note"
+            ]
+          ]
+        },
+        {
+          "id": "link-in-text-block",
+          "nodes": [
+            [
+              "a[href$=\"staff-dashboard.html\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Embroidery Pricing | Northwest Custom Apparel",
+      "url": "/calculators/embroidery-pricing-all/index.html?tab=al-retail",
+      "ids": {
+        "alRetailItemType": "Garment Cap Laser Patch",
+        "alRetailQuantity": "",
+        "alRetailBreakdownLabel": "Laser Patch:",
+        "alRetailBreakdownValue": "$21.00",
+        "alRetailLtmBreakdownLabel": "+ LTM ($50 ÷ 5):",
+        "alRetailLtmBreakdownValue": "+$10.00",
+        "alRetailFinalUnitPrice": "$31.00",
+        "alRetailCapUpgrades": "3D-EMB 3D Puff +$5.00 Laser Patch Patch +$5.00",
+        "alRetailGarmentsMatrix": "Quantity ADD LOGO PRICE 1-7 pcs +$50 LTM $16.00 each 8-23 pcs $14.25 each 24-47 pcs $12.75 each 48-71 pcs $11.75 each 72+ pcs $11.25 each",
+        "alRetailCapsMatrix": "Quantity ADD LOGO PRICE 1-7 pcs +$50 LTM $15.00 each 8-23 pcs $13.00 each 24-47 pcs $11.00 each 48-71 pcs $10.00 each 72+ pcs $9.00 each"
+      },
+      "fields": [
+        {
+          "id": "alRetailItemType",
+          "type": "select-one",
+          "value": "laser-patch",
+          "disabled": false
+        },
+        {
+          "id": "alRetailQuantity",
+          "type": "number",
+          "value": "5",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        },
+        {
+          "href": "/calculators/embroidery-contract/",
+          "text": "Looking for Contract Embroidery? →"
+        },
+        {
+          "href": "?tab=fullback",
+          "text": "Full Back Embroidery (25K+, DECG-FB)? Same rate when we supply the garment — see the dedicated Full Back Embroidery tab →"
+        }
+      ],
+      "tables": [
+        "Quantity ADD LOGO PRICE 1-7 pcs +$50 LTM $16.00 each 8-23 pcs $14.25 each 24-47 pcs $12.75 each 48-71 pcs $11.75 each 72+ pcs $11.25 each",
+        "Quantity ADD LOGO PRICE 1-7 pcs +$50 LTM $15.00 each 8-23 pcs $13.00 each 24-47 pcs $11.00 each 48-71 pcs $10.00 each 72+ pcs $9.00 each"
+      ],
+      "headings": [
+        "Embroidery Pricing 2026",
+        "Quick Price Calculator",
+        "Garment Additional Logo AL",
+        "Cap Additional Logo AL-CAP",
+        "Quick Quote Example"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a[href$=\"staff-dashboard.html\"]"
+            ],
+            [
+              ".version-info"
+            ],
+            [
+              "button[data-tab=\"decg-retail\"] > .tab-subtitle"
+            ],
+            [
+              "button[data-tab=\"stitch-charges\"] > .tab-subtitle"
+            ],
+            [
+              "button[data-tab=\"fullback\"] > .tab-subtitle"
+            ],
+            [
+              "#tab-al-retail > details:nth-child(1) > summary > .disclosure-hint"
+            ],
+            [
+              "details:nth-child(2) > summary > .disclosure-hint"
+            ],
+            [
+              "#alRetailBreakdownLabel"
+            ],
+            [
+              "#alRetailBreakdownValue"
+            ],
+            [
+              "#alRetailLtmBreakdownLabel"
+            ],
+            [
+              "#alRetailLtmBreakdownValue"
+            ],
+            [
+              "#alRetailCapUpgrades > .upgrade-item:nth-child(1) > .upgrade-price"
+            ],
+            [
+              "#alRetailCapUpgrades > .upgrade-item:nth-child(2) > .upgrade-price"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(1) > .matrix-header > h3 > .part-number-badge"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(1) > .matrix-header > .matrix-meta"
+            ],
+            [
+              "#alRetailGarmentsMatrix > thead > tr > th:nth-child(2)"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(1) > .matrix-note"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(2) > .matrix-header > h3 > .part-number-badge"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(2) > .matrix-header > .matrix-meta"
+            ],
+            [
+              "#alRetailCapsMatrix > thead > tr > th:nth-child(2)"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(2) > .matrix-note"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Embroidery Pricing | Northwest Custom Apparel",
+      "url": "/calculators/embroidery-pricing-all/index.html?tab=al-retail",
+      "ids": {
+        "alRetailItemType": "Garment Cap Laser Patch",
+        "alRetailQuantity": "",
+        "alRetailBreakdownLabel": "Laser Patch:",
+        "alRetailBreakdownValue": "$21.00",
+        "alRetailLtmBreakdownLabel": "+ LTM ($50 ÷ 5):",
+        "alRetailLtmBreakdownValue": "+$10.00",
+        "alRetailFinalUnitPrice": "$31.00",
+        "alRetailCapUpgrades": "3D-EMB 3D Puff +$5.00 Laser Patch Patch +$5.00",
+        "alRetailGarmentsMatrix": "Quantity ADD LOGO PRICE 1-7 pcs +$50 LTM $16.00 each 8-23 pcs $14.25 each 24-47 pcs $12.75 each 48-71 pcs $11.75 each 72+ pcs $11.25 each",
+        "alRetailCapsMatrix": "Quantity ADD LOGO PRICE 1-7 pcs +$50 LTM $15.00 each 8-23 pcs $13.00 each 24-47 pcs $11.00 each 48-71 pcs $10.00 each 72+ pcs $9.00 each"
+      },
+      "fields": [
+        {
+          "id": "alRetailItemType",
+          "type": "select-one",
+          "value": "laser-patch",
+          "disabled": false
+        },
+        {
+          "id": "alRetailQuantity",
+          "type": "number",
+          "value": "5",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        },
+        {
+          "href": "/calculators/embroidery-contract/",
+          "text": "Looking for Contract Embroidery? →"
+        },
+        {
+          "href": "?tab=fullback",
+          "text": "Full Back Embroidery (25K+, DECG-FB)? Same rate when we supply the garment — see the dedicated Full Back Embroidery tab →"
+        }
+      ],
+      "tables": [
+        "Quantity ADD LOGO PRICE 1-7 pcs +$50 LTM $16.00 each 8-23 pcs $14.25 each 24-47 pcs $12.75 each 48-71 pcs $11.75 each 72+ pcs $11.25 each",
+        "Quantity ADD LOGO PRICE 1-7 pcs +$50 LTM $15.00 each 8-23 pcs $13.00 each 24-47 pcs $11.00 each 48-71 pcs $10.00 each 72+ pcs $9.00 each"
+      ],
+      "headings": [
+        "Embroidery Pricing 2026",
+        "Quick Price Calculator",
+        "Garment Additional Logo AL",
+        "Cap Additional Logo AL-CAP",
+        "Quick Quote Example"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a[href$=\"staff-dashboard.html\"]"
+            ],
+            [
+              ".version-info"
+            ],
+            [
+              "button[data-tab=\"decg-retail\"] > .tab-subtitle"
+            ],
+            [
+              "button[data-tab=\"stitch-charges\"] > .tab-subtitle"
+            ],
+            [
+              "button[data-tab=\"fullback\"] > .tab-subtitle"
+            ],
+            [
+              "#tab-al-retail > details:nth-child(1) > summary > .disclosure-hint"
+            ],
+            [
+              "details:nth-child(2) > summary > .disclosure-hint"
+            ],
+            [
+              "#alRetailBreakdownLabel"
+            ],
+            [
+              "#alRetailBreakdownValue"
+            ],
+            [
+              "#alRetailLtmBreakdownLabel"
+            ],
+            [
+              "#alRetailLtmBreakdownValue"
+            ],
+            [
+              "#alRetailCapUpgrades > .upgrade-item:nth-child(1) > .upgrade-price"
+            ],
+            [
+              "#alRetailCapUpgrades > .upgrade-item:nth-child(2) > .upgrade-price"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(1) > .matrix-header > h3 > .part-number-badge"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(1) > .matrix-header > .matrix-meta"
+            ],
+            [
+              "#alRetailGarmentsMatrix > thead > tr > th:nth-child(2)"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(1) > .matrix-note"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(2) > .matrix-header > h3 > .part-number-badge"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(2) > .matrix-header > .matrix-meta"
+            ],
+            [
+              "#alRetailCapsMatrix > thead > tr > th:nth-child(2)"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(2) > .matrix-note"
+            ]
+          ]
+        },
+        {
+          "id": "link-in-text-block",
+          "nodes": [
+            [
+              "a[href$=\"staff-dashboard.html\"]"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "reads": [
+    "/api/contract-pricing",
+    "/api/al-pricing",
+    "/api/decg-pricing",
+    "/api/pricing-bundle?method=EMB",
+    "/api/embroidery-costs?itemType=3D-Puff&stitchCount=0",
+    "/api/embroidery-costs?itemType=Patch&stitchCount=0"
+  ],
+  "dialogs": []
+}

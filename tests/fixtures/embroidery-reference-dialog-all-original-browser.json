@@ -1,0 +1,736 @@
+{
+  "name": "dialog-all",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Embroidery Pricing | Northwest Custom Apparel",
+      "url": "/calculators/embroidery-pricing-all/index.html?tab=stitch-charges",
+      "ids": {
+        "es-mid-range": "10,001 – 18,000",
+        "es-mid-price": "+$4",
+        "es-large-range": "18,001 – 25,000",
+        "es-large-price": "+$10",
+        "openSurchargeModal": "View All 4 Surcharge Accounts",
+        "accountList": "1 Example Alpine Team Rep: Nika Lao Large +$10 Mid +$4 ▾ 2 Example Harbor Team Rep: Taneisha Clark Large +$10 Mid +$4 ▾ 3 Example Summit Team Rep: House Large +$10 Mid +$4 ▾",
+        "scStatTotal": "4",
+        "scStatMid": "3",
+        "scStatLarge": "2",
+        "scModalClose": "×",
+        "scSearch": "",
+        "scTierFilters": "All Mid +$4 Large +$10 Mixed",
+        "scRepFilters": "All Nika Taneisha House",
+        "scResultsCount": "4 of 4 accounts",
+        "scTbody": "#900001 Example Company A Example Contact A customer-0@example.invalid 555-0100 Nika Lao Mid +$4 #99001 Example stitched crest 0 14,000 st +$4.00 / piece #900002 Example Company B Example Contact B customer-1@example.invalid 555-0101 Taneisha Clark Large +$10 #99002 Example stitched crest 1 23,000 st +$10.00 / piece #900003 Example Company C Example Contact C customer-2@example.invalid 555-0102 House Mid + Large #99003 Example stitched crest 2 23,000 st +$10.00 / piece #900004 Example Company D Example Contact D customer-3@example.invalid 555-0103 House Mid +$4 #99004 Example stitched crest 3 14,000 st +$4.00 / piece"
+      },
+      "fields": [
+        {
+          "id": "scSearch",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        },
+        {
+          "href": "/calculators/embroidery-contract/",
+          "text": "Looking for Contract Embroidery? →"
+        },
+        {
+          "href": "?tab=fullback",
+          "text": "Looking for Full Back Embroidery (25K+)? See the dedicated Full Back Embroidery tab →"
+        },
+        {
+          "href": "mailto:customer-0@example.invalid",
+          "text": "customer-0@example.invalid"
+        },
+        {
+          "href": "mailto:customer-1@example.invalid",
+          "text": "customer-1@example.invalid"
+        },
+        {
+          "href": "mailto:customer-2@example.invalid",
+          "text": "customer-2@example.invalid"
+        },
+        {
+          "href": "mailto:customer-3@example.invalid",
+          "text": "customer-3@example.invalid"
+        }
+      ],
+      "tables": [
+        "# ↕ COMPANY ↕ CONTACT REP ↕ TIER ↕ LOGO / DESIGN DETAILS #900001 Example Company A Example Contact A customer-0@example.invalid 555-0100 Nika Lao Mid +$4 #99001 Example stitched crest 0 14,000 st +$4.00 / piece #900002 Example Company B Example Contact B customer-1@example.invalid 555-0101 Taneisha Clark Large +$10 #99002 Example stitched crest 1 23,000 st +$10.00 / piece #900003 Example Company C Example Contact C customer-2@example.invalid 555-0102 House Mid + Large #99003 Example stitched crest 2 23,000 st +$10.00 / piece #900004 Example Company D Example Contact D customer-3@example.invalid 555-0103 House Mid +$4 #99004 Example stitched crest 3 14,000 st +$4.00 / piece"
+      ],
+      "headings": [
+        "Embroidery Pricing 2026",
+        "Additional Stitch Pricing",
+        "Stitch Surcharge — All Customer Accounts"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a[href$=\"staff-dashboard.html\"]"
+            ],
+            [
+              ".version-info"
+            ],
+            [
+              "button[data-tab=\"al-retail\"] > .tab-subtitle"
+            ],
+            [
+              "button[data-tab=\"decg-retail\"] > .tab-subtitle"
+            ],
+            [
+              "button[data-tab=\"fullback\"] > .tab-subtitle"
+            ],
+            [
+              ".es-part:nth-child(1) > .es-part-label"
+            ],
+            [
+              ".es-part:nth-child(1) > .es-part-desc"
+            ],
+            [
+              ".es-part:nth-child(2) > .es-part-label"
+            ],
+            [
+              ".es-part:nth-child(2) > .es-part-desc"
+            ],
+            [
+              ".es-account-card:nth-child(1) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--large.es-tier-pill"
+            ],
+            [
+              ".es-account-card:nth-child(1) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--mid.es-tier-pill"
+            ],
+            [
+              ".es-account-card:nth-child(2) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--large.es-tier-pill"
+            ],
+            [
+              ".es-account-card:nth-child(2) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--mid.es-tier-pill"
+            ],
+            [
+              ".es-account-card:nth-child(3) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--large.es-tier-pill"
+            ],
+            [
+              ".es-account-card:nth-child(3) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--mid.es-tier-pill"
+            ],
+            [
+              "th[data-col=\"company\"]"
+            ],
+            [
+              "#scTable > thead > tr > th:nth-child(3)"
+            ],
+            [
+              "th[data-col=\"rep\"]"
+            ],
+            [
+              "th[data-col=\"tier\"]"
+            ],
+            [
+              "#scTable > thead > tr > th:nth-child(6)"
+            ],
+            [
+              "tr:nth-child(1) > .sc-col-id"
+            ],
+            [
+              "tr:nth-child(1) > .sc-col-contact > .sc-contact-phone"
+            ],
+            [
+              ".sc-rep-nika"
+            ],
+            [
+              "tr:nth-child(1) > td:nth-child(5) > .sc-tier-mid.sc-tier-badge"
+            ],
+            [
+              "tr:nth-child(1) > .sc-col-designs > .sc-design-item > .sc-design-name > .sc-design-num"
+            ],
+            [
+              "tr:nth-child(1) > .sc-col-designs > .sc-design-item > .sc-design-meta > .sc-design-stitches"
+            ],
+            [
+              "tr:nth-child(1) > .sc-col-designs > .sc-design-item > .sc-design-meta > .sc-charge-mid.sc-design-charge"
+            ],
+            [
+              "tr:nth-child(2) > .sc-col-id"
+            ],
+            [
+              "tr:nth-child(2) > .sc-col-contact > .sc-contact-phone"
+            ],
+            [
+              ".sc-rep-taneisha"
+            ],
+            [
+              ".sc-tier-large"
+            ],
+            [
+              "tr:nth-child(2) > .sc-col-designs > .sc-design-item > .sc-design-name > .sc-design-num"
+            ],
+            [
+              "tr:nth-child(2) > .sc-col-designs > .sc-design-item > .sc-design-meta > .sc-design-stitches"
+            ],
+            [
+              "tr:nth-child(3) > .sc-col-id"
+            ],
+            [
+              "tr:nth-child(3) > .sc-col-contact > .sc-contact-phone"
+            ],
+            [
+              "tr:nth-child(3) > .sc-col-designs > .sc-design-item > .sc-design-name > .sc-design-num"
+            ],
+            [
+              "tr:nth-child(3) > .sc-col-designs > .sc-design-item > .sc-design-meta > .sc-design-stitches"
+            ],
+            [
+              "tr:nth-child(4) > .sc-col-id"
+            ],
+            [
+              "tr:nth-child(4) > .sc-col-contact > .sc-contact-phone"
+            ],
+            [
+              "tr:nth-child(4) > td:nth-child(5) > .sc-tier-mid.sc-tier-badge"
+            ],
+            [
+              "tr:nth-child(4) > .sc-col-designs > .sc-design-item > .sc-design-name > .sc-design-num"
+            ],
+            [
+              "tr:nth-child(4) > .sc-col-designs > .sc-design-item > .sc-design-meta > .sc-design-stitches"
+            ],
+            [
+              "tr:nth-child(4) > .sc-col-designs > .sc-design-item > .sc-design-meta > .sc-charge-mid.sc-design-charge"
+            ]
+          ]
+        },
+        {
+          "id": "link-in-text-block",
+          "nodes": [
+            [
+              "a[href$=\"staff-dashboard.html\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Embroidery Pricing | Northwest Custom Apparel",
+      "url": "/calculators/embroidery-pricing-all/index.html?tab=stitch-charges",
+      "ids": {
+        "es-mid-range": "10,001 – 18,000",
+        "es-mid-price": "+$4",
+        "es-large-range": "18,001 – 25,000",
+        "es-large-price": "+$10",
+        "openSurchargeModal": "View All 4 Surcharge Accounts",
+        "accountList": "1 Example Alpine Team Rep: Nika Lao Large +$10 Mid +$4 ▾ 2 Example Harbor Team Rep: Taneisha Clark Large +$10 Mid +$4 ▾ 3 Example Summit Team Rep: House Large +$10 Mid +$4 ▾",
+        "scStatTotal": "4",
+        "scStatMid": "3",
+        "scStatLarge": "2",
+        "scModalClose": "×",
+        "scSearch": "",
+        "scTierFilters": "All Mid +$4 Large +$10 Mixed",
+        "scRepFilters": "All Nika Taneisha House",
+        "scResultsCount": "4 of 4 accounts",
+        "scTbody": "#900001 Example Company A Example Contact A customer-0@example.invalid 555-0100 Nika Lao Mid +$4 #99001 Example stitched crest 0 14,000 st +$4.00 / piece #900002 Example Company B Example Contact B customer-1@example.invalid 555-0101 Taneisha Clark Large +$10 #99002 Example stitched crest 1 23,000 st +$10.00 / piece #900003 Example Company C Example Contact C customer-2@example.invalid 555-0102 House Mid + Large #99003 Example stitched crest 2 23,000 st +$10.00 / piece #900004 Example Company D Example Contact D customer-3@example.invalid 555-0103 House Mid +$4 #99004 Example stitched crest 3 14,000 st +$4.00 / piece"
+      },
+      "fields": [
+        {
+          "id": "scSearch",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        },
+        {
+          "href": "/calculators/embroidery-contract/",
+          "text": "Looking for Contract Embroidery? →"
+        },
+        {
+          "href": "?tab=fullback",
+          "text": "Looking for Full Back Embroidery (25K+)? See the dedicated Full Back Embroidery tab →"
+        },
+        {
+          "href": "mailto:customer-0@example.invalid",
+          "text": "customer-0@example.invalid"
+        },
+        {
+          "href": "mailto:customer-1@example.invalid",
+          "text": "customer-1@example.invalid"
+        },
+        {
+          "href": "mailto:customer-2@example.invalid",
+          "text": "customer-2@example.invalid"
+        },
+        {
+          "href": "mailto:customer-3@example.invalid",
+          "text": "customer-3@example.invalid"
+        }
+      ],
+      "tables": [
+        "# ↕ COMPANY ↕ CONTACT REP ↕ TIER ↕ LOGO / DESIGN DETAILS #900001 Example Company A Example Contact A customer-0@example.invalid 555-0100 Nika Lao Mid +$4 #99001 Example stitched crest 0 14,000 st +$4.00 / piece #900002 Example Company B Example Contact B customer-1@example.invalid 555-0101 Taneisha Clark Large +$10 #99002 Example stitched crest 1 23,000 st +$10.00 / piece #900003 Example Company C Example Contact C customer-2@example.invalid 555-0102 House Mid + Large #99003 Example stitched crest 2 23,000 st +$10.00 / piece #900004 Example Company D Example Contact D customer-3@example.invalid 555-0103 House Mid +$4 #99004 Example stitched crest 3 14,000 st +$4.00 / piece"
+      ],
+      "headings": [
+        "Embroidery Pricing 2026",
+        "Additional Stitch Pricing",
+        "Stitch Surcharge — All Customer Accounts"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a[href$=\"staff-dashboard.html\"]"
+            ],
+            [
+              ".version-info"
+            ],
+            [
+              "button[data-tab=\"al-retail\"] > .tab-subtitle"
+            ],
+            [
+              "button[data-tab=\"decg-retail\"] > .tab-subtitle"
+            ],
+            [
+              "button[data-tab=\"fullback\"] > .tab-subtitle"
+            ],
+            [
+              ".es-part:nth-child(1) > .es-part-label"
+            ],
+            [
+              ".es-part:nth-child(1) > .es-part-desc"
+            ],
+            [
+              ".es-part:nth-child(2) > .es-part-label"
+            ],
+            [
+              ".es-part:nth-child(2) > .es-part-desc"
+            ],
+            [
+              ".es-account-card:nth-child(1) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--large.es-tier-pill"
+            ],
+            [
+              ".es-account-card:nth-child(1) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--mid.es-tier-pill"
+            ],
+            [
+              ".es-account-card:nth-child(2) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--large.es-tier-pill"
+            ],
+            [
+              ".es-account-card:nth-child(2) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--mid.es-tier-pill"
+            ],
+            [
+              ".es-account-card:nth-child(3) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--large.es-tier-pill"
+            ],
+            [
+              ".es-account-card:nth-child(3) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--mid.es-tier-pill"
+            ],
+            [
+              "th[data-col=\"company\"]"
+            ],
+            [
+              "#scTable > thead > tr > th:nth-child(3)"
+            ],
+            [
+              "th[data-col=\"rep\"]"
+            ],
+            [
+              "th[data-col=\"tier\"]"
+            ],
+            [
+              "#scTable > thead > tr > th:nth-child(6)"
+            ],
+            [
+              "tr:nth-child(1) > .sc-col-id"
+            ],
+            [
+              "tr:nth-child(1) > .sc-col-contact > .sc-contact-phone"
+            ],
+            [
+              ".sc-rep-nika"
+            ],
+            [
+              "tr:nth-child(1) > td:nth-child(5) > .sc-tier-mid.sc-tier-badge"
+            ],
+            [
+              "tr:nth-child(1) > .sc-col-designs > .sc-design-item > .sc-design-name > .sc-design-num"
+            ],
+            [
+              "tr:nth-child(2) > .sc-col-id"
+            ],
+            [
+              "tr:nth-child(2) > .sc-col-contact > .sc-contact-phone"
+            ],
+            [
+              ".sc-rep-taneisha"
+            ],
+            [
+              ".sc-tier-large"
+            ],
+            [
+              "tr:nth-child(2) > .sc-col-designs > .sc-design-item > .sc-design-name > .sc-design-num"
+            ],
+            [
+              "tr:nth-child(3) > .sc-col-id"
+            ],
+            [
+              "tr:nth-child(3) > .sc-col-contact > .sc-contact-phone"
+            ],
+            [
+              "tr:nth-child(3) > .sc-col-designs > .sc-design-item > .sc-design-name > .sc-design-num"
+            ],
+            [
+              "tr:nth-child(4) > .sc-col-id"
+            ],
+            [
+              "tr:nth-child(4) > .sc-col-contact > .sc-contact-phone"
+            ],
+            [
+              "tr:nth-child(4) > td:nth-child(5) > .sc-tier-mid.sc-tier-badge"
+            ],
+            [
+              "tr:nth-child(4) > .sc-col-designs > .sc-design-item > .sc-design-name > .sc-design-num"
+            ]
+          ]
+        },
+        {
+          "id": "link-in-text-block",
+          "nodes": [
+            [
+              "a[href$=\"staff-dashboard.html\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Embroidery Pricing | Northwest Custom Apparel",
+      "url": "/calculators/embroidery-pricing-all/index.html?tab=stitch-charges",
+      "ids": {
+        "es-mid-range": "10,001 – 18,000",
+        "es-mid-price": "+$4",
+        "es-large-range": "18,001 – 25,000",
+        "es-large-price": "+$10",
+        "openSurchargeModal": "View All 4 Surcharge Accounts",
+        "accountList": "1 Example Alpine Team Rep: Nika Lao Large +$10 Mid +$4 ▾ 2 Example Harbor Team Rep: Taneisha Clark Large +$10 Mid +$4 ▾ 3 Example Summit Team Rep: House Large +$10 Mid +$4 ▾",
+        "scStatTotal": "4",
+        "scStatMid": "3",
+        "scStatLarge": "2",
+        "scModalClose": "×",
+        "scSearch": "",
+        "scTierFilters": "All Mid +$4 Large +$10 Mixed",
+        "scRepFilters": "All Nika Taneisha House",
+        "scResultsCount": "4 of 4 accounts",
+        "scTbody": "#900001 Example Company A Example Contact A customer-0@example.invalid 555-0100 Nika Lao Mid +$4 #99001 Example stitched crest 0 14,000 st +$4.00 / piece #900002 Example Company B Example Contact B customer-1@example.invalid 555-0101 Taneisha Clark Large +$10 #99002 Example stitched crest 1 23,000 st +$10.00 / piece #900003 Example Company C Example Contact C customer-2@example.invalid 555-0102 House Mid + Large #99003 Example stitched crest 2 23,000 st +$10.00 / piece #900004 Example Company D Example Contact D customer-3@example.invalid 555-0103 House Mid +$4 #99004 Example stitched crest 3 14,000 st +$4.00 / piece"
+      },
+      "fields": [
+        {
+          "id": "scSearch",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        },
+        {
+          "href": "/calculators/embroidery-contract/",
+          "text": "Looking for Contract Embroidery? →"
+        },
+        {
+          "href": "?tab=fullback",
+          "text": "Looking for Full Back Embroidery (25K+)? See the dedicated Full Back Embroidery tab →"
+        },
+        {
+          "href": "mailto:customer-0@example.invalid",
+          "text": "customer-0@example.invalid"
+        },
+        {
+          "href": "mailto:customer-1@example.invalid",
+          "text": "customer-1@example.invalid"
+        },
+        {
+          "href": "mailto:customer-2@example.invalid",
+          "text": "customer-2@example.invalid"
+        },
+        {
+          "href": "mailto:customer-3@example.invalid",
+          "text": "customer-3@example.invalid"
+        }
+      ],
+      "tables": [
+        "# ↕ COMPANY ↕ CONTACT REP ↕ TIER ↕ LOGO / DESIGN DETAILS #900001 Example Company A Example Contact A customer-0@example.invalid 555-0100 Nika Lao Mid +$4 #99001 Example stitched crest 0 14,000 st +$4.00 / piece #900002 Example Company B Example Contact B customer-1@example.invalid 555-0101 Taneisha Clark Large +$10 #99002 Example stitched crest 1 23,000 st +$10.00 / piece #900003 Example Company C Example Contact C customer-2@example.invalid 555-0102 House Mid + Large #99003 Example stitched crest 2 23,000 st +$10.00 / piece #900004 Example Company D Example Contact D customer-3@example.invalid 555-0103 House Mid +$4 #99004 Example stitched crest 3 14,000 st +$4.00 / piece"
+      ],
+      "headings": [
+        "Embroidery Pricing 2026",
+        "Additional Stitch Pricing",
+        "Stitch Surcharge — All Customer Accounts"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a[href$=\"staff-dashboard.html\"]"
+            ],
+            [
+              ".version-info"
+            ],
+            [
+              "button[data-tab=\"al-retail\"] > .tab-subtitle"
+            ],
+            [
+              "button[data-tab=\"decg-retail\"] > .tab-subtitle"
+            ],
+            [
+              "button[data-tab=\"fullback\"] > .tab-subtitle"
+            ],
+            [
+              ".es-part:nth-child(1) > .es-part-label"
+            ],
+            [
+              ".es-part:nth-child(1) > .es-part-desc"
+            ],
+            [
+              ".es-part:nth-child(2) > .es-part-label"
+            ],
+            [
+              ".es-part:nth-child(2) > .es-part-desc"
+            ],
+            [
+              ".es-account-card:nth-child(1) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--large.es-tier-pill"
+            ],
+            [
+              ".es-account-card:nth-child(1) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--mid.es-tier-pill"
+            ],
+            [
+              ".es-account-card:nth-child(2) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--large.es-tier-pill"
+            ],
+            [
+              ".es-account-card:nth-child(2) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--mid.es-tier-pill"
+            ],
+            [
+              ".es-account-card:nth-child(3) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--large.es-tier-pill"
+            ],
+            [
+              ".es-account-card:nth-child(3) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--mid.es-tier-pill"
+            ],
+            [
+              "th[data-col=\"company\"]"
+            ],
+            [
+              "#scTable > thead > tr > th:nth-child(3)"
+            ],
+            [
+              "tr:nth-child(1) > .sc-col-id"
+            ],
+            [
+              "tr:nth-child(1) > .sc-col-contact > .sc-contact-phone"
+            ],
+            [
+              "tr:nth-child(2) > .sc-col-id"
+            ],
+            [
+              "tr:nth-child(2) > .sc-col-contact > .sc-contact-phone"
+            ],
+            [
+              "tr:nth-child(3) > .sc-col-id"
+            ],
+            [
+              "tr:nth-child(3) > .sc-col-contact > .sc-contact-phone"
+            ],
+            [
+              "tr:nth-child(4) > .sc-col-id"
+            ],
+            [
+              "tr:nth-child(4) > .sc-col-contact > .sc-contact-phone"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Embroidery Pricing | Northwest Custom Apparel",
+      "url": "/calculators/embroidery-pricing-all/index.html?tab=stitch-charges",
+      "ids": {
+        "es-mid-range": "10,001 – 18,000",
+        "es-mid-price": "+$4",
+        "es-large-range": "18,001 – 25,000",
+        "es-large-price": "+$10",
+        "openSurchargeModal": "View All 4 Surcharge Accounts",
+        "accountList": "1 Example Alpine Team Rep: Nika Lao Large +$10 Mid +$4 ▾ 2 Example Harbor Team Rep: Taneisha Clark Large +$10 Mid +$4 ▾ 3 Example Summit Team Rep: House Large +$10 Mid +$4 ▾",
+        "scStatTotal": "4",
+        "scStatMid": "3",
+        "scStatLarge": "2",
+        "scModalClose": "×",
+        "scSearch": "",
+        "scTierFilters": "All Mid +$4 Large +$10 Mixed",
+        "scRepFilters": "All Nika Taneisha House",
+        "scResultsCount": "4 of 4 accounts",
+        "scTbody": "#900001 Example Company A Example Contact A customer-0@example.invalid 555-0100 Nika Lao Mid +$4 #99001 Example stitched crest 0 14,000 st +$4.00 / piece #900002 Example Company B Example Contact B customer-1@example.invalid 555-0101 Taneisha Clark Large +$10 #99002 Example stitched crest 1 23,000 st +$10.00 / piece #900003 Example Company C Example Contact C customer-2@example.invalid 555-0102 House Mid + Large #99003 Example stitched crest 2 23,000 st +$10.00 / piece #900004 Example Company D Example Contact D customer-3@example.invalid 555-0103 House Mid +$4 #99004 Example stitched crest 3 14,000 st +$4.00 / piece"
+      },
+      "fields": [
+        {
+          "id": "scSearch",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        },
+        {
+          "href": "/calculators/embroidery-contract/",
+          "text": "Looking for Contract Embroidery? →"
+        },
+        {
+          "href": "?tab=fullback",
+          "text": "Looking for Full Back Embroidery (25K+)? See the dedicated Full Back Embroidery tab →"
+        },
+        {
+          "href": "mailto:customer-0@example.invalid",
+          "text": "customer-0@example.invalid"
+        },
+        {
+          "href": "mailto:customer-1@example.invalid",
+          "text": "customer-1@example.invalid"
+        },
+        {
+          "href": "mailto:customer-2@example.invalid",
+          "text": "customer-2@example.invalid"
+        },
+        {
+          "href": "mailto:customer-3@example.invalid",
+          "text": "customer-3@example.invalid"
+        }
+      ],
+      "tables": [
+        "# ↕ COMPANY ↕ CONTACT REP ↕ TIER ↕ LOGO / DESIGN DETAILS #900001 Example Company A Example Contact A customer-0@example.invalid 555-0100 Nika Lao Mid +$4 #99001 Example stitched crest 0 14,000 st +$4.00 / piece #900002 Example Company B Example Contact B customer-1@example.invalid 555-0101 Taneisha Clark Large +$10 #99002 Example stitched crest 1 23,000 st +$10.00 / piece #900003 Example Company C Example Contact C customer-2@example.invalid 555-0102 House Mid + Large #99003 Example stitched crest 2 23,000 st +$10.00 / piece #900004 Example Company D Example Contact D customer-3@example.invalid 555-0103 House Mid +$4 #99004 Example stitched crest 3 14,000 st +$4.00 / piece"
+      ],
+      "headings": [
+        "Embroidery Pricing 2026",
+        "Additional Stitch Pricing",
+        "Stitch Surcharge — All Customer Accounts"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a[href$=\"staff-dashboard.html\"]"
+            ],
+            [
+              ".version-info"
+            ],
+            [
+              "button[data-tab=\"al-retail\"] > .tab-subtitle"
+            ],
+            [
+              "button[data-tab=\"decg-retail\"] > .tab-subtitle"
+            ],
+            [
+              "button[data-tab=\"fullback\"] > .tab-subtitle"
+            ],
+            [
+              ".es-part:nth-child(1) > .es-part-label"
+            ],
+            [
+              ".es-part:nth-child(1) > .es-part-desc"
+            ],
+            [
+              ".es-part:nth-child(2) > .es-part-label"
+            ],
+            [
+              ".es-part:nth-child(2) > .es-part-desc"
+            ],
+            [
+              ".es-account-card:nth-child(1) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--large.es-tier-pill"
+            ],
+            [
+              ".es-account-card:nth-child(1) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--mid.es-tier-pill"
+            ],
+            [
+              ".es-account-card:nth-child(2) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--large.es-tier-pill"
+            ],
+            [
+              ".es-account-card:nth-child(2) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--mid.es-tier-pill"
+            ],
+            [
+              ".es-account-card:nth-child(3) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--large.es-tier-pill"
+            ],
+            [
+              ".es-account-card:nth-child(3) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--mid.es-tier-pill"
+            ],
+            [
+              "th[data-col=\"company\"]"
+            ],
+            [
+              "#scTable > thead > tr > th:nth-child(3)"
+            ],
+            [
+              "tr:nth-child(1) > .sc-col-id"
+            ],
+            [
+              "tr:nth-child(1) > .sc-col-contact > .sc-contact-phone"
+            ],
+            [
+              "tr:nth-child(2) > .sc-col-id"
+            ],
+            [
+              "tr:nth-child(2) > .sc-col-contact > .sc-contact-phone"
+            ],
+            [
+              "tr:nth-child(3) > .sc-col-id"
+            ],
+            [
+              "tr:nth-child(3) > .sc-col-contact > .sc-contact-phone"
+            ],
+            [
+              "tr:nth-child(4) > .sc-col-id"
+            ],
+            [
+              "tr:nth-child(4) > .sc-col-contact > .sc-contact-phone"
+            ]
+          ]
+        },
+        {
+          "id": "link-in-text-block",
+          "nodes": [
+            [
+              "a[href$=\"staff-dashboard.html\"]"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "reads": [
+    "/api/contract-pricing",
+    "/api/al-pricing",
+    "/api/decg-pricing",
+    "/api/pricing-bundle?method=EMB",
+    "/api/embroidery-costs?itemType=3D-Puff&stitchCount=0",
+    "/api/embroidery-costs?itemType=Patch&stitchCount=0"
+  ],
+  "dialogs": []
+}
