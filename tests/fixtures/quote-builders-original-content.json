@@ -1288,6 +1288,192 @@
       "before": "<td colspan=\"13\" class=\"qb-empty-state\">",
       "after": "<td colspan=\"14\" class=\"qb-empty-state\">",
       "count": 1
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "<body class=\"dtf-builder qb-shell-body\">",
+      "after": "<body class=\"dtf-builder qb-shell-body\" data-ui=\"unified\" data-quote-workspace=\"dtf\">",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "family=Inter:wght@400;500;600;700",
+      "after": "family=Public+Sans:wght@400;500;600;700",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "<link href=\"/shared_components/vendor/bootstrap/css/bootstrap.min.css?v=2026.07.08.8\" rel=\"stylesheet\">",
+      "after": "<!-- Quote workspace replaces bootstrap.min.css on this page. -->",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "<link rel=\"stylesheet\" href=\"/shared_components/css/quote-builder-common.css?v=2026.09.07.19\">",
+      "after": "<!-- Quote workspace replaces quote-builder-common.css on this page. -->",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "<link rel=\"stylesheet\" href=\"/shared_components/css/quote-builder-shell.css?v=2026.09.07.19\">",
+      "after": "<!-- Quote workspace replaces quote-builder-shell.css on this page. -->",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "<link rel=\"stylesheet\" href=\"/shared_components/css/quote-builder-guided.css?v=2026.09.07.16\">",
+      "after": "<!-- Quote workspace replaces quote-builder-guided.css on this page. -->",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "<link rel=\"stylesheet\" href=\"/shared_components/css/dtf-quote-builder.css?v=2026.09.07.19\">",
+      "after": "<!-- Quote workspace replaces dtf-quote-builder.css on this page. -->",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "<link rel=\"stylesheet\" href=\"/shared_components/css/quote-print.css?v=2026.09.07.19\">",
+      "after": "<!-- Quote workspace replaces quote-print.css on this page. -->",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "<link rel=\"stylesheet\" href=\"/shared_components/css/color-picker-shared.css?v=2026.09.07.16\">",
+      "after": "<!-- Quote workspace replaces color-picker-shared.css on this page. -->",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "<link rel=\"stylesheet\" href=\"/shared_components/css/quote-share-modal.css?v=2026.09.07.19\">",
+      "after": "<!-- Quote workspace replaces quote-share-modal.css on this page. -->",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "<link rel=\"stylesheet\" href=\"/shared_components/css/customer-lookup.css?v=2026.09.07.19\">",
+      "after": "<!-- Quote workspace replaces customer-lookup.css on this page. -->",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "<link rel=\"stylesheet\" href=\"/shared_components/css/quote-session.css?v=2026.09.07.16\">",
+      "after": "<!-- Quote workspace replaces quote-session.css on this page. -->",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "<link rel=\"stylesheet\" href=\"/shared_components/css/quote-builder-utilities.css?v=2026.09.07.19\">",
+      "after": "<!-- Quote workspace replaces quote-builder-utilities.css on this page. -->",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "</head>",
+      "after": "    <link rel=\"stylesheet\" href=\"/shared_components/css/components.css?v=2026.09.12.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/utilities.css?v=2026.09.12.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/quote-workspace.css?v=2026.09.12.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/quote-dtf.css?v=2026.09.12.2\">\n</head>",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "qb-cols-1fr-1fr-gap-8",
+      "after": "workspace-customer-grid",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "qb-span-all",
+      "after": "workspace-customer-span",
+      "count": 2
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "qb-fwrap-wrap-gap-6-m-4-0",
+      "after": "workspace-customer-search-row",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "qb-fwrap-wrap-gap-24-ai-flex-end-pt-8",
+      "after": "workspace-charge-fields",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "qb-pos-relative",
+      "after": "workspace-shipping-money",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "qb-pos-absolute-left-8-top-50-tf-translatey-50-c-qb-gray-fs-12",
+      "after": "workspace-shipping-currency",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "qb-fs-11-c-slate-500-minh-14",
+      "after": "workspace-tax-status",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "qb-fs-12-p-6-8-minh-60-rs-vertical-ff-inherit",
+      "after": "workspace-order-notes",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "id=\"min-order-warning\" style=",
+      "after": "id=\"min-order-warning\" class=\"workspace-min-order\" style=",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "<div class=\"product-table-wrapper\">",
+      "after": "<div class=\"product-table-wrapper\" role=\"region\" aria-label=\"Quote line items\" tabindex=\"0\">",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "class=\"charges-header\" data-call=\"toggleFeesCharges\"",
+      "after": "class=\"charges-header\" role=\"button\" tabindex=\"0\" data-keyclick=\"1\" data-call=\"toggleFeesCharges\"",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "class=\"charges-header\" data-call=\"toggleOrderDetails\"",
+      "after": "class=\"charges-header\" role=\"button\" tabindex=\"0\" data-keyclick=\"1\" data-call=\"toggleOrderDetails\"",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/builders/dtf/product-rows.js",
+      "before": "    selected.setAttribute('aria-expanded', String(nowOpen));",
+      "after": "    selected.setAttribute('aria-expanded', String(nowOpen));\n    if (nowOpen) selected.setAttribute('aria-controls', dropdown.id);\n    else selected.removeAttribute('aria-activedescendant');",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/builders/dtf/product-rows.js",
+      "before": "    row.querySelector('.color-picker-dropdown').classList.add('hidden');",
+      "after": "    row.querySelector('.color-picker-dropdown').classList.add('hidden');\n    row.querySelector('.color-picker-selected')?.setAttribute('aria-expanded', 'false');\n    row.querySelector('.color-picker-selected')?.removeAttribute('aria-activedescendant');",
+      "count": 2
+    },
+    {
+      "file": "shared_components/js/builders/dtf/product-rows.js",
+      "before": "    if (dropdown) dropdown.classList.add('hidden');",
+      "after": "    if (dropdown) dropdown.classList.add('hidden');\n    childRow.querySelector('.color-picker-selected')?.setAttribute('aria-expanded', 'false');\n    childRow.querySelector('.color-picker-selected')?.removeAttribute('aria-activedescendant');",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/builders/dtf/product-rows.js",
+      "before": "        if (d !== dropdown) d.classList.add('hidden');",
+      "after": "        if (d !== dropdown) {\n            d.classList.add('hidden');\n            const other = d.closest('tr')?.querySelector('.color-picker-selected');\n            other?.setAttribute('aria-expanded', 'false');\n            other?.removeAttribute('aria-activedescendant');\n        }",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/builders/dtf/product-rows.js",
+      "before": "        row.querySelector('.color-picker-dropdown').classList.add('hidden');\n    row.querySelector('.color-picker-selected')?.setAttribute('aria-expanded', 'false');\n    row.querySelector('.color-picker-selected')?.removeAttribute('aria-activedescendant');",
+      "after": "        row.querySelector('.color-picker-dropdown').classList.add('hidden');\n        row.querySelector('.color-picker-selected')?.setAttribute('aria-expanded', 'false');\n        row.querySelector('.color-picker-selected')?.removeAttribute('aria-activedescendant');",
+      "count": 1
     }
   ]
 }

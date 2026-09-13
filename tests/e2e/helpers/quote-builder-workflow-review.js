@@ -54,10 +54,13 @@ async function evidence(page,name,e){
     expect(currentURL.origin,name+' share link uses the current app origin').toBe(previewOrigin);
     return {...field,value:originalURL.origin+currentURL.pathname+currentURL.search+currentURL.hash};
    });
-   if(/^(embroidery|screenprint)-/.test(name)&&!name.startsWith('screenprint-fast-')&&key==='ids'){
+   if(/^(embroidery|screenprint|dtf)-/.test(name)&&!name.startsWith('screenprint-fast-')&&key==='ids'){
     // The resized layout keeps thumbnails on phones and offers its drag handle only beside the content.
     // These empty presentation nodes may change visibility; all values and form controls stay exact.
     for(const id of ['thumb-1','sidebar-resize-handle']){if(actual[id]==='')delete actual[id];if(expectedValue[id]==='')delete expectedValue[id];}
+    // DTF formerly hid color choices and fee cells on phones. Each restored
+    // value must equal the original desktop state before comparing old visibility.
+    if(name.startsWith('dtf-'))for(const id of ['color-dropdown-1-opt-0','color-dropdown-1-opt-1','art-charge-total','art-charge-unit','graphic-design-total-row','graphic-design-unit','rush-fee-total','rush-fee-unit'])if(expectedValue[id]===undefined&&actual[id]!==undefined){expect(actual[id]).toBe(expected.states[0].ids[id]);delete actual[id];}
     if(name==='screenprint-healthy-fees')for(const id of ['vellum-qty-cell','color-change-qty-cell'])if(expectedValue[id]===undefined){expect(actual[id]).toBe(expected.states[0].ids[id]);delete actual[id];}
     // These informational notices expire on real timers during four-width capture.
     // Transient warnings below are asserted at their trigger. Persistent errors,
@@ -71,6 +74,18 @@ async function evidence(page,name,e){
      if(name.startsWith('embroidery-caps'))state['toast-container']=state['toast-container'].replace('Cap detected - using cap embroidery pricing','').trim();
      if(name==='embroidery-full-back')state['toast-container']=state['toast-container'].replace('Full Back requires minimum 25,000 stitches','').trim();
      if(name==='embroidery-save-failure')state['toast-container']=state['toast-container'].replace('Error saving quote: Session save failed: {"error":"Synthetic save failure"}','').trim();
+    }
+   }
+   if(name.startsWith('dtf-')&&key==='tables'){
+    // Every table column now remains available at all widths; compare the
+    // complete original desktop content, including restored color/fee cells.
+    expectedValue=expected.states[0].tables;
+   }
+   if(name.startsWith('dtf-')&&key==='fields'&&states[i].width<=600){
+    const originalDescription=expected.states[0].fields.find(f=>f.type==='text'&&f.value==='Essential Cotton Tee');
+    if(originalDescription&&!expectedValue.some(f=>f.type==='text'&&f.value===originalDescription.value)){
+     expect(actual.filter(f=>f.type==='text'&&f.value===originalDescription.value)).toEqual([originalDescription]);
+     actual=actual.filter(f=>!(f.type==='text'&&f.value===originalDescription.value));
     }
    }
    if(/^(embroidery|screenprint)-/.test(name)&&!name.startsWith('screenprint-fast-')&&key==='tables'){

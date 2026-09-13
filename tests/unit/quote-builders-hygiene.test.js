@@ -33,9 +33,9 @@ describe('builder markup carries no decorative inline styles (2026-09-06 extract
             if (props.some((p) => !STATE.has(p))) decorative.push(m[1]);
         }
         expect(decorative).toEqual([]);
-        if (['quote-builders/embroidery-quote-builder.html', 'quote-builders/screenprint-quote-builder.html'].includes(rel)) {
+        if (['quote-builders/embroidery-quote-builder.html', 'quote-builders/screenprint-quote-builder.html', 'quote-builders/dtf-quote-builder.html'].includes(rel)) {
             expect(html).toMatch(/quote-workspace\.css\?v=/);
-            expect(html).toMatch(rel.includes('embroidery') ? /quote-embroidery\.css\?v=/ : /quote-screenprint\.css\?v=/);
+            expect(html).toMatch(rel.includes('embroidery') ? /quote-embroidery\.css\?v=/ : rel.includes('screenprint') ? /quote-screenprint\.css\?v=/ : /quote-dtf\.css\?v=/);
             expect(html).not.toMatch(/quote-builder-utilities\.css\?v=/);
         } else if (rel !== 'quote-builders/dtg-quote-builder.html') expect(html).toMatch(/quote-builder-utilities\.css\?v=/);
     });

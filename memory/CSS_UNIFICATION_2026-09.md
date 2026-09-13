@@ -1971,3 +1971,11 @@ All145 current screen captures and17 PDFs/50 paper pages were reviewed. Final co
 553 unit/source/ownership/totals/escaping checks pass across five suites, with the final ownership rerun registering the renderer-provided --swatch token. Repository JavaScript lint and280-file CSS lint pass. Corrected issues include clipped tax/currency inputs, empty-row column spans and orphaned printed customer details. No pricing math changed and all business requests remained synthetic.
 
 Local census223/225 reviewed; DTF and DTG pages remain. Production stays215/225 at v2026.09.12.1 / Heroku2110. DTF original review is complete; next adopt its shared workspace and verify method-specific location/shipping flows. DTG has32 original sheets still to inspect. Shared/generated/provider/email work and the complete final regression/release remain separate unfinished work.
+
+## DTF workspace reviewed — September 12, 2026
+
+DTF uses the shared workspace for navigation, artwork, line items, customer and quote controls, with one method sheet for transfer locations, order details and extended sizes. Its local CSS falls from 540,541 to 235,696 raw LF bytes (14 to 7 local stylesheets). All 15 browser cases pass, including native location keys, picker close-state, shipping/tax/currency geometry, detailed fees, all transfer positions and exact original saved values. Three detailed original fixtures are included explicitly.
+
+All 109 current screenshots and 14 PDFs / 30 paper pages are reviewed. The final corrections required 42 changed panels on 11 sheets; 130 panels matched the fully reviewed prior output. Dialog spacing, customer-heading alignment and long location values are corrected. The 136 source hashes and financial/data content remain protected; no pricing math changed. Five targeted suites pass 553 tests; repository JavaScript lint and all 281 scoped CSS files pass. The newly registered owner is checked separately.
+
+Local census is 224/225; DTG is the last static page. Production remains 215/225 at v2026.09.12.1 / Heroku 2110 until the final release. DTG original sheets 0–11, 17, 18 and 32 have been inspected; the other 20 still require review before adoption. Shared/generated/server/provider/email work and whole-app regression/CI/release remain unfinished.

@@ -124,18 +124,6 @@ Exact-source CI must pass its actual browser/parity jobs, including credentials 
 
 Quote-operation access rollout (2026-09-07) is archived in LESSONS_LEARNED_ARCHIVE.md; caller/quote scope and live-mutation boundaries remain enforced by quote-sync-access.test.js.
 
-## Training controls and printed guides need state/output checks (2026-09-08, archived)
-
-Exercise state transitions and verify complete printed content. Full entry in LESSONS_LEARNED_ARCHIVE.md.
-
-### Shared form styles and print pseudo-elements (2026-09-08, archived): inspect actual filled paper and scoped pseudo-elements. Full entry in LESSONS_LEARNED_ARCHIVE.md.
-
-### Training state must survive every input path (2026-09-08, archived): preserve input/retry/storage behavior. Full entry in LESSONS_LEARNED_ARCHIVE.md.
-
-Native storefront menu focus and paper migration (2026-09-09) is archived in LESSONS_LEARNED_ARCHIVE.md; existing keyboard/browser guards retain the contract.
-
-Staff reference failure-state findings (2026-09-09) are preserved in LESSONS_LEARNED_ARCHIVE.md.
-
 ## A reviewed page wrapper is not a reviewed external app (2026-09-09)
 
 Problem: the CSS census omitted Jotform scripts and its external-owner backlog named only three Caspio pages. Root cause: provider recognition did not match the currently loaded embeds. Solution: recognize Jotform and explicitly retain vendor-owned UI as pending even after its surrounding page is reviewed. Prevention: lock live embed IDs/URLs, test wrapper boundaries with login/table/empty/failure fixtures and block all real provider writes; do not describe synthetic fixture coverage as validation of a vendor app. Check DESIGN_COLOUR_CODE before mapping an inherited palette: announcement admin tools are neutral; legacy maroon does not make them AE-owned.
@@ -250,3 +238,9 @@ Browser baselines must work from a fresh checkout. The tumbler export test previ
 - Problem/root cause: screen-print empty rows spanned only 13 of 14 columns, so horizontal scrolling clipped instructions; generic input padding overrode shipping currency spacing. Hidden native ink radios and mouse-only expanders blocked keyboard operation.
 - Solution: match both initial/reset column spans, use named shipping field styles with sufficient specificity, retain native focusable radios and reuse keyboard delegation for fees/order sections. Share artwork and customer controls with method-scoped layout rules.
 - Prevention: assert far-right scroll geometry, numeric text/currency clearance, arrow/Enter/Space operation, exact original prices and saved fields, every paper page, and all embroidery scenes after shared-style changes. Assert timed notices immediately at their trigger before comparing four-width layouts.
+
+## Method dialogs need explicit state and spacing (2026-09-12)
+
+- Problem/root cause: DTF color controls kept aria-expanded true after selection; its distinct size-dialog body/footer and customer heading relied on removed legacy spacing. Long location names overflowed the phone summary.
+- Solution: synchronize picker open/close attributes, give the method-specific size grid and footer canonical spacing, align the customer header and wrap summary values. Native location and shipping controls share the existing keyboard delegation.
+- Prevention: compare original prices, fees, shipping and saved fields at four widths; test selection/Escape and native location keys, inspect complete size dialogs, every table column and all paper pages.

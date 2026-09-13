@@ -85,6 +85,34 @@ for(const scene of ['products','locations','fees','safety','recommendations','sh
  await page.waitForLoadState('networkidle');await evidence(page,'screenprint-healthy-'+scene,e);
 });
 
+for(const scene of ['locations','fees','shipping-fields'])test('CSS quote builders: dtf detailed-'+scene,async({page})=>{
+ page.setDefaultTimeout(15000);
+ const e=await open(page,{original,url:'/quote-builders/dtf-quote-builder.html'});
+ await addProduct(page,'dtf');
+ if(scene==='locations'){
+  await page.locator('.guided-step[data-step="1"]').click();
+  await page.locator('input[name="front-location"][value="full-front"]').check();
+  await page.locator('input[name="back-location"][value="center-back"]').check();
+  await page.locator('input[name="sleeve-location"][value="left-sleeve"]').check();
+  await page.locator('input[name="sleeve-location"][value="right-sleeve"]').check();
+ }
+ if(scene==='fees'){
+  await page.locator('[data-call="toggleFeesCharges"]').click();
+  await page.locator('#art-charge-toggle').check();
+  for(const [id,value] of [['graphic-design-hours','2'],['rush-fee','50']]){
+   await page.locator('#'+id).fill(value);await page.locator('#'+id).dispatchEvent('change');
+  }
+ }
+ if(scene==='shipping-fields'){
+  await page.locator('.guided-step[data-step="3"]').click();
+  await page.locator('[data-call="toggleOrderDetails"]').click();
+  for(const [id,value] of [['po-number','SYNTHETIC-PO-17'],['ship-to-name','Example Recipient'],['ship-address','123 Example Street'],['ship-city','Example City'],['dtf-notes','Synthetic delivery instructions']])await page.locator('#'+id).fill(value);
+  await page.locator('#ship-method').selectOption('Customer Pickup');
+  await page.locator('#dtf-shipping-fee').fill('12.50');await page.locator('#dtf-shipping-fee').dispatchEvent('change');
+ }
+ await page.waitForLoadState('networkidle');await evidence(page,'dtf-detailed-'+scene,e);
+});
+
 for(const scene of ['import','shipping','design-gallery'])test('CSS quote builders: embroidery '+scene,async({page})=>{
  page.setDefaultTimeout(15000);
  const e=await open(page,{original,url:'/quote-builders/embroidery-quote-builder.html'});await addProduct(page,'embroidery');
@@ -116,6 +144,41 @@ for(const scene of ['caps','caps-puff','caps-patch','full-back','services-artwor
   if(scene.startsWith('services-'))await page.locator('.service-cat-btn').filter({hasText:{'services-artwork':'Artwork','services-add-ons':'Add-Ons','services-supplied':'Customer-Supplied'}[scene]}).click();
  }
  await page.waitForLoadState('networkidle');await evidence(page,'embroidery-'+scene,e);
+});
+
+test('CSS quote builders: dtf keyboard locations and shipping controls',async({page})=>{
+ test.skip(original,'The original keyboard defects are preserved in visual/source fixtures.');
+ const e=await open(page,{url:'/quote-builders/dtf-quote-builder.html'});await addProduct(page,'dtf');
+ await page.locator('.guided-step[data-step="1"]').click();
+ const front=page.locator('input[name="front-location"][value="left-chest"]');
+ await front.focus();await page.keyboard.press('ArrowDown');
+ await expect(page.locator('input[name="front-location"][value="right-chest"]')).toBeChecked();
+ await page.keyboard.press('ArrowUp');await expect(front).toBeChecked();
+ const sleeve=page.locator('input[name="sleeve-location"][value="left-sleeve"]');
+ await sleeve.focus();await page.keyboard.press('Space');await expect(sleeve).toBeChecked();
+ await page.keyboard.press('Space');await expect(sleeve).not.toBeChecked();
+ await page.locator('.guided-step[data-step="0"]').click();
+ const color=page.locator('tr[data-style] .color-picker-selected').first();
+ await color.focus();await page.keyboard.press('Enter');await expect(color).toHaveAttribute('aria-expanded','true');
+ await expect(color).toHaveAttribute('aria-controls','color-dropdown-1');
+ await page.keyboard.press('Escape');await expect(color).toHaveAttribute('aria-expanded','false');
+ const fees=page.locator('[data-call="toggleFeesCharges"]');await fees.focus();await page.keyboard.press('Space');
+ await expect(page.locator('#graphic-design-hours')).toBeVisible();await page.keyboard.press('Space');
+ await expect(page.locator('#graphic-design-hours')).toBeHidden();
+ await page.locator('.guided-step[data-step="3"]').click();
+ const shipping=page.locator('[data-call="toggleOrderDetails"]');await shipping.focus();await page.keyboard.press('Enter');
+ await page.locator('#po-number').fill('KEYBOARD-PO-17');
+ for(const width of [1440,768,390,320]){
+  await page.setViewportSize({width,height:1000});
+  const dimensions=await page.evaluate(()=>{
+   const field=document.querySelector('#dtf-shipping-fee'),currency=document.querySelector('.workspace-shipping-currency'),tax=document.querySelector('#tax-rate-input');
+   return {currencyRight:currency.getBoundingClientRect().right,textLeft:field.getBoundingClientRect().left+parseFloat(getComputedStyle(field).paddingLeft),taxTextWidth:tax.clientWidth-parseFloat(getComputedStyle(tax).paddingLeft)-parseFloat(getComputedStyle(tax).paddingRight)};
+  });
+  expect(dimensions.currencyRight).toBeLessThan(dimensions.textLeft);expect(dimensions.taxTextWidth).toBeGreaterThanOrEqual(64);
+  await expect(page.locator('#po-number')).toHaveValue('KEYBOARD-PO-17');
+ }
+ await expect(page.locator('#grand-total-with-tax')).toHaveText('$714.10');
+ expect(e.mutations||[]).toEqual([]);
 });
 
 test('CSS quote builders: screenprint keyboard ink and shipping controls',async({page})=>{

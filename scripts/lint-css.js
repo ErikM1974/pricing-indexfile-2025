@@ -220,6 +220,7 @@ const CSS_LINT_SCOPE = [
     'shared_components/css/quote-workspace.css',
     'shared_components/css/quote-embroidery.css',
     'shared_components/css/quote-screenprint.css',
+    'shared_components/css/quote-dtf.css',
     'shared_components/css/quote-invoice.css',
     'shared_components/css/sticker-pricing-page.css',
     'shared_components/css/quote-share-modal.css',

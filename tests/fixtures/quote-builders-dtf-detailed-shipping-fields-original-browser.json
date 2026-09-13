@@ -1,0 +1,822 @@
+{
+  "name": "dtf-detailed-shipping-fields",
+  "states": [
+    {
+      "width": 1440,
+      "title": "2026 DTF Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/dtf-quote-builder.html",
+      "ids": {
+        "toast-container": "",
+        "method-switch-menu": "Switch method … Embroidery Screen Print DTG (1st product only)",
+        "order-details-chevron": "",
+        "order-number": "",
+        "po-number": "",
+        "req-ship-date": "",
+        "drop-dead-date": "",
+        "ship-to-name": "",
+        "ship-address": "",
+        "ship-city": "",
+        "ship-state": "WA AL AK AZ AR CA CO CT DE FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WV WI WY",
+        "ship-zip": "",
+        "tax-lookup-status": "",
+        "ship-method": "Select... Ground 2-Day Overnight Customer Pickup Local Delivery",
+        "dtf-shipping-fee": "",
+        "ship-residential": "",
+        "estimate-ship-btn": "Estimate UPS Ground",
+        "estimate-ship-result": "",
+        "dtf-notes": "",
+        "pre-tax-subtotal": "$660.50",
+        "include-tax": "",
+        "tax-rate-input": "",
+        "wholesale-checkbox": "",
+        "tax-rate-label": "Sales Tax (10.2%)",
+        "tax-amount": "$67.37",
+        "grand-total-with-tax": "$727.87",
+        "push-readiness": "BEFORE YOU PUSH ShopWorks Customer # At least one item Customer name Customer email",
+        "dtf-push-shopworks-label": "Push to ShopWorks",
+        "sidebar-resize-handle": "",
+        "sidebar-location": "Left Chest",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$648.00",
+        "per-unit-price": "$13.50/piece",
+        "sidebar-grand-total": "$727.87"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "order-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "po-number",
+          "name": "",
+          "type": "text",
+          "value": "SYNTHETIC-PO-17",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "req-ship-date",
+          "name": "",
+          "type": "date",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "drop-dead-date",
+          "name": "",
+          "type": "date",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "ship-to-name",
+          "name": "",
+          "type": "text",
+          "value": "Example Recipient",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "ship-address",
+          "name": "",
+          "type": "text",
+          "value": "123 Example Street",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "ship-city",
+          "name": "",
+          "type": "text",
+          "value": "Example City",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "ship-state",
+          "name": "",
+          "type": "select-one",
+          "value": "WA",
+          "disabled": false
+        },
+        {
+          "id": "ship-zip",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "ship-method",
+          "name": "",
+          "type": "select-one",
+          "value": "Customer Pickup",
+          "disabled": false
+        },
+        {
+          "id": "dtf-shipping-fee",
+          "name": "",
+          "type": "number",
+          "value": "12.50",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "ship-residential",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtf-notes",
+          "name": "",
+          "type": "textarea",
+          "value": "Synthetic delivery instructions",
+          "disabled": false
+        },
+        {
+          "id": "include-tax",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "tax-rate-input",
+          "name": "",
+          "type": "number",
+          "value": "10.2",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "wholesale-checkbox",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".pr-ok"
+            ],
+            [
+              ".btn-share-link"
+            ],
+            [
+              "#per-unit-price"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "2026 DTF Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/dtf-quote-builder.html",
+      "ids": {
+        "toast-container": "",
+        "method-switch-menu": "Switch method … Embroidery Screen Print DTG (1st product only)",
+        "order-details-chevron": "",
+        "order-number": "",
+        "po-number": "",
+        "req-ship-date": "",
+        "drop-dead-date": "",
+        "ship-to-name": "",
+        "ship-address": "",
+        "ship-city": "",
+        "ship-state": "WA AL AK AZ AR CA CO CT DE FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WV WI WY",
+        "ship-zip": "",
+        "tax-lookup-status": "",
+        "ship-method": "Select... Ground 2-Day Overnight Customer Pickup Local Delivery",
+        "dtf-shipping-fee": "",
+        "ship-residential": "",
+        "estimate-ship-btn": "Estimate UPS Ground",
+        "estimate-ship-result": "",
+        "dtf-notes": "",
+        "pre-tax-subtotal": "$660.50",
+        "include-tax": "",
+        "tax-rate-input": "",
+        "wholesale-checkbox": "",
+        "tax-rate-label": "Sales Tax (10.2%)",
+        "tax-amount": "$67.37",
+        "grand-total-with-tax": "$727.87",
+        "push-readiness": "BEFORE YOU PUSH ShopWorks Customer # At least one item Customer name Customer email",
+        "dtf-push-shopworks-label": "Push to ShopWorks",
+        "sidebar-resize-handle": "",
+        "sidebar-location": "Left Chest",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$648.00",
+        "per-unit-price": "$13.50/piece",
+        "sidebar-grand-total": "$727.87"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "order-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "po-number",
+          "name": "",
+          "type": "text",
+          "value": "SYNTHETIC-PO-17",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "req-ship-date",
+          "name": "",
+          "type": "date",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "drop-dead-date",
+          "name": "",
+          "type": "date",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "ship-to-name",
+          "name": "",
+          "type": "text",
+          "value": "Example Recipient",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "ship-address",
+          "name": "",
+          "type": "text",
+          "value": "123 Example Street",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "ship-city",
+          "name": "",
+          "type": "text",
+          "value": "Example City",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "ship-state",
+          "name": "",
+          "type": "select-one",
+          "value": "WA",
+          "disabled": false
+        },
+        {
+          "id": "ship-zip",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "ship-method",
+          "name": "",
+          "type": "select-one",
+          "value": "Customer Pickup",
+          "disabled": false
+        },
+        {
+          "id": "dtf-shipping-fee",
+          "name": "",
+          "type": "number",
+          "value": "12.50",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "ship-residential",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtf-notes",
+          "name": "",
+          "type": "textarea",
+          "value": "Synthetic delivery instructions",
+          "disabled": false
+        },
+        {
+          "id": "include-tax",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "tax-rate-input",
+          "name": "",
+          "type": "number",
+          "value": "10.2",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "wholesale-checkbox",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".pr-ok"
+            ],
+            [
+              ".btn-share-link"
+            ],
+            [
+              "#per-unit-price"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "2026 DTF Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/dtf-quote-builder.html",
+      "ids": {
+        "toast-container": "",
+        "method-switch-menu": "Switch method … Embroidery Screen Print DTG (1st product only)",
+        "order-details-chevron": "",
+        "order-number": "",
+        "po-number": "",
+        "req-ship-date": "",
+        "drop-dead-date": "",
+        "ship-to-name": "",
+        "ship-address": "",
+        "ship-city": "",
+        "ship-state": "WA AL AK AZ AR CA CO CT DE FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WV WI WY",
+        "ship-zip": "",
+        "tax-lookup-status": "",
+        "ship-method": "Select... Ground 2-Day Overnight Customer Pickup Local Delivery",
+        "dtf-shipping-fee": "",
+        "ship-residential": "",
+        "estimate-ship-btn": "Estimate UPS Ground",
+        "estimate-ship-result": "",
+        "dtf-notes": "",
+        "pre-tax-subtotal": "$660.50",
+        "include-tax": "",
+        "tax-rate-input": "",
+        "wholesale-checkbox": "",
+        "tax-rate-label": "Sales Tax (10.2%)",
+        "tax-amount": "$67.37",
+        "grand-total-with-tax": "$727.87",
+        "push-readiness": "BEFORE YOU PUSH ShopWorks Customer # At least one item Customer name Customer email",
+        "dtf-push-shopworks-label": "Push to ShopWorks",
+        "sidebar-resize-handle": "",
+        "sidebar-location": "Left Chest",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$648.00",
+        "per-unit-price": "$13.50/piece",
+        "sidebar-grand-total": "$727.87"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "order-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "po-number",
+          "name": "",
+          "type": "text",
+          "value": "SYNTHETIC-PO-17",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "req-ship-date",
+          "name": "",
+          "type": "date",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "drop-dead-date",
+          "name": "",
+          "type": "date",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "ship-to-name",
+          "name": "",
+          "type": "text",
+          "value": "Example Recipient",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "ship-address",
+          "name": "",
+          "type": "text",
+          "value": "123 Example Street",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "ship-city",
+          "name": "",
+          "type": "text",
+          "value": "Example City",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "ship-state",
+          "name": "",
+          "type": "select-one",
+          "value": "WA",
+          "disabled": false
+        },
+        {
+          "id": "ship-zip",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "ship-method",
+          "name": "",
+          "type": "select-one",
+          "value": "Customer Pickup",
+          "disabled": false
+        },
+        {
+          "id": "dtf-shipping-fee",
+          "name": "",
+          "type": "number",
+          "value": "12.50",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "ship-residential",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtf-notes",
+          "name": "",
+          "type": "textarea",
+          "value": "Synthetic delivery instructions",
+          "disabled": false
+        },
+        {
+          "id": "include-tax",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "tax-rate-input",
+          "name": "",
+          "type": "number",
+          "value": "10.2",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "wholesale-checkbox",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".pr-ok"
+            ],
+            [
+              ".btn-share-link"
+            ],
+            [
+              "#per-unit-price"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "2026 DTF Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/dtf-quote-builder.html",
+      "ids": {
+        "toast-container": "",
+        "method-switch-menu": "Switch method … Embroidery Screen Print DTG (1st product only)",
+        "order-details-chevron": "",
+        "order-number": "",
+        "po-number": "",
+        "req-ship-date": "",
+        "drop-dead-date": "",
+        "ship-to-name": "",
+        "ship-address": "",
+        "ship-city": "",
+        "ship-state": "WA AL AK AZ AR CA CO CT DE FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WV WI WY",
+        "ship-zip": "",
+        "tax-lookup-status": "",
+        "ship-method": "Select... Ground 2-Day Overnight Customer Pickup Local Delivery",
+        "dtf-shipping-fee": "",
+        "ship-residential": "",
+        "estimate-ship-btn": "Estimate UPS Ground",
+        "estimate-ship-result": "",
+        "dtf-notes": "",
+        "pre-tax-subtotal": "$660.50",
+        "include-tax": "",
+        "tax-rate-input": "",
+        "wholesale-checkbox": "",
+        "tax-rate-label": "Sales Tax (10.2%)",
+        "tax-amount": "$67.37",
+        "grand-total-with-tax": "$727.87",
+        "push-readiness": "BEFORE YOU PUSH ShopWorks Customer # At least one item Customer name Customer email",
+        "dtf-push-shopworks-label": "Push to ShopWorks",
+        "sidebar-resize-handle": "",
+        "sidebar-location": "Left Chest",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$648.00",
+        "per-unit-price": "$13.50/piece",
+        "sidebar-grand-total": "$727.87"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "order-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "po-number",
+          "name": "",
+          "type": "text",
+          "value": "SYNTHETIC-PO-17",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "req-ship-date",
+          "name": "",
+          "type": "date",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "drop-dead-date",
+          "name": "",
+          "type": "date",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "ship-to-name",
+          "name": "",
+          "type": "text",
+          "value": "Example Recipient",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "ship-address",
+          "name": "",
+          "type": "text",
+          "value": "123 Example Street",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "ship-city",
+          "name": "",
+          "type": "text",
+          "value": "Example City",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "ship-state",
+          "name": "",
+          "type": "select-one",
+          "value": "WA",
+          "disabled": false
+        },
+        {
+          "id": "ship-zip",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "ship-method",
+          "name": "",
+          "type": "select-one",
+          "value": "Customer Pickup",
+          "disabled": false
+        },
+        {
+          "id": "dtf-shipping-fee",
+          "name": "",
+          "type": "number",
+          "value": "12.50",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "ship-residential",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtf-notes",
+          "name": "",
+          "type": "textarea",
+          "value": "Synthetic delivery instructions",
+          "disabled": false
+        },
+        {
+          "id": "include-tax",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "tax-rate-input",
+          "name": "",
+          "type": "number",
+          "value": "10.2",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "wholesale-checkbox",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".pr-ok"
+            ],
+            [
+              ".btn-share-link"
+            ],
+            [
+              "#per-unit-price"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "mutations": []
+}

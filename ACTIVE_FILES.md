@@ -1535,3 +1535,11 @@ Garment designer completion: page styles are scoped to the unified designer; art
 - tests/fixtures/quote-builders-screenprint-healthy-shipping-fields-original-browser.json — immutable original synthetic populated builder workflow evidence.
 
 - shared_components/css/quote-screenprint.css — canonical Screen Print configuration and paper layout; shares workspace fields/dialogs/artwork with the other builders.
+
+- tests/fixtures/quote-builders-dtf-detailed-locations-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-dtf-detailed-fees-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-dtf-detailed-shipping-fields-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- shared_components/css/quote-dtf.css — canonical DTF transfer-location and order form styles, using the shared quote workspace.
