@@ -226,6 +226,7 @@ test('CSS records: original shared art form loads with lead prefill and remains 
         await page.screenshot({ path: path.join(output, 'records-art-form-' + width + '.png') });
     }
     await page.locator('#lw-art-modal-close').focus(); await page.keyboard.press('Shift+Tab'); expect(await page.evaluate(() => !!document.activeElement.closest('#lw-art-modal'))).toBe(true);
+    await require('./helpers/garment-form-review').captureForm(page,'lead',expect);
     await page.keyboard.press('Escape'); await expect(page.locator('#lw-art-modal')).toBeHidden(); await expect(page.locator('.dash-shell')).toHaveJSProperty('inert', false); await expect(page.locator('#lw-art-send')).toBeFocused(); clean(events);
 });
 

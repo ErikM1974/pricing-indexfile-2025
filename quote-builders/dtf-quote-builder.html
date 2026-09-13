@@ -16,10 +16,10 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
     <link rel="stylesheet" href="/shared_components/vendor/fontawesome/css/all.min.css?v=2026.07.08.8">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><!-- PNW shell typography (expert audit 2026-07-07): DTG loaded Inter, the trio never did -->
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"><!-- PNW shell typography (expert audit 2026-07-07): DTG loaded Inter, the trio never did -->
 
     <!-- Bootstrap CSS -->
-    <link href="/shared_components/vendor/bootstrap/css/bootstrap.min.css?v=2026.07.08.8" rel="stylesheet">
+    <!-- Quote workspace replaces bootstrap.min.css on this page. -->
 
     <!-- EmailJS -->
     <script src="/shared_components/vendor/emailjs/email.min.js?v=2026.07.08.8"></script>
@@ -30,30 +30,34 @@
     <script src="/config/tenant.js?v=2026.09.06.18"></script>
 
     <!-- Quote Builder Common Styles (loads FIRST — base styles) -->
-    <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=2026.09.07.19">
+    <!-- Quote workspace replaces quote-builder-common.css on this page. -->
 
     <!-- Quote Builder Shell (Phase 2a — PNW palette + tokens; overrides common's legacy --builder-* tokens) -->
-    <link rel="stylesheet" href="/shared_components/css/quote-builder-shell.css?v=2026.09.07.19">
+    <!-- Quote workspace replaces quote-builder-shell.css on this page. -->
 
     <!-- Guided Quote shell (Phase B, 2026-07-07) -->
-    <link rel="stylesheet" href="/shared_components/css/quote-builder-guided.css?v=2026.09.07.16">
+    <!-- Quote workspace replaces quote-builder-guided.css on this page. -->
 
     <!-- DTF Quote Builder Styles (overrides common + shell) -->
-    <link rel="stylesheet" href="/shared_components/css/dtf-quote-builder.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/quote-print.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/color-picker-shared.css?v=2026.09.07.16">
-    <link rel="stylesheet" href="/shared_components/css/quote-share-modal.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/customer-lookup.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/safety-stripe-recs.css?v=2026.09.07.20">
+    <!-- Quote workspace replaces dtf-quote-builder.css on this page. -->
+    <!-- Quote workspace replaces quote-print.css on this page. -->
+    <!-- Quote workspace replaces color-picker-shared.css on this page. -->
+    <!-- Quote workspace replaces quote-share-modal.css on this page. -->
+    <!-- Quote workspace replaces customer-lookup.css on this page. -->
+    <link rel="stylesheet" href="/shared_components/css/safety-stripe-recs.css?v=2026.09.13.2">
     <!-- quote-builder-base.js tag removed 2026-07-07 (roadmap 0.4 audit): the class
          was never instantiated or extended — 793 dead lines per pageload. The file
          stays in the repo as the base being revived by the 0.4 decomposition. -->
     <script src="/shared_components/js/quote-formatter.js?v=2026.09.03.11"></script>
     <script src="/shared_components/js/product-thumbnail-modal.js?v=2026.09.08.5"></script>
-    <link rel="stylesheet" href="/shared_components/css/quote-session.css?v=2026.09.07.16">
-    <link rel="stylesheet" href="/shared_components/css/quote-builder-utilities.css?v=2026.09.07.19">
+    <!-- Quote workspace replaces quote-session.css on this page. -->
+    <!-- Quote workspace replaces quote-builder-utilities.css on this page. -->
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.12.2">
+    <link rel="stylesheet" href="/shared_components/css/utilities.css?v=2026.09.12.2">
+    <link rel="stylesheet" href="/shared_components/css/quote-workspace.css?v=2026.09.13.2">
+    <link rel="stylesheet" href="/shared_components/css/quote-dtf.css?v=2026.09.13.2">
 </head>
-<body class="dtf-builder qb-shell-body">
+<body class="dtf-builder qb-shell-body" data-ui="unified" data-quote-workspace="dtf">
     <nav aria-label="Skip link"><a href="#" class="qb-skip-link" data-call="qbFocusMain" data-prevent="1">Skip to quote builder</a></nav><!-- qb-shell-body: 2026 PNW shell (Inter + tabular numerals + birch ground) — built 2026-06, had ZERO adopters until 2026-07-07 (expert audit) --><!-- scoping hook for Option C page-flow overrides (2026-06-07) -->
     <!-- Loading Overlay -->
     <div id="loading-overlay" class="loading-overlay">
@@ -196,14 +200,14 @@
                 </div>
 
                 <!-- Minimum Order Warning Banner -->
-                <div id="min-order-warning" style="display: none;">
+                <div id="min-order-warning" class="workspace-min-order" style="display: none;">
                     <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                     <strong>Minimum Order: 10 pieces required.</strong>
                     Orders of 10-23 pieces include a $<span id="ltm-fee-banner-amount">50</span> small-batch fee — it disappears at 24+.
                 </div>
 
                 <!-- Excel-Style Product Table -->
-                <div class="product-table-wrapper">
+                <div class="product-table-wrapper" role="region" aria-label="Quote line items" tabindex="0">
                     <table class="product-table" id="product-table">
                         <thead>
                             <tr>
@@ -313,7 +317,7 @@
                  Phase A (2026-07-07): default-COLLAPSED to calm the page — the badge stays visible in the
                  header, and autoExpandFeesOnFirstCharge() opens it once when a saved fee loads. -->
             <div class="additional-charges-panel qb-m-0-0-14">
-                <div class="charges-header" data-call="toggleFeesCharges">
+                <div class="charges-header" role="button" tabindex="0" data-keyclick="1" data-call="toggleFeesCharges">
                     <div class="d-flex align-items-center gap-2">
                         <i class="fas fa-plus-circle" aria-hidden="true"></i>
                         <span>More services &amp; fees</span>
@@ -323,7 +327,7 @@
                     <i id="charges-chevron" class="fas fa-chevron-down collapsible-chevron" aria-hidden="true"></i>
                 </div>
                 <div id="fees-charges-content" class="charges-content hidden" style="display:none">
-                    <div class="qb-fwrap-wrap-gap-24-ai-flex-end-pt-8" style="display: flex">
+                    <div class="workspace-charge-fields" style="display: flex">
                         <div class="charge-field qb-m0">
                             <label class="d-flex align-items-center gap-2 qb-cur-pointer">
                                 <input type="checkbox" id="art-charge-toggle" data-change="toggleArtCharge,updateAdditionalCharges">
@@ -370,7 +374,7 @@
                 <div class="if-order-details-col">
                     <!-- Shipping & Order Details (collapsible) -->
                     <div class="dtf-order-details-panel">
-                        <div class="charges-header" data-call="toggleOrderDetails">
+                        <div class="charges-header" role="button" tabindex="0" data-keyclick="1" data-call="toggleOrderDetails">
                             <div class="d-flex align-items-center gap-2">
                                 <i class="fas fa-truck" aria-hidden="true"></i>
                                 <span>Shipping & Order Details</span>
@@ -444,7 +448,7 @@
                                         <i class="fas fa-search" aria-hidden="true"></i>
                                     </button>
                                 </div>
-                                <div class="qb-fs-11-c-slate-500-minh-14" id="tax-lookup-status"></div>
+                                <div class="workspace-tax-status" id="tax-lookup-status"></div>
                                 <!-- Shipping Method -->
                                 <div class="customer-field">
                                     <label class="quote-label qb-fs11">Shipping Method</label>
@@ -460,8 +464,8 @@
                                 <!-- Shipping Fee -->
                                 <div class="customer-field">
                                     <label class="quote-label qb-fs11">Shipping Fee</label>
-                                    <div class="qb-pos-relative">
-                                        <span class="qb-pos-absolute-left-8-top-50-tf-translatey-50-c-qb-gray-fs-12">$</span>
+                                    <div class="workspace-shipping-money">
+                                        <span class="workspace-shipping-currency">$</span>
                                         <input type="number" id="dtf-shipping-fee" aria-label="Shipping fee in dollars" min="0" step="0.01" placeholder="0.00" value="0"
                                                class="quote-input qb-fs-12-p-6-8-6-22"
                                                data-change="updateTaxCalculation" data-input="updateTaxCalculation">
@@ -479,7 +483,7 @@
                                 <div class="customer-field qb-mt-4">
                                     <label class="quote-label qb-fs11"><i class="fas fa-sticky-note qb-c-qb-orange" aria-hidden="true"></i> Notes</label>
                                     <textarea id="dtf-notes" aria-label="Quote notes" placeholder="Special instructions, employee names, etc."
-                                              class="quote-input qb-fs-12-p-6-8-minh-60-rs-vertical-ff-inherit"></textarea>
+                                              class="quote-input workspace-order-notes"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -550,14 +554,14 @@
 
                         <!-- Customer context banners (Erik 2026-05-23) -->
                         <div id="customer-warning-banner" hidden></div>
-                        <div class="qb-fwrap-wrap-gap-6-m-4-0" style="display: flex">
+                        <div class="workspace-customer-search-row" style="display: flex">
                             <span id="customer-tax-chip" hidden></span>
                             <span id="customer-tier-badge" hidden></span>
                         </div>
                     </div>
                     <details class="customer-manual" id="dtf-customer-manual">
                     <summary>Enter details manually <span class="cm-hint">— the search fills these for you</span></summary>
-                    <div class="qb-cols-1fr-1fr-gap-8" style="display: grid">
+                    <div class="workspace-customer-grid" style="display: grid">
                         <div class="customer-field">
                             <label class="quote-label">NAME *</label>
                             <input type="text" id="customer-name" aria-label="Customer name" placeholder="Customer name" class="quote-input" data-input="?renderOrderRecap,?updateDtfPushButtonState">
@@ -591,12 +595,12 @@
                             <label class="quote-label">PHONE</label>
                             <input type="tel" id="customer-phone" aria-label="Customer phone" placeholder="(253) 555-1234" class="quote-input">
                         </div>
-                        <div class="customer-field qb-span-all">
+                        <div class="customer-field workspace-customer-span">
                             <label class="quote-label">PROJECT NAME</label>
                             <input type="text" id="project-name" aria-label="Project name" placeholder="e.g., Spring Fundraiser Tees" class="quote-input">
                         </div>
                         <!-- Phase 11.1 (2026-05-24): customer-aware Design # lookup -->
-                        <div class="customer-field qb-span-all">
+                        <div class="customer-field workspace-customer-span">
                             <label class="quote-label" for="design-number">
                                 DESIGN # <span class="qb-c-gray-400-fw-400">(pick from this customer's DTF designs)</span>
                             </label>
@@ -724,7 +728,7 @@
     <script src="/shared_components/vendor/bootstrap/js/bootstrap.bundle.min.js?v=2026.07.08.8"></script>
 
     <!-- Quote Builder Shared Utilities (2026 consolidation) -->
-    <script src="/shared_components/js/quote-builder-utils.js?v=2026.09.06.46"></script>
+    <script src="/shared_components/js/quote-builder-utils.js?v=2026.09.13.2"></script>
 
     <!-- Exact Match Search Module -->
     <script src="/shared_components/js/exact-match-search.js?v=2026.09.06.37"></script>
@@ -753,7 +757,7 @@
 
     <!-- Invoice Generator (for professional PDF output) -->
     <script src="/shared_components/js/quote-pricing-data.js?v=2026.06.27.1"></script>
-    <script src="/shared_components/js/embroidery-quote-invoice.js?v=2026.09.06.22"></script>
+    <script src="/shared_components/js/embroidery-quote-invoice.js?v=2026.09.13.2"></script>
 
     <!-- DTF-specific Scripts -->
     <script src="/shared_components/js/product-category-filter.js?v=2026.09.06.37"></script>
@@ -771,7 +775,7 @@
     <script src="/shared_components/js/customer-design-combobox.js?v=2026.09.06.31"></script>
     <!-- [2026-06-08] Shared order-summary band — MUST load before the builders/dtf bundle (the class calls QuoteOrderSummary.configure() during init) -->
     <script src="/shared_components/js/quote-order-summary.js?v=2026.09.06.31"></script>
-    <script src="/shared_components/js/safety-stripe-recs.js?v=2026.09.06.31"></script>
+    <script src="/shared_components/js/safety-stripe-recs.js?v=2026.09.13.2"></script>
 
     <!-- Save Success Modal (referenced by builders/dtf/page-ui.js showSaveModal) -->
     <div id="save-success-modal" class="save-modal-overlay" style="display: none;">

@@ -1,0 +1,1502 @@
+{
+  "name": "screenprint-healthy-safety",
+  "states": [
+    {
+      "width": 1440,
+      "title": "2026 Screen Print Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Embroidery DTF Transfers DTG (1st product only)",
+        "dark-garment-toggle": "",
+        "dark-garment-nudge": "Dark garments in this quote — add white underbase screens? Enable ×",
+        "safety-stripes-toggle": "",
+        "front-setup-display": "1 screen × $30.00 = $30.00",
+        "back-icon": "",
+        "sleeve-icon": "",
+        "left-sleeve-toggle": "",
+        "right-sleeve-toggle": "",
+        "total-screens-display": "1 screen total",
+        "setup-fee-display": "$30.00",
+        "artwork-upload-ccqw5v-design-name": "",
+        "artwork-upload-ccqw5v-dropzone": "Drop files here or click to browse AI / EPS / PSD / PDF / PNG / JPG / TIFF · 20 MB max each",
+        "product-search": "",
+        "thumb-1": "",
+        "row-qty-1": "48",
+        "row-price-1": "$14.00",
+        "row-total-1": "$672.00",
+        "setup-screens-label": "1 screen",
+        "setup-per-screen-label": "$30",
+        "setup-fee-unit": "$30.00",
+        "setup-fee-total": "$30.00",
+        "charges-chevron": "",
+        "spc-order-fields": "Order & Shipping",
+        "ship-residential": "",
+        "estimate-ship-btn": "Estimate UPS Ground",
+        "estimate-ship-result": "",
+        "pre-tax-subtotal": "$702.00",
+        "include-tax": "",
+        "tax-rate-input": "",
+        "wholesale-checkbox": "",
+        "tax-rate-label": "Sales Tax (10.2%)",
+        "tax-amount": "$71.60",
+        "grand-total-with-tax": "$773.60",
+        "sidebar-resize-handle": "",
+        "customer-lookup": "",
+        "customer-name": "",
+        "customer-email": "",
+        "company-name": "",
+        "customer-number": "",
+        "sales-rep": "General Sales Bradley Wright Erik Mickelson Jim Mickelson Nika Lao Ruth Nhong Steve Deland Taneisha Clark",
+        "customer-phone": "",
+        "project-name": "",
+        "design-number": "",
+        "sidebar-front": "Left Chest (1-color)",
+        "sidebar-screens": "1",
+        "sidebar-stripes-cost": "+$2.00/pc",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$672.00",
+        "per-unit-price": "$14.00/piece",
+        "sidebar-grand-total": "$773.60",
+        "push-readiness": "BEFORE YOU PUSH ShopWorks Customer # At least one item Customer name Customer email",
+        "scp-push-shopworks-label": "Push to ShopWorks",
+        "toast-container": "Ready to build Screen Print quotes!"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "dark-garment-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "safety-stripes-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "LC",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "FF",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "JF",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "FB",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "JB",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "left-sleeve-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "right-sleeve-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "artwork-upload-ccqw5v-design-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "product-search",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "PC54",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "Essential Cotton Tee",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "48",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "ship-residential",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "include-tax",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "tax-rate-input",
+          "name": "",
+          "type": "number",
+          "value": "10.2",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "wholesale-checkbox",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-lookup",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-email",
+          "name": "",
+          "type": "email",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "company-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "sales-rep",
+          "name": "",
+          "type": "select-one",
+          "value": "sales@nwcustomapparel.com",
+          "disabled": false
+        },
+        {
+          "id": "customer-phone",
+          "name": "",
+          "type": "tel",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "project-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "design-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/Erik%20Modeling%20Hoodie%20Front%20and%20Back.png?ver=1",
+          "text": ""
+        }
+      ],
+      "tables": [
+        "Style Product image Description Color S M L XL 2XL More Sizes Qty Unit $ Total Row actions Jet Black 125 125 125 125 125 125 48 $14.00 $672.00 Screen Print Set Up Charge (1 screen × $30) 1 $30.00 $30.00"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "button[data-step=\"3\"] > .gs-txt > .gs-title"
+            ],
+            [
+              ".artwork-dropzone-sub"
+            ],
+            [
+              "#sidebar-stripes-cost"
+            ],
+            [
+              "#per-unit-price"
+            ],
+            [
+              ".pr-ok"
+            ],
+            [
+              ".btn-share-link"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "2026 Screen Print Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Embroidery DTF Transfers DTG (1st product only)",
+        "dark-garment-toggle": "",
+        "dark-garment-nudge": "Dark garments in this quote — add white underbase screens? Enable ×",
+        "safety-stripes-toggle": "",
+        "front-setup-display": "1 screen × $30.00 = $30.00",
+        "back-icon": "",
+        "sleeve-icon": "",
+        "left-sleeve-toggle": "",
+        "right-sleeve-toggle": "",
+        "total-screens-display": "1 screen total",
+        "setup-fee-display": "$30.00",
+        "artwork-upload-ccqw5v-design-name": "",
+        "artwork-upload-ccqw5v-dropzone": "Drop files here or click to browse AI / EPS / PSD / PDF / PNG / JPG / TIFF · 20 MB max each",
+        "product-search": "",
+        "row-qty-1": "48",
+        "row-price-1": "$14.00",
+        "row-total-1": "$672.00",
+        "setup-screens-label": "1 screen",
+        "setup-per-screen-label": "$30",
+        "setup-fee-unit": "$30.00",
+        "setup-fee-total": "$30.00",
+        "charges-chevron": "",
+        "spc-order-fields": "Order & Shipping",
+        "ship-residential": "",
+        "estimate-ship-btn": "Estimate UPS Ground",
+        "estimate-ship-result": "",
+        "pre-tax-subtotal": "$702.00",
+        "include-tax": "",
+        "tax-rate-input": "",
+        "wholesale-checkbox": "",
+        "tax-rate-label": "Sales Tax (10.2%)",
+        "tax-amount": "$71.60",
+        "grand-total-with-tax": "$773.60",
+        "sidebar-resize-handle": "",
+        "customer-lookup": "",
+        "customer-name": "",
+        "customer-email": "",
+        "company-name": "",
+        "customer-number": "",
+        "sales-rep": "General Sales Bradley Wright Erik Mickelson Jim Mickelson Nika Lao Ruth Nhong Steve Deland Taneisha Clark",
+        "customer-phone": "",
+        "project-name": "",
+        "design-number": "",
+        "sidebar-front": "Left Chest (1-color)",
+        "sidebar-screens": "1",
+        "sidebar-stripes-cost": "+$2.00/pc",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$672.00",
+        "per-unit-price": "$14.00/piece",
+        "sidebar-grand-total": "$773.60",
+        "push-readiness": "BEFORE YOU PUSH ShopWorks Customer # At least one item Customer name Customer email",
+        "scp-push-shopworks-label": "Push to ShopWorks",
+        "toast-container": ""
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "dark-garment-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "safety-stripes-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "LC",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "FF",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "JF",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "FB",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "JB",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "left-sleeve-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "right-sleeve-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "artwork-upload-ccqw5v-design-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "product-search",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "PC54",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "Essential Cotton Tee",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "48",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "ship-residential",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "include-tax",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "tax-rate-input",
+          "name": "",
+          "type": "number",
+          "value": "10.2",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "wholesale-checkbox",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-lookup",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-email",
+          "name": "",
+          "type": "email",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "company-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "sales-rep",
+          "name": "",
+          "type": "select-one",
+          "value": "sales@nwcustomapparel.com",
+          "disabled": false
+        },
+        {
+          "id": "customer-phone",
+          "name": "",
+          "type": "tel",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "project-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "design-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/Erik%20Modeling%20Hoodie%20Front%20and%20Back.png?ver=1",
+          "text": ""
+        }
+      ],
+      "tables": [
+        "Style Product image Color S M L XL 2XL More Sizes Qty Unit $ Total Row actions Jet Black 125 125 125 125 125 125 48 $14.00 $672.00 Screen Print Set Up Charge (1 screen × $30) $30.00 $30.00"
+      ],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".artwork-dropzone-sub"
+            ],
+            [
+              "#sidebar-stripes-cost"
+            ],
+            [
+              "#per-unit-price"
+            ],
+            [
+              ".pr-ok"
+            ],
+            [
+              ".btn-share-link"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "2026 Screen Print Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Embroidery DTF Transfers DTG (1st product only)",
+        "dark-garment-toggle": "",
+        "dark-garment-nudge": "Dark garments in this quote — add white underbase screens? Enable ×",
+        "safety-stripes-toggle": "",
+        "front-setup-display": "1 screen × $30.00 = $30.00",
+        "back-icon": "",
+        "sleeve-icon": "",
+        "left-sleeve-toggle": "",
+        "right-sleeve-toggle": "",
+        "total-screens-display": "1 screen total",
+        "setup-fee-display": "$30.00",
+        "artwork-upload-ccqw5v-design-name": "",
+        "artwork-upload-ccqw5v-dropzone": "Drop files here or click to browse AI / EPS / PSD / PDF / PNG / JPG / TIFF · 20 MB max each",
+        "product-search": "",
+        "row-qty-1": "48",
+        "row-price-1": "$14.00",
+        "row-total-1": "$672.00",
+        "setup-screens-label": "1 screen",
+        "setup-per-screen-label": "$30",
+        "setup-fee-unit": "$30.00",
+        "setup-fee-total": "$30.00",
+        "charges-chevron": "",
+        "spc-order-fields": "Order & Shipping",
+        "ship-residential": "",
+        "estimate-ship-btn": "Estimate UPS Ground",
+        "estimate-ship-result": "",
+        "pre-tax-subtotal": "$702.00",
+        "include-tax": "",
+        "tax-rate-input": "",
+        "wholesale-checkbox": "",
+        "tax-rate-label": "Sales Tax (10.2%)",
+        "tax-amount": "$71.60",
+        "grand-total-with-tax": "$773.60",
+        "sidebar-resize-handle": "",
+        "customer-lookup": "",
+        "customer-name": "",
+        "customer-email": "",
+        "company-name": "",
+        "customer-number": "",
+        "sales-rep": "General Sales Bradley Wright Erik Mickelson Jim Mickelson Nika Lao Ruth Nhong Steve Deland Taneisha Clark",
+        "customer-phone": "",
+        "project-name": "",
+        "design-number": "",
+        "sidebar-front": "Left Chest (1-color)",
+        "sidebar-screens": "1",
+        "sidebar-stripes-cost": "+$2.00/pc",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$672.00",
+        "per-unit-price": "$14.00/piece",
+        "sidebar-grand-total": "$773.60",
+        "push-readiness": "BEFORE YOU PUSH ShopWorks Customer # At least one item Customer name Customer email",
+        "scp-push-shopworks-label": "Push to ShopWorks",
+        "toast-container": ""
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "dark-garment-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "safety-stripes-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "LC",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "FF",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "JF",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "FB",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "JB",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "left-sleeve-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "right-sleeve-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "artwork-upload-ccqw5v-design-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "product-search",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "PC54",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "Essential Cotton Tee",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "48",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "ship-residential",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "include-tax",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "tax-rate-input",
+          "name": "",
+          "type": "number",
+          "value": "10.2",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "wholesale-checkbox",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-lookup",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-email",
+          "name": "",
+          "type": "email",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "company-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "sales-rep",
+          "name": "",
+          "type": "select-one",
+          "value": "sales@nwcustomapparel.com",
+          "disabled": false
+        },
+        {
+          "id": "customer-phone",
+          "name": "",
+          "type": "tel",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "project-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "design-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/Erik%20Modeling%20Hoodie%20Front%20and%20Back.png?ver=1",
+          "text": ""
+        }
+      ],
+      "tables": [
+        "Style Product image Color S M L XL 2XL More Sizes Qty Unit $ Total Row actions Jet Black 125 125 125 125 125 125 48 $14.00 $672.00 Screen Print Set Up Charge (1 screen × $30) $30.00 $30.00"
+      ],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".artwork-dropzone-sub"
+            ],
+            [
+              "#sidebar-stripes-cost"
+            ],
+            [
+              "#per-unit-price"
+            ],
+            [
+              ".pr-ok"
+            ],
+            [
+              ".btn-share-link"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "2026 Screen Print Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Embroidery DTF Transfers DTG (1st product only)",
+        "dark-garment-toggle": "",
+        "dark-garment-nudge": "Dark garments in this quote — add white underbase screens? Enable ×",
+        "safety-stripes-toggle": "",
+        "front-setup-display": "1 screen × $30.00 = $30.00",
+        "back-icon": "",
+        "sleeve-icon": "",
+        "left-sleeve-toggle": "",
+        "right-sleeve-toggle": "",
+        "total-screens-display": "1 screen total",
+        "setup-fee-display": "$30.00",
+        "artwork-upload-ccqw5v-design-name": "",
+        "artwork-upload-ccqw5v-dropzone": "Drop files here or click to browse AI / EPS / PSD / PDF / PNG / JPG / TIFF · 20 MB max each",
+        "product-search": "",
+        "row-qty-1": "48",
+        "row-price-1": "$14.00",
+        "row-total-1": "$672.00",
+        "setup-screens-label": "1 screen",
+        "setup-per-screen-label": "$30",
+        "setup-fee-unit": "$30.00",
+        "setup-fee-total": "$30.00",
+        "charges-chevron": "",
+        "spc-order-fields": "Order & Shipping",
+        "ship-residential": "",
+        "estimate-ship-btn": "Estimate UPS Ground",
+        "estimate-ship-result": "",
+        "pre-tax-subtotal": "$702.00",
+        "include-tax": "",
+        "tax-rate-input": "",
+        "wholesale-checkbox": "",
+        "tax-rate-label": "Sales Tax (10.2%)",
+        "tax-amount": "$71.60",
+        "grand-total-with-tax": "$773.60",
+        "sidebar-resize-handle": "",
+        "customer-lookup": "",
+        "customer-name": "",
+        "customer-email": "",
+        "company-name": "",
+        "customer-number": "",
+        "sales-rep": "General Sales Bradley Wright Erik Mickelson Jim Mickelson Nika Lao Ruth Nhong Steve Deland Taneisha Clark",
+        "customer-phone": "",
+        "project-name": "",
+        "design-number": "",
+        "sidebar-front": "Left Chest (1-color)",
+        "sidebar-screens": "1",
+        "sidebar-stripes-cost": "+$2.00/pc",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$672.00",
+        "per-unit-price": "$14.00/piece",
+        "sidebar-grand-total": "$773.60",
+        "push-readiness": "BEFORE YOU PUSH ShopWorks Customer # At least one item Customer name Customer email",
+        "scp-push-shopworks-label": "Push to ShopWorks",
+        "toast-container": ""
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "dark-garment-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "safety-stripes-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "LC",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "FF",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "JF",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "FB",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "JB",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "left-sleeve-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "right-sleeve-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "artwork-upload-ccqw5v-design-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "product-search",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "PC54",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "Essential Cotton Tee",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "48",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "ship-residential",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "include-tax",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "tax-rate-input",
+          "name": "",
+          "type": "number",
+          "value": "10.2",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "wholesale-checkbox",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-lookup",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-email",
+          "name": "",
+          "type": "email",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "company-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "sales-rep",
+          "name": "",
+          "type": "select-one",
+          "value": "sales@nwcustomapparel.com",
+          "disabled": false
+        },
+        {
+          "id": "customer-phone",
+          "name": "",
+          "type": "tel",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "project-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "design-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/Erik%20Modeling%20Hoodie%20Front%20and%20Back.png?ver=1",
+          "text": ""
+        }
+      ],
+      "tables": [
+        "Style Product image Color S M L XL 2XL More Sizes Qty Unit $ Total Row actions Jet Black 125 125 125 125 125 125 48 $14.00 $672.00 Screen Print Set Up Charge (1 screen × $30) $30.00 $30.00"
+      ],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".artwork-dropzone-sub"
+            ],
+            [
+              "#sidebar-stripes-cost"
+            ],
+            [
+              "#per-unit-price"
+            ],
+            [
+              ".pr-ok"
+            ],
+            [
+              ".btn-share-link"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "mutations": []
+}

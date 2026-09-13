@@ -1,0 +1,150 @@
+const fs=require('node:fs'),path=require('node:path'),http=require('node:http');
+const esbuild=require('esbuild');
+const root=path.resolve(__dirname,'../../..'),original=require('../../fixtures/quote-builders-original-content.json');
+const pricing=name=>JSON.parse(fs.readFileSync(path.join(root,'tests/fixtures/pricing',name),'utf8'));
+const clone=value=>JSON.parse(JSON.stringify(value)),dtg=clone(require('../../fixtures/custom-apparel-api-fixtures.json').tees);
+const dtgCanonical=require('../../../shared_components/js/dtg-canonical-pricing');
+dtg.allDtgCostsR=[];
+for(const [location,base]of [['LC',7],['FF',10],['FB',10],['JF',12],['JB',12]])for(const [i,tier]of dtg.tiersR.entries())dtg.allDtgCostsR.push({PrintLocationCode:location,TierLabel:tier.TierLabel,PrintCost:base+4-i});
+const image='/__core-fixture/garment.svg',garment='<svg xmlns="http://www.w3.org/2000/svg" width="600" height="720"><rect width="600" height="720" fill="white"/><path d="M175 80L235 60Q300 125 365 60L425 80L545 200L455 285L415 240L425 640L175 640L185 240L145 285L55 200Z" fill="#263b46"/></svg>';
+const colors=[{name:'Jet Black',catalog:'JetBlack',hex:'#263b46'},{name:'Brilliant Orange',catalog:'BrillOrng',hex:'#c64f13'}];
+function details(style='PC54'){return colors.map(c=>({STYLE:style,PRODUCT_TITLE:style==='C112'?'Structured Twill Cap':'Essential Cotton Tee',PRODUCT_DESCRIPTION:'Comfortable, durable cotton apparel for the whole team.',BRAND_NAME:style==='C112'?'Port Authority':'Port & Company',CATEGORY:style==='C112'?'Caps':'T-Shirts',CATEGORY_NAME:style==='C112'?'Caps':'T-Shirts',PRODUCT_STATUS:'Active',CATALOG_COLOR:c.catalog,COLOR_NAME:c.name,HEX_CODE:c.hex,COLOR_SQUARE_IMAGE:image,MAIN_IMAGE_URL:image,FRONT_MODEL:image,BACK_MODEL:image,FRONT_FLAT:image,BACK_FLAT:image,PRODUCT_IMAGE:image}));}
+function sizePricing(style){const template=pricing('size-pricing-'+(style==='C112'?'C112':'PC61')+'.json')[0];return colors.map(c=>({...template,styleNumber:style,color:c.name}));}
+function source(file){let s=fs.readFileSync(path.join(root,file),'utf8').replace(/\r\n/g,'\n');for(const c of original.changes.filter(c=>c.file===file).reverse()){if(s.split(c.after).length-1!==c.count)throw Error('Original mapping drift '+file);s=s.split(c.after).join(c.before);}return s;}
+async function open(page,state={}){
+ const events={errors:[],writes:[],unknown:[],missing:[],reads:[],dialogs:[],mutations:[]};
+ // document.write resources fail under Chromium protocol interception. Invoice
+ // scenes use real local assets and transfer fetches to the synthetic handler
+ // before printing, preserving the same API fixtures without business requests.
+ let previewOrigin;
+ if(state.realPreview){
+  const server=http.createServer(async(req,res)=>{
+   try{
+    const u=new URL(req.url,'http://quote-preview.localhost'),file=decodeURIComponent(u.pathname.slice(1)),absolute=path.resolve(root,file);
+    if(!['GET','HEAD'].includes(req.method)||u.pathname.startsWith('/api/')||!absolute.startsWith(root+path.sep)||!fs.existsSync(absolute)||!fs.statSync(absolute).isFile()){res.writeHead(404);res.end();return;}
+    if(state.invoiceStyles&&u.pathname===state.invoiceStyles.path){
+     state.invoiceStyles.requested?.();await state.invoiceStyles.wait;
+     if(state.invoiceStyles.failed){res.writeHead(503);res.end();return;}
+    }
+    const asset=await staticAsset(file,absolute,state.original);
+    res.writeHead(200,{'Content-Type':asset.contentType});res.end(req.method==='HEAD'?undefined:asset.body);
+   }catch(error){events.errors.push(error.message);res.writeHead(500);res.end();}
+  });
+  await new Promise((resolve,reject)=>{server.once('error',reject);server.listen(0,'127.0.0.1',resolve);});server.unref();
+  page.context().once('close',()=>{server.closeAllConnections();server.close();});
+  previewOrigin='http://quote-preview.localhost:'+server.address().port;
+ }
+ await page.context().addInitScript(()=>{sessionStorage.setItem('nwca_user_name','Example Rep');sessionStorage.setItem('nwca_user_email','rep@example.invalid');sessionStorage.setItem('nwca_user_role','staff');});
+ await page.clock.setFixedTime(new Date('2026-09-12T18:30:00.000Z'));
+ await page.context().addInitScript(()=>{window.__printCalls=0;window.print=()=>{window.__printCalls++;window.dispatchEvent(new Event('beforeprint'));};});
+ page.on('pageerror',e=>events.errors.push(e.message));page.on('dialog',async d=>{events.dialogs.push(d.message());await d.dismiss();});
+ const handleRoute=async route=>{
+  const request=route.request(),u=new URL(request.url()),p=u.pathname,method=request.method(),style=u.searchParams.get('styleNumber')||'PC54';
+  if((state.save||state.assistant)&&p.startsWith('/api/quote-sequence/'))return route.fulfill({json:{prefix:p.split('/').pop(),year:2026,sequence:777}});
+  if(state.assistant&&p==='/api/dtg-quote-ai/chat'&&method==='POST'){
+   events.reads.push({path:p,method,body:request.postDataJSON()});
+   return route.fulfill({contentType:'text/event-stream',body:'event: delta\ndata: '+JSON.stringify({text:'Synthetic research reply. Review the selected product, print location, quantities and customer details in the order form.'})+'\n\n'});
+  }
+  if(state.save&&['/api/quote_sessions','/api/quote_items'].includes(p)){
+   if(method==='GET')return route.fulfill({json:[]});
+   if(method==='POST'){const body=request.postDataJSON();events.mutations.push({path:p,method,body:{...body,...(body.SessionID?{SessionID:'synthetic-session'}:{})}});return route.fulfill({status:state.saveFailed?503:201,json:state.saveFailed?{error:'Synthetic save failure'}:{PK_ID:99001,QuoteID:body.QuoteID}});}
+  }
+  if(state.save&&u.hostname==='api.emailjs.com'&&method==='POST'){const body=request.postDataJSON();events.mutations.push({path:'emailjs',method,body:{template_id:body.template_id,template_params:body.template_params}});return route.fulfill({status:200,body:'OK'});}
+  if(p==='/api/tax-rates/lookup'&&method==='POST'){events.reads.push({path:p,method,body:request.postDataJSON()});return route.fulfill({json:{success:true,taxRate:10.1,locationCode:'EXAMPLE',account:'2200.101',outOfState:false,fallback:false}});}
+  if(p==='/api/dtg/quote-pricing'&&method==='POST'){
+   const body=request.postDataJSON();events.reads.push({path:p,method,body});
+   const bundle={pricing:{tiers:dtg.tiersR,costs:dtg.allDtgCostsR,sizes:dtg.sizes,upcharges:dtg.sellingPriceDisplayAddOns}};
+   return route.fulfill({status:state.pricingFailed?503:200,json:dtgCanonical.priceLines({...body,bundlesByStyle:Object.fromEntries(body.lines.map(l=>[l.styleNumber,bundle]))})});
+  }
+  if(state.assistant&&p==='/api/emb-quote-ai/chat'&&method==='POST'){events.reads.push({path:p,method,body:request.postDataJSON()});return route.fulfill({contentType:'text/event-stream',body:'event: delta\ndata: {"text":"I can help with embroidery products, colors and customer details. What would you like to look up?"}\n\nevent: done\ndata: {}\n\n'});}
+  if(!['GET','HEAD'].includes(method)||/quote-sequence|logout/.test(p)){events.writes.push({path:p,method});return route.fulfill({status:503});}
+  if(p.startsWith('/api/'))events.reads.push({path:p,query:u.search});
+  if(p==='/api/version')return route.fulfill({json:{version:'2026.09.12.1'}});
+  if(p==='/api/company-contacts/search')return route.fulfill({json:{contacts:[]}});
+  if(p==='/api/dtg/top-sellers/categories')return route.fulfill({json:{categories:[{category:'T-Shirts',style_count:1}]}});
+  if(['/api/crm-session/me','/api/staff-session','/api/auth/me'].includes(p))return route.fulfill({json:{authenticated:true,name:'Example Rep',email:'rep@example.invalid',role:'staff',user:{name:'Example Rep',email:'rep@example.invalid'}}});
+  if(p==='/api/pricing-rules')return route.fulfill({json:pricing('emb-bundle-PC54.json').rulesR||[]});
+  if(p==='/api/decoration-methods')return route.fulfill({json:{rules:['T-Shirts','Caps'].map(category=>({category,EMB:true,DTG:category==='T-Shirts',SCP:category==='T-Shirts',DTF:category==='T-Shirts'})),overrides:[]}});
+  if(p==='/api/safety-stripes/top-sellers/styles')return route.fulfill({json:{records:state.safetyRecs?['PC54','PC61'].map((style,i)=>({style,brand:'Port & Company',product_title:'Example safety garment '+(i+1),style_rank:i+1,main_image_url:image,best_for:'Team workwear',colors:[{color_name:'Safety Yellow',catalog_color:'SafetyYellow',front_image_url:image},{color_name:'Safety Orange',catalog_color:'SafetyOrange',front_image_url:image}]})):[]}});
+  if(p.startsWith('/__core-fixture/')||p==='/api/image-proxy')return route.fulfill({contentType:'image/svg+xml',body:garment});
+  if(p==='/api/inventory')return route.fulfill({status:state.stockFailed?503:200,json:['S','M','L','XL','2XL','3XL','4XL'].map(SIZE=>({SIZE,QTY:state.out?0:125}))});
+  if(p==='/api/product-details'||p==='/api/color-swatches')return route.fulfill({status:state.productFailed?503:200,json:state.productEmpty?[]:details(style)});
+  if(p==='/api/product-colors')return route.fulfill({status:state.productFailed?503:200,json:{...details(style)[0],styleNumber:style,productTitle:details(style)[0].PRODUCT_TITLE,colors:state.productEmpty?[]:details(style)}});
+  if(p==='/api/products/search'){const q=u.searchParams.get('q')||'PC54';return route.fulfill({json:{success:true,data:{products:[{styleNumber:q,productName:details(q)[0].PRODUCT_TITLE,images:{display:image}}]}}});}
+  if(p==='/api/stylesearch')return route.fulfill({json:['PC54','C112'].filter(s=>s.toLowerCase().includes((u.searchParams.get('term')||'').toLowerCase())).map(s=>({style:s,value:s,label:details(s)[0].PRODUCT_TITLE,thumb:image}))});
+  if(p==='/api/size-pricing')return route.fulfill({json:sizePricing(style)});
+  if(p==='/api/sizes-by-style-color')return route.fulfill({json:style==='C112'?['OSFA']:['S','M','L','XL','2XL','3XL','4XL']});
+  if(p==='/api/sanmar-shopworks/import-format')return route.fulfill({json:style==='C112'?[{PartNumber:style,Color:'JetBlack',Size01:'OSFA'}]:[{PartNumber:style,Color:'JetBlack',Size01:'S',Size02:'M',Size03:'L',Size04:'XL',Size05:'2XL',Size06:'3XL'},{PartNumber:style+'_4XL',Color:'JetBlack',Size06:'4XL'}]});
+  if(p==='/api/base-item-costs')return route.fulfill({json:{baseCosts:sizePricing(style)[0].basePrices}});
+  if(p==='/api/max-prices-by-style')return route.fulfill({json:{maxPrices:sizePricing(style)[0].basePrices,sizes:Object.entries(sizePricing(style)[0].basePrices).map(([size,maxPrice])=>({size,maxPrice})),sellingPriceDisplayAddOns:sizePricing(style)[0].sizeUpcharges}});
+  if(p==='/api/dtg/product-bundle')return route.fulfill({status:state.pricingFailed?503:200,json:{product:{...details(style)[0],styleNumber:style,colors:details(style)},pricing:{tiers:dtg.tiersR,costs:dtg.allDtgCostsR,sizes:dtg.sizes,upcharges:dtg.sellingPriceDisplayAddOns}}});
+  if(p==='/api/dtg/top-sellers/styles')return route.fulfill({json:{records:[state.richCatalog?{style:'PC54',product_title:'Essential Cotton Tee',category:'T-Shirts',style_rank:1,total_units_sold:480,total_orders:12,main_image_url:image,top_color:'Jet Black',top_colors:colors.map((c,i)=>({color_name:c.name,catalog_color:c.catalog,front_image_url:image,swatch_image_url:image,color_units_sold:240,color_rank:i+1})),color_count:2}:{style:'PC54'}]}});
+  if(p==='/api/dtg/top-sellers')return route.fulfill({json:{records:colors.map((c,i)=>({style:'PC54',product_title:'Essential Cotton Tee',category:'T-Shirts',style_rank:1,total_units_sold:480,total_orders:12,color_name:c.name,catalog_color:c.catalog,swatch_image_url:image,color_units_sold:240,color_rank:i+1,sizes:{S:20,M:120,L:100}}))}});
+  if(p==='/api/service-codes'){
+   const data=pricing('service-codes.json');
+   if(state.scpFees){
+    data.data.push(...[['Vellum',10],['Color Chg',15]].map(([ServiceCode,SellPrice])=>({ServiceCode,SellPrice,ServiceType:'SCREENPRINT',IsActive:true,Visible:true})));
+    data.count=data.data.length;
+   }
+   return route.fulfill({json:data});
+  }
+  if(p==='/api/pricing-bundle'){
+   const method=u.searchParams.get('method'),files={PATCH:'patch-bundle.json',BLANK:'blank-bundle-PC54.json',DTF:'dtf-bundle.json',EMB:'emb-bundle-PC54.json','EMB-AL':'emb-al-bundle.json',CAP:'cap-bundle-C112.json','CAP-AL':'cap-al-bundle.json','CAP-PUFF':'cap-puff-bundle.json',ScreenPrint:'scp-bundle-PC61.json'};
+   if(method==='DTG'||files[method]){const data=method==='DTG'?clone(dtg):pricing(files[method]);if(method==='DTF')data.sizes=Object.entries(sizePricing(style)[0].basePrices).map(([size,price],i)=>({size,price,sortOrder:i+1}));return route.fulfill({status:state.pricingFailed?503:200,json:data});}
+  }
+  if(p==='/api/al-pricing'){
+   const category=(file,stitches)=>({baseStitches:stitches,basePrices:Object.fromEntries(pricing(file).allEmbroideryCostsR.filter(r=>r.StitchCount===stitches).map(r=>[r.TierLabel,r.EmbroideryCost])),perThousandUpcharge:stitches===5000?1:1.25,ltmThreshold:7,ltmFee:50});
+   return route.fulfill({json:{garments:category('emb-al-bundle.json',8000),caps:category('cap-al-bundle.json',5000)}});
+  }
+  if(p==='/api/decg-pricing')return route.fulfill({json:{fullBack:{minStitches:25000,ratesPerThousand:{'1-7':1.6,'8-23':1.4,'24-47':1.2,'48-71':1.1,'72+':1}}}});
+  if(p.startsWith('/api/sanmar/inventory/')){const sizes=p.includes('C112')?['OSFA']:['S','M','L','XL','2XL','3XL','4XL'],qty=state.out?0:125;return route.fulfill({status:state.stockFailed?503:200,json:{grandTotal:sizes.length*qty,inventory:sizes.map(size=>({size,totalQty:qty,warehouses:[{id:1,name:'Synthetic warehouse',qty}]}))}});}
+  // Axe fetches these same linked styles to evaluate contrast.
+  if(['fonts.googleapis.com','fonts.gstatic.com'].includes(u.hostname)||(u.hostname==='cdnjs.cloudflare.com'&&/^\/ajax\/libs\/font-awesome\/6\.(4|6)\.0\/css\/all\.min\.css$/.test(p))||(u.hostname==='cdn.jsdelivr.net'&&p==='/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css'))return route.continue();
+  if(p.startsWith('/api/')||['fetch','xhr'].includes(request.resourceType())){events.unknown.push(request.url());return route.fulfill({status:503});}
+  if(previewOrigin&&u.origin===previewOrigin)return route.continue();
+  if(['localhost','127.0.0.1','quote-builder.example.invalid'].includes(u.hostname)){
+   const file=decodeURIComponent(p.slice(1)),absolute=path.resolve(root,file);if(!absolute.startsWith(root+path.sep)||!fs.existsSync(absolute)||!fs.statSync(absolute).isFile()){events.missing.push(p);return route.fulfill({status:404});}
+
+   return route.fulfill(await staticAsset(file,absolute,state.original));
+  }
+  const allowedScripts=['https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js','https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js','https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js'];
+  if(['image','font','stylesheet'].includes(request.resourceType())||allowedScripts.includes(u.href))return route.continue();
+  events.unknown.push(request.url());return route.fulfill({status:503});
+ };
+ await page.context().route('**/*',handleRoute);
+ if(state.realPreview){
+  // Keep all fetches on the same synthetic handler while releasing Chromium's
+  // protocol interception before document.write creates the print document.
+  await page.exposeBinding('__quotePreviewFetch',async(_,input)=>{
+   let response;
+   await handleRoute({request:()=>({url:()=>input.url,method:()=>input.method,postDataJSON:()=>JSON.parse(input.body),resourceType:()=> 'fetch'}),fulfill:async value=>{response={status:value.status||200,body:value.json===undefined?(value.body||''):JSON.stringify(value.json),type:value.json===undefined?(value.contentType||'text/plain'):'application/json'};},continue:async()=>{throw Error('Unexpected preview fetch '+input.url);}});
+   return response;
+  });
+  events.preparePrint=async()=>{
+   await page.evaluate(()=>{
+    window.fetch=async(input,init)=>{const request=new Request(new URL(typeof input==='string'?input:input.url,location.href),init);const body=['GET','HEAD'].includes(request.method)?undefined:await request.text();const result=await window.__quotePreviewFetch({url:request.url,method:request.method,body});return new Response(result.body,{status:result.status,headers:{'Content-Type':result.type}});};
+    XMLHttpRequest.prototype.send=function(){throw Error('Unexpected XHR during synthetic print preview');};
+    navigator.sendBeacon=()=>{throw Error('Unexpected beacon during synthetic print preview');};
+   });
+   await page.context().unrouteAll({behavior:'wait'});
+  };
+ }
+ const destination=previewOrigin?previewOrigin+new URL(state.url,'http://localhost').pathname+new URL(state.url,'http://localhost').search:state.url;
+ await page.goto(destination);await page.evaluate(()=>document.fonts.ready);return events;
+}
+
+async function staticAsset(file,absolute,preserved){
+ const contentType={'.html':'text/html','.css':'text/css','.js':'application/javascript','.json':'application/json','.svg':'image/svg+xml','.png':'image/png','.woff2':'font/woff2'}[path.extname(absolute)]||'application/octet-stream';
+ if(/^shared_components\/js\/builders\/(emb|scp|dtf|dtg)\/index\.js$/.test(file)){
+  const bundle=await esbuild.build({entryPoints:[absolute],bundle:true,format:'iife',platform:'browser',target:'es2020',write:false,plugins:[{name:'preserved-preview-source',setup(build){build.onLoad({filter:/\.js$/},args=>{const f=path.relative(root,args.path).replace(/\\/g,'/');return{contents:preserved&&original.hashes[f]?source(f):fs.readFileSync(args.path,'utf8'),loader:'js'};});}}]});
+  return{contentType,body:bundle.outputFiles[0].text};
+ }
+ return{contentType,body:preserved&&original.hashes[file]?Buffer.from(source(file)):fs.readFileSync(absolute)};
+}
+async function snapshot(page){return page.evaluate(()=>{
+ const visible=n=>!!n.getClientRects().length&&getComputedStyle(n).visibility!=='hidden',norm=s=>s.replace(/\s+/g,' ').trim(),ids={};
+ for(const n of document.querySelectorAll('[id]'))if(visible(n)&&!n.querySelector('[id]')&&!['SCRIPT','STYLE'].includes(n.tagName)){ let text=n.innerText||n.textContent;for(const control of n.querySelectorAll('[data-quick-quote-control]'))text=text.replace(control.innerText,'');ids[n.id]=norm(text); }
+ return{title:document.title,url:location.pathname+location.search,ids,fields:[...document.querySelectorAll('input,select,textarea')].filter(visible).map(n=>({id:n.id,name:n.name,type:n.type,value:n.value,checked:n.checked,disabled:n.disabled})),links:[...document.querySelectorAll('a[href]')].filter(visible).map(n=>({href:n.getAttribute('href'),text:norm(n.textContent)})),tables:[...document.querySelectorAll('table')].filter(visible).map(n=>norm(n.innerText)),overflow:document.documentElement.scrollWidth>innerWidth+1};
+});}
+function check(expect,e){expect(e.errors).toEqual([]);expect(e.writes).toEqual([]);expect(e.unknown).toEqual([]);expect(e.missing).toEqual([]);}
+module.exports={open,snapshot,source,check,details,sizePricing,pricing};

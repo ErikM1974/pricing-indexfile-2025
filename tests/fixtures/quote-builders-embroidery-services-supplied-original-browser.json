@@ -1,0 +1,502 @@
+{
+  "name": "embroidery-services-supplied",
+  "states": [
+    {
+      "width": 1440,
+      "title": "2026 Embroidery Quote Builder - Garments & Caps | Northwest Custom Apparel",
+      "url": "/quote-builders/embroidery-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Screen Print DTF Transfers DTG (1st product only)",
+        "garment-design-number": "",
+        "artwork-upload-vwlzdf-design-name": "",
+        "artwork-upload-vwlzdf-dropzone": "Drop files here or click to browse AI / EPS / PSD / PDF / PNG / JPG / TIFF · 20 MB max each",
+        "primary-position": "Left Chest Right Chest Center Chest Left Sleeve Right Sleeve Back of Neck / Yoke Full Back (25K min)",
+        "primary-stitches": "Standard (≤10K) Mid +$4/pc (10-15K) Large +$10/pc (15-25K) Full Back (25K+)",
+        "emb-services-bar": "Add to order: Artwork Add-Ons Customer-Supplied Customer Garment Stitches Std Mid Large Heavyweight +$10 Add Customer Cap Stitches Std Mid Large Heavyweight +$10 Add",
+        "sidebar-resize-handle": "",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "products-label": "Products (Base 8K):",
+        "subtotal": "$960.00",
+        "per-unit-price": "$20.00/piece",
+        "additional-logos-pricing": "",
+        "cap-additional-logos-pricing": "",
+        "sidebar-grand-total": "$1056.96",
+        "toast-container": "Ready to build quotes!",
+        "floatingQuoteBtn": "✨ Ask"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "garment-design-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "artwork-upload-vwlzdf-design-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "primary-position",
+          "name": "",
+          "type": "select-one",
+          "value": "Left Chest",
+          "disabled": false
+        },
+        {
+          "id": "primary-stitches",
+          "name": "",
+          "type": "select-one",
+          "value": "8000",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "8000",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "8000",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".artwork-dropzone-sub"
+            ],
+            [
+              ".sci-add.sci-add-config[data-code=\"DECG\"]"
+            ],
+            [
+              ".sci-add.sci-add-config[data-code=\"DECC\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "2026 Embroidery Quote Builder - Garments & Caps | Northwest Custom Apparel",
+      "url": "/quote-builders/embroidery-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Screen Print DTF Transfers DTG (1st product only)",
+        "garment-design-number": "",
+        "artwork-upload-vwlzdf-design-name": "",
+        "artwork-upload-vwlzdf-dropzone": "Drop files here or click to browse AI / EPS / PSD / PDF / PNG / JPG / TIFF · 20 MB max each",
+        "primary-position": "Left Chest Right Chest Center Chest Left Sleeve Right Sleeve Back of Neck / Yoke Full Back (25K min)",
+        "primary-stitches": "Standard (≤10K) Mid +$4/pc (10-15K) Large +$10/pc (15-25K) Full Back (25K+)",
+        "emb-services-bar": "Add to order: Artwork Add-Ons Customer-Supplied Customer Garment Stitches Std Mid Large Heavyweight +$10 Add Customer Cap Stitches Std Mid Large Heavyweight +$10 Add",
+        "sidebar-resize-handle": "",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "products-label": "Products (Base 8K):",
+        "subtotal": "$960.00",
+        "per-unit-price": "$20.00/piece",
+        "additional-logos-pricing": "",
+        "cap-additional-logos-pricing": "",
+        "sidebar-grand-total": "$1056.96",
+        "toast-container": "Ready to build quotes!",
+        "floatingQuoteBtn": "✨ Ask"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "garment-design-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "artwork-upload-vwlzdf-design-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "primary-position",
+          "name": "",
+          "type": "select-one",
+          "value": "Left Chest",
+          "disabled": false
+        },
+        {
+          "id": "primary-stitches",
+          "name": "",
+          "type": "select-one",
+          "value": "8000",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "8000",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "8000",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".artwork-dropzone-sub"
+            ],
+            [
+              ".sci-add.sci-add-config[data-code=\"DECG\"]"
+            ],
+            [
+              ".sci-add.sci-add-config[data-code=\"DECC\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "2026 Embroidery Quote Builder - Garments & Caps | Northwest Custom Apparel",
+      "url": "/quote-builders/embroidery-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Screen Print DTF Transfers DTG (1st product only)",
+        "garment-design-number": "",
+        "artwork-upload-vwlzdf-design-name": "",
+        "artwork-upload-vwlzdf-dropzone": "Drop files here or click to browse AI / EPS / PSD / PDF / PNG / JPG / TIFF · 20 MB max each",
+        "primary-position": "Left Chest Right Chest Center Chest Left Sleeve Right Sleeve Back of Neck / Yoke Full Back (25K min)",
+        "primary-stitches": "Standard (≤10K) Mid +$4/pc (10-15K) Large +$10/pc (15-25K) Full Back (25K+)",
+        "emb-services-bar": "Add to order: Artwork Add-Ons Customer-Supplied Customer Garment Stitches Std Mid Large Heavyweight +$10 Add Customer Cap Stitches Std Mid Large Heavyweight +$10 Add",
+        "sidebar-resize-handle": "",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "products-label": "Products (Base 8K):",
+        "subtotal": "$960.00",
+        "per-unit-price": "$20.00/piece",
+        "additional-logos-pricing": "",
+        "cap-additional-logos-pricing": "",
+        "sidebar-grand-total": "$1056.96",
+        "toast-container": "",
+        "floatingQuoteBtn": "✨ Ask"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "garment-design-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "artwork-upload-vwlzdf-design-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "primary-position",
+          "name": "",
+          "type": "select-one",
+          "value": "Left Chest",
+          "disabled": false
+        },
+        {
+          "id": "primary-stitches",
+          "name": "",
+          "type": "select-one",
+          "value": "8000",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "8000",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "8000",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".artwork-dropzone-sub"
+            ],
+            [
+              ".sci-add.sci-add-config[data-code=\"DECG\"]"
+            ],
+            [
+              ".sci-add.sci-add-config[data-code=\"DECC\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "2026 Embroidery Quote Builder - Garments & Caps | Northwest Custom Apparel",
+      "url": "/quote-builders/embroidery-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Screen Print DTF Transfers DTG (1st product only)",
+        "garment-design-number": "",
+        "artwork-upload-vwlzdf-design-name": "",
+        "artwork-upload-vwlzdf-dropzone": "Drop files here or click to browse AI / EPS / PSD / PDF / PNG / JPG / TIFF · 20 MB max each",
+        "primary-position": "Left Chest Right Chest Center Chest Left Sleeve Right Sleeve Back of Neck / Yoke Full Back (25K min)",
+        "primary-stitches": "Standard (≤10K) Mid +$4/pc (10-15K) Large +$10/pc (15-25K) Full Back (25K+)",
+        "emb-services-bar": "Add to order: Artwork Add-Ons Customer-Supplied Customer Garment Stitches Std Mid Large Heavyweight +$10 Add Customer Cap Stitches Std Mid Large Heavyweight +$10 Add",
+        "sidebar-resize-handle": "",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "products-label": "Products (Base 8K):",
+        "subtotal": "$960.00",
+        "per-unit-price": "$20.00/piece",
+        "additional-logos-pricing": "",
+        "cap-additional-logos-pricing": "",
+        "sidebar-grand-total": "$1056.96",
+        "toast-container": "",
+        "floatingQuoteBtn": "✨ Ask"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "garment-design-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "artwork-upload-vwlzdf-design-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "primary-position",
+          "name": "",
+          "type": "select-one",
+          "value": "Left Chest",
+          "disabled": false
+        },
+        {
+          "id": "primary-stitches",
+          "name": "",
+          "type": "select-one",
+          "value": "8000",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "8000",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "8000",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".artwork-dropzone-sub"
+            ],
+            [
+              ".sci-add.sci-add-config[data-code=\"DECG\"]"
+            ],
+            [
+              ".sci-add.sci-add-config[data-code=\"DECC\"]"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "mutations": []
+}

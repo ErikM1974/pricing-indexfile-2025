@@ -1,5 +1,19 @@
 # CSS unification — design direction and implementation plan
 
+## FINAL RELEASE CANDIDATE — v2026.09.13.2
+
+All225/225 local application pages and active generated layouts have completed visual review. Shared email templates are locally reviewed; provider publication and ten external embedded interfaces retain explicit separate backlog entries. This release follows the gift-box deployment v2026.09.12.1/Heroku2110.
+
+The final cache pass resolves changed assets against their actual consumers and versions74 references across34 source/fixture files (including matching local preview harnesses). Original preservation mappings remain intact. Hashed pages also rebuild content-addressed assets; ordinary source files retain the existing no-store policy. Full local gates and exact-source CI must pass before Heroku publication.
+
+## LOCAL CSS REVIEW COMPLETE — 2026-09-13
+
+All225/225 app-served static pages are reviewed locally. The four quote builders, generated invoices/staff printouts, sample notifications/removal focus and server response templates have also been reviewed. Customer invoice checkpoint802e15bd and sample removal/inactive-owner checkpoint4fa6e413 are committed and backed up. No unreviewed active application-generated style owner remains in the recorded backlog.
+
+The four email templates now share a compiled static theme: four browser checks pass, with24screens and six pages in four PDFs fully reviewed. Original bindings, links and copy remain, except the authorized Christmas2026 deadline. Local email review is separate from publication of the four provider templates and mail-client certification. Ten provider-owned Caspio/Jotform inner UIs stay in the external backlog; app wrapper review does not complete them. See EMAIL_STYLE_CONTRACT_2026-09.md.
+
+Production remains v2026.09.12.1 / Heroku2110, with215/225 app pages reviewed in that release. Next: final asset cache review, full local unit/DOM/a11y/CSS-browser/e2e/parity/lint/build/audit/boot gates, exact-source CI and release verification. Do not stop at family milestones; no real business writes, email sends, env copying or dependency-junction deletion.
+
 ## RELEASE CANDIDATE — v2026.09.12.1 specialty and seasonal pages
 
 User explicitly authorized deployment and publication of this reviewed batch on 2026-09-12. Earlier pending-publication notes below are historical and superseded. Eight reviewed pages bring the candidate to 215/225 with 10 pending; live remains 75ef80194384912f4c644e9b868898aa5d62de28 / v2026.09.11.6 / Heroku2109 until verified rollout. Christmas gift boxes now target 2026 and have staff-dashboard links. Thirty-one browser asset references are versioned with reversible preservation mappings. Source checkpoint 78f2dfe3fb6faf451abef41f101f39441fec3271. Full local and exact-source CI gates, actual Heroku release and live asset verification remain required before claiming deployment.
@@ -1845,3 +1859,177 @@ Final local verification:251 unit suites,5,993 tests passed and26 existing condi
 ## September12 release integration corrections
 
 The first exact-source full browser run on ca07da80 failed:1555 passed,9 failed,3 intentionally skipped. CI34708639505 also failed; neither is green evidence. Staff-home contracts now apply only the authorized2026 gift-link label change to preserved original expectations. Tumbler PNG comparison runs the preserved original in an isolated context and no longer requires ignored screenshots. Screen-print background tier rendering no longer steals keyboard focus; explicit small-order tier selection focuses its exact-quantity input synchronously. Focus and unchanged financial implementation guards pass. Original fixtures remain unchanged except reversible source mappings. Full local and exact-source CI gates must pass again before release.
+
+## Webstore calculator originals reviewed — 2026-09-12
+
+Ten original browser cases pass; all 40 full-page screens and 12 paper pages in ten PDFs reviewed through 16 sheets, with 30 duplicate panels accounted for. Four immutable source hashes and six exact financial/email transformations protect the baseline. Original defects: idle copy toast is visible, closed/disabled assistant content leaks, phone drawer does not fill the viewport, print omits the title and outputs only the footer unless sections are opened manually, failed quote-item writes still claim saved.
+
+Plan: reuse canonical controls and share the existing emblem assistant presentation, remove the legacy sticker stylesheet from this consumer, retain every price, quote payload and email transformation, expose persistent save errors and retry only unconfirmed items, then review every layout and full paper output. This page remains pending until that work is verified. The separate eight-page release candidate ca07da80 is being tested on primary develop; do not mix this next family into it.
+
+## Webstore calculator reviewed — September 12, 2026
+
+- [x] Preserved the dd8d94de original checkpoint: four source hashes, ten browser contracts, all original prices/content/links, six exact financial/email transformations and successful quote request payloads.
+- [x] Adopted canonical Public Sans, tokens and controls; extracted the reviewed emblem assistant presentation to specialty-assistant.css for both consumers. Webstores no longer loads the legacy sticker stylesheet. Emblem-specific quote styles remain local.
+- [x] Fixed hidden-state leaks, phone drawer sizing, keyboard conversation scrolling, focus containment/return and reference print omissions. Printed disclosures open for paper and restore afterward. Notices remain in the drawer flow and do not cover the input.
+- [x] Save failures stay visible; confirmed session/items are retained across retries. Pending saves block duplicate clicks and edits. Revised quotes clear old saved links and acquire a new quote ID. Confirmed-stage retry does not guarantee server-side idempotency after a lost response acknowledgment.
+- [x] Final15 browser cases pass, including setup, on-demand, fundraiser, search, AI/session/item faults, partial retries, pending ownership, revised amounts, keyboard and print restoration. Forty current screens at1440/768/390/320 and30 pages in10 PDFs reviewed; final14 contact sheets account for46 duplicate panels. The final notification changes were re-reviewed against the prior15-sheet pass. All writes and email remain synthetic.
+- [x] Shared-emblem/decal regression18 cases and62 checks across four source/inventory/lessons suites pass. Full CSS lint (276 files) and scoped JavaScript lint pass.
+
+Local candidate216/225 reviewed,9 pending: embroidery-pricing-all, quick-quote, its DTF prints prototype, garment-designer and five quote builders. Shared/generated/provider/email surfaces remain separately tracked. This next family is isolated on codex/remaining-calculators and is not included in the eight-page v2026.09.12.1 release candidate ca07da80.
+
+User authorized publication/deployment on September12; earlier unanswered-publication notes are historical. Exact-source release CI34708639505 and the full local browser gates are running separately; do not claim the candidate live until Heroku and live bytes are verified.
+
+## Quick Quote family plan — September12
+
+- [ ] Preserve original source hashes and actual browser pricing, line sheets, prototype methods, rate card, size and failure states using synthetic services. Review all screens and paper before layout edits.
+- [ ] Replace the shared legacy theme with canonical Public Sans, neutral/green tokens and scoped controls; retain complete pricing and original contents. Quick Quote and the prototype share an owner and must migrate together.
+- [ ] Check four widths, keyboard, accessibility, all print surfaces and original financial results before adding migration credit. No credit or application edits at this baseline.
+
+Quick Quote original review complete (2026-09-12): 20 synthetic states, 80 screens across 320/390/768/1440, 20 PDFs / 35 paper pages, 46 contact sheets visually inspected. Preserve seven source hashes and all original browser records before migration. Reviewed defects: narrow control overflow, floating error banner, blank prototype ordinary printing, long Quick Price print output, and silent inventory errors. Application source is still unchanged at this checkpoint.
+
+## Quick Quote family reviewed — September 12, 2026
+
+- [x] Original checkpoint 2e1c7e6d preserves seven source hashes and 20 browser contracts. All original prices, active fields, content, links and controller financial logic are retained; only the two inventory functions have non-financial recovery changes.
+- [x] Both pages now use Public Sans, canonical tokens/components and scoped page CSS. Native hidden controls stay hidden. Stock failures remain unknown with explicit retry, and stale inventory responses cannot replace the current product.
+- [x] Native keyboard buttons select price breaks and prototype quantities, return focus after re-rendering, and expose pressed/expanded state. Narrow price tables keep currency together and scroll from the keyboard.
+- [x] Ordinary printing includes complete quote results. Explicit rate-card requests print only a freshly rebuilt sheet; canceled or failed preparation cannot reuse another product's old sheet. Product/stock errors remain visible on paper.
+- [x] Twenty presentation scenarios plus five behavior checks pass. All 80 current screens and 20 one-page PDFs reviewed, with zero tested overflow or WCAG2/2.1AA violations. The 53-sheet first review found three refinements; all 24 changed final sheets were re-reviewed and 29 unchanged sheets retained. Original 35 paper pages remain preserved. All business writes are intercepted; no real quote/email/order is created.
+
+Local candidate: 218/225 reviewed, seven pending — embroidery-pricing-all, garment designer and five builders. Shared/generated/provider/email surfaces remain additional work. Current release is live at v2026.09.12.1 / Heroku2110 / 4b00f3ab, with main/develop CI green and 69 live checks; its census is 215/225. Webstore and Quick Quote are local reviewed work, not part of that release. Merge the verified release into this branch before future integration.
+
+Quick Quote completion follow-up: the shared safety-apparel panel is now scoped at its own renderer mount, so the existing DTF and screen-print builders receive the same canonical styles without requiring their whole-page migration. Preserve two additional original source hashes and two populated recommendation browser contracts; all eight original screens/eight paper pages and eight current screens/four paper pages were visually reviewed. Two compatibility cases use the builders' real stylesheet order and mount ancestry with synthetic records; all eight component screenshots reviewed. Keyboard accordion/color selection, 44px swatches and exact style/catalog-color handoff pass. Those component checks do not award whole-builder migration credit.
+
+The final Quick Quote run passes all28 cases:22 presentation states, five behavior cases and two builder compatibility cases (the two recommendation states share one test). Original financial controllers remain protected. Integration guards also caught two unresolved amber-50 references on the already-reviewed webstore page; both now use color-warning-bg. Four affected browser cases and all seven changed contact sheets were re-reviewed. Shared recommendations retain all print content on a separate complete page when needed. No real quote, order, upload or email was created.
+
+Final verification: all28 Quick Quote browser cases pass, with330 unique source/ownership/financial/hygiene/lessons checks verified across six suites. The final scope/source rerun passes282 checks after a formatter quote-style mismatch; the other48 checks passed unchanged. All276 CSS files and scoped JS lint are clean. Release integration and full regression gates remain separate from this local family review.
+
+Release integration checkpoint: verified production commit4b00f3ab has now been merged into codex/remaining-calculators, retaining both release corrections and the local webstore/Quick Quote work. The earlier release-gate failure and publication-pending notes are historical: v2026.09.12.1 / Heroku2110 is verified live, exact-source/main/develop CI is green, and69 live checks pass. Local218/225 remains separate from live215/225. Next: embroidery-pricing-all, garment designer, then five quote builders; final shared/runtime and whole-app release gates still required.
+
+## Embroidery reference plan — September 12, 2026
+
+- [x] Preserve four original source hashes; replace complete private account initializers with synthetic records before browser execution; never store real customers in fixtures or reversal ledgers.
+- [x] Review the original four pricing tabs, garments/caps/patches, extra stitches and small orders, account dialog/filter/sort, failures and paper output.
+- [x] Adopt canonical tokens and controls in one scoped owner; retain financial functions and data, repair keyboard/dialog/failure/print presentation, then review all four widths and complete PDFs before migration credit.
+
+Local census remains218/225, seven pending. Webstore and Quick Quote are committed and backed up at efa277d6; production remains215/225 at v2026.09.12.1 / Heroku2110.
+
+Embroidery original baseline:20 browser cases and15 source/financial/privacy checks pass;80 original screens and20 paper pages reviewed through41 contact sheets. Private customer initializers are replaced before browser execution. Application files remain unchanged at this checkpoint; all pending UI fixes are listed in the external review report.
+
+
+## Embroidery reference completed — September 12, 2026
+
+The four-tab pricing reference now uses Public Sans, canonical tokens, scoped cards and native controls. It preserves all original pricing functions, amounts, content and customer initializers. Account disclosures, filters and sortable headings work by keyboard; the native dialog keeps focus and restores its opener. Missing required pricing clears defaults and disables quoting controls with a visible refresh message; the existing optional cap-upgrade fallback keeps its warning.
+
+All24 final browser cases pass. All80 current screens and33 complete paper pages in20 PDFs were visually reviewed through46 contact sheets;39 duplicate panels are accounted for. Original20 browser cases,80 screens,20 paper pages and four source hashes remain preserved, with ten exact financial-function guards. All preview customer records are synthetic before execution. Ordinary printing retains the active tab, title, policy disclosures and whole account cards; full-back prints on one portrait sheet, filtered customer lists and legacy contract pricing use landscape. Print restoration preserves the screen state. Source/ownership and lint gates are checked separately before committing.
+
+Local census219/225 reviewed, six pending: garment designer plus five quote builders. Production remains215/225 at v2026.09.12.1 / Heroku2110. The local webstore, Quick Quote and embroidery work awaits the remaining regression and release gates.
+
+## Garment designer plan — September 12, 2026
+
+- [x] Preserve original designer, submission form, picker and text-engine sources; capture actual canvas, upload-selection, placement, thread, text, detail, proof, form and visible-failure states using synthetic artwork and fully intercepted business requests. Inspect all original screens and paper before edits.
+- [x] Replace the designer's layered overrides with a single scoped canonical owner. Retain model photographs, artwork colors, all curated decoration fonts, exact placement geometry, file format decoders, download/proof contents and successful submission payloads. Keep interface typography separate from printed artwork fonts.
+- [x] Review phone/tablet/desktop, keyboard and dialog focus, accessible controls, complete scrollable panels, proofs/specifications and recoverable failures. Shared submission/picker changes require all-consumer evidence; do not claim provider or shared-runtime completion from page credit alone.
+- [x] Review complete current screens and paper and original-source guards before page credit. Five quote builders, shared runtime/generated/provider/email work, whole-application regression and next deployment remain.
+
+Original garment designer checkpoint: 19 browser workflows pass; all151 original screens (including scrolled panels) and46 paper pages in19 PDFs inspected through51 contact sheets. Eight original source hashes and21 exact artwork/export function guards pass (29 checks). Confirmed existing defects include overlapping phone header/toolbar, overflowing position and thread controls, cropped model preview after resizing, and repeated/clipped ordinary-print dialogs. Dedicated proof/spec contents are preserved for comparison. Application files are unchanged at this baseline checkpoint; no migration credit yet.
+
+## Garment designer and shared form reviewed — September 12, 2026
+
+The designer now uses canonical interface typography, tokens and scoped responsive controls while keeping all 24 artwork fonts, exact geometry/decoders and proof/specification contents. Keyboard dialogs retain and restore focus, native upload selection works, resized canvases fit, and invalid/customer/upload failures remain visible. Print state survives the print dialog and restores only after printing ends. The shared garment form and picker now belong to art-intake.css, with the original lazy-loader URL retained as a compatibility import. All four hosts were reviewed; successful submission fields and payload logic remain protected.
+
+All 27 designer presentation/behavior cases passed. After the final tablet size-column correction, all five affected designer/AE/lead/Quote View cases passed again. Final designer review: 145 screens, 33 paper pages in 19 PDFs and 53 contact sheets. Shared-host review: 144 screens, ten paper pages in three PDFs and 37 contact sheets. Every paper page and full scroll panel was visually inspected; immutable original browser records and ten source hashes plus 21 exact artwork/export functions remain preserved. All uploads, emails, saves and business writes are synthetic or blocked.
+
+Local candidate is 220/225 reviewed, with all 381 source/payload/ownership checks passing and scoped CSS/JS lint clean, with five quote builders remaining. Production remains 215/225 at v2026.09.12.1 / Heroku2110. Shared/generated/provider/email backlog and whole-app regression/release gates remain separate.
+
+Final ownership check found inherited art-dashboard state aliases in the shared intake sheet. These now use canonical palette tokens with the existing AE colors; all five affected browser cases passed again and every changed final panel was re-reviewed. 180 designer and 123 shared-form panels were verified pixel-identical to the preceding complete review; 26 designer and 23 shared-form changed panels were inspected. The first ownership failure is retained in the evidence, not counted as a passing run.
+
+## Final quote-builder family plan — September 12, 2026
+
+- [ ] Preserve the original five pages and their complete shared CSS/JavaScript dependency graph; capture real rendered workflows using synthetic pricing, customers and artwork. Review original phone/tablet/desktop, all guided steps and complete print/PDF documents before edits.
+- [ ] Prove shared structural improvements on EMB, adopt them in SCP/DTF, and retain DTG’s separate inline-form flow. Replace legacy override stacks with scoped canonical owners; financial engines and successful payloads stay unchanged.
+- [ ] Review all five builders, every shared control consumer, unavailable/recovery states, keyboard/focus, generated documents and pricing parity before migration credit. Full application regression and release gates remain.
+
+Fast screen-print request form: its six original states,24 screens,eight paper pages and ten contact sheets are fully reviewed. This independent form can migrate while the four pricing builders complete their larger modal/invoice baseline. Use Public Sans, neutral canvas, white surface and canonical green; compact three-choice rows, left-aligned form labels, persistent validation and one-page paper layout. Preserve estimates and successful payloads. Correct false success after a failed save. No migration credit until current browser/keyboard/paper review.
+
+
+## Fast screen-print request form reviewed — September 12, 2026
+
+The independent short request form now uses canonical typography, tokens, scoped controls and compact native option buttons. Persistent validation focuses the field or step heading. A failed database save retains customer input and stops the former false success/email path; retry works, and pending requests reject duplicate clicks. Estimates and successful request/email payloads remain unchanged.
+
+All eight final browser checks pass, including six presentation states at four widths, keyboard selection/validation, icon-click duplicate protection and failed-save retry. All 24 current screens and six one-page PDFs were visually reviewed through ten sheets; six changed final sheets were re-reviewed and four retained as pixel-identical. Original 24 screens/eight paper pages remain preserved. All business requests use synthetic services.
+
+Local candidate221/225 reviewed; the four pricing builders remain pending. Original baseline captures for EMB/SCP/DTF/DTG are preserved, but their full visual review and CSS migration are next. The 136 original dependency hashes permit only exact recorded presentation/recovery changes. Production remains215/225 at v2026.09.12.1 / Heroku2110; shared/generated/provider/email work and complete regression/release checks remain.
+
+## Quote workspace implementation in progress — September 12, 2026
+
+EMB, DTF and SCP original screen/paper reviews are complete; DTG's whole-page original review remains partial (its original generated invoice is reviewed). EMB now has canonical shared workspace and method-specific styles. All four generated quote documents share quote-invoice.css; their calculations, field content and successful payloads remain protected by the 136-source reversal guard.
+
+The current EMB pass has25 successful browser checks (23 visual states plus two print-readiness regressions); the four generated invoices pass separately.389 unit checks across source, page, hygiene, totals and input-escaping suites pass. Slow/failed required stylesheet tests proved an actual document.write timing issue and now verify one correctly formatted print or a visible failure with no print. No real business writes, emails, uploads or printing occurred.
+
+Full current visual review is still in progress. The first paper review found cramped tax controls, clipped table totals and orphaned summaries; five affected browser scenes passed after the first refinements. All affected final screens/PDFs must be re-reviewed before migration credit, ownership registration or release. Local census remains221/225; the new EMB and shared invoice changes are uncommitted WIP on codex/remaining-calculators at d25e4ddb. External CSS_RESUME.md and the active checkpoint carry exact evidence paths. Next: finish EMB current review, then SCP/DTF shared structure and DTG's separate form.
+
+## Embroidery workspace and shared invoices reviewed — September 12, 2026
+
+The embroidery workspace uses canonical responsive navigation, fields, dialogs, line items and method-specific design/service controls. Local CSS falls from 623,614 to 236,496 raw bytes (15 to 8 local sheets). All 24 final browser checks pass, including 23 visual scenes and keyboard/sidebar controls; slow/failed print asset checks passed separately. Complete final review covers 157 screens and 48 paper pages in 23 PDFs, including all scroll panels. The last eight changed panels were inspected, with 230 panels pixel-identical to the preceding full review. Order and customer blocks remain together in print. Informational startup/cap notices are normalized narrowly for real timer expiry; errors and every financial value remain exact.
+
+All four generated invoices now use one external canonical stylesheet and await real resources before printing. Their entire screen and paper output is reviewed. The manifest now tracks generated-document ownership separately from static page credit, including its exact styles, byte budget and all four callers. 552 unit/source/ownership/totals/escaping checks pass; scoped CSS lint and repository JavaScript lint pass. The 136 original source hashes and original financial/customer/payload records remain protected.
+
+Local census222/225 reviewed: Screen Print, DTF and DTG remain. Production stays215/225 at v2026.09.12.1 / Heroku2110. Next: extend the shared workspace to SCP/DTF after adding healthy SCP fee/config baselines, finish DTG original visual review and its separate form, then remaining shared/generated/provider/email work and whole-app regression/release.
+
+## Screen Print workspace reviewed — September 12, 2026
+
+Screen Print now shares canonical navigation, line items, artwork, customer fields, order details and paper rules. Its method sheet owns location/ink/underbase controls. Local CSS falls from494,161 to237,526 raw LFbytes (13 to7 local requests). All18 browser cases pass:17 full visual states plus keyboard/field/scroll geometry. Original prices and successful saved payloads remain exact, including healthy rates, multi-location setups, safety products and shipping fields. Six additional immutable original fixtures are explicitly included.
+
+All145 current screen captures and17 PDFs/50 paper pages were reviewed. Final correction review inspected114 changed panels on29 sheets;127 panels were pixel-identical to the previous complete review. Embroidery also passes all24 scenes after shared controls moved:214 previously reviewed panels remained identical and25 changed panels on7 sheets were inspected. Its measured shared CSS graph is now250,225 bytes; the added SCP/DTF rules are method-scoped.
+
+553 unit/source/ownership/totals/escaping checks pass across five suites, with the final ownership rerun registering the renderer-provided --swatch token. Repository JavaScript lint and280-file CSS lint pass. Corrected issues include clipped tax/currency inputs, empty-row column spans and orphaned printed customer details. No pricing math changed and all business requests remained synthetic.
+
+Local census223/225 reviewed; DTF and DTG pages remain. Production stays215/225 at v2026.09.12.1 / Heroku2110. DTF original review is complete; next adopt its shared workspace and verify method-specific location/shipping flows. DTG has32 original sheets still to inspect. Shared/generated/provider/email work and the complete final regression/release remain separate unfinished work.
+
+## DTF workspace reviewed — September 12, 2026
+
+DTF uses the shared workspace for navigation, artwork, line items, customer and quote controls, with one method sheet for transfer locations, order details and extended sizes. Its local CSS falls from 540,541 to 235,696 raw LF bytes (14 to 7 local stylesheets). All 15 browser cases pass, including native location keys, picker close-state, shipping/tax/currency geometry, detailed fees, all transfer positions and exact original saved values. Three detailed original fixtures are included explicitly.
+
+All 109 current screenshots and 14 PDFs / 30 paper pages are reviewed. The final corrections required 42 changed panels on 11 sheets; 130 panels matched the fully reviewed prior output. Dialog spacing, customer-heading alignment and long location values are corrected. The 136 source hashes and financial/data content remain protected; no pricing math changed. Five targeted suites pass 553 tests; repository JavaScript lint and all 281 scoped CSS files pass. The newly registered owner is checked separately.
+
+Local census is 224/225; DTG is the last static page. Production remains 215/225 at v2026.09.12.1 / Heroku 2110 until the final release. DTG original sheets 0–11, 17, 18 and 32 have been inspected; the other 20 still require review before adoption. Shared/generated/server/provider/email work and whole-app regression/CI/release remain unfinished.
+
+## DTG workspace reviewed — September 12, 2026
+
+All 225 static inventory pages are now reviewed locally. DTG uses shared navigation, form controls, quote recaps and assistant shell with one method stylesheet. CSS decreases from 326,706 to 282,720 raw LF bytes; six old requests become seven canonical requests. All 16 DTG browser cases passed (14 in the combined run, then the two corrected shipping/assistant cases). Five focused suites pass 554 checks; JavaScript lint is clean. Newly registered ownership and CSS scope are checked separately.
+
+The full DTG original baseline and six detailed original fixtures are inspected. Current evidence covers 65 screenshots, 15 PDFs and all 45 pages; all 91 changed panels on 23 sheets reviewed, 119 panels identical to the complete earlier review. Shipping totals, setup/design fees, front/back positions, customer fields and synthetic save payloads match original behavior. Hidden empty notices, expired share toast and research-only disabled assistant actions now respect their existing hidden state. No pricing calculation changed.
+
+Production remains v2026.09.12.1 / Heroku 2110 (215/225) until the final release. Static page completion is not whole-application completion: runtime CSS, generated documents, server responses, the served archive and email/provider contracts remain in migration-manifest pendingRuntimeOwners, followed by full regression, CI and release. Next: sample-cart handoff and generated document owners.
+
+
+## Shared sample notifications and runtime census — September 12, 2026
+
+Sample-cart runtime reviewed on catalog/product: 5 targeted browser cases across final and existing drawer runs, 26 notification screens / 38 panels fully reviewed. Icons reuse one link; modal notifications remain visible and accessible; out-of-stock adds stay blocked. CSS lint now includes DTG and staff-home (283 files), with reviewed-owner inclusion checked against actual expanded paths. Runtime census now reads generated stylesheet links and ignores data-style attributes. Catalog source evidence reconciles the already-reviewed Quick Quote recommendation edits using identical original hashes. The served awareness archive is already reviewed and was removed from the stale pending list. Remaining: builder runtime error/empty snippets, generated documents, server pages, email/provider contracts, final full-app gates and release.
+
+
+## Builder runtime alerts — September 12, 2026
+
+DTG persistent pricing errors and DTF extended-size empty/error/rate-limit messages now use the shared alert styles. Six focused browser cases passed, three unit suites / 226 checks passed, and all current evidence was visually inspected: DTF 48 screenshots / four PDFs (eight pages), DTG four screenshots / one PDF (three pages). Original amounts, payloads, controls and refresh recovery are preserved. This closes the two named dynamic-CSS backlog owners; generated print, server pages, email/provider contracts and final whole-app gates/release remain.
+
+
+## Server-generated pages reviewed — September 13, 2026
+
+Blog, access-denied/restricted and retired-sticker responses now use canonical shared tokens/components with two scoped family styles. Four server owners are recorded without changing the 225 static-page count. Original response text, links, metadata, anonymous redirects/JSON, role checks and retired 410/noindex behavior are preserved. Names are escaped as text; JSON-LD titles cannot close the script element. Eleven browser cases pass, including long/malicious names and keyboard exits with all styles unavailable. All 36 current screenshots and nine PDFs / ten pages were inspected. The six focused unit suites pass 383 checks across the combined run and corrected two-suite rerun; JavaScript lint, 284-file CSS lint and the unchanged 485-route table pass. Current print selector deduplication is presentation-equivalent. Production remains v2026.09.12.1 / Heroku 2110 until final regression and release.
+
+
+## Staff-generated documents reviewed — September 13, 2026
+
+Staff call sheets, Avery 5160 mailing labels and thread sheets now share canonical tokens/components/staff-print CSS and a required-asset print helper. Twenty-one dedicated browser cases pass across the full run and corrected injection-test rerun. All 34 current screenshots, seven PDFs / twelve pages and 22 review sheets were inspected. Real blocked/missing-helper/style/image cases visibly fail; delayed styles wait; imported thread text is escaped and color values validated. Label geometry is 2.625 by 1 inch with 0.125-inch gaps; 32 labels retain all data across two pages. Five focused suites pass 76 checks across the run and corrected fixture replay; the six ownership/runtime/lint suites pass 351 across the run and corrected workspace replay. CSS lint covers 285 files and JavaScript lint is clean. Host regression: 84 passed initially, then all 33 selected correction cases passed after restoring baseline replay and using the expected local test-server origin. Original financial/address values and synthetic request bodies remain protected. All 225 static pages remain locally reviewed; production remains v2026.09.12.1 / Heroku 2110 until final gates/release.
+
+## Customer-supplied quote documents reviewed — September 13, 2026
+
+Customer-supplied screenprint invoices now share the required-asset print helper. Eight final browser checks pass (six real popup readiness/failure cases and two saved-quote layouts), with two earlier estimate/clipboard/blocked-popup regressions also passing. All twelve current screenshots, both one-page PDFs and five review sheets were inspected, including every horizontal table segment. Two focused suites / 59 source and financial checks pass; CSS and JavaScript lint pass. Numeric headings stay intact on phones; totals, notes, waiver and captured customer values remain exact. Local static census stays225/225; production remains v2026.09.12.1 / Heroku2110 pending full-app gates and release.
+
+Final registration checks:281 ownership/CSS/lessons checks pass, plus50 original-source checks. Both saved invoice cases pass again after adding the existing unified-body scope; four review sheets remain pixel-identical and the changed fifth sheet is inspected. Required CSS totals61,722 LFbytes across three owners, with a63,770-byte cap.
+
+## Final sample removal and inactive generators — September 13, 2026
+
+Both catalog/product sample drawers now use one service-owned removal notice and retain focus after list replacement. Five current browser checks and49 targeted source/runtime checks pass. All eight original/eight current screenshots and seven sheets per phase were inspected. No stylesheet or pricing changes; notices remain hidden on paper. Source reversal locks preserve the original method.
+
+Two legacy print owners are explicitly inactive in the manifest: QuoteFormatter has no call/construction (DTF still loads its unused script); the old Christmas bundle service is commented out and the live implementation comes from calculators/js/christmas-bundle-order.js. Files and references are retained. Reactivation requires a new original/current screen and print review; inactivity earns no CSS review credit. Remaining: four local email templates, ten externally controlled UI contracts, final whole-app gates/CI/release.

@@ -1,0 +1,148 @@
+{
+  "name": "landing",
+  "states": [
+    {
+      "width": 1440,
+      "title": "T-Shirt Designer — Northwest Custom Apparel",
+      "ids": {
+        "addTextBtn": "➕ Add Text",
+        "palBtn": "🎨 Shirt Color",
+        "garmentStyleSelect": "Crew Tee Polo Hoodie Long Sleeve Ladies Tee",
+        "canvasHolder": ""
+      },
+      "fields": [
+        {
+          "id": "garmentStyleSelect",
+          "type": "select-one",
+          "value": "tee",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/pages/mockup-library.html",
+          "text": "📚 Saved Mockups"
+        }
+      ],
+      "headings": [
+        "NWCA Easy Shirt Designer",
+        "Start with the shirt.",
+        "Add your artwork"
+      ],
+      "entries": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".easy-upload-card[data-call=\"pickSide\"][data-args=\"[\\\"front\\\"]\"] > span"
+            ],
+            [
+              ".easy-upload-card[data-call=\"pickSide\"][data-args=\"[\\\"back\\\"]\"] > span"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "T-Shirt Designer — Northwest Custom Apparel",
+      "ids": {
+        "addTextBtn": "➕ Add Text",
+        "palBtn": "🎨 Shirt Color",
+        "garmentStyleSelect": "Crew Tee Polo Hoodie Long Sleeve Ladies Tee",
+        "canvasHolder": ""
+      },
+      "fields": [
+        {
+          "id": "garmentStyleSelect",
+          "type": "select-one",
+          "value": "tee",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/pages/mockup-library.html",
+          "text": "📚 Saved Mockups"
+        }
+      ],
+      "headings": [
+        "NWCA Easy Shirt Designer",
+        "Start with the shirt.",
+        "Add your artwork"
+      ],
+      "entries": [],
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "width": 390,
+      "title": "T-Shirt Designer — Northwest Custom Apparel",
+      "ids": {
+        "addTextBtn": "➕ Add Text",
+        "palBtn": "🎨 Shirt Color",
+        "garmentStyleSelect": "Crew Tee Polo Hoodie Long Sleeve Ladies Tee",
+        "canvasHolder": ""
+      },
+      "fields": [
+        {
+          "id": "garmentStyleSelect",
+          "type": "select-one",
+          "value": "tee",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/pages/mockup-library.html",
+          "text": "📚 Saved Mockups"
+        }
+      ],
+      "headings": [
+        "NWCA Easy Shirt Designer",
+        "Start with the shirt.",
+        "Add your artwork"
+      ],
+      "entries": [],
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "width": 320,
+      "title": "T-Shirt Designer — Northwest Custom Apparel",
+      "ids": {
+        "addTextBtn": "➕ Add Text",
+        "palBtn": "🎨 Shirt Color",
+        "garmentStyleSelect": "Crew Tee Polo Hoodie Long Sleeve Ladies Tee",
+        "canvasHolder": ""
+      },
+      "fields": [
+        {
+          "id": "garmentStyleSelect",
+          "type": "select-one",
+          "value": "tee",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/pages/mockup-library.html",
+          "text": "📚 Saved Mockups"
+        }
+      ],
+      "headings": [
+        "NWCA Easy Shirt Designer",
+        "Start with the shirt.",
+        "Add your artwork"
+      ],
+      "entries": [],
+      "overflow": true,
+      "violations": []
+    }
+  ],
+  "reads": [],
+  "writes": [],
+  "dialogs": []
+}

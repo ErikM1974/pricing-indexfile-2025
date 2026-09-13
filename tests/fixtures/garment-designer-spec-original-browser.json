@@ -1,0 +1,603 @@
+{
+  "name": "spec",
+  "states": [
+    {
+      "width": 1440,
+      "title": "T-Shirt Designer — Northwest Custom Apparel",
+      "ids": {
+        "thumb-1": "",
+        "advice-1": "Screen Print Usable · 100 DPI 3,500–5,500 st",
+        "badge-1": "SVG",
+        "pcStatusChip": "Front only",
+        "pcFrontBtn": "Front",
+        "pcBackBtn": "Back",
+        "pcBothBtn": "Both",
+        "pcLeftChestBtn": "Left Chest",
+        "pcFullFrontBtn": "Full Front",
+        "pcUpperBackBtn": "Upper Back",
+        "pcFullBackBtn": "Full Back",
+        "pcCenterBtn": "Center Art",
+        "pcWidthLabel": "3.75 in",
+        "pcWidthRange": "",
+        "pcWidthNumber": "",
+        "pcXLabel": "-42",
+        "pcXRange": "",
+        "pcXNumber": "",
+        "pcYLabel": "-6",
+        "pcYRange": "",
+        "pcYNumber": "",
+        "addTextBtn": "➕ Add Text",
+        "palBtn": "🎨 Shirt Color",
+        "garmentStyleSelect": "Crew Tee Polo Hoodie Long Sleeve Ladies Tee",
+        "removeBgBtn": "✓ White BG Removed",
+        "artDetailsBtn": "ℹ️ Art Details",
+        "threadColorsBtn": "🧵 Thread Colors",
+        "modelViewBtn": "👕 Model View",
+        "spinBtn": "🔄 Spin",
+        "proofBtn": "🖨 Customer Proof",
+        "dlBtn": "⬇ Download PNG",
+        "sendSteveBtn": "🧵 Send to Steve",
+        "sendCustomerBtn": "📧 Send to Customer",
+        "contrastWarn": "⚠ Low art/shirt contrast — the print may be hard to see",
+        "canvasHolder": "",
+        "advisorMethodPill": "Screen Print",
+        "advisorMain": "Screen print looks possible.",
+        "advisorCopy": "Artwork appears within the 6-color screen print limit.",
+        "advisorColors": "4 total incl. base",
+        "advisorQuality": "Usable · 100 DPI",
+        "advisorFabric": "Cotton",
+        "advisorScreen": "4 / 6",
+        "fabricSelect": "Cotton shirt Cotton/poly blend Polyester Nylon Fabric unknown",
+        "embStatusPill": "Embroidery OK",
+        "embMain": "Embroidery looks possible.",
+        "embCopy": "This estimate is based on the visible artwork only, not the transparent/background canvas. Thread color count is in the preferred embroidery range.",
+        "embStitches": "3,500–5,500",
+        "embThreads": "3 estimated",
+        "embSize": "3.8\" × 1.4\"",
+        "embBestUse": "Left chest",
+        "embNote": "Estimate only. The app now estimates stitches from visible design pixels only. Final stitch count still depends on digitizing, small text, outlines, gradients, fabric, and sew-out quality."
+      },
+      "fields": [
+        {
+          "id": "pcWidthRange",
+          "type": "range",
+          "value": "4",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcWidthNumber",
+          "type": "number",
+          "value": "3.75",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcXRange",
+          "type": "range",
+          "value": "-42",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcXNumber",
+          "type": "number",
+          "value": "-42",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcYRange",
+          "type": "range",
+          "value": "-6",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcYNumber",
+          "type": "number",
+          "value": "-6",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "garmentStyleSelect",
+          "type": "select-one",
+          "value": "tee",
+          "disabled": false
+        },
+        {
+          "id": "fabricSelect",
+          "type": "select-one",
+          "value": "cotton",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/pages/mockup-library.html",
+          "text": "📚 Saved Mockups"
+        }
+      ],
+      "headings": [
+        "NWCA Easy Shirt Designer"
+      ],
+      "entries": [
+        {
+          "name": "example-logo.svg",
+          "kind": "canvas",
+          "status": "ready",
+          "printLoc": "Left Chest",
+          "printW": 3.75,
+          "onShirt": true,
+          "textModel": null,
+          "dst": null
+        }
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".side-head > span"
+            ],
+            [
+              ".fsize"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "T-Shirt Designer — Northwest Custom Apparel",
+      "ids": {
+        "thumb-1": "",
+        "advice-1": "Screen Print Usable · 100 DPI 3,500–5,500 st",
+        "badge-1": "SVG",
+        "pcStatusChip": "Front only",
+        "pcFrontBtn": "Front",
+        "pcBackBtn": "Back",
+        "pcBothBtn": "Both",
+        "pcLeftChestBtn": "Left Chest",
+        "pcFullFrontBtn": "Full Front",
+        "pcUpperBackBtn": "Upper Back",
+        "pcFullBackBtn": "Full Back",
+        "pcCenterBtn": "Center Art",
+        "pcWidthLabel": "3.75 in",
+        "pcWidthRange": "",
+        "pcWidthNumber": "",
+        "pcXLabel": "-42",
+        "pcXRange": "",
+        "pcXNumber": "",
+        "pcYLabel": "-6",
+        "pcYRange": "",
+        "pcYNumber": "",
+        "addTextBtn": "➕ Add Text",
+        "palBtn": "🎨 Shirt Color",
+        "garmentStyleSelect": "Crew Tee Polo Hoodie Long Sleeve Ladies Tee",
+        "removeBgBtn": "✓ White BG Removed",
+        "artDetailsBtn": "ℹ️ Art Details",
+        "threadColorsBtn": "🧵 Thread Colors",
+        "modelViewBtn": "👕 Model View",
+        "spinBtn": "🔄 Spin",
+        "proofBtn": "🖨 Customer Proof",
+        "dlBtn": "⬇ Download PNG",
+        "sendSteveBtn": "🧵 Send to Steve",
+        "sendCustomerBtn": "📧 Send to Customer",
+        "contrastWarn": "⚠ Low art/shirt contrast — the print may be hard to see",
+        "canvasHolder": "",
+        "advisorMethodPill": "Screen Print",
+        "advisorMain": "Screen print looks possible.",
+        "advisorCopy": "Artwork appears within the 6-color screen print limit.",
+        "advisorColors": "4 total incl. base",
+        "advisorQuality": "Usable · 100 DPI",
+        "advisorFabric": "Cotton",
+        "advisorScreen": "4 / 6",
+        "fabricSelect": "Cotton shirt Cotton/poly blend Polyester Nylon Fabric unknown",
+        "embStatusPill": "Embroidery OK",
+        "embMain": "Embroidery looks possible.",
+        "embCopy": "This estimate is based on the visible artwork only, not the transparent/background canvas. Thread color count is in the preferred embroidery range.",
+        "embStitches": "3,500–5,500",
+        "embThreads": "3 estimated",
+        "embSize": "3.8\" × 1.4\"",
+        "embBestUse": "Left chest",
+        "embNote": "Estimate only. The app now estimates stitches from visible design pixels only. Final stitch count still depends on digitizing, small text, outlines, gradients, fabric, and sew-out quality."
+      },
+      "fields": [
+        {
+          "id": "pcWidthRange",
+          "type": "range",
+          "value": "4",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcWidthNumber",
+          "type": "number",
+          "value": "3.75",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcXRange",
+          "type": "range",
+          "value": "-42",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcXNumber",
+          "type": "number",
+          "value": "-42",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcYRange",
+          "type": "range",
+          "value": "-6",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcYNumber",
+          "type": "number",
+          "value": "-6",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "garmentStyleSelect",
+          "type": "select-one",
+          "value": "tee",
+          "disabled": false
+        },
+        {
+          "id": "fabricSelect",
+          "type": "select-one",
+          "value": "cotton",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/pages/mockup-library.html",
+          "text": "📚 Saved Mockups"
+        }
+      ],
+      "headings": [
+        "NWCA Easy Shirt Designer"
+      ],
+      "entries": [
+        {
+          "name": "example-logo.svg",
+          "kind": "canvas",
+          "status": "ready",
+          "printLoc": "Left Chest",
+          "printW": 3.75,
+          "onShirt": true,
+          "textModel": null,
+          "dst": null
+        }
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".side-head > span"
+            ],
+            [
+              ".fsize"
+            ],
+            [
+              "#threadColorsBtn"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "T-Shirt Designer — Northwest Custom Apparel",
+      "ids": {
+        "thumb-1": "",
+        "advice-1": "Screen Print Usable · 100 DPI 3,500–5,500 st",
+        "badge-1": "SVG",
+        "pcStatusChip": "Front only",
+        "pcFrontBtn": "Front",
+        "pcBackBtn": "Back",
+        "pcBothBtn": "Both",
+        "pcLeftChestBtn": "Left Chest",
+        "pcFullFrontBtn": "Full Front",
+        "pcUpperBackBtn": "Upper Back",
+        "pcFullBackBtn": "Full Back",
+        "pcCenterBtn": "Center Art",
+        "pcWidthLabel": "3.75 in",
+        "pcWidthRange": "",
+        "pcWidthNumber": "",
+        "pcXLabel": "-42",
+        "pcXRange": "",
+        "pcXNumber": "",
+        "pcYLabel": "-6",
+        "pcYRange": "",
+        "pcYNumber": "",
+        "addTextBtn": "➕ Add Text",
+        "palBtn": "🎨 Shirt Color",
+        "garmentStyleSelect": "Crew Tee Polo Hoodie Long Sleeve Ladies Tee",
+        "removeBgBtn": "✓ White BG Removed",
+        "artDetailsBtn": "ℹ️ Art Details",
+        "threadColorsBtn": "🧵 Thread Colors",
+        "modelViewBtn": "👕 Model View",
+        "spinBtn": "🔄 Spin",
+        "proofBtn": "🖨 Customer Proof",
+        "dlBtn": "⬇ Download PNG",
+        "sendSteveBtn": "🧵 Send to Steve",
+        "sendCustomerBtn": "📧 Send to Customer",
+        "contrastWarn": "⚠ Low art/shirt contrast — the print may be hard to see",
+        "canvasHolder": "",
+        "advisorMethodPill": "Screen Print",
+        "advisorMain": "Screen print looks possible.",
+        "advisorCopy": "Artwork appears within the 6-color screen print limit.",
+        "advisorColors": "4 total incl. base",
+        "advisorQuality": "Usable · 100 DPI",
+        "advisorFabric": "Cotton",
+        "advisorScreen": "4 / 6",
+        "fabricSelect": "Cotton shirt Cotton/poly blend Polyester Nylon Fabric unknown",
+        "embStatusPill": "Embroidery OK",
+        "embMain": "Embroidery looks possible.",
+        "embCopy": "This estimate is based on the visible artwork only, not the transparent/background canvas. Thread color count is in the preferred embroidery range.",
+        "embStitches": "3,500–5,500",
+        "embThreads": "3 estimated",
+        "embSize": "3.8\" × 1.4\"",
+        "embBestUse": "Left chest",
+        "embNote": "Estimate only. The app now estimates stitches from visible design pixels only. Final stitch count still depends on digitizing, small text, outlines, gradients, fabric, and sew-out quality."
+      },
+      "fields": [
+        {
+          "id": "pcWidthRange",
+          "type": "range",
+          "value": "4",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcWidthNumber",
+          "type": "number",
+          "value": "3.75",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcXRange",
+          "type": "range",
+          "value": "-42",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcXNumber",
+          "type": "number",
+          "value": "-42",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcYRange",
+          "type": "range",
+          "value": "-6",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcYNumber",
+          "type": "number",
+          "value": "-6",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "garmentStyleSelect",
+          "type": "select-one",
+          "value": "tee",
+          "disabled": false
+        },
+        {
+          "id": "fabricSelect",
+          "type": "select-one",
+          "value": "cotton",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/pages/mockup-library.html",
+          "text": "📚 Saved Mockups"
+        }
+      ],
+      "headings": [
+        "NWCA Easy Shirt Designer"
+      ],
+      "entries": [
+        {
+          "name": "example-logo.svg",
+          "kind": "canvas",
+          "status": "ready",
+          "printLoc": "Left Chest",
+          "printW": 3.75,
+          "onShirt": true,
+          "textModel": null,
+          "dst": null
+        }
+      ],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".side-head > span"
+            ],
+            [
+              ".fsize"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "T-Shirt Designer — Northwest Custom Apparel",
+      "ids": {
+        "thumb-1": "",
+        "advice-1": "Screen Print Usable · 100 DPI 3,500–5,500 st",
+        "badge-1": "SVG",
+        "pcStatusChip": "Front only",
+        "pcFrontBtn": "Front",
+        "pcBackBtn": "Back",
+        "pcBothBtn": "Both",
+        "pcLeftChestBtn": "Left Chest",
+        "pcFullFrontBtn": "Full Front",
+        "pcUpperBackBtn": "Upper Back",
+        "pcFullBackBtn": "Full Back",
+        "pcCenterBtn": "Center Art",
+        "pcWidthLabel": "3.75 in",
+        "pcWidthRange": "",
+        "pcWidthNumber": "",
+        "pcXLabel": "-42",
+        "pcXRange": "",
+        "pcXNumber": "",
+        "pcYLabel": "-6",
+        "pcYRange": "",
+        "pcYNumber": "",
+        "addTextBtn": "➕ Add Text",
+        "palBtn": "🎨 Shirt Color",
+        "garmentStyleSelect": "Crew Tee Polo Hoodie Long Sleeve Ladies Tee",
+        "removeBgBtn": "✓ White BG Removed",
+        "artDetailsBtn": "ℹ️ Art Details",
+        "threadColorsBtn": "🧵 Thread Colors",
+        "modelViewBtn": "👕 Model View",
+        "spinBtn": "🔄 Spin",
+        "proofBtn": "🖨 Customer Proof",
+        "dlBtn": "⬇ Download PNG",
+        "sendSteveBtn": "🧵 Send to Steve",
+        "sendCustomerBtn": "📧 Send to Customer",
+        "contrastWarn": "⚠ Low art/shirt contrast — the print may be hard to see",
+        "canvasHolder": "",
+        "advisorMethodPill": "Screen Print",
+        "advisorMain": "Screen print looks possible.",
+        "advisorCopy": "Artwork appears within the 6-color screen print limit.",
+        "advisorColors": "4 total incl. base",
+        "advisorQuality": "Usable · 100 DPI",
+        "advisorFabric": "Cotton",
+        "advisorScreen": "4 / 6",
+        "fabricSelect": "Cotton shirt Cotton/poly blend Polyester Nylon Fabric unknown",
+        "embStatusPill": "Embroidery OK",
+        "embMain": "Embroidery looks possible.",
+        "embCopy": "This estimate is based on the visible artwork only, not the transparent/background canvas. Thread color count is in the preferred embroidery range.",
+        "embStitches": "3,500–5,500",
+        "embThreads": "3 estimated",
+        "embSize": "3.8\" × 1.4\"",
+        "embBestUse": "Left chest",
+        "embNote": "Estimate only. The app now estimates stitches from visible design pixels only. Final stitch count still depends on digitizing, small text, outlines, gradients, fabric, and sew-out quality."
+      },
+      "fields": [
+        {
+          "id": "pcWidthRange",
+          "type": "range",
+          "value": "4",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcWidthNumber",
+          "type": "number",
+          "value": "3.75",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcXRange",
+          "type": "range",
+          "value": "-42",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcXNumber",
+          "type": "number",
+          "value": "-42",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcYRange",
+          "type": "range",
+          "value": "-6",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcYNumber",
+          "type": "number",
+          "value": "-6",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "garmentStyleSelect",
+          "type": "select-one",
+          "value": "tee",
+          "disabled": false
+        },
+        {
+          "id": "fabricSelect",
+          "type": "select-one",
+          "value": "cotton",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/pages/mockup-library.html",
+          "text": "📚 Saved Mockups"
+        }
+      ],
+      "headings": [
+        "NWCA Easy Shirt Designer"
+      ],
+      "entries": [
+        {
+          "name": "example-logo.svg",
+          "kind": "canvas",
+          "status": "ready",
+          "printLoc": "Left Chest",
+          "printW": 3.75,
+          "onShirt": true,
+          "textModel": null,
+          "dst": null
+        }
+      ],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".side-head > span"
+            ],
+            [
+              ".fsize"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "reads": [],
+  "writes": [],
+  "dialogs": []
+}

@@ -1,0 +1,172 @@
+{
+  "name": "back-placement",
+  "states": [
+    {
+      "width": 1440,
+      "title": "T-Shirt Designer — Northwest Custom Apparel",
+      "ids": {
+        "addTextBtn": "➕ Add Text",
+        "palBtn": "🎨 Shirt Color",
+        "garmentStyleSelect": "Crew Tee Polo Hoodie Long Sleeve Ladies Tee",
+        "canvasHolder": "",
+        "chooserTitle": "Back artwork placement",
+        "chooserSubtitle": "Choose a recommended back print location before you upload the artwork.",
+        "chooserBody": "Recommended small back print Upper Back Great for small event marks or secondary back logos placed higher on the shirt. Snaps higher on the back Starts at about 11.5\" wide You can still drag and resize it after upload Recommended large back print Full Back Best for main back graphics, event artwork, and larger statement prints. Snaps centered on the back Starts at about 12\" wide You can still drag and resize it after upload"
+      },
+      "fields": [
+        {
+          "id": "garmentStyleSelect",
+          "type": "select-one",
+          "value": "tee",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/pages/mockup-library.html",
+          "text": "📚 Saved Mockups"
+        }
+      ],
+      "headings": [
+        "NWCA Easy Shirt Designer",
+        "Start with the shirt.",
+        "Add your artwork",
+        "Back artwork placement",
+        "Upper Back",
+        "Full Back"
+      ],
+      "entries": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".easy-upload-card[data-call=\"pickSide\"][data-args=\"[\\\"front\\\"]\"] > span"
+            ],
+            [
+              ".easy-upload-card[data-call=\"pickSide\"][data-args=\"[\\\"back\\\"]\"] > span"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "T-Shirt Designer — Northwest Custom Apparel",
+      "ids": {
+        "addTextBtn": "➕ Add Text",
+        "palBtn": "🎨 Shirt Color",
+        "garmentStyleSelect": "Crew Tee Polo Hoodie Long Sleeve Ladies Tee",
+        "canvasHolder": "",
+        "chooserTitle": "Back artwork placement",
+        "chooserSubtitle": "Choose a recommended back print location before you upload the artwork.",
+        "chooserBody": "Recommended small back print Upper Back Great for small event marks or secondary back logos placed higher on the shirt. Snaps higher on the back Starts at about 11.5\" wide You can still drag and resize it after upload Recommended large back print Full Back Best for main back graphics, event artwork, and larger statement prints. Snaps centered on the back Starts at about 12\" wide You can still drag and resize it after upload"
+      },
+      "fields": [
+        {
+          "id": "garmentStyleSelect",
+          "type": "select-one",
+          "value": "tee",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/pages/mockup-library.html",
+          "text": "📚 Saved Mockups"
+        }
+      ],
+      "headings": [
+        "NWCA Easy Shirt Designer",
+        "Start with the shirt.",
+        "Add your artwork",
+        "Back artwork placement",
+        "Upper Back",
+        "Full Back"
+      ],
+      "entries": [],
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "width": 390,
+      "title": "T-Shirt Designer — Northwest Custom Apparel",
+      "ids": {
+        "addTextBtn": "➕ Add Text",
+        "palBtn": "🎨 Shirt Color",
+        "garmentStyleSelect": "Crew Tee Polo Hoodie Long Sleeve Ladies Tee",
+        "canvasHolder": "",
+        "chooserTitle": "Back artwork placement",
+        "chooserSubtitle": "Choose a recommended back print location before you upload the artwork.",
+        "chooserBody": "Recommended small back print Upper Back Great for small event marks or secondary back logos placed higher on the shirt. Snaps higher on the back Starts at about 11.5\" wide You can still drag and resize it after upload Recommended large back print Full Back Best for main back graphics, event artwork, and larger statement prints. Snaps centered on the back Starts at about 12\" wide You can still drag and resize it after upload"
+      },
+      "fields": [
+        {
+          "id": "garmentStyleSelect",
+          "type": "select-one",
+          "value": "tee",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/pages/mockup-library.html",
+          "text": "📚 Saved Mockups"
+        }
+      ],
+      "headings": [
+        "NWCA Easy Shirt Designer",
+        "Start with the shirt.",
+        "Add your artwork",
+        "Back artwork placement",
+        "Upper Back",
+        "Full Back"
+      ],
+      "entries": [],
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "width": 320,
+      "title": "T-Shirt Designer — Northwest Custom Apparel",
+      "ids": {
+        "addTextBtn": "➕ Add Text",
+        "palBtn": "🎨 Shirt Color",
+        "garmentStyleSelect": "Crew Tee Polo Hoodie Long Sleeve Ladies Tee",
+        "canvasHolder": "",
+        "chooserTitle": "Back artwork placement",
+        "chooserSubtitle": "Choose a recommended back print location before you upload the artwork.",
+        "chooserBody": "Recommended small back print Upper Back Great for small event marks or secondary back logos placed higher on the shirt. Snaps higher on the back Starts at about 11.5\" wide You can still drag and resize it after upload Recommended large back print Full Back Best for main back graphics, event artwork, and larger statement prints. Snaps centered on the back Starts at about 12\" wide You can still drag and resize it after upload"
+      },
+      "fields": [
+        {
+          "id": "garmentStyleSelect",
+          "type": "select-one",
+          "value": "tee",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/pages/mockup-library.html",
+          "text": "📚 Saved Mockups"
+        }
+      ],
+      "headings": [
+        "NWCA Easy Shirt Designer",
+        "Start with the shirt.",
+        "Add your artwork",
+        "Back artwork placement",
+        "Upper Back",
+        "Full Back"
+      ],
+      "entries": [],
+      "overflow": true,
+      "violations": []
+    }
+  ],
+  "reads": [],
+  "writes": [],
+  "dialogs": []
+}

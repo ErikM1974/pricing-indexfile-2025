@@ -21,6 +21,11 @@ test.each(Object.keys(original.hashes).filter(f => !f.endsWith('.html')))('%s re
         return;
     }
     let s = fs.readFileSync(path.join(root, file), 'utf8').replace(/\r\n/g, '\n');
+    // Later shared-form modernization remains reversible to this earlier review.
+    for (const change of require('../fixtures/garment-designer-original-content.json').changes.filter(c => c.file === file).reverse()) {
+        expect(s.split(change.after).length - 1).toBe(change.count);
+        s = s.split(change.after).join(change.before);
+    }
     for (const change of original.changes.filter(c => c.file === file).reverse()) {
         expect(change.after).not.toBe(''); expect(s.split(change.after).length - 1).toBe(change.count);
         s = s.split(change.after).join(change.before);
@@ -39,9 +44,11 @@ test('retired styles have no remaining HTML consumer and dynamic art ownership s
     const manifest = require('../../scripts/css/migration-manifest.json');
     const lead = manifest.pilots.find(p => p.source === 'dashboards/lead.html');
     expect(lead.dynamicStyles).toEqual(['shared_components/css/garment-submit-form.css']);
-    expect(lead.runtimeBoundary.status).toBe('shared-module-migration-pending');
-    expect(lead.measuredTriggeredCssBytes).toBe(lead.measuredRawCssBytes + Buffer.byteLength(fs.readFileSync(path.join(root, lead.dynamicStyles[0]), 'utf8').replace(/\r\n/g, '\n')));
-    expect(manifest.pendingRuntimeOwners.find(p => p.kind === 'dynamic-css').owners).toContain('dashboards/js/lead-workspace.js');
+    expect(lead.runtimeBoundary.status).toBe('reviewed');
+    const imported = 'shared_components/css/art-intake.css';
+    expect(fs.readFileSync(path.join(root, lead.dynamicStyles[0]), 'utf8')).toContain('/' + imported);
+    expect(lead.measuredTriggeredCssBytes).toBe(lead.measuredRawCssBytes + [lead.dynamicStyles[0], imported].reduce((sum, file) => sum + Buffer.byteLength(fs.readFileSync(path.join(root, file), 'utf8').replace(/\r\n/g, '\n')), 0));
+    expect(manifest.pendingRuntimeOwners.flatMap(p => p.owners)).not.toContain('dashboards/js/lead-workspace.js');
 });
 
 test.each([['lead', 'lead-workspace', 'test-leads-stub.js'], ['form-submissions', 'form-submissions', 'test-form-submissions-stub.js'], ['leads', 'leads', 'test-leads-stub.js']])('%s preview follows current markup, assets and mock boundary', (page, preview, stub) => {

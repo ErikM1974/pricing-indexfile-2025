@@ -1,0 +1,384 @@
+{
+  "role-denied": {
+    "title": "Access Denied",
+    "text": "Access Denied You don't have permission to view this dashboard, Avery. Return to Staff Dashboard",
+    "links": [
+      [
+        "/staff-dashboard.html",
+        "Return to Staff Dashboard"
+      ]
+    ],
+    "seo": []
+  },
+  "restricted": {
+    "title": "Access Restricted — Northwest Custom Apparel",
+    "text": "Access Restricted Sorry, Avery — this page is restricted, and your account doesn’t have access to it. If you need access, please ask Erik. ← Back to Dashboard",
+    "links": [
+      [
+        "/staff-dashboard.html",
+        "← Back to Dashboard"
+      ]
+    ],
+    "seo": [
+      "<meta charset=\"utf-8\">"
+    ]
+  },
+  "restricted-no-name": {
+    "title": "Access Restricted — Northwest Custom Apparel",
+    "text": "Access Restricted This page is restricted, and your account doesn’t have access to it. If you need access, please ask Erik. ← Back to Dashboard",
+    "links": [
+      [
+        "/staff-dashboard.html",
+        "← Back to Dashboard"
+      ]
+    ],
+    "seo": [
+      "<meta charset=\"utf-8\">"
+    ]
+  },
+  "blog-index": {
+    "title": "Blog — Custom Apparel Guides & News | Northwest Custom Apparel",
+    "text": "Catalog Blog Get a Quote The Northwest Custom Apparel Blog Guides, news, and behind-the-scenes from our Milton, WA shop — embroidery, screen printing, DTG, and DTF since 1977. All GuidesNews Guides Made for your team. Built for everyday work. A practical guide to choosing apparel, decoration and a fit your whole team will enjoy. September 1, 2026 News From our Milton shop Meet the people behind your custom apparel. August 24, 2026 Guides Choosing the right fit Simple details for a comfortable team uniform. August 18, 2026 © 2026 Northwest Custom Apparel · Family-owned since 1977 · Milton, WA 253-922-5793 · sales@nwcustomapparel.com · Request a quote",
+    "links": [
+      [
+        "/",
+        ""
+      ],
+      [
+        "/catalog",
+        "Catalog"
+      ],
+      [
+        "/blog",
+        "Blog"
+      ],
+      [
+        "/pages/request-a-quote.html",
+        "Get a Quote"
+      ],
+      [
+        "/blog",
+        "All"
+      ],
+      [
+        "/blog?category=Guides",
+        "Guides"
+      ],
+      [
+        "/blog?category=News",
+        "News"
+      ],
+      [
+        "/blog/team-apparel-guide",
+        "Guides Made for your team. Built for everyday work. A practical guide to choosing apparel, decoration and a fit your whole team will enjoy. September 1, 2026"
+      ],
+      [
+        "/blog/shop-news",
+        "News From our Milton shop Meet the people behind your custom apparel. August 24, 2026"
+      ],
+      [
+        "/blog/simple-guide",
+        "Guides Choosing the right fit Simple details for a comfortable team uniform. August 18, 2026"
+      ],
+      [
+        "tel:253-922-5793",
+        "253-922-5793"
+      ],
+      [
+        "mailto:sales@nwcustomapparel.com",
+        "sales@nwcustomapparel.com"
+      ],
+      [
+        "/pages/request-a-quote.html",
+        "Request a quote"
+      ]
+    ],
+    "seo": [
+      "<meta charset=\"UTF-8\">",
+      "<meta name=\"description\" content=\"Guides, news, and behind-the-scenes from Northwest Custom Apparel — custom embroidery, screen printing, DTG, and DTF transfers in Milton, WA.\">",
+      "<link rel=\"canonical\" href=\"https://www.teamnwca.com/blog\">",
+      "<meta property=\"og:site_name\" content=\"Northwest Custom Apparel\">",
+      "<meta property=\"og:type\" content=\"website\">",
+      "<meta property=\"og:title\" content=\"Blog — Custom Apparel Guides &amp; News | Northwest Custom Apparel\">",
+      "<meta property=\"og:description\" content=\"Guides, news, and behind-the-scenes from Northwest Custom Apparel — custom embroidery, screen printing, DTG, and DTF transfers in Milton, WA.\">",
+      "<meta property=\"og:url\" content=\"https://www.teamnwca.com/blog\">",
+      "<meta property=\"og:image\" content=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\">",
+      "<meta name=\"twitter:card\" content=\"summary_large_image\">",
+      "<script type=\"application/ld+json\">{\"@context\":\"https://schema.org\",\"@type\":\"Blog\",\"name\":\"Northwest Custom Apparel Blog\",\"url\":\"https://www.teamnwca.com/blog\",\"publisher\":{\"@type\":\"Organization\",\"name\":\"Northwest Custom Apparel\",\"logo\":{\"@type\":\"ImageObject\",\"url\":\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\"}}}</script>"
+    ]
+  },
+  "blog-category": {
+    "title": "Guides — Northwest Custom Apparel Blog",
+    "text": "Catalog Blog Get a Quote The Northwest Custom Apparel Blog Guides, news, and behind-the-scenes from our Milton, WA shop — embroidery, screen printing, DTG, and DTF since 1977. All GuidesNews Guides Made for your team. Built for everyday work. A practical guide to choosing apparel, decoration and a fit your whole team will enjoy. September 1, 2026 Guides Choosing the right fit Simple details for a comfortable team uniform. August 18, 2026 © 2026 Northwest Custom Apparel · Family-owned since 1977 · Milton, WA 253-922-5793 · sales@nwcustomapparel.com · Request a quote",
+    "links": [
+      [
+        "/",
+        ""
+      ],
+      [
+        "/catalog",
+        "Catalog"
+      ],
+      [
+        "/blog",
+        "Blog"
+      ],
+      [
+        "/pages/request-a-quote.html",
+        "Get a Quote"
+      ],
+      [
+        "/blog",
+        "All"
+      ],
+      [
+        "/blog?category=Guides",
+        "Guides"
+      ],
+      [
+        "/blog?category=News",
+        "News"
+      ],
+      [
+        "/blog/team-apparel-guide",
+        "Guides Made for your team. Built for everyday work. A practical guide to choosing apparel, decoration and a fit your whole team will enjoy. September 1, 2026"
+      ],
+      [
+        "/blog/simple-guide",
+        "Guides Choosing the right fit Simple details for a comfortable team uniform. August 18, 2026"
+      ],
+      [
+        "tel:253-922-5793",
+        "253-922-5793"
+      ],
+      [
+        "mailto:sales@nwcustomapparel.com",
+        "sales@nwcustomapparel.com"
+      ],
+      [
+        "/pages/request-a-quote.html",
+        "Request a quote"
+      ]
+    ],
+    "seo": [
+      "<meta charset=\"UTF-8\">",
+      "<meta name=\"description\" content=\"Guides, news, and behind-the-scenes from Northwest Custom Apparel — custom embroidery, screen printing, DTG, and DTF transfers in Milton, WA.\">",
+      "<link rel=\"canonical\" href=\"https://www.teamnwca.com/blog?category=Guides\">",
+      "<meta property=\"og:site_name\" content=\"Northwest Custom Apparel\">",
+      "<meta property=\"og:type\" content=\"website\">",
+      "<meta property=\"og:title\" content=\"Guides — Northwest Custom Apparel Blog\">",
+      "<meta property=\"og:description\" content=\"Guides, news, and behind-the-scenes from Northwest Custom Apparel — custom embroidery, screen printing, DTG, and DTF transfers in Milton, WA.\">",
+      "<meta property=\"og:url\" content=\"https://www.teamnwca.com/blog?category=Guides\">",
+      "<meta property=\"og:image\" content=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\">",
+      "<meta name=\"twitter:card\" content=\"summary_large_image\">",
+      "<script type=\"application/ld+json\">{\"@context\":\"https://schema.org\",\"@type\":\"Blog\",\"name\":\"Northwest Custom Apparel Blog\",\"url\":\"https://www.teamnwca.com/blog\",\"publisher\":{\"@type\":\"Organization\",\"name\":\"Northwest Custom Apparel\",\"logo\":{\"@type\":\"ImageObject\",\"url\":\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\"}}}</script>"
+    ]
+  },
+  "blog-empty": {
+    "title": "Blog — Custom Apparel Guides & News | Northwest Custom Apparel",
+    "text": "Catalog Blog Get a Quote The Northwest Custom Apparel Blog Guides, news, and behind-the-scenes from our Milton, WA shop — embroidery, screen printing, DTG, and DTF since 1977. No posts here yet — check back soon. © 2026 Northwest Custom Apparel · Family-owned since 1977 · Milton, WA 253-922-5793 · sales@nwcustomapparel.com · Request a quote",
+    "links": [
+      [
+        "/",
+        ""
+      ],
+      [
+        "/catalog",
+        "Catalog"
+      ],
+      [
+        "/blog",
+        "Blog"
+      ],
+      [
+        "/pages/request-a-quote.html",
+        "Get a Quote"
+      ],
+      [
+        "tel:253-922-5793",
+        "253-922-5793"
+      ],
+      [
+        "mailto:sales@nwcustomapparel.com",
+        "sales@nwcustomapparel.com"
+      ],
+      [
+        "/pages/request-a-quote.html",
+        "Request a quote"
+      ]
+    ],
+    "seo": [
+      "<meta charset=\"UTF-8\">",
+      "<meta name=\"description\" content=\"Guides, news, and behind-the-scenes from Northwest Custom Apparel — custom embroidery, screen printing, DTG, and DTF transfers in Milton, WA.\">",
+      "<link rel=\"canonical\" href=\"https://www.teamnwca.com/blog\">",
+      "<meta property=\"og:site_name\" content=\"Northwest Custom Apparel\">",
+      "<meta property=\"og:type\" content=\"website\">",
+      "<meta property=\"og:title\" content=\"Blog — Custom Apparel Guides &amp; News | Northwest Custom Apparel\">",
+      "<meta property=\"og:description\" content=\"Guides, news, and behind-the-scenes from Northwest Custom Apparel — custom embroidery, screen printing, DTG, and DTF transfers in Milton, WA.\">",
+      "<meta property=\"og:url\" content=\"https://www.teamnwca.com/blog\">",
+      "<meta property=\"og:image\" content=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\">",
+      "<meta name=\"twitter:card\" content=\"summary_large_image\">",
+      "<script type=\"application/ld+json\">{\"@context\":\"https://schema.org\",\"@type\":\"Blog\",\"name\":\"Northwest Custom Apparel Blog\",\"url\":\"https://www.teamnwca.com/blog\",\"publisher\":{\"@type\":\"Organization\",\"name\":\"Northwest Custom Apparel\",\"logo\":{\"@type\":\"ImageObject\",\"url\":\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\"}}}</script>"
+    ]
+  },
+  "blog-post": {
+    "title": "Made for your team. Built for everyday work. | Northwest Custom Apparel",
+    "text": "Catalog Blog Get a Quote ← All posts Guides Made for your team. Built for everyday work. Northwest Custom Apparel · September 1, 2026 · 1 min read Start with the way you work Choose a comfortable garment for the workday, then make the details your own. Embroidery and printed designs each suit different fabrics. A good team uniform should feel as good as it looks. Details that make a difference Choose a fabric for your working conditions. Compare the whole size range. Review artwork before production. Method Good for Care Embroidery Polos and jackets Follow the garment label Screen printing Team tees Wash inside out Visit our catalog or read https://example.test/a-very-long-reference-that-should-wrap-without-cutting-off-content-on-a-small-phone-screen. An example note that remains readable when a line is longer than the phone screen. Have a project like this? We've decorated apparel for Northwest teams and companies since 1977 — tell us what you're making and a real person will reply within one business day. Request a quote or call 253-922-5793 Keep reading News From our Milton shop Meet the people behind your custom apparel. August 24, 2026 Guides Choosing the right fit Simple details for a comfortable team uniform. August 18, 2026 © 2026 Northwest Custom Apparel · Family-owned since 1977 · Milton, WA 253-922-5793 · sales@nwcustomapparel.com · Request a quote",
+    "links": [
+      [
+        "/",
+        ""
+      ],
+      [
+        "/catalog",
+        "Catalog"
+      ],
+      [
+        "/blog",
+        "Blog"
+      ],
+      [
+        "/pages/request-a-quote.html",
+        "Get a Quote"
+      ],
+      [
+        "/blog",
+        "← All posts"
+      ],
+      [
+        "/catalog",
+        "our catalog"
+      ],
+      [
+        "https://example.test/a-very-long-reference-that-should-wrap-without-cutting-off-content-on-a-small-phone-screen",
+        "https://example.test/a-very-long-reference-that-should-wrap-without-cutting-off-content-on-a-small-phone-screen"
+      ],
+      [
+        "/pages/request-a-quote.html",
+        "Request a quote"
+      ],
+      [
+        "tel:253-922-5793",
+        "253-922-5793"
+      ],
+      [
+        "/blog/shop-news",
+        "News From our Milton shop Meet the people behind your custom apparel. August 24, 2026"
+      ],
+      [
+        "/blog/simple-guide",
+        "Guides Choosing the right fit Simple details for a comfortable team uniform. August 18, 2026"
+      ],
+      [
+        "tel:253-922-5793",
+        "253-922-5793"
+      ],
+      [
+        "mailto:sales@nwcustomapparel.com",
+        "sales@nwcustomapparel.com"
+      ],
+      [
+        "/pages/request-a-quote.html",
+        "Request a quote"
+      ]
+    ],
+    "seo": [
+      "<meta charset=\"UTF-8\">",
+      "<meta name=\"description\" content=\"A practical guide to choosing apparel, decoration and a fit your whole team will enjoy.\">",
+      "<link rel=\"canonical\" href=\"https://www.teamnwca.com/blog/team-apparel-guide\">",
+      "<meta property=\"og:site_name\" content=\"Northwest Custom Apparel\">",
+      "<meta property=\"og:type\" content=\"article\">",
+      "<meta property=\"og:title\" content=\"Made for your team. Built for everyday work. | Northwest Custom Apparel\">",
+      "<meta property=\"og:description\" content=\"A practical guide to choosing apparel, decoration and a fit your whole team will enjoy.\">",
+      "<meta property=\"og:url\" content=\"https://www.teamnwca.com/blog/team-apparel-guide\">",
+      "<meta property=\"og:image\" content=\"/__server-fixture/workshop.svg\">",
+      "<meta name=\"twitter:card\" content=\"summary_large_image\">",
+      "<script type=\"application/ld+json\">{\"@context\":\"https://schema.org\",\"@type\":\"BlogPosting\",\"headline\":\"Made for your team. Built for everyday work.\",\"description\":\"A practical guide to choosing apparel, decoration and a fit your whole team will enjoy.\",\"image\":\"/__server-fixture/workshop.svg\",\"datePublished\":\"2026-09-01T18:00:00Z\",\"dateModified\":\"2026-09-02T18:00:00Z\",\"author\":{\"@type\":\"Organization\",\"name\":\"Northwest Custom Apparel\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"Northwest Custom Apparel\",\"logo\":{\"@type\":\"ImageObject\",\"url\":\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\"}},\"mainEntityOfPage\":\"https://www.teamnwca.com/blog/team-apparel-guide\"}</script>"
+    ]
+  },
+  "blog-post-minimal": {
+    "title": "Choosing the right fit | Northwest Custom Apparel",
+    "text": "Catalog Blog Get a Quote ← All posts Guides Choosing the right fit August 18, 2026 · 1 min read A short guide without a hero image or an author. Have a project like this? We've decorated apparel for Northwest teams and companies since 1977 — tell us what you're making and a real person will reply within one business day. Request a quote or call 253-922-5793 © 2026 Northwest Custom Apparel · Family-owned since 1977 · Milton, WA 253-922-5793 · sales@nwcustomapparel.com · Request a quote",
+    "links": [
+      [
+        "/",
+        ""
+      ],
+      [
+        "/catalog",
+        "Catalog"
+      ],
+      [
+        "/blog",
+        "Blog"
+      ],
+      [
+        "/pages/request-a-quote.html",
+        "Get a Quote"
+      ],
+      [
+        "/blog",
+        "← All posts"
+      ],
+      [
+        "/pages/request-a-quote.html",
+        "Request a quote"
+      ],
+      [
+        "tel:253-922-5793",
+        "253-922-5793"
+      ],
+      [
+        "tel:253-922-5793",
+        "253-922-5793"
+      ],
+      [
+        "mailto:sales@nwcustomapparel.com",
+        "sales@nwcustomapparel.com"
+      ],
+      [
+        "/pages/request-a-quote.html",
+        "Request a quote"
+      ]
+    ],
+    "seo": [
+      "<meta charset=\"UTF-8\">",
+      "<meta name=\"description\" content=\"Simple details for a comfortable team uniform.\">",
+      "<link rel=\"canonical\" href=\"https://www.teamnwca.com/blog/simple-guide\">",
+      "<meta property=\"og:site_name\" content=\"Northwest Custom Apparel\">",
+      "<meta property=\"og:type\" content=\"article\">",
+      "<meta property=\"og:title\" content=\"Choosing the right fit | Northwest Custom Apparel\">",
+      "<meta property=\"og:description\" content=\"Simple details for a comfortable team uniform.\">",
+      "<meta property=\"og:url\" content=\"https://www.teamnwca.com/blog/simple-guide\">",
+      "<meta property=\"og:image\" content=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\">",
+      "<meta name=\"twitter:card\" content=\"summary_large_image\">",
+      "<script type=\"application/ld+json\">{\"@context\":\"https://schema.org\",\"@type\":\"BlogPosting\",\"headline\":\"Choosing the right fit\",\"description\":\"Simple details for a comfortable team uniform.\",\"image\":\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\",\"datePublished\":\"2026-08-18T18:00:00Z\",\"dateModified\":\"2026-08-18T18:00:00Z\",\"author\":{\"@type\":\"Organization\",\"name\":\"Northwest Custom Apparel\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"Northwest Custom Apparel\",\"logo\":{\"@type\":\"ImageObject\",\"url\":\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\"}},\"mainEntityOfPage\":\"https://www.teamnwca.com/blog/simple-guide\"}</script>"
+    ]
+  },
+  "retired": {
+    "title": "This page moved",
+    "text": "The sticker & banner quote page was retired Its three sections each have a better home now: Sticker pricing (2×2 – 6×6) — the customer page, same prices Banner pricing — the customer page Custom & oversize decals — staff calculator Back to the dashboard",
+    "links": [
+      [
+        "/custom-stickers",
+        "Sticker pricing (2×2 – 6×6)"
+      ],
+      [
+        "/custom-banners",
+        "Banner pricing"
+      ],
+      [
+        "/pricing/decals",
+        "Custom & oversize decals"
+      ],
+      [
+        "/staff-dashboard.html",
+        "Back to the dashboard"
+      ]
+    ],
+    "seo": [
+      "<meta charset=\"utf-8\">",
+      "<meta name=\"robots\" content=\"noindex, nofollow\">"
+    ]
+  }
+}

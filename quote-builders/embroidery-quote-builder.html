@@ -16,40 +16,46 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
     <link rel="stylesheet" href="/shared_components/vendor/fontawesome/css/all.min.css?v=2026.07.08.8">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><!-- PNW shell typography (expert audit 2026-07-07): DTG loaded Inter, the trio never did -->
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"><!-- PNW shell typography (expert audit 2026-07-07): DTG loaded Inter, the trio never did -->
 
     <!-- Bootstrap CSS -->
-    <link href="/shared_components/vendor/bootstrap/css/bootstrap.min.css?v=2026.07.08.8" rel="stylesheet">
+    <!-- Quote workspace replaces bootstrap.min.css on this page. -->
 
     <!-- Quote Builder Common Styles (loads FIRST — base styles) -->
-    <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=2026.09.07.19">
+    <!-- Quote workspace replaces quote-builder-common.css on this page. -->
 
     <!-- Quote Builder Shell (Phase 2a — PNW palette + tokens; overrides common's legacy --builder-* tokens) -->
-    <link rel="stylesheet" href="/shared_components/css/quote-builder-shell.css?v=2026.09.07.19">
+    <!-- Quote workspace replaces quote-builder-shell.css on this page. -->
 
     <!-- Guided Quote shell (Phase B, 2026-07-07) -->
-    <link rel="stylesheet" href="/shared_components/css/quote-builder-guided.css?v=2026.09.07.16">
+    <!-- Quote workspace replaces quote-builder-guided.css on this page. -->
 
     <!-- Embroidery Quote Builder Styles (overrides common + shell) -->
-    <link rel="stylesheet" href="/shared_components/css/embroidery-quote-builder-extracted.css?v=2026.09.07.19">
+    <!-- Quote workspace replaces embroidery-quote-builder-extracted.css on this page. -->
 
     <!-- Shared Color Picker Component -->
-    <link rel="stylesheet" href="/shared_components/css/color-picker-shared.css?v=2026.09.07.16">
+    <!-- Quote workspace replaces color-picker-shared.css on this page. -->
 
     <!-- Shared Quote Share Modal (2026 consolidation) -->
-    <link rel="stylesheet" href="/shared_components/css/quote-share-modal.css?v=2026.09.07.19">
+    <!-- Quote workspace replaces quote-share-modal.css on this page. -->
 
     <!-- Customer Lookup Autocomplete -->
-    <link rel="stylesheet" href="/shared_components/css/customer-lookup.css?v=2026.09.07.19">
+    <!-- Quote workspace replaces customer-lookup.css on this page. -->
 
     <!-- ShopWorks Import Modal -->
-    <link rel="stylesheet" href="/shared_components/css/shopworks-import.css?v=2026.09.07.19">
+    <!-- Quote workspace replaces shopworks-import.css on this page. -->
 
     <!-- AI Chat Panel CSS (shared with DTG — chat-panel + floating-quote-btn classes
          live in sticker-pricing-page.css). MUST load in <head> to avoid FOUC on the
          chat panel — without this, the panel briefly renders as an unstyled white
          block over the Ask button before the CSS catches up. Bug fix 2026-05-25. -->
-    <link rel="stylesheet" href="/shared_components/css/sticker-pricing-page.css?v=2026.09.07.19">
+    <!-- Quote workspace replaces sticker-pricing-page.css on this page. -->
+
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.12.2">
+    <link rel="stylesheet" href="/shared_components/css/utilities.css?v=2026.09.12.2">
+    <link rel="stylesheet" href="/shared_components/css/quote-workspace.css?v=2026.09.13.2">
+    <link rel="stylesheet" href="/shared_components/css/quote-embroidery.css?v=2026.09.13.2">
+    <link rel="stylesheet" href="/shared_components/css/specialty-assistant.css?v=2026.09.13.2">
 
     <!-- EmailJS -->
     <script src="/shared_components/vendor/emailjs/email.min.js?v=2026.07.08.8"></script>
@@ -64,10 +70,10 @@
     <script src="/shared_components/js/quote-extended-sizes.js?v=2026.09.06.22"></script>
 
     <link rel="stylesheet" href="/shared_components/css/embroidery-quote-pricing.css?v=2026.09.07.8">
-    <link rel="stylesheet" href="/shared_components/css/quote-session.css?v=2026.09.07.16">
-    <link rel="stylesheet" href="/shared_components/css/quote-builder-utilities.css?v=2026.09.07.19">
+    <!-- Quote workspace replaces quote-session.css on this page. -->
+    <!-- Quote workspace replaces quote-builder-utilities.css on this page. -->
 </head>
-<body class="emb-builder qb-shell-body">
+<body class="emb-builder qb-shell-body" data-ui="unified" data-quote-workspace="embroidery" data-specialty-assistant>
     <nav aria-label="Skip link"><a href="#" class="qb-skip-link" data-call="qbFocusMain" data-prevent="1">Skip to quote builder</a></nav><!-- qb-shell-body: 2026 PNW shell (Inter + tabular numerals + birch ground) — built 2026-06, had ZERO adopters until 2026-07-07 (expert audit) --><!-- scoping hook: EMB-only re-skin overrides (indigo) target .emb-builder so they don't leak into DTF/SCP/DTG via shared CSS (review C33/C34) -->
     <!-- Loading Overlay -->
     <div id="loading-overlay" class="loading-overlay" role="status" aria-live="polite">
@@ -349,7 +355,7 @@
                 </div>
 
                 <!-- Excel-Style Product Table -->
-                <div class="product-table-wrapper">
+                <div class="product-table-wrapper" role="region" aria-label="Quote products — scroll to view all sizes and prices" tabindex="0">
                     <table class="product-table" id="product-table">
                         <thead>
                             <tr>
@@ -600,7 +606,7 @@
                     <div class="ship-to-card" id="ship-to-card"></div>
                     <!-- Order Details — relocated from the sidebar into the footer band (Erik 2026-06-07): sidebar slims
                          to Customer + Quote Summary + Push; order metadata reviews here with glance / ship-to / totals. -->
-                    <div class="flow-step in-footer" id="order-details-step">
+                    <div class="flow-step in-footer workspace-order-details" id="order-details-step">
                         <div class="flow-step-head">
                             <span class="flow-step-num">2</span>
                             <i class="fas fa-file-invoice" aria-hidden="true"></i> Order Details
@@ -608,7 +614,7 @@
                             <i id="order-details-chevron" class="fas fa-chevron-down" style="display:none;" aria-hidden="true"></i>
                         </div>
                         <div class="flow-step-body" id="order-details-content">
-                            <div class="qb-cols-1fr-1fr-gap-8" style="display: grid">
+                            <div class="workspace-field-grid workspace-field-grid-order" style="display: grid">
                                 <div>
                                     <label for="po-number">PO #</label>
                                     <input type="text" id="po-number" placeholder="Purchase Order #" class="qb-field--p5">
@@ -625,11 +631,11 @@
                                     <label for="drop-dead-date">Drop Dead Date</label>
                                     <input type="date" id="drop-dead-date" class="qb-field--p5">
                                 </div>
-                                <div class="qb-span-all">
+                                <div class="workspace-span-all workspace-span-field">
                                     <label for="payment-terms">Terms <span id="customer-terms-note" hidden></span></label>
                                     <input type="text" id="payment-terms" placeholder="Payment terms" class="qb-field--p5">
                                 </div>
-                                <div class="qb-grid-column-1-1-mt-2">
+                                <div class="workspace-span-all workspace-span-reference">
                                     <label for="order-number">ShopWorks Order # <span class="field-hint-muted">— filled after you import</span></label>
                                     <input class="qb-w-100-p-5-8-b-1-dashed-gray-300-r-4-fs-12-box-sizing-border-b-7463" type="text" id="order-number" placeholder="(after import)">
                                 </div>
@@ -724,12 +730,12 @@
                         </div>
                         <details class="customer-manual" id="emb-customer-manual">
                         <summary>Enter details manually <span class="cm-hint">— the search fills these for you</span></summary>
-                        <div class="qb-cols-1fr-1fr-gap-6" style="display: grid">
-                            <div class="customer-field qb-grid-column-span-2">
+                        <div class="workspace-field-grid workspace-field-grid-customer" style="display: grid">
+                            <div class="customer-field workspace-span-all workspace-span-contact">
                                 <label for="customer-name" class="qb-label">Name *</label>
                                 <input type="text" id="customer-name" placeholder="Customer name" class="qb-field">
                             </div>
-                            <div class="customer-field qb-grid-column-span-2">
+                            <div class="customer-field workspace-span-all workspace-span-contact">
                                 <label for="customer-email" class="qb-label">Email *</label>
                                 <input type="email" id="customer-email" placeholder="email@company.com" class="qb-field">
                             </div>
@@ -759,7 +765,7 @@
                                     <option value="taneisha@nwcustomapparel.com">Taneisha Clark</option>
                                 </select>
                             </div>
-                            <div class="customer-field qb-span-all">
+                            <div class="customer-field workspace-span-all workspace-span-field">
                                 <label for="project-name" class="qb-label">Project Name</label>
                                 <input type="text" id="project-name" placeholder="e.g., Spring Fundraiser Tees" class="qb-field">
                             </div>
@@ -1308,7 +1314,7 @@ Company:Absher Construction Company
                     <div id="ship-address-fields">
                         <input class="qb-w-100-p-8-10-b-1-solid-store-line-r-4-fs-13-box-sizing-border-299f" type="text" id="ship-address" placeholder="Street address"
                               >
-                        <div class="qb-gap-6" style="display: flex">
+                        <div class="workspace-fields-inline" style="display: flex">
                             <input class="qb-flex-2-p-8-10-b-1-solid-store-line-r-4-fs-13-box-sizing-border-box" type="text" id="ship-city" aria-label="Shipping city" placeholder="City"
                                   >
                             <select class="qb-w-64-p-8-4-b-1-solid-store-line-r-4-fs-13-bg-white" id="ship-state" aria-label="Shipping state" data-change="onShipStateChange"
@@ -1380,7 +1386,7 @@ Company:Absher Construction Company
     <!-- Core Dependencies -->
     <script src="/shared_components/js/fetch-timeout.js?v=2026.09.06.18"></script>
     <script src="/shared_components/js/product-category-filter.js?v=2026.09.06.37"></script>
-    <script src="/shared_components/js/quote-builder-utils.js?v=2026.09.06.46"></script>
+    <script src="/shared_components/js/quote-builder-utils.js?v=2026.09.13.2"></script>
     <script src="/shared_components/js/quote-services-bar.js?v=2026.09.06.22"></script>
     <script src="/shared_components/js/exact-match-search.js?v=2026.09.06.37"></script>
     <script src="/shared_components/js/quote-share-modal.js?v=2026.09.06.22"></script>
@@ -1415,7 +1421,7 @@ Company:Absher Construction Company
 
     <!-- Power Quote Controller (extracted to external JS) -->
     <script src="/shared_components/js/quote-pricing-data.js?v=2026.06.27.1"></script>
-    <script src="/shared_components/js/embroidery-quote-invoice.js?v=2026.09.06.22"></script>
+    <script src="/shared_components/js/embroidery-quote-invoice.js?v=2026.09.13.2"></script>
     <!-- Phase 9 → Phase 11.3 artwork upload (rich mode: design name + per-file placement) -->
     <script src="/shared_components/js/artwork-upload.js?v=2026.09.06.37"></script>
     <!-- Phase 10.1: SanMar inventory check + per-row stock badges -->

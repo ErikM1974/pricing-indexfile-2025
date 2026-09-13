@@ -57,7 +57,16 @@ for (const file of BUILDERS) {
             const samples = page.locator('#toast-container .toast.show[data-a11y-sample]');
             await expect(samples).toHaveCount(4);
             for (const sample of await samples.all()) {
-                await expect(sample).toHaveCSS('transform', 'matrix(1, 0, 0, 1, 0, 0)');
+                // Notifications no longer animate in from outside the viewport.
+                // Verify readable final placement rather than a legacy transform.
+                await expect(sample).toBeVisible();
+                await expect(sample).toHaveCSS('opacity', '1');
+                const bounds = await sample.boundingBox();
+                const viewport = page.viewportSize();
+                expect(bounds.x).toBeGreaterThanOrEqual(0);
+                expect(bounds.y).toBeGreaterThanOrEqual(0);
+                expect(bounds.x + bounds.width).toBeLessThanOrEqual(viewport.width);
+                expect(bounds.y + bounds.height).toBeLessThanOrEqual(viewport.height);
             }
         }
 

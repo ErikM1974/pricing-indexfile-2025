@@ -16,34 +16,34 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
     <link rel="stylesheet" href="/shared_components/vendor/fontawesome/css/all.min.css?v=2026.07.08.8">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><!-- PNW shell typography (expert audit 2026-07-07): DTG loaded Inter, the trio never did -->
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"><!-- PNW shell typography (expert audit 2026-07-07): DTG loaded Inter, the trio never did -->
 
     <!-- Bootstrap CSS -->
-    <link href="/shared_components/vendor/bootstrap/css/bootstrap.min.css?v=2026.07.08.8" rel="stylesheet">
+    <!-- Quote workspace replaces bootstrap.min.css on this page. -->
 
     <!-- Quote Builder Common Styles (loads FIRST — base styles) -->
-    <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=2026.09.07.19">
+    <!-- Quote workspace replaces quote-builder-common.css on this page. -->
 
     <!-- Quote Builder Shell (Phase 2a — PNW palette + tokens; overrides common's legacy --builder-* tokens) -->
-    <link rel="stylesheet" href="/shared_components/css/quote-builder-shell.css?v=2026.09.07.19">
+    <!-- Quote workspace replaces quote-builder-shell.css on this page. -->
 
     <!-- Guided Quote shell (Phase B, 2026-07-07) -->
-    <link rel="stylesheet" href="/shared_components/css/quote-builder-guided.css?v=2026.09.07.16">
+    <!-- Quote workspace replaces quote-builder-guided.css on this page. -->
 
     <!-- Screen Print Quote Builder Styles (overrides common + shell) -->
-    <link rel="stylesheet" href="/shared_components/css/screenprint-quote-builder-extracted.css?v=2026.09.07.19">
+    <!-- Quote workspace replaces screenprint-quote-builder-extracted.css on this page. -->
 
     <!-- Shared Color Picker Component -->
-    <link rel="stylesheet" href="/shared_components/css/color-picker-shared.css?v=2026.09.07.16">
+    <!-- Quote workspace replaces color-picker-shared.css on this page. -->
 
     <!-- Shared Quote Share Modal (2026 consolidation) -->
-    <link rel="stylesheet" href="/shared_components/css/quote-share-modal.css?v=2026.09.07.19">
+    <!-- Quote workspace replaces quote-share-modal.css on this page. -->
 
     <!-- Customer Lookup Autocomplete -->
-    <link rel="stylesheet" href="/shared_components/css/customer-lookup.css?v=2026.09.07.19">
+    <!-- Quote workspace replaces customer-lookup.css on this page. -->
 
     <!-- Safety-Stripe Garment Recommendations (shared) -->
-    <link rel="stylesheet" href="/shared_components/css/safety-stripe-recs.css?v=2026.09.07.20">
+    <link rel="stylesheet" href="/shared_components/css/safety-stripe-recs.css?v=2026.09.13.2">
 
     <!-- EmailJS -->
     <script src="/shared_components/vendor/emailjs/email.min.js?v=2026.07.08.8"></script>
@@ -57,10 +57,14 @@
     <script src="/shared_components/js/extended-sizes-config.js?v=2026.09.07.33"></script>
     <script src="/shared_components/js/quote-extended-sizes.js?v=2026.09.06.22"></script>
 
-    <link rel="stylesheet" href="/shared_components/css/quote-session.css?v=2026.09.07.16">
-    <link rel="stylesheet" href="/shared_components/css/quote-builder-utilities.css?v=2026.09.07.19">
+    <!-- Quote workspace replaces quote-session.css on this page. -->
+    <!-- Quote workspace replaces quote-builder-utilities.css on this page. -->
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.12.2">
+    <link rel="stylesheet" href="/shared_components/css/utilities.css?v=2026.09.12.2">
+    <link rel="stylesheet" href="/shared_components/css/quote-workspace.css?v=2026.09.13.2">
+    <link rel="stylesheet" href="/shared_components/css/quote-screenprint.css?v=2026.09.13.2">
 </head>
-<body class="scp-builder qb-shell-body">
+<body class="scp-builder qb-shell-body" data-ui="unified" data-quote-workspace="screenprint">
     <nav aria-label="Skip link"><a href="#" class="qb-skip-link" data-call="qbFocusMain" data-prevent="1">Skip to quote builder</a></nav><!-- qb-shell-body: 2026 PNW shell (Inter + tabular numerals + birch ground) — built 2026-06, had ZERO adopters until 2026-07-07 (expert audit) --><!-- scoping hook for Option C page-flow overrides (2026-06-07) -->
     <!-- Loading Overlay -->
     <div id="loading-overlay" class="loading-overlay">
@@ -154,7 +158,7 @@
                             <div class="section-label">
                                 <i class="fas fa-plus-circle qb-c-qb-gray" aria-hidden="true" id="back-icon"></i> BACK LOCATION <span class="qb-fw-400-c-qb-gray">(optional)</span>
                             </div>
-                            <div class="qb-fd-column-gap-6-mb-12" style="display: flex">
+                            <div class="workspace-location-stack" style="display: flex">
                                 <label class="location-radio">
                                     <input type="radio" name="back-location" value="" checked data-change="updatePrintConfig">
                                     <span>None</span>
@@ -169,7 +173,7 @@
                                 </label>
                             </div>
                             <!-- Ink Colors for Back (hidden when None) -->
-                            <div class="qb-bt-1-solid-gray-200-pt-10" id="back-colors-section" style="display: none">
+                            <div class="workspace-ink-section" id="back-colors-section" style="display: none">
                                 <div class="qb-fs-11-c-qb-gray-mb-6">INK COLORS</div>
                                 <div class="ink-color-selector qb-gap-4" style="display: flex">
                                     <label class="ink-btn"><input type="radio" name="back-colors" value="1" checked data-change="updatePrintConfig"><span>1</span></label>
@@ -193,7 +197,7 @@
                                 <input type="checkbox" id="left-sleeve-toggle" data-change="updatePrintConfig">
                                 <span>Left Sleeve</span>
                             </label>
-                            <div class="qb-bt-1-solid-gray-200-pt-10-mb-12" id="left-sleeve-colors-section" style="display: none">
+                            <div class="workspace-sleeve-inks" id="left-sleeve-colors-section" style="display: none">
                                 <div class="qb-fs-11-c-qb-gray-mb-6">LEFT SLEEVE INK COLORS</div>
                                 <div class="ink-color-selector qb-gap-4" style="display: flex">
                                     <label class="ink-btn"><input type="radio" name="left-sleeve-colors" value="1" checked data-change="updatePrintConfig"><span>1</span></label>
@@ -210,7 +214,7 @@
                                 <input type="checkbox" id="right-sleeve-toggle" data-change="updatePrintConfig">
                                 <span>Right Sleeve</span>
                             </label>
-                            <div class="qb-bt-1-solid-gray-200-pt-10" id="right-sleeve-colors-section" style="display: none">
+                            <div class="workspace-ink-section" id="right-sleeve-colors-section" style="display: none">
                                 <div class="qb-fs-11-c-qb-gray-mb-6">RIGHT SLEEVE INK COLORS</div>
                                 <div class="ink-color-selector qb-gap-4" style="display: flex">
                                     <label class="ink-btn"><input type="radio" name="right-sleeve-colors" value="1" checked data-change="updatePrintConfig"><span>1</span></label>
@@ -228,7 +232,7 @@
                         <div class="location-summary qb-bg-brand-100-p-16-r-8-minw-180-b-1-solid-qb-green-3">
                             <div class="qb-fs-11-c-qb-gray-mb-4">SETUP FEE</div>
                             <div class="qb-fs-12-c-qb-gray-mb-4" id="total-screens-display">1 screen total</div>
-                            <div class="qb-fs-20-fw-700-c-store-green-700" id="setup-fee-display">$30.00</div>
+                            <div class="workspace-setup-total" id="setup-fee-display">$30.00</div>
                             <div class="qb-fs-10-c-qb-gray-mt-4" id="dark-garment-note" style="display: none">Includes white underbase</div>
                         </div>
                     </div>
@@ -268,7 +272,7 @@
                 </div>
 
                 <!-- Excel-Style Product Table -->
-                <div class="product-table-wrapper">
+                <div class="product-table-wrapper" role="region" aria-label="Quote products — scroll to view all sizes and prices" tabindex="0">
                     <table class="product-table" id="product-table">
                         <thead>
                             <tr>
@@ -291,7 +295,7 @@
                         <tbody id="product-tbody">
                             <!-- Empty State Message - shown until products added -->
                             <tr id="empty-state-row">
-                                <td colspan="13" class="qb-empty-state">
+                                <td colspan="14" class="qb-empty-state">
                                     <div class="qb-empty-state-emoji">&#128085;</div>
                                     <div class="qb-fs-16-fw-500-mb-8">Enter a style number to get started</div>
                                     <div class="qb-fs-13-c-gray-600">Type a style # in the search bar above (e.g., PC54, G500, C112)</div>
@@ -414,7 +418,7 @@
                  Phase A (2026-07-07): default-COLLAPSED to calm the page — the badge stays visible in the
                  header, and autoExpandFeesOnFirstCharge() opens it once when a saved fee loads. -->
             <div class="additional-charges-panel qb-m-0-0-14">
-                <div class="charges-header" data-call="toggleFeesCharges">
+                <div class="charges-header" role="button" tabindex="0" data-keyclick="1" data-call="toggleFeesCharges">
                     <div class="d-flex align-items-center gap-2">
                         <i class="fas fa-plus-circle" aria-hidden="true"></i>
                         <span>More services &amp; fees</span>
@@ -424,7 +428,7 @@
                     <i id="charges-chevron" class="fas fa-chevron-down collapsible-chevron" aria-hidden="true"></i>
                 </div>
                 <div id="fees-charges-content" class="charges-content hidden" style="display:none">
-                    <div class="qb-fwrap-wrap-gap-24-ai-flex-end-pt-8" style="display: flex">
+                    <div class="workspace-charge-fields" style="display: flex">
                         <div class="charge-field qb-m0">
                             <label class="d-flex align-items-center gap-2 qb-cur-pointer">
                                 <input type="checkbox" id="art-charge-toggle" data-change="toggleArtCharge,updateAdditionalCharges">
@@ -561,14 +565,14 @@
 
                         <!-- Customer context banners (Erik 2026-05-23) -->
                         <div id="customer-warning-banner" hidden></div>
-                        <div class="qb-fwrap-wrap-gap-6-m-4-0" style="display: flex">
+                        <div class="workspace-customer-search-row" style="display: flex">
                             <span id="customer-tax-chip" hidden></span>
                             <span id="customer-tier-badge" hidden></span>
                         </div>
                     </div>
                     <details class="customer-manual" id="spc-customer-manual">
                     <summary>Enter details manually <span class="cm-hint">— the search fills these for you</span></summary>
-                    <div class="qb-cols-1fr-1fr-gap-8" style="display: grid">
+                    <div class="workspace-customer-grid" style="display: grid">
                         <div class="customer-field">
                             <label class="quote-label">NAME *</label>
                             <input type="text" id="customer-name" aria-label="Customer name" placeholder="Customer name" class="quote-input" data-input="?renderOrderRecap,?updateScpPushButtonState">
@@ -608,12 +612,12 @@
                             <label class="quote-label">PHONE</label>
                             <input type="tel" id="customer-phone" aria-label="Customer phone" placeholder="(253) 555-1234" class="quote-input">
                         </div>
-                        <div class="customer-field qb-span-all">
+                        <div class="customer-field workspace-customer-span">
                             <label class="quote-label">PROJECT NAME</label>
                             <input type="text" id="project-name" aria-label="Project name" placeholder="e.g., Spring Fundraiser Tees" class="quote-input">
                         </div>
                         <!-- Phase 11.1 (2026-05-24): customer-aware Design # lookup -->
-                        <div class="customer-field qb-span-all">
+                        <div class="customer-field workspace-customer-span">
                             <label class="quote-label" for="design-number">
                                 DESIGN # <span class="qb-c-gray-400-fw-400">(pick from this customer's Screen Print designs)</span>
                             </label>
@@ -777,14 +781,14 @@
 
     <!-- Core Dependencies -->
     <script src="/shared_components/js/product-category-filter.js?v=2026.09.06.37"></script>
-    <script src="/shared_components/js/quote-builder-utils.js?v=2026.09.06.46"></script>
+    <script src="/shared_components/js/quote-builder-utils.js?v=2026.09.13.2"></script>
     <script src="/shared_components/js/exact-match-search.js?v=2026.09.06.37"></script>
     <script src="/shared_components/js/quote-share-modal.js?v=2026.09.06.22"></script>
     <script src="/shared_components/js/screenprint-pricing-service.js?v=2026.09.06.44"></script>
     <script src="/shared_components/js/screenprint-quote-service.js?v=2026.09.06.37"></script>
     <script src="/shared_components/js/sku-validation-service.js?v=2026.09.06.37"></script>
     <script src="/shared_components/js/quote-pricing-data.js?v=2026.06.27.1"></script>
-    <script src="/shared_components/js/embroidery-quote-invoice.js?v=2026.09.06.22"></script>
+    <script src="/shared_components/js/embroidery-quote-invoice.js?v=2026.09.13.2"></script>
 
     <!-- Auto-Save & Draft Recovery (2026 consolidation) -->
     <script src="/shared_components/js/quote-persistence.js?v=2026.09.06.37"></script>
@@ -815,7 +819,7 @@
     <script src="/shared_components/js/customer-design-combobox.js?v=2026.09.06.31"></script>
     <!-- [2026-06-08] Shared order-summary band — MUST load after quote-builder-utils.js + before the builders/scp bundle (configure() runs at its eval) -->
     <script src="/shared_components/js/quote-order-summary.js?v=2026.09.06.31"></script>
-    <script src="/shared_components/js/safety-stripe-recs.js?v=2026.09.06.31"></script>
+    <script src="/shared_components/js/safety-stripe-recs.js?v=2026.09.13.2"></script>
 
     <!-- Guided Quote shell (Phase B, 2026-07-07) — 4-step flow over the existing
          sections, sidebar stays the price rail; "Show everything" restores the

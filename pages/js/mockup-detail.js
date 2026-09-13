@@ -4136,34 +4136,9 @@ var mockdetaLog = MOCKDETA_LOG_ON ? console.log.bind(console) : function () {}; 
             }
         }
 
-        var html = '<!DOCTYPE html><html><head><meta charset="UTF-8">'
+        var html = '<!DOCTYPE html><html lang="en"><head><meta name="viewport" content="width=device-width,initial-scale=1"><meta charset="UTF-8">'
             + '<title>Thread Sheet - ' + escapeHtml(company) + ' #' + escapeHtml(designNum) + '</title>'
-            + '<style>'
-            + '* { box-sizing: border-box; margin: 0; padding: 0; }'
-            + 'body { font-family: Arial, Helvetica, sans-serif; padding: 24px; color: #1a1a1a; }'
-            + '.header { text-align: center; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 2px solid #333; }'
-            + '.header h1 { font-size: 20px; margin-bottom: 4px; }'
-            + '.header .meta { font-size: 13px; color: #555; }'
-            + '.header .meta-details { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 18px; margin-top: 8px; font-size: 12px; color: #444; }'
-            + '.header .meta-details span { white-space: nowrap; }'
-            + '.header .meta-details .md-label { font-weight: 700; color: #222; }'
-            + '.mockup-section { display: flex; gap: 20px; margin-bottom: 28px; page-break-inside: avoid; align-items: flex-start; }'
-            + '.mockup-img { width: 220px; height: 220px; object-fit: contain; border: 1px solid #ddd; border-radius: 6px; background: #f8f8f8; flex-shrink: 0; }'
-            + '.thread-table { flex: 1; }'
-            + '.thread-table h3 { font-size: 14px; margin-bottom: 6px; color: #333; }'
-            + 'table { width: 100%; border-collapse: collapse; font-size: 12px; }'
-            + 'th { background: #333; color: #fff; padding: 5px 8px; text-align: left; font-size: 11px; }'
-            + 'td { padding: 5px 8px; border-bottom: 1px solid #e5e5e5; }'
-            + 'tr:nth-child(even) { background: #f9f9f9; }'
-            + '.color-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; border: 1px solid #ccc; vertical-align: middle; }'
-            + '.td-element { color: #555; font-style: italic; }'
-            + '.footer { text-align: center; font-size: 11px; color: #999; margin-top: 24px; padding-top: 12px; border-top: 1px solid #ddd; }'
-            + '@media print {'
-            + '  body { padding: 12px; }'
-            + '  @page { size: letter portrait; margin: 0.4in; }'
-            + '  .mockup-section { page-break-inside: avoid; }'
-            + '}'
-            + '</style></head><body>';
+            + '<link rel="stylesheet" data-print-styles href="/shared_components/css/tokens.css?v=2026.09.13.1"><link rel="stylesheet" data-print-styles href="/shared_components/css/components.css?v=2026.09.13.1"><link rel="stylesheet" data-print-styles href="/shared_components/css/staff-print.css?v=2026.09.13.1"></head><body data-ui="unified" class="staff-print staff-print--threads"><main class="staff-print-main">';
 
         // Header
         html += '<div class="header">'
@@ -4183,7 +4158,7 @@ var mockdetaLog = MOCKDETA_LOG_ON ? console.log.bind(console) : function () {}; 
         if (metaParts.length > 0) {
             html += '<div class="meta-details">' + metaParts.join('') + '</div>';
         }
-        html += '<div class="meta" style="margin-top:4px;">' + today + '</div>';
+        html += '<div class="meta print-date">' + today + '</div>';
         html += '</div>';
 
         // Each mockup slot with threads
@@ -4207,7 +4182,7 @@ var mockdetaLog = MOCKDETA_LOG_ON ? console.log.bind(console) : function () {}; 
             if (imgUrl) {
                 html += '<img src="' + escapeHtml(resolveBoxUrl(imgUrl)) + '" class="mockup-img" alt="Mockup ' + s + '">';
             } else {
-                html += '<div class="mockup-img" style="display:flex;align-items:center;justify-content:center;color:#999;">No Image</div>';
+                html += '<div class="mockup-img mockup-img--empty">No Image</div>';
             }
 
             // Thread table
@@ -4216,21 +4191,21 @@ var mockdetaLog = MOCKDETA_LOG_ON ? console.log.bind(console) : function () {}; 
 
             if (threads.length > 0) {
                 var slotHasElements = threads.some(function (t) { return t.element; });
-                html += '<table><tr><th>#</th><th></th><th>Color</th>'
+                html += '<table><tr><th>#</th><th aria-label="Swatch"></th><th>Color</th>'
                     + (slotHasElements ? '<th>Element</th>' : '')
                     + '<th>Cat#</th></tr>';
                 threads.forEach(function (t) {
                     html += '<tr>'
-                        + '<td><strong>' + (t.run || '') + '</strong></td>'
-                        + '<td><span class="color-dot" style="background:' + escapeHtml(t.hex || '#888') + ';"></span></td>'
+                        + '<td><strong>' + escapeHtml(t.run || '') + '</strong></td>'
+                        + '<td><span class="color-dot" style="--thread-color:' + escapeHtml(/^#[0-9a-f]{3}([0-9a-f]{3})?$/i.test(t.hex || '') ? t.hex : '#888') + ';"></span></td>'
                         + '<td>' + escapeHtml(t.name || '') + '</td>'
                         + (slotHasElements ? '<td class="td-element">' + escapeHtml(t.element || '') + '</td>' : '')
-                        + '<td style="font-family:monospace;">' + escapeHtml(t.catalog || '') + '</td>'
+                        + '<td class="thread-catalog">' + escapeHtml(t.catalog || '') + '</td>'
                         + '</tr>';
                 });
                 html += '</table>';
             } else {
-                html += '<p style="color:#999;font-size:12px;">No thread data</p>';
+                html += '<p class="thread-empty">No thread data</p>';
             }
 
             html += '</div></div>';
@@ -4243,12 +4218,14 @@ var mockdetaLog = MOCKDETA_LOG_ON ? console.log.bind(console) : function () {}; 
 
         // Footer
         html += '<div class="footer">NW Custom Apparel &mdash; 253-922-5793 &mdash; Printed ' + today + '</div>';
-        html += '</body></html>';
+        html += '</main></body></html>';
 
+        if (typeof NWCAStaffPrint === 'undefined') { showToast('Print tools could not load. Please refresh this page and try again.', 'error'); return; }
         var printWin = window.open('', '', 'width=900,height=700');
+        if (!printWin) { showToast('Please allow pop-ups so the thread sheet can open.', 'error'); return; }
         printWin.document.write(html);
         printWin.document.close();
-        setTimeout(function () { printWin.print(); }, 500);
+        NWCAStaffPrint.printWhenReady(printWin).catch(function (error) { showToast(error.message, 'error'); });
     }
 
     function renderThreadSwatches(threads) {

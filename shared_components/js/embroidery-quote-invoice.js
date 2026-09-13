@@ -107,15 +107,18 @@ class EmbroideryInvoiceGenerator {
         
         return `
             <!DOCTYPE html>
-            <html>
+            <html lang="en">
             <head>
                 <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1">
+                <!-- Relative assets inherit the quote builder origin in the print window. -->
                 <title>${this.getQuoteTypeInfo(pricingData).prefix} ${pricingData.quoteId || ''}</title>
-                <style>
-                    ${this.getInvoiceStyles()}
-                </style>
+                <link rel="stylesheet" data-invoice-styles href="/shared_components/css/tokens.css?v=2026.09.12.2">
+                <link rel="stylesheet" data-invoice-styles href="/shared_components/css/components.css?v=2026.09.12.2">
+                <link rel="stylesheet" data-invoice-styles href="/shared_components/css/quote-invoice.css?v=2026.09.12.2">
+                <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap">
             </head>
-            <body>
+            <body data-ui="unified" data-quote-invoice>
                 <div class="invoice-container">
                     ${this.generateHeader(pricingData, today, expiryDate, customerData)}
                     ${this.generateCustomerSection(customerData, salesRepName)}
@@ -129,392 +132,41 @@ class EmbroideryInvoiceGenerator {
         `;
     }
     
-    /**
-     * Get invoice CSS styles
-     */
-    getInvoiceStyles() {
-        return `
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-            }
-            
-            body {
-                font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;   /* PNW shell face when the opener loaded it (expert audit 2026-07-07) */
-                color: #333;
-                line-height: 1.6;
-            }
-            
-            .invoice-container {
-                max-width: 8.5in;
-                margin: 0 auto;
-                padding: 0.15in;
-                background: white;
-            }
-            
-            @page {
-                size: letter portrait;
-                margin: 0.25in;
-            }
-            
-            @media print {
-                body { margin: 0; }
-                .invoice-container { padding: 0; }
-                .invoice-header { page-break-inside: avoid; }
-                /* Protect ROWS, not the whole table — forcing an entire 12+ line
-                   table to one page shoved it to page 2 and left page 1 half-empty
-                   on exactly the big B2B quotes that must look best. (2026-07-07) */
-                .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-            .products-table tr { page-break-inside: avoid; }
-                .products-table thead { display: table-header-group; }
-            }
-            
-            /* Header */
-            .invoice-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: start;
-                padding-bottom: 8px;
-                border-bottom: 2px solid #2e5827;
-                margin-bottom: 10px;
-            }
-            
-            .company-info {
-                flex: 1;
-            }
-            
-            .company-logo {
-                width: 120px;
-                height: auto;
-                margin-bottom: 3px;
-            }
-            
-            .company-details {
-                font-size: 10px;
-                color: #666;
-                line-height: 1.2;
-            }
-            
-            .quote-info {
-                text-align: right;
-                flex: 0 0 200px;
-            }
-            
-            .quote-title {
-                font-size: 18px;
-                font-weight: bold;
-                color: #2e5827;
-                margin-bottom: 5px;
-            }
-            
-            .quote-details {
-                font-size: 10px;
-                color: #666;
-            }
-            
-            .quote-details strong {
-                color: #333;
-            }
-            
-            /* Customer Section */
-            .customer-section {
-                display: flex;
-                justify-content: space-between;
-                margin-bottom: 8px;
-                padding: 6px;
-                background: #f8f9fa;
-                border-radius: 3px;
-            }
-            
-            .customer-info, .sales-rep-info {
-                flex: 1;
-            }
-            
-            .section-title {
-                font-size: 11px;
-                font-weight: bold;
-                color: #2e5827;
-                margin-bottom: 3px;
-            }
-            
-            .info-line {
-                font-size: 10px;
-                color: #666;
-                margin: 1px 0;
-            }
-            
-            /* Products Table */
-            .products-table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-bottom: 15px;
-            }
-            
-            .products-table thead {
-                background: #2e5827;
-                color: white;
-            }
-            
-            .products-table th {
-                padding: 5px 4px;
-                text-align: left;
-                font-size: 10px;
-                font-weight: 600;
-                border-right: 1px solid rgba(255,255,255,0.2);
-            }
-            
-            .products-table th:last-child {
-                border-right: none;
-            }
-            
-            .products-table th:nth-child(6) {
-                text-align: center;
-            }
-            
-            .products-table th:nth-child(7),
-            .products-table th:nth-child(8) {
-                text-align: right;
-            }
-            
-            .products-table td {
-                padding: 3px;
-                border-bottom: 1px solid #e0e0e0;
-                font-size: 10.5px;   /* was 9px — receipt-sized on the artifact customers forward (expert audit 2026-07-07) */
-                vertical-align: top;
-            }
-            
-            .price-breakdown {
-                font-size: 10px;
-                line-height: 1.3;
-                color: #666;
-            }
-            
-            .price-total {
-                font-weight: bold;
-                color: #000;
-                border-top: 1px solid #ddd;
-                margin-top: 2px;
-                padding-top: 2px;
-            }
-            
-            .product-image {
-                width: 20px;
-                height: 20px;
-                object-fit: contain;
-                display: block;
-            }
-            
-            .description-cell {
-                line-height: 1.3;
-            }
-            
-            .logo-position {
-                font-weight: 600;
-                color: #333;
-            }
-            
-            .stitch-count {
-                font-size: 10px;
-                color: #666;
-                display: inline;
-                margin-left: 3px;
-            }
-            
-            .size-breakdown {
-                font-family: 'Courier New', monospace;
-                font-size: 10px;
-                word-break: break-word;
-                line-height: 1.2;
-            }
-            
-            /* Additional Services */
-            .additional-service-row {
-                background: #f8f9fa;
-            }
-            
-            /* Totals Section */
-            .totals-section {
-                margin-left: auto;
-                width: 300px;
-                margin-top: 20px;
-            }
-            
-            .total-row {
-                display: flex;
-                justify-content: space-between;
-                padding: 5px 0;
-                font-size: 13px;
-            }
-            
-            .total-row.subtotal-row {
-                border-top: 1px solid #e0e0e0;
-                padding-top: 10px;
-            }
-            
-            .total-row.tax-row {
-                color: #666;
-            }
-            
-            .total-row.grand-total {   /* the number the customer is looking for */
-                border-top: 2px solid #2e5827;
-                padding-top: 10px;
-                margin-top: 5px;
-                font-size: 18px;
-                font-weight: bold;
-                color: #2e5827;
-            }
-            
-            /* Footer */
-            .invoice-footer {
-                margin-top: 40px;
-                padding-top: 20px;
-                border-top: 1px solid #e0e0e0;
-            }
-            
-            .footer-section {
-                margin-bottom: 15px;
-            }
-            
-            .footer-title {
-                font-size: 12px;
-                font-weight: bold;
-                color: #2e5827;
-                margin-bottom: 5px;
-            }
-            
-            .footer-text {
-                font-size: 11px;
-                color: #666;
-                line-height: 1.4;
-            }
-            
-            .tagline {
-                text-align: center;
-                font-style: italic;
-                color: #999;
-                margin-top: 20px;
-                font-size: 11px;
-            }
-            
-            @media print {
-                body {
-                    margin: 0;
-                    line-height: 1.3;
-                }
-                .invoice-container {
-                    padding: 0;
-                }
-                .products-table tr {
-                    page-break-inside: avoid;
-                }
-                .no-print {
-                    display: none;
-                }
-                /* Single-page fit: the on-screen invoice fits one page, but the
-                   PDF overflowed to a 2nd page once the method specs/locations
-                   box was added. Compact the print spacing (screen view unchanged).
-                   Erik 2026-06-02. */
-                .invoice-header { margin-bottom: 6px; }
-                .method-specs { margin: 5px 0 !important; padding: 6px 8px !important; }
-                .totals-section { margin-top: 8px; }
-                .invoice-footer { margin-top: 12px; padding-top: 8px; page-break-inside: avoid; }
-                .footer-section { margin-bottom: 5px; }
-                .tagline { margin-top: 8px; }
-            }
-
-            /* Size Matrix Table */
-            .size-matrix {
-                width: 100%;
-                border-collapse: collapse;
-                margin-bottom: 10px;
-            }
-            .size-matrix th {
-                background: #2e5827;
-                color: white;
-                padding: 5px 3px;
-                font-size: 10px;
-                text-align: center;
-                font-weight: 600;
-            }
-            .size-matrix th.part-col,
-            .size-matrix th.color-col {
-                text-align: left;
-                padding-left: 6px;
-            }
-            .size-matrix th.size-col {
-                min-width: 26px;
-                max-width: 34px;
-            }
-            .size-matrix td {
-                padding: 5px 3px;
-                border-bottom: 1px solid #e0e0e0;
-                font-size: 10px;
-                vertical-align: middle;
-            }
-            .size-matrix td.part-cell,
-            .size-matrix td.desc-cell,
-            .size-matrix td.color-cell {
-                text-align: left;
-                padding-left: 6px;
-            }
-            .size-matrix td.desc-cell {
-                font-size: 10px;
-                max-width: 180px;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-            }
-            .size-matrix td.size-cell {
-                text-align: center;
-                font-weight: 500;
-            }
-            .size-matrix td.pcs-cell,
-            .size-matrix td.total-cell {
-                text-align: right;
-                font-weight: 600;
-                padding-right: 6px;
-            }
-            .size-matrix tr.product-row:nth-child(even) {
-                background: #fafafa;
-            }
-            .size-matrix tr.totals-row {
-                background: #f0f0f0;
-                font-weight: 600;
-                border-top: 2px solid #2e5827;
-            }
-            .size-matrix tr.totals-row td {
-                padding-top: 8px;
-                padding-bottom: 8px;
-            }
-            .size-matrix tr.extended-size-row {
-                background: #f9f9f9;
-            }
-            .size-matrix tr.extended-size-row td {
-                border-top: none;
-                padding-top: 2px;
-            }
-            .size-matrix .unit-cell {
-                font-weight: 500;
-                color: #333;
-            }
-            .price-legend {
-                font-size: 10px;
-                color: #666;
-                margin: 8px 0 15px 0;
-                padding: 6px 10px;
-                background: #f8f9fa;
-                border-radius: 3px;
-                border-left: 3px solid #2e5827;
-            }
-            @media print {
-                .size-matrix tr {
-                    page-break-inside: avoid;
-                }
-            }
-        `;
+    /** Wait for actual print assets; document.write can report complete before its links load. */
+    async printWhenReady(printWindow) {
+        const failure = () => new Error('Quote formatting could not load. Please try printing again.');
+        if (!printWindow || printWindow.closed) throw new Error('The quote window was closed or blocked.');
+        const doc = printWindow.document;
+        const stylesheets = [...doc.querySelectorAll('[data-invoice-styles]')];
+        if (stylesheets.length !== 3) throw failure();
+        const cleanup = [];
+        let timeout;
+        const loaded = (node, required) => new Promise((resolve, reject) => {
+            const done = () => resolve();
+            const failed = () => required ? reject(failure()) : resolve();
+            node.addEventListener('load', done, { once: true });
+            node.addEventListener('error', failed, { once: true });
+            cleanup.push(() => { node.removeEventListener('load', done); node.removeEventListener('error', failed); });
+        });
+        try {
+            await Promise.race([
+                (async () => {
+                    await Promise.all([
+                        ...stylesheets.filter(link => !link.sheet).map(link => loaded(link, true)),
+                        ...[...doc.images].filter(img => !img.complete).map(img => loaded(img, false))
+                    ]);
+                    if (doc.fonts) await doc.fonts.ready;
+                })(),
+                new Promise((resolve, reject) => { timeout = setTimeout(() => reject(failure()), 20000); })
+            ]);
+            if (printWindow.closed) throw new Error('The quote window was closed.');
+            printWindow.print();
+        } finally {
+            clearTimeout(timeout);
+            cleanup.forEach(remove => remove());
+        }
     }
-    
+
     /**
      * Generate invoice header
      */
@@ -649,9 +301,9 @@ class EmbroideryInvoiceGenerator {
         };
 
         let specsHTML = `
-            <div class="method-specs" style="margin: 10px 0; padding: 10px; background: #e3f2fd; border: 1px solid #2196f3; border-radius: 5px;">
-                <div style="font-size: 12px; font-weight: bold; color: #1976d2; margin-bottom: 8px;">
-                    <i class="fas fa-tshirt" aria-hidden="true" style="margin-right: 5px;"></i>DTG PRINT LOCATIONS:
+            <div class="method-specs" data-invoice-style="method-dtg">
+                <div data-invoice-style="title-dtg">
+                    <i class="fas fa-tshirt" aria-hidden="true" data-invoice-style="icon"></i>DTG PRINT LOCATIONS:
                 </div>
         `;
 
@@ -659,7 +311,7 @@ class EmbroideryInvoiceGenerator {
         if (printLocation.front) {
             const frontName = LOCATION_NAMES[printLocation.front] || printLocation.front;
             specsHTML += `
-                <div style="font-size: 11px; color: #333; margin: 4px 0;">
+                <div data-invoice-style="detail">
                     <strong>Front:</strong> ${this.esc(frontName)}
                 </div>
             `;
@@ -669,7 +321,7 @@ class EmbroideryInvoiceGenerator {
         if (printLocation.back) {
             const backName = LOCATION_NAMES[printLocation.back] || printLocation.back;
             specsHTML += `
-                <div style="font-size: 11px; color: #333; margin: 4px 0;">
+                <div data-invoice-style="detail">
                     <strong>Back:</strong> ${this.esc(backName)}
                 </div>
             `;
@@ -687,16 +339,16 @@ class EmbroideryInvoiceGenerator {
         if (!printConfig) return '';
 
         let specsHTML = `
-            <div class="method-specs" style="margin: 10px 0; padding: 10px; background: #fff3e0; border: 1px solid #ff9800; border-radius: 5px;">
-                <div style="font-size: 12px; font-weight: bold; color: #e65100; margin-bottom: 8px;">
-                    <i class="fas fa-palette" aria-hidden="true" style="margin-right: 5px;"></i>SCREEN PRINT CONFIGURATION:
+            <div class="method-specs" data-invoice-style="method-screenprint">
+                <div data-invoice-style="title-screenprint">
+                    <i class="fas fa-palette" aria-hidden="true" data-invoice-style="icon"></i>SCREEN PRINT CONFIGURATION:
                 </div>
         `;
 
         // Front location with colors
         if (printConfig.front) {
             specsHTML += `
-                <div style="font-size: 11px; color: #333; margin: 4px 0;">
+                <div data-invoice-style="detail">
                     <strong>Front:</strong> ${this.esc(printConfig.front)}
                 </div>
             `;
@@ -705,7 +357,7 @@ class EmbroideryInvoiceGenerator {
         // Back location with colors (if present)
         if (printConfig.back) {
             specsHTML += `
-                <div style="font-size: 11px; color: #333; margin: 4px 0;">
+                <div data-invoice-style="detail">
                     <strong>Back:</strong> ${this.esc(printConfig.back)}
                 </div>
             `;
@@ -714,7 +366,7 @@ class EmbroideryInvoiceGenerator {
         // Sleeve locations with colors (if present — screen print only; other methods pass nothing)
         if (printConfig.sleeves) {
             specsHTML += `
-                <div style="font-size: 11px; color: #333; margin: 4px 0;">
+                <div data-invoice-style="detail">
                     <strong>Sleeves:</strong> ${this.esc(printConfig.sleeves)}
                 </div>
             `;
@@ -723,8 +375,8 @@ class EmbroideryInvoiceGenerator {
         // Dark garment indicator
         if (printConfig.isDarkGarment) {
             specsHTML += `
-                <div style="font-size: 11px; color: #333; margin: 4px 0;">
-                    <strong>Dark Garment:</strong> Yes <span style="color: #666;">(+white underbase)</span>
+                <div data-invoice-style="detail">
+                    <strong>Dark Garment:</strong> Yes <span data-invoice-style="muted">(+white underbase)</span>
                 </div>
             `;
         }
@@ -732,8 +384,8 @@ class EmbroideryInvoiceGenerator {
         // Safety stripes indicator
         if (printConfig.hasSafetyStripes) {
             specsHTML += `
-                <div style="font-size: 11px; color: #333; margin: 4px 0;">
-                    <strong>Safety Stripes:</strong> Yes <span style="color: #666;">(+$2/piece/location)</span>
+                <div data-invoice-style="detail">
+                    <strong>Safety Stripes:</strong> Yes <span data-invoice-style="muted">(+$2/piece/location)</span>
                 </div>
             `;
         }
@@ -741,7 +393,7 @@ class EmbroideryInvoiceGenerator {
         // Screen count and setup fee
         if (printConfig.totalScreens && pricingData.setupFees > 0) {
             specsHTML += `
-                <div style="font-size: 10px; color: #666; margin-top: 8px; padding-top: 5px; border-top: 1px solid #ffcc80;">
+                <div data-invoice-style="setup-detail">
                     <strong>Setup:</strong> ${printConfig.totalScreens} screen${printConfig.totalScreens > 1 ? 's' : ''} × $${(pricingData.setupFees / printConfig.totalScreens).toFixed(2).replace(/\.00$/, '')} = $${pricingData.setupFees.toFixed(2)}
                 </div>
             `;
@@ -772,9 +424,9 @@ class EmbroideryInvoiceGenerator {
         };
 
         let specsHTML = `
-            <div class="method-specs" style="margin: 10px 0; padding: 10px; background: #f3e5f5; border: 1px solid #9c27b0; border-radius: 5px;">
-                <div style="font-size: 12px; font-weight: bold; color: #7b1fa2; margin-bottom: 8px;">
-                    <i class="fas fa-layer-group" aria-hidden="true" style="margin-right: 5px;"></i>DTF TRANSFER LOCATIONS:
+            <div class="method-specs" data-invoice-style="method-dtf">
+                <div data-invoice-style="title-dtf">
+                    <i class="fas fa-layer-group" aria-hidden="true" data-invoice-style="icon"></i>DTF TRANSFER LOCATIONS:
                 </div>
         `;
 
@@ -782,8 +434,8 @@ class EmbroideryInvoiceGenerator {
         selectedLocations.forEach(loc => {
             const config = locationConfig[loc] || { label: loc, size: '' };
             specsHTML += `
-                <div style="font-size: 11px; color: #333; margin: 4px 0;">
-                    • ${this.esc(config.label)} <span style="color: #666;">(${config.size})</span>
+                <div data-invoice-style="detail">
+                    • ${this.esc(config.label)} <span data-invoice-style="muted">(${config.size})</span>
                 </div>
             `;
         });
@@ -807,7 +459,7 @@ class EmbroideryInvoiceGenerator {
         }
 
         let specsHTML = `
-            <div class="method-specs" style="margin: 10px 0; padding: 10px; background: #e8f5e9; border: 1px solid #2e5827; border-radius: 5px;">
+            <div class="method-specs" data-invoice-style="method-embroidery">
         `;
 
         // ---- Additional Logo (AL) per-piece prices actually charged -------------
@@ -855,7 +507,7 @@ class EmbroideryInvoiceGenerator {
         if (hasLogoConfigs) {
             // GARMENT EMBROIDERY SECTION
             if (pricingData.garmentLogos && pricingData.garmentLogos.length > 0 && pricingData.hasGarments) {
-                specsHTML += `<div style="font-size: 12px; font-weight: bold; color: #2e5827; margin-bottom: 8px;">GARMENT EMBROIDERY:</div>`;
+                specsHTML += `<div data-invoice-style="title-embroidery">GARMENT EMBROIDERY:</div>`;
                 specsHTML += this.generateLogoListHTML(pricingData.garmentLogos, alBaseRate, 'garment', logoListOpts);
             }
 
@@ -869,19 +521,19 @@ class EmbroideryInvoiceGenerator {
                     'laser-patch': 'CAP LASER LEATHERETTE PATCH:'
                 }[capEmbType] || 'CAP EMBELLISHMENT:';
 
-                specsHTML += `<div style="font-size: 12px; font-weight: bold; color: #2196F3; margin-bottom: 8px; margin-top: ${pricingData.hasGarments ? '12px' : '0'};">${capEmbLabel}</div>`;
+                specsHTML += `<div data-invoice-style="title-cap" data-invoice-separated="${pricingData.hasGarments}">${capEmbLabel}</div>`;
 
                 if (capEmbType === 'laser-patch') {
                     // Patch-specific display (no stitch count)
                     specsHTML += `
-                        <div style="font-size: 11px; margin-left: 10px; margin-bottom: 3px;">
+                        <div data-invoice-style="cap-detail">
                             <strong>Position:</strong> Cap Front | <strong>Type:</strong> Laser Leatherette Patch
                         </div>
                     `;
                     // Show patch setup fee if applicable
                     if (pricingData.capPatchSetupFee > 0) {
                         specsHTML += `
-                            <div style="font-size: 10px; color: #666; margin-left: 10px;">
+                            <div data-invoice-style="cap-note">
                                 Design Setup Fee: $${pricingData.capPatchSetupFee.toFixed(2)}
                             </div>
                         `;
@@ -892,7 +544,7 @@ class EmbroideryInvoiceGenerator {
                     // Show 3D puff upcharge if applicable
                     if (capEmbType === '3d-puff' && pricingData.puffUpchargePerCap > 0) {
                         specsHTML += `
-                            <div style="font-size: 10px; color: #2196F3; margin-left: 10px; margin-top: 3px;">
+                            <div data-invoice-style="cap-price">
                                 3D Puff Upcharge: +$${pricingData.puffUpchargePerCap.toFixed(2)} per cap
                             </div>
                         `;
@@ -901,7 +553,7 @@ class EmbroideryInvoiceGenerator {
             }
         } else {
             // Legacy: All logos are garment logos
-            specsHTML += `<div style="font-size: 12px; font-weight: bold; color: #2e5827; margin-bottom: 8px;">EMBROIDERY PACKAGE FOR THIS ORDER:</div>`;
+            specsHTML += `<div data-invoice-style="title-embroidery">EMBROIDERY PACKAGE FOR THIS ORDER:</div>`;
             specsHTML += this.generateLogoListHTML(pricingData.logos, alBaseRate, 'garment', logoListOpts);
         }
 
@@ -911,7 +563,7 @@ class EmbroideryInvoiceGenerator {
             if (digitizingLogoCount > 0) {
                 const rateLabel = digitizingRate > 0 ? digitizingRate.toFixed(2).replace(/\.00$/, '') : String(this.fallbackDigitizingRate());
                 specsHTML += `
-                    <div style="font-size: 10px; color: #666; margin-top: 5px;">
+                    <div data-invoice-style="note">
                         <strong>Setup Fees:</strong> ${digitizingLogoCount} logo${digitizingLogoCount > 1 ? 's' : ''} × $${rateLabel} digitizing = $${pricingData.setupFees.toFixed(2)}
                     </div>
                 `;
@@ -922,7 +574,7 @@ class EmbroideryInvoiceGenerator {
         if (pricingData.ltmFee > 0 && !pricingData.ltmDistributed) {
             const ltmPerPiece = (pricingData.ltmFee / pricingData.totalQuantity).toFixed(2);
             specsHTML += `
-                <div style="font-size: 10px; color: #dc3545; margin-top: 5px; font-style: italic;">
+                <div data-invoice-style="warning">
                     ⚠ Small Batch Fee: +$${ltmPerPiece} per piece (orders under 8)
                 </div>
             `;
@@ -971,9 +623,9 @@ class EmbroideryInvoiceGenerator {
 
             // Primary logo (base 8K included)
             html += `
-                <div style="font-size: 11px; color: #333; margin: 4px 0;">
+                <div data-invoice-style="detail">
                     ✓ <strong>${this.esc(position)}</strong> (${stitchCount.toLocaleString()} stitches)${primaryLogo.designNumber ? ` &middot; Design #${this.esc(primaryLogo.designNumber)}` : ''} -
-                    <span style="color: #2e5827;">BASE (8K INCLUDED)</span>
+                    <span data-invoice-style="included">BASE (8K INCLUDED)</span>
                 </div>
             `;
 
@@ -985,9 +637,9 @@ class EmbroideryInvoiceGenerator {
             if (extraStitches > 0 && type === 'garment') {
                 const extraK = extraStitches / 1000;
                 html += `
-                    <div style="font-size: 11px; color: #333; margin: 4px 0; margin-left: 15px;">
+                    <div data-invoice-style="logo-detail">
                         + <strong>Additional Stitches</strong> (+${extraK}K over base) -
-                        <span style="color: #ff6b35;">charged in the line items below</span>
+                        <span data-invoice-style="charge">charged in the line items below</span>
                     </div>
                 `;
             }
@@ -995,7 +647,7 @@ class EmbroideryInvoiceGenerator {
             // Primary digitizing if needed
             if (primaryLogo.needsDigitizing) {
                 html += `
-                    <div style="font-size: 10px; color: #666; margin: 2px 0; margin-left: 15px;">
+                    <div data-invoice-style="logo-note">
                         + Digitizing: ${digitizingLabel}
                     </div>
                 `;
@@ -1032,10 +684,10 @@ class EmbroideryInvoiceGenerator {
                 const digitizingText = needsDigitizing ? ` [+${digitizingLabel} Digitizing]` : '';
 
                 html += `
-                    <div style="font-size: 11px; color: #333; margin: 4px 0;">
+                    <div data-invoice-style="detail">
                         ✓ <strong>${this.esc(position)}</strong> (${stitchCount.toLocaleString()} stitches)${stitchNote}${logo.designNumber ? ` &middot; Design #${this.esc(logo.designNumber)}` : ''} -
-                        <span style="color: #ff6b35;">+$${alUnitPrice.toFixed(2)} per piece</span>
-                        <span style="color: #666; font-size: 10px;">${digitizingText}</span>
+                        <span data-invoice-style="charge">+$${alUnitPrice.toFixed(2)} per piece</span>
+                        <span data-invoice-style="rate-note">${digitizingText}</span>
                     </div>
                 `;
             });
@@ -1083,21 +735,21 @@ class EmbroideryInvoiceGenerator {
         const totalPieces = lineItems.reduce((sum, item) => sum + item.quantity, 0);
 
         let tableHTML = `
-            <div style="margin: 15px 0;">
-                <div style="font-size: 14px; font-weight: bold; color: #2e5827; margin-bottom: 10px;">
+            <div data-invoice-style="product-section">
+                <div data-invoice-style="product-heading">
                     👕 Products (${totalPieces} pieces total)
                 </div>
-                <table class="products-table">
+                <div class="invoice-table-scroll" role="region" aria-label="Quote line items — scroll to view all sizes and prices" tabindex="0"><table class="products-table">
                     <caption class="sr-only">Quoted products with sizes, unit prices, and line totals</caption>
                     <thead>
                         <tr>
-                            <th scope="col" style="width: 70px;">Part #</th>
-                            <th scope="col" style="width: 180px;">Description</th>
-                            <th scope="col" style="width: 80px;">Color</th>
-                            <th scope="col" style="width: 50px; text-align: center;">Size</th>
-                            <th scope="col" style="width: 40px; text-align: center;">Qty</th>
-                            <th scope="col" style="width: 60px; text-align: right;">Unit</th>
-                            <th scope="col" style="width: 70px; text-align: right;">Total</th>
+                            <th scope="col" data-invoice-style="part-column">Part #</th>
+                            <th scope="col" data-invoice-style="description-column">Description</th>
+                            <th scope="col" data-invoice-style="color-column">Color</th>
+                            <th scope="col" data-invoice-style="size-column">Size</th>
+                            <th scope="col" data-invoice-style="qty-column">Qty</th>
+                            <th scope="col" data-invoice-style="unit-column">Unit</th>
+                            <th scope="col" data-invoice-style="total-column">Total</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1126,13 +778,13 @@ class EmbroideryInvoiceGenerator {
                         <td>${this.esc(item.partNumber)}${item.hasUpcharge ? '' : ''}</td>
                         <td>${isFirstRow ? this.esc(item.description) : ''}</td>
                         <td>${isFirstRow ? this.esc(item.displayColor) : ''}</td>
-                        <td style="text-align: center;">
+                        <td data-invoice-style="center">
                             ${item.size}
-                            ${item.hasUpcharge ? '<span style="color:#f59e0b;font-size:9px;"> +$' + item.upchargeAmount.toFixed(0) + '</span>' : ''}
+                            ${item.hasUpcharge ? '<span data-invoice-style="upcharge"> +$' + item.upchargeAmount.toFixed(0) + '</span>' : ''}
                         </td>
-                        <td style="text-align: center;">${item.quantity}</td>
-                        <td style="text-align: right;">$${item.unitPrice.toFixed(2)}</td>
-                        <td style="text-align: right;">$${item.total.toFixed(2)}</td>
+                        <td data-invoice-style="center">${item.quantity}</td>
+                        <td data-invoice-style="right">$${item.unitPrice.toFixed(2)}</td>
+                        <td data-invoice-style="right">$${item.total.toFixed(2)}</td>
                     </tr>
                 `;
             });
@@ -1141,20 +793,20 @@ class EmbroideryInvoiceGenerator {
             const groupTotal = items.reduce((sum, item) => sum + item.total, 0);
             const groupQty = items.reduce((sum, item) => sum + item.quantity, 0);
             tableHTML += `
-                <tr class="product-group-subtotal" style="background: #f8f9fa; font-weight: 600;">
-                    <td colspan="4" style="text-align: right; font-size: 10px;">
+                <tr class="product-group-subtotal" data-invoice-style="group-subtotal">
+                    <td colspan="4" data-invoice-style="subtotal-label">
                         ${this.esc(items[0].partNumber)} ${this.esc(items[0].displayColor)} Subtotal:
                     </td>
-                    <td style="text-align: center;">${groupQty}</td>
+                    <td data-invoice-style="center">${groupQty}</td>
                     <td></td>
-                    <td style="text-align: right;">$${groupTotal.toFixed(2)}</td>
+                    <td data-invoice-style="right">$${groupTotal.toFixed(2)}</td>
                 </tr>
             `;
         }
 
         tableHTML += `
                     </tbody>
-                </table>
+                </table></div>
             </div>
         `;
 
@@ -1300,7 +952,7 @@ class EmbroideryInvoiceGenerator {
             if ((pricingData.decgQty > 0) || (pricingData.deccQty > 0)) {
                 return this.generateCustomerSuppliedTable(pricingData);
             }
-            return '<div style="color: #666; font-style: italic;">No products added</div>';
+            return '<div data-invoice-style="italic">No products added</div>';
         }
 
         // Fixed size columns matching quote builder (standardized labels)
@@ -1332,24 +984,24 @@ class EmbroideryInvoiceGenerator {
 
         // Build header
         let tableHTML = `
-            <div style="margin: 15px 0;">
-                <div style="font-size: 14px; font-weight: bold; color: #2e5827; margin-bottom: 10px;">
+            <div data-invoice-style="product-section">
+                <div data-invoice-style="product-heading">
                     Products
                 </div>
-                <table class="size-matrix">
+                <div class="invoice-table-scroll" role="region" aria-label="Quote line items — scroll to view all sizes and prices" tabindex="0"><table class="size-matrix">
                     <thead>
                         <tr>
-                            <th scope="col" class="part-col" style="width: 55px;">Style</th>
-                            <th scope="col" class="desc-col" style="width: 180px;">Description</th>
-                            <th scope="col" class="color-col" style="width: 90px;">Color</th>
-                            <th scope="col" class="size-col" style="width: 28px;">S</th>
-                            <th scope="col" class="size-col" style="width: 28px;">M</th>
-                            <th scope="col" class="size-col" style="width: 28px;">L</th>
-                            <th scope="col" class="size-col" style="width: 28px;">XL</th>
-                            <th scope="col" class="size-col" style="width: 28px;">2XL</th>
-                            <th scope="col" class="size-col" style="width: 40px;">3XL+<br><span style="font-size: 7px; font-weight: normal;">(Other)</span></th>
-                            <th scope="col" style="width: 32px; text-align: center;">Qty</th>
-                            <th scope="col" style="width: 55px; text-align: right;">Unit $</th>
+                            <th scope="col" class="part-col" data-invoice-style="style-column">Style</th>
+                            <th scope="col" class="desc-col" data-invoice-style="description-column">Description</th>
+                            <th scope="col" class="color-col" data-invoice-style="matrix-description">Color</th>
+                            <th scope="col" class="size-col" data-invoice-style="matrix-size">S</th>
+                            <th scope="col" class="size-col" data-invoice-style="matrix-size">M</th>
+                            <th scope="col" class="size-col" data-invoice-style="matrix-size">L</th>
+                            <th scope="col" class="size-col" data-invoice-style="matrix-size">XL</th>
+                            <th scope="col" class="size-col" data-invoice-style="matrix-size">2XL</th>
+                            <th scope="col" class="size-col" data-invoice-style="matrix-extended">3XL+<br><span data-invoice-style="other-label">(Other)</span></th>
+                            <th scope="col" data-invoice-style="matrix-qty">Qty</th>
+                            <th scope="col" data-invoice-style="matrix-unit">Unit $</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1372,14 +1024,14 @@ class EmbroideryInvoiceGenerator {
 
                 // Service row - spans size columns with description
                 tableHTML += `
-                    <tr class="product-row service-row" style="background: ${isCap ? '#eff6ff' : '#fffbeb'};">
-                        <td class="part-cell" style="font-weight: 600; color: ${isCap ? '#1e40af' : '#92400e'};">${this.esc(serviceType)}</td>
+                    <tr class="product-row service-row" data-invoice-style="supplied-row" data-invoice-kind="${isCap ? 'cap' : 'garment'}">
+                        <td class="part-cell" data-invoice-style="supplied-label" data-invoice-kind="${isCap ? 'cap' : 'garment'}">${this.esc(serviceType)}</td>
                         <td class="desc-cell" colspan="2">${this.esc(description)}${position && !String(description).includes(position) ? ' - ' + this.esc(position) : ''}</td>
-                        <td colspan="6" style="text-align: center; color: #94a3b8; font-size: 10px; font-style: italic;">
+                        <td colspan="6" data-invoice-style="empty-sizes">
                             Service item
                         </td>
-                        <td class="qty-cell" style="text-align: center;">${quantity}</td>
-                        <td class="unit-cell" style="text-align: right;">$${unitPrice.toFixed(2)}</td>
+                        <td class="qty-cell" data-invoice-style="center">${quantity}</td>
+                        <td class="unit-cell" data-invoice-style="right">$${unitPrice.toFixed(2)}</td>
                     </tr>
                 `;
                 return; // Skip regular product processing
@@ -1430,7 +1082,7 @@ class EmbroideryInvoiceGenerator {
                     // Base row with extended sizes below - show checkmark in 3XL+
                     sizeColumns.forEach(col => {
                         if (col === '3XL+') {
-                            sizeCells += `<td class="size-cell" style="color: #2e5827; font-weight: bold;">✓</td>`;
+                            sizeCells += `<td class="size-cell" data-invoice-style="accent-strong">✓</td>`;
                         } else {
                             // Map legacy formats: LG -> L, XXL -> 2XL
                             let qty = sizes[col];
@@ -1466,8 +1118,8 @@ class EmbroideryInvoiceGenerator {
                         <td class="desc-cell">${this.esc(rowDescription)}</td>
                         <td class="color-cell">${this.esc(rowColor)}</td>
                         ${sizeCells}
-                        <td class="qty-cell" style="text-align: center;">${item.quantity}</td>
-                        <td class="unit-cell" style="text-align: right;">$${item.unitPrice.toFixed(2)}</td>
+                        <td class="qty-cell" data-invoice-style="center">${item.quantity}</td>
+                        <td class="unit-cell" data-invoice-style="right">$${item.unitPrice.toFixed(2)}</td>
                     </tr>
                 `;
             });
@@ -1476,13 +1128,13 @@ class EmbroideryInvoiceGenerator {
         // Build totals row
         tableHTML += `
                 <tr class="totals-row">
-                    <td colspan="3" style="text-align: right; padding-right: 10px;"><strong>TOTAL:</strong></td>
+                    <td colspan="3" data-invoice-style="total-label"><strong>TOTAL:</strong></td>
                     <td colspan="6"></td>
-                    <td class="qty-cell" style="text-align: center;"><strong>${grandTotalQty}</strong></td>
-                    <td class="unit-cell" style="text-align: right;"><strong>$${grandTotalAmount.toFixed(2)}</strong></td>
+                    <td class="qty-cell" data-invoice-style="center"><strong>${grandTotalQty}</strong></td>
+                    <td class="unit-cell" data-invoice-style="right"><strong>$${grandTotalAmount.toFixed(2)}</strong></td>
                 </tr>
                     </tbody>
-                </table>
+                </table></div>
             </div>
         `;
 
@@ -1498,18 +1150,18 @@ class EmbroideryInvoiceGenerator {
         let grandTotalAmount = 0;
 
         let tableHTML = `
-            <div style="margin: 15px 0;">
-                <div style="font-size: 14px; font-weight: bold; color: #2e5827; margin-bottom: 10px;">
+            <div data-invoice-style="product-section">
+                <div data-invoice-style="product-heading">
                     Products
                 </div>
-                <table class="size-matrix">
+                <div class="invoice-table-scroll" role="region" aria-label="Quote line items — scroll to view all sizes and prices" tabindex="0"><table class="size-matrix">
                     <thead>
                         <tr>
-                            <th scope="col" class="part-col" style="width: 80px;">Part #</th>
-                            <th scope="col" style="width: 300px;">Description</th>
-                            <th scope="col" style="width: 60px; text-align: center;">Qty</th>
-                            <th scope="col" style="width: 80px; text-align: right;">Unit Price</th>
-                            <th scope="col" style="width: 80px; text-align: right;">Total</th>
+                            <th scope="col" class="part-col" data-invoice-style="color-column">Part #</th>
+                            <th scope="col" data-invoice-style="wide-description">Description</th>
+                            <th scope="col" data-invoice-style="service-qty">Qty</th>
+                            <th scope="col" data-invoice-style="service-total">Unit Price</th>
+                            <th scope="col" data-invoice-style="service-total">Total</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1521,11 +1173,11 @@ class EmbroideryInvoiceGenerator {
             grandTotalAmount += pricingData.decgTotal;
             tableHTML += `
                 <tr class="product-row">
-                    <td class="part-cell" style="font-weight: 600;">DECG</td>
+                    <td class="part-cell" data-invoice-style="semibold">DECG</td>
                     <td>Customer-Supplied Garments — Embroidery</td>
-                    <td style="text-align: center;">${pricingData.decgQty}</td>
-                    <td style="text-align: right;">$${pricingData.decgUnit.toFixed(2)}</td>
-                    <td style="text-align: right;">$${pricingData.decgTotal.toFixed(2)}</td>
+                    <td data-invoice-style="center">${pricingData.decgQty}</td>
+                    <td data-invoice-style="right">$${pricingData.decgUnit.toFixed(2)}</td>
+                    <td data-invoice-style="right">$${pricingData.decgTotal.toFixed(2)}</td>
                 </tr>
             `;
         }
@@ -1536,11 +1188,11 @@ class EmbroideryInvoiceGenerator {
             grandTotalAmount += pricingData.deccTotal;
             tableHTML += `
                 <tr class="product-row">
-                    <td class="part-cell" style="font-weight: 600;">DECC</td>
+                    <td class="part-cell" data-invoice-style="semibold">DECC</td>
                     <td>Customer-Supplied Caps — Embroidery</td>
-                    <td style="text-align: center;">${pricingData.deccQty}</td>
-                    <td style="text-align: right;">$${pricingData.deccUnit.toFixed(2)}</td>
-                    <td style="text-align: right;">$${pricingData.deccTotal.toFixed(2)}</td>
+                    <td data-invoice-style="center">${pricingData.deccQty}</td>
+                    <td data-invoice-style="right">$${pricingData.deccUnit.toFixed(2)}</td>
+                    <td data-invoice-style="right">$${pricingData.deccTotal.toFixed(2)}</td>
                 </tr>
             `;
         }
@@ -1548,13 +1200,13 @@ class EmbroideryInvoiceGenerator {
         // Totals row
         tableHTML += `
                 <tr class="totals-row">
-                    <td colspan="2" style="text-align: right; padding-right: 10px;"><strong>TOTAL:</strong></td>
-                    <td style="text-align: center;"><strong>${grandTotalQty}</strong></td>
+                    <td colspan="2" data-invoice-style="total-label"><strong>TOTAL:</strong></td>
+                    <td data-invoice-style="center"><strong>${grandTotalQty}</strong></td>
                     <td></td>
-                    <td style="text-align: right;"><strong>$${grandTotalAmount.toFixed(2)}</strong></td>
+                    <td data-invoice-style="right"><strong>$${grandTotalAmount.toFixed(2)}</strong></td>
                 </tr>
                     </tbody>
-                </table>
+                </table></div>
             </div>
         `;
 

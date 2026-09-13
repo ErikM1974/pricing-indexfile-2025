@@ -58,6 +58,7 @@ class ScreenPrintFastQuoteService {
 
             // Save to database
             const dbResult = await this.saveToDatabase(quoteId, formData);
+            if (!dbResult.success) throw new Error(dbResult.error || 'Unable to save quote request');
 
             // Send emails (don't fail if email fails)
             try {
@@ -129,7 +130,7 @@ class ScreenPrintFastQuoteService {
 
         } catch (error) {
             console.error('[FastQuoteService] Database error:', error);
-            // Don't throw - allow quote to succeed even if DB fails
+            // Return a structured failure; submitQuote stops before confirmation emails.
             return { success: false, error: error.message };
         }
     }

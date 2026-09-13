@@ -1,0 +1,167 @@
+{
+  "name": "line-empty",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Quick Quote — Northwest Custom Apparel",
+      "url": "/calculators/quick-quote/index.html",
+      "ids": {
+        "qqModeToggle": "Line Sheet Quick Price",
+        "qqLineMethodChips": "Embroidery Cap embroidery DTG print Screen print DTF transfer",
+        "qqLineList": "Add a style to start the sheet.",
+        "qqLineAdd": "+ Add style",
+        "qqLineDownload": "Download PDF",
+        "qqLinePrint": "Print",
+        "qqSheet": "Pick an imprint method, then add styles to build the line sheet."
+      },
+      "fields": [],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".lede"
+            ],
+            [
+              "button[data-mode=\"quick\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Quick Quote — Northwest Custom Apparel",
+      "url": "/calculators/quick-quote/index.html",
+      "ids": {
+        "qqModeToggle": "Line Sheet Quick Price",
+        "qqLineMethodChips": "Embroidery Cap embroidery DTG print Screen print DTF transfer",
+        "qqLineList": "Add a style to start the sheet.",
+        "qqLineAdd": "+ Add style",
+        "qqLineDownload": "Download PDF",
+        "qqLinePrint": "Print",
+        "qqSheet": "Pick an imprint method, then add styles to build the line sheet."
+      },
+      "fields": [],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".lede"
+            ],
+            [
+              "button[data-mode=\"quick\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Quick Quote — Northwest Custom Apparel",
+      "url": "/calculators/quick-quote/index.html",
+      "ids": {
+        "qqModeToggle": "Line Sheet Quick Price",
+        "qqLineMethodChips": "Embroidery Cap embroidery DTG print Screen print DTF transfer",
+        "qqLineList": "Add a style to start the sheet.",
+        "qqLineAdd": "+ Add style",
+        "qqLineDownload": "Download PDF",
+        "qqLinePrint": "Print",
+        "qqSheet": "Pick an imprint method, then add styles to build the line sheet."
+      },
+      "fields": [],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".lede"
+            ],
+            [
+              "button[data-mode=\"quick\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Quick Quote — Northwest Custom Apparel",
+      "url": "/calculators/quick-quote/index.html",
+      "ids": {
+        "qqModeToggle": "Line Sheet Quick Price",
+        "qqLineMethodChips": "Embroidery Cap embroidery DTG print Screen print DTF transfer",
+        "qqLineList": "Add a style to start the sheet.",
+        "qqLineAdd": "+ Add style",
+        "qqLineDownload": "Download PDF",
+        "qqLinePrint": "Print",
+        "qqSheet": "Pick an imprint method, then add styles to build the line sheet."
+      },
+      "fields": [],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        }
+      ],
+      "tables": [],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".lede"
+            ],
+            [
+              "button[data-mode=\"quick\"]"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "reads": [],
+  "dialogs": []
+}

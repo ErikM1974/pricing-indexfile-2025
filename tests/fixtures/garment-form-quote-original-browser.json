@@ -1,0 +1,2070 @@
+[
+  {
+    "fields": [
+      {
+        "id": "gsf-company",
+        "name": "",
+        "type": "text",
+        "value": "Cedar Example Construction",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-cust-num",
+        "name": "",
+        "type": "text",
+        "value": "90210",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-customer-id",
+        "name": "",
+        "type": "hidden",
+        "value": "90210",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-contact-name",
+        "name": "",
+        "type": "text",
+        "value": "River Sample",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-contact-email",
+        "name": "",
+        "type": "email",
+        "value": "review@example.test",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-sales-rep",
+        "name": "",
+        "type": "text",
+        "value": "Example Rep",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-due-date",
+        "name": "",
+        "type": "date",
+        "value": "2026-09-21",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-design-num",
+        "name": "",
+        "type": "text",
+        "value": "44012",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-order-num",
+        "name": "",
+        "type": "text",
+        "value": "740123",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-prelim",
+        "name": "",
+        "type": "select-one",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-artwork-status",
+        "name": "",
+        "type": "select-one",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-approval-status",
+        "name": "",
+        "type": "select-one",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "Screen Print",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "DTG",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "Embroidery",
+        "checked": true,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "Transfer",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "Sticker",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "Banner",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "JDS Product",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "Laser Leatherette Patch",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "Not sure — Steve to advise",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-patch-material",
+        "name": "",
+        "type": "select-one",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-patch-shape",
+        "name": "",
+        "type": "select-one",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-patch-material-other",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-patch-width",
+        "name": "",
+        "type": "number",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-patch-height",
+        "name": "",
+        "type": "number",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-patch-edge",
+        "name": "",
+        "type": "select-one",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-patch-attach",
+        "name": "",
+        "type": "select-one",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-style-0",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-color-0",
+        "name": "",
+        "type": "select-one",
+        "value": "",
+        "checked": false,
+        "disabled": true
+      },
+      {
+        "id": "gsf-loc-place-0",
+        "name": "",
+        "type": "select-one",
+        "value": "Full Front",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-loc-w-0",
+        "name": "",
+        "type": "number",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-loc-h-0",
+        "name": "",
+        "type": "number",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-loc-n-0",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-loc-place-1",
+        "name": "",
+        "type": "select-one",
+        "value": "Full Back",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-loc-w-1",
+        "name": "",
+        "type": "number",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-loc-h-1",
+        "name": "",
+        "type": "number",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-loc-n-1",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-color-mode",
+        "name": "",
+        "type": "select-one",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-underbase",
+        "name": "",
+        "type": "select-one",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-pms",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-thread",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-exact-text",
+        "name": "",
+        "type": "textarea",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-no-text",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-prev-order",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-prev-design",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-keep-same",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-change",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-file-type",
+        "name": "",
+        "type": "select-one",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-file-input",
+        "name": "",
+        "type": "file",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-notes",
+        "name": "",
+        "type": "textarea",
+        "value": "Carried over from quote EMB0910-7401 · WO 740123. Customer art + approved mockups attached from the order.",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      }
+    ],
+    "text": "👕 Garment Art Request to Steve Give Steve everything he needs to start without guessing — fill in each section, then run the final checklist before you submit. 1Customer & OrderWho and which job this art is for. Company * Company is required SW Cust# Contact Name * Contact name is required Contact Email Sales Rep Due Date * Due date is required Design # * Type the number and tab out — looks it up in ShopWorks. New design? Type a new number. Design # is required Order # * Click to browse this customer's recent orders. Order # is required Art Estimate from AE - select -GRT-REVIEW · Synthetic art fee — $50 The GRT part numbers Steve bills, straight from ShopWorks / Caspio. Priority 🔥 Rush Order Tick if Steve needs this ASAP 2Artwork & Approval StatusTells Steve what kind of work this is and whether it is cleared for production. Artwork Status * - select -New artwork from scratchMockup onlyRevision to existing proofRepeat from previous orderFinal approved / production ready Artwork status is required Approval Status * - select -Not approved — Steve to create proofCustomer reviewing proofCustomer approved — ready for productionInternal revision onlyPost-approval change order Approval status is required Approved = final & production-ready. Once approved, Steve may prepare screens / production files. Complete the final checklist below, and make sure the customer reviewed the final proof for spelling, layout, color, size, and placement. Changes after approval may delay the order and add charges.3Decoration MethodHow this art will be produced — pick all that apply. Screen Print DTG Embroidery Transfer Sticker Banner JDS Product Laser Leatherette Patch Not sure — Steve to adviseSelect at least one decoration method 🪡 Laser Leatherette Patch SpecsShown because you picked Laser Leatherette Patch. Tell Steve exactly what to laser-cut and engrave, and how it attaches to the cap. The cap itself goes in the Garment section below; placement (e.g. Cap Front) goes in Artwork Placement. Leatherette Color * - select color -Black / Silver engraveBlack / Gold engraveBlack / White engraveBlack / Red engraveGray / Black engraveLight Gray / Black engraveWhite / Black engraveBrown / Black engraveRawhide (Light Brown) / Black engraveDark Brown / Black engraveTan / Black engraveNavy / White engraveOther — specify exact stock Surface color / laser-reveal color. Pick the leatherette color Patch Shape * - select shape -RectangleRounded RectangleSquareCircleOvalShield / CrestCustom die-cut (describe in notes) Pick the patch shape Exact material / stock name * Type the exact material Patch Width\" * Finished patch size (also fills the Cap placement size). Enter the patch width Patch Height\" Edge / Border Finish - select finish -Clean laser-cut edgeStitched (merrowed) borderSteve to advise Attachment to Cap * - select attachment -Heat press (adhesive backing)Sewn / stitchedHeat press + tack stitchSteve to advise Pick how the patch attaches 4Garment / ProductStyle number and color for each garment. Type a style and tab out to load its colors.1 - enter style first -+ Add another garment5Artwork Placement & SizeOne block per print location. Give the placement and the final print size in inches.1 Placement * - placement -Left ChestRight ChestFull FrontFull BackLeft SleeveRight SleeveCap FrontCap BackCap Side (Left)Cap Side (Right)PocketYoke / Upper BackNape of NeckPant LegTote / BagOther (describe in notes) Width\" * Height\" Placement instructions ×2 Placement * - placement -Left ChestRight ChestFull FrontFull BackLeft SleeveRight SleeveCap FrontCap BackCap Side (Left)Cap Side (Right)PocketYoke / Upper BackNape of NeckPant LegTote / BagOther (describe in notes) Width\" * Height\" Placement instructions ×+ Add another locationAdd at least one location with a placement and width6Artwork ColorsHow colors should be handled. PMS and thread are optional but help Steve match exactly. Color Direction * - select -Use exact PMS colorsUse closest matchMatch previous orderBlack onlyWhite onlyFull colorAE/customer doesn't know — Steve to recommend Color direction is required Underbase on dark garments - select - Yes No Steve to decide PMS Colors (if known) Thread Colors (embroidery) 7Exact Text in ArtworkType the exact wording, spelling, dates, names, and phone numbers that should appear. This design has no text (graphic / logo only) Enter the exact text, or tick \"no text\"8Previous Order / Design ReferenceRequired for a repeat or a revision — what to copy and what to change. Previous Order # Previous order # is required for a repeat / revision Previous Design # Previous design # is required for a repeat / revision What should stay the same What should change Describe what changes for a revision 9Files & File TypeAttach the customer artwork and tell Steve what kind of file it is. What was provided? * - select -Customer vector file (AI, EPS, PDF, SVG)Customer raster file (PNG / JPG)Customer screenshot onlyLogo from a previous orderNo usable artwork provided — Steve must recreate Pick the file type, or upload a file / give a previous design # Upload Files Add another file 1 more can be added .AI, .EPS, .PDF, .PNG, .JPG, .SVG · 20MB each. Larger? Upload to Box and paste the link in notes. ✓ 3 file(s) carried over from the quote. Front artworkfrom quote×Back artworkfrom quote×Mockup — frontfrom quote×10Additional Art NotesShort bullet points only. Do NOT use this for size, placement, color, wording, or approval — those have their own fields above. 11AE Final ChecklistConfirm before sending to Steve. A request is not ready until these are true. Customer and order information are correct Artwork status is selected Approval status is accurate Decoration method is selected Garment style and color are entered Artwork placement is entered Art size is entered in inches Ink / PMS / thread / color direction is entered Exact wording has been checked for spelling Previous order / design number is included (if a repeat or revision) Customer files are uploaded (if available) If marked approved, the customer has reviewed the final proof Customer understands changes after approval may delay the order or add chargesCheck allComplete the final checklist before submitting Submit Art Request Section 11 of 1112 required left · next: CompanySubmit Art Request"
+  },
+  {
+    "fields": [
+      {
+        "id": "gsf-company",
+        "name": "",
+        "type": "text",
+        "value": "Cedar Example Construction",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-cust-num",
+        "name": "",
+        "type": "text",
+        "value": "90210",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-customer-id",
+        "name": "",
+        "type": "hidden",
+        "value": "90210",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-contact-name",
+        "name": "",
+        "type": "text",
+        "value": "River Sample",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-contact-email",
+        "name": "",
+        "type": "email",
+        "value": "review@example.test",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-sales-rep",
+        "name": "",
+        "type": "text",
+        "value": "Example Rep",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-due-date",
+        "name": "",
+        "type": "date",
+        "value": "2026-09-21",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-design-num",
+        "name": "",
+        "type": "text",
+        "value": "44012",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-order-num",
+        "name": "",
+        "type": "text",
+        "value": "740123",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-prelim",
+        "name": "",
+        "type": "select-one",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-artwork-status",
+        "name": "",
+        "type": "select-one",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-approval-status",
+        "name": "",
+        "type": "select-one",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "Screen Print",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "DTG",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "Embroidery",
+        "checked": true,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "Transfer",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "Sticker",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "Banner",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "JDS Product",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "Laser Leatherette Patch",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "Not sure — Steve to advise",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-patch-material",
+        "name": "",
+        "type": "select-one",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-patch-shape",
+        "name": "",
+        "type": "select-one",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-patch-material-other",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-patch-width",
+        "name": "",
+        "type": "number",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-patch-height",
+        "name": "",
+        "type": "number",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-patch-edge",
+        "name": "",
+        "type": "select-one",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-patch-attach",
+        "name": "",
+        "type": "select-one",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-style-0",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-color-0",
+        "name": "",
+        "type": "select-one",
+        "value": "",
+        "checked": false,
+        "disabled": true
+      },
+      {
+        "id": "gsf-loc-place-0",
+        "name": "",
+        "type": "select-one",
+        "value": "Full Front",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-loc-w-0",
+        "name": "",
+        "type": "number",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-loc-h-0",
+        "name": "",
+        "type": "number",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-loc-n-0",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-loc-place-1",
+        "name": "",
+        "type": "select-one",
+        "value": "Full Back",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-loc-w-1",
+        "name": "",
+        "type": "number",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-loc-h-1",
+        "name": "",
+        "type": "number",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-loc-n-1",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-color-mode",
+        "name": "",
+        "type": "select-one",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-underbase",
+        "name": "",
+        "type": "select-one",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-pms",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-thread",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-exact-text",
+        "name": "",
+        "type": "textarea",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-no-text",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-prev-order",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-prev-design",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-keep-same",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-change",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-file-type",
+        "name": "",
+        "type": "select-one",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-file-input",
+        "name": "",
+        "type": "file",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-notes",
+        "name": "",
+        "type": "textarea",
+        "value": "Carried over from quote EMB0910-7401 · WO 740123. Customer art + approved mockups attached from the order.",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      }
+    ],
+    "text": "👕 Garment Art Request to Steve Give Steve everything he needs to start without guessing — fill in each section, then run the final checklist before you submit. 1Customer & OrderWho and which job this art is for. Company * Company is required SW Cust# Contact Name * Contact name is required Contact Email Sales Rep Due Date * Due date is required Design # * Type the number and tab out — looks it up in ShopWorks. New design? Type a new number. Design # is required Order # * Click to browse this customer's recent orders. Order # is required Art Estimate from AE - select -GRT-REVIEW · Synthetic art fee — $50 The GRT part numbers Steve bills, straight from ShopWorks / Caspio. Priority 🔥 Rush Order Tick if Steve needs this ASAP 2Artwork & Approval StatusTells Steve what kind of work this is and whether it is cleared for production. Artwork Status * - select -New artwork from scratchMockup onlyRevision to existing proofRepeat from previous orderFinal approved / production ready Artwork status is required Approval Status * - select -Not approved — Steve to create proofCustomer reviewing proofCustomer approved — ready for productionInternal revision onlyPost-approval change order Approval status is required Approved = final & production-ready. Once approved, Steve may prepare screens / production files. Complete the final checklist below, and make sure the customer reviewed the final proof for spelling, layout, color, size, and placement. Changes after approval may delay the order and add charges.3Decoration MethodHow this art will be produced — pick all that apply. Screen Print DTG Embroidery Transfer Sticker Banner JDS Product Laser Leatherette Patch Not sure — Steve to adviseSelect at least one decoration method 🪡 Laser Leatherette Patch SpecsShown because you picked Laser Leatherette Patch. Tell Steve exactly what to laser-cut and engrave, and how it attaches to the cap. The cap itself goes in the Garment section below; placement (e.g. Cap Front) goes in Artwork Placement. Leatherette Color * - select color -Black / Silver engraveBlack / Gold engraveBlack / White engraveBlack / Red engraveGray / Black engraveLight Gray / Black engraveWhite / Black engraveBrown / Black engraveRawhide (Light Brown) / Black engraveDark Brown / Black engraveTan / Black engraveNavy / White engraveOther — specify exact stock Surface color / laser-reveal color. Pick the leatherette color Patch Shape * - select shape -RectangleRounded RectangleSquareCircleOvalShield / CrestCustom die-cut (describe in notes) Pick the patch shape Exact material / stock name * Type the exact material Patch Width\" * Finished patch size (also fills the Cap placement size). Enter the patch width Patch Height\" Edge / Border Finish - select finish -Clean laser-cut edgeStitched (merrowed) borderSteve to advise Attachment to Cap * - select attachment -Heat press (adhesive backing)Sewn / stitchedHeat press + tack stitchSteve to advise Pick how the patch attaches 4Garment / ProductStyle number and color for each garment. Type a style and tab out to load its colors.1 - enter style first -+ Add another garment5Artwork Placement & SizeOne block per print location. Give the placement and the final print size in inches.1 Placement * - placement -Left ChestRight ChestFull FrontFull BackLeft SleeveRight SleeveCap FrontCap BackCap Side (Left)Cap Side (Right)PocketYoke / Upper BackNape of NeckPant LegTote / BagOther (describe in notes) Width\" * Height\" Placement instructions ×2 Placement * - placement -Left ChestRight ChestFull FrontFull BackLeft SleeveRight SleeveCap FrontCap BackCap Side (Left)Cap Side (Right)PocketYoke / Upper BackNape of NeckPant LegTote / BagOther (describe in notes) Width\" * Height\" Placement instructions ×+ Add another locationAdd at least one location with a placement and width6Artwork ColorsHow colors should be handled. PMS and thread are optional but help Steve match exactly. Color Direction * - select -Use exact PMS colorsUse closest matchMatch previous orderBlack onlyWhite onlyFull colorAE/customer doesn't know — Steve to recommend Color direction is required Underbase on dark garments - select - Yes No Steve to decide PMS Colors (if known) Thread Colors (embroidery) 7Exact Text in ArtworkType the exact wording, spelling, dates, names, and phone numbers that should appear. This design has no text (graphic / logo only) Enter the exact text, or tick \"no text\"8Previous Order / Design ReferenceRequired for a repeat or a revision — what to copy and what to change. Previous Order # Previous order # is required for a repeat / revision Previous Design # Previous design # is required for a repeat / revision What should stay the same What should change Describe what changes for a revision 9Files & File TypeAttach the customer artwork and tell Steve what kind of file it is. What was provided? * - select -Customer vector file (AI, EPS, PDF, SVG)Customer raster file (PNG / JPG)Customer screenshot onlyLogo from a previous orderNo usable artwork provided — Steve must recreate Pick the file type, or upload a file / give a previous design # Upload Files Add another file 1 more can be added .AI, .EPS, .PDF, .PNG, .JPG, .SVG · 20MB each. Larger? Upload to Box and paste the link in notes. ✓ 3 file(s) carried over from the quote. Front artworkfrom quote×Back artworkfrom quote×Mockup — frontfrom quote×10Additional Art NotesShort bullet points only. Do NOT use this for size, placement, color, wording, or approval — those have their own fields above. 11AE Final ChecklistConfirm before sending to Steve. A request is not ready until these are true. Customer and order information are correct Artwork status is selected Approval status is accurate Decoration method is selected Garment style and color are entered Artwork placement is entered Art size is entered in inches Ink / PMS / thread / color direction is entered Exact wording has been checked for spelling Previous order / design number is included (if a repeat or revision) Customer files are uploaded (if available) If marked approved, the customer has reviewed the final proof Customer understands changes after approval may delay the order or add chargesCheck allComplete the final checklist before submitting Submit Art Request Section 11 of 1112 required left · next: CompanySubmit Art Request"
+  },
+  {
+    "fields": [
+      {
+        "id": "gsf-company",
+        "name": "",
+        "type": "text",
+        "value": "Cedar Example Construction",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-cust-num",
+        "name": "",
+        "type": "text",
+        "value": "90210",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-customer-id",
+        "name": "",
+        "type": "hidden",
+        "value": "90210",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-contact-name",
+        "name": "",
+        "type": "text",
+        "value": "River Sample",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-contact-email",
+        "name": "",
+        "type": "email",
+        "value": "review@example.test",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-sales-rep",
+        "name": "",
+        "type": "text",
+        "value": "Example Rep",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-due-date",
+        "name": "",
+        "type": "date",
+        "value": "2026-09-21",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-design-num",
+        "name": "",
+        "type": "text",
+        "value": "44012",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-order-num",
+        "name": "",
+        "type": "text",
+        "value": "740123",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-prelim",
+        "name": "",
+        "type": "select-one",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-artwork-status",
+        "name": "",
+        "type": "select-one",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-approval-status",
+        "name": "",
+        "type": "select-one",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "Screen Print",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "DTG",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "Embroidery",
+        "checked": true,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "Transfer",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "Sticker",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "Banner",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "JDS Product",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "Laser Leatherette Patch",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "Not sure — Steve to advise",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-patch-material",
+        "name": "",
+        "type": "select-one",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-patch-shape",
+        "name": "",
+        "type": "select-one",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-patch-material-other",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-patch-width",
+        "name": "",
+        "type": "number",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-patch-height",
+        "name": "",
+        "type": "number",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-patch-edge",
+        "name": "",
+        "type": "select-one",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-patch-attach",
+        "name": "",
+        "type": "select-one",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-style-0",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-color-0",
+        "name": "",
+        "type": "select-one",
+        "value": "",
+        "checked": false,
+        "disabled": true
+      },
+      {
+        "id": "gsf-loc-place-0",
+        "name": "",
+        "type": "select-one",
+        "value": "Full Front",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-loc-w-0",
+        "name": "",
+        "type": "number",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-loc-h-0",
+        "name": "",
+        "type": "number",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-loc-n-0",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-loc-place-1",
+        "name": "",
+        "type": "select-one",
+        "value": "Full Back",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-loc-w-1",
+        "name": "",
+        "type": "number",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-loc-h-1",
+        "name": "",
+        "type": "number",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-loc-n-1",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-color-mode",
+        "name": "",
+        "type": "select-one",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-underbase",
+        "name": "",
+        "type": "select-one",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-pms",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-thread",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-exact-text",
+        "name": "",
+        "type": "textarea",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-no-text",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-prev-order",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-prev-design",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-keep-same",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-change",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-file-type",
+        "name": "",
+        "type": "select-one",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-file-input",
+        "name": "",
+        "type": "file",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-notes",
+        "name": "",
+        "type": "textarea",
+        "value": "Carried over from quote EMB0910-7401 · WO 740123. Customer art + approved mockups attached from the order.",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      }
+    ],
+    "text": "👕 Garment Art Request to Steve Give Steve everything he needs to start without guessing — fill in each section, then run the final checklist before you submit. 1Customer & OrderWho and which job this art is for. Company * Company is required SW Cust# Contact Name * Contact name is required Contact Email Sales Rep Due Date * Due date is required Design # * Type the number and tab out — looks it up in ShopWorks. New design? Type a new number. Design # is required Order # * Click to browse this customer's recent orders. Order # is required Art Estimate from AE - select -GRT-REVIEW · Synthetic art fee — $50 The GRT part numbers Steve bills, straight from ShopWorks / Caspio. Priority 🔥 Rush Order Tick if Steve needs this ASAP 2Artwork & Approval StatusTells Steve what kind of work this is and whether it is cleared for production. Artwork Status * - select -New artwork from scratchMockup onlyRevision to existing proofRepeat from previous orderFinal approved / production ready Artwork status is required Approval Status * - select -Not approved — Steve to create proofCustomer reviewing proofCustomer approved — ready for productionInternal revision onlyPost-approval change order Approval status is required Approved = final & production-ready. Once approved, Steve may prepare screens / production files. Complete the final checklist below, and make sure the customer reviewed the final proof for spelling, layout, color, size, and placement. Changes after approval may delay the order and add charges.3Decoration MethodHow this art will be produced — pick all that apply. Screen Print DTG Embroidery Transfer Sticker Banner JDS Product Laser Leatherette Patch Not sure — Steve to adviseSelect at least one decoration method 🪡 Laser Leatherette Patch SpecsShown because you picked Laser Leatherette Patch. Tell Steve exactly what to laser-cut and engrave, and how it attaches to the cap. The cap itself goes in the Garment section below; placement (e.g. Cap Front) goes in Artwork Placement. Leatherette Color * - select color -Black / Silver engraveBlack / Gold engraveBlack / White engraveBlack / Red engraveGray / Black engraveLight Gray / Black engraveWhite / Black engraveBrown / Black engraveRawhide (Light Brown) / Black engraveDark Brown / Black engraveTan / Black engraveNavy / White engraveOther — specify exact stock Surface color / laser-reveal color. Pick the leatherette color Patch Shape * - select shape -RectangleRounded RectangleSquareCircleOvalShield / CrestCustom die-cut (describe in notes) Pick the patch shape Exact material / stock name * Type the exact material Patch Width\" * Finished patch size (also fills the Cap placement size). Enter the patch width Patch Height\" Edge / Border Finish - select finish -Clean laser-cut edgeStitched (merrowed) borderSteve to advise Attachment to Cap * - select attachment -Heat press (adhesive backing)Sewn / stitchedHeat press + tack stitchSteve to advise Pick how the patch attaches 4Garment / ProductStyle number and color for each garment. Type a style and tab out to load its colors.1 - enter style first -+ Add another garment5Artwork Placement & SizeOne block per print location. Give the placement and the final print size in inches.1 Placement * - placement -Left ChestRight ChestFull FrontFull BackLeft SleeveRight SleeveCap FrontCap BackCap Side (Left)Cap Side (Right)PocketYoke / Upper BackNape of NeckPant LegTote / BagOther (describe in notes) Width\" * Height\" Placement instructions ×2 Placement * - placement -Left ChestRight ChestFull FrontFull BackLeft SleeveRight SleeveCap FrontCap BackCap Side (Left)Cap Side (Right)PocketYoke / Upper BackNape of NeckPant LegTote / BagOther (describe in notes) Width\" * Height\" Placement instructions ×+ Add another locationAdd at least one location with a placement and width6Artwork ColorsHow colors should be handled. PMS and thread are optional but help Steve match exactly. Color Direction * - select -Use exact PMS colorsUse closest matchMatch previous orderBlack onlyWhite onlyFull colorAE/customer doesn't know — Steve to recommend Color direction is required Underbase on dark garments - select - Yes No Steve to decide PMS Colors (if known) Thread Colors (embroidery) 7Exact Text in ArtworkType the exact wording, spelling, dates, names, and phone numbers that should appear. This design has no text (graphic / logo only) Enter the exact text, or tick \"no text\"8Previous Order / Design ReferenceRequired for a repeat or a revision — what to copy and what to change. Previous Order # Previous order # is required for a repeat / revision Previous Design # Previous design # is required for a repeat / revision What should stay the same What should change Describe what changes for a revision 9Files & File TypeAttach the customer artwork and tell Steve what kind of file it is. What was provided? * - select -Customer vector file (AI, EPS, PDF, SVG)Customer raster file (PNG / JPG)Customer screenshot onlyLogo from a previous orderNo usable artwork provided — Steve must recreate Pick the file type, or upload a file / give a previous design # Upload Files Add another file 1 more can be added .AI, .EPS, .PDF, .PNG, .JPG, .SVG · 20MB each. Larger? Upload to Box and paste the link in notes. ✓ 3 file(s) carried over from the quote. Front artworkfrom quote×Back artworkfrom quote×Mockup — frontfrom quote×10Additional Art NotesShort bullet points only. Do NOT use this for size, placement, color, wording, or approval — those have their own fields above. 11AE Final ChecklistConfirm before sending to Steve. A request is not ready until these are true. Customer and order information are correct Artwork status is selected Approval status is accurate Decoration method is selected Garment style and color are entered Artwork placement is entered Art size is entered in inches Ink / PMS / thread / color direction is entered Exact wording has been checked for spelling Previous order / design number is included (if a repeat or revision) Customer files are uploaded (if available) If marked approved, the customer has reviewed the final proof Customer understands changes after approval may delay the order or add chargesCheck allComplete the final checklist before submitting Submit Art Request Section 11 of 1112 required left · next: CompanySubmit Art Request"
+  },
+  {
+    "fields": [
+      {
+        "id": "gsf-company",
+        "name": "",
+        "type": "text",
+        "value": "Cedar Example Construction",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-cust-num",
+        "name": "",
+        "type": "text",
+        "value": "90210",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-customer-id",
+        "name": "",
+        "type": "hidden",
+        "value": "90210",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-contact-name",
+        "name": "",
+        "type": "text",
+        "value": "River Sample",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-contact-email",
+        "name": "",
+        "type": "email",
+        "value": "review@example.test",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-sales-rep",
+        "name": "",
+        "type": "text",
+        "value": "Example Rep",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-due-date",
+        "name": "",
+        "type": "date",
+        "value": "2026-09-21",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-design-num",
+        "name": "",
+        "type": "text",
+        "value": "44012",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-order-num",
+        "name": "",
+        "type": "text",
+        "value": "740123",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-prelim",
+        "name": "",
+        "type": "select-one",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-artwork-status",
+        "name": "",
+        "type": "select-one",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-approval-status",
+        "name": "",
+        "type": "select-one",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "Screen Print",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "DTG",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "Embroidery",
+        "checked": true,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "Transfer",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "Sticker",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "Banner",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "JDS Product",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "Laser Leatherette Patch",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "Not sure — Steve to advise",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-patch-material",
+        "name": "",
+        "type": "select-one",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-patch-shape",
+        "name": "",
+        "type": "select-one",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-patch-material-other",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-patch-width",
+        "name": "",
+        "type": "number",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-patch-height",
+        "name": "",
+        "type": "number",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-patch-edge",
+        "name": "",
+        "type": "select-one",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-patch-attach",
+        "name": "",
+        "type": "select-one",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-style-0",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-color-0",
+        "name": "",
+        "type": "select-one",
+        "value": "",
+        "checked": false,
+        "disabled": true
+      },
+      {
+        "id": "gsf-loc-place-0",
+        "name": "",
+        "type": "select-one",
+        "value": "Full Front",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-loc-w-0",
+        "name": "",
+        "type": "number",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-loc-h-0",
+        "name": "",
+        "type": "number",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-loc-n-0",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-loc-place-1",
+        "name": "",
+        "type": "select-one",
+        "value": "Full Back",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-loc-w-1",
+        "name": "",
+        "type": "number",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-loc-h-1",
+        "name": "",
+        "type": "number",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-loc-n-1",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-color-mode",
+        "name": "",
+        "type": "select-one",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-underbase",
+        "name": "",
+        "type": "select-one",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-pms",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-thread",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-exact-text",
+        "name": "",
+        "type": "textarea",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-no-text",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-prev-order",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-prev-design",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-keep-same",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-change",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-file-type",
+        "name": "",
+        "type": "select-one",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-file-input",
+        "name": "",
+        "type": "file",
+        "value": "",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "gsf-notes",
+        "name": "",
+        "type": "textarea",
+        "value": "Carried over from quote EMB0910-7401 · WO 740123. Customer art + approved mockups attached from the order.",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      },
+      {
+        "id": "",
+        "name": "",
+        "type": "checkbox",
+        "value": "on",
+        "checked": false,
+        "disabled": false
+      }
+    ],
+    "text": "👕 Garment Art Request to Steve Give Steve everything he needs to start without guessing — fill in each section, then run the final checklist before you submit. 1Customer & OrderWho and which job this art is for. Company * Company is required SW Cust# Contact Name * Contact name is required Contact Email Sales Rep Due Date * Due date is required Design # * Type the number and tab out — looks it up in ShopWorks. New design? Type a new number. Design # is required Order # * Click to browse this customer's recent orders. Order # is required Art Estimate from AE - select -GRT-REVIEW · Synthetic art fee — $50 The GRT part numbers Steve bills, straight from ShopWorks / Caspio. Priority 🔥 Rush Order Tick if Steve needs this ASAP 2Artwork & Approval StatusTells Steve what kind of work this is and whether it is cleared for production. Artwork Status * - select -New artwork from scratchMockup onlyRevision to existing proofRepeat from previous orderFinal approved / production ready Artwork status is required Approval Status * - select -Not approved — Steve to create proofCustomer reviewing proofCustomer approved — ready for productionInternal revision onlyPost-approval change order Approval status is required Approved = final & production-ready. Once approved, Steve may prepare screens / production files. Complete the final checklist below, and make sure the customer reviewed the final proof for spelling, layout, color, size, and placement. Changes after approval may delay the order and add charges.3Decoration MethodHow this art will be produced — pick all that apply. Screen Print DTG Embroidery Transfer Sticker Banner JDS Product Laser Leatherette Patch Not sure — Steve to adviseSelect at least one decoration method 🪡 Laser Leatherette Patch SpecsShown because you picked Laser Leatherette Patch. Tell Steve exactly what to laser-cut and engrave, and how it attaches to the cap. The cap itself goes in the Garment section below; placement (e.g. Cap Front) goes in Artwork Placement. Leatherette Color * - select color -Black / Silver engraveBlack / Gold engraveBlack / White engraveBlack / Red engraveGray / Black engraveLight Gray / Black engraveWhite / Black engraveBrown / Black engraveRawhide (Light Brown) / Black engraveDark Brown / Black engraveTan / Black engraveNavy / White engraveOther — specify exact stock Surface color / laser-reveal color. Pick the leatherette color Patch Shape * - select shape -RectangleRounded RectangleSquareCircleOvalShield / CrestCustom die-cut (describe in notes) Pick the patch shape Exact material / stock name * Type the exact material Patch Width\" * Finished patch size (also fills the Cap placement size). Enter the patch width Patch Height\" Edge / Border Finish - select finish -Clean laser-cut edgeStitched (merrowed) borderSteve to advise Attachment to Cap * - select attachment -Heat press (adhesive backing)Sewn / stitchedHeat press + tack stitchSteve to advise Pick how the patch attaches 4Garment / ProductStyle number and color for each garment. Type a style and tab out to load its colors.1 - enter style first -+ Add another garment5Artwork Placement & SizeOne block per print location. Give the placement and the final print size in inches.1 Placement * - placement -Left ChestRight ChestFull FrontFull BackLeft SleeveRight SleeveCap FrontCap BackCap Side (Left)Cap Side (Right)PocketYoke / Upper BackNape of NeckPant LegTote / BagOther (describe in notes) Width\" * Height\" Placement instructions ×2 Placement * - placement -Left ChestRight ChestFull FrontFull BackLeft SleeveRight SleeveCap FrontCap BackCap Side (Left)Cap Side (Right)PocketYoke / Upper BackNape of NeckPant LegTote / BagOther (describe in notes) Width\" * Height\" Placement instructions ×+ Add another locationAdd at least one location with a placement and width6Artwork ColorsHow colors should be handled. PMS and thread are optional but help Steve match exactly. Color Direction * - select -Use exact PMS colorsUse closest matchMatch previous orderBlack onlyWhite onlyFull colorAE/customer doesn't know — Steve to recommend Color direction is required Underbase on dark garments - select - Yes No Steve to decide PMS Colors (if known) Thread Colors (embroidery) 7Exact Text in ArtworkType the exact wording, spelling, dates, names, and phone numbers that should appear. This design has no text (graphic / logo only) Enter the exact text, or tick \"no text\"8Previous Order / Design ReferenceRequired for a repeat or a revision — what to copy and what to change. Previous Order # Previous order # is required for a repeat / revision Previous Design # Previous design # is required for a repeat / revision What should stay the same What should change Describe what changes for a revision 9Files & File TypeAttach the customer artwork and tell Steve what kind of file it is. What was provided? * - select -Customer vector file (AI, EPS, PDF, SVG)Customer raster file (PNG / JPG)Customer screenshot onlyLogo from a previous orderNo usable artwork provided — Steve must recreate Pick the file type, or upload a file / give a previous design # Upload Files Add another file 1 more can be added .AI, .EPS, .PDF, .PNG, .JPG, .SVG · 20MB each. Larger? Upload to Box and paste the link in notes. ✓ 3 file(s) carried over from the quote. Front artworkfrom quote×Back artworkfrom quote×Mockup — frontfrom quote×10Additional Art NotesShort bullet points only. Do NOT use this for size, placement, color, wording, or approval — those have their own fields above. 11AE Final ChecklistConfirm before sending to Steve. A request is not ready until these are true. Customer and order information are correct Artwork status is selected Approval status is accurate Decoration method is selected Garment style and color are entered Artwork placement is entered Art size is entered in inches Ink / PMS / thread / color direction is entered Exact wording has been checked for spelling Previous order / design number is included (if a repeat or revision) Customer files are uploaded (if available) If marked approved, the customer has reviewed the final proof Customer understands changes after approval may delay the order or add chargesCheck allComplete the final checklist before submitting Submit Art Request Section 11 of 1112 required left · next: CompanySubmit Art Request"
+  }
+]

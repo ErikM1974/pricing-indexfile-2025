@@ -472,7 +472,7 @@ export const rowsMethods = {
                 ? 'Too many requests. Please wait a moment and try again.'
                 : 'Unable to load extended sizes. Please try again.';
             body.innerHTML = `
-                <div class="ext-popup-error" style="padding: 20px; text-align: center; color: #c00;">
+                <div class="ext-popup-error alert alert-error" role="alert">
                     <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                     <p>${escapeHtml(message)}</p>
                 </div>
@@ -482,7 +482,7 @@ export const rowsMethods = {
 
         if (extendedSizes.length === 0) {
             body.innerHTML = `
-                <div class="ext-popup-empty" style="padding: 20px; text-align: center; color: #666;">
+                <div class="ext-popup-empty alert alert-info" role="status">
                     <i class="fas fa-info-circle" aria-hidden="true"></i>
                     <p>No extended sizes available for this product.</p>
                 </div>

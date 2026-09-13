@@ -316,6 +316,13 @@ display: none;
 
 :where([data-ui="unified"][data-catalog-storefront]) .drawer-toast {
     position: fixed;
+    inset: auto;
+    margin: 0;
+    border: 0;
+    box-sizing: border-box;
+    width: max-content;
+    max-width: calc(100vw - 32px);
+    overflow-wrap: anywhere;
     bottom: 24px;
     left: 50%;
     transform: translateX(-50%) translateY(100px);
@@ -346,6 +353,7 @@ display: none;
 }
 
 :where([data-ui="unified"][data-catalog-storefront]) .drawer-toast i {
+    flex: none;
     font-size: 18px;
 }
 
@@ -438,6 +446,7 @@ display: none;
 }
 
 @media print {
+    :where([data-ui="unified"][data-catalog-storefront]) .drawer-toast,
     :where([data-ui="unified"][data-catalog-storefront]) .cart-drawer,
     :where([data-ui="unified"][data-catalog-storefront]) .drawer-overlay {
         display: none;

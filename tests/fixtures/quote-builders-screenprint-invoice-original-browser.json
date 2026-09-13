@@ -1,0 +1,138 @@
+{
+  "name": "screenprint-invoice",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Screen Print Quote",
+      "url": "/quote-builders/screenprint-quote-builder.html",
+      "ids": {},
+      "fields": [],
+      "links": [],
+      "tables": [
+        "Style Description Color S M L XL 2XL 3XL+ (Other) Qty Unit $ PC54 Essential Cotton Tee Jet Black 48 48 $12.00 TOTAL: 48 $576.00"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".method-specs > div:nth-child(1)"
+            ],
+            [
+              ".tagline"
+            ]
+          ]
+        },
+        {
+          "id": "html-has-lang",
+          "nodes": [
+            [
+              "html"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Screen Print Quote",
+      "url": "/quote-builders/screenprint-quote-builder.html",
+      "ids": {},
+      "fields": [],
+      "links": [],
+      "tables": [
+        "Style Description Color S M L XL 2XL 3XL+ (Other) Qty Unit $ PC54 Essential Cotton Tee Jet Black 48 48 $12.00 TOTAL: 48 $576.00"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".method-specs > div:nth-child(1)"
+            ],
+            [
+              ".tagline"
+            ]
+          ]
+        },
+        {
+          "id": "html-has-lang",
+          "nodes": [
+            [
+              "html"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Screen Print Quote",
+      "url": "/quote-builders/screenprint-quote-builder.html",
+      "ids": {},
+      "fields": [],
+      "links": [],
+      "tables": [
+        "Style Description Color S M L XL 2XL 3XL+ (Other) Qty Unit $ PC54 Essential Cotton Tee Jet Black 48 48 $12.00 TOTAL: 48 $576.00"
+      ],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".method-specs > div:nth-child(1)"
+            ],
+            [
+              ".tagline"
+            ]
+          ]
+        },
+        {
+          "id": "html-has-lang",
+          "nodes": [
+            [
+              "html"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Screen Print Quote",
+      "url": "/quote-builders/screenprint-quote-builder.html",
+      "ids": {},
+      "fields": [],
+      "links": [],
+      "tables": [
+        "Style Description Color S M L XL 2XL 3XL+ (Other) Qty Unit $ PC54 Essential Cotton Tee Jet Black 48 48 $12.00 TOTAL: 48 $576.00"
+      ],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".method-specs > div:nth-child(1)"
+            ],
+            [
+              ".tagline"
+            ]
+          ]
+        },
+        {
+          "id": "html-has-lang",
+          "nodes": [
+            [
+              "html"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "mutations": []
+}

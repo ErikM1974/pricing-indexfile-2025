@@ -6,6 +6,7 @@ const { JSDOM } = require('jsdom');
 const ROOT = path.resolve(__dirname, '../..');
 const read = file => fs.readFileSync(path.join(ROOT, file), 'utf8');
 const manifest = JSON.parse(read('scripts/css/migration-manifest.json'));
+const styleOwners = [...manifest.pilots, ...(manifest.generatedDocuments || []), ...(manifest.reviewedRuntimeOwners || [])];
 
 describe('unified CSS ownership and preserved content', () => {
     const knownTokens = new Set();
@@ -26,17 +27,17 @@ describe('unified CSS ownership and preserved content', () => {
     test('migrated styles resolve tokens in every consuming page and keep bounded visibility exceptions', () => {
         const normalize = value => value.replace(/\s+/g, ' ').trim();
         const declaredByFile = new Map();
-        for (const file of new Set(manifest.pilots.flatMap(p => p.styles))) {
+        for (const file of new Set(styleOwners.flatMap(p => p.styles))) {
             const names = new Set();
             postcss.parse(read(file)).walkDecls(d => { if (d.prop.startsWith('--')) names.add(d.prop); });
             declaredByFile.set(file, names);
         }
-        const tokensByPage = new Map(manifest.pilots.map(pilot => [pilot.source,
+        const tokensByPage = new Map(styleOwners.map(pilot => [pilot.source,
             new Set([...knownTokens, ...(pilot.dynamicTokens || []), ...pilot.styles.flatMap(file => [...declaredByFile.get(file)])])
         ]));
         const exceptions = manifest.importantExceptions || [];
         const usedExceptions = [];
-        const files = new Set(manifest.pilots.flatMap(p => p.styles));
+        const files = new Set(styleOwners.flatMap(p => p.styles));
         files.delete('shared_components/css/tokens.css');
         // Existing utility animations/sr-only remain independently maintained and linted.
         files.delete('shared_components/css/utilities.css');
@@ -59,23 +60,23 @@ describe('unified CSS ownership and preserved content', () => {
                     const exception = exceptions.find(item => item.file === file && item.selector === normalize(d.parent.selector) && item.property === d.prop && item.value === d.value);
                     expect({ file, selector: d.parent.selector, property: d.prop, documented: Boolean(exception) }).toMatchObject({ documented: true });
                     expect(exception.reason.length).toBeGreaterThan(20);
-                    if (exception.context === 'print') {
+                    if (exception.context === 'print' || exception.context === 'screen') {
                         let parent = d.parent;
-                        while (parent && !(parent.type === 'atrule' && parent.name === 'media' && parent.params === 'print')) parent = parent.parent;
+                        while (parent && !(parent.type === 'atrule' && parent.name === 'media' && parent.params === exception.context)) parent = parent.parent;
                         expect(Boolean(parent)).toBe(true);
                     }
                     usedExceptions.push(exception);
                 }
                 expect(d.prop).not.toMatch(/^--(?:space-|font-size-|radius-|shadow-)/);
                 for (const token of d.value.matchAll(/var\((--[\w-]+)/g)) {
-                    for (const pilot of manifest.pilots.filter(p => p.styles.includes(file))) {
+                    for (const pilot of styleOwners.filter(p => p.styles.includes(file))) {
                         expect({ page: pilot.source, file, token: token[1], defined: tokensByPage.get(pilot.source).has(token[1]) }).toMatchObject({ defined: true });
                     }
                 }
             });
         }
         expect(usedExceptions).toHaveLength(exceptions.length);
-        expect(exceptions).toHaveLength(81);
+        expect(exceptions).toHaveLength(82);
         expect(exceptions.filter(item => item.file === 'pages/css/art-request-detail.css')).toHaveLength(4);
         const provider = exceptions.filter(item => item.file === 'shared_components/css/design-library-provider.css');
         expect(provider).toHaveLength(77);

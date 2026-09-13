@@ -1,0 +1,832 @@
+{
+  "name": "safety-expanded",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Quick Quote — Northwest Custom Apparel",
+      "url": "/calculators/quick-quote/index.html?mode=quick&style=PC54&qty=24",
+      "ids": {
+        "qqModeToggle": "Line Sheet Quick Price",
+        "qqStyle": "",
+        "qqStyleStatus": "",
+        "qqThumb": "",
+        "qqProductName": "Essential Cotton Tee",
+        "qqColorSelected": "Jet Black",
+        "qqColorSwatches": "",
+        "qqInventory": "Blank stock · 875 total · approx — confirm at order S 125 M 125 L 125 XL 125 2XL 125 3XL 125 4XL 125",
+        "qqQty": "",
+        "qqSizesToggle": "+ Add sizes (2XL upcharges)",
+        "qqQtyPresets": "24 48 72 144",
+        "qqEmbLabel": "Embroidery logos",
+        "qqCapEmbType": "",
+        "qqEmbLogos": "Logo 1 Left chest stitches",
+        "qqEmbAddBtn": "+ Add another logo",
+        "qqEmbDigitizing": "",
+        "qqEmbHint": "Up to 10,000 stitches included. Each additional logo priced at our additional-logo (AL) rate. Typical stitches — left chest ~8K · full front ~15–30K · jacket back ~25–40K (add a back/front as its own logo).",
+        "qqPlacementLabel": "Where does the print go? · DTG / screen print / DTF",
+        "qqPlacePresets": "Left chest Front + back Full front",
+        "qqFront": "None Left chest ≤5×5\" Center front ≤9×12\" Full front ≤12×16.5\" Jumbo front ≤12×16.5\"",
+        "qqBack": "None Center back ≤9×12\" Full back ≤12×16.5\" Jumbo back ≤12×16.5\"",
+        "qqSleeveLabel": "Sleeves · DTF · ≤5×5\" · screen print",
+        "qqSleeveL": "",
+        "qqSleeveR": "",
+        "qqInkFront": "",
+        "qqInkBack": "",
+        "qqScpDark": "",
+        "qqScpStripes": "",
+        "qqResultsTitle": "Price",
+        "qqResultsSub": "for 24 pieces · Jet Black",
+        "qqResults": "Embroidery $21.00/pc $504.00 total 1 logo 24-47 tier ↑ Add 24 more → $20.00/pc Turn this into a full quote → DTG print $15.00/pc $360.00 total Left chest · 4×4\" 24-47 tier ↑ Add 24 more → $14.00/pc Turn this into a full quote → Screen print $14.58/pc $410.00 total 1-color front dark garment ONE-TIME SETUP · per order, not per piece Screen setup — 2 screens × $30 $60.00 24-47 tier incl. $50 small-batch fee ↑ Add 24 more → $12.00/pc · small-batch fee gone Turn this into a full quote → DTF transfer $14.50/pc $348.00 total BEST VALUE Left chest · ≤5×5\" Garment (blank) $7.00/pc Left chest $7.50/pc 24-47 tier ↑ Add 24 more → $13.50/pc Turn this into a full quote → price breaks below ↓",
+        "qqMatrix": "PRICE BREAKS — DTF TRANSFER · LEFT CHEST · ≤5×5\" Quantity 10–23 24–47 48–71 72+ Per pc $15.17 $14.50 $13.50 $12.50 Small-batch fee +$50.00 — — — Highlighted column = your current quantity. Per pc for a standard size — extended sizes (2XL+) add their upcharge. Small-batch fee is one-time per order.",
+        "qqSafetyRecs": "Safety apparel top sellers (2) Popular hi-vis garments — click to price one here #1 SELLER PC54 Example safety garment 1 Team workwear Price this style #2 SELLER PC61 Example safety garment 2 Team workwear Price this style"
+      },
+      "fields": [
+        {
+          "id": "qqStyle",
+          "name": "",
+          "type": "text",
+          "value": "PC54",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqQty",
+          "name": "",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "8000",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqEmbDigitizing",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqSleeveL",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqSleeveR",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqInkFront",
+          "name": "",
+          "type": "number",
+          "value": "1",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqInkBack",
+          "name": "",
+          "type": "number",
+          "value": "1",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqScpDark",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "qqScpStripes",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/Erik%20Modeling%20Hoodie%20Front%20and%20Back.png?ver=1",
+          "text": ""
+        },
+        {
+          "href": "/quote-builders/embroidery-quote-builder.html?from=quickquote&style=PC54&color=JetBlack&colorName=Jet+Black&qty=24&sizes=S%3A24",
+          "text": "Turn this into a full quote →"
+        },
+        {
+          "href": "/quote-builders/dtg-quote-builder.html?from=quickquote&style=PC54&color=JetBlack&colorName=Jet+Black&qty=24&sizes=S%3A24&location=LC",
+          "text": "Turn this into a full quote →"
+        },
+        {
+          "href": "/quote-builders/screenprint-quote-builder.html?from=quickquote&style=PC54&color=JetBlack&colorName=Jet+Black&qty=24&sizes=S%3A24",
+          "text": "Turn this into a full quote →"
+        },
+        {
+          "href": "/quote-builders/dtf-quote-builder.html?from=quickquote&style=PC54&color=JetBlack&colorName=Jet+Black&qty=24&sizes=S%3A24",
+          "text": "Turn this into a full quote →"
+        }
+      ],
+      "tables": [
+        "Quantity 10–23 24–47 48–71 72+ Per pc $15.17 $14.50 $13.50 $12.50 Small-batch fee +$50.00 — — —"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".lede"
+            ],
+            [
+              "button[data-mode=\"linesheet\"]"
+            ],
+            [
+              ".qq-card-onetime > .qq-bd-row > span:nth-child(1)"
+            ]
+          ]
+        },
+        {
+          "id": "label",
+          "nodes": [
+            [
+              ".qq-emb-stitch"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Quick Quote — Northwest Custom Apparel",
+      "url": "/calculators/quick-quote/index.html?mode=quick&style=PC54&qty=24",
+      "ids": {
+        "qqModeToggle": "Line Sheet Quick Price",
+        "qqStyle": "",
+        "qqStyleStatus": "",
+        "qqThumb": "",
+        "qqProductName": "Essential Cotton Tee",
+        "qqColorSelected": "Jet Black",
+        "qqColorSwatches": "",
+        "qqInventory": "Blank stock · 875 total · approx — confirm at order S 125 M 125 L 125 XL 125 2XL 125 3XL 125 4XL 125",
+        "qqQty": "",
+        "qqSizesToggle": "+ Add sizes (2XL upcharges)",
+        "qqQtyPresets": "24 48 72 144",
+        "qqEmbLabel": "Embroidery logos",
+        "qqCapEmbType": "",
+        "qqEmbLogos": "Logo 1 Left chest stitches",
+        "qqEmbAddBtn": "+ Add another logo",
+        "qqEmbDigitizing": "",
+        "qqEmbHint": "Up to 10,000 stitches included. Each additional logo priced at our additional-logo (AL) rate. Typical stitches — left chest ~8K · full front ~15–30K · jacket back ~25–40K (add a back/front as its own logo).",
+        "qqPlacementLabel": "Where does the print go? · DTG / screen print / DTF",
+        "qqPlacePresets": "Left chest Front + back Full front",
+        "qqFront": "None Left chest ≤5×5\" Center front ≤9×12\" Full front ≤12×16.5\" Jumbo front ≤12×16.5\"",
+        "qqBack": "None Center back ≤9×12\" Full back ≤12×16.5\" Jumbo back ≤12×16.5\"",
+        "qqSleeveLabel": "Sleeves · DTF · ≤5×5\" · screen print",
+        "qqSleeveL": "",
+        "qqSleeveR": "",
+        "qqInkFront": "",
+        "qqInkBack": "",
+        "qqScpDark": "",
+        "qqScpStripes": "",
+        "qqResultsTitle": "Price",
+        "qqResultsSub": "for 24 pieces · Jet Black",
+        "qqResults": "Embroidery $21.00/pc $504.00 total 1 logo 24-47 tier ↑ Add 24 more → $20.00/pc Turn this into a full quote → DTG print $15.00/pc $360.00 total Left chest · 4×4\" 24-47 tier ↑ Add 24 more → $14.00/pc Turn this into a full quote → Screen print $14.58/pc $410.00 total 1-color front dark garment ONE-TIME SETUP · per order, not per piece Screen setup — 2 screens × $30 $60.00 24-47 tier incl. $50 small-batch fee ↑ Add 24 more → $12.00/pc · small-batch fee gone Turn this into a full quote → DTF transfer $14.50/pc $348.00 total BEST VALUE Left chest · ≤5×5\" Garment (blank) $7.00/pc Left chest $7.50/pc 24-47 tier ↑ Add 24 more → $13.50/pc Turn this into a full quote → price breaks below ↓",
+        "qqMatrix": "PRICE BREAKS — DTF TRANSFER · LEFT CHEST · ≤5×5\" Quantity 10–23 24–47 48–71 72+ Per pc $15.17 $14.50 $13.50 $12.50 Small-batch fee +$50.00 — — — Highlighted column = your current quantity. Per pc for a standard size — extended sizes (2XL+) add their upcharge. Small-batch fee is one-time per order.",
+        "qqSafetyRecs": "Safety apparel top sellers (2) Popular hi-vis garments — click to price one here #1 SELLER PC54 Example safety garment 1 Team workwear Price this style #2 SELLER PC61 Example safety garment 2 Team workwear Price this style"
+      },
+      "fields": [
+        {
+          "id": "qqStyle",
+          "name": "",
+          "type": "text",
+          "value": "PC54",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqQty",
+          "name": "",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "8000",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqEmbDigitizing",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqSleeveL",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqSleeveR",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqInkFront",
+          "name": "",
+          "type": "number",
+          "value": "1",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqInkBack",
+          "name": "",
+          "type": "number",
+          "value": "1",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqScpDark",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "qqScpStripes",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/Erik%20Modeling%20Hoodie%20Front%20and%20Back.png?ver=1",
+          "text": ""
+        },
+        {
+          "href": "/quote-builders/embroidery-quote-builder.html?from=quickquote&style=PC54&color=JetBlack&colorName=Jet+Black&qty=24&sizes=S%3A24",
+          "text": "Turn this into a full quote →"
+        },
+        {
+          "href": "/quote-builders/dtg-quote-builder.html?from=quickquote&style=PC54&color=JetBlack&colorName=Jet+Black&qty=24&sizes=S%3A24&location=LC",
+          "text": "Turn this into a full quote →"
+        },
+        {
+          "href": "/quote-builders/screenprint-quote-builder.html?from=quickquote&style=PC54&color=JetBlack&colorName=Jet+Black&qty=24&sizes=S%3A24",
+          "text": "Turn this into a full quote →"
+        },
+        {
+          "href": "/quote-builders/dtf-quote-builder.html?from=quickquote&style=PC54&color=JetBlack&colorName=Jet+Black&qty=24&sizes=S%3A24",
+          "text": "Turn this into a full quote →"
+        }
+      ],
+      "tables": [
+        "Quantity 10–23 24–47 48–71 72+ Per pc $15.17 $14.50 $13.50 $12.50 Small-batch fee +$50.00 — — —"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".lede"
+            ],
+            [
+              "button[data-mode=\"linesheet\"]"
+            ],
+            [
+              ".qq-card-onetime > .qq-bd-row > span:nth-child(1)"
+            ]
+          ]
+        },
+        {
+          "id": "label",
+          "nodes": [
+            [
+              ".qq-emb-stitch"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Quick Quote — Northwest Custom Apparel",
+      "url": "/calculators/quick-quote/index.html?mode=quick&style=PC54&qty=24",
+      "ids": {
+        "qqModeToggle": "Line Sheet Quick Price",
+        "qqStyle": "",
+        "qqStyleStatus": "",
+        "qqThumb": "",
+        "qqProductName": "Essential Cotton Tee",
+        "qqColorSelected": "Jet Black",
+        "qqColorSwatches": "",
+        "qqInventory": "Blank stock · 875 total · approx — confirm at order S 125 M 125 L 125 XL 125 2XL 125 3XL 125 4XL 125",
+        "qqQty": "",
+        "qqSizesToggle": "+ Add sizes (2XL upcharges)",
+        "qqQtyPresets": "24 48 72 144",
+        "qqEmbLabel": "Embroidery logos",
+        "qqCapEmbType": "",
+        "qqEmbLogos": "Logo 1 Left chest stitches",
+        "qqEmbAddBtn": "+ Add another logo",
+        "qqEmbDigitizing": "",
+        "qqEmbHint": "Up to 10,000 stitches included. Each additional logo priced at our additional-logo (AL) rate. Typical stitches — left chest ~8K · full front ~15–30K · jacket back ~25–40K (add a back/front as its own logo).",
+        "qqPlacementLabel": "Where does the print go? · DTG / screen print / DTF",
+        "qqPlacePresets": "Left chest Front + back Full front",
+        "qqFront": "None Left chest ≤5×5\" Center front ≤9×12\" Full front ≤12×16.5\" Jumbo front ≤12×16.5\"",
+        "qqBack": "None Center back ≤9×12\" Full back ≤12×16.5\" Jumbo back ≤12×16.5\"",
+        "qqSleeveLabel": "Sleeves · DTF · ≤5×5\" · screen print",
+        "qqSleeveL": "",
+        "qqSleeveR": "",
+        "qqInkFront": "",
+        "qqInkBack": "",
+        "qqScpDark": "",
+        "qqScpStripes": "",
+        "qqResultsTitle": "Price",
+        "qqResultsSub": "for 24 pieces · Jet Black",
+        "qqResults": "Embroidery $21.00/pc $504.00 total 1 logo 24-47 tier ↑ Add 24 more → $20.00/pc Turn this into a full quote → DTG print $15.00/pc $360.00 total Left chest · 4×4\" 24-47 tier ↑ Add 24 more → $14.00/pc Turn this into a full quote → Screen print $14.58/pc $410.00 total 1-color front dark garment ONE-TIME SETUP · per order, not per piece Screen setup — 2 screens × $30 $60.00 24-47 tier incl. $50 small-batch fee ↑ Add 24 more → $12.00/pc · small-batch fee gone Turn this into a full quote → DTF transfer $14.50/pc $348.00 total BEST VALUE Left chest · ≤5×5\" Garment (blank) $7.00/pc Left chest $7.50/pc 24-47 tier ↑ Add 24 more → $13.50/pc Turn this into a full quote → price breaks below ↓",
+        "qqMatrix": "PRICE BREAKS — DTF TRANSFER · LEFT CHEST · ≤5×5\" Quantity 10–23 24–47 48–71 72+ Per pc $15.17 $14.50 $13.50 $12.50 Small-batch fee +$50.00 — — — Highlighted column = your current quantity. Per pc for a standard size — extended sizes (2XL+) add their upcharge. Small-batch fee is one-time per order.",
+        "qqSafetyRecs": "Safety apparel top sellers (2) Popular hi-vis garments — click to price one here #1 SELLER PC54 Example safety garment 1 Team workwear Price this style #2 SELLER PC61 Example safety garment 2 Team workwear Price this style"
+      },
+      "fields": [
+        {
+          "id": "qqStyle",
+          "name": "",
+          "type": "text",
+          "value": "PC54",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqQty",
+          "name": "",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "8000",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqEmbDigitizing",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqSleeveL",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqSleeveR",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqInkFront",
+          "name": "",
+          "type": "number",
+          "value": "1",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqInkBack",
+          "name": "",
+          "type": "number",
+          "value": "1",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqScpDark",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "qqScpStripes",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/Erik%20Modeling%20Hoodie%20Front%20and%20Back.png?ver=1",
+          "text": ""
+        },
+        {
+          "href": "/quote-builders/embroidery-quote-builder.html?from=quickquote&style=PC54&color=JetBlack&colorName=Jet+Black&qty=24&sizes=S%3A24",
+          "text": "Turn this into a full quote →"
+        },
+        {
+          "href": "/quote-builders/dtg-quote-builder.html?from=quickquote&style=PC54&color=JetBlack&colorName=Jet+Black&qty=24&sizes=S%3A24&location=LC",
+          "text": "Turn this into a full quote →"
+        },
+        {
+          "href": "/quote-builders/screenprint-quote-builder.html?from=quickquote&style=PC54&color=JetBlack&colorName=Jet+Black&qty=24&sizes=S%3A24",
+          "text": "Turn this into a full quote →"
+        },
+        {
+          "href": "/quote-builders/dtf-quote-builder.html?from=quickquote&style=PC54&color=JetBlack&colorName=Jet+Black&qty=24&sizes=S%3A24",
+          "text": "Turn this into a full quote →"
+        }
+      ],
+      "tables": [
+        "Quantity 10–23 24–47 48–71 72+ Per pc $15.17 $14.50 $13.50 $12.50 Small-batch fee +$50.00 — — —"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".lede"
+            ],
+            [
+              "button[data-mode=\"linesheet\"]"
+            ],
+            [
+              ".qq-card-onetime > .qq-bd-row > span:nth-child(1)"
+            ]
+          ]
+        },
+        {
+          "id": "label",
+          "nodes": [
+            [
+              ".qq-emb-stitch"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Quick Quote — Northwest Custom Apparel",
+      "url": "/calculators/quick-quote/index.html?mode=quick&style=PC54&qty=24",
+      "ids": {
+        "qqModeToggle": "Line Sheet Quick Price",
+        "qqStyle": "",
+        "qqStyleStatus": "",
+        "qqThumb": "",
+        "qqProductName": "Essential Cotton Tee",
+        "qqColorSelected": "Jet Black",
+        "qqColorSwatches": "",
+        "qqInventory": "Blank stock · 875 total · approx — confirm at order S 125 M 125 L 125 XL 125 2XL 125 3XL 125 4XL 125",
+        "qqQty": "",
+        "qqSizesToggle": "+ Add sizes (2XL upcharges)",
+        "qqQtyPresets": "24 48 72 144",
+        "qqEmbLabel": "Embroidery logos",
+        "qqCapEmbType": "",
+        "qqEmbLogos": "Logo 1 Left chest stitches",
+        "qqEmbAddBtn": "+ Add another logo",
+        "qqEmbDigitizing": "",
+        "qqEmbHint": "Up to 10,000 stitches included. Each additional logo priced at our additional-logo (AL) rate. Typical stitches — left chest ~8K · full front ~15–30K · jacket back ~25–40K (add a back/front as its own logo).",
+        "qqPlacementLabel": "Where does the print go? · DTG / screen print / DTF",
+        "qqPlacePresets": "Left chest Front + back Full front",
+        "qqFront": "None Left chest ≤5×5\" Center front ≤9×12\" Full front ≤12×16.5\" Jumbo front ≤12×16.5\"",
+        "qqBack": "None Center back ≤9×12\" Full back ≤12×16.5\" Jumbo back ≤12×16.5\"",
+        "qqSleeveLabel": "Sleeves · DTF · ≤5×5\" · screen print",
+        "qqSleeveL": "",
+        "qqSleeveR": "",
+        "qqInkFront": "",
+        "qqInkBack": "",
+        "qqScpDark": "",
+        "qqScpStripes": "",
+        "qqResultsTitle": "Price",
+        "qqResultsSub": "for 24 pieces · Jet Black",
+        "qqResults": "Embroidery $21.00/pc $504.00 total 1 logo 24-47 tier ↑ Add 24 more → $20.00/pc Turn this into a full quote → DTG print $15.00/pc $360.00 total Left chest · 4×4\" 24-47 tier ↑ Add 24 more → $14.00/pc Turn this into a full quote → Screen print $14.58/pc $410.00 total 1-color front dark garment ONE-TIME SETUP · per order, not per piece Screen setup — 2 screens × $30 $60.00 24-47 tier incl. $50 small-batch fee ↑ Add 24 more → $12.00/pc · small-batch fee gone Turn this into a full quote → DTF transfer $14.50/pc $348.00 total BEST VALUE Left chest · ≤5×5\" Garment (blank) $7.00/pc Left chest $7.50/pc 24-47 tier ↑ Add 24 more → $13.50/pc Turn this into a full quote → price breaks below ↓",
+        "qqMatrix": "PRICE BREAKS — DTF TRANSFER · LEFT CHEST · ≤5×5\" Quantity 10–23 24–47 48–71 72+ Per pc $15.17 $14.50 $13.50 $12.50 Small-batch fee +$50.00 — — — Highlighted column = your current quantity. Per pc for a standard size — extended sizes (2XL+) add their upcharge. Small-batch fee is one-time per order.",
+        "qqSafetyRecs": "Safety apparel top sellers (2) Popular hi-vis garments — click to price one here #1 SELLER PC54 Example safety garment 1 Team workwear Price this style #2 SELLER PC61 Example safety garment 2 Team workwear Price this style"
+      },
+      "fields": [
+        {
+          "id": "qqStyle",
+          "name": "",
+          "type": "text",
+          "value": "PC54",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqQty",
+          "name": "",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "8000",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqEmbDigitizing",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqSleeveL",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqSleeveR",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqInkFront",
+          "name": "",
+          "type": "number",
+          "value": "1",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqInkBack",
+          "name": "",
+          "type": "number",
+          "value": "1",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqScpDark",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "qqScpStripes",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/Erik%20Modeling%20Hoodie%20Front%20and%20Back.png?ver=1",
+          "text": ""
+        },
+        {
+          "href": "/quote-builders/embroidery-quote-builder.html?from=quickquote&style=PC54&color=JetBlack&colorName=Jet+Black&qty=24&sizes=S%3A24",
+          "text": "Turn this into a full quote →"
+        },
+        {
+          "href": "/quote-builders/dtg-quote-builder.html?from=quickquote&style=PC54&color=JetBlack&colorName=Jet+Black&qty=24&sizes=S%3A24&location=LC",
+          "text": "Turn this into a full quote →"
+        },
+        {
+          "href": "/quote-builders/screenprint-quote-builder.html?from=quickquote&style=PC54&color=JetBlack&colorName=Jet+Black&qty=24&sizes=S%3A24",
+          "text": "Turn this into a full quote →"
+        },
+        {
+          "href": "/quote-builders/dtf-quote-builder.html?from=quickquote&style=PC54&color=JetBlack&colorName=Jet+Black&qty=24&sizes=S%3A24",
+          "text": "Turn this into a full quote →"
+        }
+      ],
+      "tables": [
+        "Quantity 10–23 24–47 48–71 72+ Per pc $15.17 $14.50 $13.50 $12.50 Small-batch fee +$50.00 — — —"
+      ],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".lede"
+            ],
+            [
+              "button[data-mode=\"linesheet\"]"
+            ],
+            [
+              ".qq-card-onetime > .qq-bd-row > span:nth-child(1)"
+            ]
+          ]
+        },
+        {
+          "id": "label",
+          "nodes": [
+            [
+              ".qq-emb-stitch"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "reads": [
+    {
+      "path": "/api/product-details",
+      "query": "?styleNumber=PC54"
+    },
+    {
+      "path": "/api/inventory",
+      "query": "?styleNumber=PC54&color=Jet%20Black"
+    },
+    {
+      "path": "/api/decoration-methods",
+      "query": ""
+    },
+    {
+      "path": "/api/safety-stripes/top-sellers/styles",
+      "query": ""
+    },
+    {
+      "path": "/api/pricing-bundle",
+      "query": "?method=BLANK&styleNumber=PC54"
+    },
+    {
+      "path": "/api/pricing-bundle",
+      "query": "?method=EMB&styleNumber=PC54"
+    },
+    {
+      "path": "/api/dtg/quote-pricing",
+      "method": "POST",
+      "body": {
+        "locationCode": "LC",
+        "lines": [
+          {
+            "styleNumber": "PC54",
+            "color": "Jet Black",
+            "sizes": {
+              "S": 24
+            }
+          }
+        ]
+      }
+    },
+    {
+      "path": "/api/service-codes",
+      "query": ""
+    },
+    {
+      "path": "/api/pricing-bundle",
+      "query": "?method=DTF"
+    },
+    {
+      "path": "/api/decg-pricing",
+      "query": ""
+    },
+    {
+      "path": "/api/pricing-bundle",
+      "query": "?method=ScreenPrint&styleNumber=PC54"
+    },
+    {
+      "path": "/api/dtg/quote-pricing",
+      "method": "POST",
+      "body": {
+        "locationCode": "LC",
+        "lines": [
+          {
+            "styleNumber": "PC54",
+            "color": "Jet Black",
+            "sizes": {
+              "S": 48
+            }
+          }
+        ]
+      }
+    },
+    {
+      "path": "/api/pricing-bundle",
+      "query": "?method=BLANK&styleNumber=PC54"
+    },
+    {
+      "path": "/api/pricing-bundle",
+      "query": "?method=EMB-AL"
+    },
+    {
+      "path": "/api/pricing-bundle",
+      "query": "?method=ScreenPrint&styleNumber=PC54"
+    },
+    {
+      "path": "/api/pricing-bundle",
+      "query": "?method=DTG&styleNumber=PC54"
+    },
+    {
+      "path": "/api/pricing-bundle",
+      "query": "?method=DTF&styleNumber=PC54"
+    },
+    {
+      "path": "/api/service-codes",
+      "query": ""
+    },
+    {
+      "path": "/api/size-pricing",
+      "query": "?styleNumber=PC54"
+    },
+    {
+      "path": "/api/pricing-bundle",
+      "query": "?method=EMB&styleNumber=PC54"
+    }
+  ],
+  "dialogs": []
+}

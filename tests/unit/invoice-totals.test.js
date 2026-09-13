@@ -33,6 +33,24 @@ const Generator = loadGenerator();
 const CUST = { customerName: 'Test Co', salesRepEmail: '' };
 const render = (pd) => parseTotals(new Generator().generateInvoiceHTML(pd, CUST));
 
+describe('shared quote document CSS ownership', () => {
+  test.each([{}, { isDTG: true }, { isDTF: true }, { isScreenprint: true }])('real generated document retains audited external styles %p', method => {
+    const { JSDOM } = require('jsdom');
+    const manifest = JSON.parse(fs.readFileSync(path.join(__dirname, '../../scripts/css/migration-manifest.json'), 'utf8'));
+    const owner = manifest.generatedDocuments.find(entry => entry.source === 'shared_components/js/embroidery-quote-invoice.js');
+    const html = new Generator().generateInvoiceHTML({ ...method, grandTotal: 100, preTaxSubtotal: 100, taxRate: 0.101, products: [] }, CUST);
+    const document = new JSDOM(html).window.document;
+    expect(document.body.dataset.ui).toBe('unified');
+    expect(document.body.hasAttribute('data-quote-invoice')).toBe(true);
+    expect(document.querySelectorAll('style, [style], script:not([src])')).toHaveLength(0);
+    const links = [...document.querySelectorAll('link[rel="stylesheet"]')].filter(link => link.getAttribute('href').startsWith('/'));
+    expect(links.map(link => link.getAttribute('href').split('?')[0])).toEqual(owner.styles.map(file => '/' + file));
+    expect(links.every(link => link.hasAttribute('data-invoice-styles'))).toBe(true);
+    const bytes = owner.styles.reduce((sum, file) => sum + Buffer.byteLength(fs.readFileSync(path.join(__dirname, '../..', file), 'utf8').replace(/\r\n/g, '\n')), 0);
+    expect(bytes).toBeLessThanOrEqual(owner.maxCssBytes);
+  });
+});
+
 describe('EmbroideryInvoiceGenerator total math (2026-06-01 PDF regression)', () => {
   test('class loads from the source file', () => {
     expect(typeof Generator).toBe('function');

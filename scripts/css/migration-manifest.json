@@ -513,8 +513,8 @@
         "rawCssBytes": 352636,
         "localCssRequests": 12
       },
-      "measuredRawCssBytes": 278859,
-      "maxCssBytes": 280907,
+      "measuredRawCssBytes": 282594,
+      "maxCssBytes": 284642,
       "estimatedGzipCssBytes": 37576
     },
     {
@@ -4528,17 +4528,17 @@
         "populated-customer-orders-quote-and-paper"
       ],
       "test": "tests/e2e/css-unification-lead-records.spec.js",
-      "maxCssBytes": 130493,
-      "measuredRawCssBytes": 129469,
-      "measuredTriggeredCssBytes": 165253,
+      "maxCssBytes": 131624,
+      "measuredRawCssBytes": 129576,
+      "measuredTriggeredCssBytes": 248147,
       "baseline": {
         "commit": "d44f7551fc1d3a251c12599314f8c23b94fadea4",
         "rawCssBytes": 186763,
         "localCssRequests": 5
       },
       "runtimeBoundary": {
-        "status": "shared-module-migration-pending",
-        "note": "Original garment art module retained byte-for-byte; its lead trigger, four-width prefill, keyboard containment and close are reviewed. Shared art-module styling remains on the runtime-owner backlog."
+        "status": "reviewed",
+        "note": "Shared garment form uses scoped art-intake.css through the existing compatibility import. AE, lead, Quote View and designer reviewed at four widths with original prefill, complete scrolling, keyboard/focus and every print page. Original successful payloads preserved; no business writes."
       }
     },
     {
@@ -4568,9 +4568,9 @@
         "populated-customer-orders-quote-and-paper"
       ],
       "test": "tests/e2e/css-unification-lead-records.spec.js",
-      "maxCssBytes": 130493,
-      "measuredRawCssBytes": 129469,
-      "measuredTriggeredCssBytes": 129469,
+      "maxCssBytes": 131624,
+      "measuredRawCssBytes": 129576,
+      "measuredTriggeredCssBytes": 129576,
       "baseline": {
         "commit": "d44f7551fc1d3a251c12599314f8c23b94fadea4",
         "rawCssBytes": 167810,
@@ -4604,9 +4604,9 @@
         "populated-customer-orders-quote-and-paper"
       ],
       "test": "tests/e2e/css-unification-lead-records.spec.js",
-      "maxCssBytes": 130493,
-      "measuredRawCssBytes": 129469,
-      "measuredTriggeredCssBytes": 129469,
+      "maxCssBytes": 131624,
+      "measuredRawCssBytes": 129576,
+      "measuredTriggeredCssBytes": 129576,
       "baseline": {
         "commit": "d44f7551fc1d3a251c12599314f8c23b94fadea4",
         "rawCssBytes": 177211,
@@ -5529,12 +5529,17 @@
         "print"
       ],
       "test": "tests/e2e/css-unification-quote-view.spec.js",
-      "maxCssBytes": 130091,
+      "maxCssBytes": 131115,
       "measuredRawCssBytes": 129067,
       "baseline": {
         "commit": "85eba439",
         "rawCssBytes": 159871,
         "localCssRequests": 4
+      },
+      "measuredTriggeredCssBytes": 247638,
+      "runtimeBoundary": {
+        "status": "reviewed",
+        "note": "Shared garment form uses scoped art-intake.css through the existing compatibility import. AE, lead, Quote View and designer reviewed at four widths with original prefill, complete scrolling, keyboard/focus and every print page. Original successful payloads preserved; no business writes."
       }
     },
     {
@@ -6413,6 +6418,7 @@
         "shared_components/css/tokens.css",
         "shared_components/css/components.css",
         "shared_components/css/specialty-pricing.css",
+        "shared_components/css/specialty-assistant.css",
         "calculators/embroidered-emblem/embroidered-emblem.css"
       ],
       "dynamicStyles": [],
@@ -6428,7 +6434,7 @@
       ],
       "test": "tests/e2e/css-unification-specialty-decal-emblem.spec.js",
       "maxCssBytes": 80519,
-      "measuredRawCssBytes": 78471,
+      "measuredRawCssBytes": 79607,
       "baseline": {
         "commit": "97cc05080d4689785bc0885b6a4223c0f1356cbf",
         "rawCssBytes": 89181,
@@ -6632,57 +6638,352 @@
         "commit": "c01ffc2058a0725d3df12c9181c8022776b4ab26",
         "note": "Six original seasonal source hashes and thirteen original Christmas browser contracts retained; original pointer and false-success defects are labeled diagnostics."
       }
+    },
+    {
+      "source": "calculators/webstores.html",
+      "family": "specialty-calculators",
+      "status": "reviewed",
+      "route": "/calculators/webstores.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/specialty-pricing.css",
+        "shared_components/css/specialty-assistant.css",
+        "shared_components/css/webstore-pricing-page.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "1440-768-390-320",
+        "original-content-prices-and-successful-quote-payloads",
+        "setup-on-demand-fundraiser-search-and-service-failure",
+        "persistent-partial-save-failure-and-accepted-stage-retry",
+        "pending-save-and-revised-quote-ownership",
+        "keyboard-conversation-scroll-focus-and-closed-inert",
+        "complete-three-page-reference-and-disclosure-restoration"
+      ],
+      "test": "tests/e2e/css-unification-webstore-calculator.spec.js",
+      "maxCssBytes": 82897,
+      "measuredRawCssBytes": 79154,
+      "baseline": {
+        "commit": "dd8d94de",
+        "rawCssBytes": 89528,
+        "localCssRequests": 3
+      }
+    },
+    {
+      "source": "calculators/quick-quote/index.html",
+      "family": "quick-quote",
+      "status": "reviewed",
+      "route": "/calculators/quick-quote/index.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/utilities.css",
+        "calculators/quick-quote/quick-quote.css",
+        "shared_components/css/safety-stripe-recs.css",
+        "calculators/quick-quote/linesheet-print.css",
+        "shared_components/css/embroidery-quote-pricing.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "1440-768-390-320",
+        "original-prices-content-fields-and-links",
+        "line-sheet-and-quick-price-methods-sizes-and-failures",
+        "keyboard-price-selection-quantity-and-scroll",
+        "unknown-stock-visible-retry-and-stale-response-guard",
+        "complete-paper-output-and-fresh-rate-card-selection",
+        "shared-safety-panel-expanded-and-garment-handoff"
+      ],
+      "test": "tests/e2e/css-unification-quick-quote.spec.js",
+      "maxCssBytes": 126108,
+      "measuredRawCssBytes": 124099,
+      "baseline": {
+        "commit": "583372db",
+        "rawCssBytes": 60371,
+        "localCssRequests": 5
+      },
+      "dynamicTokens": [
+        "--swatch"
+      ]
+    },
+    {
+      "source": "calculators/quick-quote/dtf-prints-prototype.html",
+      "family": "quick-quote",
+      "status": "reviewed",
+      "route": "/calculators/quick-quote/dtf-prints-prototype.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/utilities.css",
+        "calculators/quick-quote/quick-quote.css",
+        "calculators/quick-quote/dtf-prints-prototype.css",
+        "calculators/quick-quote/linesheet-print.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "1440-768-390-320",
+        "original-prices-content-fields-and-links",
+        "line-sheet-and-quick-price-methods-sizes-and-failures",
+        "keyboard-price-selection-quantity-and-scroll",
+        "unknown-stock-visible-retry-and-stale-response-guard",
+        "complete-paper-output-and-fresh-rate-card-selection",
+        "shared-safety-panel-expanded-and-garment-handoff"
+      ],
+      "test": "tests/e2e/css-unification-quick-quote.spec.js",
+      "maxCssBytes": 135448,
+      "measuredRawCssBytes": 133400,
+      "baseline": {
+        "commit": "583372db",
+        "rawCssBytes": 61878,
+        "localCssRequests": 3
+      }
+    },
+    {
+      "source": "calculators/embroidery-pricing-all/index.html",
+      "family": "specialty-calculators",
+      "status": "reviewed",
+      "route": "/calculators/embroidery-pricing-all/",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/utilities.css",
+        "calculators/embroidery-pricing-all/embroidery-pricing-all.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "1440-768-390-320",
+        "original-content-prices-links-and-private-data-source-protection",
+        "four-tabs-garment-cap-patch-extra-stitches-small-order-heavyweight",
+        "account-expansion-dialog-search-filters-sort-and-empty",
+        "keyboard-disclosure-dialog-focus-escape-and-table-scroll",
+        "visible-required-pricing-failure-inert-controls-and-reload-recovery",
+        "complete-active-tab-paper-account-landscape-and-contract-print-restoration"
+      ],
+      "test": "tests/e2e/css-unification-embroidery-reference.spec.js",
+      "maxCssBytes": 129467,
+      "measuredRawCssBytes": 127419,
+      "baseline": {
+        "commit": "efa277d6",
+        "rawCssBytes": 71847,
+        "localCssRequests": 2
+      }
+    },
+    {
+      "source": "pages/garment-designer.html",
+      "family": "specialty-calculators",
+      "status": "reviewed",
+      "route": "/pages/garment-designer.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/utilities.css",
+        "pages/css/garment-designer.css",
+        "shared_components/css/art-intake.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "1440-768-390-320",
+        "original-artwork-canvas-placement-decoders-and-successful-payloads",
+        "front-back-polo-multiple-artwork-text-and-thread-colors",
+        "art-details-and-shared-form-complete-scroll-panels",
+        "nested-dialog-focus-escape-and-native-upload-keyboard",
+        "persistent-invalid-customer-unavailable-fees-and-upload-failure",
+        "resize-fit-and-png-export",
+        "complete-proof-specification-form-and-ordinary-paper-restoration",
+        "visible-action-toast-contrast-and-hidden-action-keyboard-exclusion"
+      ],
+      "test": "tests/e2e/css-unification-garment-designer.spec.js",
+      "measuredRawCssBytes": 274101,
+      "maxCssBytes": 275965,
+      "baseline": {
+        "commit": "8763d6dba64bec28ea82a3bf4887cf5625ca4033",
+        "rawCssBytes": 107251,
+        "localCssRequests": 3
+      }
+    },
+    {
+      "source": "quote-builders/screenprint-fast-quote.html",
+      "family": "quote-builders",
+      "status": "reviewed",
+      "route": "/quote-builders/screenprint-fast-quote.html",
+      "styles": [
+        "shared_components/vendor/fontawesome/css/all.min.css",
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/utilities.css",
+        "shared_components/css/screenprint-fast-quote.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "1440-768-390-320",
+        "original-estimates-fields-links-and-successful-request-payloads",
+        "native-keyboard-choices-and-focused-step-headings",
+        "persistent-validation-and-failed-save-retains-input-for-retry",
+        "duplicate-click-protection-including-icon-click",
+        "complete-one-page-project-contact-success-and-error-printouts"
+      ],
+      "test": "tests/e2e/css-unification-quote-builder-alternate-workflows.spec.js",
+      "measuredRawCssBytes": 164885,
+      "maxCssBytes": 166933,
+      "baseline": {
+        "commit": "acc1bbf6",
+        "rawCssBytes": 7637,
+        "localCssRequests": 1
+      }
+    },
+    {
+      "source": "quote-builders/embroidery-quote-builder.html",
+      "family": "quote-builders",
+      "status": "reviewed",
+      "route": "/quote-builders/embroidery-quote-builder.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/vendor/fontawesome/css/all.min.css",
+        "shared_components/css/components.css",
+        "shared_components/css/utilities.css",
+        "shared_components/css/quote-workspace.css",
+        "shared_components/css/quote-embroidery.css",
+        "shared_components/css/specialty-assistant.css",
+        "shared_components/css/embroidery-quote-pricing.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "1440-768-390-320-full-scroll-and-table-panels",
+        "original-values-fields-pricing-and-successful-payloads",
+        "guided-and-workbench-keyboard-resize-controls",
+        "garment-cap-puff-patch-full-back-services",
+        "customer-save-failure-import-shipping-gallery-assistant",
+        "complete-builder-paper-and-real-generated-invoice"
+      ],
+      "test": "tests/e2e/css-unification-quote-builder-workflows.spec.js",
+      "measuredRawCssBytes": 250225,
+      "maxCssBytes": 252273,
+      "baseline": {
+        "commit": "d25e4ddb",
+        "rawCssBytes": 623614,
+        "localCssRequests": 15
+      },
+      "sharedStyleNote": "Shared artwork rules retain identical values; the SCP/DTF fee and order controls are scoped to those two builders. All 24 embroidery browser cases and complete shared-style visual delta reviewed."
+    },
+    {
+      "source": "quote-builders/screenprint-quote-builder.html",
+      "family": "quote-builders",
+      "status": "reviewed",
+      "route": "/quote-builders/screenprint-quote-builder.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/vendor/fontawesome/css/all.min.css",
+        "shared_components/css/safety-stripe-recs.css",
+        "shared_components/css/components.css",
+        "shared_components/css/utilities.css",
+        "shared_components/css/quote-workspace.css",
+        "shared_components/css/quote-screenprint.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "1440-768-390-320-complete-scroll-and-table-panels",
+        "original-values-fields-pricing-and-successful-payloads",
+        "native-ink-arrow-keys-and-expandable-fees-shipping",
+        "front-back-underbase-and-both-sleeves",
+        "healthy-fees-safety-recommendations-and-order-fields",
+        "customer-save-failure-and-visible-pricing-errors",
+        "complete-builder-paper-and-real-generated-invoice"
+      ],
+      "test": "tests/e2e/css-unification-quote-builder-workflows.spec.js",
+      "measuredRawCssBytes": 237526,
+      "maxCssBytes": 239574,
+      "baseline": {
+        "commit": "d25e4ddb",
+        "rawCssBytes": 494161,
+        "localCssRequests": 13
+      },
+      "dynamicTokens": [
+        "--swatch"
+      ]
+    },
+    {
+      "source": "quote-builders/dtf-quote-builder.html",
+      "family": "quote-builders",
+      "status": "reviewed",
+      "route": "/quote-builders/dtf-quote-builder.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/vendor/fontawesome/css/all.min.css",
+        "shared_components/css/safety-stripe-recs.css",
+        "shared_components/css/components.css",
+        "shared_components/css/utilities.css",
+        "shared_components/css/quote-workspace.css",
+        "shared_components/css/quote-dtf.css"
+      ],
+      "dynamicStyles": [],
+      "dynamicTokens": [
+        "--swatch"
+      ],
+      "states": [
+        "1440-768-390-320-complete-scroll-and-table-panels",
+        "original-values-fields-pricing-and-successful-payloads",
+        "native-location-keyboard-and-expanded-color-state",
+        "front-back-and-both-sleeves",
+        "healthy-fees-and-shipping-fields",
+        "complete-extended-size-dialog",
+        "complete-builder-paper-and-real-generated-invoice"
+      ],
+      "test": "tests/e2e/css-unification-quote-builder-workflows.spec.js",
+      "measuredRawCssBytes": 235696,
+      "maxCssBytes": 237744,
+      "baseline": {
+        "commit": "d25e4ddb",
+        "rawCssBytes": 540541,
+        "localCssRequests": 14
+      }
+    },
+    {
+      "source": "quote-builders/dtg-quote-builder.html",
+      "family": "quote-builders",
+      "status": "reviewed",
+      "route": "/quote-builders/dtg-quote-builder.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/vendor/fontawesome/css/all.min.css",
+        "shared_components/css/components.css",
+        "shared_components/css/utilities.css",
+        "shared_components/css/quote-workspace.css",
+        "shared_components/css/specialty-assistant.css",
+        "shared_components/css/quote-dtg.css"
+      ],
+      "dynamicStyles": [],
+      "dynamicTokens": [],
+      "states": [
+        "1440-768-390-320-complete-scroll-and-dialog-panels",
+        "original-values-fields-pricing-and-successful-payloads",
+        "native-location-and-pickup-keyboard",
+        "catalog-modal-escape-and-restored-focus",
+        "front-back-fees-shipping-and-date-fields",
+        "successful-and-failed-save",
+        "research-assistant-hidden-disabled-quote-actions",
+        "complete-builder-paper-and-real-generated-invoice"
+      ],
+      "test": "tests/e2e/css-unification-quote-builder-alternate-workflows.spec.js",
+      "measuredRawCssBytes": 282720,
+      "maxCssBytes": 284768,
+      "baseline": {
+        "commit": "d25e4ddb",
+        "rawCssBytes": 326706,
+        "localCssRequests": 6
+      }
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",
   "pendingRuntimeOwners": [
     {
-      "kind": "dynamic-css",
-      "owners": [
-        "shared_components/js/sample-cart-service.js",
-        "dashboards/js/lead-workspace.js",
-        "pages/js/quote-view.js"
-      ],
-      "note": "The lead workspace and Quote View lazy triggers are reviewed at four widths with original prefill, keyboard close/focus, and intercepted reference-import bodies. garment-submit-form.css/js remain original; shared-module modernization stays pending across all consumers."
-    },
-    {
-      "kind": "generated-document",
-      "owners": [
-        "shared_components/js/embroidery-quote-invoice.js",
-        "shared_components/js/quote-formatter.js",
-        "calculators/christmas-bundle-service.js",
-        "calculators/screenprint-customer/screenprint-customer-calculator.js",
-        "dashboards/js/ae-mission-control.js",
-        "dashboards/js/jim-mailing-list.js",
-        "pages/js/mockup-detail.js"
-      ],
-      "note": "Own print/PDF fixtures required; static HTML inventory cannot cover these."
-    },
-    {
-      "kind": "server-generated",
-      "owners": [
-        "lib/blog-templates.js",
-        "server.js",
-        "routes/blog.js"
-      ],
-      "note": "Blog, denied-access and retirement responses."
-    },
-    {
-      "kind": "served-archive",
-      "owners": [
-        "calculators/archive/seasonal-2025/breast-cancer-awareness-bundle.html"
-      ],
-      "note": "Still served by a root route; do not count as an excluded archive."
-    },
-    {
-      "kind": "non-page",
+      "kind": "email-provider",
       "owners": [
         "calculators/christmas-bundle-emailjs-template.html",
         "emailjs-template-mockup-customer-approval.html",
         "pages/golf-tournament-customer-emailjs-template.html",
         "pages/golf-tournament-lead-emailjs-template.html"
       ],
-      "note": "Email rendering is a separate compatibility contract."
+      "note": "Local template source and Chromium previews are reviewed. Saved provider templates, real mail-client rendering and campaign-content renewal remain separate publication work; deployment does not update them."
     },
     {
       "kind": "external-embed",
@@ -7350,6 +7651,14 @@
       "value": "repeat(2, minmax(0, 1fr))",
       "context": "print",
       "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/quote-workspace.css",
+      "selector": ":where([data-ui=\"unified\"][data-quote-workspace]).guided-on [data-guided-step].guided-hidden",
+      "property": "display",
+      "value": "none",
+      "context": "screen",
+      "reason": "Guided navigation must hide controller-managed sections whose display is set inline; print exposes every section."
     }
   ],
   "trainingContent": [
@@ -8390,6 +8699,362 @@
       "source": "training/js/sales-coordinator-training-schedule.js",
       "key": "scenarios",
       "sha256": "858e905a4b09c348e68f326dcfa74d25403f458104a963d4dbb98d352471f1d7"
+    }
+  ],
+  "generatedDocuments": [
+    {
+      "source": "shared_components/js/embroidery-quote-invoice.js",
+      "family": "quote-builders",
+      "status": "reviewed",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/quote-invoice.css"
+      ],
+      "callers": [
+        "emb",
+        "scp",
+        "dtf",
+        "dtg"
+      ],
+      "states": [
+        "all-four-real-print-windows",
+        "1440-768-390-320-full-horizontal-scroll",
+        "complete-letter-documents",
+        "original-amounts-customer-fields-and-payloads",
+        "delayed-required-style-waits-and-failed-style-does-not-print"
+      ],
+      "test": "tests/e2e/css-unification-quote-builder-workflows.spec.js",
+      "maxCssBytes": 75859,
+      "measuredRawCssBytes": 73811
+    },
+    {
+      "source": "dashboards/js/ae-mission-control.js",
+      "family": "staff-print",
+      "status": "reviewed",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/staff-print.css"
+      ],
+      "dynamicTokens": [
+        "--thread-color"
+      ],
+      "states": [
+        "original-text-addresses-and-thread-data",
+        "normal-and-multipage-documents",
+        "1440-768-390-320-complete-horizontal-scroll",
+        "real-print-window-ready-blocked-and-failed-style",
+        "delayed-style-and-missing-artwork",
+        "missing-helper-visible-error",
+        "imported-thread-values-escaped",
+        "avery-5160-physical-dimensions"
+      ],
+      "test": "tests/e2e/css-unification-staff-print.spec.js",
+      "measuredRawCssBytes": 62217,
+      "maxCssBytes": 64265
+    },
+    {
+      "source": "dashboards/js/jim-mailing-list.js",
+      "family": "staff-print",
+      "status": "reviewed",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/staff-print.css"
+      ],
+      "dynamicTokens": [
+        "--thread-color"
+      ],
+      "states": [
+        "original-text-addresses-and-thread-data",
+        "normal-and-multipage-documents",
+        "1440-768-390-320-complete-horizontal-scroll",
+        "real-print-window-ready-blocked-and-failed-style",
+        "delayed-style-and-missing-artwork",
+        "missing-helper-visible-error",
+        "imported-thread-values-escaped",
+        "avery-5160-physical-dimensions"
+      ],
+      "test": "tests/e2e/css-unification-staff-print.spec.js",
+      "measuredRawCssBytes": 62217,
+      "maxCssBytes": 64265
+    },
+    {
+      "source": "pages/js/mockup-detail.js",
+      "family": "staff-print",
+      "status": "reviewed",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/staff-print.css"
+      ],
+      "dynamicTokens": [
+        "--thread-color"
+      ],
+      "states": [
+        "original-text-addresses-and-thread-data",
+        "normal-and-multipage-documents",
+        "1440-768-390-320-complete-horizontal-scroll",
+        "real-print-window-ready-blocked-and-failed-style",
+        "delayed-style-and-missing-artwork",
+        "missing-helper-visible-error",
+        "imported-thread-values-escaped",
+        "avery-5160-physical-dimensions"
+      ],
+      "test": "tests/e2e/css-unification-staff-print.spec.js",
+      "measuredRawCssBytes": 62217,
+      "maxCssBytes": 64265
+    },
+    {
+      "source": "calculators/screenprint-customer/screenprint-customer-calculator.js",
+      "family": "screenprint-customer-invoice",
+      "status": "reviewed",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "calculators/screenprint-customer/screenprint-customer-invoice.css"
+      ],
+      "states": [
+        "original-24-and-145-piece-quote-amounts-notes-and-waiver",
+        "1440-768-390-320-complete-horizontal-scroll",
+        "two-complete-one-page-letter-quotes",
+        "real-print-window-ready-delayed-blocked-failed-style-and-image",
+        "missing-helper-visible-error"
+      ],
+      "test": "tests/e2e/css-unification-specialty-screenprint-customer.spec.js",
+      "readinessTest": "tests/e2e/css-unification-customer-invoice-readiness.spec.js",
+      "measuredRawCssBytes": 61722,
+      "maxCssBytes": 63770
+    }
+  ],
+  "reviewedRuntimeOwners": [
+    {
+      "kind": "dynamic-css",
+      "source": "shared_components/js/sample-cart-service.js",
+      "status": "reviewed",
+      "hosts": [
+        "pages/catalog.html",
+        "product.html"
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/cart-drawer.css"
+      ],
+      "states": [
+        "success-warning-info-four-widths",
+        "native-modal-top-layer-and-focus",
+        "unavailable-stock-blocks-add",
+        "escaped-notification-text",
+        "one-icon-stylesheet",
+        "timed-cleanup",
+        "notification-hidden-on-paper"
+      ],
+      "test": "tests/e2e/css-unification-sample-runtime.spec.js",
+      "note": "Only two direct script hosts; sample checkout reads the stored cart independently. All 26 notification screens / 38 panels reviewed; existing complete catalog/product page evidence remains valid."
+    },
+    {
+      "kind": "dynamic-css",
+      "source": "shared_components/js/builders/dtg/pricing.js",
+      "status": "reviewed",
+      "hosts": [
+        "quote-builders/dtg-quote-builder.html"
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css"
+      ],
+      "states": [
+        "pricing-failure-and-refresh-recovery",
+        "1440-768-390-320-full-panels",
+        "complete-letter-documents",
+        "original-prices-and-payloads"
+      ],
+      "test": "tests/e2e/css-unification-quote-builder-alternate-workflows.spec.js",
+      "note": "Decorative inline declarations replaced with existing shared alert classes; complete builder stylesheet ownership remains in pilots."
+    },
+    {
+      "kind": "dynamic-css",
+      "source": "shared_components/js/builders/dtf/methods-rows.js",
+      "status": "reviewed",
+      "hosts": [
+        "quote-builders/dtf-quote-builder.html"
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css"
+      ],
+      "states": [
+        "extended-sizes-success-empty-error-rate-limit",
+        "1440-768-390-320-full-panels",
+        "complete-letter-documents",
+        "original-prices-and-payloads"
+      ],
+      "test": "tests/e2e/css-unification-quote-builder-workflows.spec.js",
+      "note": "Decorative inline declarations replaced with existing shared alert classes; complete builder stylesheet ownership remains in pilots."
+    },
+    {
+      "kind": "server-generated",
+      "source": "lib/blog-templates.js",
+      "status": "reviewed",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/blog.css"
+      ],
+      "measuredRawCssBytes": 67380,
+      "maxCssBytes": 69428,
+      "states": [
+        "nine-original-response-content-and-SEO-contracts",
+        "1440-768-390-320-full-pages",
+        "nine-complete-letter-documents",
+        "escaped-user-text-and-JSON-LD",
+        "native-keyboard-exit-with-unavailable-styles"
+      ],
+      "test": "tests/e2e/css-unification-server-pages.spec.js"
+    },
+    {
+      "kind": "server-generated",
+      "source": "server.js",
+      "status": "reviewed",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/status-pages.css"
+      ],
+      "measuredRawCssBytes": 57712,
+      "maxCssBytes": 59760,
+      "states": [
+        "nine-original-response-content-and-SEO-contracts",
+        "1440-768-390-320-full-pages",
+        "nine-complete-letter-documents",
+        "escaped-user-text-and-JSON-LD",
+        "native-keyboard-exit-with-unavailable-styles"
+      ],
+      "test": "tests/e2e/css-unification-server-pages.spec.js"
+    },
+    {
+      "kind": "server-generated",
+      "source": "routes/blog.js",
+      "status": "reviewed",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/status-pages.css"
+      ],
+      "measuredRawCssBytes": 57712,
+      "maxCssBytes": 59760,
+      "states": [
+        "nine-original-response-content-and-SEO-contracts",
+        "1440-768-390-320-full-pages",
+        "nine-complete-letter-documents",
+        "escaped-user-text-and-JSON-LD",
+        "native-keyboard-exit-with-unavailable-styles"
+      ],
+      "test": "tests/e2e/css-unification-server-pages.spec.js"
+    },
+    {
+      "kind": "server-generated",
+      "source": "lib/status-page-templates.js",
+      "status": "reviewed",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/status-pages.css"
+      ],
+      "measuredRawCssBytes": 57712,
+      "maxCssBytes": 59760,
+      "states": [
+        "nine-original-response-content-and-SEO-contracts",
+        "1440-768-390-320-full-pages",
+        "nine-complete-letter-documents",
+        "escaped-user-text-and-JSON-LD",
+        "native-keyboard-exit-with-unavailable-styles"
+      ],
+      "test": "tests/e2e/css-unification-server-pages.spec.js"
+    }
+  ],
+  "inactiveRuntimeOwners": [
+    {
+      "source": "shared_components/js/quote-formatter.js",
+      "kind": "generated-document",
+      "status": "inactive",
+      "evidence": "Only class declaration and CommonJS export reference QuoteFormatter; no construction or call in application JS/HTML. DTF still loads the script, but prints through EmbroideryInvoiceGenerator.",
+      "reactivation": "Retain source and script reference; require original/current visual and print fixtures before enabling this generator."
+    },
+    {
+      "source": "calculators/christmas-bundle-service.js",
+      "kind": "generated-document",
+      "status": "inactive",
+      "evidence": "The HTML script reference is commented out to avoid a duplicate class. The live ChristmasBundleQuoteService is supplied by calculators/js/christmas-bundle-order.js.",
+      "reactivation": "Retain source; verify the active order-service contract and review its generated documents before reconnecting."
+    }
+  ],
+  "emailDocuments": [
+    {
+      "source": "calculators/christmas-bundle-emailjs-template.html",
+      "status": "reviewed-local",
+      "theme": "shared_components/css/email-theme.css",
+      "compiler": "scripts/css/build-email-templates.js",
+      "test": "tests/e2e/css-unification-email-templates.spec.js",
+      "contract": "memory/EMAIL_STYLE_CONTRACT_2026-09.md",
+      "states": [
+        "1440-768-390-320-full-pages",
+        "long-values",
+        "blocked-images",
+        "complete-letter-documents",
+        "original-bindings-links-and-copy"
+      ],
+      "providerStatus": "publication-pending; mail-client rendering not certified"
+    },
+    {
+      "source": "emailjs-template-mockup-customer-approval.html",
+      "status": "reviewed-local",
+      "theme": "shared_components/css/email-theme.css",
+      "compiler": "scripts/css/build-email-templates.js",
+      "test": "tests/e2e/css-unification-email-templates.spec.js",
+      "contract": "memory/EMAIL_STYLE_CONTRACT_2026-09.md",
+      "states": [
+        "1440-768-390-320-full-pages",
+        "long-values",
+        "blocked-images",
+        "complete-letter-documents",
+        "original-bindings-links-and-copy"
+      ],
+      "providerStatus": "publication-pending; mail-client rendering not certified"
+    },
+    {
+      "source": "pages/golf-tournament-customer-emailjs-template.html",
+      "status": "reviewed-local",
+      "theme": "shared_components/css/email-theme.css",
+      "compiler": "scripts/css/build-email-templates.js",
+      "test": "tests/e2e/css-unification-email-templates.spec.js",
+      "contract": "memory/EMAIL_STYLE_CONTRACT_2026-09.md",
+      "states": [
+        "1440-768-390-320-full-pages",
+        "long-values",
+        "blocked-images",
+        "complete-letter-documents",
+        "original-bindings-links-and-copy"
+      ],
+      "providerStatus": "publication-pending; mail-client rendering not certified"
+    },
+    {
+      "source": "pages/golf-tournament-lead-emailjs-template.html",
+      "status": "reviewed-local",
+      "theme": "shared_components/css/email-theme.css",
+      "compiler": "scripts/css/build-email-templates.js",
+      "test": "tests/e2e/css-unification-email-templates.spec.js",
+      "contract": "memory/EMAIL_STYLE_CONTRACT_2026-09.md",
+      "states": [
+        "1440-768-390-320-full-pages",
+        "long-values",
+        "blocked-images",
+        "complete-letter-documents",
+        "original-bindings-links-and-copy"
+      ],
+      "providerStatus": "publication-pending; mail-client rendering not certified"
     }
   ]
 }

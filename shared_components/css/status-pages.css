@@ -1,0 +1,54 @@
+/* Shared server responses: access gates and retired routes. No script required. */
+@layer components.pages {
+    :where([data-ui="unified"]).status-page {
+        min-height: 100svh;
+        display: grid;
+        place-items: center;
+        padding: clamp(16px, 4vw, 48px);
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"]) .status-card {
+        width: min(100%, 32rem);
+        padding: clamp(24px, 5vw, 48px);
+        border: 1px solid var(--ui-line);
+        border-top: 4px solid var(--ui-accent);
+        border-radius: var(--radius-lg);
+        background: var(--ui-surface);
+        box-shadow: var(--shadow-sm);
+        text-align: center;
+    }
+
+    :where([data-ui="unified"]) .status-card h1 {
+        margin: 0 0 var(--space-4);
+        font-size: clamp(1.5rem, 4vw, 2rem);
+        color: var(--store-green-950);
+    }
+
+    :where([data-ui="unified"]) .status-card p { margin: 0 0 var(--space-5); }
+    :where([data-ui="unified"]) .status-help { color: var(--ui-muted); }
+    :where([data-ui="unified"]) .status-help strong { color: var(--ui-accent); }
+    :where([data-ui="unified"]) .status-card .btn { max-width: 100%; white-space: normal; }
+    :where([data-ui="unified"]) .status-logo { width: 160px; max-width: 100%; height: auto; margin-bottom: var(--space-5); }
+
+    :where([data-ui="unified"]) .status-icon {
+        display: grid;
+        place-items: center;
+        width: 60px;
+        height: 60px;
+        margin: 0 auto var(--space-5);
+        background: var(--ui-tint);
+        color: var(--ui-accent);
+        border-radius: var(--radius-pill);
+    }
+
+    :where([data-ui="unified"]).status-page--retired .status-card { width: min(100%, 42rem); text-align: left; }
+    :where([data-ui="unified"]).status-page--retired ul { padding-left: var(--space-5); margin: var(--space-5) 0; }
+    :where([data-ui="unified"]).status-page--retired li { margin: var(--space-3) 0; }
+
+    @media print {
+        @page { margin: 0.5in; }
+        :where([data-ui="unified"]).status-page { display: block; min-height: 0; padding: 0; background: var(--color-surface); }
+        :where([data-ui="unified"]) .status-card { margin: 0 auto; box-shadow: none; break-inside: avoid; }
+    }
+}

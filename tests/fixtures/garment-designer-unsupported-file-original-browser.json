@@ -1,0 +1,607 @@
+{
+  "name": "unsupported-file",
+  "states": [
+    {
+      "width": 1440,
+      "title": "T-Shirt Designer — Northwest Custom Apparel",
+      "ids": {
+        "thumb-1": "TXT",
+        "advice-1": "",
+        "badge-1": "!",
+        "pcStatusChip": "No art selected",
+        "pcFrontBtn": "Front",
+        "pcBackBtn": "Back",
+        "pcBothBtn": "Both",
+        "pcLeftChestBtn": "Left Chest",
+        "pcFullFrontBtn": "Full Front",
+        "pcUpperBackBtn": "Upper Back",
+        "pcFullBackBtn": "Full Back",
+        "pcCenterBtn": "Center Art",
+        "pcWidthLabel": "—",
+        "pcWidthRange": "",
+        "pcWidthNumber": "",
+        "pcXLabel": "—",
+        "pcXRange": "",
+        "pcXNumber": "",
+        "pcYLabel": "—",
+        "pcYRange": "",
+        "pcYNumber": "",
+        "addTextBtn": "➕ Add Text",
+        "palBtn": "🎨 Shirt Color",
+        "garmentStyleSelect": "Crew Tee Polo Hoodie Long Sleeve Ladies Tee",
+        "removeBgBtn": "⬜ Remove White BG",
+        "artDetailsBtn": "ℹ️ Art Details",
+        "threadColorsBtn": "🧵 Thread Colors",
+        "modelViewBtn": "👕 Model View",
+        "spinBtn": "🔄 Spin",
+        "proofBtn": "🖨 Customer Proof",
+        "dlBtn": "⬇ Download PNG",
+        "sendSteveBtn": "🧵 Send to Steve",
+        "sendCustomerBtn": "📧 Send to Customer",
+        "canvasHolder": "",
+        "msgTitle": "Unsupported file type",
+        "msgBody": "This viewer supports .dst embroidery files, .ai (PDF-compatible), .psd, .psb, .cdr, .pdf, and common image formats.",
+        "advisorMethodPill": "—",
+        "advisorMain": "Upload artwork for a print recommendation.",
+        "advisorCopy": "The app checks color count, screen-print limits, fabric type, and logo clarity.",
+        "advisorColors": "—",
+        "advisorQuality": "—",
+        "advisorFabric": "Cotton",
+        "advisorScreen": "—",
+        "fabricSelect": "Cotton shirt Cotton/poly blend Polyester Nylon Fabric unknown",
+        "embStatusPill": "—",
+        "embMain": "Upload artwork for an embroidery estimate.",
+        "embCopy": "The app estimates stitch count, thread colors, and embroidery friendliness.",
+        "embStitches": "—",
+        "embThreads": "—",
+        "embSize": "—",
+        "embBestUse": "—",
+        "embNote": "Best embroidery results usually use 3–4 thread colors. 4–6 colors is workable. Up to 10 colors may be possible but should be reviewed by the art team."
+      },
+      "fields": [
+        {
+          "id": "pcWidthRange",
+          "type": "range",
+          "value": "30.5",
+          "checked": false,
+          "disabled": true
+        },
+        {
+          "id": "pcWidthNumber",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": true
+        },
+        {
+          "id": "pcXRange",
+          "type": "range",
+          "value": "0",
+          "checked": false,
+          "disabled": true
+        },
+        {
+          "id": "pcXNumber",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": true
+        },
+        {
+          "id": "pcYRange",
+          "type": "range",
+          "value": "0",
+          "checked": false,
+          "disabled": true
+        },
+        {
+          "id": "pcYNumber",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": true
+        },
+        {
+          "id": "garmentStyleSelect",
+          "type": "select-one",
+          "value": "tee",
+          "disabled": false
+        },
+        {
+          "id": "fabricSelect",
+          "type": "select-one",
+          "value": "cotton",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/pages/mockup-library.html",
+          "text": "📚 Saved Mockups"
+        }
+      ],
+      "headings": [
+        "NWCA Easy Shirt Designer"
+      ],
+      "entries": [
+        {
+          "name": "example-unsupported.txt",
+          "kind": null,
+          "status": "error",
+          "textModel": null,
+          "dst": null
+        }
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".side-head > span"
+            ],
+            [
+              ".fsize"
+            ],
+            [
+              "#msgBody"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "T-Shirt Designer — Northwest Custom Apparel",
+      "ids": {
+        "thumb-1": "TXT",
+        "advice-1": "",
+        "badge-1": "!",
+        "pcStatusChip": "No art selected",
+        "pcFrontBtn": "Front",
+        "pcBackBtn": "Back",
+        "pcBothBtn": "Both",
+        "pcLeftChestBtn": "Left Chest",
+        "pcFullFrontBtn": "Full Front",
+        "pcUpperBackBtn": "Upper Back",
+        "pcFullBackBtn": "Full Back",
+        "pcCenterBtn": "Center Art",
+        "pcWidthLabel": "—",
+        "pcWidthRange": "",
+        "pcWidthNumber": "",
+        "pcXLabel": "—",
+        "pcXRange": "",
+        "pcXNumber": "",
+        "pcYLabel": "—",
+        "pcYRange": "",
+        "pcYNumber": "",
+        "addTextBtn": "➕ Add Text",
+        "palBtn": "🎨 Shirt Color",
+        "garmentStyleSelect": "Crew Tee Polo Hoodie Long Sleeve Ladies Tee",
+        "removeBgBtn": "⬜ Remove White BG",
+        "artDetailsBtn": "ℹ️ Art Details",
+        "threadColorsBtn": "🧵 Thread Colors",
+        "modelViewBtn": "👕 Model View",
+        "spinBtn": "🔄 Spin",
+        "proofBtn": "🖨 Customer Proof",
+        "dlBtn": "⬇ Download PNG",
+        "sendSteveBtn": "🧵 Send to Steve",
+        "sendCustomerBtn": "📧 Send to Customer",
+        "canvasHolder": "",
+        "msgTitle": "Unsupported file type",
+        "msgBody": "This viewer supports .dst embroidery files, .ai (PDF-compatible), .psd, .psb, .cdr, .pdf, and common image formats.",
+        "advisorMethodPill": "—",
+        "advisorMain": "Upload artwork for a print recommendation.",
+        "advisorCopy": "The app checks color count, screen-print limits, fabric type, and logo clarity.",
+        "advisorColors": "—",
+        "advisorQuality": "—",
+        "advisorFabric": "Cotton",
+        "advisorScreen": "—",
+        "fabricSelect": "Cotton shirt Cotton/poly blend Polyester Nylon Fabric unknown",
+        "embStatusPill": "—",
+        "embMain": "Upload artwork for an embroidery estimate.",
+        "embCopy": "The app estimates stitch count, thread colors, and embroidery friendliness.",
+        "embStitches": "—",
+        "embThreads": "—",
+        "embSize": "—",
+        "embBestUse": "—",
+        "embNote": "Best embroidery results usually use 3–4 thread colors. 4–6 colors is workable. Up to 10 colors may be possible but should be reviewed by the art team."
+      },
+      "fields": [
+        {
+          "id": "pcWidthRange",
+          "type": "range",
+          "value": "30.5",
+          "checked": false,
+          "disabled": true
+        },
+        {
+          "id": "pcWidthNumber",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": true
+        },
+        {
+          "id": "pcXRange",
+          "type": "range",
+          "value": "0",
+          "checked": false,
+          "disabled": true
+        },
+        {
+          "id": "pcXNumber",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": true
+        },
+        {
+          "id": "pcYRange",
+          "type": "range",
+          "value": "0",
+          "checked": false,
+          "disabled": true
+        },
+        {
+          "id": "pcYNumber",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": true
+        },
+        {
+          "id": "garmentStyleSelect",
+          "type": "select-one",
+          "value": "tee",
+          "disabled": false
+        },
+        {
+          "id": "fabricSelect",
+          "type": "select-one",
+          "value": "cotton",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/pages/mockup-library.html",
+          "text": "📚 Saved Mockups"
+        }
+      ],
+      "headings": [
+        "NWCA Easy Shirt Designer"
+      ],
+      "entries": [
+        {
+          "name": "example-unsupported.txt",
+          "kind": null,
+          "status": "error",
+          "textModel": null,
+          "dst": null
+        }
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".side-head > span"
+            ],
+            [
+              ".fsize"
+            ],
+            [
+              "#threadColorsBtn"
+            ],
+            [
+              "#msgBody"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "T-Shirt Designer — Northwest Custom Apparel",
+      "ids": {
+        "thumb-1": "TXT",
+        "advice-1": "",
+        "badge-1": "!",
+        "pcStatusChip": "No art selected",
+        "pcFrontBtn": "Front",
+        "pcBackBtn": "Back",
+        "pcBothBtn": "Both",
+        "pcLeftChestBtn": "Left Chest",
+        "pcFullFrontBtn": "Full Front",
+        "pcUpperBackBtn": "Upper Back",
+        "pcFullBackBtn": "Full Back",
+        "pcCenterBtn": "Center Art",
+        "pcWidthLabel": "—",
+        "pcWidthRange": "",
+        "pcWidthNumber": "",
+        "pcXLabel": "—",
+        "pcXRange": "",
+        "pcXNumber": "",
+        "pcYLabel": "—",
+        "pcYRange": "",
+        "pcYNumber": "",
+        "addTextBtn": "➕ Add Text",
+        "palBtn": "🎨 Shirt Color",
+        "garmentStyleSelect": "Crew Tee Polo Hoodie Long Sleeve Ladies Tee",
+        "removeBgBtn": "⬜ Remove White BG",
+        "artDetailsBtn": "ℹ️ Art Details",
+        "threadColorsBtn": "🧵 Thread Colors",
+        "modelViewBtn": "👕 Model View",
+        "spinBtn": "🔄 Spin",
+        "proofBtn": "🖨 Customer Proof",
+        "dlBtn": "⬇ Download PNG",
+        "sendSteveBtn": "🧵 Send to Steve",
+        "sendCustomerBtn": "📧 Send to Customer",
+        "canvasHolder": "",
+        "msgTitle": "Unsupported file type",
+        "msgBody": "This viewer supports .dst embroidery files, .ai (PDF-compatible), .psd, .psb, .cdr, .pdf, and common image formats.",
+        "advisorMethodPill": "—",
+        "advisorMain": "Upload artwork for a print recommendation.",
+        "advisorCopy": "The app checks color count, screen-print limits, fabric type, and logo clarity.",
+        "advisorColors": "—",
+        "advisorQuality": "—",
+        "advisorFabric": "Cotton",
+        "advisorScreen": "—",
+        "fabricSelect": "Cotton shirt Cotton/poly blend Polyester Nylon Fabric unknown",
+        "embStatusPill": "—",
+        "embMain": "Upload artwork for an embroidery estimate.",
+        "embCopy": "The app estimates stitch count, thread colors, and embroidery friendliness.",
+        "embStitches": "—",
+        "embThreads": "—",
+        "embSize": "—",
+        "embBestUse": "—",
+        "embNote": "Best embroidery results usually use 3–4 thread colors. 4–6 colors is workable. Up to 10 colors may be possible but should be reviewed by the art team."
+      },
+      "fields": [
+        {
+          "id": "pcWidthRange",
+          "type": "range",
+          "value": "30.5",
+          "checked": false,
+          "disabled": true
+        },
+        {
+          "id": "pcWidthNumber",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": true
+        },
+        {
+          "id": "pcXRange",
+          "type": "range",
+          "value": "0",
+          "checked": false,
+          "disabled": true
+        },
+        {
+          "id": "pcXNumber",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": true
+        },
+        {
+          "id": "pcYRange",
+          "type": "range",
+          "value": "0",
+          "checked": false,
+          "disabled": true
+        },
+        {
+          "id": "pcYNumber",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": true
+        },
+        {
+          "id": "garmentStyleSelect",
+          "type": "select-one",
+          "value": "tee",
+          "disabled": false
+        },
+        {
+          "id": "fabricSelect",
+          "type": "select-one",
+          "value": "cotton",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/pages/mockup-library.html",
+          "text": "📚 Saved Mockups"
+        }
+      ],
+      "headings": [
+        "NWCA Easy Shirt Designer"
+      ],
+      "entries": [
+        {
+          "name": "example-unsupported.txt",
+          "kind": null,
+          "status": "error",
+          "textModel": null,
+          "dst": null
+        }
+      ],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".side-head > span"
+            ],
+            [
+              ".fsize"
+            ],
+            [
+              "#msgBody"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "T-Shirt Designer — Northwest Custom Apparel",
+      "ids": {
+        "thumb-1": "TXT",
+        "advice-1": "",
+        "badge-1": "!",
+        "pcStatusChip": "No art selected",
+        "pcFrontBtn": "Front",
+        "pcBackBtn": "Back",
+        "pcBothBtn": "Both",
+        "pcLeftChestBtn": "Left Chest",
+        "pcFullFrontBtn": "Full Front",
+        "pcUpperBackBtn": "Upper Back",
+        "pcFullBackBtn": "Full Back",
+        "pcCenterBtn": "Center Art",
+        "pcWidthLabel": "—",
+        "pcWidthRange": "",
+        "pcWidthNumber": "",
+        "pcXLabel": "—",
+        "pcXRange": "",
+        "pcXNumber": "",
+        "pcYLabel": "—",
+        "pcYRange": "",
+        "pcYNumber": "",
+        "addTextBtn": "➕ Add Text",
+        "palBtn": "🎨 Shirt Color",
+        "garmentStyleSelect": "Crew Tee Polo Hoodie Long Sleeve Ladies Tee",
+        "removeBgBtn": "⬜ Remove White BG",
+        "artDetailsBtn": "ℹ️ Art Details",
+        "threadColorsBtn": "🧵 Thread Colors",
+        "modelViewBtn": "👕 Model View",
+        "spinBtn": "🔄 Spin",
+        "proofBtn": "🖨 Customer Proof",
+        "dlBtn": "⬇ Download PNG",
+        "sendSteveBtn": "🧵 Send to Steve",
+        "sendCustomerBtn": "📧 Send to Customer",
+        "canvasHolder": "",
+        "msgTitle": "Unsupported file type",
+        "msgBody": "This viewer supports .dst embroidery files, .ai (PDF-compatible), .psd, .psb, .cdr, .pdf, and common image formats.",
+        "advisorMethodPill": "—",
+        "advisorMain": "Upload artwork for a print recommendation.",
+        "advisorCopy": "The app checks color count, screen-print limits, fabric type, and logo clarity.",
+        "advisorColors": "—",
+        "advisorQuality": "—",
+        "advisorFabric": "Cotton",
+        "advisorScreen": "—",
+        "fabricSelect": "Cotton shirt Cotton/poly blend Polyester Nylon Fabric unknown",
+        "embStatusPill": "—",
+        "embMain": "Upload artwork for an embroidery estimate.",
+        "embCopy": "The app estimates stitch count, thread colors, and embroidery friendliness.",
+        "embStitches": "—",
+        "embThreads": "—",
+        "embSize": "—",
+        "embBestUse": "—",
+        "embNote": "Best embroidery results usually use 3–4 thread colors. 4–6 colors is workable. Up to 10 colors may be possible but should be reviewed by the art team."
+      },
+      "fields": [
+        {
+          "id": "pcWidthRange",
+          "type": "range",
+          "value": "30.5",
+          "checked": false,
+          "disabled": true
+        },
+        {
+          "id": "pcWidthNumber",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": true
+        },
+        {
+          "id": "pcXRange",
+          "type": "range",
+          "value": "0",
+          "checked": false,
+          "disabled": true
+        },
+        {
+          "id": "pcXNumber",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": true
+        },
+        {
+          "id": "pcYRange",
+          "type": "range",
+          "value": "0",
+          "checked": false,
+          "disabled": true
+        },
+        {
+          "id": "pcYNumber",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": true
+        },
+        {
+          "id": "garmentStyleSelect",
+          "type": "select-one",
+          "value": "tee",
+          "disabled": false
+        },
+        {
+          "id": "fabricSelect",
+          "type": "select-one",
+          "value": "cotton",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/pages/mockup-library.html",
+          "text": "📚 Saved Mockups"
+        }
+      ],
+      "headings": [
+        "NWCA Easy Shirt Designer"
+      ],
+      "entries": [
+        {
+          "name": "example-unsupported.txt",
+          "kind": null,
+          "status": "error",
+          "textModel": null,
+          "dst": null
+        }
+      ],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".side-head > span"
+            ],
+            [
+              ".fsize"
+            ],
+            [
+              "#msgBody"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "reads": [],
+  "writes": [],
+  "dialogs": []
+}

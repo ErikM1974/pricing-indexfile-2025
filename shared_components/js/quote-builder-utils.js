@@ -1305,7 +1305,7 @@ function renderOrderShippingFields(containerId) {
     // eslint-disable-next-line no-unsanitized/property -- audited (1.4): US_STATES internal const only
     container.innerHTML = `
         <div class="order-shipping-panel">
-            <div class="charges-header" data-call="toggleOrderShippingPanel" data-args="${escapeHtml(JSON.stringify([containerId]))}">
+            <div class="charges-header" role="button" tabindex="0" data-keyclick="1" data-call="toggleOrderShippingPanel" data-args="${escapeHtml(JSON.stringify([containerId]))}">
                 <div class="d-flex align-items-center gap-2">
                     <i class="fas fa-truck" aria-hidden="true"></i>
                     <span>Order & Shipping</span>
@@ -1314,71 +1314,71 @@ function renderOrderShippingFields(containerId) {
                 <i class="order-shipping-chevron fas fa-chevron-down collapsible-chevron" aria-hidden="true"></i>
             </div>
             <div class="order-shipping-content charges-content hidden">
-                <div class="d-flex flex-column gap-2" style="padding: 8px 0;">
+                <div class="d-flex flex-column gap-2" data-order-style="stack">
                     <!-- Phone + Order # -->
                     <div class="d-flex gap-2">
-                        <div class="customer-field" style="flex: 1;">
-                            <label class="quote-label" style="font-size: 11px;">Phone</label>
-                            <input type="tel" class="os-phone quote-input" aria-label="Customer phone" placeholder="(253) 555-1234" style="font-size: 12px; padding: 6px 8px;">
+                        <div class="customer-field" data-order-style="field">
+                            <label class="quote-label" data-order-style="label">Phone</label>
+                            <input type="tel" class="os-phone quote-input" aria-label="Customer phone" placeholder="(253) 555-1234" data-order-style="input">
                         </div>
-                        <div class="customer-field" style="flex: 1;">
-                            <label class="quote-label" style="font-size: 11px;">Order #</label>
-                            <input type="text" class="os-order-number quote-input" aria-label="ShopWorks order number" placeholder="ShopWorks #" style="font-size: 12px; padding: 6px 8px;">
+                        <div class="customer-field" data-order-style="field">
+                            <label class="quote-label" data-order-style="label">Order #</label>
+                            <input type="text" class="os-order-number quote-input" aria-label="ShopWorks order number" placeholder="ShopWorks #" data-order-style="input">
                         </div>
                     </div>
                     <!-- PO # + Shipping Fee -->
                     <div class="d-flex gap-2">
-                        <div class="customer-field" style="flex: 1;">
-                            <label class="quote-label" style="font-size: 11px;">PO #</label>
-                            <input type="text" class="os-po-number quote-input" aria-label="Customer PO number" placeholder="Purchase Order" style="font-size: 12px; padding: 6px 8px;">
+                        <div class="customer-field" data-order-style="field">
+                            <label class="quote-label" data-order-style="label">PO #</label>
+                            <input type="text" class="os-po-number quote-input" aria-label="Customer PO number" placeholder="Purchase Order" data-order-style="input">
                         </div>
-                        <div class="customer-field" style="flex: 1;">
-                            <label class="quote-label" style="font-size: 11px;">Shipping Fee</label>
-                            <div style="position: relative;">
-                                <span style="position: absolute; left: 8px; top: 50%; transform: translateY(-50%); color: #666; font-size: 12px;">$</span>
+                        <div class="customer-field" data-order-style="field">
+                            <label class="quote-label" data-order-style="label">Shipping Fee</label>
+                            <div data-order-style="money">
+                                <span data-order-style="currency">$</span>
                                 <input type="number" class="os-shipping-fee quote-input" aria-label="Shipping fee" min="0" step="0.01" placeholder="0.00" value="0"
-                                       style="font-size: 12px; padding: 6px 8px 6px 22px; width: 100%; box-sizing: border-box;">
+                                       data-order-style="shipping-fee">
                             </div>
                         </div>
                     </div>
                     <!-- Dates -->
                     <div class="d-flex gap-2">
-                        <div class="customer-field" style="flex: 1;">
-                            <label class="quote-label" style="font-size: 11px;">Ship Date</label>
-                            <input type="date" class="os-req-ship-date quote-input" aria-label="Requested ship date" style="font-size: 12px; padding: 6px 8px;">
+                        <div class="customer-field" data-order-style="field">
+                            <label class="quote-label" data-order-style="label">Ship Date</label>
+                            <input type="date" class="os-req-ship-date quote-input" aria-label="Requested ship date" data-order-style="input">
                         </div>
-                        <div class="customer-field" style="flex: 1;">
-                            <label class="quote-label" style="font-size: 11px;">Drop Dead Date</label>
-                            <input type="date" class="os-drop-dead-date quote-input" aria-label="Drop-dead date" style="font-size: 12px; padding: 6px 8px;">
+                        <div class="customer-field" data-order-style="field">
+                            <label class="quote-label" data-order-style="label">Drop Dead Date</label>
+                            <input type="date" class="os-drop-dead-date quote-input" aria-label="Drop-dead date" data-order-style="input">
                         </div>
                     </div>
                     <!-- Ship To Address -->
                     <div class="customer-field">
-                        <label class="quote-label" style="font-size: 11px;">Ship To Address</label>
-                        <input type="text" class="os-ship-address quote-input" aria-label="Ship-to street address" placeholder="Street address" style="font-size: 12px; padding: 6px 8px;">
+                        <label class="quote-label" data-order-style="label">Ship To Address</label>
+                        <input type="text" class="os-ship-address quote-input" aria-label="Ship-to street address" placeholder="Street address" data-order-style="input">
                     </div>
                     <div class="d-flex gap-2">
-                        <div class="customer-field" style="flex: 2;">
-                            <input type="text" class="os-ship-city quote-input" aria-label="Ship-to city" placeholder="City" style="font-size: 12px; padding: 6px 8px;">
+                        <div class="customer-field" data-order-style="city">
+                            <input type="text" class="os-ship-city quote-input" aria-label="Ship-to city" placeholder="City" data-order-style="input">
                         </div>
-                        <div class="customer-field" style="flex: 0 0 60px;">
-                            <select class="os-ship-state quote-input" aria-label="Ship-to state" style="font-size: 12px; padding: 6px 4px;">
+                        <div class="customer-field" data-order-style="state">
+                            <select class="os-ship-state quote-input" aria-label="Ship-to state" data-order-style="state-input">
                                 ${stateOptions}
                             </select>
                         </div>
-                        <div class="customer-field" style="flex: 0 0 80px;">
+                        <div class="customer-field" data-order-style="postal">
                             <input type="text" class="os-ship-zip quote-input" aria-label="Ship-to ZIP" placeholder="ZIP" maxlength="10"
-                                   style="font-size: 12px; padding: 6px 8px;">
+                                   data-order-style="input">
                         </div>
                         <button type="button" class="btn-tax-lookup" title="Look up tax rate">
                             <i class="fas fa-search" aria-hidden="true"></i>
                         </button>
                     </div>
-                    <div class="os-tax-status" style="font-size: 11px; color: #64748b; min-height: 14px;"></div>
+                    <div class="os-tax-status" data-order-style="tax-status"></div>
                     <!-- Ship Method -->
                     <div class="customer-field">
-                        <label class="quote-label" style="font-size: 11px;">Ship Method</label>
-                        <select class="os-ship-method quote-input" aria-label="Ship method" style="font-size: 12px; padding: 6px 8px;">
+                        <label class="quote-label" data-order-style="label">Ship Method</label>
+                        <select class="os-ship-method quote-input" aria-label="Ship method" data-order-style="input">
                             <option value="">Select...</option>
                             <option value="Ground">Ground</option>
                             <option value="2-Day">2-Day</option>
@@ -1388,10 +1388,10 @@ function renderOrderShippingFields(containerId) {
                         </select>
                     </div>
                     <!-- Notes -->
-                    <div class="customer-field" style="margin-top: 4px;">
-                        <label class="quote-label" style="font-size: 11px;"><i class="fas fa-sticky-note" aria-hidden="true" style="color: #f9a825;"></i> Notes</label>
+                    <div class="customer-field" data-order-style="notes-field">
+                        <label class="quote-label" data-order-style="label"><i class="fas fa-sticky-note" aria-hidden="true" data-order-style="notes-icon"></i> Notes</label>
                         <textarea class="os-notes quote-input" aria-label="Order notes" placeholder="Special instructions, employee names, etc."
-                                  style="font-size: 12px; padding: 6px 8px; min-height: 60px; resize: vertical; font-family: inherit;"></textarea>
+                                  data-order-style="notes"></textarea>
                     </div>
                 </div>
             </div>

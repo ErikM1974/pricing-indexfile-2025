@@ -1,0 +1,538 @@
+{
+  "name": "decg-retail-laser-patch",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Embroidery Pricing | Northwest Custom Apparel",
+      "url": "/calculators/embroidery-pricing-all/index.html?tab=decg-retail",
+      "ids": {
+        "decgRetailItemType": "Garment Cap Laser Patch",
+        "decgRetailQuantity": "",
+        "decgRetailBreakdownLabel": "Laser Patch:",
+        "decgRetailBreakdownValue": "$21.00",
+        "decgRetailLtmBreakdownLabel": "+ LTM ($50 ÷ 5):",
+        "decgRetailLtmBreakdownValue": "+$10.00",
+        "decgRetailFinalUnitPrice": "$31.00",
+        "decgRetailCapUpgrades": "3D-EMB 3D Puff +$5.00 Laser Patch Patch +$5.00",
+        "decgRetailGarmentsMatrix": "Quantity EMBROIDERY PRICE 1-7 pcs +$50 LTM $22.00 each 8-23 pcs $19.00 each 24-47 pcs $17.00 each 48-71 pcs $16.00 each 72+ pcs $15.00 each",
+        "decgRetailCapsMatrix": "Quantity EMBROIDERY PRICE 1-7 pcs +$50 LTM $15.00 each 8-23 pcs $13.00 each 24-47 pcs $11.00 each 48-71 pcs $10.00 each 72+ pcs $9.00 each"
+      },
+      "fields": [
+        {
+          "id": "decgRetailItemType",
+          "type": "select-one",
+          "value": "laser-patch",
+          "disabled": false
+        },
+        {
+          "id": "decgRetailQuantity",
+          "type": "number",
+          "value": "5",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        },
+        {
+          "href": "/calculators/embroidery-contract/",
+          "text": "Looking for Contract Embroidery? →"
+        },
+        {
+          "href": "?tab=fullback",
+          "text": "Full Back Embroidery (25K+, DECG-FB)? Same rate when the customer supplies the garment — see the dedicated Full Back Embroidery tab →"
+        }
+      ],
+      "tables": [
+        "Quantity EMBROIDERY PRICE 1-7 pcs +$50 LTM $22.00 each 8-23 pcs $19.00 each 24-47 pcs $17.00 each 48-71 pcs $16.00 each 72+ pcs $15.00 each",
+        "Quantity EMBROIDERY PRICE 1-7 pcs +$50 LTM $15.00 each 8-23 pcs $13.00 each 24-47 pcs $11.00 each 48-71 pcs $10.00 each 72+ pcs $9.00 each"
+      ],
+      "headings": [
+        "Embroidery Pricing 2026",
+        "Quick Price Calculator",
+        "DECG Garments DECG",
+        "DECG Caps DECC",
+        "Heavyweight Surcharge"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a[href$=\"staff-dashboard.html\"]"
+            ],
+            [
+              ".version-info"
+            ],
+            [
+              "button[data-tab=\"al-retail\"] > .tab-subtitle"
+            ],
+            [
+              "button[data-tab=\"stitch-charges\"] > .tab-subtitle"
+            ],
+            [
+              "button[data-tab=\"fullback\"] > .tab-subtitle"
+            ],
+            [
+              "#tab-decg-retail > details > summary > .disclosure-hint"
+            ],
+            [
+              "#decgRetailBreakdownLabel"
+            ],
+            [
+              "#decgRetailBreakdownValue"
+            ],
+            [
+              "#decgRetailLtmBreakdownLabel"
+            ],
+            [
+              "#decgRetailLtmBreakdownValue"
+            ],
+            [
+              "#decgRetailCapUpgrades > .upgrade-item:nth-child(1) > .upgrade-price"
+            ],
+            [
+              "#decgRetailCapUpgrades > .upgrade-item:nth-child(2) > .upgrade-price"
+            ],
+            [
+              "#tab-decg-retail > .matrices-grid > .matrix-card:nth-child(1) > .matrix-header > h3 > .part-number-badge"
+            ],
+            [
+              "#tab-decg-retail > .matrices-grid > .matrix-card:nth-child(1) > .matrix-header > .matrix-meta"
+            ],
+            [
+              "#decgRetailGarmentsMatrix > thead > tr > th:nth-child(2)"
+            ],
+            [
+              "#tab-decg-retail > .matrices-grid > .matrix-card:nth-child(1) > .matrix-note"
+            ],
+            [
+              "#tab-decg-retail > .matrices-grid > .matrix-card:nth-child(2) > .matrix-header > h3 > .part-number-badge"
+            ],
+            [
+              "#tab-decg-retail > .matrices-grid > .matrix-card:nth-child(2) > .matrix-header > .matrix-meta"
+            ],
+            [
+              "#decgRetailCapsMatrix > thead > tr > th:nth-child(2)"
+            ],
+            [
+              "#tab-decg-retail > .matrices-grid > .matrix-card:nth-child(2) > .matrix-note"
+            ]
+          ]
+        },
+        {
+          "id": "link-in-text-block",
+          "nodes": [
+            [
+              "a[href$=\"staff-dashboard.html\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Embroidery Pricing | Northwest Custom Apparel",
+      "url": "/calculators/embroidery-pricing-all/index.html?tab=decg-retail",
+      "ids": {
+        "decgRetailItemType": "Garment Cap Laser Patch",
+        "decgRetailQuantity": "",
+        "decgRetailBreakdownLabel": "Laser Patch:",
+        "decgRetailBreakdownValue": "$21.00",
+        "decgRetailLtmBreakdownLabel": "+ LTM ($50 ÷ 5):",
+        "decgRetailLtmBreakdownValue": "+$10.00",
+        "decgRetailFinalUnitPrice": "$31.00",
+        "decgRetailCapUpgrades": "3D-EMB 3D Puff +$5.00 Laser Patch Patch +$5.00",
+        "decgRetailGarmentsMatrix": "Quantity EMBROIDERY PRICE 1-7 pcs +$50 LTM $22.00 each 8-23 pcs $19.00 each 24-47 pcs $17.00 each 48-71 pcs $16.00 each 72+ pcs $15.00 each",
+        "decgRetailCapsMatrix": "Quantity EMBROIDERY PRICE 1-7 pcs +$50 LTM $15.00 each 8-23 pcs $13.00 each 24-47 pcs $11.00 each 48-71 pcs $10.00 each 72+ pcs $9.00 each"
+      },
+      "fields": [
+        {
+          "id": "decgRetailItemType",
+          "type": "select-one",
+          "value": "laser-patch",
+          "disabled": false
+        },
+        {
+          "id": "decgRetailQuantity",
+          "type": "number",
+          "value": "5",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        },
+        {
+          "href": "/calculators/embroidery-contract/",
+          "text": "Looking for Contract Embroidery? →"
+        },
+        {
+          "href": "?tab=fullback",
+          "text": "Full Back Embroidery (25K+, DECG-FB)? Same rate when the customer supplies the garment — see the dedicated Full Back Embroidery tab →"
+        }
+      ],
+      "tables": [
+        "Quantity EMBROIDERY PRICE 1-7 pcs +$50 LTM $22.00 each 8-23 pcs $19.00 each 24-47 pcs $17.00 each 48-71 pcs $16.00 each 72+ pcs $15.00 each",
+        "Quantity EMBROIDERY PRICE 1-7 pcs +$50 LTM $15.00 each 8-23 pcs $13.00 each 24-47 pcs $11.00 each 48-71 pcs $10.00 each 72+ pcs $9.00 each"
+      ],
+      "headings": [
+        "Embroidery Pricing 2026",
+        "Quick Price Calculator",
+        "DECG Garments DECG",
+        "DECG Caps DECC",
+        "Heavyweight Surcharge"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a[href$=\"staff-dashboard.html\"]"
+            ],
+            [
+              ".version-info"
+            ],
+            [
+              "button[data-tab=\"al-retail\"] > .tab-subtitle"
+            ],
+            [
+              "button[data-tab=\"stitch-charges\"] > .tab-subtitle"
+            ],
+            [
+              "button[data-tab=\"fullback\"] > .tab-subtitle"
+            ],
+            [
+              "#tab-decg-retail > details > summary > .disclosure-hint"
+            ],
+            [
+              "#decgRetailBreakdownLabel"
+            ],
+            [
+              "#decgRetailBreakdownValue"
+            ],
+            [
+              "#decgRetailLtmBreakdownLabel"
+            ],
+            [
+              "#decgRetailLtmBreakdownValue"
+            ],
+            [
+              "#decgRetailCapUpgrades > .upgrade-item:nth-child(1) > .upgrade-price"
+            ],
+            [
+              "#decgRetailCapUpgrades > .upgrade-item:nth-child(2) > .upgrade-price"
+            ],
+            [
+              "#tab-decg-retail > .matrices-grid > .matrix-card:nth-child(1) > .matrix-header > h3 > .part-number-badge"
+            ],
+            [
+              "#tab-decg-retail > .matrices-grid > .matrix-card:nth-child(1) > .matrix-header > .matrix-meta"
+            ],
+            [
+              "#decgRetailGarmentsMatrix > thead > tr > th:nth-child(2)"
+            ],
+            [
+              "#tab-decg-retail > .matrices-grid > .matrix-card:nth-child(1) > .matrix-note"
+            ],
+            [
+              "#tab-decg-retail > .matrices-grid > .matrix-card:nth-child(2) > .matrix-header > h3 > .part-number-badge"
+            ],
+            [
+              "#tab-decg-retail > .matrices-grid > .matrix-card:nth-child(2) > .matrix-header > .matrix-meta"
+            ],
+            [
+              "#decgRetailCapsMatrix > thead > tr > th:nth-child(2)"
+            ],
+            [
+              "#tab-decg-retail > .matrices-grid > .matrix-card:nth-child(2) > .matrix-note"
+            ]
+          ]
+        },
+        {
+          "id": "link-in-text-block",
+          "nodes": [
+            [
+              "a[href$=\"staff-dashboard.html\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Embroidery Pricing | Northwest Custom Apparel",
+      "url": "/calculators/embroidery-pricing-all/index.html?tab=decg-retail",
+      "ids": {
+        "decgRetailItemType": "Garment Cap Laser Patch",
+        "decgRetailQuantity": "",
+        "decgRetailBreakdownLabel": "Laser Patch:",
+        "decgRetailBreakdownValue": "$21.00",
+        "decgRetailLtmBreakdownLabel": "+ LTM ($50 ÷ 5):",
+        "decgRetailLtmBreakdownValue": "+$10.00",
+        "decgRetailFinalUnitPrice": "$31.00",
+        "decgRetailCapUpgrades": "3D-EMB 3D Puff +$5.00 Laser Patch Patch +$5.00",
+        "decgRetailGarmentsMatrix": "Quantity EMBROIDERY PRICE 1-7 pcs +$50 LTM $22.00 each 8-23 pcs $19.00 each 24-47 pcs $17.00 each 48-71 pcs $16.00 each 72+ pcs $15.00 each",
+        "decgRetailCapsMatrix": "Quantity EMBROIDERY PRICE 1-7 pcs +$50 LTM $15.00 each 8-23 pcs $13.00 each 24-47 pcs $11.00 each 48-71 pcs $10.00 each 72+ pcs $9.00 each"
+      },
+      "fields": [
+        {
+          "id": "decgRetailItemType",
+          "type": "select-one",
+          "value": "laser-patch",
+          "disabled": false
+        },
+        {
+          "id": "decgRetailQuantity",
+          "type": "number",
+          "value": "5",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        },
+        {
+          "href": "/calculators/embroidery-contract/",
+          "text": "Looking for Contract Embroidery? →"
+        },
+        {
+          "href": "?tab=fullback",
+          "text": "Full Back Embroidery (25K+, DECG-FB)? Same rate when the customer supplies the garment — see the dedicated Full Back Embroidery tab →"
+        }
+      ],
+      "tables": [
+        "Quantity EMBROIDERY PRICE 1-7 pcs +$50 LTM $22.00 each 8-23 pcs $19.00 each 24-47 pcs $17.00 each 48-71 pcs $16.00 each 72+ pcs $15.00 each",
+        "Quantity EMBROIDERY PRICE 1-7 pcs +$50 LTM $15.00 each 8-23 pcs $13.00 each 24-47 pcs $11.00 each 48-71 pcs $10.00 each 72+ pcs $9.00 each"
+      ],
+      "headings": [
+        "Embroidery Pricing 2026",
+        "Quick Price Calculator",
+        "DECG Garments DECG",
+        "DECG Caps DECC",
+        "Heavyweight Surcharge"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a[href$=\"staff-dashboard.html\"]"
+            ],
+            [
+              ".version-info"
+            ],
+            [
+              "button[data-tab=\"al-retail\"] > .tab-subtitle"
+            ],
+            [
+              "button[data-tab=\"stitch-charges\"] > .tab-subtitle"
+            ],
+            [
+              "button[data-tab=\"fullback\"] > .tab-subtitle"
+            ],
+            [
+              "#tab-decg-retail > details > summary > .disclosure-hint"
+            ],
+            [
+              "#decgRetailBreakdownLabel"
+            ],
+            [
+              "#decgRetailBreakdownValue"
+            ],
+            [
+              "#decgRetailLtmBreakdownLabel"
+            ],
+            [
+              "#decgRetailLtmBreakdownValue"
+            ],
+            [
+              "#decgRetailCapUpgrades > .upgrade-item:nth-child(1) > .upgrade-price"
+            ],
+            [
+              "#decgRetailCapUpgrades > .upgrade-item:nth-child(2) > .upgrade-price"
+            ],
+            [
+              "#tab-decg-retail > .matrices-grid > .matrix-card:nth-child(1) > .matrix-header > h3 > .part-number-badge"
+            ],
+            [
+              "#tab-decg-retail > .matrices-grid > .matrix-card:nth-child(1) > .matrix-header > .matrix-meta"
+            ],
+            [
+              "#decgRetailGarmentsMatrix > thead > tr > th:nth-child(2)"
+            ],
+            [
+              "#tab-decg-retail > .matrices-grid > .matrix-card:nth-child(1) > .matrix-note"
+            ],
+            [
+              "#tab-decg-retail > .matrices-grid > .matrix-card:nth-child(2) > .matrix-header > h3 > .part-number-badge"
+            ],
+            [
+              "#tab-decg-retail > .matrices-grid > .matrix-card:nth-child(2) > .matrix-header > .matrix-meta"
+            ],
+            [
+              "#decgRetailCapsMatrix > thead > tr > th:nth-child(2)"
+            ],
+            [
+              "#tab-decg-retail > .matrices-grid > .matrix-card:nth-child(2) > .matrix-note"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Embroidery Pricing | Northwest Custom Apparel",
+      "url": "/calculators/embroidery-pricing-all/index.html?tab=decg-retail",
+      "ids": {
+        "decgRetailItemType": "Garment Cap Laser Patch",
+        "decgRetailQuantity": "",
+        "decgRetailBreakdownLabel": "Laser Patch:",
+        "decgRetailBreakdownValue": "$21.00",
+        "decgRetailLtmBreakdownLabel": "+ LTM ($50 ÷ 5):",
+        "decgRetailLtmBreakdownValue": "+$10.00",
+        "decgRetailFinalUnitPrice": "$31.00",
+        "decgRetailCapUpgrades": "3D-EMB 3D Puff +$5.00 Laser Patch Patch +$5.00",
+        "decgRetailGarmentsMatrix": "Quantity EMBROIDERY PRICE 1-7 pcs +$50 LTM $22.00 each 8-23 pcs $19.00 each 24-47 pcs $17.00 each 48-71 pcs $16.00 each 72+ pcs $15.00 each",
+        "decgRetailCapsMatrix": "Quantity EMBROIDERY PRICE 1-7 pcs +$50 LTM $15.00 each 8-23 pcs $13.00 each 24-47 pcs $11.00 each 48-71 pcs $10.00 each 72+ pcs $9.00 each"
+      },
+      "fields": [
+        {
+          "id": "decgRetailItemType",
+          "type": "select-one",
+          "value": "laser-patch",
+          "disabled": false
+        },
+        {
+          "id": "decgRetailQuantity",
+          "type": "number",
+          "value": "5",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        },
+        {
+          "href": "/calculators/embroidery-contract/",
+          "text": "Looking for Contract Embroidery? →"
+        },
+        {
+          "href": "?tab=fullback",
+          "text": "Full Back Embroidery (25K+, DECG-FB)? Same rate when the customer supplies the garment — see the dedicated Full Back Embroidery tab →"
+        }
+      ],
+      "tables": [
+        "Quantity EMBROIDERY PRICE 1-7 pcs +$50 LTM $22.00 each 8-23 pcs $19.00 each 24-47 pcs $17.00 each 48-71 pcs $16.00 each 72+ pcs $15.00 each",
+        "Quantity EMBROIDERY PRICE 1-7 pcs +$50 LTM $15.00 each 8-23 pcs $13.00 each 24-47 pcs $11.00 each 48-71 pcs $10.00 each 72+ pcs $9.00 each"
+      ],
+      "headings": [
+        "Embroidery Pricing 2026",
+        "Quick Price Calculator",
+        "DECG Garments DECG",
+        "DECG Caps DECC",
+        "Heavyweight Surcharge"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a[href$=\"staff-dashboard.html\"]"
+            ],
+            [
+              ".version-info"
+            ],
+            [
+              "button[data-tab=\"al-retail\"] > .tab-subtitle"
+            ],
+            [
+              "button[data-tab=\"stitch-charges\"] > .tab-subtitle"
+            ],
+            [
+              "button[data-tab=\"fullback\"] > .tab-subtitle"
+            ],
+            [
+              "#tab-decg-retail > details > summary > .disclosure-hint"
+            ],
+            [
+              "#decgRetailBreakdownLabel"
+            ],
+            [
+              "#decgRetailBreakdownValue"
+            ],
+            [
+              "#decgRetailLtmBreakdownLabel"
+            ],
+            [
+              "#decgRetailLtmBreakdownValue"
+            ],
+            [
+              "#decgRetailCapUpgrades > .upgrade-item:nth-child(1) > .upgrade-price"
+            ],
+            [
+              "#decgRetailCapUpgrades > .upgrade-item:nth-child(2) > .upgrade-price"
+            ],
+            [
+              "#tab-decg-retail > .matrices-grid > .matrix-card:nth-child(1) > .matrix-header > h3 > .part-number-badge"
+            ],
+            [
+              "#tab-decg-retail > .matrices-grid > .matrix-card:nth-child(1) > .matrix-header > .matrix-meta"
+            ],
+            [
+              "#decgRetailGarmentsMatrix > thead > tr > th:nth-child(2)"
+            ],
+            [
+              "#tab-decg-retail > .matrices-grid > .matrix-card:nth-child(1) > .matrix-note"
+            ],
+            [
+              "#tab-decg-retail > .matrices-grid > .matrix-card:nth-child(2) > .matrix-header > h3 > .part-number-badge"
+            ],
+            [
+              "#tab-decg-retail > .matrices-grid > .matrix-card:nth-child(2) > .matrix-header > .matrix-meta"
+            ],
+            [
+              "#decgRetailCapsMatrix > thead > tr > th:nth-child(2)"
+            ],
+            [
+              "#tab-decg-retail > .matrices-grid > .matrix-card:nth-child(2) > .matrix-note"
+            ]
+          ]
+        },
+        {
+          "id": "link-in-text-block",
+          "nodes": [
+            [
+              "a[href$=\"staff-dashboard.html\"]"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "reads": [
+    "/api/contract-pricing",
+    "/api/al-pricing",
+    "/api/decg-pricing",
+    "/api/pricing-bundle?method=EMB",
+    "/api/embroidery-costs?itemType=3D-Puff&stitchCount=0",
+    "/api/embroidery-costs?itemType=Patch&stitchCount=0"
+  ],
+  "dialogs": []
+}

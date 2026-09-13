@@ -1,0 +1,406 @@
+{
+  "name": "screenprint-review",
+  "states": [
+    {
+      "width": 1440,
+      "title": "2026 Screen Print Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Embroidery DTF Transfers DTG (1st product only)",
+        "spc-order-fields": "Order & Shipping",
+        "ship-residential": "",
+        "estimate-ship-btn": "Estimate UPS Ground",
+        "estimate-ship-result": "",
+        "pre-tax-subtotal": "$606.00",
+        "include-tax": "",
+        "tax-rate-input": "",
+        "wholesale-checkbox": "",
+        "tax-rate-label": "Sales Tax (10.2%)",
+        "tax-amount": "$61.81",
+        "grand-total-with-tax": "$667.81",
+        "push-readiness": "BEFORE YOU PUSH ShopWorks Customer # At least one item Customer name Customer email",
+        "scp-push-shopworks-label": "Push to ShopWorks",
+        "sidebar-resize-handle": "",
+        "sidebar-front": "Left Chest (1-color)",
+        "sidebar-screens": "1",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$576.00",
+        "per-unit-price": "$12.00/piece",
+        "sidebar-grand-total": "$667.81",
+        "toast-container": "Ready to build Screen Print quotes! Vellum rate is an estimate ($10.00) — live pricing didn't return it. Verify before saving. Color Chg rate is an estimate ($15.00) — live pricing didn't return it. Verify before saving.",
+        "qb-fallback-badge": "⚠ Estimated pricing in use: Vellum, Color Chg — live rates unavailable. Verify before sending."
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "ship-residential",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "include-tax",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "tax-rate-input",
+          "name": "",
+          "type": "number",
+          "value": "10.2",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "wholesale-checkbox",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".pr-ok"
+            ],
+            [
+              ".btn-share-link"
+            ],
+            [
+              "#per-unit-price"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "2026 Screen Print Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Embroidery DTF Transfers DTG (1st product only)",
+        "spc-order-fields": "Order & Shipping",
+        "ship-residential": "",
+        "estimate-ship-btn": "Estimate UPS Ground",
+        "estimate-ship-result": "",
+        "pre-tax-subtotal": "$606.00",
+        "include-tax": "",
+        "tax-rate-input": "",
+        "wholesale-checkbox": "",
+        "tax-rate-label": "Sales Tax (10.2%)",
+        "tax-amount": "$61.81",
+        "grand-total-with-tax": "$667.81",
+        "push-readiness": "BEFORE YOU PUSH ShopWorks Customer # At least one item Customer name Customer email",
+        "scp-push-shopworks-label": "Push to ShopWorks",
+        "sidebar-resize-handle": "",
+        "sidebar-front": "Left Chest (1-color)",
+        "sidebar-screens": "1",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$576.00",
+        "per-unit-price": "$12.00/piece",
+        "sidebar-grand-total": "$667.81",
+        "toast-container": "Ready to build Screen Print quotes! Vellum rate is an estimate ($10.00) — live pricing didn't return it. Verify before saving. Color Chg rate is an estimate ($15.00) — live pricing didn't return it. Verify before saving.",
+        "qb-fallback-badge": "⚠ Estimated pricing in use: Vellum, Color Chg — live rates unavailable. Verify before sending."
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "ship-residential",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "include-tax",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "tax-rate-input",
+          "name": "",
+          "type": "number",
+          "value": "10.2",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "wholesale-checkbox",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".pr-ok"
+            ],
+            [
+              ".btn-share-link"
+            ],
+            [
+              "#per-unit-price"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "2026 Screen Print Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Embroidery DTF Transfers DTG (1st product only)",
+        "spc-order-fields": "Order & Shipping",
+        "ship-residential": "",
+        "estimate-ship-btn": "Estimate UPS Ground",
+        "estimate-ship-result": "",
+        "pre-tax-subtotal": "$606.00",
+        "include-tax": "",
+        "tax-rate-input": "",
+        "wholesale-checkbox": "",
+        "tax-rate-label": "Sales Tax (10.2%)",
+        "tax-amount": "$61.81",
+        "grand-total-with-tax": "$667.81",
+        "push-readiness": "BEFORE YOU PUSH ShopWorks Customer # At least one item Customer name Customer email",
+        "scp-push-shopworks-label": "Push to ShopWorks",
+        "sidebar-resize-handle": "",
+        "sidebar-front": "Left Chest (1-color)",
+        "sidebar-screens": "1",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$576.00",
+        "per-unit-price": "$12.00/piece",
+        "sidebar-grand-total": "$667.81",
+        "toast-container": "Vellum rate is an estimate ($10.00) — live pricing didn't return it. Verify before saving. Color Chg rate is an estimate ($15.00) — live pricing didn't return it. Verify before saving.",
+        "qb-fallback-badge": "⚠ Estimated pricing in use: Vellum, Color Chg — live rates unavailable. Verify before sending."
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "ship-residential",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "include-tax",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "tax-rate-input",
+          "name": "",
+          "type": "number",
+          "value": "10.2",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "wholesale-checkbox",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".pr-ok"
+            ],
+            [
+              ".btn-share-link"
+            ],
+            [
+              "#per-unit-price"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "2026 Screen Print Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Embroidery DTF Transfers DTG (1st product only)",
+        "spc-order-fields": "Order & Shipping",
+        "ship-residential": "",
+        "estimate-ship-btn": "Estimate UPS Ground",
+        "estimate-ship-result": "",
+        "pre-tax-subtotal": "$606.00",
+        "include-tax": "",
+        "tax-rate-input": "",
+        "wholesale-checkbox": "",
+        "tax-rate-label": "Sales Tax (10.2%)",
+        "tax-amount": "$61.81",
+        "grand-total-with-tax": "$667.81",
+        "push-readiness": "BEFORE YOU PUSH ShopWorks Customer # At least one item Customer name Customer email",
+        "scp-push-shopworks-label": "Push to ShopWorks",
+        "sidebar-resize-handle": "",
+        "sidebar-front": "Left Chest (1-color)",
+        "sidebar-screens": "1",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$576.00",
+        "per-unit-price": "$12.00/piece",
+        "sidebar-grand-total": "$667.81",
+        "toast-container": "Vellum rate is an estimate ($10.00) — live pricing didn't return it. Verify before saving. Color Chg rate is an estimate ($15.00) — live pricing didn't return it. Verify before saving.",
+        "qb-fallback-badge": "⚠ Estimated pricing in use: Vellum, Color Chg — live rates unavailable. Verify before sending."
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "ship-residential",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "include-tax",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "tax-rate-input",
+          "name": "",
+          "type": "number",
+          "value": "10.2",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "wholesale-checkbox",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".pr-ok"
+            ],
+            [
+              ".btn-share-link"
+            ],
+            [
+              "#per-unit-price"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "mutations": []
+}

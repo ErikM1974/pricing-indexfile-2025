@@ -1,0 +1,774 @@
+{
+  "name": "screenprint-healthy-shipping-fields",
+  "states": [
+    {
+      "width": 1440,
+      "title": "2026 Screen Print Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Embroidery DTF Transfers DTG (1st product only)",
+        "spc-order-fields": "Order & Shipping PHONE ORDER # PO # SHIPPING FEE $ SHIP DATE DROP DEAD DATE SHIP TO ADDRESS AL AK AZ AR CA CO CT DE FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI WY SHIP METHOD Select... Ground 2-Day Overnight Customer Pickup Local Delivery NOTES",
+        "ship-residential": "",
+        "estimate-ship-btn": "Estimate UPS Ground",
+        "estimate-ship-result": "",
+        "pre-tax-subtotal": "$606.00",
+        "include-tax": "",
+        "tax-rate-input": "",
+        "wholesale-checkbox": "",
+        "tax-rate-label": "Sales Tax (10.2%)",
+        "tax-amount": "$61.81",
+        "grand-total-with-tax": "$667.81",
+        "push-readiness": "BEFORE YOU PUSH ShopWorks Customer # At least one item Customer name Customer email",
+        "scp-push-shopworks-label": "Push to ShopWorks",
+        "sidebar-resize-handle": "",
+        "sidebar-front": "Left Chest (1-color)",
+        "sidebar-screens": "1",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$576.00",
+        "per-unit-price": "$12.00/piece",
+        "sidebar-grand-total": "$667.81",
+        "toast-container": "Ready to build Screen Print quotes!"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "tel",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "date",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "date",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "WA",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "textarea",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "ship-residential",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "include-tax",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "tax-rate-input",
+          "name": "",
+          "type": "number",
+          "value": "10.2",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "wholesale-checkbox",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".pr-ok"
+            ],
+            [
+              ".btn-share-link"
+            ],
+            [
+              "#per-unit-price"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "2026 Screen Print Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Embroidery DTF Transfers DTG (1st product only)",
+        "spc-order-fields": "Order & Shipping PHONE ORDER # PO # SHIPPING FEE $ SHIP DATE DROP DEAD DATE SHIP TO ADDRESS AL AK AZ AR CA CO CT DE FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI WY SHIP METHOD Select... Ground 2-Day Overnight Customer Pickup Local Delivery NOTES",
+        "ship-residential": "",
+        "estimate-ship-btn": "Estimate UPS Ground",
+        "estimate-ship-result": "",
+        "pre-tax-subtotal": "$606.00",
+        "include-tax": "",
+        "tax-rate-input": "",
+        "wholesale-checkbox": "",
+        "tax-rate-label": "Sales Tax (10.2%)",
+        "tax-amount": "$61.81",
+        "grand-total-with-tax": "$667.81",
+        "push-readiness": "BEFORE YOU PUSH ShopWorks Customer # At least one item Customer name Customer email",
+        "scp-push-shopworks-label": "Push to ShopWorks",
+        "sidebar-resize-handle": "",
+        "sidebar-front": "Left Chest (1-color)",
+        "sidebar-screens": "1",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$576.00",
+        "per-unit-price": "$12.00/piece",
+        "sidebar-grand-total": "$667.81",
+        "toast-container": ""
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "tel",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "date",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "date",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "WA",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "textarea",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "ship-residential",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "include-tax",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "tax-rate-input",
+          "name": "",
+          "type": "number",
+          "value": "10.2",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "wholesale-checkbox",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".pr-ok"
+            ],
+            [
+              ".btn-share-link"
+            ],
+            [
+              "#per-unit-price"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "2026 Screen Print Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Embroidery DTF Transfers DTG (1st product only)",
+        "spc-order-fields": "Order & Shipping PHONE ORDER # PO # SHIPPING FEE $ SHIP DATE DROP DEAD DATE SHIP TO ADDRESS AL AK AZ AR CA CO CT DE FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI WY SHIP METHOD Select... Ground 2-Day Overnight Customer Pickup Local Delivery NOTES",
+        "ship-residential": "",
+        "estimate-ship-btn": "Estimate UPS Ground",
+        "estimate-ship-result": "",
+        "pre-tax-subtotal": "$606.00",
+        "include-tax": "",
+        "tax-rate-input": "",
+        "wholesale-checkbox": "",
+        "tax-rate-label": "Sales Tax (10.2%)",
+        "tax-amount": "$61.81",
+        "grand-total-with-tax": "$667.81",
+        "push-readiness": "BEFORE YOU PUSH ShopWorks Customer # At least one item Customer name Customer email",
+        "scp-push-shopworks-label": "Push to ShopWorks",
+        "sidebar-resize-handle": "",
+        "sidebar-front": "Left Chest (1-color)",
+        "sidebar-screens": "1",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$576.00",
+        "per-unit-price": "$12.00/piece",
+        "sidebar-grand-total": "$667.81",
+        "toast-container": ""
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "tel",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "date",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "date",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "WA",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "textarea",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "ship-residential",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "include-tax",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "tax-rate-input",
+          "name": "",
+          "type": "number",
+          "value": "10.2",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "wholesale-checkbox",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".pr-ok"
+            ],
+            [
+              ".btn-share-link"
+            ],
+            [
+              "#per-unit-price"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "2026 Screen Print Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Embroidery DTF Transfers DTG (1st product only)",
+        "spc-order-fields": "Order & Shipping PHONE ORDER # PO # SHIPPING FEE $ SHIP DATE DROP DEAD DATE SHIP TO ADDRESS AL AK AZ AR CA CO CT DE FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI WY SHIP METHOD Select... Ground 2-Day Overnight Customer Pickup Local Delivery NOTES",
+        "ship-residential": "",
+        "estimate-ship-btn": "Estimate UPS Ground",
+        "estimate-ship-result": "",
+        "pre-tax-subtotal": "$606.00",
+        "include-tax": "",
+        "tax-rate-input": "",
+        "wholesale-checkbox": "",
+        "tax-rate-label": "Sales Tax (10.2%)",
+        "tax-amount": "$61.81",
+        "grand-total-with-tax": "$667.81",
+        "push-readiness": "BEFORE YOU PUSH ShopWorks Customer # At least one item Customer name Customer email",
+        "scp-push-shopworks-label": "Push to ShopWorks",
+        "sidebar-resize-handle": "",
+        "sidebar-front": "Left Chest (1-color)",
+        "sidebar-screens": "1",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$576.00",
+        "per-unit-price": "$12.00/piece",
+        "sidebar-grand-total": "$667.81",
+        "toast-container": ""
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "tel",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "date",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "date",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "WA",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "textarea",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "ship-residential",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "include-tax",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "tax-rate-input",
+          "name": "",
+          "type": "number",
+          "value": "10.2",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "wholesale-checkbox",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".pr-ok"
+            ],
+            [
+              ".btn-share-link"
+            ],
+            [
+              "#per-unit-price"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "mutations": []
+}

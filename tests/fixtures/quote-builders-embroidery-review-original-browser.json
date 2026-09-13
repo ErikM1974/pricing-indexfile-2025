@@ -1,0 +1,570 @@
+{
+  "name": "embroidery-review",
+  "states": [
+    {
+      "width": 1440,
+      "title": "2026 Embroidery Quote Builder - Garments & Caps | Northwest Custom Apparel",
+      "url": "/quote-builders/embroidery-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Screen Print DTF Transfers DTG (1st product only)",
+        "po-number": "",
+        "date-order-placed": "",
+        "req-ship-date": "",
+        "drop-dead-date": "",
+        "payment-terms": "",
+        "order-number": "",
+        "invoice-subtotal-display": "$960.00",
+        "it-shipping-amt": "Customer Pickup",
+        "include-tax": "",
+        "tax-label": "Sales Tax (10.1%)",
+        "tax-rate-input": "",
+        "tax-amount": "$96.96",
+        "wholesale-checkbox": "",
+        "grand-total-with-tax": "$1056.96",
+        "push-readiness": "BEFORE YOU PUSH ShopWorks Customer # At least one item Customer name Customer email",
+        "emb-push-shopworks-label": "Push to ShopWorks",
+        "sidebar-resize-handle": "",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "products-label": "Products (Base 8K):",
+        "subtotal": "$960.00",
+        "per-unit-price": "$20.00/piece",
+        "additional-logos-pricing": "",
+        "cap-additional-logos-pricing": "",
+        "sidebar-grand-total": "$1056.96",
+        "toast-container": "Ready to build quotes!",
+        "floatingQuoteBtn": "✨ Ask"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "po-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "date-order-placed",
+          "name": "",
+          "type": "date",
+          "value": "2026-09-12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "req-ship-date",
+          "name": "",
+          "type": "date",
+          "value": "2026-09-26",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "drop-dead-date",
+          "name": "",
+          "type": "date",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "payment-terms",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "order-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "include-tax",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "tax-rate-input",
+          "name": "",
+          "type": "number",
+          "value": "10.1",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "wholesale-checkbox",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".pr-ok"
+            ],
+            [
+              ".btn-share-link"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "2026 Embroidery Quote Builder - Garments & Caps | Northwest Custom Apparel",
+      "url": "/quote-builders/embroidery-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Screen Print DTF Transfers DTG (1st product only)",
+        "po-number": "",
+        "date-order-placed": "",
+        "req-ship-date": "",
+        "drop-dead-date": "",
+        "payment-terms": "",
+        "order-number": "",
+        "invoice-subtotal-display": "$960.00",
+        "it-shipping-amt": "Customer Pickup",
+        "include-tax": "",
+        "tax-label": "Sales Tax (10.1%)",
+        "tax-rate-input": "",
+        "tax-amount": "$96.96",
+        "wholesale-checkbox": "",
+        "grand-total-with-tax": "$1056.96",
+        "push-readiness": "BEFORE YOU PUSH ShopWorks Customer # At least one item Customer name Customer email",
+        "emb-push-shopworks-label": "Push to ShopWorks",
+        "sidebar-resize-handle": "",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "products-label": "Products (Base 8K):",
+        "subtotal": "$960.00",
+        "per-unit-price": "$20.00/piece",
+        "additional-logos-pricing": "",
+        "cap-additional-logos-pricing": "",
+        "sidebar-grand-total": "$1056.96",
+        "toast-container": "Ready to build quotes!",
+        "floatingQuoteBtn": "✨ Ask"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "po-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "date-order-placed",
+          "name": "",
+          "type": "date",
+          "value": "2026-09-12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "req-ship-date",
+          "name": "",
+          "type": "date",
+          "value": "2026-09-26",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "drop-dead-date",
+          "name": "",
+          "type": "date",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "payment-terms",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "order-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "include-tax",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "tax-rate-input",
+          "name": "",
+          "type": "number",
+          "value": "10.1",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "wholesale-checkbox",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".pr-ok"
+            ],
+            [
+              ".btn-share-link"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "2026 Embroidery Quote Builder - Garments & Caps | Northwest Custom Apparel",
+      "url": "/quote-builders/embroidery-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Screen Print DTF Transfers DTG (1st product only)",
+        "po-number": "",
+        "date-order-placed": "",
+        "req-ship-date": "",
+        "drop-dead-date": "",
+        "payment-terms": "",
+        "order-number": "",
+        "invoice-subtotal-display": "$960.00",
+        "it-shipping-amt": "Customer Pickup",
+        "include-tax": "",
+        "tax-label": "Sales Tax (10.1%)",
+        "tax-rate-input": "",
+        "tax-amount": "$96.96",
+        "wholesale-checkbox": "",
+        "grand-total-with-tax": "$1056.96",
+        "push-readiness": "BEFORE YOU PUSH ShopWorks Customer # At least one item Customer name Customer email",
+        "emb-push-shopworks-label": "Push to ShopWorks",
+        "sidebar-resize-handle": "",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "products-label": "Products (Base 8K):",
+        "subtotal": "$960.00",
+        "per-unit-price": "$20.00/piece",
+        "additional-logos-pricing": "",
+        "cap-additional-logos-pricing": "",
+        "sidebar-grand-total": "$1056.96",
+        "toast-container": "",
+        "floatingQuoteBtn": "✨ Ask"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "po-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "date-order-placed",
+          "name": "",
+          "type": "date",
+          "value": "2026-09-12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "req-ship-date",
+          "name": "",
+          "type": "date",
+          "value": "2026-09-26",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "drop-dead-date",
+          "name": "",
+          "type": "date",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "payment-terms",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "order-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "include-tax",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "tax-rate-input",
+          "name": "",
+          "type": "number",
+          "value": "10.1",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "wholesale-checkbox",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".pr-ok"
+            ],
+            [
+              ".btn-share-link"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "2026 Embroidery Quote Builder - Garments & Caps | Northwest Custom Apparel",
+      "url": "/quote-builders/embroidery-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Screen Print DTF Transfers DTG (1st product only)",
+        "po-number": "",
+        "date-order-placed": "",
+        "req-ship-date": "",
+        "drop-dead-date": "",
+        "payment-terms": "",
+        "order-number": "",
+        "invoice-subtotal-display": "$960.00",
+        "it-shipping-amt": "Customer Pickup",
+        "include-tax": "",
+        "tax-label": "Sales Tax (10.1%)",
+        "tax-rate-input": "",
+        "tax-amount": "$96.96",
+        "wholesale-checkbox": "",
+        "grand-total-with-tax": "$1056.96",
+        "push-readiness": "BEFORE YOU PUSH ShopWorks Customer # At least one item Customer name Customer email",
+        "emb-push-shopworks-label": "Push to ShopWorks",
+        "sidebar-resize-handle": "",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "products-label": "Products (Base 8K):",
+        "subtotal": "$960.00",
+        "per-unit-price": "$20.00/piece",
+        "additional-logos-pricing": "",
+        "cap-additional-logos-pricing": "",
+        "sidebar-grand-total": "$1056.96",
+        "toast-container": "",
+        "floatingQuoteBtn": "✨ Ask"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "po-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "date-order-placed",
+          "name": "",
+          "type": "date",
+          "value": "2026-09-12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "req-ship-date",
+          "name": "",
+          "type": "date",
+          "value": "2026-09-26",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "drop-dead-date",
+          "name": "",
+          "type": "date",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "payment-terms",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "order-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "include-tax",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "tax-rate-input",
+          "name": "",
+          "type": "number",
+          "value": "10.1",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "wholesale-checkbox",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".pr-ok"
+            ],
+            [
+              ".btn-share-link"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "mutations": []
+}

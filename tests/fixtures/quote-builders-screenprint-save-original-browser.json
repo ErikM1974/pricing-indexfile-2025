@@ -1,0 +1,567 @@
+{
+  "name": "screenprint-save",
+  "states": [
+    {
+      "width": 1440,
+      "title": "2026 Screen Print Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Embroidery DTF Transfers DTG (1st product only)",
+        "order-recap": "ORDER AT A GLANCE Customer Example Customer",
+        "spc-order-fields": "Order & Shipping",
+        "ship-residential": "",
+        "estimate-ship-btn": "Estimate UPS Ground",
+        "estimate-ship-result": "",
+        "pre-tax-subtotal": "$606.00",
+        "include-tax": "",
+        "tax-rate-input": "",
+        "wholesale-checkbox": "",
+        "tax-rate-label": "Sales Tax (10.2%)",
+        "tax-amount": "$61.81",
+        "grand-total-with-tax": "$667.81",
+        "push-readiness": "BEFORE YOU PUSH ShopWorks Customer # At least one item Customer name Customer email",
+        "scp-push-shopworks-label": "Push to ShopWorks",
+        "sidebar-resize-handle": "",
+        "sidebar-front": "Left Chest (1-color)",
+        "sidebar-screens": "1",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$576.00",
+        "per-unit-price": "$12.00/piece",
+        "sidebar-grand-total": "$667.81",
+        "toast-container": "Ready to build Screen Print quotes! Vellum rate is an estimate ($10.00) — live pricing didn't return it. Verify before saving. Color Chg rate is an estimate ($15.00) — live pricing didn't return it. Verify before saving.",
+        "quote-share-title": "Quote Saved!",
+        "quote-share-modal-id": "SP-2026-777",
+        "quote-share-instructions": "Share this link with your customer:",
+        "quote-share-url": "",
+        "quote-share-copy-btn": "Copy",
+        "quote-share-email-btn": "Email to customer",
+        "quote-share-view-btn": "View Quote",
+        "quote-share-close-btn": "Close",
+        "qb-fallback-badge": "⚠ Estimated pricing in use: Vellum, Color Chg — live rates unavailable. Verify before sending."
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "ship-residential",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "include-tax",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "tax-rate-input",
+          "name": "",
+          "type": "number",
+          "value": "10.2",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "wholesale-checkbox",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "quote-share-url",
+          "name": "",
+          "type": "text",
+          "value": "http://localhost:3414/quote/SP-2026-777",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".pr-ok.pr-item:nth-child(3)"
+            ],
+            [
+              ".pr-ok.pr-item:nth-child(4)"
+            ],
+            [
+              ".pr-ok.pr-item:nth-child(5)"
+            ],
+            [
+              ".btn-share-link"
+            ],
+            [
+              "#per-unit-price"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "2026 Screen Print Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Embroidery DTF Transfers DTG (1st product only)",
+        "order-recap": "ORDER AT A GLANCE Customer Example Customer",
+        "spc-order-fields": "Order & Shipping",
+        "ship-residential": "",
+        "estimate-ship-btn": "Estimate UPS Ground",
+        "estimate-ship-result": "",
+        "pre-tax-subtotal": "$606.00",
+        "include-tax": "",
+        "tax-rate-input": "",
+        "wholesale-checkbox": "",
+        "tax-rate-label": "Sales Tax (10.2%)",
+        "tax-amount": "$61.81",
+        "grand-total-with-tax": "$667.81",
+        "push-readiness": "BEFORE YOU PUSH ShopWorks Customer # At least one item Customer name Customer email",
+        "scp-push-shopworks-label": "Push to ShopWorks",
+        "sidebar-resize-handle": "",
+        "sidebar-front": "Left Chest (1-color)",
+        "sidebar-screens": "1",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$576.00",
+        "per-unit-price": "$12.00/piece",
+        "sidebar-grand-total": "$667.81",
+        "toast-container": "Vellum rate is an estimate ($10.00) — live pricing didn't return it. Verify before saving. Color Chg rate is an estimate ($15.00) — live pricing didn't return it. Verify before saving.",
+        "quote-share-title": "Quote Saved!",
+        "quote-share-modal-id": "SP-2026-777",
+        "quote-share-instructions": "Share this link with your customer:",
+        "quote-share-url": "",
+        "quote-share-copy-btn": "Copy",
+        "quote-share-email-btn": "Email to customer",
+        "quote-share-view-btn": "View Quote",
+        "quote-share-close-btn": "Close",
+        "qb-fallback-badge": "⚠ Estimated pricing in use: Vellum, Color Chg — live rates unavailable. Verify before sending."
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "ship-residential",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "include-tax",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "tax-rate-input",
+          "name": "",
+          "type": "number",
+          "value": "10.2",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "wholesale-checkbox",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "quote-share-url",
+          "name": "",
+          "type": "text",
+          "value": "http://localhost:3414/quote/SP-2026-777",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".pr-ok.pr-item:nth-child(3)"
+            ],
+            [
+              ".pr-ok.pr-item:nth-child(4)"
+            ],
+            [
+              ".pr-ok.pr-item:nth-child(5)"
+            ],
+            [
+              ".btn-share-link"
+            ],
+            [
+              "#per-unit-price"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "2026 Screen Print Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Embroidery DTF Transfers DTG (1st product only)",
+        "order-recap": "ORDER AT A GLANCE Customer Example Customer",
+        "spc-order-fields": "Order & Shipping",
+        "ship-residential": "",
+        "estimate-ship-btn": "Estimate UPS Ground",
+        "estimate-ship-result": "",
+        "pre-tax-subtotal": "$606.00",
+        "include-tax": "",
+        "tax-rate-input": "",
+        "wholesale-checkbox": "",
+        "tax-rate-label": "Sales Tax (10.2%)",
+        "tax-amount": "$61.81",
+        "grand-total-with-tax": "$667.81",
+        "push-readiness": "BEFORE YOU PUSH ShopWorks Customer # At least one item Customer name Customer email",
+        "scp-push-shopworks-label": "Push to ShopWorks",
+        "sidebar-resize-handle": "",
+        "sidebar-front": "Left Chest (1-color)",
+        "sidebar-screens": "1",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$576.00",
+        "per-unit-price": "$12.00/piece",
+        "sidebar-grand-total": "$667.81",
+        "toast-container": "Vellum rate is an estimate ($10.00) — live pricing didn't return it. Verify before saving. Color Chg rate is an estimate ($15.00) — live pricing didn't return it. Verify before saving.",
+        "quote-share-title": "Quote Saved!",
+        "quote-share-modal-id": "SP-2026-777",
+        "quote-share-instructions": "Share this link with your customer:",
+        "quote-share-url": "",
+        "quote-share-copy-btn": "Copy",
+        "quote-share-email-btn": "Email to customer",
+        "quote-share-view-btn": "View Quote",
+        "quote-share-close-btn": "Close",
+        "qb-fallback-badge": "⚠ Estimated pricing in use: Vellum, Color Chg — live rates unavailable. Verify before sending."
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "ship-residential",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "include-tax",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "tax-rate-input",
+          "name": "",
+          "type": "number",
+          "value": "10.2",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "wholesale-checkbox",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "quote-share-url",
+          "name": "",
+          "type": "text",
+          "value": "http://localhost:3414/quote/SP-2026-777",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".pr-ok.pr-item:nth-child(3)"
+            ],
+            [
+              ".pr-ok.pr-item:nth-child(4)"
+            ],
+            [
+              ".pr-ok.pr-item:nth-child(5)"
+            ],
+            [
+              ".btn-share-link"
+            ],
+            [
+              "#per-unit-price"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "2026 Screen Print Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Embroidery DTF Transfers DTG (1st product only)",
+        "order-recap": "ORDER AT A GLANCE Customer Example Customer",
+        "spc-order-fields": "Order & Shipping",
+        "ship-residential": "",
+        "estimate-ship-btn": "Estimate UPS Ground",
+        "estimate-ship-result": "",
+        "pre-tax-subtotal": "$606.00",
+        "include-tax": "",
+        "tax-rate-input": "",
+        "wholesale-checkbox": "",
+        "tax-rate-label": "Sales Tax (10.2%)",
+        "tax-amount": "$61.81",
+        "grand-total-with-tax": "$667.81",
+        "push-readiness": "BEFORE YOU PUSH ShopWorks Customer # At least one item Customer name Customer email",
+        "scp-push-shopworks-label": "Push to ShopWorks",
+        "sidebar-resize-handle": "",
+        "sidebar-front": "Left Chest (1-color)",
+        "sidebar-screens": "1",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$576.00",
+        "per-unit-price": "$12.00/piece",
+        "sidebar-grand-total": "$667.81",
+        "toast-container": "",
+        "quote-share-title": "Quote Saved!",
+        "quote-share-modal-id": "SP-2026-777",
+        "quote-share-instructions": "Share this link with your customer:",
+        "quote-share-url": "",
+        "quote-share-copy-btn": "Copy",
+        "quote-share-email-btn": "Email to customer",
+        "quote-share-view-btn": "View Quote",
+        "quote-share-close-btn": "Close",
+        "qb-fallback-badge": "⚠ Estimated pricing in use: Vellum, Color Chg — live rates unavailable. Verify before sending."
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "ship-residential",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "include-tax",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "tax-rate-input",
+          "name": "",
+          "type": "number",
+          "value": "10.2",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "wholesale-checkbox",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "quote-share-url",
+          "name": "",
+          "type": "text",
+          "value": "http://localhost:3414/quote/SP-2026-777",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".pr-ok.pr-item:nth-child(3)"
+            ],
+            [
+              ".pr-ok.pr-item:nth-child(4)"
+            ],
+            [
+              ".pr-ok.pr-item:nth-child(5)"
+            ],
+            [
+              ".btn-share-link"
+            ],
+            [
+              "#per-unit-price"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "mutations": [
+    {
+      "path": "/api/quote_sessions",
+      "method": "POST",
+      "body": {
+        "QuoteID": "SP-2026-777",
+        "SessionID": "synthetic-session",
+        "CustomerEmail": "customer@example.invalid",
+        "CustomerName": "Example Customer",
+        "CompanyName": "",
+        "CustomerNumber": "",
+        "TotalQuantity": 48,
+        "SubtotalAmount": 576,
+        "LTMFeeTotal": 0,
+        "TotalAmount": 606,
+        "Status": "Open",
+        "ExpiresAt": "2026-10-12T18:30:00",
+        "Notes": "{\"locations\":[],\"primaryColors\":1,\"additionalColors\":{},\"frontLocation\":\"LC\",\"backLocation\":\"\",\"frontColors\":1,\"backColors\":1,\"leftSleeveColors\":0,\"rightSleeveColors\":0,\"sleeveColorsList\":[],\"totalScreens\":1,\"isDarkGarment\":false,\"hasSafetyStripes\":false,\"setupFeeTotal\":30,\"vellumQty\":0,\"vellumTotal\":0,\"colorChangeQty\":0,\"colorChangeTotal\":0,\"userNotes\":\"\",\"referenceArtwork\":[],\"designNumber\":\"\",\"newDesignName\":\"\"}",
+        "SalesRepEmail": "sales@nwcustomapparel.com",
+        "ArtCharge": 0,
+        "GraphicDesignHours": 0,
+        "GraphicDesignCharge": 0,
+        "RushFee": 0,
+        "Discount": 0,
+        "DiscountPercent": 0,
+        "DiscountReason": "",
+        "LTM_Display_Mode": "builtin",
+        "LTM_Waived": false,
+        "TaxRate": 10.2,
+        "TaxAmount": 61.81,
+        "IsWholesale": "No",
+        "Phone": "",
+        "OrderNumber": "",
+        "PurchaseOrderNumber": "",
+        "ShipToAddress": "",
+        "ShipToCity": "",
+        "ShipToState": "WA",
+        "ShipToZip": "",
+        "ShipMethod": "",
+        "ShippingFee": 0,
+        "ReqShipDate": null,
+        "DropDeadDate": null
+      }
+    },
+    {
+      "path": "/api/quote_items",
+      "method": "POST",
+      "body": {
+        "QuoteID": "SP-2026-777",
+        "LineNumber": 1,
+        "StyleNumber": "PC54",
+        "ProductName": "Essential Cotton Tee",
+        "Color": "Jet Black",
+        "ColorCode": "JetBlack",
+        "EmbellishmentType": "screenprint",
+        "PrintLocation": "Primary",
+        "PrintLocationName": "Primary Location",
+        "Quantity": 48,
+        "HasLTM": "No",
+        "BaseUnitPrice": 12,
+        "LTMPerUnit": 0,
+        "FinalUnitPrice": 12,
+        "LineTotal": 576,
+        "SizeBreakdown": "{\"M\":48}",
+        "PricingTier": "37-71",
+        "ImageURL": "",
+        "AddedAt": "2026-09-12T18:30:00"
+      }
+    }
+  ]
+}

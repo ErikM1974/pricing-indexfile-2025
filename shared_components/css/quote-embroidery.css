@@ -1,0 +1,121 @@
+@layer components.pages {
+/* Embroidery-only configuration, design gallery and catalog service controls. */
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .logo-config-container { min-width:0; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .logo-cards-column { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr)); align-items:start; gap:20px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .logo-card { min-width:0; border:1px solid var(--ui-line); border-radius:var(--radius-md); background:var(--ui-surface); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .logo-card-header { display:flex; align-items:center; gap:10px; min-height:60px; padding:14px 20px; border-bottom:1px solid var(--ui-line); cursor:pointer; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .logo-card-icon { width:32px; height:32px; display:grid; place-items:center; border-radius:var(--radius-sm); color:var(--ui-accent); background:var(--ui-tint); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .logo-card-icon.cap { color:var(--indigo-700); background:color-mix(in srgb, var(--indigo-700) 8%, var(--ui-surface)); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .logo-card-title { font-weight:600; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .logo-card-collapse-icon { margin-left:auto; color:var(--ui-muted); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .logo-card-body { padding:20px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .logo-card.collapsed .logo-card-body { display:none; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .logo-card.collapsed .logo-card-collapse-icon { transform:rotate(-90deg); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .logo-form-row { display:flex; align-items:end; flex-wrap:wrap; gap:16px; margin-top:16px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .logo-form-field { flex:1 1 170px; min-width:0; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .logo-form-field label,:where([data-ui="unified"][data-quote-workspace="embroidery"]) .design-row-label { display:block; color:var(--ui-muted); font-weight:600; font-size:12px; margin-bottom:6px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .logo-form-divider { border-top:1px solid var(--ui-line); margin:16px 0; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .digitizing-checkbox { display:flex; align-items:center; flex-wrap:wrap; gap:8px; min-height:44px; padding:10px 12px; border:1px solid var(--ui-line-strong); border-radius:var(--radius-sm); color:var(--ui-accent); background:var(--ui-tint); cursor:pointer; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .digitizing-checkbox-indicator { display:grid; place-items:center; width:20px; height:20px; border:1px solid var(--ui-accent); border-radius:4px; background:var(--ui-surface); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .digitizing-checkbox-indicator i { display:none; --fa-display:none; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .digitizing-checkbox.checked .digitizing-checkbox-indicator { background:var(--ui-accent); color:var(--color-on-brand); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .digitizing-checkbox.checked .digitizing-checkbox-indicator i { display:block; --fa-display:block; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .digitizing-checkbox-label { font-weight:600; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .digitizing-checkbox input[type="checkbox"] { display:none; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .digitizing-checkbox-price,:where([data-ui="unified"][data-quote-workspace="embroidery"]) .digitizing-price { font-size:12px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .design-number-input-group { display:flex; align-items:center; flex-wrap:wrap; gap:8px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .design-number-input-group input { flex:1 1 120px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .design-btn { min-width:44px; padding:8px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .design-info-badge { padding:10px; margin-top:10px; color:var(--ui-accent); background:var(--ui-tint); border-radius:var(--radius-sm); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .design-thumbnail-preview { margin:12px 0; width:120px; height:100px; padding:8px; border:1px solid var(--ui-line); border-radius:var(--radius-sm); cursor:pointer; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .design-thumb-img { width:100%; height:100%; object-fit:contain; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .al-inline-fields { gap:12px; flex-wrap:wrap; display:none; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .al-inline-fields input,:where([data-ui="unified"][data-quote-workspace="embroidery"]) .al-inline-fields select { max-width:180px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .al-inline-fields.visible { display:flex; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .service-bar { display:flex; align-items:center; flex-wrap:wrap; gap:8px; padding:14px; border:1px solid var(--ui-line); border-radius:var(--radius-md); background:var(--ui-surface); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .service-bar-label { font-size:13px; font-weight:600; margin-right:8px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .service-cat { position:relative; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .service-cat-btn { display:flex; align-items:center; gap:8px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .service-cat-btn > i:first-child { color:var(--indigo-700); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .service-cat-caret { font-size:11px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .service-cat-menu { position:absolute; top:calc(100% + 6px); left:0; width:min(380px,calc(100vw - 48px)); max-height:70vh; overflow:auto; border:1px solid var(--ui-line-strong); border-radius:var(--radius-sm); padding:6px; background:var(--ui-surface); box-shadow:var(--shadow-md); z-index:var(--z-overlay); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .service-cat:last-child .service-cat-menu { left:auto; right:0; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .service-cat-item { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; width:100%; min-height:48px; padding:12px; border:0; border-radius:4px; text-align:left; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .sci-name { display:inline-flex; align-items:center; gap:8px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .sci-hint { font-size:12px; color:var(--ui-accent); background:var(--ui-tint); padding:3px 8px; border-radius:4px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .sci-amt-wrap,:where([data-ui="unified"][data-quote-workspace="embroidery"]) .sci-config-wrap,:where([data-ui="unified"][data-quote-workspace="embroidery"]) .sci-field-lbl { display:flex; align-items:center; flex-wrap:wrap; gap:8px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .sci-config { align-items:stretch; flex-direction:column; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .sci-config .sci-name { font-weight:600; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .sci-field-lbl { color:var(--ui-muted); font-size:12px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .sci-field-lbl input,:where([data-ui="unified"][data-quote-workspace="embroidery"]) .sci-field-lbl select { max-width:180px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) input.sci-amt,:where([data-ui="unified"][data-quote-workspace="embroidery"]) input.sci-num { width:96px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .sci-add { color:var(--color-on-brand); background:var(--ui-accent); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .sci-presets { display:flex; flex-wrap:wrap; gap:6px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .sci-fl { min-width:60px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .service-row td { background:var(--ui-tint); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .design-search-input-row { display:flex; flex-wrap:wrap; gap:12px; margin-bottom:12px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .design-search-field { flex:1 1 200px; min-width:0; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .design-search-filters,:where([data-ui="unified"][data-quote-workspace="embroidery"]) .design-search-company-chips { display:flex; flex-wrap:wrap; gap:8px; margin:12px 0; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .design-search-chip.active,:where([data-ui="unified"][data-quote-workspace="embroidery"]) .design-search-company-chip.active { color:var(--ui-accent); background:var(--ui-tint); border-color:var(--ui-accent); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .design-search-hint,:where([data-ui="unified"][data-quote-workspace="embroidery"]) .design-search-empty,:where([data-ui="unified"][data-quote-workspace="embroidery"]) .design-search-loading { padding:20px; text-align:center; color:var(--ui-muted); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .design-search-error { padding:16px; color:var(--color-danger-ink); background:var(--color-danger-bg); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .design-search-results { display:grid; gap:12px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .design-search-result { display:flex; align-items:start; gap:12px; padding:16px; border:1px solid var(--ui-line); border-radius:var(--radius-sm); cursor:pointer; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .design-search-result:hover { border-color:var(--ui-accent); background:var(--ui-tint); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .design-search-thumb { width:72px; height:72px; object-fit:contain; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .design-search-thumb img { width:100%; height:100%; object-fit:contain; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .design-search-results-header,:where([data-ui="unified"][data-quote-workspace="embroidery"]) .design-gallery-header { display:flex; align-items:center; flex-wrap:wrap; gap:12px; padding:16px 0; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .gallery-customer-name,:where([data-ui="unified"][data-quote-workspace="embroidery"]) .design-gallery-number { font-weight:700; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .gallery-design-count,:where([data-ui="unified"][data-quote-workspace="embroidery"]) .design-gallery-meta { color:var(--ui-muted); font-size:12px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .design-gallery-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:12px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .design-gallery-card { padding:12px; border:1px solid var(--ui-line); border-radius:var(--radius-sm); cursor:pointer; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .design-gallery-thumb { height:120px; display:grid; place-items:center; background:var(--ui-canvas); margin-bottom:12px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .design-gallery-thumb img { max-width:100%; max-height:120px; object-fit:contain; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .design-gallery-name { margin:6px 0; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .design-gallery-no-match { padding:24px; text-align:center; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .design-search-show-more { text-align:center; padding:16px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .sub-breakdown { padding-left:14px; color:var(--ui-muted); font-size:12px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .sub-breakdown .pricing-row { padding:4px 0; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .it-tax-row { flex-wrap:wrap; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .it-tax-row .it-amt { margin-left:auto; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .fee-row:not(tr) { display:flex; justify-content:space-between; gap:10px; padding:8px 0; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .fee-row input,:where([data-ui="unified"][data-quote-workspace="embroidery"]) .charge-field input { max-width:120px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .min-order-warning-text { color:var(--color-warning-ink); background:var(--color-warning-bg); padding:12px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .toggle-switch { position:relative; width:42px; height:24px; border-radius:var(--radius-pill); background:var(--ui-line-strong); cursor:pointer; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .toggle-switch.active { background:var(--ui-accent); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .toggle-switch-handle { position:absolute; top:3px; left:3px; width:18px; height:18px; border-radius:50%; background:var(--ui-surface); }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .toggle-switch.active .toggle-switch-handle { left:21px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .workspace-field-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .workspace-span-all { grid-column:1/-1; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .workspace-field-grid > * { min-width:0; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .workspace-fields-inline { align-items:center; flex-wrap:wrap; gap:10px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .workspace-fields-inline > input { flex:1 1 140px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .workspace-fields-inline > select { flex:0 1 100px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .workspace-pad { padding:16px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .workspace-hint { color:var(--ui-muted); font-size:12px; line-height:1.6; margin-top:8px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .workspace-relative { position:relative; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .workspace-label { font-weight:600; display:block; margin-bottom:6px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .workspace-order-details { border:1px solid var(--ui-line); border-radius:var(--radius-md); background:var(--ui-surface); padding:16px; }
+:where([data-ui="unified"][data-quote-workspace="embroidery"]) .workspace-search-icon { display:none; }
+
+@media (width <= 600px) {
+ :where([data-ui="unified"][data-quote-workspace="embroidery"]) .logo-card-header,:where([data-ui="unified"][data-quote-workspace="embroidery"]) .logo-card-body { padding:16px; }
+ :where([data-ui="unified"][data-quote-workspace="embroidery"]) .logo-form-field { flex-basis:100%; }
+ :where([data-ui="unified"][data-quote-workspace="embroidery"]) .workspace-field-grid { grid-template-columns:minmax(0,1fr); }
+ :where([data-ui="unified"][data-quote-workspace="embroidery"]) .workspace-field-grid .workspace-span-all { grid-column:auto; }
+ :where([data-ui="unified"][data-quote-workspace="embroidery"]) .service-cat { width:100%; }
+ :where([data-ui="unified"][data-quote-workspace="embroidery"]) .service-cat-btn { width:100%; }
+ :where([data-ui="unified"][data-quote-workspace="embroidery"]) .service-cat-menu { position:static; width:100%; max-height:60vh; margin-top:6px; }
+}
+
+@media print {
+ :where([data-ui="unified"][data-quote-workspace="embroidery"]) .service-bar { display:none; }
+ :where([data-ui="unified"][data-quote-workspace="embroidery"]) .logo-cards-column { grid-template-columns:minmax(0,1fr); }
+ :where([data-ui="unified"][data-quote-workspace="embroidery"]) .logo-card-header,:where([data-ui="unified"][data-quote-workspace="embroidery"]) .logo-card-body,:where([data-ui="unified"][data-quote-workspace="embroidery"]) .logo-status-chips { padding:10px; }
+ :where([data-ui="unified"][data-quote-workspace="embroidery"]) .logo-form-row { gap:8px; margin-top:8px; }
+ :where([data-ui="unified"][data-quote-workspace="embroidery"]) .logo-form-field { flex-basis:100px; }
+ :where([data-ui="unified"][data-quote-workspace="embroidery"]) .digitizing-checkbox { padding:4px; min-height:0; }
+ :where([data-ui="unified"][data-quote-workspace="embroidery"]) .workspace-field-grid { gap:8px; }
+}
+
+}

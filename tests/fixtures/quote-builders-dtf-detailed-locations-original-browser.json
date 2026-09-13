@@ -1,0 +1,605 @@
+{
+  "name": "dtf-detailed-locations",
+  "states": [
+    {
+      "width": 1440,
+      "title": "2026 DTF Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/dtf-quote-builder.html",
+      "ids": {
+        "toast-container": "",
+        "method-switch-menu": "Switch method … Embroidery Screen Print DTG (1st product only)",
+        "location-display": "Full Front + Center Back + Left Sleeve + Right Sleeve",
+        "artwork-upload-o56jin-design-name": "",
+        "artwork-upload-o56jin-dropzone": "Drop files here or click to browse AI / EPS / PSD / PDF / PNG / JPG / TIFF · 20 MB max each",
+        "sidebar-resize-handle": "",
+        "sidebar-location": "Full Front + Center Back + Left Sleeve + Right Sleeve",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$2136.00",
+        "per-unit-price": "$44.50/piece",
+        "sidebar-grand-total": "$2353.87"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "left-chest",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "right-chest",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "center-front",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "full-front",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "back-of-neck",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "center-back",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "full-back",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "sleeve-location",
+          "type": "checkbox",
+          "value": "left-sleeve",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "sleeve-location",
+          "type": "checkbox",
+          "value": "right-sleeve",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "artwork-upload-o56jin-design-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "button[data-step=\"2\"] > .gs-txt > .gs-title"
+            ],
+            [
+              ".artwork-dropzone-sub"
+            ],
+            [
+              "#per-unit-price"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "2026 DTF Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/dtf-quote-builder.html",
+      "ids": {
+        "toast-container": "",
+        "method-switch-menu": "Switch method … Embroidery Screen Print DTG (1st product only)",
+        "location-display": "Full Front + Center Back + Left Sleeve + Right Sleeve",
+        "artwork-upload-o56jin-design-name": "",
+        "artwork-upload-o56jin-dropzone": "Drop files here or click to browse AI / EPS / PSD / PDF / PNG / JPG / TIFF · 20 MB max each",
+        "sidebar-resize-handle": "",
+        "sidebar-location": "Full Front + Center Back + Left Sleeve + Right Sleeve",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$2136.00",
+        "per-unit-price": "$44.50/piece",
+        "sidebar-grand-total": "$2353.87"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "left-chest",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "right-chest",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "center-front",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "full-front",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "back-of-neck",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "center-back",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "full-back",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "sleeve-location",
+          "type": "checkbox",
+          "value": "left-sleeve",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "sleeve-location",
+          "type": "checkbox",
+          "value": "right-sleeve",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "artwork-upload-o56jin-design-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".artwork-dropzone-sub"
+            ],
+            [
+              "#per-unit-price"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "2026 DTF Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/dtf-quote-builder.html",
+      "ids": {
+        "toast-container": "",
+        "method-switch-menu": "Switch method … Embroidery Screen Print DTG (1st product only)",
+        "location-display": "Full Front + Center Back + Left Sleeve + Right Sleeve",
+        "artwork-upload-o56jin-design-name": "",
+        "artwork-upload-o56jin-dropzone": "Drop files here or click to browse AI / EPS / PSD / PDF / PNG / JPG / TIFF · 20 MB max each",
+        "sidebar-resize-handle": "",
+        "sidebar-location": "Full Front + Center Back + Left Sleeve + Right Sleeve",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$2136.00",
+        "per-unit-price": "$44.50/piece",
+        "sidebar-grand-total": "$2353.87"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "left-chest",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "right-chest",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "center-front",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "full-front",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "back-of-neck",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "center-back",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "full-back",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "sleeve-location",
+          "type": "checkbox",
+          "value": "left-sleeve",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "sleeve-location",
+          "type": "checkbox",
+          "value": "right-sleeve",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "artwork-upload-o56jin-design-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".artwork-dropzone-sub"
+            ],
+            [
+              "#per-unit-price"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "2026 DTF Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/dtf-quote-builder.html",
+      "ids": {
+        "toast-container": "",
+        "method-switch-menu": "Switch method … Embroidery Screen Print DTG (1st product only)",
+        "location-display": "Full Front + Center Back + Left Sleeve + Right Sleeve",
+        "artwork-upload-o56jin-design-name": "",
+        "artwork-upload-o56jin-dropzone": "Drop files here or click to browse AI / EPS / PSD / PDF / PNG / JPG / TIFF · 20 MB max each",
+        "sidebar-resize-handle": "",
+        "sidebar-location": "Full Front + Center Back + Left Sleeve + Right Sleeve",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$2136.00",
+        "per-unit-price": "$44.50/piece",
+        "sidebar-grand-total": "$2353.87"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "left-chest",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "right-chest",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "center-front",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "full-front",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "back-of-neck",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "center-back",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "full-back",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "sleeve-location",
+          "type": "checkbox",
+          "value": "left-sleeve",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "sleeve-location",
+          "type": "checkbox",
+          "value": "right-sleeve",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "artwork-upload-o56jin-design-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".artwork-dropzone-sub"
+            ],
+            [
+              "#per-unit-price"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "mutations": []
+}

@@ -22,9 +22,12 @@ export function positionColorDropdown(trigger, dropdown) {
     const r = trigger.getBoundingClientRect();
     const vh = window.innerHeight || document.documentElement.clientHeight;
     dropdown.style.position = 'fixed';
-    dropdown.style.left = r.left + 'px';
+    const vw = window.innerWidth || document.documentElement.clientWidth;
+    const menuWidth = vw > 0 ? Math.min(Math.max(r.width, 220), Math.max(1, vw - 24)) : Math.max(r.width, 220);
+    const menuLeft = vw > 0 ? Math.max(12, Math.min(r.left, vw - menuWidth - 12)) : r.left;
+    dropdown.style.left = menuLeft + 'px';
     dropdown.style.right = 'auto';
-    dropdown.style.width = Math.max(r.width, 220) + 'px';
+    dropdown.style.width = menuWidth + 'px';
     if (!vh || vh <= 0) {
         // embedded/headless contexts can report 0 — just open below, unclamped
         dropdown.style.bottom = 'auto';

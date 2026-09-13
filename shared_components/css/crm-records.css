@@ -1028,5 +1028,9 @@
             width: auto;
             height: auto;
         }
+
+        :where([data-ui="unified"][data-crm-record]) .lw-art-modal {
+            display: none;
+        }
     }
 }

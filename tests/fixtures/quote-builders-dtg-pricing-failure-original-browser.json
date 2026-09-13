@@ -1,0 +1,1486 @@
+{
+  "name": "dtg-pricing-failure",
+  "states": [
+    {
+      "width": 1440,
+      "title": "DTG Quote Builder — Northwest Custom Apparel",
+      "url": "/quote-builders/dtg-quote-builder.html",
+      "ids": {
+        "toast-container": "",
+        "dtgCatalogTabs": "All (1) T-Shirts (1)",
+        "dtgCatalogSearch": "",
+        "dtgCatalogGrid": "#1 PC54 T-SHIRTS Essential Cotton Tee 480 units sold total Jet Black · 240 units sold Add Jet Black All 2",
+        "dtgFormHead": "DTG Order Form",
+        "dtgResumeBannerMount": "",
+        "dtgFrontOptions": "Left Chest 4″×4″ Full Front 12″×16″ Jumbo Front 16″×20″",
+        "dtgBackOptions": "None Full Back 12″×16″ Jumbo Back 16″×20″",
+        "dtgLocationSummary": "Left Chest Code: LC",
+        "dtg-cbx-4": "",
+        "dtg-cbx-5": "",
+        "dtgAddRowBtn": "Add row",
+        "dtgArtSetupToggle": "",
+        "dtgArtSetupQty": "",
+        "dtgArtSetupRate": "× $50.00",
+        "dtgArtSetupTotal": "$0.00",
+        "dtgDesignHours": "",
+        "dtgDesignRate": "hrs × $75.00/hr",
+        "dtgDesignTotal": "$0.00",
+        "dtgPriceSummary": "Add at least one row with sizes to see live pricing.",
+        "dtgCompanyInput": "",
+        "dtgCustomerWarning": "",
+        "dtgTaxExemptChip": "",
+        "dtgAccountTierBadge": "",
+        "dtgFirstName": "",
+        "dtgLastName": "",
+        "dtgEmail": "",
+        "dtgPhone": "",
+        "dtgCompanyId": "",
+        "dtgPoNumber": "",
+        "dtgDesignNumber": "",
+        "dtgDesignThumbImg": "",
+        "dtgTerms": "Prepaid Net 10 Pay On Pickup",
+        "dtgNewArtworkName": "",
+        "dtgNewArtworkDropzone": "Drop file here or click to browse AI / EPS / PSD / PDF / PNG / JPG / TIFF · 20 MB max",
+        "dtgNewArtworkList": "",
+        "dtgNewArtworkStatus": "",
+        "dtgSalesRep": "Nika Lao Erik Mickelson Ruthie Nhoung Taneisha Clark Jim Mickelson",
+        "dtgShipMethod": "Customer Pickup UPS Ground Priority Mail",
+        "dtgDueDate": "",
+        "dtgDueDateHint": "5 business days (auto)",
+        "dtgDropDeadDate": "",
+        "dtgPickupToggle": "",
+        "include-tax": "",
+        "tax-rate-input": "",
+        "wholesale-checkbox": "",
+        "dtgPreflightPanel": "2 things need attention before push Print location: Left Chest Line items: 1 line · 24 combined pcs · tier ? Customer: Search for a company or fill name manually Sales rep: Erik Mickelson Ship method: Customer Pickup — Milton, WA (tax 10.2%) Design: Pick an existing design # OR upload new artwork",
+        "dtgSubmitBtn": "PUSH TO SHOPWORKS",
+        "dtgSaveBtn": "Save & Get Link",
+        "dtgPrintBtn": "Print Quote",
+        "dtgEmailBtn": "Email Quote",
+        "dtgResetBtn": "Reset form",
+        "floatingQuoteBtn": "✨ Ask",
+        "shareToastText": "Quote link copied — paste into your email or chat"
+      },
+      "fields": [
+        {
+          "id": "dtgCatalogSearch",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtg-cbx-4",
+          "name": "",
+          "type": "text",
+          "value": "PC54",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtg-cbx-5",
+          "name": "",
+          "type": "text",
+          "value": "Jet Black",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgArtSetupToggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgArtSetupQty",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": true
+        },
+        {
+          "id": "dtgDesignHours",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgCompanyInput",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgFirstName",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgLastName",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgEmail",
+          "name": "",
+          "type": "email",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgPhone",
+          "name": "",
+          "type": "tel",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgCompanyId",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgPoNumber",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgDesignNumber",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgTerms",
+          "name": "",
+          "type": "select-one",
+          "value": "Prepaid",
+          "disabled": false
+        },
+        {
+          "id": "dtgNewArtworkName",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgSalesRep",
+          "name": "",
+          "type": "select-one",
+          "value": "erik",
+          "disabled": false
+        },
+        {
+          "id": "dtgShipMethod",
+          "name": "",
+          "type": "select-one",
+          "value": "Customer Pickup",
+          "disabled": false
+        },
+        {
+          "id": "dtgDueDate",
+          "name": "",
+          "type": "date",
+          "value": "2026-09-18",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgDropDeadDate",
+          "name": "",
+          "type": "date",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgPickupToggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "include-tax",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "tax-rate-input",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "wholesale-checkbox",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/pricing/dtg",
+          "text": "/pricing/dtg"
+        },
+        {
+          "href": "#",
+          "text": ""
+        },
+        {
+          "href": "/pricing/dtg",
+          "text": "/pricing/dtg"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "(253) 922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "width": 768,
+      "title": "DTG Quote Builder — Northwest Custom Apparel",
+      "url": "/quote-builders/dtg-quote-builder.html",
+      "ids": {
+        "toast-container": "",
+        "dtgCatalogTabs": "All (1) T-Shirts (1)",
+        "dtgCatalogSearch": "",
+        "dtgCatalogGrid": "#1 PC54 T-SHIRTS Essential Cotton Tee 480 units sold total Jet Black · 240 units sold Add Jet Black All 2",
+        "dtgFormHead": "DTG Order Form",
+        "dtg-price-error-banner": "⚠ Live pricing failed for PC54 — the total below is INCOMPLETE. Refresh and try again before quoting this customer.",
+        "dtgFrontOptions": "Left Chest 4″×4″ Full Front 12″×16″ Jumbo Front 16″×20″",
+        "dtgBackOptions": "None Full Back 12″×16″ Jumbo Back 16″×20″",
+        "dtgLocationSummary": "Left Chest Code: LC",
+        "dtg-cbx-6": "",
+        "dtg-cbx-7": "",
+        "dtgAddRowBtn": "Add row",
+        "dtgArtSetupToggle": "",
+        "dtgArtSetupQty": "",
+        "dtgArtSetupRate": "× $50.00",
+        "dtgArtSetupTotal": "$0.00",
+        "dtgDesignHours": "",
+        "dtgDesignRate": "hrs × $75.00/hr",
+        "dtgDesignTotal": "$0.00",
+        "dtgPriceSummary": "LIVE DTG QUOTE · LEFT CHEST · CUSTOMER PICKUP 24-47 24 combined pieces $0.00 Subtotal $0.00 Tax (pickup, Milton WA 10.20%) $0.00 Order total $0.00",
+        "dtgCompanyInput": "",
+        "dtgCustomerWarning": "",
+        "dtgTaxExemptChip": "",
+        "dtgAccountTierBadge": "",
+        "dtgFirstName": "",
+        "dtgLastName": "",
+        "dtgEmail": "",
+        "dtgPhone": "",
+        "dtgCompanyId": "",
+        "dtgPoNumber": "",
+        "dtgDesignNumber": "",
+        "dtgDesignThumbImg": "",
+        "dtgTerms": "Prepaid Net 10 Pay On Pickup",
+        "dtgNewArtworkName": "",
+        "dtgNewArtworkDropzone": "Drop file here or click to browse AI / EPS / PSD / PDF / PNG / JPG / TIFF · 20 MB max",
+        "dtgNewArtworkList": "",
+        "dtgNewArtworkStatus": "",
+        "dtgSalesRep": "Nika Lao Erik Mickelson Ruthie Nhoung Taneisha Clark Jim Mickelson",
+        "dtgShipMethod": "Customer Pickup UPS Ground Priority Mail",
+        "dtgDueDate": "",
+        "dtgDueDateHint": "5 business days (auto · 24 pcs)",
+        "dtgDropDeadDate": "",
+        "dtgPickupToggle": "",
+        "include-tax": "",
+        "tax-rate-input": "",
+        "wholesale-checkbox": "",
+        "dtgPreflightPanel": "2 things need attention before push Print location: Left Chest Line items: 1 line · 24 combined pcs · tier ? Customer: Search for a company or fill name manually Sales rep: Erik Mickelson Ship method: Customer Pickup — Milton, WA (tax 10.2%) Design: Pick an existing design # OR upload new artwork",
+        "dtgSubmitBtn": "PUSH TO SHOPWORKS",
+        "dtgSaveBtn": "Save & Get Link",
+        "dtgPrintBtn": "Print Quote",
+        "dtgEmailBtn": "Email Quote",
+        "dtgResetBtn": "Reset form",
+        "floatingQuoteBtn": "✨ Ask",
+        "shareToastText": "Quote link copied — paste into your email or chat"
+      },
+      "fields": [
+        {
+          "id": "dtgCatalogSearch",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtg-cbx-6",
+          "name": "",
+          "type": "text",
+          "value": "PC54",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtg-cbx-7",
+          "name": "",
+          "type": "text",
+          "value": "Jet Black",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgArtSetupToggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgArtSetupQty",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": true
+        },
+        {
+          "id": "dtgDesignHours",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgCompanyInput",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgFirstName",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgLastName",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgEmail",
+          "name": "",
+          "type": "email",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgPhone",
+          "name": "",
+          "type": "tel",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgCompanyId",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgPoNumber",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgDesignNumber",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgTerms",
+          "name": "",
+          "type": "select-one",
+          "value": "Prepaid",
+          "disabled": false
+        },
+        {
+          "id": "dtgNewArtworkName",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgSalesRep",
+          "name": "",
+          "type": "select-one",
+          "value": "erik",
+          "disabled": false
+        },
+        {
+          "id": "dtgShipMethod",
+          "name": "",
+          "type": "select-one",
+          "value": "Customer Pickup",
+          "disabled": false
+        },
+        {
+          "id": "dtgDueDate",
+          "name": "",
+          "type": "date",
+          "value": "2026-09-18",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgDropDeadDate",
+          "name": "",
+          "type": "date",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgPickupToggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "include-tax",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "tax-rate-input",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "wholesale-checkbox",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/pricing/dtg",
+          "text": "/pricing/dtg"
+        },
+        {
+          "href": "#",
+          "text": ""
+        },
+        {
+          "href": "/pricing/dtg",
+          "text": "/pricing/dtg"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "(253) 922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#dtgArtSetupRate"
+            ],
+            [
+              "#dtgArtSetupTotal"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "DTG Quote Builder — Northwest Custom Apparel",
+      "url": "/quote-builders/dtg-quote-builder.html",
+      "ids": {
+        "toast-container": "",
+        "dtgCatalogTabs": "All (1) T-Shirts (1)",
+        "dtgCatalogSearch": "",
+        "dtgCatalogGrid": "#1 PC54 T-SHIRTS Essential Cotton Tee 480 units sold total Jet Black · 240 units sold Add Jet Black All 2",
+        "dtgFormHead": "DTG Order Form",
+        "dtg-price-error-banner": "⚠ Live pricing failed for PC54 — the total below is INCOMPLETE. Refresh and try again before quoting this customer.",
+        "dtgFrontOptions": "Left Chest 4″×4″ Full Front 12″×16″ Jumbo Front 16″×20″",
+        "dtgBackOptions": "None Full Back 12″×16″ Jumbo Back 16″×20″",
+        "dtgLocationSummary": "Left Chest Code: LC",
+        "dtg-cbx-6": "",
+        "dtg-cbx-7": "",
+        "dtgAddRowBtn": "Add row",
+        "dtgArtSetupToggle": "",
+        "dtgArtSetupQty": "",
+        "dtgArtSetupRate": "× $50.00",
+        "dtgArtSetupTotal": "$0.00",
+        "dtgDesignHours": "",
+        "dtgDesignRate": "hrs × $75.00/hr",
+        "dtgDesignTotal": "$0.00",
+        "dtgPriceSummary": "LIVE DTG QUOTE · LEFT CHEST · CUSTOMER PICKUP 24-47 24 combined pieces $0.00 Subtotal $0.00 Tax (pickup, Milton WA 10.20%) $0.00 Order total $0.00",
+        "dtgCompanyInput": "",
+        "dtgCustomerWarning": "",
+        "dtgTaxExemptChip": "",
+        "dtgAccountTierBadge": "",
+        "dtgFirstName": "",
+        "dtgLastName": "",
+        "dtgEmail": "",
+        "dtgPhone": "",
+        "dtgCompanyId": "",
+        "dtgPoNumber": "",
+        "dtgDesignNumber": "",
+        "dtgDesignThumbImg": "",
+        "dtgTerms": "Prepaid Net 10 Pay On Pickup",
+        "dtgNewArtworkName": "",
+        "dtgNewArtworkDropzone": "Drop file here or click to browse AI / EPS / PSD / PDF / PNG / JPG / TIFF · 20 MB max",
+        "dtgNewArtworkList": "",
+        "dtgNewArtworkStatus": "",
+        "dtgSalesRep": "Nika Lao Erik Mickelson Ruthie Nhoung Taneisha Clark Jim Mickelson",
+        "dtgShipMethod": "Customer Pickup UPS Ground Priority Mail",
+        "dtgDueDate": "",
+        "dtgDueDateHint": "5 business days (auto · 24 pcs)",
+        "dtgDropDeadDate": "",
+        "dtgPickupToggle": "",
+        "include-tax": "",
+        "tax-rate-input": "",
+        "wholesale-checkbox": "",
+        "dtgPreflightPanel": "2 things need attention before push Print location: Left Chest Line items: 1 line · 24 combined pcs · tier ? Customer: Search for a company or fill name manually Sales rep: Erik Mickelson Ship method: Customer Pickup — Milton, WA (tax 10.2%) Design: Pick an existing design # OR upload new artwork",
+        "dtgSubmitBtn": "PUSH TO SHOPWORKS",
+        "dtgSaveBtn": "Save & Get Link",
+        "dtgPrintBtn": "Print Quote",
+        "dtgEmailBtn": "Email Quote",
+        "dtgResetBtn": "Reset form",
+        "floatingQuoteBtn": "✨ Ask",
+        "shareToastText": "Quote link copied — paste into your email or chat"
+      },
+      "fields": [
+        {
+          "id": "dtgCatalogSearch",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtg-cbx-6",
+          "name": "",
+          "type": "text",
+          "value": "PC54",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtg-cbx-7",
+          "name": "",
+          "type": "text",
+          "value": "Jet Black",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgArtSetupToggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgArtSetupQty",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": true
+        },
+        {
+          "id": "dtgDesignHours",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgCompanyInput",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgFirstName",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgLastName",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgEmail",
+          "name": "",
+          "type": "email",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgPhone",
+          "name": "",
+          "type": "tel",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgCompanyId",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgPoNumber",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgDesignNumber",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgTerms",
+          "name": "",
+          "type": "select-one",
+          "value": "Prepaid",
+          "disabled": false
+        },
+        {
+          "id": "dtgNewArtworkName",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgSalesRep",
+          "name": "",
+          "type": "select-one",
+          "value": "erik",
+          "disabled": false
+        },
+        {
+          "id": "dtgShipMethod",
+          "name": "",
+          "type": "select-one",
+          "value": "Customer Pickup",
+          "disabled": false
+        },
+        {
+          "id": "dtgDueDate",
+          "name": "",
+          "type": "date",
+          "value": "2026-09-18",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgDropDeadDate",
+          "name": "",
+          "type": "date",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgPickupToggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "include-tax",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "tax-rate-input",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "wholesale-checkbox",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/pricing/dtg",
+          "text": "/pricing/dtg"
+        },
+        {
+          "href": "#",
+          "text": ""
+        },
+        {
+          "href": "/pricing/dtg",
+          "text": "/pricing/dtg"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "(253) 922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#dtgArtSetupRate"
+            ],
+            [
+              "#dtgArtSetupTotal"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "DTG Quote Builder — Northwest Custom Apparel",
+      "url": "/quote-builders/dtg-quote-builder.html",
+      "ids": {
+        "toast-container": "",
+        "dtgCatalogTabs": "All (1) T-Shirts (1)",
+        "dtgCatalogSearch": "",
+        "dtgCatalogGrid": "#1 PC54 T-SHIRTS Essential Cotton Tee 480 units sold total Jet Black · 240 units sold Add Jet Black All 2",
+        "dtgFormHead": "DTG Order Form",
+        "dtg-price-error-banner": "⚠ Live pricing failed for PC54 — the total below is INCOMPLETE. Refresh and try again before quoting this customer.",
+        "dtgFrontOptions": "Left Chest 4″×4″ Full Front 12″×16″ Jumbo Front 16″×20″",
+        "dtgBackOptions": "None Full Back 12″×16″ Jumbo Back 16″×20″",
+        "dtgLocationSummary": "Left Chest Code: LC",
+        "dtg-cbx-6": "",
+        "dtg-cbx-7": "",
+        "dtgAddRowBtn": "Add row",
+        "dtgArtSetupToggle": "",
+        "dtgArtSetupQty": "",
+        "dtgArtSetupRate": "× $50.00",
+        "dtgArtSetupTotal": "$0.00",
+        "dtgDesignHours": "",
+        "dtgDesignRate": "hrs × $75.00/hr",
+        "dtgDesignTotal": "$0.00",
+        "dtgPriceSummary": "LIVE DTG QUOTE · LEFT CHEST · CUSTOMER PICKUP 24-47 24 combined pieces $0.00 Subtotal $0.00 Tax (pickup, Milton WA 10.20%) $0.00 Order total $0.00",
+        "dtgCompanyInput": "",
+        "dtgCustomerWarning": "",
+        "dtgTaxExemptChip": "",
+        "dtgAccountTierBadge": "",
+        "dtgFirstName": "",
+        "dtgLastName": "",
+        "dtgEmail": "",
+        "dtgPhone": "",
+        "dtgCompanyId": "",
+        "dtgPoNumber": "",
+        "dtgDesignNumber": "",
+        "dtgDesignThumbImg": "",
+        "dtgTerms": "Prepaid Net 10 Pay On Pickup",
+        "dtgNewArtworkName": "",
+        "dtgNewArtworkDropzone": "Drop file here or click to browse AI / EPS / PSD / PDF / PNG / JPG / TIFF · 20 MB max",
+        "dtgNewArtworkList": "",
+        "dtgNewArtworkStatus": "",
+        "dtgSalesRep": "Nika Lao Erik Mickelson Ruthie Nhoung Taneisha Clark Jim Mickelson",
+        "dtgShipMethod": "Customer Pickup UPS Ground Priority Mail",
+        "dtgDueDate": "",
+        "dtgDueDateHint": "5 business days (auto · 24 pcs)",
+        "dtgDropDeadDate": "",
+        "dtgPickupToggle": "",
+        "include-tax": "",
+        "tax-rate-input": "",
+        "wholesale-checkbox": "",
+        "dtgPreflightPanel": "2 things need attention before push Print location: Left Chest Line items: 1 line · 24 combined pcs · tier ? Customer: Search for a company or fill name manually Sales rep: Erik Mickelson Ship method: Customer Pickup — Milton, WA (tax 10.2%) Design: Pick an existing design # OR upload new artwork",
+        "dtgSubmitBtn": "PUSH TO SHOPWORKS",
+        "dtgSaveBtn": "Save & Get Link",
+        "dtgPrintBtn": "Print Quote",
+        "dtgEmailBtn": "Email Quote",
+        "dtgResetBtn": "Reset form",
+        "floatingQuoteBtn": "✨ Ask",
+        "shareToastText": "Quote link copied — paste into your email or chat"
+      },
+      "fields": [
+        {
+          "id": "dtgCatalogSearch",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtg-cbx-6",
+          "name": "",
+          "type": "text",
+          "value": "PC54",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtg-cbx-7",
+          "name": "",
+          "type": "text",
+          "value": "Jet Black",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgArtSetupToggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgArtSetupQty",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": true
+        },
+        {
+          "id": "dtgDesignHours",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgCompanyInput",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgFirstName",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgLastName",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgEmail",
+          "name": "",
+          "type": "email",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgPhone",
+          "name": "",
+          "type": "tel",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgCompanyId",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgPoNumber",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgDesignNumber",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgTerms",
+          "name": "",
+          "type": "select-one",
+          "value": "Prepaid",
+          "disabled": false
+        },
+        {
+          "id": "dtgNewArtworkName",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgSalesRep",
+          "name": "",
+          "type": "select-one",
+          "value": "erik",
+          "disabled": false
+        },
+        {
+          "id": "dtgShipMethod",
+          "name": "",
+          "type": "select-one",
+          "value": "Customer Pickup",
+          "disabled": false
+        },
+        {
+          "id": "dtgDueDate",
+          "name": "",
+          "type": "date",
+          "value": "2026-09-18",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgDropDeadDate",
+          "name": "",
+          "type": "date",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "dtgPickupToggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "include-tax",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "tax-rate-input",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "wholesale-checkbox",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/pricing/dtg",
+          "text": "/pricing/dtg"
+        },
+        {
+          "href": "#",
+          "text": ""
+        },
+        {
+          "href": "/pricing/dtg",
+          "text": "/pricing/dtg"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "text": "(253) 922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "text": "sales@nwcustomapparel.com"
+        }
+      ],
+      "tables": [],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#dtgArtSetupRate"
+            ],
+            [
+              "#dtgArtSetupTotal"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "mutations": []
+}

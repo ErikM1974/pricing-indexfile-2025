@@ -455,7 +455,7 @@ function renderThreadColorsButtonState() {
 
 function closeThreadColors() {
   const modal = $('threadColorsModal');
-  if (modal) modal.classList.remove('visible');
+  if (modal) document.dispatchEvent(new CustomEvent('garment:close-dialog', { detail: { modal: modal } }));
 }
 
 function renderThreadColorsModal(entry) {
@@ -483,7 +483,7 @@ function openThreadColors() {
   }
   renderThreadColorsModal(e);
   const modal = $('threadColorsModal');
-  if (modal) modal.classList.add('visible');
+  if (modal) document.dispatchEvent(new CustomEvent('garment:open-dialog', { detail: { modal: modal, visibleClass: 'visible' } }));
 }
 
 window.addEventListener('keydown', (e) => {
@@ -511,11 +511,11 @@ function dstThreadSelectorHtml(entry, modalMode) {
     html += '<div class="dst-thread-row">'
       + '<span class="dst-thread-swatch" style="background:' + cur.hex + '"></span>'
       + '<span class="dst-thread-stop">Stop ' + (i + 1) + '</span>'
-      + '<div><select data-change="updateDSTThreadColor" data-change-args="[' + entry.id + ',' + i + ',&quot;$this.value&quot;]">' + opts + '</select>'
+      + '<div><select aria-label="Thread color for stop ' + (i + 1) + '" data-change="updateDSTThreadColor" data-change-args="[' + entry.id + ',' + i + ',&quot;$this.value&quot;]">' + opts + '</select>'
       + '<div class="dst-thread-name">' + escapeHtml(cur.code + ' · ' + cur.name) + '</div></div>'
       + '<div class="dst-thread-element-wrap">'
       + '<span class="dst-thread-element-label">Element / run</span>'
-      + '<input class="dst-thread-element-input" value="' + escapeHtml(element) + '" placeholder="outline, fill, text, accent…" data-input="updateDSTThreadElement" data-input-args="[' + entry.id + ',' + i + ',&quot;$this.value&quot;]">'
+      + '<input aria-label="Element for stop ' + (i + 1) + '" class="dst-thread-element-input" value="' + escapeHtml(element) + '" placeholder="outline, fill, text, accent…" data-input="updateDSTThreadElement" data-input-args="[' + entry.id + ',' + i + ',&quot;$this.value&quot;]">'
       + '</div>'
       + '<span class="dst-pill">' + escapeHtml(cur.hex.toUpperCase()) + '</span>'
       + '</div>';
@@ -622,18 +622,18 @@ function openPlacementChooser(side) {
         </ul>
       </button>`;
   }
-  overlay.classList.add('visible');
+  document.dispatchEvent(new CustomEvent('garment:open-dialog', { detail: { modal: overlay, visibleClass: 'visible' } }));
 }
 function closePlacementChooser() {
   const overlay = $('placementChooser');
-  if (overlay) overlay.classList.remove('visible');
+  if (overlay) document.dispatchEvent(new CustomEvent('garment:close-dialog', { detail: { modal: overlay } }));
   pendingSide = null;
   pendingPlacement = null;
 }
 function choosePlacementAndUpload(loc) {
   pendingPlacement = loc;
   const overlay = $('placementChooser');
-  if (overlay) overlay.classList.remove('visible');
+  if (overlay) document.dispatchEvent(new CustomEvent('garment:close-dialog', { detail: { modal: overlay } }));
   $('fileInput').click();
 }
 window.addEventListener('keydown', (e) => {
@@ -1507,7 +1507,7 @@ function renderInfo(entry) {
   }
 
   const note = $('infoNote');
-  if (entry.note) { note.style.display = ''; note.textContent = entry.note; }
+  if (entry.note) { note.style.display = 'block'; note.textContent = entry.note; }
   else note.style.display = 'none';
 
   const isBack = isBackLoc(entry.printLoc);
@@ -2063,9 +2063,9 @@ function openArtDetails() {
         + '</div>';
     }
     colorHtml += '</div>';
-    colorHtml += '<p style="font-size:12px;line-height:1.5;color:var(--text-dim);margin:12px 0 0;">PMS matches are screen approximations. Final color should be confirmed by the art department.</p>';
+    colorHtml += '<p style="font-size:12px;line-height:1.5;color:var(--ui-muted);margin:12px 0 0;">PMS matches are screen approximations. Final color should be confirmed by the art department.</p>';
   } else {
-    colorHtml = '<p style="font-size:13px;color:var(--text-dim);">No color analysis available for this artwork.</p>';
+    colorHtml = '<p style="font-size:13px;color:var(--ui-muted);">No color analysis available for this artwork.</p>';
   }
 
   if (e.kind === 'dst') {
@@ -2085,12 +2085,12 @@ function openArtDetails() {
     + '<div class="method-row"><strong>Embroidery estimate:</strong> ' + escapeHtml(emb.stitchesText) + ' stitches · ' + escapeHtml(emb.threadText) + '<br>' + escapeHtml(emb.copy) + '</div>'
     + colorHtml + advice.detailHtml + emb.detailHtml;
   colors.innerHTML = colorHtml;
-  modal.classList.add('visible');
+  document.dispatchEvent(new CustomEvent('garment:open-dialog', { detail: { modal: modal, visibleClass: 'visible' } }));
 }
 
 function closeArtDetails() {
   const modal = $('artDetailsModal');
-  if (modal) modal.classList.remove('visible');
+  if (modal) document.dispatchEvent(new CustomEvent('garment:close-dialog', { detail: { modal: modal } }));
 }
 
 window.addEventListener('keydown', (e) => {
@@ -2675,7 +2675,7 @@ window.addEventListener('keydown', (ev) => {
 
 window.addEventListener('resize', () => {
   const e = current();
-  if (e && e.status === 'ready' && e.view.fitted) zoomFit();
+  if (e && e.status === 'ready' && (e.mockOn || e.view.fitted)) requestAnimationFrame(zoomFit);
 });
 
 /* ============================================================
@@ -4864,7 +4864,7 @@ function toggleEraser() {
   erasing = !erasing;
   if (erasing && eyedropping) toggleEyedrop();
   $('eraseBtn').classList.toggle('primary', erasing);
-  $('eraseAllBtn').style.display = erasing ? '' : 'none';
+  $('eraseAllBtn').style.display = erasing ? 'inline-flex' : 'none';
   stage.classList.toggle('eyedrop', erasing || eyedropping);
   if (erasing) showToast('Click a white area to erase it — or hit "Erase ALL white"');
 }
@@ -5012,12 +5012,7 @@ function printProofSheet() {
   const e = current();
   if (!e || e.status !== 'ready') { showToast('Add a logo first'); return; }
   if (!e.mockOn) toggleMockup();
-  buildProofSheet(e);
-  document.body.classList.add('print-spec');
-  const cleanup = () => document.body.classList.remove('print-spec');
-  window.addEventListener('afterprint', cleanup, { once: true });
-  window.print();
-  setTimeout(cleanup, 3000);
+  document.dispatchEvent(new CustomEvent('garment:print-sheet', { detail: { kind: 'proof' } }));
 }
 
 
@@ -5091,7 +5086,7 @@ function buildProofSheet(e) {
   $('specSheet').innerHTML =
     '<div class="sp-head">'
     + '<div><h1>Mockup Proof</h1><div class="sp-sub">Northwest Custom Apparel — ' + today + '</div></div>'
-    + '<div class="sp-sub" style="text-align:right">' + escapeHtml(CONTACT_EMAIL) + '</div>'
+    + '<div class="sp-sub sp-contact">' + escapeHtml(CONTACT_EMAIL) + '</div>'
     + '</div>'
     + '<div class="proof-upgrade-note"><b>Recommended print method:</b> ' + escapeHtml(printAdvice(e).method) + ' — ' + escapeHtml(printAdvice(e).copy) + '</div>'
     + '<div class="proof-upgrade-note"><b>' + (e.kind === 'dst' ? 'Exact DST embroidery:' : 'Embroidery estimate:') + '</b> ' + escapeHtml(estimateEmbroidery(e).stitchesText) + ' stitches · ' + escapeHtml(estimateEmbroidery(e).threadText) + '. ' + escapeHtml(estimateEmbroidery(e).copy) + '</div>'
@@ -5105,9 +5100,9 @@ function buildProofSheet(e) {
     + '<div><b>Proof type:</b> Customer approval mockup</div>'
     + '<div><b>Artwork files:</b> ' + artCount + '</div>'
     + '</div>'
-    + (mock ? '<p style="text-align:center"><img src="' + mock + '" style="max-width:100%;max-height:520px;border:1px solid #ddd;border-radius:8px"></p>' : '')
-    + (artCards ? '<h2 style="font-size:15px;color:#2f661e;margin:10px 0 8px;">Artwork submitted</h2><div class="proof-art-grid">' + artCards + '</div>' : '')
-    + (e.kind === 'dst' ? '<h2 style="font-size:15px;color:#2f661e;margin:10px 0 8px;">Embroidery thread assignments</h2><div class="proof-upgrade-note">' + escapeHtml(dstThreadSummaryInline(e)) + '</div>' : '')
+    + (mock ? '<p class="proof-model"><img src="' + mock + '" class="proof-model-image" alt="Garment mockup"></p>' : '')
+    + (artCards ? '<h2 class="proof-section-title">Artwork submitted</h2><div class="proof-art-grid">' + artCards + '</div>' : '')
+    + (e.kind === 'dst' ? '<h2 class="proof-section-title">Embroidery thread assignments</h2><div class="proof-upgrade-note">' + escapeHtml(dstThreadSummaryInline(e)) + '</div>' : '')
     + (rows ? '<table><tr><th>Side</th><th>Artwork file</th><th>Print size &amp; placement</th></tr>' + rows + '</table>' : '')
     + '<div class="approval-checklist"><b>Approval checklist</b><br>'
     + '☐ Shirt color is correct<br>'
@@ -5117,23 +5112,18 @@ function buildProofSheet(e) {
     + '☐ Print size is approved</div>'
     + '<div class="sp-flags">Approval confirms that the customer has reviewed the proof for artwork, spelling, placement, sizing, and garment color. '
     + 'Production begins after approval.</div>'
-    + '<div style="display:flex;gap:40px;margin-top:34px;font-size:13px">'
-    + '<div style="flex:1;border-top:1px solid #333;padding-top:6px">Approved by (signature)</div>'
-    + '<div style="width:160px;border-top:1px solid #333;padding-top:6px">Date</div>'
+    + '<div class="proof-signatures">'
+    + '<div class="proof-signature">Approved by (signature)</div>'
+    + '<div class="proof-signature-date">Date</div>'
     + '</div>'
-    + '<div style="margin-top:26px;font-size:13px;border-top:1px solid #333;padding-top:6px;max-width:70%">Changes requested</div>'
+    + '<div class="proof-changes">Changes requested</div>'
     + '<div class="sp-foot">Generated by the NWCA Designer Pro proofing tool.</div>';
 }
 
 function printSpecSheet() {
   const e = current();
   if (!e || e.status !== 'ready') { showToast('Open a file first'); return; }
-  buildSpecSheet(e);
-  document.body.classList.add('print-spec');
-  const cleanup = () => document.body.classList.remove('print-spec');
-  window.addEventListener('afterprint', cleanup, { once: true });
-  window.print();
-  setTimeout(cleanup, 3000);   // fallback for browsers without afterprint
+  document.dispatchEvent(new CustomEvent('garment:print-sheet', { detail: { kind: 'spec' } }));
 }
 
 function buildSpecSheet(e) {
@@ -5183,7 +5173,7 @@ function buildSpecSheet(e) {
   $('specSheet').innerHTML =
     '<div class="sp-head">'
     + '<div><h1>Art Spec Sheet</h1><div class="sp-sub">Northwest Custom Apparel — prepared ' + today + '</div></div>'
-    + '<div class="sp-sub" style="text-align:right">' + escapeHtml(CONTACT_EMAIL) + '</div>'
+    + '<div class="sp-sub sp-contact">' + escapeHtml(CONTACT_EMAIL) + '</div>'
     + '</div>'
     + '<div class="sp-grid">'
     + '<div><b>File:</b> ' + escapeHtml(e.name) + '</div>'
@@ -5197,7 +5187,7 @@ function buildSpecSheet(e) {
     + '</div>'
     + (inkRows ? '<table><tr><th>#</th><th>Color</th><th>Closest PMS</th><th>Coverage</th></tr>' + inkRows + '</table>' : '')
     + (flags.length ? '<div class="sp-flags"><b>Notes:</b><br>• ' + flags.map(escapeHtml).join('<br>• ') + '</div>' : '')
-    + (thumb ? '<p><img class="sp-thumb" src="' + thumb + '"></p>' : '')
+    + (thumb ? '<p><img class="sp-thumb" alt="Artwork and placement preview" src="' + thumb + '"></p>' : '')
     + '<div class="sp-foot">All counts and PMS matches are estimates from on-screen colors, pending review by the NWCA art department. Generated by the NWCA Art File Viewer.</div>';
 }
 
@@ -5555,14 +5545,14 @@ function dsModalOpen(id) {
   const m = document.getElementById(id);
   if (!m) return;
   _dsLastFocus = document.activeElement;
-  m.classList.add('open');
+  document.dispatchEvent(new CustomEvent('garment:open-dialog', { detail: { modal: m, visibleClass: 'open' } }));
   const f = _dsFocusables(m)[0];
   if (f) { try { f.focus(); } catch (e) { /* non-fatal */ } }
 }
 function dsModalClose(id) {
   const m = document.getElementById(id);
-  if (!m) return;
-  m.classList.remove('open');
+  if (!m || !m.classList.contains('open')) return;
+  document.dispatchEvent(new CustomEvent('garment:close-dialog', { detail: { modal: m } }));
   if (_dsLastFocus && typeof _dsLastFocus.focus === 'function') {
     try { _dsLastFocus.focus(); } catch (e) { /* non-fatal */ }
     _dsLastFocus = null;
@@ -5700,6 +5690,8 @@ function openSendToCustomer() {
   }
   const note = document.getElementById('custModalNote');
   if (note) note.textContent = 'Emails an approve / request-changes link for request #' + seed.designId + '. Steve still produces the final production proof.';
+  const sendError = document.getElementById('custSendError');
+  if (sendError) { sendError.hidden = true; sendError.textContent = ''; }
   const emailEl = document.getElementById('custEmail');
   if (emailEl && !emailEl.value && seed.contactEmail) emailEl.value = seed.contactEmail;
   dsModalOpen('custModal');
@@ -5707,6 +5699,8 @@ function openSendToCustomer() {
 }
 
 async function doSendToCustomer() {
+  const sendError = document.getElementById('custSendError');
+  if (sendError) { sendError.hidden = true; sendError.textContent = ''; }
   const e = requireMockup();
   if (!e) return;
   const seed = window.__artRequestSeed || {};
@@ -5717,8 +5711,8 @@ async function doSendToCustomer() {
   const nameEl = document.getElementById('custName');
   const msgEl = document.getElementById('custMessage');
   const toEmail = ((emailEl && emailEl.value) || '').trim();
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(toEmail)) { showToast('Enter a valid customer email'); if (emailEl) emailEl.focus(); return; }
-  if (typeof emailjs === 'undefined') { showToast('Email service not loaded — refresh and try again'); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(toEmail)) { if (sendError) { sendError.textContent = 'Enter a valid customer email.'; sendError.hidden = false; } showToast('Enter a valid customer email'); if (emailEl) emailEl.focus(); return; }
+  if (typeof emailjs === 'undefined') { if (sendError) { sendError.textContent = 'Email service not loaded — refresh and try again.'; sendError.hidden = false; } showToast('Email service not loaded — refresh and try again'); return; }
 
   const sendBtn = document.getElementById('custModalSend');
   const orig = sendBtn ? sendBtn.textContent : '';
@@ -5768,6 +5762,7 @@ async function doSendToCustomer() {
     try { if (window.opener && !window.opener.closed) window.opener.postMessage({ type: 'rep-mockup-saved', designId: designId }, location.origin); } catch (_) {}
   } catch (err) {
     console.error('[doSendToCustomer]', err);
+    if (sendError) { sendError.textContent = 'Send failed: ' + (err && err.message ? err.message : 'unknown error') + '. Please try again.'; sendError.hidden = false; }
     showToast('Send failed: ' + (err && err.message ? err.message : 'unknown error'));
   } finally {
     if (sendBtn) { sendBtn.disabled = false; sendBtn.textContent = orig; }

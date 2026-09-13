@@ -634,6 +634,8 @@ app.use(function loadVendorSession(req, res, next) {
 // CRM ROLE-BASED ACCESS CONTROL
 // =============================================================================
 // Role-based middleware factory - replaces old password-based requireCrmAuth
+const statusPageTemplates = require('./lib/status-page-templates');
+
 function requireCrmRole(allowedRoles) {
   return (req, res, next) => {
     // Check if this is an API request (return JSON) vs page request (redirect/HTML)
@@ -663,34 +665,7 @@ function requireCrmRole(allowedRoles) {
         });
       }
       // Return HTML for page requests
-      return res.status(403).send(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <title>Access Denied</title>
-          <style>
-            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                   display: flex; align-items: center; justify-content: center; min-height: 100vh;
-                   background: #f5f5f5; margin: 0; }
-            .container { text-align: center; background: white; padding: 3rem; border-radius: 12px;
-                        box-shadow: 0 4px 24px rgba(0,0,0,0.1); max-width: 400px; }
-            h1 { color: #dc2626; margin-bottom: 1rem; }
-            p { color: #666; margin-bottom: 1.5rem; }
-            a { display: inline-block; padding: 0.75rem 1.5rem; background: #3a7c52; color: white;
-                text-decoration: none; border-radius: 8px; font-weight: 500; }
-            a:hover { background: #1a472a; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <h1>Access Denied</h1>
-            <p>You don't have permission to view this dashboard, ${req.session.crmUser.firstName || 'User'}.</p>
-            <a href="/staff-dashboard.html">Return to Staff Dashboard</a>
-          </div>
-        </body>
-        </html>
-      `);
-    }
+      return res.status(403).send(statusPageTemplates.roleDenied(req.session.crmUser.firstName));    }
 
     next();
   };
@@ -945,22 +920,9 @@ function requirePageAccess(page) {
 }
 
 // Branded 403 page shown when a logged-in staffer opens a page they're not allowed on.
-// Self-contained (only the logo is external) so it renders even if assets are down.
+// Plain semantic content stays usable even when shared styles are unavailable.
 function accessRestrictedPage(firstName) {
-  const greeting = firstName ? `Sorry, ${firstName} — this` : 'This';
-  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Access Restricted — Northwest Custom Apparel</title></head>
-<body style="margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;background:linear-gradient(135deg,#f5f7f5 0%,#e3f0e7 100%);padding:20px">
-<div style="background:#fff;border-radius:16px;box-shadow:0 12px 44px rgba(26,71,42,.13);max-width:440px;width:100%;padding:2.75rem 2.5rem 2.5rem;text-align:center;position:relative;overflow:hidden">
-<div style="position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,#1a472a 0%,#3a7c52 50%,#1a472a 100%)"></div>
-<img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png" alt="Northwest Custom Apparel" style="max-width:190px;height:auto;margin:.25rem 0 1.5rem;filter:drop-shadow(0 2px 4px rgba(0,0,0,.08))">
-<div style="width:66px;height:66px;margin:0 auto 1.25rem;border-radius:50%;background:#e8f5e9;display:flex;align-items:center;justify-content:center">
-<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1a472a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-</div>
-<h1 style="color:#1a472a;font-size:1.5rem;margin:0 0 .65rem;font-weight:700">Access Restricted</h1>
-<p style="color:#444;font-size:1.02rem;line-height:1.55;margin:0 0 .45rem">${greeting} page is restricted, and your account doesn’t have access to it.</p>
-<p style="color:#8a8a8a;font-size:.9rem;line-height:1.5;margin:0 0 1.9rem">If you need access, please ask <strong style="color:#3a7c52">Erik</strong>.</p>
-<a href="/staff-dashboard.html" style="display:inline-block;background:#3a7c52;color:#fff;text-decoration:none;font-weight:600;font-size:.98rem;padding:.72rem 1.7rem;border-radius:9px;box-shadow:0 4px 14px rgba(58,124,82,.28)">← Back to Dashboard</a>
-</div></body></html>`;
+  return statusPageTemplates.restricted(firstName);
 }
 
 // Reusable page gate: require a verified staff session + enforce the Staff_Page_Access

@@ -1,0 +1,241 @@
+{
+  "method": "embroidery",
+  "states": [
+    {
+      "width": 1440,
+      "title": "2026 Embroidery Quote Builder - Garments & Caps | Northwest Custom Apparel",
+      "url": "/quote-builders/embroidery-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Screen Print DTF Transfers DTG (1st product only)",
+        "product-search": "",
+        "empty-state-row": "👕 Getting Started 1 Type a style # above (e.g., PC54, G500, C112) • 2 Paste from ShopWorks • 3 Use the Add to order bar below for Monogram, Additional Logo, Rush, etc. • 4 Customer bringing their own garments? Use Customer-Supplied in the bar below.",
+        "sidebar-resize-handle": "",
+        "total-qty": "0",
+        "pricing-tier": "1-7",
+        "products-label": "Products (Base 8K):",
+        "subtotal": "$0.00",
+        "additional-logos-pricing": "",
+        "cap-additional-logos-pricing": "",
+        "sidebar-grand-total": "$0.00",
+        "toast-container": "Ready to build quotes!",
+        "floatingQuoteBtn": "✨ Ask"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "product-search",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "javascript:void(0)",
+          "text": "Paste from ShopWorks"
+        },
+        {
+          "href": "javascript:void(0)",
+          "text": "Customer-Supplied"
+        }
+      ],
+      "tables": [
+        "Style Product image Description Color S M L XL 2XL More Sizes Qty Unit $ Total Row actions 👕 Getting Started 1 Type a style # above (e.g., PC54, G500, C112) • 2 Paste from ShopWorks • 3 Use the Add to order bar below for Monogram, Additional Logo, Rush, etc. • 4 Customer bringing their own garments? Use Customer-Supplied in the bar below."
+      ],
+      "overflow": false
+    },
+    {
+      "width": 768,
+      "title": "2026 Embroidery Quote Builder - Garments & Caps | Northwest Custom Apparel",
+      "url": "/quote-builders/embroidery-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Screen Print DTF Transfers DTG (1st product only)",
+        "product-search": "",
+        "empty-state-row": "👕 Getting Started 1 Type a style # above (e.g., PC54, G500, C112) • 2 Paste from ShopWorks • 3 Use the Add to order bar below for Monogram, Additional Logo, Rush, etc. • 4 Customer bringing their own garments? Use Customer-Supplied in the bar below.",
+        "sidebar-resize-handle": "",
+        "total-qty": "0",
+        "pricing-tier": "1-7",
+        "products-label": "Products (Base 8K):",
+        "subtotal": "$0.00",
+        "additional-logos-pricing": "",
+        "cap-additional-logos-pricing": "",
+        "sidebar-grand-total": "$0.00",
+        "toast-container": "Ready to build quotes!",
+        "floatingQuoteBtn": "✨ Ask"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "product-search",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "javascript:void(0)",
+          "text": "Paste from ShopWorks"
+        },
+        {
+          "href": "javascript:void(0)",
+          "text": "Customer-Supplied"
+        }
+      ],
+      "tables": [
+        "Style Product image Color S M L XL 2XL More Sizes Qty Unit $ Total Row actions 👕 Getting Started 1 Type a style # above (e.g., PC54, G500, C112) • 2 Paste from ShopWorks • 3 Use the Add to order bar below for Monogram, Additional Logo, Rush, etc. • 4 Customer bringing their own garments? Use Customer-Supplied in the bar below."
+      ],
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "title": "2026 Embroidery Quote Builder - Garments & Caps | Northwest Custom Apparel",
+      "url": "/quote-builders/embroidery-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Screen Print DTF Transfers DTG (1st product only)",
+        "product-search": "",
+        "empty-state-row": "👕 Getting Started 1 Type a style # above (e.g., PC54, G500, C112) • 2 Paste from ShopWorks • 3 Use the Add to order bar below for Monogram, Additional Logo, Rush, etc. • 4 Customer bringing their own garments? Use Customer-Supplied in the bar below.",
+        "sidebar-resize-handle": "",
+        "total-qty": "0",
+        "pricing-tier": "1-7",
+        "products-label": "Products (Base 8K):",
+        "subtotal": "$0.00",
+        "additional-logos-pricing": "",
+        "cap-additional-logos-pricing": "",
+        "sidebar-grand-total": "$0.00",
+        "toast-container": "Ready to build quotes!",
+        "floatingQuoteBtn": "✨ Ask"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "product-search",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "javascript:void(0)",
+          "text": "Paste from ShopWorks"
+        },
+        {
+          "href": "javascript:void(0)",
+          "text": "Customer-Supplied"
+        }
+      ],
+      "tables": [
+        "Style Product image Color S M L XL 2XL More Sizes Qty Unit $ Total Row actions 👕 Getting Started 1 Type a style # above (e.g., PC54, G500, C112) • 2 Paste from ShopWorks • 3 Use the Add to order bar below for Monogram, Additional Logo, Rush, etc. • 4 Customer bringing their own garments? Use Customer-Supplied in the bar below."
+      ],
+      "overflow": false
+    },
+    {
+      "width": 320,
+      "title": "2026 Embroidery Quote Builder - Garments & Caps | Northwest Custom Apparel",
+      "url": "/quote-builders/embroidery-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Screen Print DTF Transfers DTG (1st product only)",
+        "product-search": "",
+        "empty-state-row": "👕 Getting Started 1 Type a style # above (e.g., PC54, G500, C112) • 2 Paste from ShopWorks • 3 Use the Add to order bar below for Monogram, Additional Logo, Rush, etc. • 4 Customer bringing their own garments? Use Customer-Supplied in the bar below.",
+        "sidebar-resize-handle": "",
+        "total-qty": "0",
+        "pricing-tier": "1-7",
+        "products-label": "Products (Base 8K):",
+        "subtotal": "$0.00",
+        "additional-logos-pricing": "",
+        "cap-additional-logos-pricing": "",
+        "sidebar-grand-total": "$0.00",
+        "toast-container": "Ready to build quotes!",
+        "floatingQuoteBtn": "✨ Ask"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "product-search",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "javascript:void(0)",
+          "text": "Paste from ShopWorks"
+        },
+        {
+          "href": "javascript:void(0)",
+          "text": "Customer-Supplied"
+        }
+      ],
+      "tables": [
+        "Style Product image Color S M L XL 2XL More Sizes Qty Unit $ Total Row actions 👕 Getting Started 1 Type a style # above (e.g., PC54, G500, C112) • 2 Paste from ShopWorks • 3 Use the Add to order bar below for Monogram, Additional Logo, Rush, etc. • 4 Customer bringing their own garments? Use Customer-Supplied in the bar below."
+      ],
+      "overflow": true
+    }
+  ]
+}

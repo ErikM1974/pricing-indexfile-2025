@@ -384,6 +384,8 @@ export function selectColor(rowId, optionEl) {
 
     // Close dropdown
     row.querySelector('.color-picker-dropdown').classList.add('hidden');
+    row.querySelector('.color-picker-selected')?.setAttribute('aria-expanded', 'false');
+    row.querySelector('.color-picker-selected')?.removeAttribute('aria-activedescendant');
 
     // Cascade color to child rows (unless they have manually set colors)
     cascadeColorToChildRows(rowId, colorName, catalogColor, swatchUrl, hex);
@@ -424,7 +426,12 @@ export function toggleColorPicker(rowId) {
 
     // Close all other dropdowns
     document.querySelectorAll('.color-picker-dropdown').forEach(d => {
-        if (d !== dropdown) d.classList.add('hidden');
+        if (d !== dropdown) {
+            d.classList.add('hidden');
+            const other = d.closest('tr')?.querySelector('.color-picker-selected');
+            other?.setAttribute('aria-expanded', 'false');
+            other?.removeAttribute('aria-activedescendant');
+        }
     });
 
     dropdown.classList.toggle('hidden');
@@ -432,6 +439,8 @@ export function toggleColorPicker(rowId) {
     // role/id/aria-selected lazily on open; keep aria-expanded truthful.
     const nowOpen = !dropdown.classList.contains('hidden');
     selected.setAttribute('aria-expanded', String(nowOpen));
+    if (nowOpen) selected.setAttribute('aria-controls', dropdown.id);
+    else selected.removeAttribute('aria-activedescendant');
     // P1 (2026-07-10): pin to viewport so table-card overflow can't clip the list
     if (nowOpen) positionColorDropdown(selected, dropdown);
     if (nowOpen) {
@@ -453,6 +462,8 @@ export function handleColorPickerKeydown(event, rowId) {
     } else if (event.key === 'Escape') {
         const row = document.getElementById(`row-${rowId}`);
         row.querySelector('.color-picker-dropdown').classList.add('hidden');
+        row.querySelector('.color-picker-selected')?.setAttribute('aria-expanded', 'false');
+        row.querySelector('.color-picker-selected')?.removeAttribute('aria-activedescendant');
     }
 }
 
@@ -863,6 +874,8 @@ export function selectChildColor(childRowId, parentRowId, optionEl) {
     // Close dropdown
     const dropdown = childRow.querySelector('.color-picker-dropdown');
     if (dropdown) dropdown.classList.add('hidden');
+    childRow.querySelector('.color-picker-selected')?.setAttribute('aria-expanded', 'false');
+    childRow.querySelector('.color-picker-selected')?.removeAttribute('aria-activedescendant');
 
     // Update visual indicator for different color
     updateChildRowColorIndicators(parentRowId);

@@ -39,7 +39,9 @@
     "capture:pricing:headed": "node scripts/capture-pricing-baselines.js --headed",
     "capture:pricing:ci": "node scripts/capture-pricing-baselines.js --start-server",
     "test:pricing-baselines": "jest tests/integration/pricing-baselines.test.js --verbose",
-    "test:parity:surfaces": "playwright test --config tests/e2e/playwright.config.js calculator-parity"
+    "test:parity:surfaces": "playwright test --config tests/e2e/playwright.config.js calculator-parity",
+    "build:emails": "node scripts/css/build-email-templates.js",
+    "check:emails": "node scripts/css/build-email-templates.js --check"
   },
   "engines": {
     "node": ">=22.13.0 <23"

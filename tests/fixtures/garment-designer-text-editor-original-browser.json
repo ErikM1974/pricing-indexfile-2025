@@ -1,0 +1,1011 @@
+{
+  "name": "text-editor",
+  "states": [
+    {
+      "width": 1440,
+      "title": "T-Shirt Designer — Northwest Custom Apparel",
+      "ids": {
+        "thumb-1": "",
+        "advice-1": "Screen Print Good · 157 DPI 11,000–17,500 st",
+        "badge-1": "TEXT",
+        "pcStatusChip": "Front only",
+        "pcFrontBtn": "Front",
+        "pcBackBtn": "Back",
+        "pcBothBtn": "Both",
+        "pcLeftChestBtn": "Left Chest",
+        "pcFullFrontBtn": "Full Front",
+        "pcUpperBackBtn": "Upper Back",
+        "pcFullBackBtn": "Full Back",
+        "pcCenterBtn": "Center Art",
+        "pcWidthLabel": "12 in",
+        "pcWidthRange": "",
+        "pcWidthNumber": "",
+        "pcXLabel": "0",
+        "pcXRange": "",
+        "pcXNumber": "",
+        "pcYLabel": "0",
+        "pcYRange": "",
+        "pcYNumber": "",
+        "addTextBtn": "➕ Add Text",
+        "palBtn": "🎨 Shirt Color",
+        "garmentStyleSelect": "Crew Tee Polo Hoodie Long Sleeve Ladies Tee",
+        "removeBgBtn": "⬜ Remove White BG",
+        "artDetailsBtn": "ℹ️ Art Details",
+        "threadColorsBtn": "🧵 Thread Colors",
+        "modelViewBtn": "👕 Model View",
+        "spinBtn": "🔄 Spin",
+        "proofBtn": "🖨 Customer Proof",
+        "dlBtn": "⬇ Download PNG",
+        "sendSteveBtn": "🧵 Send to Steve",
+        "sendCustomerBtn": "📧 Send to Customer",
+        "contrastWarn": "⚠ Low art/shirt contrast — the print may be hard to see",
+        "canvasHolder": "",
+        "advisorMethodPill": "Screen Print",
+        "advisorMain": "Screen print looks possible.",
+        "advisorCopy": "Artwork appears within the 6-color screen print limit.",
+        "advisorColors": "2 total incl. base",
+        "advisorQuality": "Good · 157 DPI",
+        "advisorFabric": "Cotton",
+        "advisorScreen": "2 / 6",
+        "fabricSelect": "Cotton shirt Cotton/poly blend Polyester Nylon Fabric unknown",
+        "embStatusPill": "Embroidery OK",
+        "embMain": "Embroidery looks possible.",
+        "embCopy": "This estimate is based on the visible artwork only, not the transparent/background canvas. Thread color count is in the preferred embroidery range. Large embroidery can get expensive and heavy; consider DTF/DTG for big full-front or full-back art.",
+        "embStitches": "11,000–17,500",
+        "embThreads": "1 estimated",
+        "embSize": "12.0\" × 2.3\"",
+        "embBestUse": "Large back/front",
+        "embNote": "Estimate only. The app now estimates stitches from visible design pixels only. Final stitch count still depends on digitizing, small text, outlines, gradients, fabric, and sew-out quality.",
+        "tpClose": "×",
+        "txt-text": "",
+        "txt-font": "Anton Bebas Neue Oswald Archivo Black Alfa Slab One Russo One Staatliches Graduate Black Ops One Bungee Montserrat Roboto Slab Playfair Display Merriweather Pacifico Dancing Script Great Vibes Lobster Satisfy Caveat Shadows Into Light Permanent Marker Bangers Fredoka",
+        "txt-bold": "B",
+        "txt-italic": "I",
+        "txt-fill": "",
+        "txt-stroke-on": "",
+        "txt-stroke": "",
+        "txt-strokeW": "",
+        "txt-tracking-v": "0",
+        "txt-tracking": "",
+        "txt-lh-v": "1.10",
+        "txt-lh": "",
+        "txt-arc-v": "25",
+        "txt-arc": "",
+        "txt-rot-v": "0°",
+        "txt-rot": "",
+        "tpDelete": "Delete",
+        "tpDone": "Done"
+      },
+      "fields": [
+        {
+          "id": "pcWidthRange",
+          "type": "range",
+          "value": "12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcWidthNumber",
+          "type": "number",
+          "value": "12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcXRange",
+          "type": "range",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcXNumber",
+          "type": "number",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcYRange",
+          "type": "range",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcYNumber",
+          "type": "number",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "garmentStyleSelect",
+          "type": "select-one",
+          "value": "tee",
+          "disabled": false
+        },
+        {
+          "id": "fabricSelect",
+          "type": "select-one",
+          "value": "cotton",
+          "disabled": false
+        },
+        {
+          "id": "txt-text",
+          "type": "textarea",
+          "value": "EXAMPLE TEAM\n2026",
+          "disabled": false
+        },
+        {
+          "id": "txt-font",
+          "type": "select-one",
+          "value": "Oswald",
+          "disabled": false
+        },
+        {
+          "id": "txt-fill",
+          "type": "color",
+          "value": "#1c2841",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "txt-stroke-on",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "txt-stroke",
+          "type": "color",
+          "value": "#ffffff",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "txt-strokeW",
+          "type": "range",
+          "value": "8",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "txt-tracking",
+          "type": "range",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "txt-lh",
+          "type": "range",
+          "value": "1.1",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "txt-arc",
+          "type": "range",
+          "value": "25",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "txt-rot",
+          "type": "range",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/pages/mockup-library.html",
+          "text": "📚 Saved Mockups"
+        }
+      ],
+      "headings": [
+        "NWCA Easy Shirt Designer"
+      ],
+      "entries": [
+        {
+          "name": "Text: EXAMPLE TEAM",
+          "kind": "canvas",
+          "status": "ready",
+          "printLoc": "Full Front",
+          "printW": 12,
+          "onShirt": true,
+          "textModel": {
+            "text": "EXAMPLE TEAM\n2026",
+            "font": "Oswald",
+            "weight": 700,
+            "italic": false,
+            "fill": "#1c2841",
+            "strokeOn": true,
+            "stroke": "#ffffff",
+            "strokeW": 8,
+            "tracking": 0,
+            "lineHeight": 1.1,
+            "align": "center",
+            "arc": 25,
+            "rotation": 0,
+            "caseMode": "none"
+          },
+          "dst": null
+        }
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".side-head > span"
+            ],
+            [
+              ".fsize"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "T-Shirt Designer — Northwest Custom Apparel",
+      "ids": {
+        "thumb-1": "",
+        "advice-1": "Screen Print Good · 157 DPI 11,000–17,500 st",
+        "badge-1": "TEXT",
+        "pcStatusChip": "Front only",
+        "pcFrontBtn": "Front",
+        "pcBackBtn": "Back",
+        "pcBothBtn": "Both",
+        "pcLeftChestBtn": "Left Chest",
+        "pcFullFrontBtn": "Full Front",
+        "pcUpperBackBtn": "Upper Back",
+        "pcFullBackBtn": "Full Back",
+        "pcCenterBtn": "Center Art",
+        "pcWidthLabel": "12 in",
+        "pcWidthRange": "",
+        "pcWidthNumber": "",
+        "pcXLabel": "0",
+        "pcXRange": "",
+        "pcXNumber": "",
+        "pcYLabel": "0",
+        "pcYRange": "",
+        "pcYNumber": "",
+        "addTextBtn": "➕ Add Text",
+        "palBtn": "🎨 Shirt Color",
+        "garmentStyleSelect": "Crew Tee Polo Hoodie Long Sleeve Ladies Tee",
+        "removeBgBtn": "⬜ Remove White BG",
+        "artDetailsBtn": "ℹ️ Art Details",
+        "threadColorsBtn": "🧵 Thread Colors",
+        "modelViewBtn": "👕 Model View",
+        "spinBtn": "🔄 Spin",
+        "proofBtn": "🖨 Customer Proof",
+        "dlBtn": "⬇ Download PNG",
+        "sendSteveBtn": "🧵 Send to Steve",
+        "sendCustomerBtn": "📧 Send to Customer",
+        "contrastWarn": "⚠ Low art/shirt contrast — the print may be hard to see",
+        "canvasHolder": "",
+        "advisorMethodPill": "Screen Print",
+        "advisorMain": "Screen print looks possible.",
+        "advisorCopy": "Artwork appears within the 6-color screen print limit.",
+        "advisorColors": "2 total incl. base",
+        "advisorQuality": "Good · 157 DPI",
+        "advisorFabric": "Cotton",
+        "advisorScreen": "2 / 6",
+        "fabricSelect": "Cotton shirt Cotton/poly blend Polyester Nylon Fabric unknown",
+        "embStatusPill": "Embroidery OK",
+        "embMain": "Embroidery looks possible.",
+        "embCopy": "This estimate is based on the visible artwork only, not the transparent/background canvas. Thread color count is in the preferred embroidery range. Large embroidery can get expensive and heavy; consider DTF/DTG for big full-front or full-back art.",
+        "embStitches": "11,000–17,500",
+        "embThreads": "1 estimated",
+        "embSize": "12.0\" × 2.3\"",
+        "embBestUse": "Large back/front",
+        "embNote": "Estimate only. The app now estimates stitches from visible design pixels only. Final stitch count still depends on digitizing, small text, outlines, gradients, fabric, and sew-out quality.",
+        "tpClose": "×",
+        "txt-text": "",
+        "txt-font": "Anton Bebas Neue Oswald Archivo Black Alfa Slab One Russo One Staatliches Graduate Black Ops One Bungee Montserrat Roboto Slab Playfair Display Merriweather Pacifico Dancing Script Great Vibes Lobster Satisfy Caveat Shadows Into Light Permanent Marker Bangers Fredoka",
+        "txt-bold": "B",
+        "txt-italic": "I",
+        "txt-fill": "",
+        "txt-stroke-on": "",
+        "txt-stroke": "",
+        "txt-strokeW": "",
+        "txt-tracking-v": "0",
+        "txt-tracking": "",
+        "txt-lh-v": "1.10",
+        "txt-lh": "",
+        "txt-arc-v": "25",
+        "txt-arc": "",
+        "txt-rot-v": "0°",
+        "txt-rot": "",
+        "tpDelete": "Delete",
+        "tpDone": "Done"
+      },
+      "fields": [
+        {
+          "id": "pcWidthRange",
+          "type": "range",
+          "value": "12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcWidthNumber",
+          "type": "number",
+          "value": "12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcXRange",
+          "type": "range",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcXNumber",
+          "type": "number",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcYRange",
+          "type": "range",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcYNumber",
+          "type": "number",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "garmentStyleSelect",
+          "type": "select-one",
+          "value": "tee",
+          "disabled": false
+        },
+        {
+          "id": "fabricSelect",
+          "type": "select-one",
+          "value": "cotton",
+          "disabled": false
+        },
+        {
+          "id": "txt-text",
+          "type": "textarea",
+          "value": "EXAMPLE TEAM\n2026",
+          "disabled": false
+        },
+        {
+          "id": "txt-font",
+          "type": "select-one",
+          "value": "Oswald",
+          "disabled": false
+        },
+        {
+          "id": "txt-fill",
+          "type": "color",
+          "value": "#1c2841",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "txt-stroke-on",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "txt-stroke",
+          "type": "color",
+          "value": "#ffffff",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "txt-strokeW",
+          "type": "range",
+          "value": "8",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "txt-tracking",
+          "type": "range",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "txt-lh",
+          "type": "range",
+          "value": "1.1",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "txt-arc",
+          "type": "range",
+          "value": "25",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "txt-rot",
+          "type": "range",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/pages/mockup-library.html",
+          "text": "📚 Saved Mockups"
+        }
+      ],
+      "headings": [
+        "NWCA Easy Shirt Designer"
+      ],
+      "entries": [
+        {
+          "name": "Text: EXAMPLE TEAM",
+          "kind": "canvas",
+          "status": "ready",
+          "printLoc": "Full Front",
+          "printW": 12,
+          "onShirt": true,
+          "textModel": {
+            "text": "EXAMPLE TEAM\n2026",
+            "font": "Oswald",
+            "weight": 700,
+            "italic": false,
+            "fill": "#1c2841",
+            "strokeOn": true,
+            "stroke": "#ffffff",
+            "strokeW": 8,
+            "tracking": 0,
+            "lineHeight": 1.1,
+            "align": "center",
+            "arc": 25,
+            "rotation": 0,
+            "caseMode": "none"
+          },
+          "dst": null
+        }
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".side-head > span"
+            ],
+            [
+              ".fsize"
+            ],
+            [
+              "#threadColorsBtn"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "T-Shirt Designer — Northwest Custom Apparel",
+      "ids": {
+        "thumb-1": "",
+        "advice-1": "Screen Print Good · 157 DPI 11,000–17,500 st",
+        "badge-1": "TEXT",
+        "pcStatusChip": "Front only",
+        "pcFrontBtn": "Front",
+        "pcBackBtn": "Back",
+        "pcBothBtn": "Both",
+        "pcLeftChestBtn": "Left Chest",
+        "pcFullFrontBtn": "Full Front",
+        "pcUpperBackBtn": "Upper Back",
+        "pcFullBackBtn": "Full Back",
+        "pcCenterBtn": "Center Art",
+        "pcWidthLabel": "12 in",
+        "pcWidthRange": "",
+        "pcWidthNumber": "",
+        "pcXLabel": "0",
+        "pcXRange": "",
+        "pcXNumber": "",
+        "pcYLabel": "0",
+        "pcYRange": "",
+        "pcYNumber": "",
+        "addTextBtn": "➕ Add Text",
+        "palBtn": "🎨 Shirt Color",
+        "garmentStyleSelect": "Crew Tee Polo Hoodie Long Sleeve Ladies Tee",
+        "removeBgBtn": "⬜ Remove White BG",
+        "artDetailsBtn": "ℹ️ Art Details",
+        "threadColorsBtn": "🧵 Thread Colors",
+        "modelViewBtn": "👕 Model View",
+        "spinBtn": "🔄 Spin",
+        "proofBtn": "🖨 Customer Proof",
+        "dlBtn": "⬇ Download PNG",
+        "sendSteveBtn": "🧵 Send to Steve",
+        "sendCustomerBtn": "📧 Send to Customer",
+        "contrastWarn": "⚠ Low art/shirt contrast — the print may be hard to see",
+        "canvasHolder": "",
+        "advisorMethodPill": "Screen Print",
+        "advisorMain": "Screen print looks possible.",
+        "advisorCopy": "Artwork appears within the 6-color screen print limit.",
+        "advisorColors": "2 total incl. base",
+        "advisorQuality": "Good · 157 DPI",
+        "advisorFabric": "Cotton",
+        "advisorScreen": "2 / 6",
+        "fabricSelect": "Cotton shirt Cotton/poly blend Polyester Nylon Fabric unknown",
+        "embStatusPill": "Embroidery OK",
+        "embMain": "Embroidery looks possible.",
+        "embCopy": "This estimate is based on the visible artwork only, not the transparent/background canvas. Thread color count is in the preferred embroidery range. Large embroidery can get expensive and heavy; consider DTF/DTG for big full-front or full-back art.",
+        "embStitches": "11,000–17,500",
+        "embThreads": "1 estimated",
+        "embSize": "12.0\" × 2.3\"",
+        "embBestUse": "Large back/front",
+        "embNote": "Estimate only. The app now estimates stitches from visible design pixels only. Final stitch count still depends on digitizing, small text, outlines, gradients, fabric, and sew-out quality.",
+        "tpClose": "×",
+        "txt-text": "",
+        "txt-font": "Anton Bebas Neue Oswald Archivo Black Alfa Slab One Russo One Staatliches Graduate Black Ops One Bungee Montserrat Roboto Slab Playfair Display Merriweather Pacifico Dancing Script Great Vibes Lobster Satisfy Caveat Shadows Into Light Permanent Marker Bangers Fredoka",
+        "txt-bold": "B",
+        "txt-italic": "I",
+        "txt-fill": "",
+        "txt-stroke-on": "",
+        "txt-stroke": "",
+        "txt-strokeW": "",
+        "txt-tracking-v": "0",
+        "txt-tracking": "",
+        "txt-lh-v": "1.10",
+        "txt-lh": "",
+        "txt-arc-v": "25",
+        "txt-arc": "",
+        "txt-rot-v": "0°",
+        "txt-rot": "",
+        "tpDelete": "Delete",
+        "tpDone": "Done"
+      },
+      "fields": [
+        {
+          "id": "pcWidthRange",
+          "type": "range",
+          "value": "12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcWidthNumber",
+          "type": "number",
+          "value": "12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcXRange",
+          "type": "range",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcXNumber",
+          "type": "number",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcYRange",
+          "type": "range",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcYNumber",
+          "type": "number",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "garmentStyleSelect",
+          "type": "select-one",
+          "value": "tee",
+          "disabled": false
+        },
+        {
+          "id": "fabricSelect",
+          "type": "select-one",
+          "value": "cotton",
+          "disabled": false
+        },
+        {
+          "id": "txt-text",
+          "type": "textarea",
+          "value": "EXAMPLE TEAM\n2026",
+          "disabled": false
+        },
+        {
+          "id": "txt-font",
+          "type": "select-one",
+          "value": "Oswald",
+          "disabled": false
+        },
+        {
+          "id": "txt-fill",
+          "type": "color",
+          "value": "#1c2841",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "txt-stroke-on",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "txt-stroke",
+          "type": "color",
+          "value": "#ffffff",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "txt-strokeW",
+          "type": "range",
+          "value": "8",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "txt-tracking",
+          "type": "range",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "txt-lh",
+          "type": "range",
+          "value": "1.1",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "txt-arc",
+          "type": "range",
+          "value": "25",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "txt-rot",
+          "type": "range",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/pages/mockup-library.html",
+          "text": "📚 Saved Mockups"
+        }
+      ],
+      "headings": [
+        "NWCA Easy Shirt Designer"
+      ],
+      "entries": [
+        {
+          "name": "Text: EXAMPLE TEAM",
+          "kind": "canvas",
+          "status": "ready",
+          "printLoc": "Full Front",
+          "printW": 12,
+          "onShirt": true,
+          "textModel": {
+            "text": "EXAMPLE TEAM\n2026",
+            "font": "Oswald",
+            "weight": 700,
+            "italic": false,
+            "fill": "#1c2841",
+            "strokeOn": true,
+            "stroke": "#ffffff",
+            "strokeW": 8,
+            "tracking": 0,
+            "lineHeight": 1.1,
+            "align": "center",
+            "arc": 25,
+            "rotation": 0,
+            "caseMode": "none"
+          },
+          "dst": null
+        }
+      ],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".side-head > span"
+            ],
+            [
+              ".fsize"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "T-Shirt Designer — Northwest Custom Apparel",
+      "ids": {
+        "thumb-1": "",
+        "advice-1": "Screen Print Good · 157 DPI 11,000–17,500 st",
+        "badge-1": "TEXT",
+        "pcStatusChip": "Front only",
+        "pcFrontBtn": "Front",
+        "pcBackBtn": "Back",
+        "pcBothBtn": "Both",
+        "pcLeftChestBtn": "Left Chest",
+        "pcFullFrontBtn": "Full Front",
+        "pcUpperBackBtn": "Upper Back",
+        "pcFullBackBtn": "Full Back",
+        "pcCenterBtn": "Center Art",
+        "pcWidthLabel": "12 in",
+        "pcWidthRange": "",
+        "pcWidthNumber": "",
+        "pcXLabel": "0",
+        "pcXRange": "",
+        "pcXNumber": "",
+        "pcYLabel": "0",
+        "pcYRange": "",
+        "pcYNumber": "",
+        "addTextBtn": "➕ Add Text",
+        "palBtn": "🎨 Shirt Color",
+        "garmentStyleSelect": "Crew Tee Polo Hoodie Long Sleeve Ladies Tee",
+        "removeBgBtn": "⬜ Remove White BG",
+        "artDetailsBtn": "ℹ️ Art Details",
+        "threadColorsBtn": "🧵 Thread Colors",
+        "modelViewBtn": "👕 Model View",
+        "spinBtn": "🔄 Spin",
+        "proofBtn": "🖨 Customer Proof",
+        "dlBtn": "⬇ Download PNG",
+        "sendSteveBtn": "🧵 Send to Steve",
+        "sendCustomerBtn": "📧 Send to Customer",
+        "contrastWarn": "⚠ Low art/shirt contrast — the print may be hard to see",
+        "canvasHolder": "",
+        "advisorMethodPill": "Screen Print",
+        "advisorMain": "Screen print looks possible.",
+        "advisorCopy": "Artwork appears within the 6-color screen print limit.",
+        "advisorColors": "2 total incl. base",
+        "advisorQuality": "Good · 157 DPI",
+        "advisorFabric": "Cotton",
+        "advisorScreen": "2 / 6",
+        "fabricSelect": "Cotton shirt Cotton/poly blend Polyester Nylon Fabric unknown",
+        "embStatusPill": "Embroidery OK",
+        "embMain": "Embroidery looks possible.",
+        "embCopy": "This estimate is based on the visible artwork only, not the transparent/background canvas. Thread color count is in the preferred embroidery range. Large embroidery can get expensive and heavy; consider DTF/DTG for big full-front or full-back art.",
+        "embStitches": "11,000–17,500",
+        "embThreads": "1 estimated",
+        "embSize": "12.0\" × 2.3\"",
+        "embBestUse": "Large back/front",
+        "embNote": "Estimate only. The app now estimates stitches from visible design pixels only. Final stitch count still depends on digitizing, small text, outlines, gradients, fabric, and sew-out quality.",
+        "tpClose": "×",
+        "txt-text": "",
+        "txt-font": "Anton Bebas Neue Oswald Archivo Black Alfa Slab One Russo One Staatliches Graduate Black Ops One Bungee Montserrat Roboto Slab Playfair Display Merriweather Pacifico Dancing Script Great Vibes Lobster Satisfy Caveat Shadows Into Light Permanent Marker Bangers Fredoka",
+        "txt-bold": "B",
+        "txt-italic": "I",
+        "txt-fill": "",
+        "txt-stroke-on": "",
+        "txt-stroke": "",
+        "txt-strokeW": "",
+        "txt-tracking-v": "0",
+        "txt-tracking": "",
+        "txt-lh-v": "1.10",
+        "txt-lh": "",
+        "txt-arc-v": "25",
+        "txt-arc": "",
+        "txt-rot-v": "0°",
+        "txt-rot": "",
+        "tpDelete": "Delete",
+        "tpDone": "Done"
+      },
+      "fields": [
+        {
+          "id": "pcWidthRange",
+          "type": "range",
+          "value": "12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcWidthNumber",
+          "type": "number",
+          "value": "12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcXRange",
+          "type": "range",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcXNumber",
+          "type": "number",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcYRange",
+          "type": "range",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "pcYNumber",
+          "type": "number",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "garmentStyleSelect",
+          "type": "select-one",
+          "value": "tee",
+          "disabled": false
+        },
+        {
+          "id": "fabricSelect",
+          "type": "select-one",
+          "value": "cotton",
+          "disabled": false
+        },
+        {
+          "id": "txt-text",
+          "type": "textarea",
+          "value": "EXAMPLE TEAM\n2026",
+          "disabled": false
+        },
+        {
+          "id": "txt-font",
+          "type": "select-one",
+          "value": "Oswald",
+          "disabled": false
+        },
+        {
+          "id": "txt-fill",
+          "type": "color",
+          "value": "#1c2841",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "txt-stroke-on",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "txt-stroke",
+          "type": "color",
+          "value": "#ffffff",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "txt-strokeW",
+          "type": "range",
+          "value": "8",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "txt-tracking",
+          "type": "range",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "txt-lh",
+          "type": "range",
+          "value": "1.1",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "txt-arc",
+          "type": "range",
+          "value": "25",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "txt-rot",
+          "type": "range",
+          "value": "0",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/pages/mockup-library.html",
+          "text": "📚 Saved Mockups"
+        }
+      ],
+      "headings": [
+        "NWCA Easy Shirt Designer"
+      ],
+      "entries": [
+        {
+          "name": "Text: EXAMPLE TEAM",
+          "kind": "canvas",
+          "status": "ready",
+          "printLoc": "Full Front",
+          "printW": 12,
+          "onShirt": true,
+          "textModel": {
+            "text": "EXAMPLE TEAM\n2026",
+            "font": "Oswald",
+            "weight": 700,
+            "italic": false,
+            "fill": "#1c2841",
+            "strokeOn": true,
+            "stroke": "#ffffff",
+            "strokeW": 8,
+            "tracking": 0,
+            "lineHeight": 1.1,
+            "align": "center",
+            "arc": 25,
+            "rotation": 0,
+            "caseMode": "none"
+          },
+          "dst": null
+        }
+      ],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".side-head > span"
+            ],
+            [
+              ".fsize"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "reads": [],
+  "writes": [],
+  "dialogs": []
+}

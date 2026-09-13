@@ -1572,11 +1572,11 @@ function showTaxStatus(message, type) {
     if (!el) return;
 
     const colors = {
-        success: '#16a34a',
-        warning: '#d97706',
-        error: '#dc2626',
-        loading: '#6366f1',
-        info: '#0284c7'
+        success: 'var(--ui-accent)',
+        warning: 'var(--color-warning-ink)',
+        error: 'var(--color-danger-ink)',
+        loading: 'var(--ui-muted)',
+        info: 'var(--ui-muted)'
     };
 
     const icons = {
@@ -1587,7 +1587,7 @@ function showTaxStatus(message, type) {
         info: '<i class="fas fa-info-circle" aria-hidden="true"></i> '
     };
 
-    el.style.color = colors[type] || '#64748b';
+    el.style.color = colors[type] || 'var(--ui-muted)';
     // eslint-disable-next-line no-unsanitized/property -- icons = internal literal map; message escapeHtml'd (1.4 audit: callers pass literals + DOR API strings)
     el.innerHTML = (icons[type] || '') + escapeHtml(message);
 }

@@ -1,543 +1,1943 @@
-/* stylelint-disable no-duplicate-selectors -- legacy sheet: rules were appended over time; merging them would reorder the cascade (2026-09-07) */
+/* Quick Quote family layout. Shared tokens, controls and focus are owned by components.css. */
+@layer components.pages {
+    :where([data-ui="unified"][data-quick-quote]) .topbar {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: var(--space-4);
+        padding: var(--space-4) max(var(--space-4), calc((100vw - 1216px) / 2));
+        background: var(--ui-surface);
+        border-bottom: 1px solid var(--ui-line);
+    }
 
-/* quick-quote.css — staff Quick Quote tool.
-   Self-contained light UI; matches the calculators' clean, professional feel.
-   Prices come from quote-cart-engine.js (same authority as the Quote Builder). */
+    :where([data-ui="unified"][data-quick-quote]) .topbar .logo-img {
+        height: 36px;
+        width: 112px;
+        object-fit: contain;
+        display: block;
+    }
 
-/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
-   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
-   raw hex is allowed ONLY in this block. */
-/* stylelint-disable color-no-hex */
-:root {
-    --quick-quote-orange: #7a541a;
-    --quick-quote-red: #b4421f;
-    --quick-quote-blue: #3b3a89;
-    --quick-quote-red-2: #b3403c;
-    --quick-quote-orange-2: #8a5a14;
-    --quick-quote-gray: #6b726b;
-    --quick-quote-orange-3: #e3b261;
-    --quick-quote-red-3: #d9534f;
-    --quick-quote-red-4: #e7b7b1;
-    --quick-quote-yellow: #ecd9ad;
-    --qq-green: var(--print-green);
-    --qq-green-dark: var(--brand-800);
-    --qq-green-tint: var(--store-green-50);   /* active-chip / accent fill, was sprinkled as #eef6f0 */
-    --qq-ink: var(--print-ink);
-    --qq-muted: var(--quick-quote-gray);
-    --qq-line: var(--gray-200);
-    --qq-line-2: var(--gray-300);
-    --qq-bg: var(--gray-100);
-    --qq-card: var(--color-surface);
-    --qq-warn-bg: var(--store-rush-soft);
-    --qq-warn-line: var(--quick-quote-orange-3);
-    --qq-warn-text: var(--quick-quote-orange);
-    --qq-err-bg: var(--red-50);
-    --qq-err-line: var(--quick-quote-red-3);
-    --qq-err-text: var(--color-ae);
-    --qq-success-text: var(--print-green);
-    --qq-radius: 12px;
+    :where([data-ui="unified"][data-quick-quote]) .crumbs {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        color: var(--ui-muted);
+        flex-wrap: wrap;
+    }
 
-    /* radius tiers (badges / controls / cards) */
-    --qq-radius-sm: 6px;
-    --qq-radius-md: 8px;
-    --qq-radius-lg: 12px;
+    :where([data-ui="unified"][data-quick-quote]) .crumbs a {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        color: var(--ui-muted);
+        text-decoration: none;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .crumbs a:hover {
+        color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .crumbs .sep {
+        opacity: 0.5;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .crumbs .here {
+        color: var(--ui-ink);
+        font-weight: 500;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .topbar .spacer {
+        flex: 1;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .theme-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        max-width: 100%;
+        font-size: var(--font-size-sm);
+        color: var(--ui-accent-hover);
+        background: var(--ui-tint);
+        padding: var(--space-2) var(--space-3);
+        border-radius: var(--radius-sm);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .theme-chip .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--ui-accent);
+        flex: none;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .page {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: var(--space-6) var(--space-6) var(--space-8);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .hero {
+        margin-bottom: var(--space-6);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .eyebrow {
+        font-size: 12px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--ui-accent);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .page-title {
+        font-size: clamp(1.75rem, 3vw, 2.25rem);
+        line-height: 1.15;
+        margin: var(--space-2) 0 0;
+        font-weight: 700;
+        letter-spacing: -0.025em;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .lede {
+        font-size: var(--font-size-base);
+        line-height: 1.65;
+        color: var(--ui-muted);
+        max-width: 80ch;
+        margin: var(--space-3) 0 0;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-banner {
+        border-radius: 10px;
+        padding: 12px 16px;
+        font-size: 14px;
+        margin-bottom: 18px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-banner--error {
+        background: var(--color-danger-bg);
+        border: 1px solid var(--red-300);
+        color: var(--color-danger-ink);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-banner--warn {
+        background: var(--color-warning-bg);
+        border: 1px solid var(--amber-300);
+        color: var(--color-warning-ink);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+        gap: 20px;
+        align-items: start;
+    }
+
+    @media (width <= 820px) {
+        :where([data-ui="unified"][data-quick-quote]) .qq-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-panel {
+        background: var(--ui-surface);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-lg);
+        padding: var(--space-6);
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-results {
+        position: static;
+        min-width: 0;
+    }
+
+    @media (width <= 820px) {
+        :where([data-ui="unified"][data-quick-quote]) .qq-results {
+            position: static;
+        }
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .field {
+        margin-bottom: 16px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .field > label {
+        display: block;
+        font-size: 13px;
+        font-weight: 500;
+        margin-bottom: 6px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .muted {
+        color: var(--ui-muted);
+        font-weight: 400;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-section-title {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--ui-muted);
+        font-weight: 600;
+        margin: 0 0 14px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-section {
+        margin-top: 18px;
+        padding-top: 18px;
+        border-top: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) [id="qqQuickInputs"].qq-section {
+        margin-top: 0;
+        padding-top: 0;
+        border-top: none;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-deco:not(:has(> :not(.qq-section-title, [hidden]))) {
+        display: none;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .input.num {
+        font-family: var(--font-mono);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-style-status {
+        font-size: 13px;
+        margin-top: 6px;
+        min-height: 18px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-style-status .ok {
+        color: var(--ui-accent-hover);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-style-status .cap {
+        display: inline-block;
+        margin-left: 6px;
+        font-size: 11px;
+        background: var(--ui-canvas);
+        color: var(--ui-accent);
+        border-radius: 6px;
+        padding: 1px 7px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-style-status .err {
+        color: var(--color-danger-ink);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-style-status .loading {
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-product {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 2px 0 16px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-thumb {
+        width: 56px;
+        height: 56px;
+        object-fit: contain;
+        border: 1px solid var(--ui-line);
+        border-radius: 9px;
+        background: var(--ui-surface);
+        flex: none;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-product-meta {
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-product-name {
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-product-name .cap {
+        display: inline-block;
+        margin-left: 6px;
+        font-size: 11px;
+        background: var(--ui-canvas);
+        color: var(--ui-accent);
+        border-radius: 6px;
+        padding: 1px 7px;
+        vertical-align: middle;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-color-selected {
+        font-size: 12.5px;
+        color: var(--ui-muted);
+        margin-top: 2px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-swatches {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        max-height: 98px;
+        overflow-y: auto;
+        padding: 2px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-swatch {
+        width: 26px;
+        height: 26px;
+        border-radius: 7px;
+        border: 1px solid var(--ui-line-strong);
+        cursor: pointer;
+        padding: 0;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        transition:
+            transform 0.1s,
+            box-shadow 0.1s;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-swatch:hover {
+        transform: scale(1.08);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-swatch.is-active {
+        border-color: var(--ui-accent);
+        box-shadow: 0 0 0 2px var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-qtyrow {
+        display: flex;
+        align-items: flex-end;
+        gap: 14px;
+        flex-wrap: wrap;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qty-field {
+        margin-bottom: 0;
+        width: 130px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-link-btn {
+        background: none;
+        border: none;
+        color: var(--ui-accent);
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        padding: 0 0 10px;
+        font-family: inherit;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-link-btn:hover {
+        text-decoration: underline;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-sizes {
+        margin: 14px 0 4px;
+        padding: 14px;
+        background: var(--ui-canvas);
+        border-radius: 10px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-sizes-note {
+        font-size: 12.5px;
+        color: var(--ui-muted);
+        margin: 0 0 10px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-size-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(64px, 1fr));
+        gap: 8px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-size-cell label {
+        display: block;
+        font-size: 11px;
+        color: var(--ui-muted);
+        margin-bottom: 3px;
+        text-align: center;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-size-cell input {
+        width: 100%;
+        min-width: 0;
+        text-align: center;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-chip {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+        border: 1px solid var(--ui-line-strong);
+        border-radius: 10px;
+        padding: 8px 14px;
+        background: var(--ui-surface);
+        cursor: pointer;
+        font-family: inherit;
+        text-align: left;
+        min-width: 96px;
+        transition:
+            border-color 0.12s,
+            background 0.12s;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-chip:hover {
+        border-color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-chip .t {
+        font-size: 13.5px;
+        font-weight: 500;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-chip .s {
+        font-size: 11px;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-chip.is-active {
+        border-color: var(--ui-accent);
+        background: var(--ui-tint);
+        box-shadow: 0 0 0 1px var(--ui-accent) inset;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-advanced {
+        margin-top: 18px;
+        border-top: 1px solid var(--ui-line);
+        padding-top: 14px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-advanced > summary {
+        font-size: 13.5px;
+        font-weight: 500;
+        color: var(--ui-accent-hover);
+        cursor: pointer;
+        list-style: none;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-advanced > summary::-webkit-details-marker {
+        display: none;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-advanced > summary::before {
+        content: "▸ ";
+        color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-advanced[open] > summary::before {
+        content: "▾ ";
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-adv-group {
+        margin-top: 14px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-adv-title {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        color: var(--ui-muted);
+        margin-bottom: 8px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-adv-row {
+        display: flex;
+        gap: 12px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-adv-row .field {
+        flex: 1;
+        margin-bottom: 10px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-check {
+        display: flex;
+        align-items: flex-start;
+        gap: var(--space-2);
+        font-size: var(--font-size-md);
+        margin: var(--space-2) 0;
+        cursor: pointer;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-example-thumb {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin: 4px 0 2px 24px;
+        width: 64px;
+        height: 64px;
+        padding: 3px;
+        border: 1px solid var(--ui-line);
+        border-radius: 9px;
+        background: var(--ui-surface);
+        overflow: hidden;
+        cursor: zoom-in;
+        transition:
+            transform 0.1s,
+            box-shadow 0.1s,
+            border-color 0.1s;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-example-thumb img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        display: block;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-example-thumb:focus-visible {
+        outline: 2px solid var(--ui-accent);
+        outline-offset: 2px;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+        :where([data-ui="unified"][data-quick-quote]) .qq-example-thumb:hover {
+            transform: scale(1.05);
+            border-color: var(--ui-accent);
+            box-shadow: none;
+        }
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-adv-foot {
+        font-size: 12px;
+        color: var(--ui-muted);
+        margin: 12px 0 0;
+        line-height: 1.5;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-ink-row {
+        display: flex;
+        gap: 14px;
+        margin-top: 6px;
+        flex-wrap: wrap;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-ink-loc {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-ink-lbl {
+        font-size: 12px;
+        color: var(--ui-muted);
+        font-weight: 500;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-ink-loc .input.num {
+        width: 92px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-ink-note {
+        font-size: 12px;
+        color: var(--ui-muted);
+        margin: 8px 0 0;
+        line-height: 1.5;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-scp-opts {
+        border-top: 1px solid var(--ui-line);
+        padding-top: 12px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-results-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: var(--space-3);
+        margin-bottom: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) [id="qqResultsTitle"] {
+        font-size: 18px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) [id="qqResultsTitle"]::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--ui-accent);
+        flex: none;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-results-sub {
+        font-size: 13px;
+        color: var(--ui-muted);
+        text-align: right;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-cards {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-card {
+        border: 1px solid var(--ui-line);
+        border-radius: 11px;
+        padding: 14px 16px;
+        background: var(--ui-surface);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-card.is-best,
+    :where([data-ui="unified"][data-quick-quote]) .qq-card.is-selected {
+        border-color: var(--ui-line);
+        border-left: 3px solid var(--ui-accent);
+        padding-left: 13px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-card-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-card-method {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-card-method .ico {
+        width: 20px;
+        height: 20px;
+        color: var(--ui-accent);
+        flex: none;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-best-tag {
+        font-size: 10.5px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        background: var(--ui-tint);
+        color: var(--ui-accent-hover);
+        padding: 2px 8px;
+        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        vertical-align: middle;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-card-price {
+        text-align: right;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-card-pp {
+        font-size: 22px;
+        font-weight: 600;
+        font-family: var(--font-mono);
+        line-height: 1.1;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-card-pp .per {
+        font-size: 12px;
+        font-weight: 400;
+        color: var(--ui-muted);
+        font-family: var(--ui-font);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-card-total {
+        font-size: 13px;
+        color: var(--ui-muted);
+        margin-top: 2px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-card-meta {
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px dashed var(--ui-line);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 14px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-card-meta .item {
+        font-size: 12.5px;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-card-meta .tier {
+        color: var(--ui-accent-hover);
+        font-weight: 500;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-card-meta .ltm {
+        color: var(--color-warning-ink);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-card-meta .fee {
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-card.is-error {
+        border-color: var(--red-300);
+        background: var(--color-danger-bg);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-card.is-error .qq-card-msg {
+        font-size: 13px;
+        color: var(--color-danger-ink);
+        margin-top: 6px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-card.is-unavailable {
+        opacity: 0.65;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-card.is-unavailable .qq-card-msg {
+        font-size: 13px;
+        color: var(--ui-muted);
+        margin-top: 4px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-retry {
+        margin-top: 8px;
+        background: var(--ui-surface);
+        border: 1px solid var(--red-300);
+        color: var(--color-danger-ink);
+        border-radius: 8px;
+        padding: 5px 12px;
+        font-size: 12.5px;
+        cursor: pointer;
+        font-family: inherit;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-skeleton {
+        height: 64px;
+        border-radius: 11px;
+        background: linear-gradient(90deg, var(--ui-tint) 25%, var(--ui-line) 37%, var(--ui-tint) 63%);
+        background-size: 400% 100%;
+        animation: qqshimmer 1.3s infinite;
+    }
+
+    @keyframes qqshimmer {
+        from {
+            background-position: 100% 0;
+        }
+
+        to {
+            background-position: 0 0;
+        }
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-empty {
+        font-size: 14px;
+        color: var(--ui-muted);
+        padding: 20px 4px;
+        text-align: center;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-foot {
+        font-size: 12px;
+        color: var(--ui-muted);
+        margin: 16px 0 0;
+        line-height: 1.5;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-card.is-clickable {
+        cursor: pointer;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-card.is-clickable:hover {
+        border-color: var(--ui-line-strong);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-card.is-selected {
+        background: var(--gray-50);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-card-selhint {
+        margin-top: 8px;
+        font-size: 11px;
+        color: var(--ui-accent);
+        font-weight: 500;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-matrix-box {
+        margin-top: 16px;
+        padding-top: 14px;
+        border-top: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-matrix-box:empty {
+        margin-top: 0;
+        padding-top: 0;
+        border-top: none;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-matrix-title {
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+        color: var(--ui-muted);
+        margin: 0 0 9px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-matrix-msg {
+        font-size: 13px;
+        color: var(--ui-muted);
+        margin: 0;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-matrix-wrap {
+        overflow-x: auto;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) table.qq-matrix {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) table.qq-matrix th,
+    :where([data-ui="unified"][data-quick-quote]) table.qq-matrix td {
+        padding: 8px 6px;
+        text-align: center;
+        border-top: 1px solid var(--ui-line);
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) table.qq-matrix thead th {
+        border-top: none;
+        font-weight: 500;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) table.qq-matrix .lbl {
+        text-align: left;
+        color: var(--ui-muted);
+        font-weight: 400;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) table.qq-matrix tbody td:not(.lbl) {
+        font-family: var(--font-mono);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) table.qq-matrix .is-cur {
+        background: var(--ui-tint);
+        color: var(--ui-accent-hover);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) table.qq-matrix thead th.is-cur {
+        border-radius: 7px 7px 0 0;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) table.qq-matrix td.warn {
+        color: var(--color-warning-ink);
+        font-weight: 500;
+        font-family: var(--ui-font);
+        font-size: 12px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-matrix-note {
+        font-size: 11.5px;
+        color: var(--ui-muted);
+        margin: 9px 0 0;
+        line-height: 1.5;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-emb-logos {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+        margin-bottom: 8px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-emb-row {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+        padding: var(--space-3);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-md);
+        background: var(--ui-surface);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-emb-badge {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--ui-muted);
+        background: var(--ui-canvas);
+        border: 1px solid var(--ui-line-strong);
+        border-radius: 6px;
+        padding: 2px 7px;
+        flex: none;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-emb-badge.is-primary {
+        color: var(--ui-accent-hover);
+        background: var(--ui-tint);
+        border-color: var(--ui-line-strong);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-emb-pos {
+        font-size: 13.5px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-emb-stitchwrap {
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-emb-stitch {
+        width: 96px;
+        text-align: right;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-emb-st {
+        font-size: 11px;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-emb-remove {
+        width: 24px;
+        height: 24px;
+        border: none;
+        background: none;
+        color: var(--ui-muted);
+        font-size: 18px;
+        line-height: 1;
+        cursor: pointer;
+        border-radius: 6px;
+        flex: none;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-emb-remove:hover {
+        color: var(--color-danger-ink);
+        background: var(--red-50);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-emb-dig {
+        margin-top: 9px;
+        font-size: 13px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-emb-hint {
+        font-size: 11.5px;
+        color: var(--ui-muted);
+        margin: 9px 0 0;
+        line-height: 1.5;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-place-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: var(--space-2);
+        margin-bottom: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-place-lbl {
+        font-size: var(--font-size-sm);
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-place-chip {
+        font-size: 12.5px;
+        padding: 6px 12px;
+        border: 1px solid var(--ui-line-strong);
+        border-radius: 8px;
+        background: var(--ui-surface);
+        cursor: pointer;
+        font-family: inherit;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-place-chip:hover {
+        border-color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-place-chip.is-active {
+        border-color: var(--ui-accent);
+        background: var(--ui-tint);
+        box-shadow: 0 0 0 1px var(--ui-accent) inset;
+        color: var(--ui-accent-hover);
+        font-weight: 500;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-place-chip.has-size {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1px;
+        line-height: 1.2;
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-chip-size {
+        font-size: 10px;
+        font-weight: 400;
+        color: var(--ui-muted);
+        font-family: var(--font-mono);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-place-chip.is-active .qq-chip-size {
+        color: var(--ui-accent-hover);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-sleeves {
+        display: flex;
+        gap: 18px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-sleeves .qq-check {
+        font-size: 13px;
+        margin: 0;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-sleeve-grp {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-sleeve-ink {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-sleeve-ink[hidden] {
+        display: none;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-sleeve-ink .input.num {
+        width: 48px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-place-note {
+        font-size: 11px;
+        color: var(--ui-muted);
+        margin: 6px 0 0;
+        line-height: 1.5;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-card-nudge {
+        margin-top: 8px;
+        font-size: 11.5px;
+        font-weight: 500;
+        color: var(--ui-accent-hover);
+        background: var(--ui-tint);
+        border-radius: 7px;
+        padding: 5px 9px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-capemb {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+        flex-wrap: wrap;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-capemb-lbl {
+        font-size: 12px;
+        color: var(--ui-muted);
+        flex: none;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-qty-presets {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+        margin: var(--space-3) 0 var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-qty-presets button {
+        font-size: 12px;
+        padding: 4px 12px;
+        border: 1px solid var(--ui-line-strong);
+        border-radius: 7px;
+        background: var(--ui-surface);
+        cursor: pointer;
+        color: var(--ui-muted);
+        font-family: inherit;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-qty-presets button:hover {
+        border-color: var(--ui-accent);
+        color: var(--ui-accent-hover);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-card-config {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 10px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-cfg-chip {
+        font-size: 11.5px;
+        color: var(--ui-muted);
+        background: transparent;
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+        padding: 2px 8px;
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-cfg-chip.on {
+        color: var(--ui-accent-hover);
+        background: var(--ui-tint);
+        border-color: var(--ui-accent);
+        font-weight: 500;
+    }
+
+    @keyframes qq-flash {
+        from {
+            background: var(--ui-tint);
+        }
+
+        to {
+            background: var(--ui-surface);
+        }
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-card[data-flash] {
+        animation: qq-flash 0.7s ease-out;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-card.is-belowmin {
+        opacity: 1;
+        border-color: var(--amber-300);
+        background: var(--color-warning-bg);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-card.is-belowmin .qq-card-msg {
+        color: var(--color-warning-ink);
+        font-weight: 500;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-swatch:focus-visible,
+    :where([data-ui="unified"][data-quick-quote]) .qq-chip:focus-visible,
+    :where([data-ui="unified"][data-quick-quote]) .qq-qty-presets button:focus-visible {
+        outline: 2px solid var(--ui-accent);
+        outline-offset: 2px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        :where([data-ui="unified"][data-quick-quote]) .qq-card[data-flash] {
+            animation: none;
+        }
+
+        :where([data-ui="unified"][data-quick-quote]) .qq-swatch,
+        :where([data-ui="unified"][data-quick-quote]) .qq-example-thumb {
+            transition: none;
+        }
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-place-presets {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin: 0 0 10px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-place-presets button {
+        font-size: 12px;
+        padding: 4px 12px;
+        border: 1px solid var(--ui-line-strong);
+        border-radius: 7px;
+        background: var(--ui-surface);
+        cursor: pointer;
+        color: var(--ui-muted);
+        font-family: inherit;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-place-presets button:hover {
+        border-color: var(--ui-accent);
+        color: var(--ui-accent-hover);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-place-presets button.is-active {
+        border-color: var(--ui-accent);
+        background: var(--ui-tint);
+        color: var(--ui-accent-hover);
+        font-weight: 500;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-place-presets button:focus-visible {
+        outline: 2px solid var(--ui-accent);
+        outline-offset: 2px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) button.qq-card-nudge {
+        display: block;
+        width: 100%;
+        border: none;
+        text-align: left;
+        cursor: pointer;
+        font-family: inherit;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) button.qq-card-nudge:hover {
+        background: var(--store-green-100);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) button.qq-card-nudge:focus-visible {
+        outline: 2px solid var(--ui-accent);
+        outline-offset: 2px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-best-tag .qq-star {
+        flex: none;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-emb-warn {
+        margin: 6px 0 0;
+        font-size: 12px;
+        color: var(--color-warning-ink);
+        background: var(--color-warning-bg);
+        border: 1px solid var(--amber-300);
+        border-radius: 7px;
+        padding: 6px 9px;
+        line-height: 1.45;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-card-breakdown {
+        margin-top: 10px;
+        border-top: 1px dashed var(--ui-line);
+        padding-top: 8px;
+        display: none;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-card.is-selected .qq-card-breakdown {
+        display: flex;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-bd-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        font-size: 12px;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-bd-row span:last-child {
+        font-family: var(--font-mono);
+        color: var(--ui-ink);
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-bd-row.is-blank span:first-child {
+        color: var(--ui-ink);
+        font-weight: 500;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-bd-row.is-ltm span {
+        color: var(--color-warning-ink);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-bd-head {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--ui-muted);
+        font-weight: 600;
+        margin-bottom: 2px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-bd-sub {
+        text-transform: none;
+        letter-spacing: 0;
+        font-weight: 400;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-card-onetime {
+        margin-top: 10px;
+        background: var(--ui-canvas);
+        border-left: 3px solid var(--amber-300);
+        border-radius: 0 var(--radius-md) var(--radius-md) 0;
+        padding: 8px 11px;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-card-onetime .qq-bd-head {
+        color: var(--color-warning-ink);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-card-onetime .qq-bd-row span:first-child {
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-bd-row.is-total span {
+        font-weight: 600;
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-inv {
+        margin-top: 8px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-inv-note {
+        font-size: 12px;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-inv-flag {
+        font-size: 12px;
+        font-weight: 600;
+        padding: 6px 10px;
+        border-radius: 7px;
+        margin-bottom: 6px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-inv-flag.is-disc {
+        background: var(--color-warning-bg);
+        color: var(--color-danger-ink);
+        border: 1px solid var(--red-200);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-inv-flag.is-oos {
+        background: var(--color-warning-bg);
+        color: var(--color-warning-ink);
+        border: 1px solid var(--amber-200);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-inv-head {
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 6px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-inv-head .muted {
+        font-weight: 400;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-inv-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-inv-cell {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        min-width: 42px;
+        padding: 4px 7px;
+        border-radius: 6px;
+        font-size: 11px;
+        line-height: 1.35;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-inv-cell.is-good {
+        background: var(--ui-tint);
+        color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-inv-cell.is-low {
+        background: var(--color-warning-bg);
+        color: var(--color-warning-ink);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-inv-cell.is-out {
+        background: var(--color-warning-bg);
+        color: var(--color-danger-ink);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-inv-sz {
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-inv-qty {
+        font-family: var(--font-mono);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-mode-toggle {
+        display: flex;
+        width: 100%;
+        gap: 4px;
+        padding: 4px;
+        background: var(--ui-canvas);
+        border: 1px solid var(--ui-line-strong);
+        border-radius: var(--radius-md);
+        margin-bottom: 20px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-mode-toggle button {
+        appearance: none;
+        flex: 1;
+        text-align: center;
+        border: 0;
+        background: none;
+        font: inherit;
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+        color: var(--ui-muted);
+        padding: 9px 16px;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        transition:
+            background 0.15s ease,
+            color 0.15s ease,
+            box-shadow 0.15s ease,
+            transform 0.15s ease;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-mode-toggle button:hover:not(.is-active) {
+        color: var(--ui-accent-hover);
+        background: var(--ui-tint);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-mode-toggle button.is-active {
+        background: var(--ui-accent);
+        color: var(--color-on-brand);
+        box-shadow: none;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-mode-toggle button:focus-visible {
+        outline: 2px solid var(--ui-accent-hover);
+        outline-offset: 2px;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+        :where([data-ui="unified"][data-quick-quote]) .qq-mode-toggle button.is-active {
+            transform: translateY(-0.5px);
+        }
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-line-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 10px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-line-empty {
+        font-size: 13px;
+        color: var(--ui-muted);
+        margin: 4px 0 8px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-line-row {
+        border: 1px solid var(--ui-line);
+        border-radius: 10px;
+        padding: 9px 10px;
+        background: var(--ui-surface);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-line-head {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-line-style {
+        flex: 1 1 120px;
+        min-width: 0;
+        text-transform: uppercase;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-line-ctrls {
+        display: inline-flex;
+        gap: 6px;
+        flex: none;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-line-mv,
+    :where([data-ui="unified"][data-quick-quote]) .qq-line-rm {
+        appearance: none;
+        border: 1px solid var(--ui-line-strong);
+        background: var(--ui-canvas);
+        color: var(--ui-muted);
+        width: 32px;
+        height: 32px;
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        font-size: 15px;
+        line-height: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition:
+            border-color 0.12s,
+            color 0.12s,
+            background 0.12s;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-line-mv:hover:not([disabled]),
+    :where([data-ui="unified"][data-quick-quote]) .qq-line-rm:hover {
+        border-color: var(--ui-accent);
+        color: var(--ui-accent-hover);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-line-mv[disabled] {
+        opacity: 0.4;
+        cursor: default;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-line-rm:hover {
+        border-color: var(--color-danger-ink);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-line-content {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 8px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-line-content:empty {
+        display: none;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-line-thumb {
+        width: 56px;
+        height: 56px;
+        object-fit: contain;
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-md);
+        background: var(--ui-surface);
+        flex: none;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-line-thumb.is-empty {
+        display: inline-block;
+        background: var(--ui-canvas);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-line-meta {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px 10px;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-line-name {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-line-color {
+        max-width: 100%;
+        min-width: 0;
+        font-size: var(--font-size-md);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-line-color:focus-visible {
+        outline: 2px solid var(--ui-accent);
+        outline-offset: 1px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-line-price {
+        font-size: 12px;
+        font-family: var(--font-mono);
+        color: var(--ui-accent-hover);
+        font-weight: 500;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-line-stat {
+        font-size: 12px;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-line-stat.err {
+        color: var(--color-danger-ink);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-line-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+        margin-top: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-line-hint {
+        font-size: 12px;
+        color: var(--ui-muted);
+        margin: 10px 0 0;
+        line-height: 1.5;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-sheet {
+        background: var(--ui-surface);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-lg);
+        padding: var(--space-5);
+        color: var(--ui-ink);
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-placeholder {
+        font-size: 13.5px;
+        color: var(--ui-muted);
+        padding: 28px 6px;
+        text-align: center;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-head {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        border-bottom: 2px solid var(--ui-accent);
+        padding-bottom: 12px;
+        margin-bottom: 14px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-logo {
+        height: 42px;
+        width: auto;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-brand {
+        font-size: 16px;
+        font-weight: 700;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-sub {
+        font-size: 12px;
+        color: var(--ui-muted);
+        margin-top: 2px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-body {
+        display: flex;
+        flex-direction: column;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-item {
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
+        padding: 14px 0;
+        border-bottom: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-item:last-child {
+        border-bottom: 0;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-img {
+        width: 76px;
+        height: 76px;
+        object-fit: contain;
+        border: 1px solid var(--ui-line);
+        border-radius: 7px;
+        background: var(--gray-50);
+        flex: none;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-img.is-empty {
+        display: inline-block;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-item-main {
+        flex: 1;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-item-head {
+        font-size: 13.5px;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-style {
+        font-family: var(--font-mono);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-color {
+        color: var(--ui-muted);
+        font-weight: 400;
+        margin-left: 10px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-ladder {
+        width: 100%;
+        white-space: nowrap;
+        border-collapse: collapse;
+        font-size: 12px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-ladder th,
+    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-ladder td {
+        border: 1px solid var(--ui-line);
+        padding: 5px 8px;
+        text-align: center;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-ladder .lbl {
+        text-align: left;
+        color: var(--ui-muted);
+        font-weight: 500;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-ladder td {
+        font-family: var(--font-mono);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-ladder .warn {
+        color: var(--color-warning-ink);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-foot {
+        margin-top: 16px;
+        padding-top: 10px;
+        border-top: 1px solid var(--ui-line);
+        font-size: 11px;
+        color: var(--ui-muted);
+        line-height: 1.5;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-ladder-wrap {
+        overflow: auto;
+        max-width: 100%;
+    }
+
+    @media (width <= 480px) {
+        :where([data-ui="unified"][data-quick-quote]) .page {
+            padding: 16px 14px 48px;
+        }
+
+        :where([data-ui="unified"][data-quick-quote]) .page-title {
+            font-size: 24px;
+        }
+
+        :where([data-ui="unified"][data-quick-quote]) .qq-panel {
+            padding: 16px;
+        }
+
+        :where([data-ui="unified"][data-quick-quote]) .field {
+            margin-bottom: 12px;
+        }
+
+        :where([data-ui="unified"][data-quick-quote]) .qq-swatches {
+            max-height: 140px;
+        }
+
+        :where([data-ui="unified"][data-quick-quote]) .qq-swatch {
+            width: 34px;
+            height: 34px;
+        }
+
+        :where([data-ui="unified"][data-quick-quote]) .qq-place-chip,
+        :where([data-ui="unified"][data-quick-quote]) .qq-qty-presets button,
+        :where([data-ui="unified"][data-quick-quote]) .qq-place-presets button {
+            min-height: 40px;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        :where([data-ui="unified"][data-quick-quote]) .qq-chip {
+            min-height: 48px;
+            min-width: 84px;
+        }
+
+        :where([data-ui="unified"][data-quick-quote]) .qq-card-pp {
+            font-size: 20px;
+        }
+
+        :where([data-ui="unified"][data-quick-quote]) table.qq-matrix {
+            font-size: 12px;
+        }
+
+        :where([data-ui="unified"][data-quick-quote]) .qq-line-thumb {
+            width: 48px;
+            height: 48px;
+        }
+
+        :where([data-ui="unified"][data-quick-quote]) .qq-mode-toggle button {
+            padding: 11px 12px;
+        }
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-open-builder {
+        margin-top: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-handback-bar {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        font-size: 12.5px;
+        color: var(--ui-accent-hover);
+        background: var(--ui-tint);
+        border: 1px solid var(--ui-accent);
+        border-radius: var(--radius-sm);
+        padding: 8px 12px;
+        margin-bottom: 12px;
+        line-height: 1.45;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-handback-bar[hidden] {
+        display: none;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-handback-bar i {
+        margin-top: 2px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-use-price {
+        display: block;
+        width: 100%;
+        margin-top: 8px;
+        border: none;
+        border-radius: 7px;
+        padding: 7px 10px;
+        font-family: inherit;
+        font-size: 12.5px;
+        font-weight: 600;
+        text-align: center;
+        cursor: pointer;
+        color: var(--color-on-brand);
+        background: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-use-price:hover {
+        background: var(--ui-accent-hover);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-use-price.is-sent {
+        background: var(--ui-tint);
+        color: var(--ui-accent-hover);
+        border: 1px solid var(--ui-accent);
+        cursor: default;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .input {
+        width: 100%;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-card-msg {
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) [hidden] {
+        display: none;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .crumbs svg {
+        transform: rotate(180deg);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-table-action {
+        padding: 4px 8px;
+        min-height: 36px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-show-breaks {
+        margin-top: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-check input {
+        flex: none;
+        margin: 4px 0 0;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-check .muted {
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-inv-error {
+        padding: var(--space-3);
+        color: var(--color-warning-ink);
+        background: var(--color-warning-bg);
+        border-radius: var(--radius-sm);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-inv-error .btn {
+        margin-top: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-critical-error {
+        padding: var(--space-4);
+        margin-bottom: var(--space-5);
+        border: 1px solid var(--red-300);
+        border-radius: var(--radius-md);
+        background: var(--color-danger-bg);
+        color: var(--color-danger-ink);
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-critical-error > div:first-child {
+        font-weight: 700;
+        margin-bottom: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-critical-error > div:last-child {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+        margin-top: var(--space-3);
+    }
+
+    @media (width <= 600px) {
+        :where([data-ui="unified"][data-quick-quote]) .topbar {
+            gap: var(--space-3);
+        }
+
+        :where([data-ui="unified"][data-quick-quote]) .topbar .spacer {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-quick-quote]) .theme-chip {
+            flex-basis: 100%;
+        }
+
+        :where([data-ui="unified"][data-quick-quote]) .qq-sheet-item {
+            flex-direction: column;
+        }
+
+        :where([data-ui="unified"][data-quick-quote]) .qq-sheet-item-main {
+            width: 100%;
+        }
+
+        :where([data-ui="unified"][data-quick-quote]) .qq-panel,
+        :where([data-ui="unified"][data-quick-quote]) .qq-sheet {
+            padding: var(--space-4);
+        }
+
+        :where([data-ui="unified"][data-quick-quote]) .qq-line-ctrls {
+            margin-left: auto;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        :where([data-ui="unified"][data-quick-quote]) .qq-skeleton,
+        :where([data-ui="unified"][data-quick-quote]) .qq-card {
+            animation: none;
+        }
+    }
 }
-/* stylelint-enable color-no-hex */
 
-* { box-sizing: border-box; }
-
-body {
-    margin: 0;
-    font-family: Geist, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    color: var(--qq-ink);
-    background: var(--qq-bg);
-    -webkit-font-smoothing: antialiased;
+@layer components.pages {
+    :where([data-ui="unified"][data-quick-quote]) .qq-print-summary {
+        display: none;
+    }
 }
-
-/* ===== Top bar ===== */
-.topbar {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 12px 24px;
-    background: var(--color-surface);
-    border-bottom: 1px solid var(--qq-line);
-    position: sticky;
-    top: 0;
-    z-index: 10;
-}
-.topbar .logo-img { height: 30px; display: block; }
-.crumbs { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--qq-muted); }
-.crumbs a { display: inline-flex; align-items: center; gap: 5px; color: var(--qq-muted); text-decoration: none; }
-.crumbs a:hover { color: var(--qq-green); }
-.crumbs .sep { opacity: .5; }
-.crumbs .here { color: var(--qq-ink); font-weight: 500; }
-.topbar .spacer { flex: 1; }
-
-.theme-chip {
-    display: inline-flex; align-items: center; gap: 7px;
-    font-size: 12px; color: var(--qq-green-dark);
-    background: var(--brand-100); border: 1px solid var(--gray-300);
-    padding: 5px 12px; border-radius: 999px;
-}
-.theme-chip .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--qq-green); }
-
-/* ===== Page ===== */
-.page { max-width: 1080px; margin: 0 auto; padding: 28px 24px 64px; }
-
-.hero { margin-bottom: 20px; }
-.eyebrow { font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: var(--qq-green); font-weight: 600; }
-.page-title { font-size: 30px; line-height: 1.1; margin: 6px 0 0; font-weight: 600; }
-.lede { font-size: 14px; line-height: 1.55; color: var(--qq-muted); max-width: 64ch; margin: 8px 0 0; }
-
-/* ===== Banners ===== */
-.qq-banner { border-radius: 10px; padding: 12px 16px; font-size: 14px; margin-bottom: 18px; }
-.qq-banner--error { background: var(--qq-err-bg); border: 1px solid var(--qq-err-line); color: var(--color-ae); }
-.qq-banner--warn { background: var(--qq-warn-bg); border: 1px solid var(--qq-warn-line); color: var(--quick-quote-orange); }
-
-/* ===== Layout ===== */
-.qq-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
-    gap: 20px;
-    align-items: start;
-}
-
-@media (width <= 820px) { .qq-grid { grid-template-columns: 1fr; } }
-
-.qq-panel {
-    background: var(--qq-card);
-    border: 1px solid var(--qq-line);
-    border-radius: var(--qq-radius);
-    padding: 20px;
-    box-shadow: 0 1px 3px rgb(26 29 26 / 6%);
-}
-.qq-results { position: sticky; top: 64px; }
-
-@media (width <= 820px) { .qq-results { position: static; } }
-
-/* ===== Fields ===== */
-.field { margin-bottom: 16px; }
-.field > label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; }
-.muted { color: var(--qq-muted); font-weight: 400; }
-
-/* ===== Input sections (Product / Decoration) — group the long stack into scannable zones ===== */
-.qq-section-title { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--qq-muted); font-weight: 600; margin: 0 0 14px; }
-.qq-section { margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--qq-line); }
-#qqQuickInputs.qq-section { margin-top: 0; padding-top: 0; border-top: none; }   /* Product is first — no divider above */
-
-/* hide the Decoration section + its title when no decoration field shows (e.g. line mode before a method is picked) */
-.qq-deco:not(:has(> :not(.qq-section-title, [hidden]))) { display: none; }
-
-.input {
-    width: 100%;
-    height: 40px;
-    border: 1px solid var(--qq-line-2);
-    border-radius: 9px;
-    padding: 0 12px;
-    font-size: 15px;
-    font-family: inherit;
-    color: var(--qq-ink);
-    background: var(--color-surface);
-    transition: border-color .12s, box-shadow .12s;
-}
-.input:focus { outline: none; border-color: var(--qq-green); box-shadow: 0 0 0 3px rgb(46 111 64 / 15%); }
-.input.num { font-family: "Geist Mono", ui-monospace, monospace; }
-select.input { appearance: none; background-image: url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b726b' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 34px; }
-
-.qq-style-status { font-size: 13px; margin-top: 6px; min-height: 18px; }
-.qq-style-status .ok { color: var(--qq-green-dark); }
-.qq-style-status .cap { display: inline-block; margin-left: 6px; font-size: 11px; background: var(--gray-100); color: var(--quick-quote-blue); border-radius: 6px; padding: 1px 7px; }
-.qq-style-status .err { color: var(--quick-quote-red-2); }
-.qq-style-status .loading { color: var(--qq-muted); }
-
-/* ===== Product card (thumb + name) ===== */
-.qq-product { display: flex; align-items: center; gap: 12px; margin: 2px 0 16px; }
-.qq-thumb { width: 56px; height: 56px; object-fit: contain; border: 1px solid var(--qq-line); border-radius: 9px; background: var(--color-surface); flex: none; }
-.qq-product-meta { min-width: 0; }
-.qq-product-name { font-size: 14px; font-weight: 500; }
-.qq-product-name .cap { display: inline-block; margin-left: 6px; font-size: 11px; background: var(--gray-100); color: var(--quick-quote-blue); border-radius: 6px; padding: 1px 7px; vertical-align: middle; }
-.qq-color-selected { font-size: 12.5px; color: var(--qq-muted); margin-top: 2px; }
-
-/* ===== Color swatches ===== */
-.qq-swatches { display: flex; flex-wrap: wrap; gap: 6px; max-height: 98px; overflow-y: auto; padding: 2px; }
-.qq-swatch { width: 26px; height: 26px; border-radius: 7px; border: 1px solid var(--qq-line-2); cursor: pointer; padding: 0; background-size: cover; background-position: center; background-repeat: no-repeat; transition: transform .1s, box-shadow .1s; }
-.qq-swatch:hover { transform: scale(1.08); }
-.qq-swatch.is-active { border-color: var(--qq-green); box-shadow: 0 0 0 2px var(--qq-green); }
-
-/* ===== Quantity + sizes ===== */
-.qq-qtyrow { display: flex; align-items: flex-end; gap: 14px; flex-wrap: wrap; }
-.qty-field { margin-bottom: 0; width: 130px; }
-
-.qq-link-btn {
-    background: none; border: none; color: var(--qq-green);
-    font-size: 13px; font-weight: 500; cursor: pointer; padding: 0 0 10px;
-    font-family: inherit;
-}
-.qq-link-btn:hover { text-decoration: underline; }
-
-.qq-sizes { margin: 14px 0 4px; padding: 14px; background: var(--qq-bg); border-radius: 10px; }
-.qq-sizes-note { font-size: 12.5px; color: var(--qq-muted); margin: 0 0 10px; }
-.qq-size-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(64px, 1fr)); gap: 8px; }
-.qq-size-cell label { display: block; font-size: 11px; color: var(--qq-muted); margin-bottom: 3px; text-align: center; }
-.qq-size-cell input { width: 100%; height: 34px; text-align: center; border: 1px solid var(--qq-line-2); border-radius: 8px; font-family: "Geist Mono", monospace; font-size: 14px; }
-.qq-size-cell input:focus { outline: none; border-color: var(--qq-green); }
-
-/* ===== Placement chips ===== */
-.qq-chips { display: flex; flex-wrap: wrap; gap: 8px; }
-
-.qq-chip {
-    display: flex; flex-direction: column; gap: 1px;
-    border: 1px solid var(--qq-line-2); border-radius: 10px;
-    padding: 8px 14px; background: var(--color-surface); cursor: pointer;
-    font-family: inherit; text-align: left; min-width: 96px;
-    transition: border-color .12s, background .12s;
-}
-.qq-chip:hover { border-color: var(--qq-green); }
-.qq-chip .t { font-size: 13.5px; font-weight: 500; }
-.qq-chip .s { font-size: 11px; color: var(--qq-muted); }
-.qq-chip.is-active { border-color: var(--qq-green); background: var(--store-green-50); box-shadow: 0 0 0 1px var(--qq-green) inset; }
-
-/* ===== Advanced ===== */
-.qq-advanced { margin-top: 18px; border-top: 1px solid var(--qq-line); padding-top: 14px; }
-.qq-advanced > summary { font-size: 13.5px; font-weight: 500; color: var(--qq-green-dark); cursor: pointer; list-style: none; }
-.qq-advanced > summary::-webkit-details-marker { display: none; }
-.qq-advanced > summary::before { content: "▸ "; color: var(--qq-green); }
-.qq-advanced[open] > summary::before { content: "▾ "; }
-.qq-adv-group { margin-top: 14px; }
-.qq-adv-title { font-size: 12px; text-transform: uppercase; letter-spacing: .03em; color: var(--qq-muted); margin-bottom: 8px; }
-.qq-adv-row { display: flex; gap: 12px; }
-.qq-adv-row .field { flex: 1; margin-bottom: 10px; }
-.qq-check { display: flex; align-items: center; gap: 8px; font-size: 13.5px; margin: 6px 0; cursor: pointer; }
-
-/* Safety-stripes example image (mirrors .qq-thumb; ~square front+back photo, click to enlarge) */
-.qq-example-thumb {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    margin: 4px 0 2px 24px;
-    width: 64px;
-    height: 64px;
-    padding: 3px;
-    border: 1px solid var(--qq-line);
-    border-radius: 9px;
-    background: var(--color-surface);
-    overflow: hidden;
-    cursor: zoom-in;
-    transition: transform .1s, box-shadow .1s, border-color .1s;
-}
-.qq-example-thumb img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
-.qq-example-thumb:focus-visible { outline: 2px solid var(--qq-green); outline-offset: 2px; }
-
-@media (hover: hover) and (pointer: fine) {
-    .qq-example-thumb:hover { transform: scale(1.05); border-color: var(--qq-green); box-shadow: 0 1px 6px rgb(0 0 0 / 12%); }
-}
-.qq-adv-foot { font-size: 12px; color: var(--qq-muted); margin: 12px 0 0; line-height: 1.5; }
-
-/* SCP ink colors — separate front + back steppers (each color = 1 screen) */
-.qq-ink-row { display: flex; gap: 14px; margin-top: 6px; flex-wrap: wrap; }
-.qq-ink-loc { display: flex; flex-direction: column; gap: 4px; }
-.qq-ink-lbl { font-size: 12px; color: var(--qq-muted); font-weight: 500; }
-.qq-ink-loc .input.num { width: 92px; }
-.qq-ink-note { font-size: 12px; color: var(--qq-muted); margin: 8px 0 0; line-height: 1.5; }
-
-/* SCP options (dark garment + safety stripes) — inline, delineated from the fields above */
-.qq-scp-opts { border-top: 1px solid var(--qq-line); padding-top: 12px; }
-
-/* ===== Results ===== */
-.qq-results-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
-#qqResultsTitle { font-size: 18px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; }
-#qqResultsTitle::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--qq-green); flex: none; }
-.qq-results-sub { font-size: 13px; color: var(--qq-muted); text-align: right; }
-
-.qq-cards { display: flex; flex-direction: column; gap: 10px; }
-
-.qq-card {
-    border: 1px solid var(--qq-line); border-radius: 11px;
-    padding: 14px 16px; background: var(--color-surface);
-}
-.qq-card.is-best, .qq-card.is-selected { border-color: var(--qq-line); border-left: 3px solid var(--qq-green); padding-left: 13px; }
-.qq-card-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-.qq-card-method { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; }
-.qq-card-method .ico { width: 20px; height: 20px; color: var(--qq-green); }
-.qq-best-tag { font-size: 10.5px; text-transform: uppercase; letter-spacing: .04em; background: var(--store-green-50); color: var(--qq-green-dark); padding: 2px 8px; border-radius: 6px; }
-.qq-card-price { text-align: right; }
-.qq-card-pp { font-size: 22px; font-weight: 600; font-family: "Geist Mono", monospace; line-height: 1.1; }
-/* stylelint-disable-next-line font-family-no-missing-generic-family-keyword -- legacy stack; adding a generic is not byte-identical */
-.qq-card-pp .per { font-size: 12px; font-weight: 400; color: var(--qq-muted); font-family: Geist; }
-.qq-card-total { font-size: 13px; color: var(--qq-muted); margin-top: 2px; }
-.qq-card-meta { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--qq-line); display: flex; flex-wrap: wrap; gap: 6px 14px; }
-.qq-card-meta .item { font-size: 12.5px; color: var(--qq-muted); }
-.qq-card-meta .tier { color: var(--qq-green-dark); font-weight: 500; }
-.qq-card-meta .ltm { color: var(--quick-quote-orange); }
-.qq-card-meta .fee { color: var(--qq-ink); }
-
-.qq-card.is-error { border-color: var(--qq-err-line); background: var(--qq-err-bg); }
-.qq-card.is-error .qq-card-msg { font-size: 13px; color: var(--color-ae); margin-top: 6px; }
-.qq-card.is-unavailable { opacity: .65; }
-.qq-card.is-unavailable .qq-card-msg { font-size: 13px; color: var(--qq-muted); margin-top: 4px; }
-.qq-retry { margin-top: 8px; background: var(--color-surface); border: 1px solid var(--qq-err-line); color: var(--color-ae); border-radius: 8px; padding: 5px 12px; font-size: 12.5px; cursor: pointer; font-family: inherit; }
-
-.qq-skeleton { height: 64px; border-radius: 11px; background: linear-gradient(90deg, var(--store-green-50) 25%, var(--gray-200) 37%, var(--store-green-50) 63%); background-size: 400% 100%; animation: qqshimmer 1.3s infinite; }
-
-@keyframes qqshimmer { from { background-position: 100% 0; } to { background-position: 0 0; } }
-
-.qq-empty { font-size: 14px; color: var(--qq-muted); padding: 20px 4px; text-align: center; }
-
-.qq-foot { font-size: 12px; color: var(--qq-muted); margin: 16px 0 0; line-height: 1.5; }
-
-/* ===== Selectable cards + price-breaks matrix ===== */
-.qq-card.is-clickable { cursor: pointer; }
-.qq-card.is-clickable:hover { border-color: var(--qq-line-2); }
-.qq-card.is-selected { background: var(--gray-50); }
-.qq-card-selhint { margin-top: 8px; font-size: 11px; color: var(--qq-green); font-weight: 500; }
-
-.qq-matrix-box { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--qq-line); }
-.qq-matrix-box:empty { margin-top: 0; padding-top: 0; border-top: none; }
-.qq-matrix-title { font-size: 12px; font-weight: 600; letter-spacing: .03em; text-transform: uppercase; color: var(--qq-muted); margin: 0 0 9px; }
-.qq-matrix-msg { font-size: 13px; color: var(--qq-muted); margin: 0; }
-.qq-matrix-wrap { overflow-x: auto; }
-table.qq-matrix { width: 100%; border-collapse: collapse; font-size: 13px; }
-table.qq-matrix th, table.qq-matrix td { padding: 8px 6px; text-align: center; border-top: 1px solid var(--qq-line); white-space: nowrap; }
-table.qq-matrix thead th { border-top: none; font-weight: 500; color: var(--qq-muted); }
-table.qq-matrix .lbl { text-align: left; color: var(--qq-muted); font-weight: 400; }
-table.qq-matrix tbody td:not(.lbl) { font-family: "Geist Mono", ui-monospace, monospace; }
-table.qq-matrix .is-cur { background: var(--store-green-50); color: var(--qq-green-dark); font-weight: 600; }
-table.qq-matrix thead th.is-cur { border-radius: 7px 7px 0 0; }
-table.qq-matrix td.warn { color: var(--quick-quote-orange); font-weight: 500; font-family: Geist, sans-serif; font-size: 12px; }
-.qq-matrix-note { font-size: 11.5px; color: var(--qq-muted); margin: 9px 0 0; line-height: 1.5; }
-
-/* ===== Embroidery logo panel ===== */
-.qq-emb-logos { display: flex; flex-direction: column; gap: 7px; margin-bottom: 8px; }
-.qq-emb-row { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border: 1px solid var(--qq-line-2); border-radius: 9px; background: var(--color-surface); }
-.qq-emb-badge { font-size: 11px; font-weight: 600; color: var(--qq-muted); background: var(--qq-bg); border: 1px solid var(--qq-line-2); border-radius: 6px; padding: 2px 7px; flex: none; }
-.qq-emb-badge.is-primary { color: var(--qq-green-dark); background: var(--store-green-50); border-color: var(--gray-300); }
-.qq-emb-pos { font-size: 13.5px; }
-.qq-emb-stitchwrap { margin-left: auto; display: flex; align-items: center; gap: 6px; }
-.qq-emb-stitch { width: 78px; height: 32px; text-align: right; padding: 0 8px; font-size: 13px; border: 1px solid var(--qq-line-2); border-radius: 7px; font-family: "Geist Mono", monospace; }
-.qq-emb-stitch:focus { outline: none; border-color: var(--qq-green); box-shadow: 0 0 0 3px rgb(46 111 64 / 15%); }
-.qq-emb-st { font-size: 11px; color: var(--qq-muted); }
-.qq-emb-remove { width: 24px; height: 24px; border: none; background: none; color: var(--qq-muted); font-size: 18px; line-height: 1; cursor: pointer; border-radius: 6px; flex: none; }
-.qq-emb-remove:hover { color: var(--quick-quote-red-2); background: var(--red-50); }
-.qq-emb-dig { margin-top: 9px; font-size: 13px; }
-.qq-emb-hint { font-size: 11.5px; color: var(--qq-muted); margin: 9px 0 0; line-height: 1.5; }
-
-/* ===== Front/Back/Sleeves placement picker ===== */
-.qq-place-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-.qq-place-lbl { font-size: 12px; color: var(--qq-muted); width: 50px; flex: none; }
-.qq-place-chip { font-size: 12.5px; padding: 6px 12px; border: 1px solid var(--qq-line-2); border-radius: 8px; background: var(--color-surface); cursor: pointer; font-family: inherit; }
-.qq-place-chip:hover { border-color: var(--qq-green); }
-.qq-place-chip.is-active { border-color: var(--qq-green); background: var(--store-green-50); box-shadow: 0 0 0 1px var(--qq-green) inset; color: var(--qq-green-dark); font-weight: 500; }
-
-/* chips that carry a print-size sub-label become a tight two-line stack (always visible — no hover) */
-.qq-place-chip.has-size { display: inline-flex; flex-direction: column; align-items: center; gap: 1px; line-height: 1.2; padding-top: 5px; padding-bottom: 5px; }
-.qq-chip-size { font-size: 10px; font-weight: 400; color: var(--qq-muted); font-family: "Geist Mono", monospace; }
-.qq-place-chip.is-active .qq-chip-size { color: var(--qq-green-dark); }
-.qq-sleeves { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
-.qq-sleeves .qq-check { font-size: 13px; margin: 0; }
-.qq-sleeve-grp { display: inline-flex; align-items: center; gap: 8px; }
-.qq-sleeve-ink { display: inline-flex; align-items: center; gap: 5px; }
-.qq-sleeve-ink[hidden] { display: none; }
-.qq-sleeve-ink .input.num { width: 48px; }
-.qq-place-note { font-size: 11px; color: var(--qq-muted); margin: 6px 0 0; line-height: 1.5; }
-
-/* Next-tier nudge on a method card */
-.qq-card-nudge { margin-top: 8px; font-size: 11.5px; font-weight: 500; color: var(--qq-green-dark); background: var(--store-green-50); border-radius: 7px; padding: 5px 9px; }
-
-/* Cap embellishment selector + quantity presets */
-.qq-capemb { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
-.qq-capemb-lbl { font-size: 12px; color: var(--qq-muted); flex: none; }
-.qq-qty-presets { display: flex; gap: 6px; margin: -4px 0 14px; }
-.qq-qty-presets button { font-size: 12px; padding: 4px 12px; border: 1px solid var(--qq-line-2); border-radius: 7px; background: var(--color-surface); cursor: pointer; color: var(--qq-muted); font-family: inherit; }
-.qq-qty-presets button:hover { border-color: var(--qq-green); color: var(--qq-green-dark); }
-
-/* ===== Config chips on result cards — the live options that shaped THIS price (2026-06-20) ===== */
-.qq-card-config { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
-.qq-cfg-chip { font-size: 11.5px; color: var(--qq-muted); background: transparent; border: 1px solid var(--qq-line); border-radius: var(--qq-radius-sm); padding: 2px 8px; white-space: nowrap; }
-.qq-cfg-chip.on { color: var(--qq-green-dark); background: var(--qq-green-tint); border-color: var(--qq-green); font-weight: 500; }
-
-/* Tasteful "price changed" flash — a brief, subtle wash (corporate; no bounce) */
-@keyframes qq-flash { from { background: var(--store-green-50); } to { background: var(--qq-card); } }
-.qq-card[data-flash] { animation: qq-flash .7s ease-out; }
-
-/* Below-minimum gets its own clearer treatment (was lumped under .is-unavailable) */
-.qq-card.is-belowmin { opacity: 1; border-color: var(--qq-warn-line); background: var(--qq-warn-bg); }
-.qq-card.is-belowmin .qq-card-msg { color: var(--quick-quote-orange); font-weight: 500; }
-
-/* Keyboard focus rings — were invisible on the button chips/swatches/presets */
-.qq-swatch:focus-visible,
-.qq-chip:focus-visible,
-.qq-qty-presets button:focus-visible { outline: 2px solid var(--qq-green); outline-offset: 2px; }
-
-@media (prefers-reduced-motion: reduce) {
-    .qq-card[data-flash] { animation: none; }
-    .qq-swatch, .qq-example-thumb { transition: none; }
-}
-
-/* ===== Phase 2: placement presets, one-click nudge, best-value star (2026-06-20) ===== */
-.qq-place-presets { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px; }
-.qq-place-presets button { font-size: 12px; padding: 4px 12px; border: 1px solid var(--qq-line-2); border-radius: 7px; background: var(--color-surface); cursor: pointer; color: var(--qq-muted); font-family: inherit; }
-.qq-place-presets button:hover { border-color: var(--qq-green); color: var(--qq-green-dark); }
-.qq-place-presets button.is-active { border-color: var(--qq-green); background: var(--store-green-50); color: var(--qq-green-dark); font-weight: 500; }
-.qq-place-presets button:focus-visible { outline: 2px solid var(--qq-green); outline-offset: 2px; }
-
-button.qq-card-nudge { display: block; width: 100%; border: none; text-align: left; cursor: pointer; font-family: inherit; }
-button.qq-card-nudge:hover { background: var(--store-green-100); }
-button.qq-card-nudge:focus-visible { outline: 2px solid var(--qq-green); outline-offset: 2px; }
-
-.qq-best-tag { display: inline-flex; align-items: center; gap: 3px; vertical-align: middle; }
-.qq-best-tag .qq-star { flex: none; }
-
-/* Embroidery >25K-stitch under-pricing guardrail */
-.qq-emb-warn { margin: 6px 0 0; font-size: 12px; color: var(--quick-quote-orange); background: var(--qq-warn-bg); border: 1px solid var(--qq-warn-line); border-radius: 7px; padding: 6px 9px; line-height: 1.45; }
-
-/* Per-piece breakdown on the card (garment + main logo, then each additional logo).
-   Shown only on the SELECTED card (the one driving the matrix) to keep sibling cards scannable —
-   pure CSS visibility; the rows are always rendered, so prices stay byte-identical. */
-.qq-card-breakdown { margin-top: 10px; border-top: 1px dashed var(--qq-line); padding-top: 8px; display: none; flex-direction: column; gap: 3px; }
-.qq-card.is-selected .qq-card-breakdown { display: flex; }
-.qq-bd-row { display: flex; justify-content: space-between; gap: 10px; font-size: 12px; color: var(--qq-muted); }
-.qq-bd-row span:last-child { font-family: "Geist Mono", monospace; color: var(--qq-ink, var(--print-ink)); white-space: nowrap; }
-.qq-bd-row.is-blank span:first-child { color: var(--qq-ink, var(--print-ink)); font-weight: 500; }   /* garment blank — the base line */
-.qq-bd-row.is-ltm span { color: var(--quick-quote-orange); }   /* small-batch (per-shirt) — warn tone, matches the matrix LTM */
-
-/* Section headers (Per piece / One-time setup) when both sections show */
-.qq-bd-head { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--qq-muted); font-weight: 600; margin-bottom: 2px; }
-.qq-bd-sub { text-transform: none; letter-spacing: 0; font-weight: 400; }
-
-/* One-time setup — a distinct tinted block (per order, NOT per piece) with a warn-toned edge */
-.qq-card-onetime { margin-top: 10px; background: var(--qq-bg); border-left: 3px solid var(--qq-warn-line); border-radius: 0 var(--qq-radius-md) var(--qq-radius-md) 0; padding: 8px 11px; display: flex; flex-direction: column; gap: 3px; }
-.qq-card-onetime .qq-bd-head { color: var(--qq-warn-text); }
-.qq-card-onetime .qq-bd-row span:first-child { color: var(--qq-muted); }
-.qq-bd-row.is-total span { font-weight: 600; color: var(--qq-ink, var(--print-ink)); }
-
-/* ---- SanMar blank-stock indicator (per-color availability, soft signal) ---- */
-.qq-inv { margin-top: 8px; }
-.qq-inv-note { font-size: 12px; color: var(--qq-muted); }
-.qq-inv-flag { font-size: 12px; font-weight: 600; padding: 6px 10px; border-radius: 7px; margin-bottom: 6px; }
-.qq-inv-flag.is-disc { background: var(--store-rush-soft); color: var(--quick-quote-red); border: 1px solid var(--quick-quote-red-4); }
-.qq-inv-flag.is-oos { background: var(--store-rush-soft); color: var(--quick-quote-orange-2); border: 1px solid var(--quick-quote-yellow); }
-.qq-inv-head { font-size: 12px; font-weight: 600; margin-bottom: 6px; }
-.qq-inv-head .muted { font-weight: 400; color: var(--qq-muted); }
-.qq-inv-grid { display: flex; flex-wrap: wrap; gap: 5px; }
-.qq-inv-cell { display: inline-flex; flex-direction: column; align-items: center; min-width: 42px; padding: 4px 7px; border-radius: 6px; font-size: 11px; line-height: 1.35; }
-.qq-inv-cell.is-good { background: var(--store-green-50); color: var(--print-green); }
-.qq-inv-cell.is-low { background: var(--store-rush-soft); color: var(--quick-quote-orange-2); }
-.qq-inv-cell.is-out { background: var(--store-rush-soft); color: var(--quick-quote-red); }
-.qq-inv-sz { font-weight: 600; }
-.qq-inv-qty { font-family: "Geist Mono", monospace; }
-
-/* ===== Mode toggle (Quick Price / Line Sheet) — the active mode reads as a solid green pill
-   so the selected tool is unmistakable; Quick Price (default) leads with that emphasis. ===== */
-.qq-mode-toggle { display: flex; width: 100%; gap: 4px; padding: 4px; background: var(--qq-bg); border: 1px solid var(--qq-line-2); border-radius: var(--qq-radius-md); margin-bottom: 20px; }
-.qq-mode-toggle button { appearance: none; flex: 1; text-align: center; border: 0; background: none; font: inherit; font-size: 14px; font-weight: 600; letter-spacing: .01em; color: var(--qq-muted); padding: 9px 16px; border-radius: var(--qq-radius-sm); cursor: pointer; transition: background .15s ease, color .15s ease, box-shadow .15s ease, transform .15s ease; }
-.qq-mode-toggle button:hover:not(.is-active) { color: var(--qq-green-dark); background: rgb(46 111 64 / 7%); }
-.qq-mode-toggle button.is-active { background: var(--qq-green); color: var(--color-on-brand); box-shadow: 0 2px 7px rgb(46 111 64 / 32%); }
-.qq-mode-toggle button:focus-visible { outline: 2px solid var(--qq-green-dark); outline-offset: 2px; }
-
-@media (prefers-reduced-motion: no-preference) {
-    .qq-mode-toggle button.is-active { transform: translateY(-0.5px); }
-}
-
-/* ===== Line Sheet — input panel (style list) ===== */
-.qq-line-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
-.qq-line-empty { font-size: 13px; color: var(--qq-muted); margin: 4px 0 8px; }
-.qq-line-row { border: 1px solid var(--qq-line); border-radius: 10px; padding: 9px 10px; background: var(--qq-card); }
-.qq-line-head { display: flex; align-items: center; gap: 8px; }
-.qq-line-style { flex: 1; min-width: 0; text-transform: uppercase; }
-.qq-line-ctrls { display: inline-flex; gap: 6px; flex: none; }
-.qq-line-mv, .qq-line-rm { appearance: none; border: 1px solid var(--qq-line-2); background: var(--qq-bg); color: var(--qq-muted); width: 32px; height: 32px; border-radius: var(--qq-radius-md); cursor: pointer; font-size: 15px; line-height: 1; display: inline-flex; align-items: center; justify-content: center; transition: border-color .12s, color .12s, background .12s; }
-.qq-line-mv:hover:not([disabled]), .qq-line-rm:hover { border-color: var(--qq-green); color: var(--qq-green-dark); }
-.qq-line-mv[disabled] { opacity: .4; cursor: default; }
-.qq-line-rm:hover { border-color: var(--quick-quote-red); }
-.qq-line-content { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
-.qq-line-content:empty { display: none; }
-.qq-line-thumb { width: 56px; height: 56px; object-fit: contain; border: 1px solid var(--qq-line); border-radius: var(--qq-radius-md); background: var(--color-surface); flex: none; }
-.qq-line-thumb.is-empty { display: inline-block; background: var(--qq-bg); }
-.qq-line-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; min-width: 0; }
-.qq-line-name { font-size: 13px; font-weight: 500; color: var(--qq-ink); }
-.qq-line-color { font: inherit; font-size: 12.5px; padding: 5px 9px; border: 1px solid var(--qq-line-2); border-radius: var(--qq-radius-sm); background: var(--color-surface); max-width: 160px; }
-.qq-line-color:focus-visible { outline: 2px solid var(--qq-green); outline-offset: 1px; }
-.qq-line-price { font-size: 12px; font-family: "Geist Mono", monospace; color: var(--qq-green-dark); font-weight: 500; }
-.qq-line-stat { font-size: 12px; color: var(--qq-muted); }
-.qq-line-stat.err { color: var(--quick-quote-red); }
-.qq-line-actions { display: flex; gap: 8px; margin-top: 4px; }
-.qq-btn { appearance: none; font: inherit; font-size: 13.5px; font-weight: 500; padding: 9px 16px; border-radius: 8px; border: 1px solid var(--qq-line-2); background: var(--qq-card); color: var(--qq-ink); cursor: pointer; transition: border-color .12s, background .12s; }
-.qq-btn:hover:not([disabled]) { border-color: var(--qq-green); }
-.qq-btn-primary { background: var(--qq-green); border-color: var(--qq-green); color: var(--color-on-brand); }
-.qq-btn-primary:hover:not([disabled]) { background: var(--qq-green-dark); border-color: var(--qq-green-dark); }
-.qq-btn[disabled] { opacity: .5; cursor: default; }
-.qq-line-hint { font-size: 12px; color: var(--qq-muted); margin: 10px 0 0; line-height: 1.5; }
-
-/* ===== Line Sheet — on-screen preview (mirrors the printed sheet) ===== */
-.qq-sheet { background: var(--qq-card); border: 1px solid var(--qq-line); border-radius: 12px; padding: 22px 24px; color: var(--qq-ink); }
-.qq-sheet-placeholder { font-size: 13.5px; color: var(--qq-muted); padding: 28px 6px; text-align: center; }
-.qq-sheet-head { display: flex; align-items: center; gap: 16px; border-bottom: 2px solid var(--qq-green); padding-bottom: 12px; margin-bottom: 14px; }
-.qq-sheet-logo { height: 42px; width: auto; }
-.qq-sheet-brand { font-size: 16px; font-weight: 700; }
-.qq-sheet-sub { font-size: 12px; color: var(--qq-muted); margin-top: 2px; }
-.qq-sheet-body { display: flex; flex-direction: column; }
-.qq-sheet-item { display: flex; gap: 16px; align-items: flex-start; padding: 14px 0; border-bottom: 1px solid var(--qq-line); }
-.qq-sheet-item:last-child { border-bottom: 0; }
-.qq-sheet-img { width: 76px; height: 76px; object-fit: contain; border: 1px solid var(--qq-line); border-radius: 7px; background: var(--gray-50); flex: none; }
-.qq-sheet-img.is-empty { display: inline-block; }
-.qq-sheet-item-main { flex: 1; min-width: 0; }
-.qq-sheet-item-head { font-size: 13.5px; font-weight: 600; margin-bottom: 8px; }
-.qq-sheet-style { font-family: "Geist Mono", monospace; }
-.qq-sheet-color { color: var(--qq-muted); font-weight: 400; margin-left: 10px; }
-.qq-sheet-ladder { width: 100%; border-collapse: collapse; font-size: 12px; }
-.qq-sheet-ladder th, .qq-sheet-ladder td { border: 1px solid var(--qq-line); padding: 5px 8px; text-align: center; }
-.qq-sheet-ladder .lbl { text-align: left; color: var(--qq-muted); font-weight: 500; }
-.qq-sheet-ladder td { font-family: "Geist Mono", monospace; }
-.qq-sheet-ladder .warn { color: var(--quick-quote-orange); }
-.qq-sheet-foot { margin-top: 16px; padding-top: 10px; border-top: 1px solid var(--qq-line); font-size: 11px; color: var(--qq-muted); line-height: 1.5; }
-.qq-sheet-ladder-wrap { overflow-x: auto; }   /* on-screen only; print stylesheet keeps it visible */
-
-/* ===== Mobile (≤480px) — reps may be quoting from their phone ===== */
-@media (width <= 480px) {
-    .page { padding: 16px 14px 48px; }
-    .page-title { font-size: 24px; }
-    .qq-panel { padding: 16px; }
-    .field { margin-bottom: 12px; }
-    .qq-swatches { max-height: 140px; }
-    .qq-swatch { width: 34px; height: 34px; }            /* easier to tap */
-    .qq-place-chip, .qq-qty-presets button, .qq-place-presets button { min-height: 40px; display: inline-flex; align-items: center; }
-    .qq-chip { min-height: 48px; min-width: 84px; }
-    .qq-card-pp { font-size: 20px; }
-    table.qq-matrix { font-size: 12px; }
-    .qq-line-thumb { width: 48px; height: 48px; }
-    .qq-mode-toggle button { padding: 11px 12px; }       /* taller tap target */
-}
-
-/* Builder handoff CTA — promoted from a dotted text link to the card's primary
-   next step (guided-quote Phase A, 2026-07-07). AEs graduate a phone estimate
-   into a real, ShopWorks-pushable quote with style/color/sizes carried over. */
-.qq-open-builder {
-    display: inline-block;
-    margin-top: 10px;
-    padding: 8px 14px;
-    background: var(--qq-green);
-    color: var(--color-on-brand);
-    border-radius: var(--qq-radius-md);
-    font-size: 12.5px;
-    font-weight: 700;
-    text-decoration: none;
-    box-shadow: 0 1px 0 var(--qq-green-dark);
-}
-
-.qq-open-builder:hover,
-.qq-open-builder:focus-visible {
-    background: var(--qq-green-dark);
-    color: var(--color-on-brand);
-    text-decoration: none;
-}
-
-/* ===== Order-form handback mode (?from=aeo — AE Order Intake round-trip, 2026-07-11) ===== */
-
-/* [hidden] pairing is REQUIRED: display:flex on the class would beat the UA hidden rule */
-.qq-handback-bar { display: flex; align-items: flex-start; gap: 8px; font-size: 12.5px; color: var(--qq-green-dark); background: var(--qq-green-tint); border: 1px solid var(--qq-green); border-radius: var(--qq-radius-sm); padding: 8px 12px; margin-bottom: 12px; line-height: 1.45; }
-.qq-handback-bar[hidden] { display: none; }
-.qq-handback-bar i { margin-top: 2px; }
-.qq-use-price { display: block; width: 100%; margin-top: 8px; border: none; border-radius: 7px; padding: 7px 10px; font-family: inherit; font-size: 12.5px; font-weight: 600; text-align: center; cursor: pointer; color: var(--color-on-brand); background: var(--qq-green); }
-.qq-use-price:hover { background: var(--qq-green-dark); }
-.qq-use-price.is-sent { background: var(--qq-green-tint); color: var(--qq-green-dark); border: 1px solid var(--qq-green); cursor: default; }

@@ -1,0 +1,514 @@
+{
+  "name": "dtf-customer",
+  "states": [
+    {
+      "width": 1440,
+      "title": "2026 DTF Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/dtf-quote-builder.html",
+      "ids": {
+        "toast-container": "",
+        "method-switch-menu": "Switch method … Embroidery Screen Print DTG (1st product only)",
+        "customer-lookup": "",
+        "customer-name": "",
+        "customer-email": "",
+        "company-name": "",
+        "sales-rep": "General Sales Bradley Wright Erik Mickelson Jim Mickelson Nika Lao Ruth Nhong Steve Deland Taneisha Clark",
+        "customer-number": "",
+        "customer-phone": "",
+        "project-name": "",
+        "design-number": "",
+        "sidebar-resize-handle": "",
+        "sidebar-location": "Left Chest",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$648.00",
+        "per-unit-price": "$13.50/piece",
+        "sidebar-grand-total": "$714.10"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "customer-lookup",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-email",
+          "name": "",
+          "type": "email",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "company-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "sales-rep",
+          "name": "",
+          "type": "select-one",
+          "value": "sales@nwcustomapparel.com",
+          "disabled": false
+        },
+        {
+          "id": "customer-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-phone",
+          "name": "",
+          "type": "tel",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "project-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "design-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#per-unit-price"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "2026 DTF Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/dtf-quote-builder.html",
+      "ids": {
+        "toast-container": "",
+        "method-switch-menu": "Switch method … Embroidery Screen Print DTG (1st product only)",
+        "customer-lookup": "",
+        "customer-name": "",
+        "customer-email": "",
+        "company-name": "",
+        "sales-rep": "General Sales Bradley Wright Erik Mickelson Jim Mickelson Nika Lao Ruth Nhong Steve Deland Taneisha Clark",
+        "customer-number": "",
+        "customer-phone": "",
+        "project-name": "",
+        "design-number": "",
+        "sidebar-resize-handle": "",
+        "sidebar-location": "Left Chest",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$648.00",
+        "per-unit-price": "$13.50/piece",
+        "sidebar-grand-total": "$714.10"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "customer-lookup",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-email",
+          "name": "",
+          "type": "email",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "company-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "sales-rep",
+          "name": "",
+          "type": "select-one",
+          "value": "sales@nwcustomapparel.com",
+          "disabled": false
+        },
+        {
+          "id": "customer-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-phone",
+          "name": "",
+          "type": "tel",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "project-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "design-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#per-unit-price"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "2026 DTF Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/dtf-quote-builder.html",
+      "ids": {
+        "toast-container": "",
+        "method-switch-menu": "Switch method … Embroidery Screen Print DTG (1st product only)",
+        "customer-lookup": "",
+        "customer-name": "",
+        "customer-email": "",
+        "company-name": "",
+        "sales-rep": "General Sales Bradley Wright Erik Mickelson Jim Mickelson Nika Lao Ruth Nhong Steve Deland Taneisha Clark",
+        "customer-number": "",
+        "customer-phone": "",
+        "project-name": "",
+        "design-number": "",
+        "sidebar-resize-handle": "",
+        "sidebar-location": "Left Chest",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$648.00",
+        "per-unit-price": "$13.50/piece",
+        "sidebar-grand-total": "$714.10"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "customer-lookup",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-email",
+          "name": "",
+          "type": "email",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "company-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "sales-rep",
+          "name": "",
+          "type": "select-one",
+          "value": "sales@nwcustomapparel.com",
+          "disabled": false
+        },
+        {
+          "id": "customer-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-phone",
+          "name": "",
+          "type": "tel",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "project-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "design-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#per-unit-price"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "2026 DTF Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/dtf-quote-builder.html",
+      "ids": {
+        "toast-container": "",
+        "method-switch-menu": "Switch method … Embroidery Screen Print DTG (1st product only)",
+        "customer-lookup": "",
+        "customer-name": "",
+        "customer-email": "",
+        "company-name": "",
+        "sales-rep": "General Sales Bradley Wright Erik Mickelson Jim Mickelson Nika Lao Ruth Nhong Steve Deland Taneisha Clark",
+        "customer-number": "",
+        "customer-phone": "",
+        "project-name": "",
+        "design-number": "",
+        "sidebar-resize-handle": "",
+        "sidebar-location": "Left Chest",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$648.00",
+        "per-unit-price": "$13.50/piece",
+        "sidebar-grand-total": "$714.10"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "customer-lookup",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-email",
+          "name": "",
+          "type": "email",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "company-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "sales-rep",
+          "name": "",
+          "type": "select-one",
+          "value": "sales@nwcustomapparel.com",
+          "disabled": false
+        },
+        {
+          "id": "customer-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-phone",
+          "name": "",
+          "type": "tel",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "project-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "design-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#per-unit-price"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "mutations": []
+}

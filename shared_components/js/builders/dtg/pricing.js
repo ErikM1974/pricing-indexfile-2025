@@ -364,7 +364,7 @@ export function renderPriceErrorBanner(styles) {
         banner = document.createElement('div');
         banner.id = 'dtg-price-error-banner';
         banner.setAttribute('role', 'alert');
-        banner.style.cssText = 'margin:10px 0;padding:10px 14px;background:#fef2f2;border:1px solid #ef4444;border-left:4px solid #b91c1c;border-radius:6px;color:#991b1b;font-size:13px;font-weight:600;line-height:1.4;';
+        banner.className = 'alert alert-error';
         const mount = document.getElementById('dtgResumeBannerMount') || document.getElementById('dtgInlineFormMount');
         if (mount) mount.insertBefore(banner, mount.firstChild); else return;
     }

@@ -95,7 +95,7 @@ export const outputMethods = {
      * Print professional PDF quote using EmbroideryInvoiceGenerator
      * Transforms DTF product data into the format expected by the invoice generator
      */
-    printQuote() {
+    async printQuote() {
         // Validate we have products
         if (this.products.length === 0 || this.getTotalQuantity() === 0) {
             this.showError('Add products before printing');
@@ -162,9 +162,7 @@ export const outputMethods = {
             printWindow.document.write(invoiceHTML);
             printWindow.document.close();
 
-            setTimeout(() => {
-                printWindow.print();
-            }, 300);
+            await invoiceGenerator.printWhenReady(printWindow);
 
         } catch (error) {
             console.error('Print error:', error);

@@ -15,6 +15,7 @@ const { HASHED_CALCULATOR_PATHS, HASHED_PAGES, HASHED_PAGES_UNDER_PAGES_MOUNT, H
 // =============================================================================
 const blog = require('../lib/blog');
 const blogTemplates = require('../lib/blog-templates');
+const statusPageTemplates = require('../lib/status-page-templates');
 
 app.get('/blog', async (req, res) => {
   try {
@@ -200,18 +201,7 @@ app.get('/pages/:page', (req, res, next) => {
 // sales rep and payment terms. Deleting the retired file is the only other way
 // to make this safe.
 app.get(['/calculators/sticker-manual-pricing.html', '/pricing/stickers'], (req, res) => {
-  res.status(410).set('X-Robots-Tag', 'noindex, nofollow').send(`<!DOCTYPE html>
-<meta charset="utf-8"><meta name="robots" content="noindex, nofollow">
-<title>This page moved</title>
-<body style="font:16px/1.6 Inter,system-ui,sans-serif;max-width:34rem;margin:4rem auto;padding:0 1rem">
-<h1 style="font-size:1.35rem">The sticker &amp; banner quote page was retired</h1>
-<p>Its three sections each have a better home now:</p>
-<ul>
-  <li><a href="/custom-stickers">Sticker pricing (2&times;2 &ndash; 6&times;6)</a> &mdash; the customer page, same prices</li>
-  <li><a href="/custom-banners">Banner pricing</a> &mdash; the customer page</li>
-  <li><a href="/pricing/decals">Custom &amp; oversize decals</a> &mdash; staff calculator</li>
-</ul>
-<p><a href="/staff-dashboard.html">Back to the dashboard</a></p>`);
+  res.status(410).set('X-Robots-Tag', 'noindex, nofollow').send(statusPageTemplates.retiredStickers());
 });
 
 // Oversize / custom decals — the ONLY consumer of /api/custom-decal-pricing.

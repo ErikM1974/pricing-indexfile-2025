@@ -1,0 +1,464 @@
+{
+  "name": "quick-cap",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Quick Quote — Northwest Custom Apparel",
+      "url": "/calculators/quick-quote/index.html?mode=quick&style=C112&qty=24",
+      "ids": {
+        "qqModeToggle": "Line Sheet Quick Price",
+        "qqStyle": "",
+        "qqStyleStatus": "",
+        "qqThumb": "",
+        "qqProductName": "Structured Twill Cap CAP",
+        "qqColorSelected": "Jet Black",
+        "qqColorSwatches": "",
+        "qqInventory": "Blank stock · 875 total · approx — confirm at order S 125 M 125 L 125 XL 125 2XL 125 3XL 125 4XL 125",
+        "qqQty": "",
+        "qqSizesToggle": "+ Add sizes (2XL upcharges)",
+        "qqQtyPresets": "24 48 72 144",
+        "qqEmbLabel": "Cap embroidery logos",
+        "qqCapEmbType": "Flat embroidery 3D puff Laser patch",
+        "qqEmbLogos": "Logo 1 Cap front stitches",
+        "qqEmbAddBtn": "+ Add cap back",
+        "qqEmbDigitizing": "",
+        "qqEmbHint": "Up to 10,000 stitches included. Cap back priced at our cap-back rate.",
+        "qqResultsTitle": "Price",
+        "qqResultsSub": "for 24 caps · Jet Black",
+        "qqResults": "Cap embroidery $20.00/cap $480.00 total BEST VALUE 1 logo Cap blank $7.00/cap Cap front logo $13.00/cap 24-47 tier ↑ Add 24 more → $18.00/cap Turn this into a full quote → price breaks below ↓",
+        "qqMatrix": "PRICE BREAKS — CAP EMBROIDERY · 1 LOGO Quantity 1–7 8–23 24–47 48–71 72+ Per cap $24.00 $24.00 $20.00 $18.00 $16.00 Small-batch fee +$50.00 — — — — Highlighted column = your current quantity. Per cap for a standard size — extended sizes (2XL+) add their upcharge. Small-batch fee is one-time per order."
+      },
+      "fields": [
+        {
+          "id": "qqStyle",
+          "name": "",
+          "type": "text",
+          "value": "C112",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqQty",
+          "name": "",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "8000",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqEmbDigitizing",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "/quote-builders/embroidery-quote-builder.html?from=quickquote&style=C112&color=JetBlack&colorName=Jet+Black&qty=24&sizes=S%3A24",
+          "text": "Turn this into a full quote →"
+        }
+      ],
+      "tables": [
+        "Quantity 1–7 8–23 24–47 48–71 72+ Per cap $24.00 $24.00 $20.00 $18.00 $16.00 Small-batch fee +$50.00 — — — —"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".lede"
+            ],
+            [
+              "button[data-mode=\"linesheet\"]"
+            ]
+          ]
+        },
+        {
+          "id": "label",
+          "nodes": [
+            [
+              ".qq-emb-stitch"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Quick Quote — Northwest Custom Apparel",
+      "url": "/calculators/quick-quote/index.html?mode=quick&style=C112&qty=24",
+      "ids": {
+        "qqModeToggle": "Line Sheet Quick Price",
+        "qqStyle": "",
+        "qqStyleStatus": "",
+        "qqThumb": "",
+        "qqProductName": "Structured Twill Cap CAP",
+        "qqColorSelected": "Jet Black",
+        "qqColorSwatches": "",
+        "qqInventory": "Blank stock · 875 total · approx — confirm at order S 125 M 125 L 125 XL 125 2XL 125 3XL 125 4XL 125",
+        "qqQty": "",
+        "qqSizesToggle": "+ Add sizes (2XL upcharges)",
+        "qqQtyPresets": "24 48 72 144",
+        "qqEmbLabel": "Cap embroidery logos",
+        "qqCapEmbType": "Flat embroidery 3D puff Laser patch",
+        "qqEmbLogos": "Logo 1 Cap front stitches",
+        "qqEmbAddBtn": "+ Add cap back",
+        "qqEmbDigitizing": "",
+        "qqEmbHint": "Up to 10,000 stitches included. Cap back priced at our cap-back rate.",
+        "qqResultsTitle": "Price",
+        "qqResultsSub": "for 24 caps · Jet Black",
+        "qqResults": "Cap embroidery $20.00/cap $480.00 total BEST VALUE 1 logo Cap blank $7.00/cap Cap front logo $13.00/cap 24-47 tier ↑ Add 24 more → $18.00/cap Turn this into a full quote → price breaks below ↓",
+        "qqMatrix": "PRICE BREAKS — CAP EMBROIDERY · 1 LOGO Quantity 1–7 8–23 24–47 48–71 72+ Per cap $24.00 $24.00 $20.00 $18.00 $16.00 Small-batch fee +$50.00 — — — — Highlighted column = your current quantity. Per cap for a standard size — extended sizes (2XL+) add their upcharge. Small-batch fee is one-time per order."
+      },
+      "fields": [
+        {
+          "id": "qqStyle",
+          "name": "",
+          "type": "text",
+          "value": "C112",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqQty",
+          "name": "",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "8000",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqEmbDigitizing",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "/quote-builders/embroidery-quote-builder.html?from=quickquote&style=C112&color=JetBlack&colorName=Jet+Black&qty=24&sizes=S%3A24",
+          "text": "Turn this into a full quote →"
+        }
+      ],
+      "tables": [
+        "Quantity 1–7 8–23 24–47 48–71 72+ Per cap $24.00 $24.00 $20.00 $18.00 $16.00 Small-batch fee +$50.00 — — — —"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".lede"
+            ],
+            [
+              "button[data-mode=\"linesheet\"]"
+            ]
+          ]
+        },
+        {
+          "id": "label",
+          "nodes": [
+            [
+              ".qq-emb-stitch"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Quick Quote — Northwest Custom Apparel",
+      "url": "/calculators/quick-quote/index.html?mode=quick&style=C112&qty=24",
+      "ids": {
+        "qqModeToggle": "Line Sheet Quick Price",
+        "qqStyle": "",
+        "qqStyleStatus": "",
+        "qqThumb": "",
+        "qqProductName": "Structured Twill Cap CAP",
+        "qqColorSelected": "Jet Black",
+        "qqColorSwatches": "",
+        "qqInventory": "Blank stock · 875 total · approx — confirm at order S 125 M 125 L 125 XL 125 2XL 125 3XL 125 4XL 125",
+        "qqQty": "",
+        "qqSizesToggle": "+ Add sizes (2XL upcharges)",
+        "qqQtyPresets": "24 48 72 144",
+        "qqEmbLabel": "Cap embroidery logos",
+        "qqCapEmbType": "Flat embroidery 3D puff Laser patch",
+        "qqEmbLogos": "Logo 1 Cap front stitches",
+        "qqEmbAddBtn": "+ Add cap back",
+        "qqEmbDigitizing": "",
+        "qqEmbHint": "Up to 10,000 stitches included. Cap back priced at our cap-back rate.",
+        "qqResultsTitle": "Price",
+        "qqResultsSub": "for 24 caps · Jet Black",
+        "qqResults": "Cap embroidery $20.00/cap $480.00 total BEST VALUE 1 logo Cap blank $7.00/cap Cap front logo $13.00/cap 24-47 tier ↑ Add 24 more → $18.00/cap Turn this into a full quote → price breaks below ↓",
+        "qqMatrix": "PRICE BREAKS — CAP EMBROIDERY · 1 LOGO Quantity 1–7 8–23 24–47 48–71 72+ Per cap $24.00 $24.00 $20.00 $18.00 $16.00 Small-batch fee +$50.00 — — — — Highlighted column = your current quantity. Per cap for a standard size — extended sizes (2XL+) add their upcharge. Small-batch fee is one-time per order."
+      },
+      "fields": [
+        {
+          "id": "qqStyle",
+          "name": "",
+          "type": "text",
+          "value": "C112",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqQty",
+          "name": "",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "8000",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqEmbDigitizing",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "/quote-builders/embroidery-quote-builder.html?from=quickquote&style=C112&color=JetBlack&colorName=Jet+Black&qty=24&sizes=S%3A24",
+          "text": "Turn this into a full quote →"
+        }
+      ],
+      "tables": [
+        "Quantity 1–7 8–23 24–47 48–71 72+ Per cap $24.00 $24.00 $20.00 $18.00 $16.00 Small-batch fee +$50.00 — — — —"
+      ],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".lede"
+            ],
+            [
+              "button[data-mode=\"linesheet\"]"
+            ]
+          ]
+        },
+        {
+          "id": "label",
+          "nodes": [
+            [
+              ".qq-emb-stitch"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Quick Quote — Northwest Custom Apparel",
+      "url": "/calculators/quick-quote/index.html?mode=quick&style=C112&qty=24",
+      "ids": {
+        "qqModeToggle": "Line Sheet Quick Price",
+        "qqStyle": "",
+        "qqStyleStatus": "",
+        "qqThumb": "",
+        "qqProductName": "Structured Twill Cap CAP",
+        "qqColorSelected": "Jet Black",
+        "qqColorSwatches": "",
+        "qqInventory": "Blank stock · 875 total · approx — confirm at order S 125 M 125 L 125 XL 125 2XL 125 3XL 125 4XL 125",
+        "qqQty": "",
+        "qqSizesToggle": "+ Add sizes (2XL upcharges)",
+        "qqQtyPresets": "24 48 72 144",
+        "qqEmbLabel": "Cap embroidery logos",
+        "qqCapEmbType": "Flat embroidery 3D puff Laser patch",
+        "qqEmbLogos": "Logo 1 Cap front stitches",
+        "qqEmbAddBtn": "+ Add cap back",
+        "qqEmbDigitizing": "",
+        "qqEmbHint": "Up to 10,000 stitches included. Cap back priced at our cap-back rate.",
+        "qqResultsTitle": "Price",
+        "qqResultsSub": "for 24 caps · Jet Black",
+        "qqResults": "Cap embroidery $20.00/cap $480.00 total BEST VALUE 1 logo Cap blank $7.00/cap Cap front logo $13.00/cap 24-47 tier ↑ Add 24 more → $18.00/cap Turn this into a full quote → price breaks below ↓",
+        "qqMatrix": "PRICE BREAKS — CAP EMBROIDERY · 1 LOGO Quantity 1–7 8–23 24–47 48–71 72+ Per cap $24.00 $24.00 $20.00 $18.00 $16.00 Small-batch fee +$50.00 — — — — Highlighted column = your current quantity. Per cap for a standard size — extended sizes (2XL+) add their upcharge. Small-batch fee is one-time per order."
+      },
+      "fields": [
+        {
+          "id": "qqStyle",
+          "name": "",
+          "type": "text",
+          "value": "C112",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqQty",
+          "name": "",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "8000",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "qqEmbDigitizing",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Dashboard"
+        },
+        {
+          "href": "/quote-builders/embroidery-quote-builder.html?from=quickquote&style=C112&color=JetBlack&colorName=Jet+Black&qty=24&sizes=S%3A24",
+          "text": "Turn this into a full quote →"
+        }
+      ],
+      "tables": [
+        "Quantity 1–7 8–23 24–47 48–71 72+ Per cap $24.00 $24.00 $20.00 $18.00 $16.00 Small-batch fee +$50.00 — — — —"
+      ],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".lede"
+            ],
+            [
+              "button[data-mode=\"linesheet\"]"
+            ]
+          ]
+        },
+        {
+          "id": "label",
+          "nodes": [
+            [
+              ".qq-emb-stitch"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "reads": [
+    {
+      "path": "/api/product-details",
+      "query": "?styleNumber=C112"
+    },
+    {
+      "path": "/api/inventory",
+      "query": "?styleNumber=C112&color=Jet%20Black"
+    },
+    {
+      "path": "/api/pricing-bundle",
+      "query": "?method=BLANK&styleNumber=C112"
+    },
+    {
+      "path": "/api/pricing-bundle",
+      "query": "?method=EMB&styleNumber=PC54"
+    },
+    {
+      "path": "/api/decg-pricing",
+      "query": ""
+    },
+    {
+      "path": "/api/pricing-bundle",
+      "query": "?method=EMB-AL"
+    },
+    {
+      "path": "/api/service-codes",
+      "query": ""
+    },
+    {
+      "path": "/api/pricing-bundle",
+      "query": "?method=CAP&styleNumber=C112"
+    },
+    {
+      "path": "/api/pricing-bundle",
+      "query": "?method=CAP-AL"
+    },
+    {
+      "path": "/api/pricing-bundle",
+      "query": "?method=CAP-PUFF"
+    },
+    {
+      "path": "/api/pricing-bundle",
+      "query": "?method=PATCH"
+    },
+    {
+      "path": "/api/size-pricing",
+      "query": "?styleNumber=C112"
+    },
+    {
+      "path": "/api/pricing-bundle",
+      "query": "?method=CAP&styleNumber=C112"
+    }
+  ],
+  "dialogs": []
+}

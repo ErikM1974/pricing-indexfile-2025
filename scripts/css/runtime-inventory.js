@@ -112,9 +112,17 @@ function jsInfo(file) {
             const target = local(file, node.value);
             if (target && exists(target)) result.cssReferences.push(target);
         }
+        // Generated documents keep real stylesheet links inside HTML strings
+        // and template chunks. Include those owners without executing any JS.
+        const html = node.type === 'TemplateElement' ? node.value.cooked
+            : node.type === 'Literal' && typeof node.value === 'string' ? node.value : '';
+        for (const match of (html || '').matchAll(/<link\b[^>]*\bhref=["']([^"']+\.css(?:\?[^"']*)?)["']/gi)) {
+            const target = local(file, match[1]);
+            if (target && exists(target)) result.cssReferences.push(target);
+        }
     });
     result.generatedStyles = /<style\b|createElement\(['"]style['"]\)/i.test(source);
-    result.inlineStyles = /\bstyle\s*=\s*["']|\.style\.(?:cssText|setProperty)/.test(source);
+    result.inlineStyles = /(?<![\w-])style\s*=\s*["']|\.style\.(?:cssText|setProperty)/.test(source);
     result.cssReferences = unique(result.cssReferences);
     return result;
 }
@@ -187,7 +195,8 @@ const counts = key => Object.fromEntries(unique(surfaces.map(s => s[key])).map(v
 const report = {
     scope: 'Tracked HTML, literal GET/path.join routes, CSS imports, JS ESM dependency closure and known runtime owners. Static evidence; no routes or business services executed. Variable-built routes/styles still require family review.',
     summary: { surfaces: surfaces.length, kind: counts('kind'), family: counts('family'), status: counts('status') },
-    serverGeneratedOwners: manifest.pendingRuntimeOwners.filter(o => o.kind === 'server-generated'),
+    serverGeneratedOwners: [...manifest.pendingRuntimeOwners.filter(o => o.kind === 'server-generated'),
+        ...(manifest.reviewedRuntimeOwners || []).filter(o => o.kind === 'server-generated').map(o => ({ ...o, owners: [o.source] }))],
     surfaces,
 };
 const output = JSON.stringify(report, null, 2) + '\n';

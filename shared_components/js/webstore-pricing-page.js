@@ -47,6 +47,8 @@ const AI_ENDPOINT = '/api/contract-webstore-ai/chat';
         quoteID: null,
         quoteIDPromise: null,
         savedQuoteID: null,
+        saveProgress: null,
+        isSaving: false,
     };
 
     // -----------------------------------------------------------------
@@ -112,7 +114,7 @@ const AI_ENDPOINT = '/api/contract-webstore-ai/chat';
             form.addEventListener('submit', function (e) {
                 e.preventDefault();
                 const text = ta.value.trim();
-                if (!text || aiState.isStreaming) return;
+                if (!text || aiState.isStreaming || aiState.isSaving) return;
                 ta.value = '';
                 autoResizeTextarea(ta);
                 aiState.messages.push({ role: 'user', content: text });
@@ -183,6 +185,7 @@ const AI_ENDPOINT = '/api/contract-webstore-ai/chat';
         backdrop.setAttribute('aria-hidden', 'true');
         aiState.opened = false;
         showFloatingButton();
+        document.getElementById('aiOpenBtn')?.focus();
     }
 
     function showFloatingButton() {
@@ -195,7 +198,7 @@ const AI_ENDPOINT = '/api/contract-webstore-ai/chat';
     }
 
     function resetChat() {
-        if (aiState.isStreaming) {
+        if (aiState.isStreaming || aiState.isSaving) {
             showToast('Wait for the current reply to finish first');
             return;
         }
@@ -212,6 +215,8 @@ const AI_ENDPOINT = '/api/contract-webstore-ai/chat';
         aiState.quoteID = null;
         aiState.quoteIDPromise = null;
         aiState.savedQuoteID = null;
+        aiState.saveProgress = null;
+        document.getElementById('quoteSaveStatus').hidden = true;
         aiState.isStreaming = false;
 
         aiState.messages.push({
@@ -409,6 +414,14 @@ const AI_ENDPOINT = '/api/contract-webstore-ai/chat';
             aiState.currentEmailDraft = emailDraft;
             renderEmailDraftCard(bubbleEl, emailDraft);
         }
+        if (aiState.saveProgress && aiState.saveProgress.fingerprint !== JSON.stringify([aiState.currentPriceQuote, aiState.currentCustomerFinal || {}, aiState.currentEmailDraft || {}])) {
+            aiState.saveProgress = null;
+            aiState.savedQuoteID = null;
+            aiState.quoteID = null;
+            aiState.quoteIDPromise = null;
+            document.getElementById('quoteSaveStatus').hidden = true;
+            updateContextPill('Quote changed — save the updated version');
+        }
         updateActionsAvailability();
     }
 
@@ -525,12 +538,18 @@ const AI_ENDPOINT = '/api/contract-webstore-ai/chat';
         const copyBtn = document.getElementById('aiCopyEmailBtn');
         const saveBtn = document.getElementById('aiSaveQuoteBtn');
         if (!actions) return;
+        document.getElementById('aiChatSend').disabled = aiState.isSaving || aiState.isStreaming;
+        document.getElementById('aiChatTextarea').disabled = aiState.isSaving;
+        document.getElementById('aiChatResetBtn').disabled = aiState.isSaving;
         const hasDraft = !!aiState.currentEmailDraft;
         const hasQuote = !!aiState.currentPriceQuote;
         actions.hidden = !(hasDraft || hasQuote);
         if (outlookBtn) outlookBtn.disabled = !hasDraft;
         if (copyBtn) copyBtn.disabled = !hasDraft;
-        if (saveBtn) saveBtn.disabled = !(hasDraft && hasQuote && aiState.currentCustomerFinal);
+        if (saveBtn) {
+            saveBtn.disabled = aiState.isSaving || !(hasDraft && hasQuote && aiState.currentCustomerFinal);
+            if (!aiState.savedQuoteID) saveBtn.textContent = aiState.isSaving ? 'Saving…' : 'Save & share link';
+        }
         if (aiState.savedQuoteID && saveBtn) {
             saveBtn.innerHTML = `<i class="fas fa-link" aria-hidden="true"></i> Copy share link`;
             saveBtn.disabled = false;
@@ -541,7 +560,7 @@ const AI_ENDPOINT = '/api/contract-webstore-ai/chat';
     // SSE streaming chat
     // -----------------------------------------------------------------
     async function sendChatMessage() {
-        if (aiState.isStreaming) return;
+        if (aiState.isStreaming || aiState.isSaving) return;
         aiState.isStreaming = true;
         const sendBtn = document.getElementById('aiChatSend');
         if (sendBtn) sendBtn.disabled = true;
@@ -714,6 +733,7 @@ const AI_ENDPOINT = '/api/contract-webstore-ai/chat';
     }
 
     async function handleSaveQuote() {
+        if (aiState.isSaving || aiState.isStreaming) return;
         if (aiState.savedQuoteID) {
             const url = `${location.origin}/quote/${encodeURIComponent(aiState.savedQuoteID)}`;
             try {
@@ -725,15 +745,21 @@ const AI_ENDPOINT = '/api/contract-webstore-ai/chat';
             return;
         }
 
-        const saveBtn = document.getElementById('aiSaveQuoteBtn');
-        if (saveBtn) saveBtn.disabled = true;
-
+        aiState.isSaving = true;
+        updateActionsAvailability();
+        const status = document.getElementById('quoteSaveStatus');
+        status.hidden = true;
         try {
             const priceQuote = aiState.currentPriceQuote;
             const customer = aiState.currentCustomerFinal || {};
             const draft = aiState.currentEmailDraft || {};
 
             if (!priceQuote) throw new Error('No price quote to save');
+            const fingerprint = JSON.stringify([priceQuote, customer, draft]);
+            if (!aiState.saveProgress || aiState.saveProgress.fingerprint !== fingerprint) {
+                aiState.saveProgress = {fingerprint, sessionPayload: null, items: null, sessionAccepted: false, acceptedItems: new Set()};
+            }
+            const progress = aiState.saveProgress;
 
             const quoteID = aiState.quoteID || await ensureQuoteID();
             if (!quoteID) throw new Error('Failed to get quote ID');
@@ -752,7 +778,7 @@ const AI_ENDPOINT = '/api/contract-webstore-ai/chat';
                 totalQuantity = lineItems.reduce((s, it) => s + (Number(it.quantity) || 0), 0);
             }
 
-            const sessionPayload = {
+            const sessionPayload = progress.sessionPayload || {
                 QuoteID: quoteID,
                 SessionID: `webstore_${Date.now()}`,
                 Status: 'Open',
@@ -773,6 +799,8 @@ const AI_ENDPOINT = '/api/contract-webstore-ai/chat';
                     emailSubject: draft.subject || '',
                 }),
             };
+            progress.sessionPayload = sessionPayload;
+            if (!progress.sessionAccepted) {
             const sessionRes = await fetch('/api/quote_sessions', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -781,6 +809,8 @@ const AI_ENDPOINT = '/api/contract-webstore-ai/chat';
             if (!sessionRes.ok) {
                 const t = await sessionRes.text();
                 throw new Error('quote_sessions POST ' + sessionRes.status + ': ' + t.slice(0, 200));
+            }
+            progress.sessionAccepted = true;
             }
 
             // Save line items
@@ -829,7 +859,9 @@ const AI_ENDPOINT = '/api/contract-webstore-ai/chat';
                 }));
             }
 
-            for (const it of items) {
+            if (!progress.items) progress.items = items;
+            for (const it of progress.items) {
+                if (progress.acceptedItems.has(it.LineNumber)) continue;
                 const r = await fetch('/api/quote_items', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -837,8 +869,9 @@ const AI_ENDPOINT = '/api/contract-webstore-ai/chat';
                 });
                 if (!r.ok) {
                     const t = await r.text();
-                    console.warn('[webstore-ai] quote_items POST failed:', r.status, t.slice(0, 200));
+                    throw new Error('quote_items POST ' + r.status + ': ' + t.slice(0, 200));
                 }
+                progress.acceptedItems.add(it.LineNumber);
             }
 
             aiState.savedQuoteID = quoteID;
@@ -847,9 +880,11 @@ const AI_ENDPOINT = '/api/contract-webstore-ai/chat';
             showToast(`Saved ${quoteID} — click again for share link`);
         } catch (err) {
             console.error('[webstore-ai] save failed:', err);
-            showToast('Save failed — check console');
-            const btn = document.getElementById('aiSaveQuoteBtn');
-            if (btn) btn.disabled = false;
+            status.textContent = 'Save failed. Some quote details may already be saved. Select Save & share link to retry the remaining details.';
+            status.hidden = false;
+        } finally {
+            aiState.isSaving = false;
+            updateActionsAvailability();
         }
     }
 

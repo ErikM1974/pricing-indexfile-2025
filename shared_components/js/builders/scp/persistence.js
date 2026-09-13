@@ -744,7 +744,7 @@ export function resetQuote() {
     const tbody = document.getElementById('product-tbody');
     tbody.innerHTML = `
         <tr id="empty-state-row">
-            <td colspan="13" class="qb-empty-state">
+            <td colspan="14" class="qb-empty-state">
                 <div class="qb-empty-state-emoji">&#128085;</div>
                 <div class="qb-empty-state-title">Enter a style number to get started</div>
                 <div class="qb-note-13">Type a style # in the search bar above (e.g., PC54, G500, C112)</div>

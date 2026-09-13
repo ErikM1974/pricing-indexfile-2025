@@ -1,0 +1,458 @@
+{
+  "name": "dialog-empty",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Embroidery Pricing | Northwest Custom Apparel",
+      "url": "/calculators/embroidery-pricing-all/index.html?tab=stitch-charges",
+      "ids": {
+        "es-mid-range": "10,001 – 18,000",
+        "es-mid-price": "+$4",
+        "es-large-range": "18,001 – 25,000",
+        "es-large-price": "+$10",
+        "openSurchargeModal": "View All 4 Surcharge Accounts",
+        "accountList": "1 Example Alpine Team Rep: Nika Lao Large +$10 Mid +$4 ▾ 2 Example Harbor Team Rep: Taneisha Clark Large +$10 Mid +$4 ▾ 3 Example Summit Team Rep: House Large +$10 Mid +$4 ▾",
+        "scStatTotal": "0",
+        "scStatMid": "0",
+        "scStatLarge": "0",
+        "scModalClose": "×",
+        "scSearch": "",
+        "scTierFilters": "All Mid +$4 Large +$10 Mixed",
+        "scRepFilters": "All Nika Taneisha House",
+        "scResultsCount": "0 of 4 accounts",
+        "scEmptyState": "No matching accounts Try adjusting your search or filters"
+      },
+      "fields": [
+        {
+          "id": "scSearch",
+          "type": "text",
+          "value": "No matching example",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        },
+        {
+          "href": "/calculators/embroidery-contract/",
+          "text": "Looking for Contract Embroidery? →"
+        },
+        {
+          "href": "?tab=fullback",
+          "text": "Looking for Full Back Embroidery (25K+)? See the dedicated Full Back Embroidery tab →"
+        }
+      ],
+      "tables": [],
+      "headings": [
+        "Embroidery Pricing 2026",
+        "Additional Stitch Pricing",
+        "Stitch Surcharge — All Customer Accounts",
+        "No matching accounts"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a[href$=\"staff-dashboard.html\"]"
+            ],
+            [
+              ".version-info"
+            ],
+            [
+              "button[data-tab=\"al-retail\"] > .tab-subtitle"
+            ],
+            [
+              "button[data-tab=\"decg-retail\"] > .tab-subtitle"
+            ],
+            [
+              "button[data-tab=\"fullback\"] > .tab-subtitle"
+            ],
+            [
+              ".es-part:nth-child(1) > .es-part-label"
+            ],
+            [
+              ".es-part:nth-child(1) > .es-part-desc"
+            ],
+            [
+              ".es-part:nth-child(2) > .es-part-label"
+            ],
+            [
+              ".es-part:nth-child(2) > .es-part-desc"
+            ],
+            [
+              ".es-account-card:nth-child(1) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--large.es-tier-pill"
+            ],
+            [
+              ".es-account-card:nth-child(1) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--mid.es-tier-pill"
+            ],
+            [
+              ".es-account-card:nth-child(2) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--large.es-tier-pill"
+            ],
+            [
+              ".es-account-card:nth-child(2) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--mid.es-tier-pill"
+            ],
+            [
+              ".es-account-card:nth-child(3) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--large.es-tier-pill"
+            ],
+            [
+              ".es-account-card:nth-child(3) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--mid.es-tier-pill"
+            ]
+          ]
+        },
+        {
+          "id": "link-in-text-block",
+          "nodes": [
+            [
+              "a[href$=\"staff-dashboard.html\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Embroidery Pricing | Northwest Custom Apparel",
+      "url": "/calculators/embroidery-pricing-all/index.html?tab=stitch-charges",
+      "ids": {
+        "es-mid-range": "10,001 – 18,000",
+        "es-mid-price": "+$4",
+        "es-large-range": "18,001 – 25,000",
+        "es-large-price": "+$10",
+        "openSurchargeModal": "View All 4 Surcharge Accounts",
+        "accountList": "1 Example Alpine Team Rep: Nika Lao Large +$10 Mid +$4 ▾ 2 Example Harbor Team Rep: Taneisha Clark Large +$10 Mid +$4 ▾ 3 Example Summit Team Rep: House Large +$10 Mid +$4 ▾",
+        "scStatTotal": "0",
+        "scStatMid": "0",
+        "scStatLarge": "0",
+        "scModalClose": "×",
+        "scSearch": "",
+        "scTierFilters": "All Mid +$4 Large +$10 Mixed",
+        "scRepFilters": "All Nika Taneisha House",
+        "scResultsCount": "0 of 4 accounts",
+        "scEmptyState": "No matching accounts Try adjusting your search or filters"
+      },
+      "fields": [
+        {
+          "id": "scSearch",
+          "type": "text",
+          "value": "No matching example",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        },
+        {
+          "href": "/calculators/embroidery-contract/",
+          "text": "Looking for Contract Embroidery? →"
+        },
+        {
+          "href": "?tab=fullback",
+          "text": "Looking for Full Back Embroidery (25K+)? See the dedicated Full Back Embroidery tab →"
+        }
+      ],
+      "tables": [],
+      "headings": [
+        "Embroidery Pricing 2026",
+        "Additional Stitch Pricing",
+        "Stitch Surcharge — All Customer Accounts",
+        "No matching accounts"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a[href$=\"staff-dashboard.html\"]"
+            ],
+            [
+              ".version-info"
+            ],
+            [
+              "button[data-tab=\"al-retail\"] > .tab-subtitle"
+            ],
+            [
+              "button[data-tab=\"decg-retail\"] > .tab-subtitle"
+            ],
+            [
+              "button[data-tab=\"fullback\"] > .tab-subtitle"
+            ],
+            [
+              ".es-part:nth-child(1) > .es-part-label"
+            ],
+            [
+              ".es-part:nth-child(1) > .es-part-desc"
+            ],
+            [
+              ".es-part:nth-child(2) > .es-part-label"
+            ],
+            [
+              ".es-part:nth-child(2) > .es-part-desc"
+            ],
+            [
+              ".es-account-card:nth-child(1) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--large.es-tier-pill"
+            ],
+            [
+              ".es-account-card:nth-child(1) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--mid.es-tier-pill"
+            ],
+            [
+              ".es-account-card:nth-child(2) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--large.es-tier-pill"
+            ],
+            [
+              ".es-account-card:nth-child(2) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--mid.es-tier-pill"
+            ],
+            [
+              ".es-account-card:nth-child(3) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--large.es-tier-pill"
+            ],
+            [
+              ".es-account-card:nth-child(3) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--mid.es-tier-pill"
+            ]
+          ]
+        },
+        {
+          "id": "link-in-text-block",
+          "nodes": [
+            [
+              "a[href$=\"staff-dashboard.html\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Embroidery Pricing | Northwest Custom Apparel",
+      "url": "/calculators/embroidery-pricing-all/index.html?tab=stitch-charges",
+      "ids": {
+        "es-mid-range": "10,001 – 18,000",
+        "es-mid-price": "+$4",
+        "es-large-range": "18,001 – 25,000",
+        "es-large-price": "+$10",
+        "openSurchargeModal": "View All 4 Surcharge Accounts",
+        "accountList": "1 Example Alpine Team Rep: Nika Lao Large +$10 Mid +$4 ▾ 2 Example Harbor Team Rep: Taneisha Clark Large +$10 Mid +$4 ▾ 3 Example Summit Team Rep: House Large +$10 Mid +$4 ▾",
+        "scStatTotal": "0",
+        "scStatMid": "0",
+        "scStatLarge": "0",
+        "scModalClose": "×",
+        "scSearch": "",
+        "scTierFilters": "All Mid +$4 Large +$10 Mixed",
+        "scRepFilters": "All Nika Taneisha House",
+        "scResultsCount": "0 of 4 accounts",
+        "scEmptyState": "No matching accounts Try adjusting your search or filters"
+      },
+      "fields": [
+        {
+          "id": "scSearch",
+          "type": "text",
+          "value": "No matching example",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        },
+        {
+          "href": "/calculators/embroidery-contract/",
+          "text": "Looking for Contract Embroidery? →"
+        },
+        {
+          "href": "?tab=fullback",
+          "text": "Looking for Full Back Embroidery (25K+)? See the dedicated Full Back Embroidery tab →"
+        }
+      ],
+      "tables": [],
+      "headings": [
+        "Embroidery Pricing 2026",
+        "Additional Stitch Pricing",
+        "Stitch Surcharge — All Customer Accounts",
+        "No matching accounts"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a[href$=\"staff-dashboard.html\"]"
+            ],
+            [
+              ".version-info"
+            ],
+            [
+              "button[data-tab=\"al-retail\"] > .tab-subtitle"
+            ],
+            [
+              "button[data-tab=\"decg-retail\"] > .tab-subtitle"
+            ],
+            [
+              "button[data-tab=\"fullback\"] > .tab-subtitle"
+            ],
+            [
+              ".es-part:nth-child(1) > .es-part-label"
+            ],
+            [
+              ".es-part:nth-child(1) > .es-part-desc"
+            ],
+            [
+              ".es-part:nth-child(2) > .es-part-label"
+            ],
+            [
+              ".es-part:nth-child(2) > .es-part-desc"
+            ],
+            [
+              ".es-account-card:nth-child(1) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--large.es-tier-pill"
+            ],
+            [
+              ".es-account-card:nth-child(1) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--mid.es-tier-pill"
+            ],
+            [
+              ".es-account-card:nth-child(2) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--large.es-tier-pill"
+            ],
+            [
+              ".es-account-card:nth-child(2) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--mid.es-tier-pill"
+            ],
+            [
+              ".es-account-card:nth-child(3) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--large.es-tier-pill"
+            ],
+            [
+              ".es-account-card:nth-child(3) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--mid.es-tier-pill"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Embroidery Pricing | Northwest Custom Apparel",
+      "url": "/calculators/embroidery-pricing-all/index.html?tab=stitch-charges",
+      "ids": {
+        "es-mid-range": "10,001 – 18,000",
+        "es-mid-price": "+$4",
+        "es-large-range": "18,001 – 25,000",
+        "es-large-price": "+$10",
+        "openSurchargeModal": "View All 4 Surcharge Accounts",
+        "accountList": "1 Example Alpine Team Rep: Nika Lao Large +$10 Mid +$4 ▾ 2 Example Harbor Team Rep: Taneisha Clark Large +$10 Mid +$4 ▾ 3 Example Summit Team Rep: House Large +$10 Mid +$4 ▾",
+        "scStatTotal": "0",
+        "scStatMid": "0",
+        "scStatLarge": "0",
+        "scModalClose": "×",
+        "scSearch": "",
+        "scTierFilters": "All Mid +$4 Large +$10 Mixed",
+        "scRepFilters": "All Nika Taneisha House",
+        "scResultsCount": "0 of 4 accounts",
+        "scEmptyState": "No matching accounts Try adjusting your search or filters"
+      },
+      "fields": [
+        {
+          "id": "scSearch",
+          "type": "text",
+          "value": "No matching example",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        },
+        {
+          "href": "/calculators/embroidery-contract/",
+          "text": "Looking for Contract Embroidery? →"
+        },
+        {
+          "href": "?tab=fullback",
+          "text": "Looking for Full Back Embroidery (25K+)? See the dedicated Full Back Embroidery tab →"
+        }
+      ],
+      "tables": [],
+      "headings": [
+        "Embroidery Pricing 2026",
+        "Additional Stitch Pricing",
+        "Stitch Surcharge — All Customer Accounts",
+        "No matching accounts"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a[href$=\"staff-dashboard.html\"]"
+            ],
+            [
+              ".version-info"
+            ],
+            [
+              "button[data-tab=\"al-retail\"] > .tab-subtitle"
+            ],
+            [
+              "button[data-tab=\"decg-retail\"] > .tab-subtitle"
+            ],
+            [
+              "button[data-tab=\"fullback\"] > .tab-subtitle"
+            ],
+            [
+              ".es-part:nth-child(1) > .es-part-label"
+            ],
+            [
+              ".es-part:nth-child(1) > .es-part-desc"
+            ],
+            [
+              ".es-part:nth-child(2) > .es-part-label"
+            ],
+            [
+              ".es-part:nth-child(2) > .es-part-desc"
+            ],
+            [
+              ".es-account-card:nth-child(1) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--large.es-tier-pill"
+            ],
+            [
+              ".es-account-card:nth-child(1) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--mid.es-tier-pill"
+            ],
+            [
+              ".es-account-card:nth-child(2) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--large.es-tier-pill"
+            ],
+            [
+              ".es-account-card:nth-child(2) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--mid.es-tier-pill"
+            ],
+            [
+              ".es-account-card:nth-child(3) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--large.es-tier-pill"
+            ],
+            [
+              ".es-account-card:nth-child(3) > .es-account-hdr[data-call=\"esToggleAccount\"][data-args=\"[\\\"$this\\\"]\"] > .es-acct-hdr-right > .es-tier-pill--mid.es-tier-pill"
+            ]
+          ]
+        },
+        {
+          "id": "link-in-text-block",
+          "nodes": [
+            [
+              "a[href$=\"staff-dashboard.html\"]"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "reads": [
+    "/api/contract-pricing",
+    "/api/al-pricing",
+    "/api/decg-pricing",
+    "/api/pricing-bundle?method=EMB",
+    "/api/embroidery-costs?itemType=3D-Puff&stitchCount=0",
+    "/api/embroidery-costs?itemType=Patch&stitchCount=0"
+  ],
+  "dialogs": []
+}

@@ -1,5 +1,7 @@
 # shared_components/js/ — File Guide
 
+- `garment-submit-form.js` — shared artwork intake in AE dashboard, lead, Quote View and garment designer. Adds a scoped data-art-intake mount for art-intake.css; the legacy garment-submit-form.css URL imports that owner for lazy callers. Original successful submission payloads remain unchanged.
+
 - `core-calculator-ui.js` — shared presentation/keyboard adapter for DTG, DTF, Embroidery, Cap Embroidery and Screen Print public calculators. Reads controller state; never computes pricing.
 
 **124 JavaScript files** organized by function. Updated 2026-02-27.
@@ -292,3 +294,7 @@ Draft design family: shared_components/css/design-libraries.css owns local desig
 Richardson factory-direct opts into specialty-calculator-ui.js: its existing hidden classes are mirrored to native hidden attributes. Pricing calculations stay in its original controller; only failed-read warnings, current selection and keyboard presentation changed.
 
 Polar Camel: laser-tumbler-simple.js owns latest color/inventory state, live-policy recalculation of age-preserved product caches and persistent failure feedback; laser-tumbler-mockup.js owns current-image requests and quote availability. jds-api-service.js adds validated pricingWarnings metadata (also available to its existing AE consumer); successful financial methods and the shared jds-tumbler-template.js engraving renderer remain unchanged. catalog-storefront-navigation.js supplies the native drawer bridge.
+
+- staff-print.js: NWCAStaffPrint.printWhenReady(window) awaits three marked stylesheets, images and fonts for staff print documents; callers display rejected errors.
+
+- staff-print.js also supplies required-asset readiness for the customer-supplied screen-print saved quote.

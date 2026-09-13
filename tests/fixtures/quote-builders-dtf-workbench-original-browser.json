@@ -1,0 +1,1403 @@
+{
+  "name": "dtf-workbench",
+  "states": [
+    {
+      "width": 1440,
+      "title": "2026 DTF Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/dtf-quote-builder.html",
+      "ids": {
+        "toast-container": "",
+        "method-switch-menu": "Switch method … Embroidery Screen Print DTG (1st product only)",
+        "location-display": "Left Chest",
+        "artwork-upload-h8u1z7-design-name": "",
+        "artwork-upload-h8u1z7-dropzone": "Drop files here or click to browse AI / EPS / PSD / PDF / PNG / JPG / TIFF · 20 MB max each",
+        "product-search": "",
+        "search-hint": "Type to search (e.g., PC54, G500)",
+        "thumb-1": "",
+        "row-qty-1": "48",
+        "row-price-1": "$13.50",
+        "row-total-1": "$648.00",
+        "charges-chevron": "",
+        "order-details-chevron": "",
+        "pre-tax-subtotal": "$648.00",
+        "include-tax": "",
+        "tax-rate-input": "",
+        "wholesale-checkbox": "",
+        "tax-rate-label": "Sales Tax (10.2%)",
+        "tax-amount": "$66.10",
+        "grand-total-with-tax": "$714.10",
+        "sidebar-resize-handle": "",
+        "customer-lookup": "",
+        "customer-name": "",
+        "customer-email": "",
+        "company-name": "",
+        "sales-rep": "General Sales Bradley Wright Erik Mickelson Jim Mickelson Nika Lao Ruth Nhong Steve Deland Taneisha Clark",
+        "customer-number": "",
+        "customer-phone": "",
+        "project-name": "",
+        "design-number": "",
+        "sidebar-location": "Left Chest",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$648.00",
+        "per-unit-price": "$13.50/piece",
+        "sidebar-grand-total": "$714.10",
+        "push-readiness": "BEFORE YOU PUSH ShopWorks Customer # At least one item Customer name Customer email",
+        "dtf-push-shopworks-label": "Push to ShopWorks"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "left-chest",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "right-chest",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "center-front",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "full-front",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "back-of-neck",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "center-back",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "full-back",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "sleeve-location",
+          "type": "checkbox",
+          "value": "left-sleeve",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "sleeve-location",
+          "type": "checkbox",
+          "value": "right-sleeve",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "artwork-upload-h8u1z7-design-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "product-search",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "PC54",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "Essential Cotton Tee",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "48",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "include-tax",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "tax-rate-input",
+          "name": "",
+          "type": "number",
+          "value": "10.2",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "wholesale-checkbox",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-lookup",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-email",
+          "name": "",
+          "type": "email",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "company-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "sales-rep",
+          "name": "",
+          "type": "select-one",
+          "value": "sales@nwcustomapparel.com",
+          "disabled": false
+        },
+        {
+          "id": "customer-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-phone",
+          "name": "",
+          "type": "tel",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "project-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "design-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [
+        "Style Product image Description Color S M L XL 2XL More Sizes Qty Unit $ Total Row actions Jet Black 125 125 125 125 125 125 48 $13.50 $648.00"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "aria-required-attr",
+          "nodes": [
+            [
+              ".color-picker-selected"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".artwork-dropzone-sub"
+            ],
+            [
+              "#per-unit-price"
+            ],
+            [
+              ".pr-ok"
+            ],
+            [
+              ".btn-share-link"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "2026 DTF Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/dtf-quote-builder.html",
+      "ids": {
+        "toast-container": "",
+        "method-switch-menu": "Switch method … Embroidery Screen Print DTG (1st product only)",
+        "location-display": "Left Chest",
+        "artwork-upload-h8u1z7-design-name": "",
+        "artwork-upload-h8u1z7-dropzone": "Drop files here or click to browse AI / EPS / PSD / PDF / PNG / JPG / TIFF · 20 MB max each",
+        "product-search": "",
+        "search-hint": "Type to search (e.g., PC54, G500)",
+        "row-qty-1": "48",
+        "row-price-1": "$13.50",
+        "row-total-1": "$648.00",
+        "charges-chevron": "",
+        "order-details-chevron": "",
+        "pre-tax-subtotal": "$648.00",
+        "include-tax": "",
+        "tax-rate-input": "",
+        "wholesale-checkbox": "",
+        "tax-rate-label": "Sales Tax (10.2%)",
+        "tax-amount": "$66.10",
+        "grand-total-with-tax": "$714.10",
+        "sidebar-resize-handle": "",
+        "customer-lookup": "",
+        "customer-name": "",
+        "customer-email": "",
+        "company-name": "",
+        "sales-rep": "General Sales Bradley Wright Erik Mickelson Jim Mickelson Nika Lao Ruth Nhong Steve Deland Taneisha Clark",
+        "customer-number": "",
+        "customer-phone": "",
+        "project-name": "",
+        "design-number": "",
+        "sidebar-location": "Left Chest",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$648.00",
+        "per-unit-price": "$13.50/piece",
+        "sidebar-grand-total": "$714.10",
+        "push-readiness": "BEFORE YOU PUSH ShopWorks Customer # At least one item Customer name Customer email",
+        "dtf-push-shopworks-label": "Push to ShopWorks"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "left-chest",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "right-chest",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "center-front",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "full-front",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "back-of-neck",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "center-back",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "full-back",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "sleeve-location",
+          "type": "checkbox",
+          "value": "left-sleeve",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "sleeve-location",
+          "type": "checkbox",
+          "value": "right-sleeve",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "artwork-upload-h8u1z7-design-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "product-search",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "PC54",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "Essential Cotton Tee",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "48",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "include-tax",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "tax-rate-input",
+          "name": "",
+          "type": "number",
+          "value": "10.2",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "wholesale-checkbox",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-lookup",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-email",
+          "name": "",
+          "type": "email",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "company-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "sales-rep",
+          "name": "",
+          "type": "select-one",
+          "value": "sales@nwcustomapparel.com",
+          "disabled": false
+        },
+        {
+          "id": "customer-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-phone",
+          "name": "",
+          "type": "tel",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "project-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "design-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [
+        "Style Product image Color S M L XL 2XL More Sizes Qty Unit $ Total Row actions Jet Black 125 125 125 125 125 125 48 $13.50 $648.00"
+      ],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "aria-required-attr",
+          "nodes": [
+            [
+              ".color-picker-selected"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".artwork-dropzone-sub"
+            ],
+            [
+              "#per-unit-price"
+            ],
+            [
+              ".pr-ok"
+            ],
+            [
+              ".btn-share-link"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "2026 DTF Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/dtf-quote-builder.html",
+      "ids": {
+        "toast-container": "",
+        "method-switch-menu": "Switch method … Embroidery Screen Print DTG (1st product only)",
+        "location-display": "Left Chest",
+        "artwork-upload-h8u1z7-design-name": "",
+        "artwork-upload-h8u1z7-dropzone": "Drop files here or click to browse AI / EPS / PSD / PDF / PNG / JPG / TIFF · 20 MB max each",
+        "product-search": "",
+        "search-hint": "Type to search (e.g., PC54, G500)",
+        "row-qty-1": "48",
+        "row-price-1": "$13.50",
+        "row-total-1": "$648.00",
+        "charges-chevron": "",
+        "order-details-chevron": "",
+        "pre-tax-subtotal": "$648.00",
+        "include-tax": "",
+        "tax-rate-input": "",
+        "wholesale-checkbox": "",
+        "tax-rate-label": "Sales Tax (10.2%)",
+        "tax-amount": "$66.10",
+        "grand-total-with-tax": "$714.10",
+        "sidebar-resize-handle": "",
+        "customer-lookup": "",
+        "customer-name": "",
+        "customer-email": "",
+        "company-name": "",
+        "sales-rep": "General Sales Bradley Wright Erik Mickelson Jim Mickelson Nika Lao Ruth Nhong Steve Deland Taneisha Clark",
+        "customer-number": "",
+        "customer-phone": "",
+        "project-name": "",
+        "design-number": "",
+        "sidebar-location": "Left Chest",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$648.00",
+        "per-unit-price": "$13.50/piece",
+        "sidebar-grand-total": "$714.10",
+        "push-readiness": "BEFORE YOU PUSH ShopWorks Customer # At least one item Customer name Customer email",
+        "dtf-push-shopworks-label": "Push to ShopWorks"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "left-chest",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "right-chest",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "center-front",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "full-front",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "back-of-neck",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "center-back",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "full-back",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "sleeve-location",
+          "type": "checkbox",
+          "value": "left-sleeve",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "sleeve-location",
+          "type": "checkbox",
+          "value": "right-sleeve",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "artwork-upload-h8u1z7-design-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "product-search",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "PC54",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "48",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "include-tax",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "tax-rate-input",
+          "name": "",
+          "type": "number",
+          "value": "10.2",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "wholesale-checkbox",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-lookup",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-email",
+          "name": "",
+          "type": "email",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "company-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "sales-rep",
+          "name": "",
+          "type": "select-one",
+          "value": "sales@nwcustomapparel.com",
+          "disabled": false
+        },
+        {
+          "id": "customer-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-phone",
+          "name": "",
+          "type": "tel",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "project-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "design-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [
+        "Style Product image S M L XL 2XL More Sizes Qty Unit $ Total Row actions 125 125 125 125 125 125 48 $13.50 $648.00"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".artwork-dropzone-sub"
+            ],
+            [
+              "#per-unit-price"
+            ],
+            [
+              ".pr-ok"
+            ],
+            [
+              ".btn-share-link"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "2026 DTF Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/dtf-quote-builder.html",
+      "ids": {
+        "toast-container": "",
+        "method-switch-menu": "Switch method … Embroidery Screen Print DTG (1st product only)",
+        "location-display": "Left Chest",
+        "artwork-upload-h8u1z7-design-name": "",
+        "artwork-upload-h8u1z7-dropzone": "Drop files here or click to browse AI / EPS / PSD / PDF / PNG / JPG / TIFF · 20 MB max each",
+        "product-search": "",
+        "search-hint": "Type to search (e.g., PC54, G500)",
+        "row-qty-1": "48",
+        "row-price-1": "$13.50",
+        "row-total-1": "$648.00",
+        "charges-chevron": "",
+        "order-details-chevron": "",
+        "pre-tax-subtotal": "$648.00",
+        "include-tax": "",
+        "tax-rate-input": "",
+        "wholesale-checkbox": "",
+        "tax-rate-label": "Sales Tax (10.2%)",
+        "tax-amount": "$66.10",
+        "grand-total-with-tax": "$714.10",
+        "sidebar-resize-handle": "",
+        "customer-lookup": "",
+        "customer-name": "",
+        "customer-email": "",
+        "company-name": "",
+        "sales-rep": "General Sales Bradley Wright Erik Mickelson Jim Mickelson Nika Lao Ruth Nhong Steve Deland Taneisha Clark",
+        "customer-number": "",
+        "customer-phone": "",
+        "project-name": "",
+        "design-number": "",
+        "sidebar-location": "Left Chest",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$648.00",
+        "per-unit-price": "$13.50/piece",
+        "sidebar-grand-total": "$714.10",
+        "push-readiness": "BEFORE YOU PUSH ShopWorks Customer # At least one item Customer name Customer email",
+        "dtf-push-shopworks-label": "Push to ShopWorks"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "left-chest",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "right-chest",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "center-front",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "full-front",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "back-of-neck",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "center-back",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "full-back",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "sleeve-location",
+          "type": "checkbox",
+          "value": "left-sleeve",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "sleeve-location",
+          "type": "checkbox",
+          "value": "right-sleeve",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "artwork-upload-h8u1z7-design-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "product-search",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "PC54",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "48",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "include-tax",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "tax-rate-input",
+          "name": "",
+          "type": "number",
+          "value": "10.2",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "wholesale-checkbox",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-lookup",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-email",
+          "name": "",
+          "type": "email",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "company-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "sales-rep",
+          "name": "",
+          "type": "select-one",
+          "value": "sales@nwcustomapparel.com",
+          "disabled": false
+        },
+        {
+          "id": "customer-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-phone",
+          "name": "",
+          "type": "tel",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "project-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "design-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [
+        "Style Product image S M L XL 2XL More Sizes Qty Unit $ Total Row actions 125 125 125 125 125 125 48 $13.50 $648.00"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".artwork-dropzone-sub"
+            ],
+            [
+              "#per-unit-price"
+            ],
+            [
+              ".pr-ok"
+            ],
+            [
+              ".btn-share-link"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "mutations": []
+}

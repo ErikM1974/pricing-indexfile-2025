@@ -1,0 +1,241 @@
+{
+  "method": "screenprint",
+  "states": [
+    {
+      "width": 1440,
+      "title": "2026 Screen Print Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Embroidery DTF Transfers DTG (1st product only)",
+        "product-search": "",
+        "empty-state-row": "👕 Enter a style number to get started Type a style # in the search bar above (e.g., PC54, G500, C112) Customer bringing their own garments? Price it in the customer-supplied screen print calculator.",
+        "setup-screens-label": "1 screen",
+        "setup-per-screen-label": "$30",
+        "setup-fee-unit": "-",
+        "setup-fee-total": "-",
+        "charges-chevron": "",
+        "sidebar-resize-handle": "",
+        "sidebar-front": "Left Chest (1-color)",
+        "sidebar-screens": "1",
+        "total-qty": "0",
+        "pricing-tier": "24-47",
+        "subtotal": "$0.00",
+        "sidebar-grand-total": "$33.06",
+        "toast-container": "Ready to build Screen Print quotes! Vellum rate is an estimate ($10.00) — live pricing didn't return it. Verify before saving. Color Chg rate is an estimate ($15.00) — live pricing didn't return it. Verify before saving.",
+        "qb-fallback-badge": "⚠ Estimated pricing in use: Vellum, Color Chg — live rates unavailable. Verify before sending."
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "product-search",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/calculators/screenprint-customer/",
+          "text": "customer-supplied screen print calculator"
+        }
+      ],
+      "tables": [
+        "Style Product image Description Color S M L XL 2XL More Sizes Qty Unit $ Total Row actions 👕 Enter a style number to get started Type a style # in the search bar above (e.g., PC54, G500, C112) Customer bringing their own garments? Price it in the customer-supplied screen print calculator. Screen Print Set Up Charge (1 screen × $30) 1 - -"
+      ],
+      "overflow": false
+    },
+    {
+      "width": 768,
+      "title": "2026 Screen Print Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Embroidery DTF Transfers DTG (1st product only)",
+        "product-search": "",
+        "empty-state-row": "👕 Enter a style number to get started Type a style # in the search bar above (e.g., PC54, G500, C112) Customer bringing their own garments? Price it in the customer-supplied screen print calculator.",
+        "setup-screens-label": "1 screen",
+        "setup-per-screen-label": "$30",
+        "setup-fee-unit": "-",
+        "setup-fee-total": "-",
+        "charges-chevron": "",
+        "sidebar-resize-handle": "",
+        "sidebar-front": "Left Chest (1-color)",
+        "sidebar-screens": "1",
+        "total-qty": "0",
+        "pricing-tier": "24-47",
+        "subtotal": "$0.00",
+        "sidebar-grand-total": "$33.06",
+        "toast-container": "Ready to build Screen Print quotes! Vellum rate is an estimate ($10.00) — live pricing didn't return it. Verify before saving. Color Chg rate is an estimate ($15.00) — live pricing didn't return it. Verify before saving.",
+        "qb-fallback-badge": "⚠ Estimated pricing in use: Vellum, Color Chg — live rates unavailable. Verify before sending."
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "product-search",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/calculators/screenprint-customer/",
+          "text": "customer-supplied screen print calculator"
+        }
+      ],
+      "tables": [
+        "Style Product image Color S M L XL 2XL More Sizes Qty Unit $ Total Row actions 👕 Enter a style number to get started Type a style # in the search bar above (e.g., PC54, G500, C112) Customer bringing their own garments? Price it in the customer-supplied screen print calculator. Screen Print Set Up Charge (1 screen × $30) - -"
+      ],
+      "overflow": true
+    },
+    {
+      "width": 390,
+      "title": "2026 Screen Print Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Embroidery DTF Transfers DTG (1st product only)",
+        "product-search": "",
+        "empty-state-row": "👕 Enter a style number to get started Type a style # in the search bar above (e.g., PC54, G500, C112) Customer bringing their own garments? Price it in the customer-supplied screen print calculator.",
+        "setup-screens-label": "1 screen",
+        "setup-per-screen-label": "$30",
+        "setup-fee-unit": "-",
+        "setup-fee-total": "-",
+        "charges-chevron": "",
+        "sidebar-resize-handle": "",
+        "sidebar-front": "Left Chest (1-color)",
+        "sidebar-screens": "1",
+        "total-qty": "0",
+        "pricing-tier": "24-47",
+        "subtotal": "$0.00",
+        "sidebar-grand-total": "$33.06",
+        "toast-container": "Ready to build Screen Print quotes! Vellum rate is an estimate ($10.00) — live pricing didn't return it. Verify before saving. Color Chg rate is an estimate ($15.00) — live pricing didn't return it. Verify before saving.",
+        "qb-fallback-badge": "⚠ Estimated pricing in use: Vellum, Color Chg — live rates unavailable. Verify before sending."
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "product-search",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/calculators/screenprint-customer/",
+          "text": "customer-supplied screen print calculator"
+        }
+      ],
+      "tables": [
+        "Style Product image Color S M L XL 2XL More Sizes Qty Unit $ Total Row actions 👕 Enter a style number to get started Type a style # in the search bar above (e.g., PC54, G500, C112) Customer bringing their own garments? Price it in the customer-supplied screen print calculator. Screen Print Set Up Charge (1 screen × $30) - -"
+      ],
+      "overflow": false
+    },
+    {
+      "width": 320,
+      "title": "2026 Screen Print Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Embroidery DTF Transfers DTG (1st product only)",
+        "product-search": "",
+        "empty-state-row": "👕 Enter a style number to get started Type a style # in the search bar above (e.g., PC54, G500, C112) Customer bringing their own garments? Price it in the customer-supplied screen print calculator.",
+        "setup-screens-label": "1 screen",
+        "setup-per-screen-label": "$30",
+        "setup-fee-unit": "-",
+        "setup-fee-total": "-",
+        "charges-chevron": "",
+        "sidebar-resize-handle": "",
+        "sidebar-front": "Left Chest (1-color)",
+        "sidebar-screens": "1",
+        "total-qty": "0",
+        "pricing-tier": "24-47",
+        "subtotal": "$0.00",
+        "sidebar-grand-total": "$33.06",
+        "toast-container": "Ready to build Screen Print quotes! Vellum rate is an estimate ($10.00) — live pricing didn't return it. Verify before saving. Color Chg rate is an estimate ($15.00) — live pricing didn't return it. Verify before saving.",
+        "qb-fallback-badge": "⚠ Estimated pricing in use: Vellum, Color Chg — live rates unavailable. Verify before sending."
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "product-search",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/calculators/screenprint-customer/",
+          "text": "customer-supplied screen print calculator"
+        }
+      ],
+      "tables": [
+        "Style Product image Color S M L XL 2XL More Sizes Qty Unit $ Total Row actions 👕 Enter a style number to get started Type a style # in the search bar above (e.g., PC54, G500, C112) Customer bringing their own garments? Price it in the customer-supplied screen print calculator. Screen Print Set Up Charge (1 screen × $30) - -"
+      ],
+      "overflow": false
+    }
+  ]
+}

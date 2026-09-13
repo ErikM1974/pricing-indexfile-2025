@@ -1,0 +1,535 @@
+{
+  "name": "failed",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Embroidery Pricing | Northwest Custom Apparel",
+      "url": "/calculators/embroidery-pricing-all/index.html?tab=al-retail",
+      "ids": {
+        "alRetailItemType": "Garment Cap Laser Patch",
+        "alRetailQuantity": "",
+        "alRetailStitches": "",
+        "alRetailBreakdownLabel": "Base (8K):",
+        "alRetailBreakdownValue": "$8.50",
+        "alRetailFinalUnitPrice": "$8.50",
+        "alRetailCapUpgrades": "Loading...",
+        "alRetailGarmentsMatrix": "Quantity ADD LOGO PRICE Unable to load pricing data. Please refresh the page.",
+        "alRetailCapsMatrix": "Quantity ADD LOGO PRICE Unable to load pricing data. Please refresh the page."
+      },
+      "fields": [
+        {
+          "id": "alRetailItemType",
+          "type": "select-one",
+          "value": "garment",
+          "disabled": false
+        },
+        {
+          "id": "alRetailQuantity",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "alRetailStitches",
+          "type": "number",
+          "value": "8000",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        },
+        {
+          "href": "/calculators/embroidery-contract/",
+          "text": "Looking for Contract Embroidery? →"
+        },
+        {
+          "href": "?tab=fullback",
+          "text": "Full Back Embroidery (25K+, DECG-FB)? Same rate when we supply the garment — see the dedicated Full Back Embroidery tab →"
+        }
+      ],
+      "tables": [
+        "Quantity ADD LOGO PRICE Unable to load pricing data. Please refresh the page.",
+        "Quantity ADD LOGO PRICE Unable to load pricing data. Please refresh the page."
+      ],
+      "headings": [
+        "Embroidery Pricing 2026",
+        "Quick Price Calculator",
+        "Garment Additional Logo AL",
+        "Cap Additional Logo AL-CAP",
+        "Quick Quote Example"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a[href$=\"staff-dashboard.html\"]"
+            ],
+            [
+              ".version-info"
+            ],
+            [
+              "button[data-tab=\"decg-retail\"] > .tab-subtitle"
+            ],
+            [
+              "button[data-tab=\"stitch-charges\"] > .tab-subtitle"
+            ],
+            [
+              "button[data-tab=\"fullback\"] > .tab-subtitle"
+            ],
+            [
+              "#tab-al-retail > details:nth-child(1) > summary > .disclosure-hint"
+            ],
+            [
+              "details:nth-child(2) > summary > .disclosure-hint"
+            ],
+            [
+              "#alRetailBreakdownLabel"
+            ],
+            [
+              "#alRetailBreakdownValue"
+            ],
+            [
+              "#alRetailCapUpgrades > .loading-text"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(1) > .matrix-header > h3 > .part-number-badge"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(1) > .matrix-header > .matrix-meta"
+            ],
+            [
+              "#alRetailGarmentsMatrix > thead > tr > th:nth-child(2)"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(1) > .matrix-note"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(2) > .matrix-header > h3 > .part-number-badge"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(2) > .matrix-header > .matrix-meta"
+            ],
+            [
+              "#alRetailCapsMatrix > thead > tr > th:nth-child(2)"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(2) > .matrix-note"
+            ]
+          ]
+        },
+        {
+          "id": "link-in-text-block",
+          "nodes": [
+            [
+              "a[href$=\"staff-dashboard.html\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Embroidery Pricing | Northwest Custom Apparel",
+      "url": "/calculators/embroidery-pricing-all/index.html?tab=al-retail",
+      "ids": {
+        "alRetailItemType": "Garment Cap Laser Patch",
+        "alRetailQuantity": "",
+        "alRetailStitches": "",
+        "alRetailBreakdownLabel": "Base (8K):",
+        "alRetailBreakdownValue": "$8.50",
+        "alRetailFinalUnitPrice": "$8.50",
+        "alRetailCapUpgrades": "Loading...",
+        "alRetailGarmentsMatrix": "Quantity ADD LOGO PRICE Unable to load pricing data. Please refresh the page.",
+        "alRetailCapsMatrix": "Quantity ADD LOGO PRICE Unable to load pricing data. Please refresh the page."
+      },
+      "fields": [
+        {
+          "id": "alRetailItemType",
+          "type": "select-one",
+          "value": "garment",
+          "disabled": false
+        },
+        {
+          "id": "alRetailQuantity",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "alRetailStitches",
+          "type": "number",
+          "value": "8000",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        },
+        {
+          "href": "/calculators/embroidery-contract/",
+          "text": "Looking for Contract Embroidery? →"
+        },
+        {
+          "href": "?tab=fullback",
+          "text": "Full Back Embroidery (25K+, DECG-FB)? Same rate when we supply the garment — see the dedicated Full Back Embroidery tab →"
+        }
+      ],
+      "tables": [
+        "Quantity ADD LOGO PRICE Unable to load pricing data. Please refresh the page.",
+        "Quantity ADD LOGO PRICE Unable to load pricing data. Please refresh the page."
+      ],
+      "headings": [
+        "Embroidery Pricing 2026",
+        "Quick Price Calculator",
+        "Garment Additional Logo AL",
+        "Cap Additional Logo AL-CAP",
+        "Quick Quote Example"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a[href$=\"staff-dashboard.html\"]"
+            ],
+            [
+              ".version-info"
+            ],
+            [
+              "button[data-tab=\"decg-retail\"] > .tab-subtitle"
+            ],
+            [
+              "button[data-tab=\"stitch-charges\"] > .tab-subtitle"
+            ],
+            [
+              "button[data-tab=\"fullback\"] > .tab-subtitle"
+            ],
+            [
+              "#tab-al-retail > details:nth-child(1) > summary > .disclosure-hint"
+            ],
+            [
+              "details:nth-child(2) > summary > .disclosure-hint"
+            ],
+            [
+              "#alRetailBreakdownLabel"
+            ],
+            [
+              "#alRetailBreakdownValue"
+            ],
+            [
+              "#alRetailCapUpgrades > .loading-text"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(1) > .matrix-header > h3 > .part-number-badge"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(1) > .matrix-header > .matrix-meta"
+            ],
+            [
+              "#alRetailGarmentsMatrix > thead > tr > th:nth-child(2)"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(1) > .matrix-note"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(2) > .matrix-header > h3 > .part-number-badge"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(2) > .matrix-header > .matrix-meta"
+            ],
+            [
+              "#alRetailCapsMatrix > thead > tr > th:nth-child(2)"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(2) > .matrix-note"
+            ]
+          ]
+        },
+        {
+          "id": "link-in-text-block",
+          "nodes": [
+            [
+              "a[href$=\"staff-dashboard.html\"]"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Embroidery Pricing | Northwest Custom Apparel",
+      "url": "/calculators/embroidery-pricing-all/index.html?tab=al-retail",
+      "ids": {
+        "alRetailItemType": "Garment Cap Laser Patch",
+        "alRetailQuantity": "",
+        "alRetailStitches": "",
+        "alRetailBreakdownLabel": "Base (8K):",
+        "alRetailBreakdownValue": "$8.50",
+        "alRetailFinalUnitPrice": "$8.50",
+        "alRetailCapUpgrades": "Loading...",
+        "alRetailGarmentsMatrix": "Quantity ADD LOGO PRICE Unable to load pricing data. Please refresh the page.",
+        "alRetailCapsMatrix": "Quantity ADD LOGO PRICE Unable to load pricing data. Please refresh the page."
+      },
+      "fields": [
+        {
+          "id": "alRetailItemType",
+          "type": "select-one",
+          "value": "garment",
+          "disabled": false
+        },
+        {
+          "id": "alRetailQuantity",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "alRetailStitches",
+          "type": "number",
+          "value": "8000",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        },
+        {
+          "href": "/calculators/embroidery-contract/",
+          "text": "Looking for Contract Embroidery? →"
+        },
+        {
+          "href": "?tab=fullback",
+          "text": "Full Back Embroidery (25K+, DECG-FB)? Same rate when we supply the garment — see the dedicated Full Back Embroidery tab →"
+        }
+      ],
+      "tables": [
+        "Quantity ADD LOGO PRICE Unable to load pricing data. Please refresh the page.",
+        "Quantity ADD LOGO PRICE Unable to load pricing data. Please refresh the page."
+      ],
+      "headings": [
+        "Embroidery Pricing 2026",
+        "Quick Price Calculator",
+        "Garment Additional Logo AL",
+        "Cap Additional Logo AL-CAP",
+        "Quick Quote Example"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a[href$=\"staff-dashboard.html\"]"
+            ],
+            [
+              ".version-info"
+            ],
+            [
+              "button[data-tab=\"decg-retail\"] > .tab-subtitle"
+            ],
+            [
+              "button[data-tab=\"stitch-charges\"] > .tab-subtitle"
+            ],
+            [
+              "button[data-tab=\"fullback\"] > .tab-subtitle"
+            ],
+            [
+              "#tab-al-retail > details:nth-child(1) > summary > .disclosure-hint"
+            ],
+            [
+              "details:nth-child(2) > summary > .disclosure-hint"
+            ],
+            [
+              "#alRetailBreakdownLabel"
+            ],
+            [
+              "#alRetailBreakdownValue"
+            ],
+            [
+              "#alRetailCapUpgrades > .loading-text"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(1) > .matrix-header > h3 > .part-number-badge"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(1) > .matrix-header > .matrix-meta"
+            ],
+            [
+              "#alRetailGarmentsMatrix > thead > tr > th:nth-child(2)"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(1) > .matrix-note"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(2) > .matrix-header > h3 > .part-number-badge"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(2) > .matrix-header > .matrix-meta"
+            ],
+            [
+              "#alRetailCapsMatrix > thead > tr > th:nth-child(2)"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(2) > .matrix-note"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Embroidery Pricing | Northwest Custom Apparel",
+      "url": "/calculators/embroidery-pricing-all/index.html?tab=al-retail",
+      "ids": {
+        "alRetailItemType": "Garment Cap Laser Patch",
+        "alRetailQuantity": "",
+        "alRetailStitches": "",
+        "alRetailBreakdownLabel": "Base (8K):",
+        "alRetailBreakdownValue": "$8.50",
+        "alRetailFinalUnitPrice": "$8.50",
+        "alRetailCapUpgrades": "Loading...",
+        "alRetailGarmentsMatrix": "Quantity ADD LOGO PRICE Unable to load pricing data. Please refresh the page.",
+        "alRetailCapsMatrix": "Quantity ADD LOGO PRICE Unable to load pricing data. Please refresh the page."
+      },
+      "fields": [
+        {
+          "id": "alRetailItemType",
+          "type": "select-one",
+          "value": "garment",
+          "disabled": false
+        },
+        {
+          "id": "alRetailQuantity",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "alRetailStitches",
+          "type": "number",
+          "value": "8000",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": "Staff Dashboard"
+        },
+        {
+          "href": "/calculators/embroidery-contract/",
+          "text": "Looking for Contract Embroidery? →"
+        },
+        {
+          "href": "?tab=fullback",
+          "text": "Full Back Embroidery (25K+, DECG-FB)? Same rate when we supply the garment — see the dedicated Full Back Embroidery tab →"
+        }
+      ],
+      "tables": [
+        "Quantity ADD LOGO PRICE Unable to load pricing data. Please refresh the page.",
+        "Quantity ADD LOGO PRICE Unable to load pricing data. Please refresh the page."
+      ],
+      "headings": [
+        "Embroidery Pricing 2026",
+        "Quick Price Calculator",
+        "Garment Additional Logo AL",
+        "Cap Additional Logo AL-CAP",
+        "Quick Quote Example"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "a[href$=\"staff-dashboard.html\"]"
+            ],
+            [
+              ".version-info"
+            ],
+            [
+              "button[data-tab=\"decg-retail\"] > .tab-subtitle"
+            ],
+            [
+              "button[data-tab=\"stitch-charges\"] > .tab-subtitle"
+            ],
+            [
+              "button[data-tab=\"fullback\"] > .tab-subtitle"
+            ],
+            [
+              "#tab-al-retail > details:nth-child(1) > summary > .disclosure-hint"
+            ],
+            [
+              "details:nth-child(2) > summary > .disclosure-hint"
+            ],
+            [
+              "#alRetailBreakdownLabel"
+            ],
+            [
+              "#alRetailBreakdownValue"
+            ],
+            [
+              "#alRetailCapUpgrades > .loading-text"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(1) > .matrix-header > h3 > .part-number-badge"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(1) > .matrix-header > .matrix-meta"
+            ],
+            [
+              "#alRetailGarmentsMatrix > thead > tr > th:nth-child(2)"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(1) > .matrix-note"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(2) > .matrix-header > h3 > .part-number-badge"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(2) > .matrix-header > .matrix-meta"
+            ],
+            [
+              "#alRetailCapsMatrix > thead > tr > th:nth-child(2)"
+            ],
+            [
+              "#tab-al-retail > .matrices-grid > .matrix-card:nth-child(2) > .matrix-note"
+            ]
+          ]
+        },
+        {
+          "id": "link-in-text-block",
+          "nodes": [
+            [
+              "a[href$=\"staff-dashboard.html\"]"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "reads": [
+    "/api/contract-pricing",
+    "/api/al-pricing",
+    "/api/decg-pricing"
+  ],
+  "dialogs": []
+}

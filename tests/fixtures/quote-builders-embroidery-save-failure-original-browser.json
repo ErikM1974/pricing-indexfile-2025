@@ -1,0 +1,860 @@
+{
+  "name": "embroidery-save-failure",
+  "states": [
+    {
+      "width": 1440,
+      "title": "2026 Embroidery Quote Builder - Garments & Caps | Northwest Custom Apparel",
+      "url": "/quote-builders/embroidery-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Screen Print DTF Transfers DTG (1st product only)",
+        "order-recap": "ORDER AT A GLANCE Customer Example Customer",
+        "po-number": "",
+        "date-order-placed": "",
+        "req-ship-date": "",
+        "drop-dead-date": "",
+        "payment-terms": "",
+        "order-number": "",
+        "invoice-subtotal-display": "$960.00",
+        "it-shipping-amt": "Customer Pickup",
+        "include-tax": "",
+        "tax-label": "Sales Tax (10.1%)",
+        "tax-rate-input": "",
+        "tax-amount": "$96.96",
+        "wholesale-checkbox": "",
+        "grand-total-with-tax": "$1056.96",
+        "push-readiness": "BEFORE YOU PUSH ShopWorks Customer # At least one item Customer name Customer email",
+        "emb-push-shopworks-label": "Push to ShopWorks",
+        "sidebar-resize-handle": "",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "products-label": "Products (Base 8K):",
+        "subtotal": "$960.00",
+        "per-unit-price": "$20.00/piece",
+        "additional-logos-pricing": "",
+        "cap-additional-logos-pricing": "",
+        "sidebar-grand-total": "$1056.96",
+        "toast-container": "Ready to build quotes!",
+        "floatingQuoteBtn": "✨ Ask"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "po-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "date-order-placed",
+          "name": "",
+          "type": "date",
+          "value": "2026-09-12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "req-ship-date",
+          "name": "",
+          "type": "date",
+          "value": "2026-09-26",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "drop-dead-date",
+          "name": "",
+          "type": "date",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "payment-terms",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "order-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "include-tax",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "tax-rate-input",
+          "name": "",
+          "type": "number",
+          "value": "10.1",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "wholesale-checkbox",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".pr-ok.pr-item:nth-child(3)"
+            ],
+            [
+              ".pr-ok.pr-item:nth-child(4)"
+            ],
+            [
+              ".pr-ok.pr-item:nth-child(5)"
+            ],
+            [
+              ".btn-share-link"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "2026 Embroidery Quote Builder - Garments & Caps | Northwest Custom Apparel",
+      "url": "/quote-builders/embroidery-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Screen Print DTF Transfers DTG (1st product only)",
+        "order-recap": "ORDER AT A GLANCE Customer Example Customer",
+        "po-number": "",
+        "date-order-placed": "",
+        "req-ship-date": "",
+        "drop-dead-date": "",
+        "payment-terms": "",
+        "order-number": "",
+        "invoice-subtotal-display": "$960.00",
+        "it-shipping-amt": "Customer Pickup",
+        "include-tax": "",
+        "tax-label": "Sales Tax (10.1%)",
+        "tax-rate-input": "",
+        "tax-amount": "$96.96",
+        "wholesale-checkbox": "",
+        "grand-total-with-tax": "$1056.96",
+        "push-readiness": "BEFORE YOU PUSH ShopWorks Customer # At least one item Customer name Customer email",
+        "emb-push-shopworks-label": "Push to ShopWorks",
+        "sidebar-resize-handle": "",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "products-label": "Products (Base 8K):",
+        "subtotal": "$960.00",
+        "per-unit-price": "$20.00/piece",
+        "additional-logos-pricing": "",
+        "cap-additional-logos-pricing": "",
+        "sidebar-grand-total": "$1056.96",
+        "toast-container": "",
+        "floatingQuoteBtn": "✨ Ask"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "po-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "date-order-placed",
+          "name": "",
+          "type": "date",
+          "value": "2026-09-12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "req-ship-date",
+          "name": "",
+          "type": "date",
+          "value": "2026-09-26",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "drop-dead-date",
+          "name": "",
+          "type": "date",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "payment-terms",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "order-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "include-tax",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "tax-rate-input",
+          "name": "",
+          "type": "number",
+          "value": "10.1",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "wholesale-checkbox",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".pr-ok.pr-item:nth-child(3)"
+            ],
+            [
+              ".pr-ok.pr-item:nth-child(4)"
+            ],
+            [
+              ".pr-ok.pr-item:nth-child(5)"
+            ],
+            [
+              ".btn-share-link"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "2026 Embroidery Quote Builder - Garments & Caps | Northwest Custom Apparel",
+      "url": "/quote-builders/embroidery-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Screen Print DTF Transfers DTG (1st product only)",
+        "order-recap": "ORDER AT A GLANCE Customer Example Customer",
+        "po-number": "",
+        "date-order-placed": "",
+        "req-ship-date": "",
+        "drop-dead-date": "",
+        "payment-terms": "",
+        "order-number": "",
+        "invoice-subtotal-display": "$960.00",
+        "it-shipping-amt": "Customer Pickup",
+        "include-tax": "",
+        "tax-label": "Sales Tax (10.1%)",
+        "tax-rate-input": "",
+        "tax-amount": "$96.96",
+        "wholesale-checkbox": "",
+        "grand-total-with-tax": "$1056.96",
+        "push-readiness": "BEFORE YOU PUSH ShopWorks Customer # At least one item Customer name Customer email",
+        "emb-push-shopworks-label": "Push to ShopWorks",
+        "sidebar-resize-handle": "",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "products-label": "Products (Base 8K):",
+        "subtotal": "$960.00",
+        "per-unit-price": "$20.00/piece",
+        "additional-logos-pricing": "",
+        "cap-additional-logos-pricing": "",
+        "sidebar-grand-total": "$1056.96",
+        "toast-container": "",
+        "floatingQuoteBtn": "✨ Ask"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "po-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "date-order-placed",
+          "name": "",
+          "type": "date",
+          "value": "2026-09-12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "req-ship-date",
+          "name": "",
+          "type": "date",
+          "value": "2026-09-26",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "drop-dead-date",
+          "name": "",
+          "type": "date",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "payment-terms",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "order-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "include-tax",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "tax-rate-input",
+          "name": "",
+          "type": "number",
+          "value": "10.1",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "wholesale-checkbox",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".pr-ok.pr-item:nth-child(3)"
+            ],
+            [
+              ".pr-ok.pr-item:nth-child(4)"
+            ],
+            [
+              ".pr-ok.pr-item:nth-child(5)"
+            ],
+            [
+              ".btn-share-link"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "2026 Embroidery Quote Builder - Garments & Caps | Northwest Custom Apparel",
+      "url": "/quote-builders/embroidery-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Screen Print DTF Transfers DTG (1st product only)",
+        "order-recap": "ORDER AT A GLANCE Customer Example Customer",
+        "po-number": "",
+        "date-order-placed": "",
+        "req-ship-date": "",
+        "drop-dead-date": "",
+        "payment-terms": "",
+        "order-number": "",
+        "invoice-subtotal-display": "$960.00",
+        "it-shipping-amt": "Customer Pickup",
+        "include-tax": "",
+        "tax-label": "Sales Tax (10.1%)",
+        "tax-rate-input": "",
+        "tax-amount": "$96.96",
+        "wholesale-checkbox": "",
+        "grand-total-with-tax": "$1056.96",
+        "push-readiness": "BEFORE YOU PUSH ShopWorks Customer # At least one item Customer name Customer email",
+        "emb-push-shopworks-label": "Push to ShopWorks",
+        "sidebar-resize-handle": "",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "products-label": "Products (Base 8K):",
+        "subtotal": "$960.00",
+        "per-unit-price": "$20.00/piece",
+        "additional-logos-pricing": "",
+        "cap-additional-logos-pricing": "",
+        "sidebar-grand-total": "$1056.96",
+        "toast-container": "Error saving quote: Session save failed: {\"error\":\"Synthetic save failure\"}",
+        "floatingQuoteBtn": "✨ Ask"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "po-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "date-order-placed",
+          "name": "",
+          "type": "date",
+          "value": "2026-09-12",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "req-ship-date",
+          "name": "",
+          "type": "date",
+          "value": "2026-09-26",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "drop-dead-date",
+          "name": "",
+          "type": "date",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "payment-terms",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "order-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "include-tax",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "tax-rate-input",
+          "name": "",
+          "type": "number",
+          "value": "10.1",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "wholesale-checkbox",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".pr-ok.pr-item:nth-child(3)"
+            ],
+            [
+              ".pr-ok.pr-item:nth-child(4)"
+            ],
+            [
+              ".pr-ok.pr-item:nth-child(5)"
+            ],
+            [
+              ".btn-share-link"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "mutations": [
+    {
+      "path": "/api/quote_sessions",
+      "method": "POST",
+      "body": {
+        "QuoteID": "EMB-2026-777",
+        "SessionID": "synthetic-session",
+        "CustomerEmail": "customer@example.invalid",
+        "CustomerName": "Example Customer",
+        "CompanyName": "Not Provided",
+        "SalesRepEmail": "sales@nwcustomapparel.com",
+        "SalesRepName": "General Sales",
+        "TotalQuantity": 48,
+        "SubtotalAmount": 960,
+        "LTMFeeTotal": 0,
+        "TotalAmount": 960,
+        "Status": "Open",
+        "CreatedAt_Quote": "2026-09-12T18:30:00",
+        "ExpiresAt": "2026-10-12T18:30:00",
+        "Notes": "",
+        "PrintLocation": "Left Chest",
+        "StitchCount": 8000,
+        "DigitizingFee": 0,
+        "AdditionalLogoLocation": "",
+        "AdditionalStitchCount": 0,
+        "CapPrintLocation": "",
+        "CapStitchCount": 0,
+        "CapDigitizingFee": 0,
+        "CapEmbellishmentType": "embroidery",
+        "GarmentStitchCharge": 0,
+        "CapStitchCharge": 0,
+        "AdditionalStitchCharge": 0,
+        "ALChargeGarment": 0,
+        "ALChargeCap": 0,
+        "ALGarmentQty": 48,
+        "ALCapQty": 0,
+        "ALGarmentUnitPrice": 0,
+        "ALCapUnitPrice": 0,
+        "ALGarmentDesc": "",
+        "ALCapDesc": "",
+        "GarmentDigitizing": 0,
+        "CapDigitizing": 0,
+        "AdditionalStitchUnitPrice": 0,
+        "ArtCharge": 0,
+        "GraphicDesignHours": 0,
+        "GraphicDesignCharge": 0,
+        "RushFee": 0,
+        "SampleFee": 0,
+        "SampleQty": 1,
+        "LTM_Garment": 0,
+        "LTM_Cap": 0,
+        "Discount": 0,
+        "DiscountPercent": 0,
+        "DiscountReason": "",
+        "Phone": "",
+        "OrderNumber": "",
+        "CustomerNumber": "",
+        "ProjectName": "",
+        "PurchaseOrderNumber": "",
+        "ShipToAddress": "",
+        "ShipToCity": "Milton",
+        "ShipToState": "WA",
+        "ShipToZip": "98354",
+        "ShipMethod": "Customer Pickup",
+        "DateOrderPlaced": "2026-09-12T07:00:00.000Z",
+        "ReqShipDate": "2026-09-26T07:00:00.000Z",
+        "DropDeadDate": null,
+        "PaymentTerms": "",
+        "DesignNumbers": "[]",
+        "DigitizingCodes": "",
+        "TaxRate": 0.10099999999999999,
+        "TaxAmount": 96.96,
+        "IsWholesale": "No",
+        "ImportNotes": "{\"importNotes\":[],\"referenceArtwork\":[],\"newDesignName\":\"\"}",
+        "PaidToDate": 0,
+        "BalanceAmount": 0,
+        "OrderNotes": "",
+        "SWTotal": 0,
+        "SWSubtotal": 0,
+        "PriceAuditJSON": "",
+        "Carrier": "",
+        "TrackingNumber": "",
+        "GarmentDesignNumber": "",
+        "CapDesignNumber": "",
+        "LTM_Display_Mode": "builtin",
+        "LTM_Waived": false
+      }
+    },
+    {
+      "path": "/api/quote_sessions",
+      "method": "POST",
+      "body": {
+        "QuoteID": "EMB-2026-777",
+        "SessionID": "synthetic-session",
+        "CustomerEmail": "customer@example.invalid",
+        "CustomerName": "Example Customer",
+        "CompanyName": "Not Provided",
+        "SalesRepEmail": "sales@nwcustomapparel.com",
+        "SalesRepName": "General Sales",
+        "TotalQuantity": 48,
+        "SubtotalAmount": 960,
+        "LTMFeeTotal": 0,
+        "TotalAmount": 960,
+        "Status": "Open",
+        "CreatedAt_Quote": "2026-09-12T18:30:00",
+        "ExpiresAt": "2026-10-12T18:30:00",
+        "Notes": "",
+        "PrintLocation": "Left Chest",
+        "StitchCount": 8000,
+        "DigitizingFee": 0,
+        "AdditionalLogoLocation": "",
+        "AdditionalStitchCount": 0,
+        "CapPrintLocation": "",
+        "CapStitchCount": 0,
+        "CapDigitizingFee": 0,
+        "CapEmbellishmentType": "embroidery",
+        "GarmentStitchCharge": 0,
+        "CapStitchCharge": 0,
+        "AdditionalStitchCharge": 0,
+        "ALChargeGarment": 0,
+        "ALChargeCap": 0,
+        "ALGarmentQty": 48,
+        "ALCapQty": 0,
+        "ALGarmentUnitPrice": 0,
+        "ALCapUnitPrice": 0,
+        "ALGarmentDesc": "",
+        "ALCapDesc": "",
+        "GarmentDigitizing": 0,
+        "CapDigitizing": 0,
+        "AdditionalStitchUnitPrice": 0,
+        "ArtCharge": 0,
+        "GraphicDesignHours": 0,
+        "GraphicDesignCharge": 0,
+        "RushFee": 0,
+        "SampleFee": 0,
+        "SampleQty": 1,
+        "LTM_Garment": 0,
+        "LTM_Cap": 0,
+        "Discount": 0,
+        "DiscountPercent": 0,
+        "DiscountReason": "",
+        "Phone": "",
+        "OrderNumber": "",
+        "CustomerNumber": "",
+        "ProjectName": "",
+        "PurchaseOrderNumber": "",
+        "ShipToAddress": "",
+        "ShipToCity": "Milton",
+        "ShipToState": "WA",
+        "ShipToZip": "98354",
+        "ShipMethod": "Customer Pickup",
+        "DateOrderPlaced": "2026-09-12T07:00:00.000Z",
+        "ReqShipDate": "2026-09-26T07:00:00.000Z",
+        "DropDeadDate": null,
+        "PaymentTerms": "",
+        "DesignNumbers": "[]",
+        "DigitizingCodes": "",
+        "TaxRate": 0.10099999999999999,
+        "TaxAmount": 96.96,
+        "IsWholesale": "No",
+        "ImportNotes": "{\"importNotes\":[],\"referenceArtwork\":[],\"newDesignName\":\"\"}",
+        "PaidToDate": 0,
+        "BalanceAmount": 0,
+        "OrderNotes": "",
+        "SWTotal": 0,
+        "SWSubtotal": 0,
+        "PriceAuditJSON": "",
+        "Carrier": "",
+        "TrackingNumber": "",
+        "GarmentDesignNumber": "",
+        "CapDesignNumber": "",
+        "LTM_Display_Mode": "builtin",
+        "LTM_Waived": false
+      }
+    },
+    {
+      "path": "/api/quote_sessions",
+      "method": "POST",
+      "body": {
+        "QuoteID": "EMB-2026-777",
+        "SessionID": "synthetic-session",
+        "CustomerEmail": "customer@example.invalid",
+        "CustomerName": "Example Customer",
+        "CompanyName": "Not Provided",
+        "SalesRepEmail": "sales@nwcustomapparel.com",
+        "SalesRepName": "General Sales",
+        "TotalQuantity": 48,
+        "SubtotalAmount": 960,
+        "LTMFeeTotal": 0,
+        "TotalAmount": 960,
+        "Status": "Open",
+        "CreatedAt_Quote": "2026-09-12T18:30:00",
+        "ExpiresAt": "2026-10-12T18:30:00",
+        "Notes": "",
+        "PrintLocation": "Left Chest",
+        "StitchCount": 8000,
+        "DigitizingFee": 0,
+        "AdditionalLogoLocation": "",
+        "AdditionalStitchCount": 0,
+        "CapPrintLocation": "",
+        "CapStitchCount": 0,
+        "CapDigitizingFee": 0,
+        "CapEmbellishmentType": "embroidery",
+        "GarmentStitchCharge": 0,
+        "CapStitchCharge": 0,
+        "AdditionalStitchCharge": 0,
+        "ALChargeGarment": 0,
+        "ALChargeCap": 0,
+        "ALGarmentQty": 48,
+        "ALCapQty": 0,
+        "ALGarmentUnitPrice": 0,
+        "ALCapUnitPrice": 0,
+        "ALGarmentDesc": "",
+        "ALCapDesc": "",
+        "GarmentDigitizing": 0,
+        "CapDigitizing": 0,
+        "AdditionalStitchUnitPrice": 0,
+        "ArtCharge": 0,
+        "GraphicDesignHours": 0,
+        "GraphicDesignCharge": 0,
+        "RushFee": 0,
+        "SampleFee": 0,
+        "SampleQty": 1,
+        "LTM_Garment": 0,
+        "LTM_Cap": 0,
+        "Discount": 0,
+        "DiscountPercent": 0,
+        "DiscountReason": "",
+        "Phone": "",
+        "OrderNumber": "",
+        "CustomerNumber": "",
+        "ProjectName": "",
+        "PurchaseOrderNumber": "",
+        "ShipToAddress": "",
+        "ShipToCity": "Milton",
+        "ShipToState": "WA",
+        "ShipToZip": "98354",
+        "ShipMethod": "Customer Pickup",
+        "DateOrderPlaced": "2026-09-12T07:00:00.000Z",
+        "ReqShipDate": "2026-09-26T07:00:00.000Z",
+        "DropDeadDate": null,
+        "PaymentTerms": "",
+        "DesignNumbers": "[]",
+        "DigitizingCodes": "",
+        "TaxRate": 0.10099999999999999,
+        "TaxAmount": 96.96,
+        "IsWholesale": "No",
+        "ImportNotes": "{\"importNotes\":[],\"referenceArtwork\":[],\"newDesignName\":\"\"}",
+        "PaidToDate": 0,
+        "BalanceAmount": 0,
+        "OrderNotes": "",
+        "SWTotal": 0,
+        "SWSubtotal": 0,
+        "PriceAuditJSON": "",
+        "Carrier": "",
+        "TrackingNumber": "",
+        "GarmentDesignNumber": "",
+        "CapDesignNumber": "",
+        "LTM_Display_Mode": "builtin",
+        "LTM_Waived": false
+      }
+    }
+  ]
+}

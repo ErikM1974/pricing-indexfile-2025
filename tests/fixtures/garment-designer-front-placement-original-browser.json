@@ -1,0 +1,172 @@
+{
+  "name": "front-placement",
+  "states": [
+    {
+      "width": 1440,
+      "title": "T-Shirt Designer — Northwest Custom Apparel",
+      "ids": {
+        "addTextBtn": "➕ Add Text",
+        "palBtn": "🎨 Shirt Color",
+        "garmentStyleSelect": "Crew Tee Polo Hoodie Long Sleeve Ladies Tee",
+        "canvasHolder": "",
+        "chooserTitle": "Front artwork placement",
+        "chooserSubtitle": "Choose a recommended front print location before you upload the artwork.",
+        "chooserBody": "Recommended small front print Left Chest Great for company logos and small marks placed in the standard left-chest area. Snaps to a recommended left-chest placement Starts at about 3.75\" wide You can still drag and resize it after upload Recommended large front print Full Front Best for centered chest artwork and larger front designs. Snaps centered on the shirt Starts at about 12\" wide You can still drag and resize it after upload"
+      },
+      "fields": [
+        {
+          "id": "garmentStyleSelect",
+          "type": "select-one",
+          "value": "tee",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/pages/mockup-library.html",
+          "text": "📚 Saved Mockups"
+        }
+      ],
+      "headings": [
+        "NWCA Easy Shirt Designer",
+        "Start with the shirt.",
+        "Add your artwork",
+        "Front artwork placement",
+        "Left Chest",
+        "Full Front"
+      ],
+      "entries": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".easy-upload-card[data-call=\"pickSide\"][data-args=\"[\\\"front\\\"]\"] > span"
+            ],
+            [
+              ".easy-upload-card[data-call=\"pickSide\"][data-args=\"[\\\"back\\\"]\"] > span"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "T-Shirt Designer — Northwest Custom Apparel",
+      "ids": {
+        "addTextBtn": "➕ Add Text",
+        "palBtn": "🎨 Shirt Color",
+        "garmentStyleSelect": "Crew Tee Polo Hoodie Long Sleeve Ladies Tee",
+        "canvasHolder": "",
+        "chooserTitle": "Front artwork placement",
+        "chooserSubtitle": "Choose a recommended front print location before you upload the artwork.",
+        "chooserBody": "Recommended small front print Left Chest Great for company logos and small marks placed in the standard left-chest area. Snaps to a recommended left-chest placement Starts at about 3.75\" wide You can still drag and resize it after upload Recommended large front print Full Front Best for centered chest artwork and larger front designs. Snaps centered on the shirt Starts at about 12\" wide You can still drag and resize it after upload"
+      },
+      "fields": [
+        {
+          "id": "garmentStyleSelect",
+          "type": "select-one",
+          "value": "tee",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/pages/mockup-library.html",
+          "text": "📚 Saved Mockups"
+        }
+      ],
+      "headings": [
+        "NWCA Easy Shirt Designer",
+        "Start with the shirt.",
+        "Add your artwork",
+        "Front artwork placement",
+        "Left Chest",
+        "Full Front"
+      ],
+      "entries": [],
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "width": 390,
+      "title": "T-Shirt Designer — Northwest Custom Apparel",
+      "ids": {
+        "addTextBtn": "➕ Add Text",
+        "palBtn": "🎨 Shirt Color",
+        "garmentStyleSelect": "Crew Tee Polo Hoodie Long Sleeve Ladies Tee",
+        "canvasHolder": "",
+        "chooserTitle": "Front artwork placement",
+        "chooserSubtitle": "Choose a recommended front print location before you upload the artwork.",
+        "chooserBody": "Recommended small front print Left Chest Great for company logos and small marks placed in the standard left-chest area. Snaps to a recommended left-chest placement Starts at about 3.75\" wide You can still drag and resize it after upload Recommended large front print Full Front Best for centered chest artwork and larger front designs. Snaps centered on the shirt Starts at about 12\" wide You can still drag and resize it after upload"
+      },
+      "fields": [
+        {
+          "id": "garmentStyleSelect",
+          "type": "select-one",
+          "value": "tee",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/pages/mockup-library.html",
+          "text": "📚 Saved Mockups"
+        }
+      ],
+      "headings": [
+        "NWCA Easy Shirt Designer",
+        "Start with the shirt.",
+        "Add your artwork",
+        "Front artwork placement",
+        "Left Chest",
+        "Full Front"
+      ],
+      "entries": [],
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "width": 320,
+      "title": "T-Shirt Designer — Northwest Custom Apparel",
+      "ids": {
+        "addTextBtn": "➕ Add Text",
+        "palBtn": "🎨 Shirt Color",
+        "garmentStyleSelect": "Crew Tee Polo Hoodie Long Sleeve Ladies Tee",
+        "canvasHolder": "",
+        "chooserTitle": "Front artwork placement",
+        "chooserSubtitle": "Choose a recommended front print location before you upload the artwork.",
+        "chooserBody": "Recommended small front print Left Chest Great for company logos and small marks placed in the standard left-chest area. Snaps to a recommended left-chest placement Starts at about 3.75\" wide You can still drag and resize it after upload Recommended large front print Full Front Best for centered chest artwork and larger front designs. Snaps centered on the shirt Starts at about 12\" wide You can still drag and resize it after upload"
+      },
+      "fields": [
+        {
+          "id": "garmentStyleSelect",
+          "type": "select-one",
+          "value": "tee",
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/pages/mockup-library.html",
+          "text": "📚 Saved Mockups"
+        }
+      ],
+      "headings": [
+        "NWCA Easy Shirt Designer",
+        "Start with the shirt.",
+        "Add your artwork",
+        "Front artwork placement",
+        "Left Chest",
+        "Full Front"
+      ],
+      "entries": [],
+      "overflow": true,
+      "violations": []
+    }
+  ],
+  "reads": [],
+  "writes": [],
+  "dialogs": []
+}

@@ -1,0 +1,550 @@
+{
+  "name": "screenprint-customer-entered",
+  "states": [
+    {
+      "width": 1440,
+      "title": "2026 Screen Print Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Embroidery DTF Transfers DTG (1st product only)",
+        "customer-lookup": "",
+        "customer-name": "",
+        "customer-email": "",
+        "company-name": "",
+        "company-name-dropdown": "Searching...",
+        "customer-number": "",
+        "sales-rep": "General Sales Bradley Wright Erik Mickelson Jim Mickelson Nika Lao Ruth Nhong Steve Deland Taneisha Clark",
+        "customer-phone": "",
+        "project-name": "",
+        "design-number": "",
+        "sidebar-resize-handle": "",
+        "sidebar-front": "Left Chest (1-color)",
+        "sidebar-screens": "1",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$576.00",
+        "per-unit-price": "$12.00/piece",
+        "sidebar-grand-total": "$667.81",
+        "toast-container": "Ready to build Screen Print quotes! Vellum rate is an estimate ($10.00) — live pricing didn't return it. Verify before saving. Color Chg rate is an estimate ($15.00) — live pricing didn't return it. Verify before saving.",
+        "qb-fallback-badge": "⚠ Estimated pricing in use: Vellum, Color Chg — live rates unavailable. Verify before sending."
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "customer-lookup",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-name",
+          "name": "",
+          "type": "text",
+          "value": "Example Customer",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-email",
+          "name": "",
+          "type": "email",
+          "value": "customer@example.invalid",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "company-name",
+          "name": "",
+          "type": "text",
+          "value": "Example Company",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "sales-rep",
+          "name": "",
+          "type": "select-one",
+          "value": "sales@nwcustomapparel.com",
+          "disabled": false
+        },
+        {
+          "id": "customer-phone",
+          "name": "",
+          "type": "tel",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "project-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "design-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ":root"
+            ],
+            [
+              ".qb-c-gray-400-fw-400"
+            ],
+            [
+              "#per-unit-price"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "2026 Screen Print Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Embroidery DTF Transfers DTG (1st product only)",
+        "customer-lookup": "",
+        "customer-name": "",
+        "customer-email": "",
+        "company-name": "",
+        "company-name-dropdown": "No customers found",
+        "customer-number": "",
+        "sales-rep": "General Sales Bradley Wright Erik Mickelson Jim Mickelson Nika Lao Ruth Nhong Steve Deland Taneisha Clark",
+        "customer-phone": "",
+        "project-name": "",
+        "design-number": "",
+        "sidebar-resize-handle": "",
+        "sidebar-front": "Left Chest (1-color)",
+        "sidebar-screens": "1",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$576.00",
+        "per-unit-price": "$12.00/piece",
+        "sidebar-grand-total": "$667.81",
+        "toast-container": "Ready to build Screen Print quotes! Vellum rate is an estimate ($10.00) — live pricing didn't return it. Verify before saving. Color Chg rate is an estimate ($15.00) — live pricing didn't return it. Verify before saving.",
+        "qb-fallback-badge": "⚠ Estimated pricing in use: Vellum, Color Chg — live rates unavailable. Verify before sending."
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "customer-lookup",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-name",
+          "name": "",
+          "type": "text",
+          "value": "Example Customer",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-email",
+          "name": "",
+          "type": "email",
+          "value": "customer@example.invalid",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "company-name",
+          "name": "",
+          "type": "text",
+          "value": "Example Company",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "sales-rep",
+          "name": "",
+          "type": "select-one",
+          "value": "sales@nwcustomapparel.com",
+          "disabled": false
+        },
+        {
+          "id": "customer-phone",
+          "name": "",
+          "type": "tel",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "project-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "design-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".customer-lookup-no-results"
+            ],
+            [
+              ".qb-c-gray-400-fw-400"
+            ],
+            [
+              "#per-unit-price"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "2026 Screen Print Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Embroidery DTF Transfers DTG (1st product only)",
+        "customer-lookup": "",
+        "customer-name": "",
+        "customer-email": "",
+        "company-name": "",
+        "company-name-dropdown": "No customers found",
+        "customer-number": "",
+        "sales-rep": "General Sales Bradley Wright Erik Mickelson Jim Mickelson Nika Lao Ruth Nhong Steve Deland Taneisha Clark",
+        "customer-phone": "",
+        "project-name": "",
+        "design-number": "",
+        "sidebar-resize-handle": "",
+        "sidebar-front": "Left Chest (1-color)",
+        "sidebar-screens": "1",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$576.00",
+        "per-unit-price": "$12.00/piece",
+        "sidebar-grand-total": "$667.81",
+        "toast-container": "Vellum rate is an estimate ($10.00) — live pricing didn't return it. Verify before saving. Color Chg rate is an estimate ($15.00) — live pricing didn't return it. Verify before saving.",
+        "qb-fallback-badge": "⚠ Estimated pricing in use: Vellum, Color Chg — live rates unavailable. Verify before sending."
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "customer-lookup",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-name",
+          "name": "",
+          "type": "text",
+          "value": "Example Customer",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-email",
+          "name": "",
+          "type": "email",
+          "value": "customer@example.invalid",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "company-name",
+          "name": "",
+          "type": "text",
+          "value": "Example Company",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "sales-rep",
+          "name": "",
+          "type": "select-one",
+          "value": "sales@nwcustomapparel.com",
+          "disabled": false
+        },
+        {
+          "id": "customer-phone",
+          "name": "",
+          "type": "tel",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "project-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "design-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".customer-lookup-no-results"
+            ],
+            [
+              ".qb-c-gray-400-fw-400"
+            ],
+            [
+              "#per-unit-price"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "2026 Screen Print Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Embroidery DTF Transfers DTG (1st product only)",
+        "customer-lookup": "",
+        "customer-name": "",
+        "customer-email": "",
+        "company-name": "",
+        "company-name-dropdown": "No customers found",
+        "customer-number": "",
+        "sales-rep": "General Sales Bradley Wright Erik Mickelson Jim Mickelson Nika Lao Ruth Nhong Steve Deland Taneisha Clark",
+        "customer-phone": "",
+        "project-name": "",
+        "design-number": "",
+        "sidebar-resize-handle": "",
+        "sidebar-front": "Left Chest (1-color)",
+        "sidebar-screens": "1",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$576.00",
+        "per-unit-price": "$12.00/piece",
+        "sidebar-grand-total": "$667.81",
+        "toast-container": "Vellum rate is an estimate ($10.00) — live pricing didn't return it. Verify before saving. Color Chg rate is an estimate ($15.00) — live pricing didn't return it. Verify before saving.",
+        "qb-fallback-badge": "⚠ Estimated pricing in use: Vellum, Color Chg — live rates unavailable. Verify before sending."
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "customer-lookup",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-name",
+          "name": "",
+          "type": "text",
+          "value": "Example Customer",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-email",
+          "name": "",
+          "type": "email",
+          "value": "customer@example.invalid",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "company-name",
+          "name": "",
+          "type": "text",
+          "value": "Example Company",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customer-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "sales-rep",
+          "name": "",
+          "type": "select-one",
+          "value": "sales@nwcustomapparel.com",
+          "disabled": false
+        },
+        {
+          "id": "customer-phone",
+          "name": "",
+          "type": "tel",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "project-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "design-number",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".customer-lookup-no-results"
+            ],
+            [
+              ".qb-c-gray-400-fw-400"
+            ],
+            [
+              "#per-unit-price"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "mutations": []
+}

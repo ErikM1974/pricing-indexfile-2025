@@ -14,7 +14,7 @@
   Files are read client-side; a mockup uploads to the proxy only
   when the AE clicks Save to Art Request (or, later, Send).
 
-  Brand colors: tweak the CSS variables in :root below.
+  Interface styling uses shared tokens; artwork colors stay in the renderer.
   ============================================================
 -->
 <!-- TODO(SRI): ag-psd is pinned to the "@27" semver RANGE, so jsdelivr serves the
@@ -25,15 +25,17 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" integrity="sha512-q+4liFwdPC/bNdhUpZx6aXDx/h77yEQtn4I1slHydcbZK34nLaR3cAeYSJshoxIOq3mjEf7xJE8YWIUHMn+oCQ==" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg==" crossorigin="anonymous"></script>
 <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-<link rel="stylesheet" href="/pages/css/garment-designer.css?v=2026.09.07.19">
-<link rel="stylesheet" href="/shared_components/css/garment-submit-form.css?v=2026.09.07.19">
+<link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.12.1">
+<link rel="stylesheet" href="/shared_components/css/utilities.css?v=2026.09.12.1">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="/pages/css/garment-designer.css?v=2026.09.13.2">
+<link rel="stylesheet" href="/shared_components/css/art-intake.css?v=2026.09.13.2">
 <!-- Text tool — curated decoration fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Archivo+Black&family=Alfa+Slab+One&family=Russo+One&family=Staatliches&family=Graduate&family=Black+Ops+One&family=Bungee&family=Pacifico&family=Great+Vibes&family=Lobster&family=Satisfy&family=Shadows+Into+Light&family=Permanent+Marker&family=Bangers&family=Oswald:wght@400;700&family=Montserrat:wght@400;700&family=Roboto+Slab:wght@400;700&family=Playfair+Display:wght@400;700&family=Merriweather:wght@400;700&family=Dancing+Script:wght@400;700&family=Caveat:wght@400;700&family=Fredoka:wght@400;700&display=swap">
-    <link rel="stylesheet" href="/shared_components/css/company-contact-picker.css?v=2026.09.07.14">
 </head>
-<body class="customer-easy clean-layout left-controls-layout">
+<body class="customer-easy clean-layout left-controls-layout" data-ui="unified" data-garment-designer>
 
 <header>
   <div class="logo-badge">NW</div>
@@ -51,7 +53,7 @@
   <aside id="sidebar">
     <div class="side-head">
       <span>Artwork</span>
-      <button class="tbtn" style="padding:3px 8px;font-size:11px;" data-call="pickFiles">+ Add</button>
+      <button class="tbtn" data-garment-add data-call="pickFiles">+ Add</button>
     </div>
     <div id="fileList"></div>
     <div id="leftControlsMount">
@@ -89,11 +91,11 @@
       <!-- SEND — appear once art exists -->
       <div class="tb-group needs-art" data-label="Send">
         <button class="easy-main-btn download" id="dlBtn" data-call="downloadPNG">⬇ Download PNG</button>
-        <button class="easy-main-btn save-req" id="saveReqBtn" data-call="saveToArtRequest" title="Attach this mockup to the art request as a reference for Steve" style="display:none;">💾 Save to Art Request</button>
+        <button class="easy-main-btn save-req" id="saveReqBtn" data-call="saveToArtRequest" title="Attach this mockup to the art request as a reference for Steve" data-initially-hidden>💾 Save to Art Request</button>
         <button class="easy-main-btn send-steve" id="sendSteveBtn" title="Forward this mockup to Steve and complete the art-submission form">🧵 Send to Steve</button>
         <button class="easy-main-btn send-customer" id="sendCustomerBtn" title="Email this mockup to the customer for approval">📧 Send to Customer</button>
       </div>
-      <div id="contrastWarn" class="contrast-warn" role="alert" style="display:none;"></div>
+      <div id="contrastWarn" class="contrast-warn" role="alert" data-initially-hidden></div>
       <div class="easy-status"><span class="easy-dot"></span><span>Start by adding front or back artwork — or drag a file anywhere on the page</span></div>
 
       <div class="easy-hidden-tools" aria-hidden="true">
@@ -105,7 +107,7 @@
         <button class="tbtn" id="flipBtn" data-call="toggleFlip">⇄</button>
         <button class="tbtn" id="knockBtn" data-call="toggleKnockout">⬜ White BG</button>
         <button class="tbtn" id="eraseBtn" data-call="toggleEraser">🧽 Erase white</button>
-        <button class="tbtn" id="eraseAllBtn" data-call="eraseAllWhite" style="display:none">Erase ALL white</button>
+        <button class="tbtn" id="eraseAllBtn" data-call="eraseAllWhite" data-initially-hidden>Erase ALL white</button>
         <span class="bgswatches" id="bgSwatches"><span class="lbl">BG:</span></span>
         <input type="color" id="bgCustom" aria-label="Custom background color" value="#3a6ea5">
         <button class="tbtn" id="eyeBtn" data-call="toggleEyedrop">💧</button>
@@ -140,7 +142,7 @@
             <div class="easy-hero-card">
               <h2>Start with the shirt.</h2>
               <p class="lead">Your mockup builds on a real shirt you can recolor, spin, and send for approval.</p>
-              <canvas id="landingPreview" style="border-radius:14px;box-shadow:0 6px 24px rgba(20,40,10,.12);"></canvas>
+              <canvas id="landingPreview" class="landing-preview"></canvas>
             </div>
             <div class="easy-hero-card">
               <h2>Add your artwork</h2>
@@ -254,9 +256,9 @@
           <div class="pc-hint">Tip: use <b>Left Chest</b> for small logos, <b>Full Front</b> for centered prints, and <b>Full Back</b> for back graphics. Transparent padding is auto-trimmed so the visible logo sizes correctly. Use Left Chest, Full Front, Upper Back, or Full Back to snap the art into place, then fine-tune if needed.</div>
         </div>
         <div class="advanced-note">Advanced file details are below. The main customer workflow is now front art, back art, shirt color, spin, and proof.</div>
-        <div class="side-head" style="border-top:1px solid var(--border);">File info</div>
+        <div class="side-head" data-file-info-heading>File info</div>
         <div class="info-rows" id="infoRows"></div>
-        <div class="info-note" id="infoNote" style="display:none;"></div>
+        <div class="info-note" id="infoNote" data-initially-hidden></div>
       </aside>
     </div>
   </div>
@@ -288,12 +290,12 @@
 
 
 <div id="artDetailsModal" class="art-details-overlay" data-call="closeArtDetails" data-self-only="1">
-  <div class="art-details-card" role="dialog" aria-modal="true">
+  <div class="art-details-card" role="dialog" aria-modal="true" aria-labelledby="artDetailsTitle">
     <div class="art-details-head">
-      <h3>Artwork Details</h3>
+      <h3 id="artDetailsTitle">Artwork Details</h3>
       <button class="art-details-close" data-call="closeArtDetails">Close</button>
     </div>
-    <div class="art-details-body" id="artDetailsBody">
+    <div class="art-details-body" id="artDetailsBody" tabindex="0" aria-label="Artwork details and print checks">
       <div class="art-details-section">
         <h4>File Info</h4>
         <div class="detail-grid" id="artDetailsInfo"></div>
@@ -312,10 +314,10 @@
 
 
 <div id="threadColorsModal" class="thread-modal-overlay" data-call="closeThreadColors" data-self-only="1">
-  <div class="thread-modal-card" role="dialog" aria-modal="true">
+  <div class="thread-modal-card" role="dialog" aria-modal="true" aria-labelledby="threadColorsTitle">
     <div class="thread-modal-head">
       <div>
-        <h3>DST Thread Colors</h3>
+        <h3 id="threadColorsTitle">DST Thread Colors</h3>
         <p>Choose Robison-Anton Poly thread colors for each DST color stop.</p>
       </div>
       <button class="thread-modal-close" data-call="closeThreadColors">Close</button>
@@ -359,13 +361,13 @@
       <button type="button" class="ds-modal-close" id="custModalClose" aria-label="Close">×</button>
     </div>
     <div class="ds-modal-body">
-      <div class="ds-field" id="custCompanyField" style="display:none;">
+      <div class="ds-field" id="custCompanyField" data-initially-hidden>
         <label for="custCompany">Company <span class="ds-req">*</span></label>
         <input type="text" id="custCompany" placeholder="Company name">
       </div>
       <div class="ds-field">
         <label for="custEmail">Customer email <span class="ds-req">*</span></label>
-        <input type="email" id="custEmail" placeholder="customer@example.com" autocomplete="off">
+        <input type="email" id="custEmail" placeholder="customer@example.com" autocomplete="off" aria-describedby="custSendError">
       </div>
       <div class="ds-field">
         <label for="custName">Customer name</label>
@@ -376,6 +378,7 @@
         <textarea id="custMessage" rows="4">Here is your mockup for review. Please click the link to approve it or request changes. Let me know if you have any questions.</textarea>
       </div>
       <div class="ds-modal-note" id="custModalNote"></div>
+      <p id="custSendError" class="designer-send-error" role="alert" hidden></p>
     </div>
     <div class="ds-modal-foot">
       <button type="button" class="ds-btn-ghost" id="custModalCancel">Cancel</button>
@@ -421,8 +424,8 @@
   <div class="tp-foot"><button type="button" class="tp-del" id="tpDelete">Delete</button><button type="button" class="tp-done" id="tpDone">Done</button></div>
 </div>
 
-<input type="file" id="fileInput" aria-label="Artwork file" multiple accept=".ai,.psd,.psb,.pdf,.eps,.cdr,.dst,image/*" style="display:none;">
-<input type="file" id="photoInput" aria-label="Photo file" accept="image/*" multiple style="display:none;">
+<input type="file" id="fileInput" aria-label="Artwork file" multiple accept=".ai,.psd,.psb,.pdf,.eps,.cdr,.dst,image/*" data-initially-hidden>
+<input type="file" id="photoInput" aria-label="Photo file" accept="image/*" multiple data-initially-hidden>
 
 <script src="/config/app.config.js"></script>
 <!-- Send-to-Customer email + Send-to-Steve art form (mirrors the AE dashboard mount) -->
@@ -437,9 +440,10 @@
 <script src="/shared_components/js/design-name-picker.js?v=2026.09.06.31"></script>
 <script src="/shared_components/js/work-order-picker.js?v=2026.09.06.31"></script>
 <script src="/shared_components/js/staff-auth-helper.js?v=2026.09.06.37"></script>
-<script src="/shared_components/js/garment-submit-form.js?v=2026.09.06.36"></script>
+<script src="/shared_components/js/garment-submit-form.js?v=2026.09.13.2"></script>
 <script src="/shared_components/js/garment-text-engine.js?v=2026.06.20.13"></script>
     <script src="/shared_components/js/data-call-delegator.js?v=2026.09.06.27"></script>
-<script src="/pages/js/garment-designer.js?v=2026.09.06.36"></script>
+<script src="/pages/js/garment-designer-ui.js?v=2026.09.13.2"></script>
+<script src="/pages/js/garment-designer.js?v=2026.09.13.2"></script>
 </body>
 </html>

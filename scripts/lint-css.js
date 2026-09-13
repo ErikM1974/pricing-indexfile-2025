@@ -15,16 +15,21 @@ const ROOT = path.resolve(__dirname, '..');
 
 /** Repo-relative globs. Widen only — never remove a file to make the lint pass. */
 const CSS_LINT_SCOPE = [
+    'shared_components/css/email-theme.css',
+    'shared_components/css/staff-print.css',
+    'shared_components/css/status-pages.css',
     'calculators/breast-cancer-awareness-bundle.css',
     'calculators/screenprint-customer/screenprint-customer-invoice.css',
     "shared_components/css/specialty-pricing.css",
     "calculators/custom-decal-pricing.css",
     "calculators/embroidered-emblem/embroidered-emblem.css",
+    "shared_components/css/specialty-assistant.css",
     'shared_components/css/crm-accounts.css',
     'shared_components/css/crm-pipeline.css',
     'shared_components/css/crm-records.css',
     'shared_components/css/personalization-workspaces.css',
     'shared_components/css/staff-toolkit.css',
+    'shared_components/css/staff-home.css',
     'shared_components/css/staff-workspaces.css',
     'shared_components/css/staff-schedules.css',
     'shared_components/css/staff-payroll.css',
@@ -216,6 +221,12 @@ const CSS_LINT_SCOPE = [
     'shared_components/css/product-thumbnail-modal.css',
     // quote builders family (2026-09-07, LAST — the money path): the builders' sheets + quote-builder-utilities.css (replaces the generated quote-builder-inline.css)
     'shared_components/css/quote-builder-shell.css',
+    'shared_components/css/quote-workspace.css',
+    'shared_components/css/quote-embroidery.css',
+    'shared_components/css/quote-screenprint.css',
+    'shared_components/css/quote-dtf.css',
+    'shared_components/css/quote-dtg.css',
+    'shared_components/css/quote-invoice.css',
     'shared_components/css/sticker-pricing-page.css',
     'shared_components/css/quote-share-modal.css',
     'shared_components/css/quote-session.css',
@@ -260,6 +271,11 @@ module.exports = { CSS_LINT_SCOPE, run };
 if (require.main === module) {
     run()
         .then((r) => {
+            if (process.argv.includes('--json')) {
+                console.log(JSON.stringify(r));
+                process.exitCode = r.errored ? 1 : 0;
+                return;
+            }
             if (r.report.trim()) console.log(r.report);
             if (r.errored) process.exit(1);
             console.log(`stylelint: ${r.files.length} file(s) in scope, all clean`);

@@ -1,0 +1,456 @@
+{
+  "name": "prototype-cap",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Decoration pricing — prototype (DTF · DTG · Embroidery) · Northwest Custom Apparel",
+      "url": "/calculators/quick-quote/dtf-prints-prototype.html",
+      "ids": {
+        "methodToggle": "DTF DTG Embroidery Screen print",
+        "style": "",
+        "styleStatus": "PC61 · base garment $3.61",
+        "color": "Jet Black Brilliant Orange",
+        "inventory": "In stock · JetBlack · 875 total S 125 M 125 L 125 XL 125 2XL 125 3XL 125 4XL 125",
+        "embTypeToggle": "Garment Cap",
+        "qty": "",
+        "printsLabel": "Logos · each priced by stitch count",
+        "printsList": "1 Cap front stitches +$13.00/pc × 2 Cap back stitches +$8.00/pc ×",
+        "addPrint": "+ Add logo",
+        "resultSub": "for 24 shirts · PC61 · Embroidery",
+        "result": "$28.00/pc $672.00 total Blank + margin $7.00/pc Cap front 8,000 st +$13.00/pc Cap back 8,000 st +$8.00/pc Price per shirt $28.00/pc Blank + each logo are rounded to $0.50, so the lines add up to the per-shirt price by hand — no separate rounding step (tier 24-47). Live embroidery rounds to the whole dollar; this prototype uses $0.50 to match the print methods.",
+        "protoMatrix": "Price by quantity · PC61 · Embroidery · your selected logos Qty Blank Front Back Small-batch Per shirt Order 12 $7.00 +$17.00 +$8.50 — $32.50 $390.00 24 $7.00 +$13.00 +$8.00 — $28.00 $672.00 48 $7.00 +$11.00 +$7.50 — $25.50 $1224.00 72 $7.00 +$9.50 +$7.50 — $24.00 $1728.00 Each row is the full per-shirt build at that quantity — blank + each logo + small-batch all add across. Click a row to make it the active quantity.",
+        "rateCardBtn": "Download rate card (PDF)"
+      },
+      "fields": [
+        {
+          "id": "style",
+          "name": "",
+          "type": "text",
+          "value": "PC61",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "color",
+          "name": "",
+          "type": "select-one",
+          "value": "JetBlack",
+          "disabled": false
+        },
+        {
+          "id": "qty",
+          "name": "",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "8000",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "8000",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/calculators/quick-quote/",
+          "text": "Quick Quote"
+        }
+      ],
+      "tables": [
+        "Qty Blank Front Back Small-batch Per shirt Order 12 $7.00 +$17.00 +$8.50 — $32.50 $390.00 24 $7.00 +$13.00 +$8.00 — $28.00 $672.00 48 $7.00 +$11.00 +$7.50 — $25.50 $1224.00 72 $7.00 +$9.50 +$7.50 — $24.00 $1728.00"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".lede"
+            ],
+            [
+              ".lede > strong:nth-child(1)"
+            ],
+            [
+              "strong:nth-child(2)"
+            ],
+            [
+              "strong:nth-child(3)"
+            ],
+            [
+              "strong:nth-child(4)"
+            ],
+            [
+              ".proto-rc-hint"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Decoration pricing — prototype (DTF · DTG · Embroidery) · Northwest Custom Apparel",
+      "url": "/calculators/quick-quote/dtf-prints-prototype.html",
+      "ids": {
+        "methodToggle": "DTF DTG Embroidery Screen print",
+        "style": "",
+        "styleStatus": "PC61 · base garment $3.61",
+        "color": "Jet Black Brilliant Orange",
+        "inventory": "In stock · JetBlack · 875 total S 125 M 125 L 125 XL 125 2XL 125 3XL 125 4XL 125",
+        "embTypeToggle": "Garment Cap",
+        "qty": "",
+        "printsLabel": "Logos · each priced by stitch count",
+        "printsList": "1 Cap front stitches +$13.00/pc × 2 Cap back stitches +$8.00/pc ×",
+        "addPrint": "+ Add logo",
+        "resultSub": "for 24 shirts · PC61 · Embroidery",
+        "result": "$28.00/pc $672.00 total Blank + margin $7.00/pc Cap front 8,000 st +$13.00/pc Cap back 8,000 st +$8.00/pc Price per shirt $28.00/pc Blank + each logo are rounded to $0.50, so the lines add up to the per-shirt price by hand — no separate rounding step (tier 24-47). Live embroidery rounds to the whole dollar; this prototype uses $0.50 to match the print methods.",
+        "protoMatrix": "Price by quantity · PC61 · Embroidery · your selected logos Qty Blank Front Back Small-batch Per shirt Order 12 $7.00 +$17.00 +$8.50 — $32.50 $390.00 24 $7.00 +$13.00 +$8.00 — $28.00 $672.00 48 $7.00 +$11.00 +$7.50 — $25.50 $1224.00 72 $7.00 +$9.50 +$7.50 — $24.00 $1728.00 Each row is the full per-shirt build at that quantity — blank + each logo + small-batch all add across. Click a row to make it the active quantity.",
+        "rateCardBtn": "Download rate card (PDF)"
+      },
+      "fields": [
+        {
+          "id": "style",
+          "name": "",
+          "type": "text",
+          "value": "PC61",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "color",
+          "name": "",
+          "type": "select-one",
+          "value": "JetBlack",
+          "disabled": false
+        },
+        {
+          "id": "qty",
+          "name": "",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "8000",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "8000",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/calculators/quick-quote/",
+          "text": "Quick Quote"
+        }
+      ],
+      "tables": [
+        "Qty Blank Front Back Small-batch Per shirt Order 12 $7.00 +$17.00 +$8.50 — $32.50 $390.00 24 $7.00 +$13.00 +$8.00 — $28.00 $672.00 48 $7.00 +$11.00 +$7.50 — $25.50 $1224.00 72 $7.00 +$9.50 +$7.50 — $24.00 $1728.00"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".lede"
+            ],
+            [
+              ".lede > strong:nth-child(1)"
+            ],
+            [
+              "strong:nth-child(2)"
+            ],
+            [
+              "strong:nth-child(3)"
+            ],
+            [
+              "strong:nth-child(4)"
+            ],
+            [
+              ".proto-rc-hint"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "Decoration pricing — prototype (DTF · DTG · Embroidery) · Northwest Custom Apparel",
+      "url": "/calculators/quick-quote/dtf-prints-prototype.html",
+      "ids": {
+        "methodToggle": "DTF DTG Embroidery Screen print",
+        "style": "",
+        "styleStatus": "PC61 · base garment $3.61",
+        "color": "Jet Black Brilliant Orange",
+        "inventory": "In stock · JetBlack · 875 total S 125 M 125 L 125 XL 125 2XL 125 3XL 125 4XL 125",
+        "embTypeToggle": "Garment Cap",
+        "qty": "",
+        "printsLabel": "Logos · each priced by stitch count",
+        "printsList": "1 Cap front stitches +$13.00/pc × 2 Cap back stitches +$8.00/pc ×",
+        "addPrint": "+ Add logo",
+        "resultSub": "for 24 shirts · PC61 · Embroidery",
+        "result": "$28.00/pc $672.00 total Blank + margin $7.00/pc Cap front 8,000 st +$13.00/pc Cap back 8,000 st +$8.00/pc Price per shirt $28.00/pc Blank + each logo are rounded to $0.50, so the lines add up to the per-shirt price by hand — no separate rounding step (tier 24-47). Live embroidery rounds to the whole dollar; this prototype uses $0.50 to match the print methods.",
+        "protoMatrix": "Price by quantity · PC61 · Embroidery · your selected logos Qty Blank Front Back Small-batch Per shirt Order 12 $7.00 +$17.00 +$8.50 — $32.50 $390.00 24 $7.00 +$13.00 +$8.00 — $28.00 $672.00 48 $7.00 +$11.00 +$7.50 — $25.50 $1224.00 72 $7.00 +$9.50 +$7.50 — $24.00 $1728.00 Each row is the full per-shirt build at that quantity — blank + each logo + small-batch all add across. Click a row to make it the active quantity.",
+        "rateCardBtn": "Download rate card (PDF)"
+      },
+      "fields": [
+        {
+          "id": "style",
+          "name": "",
+          "type": "text",
+          "value": "PC61",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "color",
+          "name": "",
+          "type": "select-one",
+          "value": "JetBlack",
+          "disabled": false
+        },
+        {
+          "id": "qty",
+          "name": "",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "8000",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "8000",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/calculators/quick-quote/",
+          "text": "Quick Quote"
+        }
+      ],
+      "tables": [
+        "Qty Blank Front Back Small-batch Per shirt Order 12 $7.00 +$17.00 +$8.50 — $32.50 $390.00 24 $7.00 +$13.00 +$8.00 — $28.00 $672.00 48 $7.00 +$11.00 +$7.50 — $25.50 $1224.00 72 $7.00 +$9.50 +$7.50 — $24.00 $1728.00"
+      ],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".lede"
+            ],
+            [
+              ".lede > strong:nth-child(1)"
+            ],
+            [
+              "strong:nth-child(2)"
+            ],
+            [
+              "strong:nth-child(3)"
+            ],
+            [
+              "strong:nth-child(4)"
+            ],
+            [
+              ".proto-rc-hint"
+            ]
+          ]
+        },
+        {
+          "id": "scrollable-region-focusable",
+          "nodes": [
+            [
+              ".proto-mx-scroll"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "Decoration pricing — prototype (DTF · DTG · Embroidery) · Northwest Custom Apparel",
+      "url": "/calculators/quick-quote/dtf-prints-prototype.html",
+      "ids": {
+        "methodToggle": "DTF DTG Embroidery Screen print",
+        "style": "",
+        "styleStatus": "PC61 · base garment $3.61",
+        "color": "Jet Black Brilliant Orange",
+        "inventory": "In stock · JetBlack · 875 total S 125 M 125 L 125 XL 125 2XL 125 3XL 125 4XL 125",
+        "embTypeToggle": "Garment Cap",
+        "qty": "",
+        "printsLabel": "Logos · each priced by stitch count",
+        "printsList": "1 Cap front stitches +$13.00/pc × 2 Cap back stitches +$8.00/pc ×",
+        "addPrint": "+ Add logo",
+        "resultSub": "for 24 shirts · PC61 · Embroidery",
+        "result": "$28.00/pc $672.00 total Blank + margin $7.00/pc Cap front 8,000 st +$13.00/pc Cap back 8,000 st +$8.00/pc Price per shirt $28.00/pc Blank + each logo are rounded to $0.50, so the lines add up to the per-shirt price by hand — no separate rounding step (tier 24-47). Live embroidery rounds to the whole dollar; this prototype uses $0.50 to match the print methods.",
+        "protoMatrix": "Price by quantity · PC61 · Embroidery · your selected logos Qty Blank Front Back Small-batch Per shirt Order 12 $7.00 +$17.00 +$8.50 — $32.50 $390.00 24 $7.00 +$13.00 +$8.00 — $28.00 $672.00 48 $7.00 +$11.00 +$7.50 — $25.50 $1224.00 72 $7.00 +$9.50 +$7.50 — $24.00 $1728.00 Each row is the full per-shirt build at that quantity — blank + each logo + small-batch all add across. Click a row to make it the active quantity.",
+        "rateCardBtn": "Download rate card (PDF)"
+      },
+      "fields": [
+        {
+          "id": "style",
+          "name": "",
+          "type": "text",
+          "value": "PC61",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "color",
+          "name": "",
+          "type": "select-one",
+          "value": "JetBlack",
+          "disabled": false
+        },
+        {
+          "id": "qty",
+          "name": "",
+          "type": "number",
+          "value": "24",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "8000",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "8000",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "/calculators/quick-quote/",
+          "text": "Quick Quote"
+        }
+      ],
+      "tables": [
+        "Qty Blank Front Back Small-batch Per shirt Order 12 $7.00 +$17.00 +$8.50 — $32.50 $390.00 24 $7.00 +$13.00 +$8.00 — $28.00 $672.00 48 $7.00 +$11.00 +$7.50 — $25.50 $1224.00 72 $7.00 +$9.50 +$7.50 — $24.00 $1728.00"
+      ],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".lede"
+            ],
+            [
+              ".lede > strong:nth-child(1)"
+            ],
+            [
+              "strong:nth-child(2)"
+            ],
+            [
+              "strong:nth-child(3)"
+            ],
+            [
+              "strong:nth-child(4)"
+            ],
+            [
+              ".proto-rc-hint"
+            ]
+          ]
+        },
+        {
+          "id": "scrollable-region-focusable",
+          "nodes": [
+            [
+              ".proto-mx-scroll"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "reads": [
+    {
+      "path": "/api/pricing-bundle",
+      "query": "?method=DTF&styleNumber=PC61"
+    },
+    {
+      "path": "/api/product-colors",
+      "query": "?styleNumber=PC61"
+    },
+    {
+      "path": "/api/inventory",
+      "query": "?styleNumber=PC61&color=JetBlack"
+    },
+    {
+      "path": "/api/pricing-bundle",
+      "query": "?method=EMB&styleNumber=PC61"
+    },
+    {
+      "path": "/api/pricing-bundle",
+      "query": "?method=EMB-AL&styleNumber=PC61"
+    },
+    {
+      "path": "/api/pricing-bundle",
+      "query": "?method=CAP&styleNumber=PC61"
+    },
+    {
+      "path": "/api/pricing-bundle",
+      "query": "?method=CAP-AL&styleNumber=PC61"
+    }
+  ],
+  "dialogs": []
+}

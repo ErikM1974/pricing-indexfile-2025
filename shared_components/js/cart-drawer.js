@@ -405,9 +405,11 @@ class CartDrawer {
         cartdrawLog('[CartDrawer] Removing item at index:', index);
 
         if (window.sampleCart) {
-            window.sampleCart.removeSample(index);
+            // The cart service owns the removal notification.
+            if (!window.sampleCart.removeSample(index)) return;
             this.updateCartDisplay();
-            this.showSuccessMessage('Item removed from cart');
+            const remaining = document.querySelectorAll('.cart-item-remove');
+            (remaining[Math.min(index, remaining.length - 1)] || document.getElementById('drawer-close')).focus();
         }
     }
 
@@ -421,25 +423,7 @@ class CartDrawer {
         window.location.href = '/pages/sample-cart.html';
     }
 
-    showSuccessMessage(message) {
-        // Create toast notification
-        const toast = document.createElement('div');
-        toast.className = 'drawer-toast';
-        toast.innerHTML = `
-            <i class="fas fa-check-circle" aria-hidden="true"></i>
-            <span>${message}</span>
-        `;
-        document.body.appendChild(toast);
-
-        // Show toast
-        setTimeout(() => toast.classList.add('show'), 100);
-
-        // Hide and remove after 3 seconds
-        setTimeout(() => {
-            toast.classList.remove('show');
-            setTimeout(() => toast.remove(), 300);
-        }, 3000);
-    }
+    // Notifications are rendered by SampleCart so they share one accessible owner.
 }
 
 // Initialize drawer on page load

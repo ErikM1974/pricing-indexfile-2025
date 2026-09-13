@@ -1,0 +1,132 @@
+{
+  "name": "screenprint-fast-save-failure",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Fast Screen Print Quote | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-fast-quote.html",
+      "ids": {
+        "displayQuoteId": "SPC-2026-777",
+        "confirmEmail": "customer@example.invalid"
+      },
+      "fields": [],
+      "links": [],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".quote-id-label"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "Fast Screen Print Quote | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-fast-quote.html",
+      "ids": {
+        "displayQuoteId": "SPC-2026-777",
+        "confirmEmail": "customer@example.invalid"
+      },
+      "fields": [],
+      "links": [],
+      "tables": [],
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "width": 390,
+      "title": "Fast Screen Print Quote | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-fast-quote.html",
+      "ids": {
+        "displayQuoteId": "SPC-2026-777",
+        "confirmEmail": "customer@example.invalid"
+      },
+      "fields": [],
+      "links": [],
+      "tables": [],
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "width": 320,
+      "title": "Fast Screen Print Quote | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-fast-quote.html",
+      "ids": {
+        "displayQuoteId": "SPC-2026-777",
+        "confirmEmail": "customer@example.invalid"
+      },
+      "fields": [],
+      "links": [],
+      "tables": [],
+      "overflow": false,
+      "violations": []
+    }
+  ],
+  "mutations": [
+    {
+      "path": "/api/quote_sessions",
+      "method": "POST",
+      "body": {
+        "QuoteID": "SPC-2026-777",
+        "SessionID": "synthetic-session",
+        "CustomerEmail": "customer@example.invalid",
+        "CustomerName": "Example Customer",
+        "CompanyName": "Example Company",
+        "Phone": "2535550100",
+        "TotalQuantity": 48,
+        "SubtotalAmount": 0,
+        "TotalAmount": 0,
+        "Status": "Fast Quote Request",
+        "ExpiresAt": "2026-10-12T18:30:00",
+        "Notes": "FAST QUOTE REQUEST\nQuantity: 48-71\nPrint Locations: 2\nColors Per Location: 3-4\nTarget Deadline: 2026-10-01\nCustomer Notes: Example team project. Please confirm artwork placement."
+      }
+    },
+    {
+      "path": "emailjs",
+      "method": "POST",
+      "body": {
+        "template_id": "template_fastquote_customer",
+        "template_params": {
+          "to_email": "customer@example.invalid",
+          "to_name": "Example Customer",
+          "quote_id": "SPC-2026-777",
+          "customer_name": "Example Customer",
+          "company_name": "Example Company",
+          "quantity": "48-71",
+          "locations": "2",
+          "colors": "3-4",
+          "deadline": "2026-10-01",
+          "notes": "Example team project. Please confirm artwork placement.",
+          "company_phone": "253-922-5793",
+          "company_email": "sales@nwcustomapparel.com"
+        }
+      }
+    },
+    {
+      "path": "emailjs",
+      "method": "POST",
+      "body": {
+        "template_id": "template_fastquote_sales",
+        "template_params": {
+          "to_email": "sales@nwcustomapparel.com",
+          "quote_id": "SPC-2026-777",
+          "customer_name": "Example Customer",
+          "customer_email": "customer@example.invalid",
+          "customer_phone": "2535550100",
+          "company_name": "Example Company",
+          "quantity": "48-71",
+          "locations": "2",
+          "colors": "3-4",
+          "deadline": "2026-10-01",
+          "notes": "Example team project. Please confirm artwork placement.",
+          "submitted_date": "9/12/2026, 11:30:00 AM"
+        }
+      }
+    }
+  ]
+}
