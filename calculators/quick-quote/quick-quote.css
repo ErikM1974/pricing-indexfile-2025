@@ -118,12 +118,6 @@
         color: var(--color-danger-ink);
     }
 
-    :where([data-ui="unified"][data-quick-quote]) .qq-banner--warn {
-        background: var(--color-warning-bg);
-        border: 1px solid var(--amber-300);
-        color: var(--color-warning-ink);
-    }
-
     :where([data-ui="unified"][data-quick-quote]) .qq-grid {
         display: grid;
         grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
@@ -146,13 +140,19 @@
     }
 
     :where([data-ui="unified"][data-quick-quote]) .qq-results {
-        position: static;
+        position: sticky;
+        top: var(--space-4);
         min-width: 0;
+        max-height: calc(100vh - 120px);
+        overflow: auto;
+        scrollbar-gutter: stable;
     }
 
     @media (width <= 820px) {
         :where([data-ui="unified"][data-quick-quote]) .qq-results {
             position: static;
+            max-height: none;
+            overflow: visible;
         }
     }
 
@@ -371,90 +371,8 @@
         gap: 8px;
     }
 
-    :where([data-ui="unified"][data-quick-quote]) .qq-chip {
-        display: flex;
-        flex-direction: column;
-        gap: 1px;
-        border: 1px solid var(--ui-line-strong);
-        border-radius: 10px;
-        padding: 8px 14px;
-        background: var(--ui-surface);
-        cursor: pointer;
-        font-family: inherit;
-        text-align: left;
-        min-width: 96px;
-        transition:
-            border-color 0.12s,
-            background 0.12s;
-    }
-
-    :where([data-ui="unified"][data-quick-quote]) .qq-chip:hover {
-        border-color: var(--ui-accent);
-    }
-
-    :where([data-ui="unified"][data-quick-quote]) .qq-chip .t {
-        font-size: 13.5px;
-        font-weight: 500;
-    }
-
-    :where([data-ui="unified"][data-quick-quote]) .qq-chip .s {
-        font-size: 11px;
-        color: var(--ui-muted);
-    }
-
-    :where([data-ui="unified"][data-quick-quote]) .qq-chip.is-active {
-        border-color: var(--ui-accent);
-        background: var(--ui-tint);
-        box-shadow: 0 0 0 1px var(--ui-accent) inset;
-    }
-
-    :where([data-ui="unified"][data-quick-quote]) .qq-advanced {
-        margin-top: 18px;
-        border-top: 1px solid var(--ui-line);
-        padding-top: 14px;
-    }
-
-    :where([data-ui="unified"][data-quick-quote]) .qq-advanced > summary {
-        font-size: 13.5px;
-        font-weight: 500;
-        color: var(--ui-accent-hover);
-        cursor: pointer;
-        list-style: none;
-    }
-
-    :where([data-ui="unified"][data-quick-quote]) .qq-advanced > summary::-webkit-details-marker {
-        display: none;
-    }
-
-    :where([data-ui="unified"][data-quick-quote]) .qq-advanced > summary::before {
-        content: "▸ ";
-        color: var(--ui-accent);
-    }
-
-    :where([data-ui="unified"][data-quick-quote]) .qq-advanced[open] > summary::before {
-        content: "▾ ";
-    }
-
     :where([data-ui="unified"][data-quick-quote]) .qq-adv-group {
         margin-top: 14px;
-    }
-
-    :where([data-ui="unified"][data-quick-quote]) .qq-adv-title {
-        font-size: 12px;
-        text-transform: uppercase;
-        letter-spacing: 0.03em;
-        color: var(--ui-muted);
-        margin-bottom: 8px;
-    }
-
-    :where([data-ui="unified"][data-quick-quote]) .qq-adv-row {
-        display: flex;
-        gap: 12px;
-    }
-
-    :where([data-ui="unified"][data-quick-quote]) .qq-adv-row .field {
-        flex: 1;
-        margin-bottom: 10px;
     }
 
     :where([data-ui="unified"][data-quick-quote]) .qq-check {
@@ -593,8 +511,7 @@
         background: var(--ui-surface);
     }
 
-    :where([data-ui="unified"][data-quick-quote]) .qq-card.is-best,
-    :where([data-ui="unified"][data-quick-quote]) .qq-card.is-selected {
+    :where([data-ui="unified"][data-quick-quote]) :is(.qq-card.is-best, .qq-card.is-selected) {
         border-color: var(--ui-line);
         border-left: 3px solid var(--ui-accent);
         padding-left: 13px;
@@ -809,8 +726,7 @@
         font-size: 13px;
     }
 
-    :where([data-ui="unified"][data-quick-quote]) table.qq-matrix th,
-    :where([data-ui="unified"][data-quick-quote]) table.qq-matrix td {
+    :where([data-ui="unified"][data-quick-quote]) :is(table.qq-matrix th, table.qq-matrix td) {
         padding: 8px 6px;
         text-align: center;
         border-top: 1px solid var(--ui-line);
@@ -1068,7 +984,7 @@
         margin: var(--space-3) 0 var(--space-4);
     }
 
-    :where([data-ui="unified"][data-quick-quote]) .qq-qty-presets button {
+    :where([data-ui="unified"][data-quick-quote]) :is(.qq-qty-presets button, .qq-place-presets button) {
         font-size: 12px;
         padding: 4px 12px;
         border: 1px solid var(--ui-line-strong);
@@ -1134,7 +1050,6 @@
     }
 
     :where([data-ui="unified"][data-quick-quote]) .qq-swatch:focus-visible,
-    :where([data-ui="unified"][data-quick-quote]) .qq-chip:focus-visible,
     :where([data-ui="unified"][data-quick-quote]) .qq-qty-presets button:focus-visible {
         outline: 2px solid var(--ui-accent);
         outline-offset: 2px;
@@ -1145,8 +1060,7 @@
             animation: none;
         }
 
-        :where([data-ui="unified"][data-quick-quote]) .qq-swatch,
-        :where([data-ui="unified"][data-quick-quote]) .qq-example-thumb {
+        :where([data-ui="unified"][data-quick-quote]) :is(.qq-swatch, .qq-example-thumb) {
             transition: none;
         }
     }
@@ -1156,17 +1070,6 @@
         flex-wrap: wrap;
         gap: 6px;
         margin: 0 0 10px;
-    }
-
-    :where([data-ui="unified"][data-quick-quote]) .qq-place-presets button {
-        font-size: 12px;
-        padding: 4px 12px;
-        border: 1px solid var(--ui-line-strong);
-        border-radius: 7px;
-        background: var(--ui-surface);
-        cursor: pointer;
-        color: var(--ui-muted);
-        font-family: inherit;
     }
 
     :where([data-ui="unified"][data-quick-quote]) .qq-place-presets button:hover {
@@ -1467,8 +1370,7 @@
         flex: none;
     }
 
-    :where([data-ui="unified"][data-quick-quote]) .qq-line-mv,
-    :where([data-ui="unified"][data-quick-quote]) .qq-line-rm {
+    :where([data-ui="unified"][data-quick-quote]) :is(.qq-line-mv, .qq-line-rm) {
         appearance: none;
         border: 1px solid var(--ui-line-strong);
         background: var(--ui-canvas);
@@ -1570,13 +1472,6 @@
         color: var(--color-danger-ink);
     }
 
-    :where([data-ui="unified"][data-quick-quote]) .qq-line-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: var(--space-2);
-        margin-top: var(--space-2);
-    }
-
     :where([data-ui="unified"][data-quick-quote]) .qq-line-hint {
         font-size: 12px;
         color: var(--ui-muted);
@@ -1587,131 +1482,143 @@
     :where([data-ui="unified"][data-quick-quote]) .qq-sheet {
         background: var(--ui-surface);
         border: 1px solid var(--ui-line);
-        border-radius: var(--radius-lg);
+        border-radius: var(--radius-md);
         padding: var(--space-5);
         color: var(--ui-ink);
         min-width: 0;
-    }
-
-    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-placeholder {
-        font-size: 13.5px;
-        color: var(--ui-muted);
-        padding: 28px 6px;
-        text-align: center;
+        overflow-wrap: anywhere;
     }
 
     :where([data-ui="unified"][data-quick-quote]) .qq-sheet-head {
         display: flex;
-        align-items: center;
-        gap: 16px;
+        justify-content: space-between;
+        align-items: start;
+        gap: var(--space-4);
         border-bottom: 2px solid var(--ui-accent);
-        padding-bottom: 12px;
-        margin-bottom: 14px;
-    }
-
-    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-logo {
-        height: 42px;
-        width: auto;
+        padding-bottom: var(--space-4);
     }
 
     :where([data-ui="unified"][data-quick-quote]) .qq-sheet-brand {
-        font-size: 16px;
+        font-size: var(--font-size-lg);
         font-weight: 700;
     }
 
-    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-sub {
-        font-size: 12px;
+    :where([data-ui="unified"][data-quick-quote]) :is(.qq-sheet-sub, .qq-document-date, .qq-document-assumptions, .qq-document-unit, .qq-sheet-foot, .qq-option-label) {
+        font-size: var(--font-size-sm);
         color: var(--ui-muted);
-        margin-top: 2px;
+        line-height: 1.6;
     }
 
-    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-body {
-        display: flex;
-        flex-direction: column;
-    }
-
-    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-item {
-        display: flex;
-        gap: 16px;
-        align-items: flex-start;
-        padding: 14px 0;
-        border-bottom: 1px solid var(--ui-line);
-    }
-
-    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-item:last-child {
-        border-bottom: 0;
-    }
-
-    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-img {
-        width: 76px;
-        height: 76px;
-        object-fit: contain;
-        border: 1px solid var(--ui-line);
-        border-radius: 7px;
-        background: var(--gray-50);
+    :where([data-ui="unified"][data-quick-quote]) .qq-document-date {
+        text-align: right;
         flex: none;
     }
 
-    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-img.is-empty {
-        display: inline-block;
+    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-item {
+        display: block;
+        padding: var(--space-5) 0;
+        border-bottom: 1px solid var(--ui-line);
+        break-inside: avoid;
     }
 
-    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-item-main {
-        flex: 1;
-        min-width: 0;
+    :where([data-ui="unified"][data-quick-quote]) :is(.qq-document-product, .qq-document-decoration) {
+        display: flex;
+        align-items: center;
+        gap: var(--space-4);
+        margin-bottom: var(--space-4);
     }
 
-    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-item-head {
-        font-size: 13.5px;
-        font-weight: 600;
-        margin-bottom: 8px;
+    :where([data-ui="unified"][data-quick-quote]) .qq-document-product h2 {
+        font-size: var(--font-size-lg);
+        line-height: 1.3;
+        margin: var(--space-1) 0;
     }
 
-    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-style {
-        font-family: var(--font-mono);
+    :where([data-ui="unified"][data-quick-quote]) :is(.qq-document-product, .qq-document-decoration) p {
+        font-size: var(--font-size-sm);
+        margin: var(--space-1) 0;
     }
 
-    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-color {
-        color: var(--ui-muted);
-        font-weight: 400;
-        margin-left: 10px;
+    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-img {
+        width: 84px;
+        height: 100px;
+        object-fit: contain;
+        flex: none;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-placement-figure {
+        color: var(--ui-accent-hover);
+        text-align: center;
+        flex: none;
+        width: 84px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-placement-figure svg {
+        width: 84px;
+        height: 55px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-placement-figure small {
+        display: block;
+        font-size: var(--font-size-xs);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-document-charges {
+        margin: var(--space-3) 0;
+        font-size: var(--font-size-sm);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-document-charges > div {
+        display: flex;
+        justify-content: space-between;
+        gap: var(--space-4);
+        padding: var(--space-2) 0;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-document-charges dd {
+        margin: 0;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-document-total {
+        border-top: 1px solid var(--ui-line);
+        font-weight: 700;
+        font-size: var(--font-size-lg);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-document-unit {
+        margin: var(--space-2) 0 var(--space-4);
     }
 
     :where([data-ui="unified"][data-quick-quote]) .qq-sheet-ladder {
         width: 100%;
         white-space: nowrap;
         border-collapse: collapse;
-        font-size: 12px;
+        font-size: var(--font-size-xs);
+        font-variant-numeric: tabular-nums;
     }
 
-    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-ladder th,
-    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-ladder td {
+    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-ladder :is(th, td) {
         border: 1px solid var(--ui-line);
-        padding: 5px 8px;
+        padding: var(--space-2);
         text-align: center;
     }
 
-    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-ladder .lbl {
+    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-ladder caption {
         text-align: left;
-        color: var(--ui-muted);
-        font-weight: 500;
+        white-space: normal;
+        padding-bottom: var(--space-2);
     }
 
-    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-ladder td {
-        font-family: var(--font-mono);
-    }
-
-    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-ladder .warn {
-        color: var(--color-warning-ink);
+    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-ladder .is-current {
+        background: var(--ui-tint);
+        color: var(--ui-accent-hover);
     }
 
     :where([data-ui="unified"][data-quick-quote]) .qq-sheet-foot {
-        margin-top: 16px;
-        padding-top: 10px;
-        border-top: 1px solid var(--ui-line);
-        font-size: 11px;
-        color: var(--ui-muted);
-        line-height: 1.5;
+        margin-top: var(--space-4);
+        padding-top: var(--space-3);
     }
 
     :where([data-ui="unified"][data-quick-quote]) .qq-sheet-ladder-wrap {
@@ -1751,11 +1658,6 @@
             min-height: 40px;
             display: inline-flex;
             align-items: center;
-        }
-
-        :where([data-ui="unified"][data-quick-quote]) .qq-chip {
-            min-height: 48px;
-            min-width: 84px;
         }
 
         :where([data-ui="unified"][data-quick-quote]) .qq-card-pp {
@@ -1910,16 +1812,7 @@
             flex-basis: 100%;
         }
 
-        :where([data-ui="unified"][data-quick-quote]) .qq-sheet-item {
-            flex-direction: column;
-        }
-
-        :where([data-ui="unified"][data-quick-quote]) .qq-sheet-item-main {
-            width: 100%;
-        }
-
-        :where([data-ui="unified"][data-quick-quote]) .qq-panel,
-        :where([data-ui="unified"][data-quick-quote]) .qq-sheet {
+        :where([data-ui="unified"][data-quick-quote]) :is(.qq-panel, .qq-sheet) {
             padding: var(--space-4);
         }
 
@@ -1929,8 +1822,7 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-        :where([data-ui="unified"][data-quick-quote]) .qq-skeleton,
-        :where([data-ui="unified"][data-quick-quote]) .qq-card {
+        :where([data-ui="unified"][data-quick-quote]) :is(.qq-skeleton, .qq-card) {
             animation: none;
         }
     }
@@ -1940,4 +1832,77 @@
     :where([data-ui="unified"][data-quick-quote]) .qq-print-summary {
         display: none;
     }
+
+    :where([data-ui="unified"][data-quick-quote]) :is(.qq-product-finder, .qq-customer-details) {
+        padding: var(--space-3) 0;
+        border-bottom: 1px solid var(--ui-line);
+        margin-bottom: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) :is(.qq-product-finder, .qq-customer-details) summary {
+        cursor: pointer;
+        font-weight: 600;
+        min-height: 44px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) :is(.qq-search-results, .qq-saved-products) {
+        display: flex;
+        gap: var(--space-2);
+        flex-wrap: wrap;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-search-results .btn {
+        width: 100%;
+        text-align: left;
+        justify-content: flex-start;
+        white-space: normal;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-saved-products > p {
+        width: 100%;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) :is(.qq-saved-product, .qq-option-control, .qq-document-toolbar, .qq-workflow-actions) {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-option-control {
+        justify-content: space-between;
+        padding: var(--space-2) 0;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-option-control .qq-check {
+        flex: 1;
+        min-width: 130px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-document-toolbar h2 {
+        font-size: var(--font-size-lg);
+        margin-right: auto;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-workflow-actions {
+        position: sticky;
+        bottom: 0;
+        z-index: 5;
+        padding: var(--space-3);
+        background: var(--ui-surface);
+        border-top: 1px solid var(--ui-line);
+        box-shadow: var(--shadow-sm);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-workflow-actions p {
+        flex: 1;
+        min-width: 180px;
+        font-size: var(--font-size-sm);
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-customer-preview {
+        scroll-margin-top: var(--space-4);
+    }
+
 }

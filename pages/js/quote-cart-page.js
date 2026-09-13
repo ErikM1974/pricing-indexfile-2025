@@ -475,17 +475,12 @@
     }
 
     function lineRowsHtml(items, gr) {
-        // Display footing: in BAKED-LTM mode the line total shown is the
-        // full-precision effective unit × qty so "each × qty = line total"
-        // reads true (it foots EXACTLY to the engine's group total because
-        // effectiveUnit carries fee/categoryQty unrounded). In itemized mode
-        // (SCP) the engine's base lineTotal is shown — the fee has its own
-        // row. Group/grand totals always come from the engine, never re-summed.
-        const baked = !!(gr && gr.ltm && gr.ltm.mode === 'baked' && gr.ltm.fee > 0);
+        // Customer lines include the engine's exact small-order share for every method.
+        // Group/grand totals remain authoritative engine values.
         return items.map(function (item) {
             const lines = gr ? gr.lines.filter(function (l) { return l.itemId === item.id; }) : [];
             const effTotal = lines.reduce(function (s, l) { return s + l.effectiveUnit * l.qty; }, 0);
-            const lineTotal = baked ? effTotal : lines.reduce(function (s, l) { return s + l.lineTotal; }, 0);
+            const lineTotal = effTotal;
             const qty = Number(item.qty) || 0;
             // Per-piece effective (LTM share included) — display only.
             let perPiece = null;
@@ -536,8 +531,9 @@
         }
 
         // Order-level fees (SCP screen setup + itemized small-order fee)
-        if ((gr.fees || []).length) {
-            rows.push('<div class="qc-fees">' + gr.fees.map(function (f) {
+        const separateFees = (gr.fees || []).filter(function (f) { return f.code !== 'LTM'; });
+        if (separateFees.length) {
+            rows.push('<div class="qc-fees">' + separateFees.map(function (f) {
                 return '<div class="qc-fee-row"><span>' + escapeHtml(f.label)
                     + (f.oneTime ? ' <em>(one-time)</em>' : '') + '</span>'
                     + '<span class="num">' + formatPrice(f.amount) + '</span></div>';
@@ -546,10 +542,8 @@
 
         // Honest small-batch line (baked modes — the fee is already inside the
         // per-piece price; never re-added)
-        if (gr.ltm && gr.ltm.fee > 0 && gr.ltm.mode === 'baked') {
-            rows.push('<p class="qc-ltm-note">$' + Math.round(gr.ltm.fee)
-                + ' small-batch fee included in the per-piece price ('
-                + formatPrice(gr.ltm.perUnit) + '/' + unit + ').</p>');
+        if (gr.ltm && gr.ltm.fee > 0) {
+            rows.push('<p class="qc-ltm-note">Small-order pricing is included. Displayed unit prices are rounded; totals use exact pricing.</p>');
         }
 
         // Amber tier nudge (engine-computed effective-per-piece diff)
@@ -695,7 +689,7 @@
             items.filter(function (it) { return groupIdFor(it) === g.groupId; })
                 .forEach(function (it) {
                     const itLines = g.lines.filter(function (l) { return l.itemId === it.id; });
-                    const total = itLines.reduce(function (s, l) { return s + l.lineTotal; }, 0);
+                    const total = itLines.reduce(function (s, l) { return s + l.effectiveUnit * l.qty; }, 0);
                     lines.push('- ' + it.style + ' ' + (it.color || '') + ' x' + it.qty
                         + ' (' + (it.placementLabel || it.placement || '') + ')'
                         + (itLines.length ? ' = $' + total.toFixed(2) : ''));
@@ -703,7 +697,7 @@
             (g.serviceLines || []).forEach(function (sl) {
                 lines.push('- ' + (sl.label || sl.code) + ' = $' + Number(sl.total).toFixed(2));
             });
-            (g.fees || []).forEach(function (f) {
+            (g.fees || []).filter(function (f) { return f.code !== 'LTM'; }).forEach(function (f) {
                 lines.push('- ' + f.label + ' = $' + Number(f.amount).toFixed(2));
             });
             lines.push('Subtotal: $' + Number(g.groupTotal).toFixed(2));

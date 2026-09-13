@@ -23,6 +23,19 @@ function compareSnapshot(actual, expected){
 }
 function compareActions(name,events){expect(events.actions).toEqual(original(name).events.actions);}
 function save(name,value){fs.writeFileSync(path.join(__dirname,'../fixtures/quote-view-'+name+'-original-browser.json'),JSON.stringify(value,null,2)+'\n',{flag:'wx'});}
+
+test('Customer saved quote and paper use billed prices including small-order charge',async({page})=>{
+ const f=fixture('screenprint');
+ f.items.splice(1);Object.assign(f.items[0],{Quantity:6,BaseUnitPrice:18.75,FinalUnitPrice:27.08,LineTotal:162.5,SizeBreakdown:JSON.stringify({M:6})});
+ Object.assign(f.session,{TotalQuantity:6,SubtotalAmount:162.5,TotalAmount:162.5,TaxAmount:0,TaxRate:0});
+ const events=await open(page,{fixture:f,staff:false});await ready(page);
+ await expect(page.locator('#items-container')).toContainText('$27.08');
+ await expect(page.locator('#items-container')).toContainText('$162.50');
+ await expect(page.locator('#items-container')).not.toContainText('$18.75');
+ await page.emulateMedia({media:'print'});await expect(page.locator('#items-container')).toContainText('$27.08');
+ await page.pdf({path:path.join(output,'quote-view-small-order-current.pdf'),format:'Letter',printBackground:true});
+ expect(events.actions).toEqual([]);check(expect,events);
+});
 for(const mode of ['open','accepted','deposit','paid','full-payment','expired','empty','escaped','mixed','dtf','dtg','screenprint','contract','sizeless','long','shopworks','cancelled','shipped','artwork'])test('CSS Quote View: '+edition+' '+mode+' values and print',async({page})=>{
  const events=await open(page,{original:capture,mode,staff:!['open','deposit','paid','full-payment','expired'].includes(mode)});await ready(page);const before=await snapshot(page),views=[];
  for(const width of [1440,768,390,320]){await page.setViewportSize({width,height:1050});views.push(await page.evaluate(()=>({width:innerWidth,scrollWidth:document.documentElement.scrollWidth})));if(!capture){expect(views.at(-1).scrollWidth).toBeLessThanOrEqual(width);const controls=await page.locator('#sw-actions-row button:visible, #sw-sync-refresh-btn:visible, #qv-deposit-enable-btn:visible').evaluateAll(nodes=>nodes.map(n=>({id:n.id,height:n.getBoundingClientRect().height})));for(const c of controls)expect(c.height,c.id+' touch target').toBeGreaterThanOrEqual(44);expect((await new AxeBuilder({page}).analyze()).violations).toEqual([]);}if(['open','mixed','shopworks','artwork'].includes(mode)&&[1440,320].includes(width))await page.screenshot({path:path.join(output,'quote-view-'+mode+'-'+edition+'-'+width+'.png'),fullPage:true});}

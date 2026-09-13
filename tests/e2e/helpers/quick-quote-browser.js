@@ -1,3 +1,4 @@
+const restorePreQuickQuote = require('../../helpers/quick-quote-source-mappings');
 const fs=require('node:fs'),path=require('node:path');
 const root=path.resolve(__dirname,'../../..'),original=require('../../fixtures/quick-quote-original-content.json');
 const pricing=name=>JSON.parse(fs.readFileSync(path.join(root,'tests/fixtures/pricing',name),'utf8'));
@@ -9,7 +10,7 @@ const image='/__core-fixture/garment.svg',garment='<svg xmlns="http://www.w3.org
 const colors=[{name:'Jet Black',catalog:'JetBlack',hex:'#263b46'},{name:'Brilliant Orange',catalog:'BrillOrng',hex:'#c64f13'}];
 function details(style='PC54'){return colors.map(c=>({STYLE:style,PRODUCT_TITLE:style==='C112'?'Structured Twill Cap':'Essential Cotton Tee',PRODUCT_DESCRIPTION:'Comfortable, durable cotton apparel for the whole team.',BRAND_NAME:style==='C112'?'Port Authority':'Port & Company',CATEGORY:style==='C112'?'Caps':'T-Shirts',CATEGORY_NAME:style==='C112'?'Caps':'T-Shirts',PRODUCT_STATUS:'Active',CATALOG_COLOR:c.catalog,COLOR_NAME:c.name,HEX_CODE:c.hex,COLOR_SQUARE_IMAGE:image,MAIN_IMAGE_URL:image,FRONT_MODEL:image,BACK_MODEL:image,FRONT_FLAT:image,BACK_FLAT:image,PRODUCT_IMAGE:image}));}
 function sizePricing(style){const template=pricing('size-pricing-'+(style==='C112'?'C112':'PC61')+'.json')[0];return colors.map(c=>({...template,styleNumber:style,color:c.name}));}
-function source(file){let s=fs.readFileSync(path.join(root,file),'utf8').replace(/\r\n/g,'\n');for(const c of original.changes.filter(c=>c.file===file).reverse()){if(s.split(c.after).length-1!==c.count)throw Error('Original mapping drift '+file);s=s.split(c.after).join(c.before);}return s;}
+function source(file){let s=restorePreQuickQuote(file, fs.readFileSync(path.join(root,file),'utf8').replace(/\r\n/g,'\n'));for(const c of original.changes.filter(c=>c.file===file).reverse()){if(s.split(c.after).length-1!==c.count)throw Error('Original mapping drift '+file);s=s.split(c.after).join(c.before);}return s;}
 async function open(page,state={}){
  const events={errors:[],writes:[],unknown:[],missing:[],reads:[],dialogs:[]};
  if(state.safetyBuilder)await page.context().addInitScript(()=>{window.APP_CONFIG={API:{BASE_URL:location.origin}};});
@@ -67,7 +68,7 @@ async function open(page,state={}){
    }
    return route.fulfill({contentType:{'.html':'text/html','.css':'text/css','.js':'application/javascript','.json':'application/json','.svg':'image/svg+xml','.png':'image/png','.woff2':'font/woff2'}[path.extname(absolute)]||'application/octet-stream',body:state.original&&original.hashes[file]?Buffer.from(source(file)):fs.readFileSync(absolute)});
   }
-  const allowedScripts=['https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js','https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js','https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js'];
+  const allowedScripts=['https://cdnjs.cloudflare.com/ajax/libs/jspdf/4.2.1/jspdf.umd.min.js','https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js','https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js','https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js'];
   if(['image','font','stylesheet'].includes(request.resourceType())||allowedScripts.includes(u.href))return route.continue();
   events.unknown.push(request.url());return route.fulfill({status:503});
  });

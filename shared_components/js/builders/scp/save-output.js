@@ -105,7 +105,7 @@ function _buildScpInvoiceProduct(product) {
     // Read base price from parent row's price cell (displayed as $25.99)
     const basePriceCell = document.getElementById(`row-price-${rowId}`);
     const basePriceText = basePriceCell?.textContent || '$0.00';
-    const baseUnitPrice = parseFloat(basePriceText.replace('$', '').replace(',', '')) || 0;
+    const baseUnitPrice = Number(basePriceCell?.dataset?.exactUnitPrice ?? parseFloat(basePriceText.replace('$', '').replace(',', ''))) || 0;
 
     // Base sizes (S, M, L, XL) - Note: L is internal, LG is display.
     // XXL/2XL are NOT base — they live in child rows whose price cell carries
@@ -161,7 +161,7 @@ function _buildScpInvoiceProduct(product) {
         const childRowId = scpState.childRowMap[rowId]?.[size];
         const childPriceCell = document.getElementById(`row-price-${childRowId}`);
         const childPriceText = childPriceCell?.textContent || '';
-        let unitPrice = parseFloat(childPriceText.replace(/[^0-9.]/g, '')) || 0;
+        let unitPrice = Number(childPriceCell?.dataset?.exactUnitPrice ?? parseFloat(childPriceText.replace(/[^0-9.]/g, ''))) || 0;
         if (!(unitPrice > 0)) unitPrice = baseUnitPrice;  // no child row (remapped parent size) → parent price
 
         lineItems.push({
@@ -303,6 +303,8 @@ function buildScreenprintPricingData(products) {
 function getLocationName(code) {
     const names = {
         'LC': 'Left Chest',
+        'CF': 'Center Front',
+        'CB': 'Center Back',
         'FF': 'Full Front',
         'JF': 'Jumbo Front',
         'FB': 'Full Back',

@@ -19,7 +19,30 @@ async function evidence(page,name,e){
  // Only their visibility changes; all active inputs, content and prices must match.
  for(const [wrapper,ids]of [['qqCapEmbWrap',['qqCapEmbType']],['qqInkBackWrap',['qqInkBack']],['qqProduct',['qqColorSelected','qqProductName','qqThumb']],['qqSleeveRow',['qqSleeveL','qqSleeveR','qqSleeveLabel']]])if(await page.locator('#'+wrapper).count()&&await page.locator('#'+wrapper).getAttribute('hidden')!==null)for(const state of before.states){for(const id of ids)delete state.ids[id];state.fields=state.fields.filter(f=>!ids.includes(f.id));}
  if(name==='quick-stock-failed')for(const state of before.states)state.ids.qqInventory='Stock could not be checked. Confirm availability before ordering. Retry stock check';
- for(let i=0;i<states.length;i++)for(const key of ['title','url','ids','fields','links','tables'])expect(states[i][key],name+' '+key).toEqual(before.states[i][key]);}
+ if(name.startsWith('prototype-')) {
+  for(let i=0;i<states.length;i++)for(const key of ['title','url','ids','fields','links','tables'])expect(states[i][key],name+' '+key).toEqual(before.states[i][key]);
+ } else {
+  // Approved workflow redesign: retain old inputs and canonical staff prices while
+  // the new customer document is covered by quick-quote-workflow.spec.js.
+  for(let i=0;i<states.length;i++){
+   const current=states[i],old=before.states[i];
+   expect(current.title).toBe(old.title);expect(current.url).toBe(old.url);
+   for(const field of old.fields)expect(current.fields,name+' original input').toContainEqual(field);
+   const changed=new Set(['qqModeToggle','qqResults','qqSheet','qqLineHint','qqLinePrint','qqLineDownload']);
+   for(const [id,value]of Object.entries(old.ids))if(!changed.has(id))expect(current.ids[id],name+' '+id).toBe(value);
+   if(old.ids.qqResults){
+    const money=text=>(text||'').replace(/ · order total \$[\d,.]+ \(now \$[\d,.]+\)/g,'').match(/\$[\d,.]+/g)||[];
+    expect(money(current.ids.qqResults),name+' unchanged staff amounts').toEqual(money(old.ids.qqResults));
+   }
+   if(!name.startsWith('line-'))expect(current.tables).toEqual(old.tables);
+   for(const link of old.links){
+    const identity=l=>({...l,href:l.href.replace(/&decoration=[^&]*/,'')});
+    expect(current.links.map(identity),name+' original destination').toContainEqual(identity(link));
+   }
+  }
+  await expect(page.locator('#qqModeToggle')).toHaveText(/Compare products\s+Compare decoration/);
+ }
+ }
  await page.setViewportSize({width:1440,height:1000});await page.pdf({path:path.join(out,'quick-quote-'+name+'-'+phase+'.pdf'),format:'Letter',printBackground:true});
 }
 test('CSS Quick Quote: initial line sheet',async({page})=>{

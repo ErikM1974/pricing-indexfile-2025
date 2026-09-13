@@ -418,7 +418,7 @@ export async function addProductFromQuote(product) {
     // can be an OLDER still-highlighted row when products load in a loop).
     const newRowId = addNewRow();
     const row = document.getElementById(`row-${newRowId}`);
-    if (!row) return;
+    if (!row) throw new Error('The product row could not be created. Please retry.');
 
     const rowId = row.dataset.rowId;
     const styleInput = row.querySelector('.style-input');
@@ -514,6 +514,24 @@ export async function applyMethodSwitchPrefillScp(ms) {
 
 export async function applyQuickQuotePrefillScp(qq) {
     try {
+        if (qq.decorationError) throw new Error(qq.decorationError);
+        if (qq.decoration) {
+            const d = qq.decoration;
+            if (d.method !== 'scp') throw new Error('The decoration method does not match this builder.');
+            const selections = { 'front-location': d.front || d.back, 'back-location': d.front ? d.back : '', 'front-colors': d.frontInk, 'back-colors': d.backInk, 'left-sleeve-colors': d.sleeveInkL, 'right-sleeve-colors': d.sleeveInkR };
+            for (const [name, value] of Object.entries(selections)) {
+                const controls = [...document.querySelectorAll(`input[name="${name}"]`)];
+                if (!controls.some(node => /** @type {HTMLInputElement} */ (node).value === String(value))) throw new Error('This print location is unavailable in the builder.');
+                controls.forEach(node => {
+                    const input = /** @type {HTMLInputElement} */ (node); input.checked = input.value === String(value);
+                    if (input.checked && input.closest('details')) input.closest('details').open = true;
+                });
+            }
+            for (const [id, value] of Object.entries({ 'left-sleeve-toggle': d.left, 'right-sleeve-toggle': d.right, 'dark-garment-toggle': d.dark, 'safety-stripes-toggle': d.stripes })) {
+                /** @type {HTMLInputElement} */ (document.getElementById(id)).checked = value;
+            }
+            updatePrintConfig();
+        }
         await addProductFromQuote({
             styleNumber: qq.style,
             color: qq.color || qq.colorName,
@@ -522,11 +540,11 @@ export async function applyQuickQuotePrefillScp(qq) {
         // Extended/XXL child rows now come from addProductFromQuote itself (Batch 2.0) —
         // the loop that used to live here would double-create them.
         showToast('Loaded ' + qq.style + ' from Quick Quote — verify color, quantities & pricing', 'info', 6000);
+        if (typeof clearQuickQuoteParams === 'function') clearQuickQuoteParams();
     } catch (e) {
         console.error('[QuickQuote prefill] failed:', e);
-        showToast('Could not prefill ' + qq.style + ' from Quick Quote — add it manually', 'warning', 6000);
+        showToast('Could not prefill ' + qq.style + ': ' + e.message, 'warning', 6000);
     }
-    if (typeof clearQuickQuoteParams === 'function') clearQuickQuoteParams();
 }
 
 /**

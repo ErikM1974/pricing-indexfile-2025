@@ -129,6 +129,12 @@ async function evidence(page,name,e){
     }));
    }
    if(name.startsWith('screenprint-')&&key==='fields'){
+    // Added Center Back is an unselected primary/secondary option. Pricing is
+    // covered through real full-builder handoffs, including back-only work.
+    const isNewLocation=f=>(f.name==='back-location'&&f.value==='CB')||(f.name==='front-location'&&['CF','CB','FB','JB'].includes(f.value));
+    const added=actual.filter(isNewLocation);
+    for(const field of added)expect(field).toMatchObject({type:'radio',checked:false,disabled:false});
+    actual=actual.filter(f=>!isNewLocation(f));
     // Native ink radios used to be display:none. They now accept keyboard input;
     // assert every newly exposed option and selection before comparing old visible fields.
     const groups=['front-colors','back-colors','left-sleeve-colors','right-sleeve-colors'];
@@ -141,6 +147,13 @@ async function evidence(page,name,e){
     actual=actual.filter(f=>!groups.includes(f.name)||expectedValue.some(old=>old.name===f.name&&old.value===f.value));
    }
    // The new persistent error replaces an alert (validation) or false success (save failure).
+   if(key==='fields')expectedValue=expectedValue.filter(f=>!f.name?.endsWith('-ltm-mode'));
+   if(key==='ids')for(const id of Object.keys(actual))if(/^(emb|spc|dtf)-ltm-panel$/.test(id)){
+    expect(actual[id]).toContain("Included in the customer's per-piece price");
+    const before=expectedValue[id];
+    if(before)expect(actual[id].match(/\$[\d,.]+/g)).toEqual(before.match(/\$[\d,.]+/g));
+    delete actual[id];delete expectedValue[id];
+   }
    if(key==='ids'&&name.startsWith('screenprint-fast-'))delete actual['fast-quote-error'];
    expect.soft(stableArtwork(actual,key),name+' '+key).toEqual(stableArtwork(expectedValue,key));
   }

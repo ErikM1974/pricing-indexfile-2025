@@ -626,17 +626,27 @@ export const lifecycleMethods = {
 
     async applyQuickQuotePrefill(qq) {
         try {
+            if (qq.decorationError) throw new Error(qq.decorationError);
+            if (qq.decoration) {
+                if (qq.decoration.method !== 'dtf') throw new Error('The decoration method does not match this builder.');
+                for (const name of ['front-location', 'back-location', 'sleeve-location']) {
+                    const controls = [...document.querySelectorAll(`input[name="${name}"]`)];
+                    const selected = controls.some(node => qq.decoration.locations.includes(/** @type {HTMLInputElement} */ (node).value));
+                    controls.forEach(node => { const input = /** @type {HTMLInputElement} */ (node); input.checked = qq.decoration.locations.includes(input.value) || (!selected && input.value === ''); });
+                }
+                this.updateSelectedLocations();
+            }
             await this.addProductFromQuote({
                 styleNumber: qq.style,
                 color: qq.color || qq.colorName,
                 sizeBreakdown: qq.sizeBreakdown
             });
             this.showToast('Loaded ' + qq.style + ' from Quick Quote — verify color, quantities & pricing', 'info');
+            if (typeof clearQuickQuoteParams === 'function') clearQuickQuoteParams();
         } catch (e) {
             console.error('[QuickQuote prefill] failed:', e);
-            this.showToast('Could not prefill ' + qq.style + ' from Quick Quote — add it manually', 'error');
+            this.showToast('Could not prefill ' + qq.style + ': ' + e.message, 'error');
         }
-        if (typeof clearQuickQuoteParams === 'function') clearQuickQuoteParams();
     },
 
     /**

@@ -17,6 +17,14 @@ export function updatePrintConfig() {
 
     scpState.printConfig.frontLocation = frontRadio ? frontRadio.value : 'LC';
     scpState.printConfig.backLocation = backRadio ? backRadio.value : '';
+    // A back-only primary is one print, never a default front plus a back.
+    const backOnly = ['CB', 'FB', 'JB'].includes(scpState.printConfig.frontLocation);
+    document.querySelectorAll('input[name="back-location"]').forEach(node => {
+        const input = /** @type {HTMLInputElement} */ (node);
+        input.disabled = backOnly && input.value !== '';
+        if (backOnly) input.checked = input.value === '';
+    });
+    if (backOnly) scpState.printConfig.backLocation = '';
     scpState.printConfig.frontColors = frontColorsRadio ? parseInt(frontColorsRadio.value) : 1;
     scpState.printConfig.backColors = backColorsRadio ? parseInt(backColorsRadio.value) : 1;
     scpState.printConfig.isDarkGarment = /** @type {HTMLInputElement} */ (document.getElementById('dark-garment-toggle')).checked;

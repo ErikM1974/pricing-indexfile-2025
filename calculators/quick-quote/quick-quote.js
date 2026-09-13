@@ -242,6 +242,7 @@
         product: null,      // { style, name, isCap, colors:[{name,catalog}], category }
         color: null,        // { name, catalog }
         qty: 24,
+        lineQty: 24,
         useSizes: false,
         sizes: {},          // { 'S':n, ... } when useSizes
         front: 'LC',          // print FRONT placement: '' | LC | FF | JF
@@ -268,7 +269,7 @@
         pinOnce: null,        // ?method= deep-link — pins that method on the first product load
         // ----- LINE SHEET MODE (method-first multi-style mini-catalog -> PDF) -----
         mode: 'linesheet',    // DEFAULT (AEs prefer line-item) | 'quick' (one style, every method)
-        lineMethod: null,     // locked imprint method id for the sheet: emb|capemb|dtg|scp|dtf
+        lineMethod: 'emb',     // locked imprint method id for the sheet: emb|capemb|dtg|scp|dtf
         lineStyles: [],       // [{ uid, raw, product, color, status, tiers, error }] — each priced independently
         lineSeq: 0            // reprice token for the line-sheet rows
     };
@@ -294,7 +295,7 @@
                 parts.push({ text: 'Front ' + state.frontInk + 'c + Back ' + state.backInk + 'c' });
             } else {
                 parts.push({ text: state.frontInk + '-color' });
-                parts.push({ text: twoLoc ? 'front + back' : 'front' });
+                parts.push({ text: twoLoc ? 'front + back' : state.front ? 'front' : 'back' });
             }
             var slv = [];
             if (state.sleeves.left) slv.push('L ' + state.sleeveInkL + 'c');
@@ -403,6 +404,7 @@
 
     function lookupStyle(raw) {
         var style = String(raw || '').trim().toUpperCase();
+        ++lookupSeq; ++sizeSeq; state.product = null; invalidateQuick();
         var statusEl = $('qqStyleStatus');
         if (!style) { statusEl.innerHTML = ''; state.product = null; renderAll(); return; }
         statusEl.innerHTML = '<span class="loading">Looking up ' + esc(style) + '…</span>';
@@ -684,7 +686,9 @@
         state.results = {};
         state.methods.forEach(function (m) { priceMethod(m.id, token); });
     }
-    var repriceDebounced = debounce(repriceAll, 300);
+    function invalidateQuick() { ++state.seq; state.results = {}; renderResults(); }
+    var scheduleQuickPrice = debounce(repriceAll, 300);
+    function repriceDebounced() { invalidateQuick(); scheduleQuickPrice(); }
 
     // ============================================================
     // RENDER
@@ -813,6 +817,9 @@
     function renderInkField() {
         var hasScp = hasActive('scp');
         $('qqInkField').hidden = !hasScp;
+        var primaryLabel = state.front ? 'Front' : 'Back';
+        $('qqInkFront').closest('.qq-ink-loc').querySelector('.qq-ink-lbl').textContent = primaryLabel;
+        $('qqInkFront').setAttribute('aria-label', primaryLabel + ' ink colors');
         var backWrap = $('qqInkBackWrap'); if (backWrap) backWrap.hidden = !(hasScp && scpLocCount() >= 2);
         $('qqScpOptsField').hidden = !hasScp; // dark garment + safety stripes, inline (one-click upsell)
     }
@@ -957,7 +964,7 @@
             var oneTimeT = (preview.fees || []).reduce(function (s, f) { return s + (f.oneTime ? (Number(f.amount) || 0) : 0); }, 0);
             var ltmFlat = (preview.ltm && preview.ltm.fee) || 0;
             var base = Math.max(0, (preview.groupTotal - oneTimeT - ltmFlat) / pq);
-            byTier[label] = { label: label, base: r2(base), ltmFee: ltmFlat, range: parseRange(label) };
+            byTier[label] = { label: label, base: r2(base), ltmFee: ltmFlat, range: parseRange(label), sampleQuantity: pq, sampleUnit: (preview.groupTotal - oneTimeT) / pq };
         }
 
         // 1) Bootstrap: probe the hardcoded representative qtys (one inside each tier we
@@ -1037,6 +1044,7 @@
     var refreshMatrix = debounce(function () { renderMatrix(); }, 250);
 
     function renderResults() {
+        notifyWorkspace();
         var box = $('qqResults');
         var sub = $('qqResultsSub');
         if (!state.product) { box.innerHTML = '<div class="qq-empty">Enter a style number to see pricing.</div>'; sub.textContent = 'Enter a style to begin'; return; }
@@ -1235,21 +1243,34 @@
         dtf: '/quote-builders/dtf-quote-builder.html'
     };
     function builderHref(id) {
-        if (!state.product || !BUILDER_PATHS[id]) return '';
+        return builderHrefFor(id, state.product, state.color, currentSizes());
+    }
+    function builderHrefFor(id, product, color, sizes) {
+        if (!product || !BUILDER_PATHS[id]) return '';
         var p = new URLSearchParams();
         p.set('from', 'quickquote');
-        p.set('style', state.product.style);
-        if (state.color) {
-            if (state.color.catalog) p.set('color', state.color.catalog);
-            if (state.color.name) p.set('colorName', state.color.name);
+        p.set('style', product.style);
+        if (color) {
+            if (color.catalog) p.set('color', color.catalog);
+            if (color.name) p.set('colorName', color.name);
         }
-        var qty = totalQty();
+        var qty = Object.values(sizes).reduce(function (a, b) { return a + b; }, 0);
         if (qty > 0) p.set('qty', String(qty));
-        var sizes = currentSizes();
         var csv = Object.keys(sizes).map(function (sz) { return sz + ':' + sizes[sz]; }).join(',');
         if (csv) p.set('sizes', csv);
         if (id === 'dtg') { var loc = dtgCode(); if (loc) p.set('location', loc); }
+        p.set('decoration', JSON.stringify(decorationPayload(id)));
         return BUILDER_PATHS[id] + '?' + p.toString();
+    }
+    function decorationPayload(id) {
+        var d = { version: 1, method: id };
+        if (id === 'emb' || id === 'capemb') {
+            d.primary = { stitchCount: state.adv.embStitch, needsDigitizing: !!state.adv.digitizing, embellishmentType: id === 'capemb' ? state.capEmb : 'embroidery' };
+            d.additional = state.embAddl.map(function (a) { return { stitchCount: a.stitch }; });
+        } else if (id === 'dtg') d.location = dtgCode();
+        else if (id === 'dtf') d.locations = dtfLocations();
+        else Object.assign(d, { front: state.front, back: state.back, frontInk: state.frontInk, backInk: state.backInk, sleeveInkL: state.sleeveInkL, sleeveInkR: state.sleeveInkR, left: state.sleeves.left, right: state.sleeves.right, dark: !!state.adv.scpDark, stripes: !!state.adv.scpStripes });
+        return d;
     }
     function openBuilderHtml(id) {
         var href = builderHref(id);
@@ -1296,7 +1317,8 @@
             var to = n.nextPerPiece != null ? (' → ' + fmt(n.nextPerPiece) + '/' + unitWord) : '';
             var save = (n.nextPerPiece == null && n.perPieceSavings > 0) ? (' — save ' + fmt(n.perPieceSavings) + '/' + unitWord) : '';
             nudgeHtml = '<button type="button" class="qq-card-nudge" data-addqty="' + n.addQty + '" title="Bump the quantity to this price break">↑ Add ' + n.addQty + ' more' + to
-                + (n.ltmDisappears ? ' · small-batch fee gone' : '') + save + '</button>';
+                + (n.ltmDisappears ? ' · small-batch fee gone' : '') + save
+                + (n.nextTotal != null ? ' · order total ' + fmt(n.nextTotal) + ' (now ' + fmt(n.currentTotal) + ')' : '') + '</button>';
         }
 
         // Per-piece breakdown (rate-card style): blank garment + each print/logo location
@@ -1307,7 +1329,7 @@
         return '<div class="qq-card is-clickable' + (isBest ? ' is-best' : '') + (sel ? ' is-selected' : '') + '"' + (changed ? ' data-flash="1"' : '') + dm + '>'
             + '<div class="qq-card-top">' + head
             + '<div class="qq-card-price"><div class="qq-card-pp">' + fmt(s.perPiece) + '<span class="per">/' + unitWord + '</span></div>'
-            + '<div class="qq-card-total">' + fmt(s.total) + ' total' + (isBest ? ' <span class="qq-best-tag"><svg class="qq-star" viewBox="0 0 24 24" width="11" height="11" fill="currentColor" aria-hidden="true"><path d="M12 2l2.9 6.3 6.9.7-5.1 4.7 1.4 6.8L12 17.8 6 21.2l1.4-6.8L2.3 9.7l6.9-.7z"/></svg>best value</span>' : '') + '</div></div></div>'
+            + '<div class="qq-card-total">' + fmt(s.total) + ' total' + (isBest ? ' <span class="qq-best-tag"><svg class="qq-star" viewBox="0 0 24 24" width="11" height="11" fill="currentColor" aria-hidden="true"><path d="M12 2l2.9 6.3 6.9.7-5.1 4.7 1.4 6.8L12 17.8 6 21.2l1.4-6.8L2.3 9.7l6.9-.7z"/></svg>lowest price</span>' : '') + '</div></div></div>'
             + configChips(id)
             + breakdownHtml
             + oneTimeHtml
@@ -1333,7 +1355,6 @@
     // probeLadder() (the same engine probe the matrix uses) and NEVER summed, so
     // every number on the sheet is identical-by-construction to the rest of the app.
     // ============================================================
-    var NWCA_LOGO = 'https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1';
     var LINE_METHODS = [
         { id: 'emb', label: 'Embroidery' },
         { id: 'capemb', label: 'Cap embroidery' },
@@ -1376,7 +1397,12 @@
         var rWrap = $('qqSleeveInkRWrap'); if (rWrap) rWrap.hidden = !(scp && state.sleeves.right);
     }
     function repriceActive() { if (state.mode === 'linesheet') repriceLineAll(); else repriceAll(); }
-    var repriceActiveDebounced = debounce(repriceActive, 350);
+    var scheduleActivePrice = debounce(repriceActive, 350);
+    function repriceActiveDebounced() {
+        if (state.mode === 'linesheet') state.lineStyles.forEach(invalidateLine);
+        else invalidateQuick();
+        notifyWorkspace(); scheduleActivePrice();
+    }
     // refresh the shared config controls (placement / ink / embroidery) for the current mode+method
     function renderConfigControls() {
         renderPlacements();          // -> renderInkField (placement + ink visibility)
@@ -1394,6 +1420,7 @@
         renderAll();
     }
     function renderMode() {
+        notifyWorkspace();
         var line = state.mode === 'linesheet';
         document.body.classList.toggle('qq-mode-line', line); // scopes the print stylesheet
         Array.prototype.forEach.call(document.querySelectorAll('#qqModeToggle [data-mode]'), function (b) {
@@ -1495,13 +1522,12 @@
         var n = state.lineStyles.length;
         $('qqLineAdd').disabled = n >= LINE_MAX;
         $('qqLineAdd').textContent = n >= LINE_MAX ? 'Max ' + LINE_MAX + ' styles' : '+ Add style';
-        var hasPriced = state.lineStyles.some(function (r) { return r.tiers && r.tiers.length; });
-        $('qqLineDownload').disabled = !hasPriced;
-        $('qqLinePrint').disabled = !hasPriced;
+        notifyWorkspace();
     }
 
     function onLineStyleInput(uid, raw) {
         var row = lineRow(uid); if (!row) return;
+        invalidateLine(row);
         row.raw = raw;
         var style = String(raw || '').trim().toUpperCase();
         if (!style) { row.product = null; row.color = null; row.status = 'empty'; row.tiers = null; updateLineRow(row); updateLineActions(); renderLinePreview(); return; }
@@ -1553,74 +1579,109 @@
         state.lineStyles.forEach(function (row) { if (row.product) { row.tiers = null; priceLineRow(row); } });
         renderLinePreview();
     }
-    function priceLineRow(row) {
+    function invalidateLine(row) {
+        if (!row) return;
+        row._ptok = ++state.lineSeq; row.preview = null; row.tiers = null; row.pricing = true;
+    }
+    async function priceLineRow(row) {
+        invalidateLine(row);
         if (!state.lineMethod || !row.product) { renderLinePreview(); return; }
-        var token = ++state.lineSeq; row._ptok = token;
-        row.pricing = true; updateLineRow(row);
-        probeLadder(state.lineMethod, row.product, row.color).then(function (tiers) {
+        var token = row._ptok, method = state.lineMethod, def = METHODS[method];
+        var product = row.product, color = row.color, qty = state.lineQty;
+        row.error = ''; updateLineRow(row); notifyWorkspace();
+        try {
+            if (!Number.isInteger(qty) || qty < 1 || qty > 100000) throw new Error('Enter a whole quantity between 1 and 100,000.');
+            if (product.isCap !== (method === 'capemb')) throw new Error(product.isCap ? 'Choose cap embroidery for this cap.' : 'Choose a garment decoration method for this product.');
+            var eligibility = await resolveEligibility(product);
+            if (!product.isCap && !eligibility[def.engineMethod]) throw new Error('This decoration is not available for this product.');
+            if (def.available && !def.available()) throw new Error('Choose a supported decoration placement.');
             if (row._ptok !== token) return;
-            row.tiers = tiers; row.pricing = false;
-            updateLineRow(row); updateLineActions(); renderLinePreview();
-        }).catch(function () {
+            var sizes = {}; sizes[stdSizeFor(product)] = qty;
+            var values = await Promise.all([
+                probeLadder(method, product, color),
+                window.QuoteCartEngine.singleItemPreview(buildItemFor(def, product, color, sizes), { groups: def.groups(), deps: engineDeps(), nudge: false })
+            ]);
             if (row._ptok !== token) return;
-            row.tiers = []; row.pricing = false;
-            updateLineRow(row); updateLineActions(); renderLinePreview();
-        });
+            if (!values[1].ok) throw new Error(values[1].error?.message || 'Pricing unavailable. Try again.');
+            if (!values[0].length) throw new Error('Quantity prices are unavailable. Try again.');
+            // Customer columns show real quantities, starting at the API's tier minimum.
+            // Ask the engine again: freight and small-order shares can vary within a tier.
+            var customerTiers = await Promise.all(values[0].map(async function (tier) {
+                var sampleSizes = {}; sampleSizes[stdSizeFor(product)] = tier.range.min;
+                var sample = await window.QuoteCartEngine.singleItemPreview(buildItemFor(def, product, color, sampleSizes), { groups: def.groups(), deps: engineDeps(), nudge: false });
+                if (!sample.ok) return tier; // retain the already verified sample for minimum-order methods
+                var setup = (sample.fees || []).reduce(function (sum, fee) { return sum + (fee.oneTime ? Number(fee.amount) : 0); }, 0);
+                return Object.assign({}, tier, { sampleQuantity: tier.range.min, sampleUnit: (sample.groupTotal - setup) / tier.range.min });
+            }));
+            if (row._ptok !== token) return;
+            row.tiers = customerTiers; row.preview = values[1]; row.pricing = false;
+        } catch (error) {
+            if (row._ptok !== token) return;
+            row.tiers = []; row.preview = null; row.pricing = false; row.error = error.message;
+        }
+        updateLineRow(row); updateLineActions(); renderLinePreview();
     }
 
-    // ---- the line-sheet preview (becomes the PDF via window.print) ----
-    function lineConfigLabel() {
-        if (!state.lineMethod) return '';
-        var m = LINE_METHODS.filter(function (x) { return x.id === state.lineMethod; })[0];
-        var cfg = configText(state.lineMethod);
-        return (m ? m.label : '') + (cfg ? ' · ' + cfg : '');
-    }
-    function lineLadderHtml(tiers, isCap) {
-        if (!tiers || !tiers.length) return '';
-        var unit = isCap ? 'cap' : 'pc';
-        var hasLtm = tiers.some(function (t) { return t.ltmFee > 0; });
-        var qcells = tiers.map(function (t) { return '<th>' + esc(rangeLabel(t)) + '</th>'; }).join('');
-        var pcells = tiers.map(function (t) { return '<td>' + fmt(t.base) + '</td>'; }).join('');
-        var ltmRow = hasLtm ? '<tr><td class="lbl">Small-batch</td>' + tiers.map(function (t) {
-            return '<td' + (t.ltmFee > 0 ? ' class="warn"' : '') + '>' + (t.ltmFee > 0 ? '+' + fmt(t.ltmFee) : '&mdash;') + '</td>';
-        }).join('') + '</tr>' : '';
-        return '<div class="qq-sheet-ladder-wrap"><table class="qq-sheet-ladder"><thead><tr><th class="lbl">Qty</th>' + qcells + '</tr></thead>'
-            + '<tbody><tr><td class="lbl">Per ' + unit + '</td>' + pcells + '</tr>' + ltmRow + '</tbody></table></div>';
-    }
-    function renderLinePreview() {
-        var box = $('qqSheet'); if (!box) return;
-        if (!state.lineMethod) {
-            box.innerHTML = '<div class="qq-sheet-placeholder">Pick an imprint method, then add styles to build the line sheet.</div>';
-            return;
+    function renderLinePreview() { notifyWorkspace(); }
+    function notifyWorkspace() { if (window.QuickQuoteWorkspace) window.QuickQuoteWorkspace.refresh(); }
+    function decorationDescription(id) {
+        if (id === 'emb' || id === 'capemb') {
+            var primary = id === 'capemb' ? 'Cap front' : 'Left chest';
+            return primary + ': ' + state.adv.embStitch.toLocaleString() + ' stitches'
+                + state.embAddl.map(function (a, i) { return '; ' + (id === 'capemb' ? 'Cap back' : 'Additional logo ' + (i + 1)) + ': ' + Number(a.stitch).toLocaleString() + ' stitches'; }).join('')
+                + (id === 'capemb' ? '; ' + state.capEmb.replace(/-/g, ' ') : '')
+                + (state.adv.digitizing ? '. New logo digitizing included below.' : '. Existing embroidery-ready artwork assumed.');
         }
-        var priced = state.lineStyles.filter(function (r) { return r.product && r.tiers && r.tiers.length; });
-        var head = '<div class="qq-sheet-head">'
-            + '<img class="qq-sheet-logo" src="' + NWCA_LOGO + '" alt="Northwest Custom Apparel" referrerpolicy="no-referrer">'
-            + '<div class="qq-sheet-htext"><div class="qq-sheet-brand">Northwest Custom Apparel</div>'
-            + '<div class="qq-sheet-sub">Line Sheet &middot; ' + esc(lineConfigLabel()) + '</div></div></div>';
-        var body;
-        if (!priced.length) {
-            body = '<div class="qq-sheet-placeholder">Add styles on the left &mdash; each appears here with its price ladder.</div>';
-        } else {
-            body = '<div class="qq-sheet-body">' + priced.map(function (r) {
-                var img = r.color && r.color.image;
-                var imgHtml = img
-                    ? '<img class="qq-sheet-img" src="' + esc(img) + '" alt="" referrerpolicy="no-referrer" onerror="this.style.visibility=\'hidden\'">'
-                    : '<span class="qq-sheet-img is-empty"></span>';
-                return '<div class="qq-sheet-item">' + imgHtml
-                    + '<div class="qq-sheet-item-main">'
-                    + '<div class="qq-sheet-item-head"><span class="qq-sheet-style">' + esc(r.product.style) + '</span> &middot; '
-                    + esc(r.product.name) + '<span class="qq-sheet-color">Color: ' + esc(r.color ? r.color.name : '') + '</span></div>'
-                    + lineLadderHtml(r.tiers, r.product.isCap)
-                    + '</div></div>';
-            }).join('') + '</div>';
-        }
-        var foot = '<div class="qq-sheet-foot">'
-            + '<div>Estimate only &middot; pricing valid 30 days &middot; confirm stock &amp; sizes at order time.</div>'
-            + '<div>Northwest Custom Apparel &middot; (253) 922-5793 &middot; sales@nwcustomapparel.com</div></div>';
-        box.innerHTML = head + body + foot;
+        return configText(id);
     }
-    function printLineSheet() { window.print(); }
+    function workspaceBridge() {
+        return {
+            state: state,
+            options: function () {
+                if (state.mode === 'linesheet') return state.lineStyles.filter(function (r) { return r.product && r.preview && !r.pricing; }).map(function (r) {
+                    return { key: String(r.uid), product: r.product, color: r.color, method: state.lineMethod, preview: r.preview, tiers: r.tiers,
+                        description: decorationDescription(state.lineMethod), placements: configPlacements(state.lineMethod), sizes: 'Standard-size pricing; extended sizes may cost more.', builderHref: builderHrefFor(state.lineMethod, r.product, r.color, { [stdSizeFor(r.product)]: state.lineQty }) };
+                });
+                return state.methods.filter(function (m) { return state.results[m.id]?.status === 'ok'; }).map(function (m) {
+                    return { key: m.id, product: state.product, color: state.color, method: m.id, preview: state.results[m.id].preview,
+                        description: decorationDescription(m.id), placements: configPlacements(m.id), sizes: state.useSizes ? 'Sizes: ' + Object.entries(currentSizes()).filter(function (p) { return p[1] > 0; }).map(function (p) { return p[0] + ': ' + p[1]; }).join(', ') : 'Standard-size pricing; extended sizes may cost more.', builderHref: builderHref(m.id) };
+                });
+            },
+            pending: function () { return state.mode === 'linesheet' ? state.lineStyles.some(function (r) { return r.raw.trim() && (!r.preview || r.pricing || r.status !== 'ok'); }) : state.methods.some(function (m) { return !state.results[m.id] || state.results[m.id].status === 'loading'; }); },
+            errors: function () { return state.mode === 'linesheet' ? state.lineStyles.filter(function (r) { return r.error; }).map(function (r) { return r.raw + ': ' + r.error; }) : []; },
+            choose: function (style) { if (state.mode === 'linesheet') { if (state.lineStyles.length >= LINE_MAX) throw new Error('Remove an option before adding another product.'); addLineStyle(); var row = state.lineStyles[state.lineStyles.length - 1]; document.querySelector('.qq-line-style[data-uid="' + row.uid + '"]').value = style; onLineStyleInput(row.uid, style); } else { $('qqStyle').value = style; lookupStyle(style); } },
+            reprice: repriceActive,
+            restore: restoreWorkspaceInputs
+        };
+    }
+    function configPlacements(id) {
+        if (id === 'emb' || id === 'capemb') return [id === 'capemb' ? 'Cap front' : 'Left chest'].concat(state.embAddl.map(function () { return id === 'capemb' ? 'Cap back' : 'Additional logo'; }));
+        if (id === 'dtf') return dtfLocations().map(function (loc) { return DTF_LOC_LABEL[loc]; });
+        return [FRONT_LABELS[state.front], BACK_LABELS[state.back]].filter(Boolean).concat(id === 'scp' ? [state.sleeves.left ? 'Left sleeve' : '', state.sleeves.right ? 'Right sleeve' : ''].filter(Boolean) : []);
+    }
+    async function restoreWorkspaceInputs(draft) {
+        setMode(draft.mode === 'quick' ? 'quick' : 'linesheet');
+        var fields = ['front', 'back', 'sleeves', 'frontInk', 'backInk', 'sleeveInkL', 'sleeveInkR', 'adv', 'embAddl', 'capEmb', 'qty', 'sizes', 'useSizes', 'lineQty', 'scpDarkUserSet'];
+        function config() { fields.forEach(function (key) { if (Object.prototype.hasOwnProperty.call(draft, key)) state[key] = draft[key]; }); $('qqQty').value = state.qty; $('qqLineQty').value = state.lineQty; renderConfigControls(); }
+        if (state.mode === 'linesheet') {
+            state.lineStyles = []; state.lineMethod = draft.lineMethod || 'emb'; config(); renderLineMethods();
+            for (var saved of (draft.products || []).slice(0, LINE_MAX)) {
+                addLineStyle(); var row = state.lineStyles[state.lineStyles.length - 1]; row.raw = saved.style; row.product = await fetchProduct(saved.style); await loadProductSizes(row.product);
+                row.color = row.product.colors.find(function (c) { return c.catalog === saved.color; });
+                if (!row.color) throw new Error('A saved color is no longer available. Choose it again.');
+                row.status = 'ok';
+            }
+            renderLineList(); repriceLineAll();
+        } else if (draft.products?.length) {
+            var savedProduct = draft.products[0]; state.product = await fetchProduct(savedProduct.style); await loadProductSizes(state.product);
+            applyProduct(await resolveEligibility(state.product)); config();
+            state.color = state.product.colors.find(function (c) { return c.catalog === savedProduct.color; });
+            if (!state.color) throw new Error('A saved color is no longer available. Choose it again.');
+            $('qqStyle').value = savedProduct.style; $('qqSizes').hidden = !state.useSizes; $('qqQty').disabled = state.useSizes;
+            if (state.useSizes) buildSizeGrid(); renderColorSwatches(); renderThumb(); loadInventory(); repriceAll();
+        }
+        renderMode(); notifyWorkspace();
+    }
 
     // ============================================================
     // ORDER-FORM HANDBACK (?from=aeo) — send a priced method back to the
@@ -1671,7 +1732,8 @@
     function wire() {
         if (!window.QuoteCartEngine) { $('qqEngineError').hidden = false; }
 
-        $('qqStyle').addEventListener('input', debounce(function (e) { lookupStyle(e.target.value); }, 450));
+        var scheduleLookup = debounce(function (value) { lookupStyle(value); }, 450);
+        $('qqStyle').addEventListener('input', function (e) { ++lookupSeq; ++sizeSeq; state.product = null; invalidateQuick(); scheduleLookup(e.target.value); });
 
         // Click a priced method card to show its price-breaks matrix below.
         $('qqResults').addEventListener('click', function (e) {
@@ -1819,9 +1881,14 @@
             setLineMethod(b.getAttribute('data-line-method'));
         });
         $('qqLineAdd').addEventListener('click', addLineStyle);
-        var onLineStyleInputDebounced = debounce(function (uid, val) { onLineStyleInput(uid, val); }, 450);
+        var lineLookupTimers = new Map();
+        function onLineStyleInputDebounced(uid, val) {
+            clearTimeout(lineLookupTimers.get(uid));
+            lineLookupTimers.set(uid, setTimeout(function () { lineLookupTimers.delete(uid); onLineStyleInput(uid, val); }, 450));
+        }
         $('qqLineList').addEventListener('input', function (e) {
-            var si = e.target.closest('.qq-line-style'); if (si) onLineStyleInputDebounced(Number(si.getAttribute('data-uid')), si.value);
+            var si = e.target.closest('.qq-line-style');
+            if (si) { var row = lineRow(Number(si.getAttribute('data-uid'))); invalidateLine(row); row.raw = si.value; row.product = null; row.status = si.value.trim() ? 'loading' : 'empty'; ++row._tok; updateLineRow(row); notifyWorkspace(); onLineStyleInputDebounced(row.uid, si.value); }
         });
         $('qqLineList').addEventListener('change', function (e) {
             var cs = e.target.closest('.qq-line-color'); if (cs) onLineColorChange(Number(cs.getAttribute('data-uid')), cs.value);
@@ -1830,8 +1897,8 @@
             var mv = e.target.closest('.qq-line-mv'); if (mv && !mv.disabled) { moveLineStyle(Number(mv.getAttribute('data-uid')), Number(mv.getAttribute('data-dir'))); return; }
             var rm = e.target.closest('.qq-line-rm'); if (rm) { removeLineStyle(Number(rm.getAttribute('data-uid'))); return; }
         });
-        $('qqLineDownload').addEventListener('click', printLineSheet);
-        $('qqLinePrint').addEventListener('click', printLineSheet);
+        $('qqLineQty').addEventListener('input', function (e) { state.lineQty = Number(e.target.value); repriceActiveDebounced(); });
+        window.QuickQuoteWorkspace.mount(workspaceBridge());
 
         // init: render both modes' scaffolding (Quick Price is the default view)
         // ?mode=quick — the dashboard's New Quote launcher deep-links straight to

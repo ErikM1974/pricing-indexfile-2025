@@ -1,7 +1,8 @@
+const restorePreQuickQuote = require('../../helpers/quick-quote-source-mappings');
 const fs=require('node:fs'),path=require('node:path');
 const root=path.resolve(__dirname,'../../..'),source=require('../../fixtures/customer-cart-original-content.json');
 const now='2026-09-10T18:30:00.000Z',sizes=['XS','S','M','L','XL','2XL','3XL','4XL'];
-function originalFile(file){let s=fs.readFileSync(path.join(root,file),'utf8').replace(/\r\n/g,'\n');for(const c of source.changes.filter(c=>c.file===file).reverse()){if(s.split(c.after).length-1!==c.count)throw Error('Original mapping drift '+file);s=s.split(c.after).join(c.before);}return s;}
+function originalFile(file){let s=restorePreQuickQuote(file, fs.readFileSync(path.join(root,file),'utf8').replace(/\r\n/g,'\n'));for(const c of source.changes.filter(c=>c.file===file).reverse()){if(s.split(c.after).length-1!==c.count)throw Error('Original mapping drift '+file);s=s.split(c.after).join(c.before);}return s;}
 function sampleItems(mode){
  if(mode==='empty')return [];
  const one={style:'PC54',name:'Core Cotton Tee',color:'Brilliant Orange',catalogColor:'BrillOrng',sizes:{M:1,'2XL':2},price:8.75,sampleType:mode==='free'?'free':'paid',upcharges:{'2XL':2,'3XL':3},imageUrl:'/__cart-fixture/tee.svg'};
@@ -33,8 +34,9 @@ function installEngine(state){
    const items=cart.items.filter(i=>groupId(i)===groupIdValue),method=items[0].method;
    if(state.mode==='failed'&&method==='DTG'){errors.push({groupId:groupIdValue,method,code:'FIXTURE_FAILURE',message:'Synthetic pricing unavailable'});continue;}
    const pooledQty=items.reduce((s,i)=>s+Object.values(i.sizes).reduce((a,b)=>a+b,0),0);
-   const lines=items.flatMap(i=>Object.entries(i.sizes).map(([size,qty])=>({itemId:i.id,styleNumber:i.styleNumber,color:i.colorName,size,label:size,qty,baseUnit:18.75,effectiveUnit:18.75,lineTotal:18.75*qty})));
-   groups.push({groupId:groupIdValue,method,pooledQty,tierLabel:'1-7',groupTotal:pooledQty*18.75,lines,serviceLines:[],fees:[],ltm:{fee:0,perUnit:0,mode:method==='SCP'?'itemized':'baked'},trace:{tierTable:[{minQty:1,label:'1-7'},{minQty:8,label:'8-23'}]},nudge:{addQty:2,nextTierMinQty:8,nextTierLabel:'8-23',nextPerPiece:17.25,perPieceSavings:1.5,ltmDisappears:false}});
+   const fee=state.smallOrder?50:0;
+   const lines=items.flatMap(i=>Object.entries(i.sizes).map(([size,qty])=>({itemId:i.id,styleNumber:i.styleNumber,color:i.colorName,size,label:size,qty,baseUnit:18.75,effectiveUnit:18.75+fee/pooledQty,lineTotal:18.75*qty})));
+   groups.push({groupId:groupIdValue,method,pooledQty,tierLabel:'1-7',groupTotal:pooledQty*18.75+fee,lines,serviceLines:[],fees:fee?[{code:'LTM',label:'Small order fee',amount:fee,oneTime:false}]:[],ltm:{fee,perUnit:fee/pooledQty,mode:method==='SCP'?'itemized':'baked'},trace:{tierTable:[{minQty:1,label:'1-7'},{minQty:8,label:'8-23'}]},nudge:{addQty:2,nextTierMinQty:8,nextTierLabel:'8-23',nextPerPiece:17.25,perPieceSavings:1.5,ltmDisappears:false}});
   }
   return {groups,grandTotal:errors.length?null:groups.reduce((s,g)=>s+g.groupTotal,0),warnings:state.mode==='warning'?[{message:'Synthetic fee information needs confirmation'}]:[],errors};
  }};
@@ -89,7 +91,7 @@ async function open(page,state={}){
    const file=path.resolve(root,'.'+decodeURIComponent(p)),relative=p.slice(1);
    if(!file.startsWith(root+path.sep)||!fs.existsSync(file)||!fs.statSync(file).isFile()){events.missing.push(p);return route.fulfill({status:404});}
    let body=state.original&&source.hashes[relative]?Buffer.from(originalFile(relative)):fs.readFileSync(file);
-   if(relative==='pages/js/quote-cart-page.js')body=Buffer.from('('+installEngine.toString()+')('+JSON.stringify({mode:state.mode})+');\n'+body.toString('utf8'));
+   if(relative==='pages/js/quote-cart-page.js')body=Buffer.from('('+installEngine.toString()+')('+JSON.stringify({mode:state.mode,smallOrder:state.smallOrder})+');\n'+body.toString('utf8'));
    return route.fulfill({contentType:{'.css':'text/css','.js':'application/javascript','.png':'image/png','.svg':'image/svg+xml','.woff2':'font/woff2','.woff':'font/woff'}[path.extname(file)]||'application/octet-stream',body});
   }
   if(['font','image','stylesheet'].includes(request.resourceType()))return route.continue();

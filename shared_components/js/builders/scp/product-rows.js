@@ -234,6 +234,7 @@ export function addNewRow() {
     setTimeout(() => {
         row.classList.remove('new-row');
     }, 1000);
+    return rowId;
 }
 
 async function addProductRow(styleNumber) {

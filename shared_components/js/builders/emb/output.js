@@ -352,7 +352,8 @@ function _buildEmbInvoiceProduct(product) {
     // Read base price from parent row's price cell
     const basePriceCell = document.getElementById(`row-price-${rowId}`);
     const basePriceText = basePriceCell?.textContent || '$0.00';
-    const baseUnitPrice = parseFloat(basePriceText.replace(/[^0-9.]/g, '')) || 0;
+    // The pricing pass keeps its exact unit beside the rounded display for PDF footing.
+    const baseUnitPrice = Number(basePriceCell?.dataset?.exactUnitPrice ?? parseFloat(basePriceText.replace(/[^0-9.]/g, ''))) || 0;
 
     // Base sizes (S, M, L, XL)
     const baseSizes = ['S', 'M', 'L', 'LG', 'XL'];
@@ -404,7 +405,7 @@ function _buildEmbInvoiceProduct(product) {
             const childRowId = embState.childRowMap[rowId]?.[size];
             const childPriceCell = document.getElementById(`row-price-${childRowId}`);
             const childPriceText = childPriceCell?.textContent || '';
-            let unitPrice = parseFloat(childPriceText.replace(/[^0-9.]/g, '')) || 0;
+            let unitPrice = Number(childPriceCell?.dataset?.exactUnitPrice ?? parseFloat(childPriceText.replace(/[^0-9.]/g, ''))) || 0;
             if (!(unitPrice > 0)) unitPrice = baseUnitPrice;  // no child row found → base price
             lineItems.push({
                 description: `${size}(${qty})`,

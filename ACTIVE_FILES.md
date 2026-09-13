@@ -1616,3 +1616,17 @@ Garment designer completion: page styles are scoped to the unified designer; art
 - `shared_components/js/embroidery-quote-pricing.d.ts` — typed calculation boundary for the canonical legacy embroidery engine; no independent price rules.
 
 - `shared_components/js/holiday-promotion.js` — shared Christmas discovery/expiry on home and catalog; protected invitation display and copy controls on Staff Dashboard.
+
+- calculators/quick-quote/quick-quote-document.js — canonical customer estimate presentation for preview, paper and PDF; engine totals only.
+- calculators/quick-quote/quick-quote-workspace.js — product search, browser favorites/input drafts, optional customer details, customer options and export controls.
+
+- tests/e2e/quick-quote-workflow.spec.js — synthetic five-method customer document, accessibility and stale-output regressions.
+- tests/unit/quick-quote-document.test.js — customer totals, all-in small-order pricing and escaping checks.
+
+- tests/unit/quick-quote-handoff.test.js — versioned decoration validation and legacy handoff compatibility.
+
+- tests/fixtures/quick-quote-workflow-source-mappings.json — approved reversible workflow source changes; historical hashes retained.
+
+- tests/helpers/quick-quote-source-mappings.js — restores pre-workflow sources for historical CSS and browser evidence.
+- tests/unit/customer-price-presentation.test.js — exact inclusive saved-quote/PDF prices and restored staff fee preferences.
+- memory/QUICK_QUOTE_2026-09.md — Quick Quote workflow, inclusive customer LTM policy, precision and regression contracts.

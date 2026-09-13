@@ -57,8 +57,8 @@ export class ScpAdapter {
     /** Print-location model (codes match printConfig + LOCATION_NAMES). */
     getLocationModel() {
         return {
-            front: ['LC', 'FF', 'JF'],
-            back: ['FB', 'JB'],
+            front: ['LC', 'CF', 'FF', 'JF', 'CB', 'FB', 'JB'],
+            back: ['CB', 'FB', 'JB'],
             sleeves: ['left', 'right'],
         };
     }

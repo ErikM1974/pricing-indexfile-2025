@@ -740,6 +740,7 @@ function paintRowPrices(pricing, logoConfigs, ltmDisplayMode) {
                         const displayPrice = (ltmDisplayMode === 'builtin')
                             ? (standardLineItem.unitPriceWithLTM || standardLineItem.unitPrice || 0)
                             : (standardLineItem.unitPrice || 0);
+                        priceCell.dataset.exactUnitPrice = String(displayPrice);
                         const hasOverride = parseFloat(/** @type {HTMLElement} */ (parentRow).dataset.sellPrice) > 0;
                         const isNsRow = /** @type {HTMLElement} */ (parentRow).dataset.nonSanmar === 'true';
                         // Gate the pencil on MANUALLY PRICED, not on non-SanMar. A cost-plus
@@ -829,6 +830,7 @@ function paintRowPrices(pricing, logoConfigs, ltmDisplayMode) {
                                 } else if (!childHasOwnOverride) {
                                     childPriceCell.classList.remove('price-overridden');
                                 }
+                                childPriceCell.dataset.exactUnitPrice = String(displayPrice);
                                 childPriceCell.textContent = `$${displayPrice.toFixed(2)}`;
 
                                 // Calculate and display line total for child row

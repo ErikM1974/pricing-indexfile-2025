@@ -1,3 +1,4 @@
+const restorePreQuickQuote = require('../../helpers/quick-quote-source-mappings');
 const fs = require('node:fs');
 const path = require('node:path');
 const root = path.resolve(__dirname, '../../..');
@@ -25,7 +26,7 @@ const customer = {name: 'Example Customer', email: 'example@example.invalid', co
 const reply = 'Synthetic emblem quote ready.\nPRICE_QUOTE START\n' + JSON.stringify(quote) + '\nPRICE_QUOTE END\nCUSTOMER_FINAL START\n' + JSON.stringify(customer) + '\nCUSTOMER_FINAL END\nEMAIL DRAFT START\nTo: example@example.invalid\nSubject: Example emblem quote\n\n100 sewn-on emblems and digitizing total $889.00 before tax.\nEMAIL DRAFT END';
 
 function source(file) {
-    let text = fs.readFileSync(path.join(root, file), 'utf8').replace(/\r\n/g, '\n');
+    let text = restorePreQuickQuote(file, fs.readFileSync(path.join(root, file), 'utf8').replace(/\r\n/g, '\n'));
     for (const change of original.changes.filter((item) => item.file === file).reverse()) {
         if (text.split(change.after).length - 1 !== change.count) throw Error('Original mapping drift: ' + file);
         text = text.split(change.after).join(change.before);

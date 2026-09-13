@@ -9,8 +9,8 @@
  *
  * IRON RULE — zero price math: every dollar in the saved payload comes from a
  * QuoteCartEngine.priceCart() result (the staff-authority orchestrator). The
- * only arithmetic in this file is SUMMING the rows it just built to assert
- * they FOOT to the engine's group totals (readers' contract: /quote and
+ * only arithmetic allocates the engine's billed units to row cents and sums
+ * those rows to assert they FOOT to the engine's group totals (/quote and
  * /invoice foot from line items; subtotal display = quote_sessions.TotalAmount).
  *
  * Save flow (saveQuote):
@@ -36,9 +36,10 @@
  *     (customer web quotes carry no shipping address yet; documented in the
  *     Notes JSON taxNote so quote-view + reps see why).
  *   - Fee/service rows save as quote_items with EmbellishmentType:'fee' and
- *     StyleNumber = the service code (DD / AL / CB / AS-GARM / SPSU / LTM /
+ *     StyleNumber = the service code (DD / AL / CB / AS-GARM / SPSU /
  *     SP-STRIPE / 3D-EMB …) — quote-view's fee emitters + catch-all render
  *     them once each, and the staff fee-routing map already knows the codes.
+ *     LTM is inside product prices; its audit metadata remains on the session.
  *   - Method-specific quote_sessions columns (PrintLocation/StitchCount/Cap*)
  *     are NOT sent — the 2026-06-04 phantom-default lesson.
  *
@@ -231,24 +232,18 @@ var webquotservLog = WEBQUOTSERV_LOG_ON ? console.log.bind(console) : function (
             var options = groupsCfg[group.groupId] || {};
             var loc = locationFields(group.method, options);
             var embType = METHOD_EMBELLISHMENT[group.method] || group.method.toLowerCase();
-            var baked = !!(group.ltm && group.ltm.mode === 'baked' && group.ltm.fee > 0);
+            var baked = !!(group.ltm && group.ltm.fee > 0);
+            var runningProductTotal = 0;
             var firstRowOfGroup = true;
 
-            // Product rows — one per engine line. Billed unit follows each
-            // method's own convention (the readers' contract):
-            //   baked LTM (EMB/CAP/DTG/DTF): FinalUnitPrice = effective unit
-            //     (LTM share inside), LineTotal = full-precision effective × qty
-            //     — the staff EMB save's exact rule, so rows foot to
-            //     groupTotal without a separate LTM row. BaseUnitPrice ALSO
-            //     stores the billed unit (the staff EMB convention: quote-view's
-            //     Unit column reads BaseUnitPrice first, so unit × qty must
-            //     equal the row total); the pre-LTM base is recoverable as
-            //     FinalUnitPrice − LTMPerUnit.
-            //   itemized LTM (SCP): FinalUnitPrice = base unit; the LTM fee is
-            //     its own fee row below.
+            // All customer product rows include the engine's small-order share.
+            // Retain exact group cents through cumulative allocation; the displayed
+            // unit may round, but LineTotal remains the authoritative billed amount.
             (group.lines || []).forEach(function (line) {
                 var store = storeById[line.itemId] || {};
-                var billedUnit = baked ? line.effectiveUnit : line.baseUnit;
+                var billedUnit = line.effectiveUnit;
+                var previousTotal = r2(runningProductTotal);
+                runningProductTotal += billedUnit * line.qty;
                 var sizeBreakdown = line.size
                     ? (function () { var o = {}; o[line.size] = line.qty; return o; })()
                     : parseLabelToSizeBreakdown(line.label);
@@ -267,7 +262,7 @@ var webquotservLog = WEBQUOTSERV_LOG_ON ? console.log.bind(console) : function (
                     BaseUnitPrice: r2(billedUnit),
                     LTMPerUnit: baked ? r2(group.ltm.perUnit) : 0,
                     FinalUnitPrice: r2(billedUnit),
-                    LineTotal: r2(billedUnit * line.qty),
+                    LineTotal: r2(r2(runningProductTotal) - previousTotal),
                     SizeBreakdown: JSON.stringify(sizeBreakdown),
                     PricingTier: group.tierLabel || '',
                     ImageURL: store.imageUrl || '',
@@ -306,7 +301,7 @@ var webquotservLog = WEBQUOTSERV_LOG_ON ? console.log.bind(console) : function (
             });
 
             // Order-level fees (DD digitizing, SPSU screen setup, itemized LTM…)
-            (group.fees || []).forEach(function (f) {
+            (group.fees || []).filter(function (f) { return f.code !== 'LTM'; }).forEach(function (f) {
                 items.push({
                     QuoteID: p.quoteId,
                     LineNumber: lineNumber++,
@@ -406,7 +401,7 @@ var webquotservLog = WEBQUOTSERV_LOG_ON ? console.log.bind(console) : function (
         // same order to slice them per group.
         for (var g = 0; g < (result.groups || []).length; g++) {
             var group = result.groups[g];
-            var rowCount = (group.lines || []).length + (group.serviceLines || []).length + (group.fees || []).length;
+            var rowCount = (group.lines || []).length + (group.serviceLines || []).length + (group.fees || []).filter(function (f) { return f.code !== 'LTM'; }).length;
             var sum = 0;
             for (var i = 0; i < rowCount; i++) sum += items[idx + i].LineTotal;
             idx += rowCount;

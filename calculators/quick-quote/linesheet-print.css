@@ -97,7 +97,7 @@
     }
 
     :where([data-ui="unified"][data-quick-quote]) .qq-sheet-item {
-        flex-direction: row;
+        display: block;
         break-inside: avoid;
         padding: 12px 0;
     }
@@ -156,5 +156,20 @@
 
     :where([data-ui="unified"][data-quick-quote]) :is(.rc-table, .rc-head) {
         break-inside: avoid;
+    }
+
+    :where([data-ui="unified"][data-quick-quote="quick"])
+        :is(.hero, .qq-print-summary, .qq-workflow-actions, .qq-document-toolbar, .qq-document-options, .qq-foot, [id="qqQuickResults"], [id="qqSafetyRecs"], [id="qqDocumentStatus"], [id="qqExportError"]) {
+        display: none;
+    }
+
+    :where([data-ui="unified"][data-quick-quote="quick"]) .qq-results {
+        position: static;
+        max-height: none;
+        overflow: visible;
+    }
+
+    :where([data-ui="unified"][data-quick-quote="quick"]) .qq-sheet-item {
+        padding: 12px 0;
     }
 }
