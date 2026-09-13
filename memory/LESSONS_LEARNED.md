@@ -138,10 +138,6 @@ DTG test follow-up: initial product hydration can replace a number input between
 
 Problem/root cause: malformed usage could appear as zero, partial schema could mark tables gone, and local review storage assumed every read/write succeeded. Solution: validate complete responses before rendering, preserve snapshot evidence and notes, distinguish unknown from zero, show export/retry paths and clear only recovered errors. Prevention: exercise malformed/partial/denied storage and successful recovery with synthetic records, preserve the original snapshot, and inspect current-value PDFs. Print long reports in block flow; inherited flex/min-height can create a blank trailing sheet even when PDF text is complete.
 
-## Local file tools need dependency errors and native download evidence (2026-09-09)
-
-Problem/root cause: missing transform/parser globals could leave conversion stuck, malformed FTP rows looked like valid files, and a download mock observed no request even when the browser saved the file. Solution: validate dependencies/listings, show visible errors with the file retained, and test browser-managed attachments using an isolated loopback CSV server. Prevention: compare actual download bytes/queries and converted SKU/prices for CSV/TSV/XLSX; preserve pure financial transforms. Use canonical data-table classes as well as scrolling wrappers; check current-value paper text and geometry, not text extraction alone.
-
 ## Purchasing views must distinguish missing ledgers from zero balances (2026-09-09)
 
 Problem/root cause: incomplete invoices looked empty, failed import logs were classified as loaded, delayed requests could replace newer selections, and partial printouts dropped failed lookups. Solution: validate source shapes, keep unknown status and disable unsafe actions, invalidate old responses, and print failure notes with complete invoices. Prevention: test malformed/empty/failed/recovered feeds, mock confirmation and exact CSV bytes, preserve pure money/CSV helpers and AE compatibility. Declare CSS sublayers after primitives; check money widths at768 as well as phones, and inspect all printed line-item columns/current filter values. Optional paid-status sync needs its own visible fallback state.
@@ -250,3 +246,9 @@ Browser baselines must work from a fresh checkout. The tumbler export test previ
 - Root cause: legacy flex/display rules exposed empty CRM notices, a design thumbnail without a design, expired share notifications and disabled assistant actions without quote output. Phone date fields and preflight values were clipped.
 - Fix: shared hidden/notification contracts, native keyboard controls, wrapping customer values and full-width dates; compact method-scoped print controls retain every financial value.
 - Prevention: test populated fees, locations, shipping, successful/failed saves and research-only replies against original fields/payloads. Inspect complete scroll areas and every printed page; assert intended hidden/disabled state before normalizing original visibility.
+
+## Notifications and runtime style ownership (2026-09-12)
+
+- Problem/root cause: sample notifications repeatedly loaded icons and rendered behind the native cart dialog; narrow messages lacked a width bound. The runtime census missed stylesheet links embedded in template strings and mistook data-invoice-style for inline CSS.
+- Solution: reuse the bundled icon link, render an accessible manual popover in the active dialog, bound/wrap the notification and retain focus; parse generated stylesheet links and distinguish style attributes from data attributes. Include every reviewed stylesheet in the actual expanded lint result.
+- Prevention: exercise each notification type at four widths, real failed-stock add, focus, text escaping, timed removal and print hiding. Reconcile shared-source evidence against the same immutable baseline instead of changing its hashes.

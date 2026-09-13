@@ -26,6 +26,7 @@ const CSS_LINT_SCOPE = [
     'shared_components/css/crm-records.css',
     'shared_components/css/personalization-workspaces.css',
     'shared_components/css/staff-toolkit.css',
+    'shared_components/css/staff-home.css',
     'shared_components/css/staff-workspaces.css',
     'shared_components/css/staff-schedules.css',
     'shared_components/css/staff-payroll.css',
@@ -221,6 +222,7 @@ const CSS_LINT_SCOPE = [
     'shared_components/css/quote-embroidery.css',
     'shared_components/css/quote-screenprint.css',
     'shared_components/css/quote-dtf.css',
+    'shared_components/css/quote-dtg.css',
     'shared_components/css/quote-invoice.css',
     'shared_components/css/sticker-pricing-page.css',
     'shared_components/css/quote-share-modal.css',
@@ -266,6 +268,11 @@ module.exports = { CSS_LINT_SCOPE, run };
 if (require.main === module) {
     run()
         .then((r) => {
+            if (process.argv.includes('--json')) {
+                console.log(JSON.stringify(r));
+                process.exitCode = r.errored ? 1 : 0;
+                return;
+            }
             if (r.report.trim()) console.log(r.report);
             if (r.errored) process.exit(1);
             console.log(`stylelint: ${r.files.length} file(s) in scope, all clean`);

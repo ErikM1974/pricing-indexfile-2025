@@ -1387,6 +1387,8 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 
 Garment designer completion: page styles are scoped to the unified designer; art-intake.css owns the shared garment form and contact picker. company-contact-picker.css has no remaining direct HTML consumer and is flagged for the later runtime/dead-file audit, not deleted. Four hosts retain original field/payload contracts, and every current screen and paper page has been reviewed.
 
+- tests/e2e/css-unification-sample-runtime.spec.js — shared sample notification, icon reuse, modal visibility and four-width rendering checks on the catalog and product hosts.
+
 - tests/fixtures/quote-builders-original-content.json — original five quote-builder page and complete shared CSS/JavaScript dependency hashes before migration.
 - tests/e2e/helpers/quote-builders-browser.js — synthetic product/pricing/identity harness; bundles actual builder ESM and blocks unknown requests and business writes.
 - tests/e2e/css-unification-quote-builders.spec.js — original and current quote-builder screen, workflow and paper review.

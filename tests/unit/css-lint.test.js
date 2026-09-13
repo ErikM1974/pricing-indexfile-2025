@@ -22,7 +22,7 @@ describe('stylelint over the standardized stylesheets', () => {
     test('every stylesheet in CSS_LINT_SCOPE passes stylelint.config.mjs', () => {
         let out;
         try {
-            out = execFileSync(process.execPath, [path.join(ROOT, 'scripts', 'lint-css.js')], {
+            out = execFileSync(process.execPath, [path.join(ROOT, 'scripts', 'lint-css.js'), '--json'], {
                 cwd: ROOT,
                 encoding: 'utf8',
                 stdio: ['ignore', 'pipe', 'pipe'],
@@ -31,6 +31,14 @@ describe('stylelint over the standardized stylesheets', () => {
         } catch (e) {
             throw new Error('stylelint findings:\n' + (e.stdout || '') + (e.stderr || ''));
         }
-        expect(out).toMatch(/all clean/);
+        const result = JSON.parse(out);
+        expect(result.errored).toBe(false);
+        // Use the actual expanded files, including directory globs, so a new
+        // reviewed stylesheet cannot silently miss the production lint gate.
+        const manifest = require('../../scripts/css/migration-manifest.json');
+        const owners = [...manifest.pilots, ...(manifest.generatedDocuments || [])];
+        const styles = [...new Set(owners.flatMap(owner => owner.styles))]
+            .filter(file => !file.includes('/vendor/'));
+        expect(styles.filter(file => !result.files.includes(file))).toEqual([]);
     });
 });

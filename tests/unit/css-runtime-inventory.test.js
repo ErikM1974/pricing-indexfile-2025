@@ -16,7 +16,13 @@ test('runtime CSS census includes aliases, dynamic styles and explicitly served 
     expect(sources.get('training/lead-email-templates.html').kind).toBe('application');
     expect(sources.get('pages/quote-view.html').dynamicStyles).toContain('shared_components/css/garment-submit-form.css');
     const invoice = sources.get('quote-builders/embroidery-quote-builder.html').runtimeOwners.find(owner => owner.source === 'shared_components/js/embroidery-quote-invoice.js');
-    expect(invoice.generatedStyles).toBe(true);
+    expect(invoice.generatedStyles).toBe(false);
+    expect(invoice.inlineStyles).toBe(false);
+    expect(invoice.cssReferences).toEqual([
+        'shared_components/css/components.css',
+        'shared_components/css/quote-invoice.css',
+        'shared_components/css/tokens.css',
+    ]);
     expect(sources.get('dashboards/design-gallery.html')).toMatchObject({ missingStyles: [], cssParseErrors: [] });
     expect(report.serverGeneratedOwners.flatMap(group => group.owners)).toContain('lib/blog-templates.js');
     expect(sources.get('calculators/monogramform.html').externalEmbeds).toContain('https://form.jotform.com/jsform/243095362828059');

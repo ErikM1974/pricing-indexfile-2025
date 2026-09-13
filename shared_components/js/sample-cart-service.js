@@ -30,7 +30,7 @@
 
     /** Lazy-load Font Awesome (drawer + toast icons) on pages that skip it. */
     function ensureIcons() {
-        if (document.querySelector('link[href*="font-awesome"]')) return;
+        if (document.querySelector('link[rel="stylesheet"][href*="font-awesome"], link[rel="stylesheet"][href*="/fontawesome/"]')) return;
         var link = document.createElement('link');
         link.rel = 'stylesheet';
         link.href = FA_HREF;
@@ -250,11 +250,17 @@
             var icon = type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle';
             var toast = document.createElement('div');
             toast.className = 'drawer-toast drawer-toast-' + type;
+            toast.setAttribute('popover', 'manual');
+            toast.setAttribute('role', type === 'warning' ? 'alert' : 'status');
+            toast.setAttribute('aria-atomic', 'true');
             var text = document.createElement('span');
             text.textContent = message;
             toast.innerHTML = '<i class="fas fa-' + icon + '" aria-hidden="true"></i>';
             toast.appendChild(text);
-            document.body.appendChild(toast);
+            // Keep feedback in the active modal's accessibility tree and above
+            // its backdrop. A manual popover never steals keyboard focus.
+            (document.querySelector('dialog[open]') || document.body).appendChild(toast);
+            toast.showPopover();
             setTimeout(function () { toast.classList.add('show'); }, 10);
             setTimeout(function () {
                 toast.classList.remove('show');

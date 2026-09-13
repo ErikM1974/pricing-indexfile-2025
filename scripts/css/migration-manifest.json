@@ -6977,9 +6977,10 @@
     {
       "kind": "dynamic-css",
       "owners": [
-        "shared_components/js/sample-cart-service.js"
+        "shared_components/js/builders/dtg/pricing.js",
+        "shared_components/js/builders/dtf/methods-rows.js"
       ],
-      "note": "Shared garment form and its AE, lead, Quote View and designer hosts are reviewed. The sample-cart service handoff and any other generated styles remain separately tracked."
+      "note": "Sample-cart notifications and garment form hosts reviewed. These remaining builder error/empty snippets were discovered during the final runtime census; other generated owners remain separately listed."
     },
     {
       "kind": "generated-document",
@@ -7001,13 +7002,6 @@
         "routes/blog.js"
       ],
       "note": "Blog, denied-access and retirement responses."
-    },
-    {
-      "kind": "served-archive",
-      "owners": [
-        "calculators/archive/seasonal-2025/breast-cancer-awareness-bundle.html"
-      ],
-      "note": "Still served by a root route; do not count as an excluded archive."
     },
     {
       "kind": "non-page",
@@ -8761,6 +8755,33 @@
       "test": "tests/e2e/css-unification-quote-builder-workflows.spec.js",
       "maxCssBytes": 75859,
       "measuredRawCssBytes": 73811
+    }
+  ],
+  "reviewedRuntimeOwners": [
+    {
+      "kind": "dynamic-css",
+      "source": "shared_components/js/sample-cart-service.js",
+      "status": "reviewed",
+      "hosts": [
+        "pages/catalog.html",
+        "product.html"
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/cart-drawer.css"
+      ],
+      "states": [
+        "success-warning-info-four-widths",
+        "native-modal-top-layer-and-focus",
+        "unavailable-stock-blocks-add",
+        "escaped-notification-text",
+        "one-icon-stylesheet",
+        "timed-cleanup",
+        "notification-hidden-on-paper"
+      ],
+      "test": "tests/e2e/css-unification-sample-runtime.spec.js",
+      "note": "Only two direct script hosts; sample checkout reads the stored cart independently. All 26 notification screens / 38 panels reviewed; existing complete catalog/product page evidence remains valid."
     }
   ]
 }

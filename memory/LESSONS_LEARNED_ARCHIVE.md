@@ -4438,3 +4438,8 @@ Exercise state transitions and verify complete printed content. Full entry in LE
 Native storefront menu focus and paper migration (2026-09-09) is archived in LESSONS_LEARNED_ARCHIVE.md; existing keyboard/browser guards retain the contract.
 
 Staff reference failure-state findings (2026-09-09) are preserved in LESSONS_LEARNED_ARCHIVE.md.
+
+
+## Local file tools need dependency errors and native download evidence (2026-09-09)
+
+Problem/root cause: missing transform/parser globals could leave conversion stuck, malformed FTP rows looked like valid files, and a download mock observed no request even when the browser saved the file. Solution: validate dependencies/listings, show visible errors with the file retained, and test browser-managed attachments using an isolated loopback CSV server. Prevention: compare actual download bytes/queries and converted SKU/prices for CSV/TSV/XLSX; preserve pure financial transforms. Use canonical data-table classes as well as scrolling wrappers; check current-value paper text and geometry, not text extraction alone.
