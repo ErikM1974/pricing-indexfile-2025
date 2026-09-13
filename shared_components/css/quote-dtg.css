@@ -1,0 +1,298 @@
+@layer components.pages {
+/* DTG catalog and card-based order form. Shared chrome, controls, recaps and
+ * assistant shell come from quote-workspace and specialty-assistant. */
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .main-container { max-width:1800px; margin:auto; padding:24px clamp(16px,3vw,40px) 48px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .visually-hidden { position:absolute; width:1px; height:1px; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .page-titlebar { padding:16px 20px; margin-bottom:24px; border-left:4px solid var(--ui-accent); background:var(--ui-tint); border-radius:var(--radius-sm); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .page-titlebar-fact { display:flex; align-items:center; gap:12px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-layout { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.2fr); gap:24px; align-items:start; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-layout > *,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-form-body > *,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-line-head > * { min-width:0; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-catalog-section,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-form-wrap { background:var(--ui-surface); border:1px solid var(--ui-line); border-radius:var(--radius-md); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-catalog-section { padding:20px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-catalog-section-title,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dfh-title { display:flex; align-items:baseline; flex-wrap:wrap; gap:8px 12px; font-size:20px; font-weight:700; margin-bottom:8px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-catalog-section-meta,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-catalog-eyebrow,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dfh-sub,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-cc-meta,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-cc-category,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-cc-color-stat,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-mc-meta,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-mc-color-meta,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-mc-color-sizes,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-fullcat-prompt-hint { color:var(--ui-muted); font-size:12px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-catalog-eyebrow { margin-bottom:12px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-catalog-toolbar,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-catalog-tabs { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-catalog-toolbar { margin:20px 0; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-catalog-search-wrap { position:relative; flex:1 1 240px; min-width:0; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-catalog-search-icon { position:absolute; left:12px; top:16px; color:var(--ui-muted); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) input.dtg-catalog-search { padding-left:36px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-cat-tab.active,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-location-pill.selected,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-submit-btn:not(:disabled),:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-cc-add-default,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-mc-add-btn:not(:disabled),:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-fullcat-trigger { background:var(--ui-accent); border-color:var(--ui-accent); color:var(--color-on-brand); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-cat-tab.active:hover,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-location-pill.selected:hover,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-submit-btn:hover:not(:disabled),:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-cc-add-default:hover,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-mc-add-btn:hover:not(:disabled),:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-fullcat-trigger:hover { background:var(--ui-accent-hover); color:var(--color-on-brand); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-catalog-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr)); gap:16px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-catalog-card { display:flex; flex-direction:column; min-width:0; border:1px solid var(--ui-line); border-radius:var(--radius-sm); background:var(--ui-surface); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-cc-hero { position:relative; height:220px; overflow:hidden; background:var(--ui-canvas); border-radius:var(--radius-sm) var(--radius-sm) 0 0; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-cc-hero-img { width:100%; height:100%; object-fit:contain; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-cc-hero-placeholder { display:grid; place-items:center; height:100%; color:var(--ui-muted); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-cc-hero-badges { position:absolute; left:12px; top:12px; display:flex; flex-wrap:wrap; gap:6px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-cc-rank,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-mc-rank,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-mc-stat,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-cat-count,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dps-tier-pill,:where([data-ui="unified"][data-quote-workspace="dtg"]) .daf-code,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dpp-qid { padding:3px 7px; border-radius:var(--radius-sm); background:var(--ui-tint); color:var(--ui-accent); font-size:12px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-cat-tab.active .dtg-cat-count { background:transparent; color:inherit; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-cc-titleblock { padding:16px 16px 8px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-cc-style-row { display:flex; flex-wrap:wrap; align-items:baseline; gap:8px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-cc-style,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-mc-style { font-weight:700; color:var(--ui-accent); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-cc-title { font-size:16px; font-weight:600; margin:6px 0; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-cc-swatches { display:flex; flex-wrap:wrap; gap:8px; padding:8px 16px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) button.dtg-cc-color-swatch { position:relative; flex:none; width:44px; height:44px; padding:5px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-cc-color-swatch img,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-cc-swatch-placeholder { display:block; width:100%; height:100%; object-fit:cover; border-radius:3px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-cc-swatch-placeholder { background:var(--ui-canvas); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-cc-color-swatch--selected { outline:2px solid var(--ui-accent); outline-offset:1px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-cc-swatch-check { display:none; position:absolute; right:-4px; bottom:-4px; width:18px; height:18px; align-items:center; justify-content:center; border-radius:50%; background:var(--ui-accent); color:var(--color-on-brand); font-size:10px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-cc-color-swatch--selected .dtg-cc-swatch-check { display:flex; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-cc-color-stat { display:flex; flex-wrap:wrap; gap:4px; padding:8px 16px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-cc-actions { display:flex; flex-wrap:wrap; gap:8px; padding:12px 16px 16px; margin-top:auto; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-cc-actions button { flex:1 1 auto; white-space:normal; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-catalog-foot { margin-top:20px; padding:16px; border-radius:var(--radius-sm); color:var(--color-warning-ink); background:var(--color-warning-bg); font-size:13px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-catalog-loading,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-catalog-empty,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-catalog-error,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-fullcat-head { grid-column:1/-1; padding:20px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-catalog-error { color:var(--color-danger-ink); background:var(--color-danger-bg); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-fullcat-prompt,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-fullcat-head { display:grid; gap:12px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-catalog-modal-backdrop { position:fixed; inset:0; background:color-mix(in srgb,var(--gray-900) 45%,transparent); z-index:var(--z-overlay); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-catalog-modal { position:fixed; inset:50% auto auto 50%; transform:translate(-50%,-50%); width:min(900px,calc(100% - 32px)); max-height:calc(100dvh - 32px); overflow:auto; background:var(--ui-surface); border:1px solid var(--ui-line); border-radius:var(--radius-md); z-index:var(--z-modal); box-shadow:var(--shadow-md); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-catalog-modal-close { position:sticky; top:12px; float:right; margin:12px 12px 0; width:44px; z-index:1; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-catalog-modal-body { padding:24px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-mc-head { padding-right:48px; margin-bottom:20px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-mc-title { font-size:24px; line-height:1.25; margin:8px 0; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-mc-meta { display:flex; flex-wrap:wrap; gap:8px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-mc-colors { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr)); gap:12px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-mc-color-card { display:grid; grid-template-columns:48px minmax(0,1fr) auto; align-items:center; gap:12px; padding:12px; border:1px solid var(--ui-line); border-radius:var(--radius-sm); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-mc-color-card-added { background:var(--ui-tint); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-mc-color-swatch { width:48px; height:48px; object-fit:cover; border:1px solid var(--ui-line); border-radius:var(--radius-sm); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-mc-color-name { font-weight:600; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-mc-color-info { min-width:0; overflow-wrap:anywhere; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-form-header,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-form-section,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-customer-pane { padding:20px; border-bottom:1px solid var(--ui-line); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-form-body { display:grid; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-rows-pane { padding:20px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-customer-pane { border-top:1px solid var(--ui-line); border-bottom:0; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dfs-label,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-label,:where([data-ui="unified"][data-quote-workspace="dtg"]) .daf-label,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-section-head,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-shipto-head,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dlr-group-label { font-weight:600; margin-bottom:12px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dlr-group-label,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-field-label,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-search-label { display:block; font-size:13px; margin-bottom:6px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-location-row { display:grid; gap:16px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dlr-options { display:flex; flex-wrap:wrap; gap:8px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-location-pill { display:inline-flex; align-items:center; flex-wrap:wrap; gap:6px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-location-pill .dim { font-size:12px; font-weight:400; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-cc-category,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-submit-btn,:where([data-ui="unified"][data-quote-workspace="dtg"]) .st-title { text-transform:uppercase; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-location-summary { padding:12px; background:var(--ui-tint); border-radius:var(--radius-sm); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-location-summary .dls-code { display:block; font-weight:600; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-rows-cards { display:grid; gap:16px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-rows-empty { padding:24px; border:1px dashed var(--ui-line-strong); border-radius:var(--radius-sm); color:var(--ui-muted); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-line-card { padding:16px; border:1px solid var(--ui-line); border-radius:var(--radius-sm); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-line-head { display:grid; grid-template-columns:100px minmax(0,1fr) auto; gap:8px; align-items:center; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-line-actions { display:flex; gap:4px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-line-actions button { width:44px; padding:8px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-line-remove { color:var(--color-danger-ink); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-combobox,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-line-color { position:relative; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-combobox-chevron { position:absolute; right:12px; top:16px; pointer-events:none; color:var(--ui-muted); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-line-color input,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-design-row input { padding-right:30px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-row-color-swatch { position:absolute; top:13px; left:10px; width:18px; height:18px; border:1px solid var(--ui-line); border-radius:3px; background-size:cover; background-position:center; pointer-events:none; z-index:1; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-line-color input[data-has-swatch="true"] { padding-left:36px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-line-desc { margin:10px 0; color:var(--ui-muted); overflow-wrap:anywhere; font-size:13px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-line-sizes { display:grid; grid-template-columns:repeat(auto-fit,minmax(54px,1fr)); gap:10px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-size-cell { display:grid; gap:6px; min-width:0; text-align:center; align-content:start; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-size-label { font-size:12px; font-weight:600; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-size-cell input[type="number"] { text-align:center; padding:8px 2px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-size-price,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-size-warn { font-size:11px; line-height:1.4; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-size-na { display:grid; place-items:center; min-height:44px; background:var(--ui-canvas); color:var(--ui-muted); border-radius:var(--radius-sm); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-size-price--oos,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-size-warn,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-row-color-warn { color:var(--color-danger-ink); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-row-color-invalid input,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-size-cell--overflow input { border-color:var(--color-danger); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-line-foot { display:flex; flex-wrap:wrap; gap:8px 16px; margin-top:14px; padding-top:12px; border-top:1px solid var(--ui-line); font-size:13px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-line-total { font-weight:700; color:var(--ui-accent); margin-left:auto; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-add-row-btn { width:100%; margin-top:16px; border-style:dashed; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-combobox-menu { position:fixed; max-height:300px; overflow:auto; background:var(--ui-surface); color:var(--ui-ink); border:1px solid var(--ui-line-strong); border-radius:var(--radius-sm); box-shadow:var(--shadow-md); z-index:var(--z-modal); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-combobox-item,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-combobox-empty,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-combobox-hint { padding:12px; border-bottom:1px solid var(--ui-line); font-size:13px; overflow-wrap:anywhere; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-combobox-item { cursor:pointer; min-height:44px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-combobox-item:hover,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-combobox-item.active { background:var(--ui-tint); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .ci-primary { font-weight:600; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .ci-secondary,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-combobox-hint { color:var(--ui-muted); font-size:12px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .ci-swatches { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .ci-swatch-mini,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-color-pill .swatch { width:20px; height:20px; border-radius:3px; border:1px solid var(--ui-line); background-size:cover; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-color-pill { display:inline-flex; align-items:center; gap:6px; padding:3px 6px; background:var(--ui-tint); border-radius:var(--radius-sm); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-color-pill img { width:100%; height:100%; object-fit:cover; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-art-fees,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-price-summary,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-preflight-panel { padding:16px; margin:16px 0; border:1px solid var(--ui-line); border-radius:var(--radius-sm); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-art-fees.daf-active,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-price-summary { background:var(--ui-tint); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .daf-label { display:flex; align-items:baseline; flex-wrap:wrap; gap:6px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .daf-sub,:where([data-ui="unified"][data-quote-workspace="dtg"]) .daf-note,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dps-note,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dps-empty,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-field-hint,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-optional,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-field-sub,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-date-hint,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-toggle-sub,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-newart-sub,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-shipto-sub,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-estimate-result,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-newart-dropzone-sub { color:var(--ui-muted); font-size:12px; line-height:1.6; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .daf-row { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px 16px; padding:8px 0; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .daf-toggle { display:flex; align-items:center; gap:8px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .daf-note { display:block; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .daf-calc { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .daf-calc input[type="number"] { width:76px; text-align:right; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .daf-line-total { min-width:68px; text-align:right; font-weight:600; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dps-label { font-weight:600; margin-bottom:12px; text-transform:uppercase; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dps-grid { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dps-total { font-size:24px; font-weight:700; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dps-totals-rows { margin-top:12px; display:grid; gap:8px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dps-totals-row,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dps-subtotal-row { display:flex; justify-content:space-between; gap:16px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dps-grand-row { font-weight:700; padding-top:12px; border-top:1px solid var(--ui-line-strong); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dps-mono { white-space:nowrap; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-tax-controls { display:flex; align-items:center; flex-wrap:wrap; gap:8px 16px; margin-top:12px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-tax-ctl { display:flex; align-items:center; gap:8px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-tax-ctl input[type="number"] { width:84px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-manual { display:grid; gap:16px; margin-top:16px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-row { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-row > * { min-width:0; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-field-email,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-field-wrap { min-width:0; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-divider { margin:16px 0; color:var(--ui-muted); font-size:12px; text-align:center; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-dates,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-shipto,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-newart,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-pickup-toggle,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-history-pill { padding:16px; border:1px solid var(--ui-line); border-radius:var(--radius-sm); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-dates .dcp-row { grid-template-columns:repeat(auto-fit,minmax(min(190px,100%),1fr)); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-toggle-label { cursor:pointer; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-toggle-track { display:none; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-toggle-text { display:grid; gap:4px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-pickup-toggle:has(input:checked) { background:var(--ui-tint); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-shipto { display:grid; gap:12px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-row.dcp-row-3 { grid-template-columns:minmax(0,2fr) minmax(80px,1fr) minmax(90px,1fr); gap:12px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-shipfee-row { display:flex; align-items:center; flex-wrap:wrap; gap:8px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-shipfee-row input[type="number"] { width:110px; text-align:right; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-tax-status { margin-top:8px; font-size:12px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-tax-status--success,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-newart-status--success,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dpp-i--ok { color:var(--ui-accent); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-tax-status--warning,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dpp-i--warn { color:var(--color-warning-ink); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-tax-status--error,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-newart-status--error,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dpp-i--block { color:var(--color-danger-ink); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-section-head { display:flex; align-items:center; flex-wrap:wrap; gap:8px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-required { font-size:12px; color:var(--color-danger-ink); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-newart-dropzone { padding:24px 16px; margin-top:12px; text-align:center; border:1px dashed var(--ui-line-strong); border-radius:var(--radius-sm); background:var(--ui-canvas); cursor:pointer; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-newart-dropzone:hover,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-newart-dropzone--over { border-color:var(--ui-accent); background:var(--ui-tint); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-newart-browse { text-decoration:underline; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-newart.dcp-newart-collapsed .dcp-newart-dropzone,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-newart.dcp-newart-collapsed .dcp-newart-list,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-newart.dcp-newart-collapsed .dcp-field-wrap { display:none; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-newart-list { display:grid; gap:12px; margin-top:12px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-newart-card { display:grid; grid-template-columns:56px minmax(0,1fr) 44px; gap:10px; align-items:center; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-newart-thumb,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-newart-thumb-img,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-design-thumb-anchor img,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-design-row-thumb { width:56px; height:56px; object-fit:contain; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-newart-card-name { overflow-wrap:anywhere; font-weight:600; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-newart-card-meta,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-newart-status { font-size:12px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-design-row { display:flex; align-items:center; gap:8px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-design-row .dtg-combobox { min-width:0; flex:1; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-design-thumb-anchor { position:relative; flex:none; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-design-thumb-zoom { position:absolute; bottom:0; right:0; padding:3px; background:var(--ui-surface); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-design-row-text { min-width:0; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-secondary-actions,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dts-error-actions,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-form-foot { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-secondary-actions button { flex:1 1 auto; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-submit-btn { width:100%; margin-top:16px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-submit-status:not(:empty),:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-validation-banner { padding:16px; margin-top:16px; border:1px solid var(--ui-line); border-radius:var(--radius-sm); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-submit-status.error,:where([data-ui="unified"][data-quote-workspace="dtg"]) .shopworks-error-card { color:var(--color-danger-ink); background:var(--color-danger-bg); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-submit-status.success,:where([data-ui="unified"][data-quote-workspace="dtg"]) .shopworks-success-card { color:var(--ui-accent); background:var(--ui-tint); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-validation-banner,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-resume-banner-inline,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-customer-warning { color:var(--color-warning-ink); background:var(--color-warning-bg); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-resume-banner-inline { display:flex; flex-wrap:wrap; align-items:center; gap:12px; padding:16px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-form-foot { align-items:center; padding:20px; border-top:1px solid var(--ui-line); margin:0; font-size:12px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-form-foot button { margin-left:auto; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-preflight-panel { padding:0; overflow:hidden; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dpp-header { display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding:14px 16px; background:var(--ui-tint); font-weight:600; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dpp-header--blocked { color:var(--color-warning-ink); background:var(--color-warning-bg); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dpp-header-text { flex:1; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dpp-items { display:grid; gap:4px; padding:12px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dpp-item { display:grid; grid-template-columns:16px minmax(60px,auto) minmax(0,1fr); gap:8px; padding:8px 4px; font-size:12px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dpp-label { font-weight:600; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dpp-value { min-width:0; overflow-wrap:anywhere; color:var(--ui-muted); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dpp-item--clickable { cursor:pointer; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dpp-item--clickable:hover { background:var(--ui-tint); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-customer-warning { display:flex; gap:10px; padding:14px; border-radius:var(--radius-sm); margin-top:12px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-chip-row { display:flex; flex-wrap:wrap; gap:8px; margin:8px 0; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) [data-dtg-style="tax-chip"],:where([data-ui="unified"][data-quote-workspace="dtg"]) [data-dtg-style="tier-chip"] { padding:6px 10px; border-radius:var(--radius-sm); background:var(--ui-tint); color:var(--ui-accent); font-size:12px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) [data-dtg-style="terms-note"] { font-size:12px; color:var(--color-warning-ink); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dhp-head,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dhp-row { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dhp-summary { flex:1; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dhp-body { display:grid; gap:8px; margin-top:12px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dhp-label { font-weight:600; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dhp-value { overflow-wrap:anywhere; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dhp-meta { font-size:12px; color:var(--ui-muted); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-stock-confirm-backdrop,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-thumb-lightbox { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; padding:16px; z-index:var(--z-modal); background:color-mix(in srgb,var(--gray-900) 45%,transparent); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-thumb-lightbox-backdrop { position:absolute; inset:0; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-stock-confirm-modal,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-thumb-lightbox-panel { position:relative; width:min(700px,100%); max-height:calc(100dvh - 32px); overflow:auto; padding:24px; border:1px solid var(--ui-line); border-radius:var(--radius-md); background:var(--ui-surface); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-thumb-lightbox-close { position:absolute; top:12px; right:12px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-thumb-lightbox-title { padding-right:48px; margin-bottom:12px; font-weight:600; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-thumb-lightbox-panel img { max-width:100%; max-height:70dvh; object-fit:contain; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dscm-head,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dscm-actions { display:flex; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dscm-title { font-size:20px; font-weight:700; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dscm-list { margin:16px 0; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dscm-item { display:flex; flex-wrap:wrap; gap:8px; padding:12px 0; border-bottom:1px solid var(--ui-line); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .cta-compact { display:flex; flex-wrap:wrap; align-items:center; gap:12px; padding:24px 0; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .pricing-footer { padding-top:20px; border-top:1px solid var(--ui-line); color:var(--ui-muted); font-size:12px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .ai-chat-backdrop { background:transparent; pointer-events:none; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .ai-chat-context-pill:empty { display:none; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-quote-card,:where([data-ui="unified"][data-quote-workspace="dtg"]) .top-seller-card,:where([data-ui="unified"][data-quote-workspace="dtg"]) .product-details-card,:where([data-ui="unified"][data-quote-workspace="dtg"]) .web-search-results,:where([data-ui="unified"][data-quote-workspace="dtg"]) .shopworks-success-card,:where([data-ui="unified"][data-quote-workspace="dtg"]) .shopworks-error-card { padding:16px; margin-top:12px; border:1px solid var(--ui-line); border-radius:var(--radius-sm); background:var(--ui-surface); overflow-wrap:anywhere; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-quote-card { background:var(--ui-tint); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-quote-card .dtg-line { display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-top:8px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-quote-card .dtg-line.total { font-size:18px; font-weight:700; border-top:1px solid var(--ui-line-strong); padding-top:12px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-quote-card .dtg-line-item { padding:12px 0; border-bottom:1px solid var(--ui-line); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-label,:where([data-ui="unified"][data-quote-workspace="dtg"]) .tsr-label,:where([data-ui="unified"][data-quote-workspace="dtg"]) .pd-label,:where([data-ui="unified"][data-quote-workspace="dtg"]) .pd-section-label { font-weight:600; margin-bottom:8px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-sizes,:where([data-ui="unified"][data-quote-workspace="dtg"]) .ts-colors,:where([data-ui="unified"][data-quote-workspace="dtg"]) .pd-top-picks-grid,:where([data-ui="unified"][data-quote-workspace="dtg"]) .pd-size-list { display:flex; flex-wrap:wrap; gap:8px; margin:8px 0; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-rule-note,:where([data-ui="unified"][data-quote-workspace="dtg"]) .ts-brand,:where([data-ui="unified"][data-quote-workspace="dtg"]) .ts-sales,:where([data-ui="unified"][data-quote-workspace="dtg"]) .ts-best-for,:where([data-ui="unified"][data-quote-workspace="dtg"]) .pd-meta,:where([data-ui="unified"][data-quote-workspace="dtg"]) .wsr-domain { font-size:12px; color:var(--ui-muted); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .top-seller-card.has-thumb { display:grid; grid-template-columns:64px minmax(0,1fr); gap:12px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .ts-thumb img { width:64px; height:80px; object-fit:contain; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .ts-color-chip { display:inline-flex; gap:6px; align-items:center; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .ts-color-chip .swatch,:where([data-ui="unified"][data-quote-workspace="dtg"]) .pd-top-pick-swatch { display:inline-block; width:24px; height:24px; background-size:cover; border:1px solid var(--ui-line); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .pd-hero { text-align:center; margin-bottom:16px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .pd-hero-img { max-width:100%; height:180px; object-fit:contain; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .color-swatch-grid,:where([data-ui="unified"][data-quote-workspace="dtg"]) .pd-size-matrix-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(64px,1fr)); gap:10px; margin-top:12px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .color-swatch { display:grid; gap:6px; width:auto; height:auto; text-align:center; font-size:12px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .color-swatch .cs-img { width:40px; height:40px; object-fit:cover; margin:auto; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .color-swatch.picked { border-color:var(--ui-accent); background:var(--ui-tint); }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .pd-size-matrix-actions { display:flex; align-items:center; flex-wrap:wrap; gap:12px; margin-top:16px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .pd-sm-cell { display:grid; gap:6px; font-size:12px; }
+
+@media (width <= 1200px) {
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-layout { grid-template-columns:minmax(0,1fr); }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-catalog-grid { grid-template-columns:repeat(auto-fit,minmax(min(250px,100%),1fr)); }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-form-body { grid-template-columns:repeat(2,minmax(0,1fr)); align-items:start; }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-customer-pane { border-top:0; border-left:1px solid var(--ui-line); }
+}
+
+@media (width <= 900px) {
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-form-body { grid-template-columns:minmax(0,1fr); }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-customer-pane { border-left:0; border-top:1px solid var(--ui-line); }
+}
+
+@media (width <= 600px) {
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .main-container { padding:16px 12px 32px; }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-catalog-section,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-form-header,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-form-section,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-rows-pane,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-customer-pane { padding:16px; }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-line-head { grid-template-columns:minmax(0,1fr) auto; }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-line-color { grid-column:1/-1; grid-row:2; }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-line-actions { grid-column:2; grid-row:1; }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-line-card { padding:12px; }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-row,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-row.dcp-row-3 { grid-template-columns:minmax(0,1fr); }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-art-fees,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-dates,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-shipto,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-newart,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-pickup-toggle { padding:12px; }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-mc-color-card { grid-template-columns:40px minmax(0,1fr); }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-mc-add-btn { grid-column:1/-1; }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-mc-color-swatch { width:40px; height:40px; }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-catalog-modal-body { padding:16px; }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dpp-item { grid-template-columns:16px minmax(0,1fr); }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dpp-value { grid-column:2; }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-form-foot { align-items:stretch; flex-direction:column; }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-form-foot button { margin-left:0; }
+}
+
+@media print {
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .main-container { padding:0; max-width:none; }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-layout,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-form-body { display:block; }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-catalog-section { margin-bottom:16px; }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-catalog-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-catalog-card,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-line-card,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-art-fees,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-price-summary,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-row,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-dates,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-pickup-toggle,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-preflight-panel { break-inside:avoid; }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-cc-hero { height:80px; }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-catalog-toolbar,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-cc-actions,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-cc-swatches,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-catalog-modal,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-catalog-modal-backdrop,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-thumb-lightbox,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-stock-confirm-backdrop,:where([data-ui="unified"][data-quote-workspace="dtg"]) .share-toast,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-secondary-actions,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-submit-btn,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-add-row-btn,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-line-actions,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-newart-dropzone,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-form-foot,:where([data-ui="unified"][data-quote-workspace="dtg"]) .cta-compact { display:none; }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-customer-pane { border-left:0; }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-form-header,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-form-section,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-rows-pane,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-customer-pane { padding:12px; }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-line-head { grid-template-columns:100px minmax(0,1fr); }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-line-sizes { grid-template-columns:repeat(10,minmax(0,1fr)); gap:6px; }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-row,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-dates .dcp-row { grid-template-columns:repeat(2,minmax(0,1fr)); }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-row.dcp-row-3 { grid-template-columns:2fr 1fr 1fr; }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dcp-manual { gap:8px; margin-top:8px; }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-form-wrap,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-catalog-section { border-color:var(--ui-line-strong); }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-catalog-section,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-line-card,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-art-fees,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-price-summary { padding:12px; }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-location-row { gap:8px; }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dlr-options { gap:4px; }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-location-pill { min-height:0; padding:5px 8px; font-size:8pt; }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dpp-item { grid-template-columns:16px auto minmax(0,1fr); }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dpp-value { grid-column:auto; }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-mc-head { padding-right:0; }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .pricing-footer { margin-top:12px; font-size:8pt; }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) :focus { outline:none; box-shadow:none; }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) :is(.dtg-form-header,.dtg-form-section,.dtg-rows-pane,.dtg-customer-pane,.dtg-line-card,.dtg-art-fees,.dtg-price-summary,.dtg-preflight-panel,.dcp-dates,.dcp-shipto,.dcp-newart,.dcp-pickup-toggle) { padding:8px 10px; }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) :is(.dfs-label,.dcp-label,.daf-label,.dcp-section-head,.dcp-shipto-head,.dlr-group-label,.dcp-field-label,.dcp-search-label,.dps-label) { margin-bottom:4px; font-size:8pt; }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) :is(.dcp-row,.dcp-shipto) { gap:8px; }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) :is(.dtg-art-fees,.dtg-price-summary,.dtg-preflight-panel,.dcp-divider) { margin:8px 0; }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) input:not([type="checkbox"],[type="radio"]),:where([data-ui="unified"][data-quote-workspace="dtg"]) select,:where([data-ui="unified"][data-quote-workspace="dtg"]) textarea,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-size-cell input[type="number"] { min-height:0; height:auto; padding:3px 6px; font-size:8pt; line-height:1.4; }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-size-na { min-height:23px; font-size:8pt; }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-row-color-swatch { top:4px; width:16px; height:16px; }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-combobox-chevron { top:6px; }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-line-color input[data-has-swatch="true"] { padding-left:32px; }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) :is(.dtg-line-foot,.dps-grand-row) { padding-top:6px; margin-top:6px; }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-cc-titleblock { padding:8px 12px 4px; }
+ :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-catalog-foot { margin-top:8px; padding:8px; }
+}
+
+}

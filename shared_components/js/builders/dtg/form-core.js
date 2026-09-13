@@ -175,7 +175,7 @@ export function render() {
 
             <div class="dtg-form-body">
                 <div class="dtg-rows-pane">
-                    <div class="dfs-label" style="margin-bottom:8px;"><i class="fas fa-list" aria-hidden="true"></i> Line items</div>
+                    <div class="dfs-label" data-dtg-style="line-label"><i class="fas fa-list" aria-hidden="true"></i> Line items</div>
                     <!-- 2026-05-19: switched from <table> to card-per-line-item
                          so the form fits cleanly in the new sticky right column
                          of the two-column layout. Each card is self-contained:
@@ -203,12 +203,12 @@ export function render() {
                          customer is picked. Hidden when the customer has no
                          warning / no tax exempt / no account tier. -->
                     <div id="dtgCustomerWarning" class="dtg-customer-warning" hidden
-                         style="display:flex;align-items:flex-start;gap:10px;background:#fef3c7;border:1px solid #fde68a;border-left:4px solid #d97706;border-radius:4px;padding:10px 14px;margin:8px 0;color:#78350f;font-size:13px;line-height:1.45;"></div>
-                    <div class="dcp-chip-row" style="display:flex;flex-wrap:wrap;gap:6px;margin:6px 0;">
+                         data-dtg-style="customer-warning"></div>
+                    <div class="dcp-chip-row" data-dtg-style="chip-row">
                         <span id="dtgTaxExemptChip" hidden
-                              style="display:inline-flex;align-items:center;gap:6px;background:#dcfce7;border:1px solid #bbf7d0;color:#166534;padding:4px 10px;border-radius:4px;font-size:12px;font-weight:600;"></span>
+                              data-dtg-style="tax-chip"></span>
                         <span id="dtgAccountTierBadge" hidden
-                              style="display:inline-flex;align-items:center;gap:6px;background:#e0e7ff;border:1px solid #c7d2fe;color:#3730a3;padding:4px 10px;border-radius:4px;font-size:12px;font-weight:600;"></span>
+                              data-dtg-style="tier-chip"></span>
                     </div>
 
                     <!-- Customer history pill (2026-05-20 — Phase 1: info-only).
@@ -295,7 +295,7 @@ export function render() {
                                 <div class="dcp-field-label">
                                     Payment terms
                                     <span id="dtgTermsMapNote" hidden
-                                          style="font-size:11px;color:#92400e;font-weight:600;margin-left:6px;"
+                                          data-dtg-style="terms-note"
                                           title="Customer's CRM term mapped to a term NWCA currently offers"></span>
                                 </div>
                                 <select id="dtgTerms" aria-label="Payment terms">

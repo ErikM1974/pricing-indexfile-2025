@@ -1474,6 +1474,60 @@
       "before": "        row.querySelector('.color-picker-dropdown').classList.add('hidden');\n    row.querySelector('.color-picker-selected')?.setAttribute('aria-expanded', 'false');\n    row.querySelector('.color-picker-selected')?.removeAttribute('aria-activedescendant');",
       "after": "        row.querySelector('.color-picker-dropdown').classList.add('hidden');\n        row.querySelector('.color-picker-selected')?.setAttribute('aria-expanded', 'false');\n        row.querySelector('.color-picker-selected')?.removeAttribute('aria-activedescendant');",
       "count": 1
+    },
+    {
+      "file": "quote-builders/dtg-quote-builder.html",
+      "before": "<body>",
+      "after": "<body data-ui=\"unified\" data-quote-workspace=\"dtg\" data-specialty-assistant=\"dtg\">",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/dtg-quote-builder.html",
+      "before": "family=Inter:wght@400;500;600;700",
+      "after": "family=Public+Sans:wght@400;500;600;700",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/dtg-quote-builder.html",
+      "before": "    <!-- Shared chat/page CSS (sticker is canonical) + DTG overrides -->\n    <link rel=\"stylesheet\" href=\"/shared_components/css/sticker-pricing-page.css?v=2026.09.07.19\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/dtg-quote-page.css?v=2026.09.09.11\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/dtg-inline-form.css?v=2026.09.07.19\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/dtg-catalog.css?v=2026.09.07.19\">",
+      "after": "    <!-- Shared quote controls and assistant shell; DTG owns its catalog and card form. -->\n    <link rel=\"stylesheet\" href=\"/shared_components/css/components.css?v=2026.09.12.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/utilities.css?v=2026.09.12.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/quote-workspace.css?v=2026.09.12.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/specialty-assistant.css?v=2026.09.12.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/quote-dtg.css?v=2026.09.12.2\">",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/builders/dtg/form-core.js",
+      "before": "style=\"margin-bottom:8px;\"",
+      "after": "data-dtg-style=\"line-label\"",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/builders/dtg/form-core.js",
+      "before": "style=\"display:flex;align-items:flex-start;gap:10px;background:#fef3c7;border:1px solid #fde68a;border-left:4px solid #d97706;border-radius:4px;padding:10px 14px;margin:8px 0;color:#78350f;font-size:13px;line-height:1.45;\"",
+      "after": "data-dtg-style=\"customer-warning\"",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/builders/dtg/form-core.js",
+      "before": "style=\"display:flex;flex-wrap:wrap;gap:6px;margin:6px 0;\"",
+      "after": "data-dtg-style=\"chip-row\"",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/builders/dtg/form-core.js",
+      "before": "style=\"display:inline-flex;align-items:center;gap:6px;background:#dcfce7;border:1px solid #bbf7d0;color:#166534;padding:4px 10px;border-radius:4px;font-size:12px;font-weight:600;\"",
+      "after": "data-dtg-style=\"tax-chip\"",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/builders/dtg/form-core.js",
+      "before": "style=\"display:inline-flex;align-items:center;gap:6px;background:#e0e7ff;border:1px solid #c7d2fe;color:#3730a3;padding:4px 10px;border-radius:4px;font-size:12px;font-weight:600;\"",
+      "after": "data-dtg-style=\"tier-chip\"",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/builders/dtg/form-core.js",
+      "before": "style=\"font-size:11px;color:#92400e;font-weight:600;margin-left:6px;\"",
+      "after": "data-dtg-style=\"terms-note\"",
+      "count": 1
     }
   ]
 }

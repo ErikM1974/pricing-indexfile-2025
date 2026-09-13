@@ -40,7 +40,11 @@ async function open(page,state={}){
  page.on('pageerror',e=>events.errors.push(e.message));page.on('dialog',async d=>{events.dialogs.push(d.message());await d.dismiss();});
  const handleRoute=async route=>{
   const request=route.request(),u=new URL(request.url()),p=u.pathname,method=request.method(),style=u.searchParams.get('styleNumber')||'PC54';
-  if(state.save&&p.startsWith('/api/quote-sequence/'))return route.fulfill({json:{prefix:p.split('/').pop(),year:2026,sequence:777}});
+  if((state.save||state.assistant)&&p.startsWith('/api/quote-sequence/'))return route.fulfill({json:{prefix:p.split('/').pop(),year:2026,sequence:777}});
+  if(state.assistant&&p==='/api/dtg-quote-ai/chat'&&method==='POST'){
+   events.reads.push({path:p,method,body:request.postDataJSON()});
+   return route.fulfill({contentType:'text/event-stream',body:'event: delta\ndata: '+JSON.stringify({text:'Synthetic research reply. Review the selected product, print location, quantities and customer details in the order form.'})+'\n\n'});
+  }
   if(state.save&&['/api/quote_sessions','/api/quote_items'].includes(p)){
    if(method==='GET')return route.fulfill({json:[]});
    if(method==='POST'){const body=request.postDataJSON();events.mutations.push({path:p,method,body:{...body,...(body.SessionID?{SessionID:'synthetic-session'}:{})}});return route.fulfill({status:state.saveFailed?503:201,json:state.saveFailed?{error:'Synthetic save failure'}:{PK_ID:99001,QuoteID:body.QuoteID}});}

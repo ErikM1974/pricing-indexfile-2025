@@ -1543,3 +1543,17 @@ Garment designer completion: page styles are scoped to the unified designer; art
 - tests/fixtures/quote-builders-dtf-detailed-shipping-fields-original-browser.json — immutable original synthetic populated builder workflow evidence.
 
 - shared_components/css/quote-dtf.css — canonical DTF transfer-location and order form styles, using the shared quote workspace.
+
+- shared_components/css/quote-dtg.css — canonical DTG catalog, card order form, responsive controls and paper layout.
+
+- tests/fixtures/quote-builders-dtg-detailed-locations-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-dtg-detailed-fees-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-dtg-detailed-shipping-fields-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-dtg-detailed-save-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-dtg-detailed-save-failure-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-dtg-detailed-assistant-original-browser.json — immutable original synthetic populated builder workflow evidence.

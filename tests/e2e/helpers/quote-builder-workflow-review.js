@@ -54,6 +54,35 @@ async function evidence(page,name,e){
     expect(currentURL.origin,name+' share link uses the current app origin').toBe(previewOrigin);
     return {...field,value:originalURL.origin+currentURL.pathname+currentURL.search+currentURL.hash};
    });
+   if(name.startsWith('dtg-')&&!name.endsWith('-invoice')){
+    // Legacy inline display declarations exposed hidden, empty CRM banners and
+    // a thumbnail with no design. The canonical hidden contract now wins.
+    if(key==='ids')for(const id of ['dtgCustomerWarning','dtgTaxExemptChip','dtgAccountTierBadge','dtgDesignThumbImg']){
+     if(expectedValue[id]===''&&actual[id]===undefined){await expect(page.locator('#'+id)).toBeHidden();delete expectedValue[id];}
+    }
+    // Research-only replies have no quote output. Legacy display:flex exposed
+    // this deliberately hidden, disabled action group before the hidden reset.
+    if(key==='ids'&&name==='dtg-detailed-assistant'){
+     await expect(page.locator('#aiChatActions')).toHaveAttribute('hidden','');
+     for(const id of ['aiOutlookBtn','aiCopyEmailBtn','aiSaveQuoteBtn']){
+      await expect(page.locator('#'+id)).toBeHidden();
+      await expect(page.locator('#'+id)).toBeDisabled();
+      await expect(page.locator('#'+id)).toHaveText(expectedValue[id]);
+      delete expectedValue[id];
+     }
+    }
+    if(key==='ids'&&expectedValue.shareToastText!==undefined&&actual.shareToastText===undefined){
+     await expect(page.locator('#shareToast')).not.toHaveClass(/show/);
+     await expect(page.locator('#shareToast')).toBeHidden();
+     await expect(page.locator('#shareToastText')).toHaveText(expectedValue.shareToastText);
+     delete expectedValue.shareToastText;
+    }
+    if(key==='links'){
+     await expect(page.locator('#dtgDesignThumbAnchor')).toHaveAttribute('hidden','');
+     await expect(page.locator('#dtgDesignThumbAnchor')).toHaveAttribute('href','#');
+     expectedValue=expectedValue.filter(link=>!(link.href==='#'&&link.text===''));
+    }
+   }
    if(/^(embroidery|screenprint|dtf)-/.test(name)&&!name.startsWith('screenprint-fast-')&&key==='ids'){
     // The resized layout keeps thumbnails on phones and offers its drag handle only beside the content.
     // These empty presentation nodes may change visibility; all values and form controls stay exact.

@@ -30,6 +30,54 @@ for(const scene of ['catalog','catalog-detail','product','colors','customer','sh
  await evidence(page,'dtg-'+scene,e);
 });
 
+for(const scene of ['fees','locations','shipping-fields','save','save-failure','assistant'])test('CSS quote builders: dtg detailed '+scene,async({page})=>{
+ const state={original,save:scene.startsWith('save'),saveFailed:scene==='save-failure',assistant:scene==='assistant',richCatalog:true,url:'/quote-builders/dtg-quote-builder.html'};
+ const e=await open(page,state);await page.waitForLoadState('networkidle');
+ await page.locator('.dtg-cc-add-default').first().click();
+ const qty=page.locator('.dtg-line-card input[data-size="M"]').first();await qty.fill('24');await qty.dispatchEvent('change');
+ await expect(page.locator('#dtgPriceSummary')).toContainText('$396.72');
+ await page.locator('#dtgFirstName').fill('Example');await page.locator('#dtgLastName').fill('Customer');await page.locator('#dtgEmail').fill('customer@example.invalid');
+ if(scene==='fees'){
+  await page.locator('#dtgArtSetupToggle').check();await page.locator('#dtgDesignHours').fill('2');await page.locator('#dtgDesignHours').dispatchEvent('change');
+  await expect(page.locator('#dtgPriceSummary')).toContainText('$617.12');
+ }
+ if(scene==='locations'){
+  await page.locator('[data-loc-group="front"][data-loc-code="FF"]').click();await page.locator('[data-loc-group="back"][data-loc-code="FB"]').click();
+  await expect(page.locator('#dtgLocationSummary')).toContainText('FF_FB');
+ }
+ if(scene==='shipping-fields'){
+  await page.locator('#dtgPoNumber').fill('SYNTHETIC-PO-17');await page.locator('.dcp-pickup-toggle label').click();
+  for(const [id,value] of Object.entries({dtgShipAddress1:'123 Example Street',dtgShipCity:'Example City',dtgShipState:'WA',dtgShipZip:'98354',dtgShipFee:'12.50'})){await page.locator('#'+id).fill(value);await page.locator('#'+id).dispatchEvent('change');}
+  await page.locator('#dtgDueDate').fill('2026-09-25');await page.locator('#dtgDueDate').dispatchEvent('change');
+  await page.locator('#dtgDropDeadDate').fill('2026-09-30');await page.locator('#dtgDropDeadDate').dispatchEvent('change');
+  await page.waitForLoadState('networkidle');
+ }
+ if(scene.startsWith('save')){
+  await page.locator('[data-call="dtgSaveQuote"]').click();
+  await expect(page.locator('#shareToastText')).toContainText(scene==='save-failure'?'Save failed':'Saved DTG');
+  expect(e.mutations.filter(m=>m.path==='/api/quote_sessions')).toHaveLength(1);
+  expect(e.mutations.filter(m=>m.path==='/api/quote_items').length).toBe(scene==='save-failure'?0:1);
+  await expect(page.locator('#shareToast')).not.toHaveClass(/show/);
+ }
+ if(scene==='assistant'){await page.locator('#floatingQuoteBtn').click();await expect(page.locator('#aiChatPanel')).toHaveClass(/open/);await expect(page.locator('#aiChatMessages')).toContainText('Synthetic research reply.');}
+ await evidence(page,'dtg-detailed-'+scene,e);
+});
+
+test('CSS quote builders: dtg keyboard and date controls',async({page})=>{
+ test.skip(original,'Native control and visibility checks for the canonical workspace.');
+ const e=await open(page,{richCatalog:true,url:'/quote-builders/dtg-quote-builder.html'});await page.waitForLoadState('networkidle');
+ await expect(page.locator('#shareToast')).toBeHidden();
+ const opener=page.locator('.dtg-cc-view-all').first();await opener.focus();await opener.press('Enter');await expect(page.locator('#dtgCatalogModal')).toBeVisible();
+ await page.keyboard.press('Escape');await expect(page.locator('#dtgCatalogModal')).toBeHidden();await expect(opener).toBeFocused();
+ const front=page.locator('[data-loc-group="front"][data-loc-code="FF"]');await front.focus();await front.press('Space');await expect(front).toHaveClass(/selected/);
+ for(const width of [1440,768,390,320]){
+  await page.setViewportSize({width,height:1000});
+  const pickup=page.locator('#dtgPickupToggle');await pickup.focus();await pickup.press('Space');await expect(page.locator('#dtgShipToBlock')).toBeVisible();await pickup.press('Space');await expect(page.locator('#dtgShipToBlock')).toBeHidden();
+  for(const id of ['dtgDueDate','dtgDropDeadDate']){const field=page.locator('#'+id);await expect(field).toBeVisible();const box=await field.boundingBox();expect(box.width).toBeGreaterThanOrEqual(185);expect(box.x+box.width).toBeLessThanOrEqual(width);}
+ }
+ check(expect,e);
+});
+
 test('CSS quote builders: screenprint-fast keyboard and duplicate protection',async({page})=>{
  test.skip(original,'Behavior introduced by the reviewed migration.');
  const e=await open(page,{save:true,url:'/quote-builders/screenprint-fast-quote.html'});

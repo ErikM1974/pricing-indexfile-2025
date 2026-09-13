@@ -244,3 +244,9 @@ Browser baselines must work from a fresh checkout. The tumbler export test previ
 - Problem/root cause: DTF color controls kept aria-expanded true after selection; its distinct size-dialog body/footer and customer heading relied on removed legacy spacing. Long location names overflowed the phone summary.
 - Solution: synchronize picker open/close attributes, give the method-specific size grid and footer canonical spacing, align the customer header and wrap summary values. Native location and shipping controls share the existing keyboard delegation.
 - Prevention: compare original prices, fees, shipping and saved fields at four widths; test selection/Escape and native location keys, inspect complete size dialogs, every table column and all paper pages.
+
+## DTG hidden states and printable controls (2026-09-12)
+
+- Root cause: legacy flex/display rules exposed empty CRM notices, a design thumbnail without a design, expired share notifications and disabled assistant actions without quote output. Phone date fields and preflight values were clipped.
+- Fix: shared hidden/notification contracts, native keyboard controls, wrapping customer values and full-width dates; compact method-scoped print controls retain every financial value.
+- Prevention: test populated fees, locations, shipping, successful/failed saves and research-only replies against original fields/payloads. Inspect complete scroll areas and every printed page; assert intended hidden/disabled state before normalizing original visibility.

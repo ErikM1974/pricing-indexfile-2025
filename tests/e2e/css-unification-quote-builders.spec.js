@@ -11,7 +11,7 @@ for(const method of ['embroidery','screenprint','dtf','dtg','screenprint-fast'])
   await expect(page.locator('#toast-container')).toContainText('Vellum rate is an estimate');
   await expect(page.locator('#toast-container')).toContainText('Color Chg rate is an estimate');
  }
- if(!original&&['embroidery','screenprint','dtf'].includes(method)){await evidence(page,method+'-initial',e);return;}
+ if(!original&&['embroidery','screenprint','dtf','dtg'].includes(method)){await evidence(page,method+'-initial',e);return;}
  fs.mkdirSync(out,{recursive:true});
  // This discovery record remains local until every observed request is mapped.
  fs.writeFileSync(path.join(out,'quote-builder-'+method+'-network.json'),JSON.stringify(e,null,2)+'\n');
