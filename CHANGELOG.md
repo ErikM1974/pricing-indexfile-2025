@@ -1,3 +1,10 @@
+## v2026.09.13.4 (2026.09.13)
+
+- Keep new pages within the shared CSS system
+- Rebuild holiday gift boxes with live pricing and staff review
+- Deploy v2026.09.13.4: launch holiday gift boxes with live inventory and reviewed requests
+- Deploy v2026.09.13.4: verify the shared request inbox and report browser failures promptly
+
 ## v2026.09.13.2 (2026.09.13)
 
 - Preserve webstore calculator originals, pricing outputs and save defects
