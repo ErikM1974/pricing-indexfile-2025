@@ -231,3 +231,10 @@ Browser baselines must work from a fresh checkout. The tumbler export test previ
 - Problem/root cause: shared navigation print rules hid the reference title; an old blanket contract-print rule hid ordinary pricing; a missing stitch response silently retained default fees.
 - Solution: give the reference header an explicit paper display, distinguish active-tab/account/contract print modes, open and restore disclosures, keep reference cards together, and fail visibly when required pricing is missing.
 - Prevention: preserve exact financial functions, exercise API rejection and recovery, and review complete PDFs alongside keyboard/dialog checks. Replace private customer initializers with synthetic records before test execution; never copy private controller data into a reversal ledger.
+
+
+## Quote requests must acknowledge a confirmed save (2026-09-12)
+
+- Problem/root cause: the fast request service ignored its database failure result and continued into email and the success screen; a submission handler relied on the implicit event target, so clicking its icon could bypass the button lock.
+- Solution: require a successful database result before confirming or emailing, select and lock the actual submit button, retain fields on failure and provide persistent accessible validation/retry.
+- Prevention: mock database rejection and retry, click both the button and its icon, assert one pending request and unchanged successful payloads; inspect narrow actions and every printed page.

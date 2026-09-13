@@ -1,0 +1,201 @@
+{
+  "method": "dtf",
+  "states": [
+    {
+      "width": 1440,
+      "title": "2026 DTF Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/dtf-quote-builder.html",
+      "ids": {
+        "toast-container": "",
+        "method-switch-menu": "Switch method … Embroidery Screen Print DTG (1st product only)",
+        "product-search": "",
+        "search-hint": "Select locations above to see pricing (products can be added now)",
+        "empty-state-row": "👕 Getting Started 1 Select transfer locations above • 2 Type a style # (e.g., PC54, G500) • 3 Enter sizes and quantities",
+        "charges-chevron": "",
+        "sidebar-resize-handle": "",
+        "sidebar-location": "-",
+        "total-qty": "0",
+        "pricing-tier": "--",
+        "subtotal": "--"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "product-search",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [
+        "Style Product image Description Color S M L XL 2XL More Sizes Qty Unit $ Total Row actions 👕 Getting Started 1 Select transfer locations above • 2 Type a style # (e.g., PC54, G500) • 3 Enter sizes and quantities"
+      ],
+      "overflow": false
+    },
+    {
+      "width": 768,
+      "title": "2026 DTF Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/dtf-quote-builder.html",
+      "ids": {
+        "toast-container": "",
+        "method-switch-menu": "Switch method … Embroidery Screen Print DTG (1st product only)",
+        "product-search": "",
+        "search-hint": "Select locations above to see pricing (products can be added now)",
+        "empty-state-row": "👕 Getting Started 1 Select transfer locations above • 2 Type a style # (e.g., PC54, G500) • 3 Enter sizes and quantities",
+        "charges-chevron": "",
+        "sidebar-resize-handle": "",
+        "sidebar-location": "-",
+        "total-qty": "0",
+        "pricing-tier": "--",
+        "subtotal": "--"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "product-search",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [
+        "Style Product image Color S M L XL 2XL More Sizes Qty Unit $ Total Row actions 👕 Getting Started 1 Select transfer locations above • 2 Type a style # (e.g., PC54, G500) • 3 Enter sizes and quantities"
+      ],
+      "overflow": true
+    },
+    {
+      "width": 390,
+      "title": "2026 DTF Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/dtf-quote-builder.html",
+      "ids": {
+        "toast-container": "",
+        "method-switch-menu": "Switch method … Embroidery Screen Print DTG (1st product only)",
+        "product-search": "",
+        "search-hint": "Select locations above to see pricing (products can be added now)",
+        "empty-state-row": "👕 Getting Started 1 Select transfer locations above • 2 Type a style # (e.g., PC54, G500) • 3 Enter sizes and quantities",
+        "charges-chevron": "",
+        "sidebar-resize-handle": "",
+        "sidebar-location": "-",
+        "total-qty": "0",
+        "pricing-tier": "--",
+        "subtotal": "--"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "product-search",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [
+        "Style Product image S M L XL 2XL More Sizes Qty Unit $ Total Row actions 👕 Getting Started 1 Select transfer locations above • 2 Type a style # (e.g., PC54, G500) • 3 Enter sizes and quantities"
+      ],
+      "overflow": false
+    },
+    {
+      "width": 320,
+      "title": "2026 DTF Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/dtf-quote-builder.html",
+      "ids": {
+        "toast-container": "",
+        "method-switch-menu": "Switch method … Embroidery Screen Print DTG (1st product only)",
+        "product-search": "",
+        "search-hint": "Select locations above to see pricing (products can be added now)",
+        "empty-state-row": "👕 Getting Started 1 Select transfer locations above • 2 Type a style # (e.g., PC54, G500) • 3 Enter sizes and quantities",
+        "charges-chevron": "",
+        "sidebar-resize-handle": "",
+        "sidebar-location": "-",
+        "total-qty": "0",
+        "pricing-tier": "--",
+        "subtotal": "--"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "product-search",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [
+        "Style Product image S M L XL 2XL More Sizes Qty Unit $ Total Row actions 👕 Getting Started 1 Select transfer locations above • 2 Type a style # (e.g., PC54, G500) • 3 Enter sizes and quantities"
+      ],
+      "overflow": false
+    }
+  ]
+}

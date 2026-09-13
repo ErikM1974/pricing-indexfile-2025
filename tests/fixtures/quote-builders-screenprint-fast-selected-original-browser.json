@@ -1,0 +1,90 @@
+{
+  "name": "screenprint-fast-selected",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Fast Screen Print Quote | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-fast-quote.html",
+      "ids": {
+        "quantity": "Select quantity... 24-47 pieces 48-71 pieces 72-143 pieces 144+ pieces"
+      },
+      "fields": [
+        {
+          "id": "quantity",
+          "name": "",
+          "type": "select-one",
+          "value": "48-71",
+          "disabled": false
+        }
+      ],
+      "links": [],
+      "tables": [],
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "width": 768,
+      "title": "Fast Screen Print Quote | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-fast-quote.html",
+      "ids": {
+        "quantity": "Select quantity... 24-47 pieces 48-71 pieces 72-143 pieces 144+ pieces"
+      },
+      "fields": [
+        {
+          "id": "quantity",
+          "name": "",
+          "type": "select-one",
+          "value": "48-71",
+          "disabled": false
+        }
+      ],
+      "links": [],
+      "tables": [],
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "width": 390,
+      "title": "Fast Screen Print Quote | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-fast-quote.html",
+      "ids": {
+        "quantity": "Select quantity... 24-47 pieces 48-71 pieces 72-143 pieces 144+ pieces"
+      },
+      "fields": [
+        {
+          "id": "quantity",
+          "name": "",
+          "type": "select-one",
+          "value": "48-71",
+          "disabled": false
+        }
+      ],
+      "links": [],
+      "tables": [],
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "width": 320,
+      "title": "Fast Screen Print Quote | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-fast-quote.html",
+      "ids": {
+        "quantity": "Select quantity... 24-47 pieces 48-71 pieces 72-143 pieces 144+ pieces"
+      },
+      "fields": [
+        {
+          "id": "quantity",
+          "name": "",
+          "type": "select-one",
+          "value": "48-71",
+          "disabled": false
+        }
+      ],
+      "links": [],
+      "tables": [],
+      "overflow": false,
+      "violations": []
+    }
+  ],
+  "mutations": []
+}

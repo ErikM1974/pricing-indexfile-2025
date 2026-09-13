@@ -1928,3 +1928,20 @@ All 27 designer presentation/behavior cases passed. After the final tablet size-
 Local candidate is 220/225 reviewed, with all 381 source/payload/ownership checks passing and scoped CSS/JS lint clean, with five quote builders remaining. Production remains 215/225 at v2026.09.12.1 / Heroku2110. Shared/generated/provider/email backlog and whole-app regression/release gates remain separate.
 
 Final ownership check found inherited art-dashboard state aliases in the shared intake sheet. These now use canonical palette tokens with the existing AE colors; all five affected browser cases passed again and every changed final panel was re-reviewed. 180 designer and 123 shared-form panels were verified pixel-identical to the preceding complete review; 26 designer and 23 shared-form changed panels were inspected. The first ownership failure is retained in the evidence, not counted as a passing run.
+
+## Final quote-builder family plan — September 12, 2026
+
+- [ ] Preserve the original five pages and their complete shared CSS/JavaScript dependency graph; capture real rendered workflows using synthetic pricing, customers and artwork. Review original phone/tablet/desktop, all guided steps and complete print/PDF documents before edits.
+- [ ] Prove shared structural improvements on EMB, adopt them in SCP/DTF, and retain DTG’s separate inline-form flow. Replace legacy override stacks with scoped canonical owners; financial engines and successful payloads stay unchanged.
+- [ ] Review all five builders, every shared control consumer, unavailable/recovery states, keyboard/focus, generated documents and pricing parity before migration credit. Full application regression and release gates remain.
+
+Fast screen-print request form: its six original states,24 screens,eight paper pages and ten contact sheets are fully reviewed. This independent form can migrate while the four pricing builders complete their larger modal/invoice baseline. Use Public Sans, neutral canvas, white surface and canonical green; compact three-choice rows, left-aligned form labels, persistent validation and one-page paper layout. Preserve estimates and successful payloads. Correct false success after a failed save. No migration credit until current browser/keyboard/paper review.
+
+
+## Fast screen-print request form reviewed — September 12, 2026
+
+The independent short request form now uses canonical typography, tokens, scoped controls and compact native option buttons. Persistent validation focuses the field or step heading. A failed database save retains customer input and stops the former false success/email path; retry works, and pending requests reject duplicate clicks. Estimates and successful request/email payloads remain unchanged.
+
+All eight final browser checks pass, including six presentation states at four widths, keyboard selection/validation, icon-click duplicate protection and failed-save retry. All 24 current screens and six one-page PDFs were visually reviewed through ten sheets; six changed final sheets were re-reviewed and four retained as pixel-identical. Original 24 screens/eight paper pages remain preserved. All business requests use synthetic services.
+
+Local candidate221/225 reviewed; the four pricing builders remain pending. Original baseline captures for EMB/SCP/DTF/DTG are preserved, but their full visual review and CSS migration are next. The 136 original dependency hashes permit only exact recorded presentation/recovery changes. Production remains215/225 at v2026.09.12.1 / Heroku2110; shared/generated/provider/email work and complete regression/release checks remain.

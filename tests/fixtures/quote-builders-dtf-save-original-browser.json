@@ -1,0 +1,514 @@
+{
+  "name": "dtf-save",
+  "states": [
+    {
+      "width": 1440,
+      "title": "2026 DTF Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/dtf-quote-builder.html",
+      "ids": {
+        "toast-container": "",
+        "method-switch-menu": "Switch method … Embroidery Screen Print DTG (1st product only)",
+        "order-recap": "ORDER AT A GLANCE Customer Example Customer",
+        "order-details-chevron": "",
+        "pre-tax-subtotal": "$648.00",
+        "include-tax": "",
+        "tax-rate-input": "",
+        "wholesale-checkbox": "",
+        "tax-rate-label": "Sales Tax (10.2%)",
+        "tax-amount": "$66.10",
+        "grand-total-with-tax": "$714.10",
+        "push-readiness": "BEFORE YOU PUSH ShopWorks Customer # At least one item Customer name Customer email",
+        "dtf-push-shopworks-label": "Push to ShopWorks",
+        "sidebar-resize-handle": "",
+        "sidebar-location": "Left Chest",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$648.00",
+        "per-unit-price": "$13.50/piece",
+        "sidebar-grand-total": "$714.10",
+        "quote-share-title": "Quote Saved!",
+        "quote-share-modal-id": "DTF-2026-777",
+        "quote-share-instructions": "Share this link with your customer:",
+        "quote-share-url": "",
+        "quote-share-copy-btn": "Copy",
+        "quote-share-email-btn": "Email to customer",
+        "quote-share-view-btn": "View Quote",
+        "quote-share-close-btn": "Close"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "include-tax",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "tax-rate-input",
+          "name": "",
+          "type": "number",
+          "value": "10.2",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "wholesale-checkbox",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "quote-share-url",
+          "name": "",
+          "type": "text",
+          "value": "http://localhost:3414/quote/DTF-2026-777",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".pr-ok.pr-item:nth-child(3)"
+            ],
+            [
+              ".pr-ok.pr-item:nth-child(4)"
+            ],
+            [
+              ".pr-ok.pr-item:nth-child(5)"
+            ],
+            [
+              ".btn-share-link"
+            ],
+            [
+              "#per-unit-price"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "2026 DTF Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/dtf-quote-builder.html",
+      "ids": {
+        "toast-container": "",
+        "method-switch-menu": "Switch method … Embroidery Screen Print DTG (1st product only)",
+        "order-recap": "ORDER AT A GLANCE Customer Example Customer",
+        "order-details-chevron": "",
+        "pre-tax-subtotal": "$648.00",
+        "include-tax": "",
+        "tax-rate-input": "",
+        "wholesale-checkbox": "",
+        "tax-rate-label": "Sales Tax (10.2%)",
+        "tax-amount": "$66.10",
+        "grand-total-with-tax": "$714.10",
+        "push-readiness": "BEFORE YOU PUSH ShopWorks Customer # At least one item Customer name Customer email",
+        "dtf-push-shopworks-label": "Push to ShopWorks",
+        "sidebar-resize-handle": "",
+        "sidebar-location": "Left Chest",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$648.00",
+        "per-unit-price": "$13.50/piece",
+        "sidebar-grand-total": "$714.10",
+        "quote-share-title": "Quote Saved!",
+        "quote-share-modal-id": "DTF-2026-777",
+        "quote-share-instructions": "Share this link with your customer:",
+        "quote-share-url": "",
+        "quote-share-copy-btn": "Copy",
+        "quote-share-email-btn": "Email to customer",
+        "quote-share-view-btn": "View Quote",
+        "quote-share-close-btn": "Close"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "include-tax",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "tax-rate-input",
+          "name": "",
+          "type": "number",
+          "value": "10.2",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "wholesale-checkbox",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "quote-share-url",
+          "name": "",
+          "type": "text",
+          "value": "http://localhost:3414/quote/DTF-2026-777",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".pr-ok.pr-item:nth-child(3)"
+            ],
+            [
+              ".pr-ok.pr-item:nth-child(4)"
+            ],
+            [
+              ".pr-ok.pr-item:nth-child(5)"
+            ],
+            [
+              ".btn-share-link"
+            ],
+            [
+              "#per-unit-price"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "2026 DTF Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/dtf-quote-builder.html",
+      "ids": {
+        "toast-container": "",
+        "method-switch-menu": "Switch method … Embroidery Screen Print DTG (1st product only)",
+        "order-recap": "ORDER AT A GLANCE Customer Example Customer",
+        "order-details-chevron": "",
+        "pre-tax-subtotal": "$648.00",
+        "include-tax": "",
+        "tax-rate-input": "",
+        "wholesale-checkbox": "",
+        "tax-rate-label": "Sales Tax (10.2%)",
+        "tax-amount": "$66.10",
+        "grand-total-with-tax": "$714.10",
+        "push-readiness": "BEFORE YOU PUSH ShopWorks Customer # At least one item Customer name Customer email",
+        "dtf-push-shopworks-label": "Push to ShopWorks",
+        "sidebar-resize-handle": "",
+        "sidebar-location": "Left Chest",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$648.00",
+        "per-unit-price": "$13.50/piece",
+        "sidebar-grand-total": "$714.10",
+        "quote-share-title": "Quote Saved!",
+        "quote-share-modal-id": "DTF-2026-777",
+        "quote-share-instructions": "Share this link with your customer:",
+        "quote-share-url": "",
+        "quote-share-copy-btn": "Copy",
+        "quote-share-email-btn": "Email to customer",
+        "quote-share-view-btn": "View Quote",
+        "quote-share-close-btn": "Close"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "include-tax",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "tax-rate-input",
+          "name": "",
+          "type": "number",
+          "value": "10.2",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "wholesale-checkbox",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "quote-share-url",
+          "name": "",
+          "type": "text",
+          "value": "http://localhost:3414/quote/DTF-2026-777",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".pr-ok.pr-item:nth-child(3)"
+            ],
+            [
+              ".pr-ok.pr-item:nth-child(4)"
+            ],
+            [
+              ".pr-ok.pr-item:nth-child(5)"
+            ],
+            [
+              ".btn-share-link"
+            ],
+            [
+              "#per-unit-price"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "2026 DTF Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/dtf-quote-builder.html",
+      "ids": {
+        "toast-container": "",
+        "method-switch-menu": "Switch method … Embroidery Screen Print DTG (1st product only)",
+        "order-recap": "ORDER AT A GLANCE Customer Example Customer",
+        "order-details-chevron": "",
+        "pre-tax-subtotal": "$648.00",
+        "include-tax": "",
+        "tax-rate-input": "",
+        "wholesale-checkbox": "",
+        "tax-rate-label": "Sales Tax (10.2%)",
+        "tax-amount": "$66.10",
+        "grand-total-with-tax": "$714.10",
+        "push-readiness": "BEFORE YOU PUSH ShopWorks Customer # At least one item Customer name Customer email",
+        "dtf-push-shopworks-label": "Push to ShopWorks",
+        "sidebar-resize-handle": "",
+        "sidebar-location": "Left Chest",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$648.00",
+        "per-unit-price": "$13.50/piece",
+        "sidebar-grand-total": "$714.10",
+        "quote-share-title": "Quote Saved!",
+        "quote-share-modal-id": "DTF-2026-777",
+        "quote-share-instructions": "Share this link with your customer:",
+        "quote-share-url": "",
+        "quote-share-copy-btn": "Copy",
+        "quote-share-email-btn": "Email to customer",
+        "quote-share-view-btn": "View Quote",
+        "quote-share-close-btn": "Close"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "include-tax",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "tax-rate-input",
+          "name": "",
+          "type": "number",
+          "value": "10.2",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "wholesale-checkbox",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "quote-share-url",
+          "name": "",
+          "type": "text",
+          "value": "http://localhost:3414/quote/DTF-2026-777",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".pr-ok.pr-item:nth-child(3)"
+            ],
+            [
+              ".pr-ok.pr-item:nth-child(4)"
+            ],
+            [
+              ".pr-ok.pr-item:nth-child(5)"
+            ],
+            [
+              ".btn-share-link"
+            ],
+            [
+              "#per-unit-price"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "mutations": [
+    {
+      "path": "/api/quote_sessions",
+      "method": "POST",
+      "body": {
+        "QuoteID": "DTF-2026-777",
+        "SessionID": "synthetic-session",
+        "CustomerEmail": "customer@example.invalid",
+        "CustomerName": "Example Customer",
+        "CompanyName": "",
+        "TotalQuantity": 48,
+        "SubtotalAmount": 648,
+        "LTMFeeTotal": 0,
+        "TotalAmount": 648,
+        "Status": "Open",
+        "ExpiresAt": "2026-10-12T18:30:00",
+        "Notes": "{\"locations\":[\"left-chest\"],\"locationCodes\":\"LC\",\"locationNames\":\"Left Chest\",\"locationCount\":1,\"transferBreakdown\":{\"breakdown\":[{\"location\":\"left-chest\",\"locationName\":\"Left Chest\",\"size\":\"small\",\"sizeName\":\"Small (Up to 5\\\" x 5\\\")\",\"unitCost\":4.5}],\"total\":4.5},\"productCount\":1,\"projectName\":\"\",\"specialNotes\":\"\",\"salesRep\":\"sales@nwcustomapparel.com\",\"marginDenominator\":0.53,\"laborPerLocation\":2.5,\"freightPerLocation\":0.5,\"shipToName\":\"\",\"includeTax\":true,\"referenceArtwork\":[],\"designNumber\":\"\",\"newDesignName\":\"\"}",
+        "ArtCharge": 0,
+        "GraphicDesignHours": 0,
+        "GraphicDesignCharge": 0,
+        "RushFee": 0,
+        "Discount": 0,
+        "DiscountPercent": 0,
+        "DiscountReason": "",
+        "LTM_Display_Mode": "builtin",
+        "LTM_Waived": false,
+        "SalesRepEmail": "sales@nwcustomapparel.com",
+        "TaxRate": 10.2,
+        "TaxAmount": 66.1,
+        "IsWholesale": "No",
+        "ShippingFee": 0,
+        "CustomerNumber": "",
+        "Phone": "",
+        "OrderNumber": "",
+        "PurchaseOrderNumber": "",
+        "ShipToAddress": "",
+        "ShipToCity": "",
+        "ShipToState": "WA",
+        "ShipToZip": "",
+        "ShipMethod": "",
+        "ReqShipDate": null,
+        "DropDeadDate": null
+      }
+    },
+    {
+      "path": "/api/quote_items",
+      "method": "POST",
+      "body": {
+        "QuoteID": "DTF-2026-777",
+        "LineNumber": 1,
+        "StyleNumber": "PC54",
+        "ProductName": "Essential Cotton Tee - Jet Black",
+        "Color": "Jet Black",
+        "ColorCode": "JetBlack",
+        "EmbellishmentType": "dtf",
+        "PrintLocation": "LC",
+        "PrintLocationName": "Left Chest",
+        "Quantity": 48,
+        "HasLTM": "No",
+        "BaseUnitPrice": 13.5,
+        "LTMPerUnit": 0,
+        "FinalUnitPrice": 13.5,
+        "LineTotal": 648,
+        "SizeBreakdown": "{\"M\":48}",
+        "ImageURL": "/__core-fixture/garment.svg",
+        "AddedAt": "2026-09-12T18:30:00"
+      }
+    }
+  ]
+}

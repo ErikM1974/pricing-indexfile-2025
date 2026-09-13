@@ -1,0 +1,633 @@
+{
+  "name": "screenprint-decoration",
+  "states": [
+    {
+      "width": 1440,
+      "title": "2026 Screen Print Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Embroidery DTF Transfers DTG (1st product only)",
+        "dark-garment-toggle": "",
+        "dark-garment-nudge": "Dark garments in this quote — add white underbase screens? Enable ×",
+        "safety-stripes-toggle": "",
+        "front-setup-display": "1 screen × $30.00 = $30.00",
+        "back-icon": "",
+        "sleeve-icon": "",
+        "left-sleeve-toggle": "",
+        "right-sleeve-toggle": "",
+        "total-screens-display": "1 screen total",
+        "setup-fee-display": "$30.00",
+        "artwork-upload-ai4e9z-design-name": "",
+        "artwork-upload-ai4e9z-dropzone": "Drop files here or click to browse AI / EPS / PSD / PDF / PNG / JPG / TIFF · 20 MB max each",
+        "sidebar-resize-handle": "",
+        "sidebar-front": "Left Chest (1-color)",
+        "sidebar-screens": "1",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$576.00",
+        "per-unit-price": "$12.00/piece",
+        "sidebar-grand-total": "$667.81",
+        "toast-container": "Ready to build Screen Print quotes! Vellum rate is an estimate ($10.00) — live pricing didn't return it. Verify before saving. Color Chg rate is an estimate ($15.00) — live pricing didn't return it. Verify before saving.",
+        "qb-fallback-badge": "⚠ Estimated pricing in use: Vellum, Color Chg — live rates unavailable. Verify before sending."
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "dark-garment-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "safety-stripes-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "LC",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "FF",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "JF",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "FB",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "JB",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "left-sleeve-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "right-sleeve-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "artwork-upload-ai4e9z-design-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/Erik%20Modeling%20Hoodie%20Front%20and%20Back.png?ver=1",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".artwork-dropzone-sub"
+            ],
+            [
+              "#per-unit-price"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "2026 Screen Print Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Embroidery DTF Transfers DTG (1st product only)",
+        "dark-garment-toggle": "",
+        "dark-garment-nudge": "Dark garments in this quote — add white underbase screens? Enable ×",
+        "safety-stripes-toggle": "",
+        "front-setup-display": "1 screen × $30.00 = $30.00",
+        "back-icon": "",
+        "sleeve-icon": "",
+        "left-sleeve-toggle": "",
+        "right-sleeve-toggle": "",
+        "total-screens-display": "1 screen total",
+        "setup-fee-display": "$30.00",
+        "artwork-upload-ai4e9z-design-name": "",
+        "artwork-upload-ai4e9z-dropzone": "Drop files here or click to browse AI / EPS / PSD / PDF / PNG / JPG / TIFF · 20 MB max each",
+        "sidebar-resize-handle": "",
+        "sidebar-front": "Left Chest (1-color)",
+        "sidebar-screens": "1",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$576.00",
+        "per-unit-price": "$12.00/piece",
+        "sidebar-grand-total": "$667.81",
+        "toast-container": "Ready to build Screen Print quotes! Vellum rate is an estimate ($10.00) — live pricing didn't return it. Verify before saving. Color Chg rate is an estimate ($15.00) — live pricing didn't return it. Verify before saving.",
+        "qb-fallback-badge": "⚠ Estimated pricing in use: Vellum, Color Chg — live rates unavailable. Verify before sending."
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "dark-garment-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "safety-stripes-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "LC",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "FF",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "JF",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "FB",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "JB",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "left-sleeve-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "right-sleeve-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "artwork-upload-ai4e9z-design-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/Erik%20Modeling%20Hoodie%20Front%20and%20Back.png?ver=1",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".done > .gs-txt > .gs-title"
+            ],
+            [
+              ".artwork-dropzone-sub"
+            ],
+            [
+              "#per-unit-price"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "2026 Screen Print Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Embroidery DTF Transfers DTG (1st product only)",
+        "dark-garment-toggle": "",
+        "dark-garment-nudge": "Dark garments in this quote — add white underbase screens? Enable ×",
+        "safety-stripes-toggle": "",
+        "front-setup-display": "1 screen × $30.00 = $30.00",
+        "back-icon": "",
+        "sleeve-icon": "",
+        "left-sleeve-toggle": "",
+        "right-sleeve-toggle": "",
+        "total-screens-display": "1 screen total",
+        "setup-fee-display": "$30.00",
+        "artwork-upload-ai4e9z-design-name": "",
+        "artwork-upload-ai4e9z-dropzone": "Drop files here or click to browse AI / EPS / PSD / PDF / PNG / JPG / TIFF · 20 MB max each",
+        "sidebar-resize-handle": "",
+        "sidebar-front": "Left Chest (1-color)",
+        "sidebar-screens": "1",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$576.00",
+        "per-unit-price": "$12.00/piece",
+        "sidebar-grand-total": "$667.81",
+        "toast-container": "Vellum rate is an estimate ($10.00) — live pricing didn't return it. Verify before saving. Color Chg rate is an estimate ($15.00) — live pricing didn't return it. Verify before saving.",
+        "qb-fallback-badge": "⚠ Estimated pricing in use: Vellum, Color Chg — live rates unavailable. Verify before sending."
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "dark-garment-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "safety-stripes-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "LC",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "FF",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "JF",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "FB",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "JB",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "left-sleeve-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "right-sleeve-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "artwork-upload-ai4e9z-design-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/Erik%20Modeling%20Hoodie%20Front%20and%20Back.png?ver=1",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".artwork-dropzone-sub"
+            ],
+            [
+              "#per-unit-price"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "2026 Screen Print Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Embroidery DTF Transfers DTG (1st product only)",
+        "dark-garment-toggle": "",
+        "dark-garment-nudge": "Dark garments in this quote — add white underbase screens? Enable ×",
+        "safety-stripes-toggle": "",
+        "front-setup-display": "1 screen × $30.00 = $30.00",
+        "back-icon": "",
+        "sleeve-icon": "",
+        "left-sleeve-toggle": "",
+        "right-sleeve-toggle": "",
+        "total-screens-display": "1 screen total",
+        "setup-fee-display": "$30.00",
+        "artwork-upload-ai4e9z-design-name": "",
+        "artwork-upload-ai4e9z-dropzone": "Drop files here or click to browse AI / EPS / PSD / PDF / PNG / JPG / TIFF · 20 MB max each",
+        "sidebar-resize-handle": "",
+        "sidebar-front": "Left Chest (1-color)",
+        "sidebar-screens": "1",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$576.00",
+        "per-unit-price": "$12.00/piece",
+        "sidebar-grand-total": "$667.81",
+        "toast-container": "Vellum rate is an estimate ($10.00) — live pricing didn't return it. Verify before saving. Color Chg rate is an estimate ($15.00) — live pricing didn't return it. Verify before saving.",
+        "qb-fallback-badge": "⚠ Estimated pricing in use: Vellum, Color Chg — live rates unavailable. Verify before sending."
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "dark-garment-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "safety-stripes-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "LC",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "FF",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "front-location",
+          "type": "radio",
+          "value": "JF",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "",
+          "checked": true,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "FB",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "back-location",
+          "type": "radio",
+          "value": "JB",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "left-sleeve-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "right-sleeve-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "artwork-upload-ai4e9z-design-name",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        },
+        {
+          "href": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/Erik%20Modeling%20Hoodie%20Front%20and%20Back.png?ver=1",
+          "text": ""
+        }
+      ],
+      "tables": [],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              ".artwork-dropzone-sub"
+            ],
+            [
+              "#per-unit-price"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "mutations": []
+}

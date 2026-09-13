@@ -1,0 +1,274 @@
+{
+  "name": "screenprint-fast-contact",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Fast Screen Print Quote | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-fast-quote.html",
+      "ids": {
+        "customerName": "",
+        "customerEmail": "",
+        "customerPhone": "",
+        "companyName": "",
+        "deadline": "",
+        "notes": "",
+        "estimateRange": "$11 - $16 per piece"
+      },
+      "fields": [
+        {
+          "id": "customerName",
+          "name": "",
+          "type": "text",
+          "value": "Example Customer",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customerEmail",
+          "name": "",
+          "type": "email",
+          "value": "customer@example.invalid",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customerPhone",
+          "name": "",
+          "type": "tel",
+          "value": "2535550100",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "companyName",
+          "name": "",
+          "type": "text",
+          "value": "Example Company",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "deadline",
+          "name": "",
+          "type": "date",
+          "value": "2026-10-01",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "notes",
+          "name": "",
+          "type": "textarea",
+          "value": "Example team project. Please confirm artwork placement.",
+          "disabled": false
+        }
+      ],
+      "links": [],
+      "tables": [],
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "width": 768,
+      "title": "Fast Screen Print Quote | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-fast-quote.html",
+      "ids": {
+        "customerName": "",
+        "customerEmail": "",
+        "customerPhone": "",
+        "companyName": "",
+        "deadline": "",
+        "notes": "",
+        "estimateRange": "$11 - $16 per piece"
+      },
+      "fields": [
+        {
+          "id": "customerName",
+          "name": "",
+          "type": "text",
+          "value": "Example Customer",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customerEmail",
+          "name": "",
+          "type": "email",
+          "value": "customer@example.invalid",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customerPhone",
+          "name": "",
+          "type": "tel",
+          "value": "2535550100",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "companyName",
+          "name": "",
+          "type": "text",
+          "value": "Example Company",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "deadline",
+          "name": "",
+          "type": "date",
+          "value": "2026-10-01",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "notes",
+          "name": "",
+          "type": "textarea",
+          "value": "Example team project. Please confirm artwork placement.",
+          "disabled": false
+        }
+      ],
+      "links": [],
+      "tables": [],
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "width": 390,
+      "title": "Fast Screen Print Quote | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-fast-quote.html",
+      "ids": {
+        "customerName": "",
+        "customerEmail": "",
+        "customerPhone": "",
+        "companyName": "",
+        "deadline": "",
+        "notes": "",
+        "estimateRange": "$11 - $16 per piece"
+      },
+      "fields": [
+        {
+          "id": "customerName",
+          "name": "",
+          "type": "text",
+          "value": "Example Customer",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customerEmail",
+          "name": "",
+          "type": "email",
+          "value": "customer@example.invalid",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customerPhone",
+          "name": "",
+          "type": "tel",
+          "value": "2535550100",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "companyName",
+          "name": "",
+          "type": "text",
+          "value": "Example Company",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "deadline",
+          "name": "",
+          "type": "date",
+          "value": "2026-10-01",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "notes",
+          "name": "",
+          "type": "textarea",
+          "value": "Example team project. Please confirm artwork placement.",
+          "disabled": false
+        }
+      ],
+      "links": [],
+      "tables": [],
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "width": 320,
+      "title": "Fast Screen Print Quote | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-fast-quote.html",
+      "ids": {
+        "customerName": "",
+        "customerEmail": "",
+        "customerPhone": "",
+        "companyName": "",
+        "deadline": "",
+        "notes": "",
+        "estimateRange": "$11 - $16 per piece"
+      },
+      "fields": [
+        {
+          "id": "customerName",
+          "name": "",
+          "type": "text",
+          "value": "Example Customer",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customerEmail",
+          "name": "",
+          "type": "email",
+          "value": "customer@example.invalid",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customerPhone",
+          "name": "",
+          "type": "tel",
+          "value": "2535550100",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "companyName",
+          "name": "",
+          "type": "text",
+          "value": "Example Company",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "deadline",
+          "name": "",
+          "type": "date",
+          "value": "2026-10-01",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "notes",
+          "name": "",
+          "type": "textarea",
+          "value": "Example team project. Please confirm artwork placement.",
+          "disabled": false
+        }
+      ],
+      "links": [],
+      "tables": [],
+      "overflow": false,
+      "violations": []
+    }
+  ],
+  "mutations": []
+}

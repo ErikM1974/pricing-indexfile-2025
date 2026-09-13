@@ -1,0 +1,274 @@
+{
+  "name": "screenprint-fast-invalid",
+  "states": [
+    {
+      "width": 1440,
+      "title": "Fast Screen Print Quote | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-fast-quote.html",
+      "ids": {
+        "customerName": "",
+        "customerEmail": "",
+        "customerPhone": "",
+        "companyName": "",
+        "deadline": "",
+        "notes": "",
+        "estimateRange": "$11 - $16 per piece"
+      },
+      "fields": [
+        {
+          "id": "customerName",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customerEmail",
+          "name": "",
+          "type": "email",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customerPhone",
+          "name": "",
+          "type": "tel",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "companyName",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "deadline",
+          "name": "",
+          "type": "date",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "notes",
+          "name": "",
+          "type": "textarea",
+          "value": "",
+          "disabled": false
+        }
+      ],
+      "links": [],
+      "tables": [],
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "width": 768,
+      "title": "Fast Screen Print Quote | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-fast-quote.html",
+      "ids": {
+        "customerName": "",
+        "customerEmail": "",
+        "customerPhone": "",
+        "companyName": "",
+        "deadline": "",
+        "notes": "",
+        "estimateRange": "$11 - $16 per piece"
+      },
+      "fields": [
+        {
+          "id": "customerName",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customerEmail",
+          "name": "",
+          "type": "email",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customerPhone",
+          "name": "",
+          "type": "tel",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "companyName",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "deadline",
+          "name": "",
+          "type": "date",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "notes",
+          "name": "",
+          "type": "textarea",
+          "value": "",
+          "disabled": false
+        }
+      ],
+      "links": [],
+      "tables": [],
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "width": 390,
+      "title": "Fast Screen Print Quote | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-fast-quote.html",
+      "ids": {
+        "customerName": "",
+        "customerEmail": "",
+        "customerPhone": "",
+        "companyName": "",
+        "deadline": "",
+        "notes": "",
+        "estimateRange": "$11 - $16 per piece"
+      },
+      "fields": [
+        {
+          "id": "customerName",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customerEmail",
+          "name": "",
+          "type": "email",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customerPhone",
+          "name": "",
+          "type": "tel",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "companyName",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "deadline",
+          "name": "",
+          "type": "date",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "notes",
+          "name": "",
+          "type": "textarea",
+          "value": "",
+          "disabled": false
+        }
+      ],
+      "links": [],
+      "tables": [],
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "width": 320,
+      "title": "Fast Screen Print Quote | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-fast-quote.html",
+      "ids": {
+        "customerName": "",
+        "customerEmail": "",
+        "customerPhone": "",
+        "companyName": "",
+        "deadline": "",
+        "notes": "",
+        "estimateRange": "$11 - $16 per piece"
+      },
+      "fields": [
+        {
+          "id": "customerName",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customerEmail",
+          "name": "",
+          "type": "email",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "customerPhone",
+          "name": "",
+          "type": "tel",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "companyName",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "deadline",
+          "name": "",
+          "type": "date",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "notes",
+          "name": "",
+          "type": "textarea",
+          "value": "",
+          "disabled": false
+        }
+      ],
+      "links": [],
+      "tables": [],
+      "overflow": false,
+      "violations": []
+    }
+  ],
+  "mutations": []
+}

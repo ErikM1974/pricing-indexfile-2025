@@ -1386,3 +1386,114 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - tests/fixtures/garment-form-quote-original-browser.json — original shared garment form fields and complete content in its real host.
 
 Garment designer completion: page styles are scoped to the unified designer; art-intake.css owns the shared garment form and contact picker. company-contact-picker.css has no remaining direct HTML consumer and is flagged for the later runtime/dead-file audit, not deleted. Four hosts retain original field/payload contracts, and every current screen and paper page has been reviewed.
+
+- tests/fixtures/quote-builders-original-content.json — original five quote-builder page and complete shared CSS/JavaScript dependency hashes before migration.
+- tests/e2e/helpers/quote-builders-browser.js — synthetic product/pricing/identity harness; bundles actual builder ESM and blocks unknown requests and business writes.
+- tests/e2e/css-unification-quote-builders.spec.js — original and current quote-builder screen, workflow and paper review.
+- tests/unit/quote-builders-content.test.js — preserve original shared and per-method pricing, payload and presentation sources through explicit reversal mappings.
+
+- tests/fixtures/quote-builders-screenprint-fast-initial-original-browser.json — immutable original synthetic quote-builder initial browser evidence.
+
+- tests/fixtures/quote-builders-embroidery-initial-original-browser.json — immutable original synthetic quote-builder initial browser evidence.
+
+- tests/fixtures/quote-builders-screenprint-initial-original-browser.json — immutable original synthetic quote-builder initial browser evidence.
+
+- tests/fixtures/quote-builders-dtf-initial-original-browser.json — immutable original synthetic quote-builder initial browser evidence.
+
+- tests/fixtures/quote-builders-dtg-initial-original-browser.json — immutable original synthetic quote-builder initial browser evidence.
+- tests/e2e/css-unification-quote-builder-workflows.spec.js — original/current populated quote builder, guided step, color, and generated invoice browser coverage with synthetic services.
+
+- tests/fixtures/quote-builders-embroidery-products-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-embroidery-invoice-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-embroidery-decoration-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-embroidery-customer-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-embroidery-review-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-embroidery-workbench-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-embroidery-colors-original-browser.json — immutable original synthetic populated builder workflow evidence.
+- tests/e2e/css-unification-quote-builder-alternate-workflows.spec.js — synthetic DTG catalog/order/invoice and fast-quote wizard/save/failure baseline and migration review.
+
+- tests/fixtures/quote-builders-screenprint-products-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-screenprint-decoration-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-screenprint-customer-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-screenprint-review-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-screenprint-workbench-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-screenprint-colors-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-dtf-products-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-dtf-decoration-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-dtf-customer-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-dtf-review-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-dtf-workbench-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-dtf-colors-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/e2e/helpers/quote-builder-workflow-review.js — shared four-width, accessibility, complete scroll-panel and invoice original/current evidence capture.
+
+- tests/fixtures/quote-builders-screenprint-invoice-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-dtf-invoice-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-dtg-catalog-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-dtg-catalog-detail-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-dtg-product-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-dtg-colors-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-dtg-customer-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-dtg-invoice-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-dtg-pricing-failure-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-dtg-shipping-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-screenprint-fast-selected-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-screenprint-fast-contact-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-screenprint-fast-invalid-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-screenprint-fast-submitted-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-screenprint-fast-save-failure-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-embroidery-extended-sizes-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-embroidery-save-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-screenprint-extended-sizes-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-screenprint-save-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-embroidery-shipping-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-embroidery-design-gallery-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-embroidery-customer-entered-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-screenprint-customer-entered-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-dtf-extended-sizes-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-dtf-customer-entered-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-dtf-save-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-embroidery-import-original-browser.json — immutable original synthetic populated builder workflow evidence.

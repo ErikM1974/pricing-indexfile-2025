@@ -1,0 +1,523 @@
+{
+  "name": "embroidery-products",
+  "states": [
+    {
+      "width": 1440,
+      "title": "2026 Embroidery Quote Builder - Garments & Caps | Northwest Custom Apparel",
+      "url": "/quote-builders/embroidery-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Screen Print DTF Transfers DTG (1st product only)",
+        "product-search": "",
+        "thumb-1": "",
+        "breakdown-1": "└─LC 8K | $20/ea",
+        "row-qty-1": "48",
+        "row-price-1": "$20.00",
+        "row-total-1": "$960.00",
+        "sidebar-resize-handle": "",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "products-label": "Products (Base 8K):",
+        "subtotal": "$960.00",
+        "per-unit-price": "$20.00/piece",
+        "additional-logos-pricing": "",
+        "cap-additional-logos-pricing": "",
+        "sidebar-grand-total": "$1056.96",
+        "toast-container": "Ready to build quotes!",
+        "floatingQuoteBtn": "✨ Ask"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "product-search",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "PC54",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "Essential Cotton Tee",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "48",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [
+        "Style Product image Description Color S M L XL 2XL More Sizes Qty Unit $ Total Row actions └─LC 8K | $20/ea Jet Black 125 125 125 125 125 125 48 $20.00 $960.00"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "aria-required-attr",
+          "nodes": [
+            [
+              ".color-picker-selected"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "2026 Embroidery Quote Builder - Garments & Caps | Northwest Custom Apparel",
+      "url": "/quote-builders/embroidery-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Screen Print DTF Transfers DTG (1st product only)",
+        "product-search": "",
+        "breakdown-1": "└─LC 8K | $20/ea",
+        "row-qty-1": "48",
+        "row-price-1": "$20.00",
+        "row-total-1": "$960.00",
+        "sidebar-resize-handle": "",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "products-label": "Products (Base 8K):",
+        "subtotal": "$960.00",
+        "per-unit-price": "$20.00/piece",
+        "additional-logos-pricing": "",
+        "cap-additional-logos-pricing": "",
+        "sidebar-grand-total": "$1056.96",
+        "toast-container": "Ready to build quotes!",
+        "floatingQuoteBtn": "✨ Ask"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "product-search",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "PC54",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "Essential Cotton Tee",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "48",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [
+        "Style Product image Color S M L XL 2XL More Sizes Qty Unit $ Total Row actions └─LC 8K | $20/ea Jet Black 125 125 125 125 125 125 48 $20.00 $960.00"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "aria-required-attr",
+          "nodes": [
+            [
+              ".color-picker-selected"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "2026 Embroidery Quote Builder - Garments & Caps | Northwest Custom Apparel",
+      "url": "/quote-builders/embroidery-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Screen Print DTF Transfers DTG (1st product only)",
+        "product-search": "",
+        "breakdown-1": "└─LC 8K | $20/ea",
+        "row-qty-1": "48",
+        "row-price-1": "$20.00",
+        "row-total-1": "$960.00",
+        "sidebar-resize-handle": "",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "products-label": "Products (Base 8K):",
+        "subtotal": "$960.00",
+        "per-unit-price": "$20.00/piece",
+        "additional-logos-pricing": "",
+        "cap-additional-logos-pricing": "",
+        "sidebar-grand-total": "$1056.96",
+        "toast-container": "",
+        "floatingQuoteBtn": "✨ Ask"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "product-search",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "PC54",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "Essential Cotton Tee",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "48",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [
+        "Style Product image Color S M L XL 2XL More Sizes Qty Unit $ Total Row actions └─LC 8K | $20/ea Jet Black 125 125 125 125 125 125 48 $20.00 $960.00"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "aria-required-attr",
+          "nodes": [
+            [
+              ".color-picker-selected"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "2026 Embroidery Quote Builder - Garments & Caps | Northwest Custom Apparel",
+      "url": "/quote-builders/embroidery-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Screen Print DTF Transfers DTG (1st product only)",
+        "product-search": "",
+        "breakdown-1": "└─LC 8K | $20/ea",
+        "row-qty-1": "48",
+        "row-price-1": "$20.00",
+        "row-total-1": "$960.00",
+        "sidebar-resize-handle": "",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "products-label": "Products (Base 8K):",
+        "subtotal": "$960.00",
+        "per-unit-price": "$20.00/piece",
+        "additional-logos-pricing": "",
+        "cap-additional-logos-pricing": "",
+        "sidebar-grand-total": "$1056.96",
+        "toast-container": "",
+        "floatingQuoteBtn": "✨ Ask"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "product-search",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "PC54",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "Essential Cotton Tee",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "48",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [
+        "Style Product image Color S M L XL 2XL More Sizes Qty Unit $ Total Row actions └─LC 8K | $20/ea Jet Black 125 125 125 125 125 125 48 $20.00 $960.00"
+      ],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "aria-required-attr",
+          "nodes": [
+            [
+              ".color-picker-selected"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "mutations": []
+}

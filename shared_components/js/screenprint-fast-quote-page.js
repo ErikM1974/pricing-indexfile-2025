@@ -5,6 +5,20 @@
 emailjs.init(((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.EMAIL && window.APP_CONFIG.EMAIL.PUBLIC_KEY) || ''));
 
 let currentStep = 1;
+
+function clearFastQuoteError() {
+    document.getElementById('fast-quote-error').hidden = true;
+    document.querySelectorAll('[aria-invalid]').forEach(field => field.removeAttribute('aria-invalid'));
+}
+
+function showFastQuoteError(message, fieldId) {
+    const notice = document.getElementById('fast-quote-error');
+    notice.textContent = message;
+    notice.hidden = false;
+    const field = fieldId && document.getElementById(fieldId);
+    if (field) field.setAttribute('aria-invalid', 'true');
+    (field || notice).focus();
+}
 const formData = {
     quantity: '',
     locations: '',
@@ -21,8 +35,12 @@ const formData = {
 document.querySelectorAll('.option-card').forEach(card => {
     card.addEventListener('click', function() {
         const group = this.parentElement;
-        group.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+        group.querySelectorAll('.option-card').forEach(c => {
+            c.classList.remove('selected');
+            c.setAttribute('aria-pressed', 'false');
+        });
         this.classList.add('selected');
+        this.setAttribute('aria-pressed', 'true');
 
         // Update hidden input
         const input = group.nextElementSibling;
@@ -34,6 +52,8 @@ document.querySelectorAll('.option-card').forEach(card => {
 
 function updateProgress(step) {
     document.querySelectorAll('.progress-step').forEach((elem, index) => {
+        if (index + 1 === step) elem.setAttribute('aria-current', 'step');
+        else elem.removeAttribute('aria-current');
         if (index + 1 < step) {
             elem.classList.add('completed');
             elem.classList.remove('active');
@@ -47,10 +67,14 @@ function updateProgress(step) {
 }
 
 function showStep(step) {
+    clearFastQuoteError();
     document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
     document.getElementById(`step-${step}`).classList.add('active');
     updateProgress(step);
     window.scrollTo(0, 0);
+    const heading = document.querySelector('#step-' + step + ' h2');
+    heading.tabIndex = -1;
+    heading.focus({ preventScroll: true });
 }
 
 function validateStep1() {
@@ -59,7 +83,7 @@ function validateStep1() {
     const colors = document.getElementById('colors').value;
 
     if (!quantity || !locations || !colors) {
-        alert('Please complete all fields before continuing');
+        showFastQuoteError('Choose a quantity, number of print locations, and number of colors before continuing.', !quantity ? 'quantity' : null);
         return false;
     }
 
@@ -125,13 +149,21 @@ function prevStep() {
 }
 
 async function submitQuote() {
+    const submitBtn = document.querySelector('[data-call="submitQuote"]');
+    if (submitBtn.disabled) return;
+    clearFastQuoteError();
     // Validate contact info
     const name = document.getElementById('customerName').value.trim();
     const email = document.getElementById('customerEmail').value.trim();
     const phone = document.getElementById('customerPhone').value.trim();
 
     if (!name || !email || !phone) {
-        alert('Please fill in all required fields (Name, Email, Phone)');
+        showFastQuoteError('Please fill in all required fields (Name, Email, Phone).', !name ? 'customerName' : !email ? 'customerEmail' : 'customerPhone');
+        return;
+    }
+
+    if (!document.getElementById('customerEmail').checkValidity()) {
+        showFastQuoteError('Enter a valid email address so we can send your quote.', 'customerEmail');
         return;
     }
 
@@ -144,7 +176,7 @@ async function submitQuote() {
     formData.notes = document.getElementById('notes').value.trim();
 
     // Disable submit button
-    const submitBtn = event.target;
+    // Keep the whole button disabled even when its icon was clicked.
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Submitting...';
 
@@ -166,7 +198,7 @@ async function submitQuote() {
         }
     } catch (error) {
         console.error('Submit error:', error);
-        alert('There was an error submitting your quote. Please try again or call us at (253) 922-5793.');
+        showFastQuoteError('Your request could not be saved. Please try again or call us at (253) 922-5793.');
         submitBtn.disabled = false;
         submitBtn.innerHTML = 'Get My Quote <i class="fas fa-check" aria-hidden="true"></i>';
     }

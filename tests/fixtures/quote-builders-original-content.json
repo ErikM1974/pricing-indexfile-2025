@@ -1,0 +1,393 @@
+{
+  "commit": "acc1bbf6a35a8218aba9a580075f6e8f402c320a",
+  "pages": [
+    {
+      "source": "quote-builders/dtf-quote-builder.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/vendor/fontawesome/css/all.min.css",
+        "shared_components/vendor/bootstrap/css/bootstrap.min.css",
+        "shared_components/css/quote-builder-common.css",
+        "shared_components/css/quote-builder-shell.css",
+        "shared_components/css/quote-builder-guided.css",
+        "shared_components/css/dtf-quote-builder.css",
+        "shared_components/css/quote-print.css",
+        "shared_components/css/color-picker-shared.css",
+        "shared_components/css/quote-share-modal.css",
+        "shared_components/css/customer-lookup.css",
+        "shared_components/css/safety-stripe-recs.css",
+        "shared_components/css/quote-session.css",
+        "shared_components/css/quote-builder-utilities.css"
+      ],
+      "rawCssBytes": 549903
+    },
+    {
+      "source": "quote-builders/dtg-quote-builder.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/vendor/fontawesome/css/all.min.css",
+        "shared_components/css/sticker-pricing-page.css",
+        "shared_components/css/dtg-quote-page.css",
+        "shared_components/css/dtg-inline-form.css",
+        "shared_components/css/dtg-catalog.css"
+      ],
+      "rawCssBytes": 334526
+    },
+    {
+      "source": "quote-builders/embroidery-quote-builder.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/vendor/fontawesome/css/all.min.css",
+        "shared_components/vendor/bootstrap/css/bootstrap.min.css",
+        "shared_components/css/quote-builder-common.css",
+        "shared_components/css/quote-builder-shell.css",
+        "shared_components/css/quote-builder-guided.css",
+        "shared_components/css/embroidery-quote-builder-extracted.css",
+        "shared_components/css/color-picker-shared.css",
+        "shared_components/css/quote-share-modal.css",
+        "shared_components/css/customer-lookup.css",
+        "shared_components/css/shopworks-import.css",
+        "shared_components/css/sticker-pricing-page.css",
+        "shared_components/css/embroidery-quote-pricing.css",
+        "shared_components/css/quote-session.css",
+        "shared_components/css/quote-builder-utilities.css"
+      ],
+      "rawCssBytes": 636132
+    },
+    {
+      "source": "quote-builders/screenprint-fast-quote.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/screenprint-fast-quote.css"
+      ],
+      "rawCssBytes": 23525
+    },
+    {
+      "source": "quote-builders/screenprint-quote-builder.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/vendor/fontawesome/css/all.min.css",
+        "shared_components/vendor/bootstrap/css/bootstrap.min.css",
+        "shared_components/css/quote-builder-common.css",
+        "shared_components/css/quote-builder-shell.css",
+        "shared_components/css/quote-builder-guided.css",
+        "shared_components/css/screenprint-quote-builder-extracted.css",
+        "shared_components/css/color-picker-shared.css",
+        "shared_components/css/quote-share-modal.css",
+        "shared_components/css/customer-lookup.css",
+        "shared_components/css/safety-stripe-recs.css",
+        "shared_components/css/quote-session.css",
+        "shared_components/css/quote-builder-utilities.css"
+      ],
+      "rawCssBytes": 501628
+    }
+  ],
+  "hashes": {
+    "config/app.config.js": "fe83e4329ce3eee97e48dd68dab81d9d5eb6ec94511d9650e2c9ebbb1528d6ea",
+    "config/tenant.js": "36477a70bc0632fc84308bf3a84a3bcebb4ff88ede21f06a26849151eaf5349f",
+    "quote-builders/dtf-quote-builder.html": "a64eca4dc1bdbb8d297277b93a321b2167948b6e944c14c3d906056a25594b97",
+    "quote-builders/dtg-quote-builder.html": "26ec96ca7eed6fdbac0fbfb34170654f8e3b07c57c8608eb2d37ac8b7830bccd",
+    "quote-builders/embroidery-quote-builder.html": "8ae4cbe36adae5bf285538650dd483999ca8c768fa1803d5a14ce5d5f0051170",
+    "quote-builders/screenprint-fast-quote.html": "b9b8985c69ad42199dc40620396f587cdb05d1849fc0248c11d5a4039bb67f62",
+    "quote-builders/screenprint-quote-builder.html": "51f17a3c485d4f2101e72133dd7e18946ac84ab3189d0a6e67ef9d05c1ec6069",
+    "shared_components/css/color-picker-shared.css": "ee39516aac2e119a052b051706802283b874ce174606da001d589dc0cc80cad7",
+    "shared_components/css/customer-lookup.css": "2458719a39d42a205ab8b4f630df268d851821d0c7bca7d9fbe5b4940e2eb31e",
+    "shared_components/css/dtf-quote-builder.css": "14fb28b2fedf3b6a8569b4bb86eff4eba75789dbf6b785ce30719f85af1b607e",
+    "shared_components/css/dtg-catalog.css": "90a92eca0e947e9e2e25593bf8a36fd2d399a9291d44f6c72ab8a10bc8c48d65",
+    "shared_components/css/dtg-inline-form.css": "c80aa24a2324dc31476cf7918414401dfb7b9d392e9139a8c91c9ce963986266",
+    "shared_components/css/dtg-quote-page.css": "b174dbb14c802b16e64a8d6cf64ded84a4d28314dc4714826f80745b403ad83a",
+    "shared_components/css/embroidery-quote-builder-extracted.css": "4fe06c1a8c1e2a50ab36822c650d6f0d33b65c2eac06ee95ecaeb4185167dc3a",
+    "shared_components/css/embroidery-quote-pricing.css": "d7e48a93fa554e0bf44cf5617a803069c942221458c191390f01ebc85a6779fa",
+    "shared_components/css/quote-builder-common.css": "f11ebe6928a9b92dc6fe96c784990b09eaf6fc16e6da6036940149881ea87a1f",
+    "shared_components/css/quote-builder-guided.css": "86718e33685892ed168dd643464cd49e26bed9b651219427abfe918fed4f1b21",
+    "shared_components/css/quote-builder-shell.css": "143812ba9a0c6a1b9c64cd878c1eb33a00d55dfb1060a32d87b7559b4bb00825",
+    "shared_components/css/quote-builder-utilities.css": "8db2f9e0bde64ee16801ce5aed7ca1d47cb6c552cd9573551395480032b945b9",
+    "shared_components/css/quote-print.css": "ee06c011e5518e9d3d77afe1de33f3c500fa3a5bca88afb22ba56e9e5af9f780",
+    "shared_components/css/quote-session.css": "9e0df4b3e46c1fe53ff965b41a380eed2c7ae83ba21aa5873983b9e790b7dae3",
+    "shared_components/css/quote-share-modal.css": "7f648b7ca3f051fb90c241ed36fb1f643cbbe1d5d1f1316c47abf07b350a9f84",
+    "shared_components/css/safety-stripe-recs.css": "f5634cf6f6471059193e75fbb6bcefbfc81319e19342de138d1214766991d442",
+    "shared_components/css/screenprint-fast-quote.css": "c1f6d0f843a5fadf3a5edd8f451779938dd1a5029e0476470e9c8fcedb23379e",
+    "shared_components/css/screenprint-quote-builder-extracted.css": "4066b7b601217fd837ba55b00d3057f678f5c58f243edea82044b4708cf10052",
+    "shared_components/css/shopworks-import.css": "fd46d002ec88eaaa4fd791a903237ad94bd703cf6bc7b9ab5358111391367690",
+    "shared_components/css/sticker-pricing-page.css": "aedc55e5a59483a62ab80127451b2801a01623a37c76c6b080e34fce0b4ea089",
+    "shared_components/css/tokens.css": "2b3ab556bb9eaf40765a5c84683777cb64d50a6c42d1b4e82bc6beff33a127b6",
+    "shared_components/js/artwork-upload.js": "ee355597c3854c7f075a9c9223c26709365b5ad497b8e644d448f191cd37b865",
+    "shared_components/js/box-url.js": "3daf0620159f6c8f4bf5929e90476030307aaf4ecbdcaa1a066d5c8a98e0935f",
+    "shared_components/js/builders/dtf/adapter.js": "7cbc13652027abe3f9fc7106735527aa7d290684721d3331f5cba80ad8dbf126",
+    "shared_components/js/builders/dtf/index.js": "34b001853a0594bd4c172fffa0b5ba189ebc1846363a7d67d4b2190b8c6158d8",
+    "shared_components/js/builders/dtf/methods-lifecycle.js": "510059adf4df54fb1e0237ec02df1d8f82f4c7beedebe0a564ee23af2d6e6b06",
+    "shared_components/js/builders/dtf/methods-locations.js": "3e278731590a361c95e0fd8e2466fe298cf90cbd8d0540e34da39a224621180f",
+    "shared_components/js/builders/dtf/methods-output.js": "4528bba19d5d70ec4beaa7e189958daa32b1dfee985d74e56a02f1838c535298",
+    "shared_components/js/builders/dtf/methods-pricing.js": "57ed0a723e80643b8655aafdfee0b5038701f3ccddeb0452c0d289ee72391a2f",
+    "shared_components/js/builders/dtf/methods-rows.js": "26de9dc1145e95a76c8e678474d1d05a2c19df33fedfe4ff8ef8e7f253384f1f",
+    "shared_components/js/builders/dtf/output.js": "ba0fc79a3180aeebfe5226d8de110da311e168f2e4932c388f38e53b966e6001",
+    "shared_components/js/builders/dtf/page-ui.js": "88016665393736d688662b6438b43d9b0b0c5a43e94469aaa17e8741ec49d845",
+    "shared_components/js/builders/dtf/product-rows.js": "c63b5d81d914752248f836fbf9491e0390ccae35d724d60b3571b244722481a5",
+    "shared_components/js/builders/dtf/push.js": "a228cca4043b98769d0b2ea98250af05f114e8c39ecb82be2ce11878f624b475",
+    "shared_components/js/builders/dtf/quote-builder-class.js": "1601456f2b1bf4f17ac4352ae9a0fab8629462d02cb99de72f32b25c3a38e0d5",
+    "shared_components/js/builders/dtf/state.js": "12a30a8c0de3000f31cfff109a7c48d4124acb3d903a99f01021d6b9d81dd039",
+    "shared_components/js/builders/dtg/adapter.js": "ae36097b4b2482c9fa8f73c57daa12068408498245a9c51974478e30e5587752",
+    "shared_components/js/builders/dtg/artwork.js": "d62865861b78504cd3a3b526ac1b6e497421e5733feb4cd64a5e157df04768ce",
+    "shared_components/js/builders/dtg/catalog-search.js": "9653e5847762a0d70adc3f08747dd83d974fd20e9c46a90832ce9e06dd0381e7",
+    "shared_components/js/builders/dtg/crm.js": "d929489d415005babab1dc31f11d76119d8c8c319dc8e2038fcd610c15ecd142",
+    "shared_components/js/builders/dtg/fees.js": "d4aafb0d1404426d093c313b58e4848d737c845cf8ce0ccd4d2aea84787e2107",
+    "shared_components/js/builders/dtg/form-core.js": "6c0546933e34be200375cd7a60e594bd6f51147e49799c62535e007092e27198",
+    "shared_components/js/builders/dtg/index.js": "4b8f1a56e9b9c9f5dd717d18cf27c2084d5baff169cc73470104641cb889b16d",
+    "shared_components/js/builders/dtg/output.js": "b42b6556b9f421ce25e424e40ecdd561bdf785170b4e7a8f7aaccf7f89e06f26",
+    "shared_components/js/builders/dtg/persistence.js": "c8698cb514bc07f4aafe250faf956e68c121b0c1e80ce42eb25c33de4cf39189",
+    "shared_components/js/builders/dtg/pricing.js": "20cfe9d7b2926c7145f9f8919a4e6792ea3ae6e385267995ea9921c49ff32f40",
+    "shared_components/js/builders/dtg/state.js": "8bb491ca7c0e87ebf0db7e1f48c4b560f9041c437154d307b2df71e3d035806e",
+    "shared_components/js/builders/dtg/tax-shipping.js": "6028c3b4f39703555c6fe358b85d259c610a670818efdea71af35fdc69313073",
+    "shared_components/js/builders/dtg/utils.js": "0fe7c44a0757f3619174295171cda35ed53774adee289f8728bd3755cda0d582",
+    "shared_components/js/builders/emb/adapter.js": "24ca414b666636eea7debe7e3435fec68631dc4c73f83af7859ac14194bcc6a8",
+    "shared_components/js/builders/emb/design-search.js": "e3884f45452157b8ce6767e25a42b65770edd6ba674b1ffe384bd265687cf885",
+    "shared_components/js/builders/emb/index.js": "c68debd7d6a1c90da5f5c8ce2b04a746be3657800ad361e4a9b91a2513adbb0f",
+    "shared_components/js/builders/emb/logo-config.js": "b39117ce5512e9829feac40f19de5de6f287fba7905545ed2dbeb22cef0a01fd",
+    "shared_components/js/builders/emb/output.js": "4674422d82279da365374d7d88c1fc124937ee2b89ddcf7402bfcb946903e604",
+    "shared_components/js/builders/emb/persistence.js": "d3dd318449d749606d09e364f52bbafd19dd42431042ea957f50edec94f1874a",
+    "shared_components/js/builders/emb/pricing-sync.js": "b900e6ab95a063af25f69cc20837fd4800d396992232cdb5328e6607508e5785",
+    "shared_components/js/builders/emb/pricing.js": "c39debe1c919955bc43224e3a3907370f363f7dac7d2b05c848c78c518799d52",
+    "shared_components/js/builders/emb/product-rows.js": "58943a14c908b197e2a6ed83fc6ad79be14bfe85c9a493056617f09dfce2a4fe",
+    "shared_components/js/builders/emb/quote-lifecycle.js": "1f465ba512cc8e308f5e9bc83a99898fc7d181cb271f487350c4c6f0ae12c9a7",
+    "shared_components/js/builders/emb/save-push.js": "806dd12e727060ff0042bffde39c8b8d47fd783b3d4ca6181907022054bfef9a",
+    "shared_components/js/builders/emb/shopworks-import.js": "685ba4e266151615246d5790d5290ac424f8a82219601812a46c7a29b546e518",
+    "shared_components/js/builders/emb/spr-modal.js": "0cc74b05834c4dc9c711b3726b4ed519395bd3cc5273109b2b7572236f60b061",
+    "shared_components/js/builders/emb/state.js": "02c3c33c236f88a14bdd65a8dd2909171ba6ed7b98bcfb36a47c8b65c8bbeb53",
+    "shared_components/js/builders/scp/adapter.js": "a847498c8377f20d913cf8c1da689b7aaf14d4d1a805d6ebab7c7acded121f95",
+    "shared_components/js/builders/scp/index.js": "81b152a25f177f04cfda41dc4ef4539d4f9fc11cc1605de04127daa12eaacc26",
+    "shared_components/js/builders/scp/persistence.js": "5d14856003ecb9641c5301de6a313be2e981efdde87327e6c8c7d01ea1d1b1c0",
+    "shared_components/js/builders/scp/pricing-sync.js": "c1179045345ccfed5b0596b70c869b2164229fbdca14b48d561e8f85247b0cf9",
+    "shared_components/js/builders/scp/print-config.js": "3e02177cd94d65ec9a9dfd28f138f10ba077c8b13d571857c40df67235210aaf",
+    "shared_components/js/builders/scp/product-rows.js": "74ad98117886d032a517c7f79d3e68ab0be5ff1b24b6c0cfd57f37059f56d145",
+    "shared_components/js/builders/scp/push.js": "5204c48f41bbf39a0a45d09a32387b829d3f044d832cf887e5be0bb915d0e7d0",
+    "shared_components/js/builders/scp/quote-lifecycle.js": "4716e99b41176afa87cec90ac995c585820b0d38b9e200e100cdfd1d15ef2df0",
+    "shared_components/js/builders/scp/save-output.js": "42ec19c2bb841995525888bdd6259d629b3b3635e323134d1167b51f7694dedd",
+    "shared_components/js/builders/scp/state.js": "b2b1b1459a083f782a49d0b6c5ab26eed28ada4a3d4582451533893b42f41f09",
+    "shared_components/js/builders/shared/color-dropdown-position.js": "c9d8c2eb820bac2162a8239200cf71454ca5d136b6ac8cd40ffaae2d902a2307",
+    "shared_components/js/builders/shared/errors.js": "75bca91d87a57c14c1bef21ac76c60e6212d9589c875e0c1383faa5bb7febacf",
+    "shared_components/js/builders/shared/quote-builder-base.js": "ab30dcafa6f92314db61eafae1a666aa5143b4fca7c21e0182756a60c159b015",
+    "shared_components/js/builders/shared/quote-model.js": "5394f3909ec24a959e194a57b56e23f6d4f8d78156fe6bb23d9fcb637b424e6a",
+    "shared_components/js/builders/shared/service-codes.js": "ca3ccf54faa95f0eb862cde719f856e0cae0f3c9a30ae9118334dec004bc4fb8",
+    "shared_components/js/builders/shared/size-constants.js": "06fb2f1e29b9213c68e1c3cb519d355999c64f63e4e0ddb5b32188be46ad2256",
+    "shared_components/js/customer-context-banners.js": "a211baccd9a2e1a785f0715de300e4c53209b9fb78c4a233b456274235e9089e",
+    "shared_components/js/customer-design-combobox.js": "8d8307517a5cdca4e41807ed17b2cd69bc9ff09296f22ad1bd77d01785195b25",
+    "shared_components/js/customer-lookup-service.js": "2114d0f8a93506556dfc26b01c7c922e12093e25a4ff541896527002e9c73ca1",
+    "shared_components/js/data-call-delegator.js": "50e836385b6804b2b52fd8c549744277fe69ff701c232b7badf4fdcb09f343f6",
+    "shared_components/js/design-thumbnail-service.js": "306a176ec0c24f2a4be2c89be7d67d7f7e6af17153cab6b889f9fc6ad677c916",
+    "shared_components/js/dtf-pricing-service.js": "949255ae38db6f51d494f78f07ebc8f484e5288035fe1d13b3af7c6fea2391ab",
+    "shared_components/js/dtf-quote-pricing.js": "af8443797219945d0b7618158dcd6c55bdd19be2c6f300693cb6bfe56543d9fb",
+    "shared_components/js/dtf-quote-products.js": "1554c08be0166f833e213c9bb7af8749f50e25f0033ebf0811e520fbcc2234df",
+    "shared_components/js/dtf-quote-service.js": "8324860c84a3598f41858c661bc751b77357db34d804c626040e768e9ce54e21",
+    "shared_components/js/dtg-canonical-pricing.js": "de8a80c0bbed8ddaea62ecb2bcf7d62afc60788701ede23d41fcd7ade372d1f3",
+    "shared_components/js/dtg-catalog.js": "93d35cc14903fb6ca3f6d8b601143498c6aa492e97f52511ec5757316340f51d",
+    "shared_components/js/dtg-pricing-service.js": "524822dab43e63a3c45868a0df9b14b00dc28a8eb43958a027c99fa9e9d0ac36",
+    "shared_components/js/dtg-quote-page.js": "df32cb9f261cbac8be7206bb6b602858d1822f9269c7c8273ce7d0e7c73373df",
+    "shared_components/js/embroidery-chat.js": "1c836df6a2e16c221023639b56ec770b033fbc682f21d104171ab6630a5e6062",
+    "shared_components/js/embroidery-pricing-service.js": "cb5ead0d8b9059ca640993e331e075d87b86016d993aec403179260f4c0b0dff",
+    "shared_components/js/embroidery-quote-invoice.js": "f5aa48ce6faeb0706ccf3245a57c4d63ba928794490bfa258127322fbf8ab54d",
+    "shared_components/js/embroidery-quote-pricing.js": "50a142670e991983b9a7ff09b20f05c59edd5cd72f19cb37d322f3bcb14c3fb3",
+    "shared_components/js/embroidery-quote-service.js": "6fd8d0689add6d692ac8a4a080331bd8852773c3e9ff5e48cc8288b1d2803adf",
+    "shared_components/js/exact-match-search.js": "19c45a7cc13a010c011a99d58865d14d08403183a60185e52b12e8212cbf031e",
+    "shared_components/js/extended-sizes-config.js": "e87167e6d9b2c314a00365772ff98d53e28c0e2eba38eda69c9bba16ed6e26f5",
+    "shared_components/js/fetch-timeout.js": "1d9852795f9af3b674a48ad5e719bc970cae867e36b1962f0c3f1a28dd830179",
+    "shared_components/js/inventory-badges.js": "a0edf84256e68c2d3c23ce0b92adb67f4bab863f7ac98dd9bb4776349cf0aa40",
+    "shared_components/js/observability.js": "71e943142e0d5090c13c03a2af76c6a51afa362f8f4d7fb8117cc9a6b6d11c34",
+    "shared_components/js/product-category-filter.js": "a06f7e081fb6b3d2c5261f04ddb0d5273bf43a84a78279dd98978ccaecdafc4c",
+    "shared_components/js/product-thumbnail-modal.js": "7744d2335da370691090b17e9ae0ffa6a2b40707290bb6d9cf14b6f20e940078",
+    "shared_components/js/quote-builder-guided.js": "8156ce6844ce272e6bcd9e318405e94ebf4eec320a28596ef3a39dc18f9147d6",
+    "shared_components/js/quote-builder-utils.js": "4dedc5cbad8aa329d3436717b722e17a336b7fe1a5bee16a8d08605dc05d06b0",
+    "shared_components/js/quote-extended-sizes.js": "f2fc669dc1495f3b7856147a6b39309e00a84530263f6464b458852095183916",
+    "shared_components/js/quote-formatter.js": "dc706a27eb87f7877cf01ebcd4a9a1d9558d4198707a65f5d650488f60e9f4e0",
+    "shared_components/js/quote-order-summary.js": "5d47d79be4f7cf391e025f975a32c55bfcd944753f9f5a8c82b911b323e9b31d",
+    "shared_components/js/quote-persistence.js": "9c82287ae5b423541e932a498776a7619d514202dd15ca47cf56e4340baae98c",
+    "shared_components/js/quote-pricing-data.js": "9b6c2b201097f5f33773d10ee8853cda778495d6c14c1d6ec1b384526a413b4e",
+    "shared_components/js/quote-services-bar.js": "c5bba464738225e32d81cecd497d5e3bb9fc30769e0b041cd2ee01000ffc9244",
+    "shared_components/js/quote-session.js": "7311752644224679f6bd681006c87db5e8885feec715c571db1af623eb226c2a",
+    "shared_components/js/quote-share-modal.js": "afdaff40b7b212441c3a8108ac097918dd2ccc3893453ce07554a1790808297d",
+    "shared_components/js/safety-stripe-recs.js": "34dcece039b306d407da9e58c56487d8e06444e9016acec3961cce8e7179b890",
+    "shared_components/js/sanmar-inventory-check.js": "77c17038b5566f6dc54aabc3eaef73da53037eb51ca015f9ab5eba1f4e94d4f8",
+    "shared_components/js/screenprint-fast-quote-page.js": "51c55c43eb6f5ebc46e00ceae96e0356fd516c70910548633b4d9b639bc9c6b0",
+    "shared_components/js/screenprint-fast-quote-service.js": "f2602b29e4e2fda1655d32c7e5e9931fd5e236ab0bed1f754c45701fa98428f5",
+    "shared_components/js/screenprint-pricing-service.js": "695a740f845263741fee5a9aa91816d9643a5dd24fa28cfc3850a9a2785300b7",
+    "shared_components/js/screenprint-quote-service.js": "12d5870faaadae68cae56b9e4bd7047932b1c7121c580abcfab81498d68700e7",
+    "shared_components/js/shopworks-import-parser.js": "c5e1170713cdba077db309d93a2be9b1dc80bd646d34f2358d4f737bf2db7f21",
+    "shared_components/js/sidebar-resize.js": "352313f608a7b8de19aba742ccc675af049a9dc784c45da306238b8aac997323",
+    "shared_components/js/sku-validation-service.js": "601ebf4fb5ea81960fd70f1eb3c98011700178a4baf545429f83ad36ad569c5f",
+    "shared_components/js/staff-auth-helper.js": "b858bb5e30a775c949aaab2e4f0bbb4796e06c02a76f3bb8d8a9c97985f5addd",
+    "shared_components/vendor/bootstrap/css/bootstrap.min.css": "62f74b1cf824a89f03554c638e719594c309b4d8a627a758928c0516fa7890ab",
+    "shared_components/vendor/bootstrap/js/bootstrap.bundle.min.js": "f5210fa3e7f0245a4c51eb7f280092c0ef99fdd28c45e17dab8cc5854fdf4fd3",
+    "shared_components/vendor/emailjs/email.min.js": "249f5139f01396e20b067fbe6db17315981fb1c36c64d64df224bcf0f8750eab",
+    "shared_components/vendor/fontawesome/css/all.min.css": "e5e202e3c899507992952533f57b634722b69b34241d271963559d31aa33ef81",
+    "shared_components/vendor/sentry/bundle.min.js": "2c29ccc109a609c9e45865ebfcde410f7bc2c6651e6e079ef4f18a7e5aa3ae0c"
+  },
+  "changes": [
+    {
+      "file": "quote-builders/screenprint-fast-quote.html",
+      "before": "<body>",
+      "after": "<body data-ui=\"unified\" data-fast-quote>",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/screenprint-fast-quote.html",
+      "before": "<link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css\">",
+      "after": "<link rel=\"stylesheet\" href=\"/shared_components/vendor/fontawesome/css/all.min.css?v=2026.07.08.8\">\n    <link rel=\"stylesheet\" href=\"https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap\">",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/screenprint-fast-quote.html",
+      "before": "    <link rel=\"stylesheet\" href=\"/shared_components/css/screenprint-fast-quote.css?v=2026.09.07.19\">",
+      "after": "    <link rel=\"stylesheet\" href=\"/shared_components/css/components.css?v=2026.09.12.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/utilities.css?v=2026.09.12.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/screenprint-fast-quote.css?v=2026.09.12.3\">",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/screenprint-fast-quote.html",
+      "before": "<div class=\"option-card\" data-value=\"1\">\n                            <div class=\"option-card-icon\">📍</div>\n                            <div class=\"option-card-label\">1 Location</div>\n                            <div class=\"option-card-hint\">Most common</div>\n                        </div>",
+      "after": "<button type=\"button\" class=\"option-card\" data-value=\"1\" aria-pressed=\"false\">\n                            <span class=\"option-card-icon\">📍</span>\n                            <span class=\"option-card-label\">1 Location</span>\n                            <span class=\"option-card-hint\">Most common</span>\n                        </button>",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/screenprint-fast-quote.html",
+      "before": "<div class=\"option-card\" data-value=\"2\">\n                            <div class=\"option-card-icon\">📍📍</div>\n                            <div class=\"option-card-label\">2 Locations</div>\n                            <div class=\"option-card-hint\">Popular</div>\n                        </div>",
+      "after": "<button type=\"button\" class=\"option-card\" data-value=\"2\" aria-pressed=\"false\">\n                            <span class=\"option-card-icon\">📍📍</span>\n                            <span class=\"option-card-label\">2 Locations</span>\n                            <span class=\"option-card-hint\">Popular</span>\n                        </button>",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/screenprint-fast-quote.html",
+      "before": "<div class=\"option-card\" data-value=\"3\">\n                            <div class=\"option-card-icon\">📍📍📍</div>\n                            <div class=\"option-card-label\">3+ Locations</div>\n                            <div class=\"option-card-hint\">Full service</div>\n                        </div>",
+      "after": "<button type=\"button\" class=\"option-card\" data-value=\"3\" aria-pressed=\"false\">\n                            <span class=\"option-card-icon\">📍📍📍</span>\n                            <span class=\"option-card-label\">3+ Locations</span>\n                            <span class=\"option-card-hint\">Full service</span>\n                        </button>",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/screenprint-fast-quote.html",
+      "before": "<div class=\"option-card\" data-value=\"1-2\">\n                            <div class=\"option-card-icon\">🎨</div>\n                            <div class=\"option-card-label\">1-2 Colors</div>\n                            <div class=\"option-card-hint\">Simple logos</div>\n                        </div>",
+      "after": "<button type=\"button\" class=\"option-card\" data-value=\"1-2\" aria-pressed=\"false\">\n                            <span class=\"option-card-icon\">🎨</span>\n                            <span class=\"option-card-label\">1-2 Colors</span>\n                            <span class=\"option-card-hint\">Simple logos</span>\n                        </button>",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/screenprint-fast-quote.html",
+      "before": "<div class=\"option-card\" data-value=\"3-4\">\n                            <div class=\"option-card-icon\">🎨🎨</div>\n                            <div class=\"option-card-label\">3-4 Colors</div>\n                            <div class=\"option-card-hint\">Detailed art</div>\n                        </div>",
+      "after": "<button type=\"button\" class=\"option-card\" data-value=\"3-4\" aria-pressed=\"false\">\n                            <span class=\"option-card-icon\">🎨🎨</span>\n                            <span class=\"option-card-label\">3-4 Colors</span>\n                            <span class=\"option-card-hint\">Detailed art</span>\n                        </button>",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/screenprint-fast-quote.html",
+      "before": "<div class=\"option-card\" data-value=\"5-6\">\n                            <div class=\"option-card-icon\">🎨🎨🎨</div>\n                            <div class=\"option-card-label\">5-6 Colors</div>\n                            <div class=\"option-card-hint\">Full color</div>\n                        </div>",
+      "after": "<button type=\"button\" class=\"option-card\" data-value=\"5-6\" aria-pressed=\"false\">\n                            <span class=\"option-card-icon\">🎨🎨🎨</span>\n                            <span class=\"option-card-label\">5-6 Colors</span>\n                            <span class=\"option-card-hint\">Full color</span>\n                        </button>",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/screenprint-fast-quote.html",
+      "before": "<div class=\"option-cards\">",
+      "after": "<div class=\"option-cards\" role=\"group\" aria-label=\"Number of print locations\">",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/screenprint-fast-quote.html",
+      "before": "<div class=\"option-cards\">",
+      "after": "<div class=\"option-cards\" role=\"group\" aria-label=\"Colors per design\">",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/screenprint-fast-quote.html",
+      "before": "        <div class=\"content\">",
+      "after": "        <div class=\"content\">\n            <p id=\"fast-quote-error\" class=\"fast-quote-error\" role=\"alert\" tabindex=\"-1\" hidden></p>",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/screenprint-fast-quote-page.js",
+      "before": "let currentStep = 1;",
+      "after": "let currentStep = 1;\n\nfunction clearFastQuoteError() {\n    document.getElementById('fast-quote-error').hidden = true;\n    document.querySelectorAll('[aria-invalid]').forEach(field => field.removeAttribute('aria-invalid'));\n}\n\nfunction showFastQuoteError(message, fieldId) {\n    const notice = document.getElementById('fast-quote-error');\n    notice.textContent = message;\n    notice.hidden = false;\n    const field = fieldId && document.getElementById(fieldId);\n    if (field) field.setAttribute('aria-invalid', 'true');\n    (field || notice).focus();\n}",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/screenprint-fast-quote-page.js",
+      "before": "        group.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));\n        this.classList.add('selected');",
+      "after": "        group.querySelectorAll('.option-card').forEach(c => {\n            c.classList.remove('selected');\n            c.setAttribute('aria-pressed', 'false');\n        });\n        this.classList.add('selected');\n        this.setAttribute('aria-pressed', 'true');",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/screenprint-fast-quote-page.js",
+      "before": "    document.querySelectorAll('.progress-step').forEach((elem, index) => {",
+      "after": "    document.querySelectorAll('.progress-step').forEach((elem, index) => {\n        if (index + 1 === step) elem.setAttribute('aria-current', 'step');\n        else elem.removeAttribute('aria-current');",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/screenprint-fast-quote-page.js",
+      "before": "function showStep(step) {",
+      "after": "function showStep(step) {\n    clearFastQuoteError();",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/screenprint-fast-quote-page.js",
+      "before": "    window.scrollTo(0, 0);",
+      "after": "    window.scrollTo(0, 0);\n    const heading = document.querySelector('#step-' + step + ' h2');\n    heading.tabIndex = -1;\n    heading.focus({ preventScroll: true });",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/screenprint-fast-quote-page.js",
+      "before": "        alert('Please complete all fields before continuing');",
+      "after": "        showFastQuoteError('Choose a quantity, number of print locations, and number of colors before continuing.', !quantity ? 'quantity' : null);",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/screenprint-fast-quote-page.js",
+      "before": "async function submitQuote() {",
+      "after": "async function submitQuote() {\n    const submitBtn = document.querySelector('[data-call=\"submitQuote\"]');\n    if (submitBtn.disabled) return;\n    clearFastQuoteError();",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/screenprint-fast-quote-page.js",
+      "before": "        alert('Please fill in all required fields (Name, Email, Phone)');",
+      "after": "        showFastQuoteError('Please fill in all required fields (Name, Email, Phone).', !name ? 'customerName' : !email ? 'customerEmail' : 'customerPhone');",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/screenprint-fast-quote-page.js",
+      "before": "    // Collect all form data",
+      "after": "    if (!document.getElementById('customerEmail').checkValidity()) {\n        showFastQuoteError('Enter a valid email address so we can send your quote.', 'customerEmail');\n        return;\n    }\n\n    // Collect all form data",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/screenprint-fast-quote-page.js",
+      "before": "    const submitBtn = event.target;",
+      "after": "    // Keep the whole button disabled even when its icon was clicked.",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/screenprint-fast-quote-page.js",
+      "before": "        alert('There was an error submitting your quote. Please try again or call us at (253) 922-5793.');",
+      "after": "        showFastQuoteError('Your request could not be saved. Please try again or call us at (253) 922-5793.');",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/screenprint-fast-quote-service.js",
+      "before": "            const dbResult = await this.saveToDatabase(quoteId, formData);",
+      "after": "            const dbResult = await this.saveToDatabase(quoteId, formData);\n            if (!dbResult.success) throw new Error(dbResult.error || 'Unable to save quote request');",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/screenprint-fast-quote-service.js",
+      "before": "            // Don't throw - allow quote to succeed even if DB fails",
+      "after": "            // Return a structured failure; submitQuote stops before confirmation emails.",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/screenprint-fast-quote.html",
+      "before": "/shared_components/js/screenprint-fast-quote-page.js?v=2026.09.06.36",
+      "after": "/shared_components/js/screenprint-fast-quote-page.js?v=2026.09.12.3",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/screenprint-fast-quote.html",
+      "before": "/shared_components/js/screenprint-fast-quote-service.js?v=2026.09.06.37",
+      "after": "/shared_components/js/screenprint-fast-quote-service.js?v=2026.09.12.3",
+      "count": 1
+    },
+    {
+      "file": "shared_components/css/screenprint-fast-quote.css",
+      "before": "/* screenprint-fast-quote.css — extracted 2026-09-06 from the inline \\3c style> in quote-builders/screenprint-fast-quote.html (Rule 3). */\n\n/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page\n   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;\n   every rule below uses var(). Raw hex is allowed ONLY in this block. */\n/* stylelint-disable color-no-hex */\n/* stylelint-enable color-no-hex */\n\n* {\n    margin: 0;\n    padding: 0;\n    box-sizing: border-box;\n}\n\nbody {\n    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;\n    background: linear-gradient(135deg, var(--color-bradley-tint) 0%, var(--gray-300) 100%);\n    min-height: 100vh;\n    padding: 20px;\n}\n\n.container {\n    max-width: 600px;\n    margin: 0 auto;\n    background: white;\n    border-radius: 16px;\n    box-shadow: 0 10px 40px rgb(0 0 0 / 10%);\n    overflow: hidden;\n}\n\n/* Header */\n.header {\n    background: linear-gradient(135deg, var(--brand-mid) 0%, var(--print-green) 100%);\n    color: white;\n    padding: 30px;\n    text-align: center;\n}\n\n.header h1 {\n    font-size: 28px;\n    margin-bottom: 10px;\n}\n\n.header p {\n    font-size: 16px;\n    opacity: 0.9;\n}\n\n/* Progress Indicator */\n.progress-bar {\n    display: flex;\n    justify-content: space-between;\n    padding: 20px 30px;\n    background: var(--gray-50);\n    border-bottom: 1px solid var(--gray-200);\n}\n\n.progress-step {\n    flex: 1;\n    text-align: center;\n    position: relative;\n}\n\n.progress-step:not(:last-child)::after {\n    content: '';\n    position: absolute;\n    top: 15px;\n    right: -50%;\n    width: 100%;\n    height: 2px;\n    background: var(--gray-200);\n    z-index: 0;\n}\n\n.progress-step.active:not(:last-child)::after {\n    background: var(--brand-mid);\n}\n\n.progress-circle {\n    width: 30px;\n    height: 30px;\n    border-radius: 50%;\n    background: var(--gray-200);\n    color: var(--gray-500);\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    font-weight: 600;\n    font-size: 14px;\n    position: relative;\n    z-index: 1;\n    transition: all 0.3s;\n}\n\n.progress-step.active .progress-circle {\n    background: var(--brand-mid);\n    color: white;\n    transform: scale(1.1);\n}\n\n.progress-step.completed .progress-circle {\n    background: var(--bs-success);\n    color: white;\n}\n\n.progress-label {\n    display: block;\n    margin-top: 8px;\n    font-size: 12px;\n    color: var(--gray-500);\n}\n\n.progress-step.active .progress-label {\n    color: var(--brand-mid);\n    font-weight: 600;\n}\n\n/* Content Area */\n.content {\n    padding: 40px 30px;\n}\n\n.step {\n    display: none;\n}\n\n.step.active {\n    display: block;\n    animation: fadeIn 0.3s;\n}\n\n@keyframes fadeIn {\n    from { opacity: 0; transform: translateY(10px); }\n    to { opacity: 1; transform: translateY(0); }\n}\n\n.step-title {\n    font-size: 24px;\n    color: var(--gray-700);\n    margin-bottom: 10px;\n}\n\n.step-subtitle {\n    font-size: 14px;\n    color: var(--slate-500);\n    margin-bottom: 30px;\n}\n\n/* Form Elements */\n.form-group {\n    margin-bottom: 20px;\n}\n\n.form-label {\n    display: block;\n    font-size: 14px;\n    font-weight: 600;\n    color: var(--gray-700);\n    margin-bottom: 8px;\n}\n\n.form-input,\n.form-select {\n    width: 100%;\n    padding: 12px 16px;\n    border: 2px solid var(--slate-200);\n    border-radius: 8px;\n    font-size: 15px;\n    transition: all 0.2s;\n}\n\n.form-input:focus,\n.form-select:focus {\n    outline: none;\n    border-color: var(--brand-mid);\n    box-shadow: 0 0 0 3px rgb(58 124 82 / 10%);\n}\n\n.form-textarea {\n    width: 100%;\n    padding: 12px 16px;\n    border: 2px solid var(--slate-200);\n    border-radius: 8px;\n    font-size: 15px;\n    min-height: 100px;\n    resize: vertical;\n    font-family: inherit;\n}\n\n/* Option Cards */\n.option-cards {\n    display: grid;\n    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));\n    gap: 15px;\n    margin-bottom: 20px;\n}\n\n.option-card {\n    padding: 20px;\n    border: 2px solid var(--slate-200);\n    border-radius: 12px;\n    cursor: pointer;\n    text-align: center;\n    transition: all 0.2s;\n}\n\n.option-card:hover {\n    border-color: var(--brand-mid);\n    background: var(--brand-50);\n    transform: translateY(-2px);\n}\n\n.option-card.selected {\n    border-color: var(--brand-mid);\n    background: linear-gradient(135deg, var(--brand-100) 0%, var(--gray-100) 100%);\n    box-shadow: 0 4px 12px rgb(58 124 82 / 20%);\n}\n\n.option-card-icon {\n    font-size: 32px;\n    margin-bottom: 10px;\n    color: var(--brand-mid);\n}\n\n.option-card-label {\n    font-size: 15px;\n    font-weight: 600;\n    color: var(--gray-700);\n}\n\n.option-card-hint {\n    font-size: 12px;\n    color: var(--slate-500);\n    margin-top: 5px;\n}\n\n/* Buttons */\n.button-group {\n    display: flex;\n    gap: 15px;\n    margin-top: 30px;\n}\n\n.btn {\n    flex: 1;\n    padding: 14px 24px;\n    border: none;\n    border-radius: 8px;\n    font-size: 16px;\n    font-weight: 600;\n    cursor: pointer;\n    transition: all 0.2s;\n}\n\n.btn-primary {\n    background: linear-gradient(135deg, var(--brand-mid) 0%, var(--print-green) 100%);\n    color: white;\n}\n\n.btn-primary:hover {\n    transform: translateY(-2px);\n    box-shadow: 0 6px 16px rgb(58 124 82 / 30%);\n}\n\n.btn-secondary {\n    background: var(--slate-200);\n    color: var(--slate-600);\n}\n\n.btn-secondary:hover {\n    background: var(--gray-300);\n}\n\n.btn:disabled {\n    opacity: 0.5;\n    cursor: not-allowed;\n    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */\n    transform: none !important;\n}\n\n/* Success Screen */\n.success-icon {\n    text-align: center;\n    font-size: 64px;\n    color: var(--bs-success);\n    margin-bottom: 20px;\n}\n\n.success-message {\n    text-align: center;\n}\n\n.success-message h2 {\n    font-size: 28px;\n    color: var(--gray-700);\n    margin-bottom: 10px;\n}\n\n.success-message p {\n    font-size: 16px;\n    color: var(--slate-500);\n    line-height: 1.6;\n}\n\n.quote-id-display {\n    background: var(--slate-50);\n    border: 2px solid var(--brand-mid);\n    border-radius: 12px;\n    padding: 20px;\n    margin: 30px 0;\n    text-align: center;\n}\n\n.quote-id-label {\n    font-size: 14px;\n    color: var(--slate-500);\n    margin-bottom: 5px;\n}\n\n.quote-id-value {\n    font-size: 32px;\n    font-weight: 700;\n    color: var(--brand-mid);\n}\n\n/* Estimate Display */\n.estimate-box {\n    background: linear-gradient(135deg, var(--brand-100) 0%, var(--gray-100) 100%);\n    border: 2px solid var(--brand-mid);\n    border-radius: 12px;\n    padding: 25px;\n    margin: 30px 0;\n}\n\n.estimate-label {\n    font-size: 14px;\n    color: var(--print-green);\n    font-weight: 600;\n    text-transform: uppercase;\n    letter-spacing: 0.5px;\n    margin-bottom: 10px;\n}\n\n.estimate-range {\n    font-size: 36px;\n    font-weight: 700;\n    color: var(--brand-mid);\n    margin-bottom: 10px;\n}\n\n.estimate-note {\n    font-size: 13px;\n    color: var(--slate-600);\n    line-height: 1.5;\n}\n\n/* Responsive */\n@media (width <= 640px) {\n    .container {\n        border-radius: 0;\n    }\n\n    .content {\n        padding: 30px 20px;\n    }\n\n    .option-cards {\n        grid-template-columns: 1fr;\n    }\n\n    .button-group {\n        flex-direction: column;\n    }\n\n    .header h1 {\n        font-size: 24px;\n    }\n}\n\n/* 2026-09-06 review */\n/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */\n[hidden] { display: none !important; }\n.fq-thanks-list { text-align: left; margin: 20px 0; padding-left: 40px; color: var(--slate-600); }\n.fq-mt-30 { margin-top: 30px; }\n",
+      "after": "/* Fast quote request: shared tokens and controls; one scoped page owner. */\n@layer components.pages {\n\n:where([data-ui=\"unified\"][data-fast-quote]) { padding: 32px 20px; }\n:where([data-ui=\"unified\"][data-fast-quote]) .container { width: min(100%, 760px); margin: 0 auto; background: var(--ui-surface); border: 1px solid var(--ui-line); border-radius: var(--radius-lg); overflow: clip; }\n:where([data-ui=\"unified\"][data-fast-quote]) .header { padding: 32px; border-bottom: 1px solid var(--ui-line); }\n:where([data-ui=\"unified\"][data-fast-quote]) .header h1 { margin: 0 0 8px; color: var(--ui-ink); font-size: clamp(24px, 4vw, 32px); line-height: 1.2; }\n:where([data-ui=\"unified\"][data-fast-quote]) .header p { margin: 0; color: var(--ui-muted); }\n:where([data-ui=\"unified\"][data-fast-quote]) .progress-bar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 20px 32px; border-bottom: 1px solid var(--ui-line); }\n:where([data-ui=\"unified\"][data-fast-quote]) .progress-step { display: flex; align-items: center; gap: 8px; color: var(--ui-muted); font-size: 14px; }\n:where([data-ui=\"unified\"][data-fast-quote]) .progress-circle { display: inline-grid; place-items: center; width: 28px; height: 28px; flex-shrink: 0; border: 1px solid var(--ui-line-strong); border-radius: 50%; font-weight: 600; }\n:where([data-ui=\"unified\"][data-fast-quote]) .progress-step.active { color: var(--ui-accent); font-weight: 700; }\n:where([data-ui=\"unified\"][data-fast-quote]) .progress-step.active .progress-circle { background: var(--ui-accent); color: var(--ui-surface); border-color: var(--ui-accent); }\n:where([data-ui=\"unified\"][data-fast-quote]) .progress-step.completed .progress-circle { color: var(--ui-accent); background: var(--ui-tint); border-color: var(--ui-accent); }\n:where([data-ui=\"unified\"][data-fast-quote]) .content { padding: 32px; }\n:where([data-ui=\"unified\"][data-fast-quote]) .step:not(.active) { display: none; }\n:where([data-ui=\"unified\"][data-fast-quote]) .step-title, :where([data-ui=\"unified\"][data-fast-quote]) .success-message h2 { font-size: 24px; line-height: 1.25; margin: 0 0 10px; }\n:where([data-ui=\"unified\"][data-fast-quote]) .step-subtitle { margin: 0 0 28px; color: var(--ui-muted); }\n:where([data-ui=\"unified\"][data-fast-quote]) .form-group { margin-bottom: 24px; min-width: 0; }\n:where([data-ui=\"unified\"][data-fast-quote]) .form-label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600; }\n:where([data-ui=\"unified\"][data-fast-quote]) .form-input, :where([data-ui=\"unified\"][data-fast-quote]) .form-select, :where([data-ui=\"unified\"][data-fast-quote]) .form-textarea { width: 100%; min-width: 0; min-height: 44px; padding: 10px 12px; color: var(--ui-ink); background: var(--ui-surface); border: 1px solid var(--ui-line-strong); border-radius: var(--radius-sm); font: inherit; }\n:where([data-ui=\"unified\"][data-fast-quote]) .form-textarea { min-height: 108px; resize: vertical; }\n:where([data-ui=\"unified\"][data-fast-quote]) .option-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }\n:where([data-ui=\"unified\"][data-fast-quote]) .option-card { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-width: 0; min-height: 116px; padding: 16px 8px; border: 1px solid var(--ui-line-strong); border-radius: var(--radius-sm); color: var(--ui-ink); background: var(--ui-surface); font: inherit; text-align: center; cursor: pointer; }\n:where([data-ui=\"unified\"][data-fast-quote]) .option-card:hover { border-color: var(--ui-accent); }\n:where([data-ui=\"unified\"][data-fast-quote]) .option-card.selected { background: var(--ui-tint); border-color: var(--ui-accent); box-shadow: inset 0 0 0 1px var(--ui-accent); }\n:where([data-ui=\"unified\"][data-fast-quote]) .option-card-icon { font-size: 22px; line-height: 1.25; }\n:where([data-ui=\"unified\"][data-fast-quote]) .option-card-label { font-size: 14px; font-weight: 600; }\n:where([data-ui=\"unified\"][data-fast-quote]) .option-card-hint { font-size: 12px; color: var(--ui-muted); }\n:where([data-ui=\"unified\"][data-fast-quote]) .button-group { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }\n:where([data-ui=\"unified\"][data-fast-quote]) .btn { flex: 1; min-height: 48px; padding: 12px 20px; border: 1px solid var(--ui-accent); border-radius: var(--radius-sm); font: inherit; font-weight: 600; cursor: pointer; }\n:where([data-ui=\"unified\"][data-fast-quote]) .btn-primary { color: var(--ui-surface); background: var(--ui-accent); }\n:where([data-ui=\"unified\"][data-fast-quote]) .btn-primary:hover { background: var(--ui-accent-hover); }\n:where([data-ui=\"unified\"][data-fast-quote]) .btn-secondary { color: var(--ui-ink); background: var(--ui-surface); border-color: var(--ui-line-strong); }\n:where([data-ui=\"unified\"][data-fast-quote]) .btn:disabled { opacity: 0.65; cursor: wait; }\n:where([data-ui=\"unified\"][data-fast-quote]) .estimate-box { border: 1px solid var(--ui-accent); border-radius: var(--radius-md); padding: 24px; margin-block: 28px; background: var(--ui-tint); }\n:where([data-ui=\"unified\"][data-fast-quote]) .estimate-label { font-size: 14px; font-weight: 600; color: var(--ui-accent); margin-bottom: 8px; }\n:where([data-ui=\"unified\"][data-fast-quote]) .estimate-range { font-size: clamp(24px, 4vw, 32px); line-height: 1.3; font-weight: 700; color: var(--ui-accent); margin-bottom: 8px; }\n:where([data-ui=\"unified\"][data-fast-quote]) .estimate-note { font-size: 14px; color: var(--ui-muted); }\n:where([data-ui=\"unified\"][data-fast-quote]) .success-icon { font-size: 48px; color: var(--ui-accent); margin-bottom: 16px; }\n:where([data-ui=\"unified\"][data-fast-quote]) .success-message p { color: var(--ui-muted); margin: 0 0 16px; }\n:where([data-ui=\"unified\"][data-fast-quote]) .quote-id-display { border-block: 1px solid var(--ui-line); padding-block: 24px; margin-block: 28px; }\n:where([data-ui=\"unified\"][data-fast-quote]) .quote-id-label { color: var(--ui-muted); font-size: 14px; margin-bottom: 8px; }\n:where([data-ui=\"unified\"][data-fast-quote]) .quote-id-value { color: var(--ui-accent); font-size: 28px; line-height: 1.25; font-weight: 700; overflow-wrap: anywhere; }\n:where([data-ui=\"unified\"][data-fast-quote]) .fq-thanks-list { margin: 16px 0 28px; padding-left: 22px; color: var(--ui-muted); }\n:where([data-ui=\"unified\"][data-fast-quote]) .fq-thanks-list li { margin-block: 6px; }\n:where([data-ui=\"unified\"][data-fast-quote]) .fq-mt-30 { margin-top: 28px; }\n:where([data-ui=\"unified\"][data-fast-quote]) .fast-quote-error:not([hidden]) { margin: 0 0 24px; padding: 16px; border: 1px solid var(--color-danger); border-radius: var(--radius-sm); background: var(--color-danger-bg); color: var(--color-danger-ink); }\n:where([data-ui=\"unified\"][data-fast-quote]) [aria-invalid=\"true\"] { border-color: var(--color-danger); }\n\n@media (width <= 600px) {\n:where([data-ui=\"unified\"][data-fast-quote]) { padding: 12px; }\n:where([data-ui=\"unified\"][data-fast-quote]) .container { border-radius: var(--radius-md); }\n:where([data-ui=\"unified\"][data-fast-quote]) .header, :where([data-ui=\"unified\"][data-fast-quote]) .content { padding: 24px 16px; }\n:where([data-ui=\"unified\"][data-fast-quote]) .progress-bar { padding: 16px; gap: 8px; }\n:where([data-ui=\"unified\"][data-fast-quote]) .progress-step { font-size: 12px; gap: 6px; }\n:where([data-ui=\"unified\"][data-fast-quote]) .progress-circle { width: 24px; height: 24px; }\n:where([data-ui=\"unified\"][data-fast-quote]) .option-cards { gap: 8px; }\n:where([data-ui=\"unified\"][data-fast-quote]) .option-card { padding-inline: 4px; }\n:where([data-ui=\"unified\"][data-fast-quote]) .option-card-icon { font-size: 18px; }\n:where([data-ui=\"unified\"][data-fast-quote]) .option-card-label { font-size: 13px; }\n:where([data-ui=\"unified\"][data-fast-quote]) .estimate-box { padding: 16px; }\n:where([data-ui=\"unified\"][data-fast-quote]) .btn { padding-inline: 12px; }\n:where([data-ui=\"unified\"][data-fast-quote]) .btn-primary { flex-grow: 2; }\n}\n\n@media print {\n@page { size: letter; margin: 0.45in; }\n\n:where([data-ui=\"unified\"][data-fast-quote]) :focus { outline: none; }\n:where([data-ui=\"unified\"][data-fast-quote]) { padding: 0; background: var(--ui-surface); font-size: 10pt; }\n:where([data-ui=\"unified\"][data-fast-quote]) .container { width: 100%; max-width: none; border: 0; border-radius: 0; overflow: visible; }\n:where([data-ui=\"unified\"][data-fast-quote]) .header { padding: 0 0 12px; }\n:where([data-ui=\"unified\"][data-fast-quote]) .header h1 { font-size: 20pt; }\n:where([data-ui=\"unified\"][data-fast-quote]) .content { padding: 16px 0 0; }\n:where([data-ui=\"unified\"][data-fast-quote]) .progress-bar { padding: 12px 0; }\n:where([data-ui=\"unified\"][data-fast-quote]) .button-group { display: none; }\n:where([data-ui=\"unified\"][data-fast-quote]) .form-group { margin-bottom: 12px; break-inside: avoid; }\n:where([data-ui=\"unified\"][data-fast-quote]) .form-label { margin-bottom: 4px; font-size: 10pt; }\n:where([data-ui=\"unified\"][data-fast-quote]) .form-input, :where([data-ui=\"unified\"][data-fast-quote]) .form-select, :where([data-ui=\"unified\"][data-fast-quote]) .form-textarea { min-height: 28px; padding: 4px 8px; font-size: 10pt; }\n:where([data-ui=\"unified\"][data-fast-quote]) .form-textarea { min-height: 60px; }\n:where([data-ui=\"unified\"][data-fast-quote]) .step-subtitle { margin-bottom: 16px; }\n:where([data-ui=\"unified\"][data-fast-quote]) .estimate-box { margin-block: 16px; padding: 12px; break-inside: avoid; }\n:where([data-ui=\"unified\"][data-fast-quote]) .estimate-range { font-size: 18pt; }\n:where([data-ui=\"unified\"][data-fast-quote]) .estimate-note { font-size: 9pt; }\n:where([data-ui=\"unified\"][data-fast-quote]) .option-card { min-height: 85px; }\n:where([data-ui=\"unified\"][data-fast-quote]) .quote-id-display { margin-block: 16px; padding-block: 16px; }\n:where([data-ui=\"unified\"][data-fast-quote]) .fast-quote-error { break-inside: avoid; }\n}\n}\n",
+      "count": 1
+    }
+  ]
+}
