@@ -1567,3 +1567,13 @@ Garment designer completion: page styles are scoped to the unified designer; art
 - tests/fixtures/quote-builders-dtf-extended-rate-limit-original-browser.json — immutable original synthetic populated builder workflow evidence.
 
 - tests/fixtures/quote-builders-dtg-runtime-pricing-failure-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/e2e/helpers/server-pages-scenes.js — synthetic rendering of real blog and denied/retired response functions without starting the server.
+- tests/e2e/css-unification-server-pages.spec.js — original/current content, responsive, accessibility and complete PDF review of server-generated pages.
+- tests/fixtures/server-pages-original-browser.json — immutable generated response content and SEO evidence.
+
+- lib/status-page-templates.js — shared escaped HTML for access-denied and retired responses; access decisions stay in callers.
+- shared_components/css/status-pages.css — canonical responsive and print layout for server status responses.
+- tests/fixtures/server-pages-original-content.json — immutable source hashes and reversible server-template/style changes.
+
+- tests/unit/server-pages.test.js — response source, role/access behavior, escaped names, retirement destinations and structured-data safety.

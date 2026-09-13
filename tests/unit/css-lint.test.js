@@ -36,7 +36,7 @@ describe('stylelint over the standardized stylesheets', () => {
         // Use the actual expanded files, including directory globs, so a new
         // reviewed stylesheet cannot silently miss the production lint gate.
         const manifest = require('../../scripts/css/migration-manifest.json');
-        const owners = [...manifest.pilots, ...(manifest.generatedDocuments || [])];
+        const owners = [...manifest.pilots, ...(manifest.generatedDocuments || []), ...(manifest.reviewedRuntimeOwners || [])];
         const styles = [...new Set(owners.flatMap(owner => owner.styles))]
             .filter(file => !file.includes('/vendor/'));
         expect(styles.filter(file => !result.files.includes(file))).toEqual([]);

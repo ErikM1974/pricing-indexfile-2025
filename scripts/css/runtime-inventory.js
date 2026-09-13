@@ -195,7 +195,8 @@ const counts = key => Object.fromEntries(unique(surfaces.map(s => s[key])).map(v
 const report = {
     scope: 'Tracked HTML, literal GET/path.join routes, CSS imports, JS ESM dependency closure and known runtime owners. Static evidence; no routes or business services executed. Variable-built routes/styles still require family review.',
     summary: { surfaces: surfaces.length, kind: counts('kind'), family: counts('family'), status: counts('status') },
-    serverGeneratedOwners: manifest.pendingRuntimeOwners.filter(o => o.kind === 'server-generated'),
+    serverGeneratedOwners: [...manifest.pendingRuntimeOwners.filter(o => o.kind === 'server-generated'),
+        ...(manifest.reviewedRuntimeOwners || []).filter(o => o.kind === 'server-generated').map(o => ({ ...o, owners: [o.source] }))],
     surfaces,
 };
 const output = JSON.stringify(report, null, 2) + '\n';

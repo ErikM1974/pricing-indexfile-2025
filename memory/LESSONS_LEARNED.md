@@ -128,12 +128,6 @@ Quote-operation access rollout (2026-09-07) is archived in LESSONS_LEARNED_ARCHI
 
 Problem: the CSS census omitted Jotform scripts and its external-owner backlog named only three Caspio pages. Root cause: provider recognition did not match the currently loaded embeds. Solution: recognize Jotform and explicitly retain vendor-owned UI as pending even after its surrounding page is reviewed. Prevention: lock live embed IDs/URLs, test wrapper boundaries with login/table/empty/failure fixtures and block all real provider writes; do not describe synthetic fixture coverage as validation of a vendor app. Check DESIGN_COLOUR_CODE before mapping an inherited palette: announcement admin tools are neutral; legacy maroon does not make them AE-owned.
 
-## Transient notifications need deterministic contrast checks (2026-09-09)
-
-Problem/root cause: a DTG service outage exposed white text on an amber toast (3.18 contrast); the notification was absent on healthy runs. Solution: use existing dark warning/success tokens and render all four real toast types in the accessibility check. Prevention: wait for their final painted state, test transient failures deliberately, and inspect each builder’s actual style owner. The other three builders have a separate warning foreground; pricing and notification behavior remain unchanged.
-
-DTG test follow-up: initial product hydration can replace a number input between automated focus and text insertion. Set the value and dispatch its actual input event atomically using the shared test helper, then assert the row quantity before waiting for pricing. Keep real pricing reads and mocked writes; never relax the positive-money guard.
-
 ## Monitoring data needs complete responses and visible persistence failures (2026-09-09)
 
 Problem/root cause: malformed usage could appear as zero, partial schema could mark tables gone, and local review storage assumed every read/write succeeded. Solution: validate complete responses before rendering, preserve snapshot evidence and notes, distinguish unknown from zero, show export/retry paths and clear only recovered errors. Prevention: exercise malformed/partial/denied storage and successful recovery with synthetic records, preserve the original snapshot, and inspect current-value PDFs. Print long reports in block flow; inherited flex/min-height can create a blank trailing sheet even when PDF text is complete.
@@ -252,3 +246,9 @@ Browser baselines must work from a fresh checkout. The tumbler export test previ
 - Problem/root cause: sample notifications repeatedly loaded icons and rendered behind the native cart dialog; narrow messages lacked a width bound. The runtime census missed stylesheet links embedded in template strings and mistook data-invoice-style for inline CSS.
 - Solution: reuse the bundled icon link, render an accessible manual popover in the active dialog, bound/wrap the notification and retain focus; parse generated stylesheet links and distinguish style attributes from data attributes. Include every reviewed stylesheet in the actual expanded lint result.
 - Prevention: exercise each notification type at four widths, real failed-stock add, focus, text escaping, timed removal and print hiding. Reconcile shared-source evidence against the same immutable baseline instead of changing its hashes.
+
+## Server response templates need explicit style and escaping contracts (2026-09-13)
+
+- Problem/root cause: blog styles referenced tokens their response never loaded; access notices interpolated raw staff names, and JSON-LD could close its script when a title contained HTML.
+- Solution: serve canonical tokens/components and scoped blog/status styles; escape names as text and encode less-than signs in serialized JSON-LD. Authorization and HTTP/SEO behavior stay with the original callers.
+- Prevention: preserve original response content, links and metadata; test malicious names/titles, anonymous and authorized gates, keyboard exits with unavailable CSS, four widths and every printed page. Keep reviewed server owners in the runtime census after closing their backlog entries.

@@ -1997,3 +1997,8 @@ Sample-cart runtime reviewed on catalog/product: 5 targeted browser cases across
 ## Builder runtime alerts — September 12, 2026
 
 DTG persistent pricing errors and DTF extended-size empty/error/rate-limit messages now use the shared alert styles. Six focused browser cases passed, three unit suites / 226 checks passed, and all current evidence was visually inspected: DTF 48 screenshots / four PDFs (eight pages), DTG four screenshots / one PDF (three pages). Original amounts, payloads, controls and refresh recovery are preserved. This closes the two named dynamic-CSS backlog owners; generated print, server pages, email/provider contracts and final whole-app gates/release remain.
+
+
+## Server-generated pages reviewed — September 13, 2026
+
+Blog, access-denied/restricted and retired-sticker responses now use canonical shared tokens/components with two scoped family styles. Four server owners are recorded without changing the 225 static-page count. Original response text, links, metadata, anonymous redirects/JSON, role checks and retired 410/noindex behavior are preserved. Names are escaped as text; JSON-LD titles cannot close the script element. Eleven browser cases pass, including long/malicious names and keyboard exits with all styles unavailable. All 36 current screenshots and nine PDFs / ten pages were inspected. The six focused unit suites pass 383 checks across the combined run and corrected two-suite rerun; JavaScript lint, 284-file CSS lint and the unchanged 485-route table pass. Current print selector deduplication is presentation-equivalent. Production remains v2026.09.12.1 / Heroku 2110 until final regression and release.

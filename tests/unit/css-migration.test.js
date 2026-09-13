@@ -6,7 +6,7 @@ const { JSDOM } = require('jsdom');
 const ROOT = path.resolve(__dirname, '../..');
 const read = file => fs.readFileSync(path.join(ROOT, file), 'utf8');
 const manifest = JSON.parse(read('scripts/css/migration-manifest.json'));
-const styleOwners = [...manifest.pilots, ...(manifest.generatedDocuments || [])];
+const styleOwners = [...manifest.pilots, ...(manifest.generatedDocuments || []), ...(manifest.reviewedRuntimeOwners || [])];
 
 describe('unified CSS ownership and preserved content', () => {
     const knownTokens = new Set();

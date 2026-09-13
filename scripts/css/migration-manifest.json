@@ -6987,15 +6987,6 @@
       "note": "Own print/PDF fixtures required; static HTML inventory cannot cover these."
     },
     {
-      "kind": "server-generated",
-      "owners": [
-        "lib/blog-templates.js",
-        "server.js",
-        "routes/blog.js"
-      ],
-      "note": "Blog, denied-access and retirement responses."
-    },
-    {
       "kind": "non-page",
       "owners": [
         "calculators/christmas-bundle-emailjs-template.html",
@@ -8814,6 +8805,86 @@
       ],
       "test": "tests/e2e/css-unification-quote-builder-workflows.spec.js",
       "note": "Decorative inline declarations replaced with existing shared alert classes; complete builder stylesheet ownership remains in pilots."
+    },
+    {
+      "kind": "server-generated",
+      "source": "lib/blog-templates.js",
+      "status": "reviewed",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/blog.css"
+      ],
+      "measuredRawCssBytes": 67380,
+      "maxCssBytes": 69428,
+      "states": [
+        "nine-original-response-content-and-SEO-contracts",
+        "1440-768-390-320-full-pages",
+        "nine-complete-letter-documents",
+        "escaped-user-text-and-JSON-LD",
+        "native-keyboard-exit-with-unavailable-styles"
+      ],
+      "test": "tests/e2e/css-unification-server-pages.spec.js"
+    },
+    {
+      "kind": "server-generated",
+      "source": "server.js",
+      "status": "reviewed",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/status-pages.css"
+      ],
+      "measuredRawCssBytes": 57712,
+      "maxCssBytes": 59760,
+      "states": [
+        "nine-original-response-content-and-SEO-contracts",
+        "1440-768-390-320-full-pages",
+        "nine-complete-letter-documents",
+        "escaped-user-text-and-JSON-LD",
+        "native-keyboard-exit-with-unavailable-styles"
+      ],
+      "test": "tests/e2e/css-unification-server-pages.spec.js"
+    },
+    {
+      "kind": "server-generated",
+      "source": "routes/blog.js",
+      "status": "reviewed",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/status-pages.css"
+      ],
+      "measuredRawCssBytes": 57712,
+      "maxCssBytes": 59760,
+      "states": [
+        "nine-original-response-content-and-SEO-contracts",
+        "1440-768-390-320-full-pages",
+        "nine-complete-letter-documents",
+        "escaped-user-text-and-JSON-LD",
+        "native-keyboard-exit-with-unavailable-styles"
+      ],
+      "test": "tests/e2e/css-unification-server-pages.spec.js"
+    },
+    {
+      "kind": "server-generated",
+      "source": "lib/status-page-templates.js",
+      "status": "reviewed",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/status-pages.css"
+      ],
+      "measuredRawCssBytes": 57712,
+      "maxCssBytes": 59760,
+      "states": [
+        "nine-original-response-content-and-SEO-contracts",
+        "1440-768-390-320-full-pages",
+        "nine-complete-letter-documents",
+        "escaped-user-text-and-JSON-LD",
+        "native-keyboard-exit-with-unavailable-styles"
+      ],
+      "test": "tests/e2e/css-unification-server-pages.spec.js"
     }
   ]
 }
