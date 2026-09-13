@@ -1497,3 +1497,27 @@ Garment designer completion: page styles are scoped to the unified designer; art
 - tests/fixtures/quote-builders-dtf-save-original-browser.json — immutable original synthetic populated builder workflow evidence.
 
 - tests/fixtures/quote-builders-embroidery-import-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-embroidery-full-back-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-embroidery-services-artwork-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-embroidery-services-add-ons-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-embroidery-services-supplied-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-embroidery-save-failure-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-embroidery-assistant-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-embroidery-caps-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-embroidery-caps-puff-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-embroidery-caps-patch-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- shared_components/css/quote-workspace.css — scoped canonical quote workspace presentation; staged adoption on the embroidery flagship.
+
+- shared_components/css/quote-embroidery.css — scoped canonical quote workspace presentation; staged adoption on the embroidery flagship.
+
+- shared_components/css/quote-invoice.css — shared canonical quote invoice presentation for EMB/SCP/DTF/DTG; all financial calculations retained in the original generator.

@@ -238,3 +238,14 @@ Browser baselines must work from a fresh checkout. The tumbler export test previ
 - Problem/root cause: the fast request service ignored its database failure result and continued into email and the success screen; a submission handler relied on the implicit event target, so clicking its icon could bypass the button lock.
 - Solution: require a successful database result before confirming or emailing, select and lock the actual submit button, retain fields on failure and provide persistent accessible validation/retry.
 - Prevention: mock database rejection and retry, click both the button and its icon, assert one pending request and unchanged successful payloads; inspect narrow actions and every printed page.
+
+## Shared quote documents must await their external styles (2026-09-12)
+
+- Problem/root cause: document.write can report a complete document before linked print styles load; fixed print timers can open an unformatted quote. Chromium protocol interception also suppresses resource loading in these popup documents during tests.
+- Solution: all four builders await the shared invoice generator's stylesheet/image/font readiness with a bounded visible failure. Invoice tests serve real local assets and route business fetches through the same synthetic handler before releasing protocol interception.
+- Prevention: assert exactly one print after a delayed stylesheet, zero prints after a failed required stylesheet, original financial totals/payloads and full phone/paper layouts. Never weaken a missing-styles check to accommodate a test harness.
+
+## Quote tables need ink and page-break checks (2026-09-12)
+
+- Problem/root cause: DOM totals can be correct while narrow auto-sized columns split quantities or clip cents; grid cards can fragment into blank print frames.
+- Solution/prevention: use explicit numeric column widths and scrollable screen regions, assert actual printed currency ink fits cells, and inspect every PDF page with customer/order groups kept together.

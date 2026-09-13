@@ -1,4 +1,4 @@
-const fs=require('node:fs'),path=require('node:path');
+const fs=require('node:fs'),path=require('node:path'),http=require('node:http');
 const esbuild=require('esbuild');
 const root=path.resolve(__dirname,'../../..'),original=require('../../fixtures/quote-builders-original-content.json');
 const pricing=name=>JSON.parse(fs.readFileSync(path.join(root,'tests/fixtures/pricing',name),'utf8'));
@@ -13,11 +13,32 @@ function sizePricing(style){const template=pricing('size-pricing-'+(style==='C11
 function source(file){let s=fs.readFileSync(path.join(root,file),'utf8').replace(/\r\n/g,'\n');for(const c of original.changes.filter(c=>c.file===file).reverse()){if(s.split(c.after).length-1!==c.count)throw Error('Original mapping drift '+file);s=s.split(c.after).join(c.before);}return s;}
 async function open(page,state={}){
  const events={errors:[],writes:[],unknown:[],missing:[],reads:[],dialogs:[],mutations:[]};
+ // document.write resources fail under Chromium protocol interception. Invoice
+ // scenes use real local assets and transfer fetches to the synthetic handler
+ // before printing, preserving the same API fixtures without business requests.
+ let previewOrigin;
+ if(state.realPreview){
+  const server=http.createServer(async(req,res)=>{
+   try{
+    const u=new URL(req.url,'http://quote-preview.localhost'),file=decodeURIComponent(u.pathname.slice(1)),absolute=path.resolve(root,file);
+    if(!['GET','HEAD'].includes(req.method)||u.pathname.startsWith('/api/')||!absolute.startsWith(root+path.sep)||!fs.existsSync(absolute)||!fs.statSync(absolute).isFile()){res.writeHead(404);res.end();return;}
+    if(state.invoiceStyles&&u.pathname===state.invoiceStyles.path){
+     state.invoiceStyles.requested?.();await state.invoiceStyles.wait;
+     if(state.invoiceStyles.failed){res.writeHead(503);res.end();return;}
+    }
+    const asset=await staticAsset(file,absolute,state.original);
+    res.writeHead(200,{'Content-Type':asset.contentType});res.end(req.method==='HEAD'?undefined:asset.body);
+   }catch(error){events.errors.push(error.message);res.writeHead(500);res.end();}
+  });
+  await new Promise((resolve,reject)=>{server.once('error',reject);server.listen(0,'127.0.0.1',resolve);});server.unref();
+  page.context().once('close',()=>{server.closeAllConnections();server.close();});
+  previewOrigin='http://quote-preview.localhost:'+server.address().port;
+ }
  await page.context().addInitScript(()=>{sessionStorage.setItem('nwca_user_name','Example Rep');sessionStorage.setItem('nwca_user_email','rep@example.invalid');sessionStorage.setItem('nwca_user_role','staff');});
  await page.clock.setFixedTime(new Date('2026-09-12T18:30:00.000Z'));
  await page.context().addInitScript(()=>{window.__printCalls=0;window.print=()=>{window.__printCalls++;window.dispatchEvent(new Event('beforeprint'));};});
  page.on('pageerror',e=>events.errors.push(e.message));page.on('dialog',async d=>{events.dialogs.push(d.message());await d.dismiss();});
- await page.context().route('**/*',async route=>{
+ const handleRoute=async route=>{
   const request=route.request(),u=new URL(request.url()),p=u.pathname,method=request.method(),style=u.searchParams.get('styleNumber')||'PC54';
   if(state.save&&p.startsWith('/api/quote-sequence/'))return route.fulfill({json:{prefix:p.split('/').pop(),year:2026,sequence:777}});
   if(state.save&&['/api/quote_sessions','/api/quote_items'].includes(p)){
@@ -31,6 +52,7 @@ async function open(page,state={}){
    const bundle={pricing:{tiers:dtg.tiersR,costs:dtg.allDtgCostsR,sizes:dtg.sizes,upcharges:dtg.sellingPriceDisplayAddOns}};
    return route.fulfill({status:state.pricingFailed?503:200,json:dtgCanonical.priceLines({...body,bundlesByStyle:Object.fromEntries(body.lines.map(l=>[l.styleNumber,bundle]))})});
   }
+  if(state.assistant&&p==='/api/emb-quote-ai/chat'&&method==='POST'){events.reads.push({path:p,method,body:request.postDataJSON()});return route.fulfill({contentType:'text/event-stream',body:'event: delta\ndata: {"text":"I can help with embroidery products, colors and customer details. What would you like to look up?"}\n\nevent: done\ndata: {}\n\n'});}
   if(!['GET','HEAD'].includes(method)||/quote-sequence|logout/.test(p)){events.writes.push({path:p,method});return route.fulfill({status:503});}
   if(p.startsWith('/api/'))events.reads.push({path:p,query:u.search});
   if(p==='/api/version')return route.fulfill({json:{version:'2026.09.12.1'}});
@@ -47,7 +69,8 @@ async function open(page,state={}){
   if(p==='/api/products/search'){const q=u.searchParams.get('q')||'PC54';return route.fulfill({json:{success:true,data:{products:[{styleNumber:q,productName:details(q)[0].PRODUCT_TITLE,images:{display:image}}]}}});}
   if(p==='/api/stylesearch')return route.fulfill({json:['PC54','C112'].filter(s=>s.toLowerCase().includes((u.searchParams.get('term')||'').toLowerCase())).map(s=>({style:s,value:s,label:details(s)[0].PRODUCT_TITLE,thumb:image}))});
   if(p==='/api/size-pricing')return route.fulfill({json:sizePricing(style)});
-  if(p==='/api/sanmar-shopworks/import-format')return route.fulfill({json:[{PartNumber:style,Color:'JetBlack',Size01:'S',Size02:'M',Size03:'L',Size04:'XL',Size05:'2XL',Size06:'3XL'},{PartNumber:style+'_4XL',Color:'JetBlack',Size06:'4XL'}]});
+  if(p==='/api/sizes-by-style-color')return route.fulfill({json:style==='C112'?['OSFA']:['S','M','L','XL','2XL','3XL','4XL']});
+  if(p==='/api/sanmar-shopworks/import-format')return route.fulfill({json:style==='C112'?[{PartNumber:style,Color:'JetBlack',Size01:'OSFA'}]:[{PartNumber:style,Color:'JetBlack',Size01:'S',Size02:'M',Size03:'L',Size04:'XL',Size05:'2XL',Size06:'3XL'},{PartNumber:style+'_4XL',Color:'JetBlack',Size06:'4XL'}]});
   if(p==='/api/base-item-costs')return route.fulfill({json:{baseCosts:sizePricing(style)[0].basePrices}});
   if(p==='/api/max-prices-by-style')return route.fulfill({json:{maxPrices:sizePricing(style)[0].basePrices,sizes:Object.entries(sizePricing(style)[0].basePrices).map(([size,maxPrice])=>({size,maxPrice})),sellingPriceDisplayAddOns:sizePricing(style)[0].sizeUpcharges}});
   if(p==='/api/dtg/product-bundle')return route.fulfill({status:state.pricingFailed?503:200,json:{product:{...details(style)[0],styleNumber:style,colors:details(style)},pricing:{tiers:dtg.tiersR,costs:dtg.allDtgCostsR,sizes:dtg.sizes,upcharges:dtg.sellingPriceDisplayAddOns}}});
@@ -67,20 +90,45 @@ async function open(page,state={}){
   // Axe fetches these same linked styles to evaluate contrast.
   if(['fonts.googleapis.com','fonts.gstatic.com'].includes(u.hostname)||(u.hostname==='cdnjs.cloudflare.com'&&/^\/ajax\/libs\/font-awesome\/6\.(4|6)\.0\/css\/all\.min\.css$/.test(p))||(u.hostname==='cdn.jsdelivr.net'&&p==='/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css'))return route.continue();
   if(p.startsWith('/api/')||['fetch','xhr'].includes(request.resourceType())){events.unknown.push(request.url());return route.fulfill({status:503});}
+  if(previewOrigin&&u.origin===previewOrigin)return route.continue();
   if(['localhost','127.0.0.1','quote-builder.example.invalid'].includes(u.hostname)){
    const file=decodeURIComponent(p.slice(1)),absolute=path.resolve(root,file);if(!absolute.startsWith(root+path.sep)||!fs.existsSync(absolute)||!fs.statSync(absolute).isFile()){events.missing.push(p);return route.fulfill({status:404});}
 
-   if(/^shared_components\/js\/builders\/(emb|scp|dtf|dtg)\/index\.js$/.test(file)){
-    const bundle=await esbuild.build({entryPoints:[absolute],bundle:true,format:'iife',platform:'browser',target:'es2020',write:false,plugins:[{name:'preserved-builder-source',setup(build){build.onLoad({filter:/\.js$/},args=>{const f=path.relative(root,args.path).replace(/\\/g,'/');return{contents:state.original&&original.hashes[f]?source(f):fs.readFileSync(args.path,'utf8'),loader:'js'};});}}]});
-    return route.fulfill({contentType:'application/javascript',body:bundle.outputFiles[0].text});
-   }
-   return route.fulfill({contentType:{'.html':'text/html','.css':'text/css','.js':'application/javascript','.json':'application/json','.svg':'image/svg+xml','.png':'image/png','.woff2':'font/woff2'}[path.extname(absolute)]||'application/octet-stream',body:state.original&&original.hashes[file]?Buffer.from(source(file)):fs.readFileSync(absolute)});
+   return route.fulfill(await staticAsset(file,absolute,state.original));
   }
   const allowedScripts=['https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js','https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js','https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js'];
   if(['image','font','stylesheet'].includes(request.resourceType())||allowedScripts.includes(u.href))return route.continue();
   events.unknown.push(request.url());return route.fulfill({status:503});
- });
- await page.goto(state.url);await page.evaluate(()=>document.fonts.ready);return events;
+ };
+ await page.context().route('**/*',handleRoute);
+ if(state.realPreview){
+  // Keep all fetches on the same synthetic handler while releasing Chromium's
+  // protocol interception before document.write creates the print document.
+  await page.exposeBinding('__quotePreviewFetch',async(_,input)=>{
+   let response;
+   await handleRoute({request:()=>({url:()=>input.url,method:()=>input.method,postDataJSON:()=>JSON.parse(input.body),resourceType:()=> 'fetch'}),fulfill:async value=>{response={status:value.status||200,body:value.json===undefined?(value.body||''):JSON.stringify(value.json),type:value.json===undefined?(value.contentType||'text/plain'):'application/json'};},continue:async()=>{throw Error('Unexpected preview fetch '+input.url);}});
+   return response;
+  });
+  events.preparePrint=async()=>{
+   await page.evaluate(()=>{
+    window.fetch=async(input,init)=>{const request=new Request(new URL(typeof input==='string'?input:input.url,location.href),init);const body=['GET','HEAD'].includes(request.method)?undefined:await request.text();const result=await window.__quotePreviewFetch({url:request.url,method:request.method,body});return new Response(result.body,{status:result.status,headers:{'Content-Type':result.type}});};
+    XMLHttpRequest.prototype.send=function(){throw Error('Unexpected XHR during synthetic print preview');};
+    navigator.sendBeacon=()=>{throw Error('Unexpected beacon during synthetic print preview');};
+   });
+   await page.context().unrouteAll({behavior:'wait'});
+  };
+ }
+ const destination=previewOrigin?previewOrigin+new URL(state.url,'http://localhost').pathname+new URL(state.url,'http://localhost').search:state.url;
+ await page.goto(destination);await page.evaluate(()=>document.fonts.ready);return events;
+}
+
+async function staticAsset(file,absolute,preserved){
+ const contentType={'.html':'text/html','.css':'text/css','.js':'application/javascript','.json':'application/json','.svg':'image/svg+xml','.png':'image/png','.woff2':'font/woff2'}[path.extname(absolute)]||'application/octet-stream';
+ if(/^shared_components\/js\/builders\/(emb|scp|dtf|dtg)\/index\.js$/.test(file)){
+  const bundle=await esbuild.build({entryPoints:[absolute],bundle:true,format:'iife',platform:'browser',target:'es2020',write:false,plugins:[{name:'preserved-preview-source',setup(build){build.onLoad({filter:/\.js$/},args=>{const f=path.relative(root,args.path).replace(/\\/g,'/');return{contents:preserved&&original.hashes[f]?source(f):fs.readFileSync(args.path,'utf8'),loader:'js'};});}}]});
+  return{contentType,body:bundle.outputFiles[0].text};
+ }
+ return{contentType,body:preserved&&original.hashes[file]?Buffer.from(source(file)):fs.readFileSync(absolute)};
 }
 async function snapshot(page){return page.evaluate(()=>{
  const visible=n=>!!n.getClientRects().length&&getComputedStyle(n).visibility!=='hidden',norm=s=>s.replace(/\s+/g,' ').trim(),ids={};

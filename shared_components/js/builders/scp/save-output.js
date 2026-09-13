@@ -73,9 +73,7 @@ export async function printQuote() {
         printWindow.document.write(invoiceHTML);
         printWindow.document.close();
 
-        setTimeout(() => {
-            printWindow.print();
-        }, 300);
+        await invoiceGenerator.printWhenReady(printWindow);
 
         showToast('Opening print dialog...', 'success');
     } catch (error) {

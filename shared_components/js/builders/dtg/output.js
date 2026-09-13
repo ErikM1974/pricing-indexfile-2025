@@ -269,10 +269,7 @@ export async function dtgPrintQuote() {
         printWindow.document.write(invoiceHTML);
         printWindow.document.close();
 
-        // Wait for fonts/images to settle before triggering the print dialog.
-        setTimeout(() => {
-            try { printWindow.print(); } catch (_) { /* user can press Ctrl+P manually */ }
-        }, 400);
+        await generator.printWhenReady(printWindow);
     } catch (e) {
         console.error('[DTG Print] Error:', e);
         showToast('Print failed: ' + (e.message || 'unknown error'), 'error', 6000);    }

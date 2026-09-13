@@ -6829,6 +6829,39 @@
         "rawCssBytes": 7637,
         "localCssRequests": 1
       }
+    },
+    {
+      "source": "quote-builders/embroidery-quote-builder.html",
+      "family": "quote-builders",
+      "status": "reviewed",
+      "route": "/quote-builders/embroidery-quote-builder.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/vendor/fontawesome/css/all.min.css",
+        "shared_components/css/components.css",
+        "shared_components/css/utilities.css",
+        "shared_components/css/quote-workspace.css",
+        "shared_components/css/quote-embroidery.css",
+        "shared_components/css/specialty-assistant.css",
+        "shared_components/css/embroidery-quote-pricing.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "1440-768-390-320-full-scroll-and-table-panels",
+        "original-values-fields-pricing-and-successful-payloads",
+        "guided-and-workbench-keyboard-resize-controls",
+        "garment-cap-puff-patch-full-back-services",
+        "customer-save-failure-import-shipping-gallery-assistant",
+        "complete-builder-paper-and-real-generated-invoice"
+      ],
+      "test": "tests/e2e/css-unification-quote-builder-workflows.spec.js",
+      "measuredRawCssBytes": 236496,
+      "maxCssBytes": 238544,
+      "baseline": {
+        "commit": "d25e4ddb",
+        "rawCssBytes": 623614,
+        "localCssRequests": 15
+      }
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",
@@ -6843,7 +6876,6 @@
     {
       "kind": "generated-document",
       "owners": [
-        "shared_components/js/embroidery-quote-invoice.js",
         "shared_components/js/quote-formatter.js",
         "calculators/christmas-bundle-service.js",
         "calculators/screenprint-customer/screenprint-customer-calculator.js",
@@ -7545,6 +7577,14 @@
       "value": "repeat(2, minmax(0, 1fr))",
       "context": "print",
       "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/quote-workspace.css",
+      "selector": ":where([data-ui=\"unified\"][data-quote-workspace]).guided-on [data-guided-step].guided-hidden",
+      "property": "display",
+      "value": "none",
+      "context": "screen",
+      "reason": "Guided navigation must hide controller-managed sections whose display is set inline; print exposes every section."
     }
   ],
   "trainingContent": [
@@ -8585,6 +8625,34 @@
       "source": "training/js/sales-coordinator-training-schedule.js",
       "key": "scenarios",
       "sha256": "858e905a4b09c348e68f326dcfa74d25403f458104a963d4dbb98d352471f1d7"
+    }
+  ],
+  "generatedDocuments": [
+    {
+      "source": "shared_components/js/embroidery-quote-invoice.js",
+      "family": "quote-builders",
+      "status": "reviewed",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/quote-invoice.css"
+      ],
+      "callers": [
+        "emb",
+        "scp",
+        "dtf",
+        "dtg"
+      ],
+      "states": [
+        "all-four-real-print-windows",
+        "1440-768-390-320-full-horizontal-scroll",
+        "complete-letter-documents",
+        "original-amounts-customer-fields-and-payloads",
+        "delayed-required-style-waits-and-failed-style-does-not-print"
+      ],
+      "test": "tests/e2e/css-unification-quote-builder-workflows.spec.js",
+      "maxCssBytes": 75859,
+      "measuredRawCssBytes": 73811
     }
   ]
 }

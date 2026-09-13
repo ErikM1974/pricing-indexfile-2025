@@ -6,7 +6,7 @@ test.setTimeout(120000);
 test.use({timezoneId:'America/Los_Angeles',locale:'en-US',reducedMotion:'reduce'});
 for(const scene of ['catalog','catalog-detail','product','colors','customer','shipping','invoice','pricing-failure'])test('CSS quote builders: dtg '+scene,async({page,context})=>{
  page.setDefaultTimeout(15000);
- const e=await open(page,{original,richCatalog:true,pricingFailed:scene==='pricing-failure',url:'/quote-builders/dtg-quote-builder.html'});
+ const e=await open(page,{original,realPreview:scene==='invoice'&&!original,richCatalog:true,pricingFailed:scene==='pricing-failure',url:'/quote-builders/dtg-quote-builder.html'});
  await page.waitForLoadState('networkidle');
  if(scene==='catalog-detail')await page.locator('.dtg-cc-view-all').first().click();
  else if(scene!=='catalog'){
@@ -20,8 +20,10 @@ for(const scene of ['catalog','catalog-detail','product','colors','customer','sh
   }
   if(scene==='shipping')await page.locator('.dcp-pickup-toggle label').click();
   if(scene==='invoice'){
+   if(e.preparePrint)await e.preparePrint();
    const popup=context.waitForEvent('page',{timeout:15000});await page.locator('#dtgPrintBtn').click();
    const invoice=await popup;await invoice.waitForLoadState('domcontentloaded');await invoice.waitForFunction(()=>document.body.innerText.includes('Example Customer'));
+   if(!original)await expect.poll(()=>invoice.evaluate(()=>window.__printCalls)).toBe(1);
    await evidence(invoice,'dtg-invoice',e);return;
   }
  }

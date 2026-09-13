@@ -1,11 +1,13 @@
 const {test,expect}=require('@playwright/test');
 const fs=require('fs'),path=require('path'),{open,snapshot,check}=require('./helpers/quote-builders-browser');
+const {evidence}=require('./helpers/quote-builder-workflow-review');
 const root=path.resolve(__dirname,'../..'),out=path.join(__dirname,'screenshots/css-unification'),original=process.env.CAPTURE_QUOTE_BUILDERS_ORIGINAL==='1',phase=original?'original':'current';
 test.setTimeout(120000);
 for(const method of ['embroidery','screenprint','dtf','dtg','screenprint-fast'])test('CSS quote builders: '+method+' initial',async({page})=>{
  const url='/quote-builders/'+(method==='screenprint-fast'?'screenprint-fast-quote':method+'-quote-builder')+'.html';
  const e=await open(page,{original,url});
  await page.waitForLoadState('networkidle');
+ if(!original&&method==='embroidery'){await evidence(page,method+'-initial',e);return;}
  fs.mkdirSync(out,{recursive:true});
  // This discovery record remains local until every observed request is mapped.
  fs.writeFileSync(path.join(out,'quote-builder-'+method+'-network.json'),JSON.stringify(e,null,2)+'\n');

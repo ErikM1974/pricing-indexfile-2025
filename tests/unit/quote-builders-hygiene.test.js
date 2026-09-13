@@ -33,7 +33,11 @@ describe('builder markup carries no decorative inline styles (2026-09-06 extract
             if (props.some((p) => !STATE.has(p))) decorative.push(m[1]);
         }
         expect(decorative).toEqual([]);
-        if (rel !== 'quote-builders/dtg-quote-builder.html') expect(html).toMatch(/quote-builder-utilities\.css\?v=/);
+        if (rel === 'quote-builders/embroidery-quote-builder.html') {
+            expect(html).toMatch(/quote-workspace\.css\?v=/);
+            expect(html).toMatch(/quote-embroidery\.css\?v=/);
+            expect(html).not.toMatch(/quote-builder-utilities\.css\?v=/);
+        } else if (rel !== 'quote-builders/dtg-quote-builder.html') expect(html).toMatch(/quote-builder-utilities\.css\?v=/);
     });
 });
 

@@ -1,0 +1,126 @@
+@layer components.pages {
+/* Shared customer quote document. Formatting only; amounts stay with the invoice generator. */
+:where([data-ui="unified"][data-quote-invoice]) { font-size:14px; font-variant-numeric:tabular-nums; }
+:where([data-ui="unified"][data-quote-invoice]) * { margin:0; padding:0; }
+:where([data-ui="unified"][data-quote-invoice]) .invoice-container { width:min(960px,100%); margin:24px auto; padding:40px; border:1px solid var(--ui-line); background:var(--ui-surface); }
+:where([data-ui="unified"][data-quote-invoice]) .invoice-header { display:flex; justify-content:space-between; align-items:start; gap:24px; border-bottom:2px solid var(--ui-accent); padding-bottom:24px; margin-bottom:24px; }
+:where([data-ui="unified"][data-quote-invoice]) .company-info { flex:1; min-width:0; }
+:where([data-ui="unified"][data-quote-invoice]) .company-logo { width:120px; height:auto; margin-bottom:12px; }
+:where([data-ui="unified"][data-quote-invoice]) .company-details,:where([data-ui="unified"][data-quote-invoice]) .quote-details { color:var(--ui-muted); font-size:12px; line-height:1.6; }
+:where([data-ui="unified"][data-quote-invoice]) .quote-info { text-align:right; flex:0 1 260px; min-width:0; }
+:where([data-ui="unified"][data-quote-invoice]) .quote-title { color:var(--ui-accent); font-size:24px; font-weight:700; line-height:1.3; margin-bottom:12px; }
+:where([data-ui="unified"][data-quote-invoice]) .quote-details strong { color:var(--ui-ink); }
+:where([data-ui="unified"][data-quote-invoice]) .customer-section { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; margin-bottom:24px; padding:20px; border-radius:var(--radius-sm); background:var(--ui-canvas); }
+:where([data-ui="unified"][data-quote-invoice]) .customer-info,:where([data-ui="unified"][data-quote-invoice]) .sales-rep-info { min-width:0; }
+:where([data-ui="unified"][data-quote-invoice]) .section-title,:where([data-ui="unified"][data-quote-invoice]) .footer-title { font-size:13px; color:var(--ui-accent); font-weight:700; margin-bottom:8px; }
+:where([data-ui="unified"][data-quote-invoice]) .info-line { font-size:13px; color:var(--ui-muted); overflow-wrap:anywhere; margin:4px 0; }
+:where([data-ui="unified"][data-quote-invoice]) .method-specs { margin:20px 0; padding:20px; border:1px solid var(--ui-line); border-radius:var(--radius-sm); background:var(--ui-tint); }
+:where([data-ui="unified"][data-quote-invoice]) .invoice-table-scroll { position:relative; width:100%; overflow:auto; margin:16px 0; border:1px solid var(--ui-line); border-radius:var(--radius-sm); }
+:where([data-ui="unified"][data-quote-invoice]) .products-table,:where([data-ui="unified"][data-quote-invoice]) .size-matrix { border-collapse:collapse; min-width:840px; table-layout:fixed; width:100%; }
+:where([data-ui="unified"][data-quote-invoice]) .products-table th,:where([data-ui="unified"][data-quote-invoice]) .size-matrix th { padding:12px 8px; background:var(--ui-accent); color:var(--color-on-brand); font-size:12px; text-align:left; font-weight:600; }
+:where([data-ui="unified"][data-quote-invoice]) .products-table td,:where([data-ui="unified"][data-quote-invoice]) .size-matrix td { padding:12px 8px; border-bottom:1px solid var(--ui-line); font-size:12px; vertical-align:middle; }
+:where([data-ui="unified"][data-quote-invoice]) .size-matrix .size-cell,:where([data-ui="unified"][data-quote-invoice]) .size-matrix th.size-col { text-align:center; white-space:nowrap; }
+:where([data-ui="unified"][data-quote-invoice]) .size-matrix .pcs-cell,:where([data-ui="unified"][data-quote-invoice]) .size-matrix .total-cell,:where([data-ui="unified"][data-quote-invoice]) .size-matrix .unit-cell { text-align:right; white-space:nowrap; font-weight:600; }
+:where([data-ui="unified"][data-quote-invoice]) .size-matrix .desc-cell,:where([data-ui="unified"][data-quote-invoice]) .products-table .description-cell { overflow-wrap:anywhere; }
+:where([data-ui="unified"][data-quote-invoice]) .size-matrix .totals-row { border-top:2px solid var(--ui-accent); font-weight:700; background:var(--ui-tint); }
+:where([data-ui="unified"][data-quote-invoice]) .product-image { width:32px; height:32px; object-fit:contain; display:block; }
+:where([data-ui="unified"][data-quote-invoice]) .size-matrix td:first-child,:where([data-ui="unified"][data-quote-invoice]) .size-matrix th:first-child { white-space:nowrap; }
+:where([data-ui="unified"][data-quote-invoice]) .price-breakdown,:where([data-ui="unified"][data-quote-invoice]) .stitch-count,:where([data-ui="unified"][data-quote-invoice]) .size-breakdown { font-size:12px; color:var(--ui-muted); }
+:where([data-ui="unified"][data-quote-invoice]) .price-total,:where([data-ui="unified"][data-quote-invoice]) .logo-position { font-weight:600; }
+:where([data-ui="unified"][data-quote-invoice]) .size-breakdown { font-family:var(--font-mono); overflow-wrap:anywhere; }
+:where([data-ui="unified"][data-quote-invoice]) .additional-service-row,:where([data-ui="unified"][data-quote-invoice]) .extended-size-row { background:var(--ui-canvas); }
+:where([data-ui="unified"][data-quote-invoice]) .price-legend { font-size:12px; color:var(--ui-muted); padding:12px; border-left:3px solid var(--ui-accent); background:var(--ui-canvas); margin:16px 0; }
+:where([data-ui="unified"][data-quote-invoice]) .totals-section { width:min(340px,100%); margin:24px 0 0 auto; }
+:where([data-ui="unified"][data-quote-invoice]) .total-row { display:flex; justify-content:space-between; gap:16px; padding:8px 0; }
+:where([data-ui="unified"][data-quote-invoice]) .total-row > :last-child { white-space:nowrap; }
+:where([data-ui="unified"][data-quote-invoice]) .subtotal-row { border-top:1px solid var(--ui-line); padding-top:12px; }
+:where([data-ui="unified"][data-quote-invoice]) .tax-row { color:var(--ui-muted); }
+:where([data-ui="unified"][data-quote-invoice]) .grand-total { border-top:2px solid var(--ui-accent); margin-top:8px; padding-top:16px; font-size:22px; font-weight:700; color:var(--ui-accent); }
+:where([data-ui="unified"][data-quote-invoice]) .invoice-footer { border-top:1px solid var(--ui-line); margin-top:32px; padding-top:24px; }
+:where([data-ui="unified"][data-quote-invoice]) .footer-section { margin-bottom:16px; }
+:where([data-ui="unified"][data-quote-invoice]) .footer-text { font-size:12px; color:var(--ui-muted); overflow-wrap:anywhere; }
+:where([data-ui="unified"][data-quote-invoice]) .tagline { margin-top:24px; font-size:12px; color:var(--ui-muted); font-style:italic; text-align:center; }
+:where([data-ui="unified"][data-quote-invoice]) .sr-only { position:absolute; width:1px; height:1px; padding:0; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style^="title-"] { color:var(--ui-accent); font-size:14px; font-weight:700; margin-bottom:12px; }
+:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="title-cap"] { color:var(--indigo-700); }
+:where([data-ui="unified"][data-quote-invoice]) [data-invoice-separated="true"] { margin-top:16px; }
+:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="icon"] { margin-right:6px; }
+:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="detail"],:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="cap-detail"],:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="logo-detail"] { margin:8px 0; }
+:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="logo-detail"],:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="logo-note"],:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="cap-detail"],:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="cap-note"],:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="cap-price"] { margin-left:12px; }
+:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="muted"],:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="cap-note"],:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="note"],:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="logo-note"],:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="rate-note"] { color:var(--ui-muted); font-size:12px; }
+:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="setup-detail"] { border-top:1px solid var(--ui-line-strong); margin-top:12px; padding-top:12px; font-size:12px; color:var(--ui-muted); }
+:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="warning"] { color:var(--color-danger-ink); font-size:12px; font-style:italic; margin-top:8px; }
+:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="included"],:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="accent-strong"] { color:var(--ui-accent); }
+:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="charge"],:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="upcharge"] { color:var(--color-warning-ink); }
+:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="cap-price"] { color:var(--indigo-700); font-size:12px; margin-top:8px; }
+:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="product-section"] { margin:24px 0; }
+:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="product-heading"] { font-size:16px; font-weight:700; color:var(--ui-accent); margin-bottom:12px; }
+:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="group-subtotal"],:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="supplied-row"] { background:var(--ui-canvas); }
+:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="group-subtotal"],:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="semibold"],:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="supplied-label"],:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="accent-strong"] { font-weight:600; }
+:where([data-ui="unified"][data-quote-invoice]) [data-invoice-kind="cap"] { color:var(--indigo-700); }
+:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="italic"],:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="empty-sizes"] { color:var(--ui-muted); font-style:italic; }
+:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="other-label"] { font-size:10px; font-weight:400; white-space:nowrap; }
+:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="center"],:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="empty-sizes"],:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="qty-column"],:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="size-column"],:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="matrix-qty"],:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="service-qty"] { text-align:center; }
+:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="right"],:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="subtotal-label"],:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="total-label"],:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="unit-column"],:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="total-column"],:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="matrix-unit"],:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="service-total"] { text-align:right; }
+:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="subtotal-label"],:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="other-label"],:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="empty-sizes"] { font-size:11px; }
+:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="description-column"],:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="wide-description"] { width:28%; }
+
+/* Reserve enough room for currency and extended-size labels on screen and Letter paper. */
+:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="style-column"] { width:9%; }
+:where([data-ui="unified"][data-quote-invoice]) .size-matrix [data-invoice-style="description-column"] { width:25%; }
+:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="matrix-description"] { width:18%; }
+:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="matrix-size"] { width:5%; }
+:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="matrix-extended"] { width:8%; }
+:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="matrix-qty"] { width:5%; }
+:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="matrix-unit"] { width:10%; }
+:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="part-column"] { width:12%; }
+:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="size-column"] { width:10%; }
+:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="qty-column"] { width:8%; }
+:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="unit-column"] { width:13%; }
+:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="total-column"] { width:14%; }
+:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="right"] { white-space:nowrap; }
+:where([data-ui="unified"][data-quote-invoice]) .products-table tr,:where([data-ui="unified"][data-quote-invoice]) .size-matrix tr,:where([data-ui="unified"][data-quote-invoice]) .totals-section,:where([data-ui="unified"][data-quote-invoice]) .invoice-footer { break-inside:avoid; }
+
+@media screen and (width <= 600px) {
+ :where([data-ui="unified"][data-quote-invoice]) .invoice-container { margin:0; padding:24px 16px; border:0; }
+ :where([data-ui="unified"][data-quote-invoice]) .invoice-header { flex-direction:column; gap:20px; }
+ :where([data-ui="unified"][data-quote-invoice]) .quote-info { flex:auto; text-align:left; }
+ :where([data-ui="unified"][data-quote-invoice]) .quote-title { font-size:24px; }
+ :where([data-ui="unified"][data-quote-invoice]) .customer-section { grid-template-columns:minmax(0,1fr); padding:16px; }
+ :where([data-ui="unified"][data-quote-invoice]) .method-specs { padding:16px; }
+ :where([data-ui="unified"][data-quote-invoice]) .invoice-footer { margin-top:24px; }
+}
+
+@media print {
+ :where([data-ui="unified"][data-quote-invoice]) { font-size:9pt; line-height:1.35; background:var(--ui-surface); }
+ :where([data-ui="unified"][data-quote-invoice]) .invoice-container { width:100%; max-width:none; margin:0; padding:0; border:0; }
+ :where([data-ui="unified"][data-quote-invoice]) .invoice-header { padding-bottom:10px; margin-bottom:12px; break-inside:avoid; }
+ :where([data-ui="unified"][data-quote-invoice]) .company-logo { width:100px; margin-bottom:4px; }
+ :where([data-ui="unified"][data-quote-invoice]) .company-details,:where([data-ui="unified"][data-quote-invoice]) .quote-details { font-size:8pt; line-height:1.4; }
+ :where([data-ui="unified"][data-quote-invoice]) .quote-title { font-size:17pt; margin-bottom:6px; }
+ :where([data-ui="unified"][data-quote-invoice]) .customer-section { margin-bottom:12px; padding:10px; gap:20px; }
+ :where([data-ui="unified"][data-quote-invoice]) .section-title,:where([data-ui="unified"][data-quote-invoice]) .footer-title { font-size:9pt; margin-bottom:4px; }
+ :where([data-ui="unified"][data-quote-invoice]) .info-line,:where([data-ui="unified"][data-quote-invoice]) .footer-text,:where([data-ui="unified"][data-quote-invoice]) .price-legend,:where([data-ui="unified"][data-quote-invoice]) .price-breakdown,:where([data-ui="unified"][data-quote-invoice]) .stitch-count,:where([data-ui="unified"][data-quote-invoice]) .size-breakdown,:where([data-ui="unified"][data-quote-invoice]) .tagline { font-size:8pt; }
+ :where([data-ui="unified"][data-quote-invoice]) .info-line { margin:2px 0; }
+ :where([data-ui="unified"][data-quote-invoice]) .method-specs { padding:10px; margin:12px 0; }
+ :where([data-ui="unified"][data-quote-invoice]) [data-invoice-style^="title-"] { font-size:10pt; margin-bottom:6px; }
+ :where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="product-section"] { margin:12px 0; }
+ :where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="product-heading"] { font-size:11pt; margin-bottom:6px; }
+ :where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="detail"],:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="cap-detail"],:where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="logo-detail"] { margin-top:4px; margin-bottom:4px; }
+ :where([data-ui="unified"][data-quote-invoice]) [data-invoice-style="setup-detail"] { padding-top:6px; margin-top:6px; }
+ :where([data-ui="unified"][data-quote-invoice]) .invoice-table-scroll { overflow:visible; border:0; margin:10px 0; }
+ :where([data-ui="unified"][data-quote-invoice]) .products-table,:where([data-ui="unified"][data-quote-invoice]) .size-matrix { min-width:0; table-layout:fixed; width:100%; }
+ :where([data-ui="unified"][data-quote-invoice]) .products-table th,:where([data-ui="unified"][data-quote-invoice]) .size-matrix th,:where([data-ui="unified"][data-quote-invoice]) .products-table td,:where([data-ui="unified"][data-quote-invoice]) .size-matrix td { padding:5px 3px; font-size:7.5pt; overflow-wrap:anywhere; }
+ :where([data-ui="unified"][data-quote-invoice]) .products-table thead,:where([data-ui="unified"][data-quote-invoice]) .size-matrix thead { display:table-header-group; }
+ :where([data-ui="unified"][data-quote-invoice]) .totals-section { width:280px; margin-top:12px; }
+ :where([data-ui="unified"][data-quote-invoice]) .total-row { padding:4px 0; }
+ :where([data-ui="unified"][data-quote-invoice]) .grand-total { font-size:15pt; padding-top:8px; }
+ :where([data-ui="unified"][data-quote-invoice]) .invoice-footer { margin-top:16px; padding-top:12px; }
+ :where([data-ui="unified"][data-quote-invoice]) .footer-section { margin-bottom:8px; }
+ :where([data-ui="unified"][data-quote-invoice]) .tagline { margin-top:10px; }
+ :where([data-ui="unified"][data-quote-invoice]) .no-print { display:none; }
+}
+
+@page { size:letter; margin:0.4in; }
+
+}
