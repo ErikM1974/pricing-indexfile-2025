@@ -1,142 +1,238 @@
-const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
-const legacy=require('../fixtures/seasonal-christmas-financial-source.json').parts;
-const {ChristmasBundleQuoteService}=require('../../calculators/js/christmas-bundle-order');
-const pricing={jackets:{CT100617:92,CT103828:137,CT104670:174},hoodies:58,beanies:35,gloves:19,giftBox:9,shipping:25};
-const fixed=Date.parse('2026-09-12T18:30:10.000Z');
-function input(jacket='CT104670',hoodie='CTK121',size='L',delivery='Ship'){
- const extra=size==='2XL'?2:0;
- const items={
-  jacket:{id:jacket,name:'Example Jacket',selectedSize:size,selectedColor:'Black',retailPrice:pricing.jackets[jacket]+extra},
-  hoodie:{id:hoodie,name:'Example Hoodie',selectedSize:size,selectedColor:'Navy',retailPrice:58+extra},
-  beanie:{id:'CT104597',name:'Example Beanie',selectedSize:'OSFA',selectedColor:'Black',retailPrice:35},
-  gloves:{id:'CTGD0794',name:'Example Gloves',selectedSize:'L',selectedColor:'Black Barley',retailPrice:19}
- };
- const total=Object.values(items).reduce((s,i)=>s+i.retailPrice,0)+34;
- const data={firstName:'Example',lastName:'Customer',email:'example@example.invalid',phone:'(253) 555-0100',company:'Example Company',deliveryMethod:delivery,
-  shippingAddress:'123 Example Street',shippingCity:'Example City',shippingState:'WA',shippingZip:'98000',
-  jacketEmbLocation:'Left Chest',hoodieEmbLocation:'Left Chest',threadColors:'Green, White',specialInstructions:'Synthetic test only',imageUpload:null,
-  jacketStyle:jacket,jacketSize:size,jacketColor:'Black',hoodieStyle:hoodie,hoodieSize:size,hoodieColor:'Navy',
-  beanieStyle:'CT104597',beanieColor:'Black',glovesStyle:'CTGD0794',glovesSize:'L',glovesColor:'Black Barley',
-  rushOrder:false,dueDate:'2026-10-16',totalQuantity:4,totalPrice:total,unitPrice:total,
-  description:'Jacket: '+jacket+', Hoodie: '+hoodie+', Beanie: CT104597, Gloves: CTGD0794'};
- return {items,data};
-}
-function original(data,items){
- const writes=[],emails=[];
- const context={Date,Math,JSON,AbortController,console:{error(){},warn(){},log(){}},cbLog(){},window:{},setTimeout:()=>1,clearTimeout(){},
-  document:{getElementById:id=>({value:id==='specialInstructions'?data.specialInstructions:''})},
-  fetch:async(url,options)=>{writes.push({url,body:JSON.parse(options.body)});return{ok:true,json:async()=>({success:true})};},
-  emailjs:{send:async(service,template,payload)=>{emails.push({service,template,data:JSON.parse(JSON.stringify(payload))});return{status:200};}}
- };
- vm.createContext(context);
- vm.runInContext(legacy.RETAIL_PRICES+'\nlet selectedItems='+JSON.stringify(items)+';\n'+
-  legacy.calculateTotalQuantity+'\n'+legacy.calculateTotalPrice+'\n'+legacy.ChristmasBundleQuoteService+'\n'+legacy.sendConfirmationEmail+
-  '\nglobalThis.perform=async function(data){const result=await new ChristmasBundleQuoteService().submitQuote(data);await sendConfirmationEmail(data,result.quoteID);return result;};',context);
- return {writes,emails,run:()=>context.perform(data)};
-}
-function current(flags={}){
- const writes=[],emails=[];
- const service=new ChristmasBundleQuoteService({
-  fetch:async(url,options)=>{
-   writes.push({url,body:JSON.parse(options.body)});
-   if(flags.hold)await flags.hold;
-   return{ok:!(flags.session&&url.endsWith('sessions')||flags.item&&url.endsWith('items')),status:503};
+const crypto = require('node:crypto');
+const fs = require('node:fs');
+const path = require('node:path');
+const createService = require('../../lib/christmas-gift-box');
+const { priceColor } = require('../../lib/christmas-pricing');
+const { validateCampaign, inventorySizes, isClosed } = require('../../calculators/js/christmas-campaign');
+const { ChristmasBundleQuoteService } = require('../../calculators/js/christmas-bundle-order');
+const campaign = require('../../config/christmas-campaign.json');
+const bundle = require('../fixtures/holiday-emb-CT104670.json');
+const sizePricing = require('../fixtures/holiday-size-CT104670.json');
+const reference = require('../fixtures/holiday-8-piece-contract.json');
+const clone = value => JSON.parse(JSON.stringify(value));
+const fixed = Date.parse('2026-09-13T19:00:00Z');
+const code = 'SYNTHETIC-INVITATION';
+function factory(flags = {}) {
+ const state = { sessions: [], items: [], emails: [], writes: [] };
+ let now = fixed;
+ const ctx = {
+  readCampaign: () => clone(campaign), now: () => now, signingSecret: 'synthetic-holiday-signing-secret',
+  giftCodeHash: crypto.createHash('sha256').update(code).digest('hex'),
+  mintShareToken: () => 'synthetic-share-token', quoteShareUrl: id => 'https://example.invalid/quote/' + id + '?k=synthetic-share-token',
+  sendEmailJSTemplate: async (template, params) => { state.emails.push({ template, params }); if (flags.email) throw new Error(flags.email); },
+  makeApiRequest: async (endpoint, method = 'GET', body) => {
+   if (method !== 'GET') state.writes.push({ endpoint, method, body: clone(body) });
+   if (endpoint.startsWith('/product-colors')) return { colors: [{ COLOR_NAME: 'Black', CATALOG_COLOR: 'Black' }] };
+   if (endpoint.startsWith('/pricing-bundle')) return clone(bundle);
+   if (endpoint.startsWith('/size-pricing')) return [{ styleNumber: new URL('https://example.invalid' + endpoint).searchParams.get('styleNumber'), color: 'Black', basePrices: { S: flags.cost || 10, L: flags.cost || 10, '2XL': flags.cost || 10, OSFA: flags.cost || 10 }, sizeUpcharges: { '2XL': 2 } }];
+   if (endpoint.startsWith('/service-codes')) return { data: flags.feesMissing ? [] : [{ ServiceCode: campaign.boxServiceCode, IsActive: true, PricingMethod: 'FLAT', SellPrice: 9 }, { ServiceCode: campaign.shippingServiceCode, IsActive: true, PricingMethod: 'FLAT', SellPrice: 25 }] };
+   if (endpoint.startsWith('/sanmar/inventory')) { const style = endpoint.split('/')[3].split('?')[0]; return { style, inventory: [{ partId: style, color: 'Black', size: style === 'CT104597' ? 'OSFA' : 'L', totalQty: flags.stock === undefined ? 30 : flags.stock }] }; }
+   if (endpoint.startsWith('/quote_sessions?')) return clone(state.sessions);
+   if (endpoint === '/quote_sessions' && method === 'POST') { state.sessions.push({ ...clone(body), PK_ID: 1 }); if (flags.lostSession) { flags.lostSession = false; throw new Error('Lost acknowledgement'); } return { PK_ID: 1 }; }
+   if (endpoint === '/quote_sessions/1' && method === 'PUT') { if (flags.markerFailure && body.OrderSettingsJSON && JSON.parse(body.OrderSettingsJSON).customerEmailSent) throw new Error('Marker save failed'); Object.assign(state.sessions[0], clone(body)); return { success: true }; }
+   if (endpoint.startsWith('/quote_items?')) return clone(state.items);
+   if (endpoint === '/quote_items' && method === 'POST') { if (flags.failLine === body.LineNumber) throw new Error('Synthetic item write failure'); state.items.push({ ...clone(body), PK_ID: state.items.length + 1 }); if (flags.lostItem) { flags.lostItem = false; throw new Error('Lost item acknowledgement'); } return { success: true }; }
+   throw new Error('Unexpected fixture endpoint ' + endpoint);
   },
-  email:()=>({send:async(service,template,data)=>{
-   emails.push({service,template,data:JSON.parse(JSON.stringify(data))});
-   if(flags.customer&&template==='template_v80ysfp'||flags.sales&&template==='template_sales_xmas')throw new Error('Synthetic email failure');
-   return{status:200};
-  }})
- });
- return{service,writes,emails};
-}
-beforeEach(()=>{jest.useFakeTimers();jest.setSystemTime(fixed);jest.spyOn(Math,'random').mockReturnValue(0.1);});
-afterEach(()=>{jest.restoreAllMocks();jest.useRealTimers();});
-const cases=[];
-for(const jacket of Object.keys(pricing.jackets))for(const hoodie of['CTK121','F281'])for(const size of['L','2XL'])for(const delivery of['Ship','Pickup'])cases.push([jacket,hoodie,size,delivery]);
-
-test.each(cases)('renewed page uses the original financial results: %s %s %s %s',(jacket,hoodie,size,delivery)=>{
- const {items}=input(jacket,hoodie,size,delivery);
- const run=(source,setup='')=>{
-  const context={window:{APP_CONFIG:{},addEventListener(){}},document:{addEventListener(){}},Date,Map,URL};
-  vm.createContext(context);vm.runInContext(source+'\n'+setup+'\nglobalThis.measure=function(items){selectedItems=items;return [calculateTotalQuantity(),calculateTotalPrice(),calculateUnitPrice(),calculateRetailValue(),generateBundleDescription()];};',context);
-  return JSON.parse(JSON.stringify(context.measure(items)));
  };
- const before=legacy.RETAIL_PRICES+'\nlet selectedItems={};\n'+['calculateTotalQuantity','calculateTotalPrice','calculateUnitPrice','calculateRetailValue','generateBundleDescription'].map(name=>legacy[name]).join('\n');
- const after=fs.readFileSync(path.resolve(__dirname,'../../calculators/js/christmas-bundles.js'),'utf8');
- expect(run(after)).toEqual(run(before));
+ const service = createService(ctx);
+ const body = { requestKey: '00000000-0000-4000-8000-000000000001', deliveryMethod: 'Ship', items: [
+  { type: 'jacket', style: 'CT104670', color: 'Black', size: 'L' }, { type: 'hoodie', style: 'CTK121', color: 'Black', size: 'L' },
+  { type: 'beanie', style: 'CT104597', color: 'Black', size: 'OSFA' }, { type: 'gloves', style: 'CTGD0794', color: 'Black', size: 'L' }],
+  customer: { firstName: 'Example', lastName: 'Customer', company: 'Example Co', email: 'customer@example.invalid', phone: '2535550100', dueDate: '2026-10-16',
+   shippingAddress: '123 Example St', shippingCity: 'Example City', shippingState: 'WA', shippingZip: '98000', jacketEmbLocation: 'right-chest', hoodieEmbLocation: 'left-chest', holidayTeamSize: '40' },
+ };
+ const prepare = async (gift = false) => { if (gift) body.promotionToken = service.validateCode(code).promotionToken; body.estimateToken = (await service.estimate(body)).estimateToken; return body; };
+ return { service, state, body, prepare, advance: ms => { now += ms; } };
+}
+
+test.each(reference.examples)('actual eight-piece calculator parity: $color $size', async row => {
+ const result = await priceColor({ bundle, sizePricing, color: { COLOR_NAME: row.color, CATALOG_COLOR: row.color } });
+ expect(result.bySize[row.size]).toBe(row.unitPrice);
+ expect(result.tier).toBe(row.tier);
 });
-test('2026 campaign keeps the physical street number and gives staff links both ways',()=>{
- const {JSDOM}=require('jsdom');
- const root=path.resolve(__dirname,'../..');
- const page=new JSDOM(fs.readFileSync(path.join(root,'calculators/christmas-bundles.html'),'utf8')).window.document;
- const dashboard=new JSDOM(fs.readFileSync(path.join(root,'staff-dashboard-v3/index.html'),'utf8')).window.document;
- expect(page.title).toContain('2026');expect(page.querySelector('.deadline-date').textContent).toBe('October 24, 2026 at 12:00 PM PST');
- expect(page.querySelector('#pickupInfo').textContent).toContain('2025 Freeman Road East');
- expect(page.querySelector('a[href="/staff-dashboard.html"]').textContent).toBe('Staff dashboard');
- const links=[...dashboard.querySelectorAll('a[href="/christmas-bundles.html"]')];expect(links).toHaveLength(1);
- expect(links[0].textContent).toContain('Christmas Gift Boxes 2026');
- expect(page.querySelector('style,[style],script:not([src]),[onclick],[onchange]')).toBeNull();
- expect([...page.querySelectorAll('link[rel="stylesheet"]')].map(n=>n.getAttribute('href').split('?')[0]).filter(url=>url.startsWith('/'))).toEqual(['/shared_components/css/tokens.css','/shared_components/css/components.css','/calculators/css/christmas-bundles.css']);
+test('missing tier, color, cost and rounding never produce a guessed price', async () => {
+ for (const change of [{ tiersR: [] }, { allEmbroideryCostsR: [] }, { rulesR: { RoundingMethod: 'unknown' } }]) await expect(priceColor({ bundle: { ...bundle, ...change }, sizePricing, color: { COLOR_NAME: 'Black' } })).rejects.toThrow();
+ await expect(priceColor({ bundle, sizePricing, color: { COLOR_NAME: 'Unknown' } })).rejects.toThrow();
+});
+test('catalog placeholders, missing quantities and wrong colors remain unknown', () => {
+ for (const data of [{ sizes: ['L'], sizeTotals: [0] }, { style: 'CT104670', inventory: [{ color: 'Navy', size: 'L', totalQty: 30 }] },
+  ...[null, '', undefined, -1, 1.5].map(totalQty => ({ style: 'CT104670', inventory: [{ color: 'Black', size: 'L', totalQty }] }))]) {
+  expect(() => inventorySizes(data, 'CT104670', { CATALOG_COLOR: 'Black' })).toThrow();
+ }
+ expect(inventorySizes({ style: 'CT104670', inventory: [{ color: 'Black', size: 'L', totalQty: 0 }] }, 'CT104670', { CATALOG_COLOR: 'Black' })).toEqual([{ size: 'L', quantity: 0 }]);
+});
+test('configuration supports a product swap and closes at midnight Pacific after October 15', () => {
+ const changed = clone(campaign); changed.products.jackets[0].style = 'NEWSTYLE';
+ expect(validateCampaign(changed).products.jackets[0].style).toBe('NEWSTYLE');
+ expect(isClosed(campaign, Date.parse('2026-10-16T06:59:59Z'))).toBe(false);
+ expect(isClosed(campaign, Date.parse('2026-10-16T07:00:00Z'))).toBe(true);
+ changed.products.hoodies[0].style = 'NEWSTYLE'; expect(() => validateCampaign(changed)).toThrow();
+});
+test('shared invitation works repeatedly, but bad, expired and forged tokens fail', async () => {
+ const f = factory(); expect(() => f.service.validateCode('wrong')).toThrow(/not recognized/);
+ expect(f.service.validateCode(code.toLowerCase()).applied).toBe(true); expect(f.service.validateCode(code).applied).toBe(true);
+ await f.prepare(true); const valid = f.body.promotionToken; f.body.promotionToken += 'x'; await expect(f.service.estimate(f.body)).rejects.toThrow();
+ f.body.promotionToken = valid; f.advance(31 * 60000); await expect(f.service.estimate(f.body)).rejects.toThrow(/refreshed/);
+});
+test.each([false, true])('one box enters existing Quotes as an uncharged request; complimentary=%s', async gift => {
+ const f = factory(); await f.prepare(gift); f.body.total = 0; f.body.complimentary = true; f.body.items.forEach(item => { item.unitPrice = 0; });
+ const result = await f.service.submit(f.body), row = f.state.sessions[0];
+ expect(result.saved).toBe(true); expect(result.quoteID).toMatch(/^XMAS-/); expect(row.Status).toBe('Open'); expect(row.TotalQuantity).toBe(4);
+ expect(f.state.items).toHaveLength(6); expect(f.state.emails).toHaveLength(2); expect(row.PaidToDate).toBe(0); expect(row.PushedToShopWorks).toBeUndefined();
+ expect(result.pricing.total === 0).toBe(gift); expect(row.TotalAmount + row.ShippingFee).toBe(result.pricing.total);
+ expect(row.PaymentTerms).toContain('No payment is due'); expect(JSON.parse(row.Notes).share_token).toBeTruthy();
+ expect(JSON.stringify(f.state.writes)).not.toContain(code); expect(JSON.stringify(f.state.writes)).not.toContain('promotionToken');
+ await f.service.submit(f.body); expect(f.state.sessions).toHaveLength(1); expect(f.state.items).toHaveLength(6); expect(f.state.emails).toHaveLength(2);
+});
+test('pickup has no shipping charge and fees must come from the API', async () => {
+ const f = factory(); const ship = await f.service.estimate(f.body); f.body.deliveryMethod = 'Pickup'; const pickup = await f.service.estimate(f.body);
+ expect(ship.total - pickup.total).toBe(25); expect(pickup.shipping).toBe(0);
+ await expect(factory({ feesMissing: true }).service.estimate(f.body)).rejects.toThrow(/charges/);
+});
+test('a changed price or zero stock stops before any write and permits revising the request', async () => {
+ for (const flag of ['cost', 'stock']) { const flags = {}, f = factory(flags); await f.prepare(); flags[flag] = flag === 'cost' ? 100 : 0;
+  await expect(f.service.submit(f.body)).rejects.toMatchObject({ canRevise: true, status: 409 }); expect(f.state.writes).toHaveLength(0);
+ }
+});
+test.each(['2026-09-26', '2026-09-15', '2026-02-30'])('rejects weekend, premature and invalid date %s', async date => {
+ const f = factory(); await f.prepare(); f.body.customer.dueDate = date; await expect(f.service.submit(f.body)).rejects.toThrow(); expect(f.state.writes).toHaveLength(0);
+});
+test.each(['lostSession', 'lostItem'])('lost acknowledgement %s resumes the durable request without new records', async key => {
+ const f = factory({ [key]: true }); await f.prepare(); await expect(f.service.submit(f.body)).rejects.toThrow();
+ const result = await f.service.submit(f.body); expect(result.complete).toBe(true); expect(f.state.sessions).toHaveLength(1); expect(f.state.items).toHaveLength(6);
+});
+test('partial item save stays Draft, then finishes missing lines and emails', async () => {
+ const flags = { failLine: 3 }, f = factory(flags); await f.prepare(); await expect(f.service.submit(f.body)).rejects.toThrow();
+ expect(f.state.sessions[0].Status).toBe('Draft'); expect(f.state.items).toHaveLength(2); expect(f.state.emails).toHaveLength(0);
+ flags.failLine = null; await f.service.submit(f.body); expect(f.state.items).toHaveLength(6); expect(f.state.sessions[0].Status).toBe('Open');
+});
+test('changed data cannot overwrite a saved partial request', async () => {
+ const f = factory({ failLine: 2 }); await f.prepare(); await expect(f.service.submit(f.body)).rejects.toThrow();
+ f.body.customer.email = 'different@example.invalid'; await expect(f.service.submit(f.body)).rejects.toMatchObject({ status: 409 }); expect(f.state.sessions).toHaveLength(1);
+});
+test('concurrent retries share the same in-process save', async () => {
+ const f = factory(); await f.prepare(); const results = await Promise.all([f.service.submit(f.body), f.service.submit(f.body)]);
+ expect(results[0].quoteID).toBe(results[1].quoteID); expect(f.state.sessions).toHaveLength(1); expect(f.state.items).toHaveLength(6);
+});
+test('failed email retries only the provider-rejected sends; uncertain email is not blindly resent', async () => {
+ const flags = { email: 'EmailJS HTTP 400: synthetic rejection' }, f = factory(flags); await f.prepare();
+ expect((await f.service.submit(f.body)).emailRetryable).toBe(true); flags.email = null;
+ expect((await f.service.submit(f.body)).complete).toBe(true); expect(f.state.sessions).toHaveLength(1);
+ const u = factory({ email: 'request timeout' }); await u.prepare(); expect((await u.service.submit(u.body)).emailUncertain).toBe(true);
+ await u.service.submit(u.body); expect(u.state.emails).toHaveLength(2);
+});
+test('email acknowledgement marker failure does not claim delivery or send again', async () => {
+ const f = factory({ markerFailure: true }); await f.prepare(); const result = await f.service.submit(f.body);
+ expect(result.complete).toBe(false); expect(result.emailUncertain).toBe(true); await f.service.submit(f.body); expect(f.state.emails).toHaveLength(2);
+});
+test('browser transport retains the exact request after uncertainty and reload', async () => {
+ let saved; const storage = { getItem: () => saved, setItem: (_key, value) => { saved = value; }, removeItem: () => { saved = null; } };
+ const bodies = []; let fail = true;
+ const fetch = async (_url, options) => { bodies.push(JSON.parse(options.body)); if (fail) throw new Error('timeout'); return { ok: true, json: async () => ({ saved: true, quoteID: 'XMAS-example', quoteUrl: '/quote/XMAS-example', pricing: { total: 100 } }) }; };
+ const service = new ChristmasBundleQuoteService({ storage, fetch }); await expect(service.submit(factory().body, null)).rejects.toThrow();
+ fail = false; const restored = new ChristmasBundleQuoteService({ storage, fetch }); await restored.retry(); expect(bodies[1]).toEqual(bodies[0]);
+ await expect(restored.submit(factory().body, null)).rejects.toThrow(/earlier request/);
+});
+test('page uses the new deadline, staff link, server pricing and no browser email sender', () => {
+ const html = fs.readFileSync(path.resolve(__dirname, '../../calculators/christmas-bundles.html'), 'utf8');
+ expect(html).toContain('October 15, 2026'); expect(html).toContain('2025 Freeman Road East'); expect(html).toContain('/staff-dashboard.html');
+ expect(html).not.toMatch(/FREE!|@emailjs\/browser|<style[ >]|on(?:click|change)=/);
+ expect(html).toContain('Have a gift code?'); expect(html).toContain('No payment is collected here');
 });
 
-test.each(cases)('original order values preserved: %s %s %s %s',async(jacket,hoodie,size,delivery)=>{
- const {data,items}=input(jacket,hoodie,size,delivery),before=original(data,items),after=current();
- await before.run();await after.service.submit(data,items,pricing,null);
- expect(after.writes).toEqual(before.writes);
- const corrected=JSON.parse(JSON.stringify(before.emails));
- corrected[0].data.thread_color_1='Green';corrected[0].data.thread_color_2='White';
- expect(after.emails).toEqual(corrected);
+test('conflicting duplicate inventory cannot silently reuse a stock count', () => {
+ const row = { partId: 'SYNTHETIC', color: 'Black', size: 'L', totalQty: 30 };
+ const parse = inventory => inventorySizes({ style: 'CT104670', inventory }, 'CT104670', { CATALOG_COLOR: 'Black' });
+ expect(parse([row, {...row}])).toEqual([{size:'L',quantity:30}]);
+ expect(() => parse([row, {...row,totalQty:0}])).toThrow(/conflicting/);
+ expect(() => parse([row, {...row,size:'S'}])).toThrow(/conflicting/);
 });
-test('a failed session blocks items and emails and retries the same reference',async()=>{
- const flags={session:true},run=current(flags),{data,items}=input();
- await expect(run.service.submit(data,items,pricing,null)).rejects.toThrow('not accepted');
- expect(run.writes).toHaveLength(1);expect(run.emails).toHaveLength(0);
- flags.session=false;await run.service.submit(data,items,pricing,null);
- expect(run.writes).toHaveLength(3);expect(run.writes[1].body.QuoteID).toBe(run.writes[0].body.QuoteID);
+
+test('a changed color, size or decoration on a partial saved line requires review', async () => {
+ for (const [key,value] of [['ColorCode','Navy'],['SizeBreakdown','{"S":1}'],['EmbroideryLocation','left-chest']]) {
+  const flags={failLine:2},f=factory(flags); await f.prepare(); await expect(f.service.submit(f.body)).rejects.toThrow();
+  f.state.items[0][key]=value; flags.failLine=null;
+  await expect(f.service.submit(f.body)).rejects.toMatchObject({status:409}); expect(f.state.emails).toEqual([]);
+ }
 });
-test('a failed item retains its accepted session and sends no premature email',async()=>{
- const flags={item:true},run=current(flags),{data,items}=input();
- await expect(run.service.submit(data,items,pricing,null)).rejects.toThrow('not accepted');
- expect(run.emails).toHaveLength(0);
- flags.item=false;await run.service.submit(data,items,pricing,null);
- expect(run.writes.filter(r=>r.url.endsWith('sessions'))).toHaveLength(1);
- expect(run.writes[2]).toEqual(run.writes[1]);
+
+test('a concurrent request with different details cannot join the original save', async () => {
+ const f=factory(); await f.prepare(); const saving=f.service.submit(f.body);
+ await expect(f.service.submit({...f.body,customer:{...f.body.customer,email:'changed@example.invalid'}})).rejects.toMatchObject({status:409});
+ await saving; expect(f.state.sessions).toHaveLength(1); expect(f.state.sessions[0].CustomerEmail).toBe(f.body.customer.email);
 });
-test.each(['customer','sales'])('retry only the unfinished %s email',async flag=>{
- const flags={[flag]:true},run=current(flags),{data,items}=input();
- const result=await run.service.submit(data,items,pricing,null);expect(result.saved).toBe(true);expect(result.complete).toBe(false);
- flags[flag]=false;expect((await run.service.retryEmails()).complete).toBe(true);
- expect(run.writes).toHaveLength(2);expect(run.emails).toHaveLength(3);
- expect(run.emails[2].template).toBe(flag==='customer'?'template_v80ysfp':'template_sales_xmas');
+
+function registered(moduleName, overrides={}) {
+ const handlers=new Map(); const app=Object.fromEntries(['get','post','put','delete','use','patch'].map(method=>[method,(url,...stack)=>handlers.set(method+' '+url,stack)]));
+ const pass=(_req,_res,next)=>next();
+ const ctx={strictLimiter:pass,requireStaff:pass,requireStaffOrSync:pass,quotePlaneWriteLimiter:pass,quoteScopedOrStaff:pass,
+  rateLimit:()=>pass,sanitizeFilterInput:value=>value,...overrides};
+ require('../../routes/'+moduleName)(app,ctx);
+ return {ctx,handlers};
+}
+function response() {return {statusCode:200,status(code){this.statusCode=code;return this;},json(body){this.body=body;return this;},set(){return this;}};}
+
+test.each(['accept','deposit-checkout','enable-deposit'])('holiday %s never charges, accepts or writes, even when terms are already enabled', async action => {
+ const row={PK_ID:1,QuoteID:'XMAS-SYNTHETIC',Status:action==='accept'?'Open':'Accepted',Notes:JSON.stringify({deposit:{enabled:true}})};
+ const api=jest.fn(async()=>[row]),stripe=jest.fn(),email=jest.fn(),autoEnable=jest.fn();
+ const {handlers}=registered('quote-lifecycle',{makeApiRequest:api,fetchQuoteSessionRow:async()=>row,shareTokenOk:()=>true,stripe,sendQuoteAcceptedEmails:email,autoEnablePickupDeposit:autoEnable});
+ const url=action==='enable-deposit'?'/api/quotes/:quoteId/enable-deposit':'/api/public/quote/:quoteId/'+action;
+ const req={params:{quoteId:row.QuoteID},body:{name:'Example',email:'customer@example.invalid',deliveryMethod:'pickup',shipping:0,taxRatePct:0},is:()=>true,session:action==='enable-deposit'?{crmUser:{name:'Example Staff'}}:{}};
+ const res=response(); await handlers.get('post '+url).at(-1)(req,res);
+ expect(res.statusCode).toBe(409);expect(res.body.error).toMatch(/staff review/);
+ expect(api.mock.calls.every(call=>!call[1]||call[1]==='GET')).toBe(true);expect(stripe).not.toHaveBeenCalled();expect(email).not.toHaveBeenCalled();expect(autoEnable).not.toHaveBeenCalled();
 });
-test('pending submissions share one captured order despite later draft edits',async()=>{
- let release;const flags={hold:new Promise(resolve=>{release=resolve;})},run=current(flags),{data,items}=input();
- const first=run.service.submit(data,items,pricing,null);
- data.firstName='Later edit';items.jacket.selectedSize='2XL';
- expect(run.service.submit(data,items,pricing,null)).toBe(first);
- release();await first;
- expect(run.writes).toHaveLength(2);expect(run.writes[1].body.First).toBe('Example');
- expect(run.writes[1].body.BundleConfiguration).toContain('CT104670 - L - Black');
+
+test.each([['quote-plane','/api/quote_sessions'],['quote-delete','/api/quote_items']])('anonymous holiday creates cannot bypass validation through %s',async(moduleName,url)=>{
+ const api=jest.fn();const {handlers}=registered(moduleName,{makeApiRequest:api});
+ for(const body of [{QuoteID:'XMAS-SYNTHETIC'},{quoteid:'xmas-synthetic'},{QuoteID:'EMB-123',qUoTeId:' XMAS-SYNTHETIC'}]){
+  const res=response();await handlers.get('post '+url).at(-1)({body,session:{}},res);expect(res.statusCode).toBe(403);
+ }expect(api).not.toHaveBeenCalled();
 });
-test('address line two survives persistence and confirmation',async()=>{
- const run=current(),{data,items}=input();data.shippingAddress2='Suite 2';
- await run.service.submit(data,items,pricing,null);
- expect(run.writes[1].body.Shipping_Address).toBe('123 Example Street\nSuite 2');
- expect(run.emails[0].data.address_2).toBe('Suite 2');
+
+test('slow request returns pending before the hosting deadline without cancelling the saved request',async()=>{
+ jest.useFakeTimers(); let finish; const saved=new Promise(resolve=>{finish=resolve;});const submit=jest.fn(()=>saved);
+ try {
+  jest.doMock('../../lib/christmas-gift-box',()=>()=>({submit}));let handlers;
+  jest.isolateModules(()=>{handlers=registered('christmas-gift-box').handlers;});
+  const res=response(); const handling=handlers.get('post /api/christmas-gift-box/requests').at(-1)({body:{requestKey:'synthetic'}},res);
+  await jest.advanceTimersByTimeAsync(15000);await handling;expect(res.body).toEqual({pending:true});
+  finish({saved:true});await saved;expect(submit).toHaveBeenCalledTimes(1);
+ } finally {jest.dontMock('../../lib/christmas-gift-box');jest.useRealTimers();}
 });
-test('a confirmed logo upload is reused when the item needs retry',async()=>{
- const flags={item:true},run=current(flags),{data,items}=input();
- run.service.upload=jest.fn().mockResolvedValue('SYNTHETIC-LOGO');
- const file={name:'synthetic.pdf',size:20,lastModified:fixed};
- await expect(run.service.submit(data,items,pricing,file)).rejects.toThrow('not accepted');
- flags.item=false;await run.service.submit(data,items,pricing,file);
- expect(run.service.upload).toHaveBeenCalledTimes(1);
- expect(run.writes[2].body.Image_Upload).toBe('SYNTHETIC-LOGO');
+
+test('browser pending polls retain one body and pre-save rejections permit a refreshed estimate',async()=>{
+ jest.useFakeTimers();
+ try {
+  const bodies=[];let count=0; const service=new ChristmasBundleQuoteService({storage:{getItem:()=>null,setItem:()=>{}},fetch:async(_url,opts)=>{
+   bodies.push(opts.body);return {ok:true,json:async()=>++count===1?{pending:true}:{saved:true,quoteID:'XMAS-synthetic',quoteUrl:'/quote/XMAS-synthetic',pricing:{total:1}}};
+  }});
+  const saving=service.submit(factory().body,null);await jest.advanceTimersByTimeAsync(1501);await saving;
+  expect(bodies).toHaveLength(2);expect(bodies[1]).toBe(bodies[0]);
+  const rejected=new ChristmasBundleQuoteService({storage:{getItem:()=>null,setItem:()=>{}},fetch:async()=>({ok:false,json:async()=>({error:'Pricing changed',canRevise:true})})});
+  await expect(rejected.submit(factory().body,null)).rejects.toMatchObject({canRevise:true});expect(rejected.record.attempted).toBe(false);
+ }finally {jest.useRealTimers();}
 });
-test('failed uploads prevent any quote or email writes',async()=>{
- const run=current(),{data,items}=input();
- run.service.upload=jest.fn().mockRejectedValue(new Error('Synthetic upload failure'));
- await expect(run.service.submit(data,items,pricing,{name:'synthetic.pdf',size:20,lastModified:fixed})).rejects.toThrow('upload failure');
- expect(run.writes).toHaveLength(0);expect(run.emails).toHaveLength(0);
+
+test.each(['/quote/:quoteId','/invoice/:quoteId'])('generated holiday reference is supported by the real %s page route',async url=>{
+ const f=factory();await f.prepare();const result=await f.service.submit(f.body);
+ const {handlers}=registered('public-quote',{path,SERVER_DIR:'/synthetic',SOFT_DELETE_RETENTION_DAYS:30});
+ const res={...response(),send:jest.fn(),sendFile:jest.fn(),redirect:jest.fn()};handlers.get('get '+url).at(-1)({params:{quoteId:result.quoteID},query:{k:'synthetic token'}},res);
+ if(url.startsWith('/invoice')){expect(res.redirect).toHaveBeenCalledWith(302,'/quote/'+result.quoteID+'?k=synthetic%20token');expect(res.sendFile).not.toHaveBeenCalled();}
+ else {expect(res.statusCode).toBe(200);expect(res.sendFile).toHaveBeenCalledTimes(1);}
+ expect(f.state.items.find(i=>i.StyleNumber==='SHIP').EmbellishmentType).toBe('fee');
+});
+
+test('contact rejection permits correction, while saved requests can finish after the lead-time window moves',async()=>{
+ const f=factory();await f.prepare();f.body.customer.phone='123';await expect(f.service.submit(f.body)).rejects.toMatchObject({canRevise:true});expect(f.state.writes).toEqual([]);
+ const flags={failLine:2},g=factory(flags);await g.prepare();await expect(g.service.submit(g.body)).rejects.toThrow();flags.failLine=null;g.advance(30*86400000);
+ await expect(g.service.submit(g.body)).resolves.toMatchObject({saved:true});expect(g.state.sessions).toHaveLength(1);
+});
+
+test('combined name and shipping fields stay inside the saved quote column limits',async()=>{
+ const f=factory();await f.prepare();f.body.customer.firstName='A'.repeat(101);
+ await expect(f.service.submit(f.body)).rejects.toMatchObject({canRevise:true});expect(f.state.writes).toEqual([]);
+ f.body.customer.firstName='Example';f.body.customer.shippingAddress='B'.repeat(121);
+ await expect(f.service.submit(f.body)).rejects.toMatchObject({canRevise:true});expect(f.state.writes).toEqual([]);
 });

@@ -1,5 +1,22 @@
 /* catalog layout. Canonical tokens and controls are provided by components.css. */
 @layer components.pages {
+:where([data-ui="unified"][data-catalog-storefront="catalog"]) .holiday-catalog-feature {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin-block: var(--space-5);
+    padding: var(--space-5);
+    background: var(--ui-surface);
+    border: 1px solid var(--ui-line);
+    border-radius: var(--radius-md);
+}
+
+:where([data-ui="unified"][data-catalog-storefront="catalog"]) .holiday-catalog-feature strong { font-family: var(--font-store-display); font-size: var(--font-size-2xl); }
+:where([data-ui="unified"][data-catalog-storefront="catalog"]) .holiday-catalog-feature p { margin-block: var(--space-2); }
+:where([data-ui="unified"][data-catalog-storefront="catalog"]) .holiday-catalog-deadline { color: var(--ui-muted); font-size: var(--font-size-md); }
+
 :where([data-ui="unified"][data-catalog-storefront="catalog"]) .filters-rail {
     position: sticky;
     overflow-y: auto; overscroll-behavior: contain;

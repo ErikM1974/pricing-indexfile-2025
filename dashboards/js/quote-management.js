@@ -507,7 +507,8 @@ function applyFilters() {
                 quote.QuoteID || '',
                 quote.CustomerName || '',
                 quote.CustomerEmail || '',
-                quote.CompanyName || ''
+                quote.CompanyName || '',
+                holidayRequestLabel(quote)
             ].join(' ').toLowerCase();
 
             if (!searchFields.includes(searchFilter)) {
@@ -604,7 +605,14 @@ function paintTabs() {
 // 2026-05-28: explicit null/undefined check before Number() — without
 // it, Number(null) === 0 made unsynced rows render as $0.00 instead
 // of falling back to the original quote total.
+function holidayRequestLabel(quote) {
+    if (!/^XMAS-/i.test(String(quote.QuoteID || ''))) return '';
+    const kind = quote.Status === 'Draft' ? 'Save incomplete' : Number(quote.TotalAmount) === 0 ? 'Complimentary sample' : 'Priced request';
+    return (quote.ProjectName || 'Holiday Gift Box 2026') + ' · ' + kind;
+}
+
 function getEffectiveAmount(quote) {
+    if (holidayRequestLabel(quote)) return (Number(quote.TotalAmount) || 0) + (Number(quote.ShippingFee) || 0) + (Number(quote.TaxAmount) || 0);
     // Only overlay for Processed quotes with a synced snapshot.
     if (quote.Status === 'Processed' && quote.ShopWorks_Snapshot) {
         try {
@@ -1203,7 +1211,9 @@ function renderTable() {
         //     (payment in, ShopWorks order not yet created)
         //   • Otherwise — editable dropdown (Open/Lost/Accepted/Expired)
         let statusCellHtml;
-        if (isCancelled) {
+        if (holidayRequestLabel(quote) && quote.Status === 'Draft') {
+            statusCellHtml = '<span class="status-badge status-open">Save incomplete</span>';
+        } else if (isCancelled) {
             statusCellHtml = `<span class="status-badge status-cancelled" title="Order was deleted in ShopWorks. Will be permanently purged after 30 days.">
                                   <i class="fas fa-ban" aria-hidden="true"></i> Cancelled (SW)
                                </span>`;
@@ -1254,7 +1264,7 @@ function renderTable() {
                                       data-pk-id="${quote.PK_ID}"
                                       data-quote-id="${escapeHtml(quote.QuoteID)}"
                                       aria-label="Status of ${escapeHtml(quote.QuoteID)}">
-                                  <option value="Open" ${quote.Status === 'Open' ? 'selected' : ''}>Open</option>
+                                  <option value="Open" ${quote.Status === 'Open' ? 'selected' : ''}>${holidayRequestLabel(quote) ? 'Awaiting review' : 'Open'}</option>
                                   <option value="Accepted" ${quote.Status === 'Accepted' ? 'selected' : ''} disabled title="Set automatically when the customer accepts the quote — not manually selectable">Accepted</option>
                                   <option value="Lost" ${quote.Status === 'Lost' ? 'selected' : ''}>Lost</option>
                                   <option value="Expired" ${quote.Status === 'Expired' ? 'selected' : ''} disabled title="Set automatically when the quote passes its expiration date — not manually selectable">Expired</option>
@@ -1293,6 +1303,7 @@ function renderTable() {
                 </td>
                 <td>
                     <span class="quote-id">${qid || '-'}</span>
+                    ${holidayRequestLabel(quote) ? `<div class="date-relative">${escapeHtml(holidayRequestLabel(quote))}</div>` : ''}
                     ${renderShopWorksRef(quote)}
                 </td>
                 <td>
@@ -1481,6 +1492,7 @@ function viewQuote(quoteId) {
 }
 
 function editQuote(quoteId) {
+    if (/^XMAS-/i.test(quoteId)) { showToast('Review the holiday request, then prepare the finalized quote in the normal builder.'); viewQuote(quoteId); return; }
     // Phase 11.3.5 (Erik 2026-05-24): defense-in-depth guard against
     // editing a quote that's been pushed to ShopWorks. The Edit button
     // in renderTable() is already disabled for these statuses, but
@@ -1667,6 +1679,7 @@ async function resendQuoteEmail(pkId) {
         return;
     }
     const quoteId = quote.QuoteID;
+    if (/^XMAS-/i.test(quoteId)) { showToast('Holiday requests use their own confirmation. Open the request to review the saved details.'); viewQuote(quoteId); return; }
     if (resendInFlight.has(quoteId)) return; // double-click guard
     resendInFlight.add(quoteId);
     try {

@@ -119,10 +119,14 @@ jobs:
       - name: Unified CSS and staff relay browser checks (mocked services)
         # These specs isolate service calls and writes per browser context; 74 cases passed
         # locally with three workers in 156.8 seconds. Keep live pricing below serial.
-        run: npm run test:css
+        # Stop on the first confirmed failure so a release can be corrected promptly.
+        # A successful gate still runs every case; no test is filtered out.
+        run: npm run test:css -- --max-failures=1
       - name: Money path + calculator parity (live engine — needs CRM_API_SECRET)
         if: ${{ env.CRM_API_SECRET != '' }}
         run: npx playwright test --config tests/e2e/playwright.config.js money-path calculator-parity
+      - name: Holiday gift-box customer requests (mocked writes and email)
+        run: npx playwright test --config tests/e2e/playwright.config.js seasonal-christmas-behavior
       - name: Money path + calculator parity skipped (no CRM_API_SECRET in Actions secrets)
         if: ${{ env.CRM_API_SECRET == '' }}
         run: echo "::warning::CRM_API_SECRET is not set for this repository — the live-engine specs did not run here; the /deploy pre-flight runs them locally"

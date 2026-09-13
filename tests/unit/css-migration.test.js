@@ -19,6 +19,12 @@ describe('unified CSS ownership and preserved content', () => {
         const assets = [...document.querySelectorAll('link[rel="stylesheet"]')]
             .map(el => el.getAttribute('href').split('?')[0]).filter(href => href.startsWith('/'));
         expect(assets).toEqual(pilot.styles.map(file => '/' + file));
+        expect(assets).toContain('/shared_components/css/tokens.css');
+        expect(assets).toContain('/shared_components/css/components.css');
+        expect(assets.indexOf('/shared_components/css/tokens.css'))
+            .toBeLessThan(assets.indexOf('/shared_components/css/components.css'));
+        expect(pilot.test).toMatch(/^tests\/e2e\/css-unification[^/]*\.spec\.js$/);
+        expect(fs.existsSync(path.join(ROOT, pilot.test))).toBe(true);
         // Match committed source bytes across Windows CRLF and Linux LF checkouts.
         const bytes = pilot.styles.reduce((sum, file) => sum + Buffer.byteLength(read(file).replace(/\r\n/g, '\n')), 0);
         expect(bytes).toBeLessThanOrEqual(pilot.maxCssBytes);

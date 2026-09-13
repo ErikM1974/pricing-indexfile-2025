@@ -128,9 +128,14 @@ describe('templates/page-template.html', () => {
             expect({ input: m[0].slice(0, 60), labelled: !!id && html.includes(`for="${id}"`) }).toEqual({ input: m[0].slice(0, 60), labelled: true });
         }
     });
-    test('loads tokens.css as its first local stylesheet and routes clicks through data-call-delegator.js', () => {
+    test('opts into shared foundations and routes clicks through data-call-delegator.js', () => {
         const locals = [...html.matchAll(/<link[^>]*rel="stylesheet"[^>]*href="(\/[^"?]+\.css)/g)].map((m) => m[1]);
-        expect(locals[0]).toBe('/shared_components/css/tokens.css');
+        expect(locals.slice(0, 3)).toEqual([
+            '/shared_components/css/tokens.css',
+            '/shared_components/css/components.css',
+            '/shared_components/css/utilities.css',
+        ]);
+        expect(html).toMatch(/<body\b[^>]*\bdata-ui="unified"/);
         expect(html).toMatch(/data-call-delegator\.js\?v=/);
         expect(html).toMatch(/\bdata-call="/);
     });

@@ -40,6 +40,7 @@ async function open(page, name, state = {}) {
             if (state.original && source.hashes[p.slice(1)]) {
                 const html = source.pages.find(r => r.file === p.slice(1));
                 let original = html ? html.html : body.toString('utf8').replace(/\r\n/g, '\n');
+                if (!html) original = require('../../helpers/holiday-source-mappings')(p.slice(1), original);
                 if (!html) original = require('./staff-print-scenes').restore(p.slice(1), original);
                 if (!html) for (const change of source.changes.filter(c => c.file === p.slice(1)).reverse()) { expect(original.split(change.after).length - 1).toBe(change.count); original = original.split(change.after).join(change.before); }
                 expect(crypto.createHash('sha256').update(original).digest('hex')).toBe(source.hashes[p.slice(1)]); body = Buffer.from(original);

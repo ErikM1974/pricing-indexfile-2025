@@ -1,3 +1,4 @@
+const restorePreHoliday = require('../helpers/holiday-source-mappings');
 const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto');
 const { JSDOM } = require('jsdom');
 const original = require('../fixtures/staff-workspaces-original-content.json');
@@ -5,7 +6,7 @@ const root = path.resolve(__dirname, '../..'), norm = s => s.replace(/\s+/g, ' '
 const hash = s => crypto.createHash('sha256').update(s).digest('hex');
 
 test.each(original.pages)('$file preserves original labels, fields, links and identifiers', record => {
-    let html = fs.readFileSync(path.join(root, record.file), 'utf8').replace(/\r\n/g, '\n');
+    let html = restorePreHoliday(record.file, fs.readFileSync(path.join(root, record.file), 'utf8').replace(/\r\n/g, '\n'));
     html = require('../e2e/helpers/staff-print-scenes').restore(record.file, html);
     for (const change of original.changes.filter(c => c.file === record.file).reverse()) {
         expect(html.split(change.after).length - 1).toBe(change.count);
@@ -26,7 +27,7 @@ test.each(Object.keys(original.hashes).filter(f => !f.endsWith('.html')))('%s re
         expect(fs.existsSync(path.join(root, file))).toBe(false);
         return;
     }
-    let s = fs.readFileSync(path.join(root, file), 'utf8').replace(/\r\n/g, '\n');
+    let s = restorePreHoliday(file, fs.readFileSync(path.join(root, file), 'utf8').replace(/\r\n/g, '\n'));
     s = require('../e2e/helpers/staff-print-scenes').restore(file, s);
     for (const change of original.changes.filter(c => c.file === file).reverse()) {
         expect(change.after).not.toBe('');

@@ -157,6 +157,7 @@ app.get('/api/quote_items/session/:sessionId', async (req, res) => {
 });
 
 app.post('/api/quote_items', quotePlaneWriteLimiter, async (req, res) => {
+  if (Object.entries(req.body || {}).some(([key, value]) => key.toLowerCase() === 'quoteid' && /^XMAS/i.test(String(value).trim())) && !req.session?.crmUser) return res.status(403).json({ error: 'Use the holiday gift-box request form.' });
   try {
     console.log('[QUOTE ITEMS API] Creating quote item for QuoteID:', req.body.QuoteID);
     

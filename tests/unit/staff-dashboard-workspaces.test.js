@@ -36,6 +36,16 @@ const parse = (html) => new DOMParser().parseFromString(html, 'text/html');
 const dash = parse(dashboardHtml);
 const numbers = parse(numbersHtml);
 
+test('holiday paid, complimentary and incomplete requests appear in the staff review inbox',async()=>{
+ document.body.innerHTML='<div id="ordersInboxAlerts"></div><ul id="inboxPaidList"></ul><ul id="inboxAcceptedList"></ul>';
+ const rows=[['XMAS-111','Open',100,25],['XMAS-222','Open',0,0],['XMAS-333','Draft',100,25]].map(([QuoteID,Status,TotalAmount,ShippingFee])=>({QuoteID,Status,TotalAmount,ShippingFee,CompanyName:'Example Company',CreatedAt:'2026-09-13'}));
+ const src=readRepo('shared_components/js/staff-dashboard/controllers/orders-inbox-controller.js').replace(/^import .*;\r?\n/gm,'').replace(/^export /gm,'');
+ const load=new Function('document','dashboardFetchJson','reportWidgetResult','escapeHtml','formatMoney','formatRelativeTime',src+'\nreturn loadOrdersInbox;')(document,async()=>rows,()=>true,s=>String(s),n=>'$'+n.toFixed(2),()=> 'Today');
+ await load();const review=document.getElementById('inboxAcceptedList');
+ expect(review.textContent).toContain('Holiday box request — pricing review');expect(review.textContent).toContain('Complimentary holiday sample request');expect(review.textContent).toContain('Incomplete holiday request — review needed');expect(review.textContent).toContain('$125.00');
+ expect(review.querySelectorAll('a')).toHaveLength(3);expect(document.getElementById('inboxPaidList').querySelectorAll('a')).toHaveLength(0);
+});
+
 // Every internal href the dashboard carried on 2026-09-03, before Workspaces
 // (extracted from the pre-restructure index.html; excludes css/img/auth/self links).
 const PRE_WORKSPACES_HREFS = [

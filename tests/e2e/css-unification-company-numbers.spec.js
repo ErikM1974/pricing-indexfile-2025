@@ -17,8 +17,12 @@ test('CSS staff workspaces: Company Numbers '+edition+' populated widgets and da
         if (!original) {
             const baseline=require('../fixtures/staff-workspaces-company-original-browser.json');
             const norm=text=>text.replace(/Skip to Company Numbers/g,'').replace(/\s+/g,' ').trim().toLowerCase();
+            await expect(page.locator('#inboxAccepted .inbox-col-title')).toHaveText('Quotes & requests to review last 30 days');
+            // Holiday requests now share this inbox. Allow only the intentional heading
+            // change; preserve the original fixture and every other label and amount.
+            const expectedText=baseline.views[0].text.replace(/Accepted quotes — unpaid/i,'Quotes & requests to review');
             // The new phone layout retains the amounts and blanks status visible on the original desktop.
-            expect.soft(norm(views.at(-1).text),width+' original figures').toBe(norm(baseline.views[0].text));
+            expect.soft(norm(views.at(-1).text),width+' original figures').toBe(norm(expectedText));
             expect.soft(await page.evaluate(()=>document.documentElement.scrollWidth),width+' width').toBeLessThanOrEqual(width);
             const result=await new (require('@axe-core/playwright').default)({page}).withTags(['wcag2a','wcag2aa']).analyze();
             expect.soft(result.violations.map(v=>({id:v.id,nodes:v.nodes.map(n=>({target:n.target,why:n.failureSummary}))})),width+' accessibility').toEqual([]);

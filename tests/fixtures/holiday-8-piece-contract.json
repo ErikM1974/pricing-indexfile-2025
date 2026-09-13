@@ -1,0 +1,247 @@
+{
+  "checkedAt": "2026-09-13T13:41:44.388Z",
+  "description": "Live API data priced with existing embroidery quote builder. Actual quantity 1, pricing quantity 8. Public pricing only; no customer data.",
+  "tier": {
+    "PK_ID": 33,
+    "TierID": 32,
+    "DecorationMethod": "EmbroideryShirts",
+    "TierLabel": "8-23",
+    "MinQuantity": 8,
+    "MaxQuantity": 23,
+    "MarginDenominator": 0.53,
+    "TargetMargin": 0,
+    "LTM_Fee": 0
+  },
+  "cost": {
+    "ItemType": "Shirt",
+    "StitchCount": 8000,
+    "EmbroideryCost": 18
+  },
+  "rounding": "HalfDollarCeil_Final",
+  "examples": [
+    {
+      "color": "Black",
+      "size": "S",
+      "tier": "8-23",
+      "quantity": 1,
+      "unitPrice": 210,
+      "lineTotal": 210
+    },
+    {
+      "color": "Black",
+      "size": "M",
+      "tier": "8-23",
+      "quantity": 1,
+      "unitPrice": 210,
+      "lineTotal": 210
+    },
+    {
+      "color": "Black",
+      "size": "L",
+      "tier": "8-23",
+      "quantity": 1,
+      "unitPrice": 210,
+      "lineTotal": 210
+    },
+    {
+      "color": "Black",
+      "size": "XL",
+      "tier": "8-23",
+      "quantity": 1,
+      "unitPrice": 210,
+      "lineTotal": 210
+    },
+    {
+      "color": "Black",
+      "size": "2XL",
+      "tier": "8-23",
+      "quantity": 1,
+      "unitPrice": 212,
+      "lineTotal": 212
+    },
+    {
+      "color": "Black",
+      "size": "3XL",
+      "tier": "8-23",
+      "quantity": 1,
+      "unitPrice": 213,
+      "lineTotal": 213
+    },
+    {
+      "color": "Black",
+      "size": "4XL",
+      "tier": "8-23",
+      "quantity": 1,
+      "unitPrice": 214,
+      "lineTotal": 214
+    },
+    {
+      "color": "Moss",
+      "size": "S",
+      "tier": "8-23",
+      "quantity": 1,
+      "unitPrice": 210,
+      "lineTotal": 210
+    },
+    {
+      "color": "Moss",
+      "size": "M",
+      "tier": "8-23",
+      "quantity": 1,
+      "unitPrice": 210,
+      "lineTotal": 210
+    },
+    {
+      "color": "Moss",
+      "size": "L",
+      "tier": "8-23",
+      "quantity": 1,
+      "unitPrice": 210,
+      "lineTotal": 210
+    },
+    {
+      "color": "Moss",
+      "size": "XL",
+      "tier": "8-23",
+      "quantity": 1,
+      "unitPrice": 210,
+      "lineTotal": 210
+    },
+    {
+      "color": "Moss",
+      "size": "2XL",
+      "tier": "8-23",
+      "quantity": 1,
+      "unitPrice": 212,
+      "lineTotal": 212
+    },
+    {
+      "color": "Moss",
+      "size": "3XL",
+      "tier": "8-23",
+      "quantity": 1,
+      "unitPrice": 213,
+      "lineTotal": 213
+    },
+    {
+      "color": "Moss",
+      "size": "4XL",
+      "tier": "8-23",
+      "quantity": 1,
+      "unitPrice": 214,
+      "lineTotal": 214
+    },
+    {
+      "color": "Navy",
+      "size": "S",
+      "tier": "8-23",
+      "quantity": 1,
+      "unitPrice": 210,
+      "lineTotal": 210
+    },
+    {
+      "color": "Navy",
+      "size": "M",
+      "tier": "8-23",
+      "quantity": 1,
+      "unitPrice": 210,
+      "lineTotal": 210
+    },
+    {
+      "color": "Navy",
+      "size": "L",
+      "tier": "8-23",
+      "quantity": 1,
+      "unitPrice": 210,
+      "lineTotal": 210
+    },
+    {
+      "color": "Navy",
+      "size": "XL",
+      "tier": "8-23",
+      "quantity": 1,
+      "unitPrice": 210,
+      "lineTotal": 210
+    },
+    {
+      "color": "Navy",
+      "size": "2XL",
+      "tier": "8-23",
+      "quantity": 1,
+      "unitPrice": 212,
+      "lineTotal": 212
+    },
+    {
+      "color": "Navy",
+      "size": "3XL",
+      "tier": "8-23",
+      "quantity": 1,
+      "unitPrice": 213,
+      "lineTotal": 213
+    },
+    {
+      "color": "Navy",
+      "size": "4XL",
+      "tier": "8-23",
+      "quantity": 1,
+      "unitPrice": 214,
+      "lineTotal": 214
+    },
+    {
+      "color": "Shadow Grey",
+      "size": "S",
+      "tier": "8-23",
+      "quantity": 1,
+      "unitPrice": 210,
+      "lineTotal": 210
+    },
+    {
+      "color": "Shadow Grey",
+      "size": "M",
+      "tier": "8-23",
+      "quantity": 1,
+      "unitPrice": 210,
+      "lineTotal": 210
+    },
+    {
+      "color": "Shadow Grey",
+      "size": "L",
+      "tier": "8-23",
+      "quantity": 1,
+      "unitPrice": 210,
+      "lineTotal": 210
+    },
+    {
+      "color": "Shadow Grey",
+      "size": "XL",
+      "tier": "8-23",
+      "quantity": 1,
+      "unitPrice": 210,
+      "lineTotal": 210
+    },
+    {
+      "color": "Shadow Grey",
+      "size": "2XL",
+      "tier": "8-23",
+      "quantity": 1,
+      "unitPrice": 212,
+      "lineTotal": 212
+    },
+    {
+      "color": "Shadow Grey",
+      "size": "3XL",
+      "tier": "8-23",
+      "quantity": 1,
+      "unitPrice": 213,
+      "lineTotal": 213
+    },
+    {
+      "color": "Shadow Grey",
+      "size": "4XL",
+      "tier": "8-23",
+      "quantity": 1,
+      "unitPrice": 214,
+      "lineTotal": 214
+    }
+  ]
+}

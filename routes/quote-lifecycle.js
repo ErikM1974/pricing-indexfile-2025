@@ -3,6 +3,8 @@
 // what the monolith had, at the same indentation, so every handler body and the registration order are unchanged
 // (tests/unit/server-route-table.test.js). Everything it needs from server.js arrives in ctx; nothing is global.
 module.exports = function register(app, ctx) {
+const holidayRequest = row => /^XMAS-/i.test(String(row?.QuoteID || ''));
+const holidayReviewMessage = 'This gift-box request requires staff review. Our team will issue a final quote or invoice after confirming artwork, delivery and applicable charges.';
 const { CASPIO_PROXY_BASE, PUBLIC_SITE_ORIGIN, QUOTE_TOTALS_HASH_VERSION, QuoteDepositMath, alertQuotePay, autoEnablePickupDeposit, computeQuoteSyncHealth, computeQuoteTotalsHash, fetch, fetchQuoteSessionRow, getDepositPct, makeApiRequest, notifyQuoteSyncHealth, nowPacificNaiveIso, parseNotesJson, quoteShareUrl, requireStaff, requireStaffOrSync, sanitizeFilterInput, sendQuoteAcceptedEmails, shareTokenOk, strictLimiter, stripe, totalsHashMatches, withProxySecret } = ctx;
 
 // ============================================================================
@@ -296,6 +298,8 @@ app.post('/api/public/quote/:quoteId/accept', strictLimiter, async (req, res) =>
       return res.status(404).json({ error: 'Quote not found' });
     }
 
+    if (holidayRequest(session)) return res.status(409).json({ error: holidayReviewMessage });
+
     // Check if quote is already accepted
     if (session.Status === 'Accepted') {
       return res.status(400).json({ error: 'Quote has already been accepted' });
@@ -399,6 +403,7 @@ app.post('/api/quotes/:quoteId/enable-deposit', requireStaff, async (req, res) =
 
     const row = await fetchQuoteSessionRow(quoteId);
     if (!row) return res.status(404).json({ error: 'Quote not found' });
+    if (holidayRequest(row) && req.session?.crmUser) return res.status(409).json({ error: holidayReviewMessage });
     if (row.Status !== 'Accepted') {
       return res.status(409).json({ error: `Quote status is '${row.Status}' — the customer must accept the quote before a deposit is collected.` });
     }
@@ -432,6 +437,7 @@ app.post('/api/quotes/:quoteId/enable-deposit', requireStaff, async (req, res) =
     // read `notes`. Re-read fresh, re-check the paid guard, and merge onto the
     // latest Notes so we never clobber a recorded payment.
     const fresh = await fetchQuoteSessionRow(quoteId);
+    if (holidayRequest(fresh || row)) return res.status(409).json({ error: holidayReviewMessage });
     const freshNotes = parseNotesJson((fresh && fresh.Notes) || row.Notes);
     if (Array.isArray(freshNotes.payments) && freshNotes.payments.some((p) => p && p.kind === 'deposit')) {
       return res.status(409).json({ error: 'A deposit has already been paid on this quote.' });
@@ -473,11 +479,13 @@ app.post('/api/public/quote/:quoteId/deposit-checkout', strictLimiter, async (re
 
     const row = await fetchQuoteSessionRow(quoteId);
     if (!row) return res.status(404).json({ error: 'Quote not found' });
+    if (holidayRequest(row) && req.session?.crmUser) return res.status(409).json({ error: holidayReviewMessage });
     // Token gate — this one MINTS A STRIPE CHECKOUT SESSION. Anything that can
     // start a payment against a quote must prove it holds that quote's link.
     if (!shareTokenOk(req, row)) {
       return res.status(404).json({ error: 'Quote not found' });
     }
+    if (holidayRequest(row)) return res.status(409).json({ error: holidayReviewMessage });
     const notes = parseNotesJson(row.Notes);
     const dep = notes.deposit;
     if (!dep || !dep.enabled) {

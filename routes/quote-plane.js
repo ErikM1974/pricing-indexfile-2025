@@ -78,6 +78,7 @@ app.get('/api/quote_sessions/quote/:quoteId', async (req, res) => {
 
 // CREATE new session — anonymous allowed (public calculators/cart), rate-limited
 app.post('/api/quote_sessions', quotePlaneWriteLimiter, async (req, res) => {
+  if (Object.entries(req.body || {}).some(([key, value]) => key.toLowerCase() === 'quoteid' && /^XMAS/i.test(String(value).trim())) && !req.session?.crmUser) return res.status(403).json({ error: 'Use the holiday gift-box request form.' });
   try {
     console.log('[QUOTE API] Creating quote session with QuoteID:', req.body.QuoteID);
     

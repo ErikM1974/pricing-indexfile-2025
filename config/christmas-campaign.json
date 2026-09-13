@@ -1,0 +1,77 @@
+{
+    "id": "holiday-samples-2026",
+    "year": 2026,
+    "closesAt": "2026-10-16T00:00:00-07:00",
+    "deadlineLabel": "October 15, 2026",
+    "headline": "Your holiday gifts. Sampled early.",
+    "introduction": "See your logo. Feel the fit. Build one gift box at our 8-piece embroidery pricing, then plan a holiday order your team will love.",
+    "eligibility": "For businesses and organizations planning employee gifts. Company logos only.",
+    "boxServiceCode": "XMAS-BOX",
+    "shippingServiceCode": "XMAS-SHIP",
+    "products": {
+        "jackets": [
+            {
+                "style": "CT104670",
+                "name": "Storm Defender jacket",
+                "brand": "Carhartt",
+                "summary": "Waterproof protection for wet-weather workdays.",
+                "preferredColor": "Black",
+                "excludedColors": []
+            },
+            {
+                "style": "CT100617",
+                "name": "Rain Defender zip-mock hoodie",
+                "brand": "Carhartt",
+                "summary": "Heavyweight comfort with a water-repellent finish.",
+                "preferredColor": "Carbon Heather",
+                "excludedColors": []
+            },
+            {
+                "style": "CT103828",
+                "name": "Duck Detroit jacket",
+                "brand": "Carhartt",
+                "summary": "The classic work jacket, ready for your company logo.",
+                "preferredColor": "Carhartt Brown",
+                "excludedColors": []
+            }
+        ],
+        "hoodies": [
+            {
+                "style": "CTK121",
+                "name": "Midweight hooded sweatshirt",
+                "brand": "Carhartt",
+                "summary": "An everyday layer for the team.",
+                "preferredColor": "Black",
+                "excludedColors": ["Dark Brown"]
+            },
+            {
+                "style": "F281",
+                "name": "Super Heavyweight hoodie",
+                "brand": "Sport-Tek",
+                "summary": "A substantial, comfortable cold-weather layer.",
+                "preferredColor": "Black",
+                "excludedColors": []
+            }
+        ],
+        "beanies": [
+            {
+                "style": "CT104597",
+                "name": "Watch cap",
+                "brand": "Carhartt",
+                "summary": "A winter staple with your logo embroidered on the front.",
+                "preferredColor": "Black",
+                "excludedColors": []
+            }
+        ],
+        "gloves": [
+            {
+                "style": "CTGD0794",
+                "name": "Fleece gloves",
+                "brand": "Carhartt",
+                "summary": "A useful finishing touch. Gloves are supplied without embroidery.",
+                "preferredColor": "Black Barley",
+                "excludedColors": []
+            }
+        ]
+    }
+}

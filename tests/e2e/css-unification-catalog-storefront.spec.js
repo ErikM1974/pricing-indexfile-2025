@@ -2,6 +2,13 @@ const {test,expect}=require('@playwright/test'),fs=require('node:fs'),path=requi
 const {open,snapshot,check}=require('./helpers/catalog-storefront-browser');
 const root=path.resolve(__dirname,'../..'),out=path.join(__dirname,'screenshots/css-unification'),capture=process.env.CAPTURE_CATALOG_STOREFRONT_ORIGINAL==='1',phase=capture?'original':'current';
 test.use({timezoneId:'America/Los_Angeles',locale:'en-US',reducedMotion:'reduce'});
+for(const mode of ['active','expired','failed'])test('holiday catalog promotion: '+mode,async({page})=>{
+ const events=await open(page,{url:'/catalog',campaignExpired:mode==='expired',campaignFailed:mode==='failed'}),feature=page.locator('.holiday-catalog-feature');
+ await expect(page.locator('.pcard')).toHaveCount(4);
+ if(mode==='expired')await expect(feature).toBeHidden();
+ else {await expect(feature).toContainText(mode==='failed'?'Offer details could not load':'October 15, 2026');await expect(feature.locator('a')).toHaveAttribute('href','/christmas-bundles.html');}
+ check(expect,events);
+});
 async function evidence(page,name,events,{paper=true,noticeChecked=false}={}){
  const states=[];fs.mkdirSync(out,{recursive:true});
  for(const width of [1440,768,390,320]){
@@ -32,7 +39,8 @@ async function evidence(page,name,events,{paper=true,noticeChecked=false}={}){
   // Successful-add notices expire after eight seconds. Check their exact original
   // text, destination and keyboard dismissal before this multi-viewport capture.
   const noticeLink=link=>noticeChecked&&link.href==='/quote-cart'&&/^(?:Set sizes & view quote|View quote) \(\d+\)$/.test(link.text);
-  const contentLinks=links=>links.filter(link=>!navigation.includes(JSON.stringify(link))&&!noticeLink(link));
+  // The authorized holiday feature has its own active/expired/failure tests below.
+  const contentLinks=links=>links.filter(link=>!navigation.includes(JSON.stringify(link))&&!noticeLink(link)&&!(link.href==='/christmas-bundles.html'&&link.text==='Build a holiday gift box'));
   for(let i=0;i<states.length;i++){
    const expectedIds={...before.states[i].ids};
    // The legacy sample-drawer stylesheet exposed the mobile-only filter close

@@ -1,5 +1,23 @@
 # LESSONS LEARNED
 
+## Evidence hashes must survive checkout line endings (2026-09-13)
+
+- Problem/root cause: an immutable JSON evidence check passed on Windows but failed on Linux because Git changed physical CRLF bytes to LF.
+- Solution: normalize physical line endings to LF before hashing text evidence, using the original tracked fixture without changing its content.
+- Prevention: pin the canonical LF checksum; preserve original fixtures and make cross-platform byte assumptions explicit. Require the exact release commit to pass CI before deploying.
+
+## Holiday requests must share receipt and inventory contracts (2026-09-13)
+
+- Problem/root cause: supported-size placeholder zeros looked like sold-out stock. A rebuilt request also needs the existing receipt’s fee types and address parser, not only a successful save.
+- Solution: use actual SanMar inventory with catalog colors; compute one box through the real eight-piece embroidery tier; use server-validated invitation grants and prices. Save a Draft with confirmed lines, then mark Open. SHIP is a fee line and XMAS references are accepted by both receipt routers.
+- Prevention: test real calculator parity, malformed/duplicate stock, partial writes and reload retries, receipt totals and logo access, staff inbox placement and payment blocking. Persist email send intent; uncertain delivery must not automatically resend. Cross-dyno exactly-once creation still requires a unique database key or durable lock.
+- Shared-workflow follow-up: an intentional inbox heading change must enter its browser content comparison as well as source mappings. Assert the new heading explicitly while preserving every original figure and the immutable fixture.
+
+## New pages must enter the CSS ownership checks (2026-09-13)
+
+- Problem/root cause: per-page CSS guards covered manifest entries, but the runtime census did not fail when a new application page was omitted. Four reviewed training pages also lacked pointers to their existing browser suite.
+- Solution/prevention: require every tracked application/served-archive page to be registered; require shared foundations and a real browser-test owner. Codex and Claude instructions point to one current authoring checklist. Keep the template aligned, stage new source before local census checks, and retain visual review instead of treating registry presence as certification.
+
 ## Shared form resets and print dialogs need explicit ownership (2026-09-12)
 
 - Problem/root cause: an unlayered designer reset overrode layered form spacing; global keyboard shortcuts could consume modal field input, and timed print cleanup could remove content before the print dialog finished. Narrow size columns clipped fractional dimensions.
@@ -124,28 +142,11 @@ Exact-source CI must pass its actual browser/parity jobs, including credentials 
 
 Quote-operation access rollout (2026-09-07) is archived in LESSONS_LEARNED_ARCHIVE.md; caller/quote scope and live-mutation boundaries remain enforced by quote-sync-access.test.js.
 
-## A reviewed page wrapper is not a reviewed external app (2026-09-09)
-
-Problem: the CSS census omitted Jotform scripts and its external-owner backlog named only three Caspio pages. Root cause: provider recognition did not match the currently loaded embeds. Solution: recognize Jotform and explicitly retain vendor-owned UI as pending even after its surrounding page is reviewed. Prevention: lock live embed IDs/URLs, test wrapper boundaries with login/table/empty/failure fixtures and block all real provider writes; do not describe synthetic fixture coverage as validation of a vendor app. Check DESIGN_COLOUR_CODE before mapping an inherited palette: announcement admin tools are neutral; legacy maroon does not make them AE-owned.
-
-## Monitoring data needs complete responses and visible persistence failures (2026-09-09)
-
-Problem/root cause: malformed usage could appear as zero, partial schema could mark tables gone, and local review storage assumed every read/write succeeded. Solution: validate complete responses before rendering, preserve snapshot evidence and notes, distinguish unknown from zero, show export/retry paths and clear only recovered errors. Prevention: exercise malformed/partial/denied storage and successful recovery with synthetic records, preserve the original snapshot, and inspect current-value PDFs. Print long reports in block flow; inherited flex/min-height can create a blank trailing sheet even when PDF text is complete.
-
 ## Record workspaces need current-response checks before secondary writes (2026-09-10)
 
 - Problem/root cause: A stale linked quote can update the current lead after refresh; removed kit/art hosts can still receive asynchronous callbacks. Native dialog conversion and fixed banners can also lose focus or cover recovery controls.
 - Solution: bind quote rendering and existing value sync to the current view sequence, lead object, quote ID and connected target. Reject malformed replies, ignore superseded loads, preserve uncertain outreach warnings beside the action, contain modal focus, and block all unknown API traffic in previews.
 - Prevention: mock delayed responses and every write, verify unchanged valid quote sync and original payloads, reverse recorded controller changes into original source hashes, and retain explicit shared-module ownership. Inspect populated PDFs: narrow grids can split money; give the order table full width and verify every row and rendered page. Precompute file updates before writing so a missing preview anchor cannot leave a partial batch. Timestamp-based browser snapshots must set the baseline time zone explicitly; fixed Date.now alone does not standardize local date formatting on Windows and Linux.
-
-## Personalization forms must preserve saved details and complete paper output (2026-09-09)
-
-**Problem:** Saved catalog styles reopened blank; custom styles interrupted loading, and editing manual styles threw. Wide roster printouts clipped garment/custom columns.
-**Root cause:** The loader populated only the custom dropdown path although saved forms create manual inputs; subsequent handlers assumed every style control was a select. The editable roster table was wider than the printed page.
-**Solution:** Restore saved styles and custom flags in manual rows, clear prior lookup constraints, guard dropdown-only handlers and retain flags through row rebuilds. Render the active roster group on paper in bounded column sections with repeated identities/headings, using existing descriptors and unchanged size-breakdown output.
-**Prevention:** Test catalog/custom round trips, row rebuilding, editing and loading after another order. Check narrow layouts, complete PDF values and multi-page headings; use the shared dialog lifecycle with native dialogs for keyboard focus and scroll restoration.
-
-**Personalization recovery follow-up:** Validate roster arrays before replacing current data; obsolete load/search/OCR/save responses must not change a newer view. Keep failed loads inert with visible retry, clear canceled OCR UI and preserve keyboard file access. Save success must match the API envelope; lock duplicate submissions and scope acknowledgments/navigation to the originating roster. Original native CSV and payload comparisons plus rejection/race tests prevent silent drift. Validate Excel groups/rows before replacing data; ignore obsolete files/views and imports preceding a save. Collect unsaved cells before adding a group; keep required-input errors inside native dialogs. Monogram ItemsJSON and save IDs/HTTP status must be validated before replacing names or clearing dirty state. Picker label clicks already dispatch native checkbox clicks; never toggle both. Return focus after Done/Escape, keep retry errors in place and preserve original proof fonts/colors when removing global print overrides.
 
 ## 2026-09-12: Background calculator rendering must not move keyboard focus
 

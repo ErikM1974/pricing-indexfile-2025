@@ -1092,7 +1092,7 @@ app.get('/api/portal/me', portalLimiter, requireCustomer, (req, res) => {
 // ShopWorks refs and ShipStation state never reach the browser):
 //   TrackingNumber/ShippedAt → Shipped · ShopWorks order/DateOrderPlaced → Ordered ·
 //   cancelled → Cancelled · ExpiresAt in the past / expired → Expired · else Open.
-const PORTAL_QUOTE_ID_RE = /^[A-Z]{2,5}[-\d]+-?\d*$/;  // the shape GET /quote/:quoteId accepts
+const PORTAL_QUOTE_ID_RE = /^(?:[A-Z]{2,5}[-\d]+-?\d*|XMAS-[A-F0-9]{28})$/;  // the shape GET /quote/:quoteId accepts
 function projectPortalQuote(q) {
   const quoteId = String(q.QuoteID || '');
   const shipped = !!(q.TrackingNumber || q.ShippedAt);
@@ -2108,6 +2108,7 @@ app.get('/api/stripe-config', (req, res) => {
 
 // POST /api/create-payment-intent - Create Stripe payment intent
 app.post('/api/create-payment-intent', async (req, res) => {
+  if (/^XMAS-/i.test(String(req.body?.orderId || ''))) return res.status(409).json({ error: 'Holiday gift-box requests require staff review before invoicing.' });
   try {
     const mode = process.env.STRIPE_MODE || 'development';
     const secretKey = mode === 'production'

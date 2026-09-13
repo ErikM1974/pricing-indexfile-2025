@@ -11,6 +11,8 @@ const FILES = [
     'emailjs-template-mockup-customer-approval.html',
     'pages/golf-tournament-customer-emailjs-template.html',
     'pages/golf-tournament-lead-emailjs-template.html',
+    'email-templates/holiday-box-customer.html',
+    'email-templates/holiday-box-sales.html',
 ];
 const THEME = 'shared_components/css/email-theme.css';
 const read = file => fs.readFileSync(path.join(ROOT, file), 'utf8').replace(/\r\n/g, '\n');
@@ -61,7 +63,7 @@ function main() {
         return;
     }
     if (!check) for (const entry of changed) fs.writeFileSync(path.join(ROOT, entry.file), entry.output);
-    console.log(check ? 'All four email templates match their shared theme.' : 'Updated ' + changed.length + ' email templates.');
+    console.log(check ? 'All ' + FILES.length + ' email templates match their shared theme.' : 'Updated ' + changed.length + ' email templates.');
 }
 if (require.main === module) main();
 module.exports = { FILES, THEME, compile };
