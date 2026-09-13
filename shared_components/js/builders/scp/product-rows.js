@@ -1111,6 +1111,7 @@ export function toggleColorPicker(rowId) {
     // role/id/aria-selected lazily on open; keep aria-expanded truthful.
     const nowOpen = !dropdown.classList.contains('hidden');
     pickerSelected.setAttribute('aria-expanded', String(nowOpen));
+    pickerSelected.setAttribute('aria-controls', dropdown.id);
     // P1 (2026-07-10): pin to viewport so table-card overflow can't clip the list
     if (nowOpen) positionColorDropdown(pickerSelected, dropdown);
     if (nowOpen) {
@@ -1205,6 +1206,8 @@ export function selectColor(rowId, optionEl) {
     const existingRow = findExistingRow(style, catalogColor, rowId);
     if (existingRow) {
         row.querySelector('.color-picker-dropdown').classList.add('hidden');
+    row.querySelector('.color-picker-selected').setAttribute('aria-expanded', 'false');
+    row.querySelector('.color-picker-selected').removeAttribute('aria-activedescendant');
         const moved = mergeDuplicateRowInto(existingRow, rowId);
         showToast(`${style} in ${colorName} is already on the quote — ${moved > 0 ? `merged ${moved} pc into` : 'jumped to'} that row.`, 'info');
         if (typeof markScreenPrintDirty === 'function') markScreenPrintDirty();
@@ -1253,6 +1256,8 @@ export function selectColor(rowId, optionEl) {
 
     // Close dropdown
     row.querySelector('.color-picker-dropdown').classList.add('hidden');
+    row.querySelector('.color-picker-selected').setAttribute('aria-expanded', 'false');
+    row.querySelector('.color-picker-selected').removeAttribute('aria-activedescendant');
 
     // Enable size inputs initially (may be disabled by detectAndAdjustSizeUI for special products)
     row.querySelectorAll('.size-input').forEach(input => /** @type {HTMLInputElement} */ (input).disabled = false);
@@ -1429,6 +1434,8 @@ export function selectChildColor(childRowId, parentRowId, optionEl) {
 
     // Close dropdown
     childRow.querySelector('.color-picker-dropdown').classList.add('hidden');
+    childRow.querySelector('.color-picker-selected').setAttribute('aria-expanded', 'false');
+    childRow.querySelector('.color-picker-selected').removeAttribute('aria-activedescendant');
 
     // Update visual indicator for different color
     updateChildRowColorIndicators(parentRowId);

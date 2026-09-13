@@ -7,7 +7,11 @@ for(const method of ['embroidery','screenprint','dtf','dtg','screenprint-fast'])
  const url='/quote-builders/'+(method==='screenprint-fast'?'screenprint-fast-quote':method+'-quote-builder')+'.html';
  const e=await open(page,{original,url});
  await page.waitForLoadState('networkidle');
- if(!original&&method==='embroidery'){await evidence(page,method+'-initial',e);return;}
+ if(!original&&method==='screenprint'){
+  await expect(page.locator('#toast-container')).toContainText('Vellum rate is an estimate');
+  await expect(page.locator('#toast-container')).toContainText('Color Chg rate is an estimate');
+ }
+ if(!original&&['embroidery','screenprint'].includes(method)){await evidence(page,method+'-initial',e);return;}
  fs.mkdirSync(out,{recursive:true});
  // This discovery record remains local until every observed request is mapped.
  fs.writeFileSync(path.join(out,'quote-builder-'+method+'-network.json'),JSON.stringify(e,null,2)+'\n');

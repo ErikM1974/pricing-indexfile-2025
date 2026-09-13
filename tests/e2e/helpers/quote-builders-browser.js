@@ -76,7 +76,14 @@ async function open(page,state={}){
   if(p==='/api/dtg/product-bundle')return route.fulfill({status:state.pricingFailed?503:200,json:{product:{...details(style)[0],styleNumber:style,colors:details(style)},pricing:{tiers:dtg.tiersR,costs:dtg.allDtgCostsR,sizes:dtg.sizes,upcharges:dtg.sellingPriceDisplayAddOns}}});
   if(p==='/api/dtg/top-sellers/styles')return route.fulfill({json:{records:[state.richCatalog?{style:'PC54',product_title:'Essential Cotton Tee',category:'T-Shirts',style_rank:1,total_units_sold:480,total_orders:12,main_image_url:image,top_color:'Jet Black',top_colors:colors.map((c,i)=>({color_name:c.name,catalog_color:c.catalog,front_image_url:image,swatch_image_url:image,color_units_sold:240,color_rank:i+1})),color_count:2}:{style:'PC54'}]}});
   if(p==='/api/dtg/top-sellers')return route.fulfill({json:{records:colors.map((c,i)=>({style:'PC54',product_title:'Essential Cotton Tee',category:'T-Shirts',style_rank:1,total_units_sold:480,total_orders:12,color_name:c.name,catalog_color:c.catalog,swatch_image_url:image,color_units_sold:240,color_rank:i+1,sizes:{S:20,M:120,L:100}}))}});
-  if(p==='/api/service-codes')return route.fulfill({json:pricing('service-codes.json')});
+  if(p==='/api/service-codes'){
+   const data=pricing('service-codes.json');
+   if(state.scpFees){
+    data.data.push(...[['Vellum',10],['Color Chg',15]].map(([ServiceCode,SellPrice])=>({ServiceCode,SellPrice,ServiceType:'SCREENPRINT',IsActive:true,Visible:true})));
+    data.count=data.data.length;
+   }
+   return route.fulfill({json:data});
+  }
   if(p==='/api/pricing-bundle'){
    const method=u.searchParams.get('method'),files={PATCH:'patch-bundle.json',BLANK:'blank-bundle-PC54.json',DTF:'dtf-bundle.json',EMB:'emb-bundle-PC54.json','EMB-AL':'emb-al-bundle.json',CAP:'cap-bundle-C112.json','CAP-AL':'cap-al-bundle.json','CAP-PUFF':'cap-puff-bundle.json',ScreenPrint:'scp-bundle-PC61.json'};
    if(method==='DTG'||files[method]){const data=method==='DTG'?clone(dtg):pricing(files[method]);if(method==='DTF')data.sizes=Object.entries(sizePricing(style)[0].basePrices).map(([size,price],i)=>({size,price,sortOrder:i+1}));return route.fulfill({status:state.pricingFailed?503:200,json:data});}

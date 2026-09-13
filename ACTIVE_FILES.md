@@ -1521,3 +1521,17 @@ Garment designer completion: page styles are scoped to the unified designer; art
 - shared_components/css/quote-embroidery.css — scoped canonical quote workspace presentation; staged adoption on the embroidery flagship.
 
 - shared_components/css/quote-invoice.css — shared canonical quote invoice presentation for EMB/SCP/DTF/DTG; all financial calculations retained in the original generator.
+
+- tests/fixtures/quote-builders-screenprint-healthy-products-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-screenprint-healthy-safety-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-screenprint-healthy-locations-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-screenprint-healthy-fees-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-screenprint-healthy-recommendations-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-screenprint-healthy-shipping-fields-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- shared_components/css/quote-screenprint.css — canonical Screen Print configuration and paper layout; shares workspace fields/dialogs/artwork with the other builders.

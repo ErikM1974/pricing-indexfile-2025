@@ -27,6 +27,10 @@ for(const method of ['embroidery','screenprint','dtf'])for(const scene of ['prod
  // Use a fully intercepted synthetic production origin for their original draft output.
  const origin=scene==='invoice'&&method!=='embroidery'?'https://quote-builder.example.invalid':'';
  const e=await open(page,{original,realPreview:scene==='invoice'&&!original,save:scene==='save',url:origin+'/quote-builders/'+method+'-quote-builder.html'});
+ if(!original&&method==='screenprint'){
+  await expect(page.locator('#toast-container')).toContainText('Vellum rate is an estimate');
+  await expect(page.locator('#toast-container')).toContainText('Color Chg rate is an estimate');
+ }
  await addProduct(page,method);
  if(scene==='colors')await page.locator('tr[data-style] .color-picker-selected').first().click();
  if(scene==='extended-sizes')await page.locator('tr[data-style] .xxxl-picker-btn').first().click();
@@ -48,6 +52,39 @@ for(const method of ['embroidery','screenprint','dtf'])for(const scene of ['prod
  await evidence(page,method+'-'+scene,e);
 });
 
+for(const scene of ['products','locations','fees','safety','recommendations','shipping-fields'])test('CSS quote builders: screenprint healthy-'+scene,async({page})=>{
+ page.setDefaultTimeout(15000);
+ const e=await open(page,{original,scpFees:true,safetyRecs:scene==='recommendations',url:'/quote-builders/screenprint-quote-builder.html'});
+ await addProduct(page,'screenprint');
+ if(scene==='locations'){
+  await page.locator('.guided-step[data-step="1"]').click();
+  await page.locator('#dark-garment-toggle').check();
+  await page.locator('label.ink-btn').filter({has:page.locator('input[name="front-colors"][value="3"]')}).click();
+  await page.locator('input[name="back-location"][value="FB"]').check();
+  await page.locator('label.ink-btn').filter({has:page.locator('input[name="back-colors"][value="2"]')}).click();
+  await page.locator('#left-sleeve-toggle').check();
+  await page.locator('#right-sleeve-toggle').check();
+ }
+ if(scene==='fees'){
+  await page.locator('.guided-step[data-step="0"]').click();
+  await page.locator('[data-call="toggleFeesCharges"]').click();
+  for(const [id,value] of [['graphic-design-hours','2'],['vellum-qty','3'],['color-change-qty','2'],['rush-fee','50']]){
+   await page.locator('#'+id).fill(value);await page.locator('#'+id).dispatchEvent('change');
+  }
+ }
+ if(scene==='safety'){
+  await page.locator('.guided-step[data-step="1"]').click();await page.locator('#safety-stripes-toggle').check();
+  await page.locator('.guided-toggle').click();
+ }
+ if(scene==='recommendations')await page.locator('#scp-safety-recs .ssr-head').click();
+ if(scene==='shipping-fields'){
+  await page.locator('.guided-step[data-step="3"]').click();
+  await page.locator('[data-call="toggleOrderShippingPanel"]').click();
+  await expect(page.locator('.os-po-number')).toBeVisible();
+ }
+ await page.waitForLoadState('networkidle');await evidence(page,'screenprint-healthy-'+scene,e);
+});
+
 for(const scene of ['import','shipping','design-gallery'])test('CSS quote builders: embroidery '+scene,async({page})=>{
  page.setDefaultTimeout(15000);
  const e=await open(page,{original,url:'/quote-builders/embroidery-quote-builder.html'});await addProduct(page,'embroidery');
@@ -67,14 +104,49 @@ for(const scene of ['caps','caps-puff','caps-patch','full-back','services-artwor
   await page.locator('#customer-name').fill('Example Customer');await page.locator('#customer-email').fill('customer@example.invalid');
   await page.locator('.guided-step[data-step="3"]').click();await page.locator('.btn-share-link').click();
   await expect(page.locator('#quote-share-modal')).toBeHidden();await expect(page.locator('.btn-share-link')).toBeEnabled();
+  await expect(page.locator('#toast-container')).toContainText('Error saving quote: Session save failed: {"error":"Synthetic save failure"}');
  } else {
   await page.locator('.guided-step[data-step="1"]').click();
   if(scene==='caps-puff')await page.locator('#cap-embellishment-type').selectOption('3d-puff');
   if(scene==='caps-patch')await page.locator('#cap-embellishment-type').selectOption('laser-patch');
-  if(scene==='full-back')await page.locator('#primary-position').selectOption('Full Back');
+  if(scene==='full-back'){
+   await page.locator('#primary-position').selectOption('Full Back');
+   await expect(page.locator('#toast-container')).toContainText('Full Back requires minimum 25,000 stitches');
+  }
   if(scene.startsWith('services-'))await page.locator('.service-cat-btn').filter({hasText:{'services-artwork':'Artwork','services-add-ons':'Add-Ons','services-supplied':'Customer-Supplied'}[scene]}).click();
  }
  await page.waitForLoadState('networkidle');await evidence(page,'embroidery-'+scene,e);
+});
+
+test('CSS quote builders: screenprint keyboard ink and shipping controls',async({page})=>{
+ test.skip(original,'Native ink and expandable-panel keyboard regression.');
+ const e=await open(page,{scpFees:true,url:'/quote-builders/screenprint-quote-builder.html'});
+ for(const width of [320,390,768,1440]){
+  await page.setViewportSize({width,height:1000});
+  const emptyFits=await page.locator('.product-table-wrapper').evaluate(n=>{
+   n.scrollLeft=n.scrollWidth;const box=n.getBoundingClientRect();
+   const fits=[...n.querySelectorAll('.qb-empty-state > div')].every(d=>{const b=d.getBoundingClientRect();return b.left>=box.left&&b.right<=box.right;});n.scrollLeft=0;return fits;
+  });expect(emptyFits,'empty instructions remain readable at the far edge').toBe(true);
+ }
+ await page.setViewportSize({width:320,height:1000});await addProduct(page,'screenprint');
+ await page.locator('.guided-step[data-step="1"]').focus();await page.keyboard.press('Enter');
+ const ink=page.locator('input[name="front-colors"][value="1"]');await ink.focus();await expect(ink).toBeFocused();
+ await page.keyboard.press('ArrowRight');await expect(page.locator('input[name="front-colors"][value="2"]')).toBeChecked();
+ await expect(page.locator('#setup-fee-display')).toHaveText('$60.00');
+ await page.keyboard.press('ArrowLeft');await expect(ink).toBeChecked();
+ await expect(page.locator('#sidebar-grand-total')).toHaveText('$667.81');
+ await page.locator('.guided-step[data-step="0"]').click();
+ const fees=page.locator('[data-call="toggleFeesCharges"]');await fees.focus();await fees.press('Space');await expect(page.locator('#vellum-qty')).toBeVisible();
+ await page.locator('.guided-step[data-step="3"]').click();
+ const shipping=page.locator('[data-call="toggleOrderShippingPanel"]');await shipping.focus();await shipping.press('Enter');await expect(page.locator('.os-po-number')).toBeVisible();
+ await page.locator('.os-po-number').fill('Example PO');await shipping.press('Enter');await expect(page.locator('.os-po-number')).toBeHidden();
+ await shipping.press('Space');await expect(page.locator('.os-po-number')).toHaveValue('Example PO');
+ for(const width of [320,390,768,1440]){
+  await page.setViewportSize({width,height:1000});
+  expect(await page.locator('#tax-rate-input').evaluate(n=>n.clientWidth-parseFloat(getComputedStyle(n).paddingLeft)-parseFloat(getComputedStyle(n).paddingRight)), 'tax amount has room for digits and spinner').toBeGreaterThanOrEqual(64);
+  expect(await page.locator('.os-shipping-fee').evaluate(n=>{const currency=n.parentElement.querySelector('[data-order-style="currency"]').getBoundingClientRect();return n.getBoundingClientRect().left+parseFloat(getComputedStyle(n).paddingLeft)>currency.right;}),'shipping amount clears its currency prefix').toBe(true);
+ }
+ expect(e.errors).toEqual([]);expect(e.unknown).toEqual([]);expect(e.writes).toEqual([]);expect(e.mutations).toEqual([]);
 });
 
 test('CSS quote builders: embroidery keyboard and responsive controls',async({page})=>{

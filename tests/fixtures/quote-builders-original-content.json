@@ -1018,6 +1018,276 @@
       "before": "    /** Wait for the printed document, external styles, images and fonts to finish loading. */\n    async printWhenReady(printWindow) {\n        if (!printWindow || printWindow.closed) throw new Error('The quote window was closed or blocked.');\n        if (printWindow.document.readyState !== 'complete') {\n            await new Promise(resolve => printWindow.addEventListener('load', resolve, { once: true }));\n        }\n        const stylesheets = [...printWindow.document.querySelectorAll('[data-invoice-styles]')];\n        if (stylesheets.length !== 3 || stylesheets.some(link => !link.sheet)) {\n            throw new Error('Quote formatting could not load. Please try printing again.');\n        }\n        if (printWindow.document.fonts) await printWindow.document.fonts.ready;\n        if (!printWindow.closed) printWindow.print();\n    }\n\n",
       "after": "    /** Wait for actual print assets; document.write can report complete before its links load. */\n    async printWhenReady(printWindow) {\n        const failure = () => new Error('Quote formatting could not load. Please try printing again.');\n        if (!printWindow || printWindow.closed) throw new Error('The quote window was closed or blocked.');\n        const doc = printWindow.document;\n        const stylesheets = [...doc.querySelectorAll('[data-invoice-styles]')];\n        if (stylesheets.length !== 3) throw failure();\n        const cleanup = [];\n        let timeout;\n        const loaded = (node, required) => new Promise((resolve, reject) => {\n            const done = () => resolve();\n            const failed = () => required ? reject(failure()) : resolve();\n            node.addEventListener('load', done, { once: true });\n            node.addEventListener('error', failed, { once: true });\n            cleanup.push(() => { node.removeEventListener('load', done); node.removeEventListener('error', failed); });\n        });\n        try {\n            await Promise.race([\n                (async () => {\n                    await Promise.all([\n                        ...stylesheets.filter(link => !link.sheet).map(link => loaded(link, true)),\n                        ...[...doc.images].filter(img => !img.complete).map(img => loaded(img, false))\n                    ]);\n                    if (doc.fonts) await doc.fonts.ready;\n                })(),\n                new Promise((resolve, reject) => { timeout = setTimeout(() => reject(failure()), 20000); })\n            ]);\n            if (printWindow.closed) throw new Error('The quote window was closed.');\n            printWindow.print();\n        } finally {\n            clearTimeout(timeout);\n            cleanup.forEach(remove => remove());\n        }\n    }\n\n",
       "count": 1
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "<body class=\"scp-builder qb-shell-body\">",
+      "after": "<body class=\"scp-builder qb-shell-body\" data-ui=\"unified\" data-quote-workspace=\"screenprint\">",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "family=Inter:wght@400;500;600;700",
+      "after": "family=Public+Sans:wght@400;500;600;700",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "<link href=\"/shared_components/vendor/bootstrap/css/bootstrap.min.css?v=2026.07.08.8\" rel=\"stylesheet\">",
+      "after": "<!-- Quote workspace replaces bootstrap.min.css on this page. -->",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "<link rel=\"stylesheet\" href=\"/shared_components/css/quote-builder-common.css?v=2026.09.07.19\">",
+      "after": "<!-- Quote workspace replaces quote-builder-common.css on this page. -->",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "<link rel=\"stylesheet\" href=\"/shared_components/css/quote-builder-shell.css?v=2026.09.07.19\">",
+      "after": "<!-- Quote workspace replaces quote-builder-shell.css on this page. -->",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "<link rel=\"stylesheet\" href=\"/shared_components/css/quote-builder-guided.css?v=2026.09.07.16\">",
+      "after": "<!-- Quote workspace replaces quote-builder-guided.css on this page. -->",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "<link rel=\"stylesheet\" href=\"/shared_components/css/screenprint-quote-builder-extracted.css?v=2026.09.07.19\">",
+      "after": "<!-- Quote workspace replaces screenprint-quote-builder-extracted.css on this page. -->",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "<link rel=\"stylesheet\" href=\"/shared_components/css/color-picker-shared.css?v=2026.09.07.16\">",
+      "after": "<!-- Quote workspace replaces color-picker-shared.css on this page. -->",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "<link rel=\"stylesheet\" href=\"/shared_components/css/quote-share-modal.css?v=2026.09.07.19\">",
+      "after": "<!-- Quote workspace replaces quote-share-modal.css on this page. -->",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "<link rel=\"stylesheet\" href=\"/shared_components/css/customer-lookup.css?v=2026.09.07.19\">",
+      "after": "<!-- Quote workspace replaces customer-lookup.css on this page. -->",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "<link rel=\"stylesheet\" href=\"/shared_components/css/quote-session.css?v=2026.09.07.16\">",
+      "after": "<!-- Quote workspace replaces quote-session.css on this page. -->",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "<link rel=\"stylesheet\" href=\"/shared_components/css/quote-builder-utilities.css?v=2026.09.07.19\">",
+      "after": "<!-- Quote workspace replaces quote-builder-utilities.css on this page. -->",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "</head>",
+      "after": "    <link rel=\"stylesheet\" href=\"/shared_components/css/components.css?v=2026.09.12.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/utilities.css?v=2026.09.12.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/quote-workspace.css?v=2026.09.12.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/quote-screenprint.css?v=2026.09.12.2\">\n</head>",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "qb-cols-1fr-1fr-gap-8",
+      "after": "workspace-customer-grid",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "qb-span-all",
+      "after": "workspace-customer-span",
+      "count": 2
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "qb-fwrap-wrap-gap-6-m-4-0",
+      "after": "workspace-customer-search-row",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "qb-fwrap-wrap-gap-24-ai-flex-end-pt-8",
+      "after": "workspace-charge-fields",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "qb-fd-column-gap-6-mb-12",
+      "after": "workspace-location-stack",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "qb-bt-1-solid-gray-200-pt-10-mb-12",
+      "after": "workspace-sleeve-inks",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "qb-bt-1-solid-gray-200-pt-10",
+      "after": "workspace-ink-section",
+      "count": 2
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "qb-fs-20-fw-700-c-store-green-700",
+      "after": "workspace-setup-total",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/builders/scp/product-rows.js",
+      "before": "pickerSelected.setAttribute('aria-expanded', String(nowOpen));",
+      "after": "pickerSelected.setAttribute('aria-expanded', String(nowOpen));\n    pickerSelected.setAttribute('aria-controls', dropdown.id);",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/builders/scp/product-rows.js",
+      "before": "row.querySelector('.color-picker-dropdown').classList.add('hidden');",
+      "after": "row.querySelector('.color-picker-dropdown').classList.add('hidden');\n    row.querySelector('.color-picker-selected').setAttribute('aria-expanded', 'false');\n    row.querySelector('.color-picker-selected').removeAttribute('aria-activedescendant');",
+      "count": 2
+    },
+    {
+      "file": "shared_components/js/builders/scp/product-rows.js",
+      "before": "childRow.querySelector('.color-picker-dropdown').classList.add('hidden');",
+      "after": "childRow.querySelector('.color-picker-dropdown').classList.add('hidden');\n    childRow.querySelector('.color-picker-selected').setAttribute('aria-expanded', 'false');\n    childRow.querySelector('.color-picker-selected').removeAttribute('aria-activedescendant');",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "<div class=\"product-table-wrapper\">",
+      "after": "<div class=\"product-table-wrapper\" role=\"region\" aria-label=\"Quote products — scroll to view all sizes and prices\" tabindex=\"0\">",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/quote-builder-utils.js",
+      "before": "function renderOrderShippingFields(containerId) {\n    const container = document.getElementById(containerId);\n    if (!container) return;\n\n    const stateOptions = US_STATES.split(',').map(s =>\n        `<option value=\"${s}\"${s === 'WA' ? ' selected' : ''}>${s}</option>`\n    ).join('');\n\n    // eslint-disable-next-line no-unsanitized/property -- audited (1.4): US_STATES internal const only\n    container.innerHTML = `\n        <div class=\"order-shipping-panel\">\n            <div class=\"charges-header\" data-call=\"toggleOrderShippingPanel\" data-args=\"${escapeHtml(JSON.stringify([containerId]))}\">\n                <div class=\"d-flex align-items-center gap-2\">\n                    <i class=\"fas fa-truck\" aria-hidden=\"true\"></i>\n                    <span>Order & Shipping</span>\n                    <span class=\"order-shipping-badge charges-badge hidden\">!</span>\n                </div>\n                <i class=\"order-shipping-chevron fas fa-chevron-down collapsible-chevron\" aria-hidden=\"true\"></i>\n            </div>\n            <div class=\"order-shipping-content charges-content hidden\">\n                <div class=\"d-flex flex-column gap-2\" style=\"padding: 8px 0;\">\n                    <!-- Phone + Order # -->\n                    <div class=\"d-flex gap-2\">\n                        <div class=\"customer-field\" style=\"flex: 1;\">\n                            <label class=\"quote-label\" style=\"font-size: 11px;\">Phone</label>\n                            <input type=\"tel\" class=\"os-phone quote-input\" aria-label=\"Customer phone\" placeholder=\"(253) 555-1234\" style=\"font-size: 12px; padding: 6px 8px;\">\n                        </div>\n                        <div class=\"customer-field\" style=\"flex: 1;\">\n                            <label class=\"quote-label\" style=\"font-size: 11px;\">Order #</label>\n                            <input type=\"text\" class=\"os-order-number quote-input\" aria-label=\"ShopWorks order number\" placeholder=\"ShopWorks #\" style=\"font-size: 12px; padding: 6px 8px;\">\n                        </div>\n                    </div>\n                    <!-- PO # + Shipping Fee -->\n                    <div class=\"d-flex gap-2\">\n                        <div class=\"customer-field\" style=\"flex: 1;\">\n                            <label class=\"quote-label\" style=\"font-size: 11px;\">PO #</label>\n                            <input type=\"text\" class=\"os-po-number quote-input\" aria-label=\"Customer PO number\" placeholder=\"Purchase Order\" style=\"font-size: 12px; padding: 6px 8px;\">\n                        </div>\n                        <div class=\"customer-field\" style=\"flex: 1;\">\n                            <label class=\"quote-label\" style=\"font-size: 11px;\">Shipping Fee</label>\n                            <div style=\"position: relative;\">\n                                <span style=\"position: absolute; left: 8px; top: 50%; transform: translateY(-50%); color: #666; font-size: 12px;\">$</span>\n                                <input type=\"number\" class=\"os-shipping-fee quote-input\" aria-label=\"Shipping fee\" min=\"0\" step=\"0.01\" placeholder=\"0.00\" value=\"0\"\n                                       style=\"font-size: 12px; padding: 6px 8px 6px 22px; width: 100%; box-sizing: border-box;\">\n                            </div>\n                        </div>\n                    </div>\n                    <!-- Dates -->\n                    <div class=\"d-flex gap-2\">\n                        <div class=\"customer-field\" style=\"flex: 1;\">\n                            <label class=\"quote-label\" style=\"font-size: 11px;\">Ship Date</label>\n                            <input type=\"date\" class=\"os-req-ship-date quote-input\" aria-label=\"Requested ship date\" style=\"font-size: 12px; padding: 6px 8px;\">\n                        </div>\n                        <div class=\"customer-field\" style=\"flex: 1;\">\n                            <label class=\"quote-label\" style=\"font-size: 11px;\">Drop Dead Date</label>\n                            <input type=\"date\" class=\"os-drop-dead-date quote-input\" aria-label=\"Drop-dead date\" style=\"font-size: 12px; padding: 6px 8px;\">\n                        </div>\n                    </div>\n                    <!-- Ship To Address -->\n                    <div class=\"customer-field\">\n                        <label class=\"quote-label\" style=\"font-size: 11px;\">Ship To Address</label>\n                        <input type=\"text\" class=\"os-ship-address quote-input\" aria-label=\"Ship-to street address\" placeholder=\"Street address\" style=\"font-size: 12px; padding: 6px 8px;\">\n                    </div>\n                    <div class=\"d-flex gap-2\">\n                        <div class=\"customer-field\" style=\"flex: 2;\">\n                            <input type=\"text\" class=\"os-ship-city quote-input\" aria-label=\"Ship-to city\" placeholder=\"City\" style=\"font-size: 12px; padding: 6px 8px;\">\n                        </div>\n                        <div class=\"customer-field\" style=\"flex: 0 0 60px;\">\n                            <select class=\"os-ship-state quote-input\" aria-label=\"Ship-to state\" style=\"font-size: 12px; padding: 6px 4px;\">\n                                ${stateOptions}\n                            </select>\n                        </div>\n                        <div class=\"customer-field\" style=\"flex: 0 0 80px;\">\n                            <input type=\"text\" class=\"os-ship-zip quote-input\" aria-label=\"Ship-to ZIP\" placeholder=\"ZIP\" maxlength=\"10\"\n                                   style=\"font-size: 12px; padding: 6px 8px;\">\n                        </div>\n                        <button type=\"button\" class=\"btn-tax-lookup\" title=\"Look up tax rate\">\n                            <i class=\"fas fa-search\" aria-hidden=\"true\"></i>\n                        </button>\n                    </div>\n                    <div class=\"os-tax-status\" style=\"font-size: 11px; color: #64748b; min-height: 14px;\"></div>\n                    <!-- Ship Method -->\n                    <div class=\"customer-field\">\n                        <label class=\"quote-label\" style=\"font-size: 11px;\">Ship Method</label>\n                        <select class=\"os-ship-method quote-input\" aria-label=\"Ship method\" style=\"font-size: 12px; padding: 6px 8px;\">\n                            <option value=\"\">Select...</option>\n                            <option value=\"Ground\">Ground</option>\n                            <option value=\"2-Day\">2-Day</option>\n                            <option value=\"Overnight\">Overnight</option>\n                            <option value=\"Customer Pickup\">Customer Pickup</option>\n                            <option value=\"Delivery\">Local Delivery</option>\n                        </select>\n                    </div>\n                    <!-- Notes -->\n                    <div class=\"customer-field\" style=\"margin-top: 4px;\">\n                        <label class=\"quote-label\" style=\"font-size: 11px;\"><i class=\"fas fa-sticky-note\" aria-hidden=\"true\" style=\"color: #f9a825;\"></i> Notes</label>\n                        <textarea class=\"os-notes quote-input\" aria-label=\"Order notes\" placeholder=\"Special instructions, employee names, etc.\"\n                                  style=\"font-size: 12px; padding: 6px 8px; min-height: 60px; resize: vertical; font-family: inherit;\"></textarea>\n                    </div>\n                </div>\n            </div>\n        </div>\n    `;\n}\n",
+      "after": "function renderOrderShippingFields(containerId) {\n    const container = document.getElementById(containerId);\n    if (!container) return;\n\n    const stateOptions = US_STATES.split(',').map(s =>\n        `<option value=\"${s}\"${s === 'WA' ? ' selected' : ''}>${s}</option>`\n    ).join('');\n\n    // eslint-disable-next-line no-unsanitized/property -- audited (1.4): US_STATES internal const only\n    container.innerHTML = `\n        <div class=\"order-shipping-panel\">\n            <div class=\"charges-header\" data-call=\"toggleOrderShippingPanel\" data-args=\"${escapeHtml(JSON.stringify([containerId]))}\">\n                <div class=\"d-flex align-items-center gap-2\">\n                    <i class=\"fas fa-truck\" aria-hidden=\"true\"></i>\n                    <span>Order & Shipping</span>\n                    <span class=\"order-shipping-badge charges-badge hidden\">!</span>\n                </div>\n                <i class=\"order-shipping-chevron fas fa-chevron-down collapsible-chevron\" aria-hidden=\"true\"></i>\n            </div>\n            <div class=\"order-shipping-content charges-content hidden\">\n                <div class=\"d-flex flex-column gap-2\" data-order-style=\"field-1\">\n                    <!-- Phone + Order # -->\n                    <div class=\"d-flex gap-2\">\n                        <div class=\"customer-field\" data-order-style=\"field-2\">\n                            <label class=\"quote-label\" data-order-style=\"field-3\">Phone</label>\n                            <input type=\"tel\" class=\"os-phone quote-input\" aria-label=\"Customer phone\" placeholder=\"(253) 555-1234\" data-order-style=\"field-4\">\n                        </div>\n                        <div class=\"customer-field\" data-order-style=\"field-2\">\n                            <label class=\"quote-label\" data-order-style=\"field-3\">Order #</label>\n                            <input type=\"text\" class=\"os-order-number quote-input\" aria-label=\"ShopWorks order number\" placeholder=\"ShopWorks #\" data-order-style=\"field-4\">\n                        </div>\n                    </div>\n                    <!-- PO # + Shipping Fee -->\n                    <div class=\"d-flex gap-2\">\n                        <div class=\"customer-field\" data-order-style=\"field-2\">\n                            <label class=\"quote-label\" data-order-style=\"field-3\">PO #</label>\n                            <input type=\"text\" class=\"os-po-number quote-input\" aria-label=\"Customer PO number\" placeholder=\"Purchase Order\" data-order-style=\"field-4\">\n                        </div>\n                        <div class=\"customer-field\" data-order-style=\"field-2\">\n                            <label class=\"quote-label\" data-order-style=\"field-3\">Shipping Fee</label>\n                            <div data-order-style=\"field-5\">\n                                <span data-order-style=\"field-6\">$</span>\n                                <input type=\"number\" class=\"os-shipping-fee quote-input\" aria-label=\"Shipping fee\" min=\"0\" step=\"0.01\" placeholder=\"0.00\" value=\"0\"\n                                       data-order-style=\"field-7\">\n                            </div>\n                        </div>\n                    </div>\n                    <!-- Dates -->\n                    <div class=\"d-flex gap-2\">\n                        <div class=\"customer-field\" data-order-style=\"field-2\">\n                            <label class=\"quote-label\" data-order-style=\"field-3\">Ship Date</label>\n                            <input type=\"date\" class=\"os-req-ship-date quote-input\" aria-label=\"Requested ship date\" data-order-style=\"field-4\">\n                        </div>\n                        <div class=\"customer-field\" data-order-style=\"field-2\">\n                            <label class=\"quote-label\" data-order-style=\"field-3\">Drop Dead Date</label>\n                            <input type=\"date\" class=\"os-drop-dead-date quote-input\" aria-label=\"Drop-dead date\" data-order-style=\"field-4\">\n                        </div>\n                    </div>\n                    <!-- Ship To Address -->\n                    <div class=\"customer-field\">\n                        <label class=\"quote-label\" data-order-style=\"field-3\">Ship To Address</label>\n                        <input type=\"text\" class=\"os-ship-address quote-input\" aria-label=\"Ship-to street address\" placeholder=\"Street address\" data-order-style=\"field-4\">\n                    </div>\n                    <div class=\"d-flex gap-2\">\n                        <div class=\"customer-field\" data-order-style=\"field-8\">\n                            <input type=\"text\" class=\"os-ship-city quote-input\" aria-label=\"Ship-to city\" placeholder=\"City\" data-order-style=\"field-4\">\n                        </div>\n                        <div class=\"customer-field\" data-order-style=\"field-9\">\n                            <select class=\"os-ship-state quote-input\" aria-label=\"Ship-to state\" data-order-style=\"field-10\">\n                                ${stateOptions}\n                            </select>\n                        </div>\n                        <div class=\"customer-field\" data-order-style=\"field-11\">\n                            <input type=\"text\" class=\"os-ship-zip quote-input\" aria-label=\"Ship-to ZIP\" placeholder=\"ZIP\" maxlength=\"10\"\n                                   data-order-style=\"field-4\">\n                        </div>\n                        <button type=\"button\" class=\"btn-tax-lookup\" title=\"Look up tax rate\">\n                            <i class=\"fas fa-search\" aria-hidden=\"true\"></i>\n                        </button>\n                    </div>\n                    <div class=\"os-tax-status\" data-order-style=\"field-12\"></div>\n                    <!-- Ship Method -->\n                    <div class=\"customer-field\">\n                        <label class=\"quote-label\" data-order-style=\"field-3\">Ship Method</label>\n                        <select class=\"os-ship-method quote-input\" aria-label=\"Ship method\" data-order-style=\"field-4\">\n                            <option value=\"\">Select...</option>\n                            <option value=\"Ground\">Ground</option>\n                            <option value=\"2-Day\">2-Day</option>\n                            <option value=\"Overnight\">Overnight</option>\n                            <option value=\"Customer Pickup\">Customer Pickup</option>\n                            <option value=\"Delivery\">Local Delivery</option>\n                        </select>\n                    </div>\n                    <!-- Notes -->\n                    <div class=\"customer-field\" data-order-style=\"field-13\">\n                        <label class=\"quote-label\" data-order-style=\"field-3\"><i class=\"fas fa-sticky-note\" aria-hidden=\"true\" data-order-style=\"field-14\"></i> Notes</label>\n                        <textarea class=\"os-notes quote-input\" aria-label=\"Order notes\" placeholder=\"Special instructions, employee names, etc.\"\n                                  data-order-style=\"field-15\"></textarea>\n                    </div>\n                </div>\n            </div>\n        </div>\n    `;\n}\n",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/quote-builder-utils.js",
+      "before": "data-order-style=\"field-1\"",
+      "after": "data-order-style=\"stack\"",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/quote-builder-utils.js",
+      "before": "data-order-style=\"field-2\"",
+      "after": "data-order-style=\"field\"",
+      "count": 6
+    },
+    {
+      "file": "shared_components/js/quote-builder-utils.js",
+      "before": "data-order-style=\"field-3\"",
+      "after": "data-order-style=\"label\"",
+      "count": 9
+    },
+    {
+      "file": "shared_components/js/quote-builder-utils.js",
+      "before": "data-order-style=\"field-4\"",
+      "after": "data-order-style=\"input\"",
+      "count": 9
+    },
+    {
+      "file": "shared_components/js/quote-builder-utils.js",
+      "before": "data-order-style=\"field-5\"",
+      "after": "data-order-style=\"money\"",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/quote-builder-utils.js",
+      "before": "data-order-style=\"field-6\"",
+      "after": "data-order-style=\"currency\"",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/quote-builder-utils.js",
+      "before": "data-order-style=\"field-7\"",
+      "after": "data-order-style=\"shipping-fee\"",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/quote-builder-utils.js",
+      "before": "data-order-style=\"field-8\"",
+      "after": "data-order-style=\"city\"",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/quote-builder-utils.js",
+      "before": "data-order-style=\"field-9\"",
+      "after": "data-order-style=\"state\"",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/quote-builder-utils.js",
+      "before": "data-order-style=\"field-10\"",
+      "after": "data-order-style=\"state-input\"",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/quote-builder-utils.js",
+      "before": "data-order-style=\"field-11\"",
+      "after": "data-order-style=\"postal\"",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/quote-builder-utils.js",
+      "before": "data-order-style=\"field-12\"",
+      "after": "data-order-style=\"tax-status\"",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/quote-builder-utils.js",
+      "before": "data-order-style=\"field-13\"",
+      "after": "data-order-style=\"notes-field\"",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/quote-builder-utils.js",
+      "before": "data-order-style=\"field-14\"",
+      "after": "data-order-style=\"notes-icon\"",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/quote-builder-utils.js",
+      "before": "data-order-style=\"field-15\"",
+      "after": "data-order-style=\"notes\"",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/quote-builder-utils.js",
+      "before": "class=\"charges-header\" data-call=\"toggleOrderShippingPanel\"",
+      "after": "class=\"charges-header\" role=\"button\" tabindex=\"0\" data-keyclick=\"1\" data-call=\"toggleOrderShippingPanel\"",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "class=\"charges-header\" data-call=\"toggleFeesCharges\"",
+      "after": "class=\"charges-header\" role=\"button\" tabindex=\"0\" data-keyclick=\"1\" data-call=\"toggleFeesCharges\"",
+      "count": 1
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "<td colspan=\"13\" class=\"qb-empty-state\">",
+      "after": "<td colspan=\"14\" class=\"qb-empty-state\">",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/builders/scp/persistence.js",
+      "before": "<td colspan=\"13\" class=\"qb-empty-state\">",
+      "after": "<td colspan=\"14\" class=\"qb-empty-state\">",
+      "count": 1
     }
   ]
 }

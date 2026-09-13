@@ -1,0 +1,841 @@
+{
+  "name": "screenprint-healthy-fees",
+  "states": [
+    {
+      "width": 1440,
+      "title": "2026 Screen Print Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Embroidery DTF Transfers DTG (1st product only)",
+        "product-search": "",
+        "thumb-1": "",
+        "row-qty-1": "48",
+        "row-price-1": "$12.00",
+        "row-total-1": "$576.00",
+        "setup-screens-label": "1 screen",
+        "setup-per-screen-label": "$30",
+        "setup-fee-unit": "$30.00",
+        "setup-fee-total": "$30.00",
+        "design-hours-label": "2",
+        "graphic-design-unit": "$150.00",
+        "graphic-design-total-row": "$150.00",
+        "rush-fee-unit": "$50.00",
+        "rush-fee-total": "$50.00",
+        "vellum-qty-label": "3",
+        "vellum-per-label": "$10",
+        "vellum-qty-cell": "3",
+        "vellum-fee-unit": "$10.00",
+        "vellum-fee-total": "$30.00",
+        "color-change-qty-label": "2",
+        "color-change-per-label": "$15",
+        "color-change-qty-cell": "2",
+        "color-change-fee-unit": "$15.00",
+        "color-change-fee-total": "$30.00",
+        "charges-badge": "+$260.00",
+        "charges-chevron": "",
+        "art-charge-toggle": "",
+        "art-charge": "",
+        "scp-design-rate-label": "75",
+        "graphic-design-hours": "",
+        "graphic-design-total": "150.00",
+        "rush-fee": "",
+        "scp-vellum-rate-label": "10",
+        "vellum-qty": "",
+        "vellum-charge-total": "30.00",
+        "scp-color-change-rate-label": "15",
+        "color-change-qty": "",
+        "color-change-charge-total": "30.00",
+        "sidebar-resize-handle": "",
+        "sidebar-front": "Left Chest (1-color)",
+        "sidebar-screens": "1",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$576.00",
+        "per-unit-price": "$12.00/piece",
+        "sidebar-grand-total": "$954.33",
+        "toast-container": "Ready to build Screen Print quotes!"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "product-search",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "PC54",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "Essential Cotton Tee",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "48",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "art-charge-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "art-charge",
+          "name": "",
+          "type": "number",
+          "value": "0",
+          "checked": false,
+          "disabled": true
+        },
+        {
+          "id": "graphic-design-hours",
+          "name": "",
+          "type": "number",
+          "value": "2",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "rush-fee",
+          "name": "",
+          "type": "number",
+          "value": "50",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "vellum-qty",
+          "name": "",
+          "type": "number",
+          "value": "3",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "color-change-qty",
+          "name": "",
+          "type": "number",
+          "value": "2",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [
+        "Style Product image Description Color S M L XL 2XL More Sizes Qty Unit $ Total Row actions Jet Black 125 125 125 125 125 125 48 $12.00 $576.00 Screen Print Set Up Charge (1 screen × $30) 1 $30.00 $30.00 Graphic Design (2 hrs × $75) 1 $150.00 $150.00 Rush Fee 1 $50.00 $50.00 Vellum Print (3 × $10) 3 $10.00 $30.00 Color Change (2 × $15) 2 $15.00 $30.00"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#charges-badge"
+            ],
+            [
+              "#per-unit-price"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "title": "2026 Screen Print Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Embroidery DTF Transfers DTG (1st product only)",
+        "product-search": "",
+        "row-qty-1": "48",
+        "row-price-1": "$12.00",
+        "row-total-1": "$576.00",
+        "setup-screens-label": "1 screen",
+        "setup-per-screen-label": "$30",
+        "setup-fee-unit": "$30.00",
+        "setup-fee-total": "$30.00",
+        "design-hours-label": "2",
+        "graphic-design-unit": "$150.00",
+        "graphic-design-total-row": "$150.00",
+        "rush-fee-unit": "$50.00",
+        "rush-fee-total": "$50.00",
+        "vellum-qty-label": "3",
+        "vellum-per-label": "$10",
+        "vellum-fee-unit": "$10.00",
+        "vellum-fee-total": "$30.00",
+        "color-change-qty-label": "2",
+        "color-change-per-label": "$15",
+        "color-change-fee-unit": "$15.00",
+        "color-change-fee-total": "$30.00",
+        "charges-badge": "+$260.00",
+        "charges-chevron": "",
+        "art-charge-toggle": "",
+        "art-charge": "",
+        "scp-design-rate-label": "75",
+        "graphic-design-hours": "",
+        "graphic-design-total": "150.00",
+        "rush-fee": "",
+        "scp-vellum-rate-label": "10",
+        "vellum-qty": "",
+        "vellum-charge-total": "30.00",
+        "scp-color-change-rate-label": "15",
+        "color-change-qty": "",
+        "color-change-charge-total": "30.00",
+        "sidebar-resize-handle": "",
+        "sidebar-front": "Left Chest (1-color)",
+        "sidebar-screens": "1",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$576.00",
+        "per-unit-price": "$12.00/piece",
+        "sidebar-grand-total": "$954.33",
+        "toast-container": "Ready to build Screen Print quotes!"
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "product-search",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "PC54",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "Essential Cotton Tee",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "48",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "art-charge-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "art-charge",
+          "name": "",
+          "type": "number",
+          "value": "0",
+          "checked": false,
+          "disabled": true
+        },
+        {
+          "id": "graphic-design-hours",
+          "name": "",
+          "type": "number",
+          "value": "2",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "rush-fee",
+          "name": "",
+          "type": "number",
+          "value": "50",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "vellum-qty",
+          "name": "",
+          "type": "number",
+          "value": "3",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "color-change-qty",
+          "name": "",
+          "type": "number",
+          "value": "2",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [
+        "Style Product image Color S M L XL 2XL More Sizes Qty Unit $ Total Row actions Jet Black 125 125 125 125 125 125 48 $12.00 $576.00 Screen Print Set Up Charge (1 screen × $30) $30.00 $30.00 Graphic Design (2 hrs × $75) $150.00 $150.00 Rush Fee $50.00 $50.00 Vellum Print (3 × $10) $10.00 $30.00 Color Change (2 × $15) $15.00 $30.00"
+      ],
+      "overflow": true,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#charges-badge"
+            ],
+            [
+              "#per-unit-price"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "title": "2026 Screen Print Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Embroidery DTF Transfers DTG (1st product only)",
+        "product-search": "",
+        "row-qty-1": "48",
+        "row-price-1": "$12.00",
+        "row-total-1": "$576.00",
+        "setup-screens-label": "1 screen",
+        "setup-per-screen-label": "$30",
+        "setup-fee-unit": "$30.00",
+        "setup-fee-total": "$30.00",
+        "design-hours-label": "2",
+        "graphic-design-unit": "$150.00",
+        "graphic-design-total-row": "$150.00",
+        "rush-fee-unit": "$50.00",
+        "rush-fee-total": "$50.00",
+        "vellum-qty-label": "3",
+        "vellum-per-label": "$10",
+        "vellum-fee-unit": "$10.00",
+        "vellum-fee-total": "$30.00",
+        "color-change-qty-label": "2",
+        "color-change-per-label": "$15",
+        "color-change-fee-unit": "$15.00",
+        "color-change-fee-total": "$30.00",
+        "charges-badge": "+$260.00",
+        "charges-chevron": "",
+        "art-charge-toggle": "",
+        "art-charge": "",
+        "scp-design-rate-label": "75",
+        "graphic-design-hours": "",
+        "graphic-design-total": "150.00",
+        "rush-fee": "",
+        "scp-vellum-rate-label": "10",
+        "vellum-qty": "",
+        "vellum-charge-total": "30.00",
+        "scp-color-change-rate-label": "15",
+        "color-change-qty": "",
+        "color-change-charge-total": "30.00",
+        "sidebar-resize-handle": "",
+        "sidebar-front": "Left Chest (1-color)",
+        "sidebar-screens": "1",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$576.00",
+        "per-unit-price": "$12.00/piece",
+        "sidebar-grand-total": "$954.33",
+        "toast-container": ""
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "product-search",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "PC54",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "Essential Cotton Tee",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "48",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "art-charge-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "art-charge",
+          "name": "",
+          "type": "number",
+          "value": "0",
+          "checked": false,
+          "disabled": true
+        },
+        {
+          "id": "graphic-design-hours",
+          "name": "",
+          "type": "number",
+          "value": "2",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "rush-fee",
+          "name": "",
+          "type": "number",
+          "value": "50",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "vellum-qty",
+          "name": "",
+          "type": "number",
+          "value": "3",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "color-change-qty",
+          "name": "",
+          "type": "number",
+          "value": "2",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [
+        "Style Product image Color S M L XL 2XL More Sizes Qty Unit $ Total Row actions Jet Black 125 125 125 125 125 125 48 $12.00 $576.00 Screen Print Set Up Charge (1 screen × $30) $30.00 $30.00 Graphic Design (2 hrs × $75) $150.00 $150.00 Rush Fee $50.00 $50.00 Vellum Print (3 × $10) $10.00 $30.00 Color Change (2 × $15) $15.00 $30.00"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#charges-badge"
+            ],
+            [
+              "#per-unit-price"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "title": "2026 Screen Print Quote Builder | Northwest Custom Apparel",
+      "url": "/quote-builders/screenprint-quote-builder.html",
+      "ids": {
+        "method-switch-menu": "Switch method … Embroidery DTF Transfers DTG (1st product only)",
+        "product-search": "",
+        "row-qty-1": "48",
+        "row-price-1": "$12.00",
+        "row-total-1": "$576.00",
+        "setup-screens-label": "1 screen",
+        "setup-per-screen-label": "$30",
+        "setup-fee-unit": "$30.00",
+        "setup-fee-total": "$30.00",
+        "design-hours-label": "2",
+        "graphic-design-unit": "$150.00",
+        "graphic-design-total-row": "$150.00",
+        "rush-fee-unit": "$50.00",
+        "rush-fee-total": "$50.00",
+        "vellum-qty-label": "3",
+        "vellum-per-label": "$10",
+        "vellum-fee-unit": "$10.00",
+        "vellum-fee-total": "$30.00",
+        "color-change-qty-label": "2",
+        "color-change-per-label": "$15",
+        "color-change-fee-unit": "$15.00",
+        "color-change-fee-total": "$30.00",
+        "charges-badge": "+$260.00",
+        "charges-chevron": "",
+        "art-charge-toggle": "",
+        "art-charge": "",
+        "scp-design-rate-label": "75",
+        "graphic-design-hours": "",
+        "graphic-design-total": "150.00",
+        "rush-fee": "",
+        "scp-vellum-rate-label": "10",
+        "vellum-qty": "",
+        "vellum-charge-total": "30.00",
+        "scp-color-change-rate-label": "15",
+        "color-change-qty": "",
+        "color-change-charge-total": "30.00",
+        "sidebar-resize-handle": "",
+        "sidebar-front": "Left Chest (1-color)",
+        "sidebar-screens": "1",
+        "total-qty": "48",
+        "pricing-tier": "48-71",
+        "subtotal": "$576.00",
+        "per-unit-price": "$12.00/piece",
+        "sidebar-grand-total": "$954.33",
+        "toast-container": ""
+      },
+      "fields": [
+        {
+          "id": "",
+          "name": "",
+          "type": "select-one",
+          "value": "",
+          "disabled": false
+        },
+        {
+          "id": "product-search",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "PC54",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "Essential Cotton Tee",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "48",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "number",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "art-charge-toggle",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "art-charge",
+          "name": "",
+          "type": "number",
+          "value": "0",
+          "checked": false,
+          "disabled": true
+        },
+        {
+          "id": "graphic-design-hours",
+          "name": "",
+          "type": "number",
+          "value": "2",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "rush-fee",
+          "name": "",
+          "type": "number",
+          "value": "50",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "vellum-qty",
+          "name": "",
+          "type": "number",
+          "value": "3",
+          "checked": false,
+          "disabled": false
+        },
+        {
+          "id": "color-change-qty",
+          "name": "",
+          "type": "number",
+          "value": "2",
+          "checked": false,
+          "disabled": false
+        }
+      ],
+      "links": [
+        {
+          "href": "#",
+          "text": "Skip to quote builder"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "text": ""
+        }
+      ],
+      "tables": [
+        "Style Product image Color S M L XL 2XL More Sizes Qty Unit $ Total Row actions Jet Black 125 125 125 125 125 125 48 $12.00 $576.00 Screen Print Set Up Charge (1 screen × $30) $30.00 $30.00 Graphic Design (2 hrs × $75) $150.00 $150.00 Rush Fee $50.00 $50.00 Vellum Print (3 × $10) $10.00 $30.00 Color Change (2 × $15) $15.00 $30.00"
+      ],
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "nodes": [
+            [
+              "#charges-badge"
+            ],
+            [
+              "#per-unit-price"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "mutations": []
+}

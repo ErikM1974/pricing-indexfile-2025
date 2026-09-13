@@ -54,20 +54,47 @@ async function evidence(page,name,e){
     expect(currentURL.origin,name+' share link uses the current app origin').toBe(previewOrigin);
     return {...field,value:originalURL.origin+currentURL.pathname+currentURL.search+currentURL.hash};
    });
-   if(name.startsWith('embroidery-')&&key==='ids'){
+   if(/^(embroidery|screenprint)-/.test(name)&&!name.startsWith('screenprint-fast-')&&key==='ids'){
     // The resized layout keeps thumbnails on phones and offers its drag handle only beside the content.
     // These empty presentation nodes may change visibility; all values and form controls stay exact.
     for(const id of ['thumb-1','sidebar-resize-handle']){if(actual[id]==='')delete actual[id];if(expectedValue[id]==='')delete expectedValue[id];}
+    if(name==='screenprint-healthy-fees')for(const id of ['vellum-qty-cell','color-change-qty-cell'])if(expectedValue[id]===undefined){expect(actual[id]).toBe(expected.states[0].ids[id]);delete actual[id];}
     // These informational notices expire on real timers during four-width capture.
-    // Never normalize failure/success messages or calculated cap pricing.
+    // Transient warnings below are asserted at their trigger. Persistent errors,
+    // success messages and calculated cap pricing still compare exactly.
     for(const state of [actual,expectedValue])if(typeof state['toast-container']==='string'){
      state['toast-container']=state['toast-container'].replace('Ready to build quotes!','').trim();
+     state['toast-container']=state['toast-container'].replace('Ready to build Screen Print quotes!','').trim();
+     // These two exact fee warnings are asserted immediately after startup in the
+     // missing-fee scenes; their existing timeout can expire during full-panel capture.
+     if(name.startsWith('screenprint-'))for(const notice of ["Vellum rate is an estimate ($10.00) — live pricing didn't return it. Verify before saving.","Color Chg rate is an estimate ($15.00) — live pricing didn't return it. Verify before saving."])state['toast-container']=state['toast-container'].replace(notice,'').trim();
      if(name.startsWith('embroidery-caps'))state['toast-container']=state['toast-container'].replace('Cap detected - using cap embroidery pricing','').trim();
+     if(name==='embroidery-full-back')state['toast-container']=state['toast-container'].replace('Full Back requires minimum 25,000 stitches','').trim();
+     if(name==='embroidery-save-failure')state['toast-container']=state['toast-container'].replace('Error saving quote: Session save failed: {"error":"Synthetic save failure"}','').trim();
     }
    }
-   if(name.startsWith('embroidery-')&&key==='tables'){
+   if(/^(embroidery|screenprint)-/.test(name)&&!name.startsWith('screenprint-fast-')&&key==='tables'){
     // Restore the description column heading formerly hidden by the phone breakpoint.
     actual=actual.map((table,j)=>expectedValue[j]?.startsWith('Style Product image Color ')?table.replace(/^Style Product image Description Color /,'Style Product image Color '):table);
+    // The full mobile table now shows the fee quantity formerly hidden at <=900px.
+    // Its exact label and calculated per-screen rate remain in the equality check.
+    if(name.startsWith('screenprint-')&&states[i].width<=900)actual=actual.map((table,j)=>table.replace(/(Screen Print Set Up Charge \([^)]*\)) 1 /,(match,label)=>expectedValue[j]?.includes(label+' 1 ')?match:label+' '));
+    if(name==='screenprint-healthy-fees'&&states[i].width<=900)actual=actual.map((table,j)=>table.replace(/(Graphic Design \([^)]*\)|Rush Fee|Vellum Print \([^)]*\)|Color Change \([^)]*\)) (\d+) /g,(match,label,quantity)=>{
+     expect(quantity).toBe(label.startsWith('Vellum')?expected.states[0].ids['vellum-qty-cell']:label.startsWith('Color Change')?expected.states[0].ids['color-change-qty-cell']:'1');
+     return expectedValue[j]?.includes(label+' '+quantity+' ')?match:label+' ';
+    }));
+   }
+   if(name.startsWith('screenprint-')&&key==='fields'){
+    // Native ink radios used to be display:none. They now accept keyboard input;
+    // assert every newly exposed option and selection before comparing old visible fields.
+    const groups=['front-colors','back-colors','left-sleeve-colors','right-sleeve-colors'];
+    for(const group of groups){
+     const fields=actual.filter(f=>f.name===group);
+     if(!fields.length)continue;
+     const selected=name==='screenprint-healthy-locations'?({'front-colors':'3','back-colors':'2'}[group]||'1'):'1';
+     expect(fields,name+' accessible '+group).toEqual(['1','2','3','4','5','6'].map(value=>({id:'',name:group,type:'radio',value,checked:value===selected,disabled:false})));
+    }
+    actual=actual.filter(f=>!groups.includes(f.name)||expectedValue.some(old=>old.name===f.name&&old.value===f.value));
    }
    // The new persistent error replaces an alert (validation) or false success (save failure).
    if(key==='ids'&&name.startsWith('screenprint-fast-'))delete actual['fast-quote-error'];
