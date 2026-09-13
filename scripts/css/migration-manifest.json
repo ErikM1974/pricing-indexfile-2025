@@ -6975,14 +6975,14 @@
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",
   "pendingRuntimeOwners": [
     {
-      "kind": "non-page",
+      "kind": "email-provider",
       "owners": [
         "calculators/christmas-bundle-emailjs-template.html",
         "emailjs-template-mockup-customer-approval.html",
         "pages/golf-tournament-customer-emailjs-template.html",
         "pages/golf-tournament-lead-emailjs-template.html"
       ],
-      "note": "Email rendering is a separate compatibility contract."
+      "note": "Local template source and Chromium previews are reviewed. Saved provider templates, real mail-client rendering and campaign-content renewal remain separate publication work; deployment does not update them."
     },
     {
       "kind": "external-embed",
@@ -8988,6 +8988,72 @@
       "status": "inactive",
       "evidence": "The HTML script reference is commented out to avoid a duplicate class. The live ChristmasBundleQuoteService is supplied by calculators/js/christmas-bundle-order.js.",
       "reactivation": "Retain source; verify the active order-service contract and review its generated documents before reconnecting."
+    }
+  ],
+  "emailDocuments": [
+    {
+      "source": "calculators/christmas-bundle-emailjs-template.html",
+      "status": "reviewed-local",
+      "theme": "shared_components/css/email-theme.css",
+      "compiler": "scripts/css/build-email-templates.js",
+      "test": "tests/e2e/css-unification-email-templates.spec.js",
+      "contract": "memory/EMAIL_STYLE_CONTRACT_2026-09.md",
+      "states": [
+        "1440-768-390-320-full-pages",
+        "long-values",
+        "blocked-images",
+        "complete-letter-documents",
+        "original-bindings-links-and-copy"
+      ],
+      "providerStatus": "publication-pending; mail-client rendering not certified"
+    },
+    {
+      "source": "emailjs-template-mockup-customer-approval.html",
+      "status": "reviewed-local",
+      "theme": "shared_components/css/email-theme.css",
+      "compiler": "scripts/css/build-email-templates.js",
+      "test": "tests/e2e/css-unification-email-templates.spec.js",
+      "contract": "memory/EMAIL_STYLE_CONTRACT_2026-09.md",
+      "states": [
+        "1440-768-390-320-full-pages",
+        "long-values",
+        "blocked-images",
+        "complete-letter-documents",
+        "original-bindings-links-and-copy"
+      ],
+      "providerStatus": "publication-pending; mail-client rendering not certified"
+    },
+    {
+      "source": "pages/golf-tournament-customer-emailjs-template.html",
+      "status": "reviewed-local",
+      "theme": "shared_components/css/email-theme.css",
+      "compiler": "scripts/css/build-email-templates.js",
+      "test": "tests/e2e/css-unification-email-templates.spec.js",
+      "contract": "memory/EMAIL_STYLE_CONTRACT_2026-09.md",
+      "states": [
+        "1440-768-390-320-full-pages",
+        "long-values",
+        "blocked-images",
+        "complete-letter-documents",
+        "original-bindings-links-and-copy"
+      ],
+      "providerStatus": "publication-pending; mail-client rendering not certified"
+    },
+    {
+      "source": "pages/golf-tournament-lead-emailjs-template.html",
+      "status": "reviewed-local",
+      "theme": "shared_components/css/email-theme.css",
+      "compiler": "scripts/css/build-email-templates.js",
+      "test": "tests/e2e/css-unification-email-templates.spec.js",
+      "contract": "memory/EMAIL_STYLE_CONTRACT_2026-09.md",
+      "states": [
+        "1440-768-390-320-full-pages",
+        "long-values",
+        "blocked-images",
+        "complete-letter-documents",
+        "original-bindings-links-and-copy"
+      ],
+      "providerStatus": "publication-pending; mail-client rendering not certified"
     }
   ]
 }

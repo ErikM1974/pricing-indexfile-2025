@@ -1590,3 +1590,12 @@ Garment designer completion: page styles are scoped to the unified designer; art
 - tests/unit/staff-print.test.js — print source/data, style ownership and empty-state contracts.
 
 - tests/e2e/css-unification-customer-invoice-readiness.spec.js — actual saved-quote print function with delayed/missing assets, blocked windows and missing helper checks; all data synthetic.
+
+- tests/fixtures/email-templates-original-content.json — immutable four local email-template sources, copy, variables, links and plain-text fallbacks.
+- tests/e2e/css-unification-email-templates.spec.js — synthetic email browser layout and blocked-image checks; never sends mail.
+
+- shared_components/css/email-theme.css — canonical email-only theme, compiled into template inline declarations; never linked from delivered mail.
+- scripts/css/build-email-templates.js — local theme compiler/check for four email templates; no sending or provider publication.
+- tests/unit/email-templates.test.js — canonical theme output, token resolution and preserved copy/bindings/plain-text contracts.
+
+- `memory/EMAIL_STYLE_CONTRACT_2026-09.md` — shared email theme/build, immutable bindings, local review and provider publication boundaries.

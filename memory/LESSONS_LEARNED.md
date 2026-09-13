@@ -147,12 +147,6 @@ Problem/root cause: incomplete invoices looked empty, failed import logs were cl
 - Solution: keep original field names and handlers, hide only the cloned source definitions, rebind replaced forms, and isolate77 exact provider exceptions from the zero-exception local owner (275flags retired). Failed/empty searches clear loading without conflating errors with no results.
 - Prevention: real read-only searches verify provider markup; synthetic tests reproduce nested records, all select options, mobile precedence, pricing tiers, clipboard denial and current-value paper output. Match print exceptions by selector/property AND media context. Preserve six original controller/helper hashes outside31 recorded UI edits.
 
-## Financial reports need complete data and faithful paper output (2026-09-09)
-
-- Problem/root cause: quote audits defaulted missing comparison fields to zero/OK and truthy fallback replaced valid zero subtotals with older session values; table sorting required a mouse. Shared table sizing also wrapped amounts mid-number on phones.
-- Solution: validate the full saved comparison, surface errors/retry, preserve explicit zero with nullish fallback, use native sort buttons with aria-sort, and let complete numeric columns scroll. The generator owns Pricing Analysis markup and chart proportions; private financial JSON stays in memory.
-- Prevention: reverse mapped UI edits to original source/data hashes, compare all42rendered tables, test auth/empty/failure/zero/fallback states, and verify every printed page against original visible data. PDF text extraction can join words across hyphens; normalize punctuation while retaining every numeric token. Respect named CSS page size in PDF capture and check print rules after screen rules.
-
 ## Record workspaces need current-response checks before secondary writes (2026-09-10)
 
 - Problem/root cause: A stale linked quote can update the current lead after refresh; removed kit/art hosts can still receive asynchronous callbacks. Native dialog conversion and fixed banners can also lose focus or cover recovery controls.
@@ -252,3 +246,9 @@ Browser baselines must work from a fresh checkout. The tumbler export test previ
 - Problem/root cause: the drawer added its own success toast after the service already announced removal, creating overlapping messages. Replacing the item list removed the focused button.
 - Solution: keep the service notification as the single owner and focus the next removal control or drawer close button after successful removal.
 - Prevention: both direct hosts, four widths, exactly one visible top-layer notice, exact remaining style, keyboard focus after first/last removal, timer cleanup and print visibility. Preserve the original source reversal ledger.
+
+## Email themes need static output and preserved binding contracts (2026-09-13)
+
+- Problem/root cause: four provider templates repeated typography/colors and fixed widths; generic table traversal spread section padding into nested data cells. Incremental inline serialization could drift on repeated builds.
+- Solution: compile one ordered theme from canonical tokens into static inline output, mark only immediate card sections, and clear/replay theme-owned properties consistently. Preserve every variable, raw HTML slot, link and plain-text copy.
+- Prevention: immutable original hashes/content, idempotent compiler checks, structural section bounds, four widths, long names, blocked images and every PDF page. Local Chromium review does not certify mail clients or publish provider templates.

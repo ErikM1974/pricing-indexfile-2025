@@ -1,0 +1,35 @@
+/* Email-only source: scripts/css/build-email-templates.js resolves tokens and
+ * embeds declarations in the four template files. This sheet is never linked
+ * by an email; keep rules static and ordered, without layers or media queries. */
+[data-email-template] { margin: 0; padding: 0; background-color: var(--ui-canvas); color: var(--ui-ink); font-family: Arial, Helvetica, sans-serif; font-size: 16px; line-height: 1.5; }
+[data-email-template] table { width: 100%; table-layout: fixed; border-collapse: collapse; font-family: Arial, Helvetica, sans-serif; }
+[data-email-template] td { vertical-align: top; overflow-wrap: break-word; font-size: 14px; line-height: 1.5; }
+[data-email-template] [data-email="wrapper"] > tbody > tr > td { padding: 16px; }
+[data-email-template] [data-email="card"] { max-width: 640px; border: 1px solid var(--ui-line); border-radius: 8px; border-collapse: separate; border-spacing: 0; overflow: hidden; background-color: var(--ui-surface); box-shadow: none; }
+[data-email-template] [data-email="section"] { padding: 20px; break-inside: avoid; }
+[data-email-template][data-email-density="compact"] [data-email="section"] { padding: 12px 20px; }
+[data-email-template] [data-email="header"] { padding: 28px 20px; break-inside: avoid; background-color: var(--ui-accent-hover); color: var(--ui-surface); }
+[data-email-template] [data-email="header"] * { color: var(--ui-surface); }
+[data-email-template] [data-email="label"] { width: 35%; }
+[data-email-template] img { max-width: 100%; height: auto; border: 0; }
+[data-email-template] p { line-height: 1.5; }
+[data-email-template] h1 { font-size: 24px; line-height: 1.25; font-weight: 700; letter-spacing: normal; text-shadow: none; }
+[data-email-template] h2, [data-email-template] h3 { font-size: 18px; line-height: 1.35; letter-spacing: normal; }
+[data-email-template] [data-email="button"] { display: inline-block; max-width: 100%; box-sizing: border-box; padding: 12px 16px; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: 700; line-height: 1.5; text-align: center; }
+[data-email-template] [data-email-color="ink"] { color: var(--ui-ink); }
+[data-email-template] [data-email-color="muted"] { color: var(--ui-muted); }
+[data-email-template] [data-email-color="accent"] { color: var(--ui-accent); }
+[data-email-template] [data-email-color="white"] { color: var(--ui-surface); }
+[data-email-template] [data-email-color="danger"] { color: var(--red-800); }
+[data-email-template] [data-email-color="warning"] { color: var(--amber-800); }
+[data-email-template] [data-email-color="info"] { color: var(--sky-900); }
+[data-email-template] [data-email-bg="surface"] { background-color: var(--ui-surface); }
+[data-email-template] [data-email-bg="canvas"] { background-color: var(--ui-canvas); }
+[data-email-template] [data-email-bg="muted"] { background-color: var(--gray-50); }
+[data-email-template] [data-email-bg="accent"] { background-color: var(--ui-accent-hover); }
+[data-email-template] [data-email-bg="tint"] { background-color: var(--ui-tint); }
+[data-email-template] [data-email-bg="danger"] { background-color: var(--red-50); }
+[data-email-template] [data-email-bg="warning"] { background-color: var(--amber-100); }
+[data-email-template] [data-email-bg="info"] { background-color: var(--sky-100); }
+[data-email-template] [data-email-border] { border-color: var(--ui-line); }
+[data-email-template] [data-email-small] { font-size: 12px; }

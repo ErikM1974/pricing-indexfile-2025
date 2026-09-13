@@ -1,5 +1,13 @@
 # CSS unification — design direction and implementation plan
 
+## LOCAL CSS REVIEW COMPLETE — 2026-09-13
+
+All225/225 app-served static pages are reviewed locally. The four quote builders, generated invoices/staff printouts, sample notifications/removal focus and server response templates have also been reviewed. Customer invoice checkpoint802e15bd and sample removal/inactive-owner checkpoint4fa6e413 are committed and backed up. No unreviewed active application-generated style owner remains in the recorded backlog.
+
+The four email templates now share a compiled static theme: four browser checks pass, with24screens and six pages in four PDFs fully reviewed. Original bindings, links and copy remain, except the authorized Christmas2026 deadline. Local email review is separate from publication of the four provider templates and mail-client certification. Ten provider-owned Caspio/Jotform inner UIs stay in the external backlog; app wrapper review does not complete them. See EMAIL_STYLE_CONTRACT_2026-09.md.
+
+Production remains v2026.09.12.1 / Heroku2110, with215/225 app pages reviewed in that release. Next: final asset cache review, full local unit/DOM/a11y/CSS-browser/e2e/parity/lint/build/audit/boot gates, exact-source CI and release verification. Do not stop at family milestones; no real business writes, email sends, env copying or dependency-junction deletion.
+
 ## RELEASE CANDIDATE — v2026.09.12.1 specialty and seasonal pages
 
 User explicitly authorized deployment and publication of this reviewed batch on 2026-09-12. Earlier pending-publication notes below are historical and superseded. Eight reviewed pages bring the candidate to 215/225 with 10 pending; live remains 75ef80194384912f4c644e9b868898aa5d62de28 / v2026.09.11.6 / Heroku2109 until verified rollout. Christmas gift boxes now target 2026 and have staff-dashboard links. Thirty-one browser asset references are versioned with reversible preservation mappings. Source checkpoint 78f2dfe3fb6faf451abef41f101f39441fec3271. Full local and exact-source CI gates, actual Heroku release and live asset verification remain required before claiming deployment.
