@@ -243,3 +243,5 @@ Browser baselines must work from a fresh checkout. The tumbler export test previ
 - Problem/root cause: the garment designer hid notices only with opacity, leaving their action controls in keyboard navigation; a full browser run also sampled the fading text during a contrast scan.
 - Solution: give dismissed notices an explicit hidden visibility state and honor reduced-motion preferences. Update old shared-safety checks to expect the now-migrated builder bodies.
 - Prevention: test the fully visible notice with contrast checks at four widths, activate its action by keyboard, and verify both the message and action are hidden afterward. Retain immutable originals and run the entire application gate before deployment.
+
+- Related capture rule: check expiring product-cart notices separately from multi-viewport page snapshots. Preserve their exact original text/link, visible contrast and keyboard dismissal before comparing permanent content. Original fixtures remain immutable; changing machine speed must not change the expected page contract.

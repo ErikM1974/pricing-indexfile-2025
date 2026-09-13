@@ -2,7 +2,7 @@ const {test,expect}=require('@playwright/test'),fs=require('node:fs'),path=requi
 const {open,snapshot,check}=require('./helpers/catalog-storefront-browser');
 const root=path.resolve(__dirname,'../..'),out=path.join(__dirname,'screenshots/css-unification'),capture=process.env.CAPTURE_CATALOG_STOREFRONT_ORIGINAL==='1',phase=capture?'original':'current';
 test.use({timezoneId:'America/Los_Angeles',locale:'en-US',reducedMotion:'reduce'});
-async function evidence(page,name,events,{paper=true}={}){
+async function evidence(page,name,events,{paper=true,noticeChecked=false}={}){
  const states=[];fs.mkdirSync(out,{recursive:true});
  for(const width of [1440,768,390,320]){
   await page.setViewportSize({width,height:1000});await page.evaluate(()=>document.fonts.ready);
@@ -29,13 +29,18 @@ async function evidence(page,name,events,{paper=true}={}){
   // also wraps at different widths. Preserve those destinations in the DOM contract
   // below, while comparing every remaining visible content link without changes.
   const navigation=await page.locator('.util-strip a[href],.nav-bar a[href],.sidebar a[href]').evaluateAll(nodes=>nodes.map(n=>JSON.stringify({href:n.getAttribute('href'),text:n.textContent.replace(/\s+/g,' ').trim()})));
-  const contentLinks=links=>links.filter(link=>!navigation.includes(JSON.stringify(link)));
+  // Successful-add notices expire after eight seconds. Check their exact original
+  // text, destination and keyboard dismissal before this multi-viewport capture.
+  const noticeLink=link=>noticeChecked&&link.href==='/quote-cart'&&/^(?:Set sizes & view quote|View quote) \(\d+\)$/.test(link.text);
+  const contentLinks=links=>links.filter(link=>!navigation.includes(JSON.stringify(link))&&!noticeLink(link));
   for(let i=0;i<states.length;i++){
    const expectedIds={...before.states[i].ids};
    // The legacy sample-drawer stylesheet exposed the mobile-only filter close
    // button on desktop. Its repaired visibility is checked explicitly below.
    if(states[i].width===1440)delete expectedIds.filtersClose;
-   expect(states[i].ids,name+' ids').toEqual(expectedIds);
+   const actualIds={...states[i].ids};
+   if(noticeChecked){delete expectedIds.toastStack;delete actualIds.toastStack;}
+   expect(actualIds,name+' ids').toEqual(expectedIds);
    for(const k of ['title','url','fields','selection'])expect(states[i][k],name+' '+k).toEqual(before.states[i][k]);
    expect(contentLinks(states[i].links),name+' content links').toEqual(contentLinks(before.states[i].links));
   }
@@ -119,7 +124,19 @@ for(const [method,loc,qty]of [['emb','frontBack',6],['capemb','frontBack',24],['
  await page.locator('#swatchGrid .pdp-swatch').nth(1).click();await productReady(page,method,qty);
  await remember(page,events,'configured');await page.locator('#cfgAddToQuote').click();
  const items=await page.evaluate(()=>window.QuoteCartStore.getItems());expect(items).toHaveLength(1);expect(items[0].catalogColor).toBe('BrillOrng');expect(items[0].qty).toBe(qty);
- events.actions.push({label:'successful quote cart payload',items});await evidence(page,'product-'+method+'-'+loc+'-'+qty,events);
+ const name='product-'+method+'-'+loc+'-'+qty;
+ if(!capture){
+  const before=JSON.parse(fs.readFileSync(path.join(root,'tests/fixtures/catalog-storefront-'+name+'-original-browser.json'),'utf8'));
+  const expectedNotice=before.states.find(state=>state.ids.toastStack)?.ids.toastStack;
+  expect(expectedNotice,'original successful-add notice').toBeTruthy();
+  const notice=page.locator('#toastStack');await expect(notice).toHaveText(expectedNotice,{useInnerText:true});
+  await expect(notice.getByRole('link')).toHaveAttribute('href','/quote-cart');
+  const noticeAxe=await new AxeBuilder({page}).include('#toastStack').withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
+  expect(noticeAxe.violations.map(v=>v.id)).toEqual([]);
+  const dismiss=notice.getByRole('button',{name:'Dismiss',exact:true});
+  await dismiss.focus();await dismiss.press('Enter');await expect(notice).toBeEmpty();
+ }
+ events.actions.push({label:'successful quote cart payload',items});await evidence(page,name,events,{noticeChecked:!capture});
 });
 test('CSS catalog storefront: product sample picker and stock keys',async({page})=>{
  const events=await open(page,{url:'/product.html?style=PC61',original:capture});await productReady(page);
