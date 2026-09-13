@@ -165,12 +165,6 @@ Problem/root cause: incomplete invoices looked empty, failed import logs were cl
 - Solution: bind quote rendering and existing value sync to the current view sequence, lead object, quote ID and connected target. Reject malformed replies, ignore superseded loads, preserve uncertain outreach warnings beside the action, contain modal focus, and block all unknown API traffic in previews.
 - Prevention: mock delayed responses and every write, verify unchanged valid quote sync and original payloads, reverse recorded controller changes into original source hashes, and retain explicit shared-module ownership. Inspect populated PDFs: narrow grids can split money; give the order table full width and verify every row and rendered page. Precompute file updates before writing so a missing preview anchor cannot leave a partial batch. Timestamp-based browser snapshots must set the baseline time zone explicitly; fixed Date.now alone does not standardize local date formatting on Windows and Linux.
 
-## Personalization lists must retain failed-load state (2026-09-09)
-
-- Problem/root cause: after a failed refresh, search/status changes rendered old monogram or roster data and removed Retry; missing roster arrays looked like zero records.
-- Solution: clear prior records/counts when loading, validate list arrays, preserve the error while filtering, and accept only the latest request before rendering. Current filters apply after a successful retry.
-- Prevention: synthetic failure/filter/retry, missing-list and out-of-order success cases must exercise the actual controls; wait for debounced handlers before judging output. Keep original rows, field values and controller/service source hashes outside mapped UI/recovery edits.
-
 ## Personalization forms must preserve saved details and complete paper output (2026-09-09)
 
 **Problem:** Saved catalog styles reopened blank; custom styles interrupted loading, and editing manual styles threw. Wide roster printouts clipped garment/custom columns.
@@ -252,3 +246,9 @@ Browser baselines must work from a fresh checkout. The tumbler export test previ
 - Problem/root cause: call sheets, mailing labels and thread sheets carried isolated CSS and printed on a timer or load event; blocked windows and missing assets could fail silently. An imported thread run was inserted as HTML.
 - Solution: canonical tokens/components plus one staff-print sheet, with a shared promise for styles/fonts/images, visible failures in the parent and preview, and escaped thread text with validated color data. Keep Avery 5160 dimensions explicit in print media.
 - Prevention: real-window ready/blocked/delayed/missing-file cases; preserve original addresses, amounts and source hashes; test each label at 2.625 by 1 inch, 0.125-inch column gaps and all 32 labels across two pages. Inspect every screen scroll segment and PDF page. Baseline replay must reverse newer print edits before older family edits.
+
+## Customer print previews must wait for successful assets (2026-09-13)
+
+- Problem/root cause: the customer-supplied quote printed on load and ignored image failures; narrow columns split numeric headings and phones clipped the table.
+- Solution: reuse staff-print readiness, report blocked/missing helper/style/image failures in the preview and parent, and give the full table keyboard scrolling with unbroken numeric columns. Preserve the captured calculation, notes and waiver.
+- Prevention: real popup tests with a local HTTP asset server, delayed and failed resources, zero OS printing, original amount/source locks, all four screen widths and both complete paper quotes. Protocol interception can stall document.write styles, so readiness tests serve deterministic assets directly.

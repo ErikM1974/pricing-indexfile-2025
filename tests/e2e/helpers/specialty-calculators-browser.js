@@ -89,7 +89,8 @@ async function open(page, state = {}) {
         if (['fonts.googleapis.com', 'fonts.gstatic.com'].includes(url.hostname)) return route.continue();
         // Axe re-reads the existing Font Awesome stylesheet through fetch.
         if (url.hostname === 'cdnjs.cloudflare.com' && filePath === '/ajax/libs/font-awesome/6.4.0/css/all.min.css') return route.continue();
-        if (filePath.startsWith('/api/') || ['fetch', 'xhr'].includes(req.resourceType())) {
+        const localCss = ['localhost', '127.0.0.1'].includes(url.hostname) && filePath.endsWith('.css');
+        if (filePath.startsWith('/api/') || (['fetch', 'xhr'].includes(req.resourceType()) && !localCss)) {
             events.unknown.push(req.url());
             return route.fulfill({status: 503});
         }

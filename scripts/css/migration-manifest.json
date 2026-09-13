@@ -6978,8 +6978,7 @@
       "kind": "generated-document",
       "owners": [
         "shared_components/js/quote-formatter.js",
-        "calculators/christmas-bundle-service.js",
-        "calculators/screenprint-customer/screenprint-customer-calculator.js"
+        "calculators/christmas-bundle-service.js"
       ],
       "note": "Own print/PDF fixtures required; static HTML inventory cannot cover these."
     },
@@ -8813,6 +8812,27 @@
       "test": "tests/e2e/css-unification-staff-print.spec.js",
       "measuredRawCssBytes": 62217,
       "maxCssBytes": 64265
+    },
+    {
+      "source": "calculators/screenprint-customer/screenprint-customer-calculator.js",
+      "family": "screenprint-customer-invoice",
+      "status": "reviewed",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "calculators/screenprint-customer/screenprint-customer-invoice.css"
+      ],
+      "states": [
+        "original-24-and-145-piece-quote-amounts-notes-and-waiver",
+        "1440-768-390-320-complete-horizontal-scroll",
+        "two-complete-one-page-letter-quotes",
+        "real-print-window-ready-delayed-blocked-failed-style-and-image",
+        "missing-helper-visible-error"
+      ],
+      "test": "tests/e2e/css-unification-specialty-screenprint-customer.spec.js",
+      "readinessTest": "tests/e2e/css-unification-customer-invoice-readiness.spec.js",
+      "measuredRawCssBytes": 61722,
+      "maxCssBytes": 63770
     }
   ],
   "reviewedRuntimeOwners": [

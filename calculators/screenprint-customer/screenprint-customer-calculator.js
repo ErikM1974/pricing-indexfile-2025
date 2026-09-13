@@ -785,17 +785,17 @@ function printQuote() {
 
     const data = calculator.lastQuoteData;
     const calc = data.calculation;
+    if (typeof NWCAStaffPrint === 'undefined') {
+        calculator.setFeedback('quoteCopyStatus', 'Print tools could not load. Please refresh this page and try again.');
+        return;
+    }
     const printWindow = window.open('', '_blank');
     if (!printWindow) {
         calculator.setFeedback('quoteCopyStatus', 'The print window could not open. Allow pop-ups for this page and try again.');
         return;
     }
     const assetRoot = window.location.origin;
-    printWindow.addEventListener('load', async () => {
-        await printWindow.document.fonts.ready;
-        await Promise.all([...printWindow.document.images].map(img => img.decode().catch(() => {})));
-        printWindow.print();
-    }, {once: true});
+    // Shared readiness runs after the complete document is written.
 
     // Build clean invoice HTML
     const printHTML = `
@@ -805,11 +805,11 @@ function printQuote() {
             <title>Quote ${data.quoteId} - Northwest Custom Apparel</title>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1">
-            <link rel="stylesheet" href="${assetRoot}/shared_components/css/tokens.css?v=2026.09.11.6">
-            <link rel="stylesheet" href="${assetRoot}/shared_components/css/components.css?v=2026.09.11.6">
-            <link rel="stylesheet" href="${assetRoot}/calculators/screenprint-customer/screenprint-customer-invoice.css?v=2026.09.11.6">
+            <link rel="stylesheet" data-print-styles href="${assetRoot}/shared_components/css/tokens.css?v=2026.09.13.1">
+            <link rel="stylesheet" data-print-styles href="${assetRoot}/shared_components/css/components.css?v=2026.09.13.1">
+            <link rel="stylesheet" data-print-styles href="${assetRoot}/calculators/screenprint-customer/screenprint-customer-invoice.css?v=2026.09.13.1">
         </head>
-        <body data-ui="unified" class="screenprint-invoice">
+        <body data-ui="unified" class="screenprint-invoice"><main>
             <!-- Invoice Header -->
             <div class="invoice-header">
                 <div class="company-section">
@@ -824,7 +824,7 @@ function printQuote() {
                     </div>
                 </div>
                 <div class="invoice-section">
-                    <div class="invoice-title">QUOTE</div>
+                    <h1 class="invoice-title">QUOTE</h1>
                     <div class="invoice-details">
                         <div><strong>Quote #:</strong> ${data.quoteId}</div>
                         <div><strong>Date:</strong> ${new Date(data.createdAt).toLocaleDateString()}</div>
@@ -846,7 +846,7 @@ function printQuote() {
             </div>
 
             <!-- Main Invoice Table -->
-            <table class="invoice-table">
+            <div class="invoice-table-scroll" role="region" aria-label="Quote line items" tabindex="0"><table class="invoice-table">
                 <thead>
                     <tr>
                         <th>Description</th>
@@ -891,7 +891,7 @@ function printQuote() {
                         <td>$${(calc.stripesPerPiece * calc.quantity).toFixed(2)}</td>
                     </tr>` : ''}
                 </tbody>
-            </table>
+            </table></div>
 
             <!-- Totals Section -->
             <div class="totals-section">
@@ -941,11 +941,12 @@ function printQuote() {
                 Thank you for your business!
             </div>
 
-            <!-- Printing is requested by the opener once this document and its images are ready. -->
+            </main><!-- Printing is requested by the opener once this document and its images are ready. -->
         </body>
         </html>
     `;
 
     printWindow.document.write(printHTML);
     printWindow.document.close();
+    NWCAStaffPrint.printWhenReady(printWindow).catch(error => calculator.setFeedback('quoteCopyStatus', error.message));
 }

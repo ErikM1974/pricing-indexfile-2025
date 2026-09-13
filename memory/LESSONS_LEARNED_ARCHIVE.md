@@ -4455,3 +4455,9 @@ DTG test follow-up: initial product hydration can replace a number input between
 - Problem/root cause: inventory omitted APP_CONFIG; its size-run endpoint returns source sanmar-bulk with placeholder zero totals, which the old renderer called out of stock. Discovery hid partial failures, audit reused prior results after failures, and a pending color response could replace the selected stock view.
 - Solution: load the existing config, label unavailable warehouse quantities honestly, validate complete responses, clear stale results, provide retries, ignore superseded reads and keep unavailable SanMar comparisons unknown while exposing internal Caspio drift. Pure API/stock/TSV helpers stay unchanged.
 - Prevention: preserve seven original script hashes outside32mapped UI edits; compare all warehouse values and four clipboard outputs. Check four widths, denied clipboard and actual provider response shape. Printing relatively positioned images inside clipped cards can omit later-page pictures: use static image containers/visible overflow in print, verify all11 rendered images plus every original data word. Browser tests must wait for a debounced filter before recording and clicking a choice.
+
+## Personalization lists must retain failed-load state (2026-09-09)
+
+- Problem/root cause: after a failed refresh, search/status changes rendered old monogram or roster data and removed Retry; missing roster arrays looked like zero records.
+- Solution: clear prior records/counts when loading, validate list arrays, preserve the error while filtering, and accept only the latest request before rendering. Current filters apply after a successful retry.
+- Prevention: synthetic failure/filter/retry, missing-list and out-of-order success cases must exercise the actual controls; wait for debounced handlers before judging output. Keep original rows, field values and controller/service source hashes outside mapped UI/recovery edits.

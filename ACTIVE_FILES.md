@@ -1588,3 +1588,5 @@ Garment designer completion: page styles are scoped to the unified designer; art
 - shared_components/css/staff-print.css — canonical call, Avery 5160 label and thread-sheet layouts.
 
 - tests/unit/staff-print.test.js — print source/data, style ownership and empty-state contracts.
+
+- tests/e2e/css-unification-customer-invoice-readiness.spec.js — actual saved-quote print function with delayed/missing assets, blocked windows and missing helper checks; all data synthetic.
