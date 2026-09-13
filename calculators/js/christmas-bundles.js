@@ -399,8 +399,8 @@ function createProductCard(product, type) {
         '" hidden>Retry sizes</button>' +
         '<button type="button" class="btn btn-primary select-btn" data-call="selectProduct" data-args="' +
         dataArgs([product.id, type]) +
-        '" disabled>Select this ' +
-        type +
+        '" disabled>' +
+        (type === 'gloves' ? 'Select these gloves' : 'Select this ' + type) +
         '</button></div>';
     return card;
 }
@@ -571,7 +571,10 @@ function selectProduct(id, type) {
         const selected = card.dataset.productId === id;
         card.classList.toggle('selected', selected);
         const button = card.querySelector('.select-btn');
-        if (button) button.textContent = selected ? 'Selected' : 'Select this ' + type;
+        if (button)
+            button.textContent = selected
+                ? 'Selected'
+                : type === 'gloves' ? 'Select these gloves' : 'Select this ' + type;
     });
     clearError();
     updateSummary();

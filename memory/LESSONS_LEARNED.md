@@ -11,6 +11,7 @@
 - Problem/root cause: supported-size placeholder zeros looked like sold-out stock. A rebuilt request also needs the existing receipt’s fee types and address parser, not only a successful save.
 - Solution: use actual SanMar inventory with catalog colors; compute one box through the real eight-piece embroidery tier; use server-validated invitation grants and prices. Save a Draft with confirmed lines, then mark Open. SHIP is a fee line and XMAS references are accepted by both receipt routers.
 - Prevention: test real calculator parity, malformed/duplicate stock, partial writes and reload retries, receipt totals and logo access, staff inbox placement and payment blocking. Persist email send intent; uncertain delivery must not automatically resend. Cross-dyno exactly-once creation still requires a unique database key or durable lock.
+- Shared-workflow follow-up: an intentional inbox heading change must enter its browser content comparison as well as source mappings. Assert the new heading explicitly while preserving every original figure and the immutable fixture.
 
 ## New pages must enter the CSS ownership checks (2026-09-13)
 
