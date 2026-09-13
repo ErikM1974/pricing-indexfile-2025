@@ -1504,6 +1504,48 @@
       "before": ":where(.screenprint-invoice)",
       "after": ":where([data-ui=\"unified\"].screenprint-invoice)",
       "count": 54
+    },
+    {
+      "file": "dashboards/ae-dashboard.html",
+      "before": "/shared_components/css/art-intake.css?v=2026.09.08.9",
+      "after": "/shared_components/css/art-intake.css?v=2026.09.13.2",
+      "count": 1,
+      "reason": "Release asset version; resolved against its actual HTML consumer."
+    },
+    {
+      "file": "dashboards/ae-dashboard.html",
+      "before": "/shared_components/js/garment-submit-form.js?v=2026.09.06.36",
+      "after": "/shared_components/js/garment-submit-form.js?v=2026.09.13.2",
+      "count": 1,
+      "reason": "Release asset version; resolved against its actual HTML consumer."
+    },
+    {
+      "file": "calculators/embroidered-emblem/index.html",
+      "before": "/shared_components/css/specialty-assistant.css?v=20260912",
+      "after": "/shared_components/css/specialty-assistant.css?v=2026.09.13.2",
+      "count": 1,
+      "reason": "Release asset version; resolved against its actual HTML consumer."
+    },
+    {
+      "file": "calculators/embroidered-emblem/index.html",
+      "before": "/calculators/embroidered-emblem/embroidered-emblem.css?v=2026.09.12.1",
+      "after": "/calculators/embroidered-emblem/embroidered-emblem.css?v=2026.09.13.2",
+      "count": 1,
+      "reason": "Release asset version; resolved against its actual HTML consumer."
+    },
+    {
+      "file": "calculators/screenprint-customer/index.html",
+      "before": "/shared_components/js/staff-print.js?v=2026.09.13.1",
+      "after": "/shared_components/js/staff-print.js?v=2026.09.13.2",
+      "count": 1,
+      "reason": "Release asset version; resolved against its actual HTML consumer."
+    },
+    {
+      "file": "calculators/screenprint-customer/index.html",
+      "before": "/calculators/screenprint-customer/screenprint-customer-calculator.js?v=2026.09.13.1",
+      "after": "/calculators/screenprint-customer/screenprint-customer-calculator.js?v=2026.09.13.2",
+      "count": 1,
+      "reason": "Release asset version; resolved against its actual HTML consumer."
     }
   ],
   "capturedAt": "2026-09-11T17:28:04.536Z"

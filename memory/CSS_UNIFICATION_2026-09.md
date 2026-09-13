@@ -1,5 +1,11 @@
 # CSS unification — design direction and implementation plan
 
+## FINAL RELEASE CANDIDATE — v2026.09.13.2
+
+All225/225 local application pages and active generated layouts have completed visual review. Shared email templates are locally reviewed; provider publication and ten external embedded interfaces retain explicit separate backlog entries. This release follows the gift-box deployment v2026.09.12.1/Heroku2110.
+
+The final cache pass resolves changed assets against their actual consumers and versions74 references across34 source/fixture files (including matching local preview harnesses). Original preservation mappings remain intact. Hashed pages also rebuild content-addressed assets; ordinary source files retain the existing no-store policy. Full local gates and exact-source CI must pass before Heroku publication.
+
 ## LOCAL CSS REVIEW COMPLETE — 2026-09-13
 
 All225/225 app-served static pages are reviewed locally. The four quote builders, generated invoices/staff printouts, sample notifications/removal focus and server response templates have also been reviewed. Customer invoice checkpoint802e15bd and sample removal/inactive-owner checkpoint4fa6e413 are committed and backed up. No unreviewed active application-generated style owner remains in the recorded backlog.

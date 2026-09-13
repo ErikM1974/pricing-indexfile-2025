@@ -66,6 +66,27 @@
       "before": "function printContractPricing() {\n    if (!CONTRACT_PRICING) {\n        alert('Pricing data not loaded. Please refresh the page.');\n        return;\n    }\n\n    // Build print tables\n    buildPrintGarmentsTable();\n    buildPrintCapsTable();\n    buildPrintLaserPatchTable();\n\n    // Set custom filename for PDF save (browsers use document.title)\n    const originalTitle = document.title;\n    document.title = 'NW Custom Apparel Contract Embroidery Pricing 2026';\n\n    // Trigger browser print dialog\n    window.print();\n\n    // Restore original title after print dialog opens\n    document.title = originalTitle;\n}",
       "after": "function printContractPricing() {\n    if (!CONTRACT_PRICING) {\n        alert('Pricing data not loaded. Please refresh the page.');\n        return;\n    }\n\n    // Build print tables\n    buildPrintGarmentsTable();\n    buildPrintCapsTable();\n    buildPrintLaserPatchTable();\n\n    // Set custom filename for PDF save (browsers use document.title)\n    const originalTitle = document.title;\n    document.title = 'NW Custom Apparel Contract Embroidery Pricing 2026';\n\n    // Trigger browser print dialog\n    document.body.dataset.printMode = 'contract';\n    window.print();\n\n    // Restore original title after print dialog opens\n    document.title = originalTitle;\n}",
       "count": 1
+    },
+    {
+      "file": "calculators/embroidery-pricing-all/index.html",
+      "before": "/calculators/embroidery-pricing-all/embroidery-pricing-all.css?v=2026.09.12.2",
+      "after": "/calculators/embroidery-pricing-all/embroidery-pricing-all.css?v=2026.09.13.2",
+      "count": 1,
+      "reason": "Release asset version; resolved against its actual HTML consumer."
+    },
+    {
+      "file": "calculators/embroidery-pricing-all/index.html",
+      "before": "/calculators/embroidery-pricing-all/embroidery-pricing-all.js?v=2026.09.12.2",
+      "after": "/calculators/embroidery-pricing-all/embroidery-pricing-all.js?v=2026.09.13.2",
+      "count": 1,
+      "reason": "Release asset version; resolved against its actual HTML consumer."
+    },
+    {
+      "file": "calculators/embroidery-pricing-all/index.html",
+      "before": "/calculators/embroidery-pricing-all/embroidery-reference-ui.js?v=2026.09.12.2",
+      "after": "/calculators/embroidery-pricing-all/embroidery-reference-ui.js?v=2026.09.13.2",
+      "count": 1,
+      "reason": "Release asset version; resolved against its actual HTML consumer."
     }
   ],
   "privateInitializerNames": [

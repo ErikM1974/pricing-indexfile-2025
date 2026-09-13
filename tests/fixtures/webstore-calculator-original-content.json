@@ -83,6 +83,27 @@
       "before": "var(--amber-50)",
       "after": "var(--color-warning-bg)",
       "count": 2
+    },
+    {
+      "file": "calculators/webstores.html",
+      "before": "/shared_components/css/specialty-assistant.css?v=20260912",
+      "after": "/shared_components/css/specialty-assistant.css?v=2026.09.13.2",
+      "count": 1,
+      "reason": "Release asset version; resolved against its actual HTML consumer."
+    },
+    {
+      "file": "calculators/webstores.html",
+      "before": "/shared_components/css/webstore-pricing-page.css?v=2026.09.07.19",
+      "after": "/shared_components/css/webstore-pricing-page.css?v=2026.09.13.2",
+      "count": 1,
+      "reason": "Release asset version; resolved against its actual HTML consumer."
+    },
+    {
+      "file": "calculators/webstores.html",
+      "before": "/shared_components/js/webstore-pricing-page.js?v=2026.09.06.31",
+      "after": "/shared_components/js/webstore-pricing-page.js?v=2026.09.13.2",
+      "count": 1,
+      "reason": "Release asset version; resolved against its actual HTML consumer."
     }
   ]
 }

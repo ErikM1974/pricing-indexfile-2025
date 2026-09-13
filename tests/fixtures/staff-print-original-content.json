@@ -87,6 +87,76 @@
       "before": "    <script src=\"/dashboards/js/ae-mission-control.js?v=2026.09.10.4\"></script>",
       "after": "    <script src=\"/shared_components/js/staff-print.js?v=2026.09.13.1\"></script>\n    <script src=\"/dashboards/js/ae-mission-control.js?v=2026.09.13.1\"></script>",
       "count": 1
+    },
+    {
+      "file": "pages/mockup-detail.html",
+      "before": "/shared_components/js/staff-print.js?v=2026.09.13.1",
+      "after": "/shared_components/js/staff-print.js?v=2026.09.13.2",
+      "count": 1,
+      "reason": "Release asset version; resolved against its actual HTML consumer."
+    },
+    {
+      "file": "pages/mockup-detail.html",
+      "before": "/pages/js/mockup-detail.js?v=2026.09.13.1",
+      "after": "/pages/js/mockup-detail.js?v=2026.09.13.2",
+      "count": 1,
+      "reason": "Release asset version; resolved against its actual HTML consumer."
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "/shared_components/js/staff-print.js?v=2026.09.13.1",
+      "after": "/shared_components/js/staff-print.js?v=2026.09.13.2",
+      "count": 1,
+      "reason": "Release asset version; resolved against its actual HTML consumer."
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "before": "/dashboards/js/jim-mailing-list.js?v=2026.09.13.1",
+      "after": "/dashboards/js/jim-mailing-list.js?v=2026.09.13.2",
+      "count": 1,
+      "reason": "Release asset version; resolved against its actual HTML consumer."
+    },
+    {
+      "file": "dashboards/ae-mission-control.html",
+      "before": "/shared_components/js/staff-print.js?v=2026.09.13.1",
+      "after": "/shared_components/js/staff-print.js?v=2026.09.13.2",
+      "count": 1,
+      "reason": "Release asset version; resolved against its actual HTML consumer."
+    },
+    {
+      "file": "dashboards/ae-mission-control.html",
+      "before": "/dashboards/js/ae-mission-control.js?v=2026.09.13.1",
+      "after": "/dashboards/js/ae-mission-control.js?v=2026.09.13.2",
+      "count": 1,
+      "reason": "Release asset version; resolved against its actual HTML consumer."
+    },
+    {
+      "file": "tests/ui/test-ae-mission-control.html",
+      "before": "/shared_components/js/staff-print.js?v=2026.09.13.1",
+      "after": "/shared_components/js/staff-print.js?v=2026.09.13.2",
+      "count": 1,
+      "reason": "Release asset version; resolved against its actual HTML consumer."
+    },
+    {
+      "file": "tests/ui/test-ae-mission-control.html",
+      "before": "/dashboards/js/ae-mission-control.js?v=2026.09.13.1",
+      "after": "/dashboards/js/ae-mission-control.js?v=2026.09.13.2",
+      "count": 1,
+      "reason": "Release asset version; resolved against its actual HTML consumer."
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "/shared_components/js/staff-print.js?v=2026.09.13.1",
+      "after": "/shared_components/js/staff-print.js?v=2026.09.13.2",
+      "count": 1,
+      "reason": "Release asset version; resolved against its actual HTML consumer."
+    },
+    {
+      "file": "tests/ui/test-jim-mailing-list.html",
+      "before": "/dashboards/js/jim-mailing-list.js?v=2026.09.13.1",
+      "after": "/dashboards/js/jim-mailing-list.js?v=2026.09.13.2",
+      "count": 1,
+      "reason": "Release asset version; resolved against its actual HTML consumer."
     }
   ]
 }

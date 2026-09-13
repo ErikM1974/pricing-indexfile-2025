@@ -1739,6 +1739,55 @@
       "before": "    showSuccessMessage(message) {\n        // Create toast notification\n        const toast = document.createElement('div');\n        toast.className = 'drawer-toast';\n        toast.innerHTML = `\n            <i class=\"fas fa-check-circle\" aria-hidden=\"true\"></i>\n            <span>${message}</span>\n        `;\n        document.body.appendChild(toast);\n\n        // Show toast\n        setTimeout(() => toast.classList.add('show'), 100);\n\n        // Hide and remove after 3 seconds\n        setTimeout(() => {\n            toast.classList.remove('show');\n            setTimeout(() => toast.remove(), 300);\n        }, 3000);\n    }",
       "after": "    // Notifications are rendered by SampleCart so they share one accessible owner.",
       "count": 1
+    },
+    {
+      "file": "pages/catalog.html",
+      "before": "/shared_components/css/cart-drawer.css?v=2026.09.11.3",
+      "after": "/shared_components/css/cart-drawer.css?v=2026.09.13.2",
+      "count": 1,
+      "reason": "Release asset version; resolved against its actual HTML consumer."
+    },
+    {
+      "file": "pages/catalog.html",
+      "before": "/shared_components/js/sample-cart-service.js?v=2026.09.06.31",
+      "after": "/shared_components/js/sample-cart-service.js?v=2026.09.13.2",
+      "count": 1,
+      "reason": "Release asset version; resolved against its actual HTML consumer."
+    },
+    {
+      "file": "pages/catalog.html",
+      "before": "/shared_components/js/cart-drawer.js?v=2026.09.11.3",
+      "after": "/shared_components/js/cart-drawer.js?v=2026.09.13.2",
+      "count": 1,
+      "reason": "Release asset version; resolved against its actual HTML consumer."
+    },
+    {
+      "file": "product.html",
+      "before": "/shared_components/css/cart-drawer.css?v=2026.09.11.3",
+      "after": "/shared_components/css/cart-drawer.css?v=2026.09.13.2",
+      "count": 1,
+      "reason": "Release asset version; resolved against its actual HTML consumer."
+    },
+    {
+      "file": "product.html",
+      "before": "/shared_components/js/safety-stripe-recs.js?v=2026.09.06.31",
+      "after": "/shared_components/js/safety-stripe-recs.js?v=2026.09.13.2",
+      "count": 1,
+      "reason": "Release asset version; resolved against its actual HTML consumer."
+    },
+    {
+      "file": "product.html",
+      "before": "/shared_components/js/sample-cart-service.js?v=2026.09.06.31",
+      "after": "/shared_components/js/sample-cart-service.js?v=2026.09.13.2",
+      "count": 1,
+      "reason": "Release asset version; resolved against its actual HTML consumer."
+    },
+    {
+      "file": "product.html",
+      "before": "/shared_components/js/cart-drawer.js?v=2026.09.11.3",
+      "after": "/shared_components/js/cart-drawer.js?v=2026.09.13.2",
+      "count": 1,
+      "reason": "Release asset version; resolved against its actual HTML consumer."
     }
   ],
   "retiredStyles": []
