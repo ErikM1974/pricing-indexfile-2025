@@ -80,7 +80,7 @@ const LEGACY_ESM = [
 ];
 
 export default [
-    { files: ['calculators/js/christmas-bundles.js', 'calculators/js/christmas-bundle-order.js'], languageOptions: { sourceType: 'script', globals: { ...globals.browser, module: 'readonly' } }, rules: { ...js.configs.recommended.rules, 'no-undef': 'error', 'no-unused-vars': ['error', { vars: 'local', argsIgnorePattern: '^_', caughtErrors: 'none' }] } },
+    { files: ['calculators/js/christmas-bundles.js', 'calculators/js/christmas-bundle-order.js', 'calculators/js/christmas-campaign.js'], languageOptions: { sourceType: 'script', globals: { ...globals.browser, module: 'readonly' } }, rules: { ...js.configs.recommended.rules, 'no-undef': 'error', 'no-unused-vars': ['error', { vars: 'local', argsIgnorePattern: '^_', caughtErrors: 'none' }] } },
     { files: ['calculators/js/christmas-bundles.js'], languageOptions: { globals: { ChristmasBundleQuoteService: 'readonly' } } },
     { files: ['calculators/breast-cancer-awareness-bundle.js', 'calculators/breast-cancer-bundle-service.js'], languageOptions: { sourceType: 'script', globals: { ...globals.browser, emailjs: 'readonly' } }, rules: { 'no-undef': 'error', 'no-unused-vars': ['error', { vars: 'local', argsIgnorePattern: '^_', caughtErrors: 'none' }] } },
     { files: ['calculators/screenprint-customer/screenprint-customer-calculator.js'], languageOptions: { globals: { CustomerScreenPrintQuoteService: 'readonly' } } },
@@ -121,7 +121,7 @@ export default [
     {
         // LEGACY browser scope (2026-09-07) — see the header.
         files: ['**/*.js'],
-        ignores: [...STRICT_FILES, 'shared_components/js/quote-builder-utils.js', 'calculators/breast-cancer-awareness-bundle.js', 'calculators/breast-cancer-bundle-service.js', 'calculators/js/christmas-bundles.js', 'calculators/js/christmas-bundle-order.js'],
+        ignores: [...STRICT_FILES, 'shared_components/js/quote-builder-utils.js', 'calculators/breast-cancer-awareness-bundle.js', 'calculators/breast-cancer-bundle-service.js', 'calculators/js/christmas-bundles.js', 'calculators/js/christmas-bundle-order.js', 'calculators/js/christmas-campaign.js'],
         languageOptions: {
             ecmaVersion: 2022,
             sourceType: 'script',

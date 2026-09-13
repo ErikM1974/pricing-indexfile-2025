@@ -1,0 +1,227 @@
+{
+  "description": "Authorized September 2026 holiday request integration. These reversible mappings preserve unrelated original page contracts; behavior is tested separately.",
+  "changes": [
+    {
+      "file": "server.js",
+      "before": "}\n\n// Quote data plane relays (quote_sessions / quote_items / quote_analytics postures + sequence mint) — extracted to routes/quote-plane.js (server split, 2026-09-07); registered here so the order is unchanged.\n{ const ctx = { makeApiRequest, originalQueryString, quotePlaneWriteLimiter, quoteScopedOrStaff, requireStaff, sanitizeFilterInput }; require('./routes/quote-plane')(app, ctx); }\n// ============================================================================\n// Quote delete — role-based server-side enforcement + quote push previews — extracted to routes/quote-delete.js (server split, 2026-09-07); registered here so the order is unchanged.\n",
+      "after": "}\n\n// Quote data plane relays (quote_sessions / quote_items / quote_analytics postures + sequence mint) — extracted to routes/quote-plane.js (server split, 2026-09-07); registered here so the order is unchanged.\n// Holiday campaign: public products, server-verified invitations/estimates and review-only quote requests.\n{ const ctx = { API_BASE_URL, fetch, withProxySecret, rateLimit, mintShareToken, quoteShareUrl, sendEmailJSTemplate }; require('./routes/christmas-gift-box')(app, ctx); }\n{ const ctx = { makeApiRequest, originalQueryString, quotePlaneWriteLimiter, quoteScopedOrStaff, requireStaff, sanitizeFilterInput }; require('./routes/quote-plane')(app, ctx); }\n// ============================================================================\n// Quote delete — role-based server-side enforcement + quote push previews — extracted to routes/quote-delete.js (server split, 2026-09-07); registered here so the order is unchanged.\n",
+      "count": 1
+    },
+    {
+      "file": "server.js",
+      "before": "  console.log('  Quote Items: /api/quote_items');\n  console.log('  Quote Analytics: /api/quote_analytics');\n  console.log('  Public Quote View: /quote/:quoteId');\n});",
+      "after": "  console.log('  Quote Items: /api/quote_items');\n  console.log('  Quote Analytics: /api/quote_analytics');\n  console.log('  Public Quote View: /quote/:quoteId');\n});\n",
+      "count": 1
+    },
+    {
+      "file": "pages/js/quote-view.js",
+      "before": "const QV_PLACEHOLDER_IMG = \"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23f3f4f6'/%3E%3Cpath d='M22 14l-12 8 5 9 5-3v22h24V28l5 3 5-9-12-8a10 10 0 0 1-20 0z' fill='%23d1d5db'/%3E%3C/svg%3E\";\n\nclass QuoteViewPage {\n    constructor() {\n        this.quoteId = null;\n        this.quoteData = null;\n",
+      "after": "const QV_PLACEHOLDER_IMG = \"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23f3f4f6'/%3E%3Cpath d='M22 14l-12 8 5 9 5-3v22h24V28l5 3 5-9-12-8a10 10 0 0 1-20 0z' fill='%23d1d5db'/%3E%3C/svg%3E\";\n\nclass QuoteViewPage {\n    isHolidayRequest() { return /^XMAS-/i.test(String(this.quoteId || '')); }\n    renderHolidayRequestNote() {\n        if (!this.isHolidayRequest()) return;\n        let note = document.getElementById('holiday-request-note');\n        if (!note) {\n            note = document.createElement('section');\n            note.id = 'holiday-request-note';\n            note.className = 'card';\n            document.querySelector('.quote-totals')?.before(note);\n        }\n        note.replaceChildren();\n        const add = (tag, text) => { const node = document.createElement(tag); node.textContent = text; note.append(node); return node; };\n        add('h3', this.quoteData.Status === 'Draft' ? 'Holiday request — save incomplete' : 'Holiday gift-box request received');\n        add('p', 'No payment has been collected. Our team will confirm artwork, inventory, delivery, applicable sales tax and any additional artwork charges. A final quote or invoice follows staff review.');\n        const requestTerms = 'This is a request for staff review. No payment is due. Artwork, availability, delivery and final charges need confirmation before production.';\n        const terms = document.querySelector('.terms-list');\n        if (terms) { const item = document.createElement('li'); item.textContent = requestTerms; terms.replaceChildren(item); }\n        const printedTerms = document.querySelector('.print-only-terms');\n        if (printedTerms) printedTerms.textContent = requestTerms;\n        let settings;\n        try { settings = JSON.parse(this.quoteData.OrderSettingsJSON || '{}'); } catch { add('p', 'Customization details could not be read. Please contact our team with this request reference.'); return; }\n        const customer = settings.customer || {};\n        add('p', settings.requestType === 'complimentary-sample' ? 'Complimentary sample — invitation verified.' : 'One box at the embroidery 8-piece pricing tier.');\n        add('p', 'Delivery: ' + (settings.deliveryMethod === 'Pickup' ? 'Factory pickup' : 'Ship to your address') + '. Requested date: ' + this.formatBusinessDate(customer.dueDate));\n        if (settings.deliveryMethod === 'Ship') {\n            const address = [this.quoteData.ShipToAddress, this.quoteData.ShipToCity, this.quoteData.ShipToState, this.quoteData.ShipToZip].filter(Boolean).join(', ');\n            add('p', 'Ship to: ' + (address || 'Please confirm the shipping address with our team.'));\n        }\n        add('p', 'Jacket: ' + (customer.jacketEmbLocation || 'To confirm') + '. Hoodie: ' + (customer.hoodieEmbLocation || 'To confirm') + '. Beanie: front center. Gloves: undecorated.');\n        if (customer.threadColors) add('p', 'Thread colors: ' + customer.threadColors);\n        if (customer.specialInstructions) add('p', 'Your notes: ' + customer.specialInstructions);\n        if (customer.holidayTeamSize) add('p', 'Planned team gifts: ' + customer.holidayTeamSize);\n        if (customer.holidayGiftDate) add('p', 'Requested holiday gift date: ' + this.formatBusinessDate(customer.holidayGiftDate));\n        if (customer.imageUpload && window.APP_CONFIG?.API?.BASE_URL) {\n            const link = add('a', 'Open uploaded company logo');\n            link.href = window.APP_CONFIG.API.BASE_URL + '/api/files/' + encodeURIComponent(customer.imageUpload);\n            link.target = '_blank'; link.rel = 'noopener';\n        } else add('p', 'Company logo: our team will arrange artwork with you.');\n    }\n\n    constructor() {\n        this.quoteId = null;\n        this.quoteData = null;\n",
+      "count": 1
+    },
+    {
+      "file": "pages/js/quote-view.js",
+      "before": "            'PATCH': 'Embroidered Emblems',\n            'STK': 'Die-Cut Stickers & Vinyl Banners',\n            'OF':  'Order Form',  // A4 (2026-05-22): OF-NNNN was falling through to \"Custom Quote\"\n            'WQ':  'Web Quote Request',  // Phase 3 customer quote-cart (2026-06-11)\n            'SAM': 'Sample Order — Blanks'  // paid Top Sellers samples (2026-08-19): was \"Custom Quote\"\n        };\n",
+      "after": "            'PATCH': 'Embroidered Emblems',\n            'STK': 'Die-Cut Stickers & Vinyl Banners',\n            'OF':  'Order Form',  // A4 (2026-05-22): OF-NNNN was falling through to \"Custom Quote\"\n            'XMAS': 'Holiday Gift Box Request',\n            'WQ':  'Web Quote Request',  // Phase 3 customer quote-cart (2026-06-11)\n            'SAM': 'Sample Order — Blanks'  // paid Top Sellers samples (2026-08-19): was \"Custom Quote\"\n        };\n",
+      "count": 1
+    },
+    {
+      "file": "pages/js/quote-view.js",
+      "before": "\n        // Wire the \"Open as Invoice\" link to the matching /invoice/:quoteId URL.\n        const invLink = document.getElementById('open-invoice-link');\n        if (invLink && this.quoteId) {\n            invLink.href = `/invoice/${encodeURIComponent(this.quoteId)}${this.shareTokenParam()}`;\n        }\n",
+      "after": "\n        // Wire the \"Open as Invoice\" link to the matching /invoice/:quoteId URL.\n        const invLink = document.getElementById('open-invoice-link');\n        if (invLink && this.isHolidayRequest()) invLink.hidden = true;\n        if (invLink && this.quoteId) {\n            invLink.href = `/invoice/${encodeURIComponent(this.quoteId)}${this.shareTokenParam()}`;\n        }\n",
+      "count": 1
+    },
+    {
+      "file": "pages/js/quote-view.js",
+      "before": "    getQuoteIdFromUrl() {\n        const path = window.location.pathname;\n        // Match multiple formats: DTF0112-1 or DTF-1768263686415\n        const match = path.match(/\\/quote\\/([A-Z]{2,5}[-\\d]+)/);\n        if (match) return match[1];\n        // Phase 10.1 (2026-05-14): defense-in-depth fallback for\n        // /pages/quote-view.html?quoteId=<ID> URLs (any old email\n",
+      "after": "    getQuoteIdFromUrl() {\n        const path = window.location.pathname;\n        // Match multiple formats: DTF0112-1 or DTF-1768263686415\n        const match = path.match(/\\/quote\\/(XMAS-[A-F0-9]{28}|[A-Z]{2,5}[-\\d]+)(?:\\/|$)/);\n        if (match) return match[1];\n        // Phase 10.1 (2026-05-14): defense-in-depth fallback for\n        // /pages/quote-view.html?quoteId=<ID> URLs (any old email\n",
+      "count": 1
+    },
+    {
+      "file": "pages/js/quote-view.js",
+      "before": "    async renderQuote() {\n        // Header - include revision if > 1\n        const revision = this.quoteData.RevisionNumber || 1;\n        let headerText = `Quote #${this.quoteId}`;\n        if (revision > 1) {\n            headerText += ` • Rev ${revision}`;\n        }\n        document.getElementById('quote-id-header').textContent = headerText;\n\n        // Set document title for PDF filename (Ctrl+P → Save as PDF)\n        document.title = `Quote ${this.quoteId} - NWCA`;\n\n        // Status\n        this.renderStatus();\n",
+      "after": "    async renderQuote() {\n        // Header - include revision if > 1\n        const revision = this.quoteData.RevisionNumber || 1;\n        let headerText = `${this.isHolidayRequest() ? 'Request' : 'Quote'} #${this.quoteId}`;\n        if (revision > 1) {\n            headerText += ` • Rev ${revision}`;\n        }\n        document.getElementById('quote-id-header').textContent = headerText;\n\n        // Set document title for PDF filename (Ctrl+P → Save as PDF)\n        document.title = `${this.isHolidayRequest() ? 'Holiday request' : 'Quote'} ${this.quoteId} - NWCA`;\n        if (this.isHolidayRequest()) document.querySelector('.document-title').textContent = 'Your holiday request';\n\n        // Status\n        this.renderStatus();\n",
+      "count": 1
+    },
+    {
+      "file": "pages/js/quote-view.js",
+      "before": "        // Paid storefront order: nothing left to accept — hide the CTA so a\n        // customer opening the share link isn't offered \"Accept Quote\" on an\n        // order they already paid for at checkout.\n        if (this._storefrontPaidInfo()) {\n            const acceptBtn = document.getElementById('accept-quote-btn');\n            if (acceptBtn) acceptBtn.hidden = true;\n        }\n\n        // Render DTF specs section if applicable\n        this.renderDTFSpecs();\n\n",
+      "after": "        // Paid storefront order: nothing left to accept — hide the CTA so a\n        // customer opening the share link isn't offered \"Accept Quote\" on an\n        // order they already paid for at checkout.\n        if (this._storefrontPaidInfo() || this.isHolidayRequest()) {\n            const acceptBtn = document.getElementById('accept-quote-btn');\n            if (acceptBtn) acceptBtn.hidden = true;\n        }\n\n        this.renderHolidayRequestNote();\n\n        // Render DTF specs section if applicable\n        this.renderDTFSpecs();\n\n",
+      "count": 1
+    },
+    {
+      "file": "pages/js/quote-view.js",
+      "before": "\n        // Paid check FIRST: a completed order must never show 'Expired' just\n        // because its 30-day quote window lapsed after the customer paid.\n        if (this._storefrontPaidInfo()) {\n            statusClass = 'status-paid';\n            statusText = 'Paid Order';\n        } else if (this.quoteData.Status === 'Accepted') {\n",
+      "after": "\n        // Paid check FIRST: a completed order must never show 'Expired' just\n        // because its 30-day quote window lapsed after the customer paid.\n        if (this.isHolidayRequest()) {\n            statusText = this.quoteData.Status === 'Draft' ? 'Save incomplete' : 'Awaiting staff review';\n        } else if (this._storefrontPaidInfo()) {\n            statusClass = 'status-paid';\n            statusText = 'Paid Order';\n        } else if (this.quoteData.Status === 'Accepted') {\n",
+      "count": 1
+    },
+    {
+      "file": "pages/js/quote-view.js",
+      "before": "        // gave a sticker line six empty cells and made the quote look broken\n        // (2026-07-24). Suppress the whole size block for those prefixes and let\n        // Item/Color/Qty/Unit/Total carry the row.\n        const sizelessPrefix = ['STK', 'PATCH'].includes(this.quoteId?.split(/[\\d-]/)[0] || '');\n        this.hideSizeColumns = sizelessPrefix;\n\n        const sizeHeaders = sizelessPrefix ? '' : `\n",
+      "after": "        // gave a sticker line six empty cells and made the quote look broken\n        // (2026-07-24). Suppress the whole size block for those prefixes and let\n        // Item/Color/Qty/Unit/Total carry the row.\n        const sizelessPrefix = ['STK', 'PATCH', 'XMAS'].includes(this.quoteId?.split(/[\\d-]/)[0] || '');\n        this.hideSizeColumns = sizelessPrefix;\n\n        const sizeHeaders = sizelessPrefix ? '' : `\n",
+      "count": 1
+    },
+    {
+      "file": "pages/js/quote-view.js",
+      "before": "            }\n            const rows = this.buildProductRows(group, groupIndex);\n            rows.forEach((row, i) => {\n                html += this.renderProductRow(row, i === 0, groupIndex);\n                rowIndex++;\n            });\n",
+      "after": "            }\n            const rows = this.buildProductRows(group, groupIndex);\n            rows.forEach((row, i) => {\n                if (this.isHolidayRequest()) { row.style = group.styleNumber; row.description = group.productName + ' · Size ' + Object.keys(row.sizes).join(', '); }\n                html += this.renderProductRow(row, i === 0, groupIndex);\n                rowIndex++;\n            });\n",
+      "count": 1
+    },
+    {
+      "file": "pages/js/quote-view.js",
+      "before": "     * Print quotes (DTG, DTF, SPC, SSC) show location only\n     */\n    renderEmbroideryInfo() {\n        // Determine quote type from prefix\n        const prefix = this.quoteId?.split(/[\\d-]/)[0] || '';\n\n",
+      "after": "     * Print quotes (DTG, DTF, SPC, SSC) show location only\n     */\n    renderEmbroideryInfo() {\n        if (this.isHolidayRequest()) return ''; // Per-garment locations are in the request details.\n        // Determine quote type from prefix\n        const prefix = this.quoteId?.split(/[\\d-]/)[0] || '';\n\n",
+      "count": 1
+    },
+    {
+      "file": "pages/js/quote-view.js",
+      "before": "            // WQ web-cart quotes save TaxRate 0 by design (no shipping address\n            // yet — the rep calculates tax at confirmation), so \"Out of State\n            // Sales\" would be wrong/alarming for them.\n            const isWebQuote = (this.quoteId || '').startsWith('WQ');\n            const zeroTaxLabel = isWholesale\n                ? 'Wholesale / Resale — No Tax (permit on file)'\n                : (isCEMB ? 'Tax-exempt'\n",
+      "after": "            // WQ web-cart quotes save TaxRate 0 by design (no shipping address\n            // yet — the rep calculates tax at confirmation), so \"Out of State\n            // Sales\" would be wrong/alarming for them.\n            const isWebQuote = (this.quoteId || '').startsWith('WQ') || this.isHolidayRequest();\n            const zeroTaxLabel = isWholesale\n                ? 'Wholesale / Resale — No Tax (permit on file)'\n                : (isCEMB ? 'Tax-exempt'\n",
+      "count": 1
+    },
+    {
+      "file": "pages/js/quote-view.js",
+      "before": "        // Grand total with tax\n        totalsHtml += `\n            <div class=\"total-row grand-total\">\n                <span class=\"label\">TOTAL:</span>\n                <span class=\"value\">${this.formatCurrency(totalWithTax)}</span>\n            </div>\n        `;\n",
+      "after": "        // Grand total with tax\n        totalsHtml += `\n            <div class=\"total-row grand-total\">\n                <span class=\"label\">${this.isHolidayRequest() ? 'REQUEST ESTIMATE:' : 'TOTAL:'}</span>\n                <span class=\"value\">${this.formatCurrency(totalWithTax)}</span>\n            </div>\n        `;\n",
+      "count": 1
+    },
+    {
+      "file": "pages/js/quote-view.js",
+      "before": "\n    // Modal Methods\n    openAcceptModal() {\n        if (this.isExpired()) {\n            window.ToastNotifications.error('This quote has expired. Please contact us for updated pricing.');\n            return;\n",
+      "after": "\n    // Modal Methods\n    openAcceptModal() {\n        if (this.isHolidayRequest()) return;\n        if (this.isExpired()) {\n            window.ToastNotifications.error('This quote has expired. Please contact us for updated pricing.');\n            return;\n",
+      "count": 1
+    },
+    {
+      "file": "pages/js/quote-view.js",
+      "before": "    }\n\n    async acceptQuote() {\n        if (this._acceptPending || this.quoteData?.Status === 'Accepted') return;\n        this.showAcceptanceError('');\n        const nameInput = document.getElementById('accept-name');\n",
+      "after": "    }\n\n    async acceptQuote() {\n        if (this.isHolidayRequest()) return;\n        if (this._acceptPending || this.quoteData?.Status === 'Accepted') return;\n        this.showAcceptanceError('');\n        const nameInput = document.getElementById('accept-name');\n",
+      "count": 1
+    },
+    {
+      "file": "pages/js/quote-view.js",
+      "before": "    renderDepositPanel(urlParams) {\n        const panel = document.getElementById('deposit-panel');\n        if (!panel || !this.quoteData) return;\n        const notes = this._depositNotes();\n        const dep = notes.deposit;\n        const payments = Array.isArray(notes.payments) ? notes.payments : [];\n",
+      "after": "    renderDepositPanel(urlParams) {\n        const panel = document.getElementById('deposit-panel');\n        if (!panel || !this.quoteData) return;\n        if (this.isHolidayRequest()) { panel.hidden = true; return; }\n        const notes = this._depositNotes();\n        const dep = notes.deposit;\n        const payments = Array.isArray(notes.payments) ? notes.payments : [];\n",
+      "count": 1
+    },
+    {
+      "file": "pages/js/quote-view.js",
+      "before": "    }\n\n    async startDepositCheckout(btn) {\n        if (this._checkoutPending) return;\n        this._checkoutPending = true;\n        btn.disabled = true;\n",
+      "after": "    }\n\n    async startDepositCheckout(btn) {\n        if (this.isHolidayRequest()) return;\n        if (this._checkoutPending) return;\n        this._checkoutPending = true;\n        btn.disabled = true;\n",
+      "count": 1
+    },
+    {
+      "file": "pages/js/quote-view.js",
+      "before": "        const state = document.getElementById('qv-deposit-state');\n        const form = document.getElementById('qv-deposit-form');\n        strip.hidden = false;\n\n        if (depositPaid) {\n            state.textContent = `Paid ${this.formatCurrency(Number(depositPaid.amount) || 0)}${depositPaid.at ? ' on ' + this.formatDate(depositPaid.at) : ''}`;\n",
+      "after": "        const state = document.getElementById('qv-deposit-state');\n        const form = document.getElementById('qv-deposit-form');\n        strip.hidden = false;\n        if (this.isHolidayRequest()) { state.textContent = 'Holiday request: review artwork, availability and final charges, then create the final quote through the usual builder.'; form.hidden = true; return; }\n\n        if (depositPaid) {\n            state.textContent = `Paid ${this.formatCurrency(Number(depositPaid.amount) || 0)}${depositPaid.at ? ' on ' + this.formatDate(depositPaid.at) : ''}`;\n",
+      "count": 1
+    },
+    {
+      "file": "pages/js/quote-view.js",
+      "before": "    }\n\n    async enableDeposit() {\n        if (!this.isStaff || this._depositPending) return;\n        const btn = document.getElementById('qv-deposit-enable-btn');\n        const shipping = parseFloat(document.getElementById('qv-deposit-shipping').value);\n",
+      "after": "    }\n\n    async enableDeposit() {\n        if (this.isHolidayRequest()) return;\n        if (!this.isStaff || this._depositPending) return;\n        const btn = document.getElementById('qv-deposit-enable-btn');\n        const shipping = parseFloat(document.getElementById('qv-deposit-shipping').value);\n",
+      "count": 1
+    },
+    {
+      "file": "pages/css/quote-view.css",
+      "before": "\n    :where([data-ui=\"unified\"][data-customer-document=\"quote-view\"])\n        .header-right {\n        margin-left: auto;\n        text-align: right;\n    }\n",
+      "after": "\n    :where([data-ui=\"unified\"][data-customer-document=\"quote-view\"])\n        .header-right {\n        min-width: 0;\n        max-width: 100%;\n        margin-left: auto;\n        text-align: right;\n    }\n",
+      "count": 1
+    },
+    {
+      "file": "pages/css/quote-view.css",
+      "before": "        .header-right\n        h2 {\n        margin: 0 0 var(--space-2);\n        color: var(--brand-800);\n        font-size: var(--font-size-xl);\n    }\n",
+      "after": "        .header-right\n        h2 {\n        margin: 0 0 var(--space-2);\n        overflow-wrap: anywhere;\n        color: var(--brand-800);\n        font-size: var(--font-size-xl);\n    }\n",
+      "count": 1
+    },
+    {
+      "file": "pages/catalog.html",
+      "before": "    <div class=\"sidebar-overlay\" id=\"sidebarOverlay\"></div>\n\n    <main id=\"main\">\n        <!-- Page header band (category landing mode swaps the title/breadcrumb) -->\n        <header class=\"page-head\">\n            <div class=\"wrap\">\n",
+      "after": "    <div class=\"sidebar-overlay\" id=\"sidebarOverlay\"></div>\n\n    <main id=\"main\">\n        <aside class=\"holiday-catalog-feature wrap\" aria-label=\"Holiday gift boxes\">\n            <div><strong>Holiday gifts, sampled early.</strong><p>Try one gift box at our 8-piece embroidery pricing. Have an invitation? Apply your gift code.</p><span class=\"holiday-catalog-deadline\">See the collection for current offer details.</span></div>\n            <a class=\"btn btn-primary\" href=\"/christmas-bundles.html\">Build a holiday gift box</a>\n        </aside>\n        <!-- Page header band (category landing mode swaps the title/breadcrumb) -->\n        <header class=\"page-head\">\n            <div class=\"wrap\">\n",
+      "count": 1
+    },
+    {
+      "file": "pages/css/catalog-2026.css",
+      "before": "/* catalog layout. Canonical tokens and controls are provided by components.css. */\n@layer components.pages {\n:where([data-ui=\"unified\"][data-catalog-storefront=\"catalog\"]) .filters-rail {\n    position: sticky;\n    overflow-y: auto; overscroll-behavior: contain;\n",
+      "after": "/* catalog layout. Canonical tokens and controls are provided by components.css. */\n@layer components.pages {\n:where([data-ui=\"unified\"][data-catalog-storefront=\"catalog\"]) .holiday-catalog-feature {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    flex-wrap: wrap;\n    gap: var(--space-4);\n    margin-block: var(--space-5);\n    padding: var(--space-5);\n    background: var(--ui-surface);\n    border: 1px solid var(--ui-line);\n    border-radius: var(--radius-md);\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront=\"catalog\"]) .holiday-catalog-feature strong { font-family: var(--font-store-display); font-size: var(--font-size-2xl); }\n:where([data-ui=\"unified\"][data-catalog-storefront=\"catalog\"]) .holiday-catalog-feature p { margin-block: var(--space-2); }\n:where([data-ui=\"unified\"][data-catalog-storefront=\"catalog\"]) .holiday-catalog-deadline { color: var(--ui-muted); font-size: var(--font-size-md); }\n\n:where([data-ui=\"unified\"][data-catalog-storefront=\"catalog\"]) .filters-rail {\n    position: sticky;\n    overflow-y: auto; overscroll-behavior: contain;\n",
+      "count": 1
+    },
+    {
+      "file": "pages/js/catalog-2026.js",
+      "before": "    }\n\n    function init() {\n        if (!window.ProductSearchService) {\n            console.error('[Catalog] ProductSearchService missing — cannot start');\n            var bootGrid = document.getElementById('resultsGrid');\n",
+      "after": "    }\n\n    function init() {\n        loadHolidayFeature();\n        if (!window.ProductSearchService) {\n            console.error('[Catalog] ProductSearchService missing — cannot start');\n            var bootGrid = document.getElementById('resultsGrid');\n",
+      "count": 1
+    },
+    {
+      "file": "pages/js/catalog-2026.js",
+      "before": "        });\n    }\n\n    if (document.readyState === 'loading') {\n        document.addEventListener('DOMContentLoaded', init);\n    } else {\n",
+      "after": "        });\n    }\n\n    // The campaign file owns the deadline; an expired promotion leaves the catalog automatically.\n    async function loadHolidayFeature() {\n        const feature = document.querySelector('.holiday-catalog-feature');\n        if (!feature) return;\n        try {\n            const response = await fetch('/api/christmas-gift-box/campaign', { signal: AbortSignal.timeout(10000) });\n            if (!response.ok) throw new Error('Campaign unavailable');\n            const campaign = await response.json();\n            if (!Number.isFinite(Date.parse(campaign.closesAt))) throw new Error('Campaign unavailable');\n            feature.hidden = Date.now() >= Date.parse(campaign.closesAt);\n            feature.querySelector('.holiday-catalog-deadline').textContent = 'Offer ends ' + campaign.deadlineLabel + ', Pacific time.';\n        } catch {\n            feature.querySelector('.holiday-catalog-deadline').textContent = 'Offer details could not load. Open the collection or contact our team.';\n        }\n    }\n\n    if (document.readyState === 'loading') {\n        document.addEventListener('DOMContentLoaded', init);\n    } else {\n",
+      "count": 1
+    },
+    {
+      "file": "dashboards/company-numbers.html",
+      "before": "                            <ul class=\"inbox-list\" id=\"inboxPaidList\" aria-busy=\"true\"></ul>\n                        </div>\n                        <div class=\"inbox-col\" id=\"inboxAccepted\">\n                            <h3 class=\"inbox-col-title\"><i class=\"fas fa-file-signature\" aria-hidden=\"true\"></i> Accepted quotes — unpaid <span class=\"cn-win\">last 30 days</span></h3>\n                            <ul class=\"inbox-list\" id=\"inboxAcceptedList\" aria-busy=\"true\"></ul>\n                        </div>\n                    </div>\n",
+      "after": "                            <ul class=\"inbox-list\" id=\"inboxPaidList\" aria-busy=\"true\"></ul>\n                        </div>\n                        <div class=\"inbox-col\" id=\"inboxAccepted\">\n                            <h3 class=\"inbox-col-title\"><i class=\"fas fa-file-signature\" aria-hidden=\"true\"></i> Quotes &amp; requests to review <span class=\"cn-win\">last 30 days</span></h3>\n                            <ul class=\"inbox-list\" id=\"inboxAcceptedList\" aria-busy=\"true\"></ul>\n                        </div>\n                    </div>\n",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "                quote.QuoteID || '',\n                quote.CustomerName || '',\n                quote.CustomerEmail || '',\n                quote.CompanyName || ''\n            ].join(' ').toLowerCase();\n\n            if (!searchFields.includes(searchFilter)) {\n",
+      "after": "                quote.QuoteID || '',\n                quote.CustomerName || '',\n                quote.CustomerEmail || '',\n                quote.CompanyName || '',\n                holidayRequestLabel(quote)\n            ].join(' ').toLowerCase();\n\n            if (!searchFields.includes(searchFilter)) {\n",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "// 2026-05-28: explicit null/undefined check before Number() — without\n// it, Number(null) === 0 made unsynced rows render as $0.00 instead\n// of falling back to the original quote total.\nfunction getEffectiveAmount(quote) {\n    // Only overlay for Processed quotes with a synced snapshot.\n    if (quote.Status === 'Processed' && quote.ShopWorks_Snapshot) {\n        try {\n",
+      "after": "// 2026-05-28: explicit null/undefined check before Number() — without\n// it, Number(null) === 0 made unsynced rows render as $0.00 instead\n// of falling back to the original quote total.\nfunction holidayRequestLabel(quote) {\n    if (!/^XMAS-/i.test(String(quote.QuoteID || ''))) return '';\n    const kind = quote.Status === 'Draft' ? 'Save incomplete' : Number(quote.TotalAmount) === 0 ? 'Complimentary sample' : 'Priced request';\n    return (quote.ProjectName || 'Holiday Gift Box 2026') + ' · ' + kind;\n}\n\nfunction getEffectiveAmount(quote) {\n    if (holidayRequestLabel(quote)) return (Number(quote.TotalAmount) || 0) + (Number(quote.ShippingFee) || 0) + (Number(quote.TaxAmount) || 0);\n    // Only overlay for Processed quotes with a synced snapshot.\n    if (quote.Status === 'Processed' && quote.ShopWorks_Snapshot) {\n        try {\n",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "        //     (payment in, ShopWorks order not yet created)\n        //   • Otherwise — editable dropdown (Open/Lost/Accepted/Expired)\n        let statusCellHtml;\n        if (isCancelled) {\n            statusCellHtml = `<span class=\"status-badge status-cancelled\" title=\"Order was deleted in ShopWorks. Will be permanently purged after 30 days.\">\n                                  <i class=\"fas fa-ban\" aria-hidden=\"true\"></i> Cancelled (SW)\n                               </span>`;\n",
+      "after": "        //     (payment in, ShopWorks order not yet created)\n        //   • Otherwise — editable dropdown (Open/Lost/Accepted/Expired)\n        let statusCellHtml;\n        if (holidayRequestLabel(quote) && quote.Status === 'Draft') {\n            statusCellHtml = '<span class=\"status-badge status-open\">Save incomplete</span>';\n        } else if (isCancelled) {\n            statusCellHtml = `<span class=\"status-badge status-cancelled\" title=\"Order was deleted in ShopWorks. Will be permanently purged after 30 days.\">\n                                  <i class=\"fas fa-ban\" aria-hidden=\"true\"></i> Cancelled (SW)\n                               </span>`;\n",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "                                      data-pk-id=\"${quote.PK_ID}\"\n                                      data-quote-id=\"${escapeHtml(quote.QuoteID)}\"\n                                      aria-label=\"Status of ${escapeHtml(quote.QuoteID)}\">\n                                  <option value=\"Open\" ${quote.Status === 'Open' ? 'selected' : ''}>Open</option>\n                                  <option value=\"Accepted\" ${quote.Status === 'Accepted' ? 'selected' : ''} disabled title=\"Set automatically when the customer accepts the quote — not manually selectable\">Accepted</option>\n                                  <option value=\"Lost\" ${quote.Status === 'Lost' ? 'selected' : ''}>Lost</option>\n                                  <option value=\"Expired\" ${quote.Status === 'Expired' ? 'selected' : ''} disabled title=\"Set automatically when the quote passes its expiration date — not manually selectable\">Expired</option>\n",
+      "after": "                                      data-pk-id=\"${quote.PK_ID}\"\n                                      data-quote-id=\"${escapeHtml(quote.QuoteID)}\"\n                                      aria-label=\"Status of ${escapeHtml(quote.QuoteID)}\">\n                                  <option value=\"Open\" ${quote.Status === 'Open' ? 'selected' : ''}>${holidayRequestLabel(quote) ? 'Awaiting review' : 'Open'}</option>\n                                  <option value=\"Accepted\" ${quote.Status === 'Accepted' ? 'selected' : ''} disabled title=\"Set automatically when the customer accepts the quote — not manually selectable\">Accepted</option>\n                                  <option value=\"Lost\" ${quote.Status === 'Lost' ? 'selected' : ''}>Lost</option>\n                                  <option value=\"Expired\" ${quote.Status === 'Expired' ? 'selected' : ''} disabled title=\"Set automatically when the quote passes its expiration date — not manually selectable\">Expired</option>\n",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "                </td>\n                <td>\n                    <span class=\"quote-id\">${qid || '-'}</span>\n                    ${renderShopWorksRef(quote)}\n                </td>\n                <td>\n",
+      "after": "                </td>\n                <td>\n                    <span class=\"quote-id\">${qid || '-'}</span>\n                    ${holidayRequestLabel(quote) ? `<div class=\"date-relative\">${escapeHtml(holidayRequestLabel(quote))}</div>` : ''}\n                    ${renderShopWorksRef(quote)}\n                </td>\n                <td>\n",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "}\n\nfunction editQuote(quoteId) {\n    // Phase 11.3.5 (Erik 2026-05-24): defense-in-depth guard against\n    // editing a quote that's been pushed to ShopWorks. The Edit button\n    // in renderTable() is already disabled for these statuses, but\n",
+      "after": "}\n\nfunction editQuote(quoteId) {\n    if (/^XMAS-/i.test(quoteId)) { showToast('Review the holiday request, then prepare the finalized quote in the normal builder.'); viewQuote(quoteId); return; }\n    // Phase 11.3.5 (Erik 2026-05-24): defense-in-depth guard against\n    // editing a quote that's been pushed to ShopWorks. The Edit button\n    // in renderTable() is already disabled for these statuses, but\n",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/quote-management.js",
+      "before": "        return;\n    }\n    const quoteId = quote.QuoteID;\n    if (resendInFlight.has(quoteId)) return; // double-click guard\n    resendInFlight.add(quoteId);\n    try {\n",
+      "after": "        return;\n    }\n    const quoteId = quote.QuoteID;\n    if (/^XMAS-/i.test(quoteId)) { showToast('Holiday requests use their own confirmation. Open the request to review the saved details.'); viewQuote(quoteId); return; }\n    if (resendInFlight.has(quoteId)) return; // double-click guard\n    resendInFlight.add(quoteId);\n    try {\n",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/staff-dashboard/controllers/orders-inbox-controller.js",
+      "before": "                   && STOREFRONT_PREFIXES.includes(pfx)\n                   && createdDay >= sevenDaysAgo) {\n            paid.push(s);\n        } else if (status === 'Accepted') {\n            accepted.push(s);   // full 30-day window — acceptance can lag creation\n        }\n    }\n",
+      "after": "                   && STOREFRONT_PREFIXES.includes(pfx)\n                   && createdDay >= sevenDaysAgo) {\n            paid.push(s);\n        } else if (status === 'Accepted' || /^XMAS-/i.test(String(s.QuoteID || '')) && ['Open', 'Draft'].includes(status)) {\n            accepted.push(s);   // full 30-day window — acceptance can lag creation\n        }\n    }\n",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/staff-dashboard/controllers/orders-inbox-controller.js",
+      "before": "\n    const orderRow = (s) => {\n        const pfx = prefixOf(s.QuoteID);\n        const total = (parseFloat(s.TotalAmount) || 0) + (parseFloat(s.TaxAmount) || 0);\n        return `\n            <li>\n                <a class=\"inbox-row\" href=\"${quoteLink(s.QuoteID)}\" target=\"_blank\" rel=\"noopener\">\n                    <span class=\"inbox-chip inbox-chip--${escapeHtml(pfx.toLowerCase())}\">${escapeHtml(pfx)}</span>\n                    <span class=\"inbox-row-main\">\n                        <span class=\"inbox-row-title\">${escapeHtml(s.CompanyName || s.CustomerName || s.QuoteID)}</span>\n                        <span class=\"inbox-row-sub\">${escapeHtml(s.QuoteID)} · ${escapeHtml(formatRelativeTime(s.CreatedAt))}</span>\n                    </span>\n                    <span class=\"inbox-row-amount\">${formatMoney(total)}</span>\n                </a>\n",
+      "after": "\n    const orderRow = (s) => {\n        const pfx = prefixOf(s.QuoteID);\n        const holiday = /^XMAS-/i.test(String(s.QuoteID || ''));\n        const holidayLabel = holiday ? s.Status === 'Draft' ? 'Incomplete holiday request — review needed' : Number(s.TotalAmount) === 0 ? 'Complimentary holiday sample request' : 'Holiday box request — pricing review' : '';\n        const total = (parseFloat(s.TotalAmount) || 0) + (parseFloat(s.TaxAmount) || 0) + (holiday ? Number(s.ShippingFee) || 0 : 0);\n        return `\n            <li>\n                <a class=\"inbox-row\" href=\"${quoteLink(s.QuoteID)}\" target=\"_blank\" rel=\"noopener\">\n                    <span class=\"inbox-chip inbox-chip--${escapeHtml(pfx.toLowerCase())}\">${escapeHtml(pfx)}</span>\n                    <span class=\"inbox-row-main\">\n                        <span class=\"inbox-row-title\">${escapeHtml(s.CompanyName || s.CustomerName || s.QuoteID)}</span>\n                        <span class=\"inbox-row-sub\">${escapeHtml(holidayLabel || s.QuoteID)} · ${escapeHtml(formatRelativeTime(s.CreatedAt))}</span>\n                    </span>\n                    <span class=\"inbox-row-amount\">${formatMoney(total)}</span>\n                </a>\n",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/staff-dashboard/controllers/orders-inbox-controller.js",
+      "before": "        : emptyRow('No paid web orders in the last 7 days.');\n    acceptedList.innerHTML = accepted.length\n        ? accepted.slice(0, 8).map(orderRow).join('')\n        : emptyRow('No accepted-but-unpaid quotes right now.');\n    paidList.setAttribute('aria-busy', 'false');\n    acceptedList.setAttribute('aria-busy', 'false');\n    return reportWidgetResult('inbox', true);\n",
+      "after": "        : emptyRow('No paid web orders in the last 7 days.');\n    acceptedList.innerHTML = accepted.length\n        ? accepted.slice(0, 8).map(orderRow).join('')\n        : emptyRow('No quotes or requests awaiting review right now.');\n    paidList.setAttribute('aria-busy', 'false');\n    acceptedList.setAttribute('aria-busy', 'false');\n    return reportWidgetResult('inbox', true);\n",
+      "count": 1
+    }
+  ]
+}

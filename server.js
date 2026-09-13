@@ -1409,6 +1409,8 @@ function originalQueryString(req) {
 }
 
 // Quote data plane relays (quote_sessions / quote_items / quote_analytics postures + sequence mint) — extracted to routes/quote-plane.js (server split, 2026-09-07); registered here so the order is unchanged.
+// Holiday campaign: public products, server-verified invitations/estimates and review-only quote requests.
+{ const ctx = { API_BASE_URL, fetch, withProxySecret, rateLimit, mintShareToken, quoteShareUrl, sendEmailJSTemplate }; require('./routes/christmas-gift-box')(app, ctx); }
 { const ctx = { makeApiRequest, originalQueryString, quotePlaneWriteLimiter, quoteScopedOrStaff, requireStaff, sanitizeFilterInput }; require('./routes/quote-plane')(app, ctx); }
 // ============================================================================
 // Quote delete — role-based server-side enforcement + quote push previews — extracted to routes/quote-delete.js (server split, 2026-09-07); registered here so the order is unchanged.

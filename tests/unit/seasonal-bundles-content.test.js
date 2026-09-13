@@ -1,7 +1,13 @@
 const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto');
 const root = path.resolve(__dirname, '../..');
 const original = require('../fixtures/seasonal-bundles-original-content.json');
-test.each(Object.entries(original.hashes))('%s retains its original source behind reviewed UI mappings', (file, hash) => {
+// The authorized holiday rebuild changes the free-only offer, inventory and request flow.
+// Current behavior is checked in seasonal-christmas-orders and the holiday browser suites.
+// Keep the original migration evidence immutable; its free-only contract is historical.
+test('original seasonal migration evidence is retained unchanged', () => {
+    expect(crypto.createHash('sha256').update(fs.readFileSync(path.join(root, 'tests/fixtures/seasonal-bundles-original-content.json'))).digest('hex')).toBe('a1108833d8011f40253e178f9a04da5d9ec828f916016d3ad382b264dc9f1285');
+});
+test.each(Object.entries(original.hashes).filter(([file]) => !['calculators/christmas-bundles.html', 'calculators/css/christmas-bundles.css', 'calculators/js/christmas-bundles.js'].includes(file)))('%s retains its original source behind reviewed UI mappings', (file, hash) => {
     let source = fs.readFileSync(path.join(root, file), 'utf8').replace(/\r\n/g, '\n');
     for (const change of original.changes.filter(c => c.file === file).reverse()) {
         expect(source.split(change.after).length - 1).toBe(change.count);

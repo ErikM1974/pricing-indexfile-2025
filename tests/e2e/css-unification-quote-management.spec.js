@@ -51,6 +51,21 @@ for(const original of [true,false]){
  });
 }
 
+test('CSS staff workspaces: Quote Management current holiday requests remain searchable and need review',async({page})=>{
+ const state=quoteState(false);
+ state.quotes=['Open','Open','Draft'].map((Status,index)=>({PK_ID:8100+index,QuoteID:'XMAS-'+String(index+1).repeat(28),Status,CreatedAt:'2026-09-10T09:00:00',ProjectName:'Holiday Gift Box 2026',CustomerName:'Example Customer',CustomerEmail:'example@example.invalid',CompanyName:'Example Company',SalesRepEmail:'sales@nwcustomapparel.com',TotalQuantity:4,TotalAmount:index===1?0:372,ShippingFee:index===1?0:25,TaxAmount:0}));
+ const events=await setup(page,state);await ready(page);
+ await page.locator('#filter-search').fill('Holiday Gift Box 2026');await page.locator('[data-action="search"]').click();await ready(page);
+ await expect(page.locator('#quotes-tbody tr')).toHaveCount(3);
+ const row=index=>page.locator('tr[data-quote-id="'+state.quotes[index].QuoteID+'"]');
+ await expect(row(0)).toContainText('Priced request');await expect(row(0).locator('.quote-amount')).toHaveText('$397.00');
+ await expect(row(1)).toContainText('Complimentary sample');await expect(row(1).locator('.quote-amount')).toHaveText('$0.00');
+ await expect(row(2)).toContainText('Save incomplete');await expect(row(2).locator('.status-dropdown')).toHaveCount(0);
+ for(const width of [1440,768,390,320]){await page.setViewportSize({width,height:1000});expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);expect((await new(require('@axe-core/playwright').default)({page}).withTags(['wcag2a','wcag2aa']).analyze()).violations).toEqual([]);if([1440,320].includes(width))await page.screenshot({path:path.join(output,'holiday-quotes-list-'+width+'.png'),fullPage:true});}
+ await row(0).locator('[data-action="edit"]').click();expect(await page.evaluate(()=>window.__opened)).toEqual([{url:'/quote/'+state.quotes[0].QuoteID,target:'_blank'}]);
+ for(const key of ['errors','unknown','missing','writes'])expect(events[key],key).toEqual([]);
+});
+
 function quoteState(original=true,mode='populated'){
  const state={original,mode,reads:[],quotes:structuredClone(fixtures.quotes)};
  state.respond=async(req,url)=>{

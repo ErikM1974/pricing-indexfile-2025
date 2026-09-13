@@ -1,5 +1,11 @@
 # LESSONS LEARNED
 
+## Holiday requests must share receipt and inventory contracts (2026-09-13)
+
+- Problem/root cause: supported-size placeholder zeros looked like sold-out stock. A rebuilt request also needs the existing receipt’s fee types and address parser, not only a successful save.
+- Solution: use actual SanMar inventory with catalog colors; compute one box through the real eight-piece embroidery tier; use server-validated invitation grants and prices. Save a Draft with confirmed lines, then mark Open. SHIP is a fee line and XMAS references are accepted by both receipt routers.
+- Prevention: test real calculator parity, malformed/duplicate stock, partial writes and reload retries, receipt totals and logo access, staff inbox placement and payment blocking. Persist email send intent; uncertain delivery must not automatically resend. Cross-dyno exactly-once creation still requires a unique database key or durable lock.
+
 ## New pages must enter the CSS ownership checks (2026-09-13)
 
 - Problem/root cause: per-page CSS guards covered manifest entries, but the runtime census did not fail when a new application page was omitted. Four reviewed training pages also lacked pointers to their existing browser suite.
@@ -128,10 +134,6 @@ Historical deployment, token, builder, junction, server split and proxy-auth mig
 Exact-source CI must pass its actual browser/parity jobs, including credentials when required; local green is not CI green. Resolved runner/secret incidents are in LESSONS_LEARNED_ARCHIVE.md.
 
 Quote-operation access rollout (2026-09-07) is archived in LESSONS_LEARNED_ARCHIVE.md; caller/quote scope and live-mutation boundaries remain enforced by quote-sync-access.test.js.
-
-## A reviewed page wrapper is not a reviewed external app (2026-09-09)
-
-Problem: the CSS census omitted Jotform scripts and its external-owner backlog named only three Caspio pages. Root cause: provider recognition did not match the currently loaded embeds. Solution: recognize Jotform and explicitly retain vendor-owned UI as pending even after its surrounding page is reviewed. Prevention: lock live embed IDs/URLs, test wrapper boundaries with login/table/empty/failure fixtures and block all real provider writes; do not describe synthetic fixture coverage as validation of a vendor app. Check DESIGN_COLOUR_CODE before mapping an inherited palette: announcement admin tools are neutral; legacy maroon does not make them AE-owned.
 
 ## Monitoring data needs complete responses and visible persistence failures (2026-09-09)
 

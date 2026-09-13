@@ -5168,7 +5168,8 @@
         "pending-delete-email-and-shipstation-actions-preserve-one-request",
         "failed-and-malformed-refresh-clears-old-data-and-remains-visible-until-retry",
         "obsolete-date-window-and-inbound-responses-cannot-revive-old-data",
-        "landscape-quote-report-and-shared-inbound-report-with-one-label-per-sheet"
+        "landscape-quote-report-and-shared-inbound-report-with-one-label-per-sheet",
+        "holiday-request-search-priced-complimentary-and-incomplete-review"
       ],
       "test": "tests/e2e/css-unification-quote-management.spec.js",
       "maxCssBytes": 149999,
@@ -5530,21 +5531,23 @@
         "art-prefill-and-import-boundaries",
         "change-notice-severities",
         "four-widths",
-        "print"
+        "print",
+        "holiday-request-priced-complimentary-draft"
       ],
       "test": "tests/e2e/css-unification-quote-view.spec.js",
       "maxCssBytes": 131115,
-      "measuredRawCssBytes": 129067,
+      "measuredRawCssBytes": 129147,
       "baseline": {
         "commit": "85eba439",
         "rawCssBytes": 159871,
         "localCssRequests": 4
       },
-      "measuredTriggeredCssBytes": 247638,
+      "measuredTriggeredCssBytes": 247718,
       "runtimeBoundary": {
         "status": "reviewed",
         "note": "Shared garment form uses scoped art-intake.css through the existing compatibility import. AE, lead, Quote View and designer reviewed at four widths with original prefill, complete scrolling, keyboard/focus and every print page. Original successful payloads preserved; no business writes."
-      }
+      },
+      "behaviorTest": "tests/e2e/seasonal-christmas-behavior.spec.js"
     },
     {
       "source": "pages/order-status.html",
@@ -5968,11 +5971,12 @@
         "quantity-pending-price-withheld",
         "exact-synthetic-cart-payloads",
         "sample-dialog-keyboard-and-axe",
-        "complete-letter-print"
+        "complete-letter-print",
+        "holiday-active-expired-failed"
       ],
       "test": "tests/e2e/css-unification-catalog-storefront.spec.js",
       "maxCssBytes": 140552,
-      "measuredRawCssBytes": 138504,
+      "measuredRawCssBytes": 139593,
       "baseline": {
         "commit": "7ce2f00c6d25de153358a3754bf16ba649e83766",
         "rawCssBytes": 190195,
@@ -6624,23 +6628,24 @@
       "dynamicStyles": [],
       "states": [
         "1440-768-390-320",
-        "2026-campaign-and-bidirectional-staff-dashboard-link",
-        "24-original-successful-order-and-email-combinations",
-        "24-original-controller-financial-combinations",
+        "2026-deadline-and-central-product-assortment",
+        "actual-eight-piece-calculator-parity",
+        "paid-one-box-and-server-verified-shared-invitation",
         "catalog-stock-errors-retries-and-color-response-ownership",
         "keyboard-product-details-and-native-image-dialog",
-        "captured-order-and-pending-duplicate-guard",
-        "independent-session-item-logo-and-email-retry-stages",
-        "address2-thread-colors-and-delivery-date-validation",
-        "52-screens-and-19-paper-pages-in-13-documents-reviewed",
+        "captured-request-recovery-after-refresh",
+        "server-verified-items-and-review-only-quote-persistence",
+        "logo-and-independent-email-recovery",
+        "address2-thread-colors-and-Pacific-delivery-date-validation",
+        "52-screens-in-13-states",
         "print-restores-confirmation-and-draft-until-explicit-done"
       ],
       "test": "tests/e2e/css-unification-seasonal-christmas.spec.js",
       "maxCssBytes": 90582,
-      "measuredRawCssBytes": 88534,
+      "measuredRawCssBytes": 87679,
       "baseline": {
         "commit": "c01ffc2058a0725d3df12c9181c8022776b4ab26",
-        "note": "Six original seasonal source hashes and thirteen original Christmas browser contracts retained; original pointer and false-success defects are labeled diagnostics."
+        "note": "Six original seasonal source hashes and thirteen original Christmas browser contracts retained; original pointer and false-success defects are labeled diagnostics. September 2026 functional rebuild replaces the historical free-only contract with current API pricing and server-verified invitations; original evidence remains unchanged."
       }
     },
     {
@@ -9059,6 +9064,36 @@
         "original-bindings-links-and-copy"
       ],
       "providerStatus": "publication-pending; mail-client rendering not certified"
+    },
+    {
+      "source": "email-templates/holiday-box-customer.html",
+      "status": "reviewed-local",
+      "theme": "shared_components/css/email-theme.css",
+      "compiler": "scripts/css/build-email-templates.js",
+      "test": "tests/e2e/css-unification-email-templates.spec.js",
+      "contract": "memory/HOLIDAY_GIFT_BOX_2026.md",
+      "states": [
+        "1440-768-390-320-full-pages",
+        "escaped-customer-values",
+        "complete-letter-documents",
+        "request-summary-link"
+      ],
+      "providerStatus": "Saved as holiday_box_customer; no sends; mail-client delivery unverified"
+    },
+    {
+      "source": "email-templates/holiday-box-sales.html",
+      "status": "reviewed-local",
+      "theme": "shared_components/css/email-theme.css",
+      "compiler": "scripts/css/build-email-templates.js",
+      "test": "tests/e2e/css-unification-email-templates.spec.js",
+      "contract": "memory/HOLIDAY_GIFT_BOX_2026.md",
+      "states": [
+        "1440-768-390-320-full-pages",
+        "escaped-customer-values",
+        "complete-letter-documents",
+        "request-summary-link"
+      ],
+      "providerStatus": "Saved as holiday_box_sales; no sends; mail-client delivery unverified"
     }
   ]
 }

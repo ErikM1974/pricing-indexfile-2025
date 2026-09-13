@@ -16,6 +16,46 @@ const QV_DEBUG = window.location.hostname === 'localhost';
 const QV_PLACEHOLDER_IMG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23f3f4f6'/%3E%3Cpath d='M22 14l-12 8 5 9 5-3v22h24V28l5 3 5-9-12-8a10 10 0 0 1-20 0z' fill='%23d1d5db'/%3E%3C/svg%3E";
 
 class QuoteViewPage {
+    isHolidayRequest() { return /^XMAS-/i.test(String(this.quoteId || '')); }
+    renderHolidayRequestNote() {
+        if (!this.isHolidayRequest()) return;
+        let note = document.getElementById('holiday-request-note');
+        if (!note) {
+            note = document.createElement('section');
+            note.id = 'holiday-request-note';
+            note.className = 'card';
+            document.querySelector('.quote-totals')?.before(note);
+        }
+        note.replaceChildren();
+        const add = (tag, text) => { const node = document.createElement(tag); node.textContent = text; note.append(node); return node; };
+        add('h3', this.quoteData.Status === 'Draft' ? 'Holiday request — save incomplete' : 'Holiday gift-box request received');
+        add('p', 'No payment has been collected. Our team will confirm artwork, inventory, delivery, applicable sales tax and any additional artwork charges. A final quote or invoice follows staff review.');
+        const requestTerms = 'This is a request for staff review. No payment is due. Artwork, availability, delivery and final charges need confirmation before production.';
+        const terms = document.querySelector('.terms-list');
+        if (terms) { const item = document.createElement('li'); item.textContent = requestTerms; terms.replaceChildren(item); }
+        const printedTerms = document.querySelector('.print-only-terms');
+        if (printedTerms) printedTerms.textContent = requestTerms;
+        let settings;
+        try { settings = JSON.parse(this.quoteData.OrderSettingsJSON || '{}'); } catch { add('p', 'Customization details could not be read. Please contact our team with this request reference.'); return; }
+        const customer = settings.customer || {};
+        add('p', settings.requestType === 'complimentary-sample' ? 'Complimentary sample — invitation verified.' : 'One box at the embroidery 8-piece pricing tier.');
+        add('p', 'Delivery: ' + (settings.deliveryMethod === 'Pickup' ? 'Factory pickup' : 'Ship to your address') + '. Requested date: ' + this.formatBusinessDate(customer.dueDate));
+        if (settings.deliveryMethod === 'Ship') {
+            const address = [this.quoteData.ShipToAddress, this.quoteData.ShipToCity, this.quoteData.ShipToState, this.quoteData.ShipToZip].filter(Boolean).join(', ');
+            add('p', 'Ship to: ' + (address || 'Please confirm the shipping address with our team.'));
+        }
+        add('p', 'Jacket: ' + (customer.jacketEmbLocation || 'To confirm') + '. Hoodie: ' + (customer.hoodieEmbLocation || 'To confirm') + '. Beanie: front center. Gloves: undecorated.');
+        if (customer.threadColors) add('p', 'Thread colors: ' + customer.threadColors);
+        if (customer.specialInstructions) add('p', 'Your notes: ' + customer.specialInstructions);
+        if (customer.holidayTeamSize) add('p', 'Planned team gifts: ' + customer.holidayTeamSize);
+        if (customer.holidayGiftDate) add('p', 'Requested holiday gift date: ' + this.formatBusinessDate(customer.holidayGiftDate));
+        if (customer.imageUpload && window.APP_CONFIG?.API?.BASE_URL) {
+            const link = add('a', 'Open uploaded company logo');
+            link.href = window.APP_CONFIG.API.BASE_URL + '/api/files/' + encodeURIComponent(customer.imageUpload);
+            link.target = '_blank'; link.rel = 'noopener';
+        } else add('p', 'Company logo: our team will arrange artwork with you.');
+    }
+
     constructor() {
         this.quoteId = null;
         this.quoteData = null;
@@ -40,6 +80,7 @@ class QuoteViewPage {
             'PATCH': 'Embroidered Emblems',
             'STK': 'Die-Cut Stickers & Vinyl Banners',
             'OF':  'Order Form',  // A4 (2026-05-22): OF-NNNN was falling through to "Custom Quote"
+            'XMAS': 'Holiday Gift Box Request',
             'WQ':  'Web Quote Request',  // Phase 3 customer quote-cart (2026-06-11)
             'SAM': 'Sample Order — Blanks'  // paid Top Sellers samples (2026-08-19): was "Custom Quote"
         };
@@ -164,6 +205,7 @@ class QuoteViewPage {
 
         // Wire the "Open as Invoice" link to the matching /invoice/:quoteId URL.
         const invLink = document.getElementById('open-invoice-link');
+        if (invLink && this.isHolidayRequest()) invLink.hidden = true;
         if (invLink && this.quoteId) {
             invLink.href = `/invoice/${encodeURIComponent(this.quoteId)}${this.shareTokenParam()}`;
         }
@@ -212,7 +254,7 @@ class QuoteViewPage {
     getQuoteIdFromUrl() {
         const path = window.location.pathname;
         // Match multiple formats: DTF0112-1 or DTF-1768263686415
-        const match = path.match(/\/quote\/([A-Z]{2,5}[-\d]+)/);
+        const match = path.match(/\/quote\/(XMAS-[A-F0-9]{28}|[A-Z]{2,5}[-\d]+)(?:\/|$)/);
         if (match) return match[1];
         // Phase 10.1 (2026-05-14): defense-in-depth fallback for
         // /pages/quote-view.html?quoteId=<ID> URLs (any old email
@@ -298,14 +340,15 @@ class QuoteViewPage {
     async renderQuote() {
         // Header - include revision if > 1
         const revision = this.quoteData.RevisionNumber || 1;
-        let headerText = `Quote #${this.quoteId}`;
+        let headerText = `${this.isHolidayRequest() ? 'Request' : 'Quote'} #${this.quoteId}`;
         if (revision > 1) {
             headerText += ` • Rev ${revision}`;
         }
         document.getElementById('quote-id-header').textContent = headerText;
 
         // Set document title for PDF filename (Ctrl+P → Save as PDF)
-        document.title = `Quote ${this.quoteId} - NWCA`;
+        document.title = `${this.isHolidayRequest() ? 'Holiday request' : 'Quote'} ${this.quoteId} - NWCA`;
+        if (this.isHolidayRequest()) document.querySelector('.document-title').textContent = 'Your holiday request';
 
         // Status
         this.renderStatus();
@@ -500,10 +543,12 @@ class QuoteViewPage {
         // Paid storefront order: nothing left to accept — hide the CTA so a
         // customer opening the share link isn't offered "Accept Quote" on an
         // order they already paid for at checkout.
-        if (this._storefrontPaidInfo()) {
+        if (this._storefrontPaidInfo() || this.isHolidayRequest()) {
             const acceptBtn = document.getElementById('accept-quote-btn');
             if (acceptBtn) acceptBtn.hidden = true;
         }
+
+        this.renderHolidayRequestNote();
 
         // Render DTF specs section if applicable
         this.renderDTFSpecs();
@@ -556,7 +601,9 @@ class QuoteViewPage {
 
         // Paid check FIRST: a completed order must never show 'Expired' just
         // because its 30-day quote window lapsed after the customer paid.
-        if (this._storefrontPaidInfo()) {
+        if (this.isHolidayRequest()) {
+            statusText = this.quoteData.Status === 'Draft' ? 'Save incomplete' : 'Awaiting staff review';
+        } else if (this._storefrontPaidInfo()) {
             statusClass = 'status-paid';
             statusText = 'Paid Order';
         } else if (this.quoteData.Status === 'Accepted') {
@@ -929,7 +976,7 @@ class QuoteViewPage {
         // gave a sticker line six empty cells and made the quote look broken
         // (2026-07-24). Suppress the whole size block for those prefixes and let
         // Item/Color/Qty/Unit/Total carry the row.
-        const sizelessPrefix = ['STK', 'PATCH'].includes(this.quoteId?.split(/[\d-]/)[0] || '');
+        const sizelessPrefix = ['STK', 'PATCH', 'XMAS'].includes(this.quoteId?.split(/[\d-]/)[0] || '');
         this.hideSizeColumns = sizelessPrefix;
 
         const sizeHeaders = sizelessPrefix ? '' : `
@@ -978,6 +1025,7 @@ class QuoteViewPage {
             }
             const rows = this.buildProductRows(group, groupIndex);
             rows.forEach((row, i) => {
+                if (this.isHolidayRequest()) { row.style = group.styleNumber; row.description = group.productName + ' · Size ' + Object.keys(row.sizes).join(', '); }
                 html += this.renderProductRow(row, i === 0, groupIndex);
                 rowIndex++;
             });
@@ -1058,6 +1106,7 @@ class QuoteViewPage {
      * Print quotes (DTG, DTF, SPC, SSC) show location only
      */
     renderEmbroideryInfo() {
+        if (this.isHolidayRequest()) return ''; // Per-garment locations are in the request details.
         // Determine quote type from prefix
         const prefix = this.quoteId?.split(/[\d-]/)[0] || '';
 
@@ -1943,7 +1992,7 @@ class QuoteViewPage {
             // WQ web-cart quotes save TaxRate 0 by design (no shipping address
             // yet — the rep calculates tax at confirmation), so "Out of State
             // Sales" would be wrong/alarming for them.
-            const isWebQuote = (this.quoteId || '').startsWith('WQ');
+            const isWebQuote = (this.quoteId || '').startsWith('WQ') || this.isHolidayRequest();
             const zeroTaxLabel = isWholesale
                 ? 'Wholesale / Resale — No Tax (permit on file)'
                 : (isCEMB ? 'Tax-exempt'
@@ -1959,7 +2008,7 @@ class QuoteViewPage {
         // Grand total with tax
         totalsHtml += `
             <div class="total-row grand-total">
-                <span class="label">TOTAL:</span>
+                <span class="label">${this.isHolidayRequest() ? 'REQUEST ESTIMATE:' : 'TOTAL:'}</span>
                 <span class="value">${this.formatCurrency(totalWithTax)}</span>
             </div>
         `;
@@ -4431,6 +4480,7 @@ class QuoteViewPage {
 
     // Modal Methods
     openAcceptModal() {
+        if (this.isHolidayRequest()) return;
         if (this.isExpired()) {
             window.ToastNotifications.error('This quote has expired. Please contact us for updated pricing.');
             return;
@@ -4468,6 +4518,7 @@ class QuoteViewPage {
     }
 
     async acceptQuote() {
+        if (this.isHolidayRequest()) return;
         if (this._acceptPending || this.quoteData?.Status === 'Accepted') return;
         this.showAcceptanceError('');
         const nameInput = document.getElementById('accept-name');
@@ -4610,6 +4661,7 @@ class QuoteViewPage {
     renderDepositPanel(urlParams) {
         const panel = document.getElementById('deposit-panel');
         if (!panel || !this.quoteData) return;
+        if (this.isHolidayRequest()) { panel.hidden = true; return; }
         const notes = this._depositNotes();
         const dep = notes.deposit;
         const payments = Array.isArray(notes.payments) ? notes.payments : [];
@@ -4682,6 +4734,7 @@ class QuoteViewPage {
     }
 
     async startDepositCheckout(btn) {
+        if (this.isHolidayRequest()) return;
         if (this._checkoutPending) return;
         this._checkoutPending = true;
         btn.disabled = true;
@@ -4715,6 +4768,7 @@ class QuoteViewPage {
         const state = document.getElementById('qv-deposit-state');
         const form = document.getElementById('qv-deposit-form');
         strip.hidden = false;
+        if (this.isHolidayRequest()) { state.textContent = 'Holiday request: review artwork, availability and final charges, then create the final quote through the usual builder.'; form.hidden = true; return; }
 
         if (depositPaid) {
             state.textContent = `Paid ${this.formatCurrency(Number(depositPaid.amount) || 0)}${depositPaid.at ? ' on ' + this.formatDate(depositPaid.at) : ''}`;
@@ -4785,6 +4839,7 @@ class QuoteViewPage {
     }
 
     async enableDeposit() {
+        if (this.isHolidayRequest()) return;
         if (!this.isStaff || this._depositPending) return;
         const btn = document.getElementById('qv-deposit-enable-btn');
         const shipping = parseFloat(document.getElementById('qv-deposit-shipping').value);

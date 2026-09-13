@@ -122,7 +122,7 @@ async function loadOrdersInbox(forceRefresh = false) {
                    && STOREFRONT_PREFIXES.includes(pfx)
                    && createdDay >= sevenDaysAgo) {
             paid.push(s);
-        } else if (status === 'Accepted') {
+        } else if (status === 'Accepted' || /^XMAS-/i.test(String(s.QuoteID || '')) && ['Open', 'Draft'].includes(status)) {
             accepted.push(s);   // full 30-day window — acceptance can lag creation
         }
     }
@@ -147,14 +147,16 @@ async function loadOrdersInbox(forceRefresh = false) {
 
     const orderRow = (s) => {
         const pfx = prefixOf(s.QuoteID);
-        const total = (parseFloat(s.TotalAmount) || 0) + (parseFloat(s.TaxAmount) || 0);
+        const holiday = /^XMAS-/i.test(String(s.QuoteID || ''));
+        const holidayLabel = holiday ? s.Status === 'Draft' ? 'Incomplete holiday request — review needed' : Number(s.TotalAmount) === 0 ? 'Complimentary holiday sample request' : 'Holiday box request — pricing review' : '';
+        const total = (parseFloat(s.TotalAmount) || 0) + (parseFloat(s.TaxAmount) || 0) + (holiday ? Number(s.ShippingFee) || 0 : 0);
         return `
             <li>
                 <a class="inbox-row" href="${quoteLink(s.QuoteID)}" target="_blank" rel="noopener">
                     <span class="inbox-chip inbox-chip--${escapeHtml(pfx.toLowerCase())}">${escapeHtml(pfx)}</span>
                     <span class="inbox-row-main">
                         <span class="inbox-row-title">${escapeHtml(s.CompanyName || s.CustomerName || s.QuoteID)}</span>
-                        <span class="inbox-row-sub">${escapeHtml(s.QuoteID)} · ${escapeHtml(formatRelativeTime(s.CreatedAt))}</span>
+                        <span class="inbox-row-sub">${escapeHtml(holidayLabel || s.QuoteID)} · ${escapeHtml(formatRelativeTime(s.CreatedAt))}</span>
                     </span>
                     <span class="inbox-row-amount">${formatMoney(total)}</span>
                 </a>
@@ -166,7 +168,7 @@ async function loadOrdersInbox(forceRefresh = false) {
         : emptyRow('No paid web orders in the last 7 days.');
     acceptedList.innerHTML = accepted.length
         ? accepted.slice(0, 8).map(orderRow).join('')
-        : emptyRow('No accepted-but-unpaid quotes right now.');
+        : emptyRow('No quotes or requests awaiting review right now.');
     paidList.setAttribute('aria-busy', 'false');
     acceptedList.setAttribute('aria-busy', 'false');
     return reportWidgetResult('inbox', true);

@@ -3,6 +3,20 @@ const fixture=require('../fixtures/email-templates-original-content.json'),root=
 const original=process.env.CAPTURE_EMAIL_TEMPLATES_ORIGINAL==='1',phase=original?'original':'current';
 const data={customer_name:'Alex Example',to_name:'Alex',company_name:'Example Team',customer_email:'alex@example.invalid',to_email:'alex@example.invalid',email:'alex@example.invalid',customer_phone:'555-0100',phone:'555-0100',company_phone:'253-922-5793',sales_phone:'253-922-5793',sales_email:'sales@example.invalid',quote_number:'XMAS0913-1',quote_id:'GOLF0913-1',quote_date:'September 13, 2026',design_number:'12345',design_size:'4 by 3 inches',placement:'Left chest',work_order:'123456',sales_rep_name:'Example Rep',mockup_count:'',approval_link:'https://example.invalid/review/example',from_name:'Example Rep',jacket_details:'Black jacket, size M',hoodie_details:'Navy hoodie, size M',beanie_details:'Navy beanie',gloves_details:'Black gloves, size M',delivery_type:'Delivery',delivery_date:'October 10, 2026',address_1:'123 Example Avenue',city:'Milton',state:'WA',zip:'98354',quantity:'4',company_year:'1977',tournament_date:'July 2026',player_count:'144',interests:'Polos, caps and event prizes',notes:'Please include individual names and a second delivery contact.',lead_score:'HOT',lead_score_emoji:'🔥',submitted_at:'September 13, 2026, 10:00 AM',utm_source:'example',utm_campaign:'golf-2026',utm_medium:'form',talking_points:'Review the tournament date and logo placement with the customer.'};
 const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+for(const recipient of ['customer','sales'])test('holiday '+recipient+' confirmation preview uses escaped details and a request link',async({page})=>{
+ const source=fs.readFileSync(path.join(root,'email-templates/holiday-box-'+recipient+'.html'),'utf8');
+ const values={customer_name:'Example Customer',company_name:'Example & Sons <Construction>',request_id:'XMAS-'+'A1'.repeat(14),request_url:'https://example.invalid/quote/synthetic?k=synthetic',request_type:'Holiday box — staff review and invoice',amount_label:'$397.00 estimated, before applicable sales tax',delivery_details:'Ship; requested date October 16, 2026',planning_details:'Team size: 40. Holiday date: December 15, 2026',customer_email:'customer@example.invalid',customer_phone:'253-555-0100'};
+ const html=source.replace('{{{items_html}}}','<p>Carhartt jacket · Black · L</p><p>Carhartt hoodie · Black · L</p><p>Carhartt beanie · Black · OSFA</p><p>Carhartt gloves · Black · L</p>').replace(/\{\{([^{}]+)\}\}/g,(_,name)=>{expect(values).toHaveProperty(name);return esc(values[name]);});
+ const requests=[];await page.route('**/*',route=>{requests.push(route.request().url());return route.abort();});
+ fs.mkdirSync(out,{recursive:true});
+ for(const width of [1440,768,390,320]){
+  await page.setViewportSize({width,height:1000});await page.setContent(html);
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+  await expect(page.locator('body')).toContainText('staff review');await expect(page.locator('a').first()).toHaveAttribute('href',values.request_url);
+  await page.screenshot({path:path.join(out,'holiday-email-'+recipient+'-'+width+'.png'),fullPage:true});
+ }
+ await page.pdf({path:path.join(out,'holiday-email-'+recipient+'.pdf'),format:'Letter',printBackground:true});expect(requests).toEqual([]);
+});
 function render(source,long=false){return source.replace(/\{\{\{mockup_images_html\}\}\}/g,'<p>Front view</p><img src="https://example.invalid/mockup.png" width="500" style="max-width:100%;height:auto;" alt="Example chest embroidery proof">').replace(/\{\{([^{}]+)\}\}/g,(_,name)=>esc(long&&['company_name','customer_name','to_name','notes'].includes(name)?'ExampleWithALongNameAndNoSpacesForWrapping '+(data[name]??name):data[name]??name));}
 for(const [index,entry] of fixture.entries.entries())test('CSS email template local preview '+index,async({page})=>{
  const requests=[],errors=[];page.on('pageerror',e=>errors.push(e.message));

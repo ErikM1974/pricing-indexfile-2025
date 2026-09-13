@@ -1,5 +1,13 @@
 # Active Files Registry
 
+- `email-templates/holiday-box-customer.html` and `email-templates/holiday-box-sales.html` — shared-theme sources for server-sent holiday request confirmations; provider IDs `holiday_box_customer` / `holiday_box_sales`.
+
+- `config/christmas-campaign.json` — holiday campaign deadline, product assortment and copy; update this file when replacing featured products. Charges come from Caspio.
+- `calculators/js/christmas-campaign.js` — shared campaign validation and exact-color SanMar inventory parsing.
+- `lib/christmas-pricing.js` — current eight-piece embroidery calculator adapter for one holiday box.
+- `lib/christmas-gift-box.js` — server-verified gift invitations, estimates, quote persistence and confirmation delivery.
+- `routes/christmas-gift-box.js` — bounded public campaign, inventory, estimate and request routes.
+
 - tests/e2e/seasonal-christmas-behavior.spec.js — synthetic 2026 catalog, inventory, keyboard, delivery, captured order, upload and email retry checks.
 
 - `shared_components/js/core-calculator-ui.js` — scoped canonical control classes, keyboard actions, state announcements and table scrolling for five public calculators; no pricing calculations.
@@ -1599,3 +1607,10 @@ Garment designer completion: page styles are scoped to the unified designer; art
 - tests/unit/email-templates.test.js — canonical theme output, token resolution and preserved copy/bindings/plain-text contracts.
 
 - `memory/EMAIL_STYLE_CONTRACT_2026-09.md` — shared email theme/build, immutable bindings, local review and provider publication boundaries.
+
+- `tests/fixtures/holiday-emb-CT104670.json`, `tests/fixtures/holiday-size-CT104670.json`, `tests/fixtures/holiday-8-piece-contract.json` — public API pricing and independent quote-builder results captured September 13, 2026 for holiday eight-piece parity.
+
+- `tests/fixtures/holiday-request-source-mappings.json` and `tests/helpers/holiday-source-mappings.js` — reversible holiday integration changes for existing staff/customer/catalog source contracts; original migration fixtures remain unchanged.
+
+- `memory/HOLIDAY_GIFT_BOX_2026.md` — current holiday campaign, pricing/inventory contracts, request review, EmailJS setup and release prerequisites.
+- `shared_components/js/embroidery-quote-pricing.d.ts` — typed calculation boundary for the canonical legacy embroidery engine; no independent price rules.

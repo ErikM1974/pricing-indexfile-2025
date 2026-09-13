@@ -49,6 +49,8 @@ Last Updated: 2026-09-03 (/memory-maintain: MEMORY.md 24.0→~19 KB — Sept shi
 | [`proxy-security-2026-08.md`](proxy-security-2026-08.md) | August 2026 proxy/app file-exposure + gating work |
 | [`sample-request-routing.md`](sample-request-routing.md) | Free-sample request → Leads routing; the 12-place form-ID vocabulary |
 
+- [Holiday Gift Box 2026](HOLIDAY_GIFT_BOX_2026.md) — campaign owner, actual inventory/pricing, shared invitation code, Quotes/inbox review, confirmations and release prerequisites.
+
 ## Known backlog
 
 - 🔴 **CLAUDE.md routes ManageOrders discoveries to files that do not exist.**

@@ -57,7 +57,7 @@ app.get('/quote/:quoteId', (req, res) => {
   // - PREFIX + MMDD + - + sequence (e.g., DTF0112-1)
   // - PREFIX + - + timestamp (e.g., DTF-1768263686415)
   const quoteId = req.params.quoteId;
-  if (!quoteId || !/^[A-Z]{2,5}[-\d]+-?\d*$/.test(quoteId)) {
+  if (!quoteId || !/^(?:[A-Z]{2,5}[-\d]+-?\d*|XMAS-[A-F0-9]{28})$/.test(quoteId)) {
     return res.status(400).send('Invalid quote ID format');
   }
   res.sendFile(path.join(SERVER_DIR, 'pages', 'quote-view.html'));
@@ -70,7 +70,13 @@ app.get('/quote/:quoteId', (req, res) => {
 // quote-view page, so any ShopWorks edits flow through here too.
 app.get('/invoice/:quoteId', (req, res) => {
   const quoteId = req.params.quoteId;
-  if (!quoteId || !/^[A-Z]{2,5}[-\d]+-?\d*$/.test(quoteId)) {
+  // Holiday submissions are requests. Keep the share token when directing an
+  // invoice-shaped link to the request receipt, which has no payment instructions.
+  if (/^XMAS-[A-F0-9]{28}$/.test(quoteId || '')) {
+    const token = typeof req.query?.k === 'string' ? '?k=' + encodeURIComponent(req.query.k) : '';
+    return res.redirect(302, '/quote/' + quoteId + token);
+  }
+  if (!quoteId || !/^(?:[A-Z]{2,5}[-\d]+-?\d*|XMAS-[A-F0-9]{28})$/.test(quoteId)) {
     return res.status(400).send('Invalid quote ID format');
   }
   res.sendFile(path.join(SERVER_DIR, 'pages', 'invoice.html'));

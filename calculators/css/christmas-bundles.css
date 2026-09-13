@@ -1,1189 +1,212 @@
-/* Christmas gift boxes use the shared UI primitives. All page rules are scoped. */
+/* Holiday gift-box arrangements; canonical tokens and components own the foundations. */
 @layer components.pages {
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .product-description
-        summary {
-        cursor: pointer;
-        min-height: 44px;
-        padding-block: 10px;
-        color: var(--ui-accent);
-        font-weight: 600;
-    }
 
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .product-description
-        p {
-        margin-top: 12px;
-    }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .upload-area input { width:100%; max-width:100%; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .holiday-planning legend { max-width:100%; white-space:normal; }
+
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) main,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .contact-bar-content,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .deadline-content,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .holiday-hero-inner { max-width:1280px; margin-inline:auto; padding-inline:var(--space-6); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) main { padding-block:var(--space-8) var(--space-8); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .contact-bar { background:var(--ui-surface); border-bottom:1px solid var(--ui-line); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .contact-bar-content { display:flex; align-items:center; flex-wrap:wrap; gap:var(--space-3) var(--space-6); padding-block:var(--space-3); font-size:var(--font-size-md); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .contact-item { display:flex; align-items:center; gap:var(--space-2); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .dashboard-return { margin-left:auto; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .holiday-hero { background:var(--store-paper); border-bottom:1px solid var(--ui-line); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .holiday-hero-inner { display:grid; grid-template-columns:1fr 1.1fr; align-items:center; gap:var(--space-8); padding-block:var(--space-8); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .holiday-introduction { min-width:0; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .holiday-logo { display:inline-flex; margin-bottom:var(--space-5); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .holiday-logo img { width:180px; height:56px; object-fit:contain; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .holiday-introduction h1 { font-family:var(--font-store-display); font-size:clamp(2.5rem,4.7vw,4.4rem); letter-spacing:-0.045em; line-height:1.03; max-width:11ch; margin:0 0 var(--space-5); color:var(--store-green-950); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .holiday-introduction > p { max-width:47ch; color:var(--ui-muted); font-size:var(--font-size-lg); line-height:var(--line-height-base); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .hero-start { margin-block:var(--space-3); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .holiday-introduction .hero-assurance { font-size:var(--font-size-md); font-weight:var(--font-weight-semibold); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .holiday-hero-display { min-width:0; text-align:center; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .hero-products { display:flex; align-items:flex-end; justify-content:center; gap:var(--space-2); min-height:300px; border-radius:var(--radius-xl); background:var(--ui-surface); padding:var(--space-5); overflow:hidden; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .hero-products img { width:31%; height:310px; object-fit:contain; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .hero-products img:nth-child(2) { height:360px; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .holiday-hero-display > p { font-size:var(--font-size-md); color:var(--ui-muted); margin:var(--space-3) 0 0; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .deadline-banner { background:var(--store-green-900); color:var(--color-surface); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .deadline-content { display:flex; justify-content:space-between; flex-wrap:wrap; gap:var(--space-3); padding-block:var(--space-4); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .deadline-content a { color:inherit; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .campaign-information { margin-bottom:var(--space-6); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .campaign-how { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:var(--space-6); padding-bottom:var(--space-6); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .campaign-how p { margin:0; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .campaign-how strong,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .campaign-how span { display:block; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .campaign-how strong { font-family:var(--font-store-display); font-size:var(--font-size-xl); margin-bottom:var(--space-2); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .campaign-how span,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .campaign-access p,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .countdown-message { color:var(--ui-muted); font-size:var(--font-size-md); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .campaign-access { display:grid; grid-template-columns:1fr 1fr; align-items:center; gap:var(--space-8); border-block:1px solid var(--ui-line); padding-block:var(--space-5); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .campaign-access form { min-width:0; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .campaign-access label { font-weight:var(--font-weight-semibold); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .gift-code-fields { display:flex; gap:var(--space-2); margin-top:var(--space-2); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .gift-code-fields input { min-width:0; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .gift-code-fields button { flex:none; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .campaign-access form p:empty { display:none; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .countdown-message { margin-bottom:0; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .value-summary-banner { background:var(--ui-tint); border-radius:var(--radius-md); margin-bottom:var(--space-5); padding:var(--space-4) var(--space-5); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .value-summary-content { display:flex; justify-content:space-between; flex-wrap:wrap; gap:var(--space-3); font-size:var(--font-size-md); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .progress-container { scroll-margin-top:var(--space-5); margin-bottom:var(--space-5); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .progress-steps { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:var(--space-2); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .step { display:flex; flex-direction:column; gap:var(--space-2); min-width:0; padding:var(--space-3) var(--space-2); border-bottom:3px solid var(--ui-line); border-radius:0; color:var(--ui-muted); background:transparent; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .step.active { color:var(--ui-accent-hover); border-color:var(--ui-accent-hover); background:var(--ui-tint); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .step-number { font-variant-numeric:tabular-nums; font-weight:var(--font-weight-bold); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .step-title { font-size:var(--font-size-md); white-space:normal; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .catalog-status { color:var(--ui-muted); font-size:var(--font-size-md); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .main-container { display:grid; grid-template-columns:minmax(0,1fr) 300px; align-items:start; gap:var(--space-6); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .main-content,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .section { min-width:0; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]):is([data-christmas-step="1"],[data-christmas-step="2"],[data-christmas-step="3"],[data-christmas-step="4"]) .main-container { grid-template-columns:minmax(0,1fr); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]):is([data-christmas-step="1"],[data-christmas-step="2"],[data-christmas-step="3"],[data-christmas-step="4"]) .order-summary { width:100%; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .section { background:var(--ui-surface); border:1px solid var(--ui-line); border-radius:var(--radius-lg); padding:var(--space-6); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .section-title { font-family:var(--font-store-display); font-size:var(--font-size-2xl); margin:0 0 var(--space-2); line-height:1.2; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .section-subtitle { color:var(--ui-muted); margin:0 0 var(--space-6); max-width:75ch; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .products-grid,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .product-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:var(--space-5); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .product-card { display:flex; flex-direction:column; min-width:0; border:1px solid var(--ui-line); border-radius:var(--radius-md); background:var(--ui-surface); overflow:hidden; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .product-card.selected { border-color:var(--ui-accent-hover); box-shadow:0 0 0 1px var(--ui-accent); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .product-image { display:block; border:0; border-bottom:1px solid var(--ui-line); border-radius:0; background:var(--ui-surface); padding:var(--space-4); width:100%; height:250px; cursor:zoom-in; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .product-image img { display:block; width:100%; height:100%; object-fit:contain; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .product-info { display:flex; flex-direction:column; gap:var(--space-3); padding:var(--space-5); flex:1; min-width:0; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .product-style { margin:0; font-size:var(--font-size-sm); color:var(--ui-muted); letter-spacing:0.025em; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .product-name { margin:0; font-family:var(--font-store-display); font-size:var(--font-size-xl); line-height:1.2; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .product-purpose { margin:0; min-height:3em; font-size:var(--font-size-md); color:var(--ui-muted); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .product-price { font-size:var(--font-size-xl); font-weight:var(--font-weight-semibold); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .price-context { display:block; color:var(--ui-muted); font-size:var(--font-size-sm); font-weight:var(--font-weight-regular); margin-top:var(--space-1); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .product-description { font-size:var(--font-size-md); border-bottom:1px solid var(--ui-line); padding-bottom:var(--space-2); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .product-description summary { cursor:pointer; color:var(--ui-accent-hover); min-height:44px; padding-block:var(--space-3); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .product-description p { margin:0; color:var(--ui-muted); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .selection-group { border:0; margin:0; padding:0; min-width:0; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .selection-group legend { font-weight:var(--font-weight-semibold); font-size:var(--font-size-md); margin-bottom:var(--space-2); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .color-grid { display:flex; flex-wrap:wrap; gap:var(--space-2); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .color-swatch { display:flex; align-items:center; gap:var(--space-2); padding:var(--space-2); min-height:44px; font-size:var(--font-size-sm); text-align:left; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .color-swatch img { width:22px; height:22px; object-fit:cover; border-radius:var(--radius-sm); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .color-swatch.selected,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .size-btn.selected { color:var(--ui-accent-hover); border-color:var(--ui-accent-hover); background:var(--ui-tint); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .size-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:var(--space-2); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .size-btn { min-width:0; display:flex; flex-direction:column; gap:var(--space-1); padding:var(--space-2) var(--space-1); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .size-quantity { font-size:var(--font-size-sm); font-weight:var(--font-weight-regular); white-space:normal; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .stock-status { min-height:3em; margin:0 0 var(--space-3); font-size:var(--font-size-sm); color:var(--ui-muted); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .select-btn { width:100%; margin-top:auto; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .product-error,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .gift-box-error { color:var(--color-danger-ink); font-size:var(--font-size-md); overflow-wrap:anywhere; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .gift-box-error { background:var(--color-danger-bg); border:1px solid var(--color-danger-ink); border-radius:var(--radius-md); padding:var(--space-4); margin-bottom:var(--space-4); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .catalog-retry { margin-bottom:var(--space-4); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .navigation,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .nav-buttons { display:flex; justify-content:space-between; gap:var(--space-3); margin-top:var(--space-6); padding-top:var(--space-5); border-top:1px solid var(--ui-line); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .summary-card { border:1px solid var(--ui-line); border-radius:var(--radius-lg); background:var(--ui-surface); padding:var(--space-5); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .summary-header { margin:0 0 var(--space-3); font-family:var(--font-store-display); font-size:var(--font-size-xl); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .summary-note { display:flex; align-items:start; gap:var(--space-2); font-size:var(--font-size-md); color:var(--ui-muted); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .summary-items { margin-top:var(--space-4); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .gift-item { display:flex; align-items:center; gap:var(--space-3); padding-block:var(--space-3); border-bottom:1px solid var(--ui-line); min-width:0; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .gift-item > img { width:52px; height:70px; object-fit:contain; flex:none; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .gift-item > div { min-width:0; flex:1; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .gift-item strong { font-size:var(--font-size-md); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .gift-item p,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .gift-item span { margin:var(--space-1) 0; color:var(--ui-muted); font-size:var(--font-size-sm); overflow-wrap:anywhere; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .remove-item { font-size:var(--font-size-sm); padding-inline:var(--space-2); flex:none; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .summary-empty,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .summary-next,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .box-pricing-status { color:var(--ui-muted); font-size:var(--font-size-md); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .box-pricing-status { font-weight:var(--font-weight-semibold); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .upload-area { border:2px dashed var(--ui-line-strong); border-radius:var(--radius-md); padding:var(--space-6); text-align:center; background:var(--ui-canvas); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .upload-area h3 { margin:var(--space-3) 0; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .logo-preview img { max-width:180px; max-height:180px; object-fit:contain; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .logo-preview { margin-top:var(--space-4); overflow-wrap:anywhere; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .upload-note,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .embroidery-note,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .form-help,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .date-info,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .email-confirmation-notice { color:var(--ui-muted); font-size:var(--font-size-md); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .form-row,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .embroidery-locations,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .embroidery-options { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--space-4); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .form-group,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .embroidery-section,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .delivery-section,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .holiday-planning { margin-bottom:var(--space-5); min-width:0; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .form-label { display:block; margin-bottom:var(--space-2); font-weight:var(--font-weight-semibold); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .holiday-planning { margin-top:var(--space-6); padding:var(--space-5); border:1px solid var(--ui-line); border-radius:var(--radius-md); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .holiday-planning label { display:block; margin-block:var(--space-3) var(--space-2); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .holiday-planning input { width:100%; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .delivery-options { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--space-3); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .delivery-option { display:flex; align-items:start; gap:var(--space-3); padding:var(--space-4); border:1px solid var(--ui-line); border-radius:var(--radius-md); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .delivery-option span { display:block; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .pickup-info,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .confirmation-card { border:1px solid var(--ui-line); border-radius:var(--radius-md); padding:var(--space-5); margin-bottom:var(--space-4); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .confirmation-card-title { margin:0 0 var(--space-4); font-size:var(--font-size-lg); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .confirmation-container { display:grid; grid-template-columns:minmax(0,1fr); gap:var(--space-4); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .confirmation-sidebar { min-width:0; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .summary-total-card { padding:var(--space-5); background:var(--ui-tint); border-radius:var(--radius-md); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .summary-total-card h3 { margin:0 0 var(--space-4); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .summary-row { display:flex; justify-content:space-between; gap:var(--space-4); padding-block:var(--space-2); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .summary-row strong { flex:none; font-variant-numeric:tabular-nums; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .estimate-total { border-top:1px solid var(--ui-line-strong); margin-top:var(--space-3); padding-top:var(--space-4); font-size:var(--font-size-lg); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .holiday-request-note { font-size:var(--font-size-md); color:var(--ui-muted); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .submit-btn { width:100%; margin-bottom:var(--space-3); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .gift-details { margin:0; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .gift-details > div { display:grid; grid-template-columns:minmax(100px,0.8fr) minmax(0,1.5fr); gap:var(--space-3); padding-block:var(--space-2); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .gift-details dt { color:var(--ui-muted); font-size:var(--font-size-md); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .gift-details dd { margin:0; overflow-wrap:anywhere; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .request-trap { display:none; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .image-zoom-modal { width:min(90vw,850px); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .zoom-close { display:block; margin-left:auto; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .zoom-image { display:block; max-height:75vh; width:100%; object-fit:contain; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .submission-overlay { max-width:520px; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .submission-modal { padding:var(--space-5); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .submission-title { font-family:var(--font-store-display); font-size:var(--font-size-2xl); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .submission-steps { display:grid; gap:var(--space-3); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .submission-step { display:flex; align-items:center; gap:var(--space-3); color:var(--ui-muted); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .submission-step.active { color:var(--ui-accent-hover); font-weight:var(--font-weight-semibold); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .submission-step-icon { width:28px; height:28px; border:1px solid currentcolor; border-radius:50%; text-align:center; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .modal { width:min(94vw,620px); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .modal-content { padding:var(--space-6); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .modal-close-btn { display:block; margin-left:auto; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .success-icon { color:var(--ui-accent-hover); font-size:var(--font-size-display); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .success-title { font-family:var(--font-store-display); font-size:var(--font-size-2xl); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .success-reference { padding:var(--space-4); margin-block:var(--space-5); background:var(--ui-tint); border-radius:var(--radius-md); overflow-wrap:anywhere; }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .reference-number { font-weight:var(--font-weight-bold); margin-top:var(--space-2); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .confirmation-status { color:var(--ui-muted); }
+:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .gift-print-confirmation { display:none; }
+
+@media (width <=1000px) {
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .products-grid,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .product-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .main-container { grid-template-columns:minmax(0,1fr); }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .summary-items { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--space-4); }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .holiday-hero-inner { gap:var(--space-4); }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .hero-products { min-height:230px; padding:var(--space-3); }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .hero-products img { height:210px; }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .hero-products img:nth-child(2) { height:250px; }
+}
+
+@media (width <=767px) {
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) main,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .contact-bar-content,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .deadline-content,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .holiday-hero-inner { padding-inline:var(--space-4); }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .holiday-hero-inner { grid-template-columns:minmax(0,1fr); padding-block:var(--space-6); }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .holiday-introduction h1 { max-width:16ch; }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .holiday-hero-display { margin-top:var(--space-3); }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .campaign-how { gap:var(--space-4); }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .campaign-how strong { font-size:var(--font-size-lg); }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .campaign-access { grid-template-columns:minmax(0,1fr); gap:var(--space-3); }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .products-grid,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .product-grid { grid-template-columns:minmax(0,1fr); }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .product-image { height:280px; }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .product-purpose { min-height:0; }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .progress-steps { display:flex; overflow-x:auto; padding-bottom:var(--space-2); }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .step { flex:0 0 86px; }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .section { padding:var(--space-4); }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .summary-items { display:block; }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .dashboard-return { margin-left:0; }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .gift-details > div { grid-template-columns:minmax(0,1fr); gap:var(--space-1); }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .form-row,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .embroidery-locations,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .embroidery-options { grid-template-columns:minmax(0,1fr); }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .modal-content { padding:var(--space-4); }
+}
+
+@media (width <=390px) {
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .campaign-how { grid-template-columns:minmax(0,1fr); }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .gift-code-fields { flex-wrap:wrap; }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .gift-code-fields input { flex:1 1 160px; }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .delivery-options { grid-template-columns:minmax(0,1fr); }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .gift-item { flex-wrap:wrap; }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .hero-products img { height:180px; }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .hero-products img:nth-child(2) { height:210px; }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .contact-bar-content { font-size:var(--font-size-sm); }
+}
+
+@media print {
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) { background:var(--ui-surface); font-size:11pt; }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) main { max-width:none; padding:0; }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .contact-bar,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .holiday-hero,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .deadline-banner,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .campaign-information,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .value-summary-banner,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .progress-container,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .catalog-status,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .order-summary,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .navigation,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .nav-buttons,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .skip-link,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) button,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .gift-box-error,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) dialog { display:none; }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .main-container,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .confirmation-container,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .section,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .confirmation-card { display:block; border:0; padding:0; }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .confirmation-card,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .gift-item,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .summary-total-card { break-inside:avoid; }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .section-title { font-size:20pt; }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .gift-item img { width:45px; height:60px; }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .gift-details > div { grid-template-columns:1fr 2fr; }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .summary-total-card { background:transparent; padding:0; }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .product-grid,:where([data-ui="unified"][data-seasonal-bundle="christmas"]) .products-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .product-image { height:150px; }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .product-card { break-inside:avoid; }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]):is(.cb-confirmed) main { display:none; }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]):is(.cb-confirmed) .gift-print-confirmation { display:block; }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .gift-print-confirmation .modal-content { padding:0; }
+ :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .gift-print-confirmation .btn { display:none; }
+}
 
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"]):has(
-        dialog[open]
-    ) {
-        overflow: hidden;
-    }
-
-    :where(
-            [data-ui="unified"][data-seasonal-bundle="christmas"]
-        )[data-christmas-step="7"]
-        .order-summary {
-        display: none;
-    }
-
-    :where(
-            [data-ui="unified"][data-seasonal-bundle="christmas"]
-        )[data-christmas-step="7"]
-        .main-container {
-        grid-template-columns: minmax(0, 1fr);
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"]) {
-        color: var(--ui-ink);
-        background: var(--ui-canvas);
-        font-family: var(--ui-font);
-        line-height: 1.55;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"]) [hidden],
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .hidden {
-        display: none;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        :is(h1, h2, h3, h4, p) {
-        margin: 0 0 14px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"]) h1 {
-        font-size: clamp(28px, 3.8vw, 44px);
-        line-height: 1.12;
-        letter-spacing: -0.035em;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"]) h2 {
-        font-size: clamp(24px, 2.5vw, 30px);
-        letter-spacing: -0.02em;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"]) h3 {
-        font-size: 20px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"]) h4 {
-        font-size: 18px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"]) button {
-        cursor: pointer;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        button:disabled {
-        cursor: not-allowed;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        :is(.contact-bar-content, .header-content, main, .deadline-content) {
-        max-width: 1280px;
-        margin-inline: auto;
-        padding-inline: 24px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .contact-bar {
-        background: var(--ui-surface);
-        border-bottom: 1px solid var(--ui-line);
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .contact-bar-content {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px 24px;
-        padding-block: 10px;
-        font-size: 14px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .contact-item {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-        overflow-wrap: anywhere;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .dashboard-return {
-        margin-left: auto;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .header {
-        background: var(--ui-surface);
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .header-content {
-        display: flex;
-        align-items: center;
-        gap: 28px;
-        padding-block: 32px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .header-logo {
-        flex: 0 0 116px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .header-logo
-        img {
-        width: 116px;
-        height: 74px;
-        object-fit: contain;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .header-text {
-        min-width: 0;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .header-text
-        p {
-        margin: 0;
-        color: var(--ui-muted);
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .deadline-banner {
-        background: var(--ui-tint);
-        border-block: 1px solid var(--ui-line);
-        color: var(--ui-accent);
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .deadline-content {
-        padding-block: 12px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .deadline-date {
-        font-weight: 700;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"]) main {
-        padding-block: 24px 48px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .gift-box-error {
-        padding: 16px;
-        margin-bottom: 18px;
-        border: 1px solid var(--color-danger-ink);
-        border-radius: var(--radius-md);
-        color: var(--color-danger-ink);
-        background: var(--ui-surface);
-        overflow-wrap: anywhere;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .catalog-retry {
-        margin-bottom: 20px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .countdown-wrapper {
-        display: flex;
-        align-items: center;
-        gap: 24px;
-        flex-wrap: wrap;
-        padding-bottom: 20px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .countdown-title {
-        font-weight: 700;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .countdown-timer {
-        display: flex;
-        gap: 12px;
-        align-items: center;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .time-unit {
-        text-align: center;
-        min-width: 40px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .time-value {
-        font-size: 24px;
-        font-weight: 700;
-        font-variant-numeric: tabular-nums;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .time-label {
-        font-size: 12px;
-        color: var(--ui-muted);
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .countdown-message {
-        max-width: 35ch;
-        color: var(--ui-muted);
-        font-size: 14px;
-        margin-left: auto;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .value-summary-content {
-        display: flex;
-        gap: 20px 48px;
-        flex-wrap: wrap;
-        background: var(--ui-surface);
-        padding: 14px 20px;
-        border: 1px solid var(--ui-line);
-        border-radius: var(--radius-md);
-        margin-bottom: 16px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .value-item {
-        display: flex;
-        gap: 12px;
-        align-items: baseline;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .value-label {
-        font-size: 14px;
-        color: var(--ui-muted);
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .value-amount {
-        font-size: 20px;
-        font-weight: 700;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        :is(.free, .free-badge, .savings) {
-        color: var(--ui-accent);
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .pricing-info-bar {
-        margin-bottom: 20px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .pricing-bar-toggle {
-        display: flex;
-        gap: 16px;
-        width: 100%;
-        justify-content: space-between;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .pricing-details {
-        padding: 18px;
-        border: 1px solid var(--ui-line);
-        border-radius: var(--radius-md);
-        background: var(--ui-surface);
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        :is(.pricing-includes, .pricing-volume) {
-        margin-top: 8px;
-        color: var(--ui-muted);
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .progress-steps {
-        display: grid;
-        grid-template-columns: repeat(7, minmax(0, 1fr));
-        gap: 8px;
-        margin-bottom: 24px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .step {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-        padding: 12px 8px;
-        font-size: 13px;
-        min-height: 54px;
-        justify-content: flex-start;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .step-number {
-        flex-shrink: 0;
-        display: grid;
-        place-items: center;
-        width: 24px;
-        height: 24px;
-        border: 1px solid currentcolor;
-        border-radius: 50%;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .step.active {
-        background: var(--ui-accent);
-        color: var(--color-on-brand);
-        border-color: var(--ui-accent);
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .main-container {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) 290px;
-        gap: 24px;
-        align-items: start;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        :is(
-            .content-area,
-            .order-summary,
-            .section,
-            .confirmation-main,
-            .confirmation-sidebar
-        ) {
-        min-width: 0;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .section {
-        background: var(--ui-surface);
-        padding: 24px;
-        border: 1px solid var(--ui-line);
-        border-radius: var(--radius-lg);
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .section-header {
-        border-bottom: 1px solid var(--ui-line);
-        margin-bottom: 24px;
-        padding-bottom: 8px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .section-subtitle {
-        color: var(--ui-muted);
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .product-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
-        gap: 20px;
-        align-items: start;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .product-card {
-        min-width: 0;
-        border: 1px solid var(--ui-line);
-        border-radius: var(--radius-md);
-        overflow: hidden;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .product-card.selected {
-        border-color: var(--ui-accent);
-        box-shadow: 0 0 0 1px var(--ui-accent);
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .product-image {
-        border: 0;
-        background: var(--ui-surface);
-        padding: 16px;
-        width: 100%;
-        display: block;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .product-image
-        img {
-        display: block;
-        width: 100%;
-        height: 200px;
-        object-fit: contain;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .product-info {
-        padding: 16px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .product-name {
-        font-size: 18px;
-        line-height: 1.35;
-        overflow-wrap: anywhere;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .product-style {
-        font-size: 12px;
-        letter-spacing: 0.07em;
-        color: var(--ui-muted);
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .product-price {
-        display: flex;
-        justify-content: space-between;
-        gap: 12px;
-        flex-wrap: wrap;
-        margin-bottom: 14px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .free-badge {
-        font-weight: 700;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .retail-value {
-        color: var(--ui-muted);
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .product-description {
-        font-size: 13px;
-        color: var(--ui-muted);
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .selection-group {
-        padding: 0;
-        margin: 16px 0;
-        border: 0;
-        min-width: 0;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"]) legend {
-        font-size: 14px;
-        font-weight: 600;
-        margin-bottom: 10px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        :is(.color-grid, .size-grid) {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .color-swatch {
-        display: flex;
-        align-items: center;
-        text-align: left;
-        gap: 8px;
-        min-height: 44px;
-        padding: 6px 8px;
-        border: 1px solid var(--ui-line-strong);
-        border-radius: var(--radius-sm);
-        color: var(--ui-ink);
-        background: var(--ui-surface);
-        font-size: 13px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .color-swatch
-        img {
-        width: 24px;
-        height: 24px;
-        border-radius: var(--radius-sm);
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        :is(.color-swatch, .size-btn).selected {
-        border-color: var(--ui-accent);
-        background: var(--ui-tint);
-        box-shadow: inset 0 0 0 1px var(--ui-accent);
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .size-btn {
-        font-size: 13px;
-        padding: 8px 10px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .stock-status {
-        font-size: 13px;
-        color: var(--ui-muted);
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .product-error {
-        color: var(--color-danger-ink);
-        font-size: 14px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        :is(.select-btn, .inventory-retry) {
-        width: 100%;
-        margin-top: 12px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .navigation {
-        display: flex;
-        justify-content: space-between;
-        gap: 12px;
-        padding-top: 24px;
-        margin-top: 24px;
-        border-top: 1px solid var(--ui-line);
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .navigation
-        > :only-child {
-        margin-left: auto;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .summary-card {
-        padding: 20px;
-        border: 1px solid var(--ui-line);
-        border-radius: var(--radius-lg);
-        background: var(--ui-surface);
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .summary-note {
-        padding: 12px;
-        margin-bottom: 18px;
-        color: var(--ui-accent);
-        background: var(--ui-tint);
-        font-size: 14px;
-        border-radius: var(--radius-sm);
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .gift-item {
-        display: grid;
-        grid-template-columns: 56px minmax(0, 1fr);
-        align-items: start;
-        gap: 12px;
-        border-bottom: 1px solid var(--ui-line);
-        padding-block: 16px;
-        font-size: 14px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .gift-item
-        img {
-        width: 56px;
-        height: 72px;
-        object-fit: contain;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .gift-item p {
-        margin: 4px 0;
-        color: var(--ui-muted);
-        overflow-wrap: anywhere;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .gift-item
-        strong {
-        display: block;
-        overflow-wrap: anywhere;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .gift-item
-        .remove-item {
-        grid-column: 2;
-        justify-self: start;
-        font-size: 12px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .summary-empty {
-        color: var(--ui-muted);
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .santa-bonus-section {
-        text-align: center;
-        padding: 16px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .santa-bonus-section
-        img {
-        width: 180px;
-        height: auto;
-        margin: 20px auto;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .santa-bonus-section
-        > div {
-        margin-block: 20px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .form-row {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 20px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .form-group {
-        min-width: 0;
-        margin-bottom: 20px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .form-label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: 600;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        :is(.form-input, .date-input-wrapper) {
-        min-width: 0;
-        max-width: 100%;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .form-textarea {
-        min-height: 120px;
-        resize: vertical;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .required {
-        color: var(--color-danger-ink);
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        :is(small, .upload-hint, .info-note) {
-        display: block;
-        color: var(--ui-muted);
-        font-size: 13px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .upload-area {
-        border: 1px dashed var(--ui-line-strong);
-        padding: 24px;
-        margin-bottom: 24px;
-        border-radius: var(--radius-md);
-        background: var(--ui-canvas);
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .upload-area
-        input {
-        width: 100%;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .upload-text {
-        font-weight: 600;
-        margin-block: 12px 6px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .logo-preview {
-        border: 1px solid var(--ui-line);
-        padding: 16px;
-        margin-bottom: 20px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .logo-preview
-        img {
-        max-width: 180px;
-        max-height: 160px;
-        display: block;
-        margin-bottom: 12px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .delivery-options {
-        display: flex;
-        gap: 12px;
-        flex-wrap: wrap;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .delivery-option {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 14px;
-        border: 1px solid var(--ui-line-strong);
-        border-radius: var(--radius-md);
-        cursor: pointer;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .delivery-option:has(input:checked) {
-        background: var(--ui-tint);
-        border-color: var(--ui-accent);
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .pickup-info-box {
-        padding: 20px;
-        margin-bottom: 20px;
-        border: 1px solid var(--ui-line);
-        background: var(--ui-canvas);
-        border-radius: var(--radius-md);
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .checkbox-label {
-        display: flex;
-        gap: 10px;
-        align-items: start;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        input:is([type="checkbox"], [type="radio"]) {
-        accent-color: var(--ui-accent);
-        min-width: 18px;
-        height: 18px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .confirmation-container {
-        display: grid;
-        gap: 24px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .confirmation-card {
-        padding-bottom: 18px;
-        border-bottom: 1px solid var(--ui-line);
-        margin-bottom: 24px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .gift-details {
-        margin: 0;
-        display: grid;
-        gap: 14px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .gift-details
-        > div {
-        display: grid;
-        grid-template-columns: 140px minmax(0, 1fr);
-        gap: 12px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .gift-details
-        dt {
-        color: var(--ui-muted);
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .gift-details
-        dd {
-        margin: 0;
-        overflow-wrap: anywhere;
-        white-space: pre-line;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .summary-total-card {
-        padding: 20px;
-        background: var(--ui-tint);
-        border-radius: var(--radius-md);
-        margin-bottom: 20px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .summary-row {
-        display: flex;
-        justify-content: space-between;
-        gap: 12px;
-        margin-bottom: 10px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .summary-value {
-        font-weight: 700;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .confirmation-sidebar
-        > button {
-        width: 100%;
-        margin-top: 12px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"]) dialog {
-        width: min(620px, calc(100% - 32px));
-        max-height: calc(100dvh - 40px);
-        overflow: auto;
-        padding: 28px;
-        color: var(--ui-ink);
-        background: var(--ui-surface);
-        border: 1px solid var(--ui-line);
-        border-radius: var(--radius-lg);
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        dialog::backdrop {
-        background: color-mix(in srgb, var(--gray-900) 65%, transparent);
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        :is(.zoom-close, .modal-close-btn) {
-        float: right;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .image-zoom-modal {
-        width: min(880px, calc(100% - 32px));
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .zoom-image {
-        width: 100%;
-        max-height: 75vh;
-        object-fit: contain;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .success-reference {
-        padding: 16px;
-        background: var(--ui-tint);
-        margin-block: 20px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .reference-number {
-        font-size: 24px;
-        font-weight: 700;
-        overflow-wrap: anywhere;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .confirmation-status {
-        margin-top: 20px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .modal-content
-        > .btn {
-        margin-top: 14px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .submission-steps {
-        display: grid;
-        gap: 14px;
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .submission-step {
-        display: flex;
-        gap: 12px;
-        padding: 12px;
-        border: 1px solid var(--ui-line);
-        border-radius: var(--radius-sm);
-    }
-
-    :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-        .submission-step.active {
-        background: var(--ui-tint);
-        border-color: var(--ui-accent);
-    }
-
-    @media (width <=1000px) {
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-            .main-container {
-            grid-template-columns: minmax(0, 1fr);
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-            .progress-steps {
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-            .summary-items {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 20px;
-        }
-    }
-
-    @media (width <=600px) {
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-            :is(
-                .contact-bar-content,
-                .header-content,
-                main,
-                .deadline-content
-            ) {
-            padding-inline: 16px;
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-            .dashboard-return {
-            margin-left: 0;
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-            .header-content {
-            align-items: start;
-            flex-direction: column;
-            gap: 16px;
-            padding-block: 24px;
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-            .header-logo {
-            flex-basis: auto;
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-            .header-logo
-            img {
-            width: 90px;
-            height: 54px;
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-            .countdown-wrapper {
-            gap: 12px;
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-            .countdown-message {
-            margin-left: 0;
-            max-width: none;
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-            .progress-steps {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .section {
-            padding: 16px;
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-            :is(.form-row, .summary-items) {
-            grid-template-columns: minmax(0, 1fr);
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-            .gift-details
-            > div {
-            grid-template-columns: minmax(0, 1fr);
-            gap: 4px;
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-            .navigation {
-            flex-wrap: wrap;
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-            .value-summary-content {
-            gap: 12px;
-            padding: 14px;
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-            .value-item {
-            width: 100%;
-            justify-content: space-between;
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"]) dialog {
-            padding: 20px;
-        }
-    }
-
-    @media print {
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"]) {
-            background: var(--color-on-brand);
-            font-size: 10pt;
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-            :is(
-                .contact-bar,
-                .deadline-banner,
-                .christmas-countdown-container,
-                .pricing-info-bar,
-                .progress-container,
-                .navigation,
-                .remove-item,
-                .color-grid,
-                .size-grid,
-                .select-btn,
-                .upload-area,
-                .confirmation-sidebar > button
-            ) {
-            display: none;
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"]) main {
-            max-width: none;
-            padding: 0;
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-            .header-content {
-            padding: 12px 0;
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"]) h1 {
-            font-size: 22pt;
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"]) h2 {
-            font-size: 17pt;
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-            .main-container {
-            display: block;
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-            .order-summary {
-            margin-top: 16px;
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"]) .section {
-            padding: 12px;
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-            .product-grid {
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 12px;
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-            .product-image
-            img {
-            height: 130px;
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-            .product-description {
-            font-size: 9pt;
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-            :is(
-                .gift-item,
-                .gift-details > div,
-                .product-card,
-                .confirmation-card,
-                .summary-total-card
-            ) {
-            break-inside: avoid;
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-            .summary-items {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 12px;
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-            .gift-details
-            > div {
-            grid-template-columns: 140px minmax(0, 1fr);
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"]):has(
-            dialog[open]
-        ) {
-            overflow: visible;
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"]) :focus {
-            outline: none;
-            box-shadow: none;
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-            dialog::backdrop {
-            display: none;
-            background: transparent;
-        }
-
-        :where(
-                [data-ui="unified"][data-seasonal-bundle="christmas"]
-            ).cb-confirmed
-            > :not(.gift-print-confirmation) {
-            display: none;
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-            .gift-print-confirmation {
-            padding: 20px;
-            max-width: none;
-            color: var(--ui-ink);
-            background: var(--ui-surface);
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-            :is(.selection-group, .product-description) {
-            display: none;
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-            .product-info {
-            padding: 10px;
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-            .product-name {
-            font-size: 12pt;
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-            .summary-card {
-            break-inside: avoid;
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-            .santa-bonus-section {
-            padding: 0;
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-            .santa-bonus-section
-            img {
-            width: 100px;
-            margin: 8px auto;
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-            .santa-bonus-section
-            > div {
-            margin-block: 10px;
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-            .section-header {
-            margin-bottom: 12px;
-            padding-bottom: 0;
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-            .gift-item {
-            padding-block: 8px;
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-            .gift-details {
-            gap: 8px;
-        }
-
-        :where([data-ui="unified"][data-seasonal-bundle="christmas"])
-            .confirmation-card {
-            margin-bottom: 12px;
-            padding-bottom: 12px;
-        }
-    }
 }

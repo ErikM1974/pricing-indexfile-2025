@@ -1,0 +1,74 @@
+[
+  {
+    "styleNumber": "CT104670",
+    "color": "Black",
+    "basePrices": {
+      "S": 101.72,
+      "M": 101.72,
+      "L": 101.72,
+      "XL": 101.72,
+      "2XL": 101.72,
+      "3XL": 110,
+      "4XL": 110
+    },
+    "sizeUpcharges": {
+      "2XL": 2,
+      "3XL": 3,
+      "4XL": 4
+    }
+  },
+  {
+    "styleNumber": "CT104670",
+    "color": "Moss",
+    "basePrices": {
+      "S": 101.72,
+      "M": 101.72,
+      "L": 101.72,
+      "XL": 101.72,
+      "2XL": 101.72,
+      "3XL": 110,
+      "4XL": 110
+    },
+    "sizeUpcharges": {
+      "2XL": 2,
+      "3XL": 3,
+      "4XL": 4
+    }
+  },
+  {
+    "styleNumber": "CT104670",
+    "color": "Navy",
+    "basePrices": {
+      "S": 101.72,
+      "M": 101.72,
+      "L": 101.72,
+      "XL": 101.72,
+      "2XL": 101.72,
+      "3XL": 110,
+      "4XL": 110
+    },
+    "sizeUpcharges": {
+      "2XL": 2,
+      "3XL": 3,
+      "4XL": 4
+    }
+  },
+  {
+    "styleNumber": "CT104670",
+    "color": "Shadow Grey",
+    "basePrices": {
+      "S": 101.72,
+      "M": 101.72,
+      "L": 101.72,
+      "XL": 101.72,
+      "2XL": 101.72,
+      "3XL": 110,
+      "4XL": 110
+    },
+    "sizeUpcharges": {
+      "2XL": 2,
+      "3XL": 3,
+      "4XL": 4
+    }
+  }
+]

@@ -1,10 +1,16 @@
 # Email styling and externally hosted UI — 2026-09-13
 
-## Reviewed local email templates
+## Holiday rebuild update — 2026-09-13
+
+The new holiday request uses `email-templates/holiday-box-customer.html` and `email-templates/holiday-box-sales.html`, compiled by the same theme (six maintained local templates total). Saved EmailJS templates `holiday_box_customer` and `holiday_box_sales` were created in the signed-in NWCA account. Customer recipient is `{{to_email}}`, reply-to sales; sales recipient is sales@nwcustomapparel.com, reply-to `{{customer_email}}`. Both use the default sender email. The server sender uses existing service_1c4k67j and existing public/private key configuration; the browser no longer sends holiday emails. No real messages or test emails were sent. Provider mail-client delivery remains unverified.
+
+The active campaign ends October 15, 2026 Pacific. The older Christmas template below retains its historical October 20 copy only as legacy evidence and is no longer the rebuilt page’s sender. Its old provider IDs were absent. The other three email copies and embedded-provider backlog are unchanged. See [HOLIDAY_GIFT_BOX_2026.md](HOLIDAY_GIFT_BOX_2026.md) for release status, provider bindings and review workflow.
+
+## Reviewed local email templates (earlier CSS pass)
 
 The Christmas confirmation, customer mockup approval and both golf inquiry templates share `shared_components/css/email-theme.css`. The theme uses the application's canonical color tokens, Arial fallbacks, a fluid 640px card, readable controls and wrapping customer fields. It is a build source, never an email stylesheet link.
 
-Run `npm run build:emails` after changing the theme or template markup, then `npm run check:emails`. The compiler resolves tokens into static inline declarations in the four HTML files. It applies the theme's rules in explicit source order, preserving other declarations; it is not a general CSS specificity compiler. Do not introduce at-rules, CSS variables in output, external stylesheet dependencies or `!important`. Keep section/header markers on immediate card cells so nested data cells do not inherit section padding. The mockup template uses the explicit compact density setting.
+Run `npm run build:emails` after changing the theme or template markup, then `npm run check:emails`. The compiler resolves tokens into static inline declarations in its registered HTML files (originally four; now six). It applies the theme's rules in explicit source order, preserving other declarations; it is not a general CSS specificity compiler. Do not introduce at-rules, CSS variables in output, external stylesheet dependencies or `!important`. Keep section/header markers on immediate card cells so nested data cells do not inherit section padding. The mockup template uses the explicit compact density setting.
 
 Edit copy and EmailJS bindings in the template files. Preserve escaped `{{variables}}`, intentional raw `{{{HTML}}}` slots, every link, provider instructions and the golf plain-text alternative. The immutable original fixture and unit tests check these contracts, including repeated-build stability. The Christmas deadline is October 20, 2026; 2025 Freeman Road East is the street address. The golf promotion still has its original August 31, 2026 deadline: this CSS pass does not renew that expired offer.
 
@@ -12,7 +18,7 @@ Four Chromium browser cases cover 1440/768/390/320px, long values and blocked im
 
 ## Publication boundary
 
-Deploying this repository does not update saved EmailJS templates. All four provider copies remain publication-pending. Before publishing, verify the current provider template IDs, recipient/reply-to settings, campaign copy (especially the expired golf offer), exact variable bindings and rendering through the intended mail clients. Retain the previous provider template for rollback. No provider copy was changed during this review.
+Deploying this repository does not update saved EmailJS templates. At the end of the earlier CSS pass all four provider copies remained publication-pending; the holiday replacement status is recorded above. Before publishing, verify the current provider template IDs, recipient/reply-to settings, campaign copy (especially the expired golf offer), exact variable bindings and rendering through the intended mail clients. Retain the previous provider template for rollback. No provider copy was changed during this review.
 
 Ten Caspio/Jotform embedded surfaces remain externally owned: digitized-designs, old-designs, announcements-create/manage, the SanMar portal/invoices/credits, and digitizing/monogram/purchasing forms. Their app wrappers are reviewed; their inner controls, styles and runtime data require provider-side review. `migration-manifest.json` keeps these owners explicit rather than crediting wrapper checks as full provider coverage.
 
@@ -23,7 +29,7 @@ Ten Caspio/Jotform embedded surfaces remain externally owned: digitized-designs,
 
 ## Provider access checked on 2026-09-13
 
-The existing Chrome sign-in reaches the EmailJS template list and the mockup approval editor (mockup_customer_approval). Its live recipient/sender settings and HTML were inspected without applying or saving changes. The list also shows template_golf_customer and template_golf_lead. The active Christmas form uses template_v80ysfp and template_sales_xmas; neither ID was visible in this signed-in account. Verify the intended account and template mapping before creating, replacing or publishing either Christmas email.
+The existing Chrome sign-in reaches the EmailJS template list and the mockup approval editor (mockup_customer_approval). Its live recipient/sender settings and HTML were inspected without applying or saving changes. The list also shows template_golf_customer and template_golf_lead. The pre-rebuild Christmas form used template_v80ysfp and template_sales_xmas; neither ID was visible in this signed-in account. Verify the intended account and template mapping before creating, replacing or publishing either Christmas email.
 
 Caspio reached its login page with no authenticated editor session. The known Jotform build link for form243095362828059 redirected to the public Monogram Form2026 instead of an editor. Neither provider was edited, and no form, upload, test email or customer message was submitted. Their editor access and mail-client review remain concrete follow-up requirements.
 
