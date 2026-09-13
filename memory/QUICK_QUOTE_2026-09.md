@@ -11,6 +11,7 @@ Erik requested a simpler workflow for Nika and Taneisha, clearer customer option
 - Quantity comparison columns use actual quantities, including the requested quantity. Never show a tier's base unit with a separate LTM row that the customer must add.
 - Versioned, validated handoff URLs carry the selected product, quantity and decoration to the full builder. Preserve stitches, additional logos, digitizing, puff/patch, print placements, ink counts, sleeves and dark/safety options. URL inputs never supply prices.
 - Errors and in-flight changes invalidate exports. Failed lookups, pricing, PDF assets and storage have visible recovery. Product searches cannot race another row or silently retain stale pricing.
+- PDF photos use the existing same-origin `/api/image-proxy` relay for external supplier URLs. A photo displaying in HTML does not prove that its origin allows canvas reads. Verified an actual CT104670 customer PDF with live pricing and the SanMar photo, without any business writes.
 
 ## Small-order policy and exact totals
 

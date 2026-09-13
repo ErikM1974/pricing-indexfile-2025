@@ -151,7 +151,10 @@
     async function imageData(url) {
         const image = new Image(); image.crossOrigin = 'anonymous'; image.referrerPolicy = 'no-referrer';
         const timeout = new Promise((_, reject) => { image._deadline = setTimeout(() => reject(new Error('A product photo could not load. Retry the download.')), 15000); });
-        image.src = url;
+        // Supplier images display cross-origin but cannot be read by a PDF canvas.
+        // Use the existing same-origin image relay for external product photos.
+        const source = new URL(url, window.location.href);
+        image.src = source.origin === window.location.origin ? source.href : '/api/image-proxy?url=' + encodeURIComponent(source.href);
         try {
             await Promise.race([image.decode(), timeout]);
             const canvas = document.createElement('canvas'); canvas.width = 180; canvas.height = 210;

@@ -95,6 +95,25 @@ test('editing a priced product immediately prevents stale output', async ({ page
     check(expect, e);
 });
 
+test('PDF embeds a supplier photo without cross-origin canvas permission', async ({ page }) => {
+    const e = await open(page, { url: '/calculators/quick-quote/index.html?mode=quick&style=PC54&qty=24' });
+    await expect(page.locator('#qqLineDownload')).toBeEnabled();
+    const photo = 'https://supplier.example.test/product.jpg';
+    await page.route(photo, route => route.fulfill({ status: 403 }));
+    await page.evaluate(photo => {
+        const original = window.QuickQuoteDocument.pdf;
+        window.QuickQuoteDocument.pdf = (model, library, imageData) => {
+            model.options.forEach(option => { option.image = photo; });
+            return original(model, library, imageData);
+        };
+    }, photo);
+    const relay = page.waitForRequest(request => new URL(request.url()).pathname === '/api/image-proxy');
+    const download = page.waitForEvent('download'); await page.locator('#qqLineDownload').click();
+    expect(new URL((await relay).url()).searchParams.get('url')).toBe(photo);
+    expect((await download).suggestedFilename()).toMatch(/^NWCA-estimate-.*\.pdf$/);
+    await expect(page.locator('#qqExportError')).toBeHidden(); check(expect, e);
+});
+
 test('customer PDF downloads a real document and local draft restores fresh inputs', async ({ page }) => {
     const e = await open(page, { url: '/calculators/quick-quote/index.html' });
     await page.locator('#qqProductSearch').fill('PC54');
