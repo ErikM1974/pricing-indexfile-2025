@@ -26,3 +26,22 @@ Ten Caspio/Jotform embedded surfaces remain externally owned: digitized-designs,
 The existing Chrome sign-in reaches the EmailJS template list and the mockup approval editor (mockup_customer_approval). Its live recipient/sender settings and HTML were inspected without applying or saving changes. The list also shows template_golf_customer and template_golf_lead. The active Christmas form uses template_v80ysfp and template_sales_xmas; neither ID was visible in this signed-in account. Verify the intended account and template mapping before creating, replacing or publishing either Christmas email.
 
 Caspio reached its login page with no authenticated editor session. The known Jotform build link for form243095362828059 redirected to the public Monogram Form2026 instead of an editor. Neither provider was edited, and no form, upload, test email or customer message was submitted. Their editor access and mail-client review remain concrete follow-up requirements.
+
+## Provider entry points for the next pass
+
+The ten pending app screens use nine distinct provider entry points. The SanMar portal and invoice page share one Caspio DataPage, so its provider style can be reviewed once and checked in both wrappers. Other raw census matches include historical comments and are not additional active backlog entries.
+
+| App source | Existing provider entry point |
+| --- | --- |
+| `dashboards/digitized-designs.html` | `https://c3eku948.caspio.com/dp/a0e1500091d2864405df4b1db655/emb` |
+| `dashboards/old-designs.html` | `https://c3eku948.caspio.com/dp/a0e150006e417291bd264106a505/emb` |
+| `admin/announcements-create.html` | `https://c3eku948.caspio.com/dp/a0e150008551501faaf64d18aef3/emb` |
+| `vendor-portals/sanmar-vendor-portal.html` | `https://c3eku948.caspio.com/dp/a0e15000094c1ad41f84402184a5/emb` |
+| `vendor-portals/sanmar-invoices.html` | `https://c3eku948.caspio.com/dp/a0e15000094c1ad41f84402184a5/emb` |
+| `vendor-portals/sanmar-credits.html` | `https://c3eku948.caspio.com/dp/a0e150009d05828dd0ed40e188fa/emb` |
+| `calculators/digitizingform.html` | `https://www.jotform.com/app/241687786443168?appEmbedded=1` |
+| `calculators/monogramform.html` | `https://form.jotform.com/jsform/243095362828059` |
+| `calculators/purchasingform.html` | `https://form.jotform.com/jsform/241646601815152` |
+| `admin/announcements-manage.html` | `https://c3eku948.caspio.com/dp/a0e1500007b4ed22d47344c4a974/emb` |
+
+Read-only comparison of the mockup approval provider found one binding difference: the local template adds `{{mockup_count}}` after “Your Mockup”; the current provider does not. The remaining normalized original HTML matches. Preserve the actual provider binding contract when preparing its style update, and capture a fresh rollback copy before publication. The live golf customer template also still contains the August31,2026 expiration; this styling task does not renew that promotion.

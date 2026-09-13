@@ -1,5 +1,14 @@
 # CSS unification — design direction and implementation plan
 
+## Release gates completed — v2026.09.13.2
+
+All 225 app-served pages and the recorded active generated layouts are locally reviewed. Final source e6a237f6262343c5cd4c357c4870d36c6e1b3e71 passed GitHub run 34752422168, including all four jobs, the full CSS sweep and live money-path/calculator parity. The 14 local deterministic gates and 27 E2E cases passed on application source a0022e8a08a2a32f7f86e3652950e053244e2891. The only intervening changes are a catalog snapshot test and its lesson; all application assets, unit suites and E2E-selected specs are identical. Three optional screenshot captures were skipped.
+
+Local CSS coverage is complete across the full sweep and targeted reruns: 1,790 passed initially, two timed cart-notice comparisons were repaired and all seven corresponding configurations passed, and one page-load timeout passed unchanged on retry. This covers all 1,793 current cases; three original-defect captures are intentionally skipped. Exact-source CI also passed the complete suite. An earlier sweep caught obsolete safety-panel assertions and a fading designer notice; the corrected notice honors reduced motion and hides dismissed action controls. Immutable originals and original failure logs remain available.
+
+The release contains the shared builder workspaces, invoice/staff print readiness, server notices, sample notifications and compiled email theme. Maintenance rules are in shared_components/css/NWCA-2026-GUIDE.md. Actual Heroku release and live-byte checks must still succeed after this publication is prepared; a Git merge alone does not prove rollout. Ten provider-controlled inner interfaces and four provider email copies remain outside the website deployment. Historical status notes below describe earlier checkpoints.
+
+
 ## FINAL RELEASE CANDIDATE — v2026.09.13.2
 
 All225/225 local application pages and active generated layouts have completed visual review. Shared email templates are locally reviewed; provider publication and ten external embedded interfaces retain explicit separate backlog entries. This release follows the gift-box deployment v2026.09.12.1/Heroku2110.

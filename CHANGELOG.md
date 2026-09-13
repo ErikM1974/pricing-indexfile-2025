@@ -1,3 +1,32 @@
+## v2026.09.13.2 (2026.09.13)
+
+- Preserve webstore calculator originals, pricing outputs and save defects
+- Unify webstore and emblem assistant styles and make quote saves reliable
+- Preserve Quick Quote and decoration preview before CSS migration
+- Unify Quick Quote layouts, keyboard controls and print output
+- Merge verified seasonal release into remaining CSS work
+- Preserve synthetic embroidery reference baseline before UI migration
+- Modernize embroidery reference screens and complete print layouts
+- Preserve garment designer artwork and workflow baselines
+- Unify garment designer and shared artwork intake presentation
+- Unify fast screen-print request form and preserve builder baselines
+- Unify embroidery workspace and all four quote invoices
+- Unify screen-print workspace with accessible ink and order controls
+- Unify DTF quote workspace and keyboard controls
+- Unify DTG workspace and complete static page CSS review
+- Finish sample notification CSS and strengthen runtime ownership checks
+- Unify quote builder runtime error and empty alerts
+- Unify server response styles and escape rendered user text
+- Unify staff print layouts and wait for required assets
+- Make customer quote previews responsive and wait for print assets
+- Unify sample removal notifications and record inactive print owners
+- Unify local email themes and document provider publication boundaries
+- Deploy v2026.09.13.2: complete application CSS unification
+- Deploy v2026.09.13.2: reconcile shared-style guards and complete release checks
+- Deploy v2026.09.13.2: verify notification visibility without legacy animation
+- Deploy v2026.09.13.2: hide dismissed designer notices and verify migrated builder panels
+- Deploy v2026.09.13.2: check transient cart notices before stable page snapshots
+
 ## v2026.09.12.1 (2026.09.12)
 
 - Preserve specialty calculator originals and review decal and emblem behavior

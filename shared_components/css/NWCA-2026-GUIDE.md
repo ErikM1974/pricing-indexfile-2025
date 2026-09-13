@@ -1,5 +1,20 @@
 # NWCA 2026 Design System — Interior-Page Class Reference
 
+## Application-wide ownership (2026-09-13)
+
+All 225 app-served pages have completed local review under the migration manifest. New work should extend the recorded family owner rather than add another visual override sheet. The manifest records each page's actual styles, triggered styles, byte budget, tested states and any explicit exceptions.
+
+- Foundations: `tokens.css` owns colors, spacing and typography; `components.css` owns common controls, dialogs, alerts and hidden state. Family/page styles live in the existing components layer and opt-in scope.
+- Quote builders: `quote-workspace.css` owns common layout; `quote-embroidery.css`, `quote-screenprint.css`, `quote-dtf.css` and `quote-dtg.css` own method-specific arrangement. Shared artwork and safety recommendations retain their own small owners. Keep pricing and saved-data behavior separate from presentation edits.
+- Generated documents: all four quote builders share `quote-invoice.css`; staff call sheets, labels and thread sheets use `staff-print.css`; customer-supplied screenprint invoices retain their scoped invoice stylesheet. Use the existing readiness helper to await required styles, images and fonts and report failures before printing. Preserve physical label geometry and complete paper content.
+- Server responses: blog pages and access notices use `blog.css` and `status-pages.css` over canonical tokens/components. Keep escaping, HTTP status, authorization and SEO contracts with their original callers.
+- Email: edit the shared `email-theme.css` source and run `npm run build:emails`; output is static inline HTML. Follow `memory/EMAIL_STYLE_CONTRACT_2026-09.md` for binding preservation and provider publication. A website deployment does not publish saved email templates.
+
+For a CSS change, run the owning family's browser states, inspect 1440/768/390/320px and every scroll area/PDF page, then run the source/ownership locks and CSS lint. Preserve original fixture hashes; add reversible mappings for intentional markup changes. Full app releases retain the unit, DOM, accessibility, CSS-browser, pricing-parity, build, audit, boot and exact-source CI gates.
+
+Ten Caspio/Jotform inner interfaces and four saved email templates are explicitly separate external work. Local wrapper or browser preview coverage does not certify those providers. Historical storefront class examples below remain reference material; the current manifest and the family's existing page establish its actual load order.
+
+
 ## Unified component pilots (2026-09-08)
 
 For new staff pages, start with `templates/page-template.html`. The living examples are
