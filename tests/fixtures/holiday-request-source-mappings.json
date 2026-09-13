@@ -135,8 +135,20 @@
     },
     {
       "file": "pages/catalog.html",
+      "before": "    <link rel=\"stylesheet\" href=\"/shared_components/css/components.css?v=2026.09.11.3\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/storefront-shell.css?v=2026.09.11.3\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/catalog-storefront.css?v=2026.09.11.3\">\n    <link rel=\"stylesheet\" href=\"/pages/css/catalog-2026.css?v=2026.09.11.3\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/cart-drawer.css?v=2026.09.13.2\">\n    <script src=\"/config/app.config.js\"></script>\n</head>\n",
+      "after": "    <link rel=\"stylesheet\" href=\"/shared_components/css/components.css?v=2026.09.11.3\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/storefront-shell.css?v=2026.09.11.3\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/catalog-storefront.css?v=2026.09.11.3\">\n    <link rel=\"stylesheet\" href=\"/pages/css/catalog-2026.css?v=2026.09.13.4\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/cart-drawer.css?v=2026.09.13.2\">\n    <script src=\"/config/app.config.js\"></script>\n</head>\n",
+      "count": 1
+    },
+    {
+      "file": "pages/catalog.html",
       "before": "    <div class=\"sidebar-overlay\" id=\"sidebarOverlay\"></div>\n\n    <main id=\"main\">\n        <!-- Page header band (category landing mode swaps the title/breadcrumb) -->\n        <header class=\"page-head\">\n            <div class=\"wrap\">\n",
       "after": "    <div class=\"sidebar-overlay\" id=\"sidebarOverlay\"></div>\n\n    <main id=\"main\">\n        <aside class=\"holiday-catalog-feature wrap\" aria-label=\"Holiday gift boxes\">\n            <div><strong>Holiday gifts, sampled early.</strong><p>Try one gift box at our 8-piece embroidery pricing. Have an invitation? Apply your gift code.</p><span class=\"holiday-catalog-deadline\">See the collection for current offer details.</span></div>\n            <a class=\"btn btn-primary\" href=\"/christmas-bundles.html\">Build a holiday gift box</a>\n        </aside>\n        <!-- Page header band (category landing mode swaps the title/breadcrumb) -->\n        <header class=\"page-head\">\n            <div class=\"wrap\">\n",
+      "count": 1
+    },
+    {
+      "file": "pages/catalog.html",
+      "before": "    <script src=\"/shared_components/js/cart-drawer.js?v=2026.09.13.2\" defer></script>\n    <script src=\"/pages/js/catalog-samples.js?v=2026.08.26.9\" defer></script>\n    <script src=\"/shared_components/js/express-eligibility.js?v=2026.08.25.4\" defer></script>\n    <script src=\"/pages/js/catalog-2026.js?v=2026.09.11.3\" defer></script>\n    <script src=\"/shared_components/js/catalog-storefront-navigation.js?v=2026.09.11.3\" defer></script>\n</body>\n</html>\n",
+      "after": "    <script src=\"/shared_components/js/cart-drawer.js?v=2026.09.13.2\" defer></script>\n    <script src=\"/pages/js/catalog-samples.js?v=2026.08.26.9\" defer></script>\n    <script src=\"/shared_components/js/express-eligibility.js?v=2026.08.25.4\" defer></script>\n    <script src=\"/pages/js/catalog-2026.js?v=2026.09.13.4\" defer></script>\n    <script src=\"/shared_components/js/catalog-storefront-navigation.js?v=2026.09.11.3\" defer></script>\n</body>\n</html>\n",
       "count": 1
     },
     {
@@ -221,6 +233,24 @@
       "file": "shared_components/js/staff-dashboard/controllers/orders-inbox-controller.js",
       "before": "        : emptyRow('No paid web orders in the last 7 days.');\n    acceptedList.innerHTML = accepted.length\n        ? accepted.slice(0, 8).map(orderRow).join('')\n        : emptyRow('No accepted-but-unpaid quotes right now.');\n    paidList.setAttribute('aria-busy', 'false');\n    acceptedList.setAttribute('aria-busy', 'false');\n    return reportWidgetResult('inbox', true);\n",
       "after": "        : emptyRow('No paid web orders in the last 7 days.');\n    acceptedList.innerHTML = accepted.length\n        ? accepted.slice(0, 8).map(orderRow).join('')\n        : emptyRow('No quotes or requests awaiting review right now.');\n    paidList.setAttribute('aria-busy', 'false');\n    acceptedList.setAttribute('aria-busy', 'false');\n    return reportWidgetResult('inbox', true);\n",
+      "count": 1
+    },
+    {
+      "file": "dashboards/quote-management.html",
+      "before": "         resendQuoteEmail() can init lazily on first use. -->\n    <script src=\"https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js\"></script>\n    <!-- Dashboard JS (extracted from inline script — Rule 3, 2026-07-05) -->\n    <script src=\"/dashboards/js/quote-management.js?v=2026.09.10.4\"></script>\n</body>\n</html>\n",
+      "after": "         resendQuoteEmail() can init lazily on first use. -->\n    <script src=\"https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js\"></script>\n    <!-- Dashboard JS (extracted from inline script — Rule 3, 2026-07-05) -->\n    <script src=\"/dashboards/js/quote-management.js?v=2026.09.13.4\"></script>\n</body>\n</html>\n",
+      "count": 1
+    },
+    {
+      "file": "pages/quote-view.html",
+      "before": "    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/components.css?v=2026.09.10.8\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/customer-documents.css?v=2026.09.10.9\">\n    <link rel=\"stylesheet\" href=\"/pages/css/quote-view.css?v=2026.09.10.9\">\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    <link href=\"https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap\" rel=\"stylesheet\">\n",
+      "after": "    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/components.css?v=2026.09.10.8\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/customer-documents.css?v=2026.09.10.9\">\n    <link rel=\"stylesheet\" href=\"/pages/css/quote-view.css?v=2026.09.13.4\">\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    <link href=\"https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap\" rel=\"stylesheet\">\n",
+      "count": 1
+    },
+    {
+      "file": "pages/quote-view.html",
+      "before": "    <script src=\"/shared_components/js/toast-notifications.js?v=2026.09.08.3\"></script>\n    <!-- Proxy host for product-image lookups (Rule 6) -->\n    <script src=\"/config/app.config.js\"></script>\n    <script src=\"/pages/js/quote-view.js?v=2026.09.10.9\"></script>\n</body>\n</html>\n",
+      "after": "    <script src=\"/shared_components/js/toast-notifications.js?v=2026.09.08.3\"></script>\n    <!-- Proxy host for product-image lookups (Rule 6) -->\n    <script src=\"/config/app.config.js\"></script>\n    <script src=\"/pages/js/quote-view.js?v=2026.09.13.4\"></script>\n</body>\n</html>\n",
       "count": 1
     }
   ]

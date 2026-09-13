@@ -5,7 +5,10 @@ const original = require('../fixtures/seasonal-bundles-original-content.json');
 // Current behavior is checked in seasonal-christmas-orders and the holiday browser suites.
 // Keep the original migration evidence immutable; its free-only contract is historical.
 test('original seasonal migration evidence is retained unchanged', () => {
-    expect(crypto.createHash('sha256').update(fs.readFileSync(path.join(root, 'tests/fixtures/seasonal-bundles-original-content.json'))).digest('hex')).toBe('a1108833d8011f40253e178f9a04da5d9ec828f916016d3ad382b264dc9f1285');
+    // Git checks text out as CRLF on Windows and LF on Linux. Lock the same
+    // original text on both hosts; do not hash platform-specific line endings.
+    const source = fs.readFileSync(path.join(root, 'tests/fixtures/seasonal-bundles-original-content.json'), 'utf8').replace(/\r\n/g, '\n');
+    expect(crypto.createHash('sha256').update(source).digest('hex')).toBe('fb3c18955ac15091d42e23a891d47831758dd00136712bc792e0b9cd0b1b943e');
 });
 test.each(Object.entries(original.hashes).filter(([file]) => !['calculators/christmas-bundles.html', 'calculators/css/christmas-bundles.css', 'calculators/js/christmas-bundles.js'].includes(file)))('%s retains its original source behind reviewed UI mappings', (file, hash) => {
     let source = fs.readFileSync(path.join(root, file), 'utf8').replace(/\r\n/g, '\n');

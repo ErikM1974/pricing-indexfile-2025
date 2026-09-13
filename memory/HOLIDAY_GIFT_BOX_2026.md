@@ -2,11 +2,12 @@
 
 ## Release status — 2026-09-13
 
-Implementation is locally verified on develop; production remains v2026.09.13.2 / Heroku 2111. Do not announce the rebuilt offer as live yet. The paid box/shipping fee decision is still pending: the old page advertised a $9 box and $25 shipping **value**, which is not authorization to charge those amounts. Test fixtures use those amounts as synthetic examples only. Do not create live charges or deploy the dependent offer until Erik answers. Final release gates and exact-commit CI are also required.
+Implementation is locally verified on develop. Erik approved $9 packaging, $25 shipping and free factory pickup on September 13. The live Service_Codes and invitation hash are now configured; website release v2026.09.13.4 is being prepared. The old website remains live until exact-commit CI, deployment and live verification finish.
 
 ## Business decisions
 
 - Public customers may request **one box at the embroidery eight-piece tier**; no eight-box minimum.
+- Paid requests include $9 packaging and $25 shipping, or $0 shipping for factory pickup. Read current charges from Service_Codes; do not hardcode these values into the page.
 - Invited customers use **one shared reusable gift code**. A valid invitation makes the entire box and shipping complimentary.
 - Campaign closes after **October 15, 2026, Pacific**: exclusive close is `2026-10-16T00:00:00-07:00`.
 - Feature the collection on the main catalog. Hide its promotion automatically after the close.
@@ -33,12 +34,12 @@ Before shipping a swap, verify the new style's real catalog colors, inventory an
 - Missing/wrong-color/malformed/conflicting duplicate inventory is unknown, not sold out. Real zero is unavailable. The page exposes a retry and the server verifies stock again before creating the request. This is an availability check, not an inventory reservation.
 - `lib/christmas-pricing.js` uses the real EmbroideryPricingCalculator at quantity eight, with current pricing-bundle tiers, margin, stitch cost, rounding and exact color/size cost/upcharge data. The order quantity remains one of each garment. Gloves are undecorated; their selling price uses the same tier's garment margin without embroidery cost.
 - Box and delivery fees come from active FLAT Service_Codes `XMAS-BOX` and `XMAS-SHIP`. Both must exist, including an explicit zero if included. Pickup shipping is zero. Missing or ambiguous fee data fails visibly; no guessed price is offered.
-- These two live Service_Code rows are not configured yet. Do not infer fees from historical advertised values.
+- Live fees configured and read back September 13: XMAS-BOX (PK 308), $9; XMAS-SHIP (PK 309), $25. Both active FLAT rows, hidden from unrelated quote-builder rails. This follows Erik's explicit approval, not the old advertised values.
 - Twenty-eight independently captured CT104670 color/size examples check exact parity with the real eight-piece calculator. Fixture prices elsewhere are synthetic test inputs.
 
 ## Shared code and request persistence
 
-Configure `CHRISTMAS_GIFT_CODE_SHA256` on the app with the SHA-256 hex digest of the trimmed, uppercase invitation code. The secret signing key is existing SESSION_SECRET. The invitation code has not been generated/configured yet. Keep plaintext out of source, browser assets, logs and documentation. Give Erik the code privately at release. Rotating its hash invalidates existing invitation grants.
+`CHRISTMAS_GIFT_CODE_SHA256` is configured on the app as the SHA-256 hex digest of the trimmed, uppercase invitation code. The secret signing key is existing SESSION_SECRET. The private invitation handoff is saved outside the repository in the working checkpoint directory, restricted to Erik's Windows account. Keep plaintext out of source, browser assets, logs and documentation. Give Erik the private file at release. Rotating its hash invalidates existing invitation grants.
 
 The server issues a 30-minute invitation grant and a 10-minute estimate, bounded by campaign close. Client totals and a client `complimentary` flag are ignored. Selections, delivery method, invitation and current prices must match when a new request is saved.
 
@@ -71,6 +72,6 @@ Owners: seasonal-christmas-orders unit suite; seasonal-christmas-behavior browse
 
 Local verification completed September 13: the 28-case money-path/calculator-parity/holiday behavior run passed; all 22 Quote Management browser cases passed, including the new holiday search, shipping totals and incomplete-save behavior; affected catalog, quote, invoice, staff and email layouts passed their broader browser suites. Four receipt states pass accessibility and overflow checks at 1440/768/390/320 pixels. Generated holiday page/receipt/email paper outputs were reviewed. Lint, type checking, CSS lint, build and production dependency audit pass. Current full-suite and CI evidence, commit and pending business decisions are recorded in the working checkpoint below. No real orders, payment charges or emails were created by tests.
 
-Before release: resolve fees; configure the two approved Service_Codes and invitation hash securely; finish unit/DOM/a11y/type/CSS/behavior/parity/build/audit/boot checks; inspect screenshots and every generated paper page; update route-table fixture with the intentional new routes; stage new files explicitly; require exact-commit green CI. Follow this repo's `.claude/skills/deploy/SKILL.md`, not the sibling proxy deploy skill. Then verify live stock, active deadline, public priced flow and gift-code validation without creating a real order or sending mail.
+Before release: finish exact release-commit checks, green CI and live read-only pricing/stock/code verification. Local unit/DOM/a11y/type/CSS/behavior/parity/build/audit checks and paper review passed; the route-table fixture includes the intentional new routes. CI caught a Windows CRLF versus Linux LF mismatch in an original-evidence hash: normalize physical line endings before hashing; the original fixture remains unchanged. Follow this repo's `.claude/skills/deploy/SKILL.md`, not the sibling proxy deploy skill. Verify the live campaign without creating a real order or sending mail.
 
 Working evidence/checkpoint: `C:/Users/erik/.codex/visualizations/2026/09/08/01a081d3-550f-7fc1-826b-bcdac1807b9a/GIFT_BOX_REBUILD_PLAN.md`.
