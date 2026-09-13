@@ -87,7 +87,9 @@ test('CSS staff workspaces: Mission Control ' + edition + ' expanded drawers and
     await popup.close();
     if (!original) {
         const baseline = require('../fixtures/staff-workspaces-ae-original-expanded.json');
-        expect(rows).toEqual(baseline.rows); expect(paper).toBe(baseline.paper);
+        // CSS uppercases the headings; preserve every word and amount independently of presentation.
+        const words = text => text.replace(/\s+/g, ' ').trim().toLowerCase();
+        expect(rows).toEqual(baseline.rows); expect(words(paper)).toBe(words(baseline.paper));
         expect(views.map(v => v.text.replace(/\s+/g, ' ').toLowerCase())).toEqual(baseline.views.map(v => v.text.replace(/\s+/g, ' ').toLowerCase()));
     }
     fs.writeFileSync(path.join(output, 'staff-workspaces-ae-' + edition + '-expanded.json'), JSON.stringify({ views, rows, paper, reads: state.reads, events }, null, 2) + '\n');

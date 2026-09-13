@@ -1577,3 +1577,14 @@ Garment designer completion: page styles are scoped to the unified designer; art
 - tests/fixtures/server-pages-original-content.json — immutable source hashes and reversible server-template/style changes.
 
 - tests/unit/server-pages.test.js — response source, role/access behavior, escaped names, retirement destinations and structured-data safety.
+
+- tests/e2e/helpers/staff-print-scenes.js — real print-function extraction and synthetic staff documents.
+- tests/fixtures/staff-print-original-content.json — immutable original staff-print functions and source hashes.
+
+- tests/e2e/css-unification-staff-print.spec.js — synthetic call sheets, Avery labels and thread sheet browser/print contracts.
+- tests/fixtures/staff-print-original-browser.json — original printed text, tables and titles.
+
+- shared_components/js/staff-print.js — shared required-asset readiness and visible print failures.
+- shared_components/css/staff-print.css — canonical call, Avery 5160 label and thread-sheet layouts.
+
+- tests/unit/staff-print.test.js — print source/data, style ownership and empty-state contracts.

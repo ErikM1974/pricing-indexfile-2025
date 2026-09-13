@@ -6,6 +6,7 @@ const hash = s => crypto.createHash('sha256').update(s).digest('hex');
 
 test.each(original.pages)('$file preserves original labels, fields, links and identifiers', record => {
     let html = fs.readFileSync(path.join(root, record.file), 'utf8').replace(/\r\n/g, '\n');
+    html = require('../e2e/helpers/staff-print-scenes').restore(record.file, html);
     for (const change of original.changes.filter(c => c.file === record.file).reverse()) {
         expect(html.split(change.after).length - 1).toBe(change.count);
         html = html.split(change.after).join(change.before);
@@ -26,6 +27,7 @@ test.each(Object.keys(original.hashes).filter(f => !f.endsWith('.html')))('%s re
         return;
     }
     let s = fs.readFileSync(path.join(root, file), 'utf8').replace(/\r\n/g, '\n');
+    s = require('../e2e/helpers/staff-print-scenes').restore(file, s);
     for (const change of require('../fixtures/server-pages-original-content.json').changes.filter(c => c.file === file).reverse()) {
         expect(s.split(change.after).length - 1).toBe(change.count);
         s = s.split(change.after).join(change.before);

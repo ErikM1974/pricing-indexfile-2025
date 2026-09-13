@@ -478,15 +478,11 @@
     function printCallSheet() {
         var rows = callState.items.slice(0, callState.rendered);
         var who = (state.rep && state.rep.firstName) || 'Call';
-        var html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>' + esc(who) + ' — call sheet</title>'
-            + '<style>body{font:12pt system-ui,sans-serif;margin:18mm}h1{font-size:15pt;margin:0 0 2mm}'
-            + 'p.sub{color:#555;margin:0 0 6mm;font-size:10pt}'
-            + 'table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:5px 4px;border-bottom:1px solid #ddd;vertical-align:top}'
-            + 'th{font-size:9pt;text-transform:uppercase;color:#666}td.n{white-space:nowrap}'
-            + '.w{font-size:9.5pt;color:#444}.chk{width:14px;height:14px;border:1px solid #888;display:inline-block}</style>'
-            + '</head><body><h1>' + esc(who) + ' — embroidery call sheet</h1>'
+        var html = '<!DOCTYPE html><html lang="en"><head><meta name="viewport" content="width=device-width,initial-scale=1"><meta charset="utf-8"><title>' + esc(who) + ' — call sheet</title>'
+            + '<link rel="stylesheet" data-print-styles href="/shared_components/css/tokens.css?v=2026.09.13.1"><link rel="stylesheet" data-print-styles href="/shared_components/css/components.css?v=2026.09.13.1"><link rel="stylesheet" data-print-styles href="/shared_components/css/staff-print.css?v=2026.09.13.1">'
+            + '</head><body data-ui="unified" class="staff-print staff-print--calls"><main class="staff-print-main"><h1>' + esc(who) + ' — embroidery call sheet</h1>'
             + '<p class="sub">' + rows.length + ' accounts, best opportunity first · printed ' + esc(localDay(0)) + '</p>'
-            + '<table><thead><tr><th></th><th>Company</th><th>Phone</th><th>Why</th><th>Bounty</th></tr></thead><tbody>'
+            + '<div class="staff-print-scroll" data-print-scroll role="region" aria-label="Call sheet accounts" tabindex="0"><table><thead><tr><th aria-label="Called"></th><th>Company</th><th>Phone</th><th>Why</th><th>Bounty</th></tr></thead><tbody>'
             + rows.map(function (x) {
                 return '<tr><td><span class="chk"></span></td><td>' + esc(x.company)
                     + '<br><span class="w">' + esc(x.playLabel) + (x.contactName ? ' · ' + esc(x.contactName) : '') + '</span></td>'
@@ -494,11 +490,13 @@
                     + '<td class="w">' + esc(x.why) + '</td>'
                     + '<td class="n">' + money2(x.bounty) + '</td></tr>';
             }).join('')
-            + '</tbody></table><script>window.onload=function(){window.print()}</script></body></html>';
+            + '</tbody></table></div></main></body></html>';
+        if (typeof NWCAStaffPrint === 'undefined') { DashPage.showError('Print tools could not load. Please refresh this page and try again.'); return; }
         var w = window.open('', '_blank');
         if (!w) { DashPage.showError('Your browser blocked the print window. Allow pop-ups for this page and try again.'); return; }
         w.document.write(html);
         w.document.close();
+        NWCAStaffPrint.printWhenReady(w).catch(function (error) { DashPage.showError(error.message); });
     }
 
     // ---------- whole-card collapse (declutter the page) ----------

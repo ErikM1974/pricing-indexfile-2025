@@ -18,6 +18,7 @@ test.each(Object.keys(fixture.hashes))('%s preserves calculations and data contr
     // The records suite separately checks current HTML semantics against this original source.
     const page = records.pages.find(p => p.file === file);
     let s = (page ? page.html : fs.readFileSync(path.join(root, file), 'utf8')).replace(/\r\n/g, '\n');
+    if (!page) s = require('../e2e/helpers/staff-print-scenes').restore(file, s);
     if (!page) for (const change of records.changes.filter(c => c.file === file).reverse()) {
         expect(s.split(change.after).length - 1).toBe(change.count);
         s = s.split(change.after).join(change.before);

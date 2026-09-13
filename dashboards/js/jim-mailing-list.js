@@ -235,16 +235,14 @@
             var l = [who, r.Company, r.Address, cityz].filter(Boolean).map(esc);
             return '<div class="lbl">' + l.join('<br>') + '</div>';
         }).join('');
-        var html = '<!doctype html><html><head><meta charset="utf-8"><title>Mailing labels</title><style>' +
-            '@page{size:letter;margin:0.5in 0.1875in;}body{margin:0;font-family:Arial,Helvetica,sans-serif;}' +
-            '.sheet{display:grid;grid-template-columns:repeat(3,2.625in);grid-auto-rows:1in;column-gap:0.125in;}' +
-            '.lbl{padding:0.12in 0.2in;font-size:11pt;line-height:1.25;overflow:hidden;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;}' +
-            '@media screen{.lbl{outline:1px dashed #ccc;}}</style></head><body>' +
+        var html = '<!doctype html><html lang="en"><head><meta name="viewport" content="width=device-width,initial-scale=1"><meta charset="utf-8"><title>Mailing labels</title><link rel="stylesheet" data-print-styles href="/shared_components/css/tokens.css?v=2026.09.13.1"><link rel="stylesheet" data-print-styles href="/shared_components/css/components.css?v=2026.09.13.1"><link rel="stylesheet" data-print-styles href="/shared_components/css/staff-print.css?v=2026.09.13.1"></head><body data-ui="unified" class="staff-print staff-print--labels"><main class="staff-label-main" aria-label="Mailing labels">' +
             '<div class="sheet">' + cells + '</div>' +
-            '<scr' + 'ipt>window.onload=function(){setTimeout(function(){window.print();},250);};</scr' + 'ipt></body></html>';
+            '</main></body></html>';
+        if (typeof NWCAStaffPrint === 'undefined') { DashPage.showError('Print tools could not load. Please refresh this page and try again.'); return; }
         var w = window.open('', '_blank');
         if (!w) { DashPage.showError('Please allow pop-ups so the labels can open in a new tab to print.'); return; }
         w.document.write(html); w.document.close();
+        NWCAStaffPrint.printWhenReady(w).catch(function (error) { DashPage.showError(error.message); });
         showOk('Opened ' + rows.length + ' labels in a new tab to print.');
     }
 

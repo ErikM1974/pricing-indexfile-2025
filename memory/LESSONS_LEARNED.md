@@ -153,12 +153,6 @@ Problem/root cause: incomplete invoices looked empty, failed import logs were cl
 - Solution: invalidate prior selected-image requests, clear stale preview and disable downloads while loading, provide retries, skip hidden/zero-size stage redraws, and order print rules after screen layouts. Native inputs and scrollable stats remain keyboard reachable; dialog focus returns to the rebuilt thread control.
 - Prevention: compare five actual PNG downloads byte for byte, retain eight original script hashes outside mapped UI edits, verify complete approval text and each PDF page, exercise four widths and delayed/failing responses. CSS text-transform can change innerText casing without changing source copy; compare DOM text and inspect paper separately.
 
-## Product detail views must distinguish sizes from warehouse stock (2026-09-09)
-
-- Problem/root cause: inventory omitted APP_CONFIG; its size-run endpoint returns source sanmar-bulk with placeholder zero totals, which the old renderer called out of stock. Discovery hid partial failures, audit reused prior results after failures, and a pending color response could replace the selected stock view.
-- Solution: load the existing config, label unavailable warehouse quantities honestly, validate complete responses, clear stale results, provide retries, ignore superseded reads and keep unavailable SanMar comparisons unknown while exposing internal Caspio drift. Pure API/stock/TSV helpers stay unchanged.
-- Prevention: preserve seven original script hashes outside32mapped UI edits; compare all warehouse values and four clipboard outputs. Check four widths, denied clipboard and actual provider response shape. Printing relatively positioned images inside clipped cards can omit later-page pictures: use static image containers/visible overflow in print, verify all11 rendered images plus every original data word. Browser tests must wait for a debounced filter before recording and clicking a choice.
-
 ## Financial reports need complete data and faithful paper output (2026-09-09)
 
 - Problem/root cause: quote audits defaulted missing comparison fields to zero/OK and truthy fallback replaced valid zero subtotals with older session values; table sorting required a mouse. Shared table sizing also wrapped amounts mid-number on phones.
@@ -252,3 +246,9 @@ Browser baselines must work from a fresh checkout. The tumbler export test previ
 - Problem/root cause: blog styles referenced tokens their response never loaded; access notices interpolated raw staff names, and JSON-LD could close its script when a title contained HTML.
 - Solution: serve canonical tokens/components and scoped blog/status styles; escape names as text and encode less-than signs in serialized JSON-LD. Authorization and HTTP/SEO behavior stay with the original callers.
 - Prevention: preserve original response content, links and metadata; test malicious names/titles, anonymous and authorized gates, keyboard exits with unavailable CSS, four widths and every printed page. Keep reviewed server owners in the runtime census after closing their backlog entries.
+
+## Generated staff documents need physical geometry and readiness checks (2026-09-13)
+
+- Problem/root cause: call sheets, mailing labels and thread sheets carried isolated CSS and printed on a timer or load event; blocked windows and missing assets could fail silently. An imported thread run was inserted as HTML.
+- Solution: canonical tokens/components plus one staff-print sheet, with a shared promise for styles/fonts/images, visible failures in the parent and preview, and escaped thread text with validated color data. Keep Avery 5160 dimensions explicit in print media.
+- Prevention: real-window ready/blocked/delayed/missing-file cases; preserve original addresses, amounts and source hashes; test each label at 2.625 by 1 inch, 0.125-inch column gaps and all 32 labels across two pages. Inspect every screen scroll segment and PDF page. Baseline replay must reverse newer print edits before older family edits.

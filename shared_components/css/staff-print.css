@@ -1,0 +1,64 @@
+/* Staff print documents share tokens; physical Avery dimensions stay explicit. */
+@layer components.pages {
+    :where([data-ui="unified"]).staff-print { margin: 0; padding: clamp(16px, 3vw, 40px); overflow-wrap: anywhere; }
+    :where([data-ui="unified"]) .staff-print-main { max-width: 1040px; margin: auto; background: var(--color-surface); padding: clamp(16px, 3vw, 32px); border: 1px solid var(--ui-line); border-radius: var(--radius-lg); }
+    :where([data-ui="unified"]).staff-print h1 { color: var(--store-green-950); font-size: clamp(24px, 3vw, 32px); margin: 0 0 var(--space-3); }
+    :where([data-ui="unified"]).staff-print .sub { color: var(--ui-muted); margin: 0 0 var(--space-5); }
+    :where([data-ui="unified"]).staff-print table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    :where([data-ui="unified"]).staff-print :is(th, td) { padding: 10px 8px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--ui-line); }
+    :where([data-ui="unified"]).staff-print th { background: var(--ui-tint); color: var(--store-green-950); font-size: 12px; }
+    :where([data-ui="unified"]).staff-print tr { break-inside: avoid; }
+    :where([data-ui="unified"]).staff-print .w { font-size: 12px; color: var(--ui-muted); }
+    :where([data-ui="unified"]).staff-print .n { white-space: nowrap; }
+    :where([data-ui="unified"]).staff-print .chk { width: 14px; height: 14px; display: inline-block; border: 1px solid var(--ui-muted); border-radius: 2px; }
+    :where([data-ui="unified"]) .staff-print-scroll { overflow-x: auto; }
+    :where([data-ui="unified"]) .staff-print-scroll:focus-visible { outline: 3px solid var(--ui-accent); outline-offset: 3px; }
+    :where([data-ui="unified"]).staff-print--calls table { min-width: 640px; }
+    :where([data-ui="unified"]).staff-print--calls th { text-transform: uppercase; }
+    :where([data-ui="unified"]).staff-print--calls th:last-child { white-space: nowrap; }
+    :where([data-ui="unified"]) .staff-print-error { padding: var(--space-4); border: 1px solid var(--color-danger-ink); color: var(--color-danger-ink); background: var(--color-surface); }
+
+    :where([data-ui="unified"]).staff-print--labels .sheet { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 252px), 252px)); gap: var(--space-4); }
+    :where([data-ui="unified"]).staff-print--labels .lbl { padding: 12px 19px; min-height: 96px; background: var(--color-surface); border: 1px dashed var(--ui-line); font-family: Arial, Helvetica, sans-serif; font-size: 14px; line-height: 1.25; overflow-wrap: anywhere; }
+
+    :where([data-ui="unified"]).staff-print--threads .header { text-align: center; padding-bottom: var(--space-5); margin-bottom: var(--space-5); border-bottom: 2px solid var(--ui-accent); }
+    :where([data-ui="unified"]).staff-print--threads .meta { font-size: 14px; color: var(--ui-muted); }
+    :where([data-ui="unified"]).staff-print--threads .meta-details { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-2) var(--space-4); margin-top: var(--space-3); font-size: 13px; }
+    :where([data-ui="unified"]).staff-print--threads .md-label { font-weight: 700; }
+    :where([data-ui="unified"]).staff-print--threads .print-date { margin-top: var(--space-1); }
+    :where([data-ui="unified"]).staff-print--threads .mockup-section { display: flex; gap: var(--space-5); margin-bottom: var(--space-6); align-items: flex-start; }
+    :where([data-ui="unified"]).staff-print--threads .mockup-img { width: 220px; height: 220px; max-width: 100%; object-fit: contain; border: 1px solid var(--ui-line); border-radius: var(--radius-sm); background: var(--ui-canvas); flex-shrink: 0; }
+    :where([data-ui="unified"]).staff-print--threads .mockup-img--empty { display: grid; place-items: center; color: var(--ui-muted); }
+    :where([data-ui="unified"]).staff-print--threads .thread-table { flex: 1; min-width: 0; }
+    :where([data-ui="unified"]).staff-print--threads h3 { font-size: 16px; margin: 0 0 var(--space-3); }
+    :where([data-ui="unified"]).staff-print--threads .thread-table table { table-layout: fixed; }
+    :where([data-ui="unified"]).staff-print--threads .thread-table :is(th, td) { padding: 7px 5px; }
+    :where([data-ui="unified"]).staff-print--threads .thread-table :is(th, td):nth-child(-n+2) { width: 32px; }
+    :where([data-ui="unified"]).staff-print--threads .color-dot { display: inline-block; width: 16px; height: 16px; border-radius: var(--radius-pill); border: 1px solid var(--ui-line); background: var(--thread-color); vertical-align: middle; print-color-adjust: exact; }
+    :where([data-ui="unified"]).staff-print--threads .td-element { color: var(--ui-muted); font-style: italic; }
+    :where([data-ui="unified"]).staff-print--threads .thread-catalog { font-family: var(--font-mono); }
+    :where([data-ui="unified"]).staff-print--threads .thread-empty { color: var(--ui-muted); font-size: 13px; }
+    :where([data-ui="unified"]).staff-print--threads .footer { font-size: 12px; color: var(--ui-muted); text-align: center; margin-top: var(--space-5); padding-top: var(--space-3); border-top: 1px solid var(--ui-line); }
+
+    @media screen and (width <= 700px) {
+        :where([data-ui="unified"]).staff-print--threads .mockup-section { flex-direction: column; }
+        :where([data-ui="unified"]).staff-print--threads .thread-table { width: 100%; }
+    }
+
+    @media print {
+        @page { size: letter portrait; margin: 0.4in; }
+        :where([data-ui="unified"]).staff-print { background: var(--color-surface); padding: 0; font-size: 10pt; }
+        :where([data-ui="unified"]) .staff-print-main { max-width: none; padding: 0; border: 0; border-radius: 0; }
+        :where([data-ui="unified"]).staff-print h1 { font-size: 18pt; }
+        :where([data-ui="unified"]) .staff-print-scroll { overflow: visible; }
+        :where([data-ui="unified"]).staff-print--calls table { min-width: 0; }
+        :where([data-ui="unified"]).staff-print--calls :is(th, td) { padding: 4px 5px; }
+        :where([data-ui="unified"]).staff-print--threads .mockup-section { break-inside: avoid; }
+        :where([data-ui="unified"]).staff-print--threads .thread-table :is(th, td) { font-size: 9pt; padding: 5px; }
+        :where([data-ui="unified"]).staff-print--labels { page: staff-labels; padding: 0; }
+
+        @page staff-labels { size: letter; margin: 0.5in 0.1875in; }
+        :where([data-ui="unified"]).staff-print--labels .sheet { grid-template-columns: repeat(3, 2.625in); grid-auto-rows: 1in; gap: 0 0.125in; }
+        :where([data-ui="unified"]).staff-print--labels .lbl { border: 0; padding: 0.12in 0.2in; height: 1in; min-height: 0; font-size: 10.5pt; line-height: 1.2; break-inside: avoid; }
+    }
+}

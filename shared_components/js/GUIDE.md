@@ -294,3 +294,5 @@ Draft design family: shared_components/css/design-libraries.css owns local desig
 Richardson factory-direct opts into specialty-calculator-ui.js: its existing hidden classes are mirrored to native hidden attributes. Pricing calculations stay in its original controller; only failed-read warnings, current selection and keyboard presentation changed.
 
 Polar Camel: laser-tumbler-simple.js owns latest color/inventory state, live-policy recalculation of age-preserved product caches and persistent failure feedback; laser-tumbler-mockup.js owns current-image requests and quote availability. jds-api-service.js adds validated pricingWarnings metadata (also available to its existing AE consumer); successful financial methods and the shared jds-tumbler-template.js engraving renderer remain unchanged. catalog-storefront-navigation.js supplies the native drawer bridge.
+
+- staff-print.js: NWCAStaffPrint.printWhenReady(window) awaits three marked stylesheets, images and fonts for staff print documents; callers display rejected errors.

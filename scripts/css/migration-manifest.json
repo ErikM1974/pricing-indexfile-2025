@@ -6979,10 +6979,7 @@
       "owners": [
         "shared_components/js/quote-formatter.js",
         "calculators/christmas-bundle-service.js",
-        "calculators/screenprint-customer/screenprint-customer-calculator.js",
-        "dashboards/js/ae-mission-control.js",
-        "dashboards/js/jim-mailing-list.js",
-        "pages/js/mockup-detail.js"
+        "calculators/screenprint-customer/screenprint-customer-calculator.js"
       ],
       "note": "Own print/PDF fixtures required; static HTML inventory cannot cover these."
     },
@@ -8738,6 +8735,84 @@
       "test": "tests/e2e/css-unification-quote-builder-workflows.spec.js",
       "maxCssBytes": 75859,
       "measuredRawCssBytes": 73811
+    },
+    {
+      "source": "dashboards/js/ae-mission-control.js",
+      "family": "staff-print",
+      "status": "reviewed",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/staff-print.css"
+      ],
+      "dynamicTokens": [
+        "--thread-color"
+      ],
+      "states": [
+        "original-text-addresses-and-thread-data",
+        "normal-and-multipage-documents",
+        "1440-768-390-320-complete-horizontal-scroll",
+        "real-print-window-ready-blocked-and-failed-style",
+        "delayed-style-and-missing-artwork",
+        "missing-helper-visible-error",
+        "imported-thread-values-escaped",
+        "avery-5160-physical-dimensions"
+      ],
+      "test": "tests/e2e/css-unification-staff-print.spec.js",
+      "measuredRawCssBytes": 62217,
+      "maxCssBytes": 64265
+    },
+    {
+      "source": "dashboards/js/jim-mailing-list.js",
+      "family": "staff-print",
+      "status": "reviewed",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/staff-print.css"
+      ],
+      "dynamicTokens": [
+        "--thread-color"
+      ],
+      "states": [
+        "original-text-addresses-and-thread-data",
+        "normal-and-multipage-documents",
+        "1440-768-390-320-complete-horizontal-scroll",
+        "real-print-window-ready-blocked-and-failed-style",
+        "delayed-style-and-missing-artwork",
+        "missing-helper-visible-error",
+        "imported-thread-values-escaped",
+        "avery-5160-physical-dimensions"
+      ],
+      "test": "tests/e2e/css-unification-staff-print.spec.js",
+      "measuredRawCssBytes": 62217,
+      "maxCssBytes": 64265
+    },
+    {
+      "source": "pages/js/mockup-detail.js",
+      "family": "staff-print",
+      "status": "reviewed",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/staff-print.css"
+      ],
+      "dynamicTokens": [
+        "--thread-color"
+      ],
+      "states": [
+        "original-text-addresses-and-thread-data",
+        "normal-and-multipage-documents",
+        "1440-768-390-320-complete-horizontal-scroll",
+        "real-print-window-ready-blocked-and-failed-style",
+        "delayed-style-and-missing-artwork",
+        "missing-helper-visible-error",
+        "imported-thread-values-escaped",
+        "avery-5160-physical-dimensions"
+      ],
+      "test": "tests/e2e/css-unification-staff-print.spec.js",
+      "measuredRawCssBytes": 62217,
+      "maxCssBytes": 64265
     }
   ],
   "reviewedRuntimeOwners": [
