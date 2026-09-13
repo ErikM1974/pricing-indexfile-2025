@@ -3,6 +3,39 @@ const fs=require('node:fs'),path=require('node:path');
 const {open,check}=require('./helpers/catalog-storefront-browser');
 const out=path.join(__dirname,'screenshots/css-unification');
 test.use({reducedMotion:'reduce',timezoneId:'America/Los_Angeles',locale:'en-US'});
+for(const [name,url] of [['catalog','/catalog'],['product','/product.html?style=PC61']])test('CSS sample runtime: '+name+' removal uses one visible notification and retains keyboard focus',async({page})=>{
+ const original=process.env.CAPTURE_SAMPLE_REMOVAL_ORIGINAL==='1',events=await open(page,{url,original});
+ if(name==='catalog')await expect(page.locator('.pcard')).toHaveCount(4);
+ else await page.waitForFunction(()=>window.PdpConfigurator?.getSelection()?.price);
+ for(const width of [1440,768,390,320]){
+  await page.setViewportSize({width,height:1000});
+  await page.evaluate(()=>{
+   document.querySelectorAll('.drawer-toast').forEach(n=>n.remove());
+   window.sampleCart.samples=['PC61','PC54'].map((style,i)=>({style,name:i?'Essential Cotton Tee':'Core Cotton Tee',color:'Brilliant Orange',catalogColor:'BrillOrng',size:'M',type:'free',price:0,imageUrl:'/__catalog-fixture/garment.svg'}));
+   window.sampleCart.save();window.sampleCart.updateUI();window.cartDrawer.open();window.cartDrawer.updateCartDisplay();
+  });
+  await page.locator('.cart-item-remove').first().click();
+  await expect(page.locator('.drawer-toast.show')).toHaveCount(original?2:1);
+  await expect(page.locator('#cart-count')).toHaveText('1');
+  expect(await page.evaluate(()=>window.sampleCart.samples.map(s=>s.style))).toEqual(['PC54']);
+  if(!original){
+   await expect(page.locator('.cart-item-remove')).toBeFocused();
+   const notice=page.getByRole('status').filter({hasText:'Core Cotton Tee removed from samples'});
+   await expect(notice).toBeVisible();
+   expect(await notice.evaluate(n=>{const r=n.getBoundingClientRect();return n.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2));})).toBe(true);
+   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);
+  }
+  await page.screenshot({path:path.join(out,'sample-removal-'+name+'-'+(original?'original':'current')+'-'+width+'.png'),fullPage:true});
+ }
+ if(!original){
+  await expect(page.locator('.drawer-toast')).toHaveCount(0,{timeout:5000});
+  await page.locator('.cart-item-remove').click();
+  await expect(page.locator('#drawer-close')).toBeFocused();await expect(page.locator('#cart-count')).toHaveText('0');
+  await expect(page.locator('.drawer-toast')).toHaveCount(1);
+  await page.emulateMedia({media:'print'});await expect(page.locator('.drawer-toast')).toBeHidden();await page.emulateMedia({media:'screen'});
+ }
+ check(expect,events);
+});
 for(const [name,url] of [['catalog','/catalog'],['product','/product.html?style=PC61']]) {
  test('CSS sample runtime: '+name+' notifications and icons',async({page})=>{
   const events=await open(page,{url});

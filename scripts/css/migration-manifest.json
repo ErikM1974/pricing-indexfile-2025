@@ -6975,14 +6975,6 @@
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",
   "pendingRuntimeOwners": [
     {
-      "kind": "generated-document",
-      "owners": [
-        "shared_components/js/quote-formatter.js",
-        "calculators/christmas-bundle-service.js"
-      ],
-      "note": "Own print/PDF fixtures required; static HTML inventory cannot cover these."
-    },
-    {
       "kind": "non-page",
       "owners": [
         "calculators/christmas-bundle-emailjs-template.html",
@@ -8980,6 +8972,22 @@
         "native-keyboard-exit-with-unavailable-styles"
       ],
       "test": "tests/e2e/css-unification-server-pages.spec.js"
+    }
+  ],
+  "inactiveRuntimeOwners": [
+    {
+      "source": "shared_components/js/quote-formatter.js",
+      "kind": "generated-document",
+      "status": "inactive",
+      "evidence": "Only class declaration and CommonJS export reference QuoteFormatter; no construction or call in application JS/HTML. DTF still loads the script, but prints through EmbroideryInvoiceGenerator.",
+      "reactivation": "Retain source and script reference; require original/current visual and print fixtures before enabling this generator."
+    },
+    {
+      "source": "calculators/christmas-bundle-service.js",
+      "kind": "generated-document",
+      "status": "inactive",
+      "evidence": "The HTML script reference is commented out to avoid a duplicate class. The live ChristmasBundleQuoteService is supplied by calculators/js/christmas-bundle-order.js.",
+      "reactivation": "Retain source; verify the active order-service contract and review its generated documents before reconnecting."
     }
   ]
 }

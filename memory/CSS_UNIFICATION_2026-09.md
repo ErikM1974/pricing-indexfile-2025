@@ -2011,4 +2011,11 @@ Staff call sheets, Avery 5160 mailing labels and thread sheets now share canonic
 ## Customer-supplied quote documents reviewed — September 13, 2026
 
 Customer-supplied screenprint invoices now share the required-asset print helper. Eight final browser checks pass (six real popup readiness/failure cases and two saved-quote layouts), with two earlier estimate/clipboard/blocked-popup regressions also passing. All twelve current screenshots, both one-page PDFs and five review sheets were inspected, including every horizontal table segment. Two focused suites / 59 source and financial checks pass; CSS and JavaScript lint pass. Numeric headings stay intact on phones; totals, notes, waiver and captured customer values remain exact. Local static census stays225/225; production remains v2026.09.12.1 / Heroku2110 pending full-app gates and release.
-`nFinal registration checks:281 ownership/CSS/lessons checks pass, plus50 original-source checks. Both saved invoice cases pass again after adding the existing unified-body scope; four review sheets remain pixel-identical and the changed fifth sheet is inspected. Required CSS totals61,722 LFbytes across three owners, with a63,770-byte cap.
+
+Final registration checks:281 ownership/CSS/lessons checks pass, plus50 original-source checks. Both saved invoice cases pass again after adding the existing unified-body scope; four review sheets remain pixel-identical and the changed fifth sheet is inspected. Required CSS totals61,722 LFbytes across three owners, with a63,770-byte cap.
+
+## Final sample removal and inactive generators — September 13, 2026
+
+Both catalog/product sample drawers now use one service-owned removal notice and retain focus after list replacement. Five current browser checks and49 targeted source/runtime checks pass. All eight original/eight current screenshots and seven sheets per phase were inspected. No stylesheet or pricing changes; notices remain hidden on paper. Source reversal locks preserve the original method.
+
+Two legacy print owners are explicitly inactive in the manifest: QuoteFormatter has no call/construction (DTF still loads its unused script); the old Christmas bundle service is commented out and the live implementation comes from calculators/js/christmas-bundle-order.js. Files and references are retained. Reactivation requires a new original/current screen and print review; inactivity earns no CSS review credit. Remaining: four local email templates, ten externally controlled UI contracts, final whole-app gates/CI/release.
