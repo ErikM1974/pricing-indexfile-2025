@@ -1,3 +1,7 @@
+## v2026.09.13.5 (2026.09.13)
+
+- Deploy v2026.09.13.5: feature holiday gift boxes on staff and customer homepages
+
 ## v2026.09.13.4 (2026.09.13)
 
 - Keep new pages within the shared CSS system
