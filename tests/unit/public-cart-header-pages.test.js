@@ -70,8 +70,14 @@ describe('quote cart + PDP modules', () => {
     test('safety-stripe swatches via --swatch; drawer close named', () => {
         expect(read('shared_components/js/safety-stripe-recs.js')).not.toMatch(/style="background/);
         expect(read('shared_components/js/safety-stripe-recs.js')).toMatch(/style="--swatch:/);
-        // the fallback became a token on 2026-09-07 (CSS standardization: no raw hex outside tokens.css)
-        expect(read('shared_components/css/safety-stripe-recs.css')).toMatch(/\.ssr-swatch \{\s*background: var\(--swatch, (?:#ddd|var\(--[a-z0-9-]+\))\);\s*\}/);
+        // Check the swatch property without assuming it is the rule's only declaration.
+        const swatchBackgrounds = [];
+        require('postcss').parse(read('shared_components/css/safety-stripe-recs.css')).walkRules(rule => {
+            if (rule.selector === '[data-ui="unified"].ssr-panel .ssr-swatch') {
+                rule.walkDecls('background', declaration => swatchBackgrounds.push(declaration.value));
+            }
+        });
+        expect(swatchBackgrounds).toEqual(['var(--swatch, var(--ui-line-strong))']);
         expect(read('shared_components/js/cart-drawer.js')).toMatch(/id="drawer-close" aria-label="Close cart"/);
         expect(read('shared_components/js/cart-drawer.js')).not.toMatch(BARE);
     });

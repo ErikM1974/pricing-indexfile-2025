@@ -26,6 +26,11 @@ test.each(Object.keys(original.hashes).filter(f => !f.endsWith('.html')))('%s re
         return;
     }
     let s = fs.readFileSync(path.join(root, file), 'utf8').replace(/\r\n/g, '\n');
+    // Reverse the later shared artwork-form migration before this earlier baseline.
+    for (const change of require('../fixtures/garment-designer-original-content.json').changes.filter(c => c.file === file).reverse()) {
+        expect(s.split(change.after).length - 1).toBe(change.count);
+        s = s.split(change.after).join(change.before);
+    }
     for (const change of original.changes.filter(c => c.file === file).reverse()) {
         expect(change.after).not.toBe('');
         expect(s.split(change.after).length - 1).toBe(change.count);
