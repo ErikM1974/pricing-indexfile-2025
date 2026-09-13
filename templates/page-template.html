@@ -2,8 +2,9 @@
 <!--
     PAGE TEMPLATE (CSS standardization Step 3, 2026-09-07) — copy this file for a new page; maintain the template when the shared contract changes.
 
-    A new page = this skeleton + ONE page stylesheet + ONE page script. Everything the repo's locks demand
-    is already in it (tests/unit/repo-hygiene-final.test.js runs on every served page):
+    Read shared_components/css/NWCA-2026-GUIDE.md#creating-or-changing-a-page first. Reuse a reviewed family
+    and keep only the CSS/JS this page needs; remove unused placeholder asset links. The base hygiene rules
+    are already included (tests/unit/repo-hygiene-final.test.js runs on every served page):
       - no <style> block, no inline <script> body, no on*= handlers  → styles in the page .css, behaviour in the page .js,
         clicks through data-call="fn" (shared_components/js/data-call-delegator.js → window.fn)
       - every local .css/.js carries ?v= (the deploy skill bumps it); /config/app.config.js is the one exception
@@ -13,7 +14,9 @@
     and utilities (memory/CSS_UNIFICATION_2026-09.md), then this page's own stylesheet — which
     uses @layer components.pages and scopes selectors under :where([data-ui="unified"]); it holds only unique arrangements, written with var(--…) tokens (stylelint rejects raw hex).
 
-    Replace every {{PLACEHOLDER}}, then: register the three files in ACTIVE_FILES.md; a staff page that should be
+    Replace every {{PLACEHOLDER}}, including ASSET_VERSION with the current change's version. Register created
+    files in ACTIVE_FILES.md and the page in scripts/css/migration-manifest.json, with actual styles, byte budget,
+    tested states and its tests/e2e/css-unification*.spec.js owner. A staff page that should be
     restricted gets a Staff_Page_Access row (CLAUDE.md § Security); a page that belongs to a person/department
     takes that colour family, not a new one (memory/DESIGN_COLOUR_CODE.md).
 -->
@@ -32,12 +35,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- 1. Tokens first — carries the @layer order. 2. Shared components + utilities. 3. This page only. -->
-    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.08.5">
-    <link rel="stylesheet" href="/shared_components/css/utilities.css?v=2026.09.07.18">
-    <link rel="stylesheet" href="/{{DIRECTORY}}/css/{{page-slug}}.css?v=2026.09.07.2">
+    <link rel="stylesheet" href="/shared_components/css/tokens.css?v={{ASSET_VERSION}}">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v={{ASSET_VERSION}}">
+    <link rel="stylesheet" href="/shared_components/css/utilities.css?v={{ASSET_VERSION}}">
+    <link rel="stylesheet" href="/{{DIRECTORY}}/css/{{page-slug}}.css?v={{ASSET_VERSION}}">
 </head>
-<body data-ui="unified" data-surface="staff" data-department="brand" data-density="comfortable">
+<body data-ui="unified" data-surface="staff" data-department="brand" data-density="comfortable" data-page="{{page-slug}}">
     <a class="skip-link" href="#main">Skip to content</a>
 
     <header class="page-header">
@@ -97,7 +100,7 @@
     </footer>
 
     <script src="/config/app.config.js"></script>
-    <script src="/shared_components/js/data-call-delegator.js?v=2026.09.07.2"></script>
-    <script src="/{{DIRECTORY}}/js/{{page-slug}}.js?v=2026.09.07.2"></script>
+    <script src="/shared_components/js/data-call-delegator.js?v={{ASSET_VERSION}}"></script>
+    <script src="/{{DIRECTORY}}/js/{{page-slug}}.js?v={{ASSET_VERSION}}"></script>
 </body>
 </html>

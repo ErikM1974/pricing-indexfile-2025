@@ -2,6 +2,10 @@
 
 Guidance for Claude Code when working in this repository.
 
+## CSS for every new or changed page
+
+Read [the current design-system guide](shared_components/css/NWCA-2026-GUIDE.md#creating-or-changing-a-page) before writing page markup or styles. Reuse the existing family, canonical tokens and shared controls. Register every new application page in `scripts/css/migration-manifest.json` with its real styles, byte budget, states and browser-test file; unregistered pages fail the census guard. The same contract is linked from `AGENTS.md` for Codex/Astra. Do not bypass CSS checks or create competing override sheets.
+
 ## 🔴 Top 9 Never-Break Rules
 
 1. **NO version-suffix files** — Never create `-backup`, `-FINAL`, `-FIXED`, `-old`, `-v2`. Use Git branches.
@@ -120,15 +124,15 @@ eyes on something risky), never the default.
   a sheet never leaves. `tests/unit/css-lint.test.js` runs the same lint under jest; `tests/unit/css-tokens.test.js`
   locks the token file's shape AND that no page loads a migrated sheet without `tokens.css` (a sheet on bare
   `var(--gray-…)` renders transparent on a page without it — it happened once).
-- **A page's own colours are declared once** in a `:root` block at the top of its stylesheet, wrapped in
-  `/* stylelint-disable color-no-hex */ … enable`. Colour means a person or a department (Steve green, Ruth
-  purple, Bradley slate, floor blue, AE maroon; storefront = `--store-*`); see `memory/DESIGN_COLOUR_CODE.md`.
-- **Any CSS change ships pixel-verified:** before/after screenshots (`tests/e2e/builder-screenshots.spec.js`)
-  + `python scripts/screenshot-diff.py`; the toolkit and the loop are in `scripts/css/README.md`.
-- New pages start from `templates/page-template.html` and the shared `components.css` / `utilities.css`.
+- **New page styles use the existing token and department system**, with scoped selectors; do not start a
+  new palette in `:root` or disable the hex-color rule for convenience. See `memory/DESIGN_COLOUR_CODE.md`.
+- **Visual review follows the current family contract:** inspect 1440/768/390/320px, relevant interaction
+  states and every print page. Register the actual `css-unification*.spec.js` file in the migration manifest.
+- New staff pages start from `templates/page-template.html`; other pages start from a reviewed family sibling.
   The staff-facing reference is **`/dashboards/brand-standards.html`** (Administration → Marketing), rendered
   live from the token file; its Decisions log is the working record of every look change.
-- Plan, census baseline and the per-family log: `memory/CSS_STANDARDIZATION_PLAN_2026-09.md` (§ 9 = final census).
+- Current authoring rules: `shared_components/css/NWCA-2026-GUIDE.md`; current owners: `scripts/css/migration-manifest.json`.
+  `memory/CSS_STANDARDIZATION_PLAN_2026-09.md` is the earlier standardization history.
 
 ### 💵 Pricing = API, never hardcoded (Erik's rule, 2026-06-03) — ALL quote builders
 

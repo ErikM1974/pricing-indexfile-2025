@@ -1,5 +1,10 @@
 # LESSONS LEARNED
 
+## New pages must enter the CSS ownership checks (2026-09-13)
+
+- Problem/root cause: per-page CSS guards covered manifest entries, but the runtime census did not fail when a new application page was omitted. Four reviewed training pages also lacked pointers to their existing browser suite.
+- Solution/prevention: require every tracked application/served-archive page to be registered; require shared foundations and a real browser-test owner. Codex and Claude instructions point to one current authoring checklist. Keep the template aligned, stage new source before local census checks, and retain visual review instead of treating registry presence as certification.
+
 ## Shared form resets and print dialogs need explicit ownership (2026-09-12)
 
 - Problem/root cause: an unlayered designer reset overrode layered form spacing; global keyboard shortcuts could consume modal field input, and timed print cleanup could remove content before the print dialog finished. Narrow size columns clipped fractional dimensions.

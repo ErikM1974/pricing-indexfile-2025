@@ -1,5 +1,18 @@
 # NWCA 2026 Design System — Interior-Page Class Reference
 
+## Creating or changing a page
+
+This is the current authoring contract, linked from both `AGENTS.md` and `CLAUDE.md`. Use the Pricing Index project when starting a new coding task so its project instructions are available. Existing tasks may need to read the updated instructions explicitly.
+
+1. Find the closest reviewed sibling and its entry in `scripts/css/migration-manifest.json`. Reuse that family's layout and stylesheet owners. For a new staff page, start with `templates/page-template.html`. Storefronts, calculators, quote builders and printed documents use their existing family shells; they do not need another design system.
+2. Load canonical `tokens.css` before `components.css` and the family's styles. Keep `data-ui="unified"` and the appropriate surface, department and density attributes. Use shared buttons, fields, tables, notices and native dialogs. Page CSS belongs in `components.pages`, scoped to the opted-in page, and contains only arrangements the family does not already provide. Add a shared component once when a reusable need is missing. Create no empty CSS/JS files just to match a template.
+3. Use the existing color, spacing, typography, radius and shadow tokens. Keep behavior and API data separate from presentation. Do not copy component rules, add override-stack files, use CSS IDs, redefine global scales or add undocumented important declarations. Preserve recorded vendor, print and email exceptions at their actual owners.
+4. Add the page to the manifest's `pilots` list (the historical key for all reviewed application pages). Record its real stylesheet order, dynamic owners, measured CSS byte budget, meaningful states and an actual `tests/e2e/css-unification*.spec.js` file. Add any new stylesheet to `scripts/lint-css.js` unless an existing glob covers it. Update `ACTIVE_FILES.md` for file creation/removal. Mark review complete only after checking the page; registry presence alone is not visual evidence.
+5. Inspect 1440/768/390/320px, all scroll panels, keyboard focus, loading/empty/error/retry states and complete print output when applicable. Exercise business actions with synthetic data and intercepted requests. Preserve pricing parity when a pricing surface changes. Never submit real orders or send email as a styling test.
+6. Run `npm run lint:css` and the relevant unit guards (`css-tokens`, `css-migration`, `css-runtime-inventory`, `css-lint`), then the affected family's browser tests. Full releases retain the existing deployment gates. The census checks tracked files, so stage the intended new source before relying on that check; CI checks committed files. Do not weaken a gate or increase a budget solely to get a green result.
+
+Automated guards reject unregistered application pages, missing test files, missing shared foundations, stylesheet-order drift, excess CSS bytes, unresolved tokens and undocumented important declarations. They supplement human/agent visual review; they cannot guarantee every design decision or dynamically constructed provider layout is correct.
+
 ## Application-wide ownership (2026-09-13)
 
 All 225 app-served pages have completed local review under the migration manifest. New work should extend the recorded family owner rather than add another visual override sheet. The manifest records each page's actual styles, triggered styles, byte budget, tested states and any explicit exceptions.
@@ -15,7 +28,7 @@ For a CSS change, run the owning family's browser states, inspect 1440/768/390/3
 Ten Caspio/Jotform inner interfaces and four saved email templates are explicitly separate external work. Local wrapper or browser preview coverage does not certify those providers. Historical storefront class examples below remain reference material; the current manifest and the family's existing page establish its actual load order.
 
 
-## Unified component pilots (2026-09-08)
+## Unified component vocabulary
 
 For new staff pages, start with `templates/page-template.html`. The living examples are
 `dashboards/brand-standards.html#components`. The first migrated consumers are Brand Standards,
@@ -38,8 +51,7 @@ Design Queue, Art Billing & File Reference and Company Store Inquiry.
   Unit guards reject unresolved tokens, important declarations, CSS IDs, global-scale shadows and changed billing content.
   Browser fixtures exercise states without contacting production business endpoints.
 
-The rest of this guide describes the existing storefront entry point. Its consumers remain on that entry point until their family migrates.
-Do not link both shared entry points onto an existing storefront page; replace competing ownership under state tests.
+The rest of this guide retains storefront class reference and historical review notes. Follow the current manifest and reviewed sibling for actual load order; do not introduce a second shared entry point from an older example.
 
 Quick reference for the primitives in `nwca-2026-core.css` (layer 7). Build interior pages from these without reading the CSS.
 

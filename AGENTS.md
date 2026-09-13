@@ -2,6 +2,15 @@
 
 Guidance for Codex when working in this repository.
 
+## CSS for every new or changed page
+
+Read [the current design-system guide](shared_components/css/NWCA-2026-GUIDE.md#creating-or-changing-a-page) before writing page markup or styles. This applies to Astra and every other coding agent working here.
+
+- Reuse the existing page family's layout and shared controls. Start new staff pages from `templates/page-template.html`; use a reviewed sibling for storefronts, calculators and quote builders.
+- Use canonical `tokens.css` and `components.css`, the unified body attributes and scoped family styles. Add only necessary page-specific arrangements; do not copy shared component rules, invent a second token scale or stack override stylesheets.
+- Register every new app page in `scripts/css/migration-manifest.json` (`pilots` is the historical name of the reviewed-page list), including its actual styles, measured byte budget, tested states and existing browser-test file. The census guard rejects unregistered application pages.
+- Follow the guide's checks and visual review before marking a page complete. Do not silence a guard, raise a budget or add an exception merely to make checks pass. Generated print layouts, email templates and embedded providers keep their own recorded owners.
+
 ## 🔴 Top 8 Never-Break Rules
 
 1. **NO version-suffix files** — Never create `-backup`, `-FINAL`, `-FIXED`, `-old`, `-v2`. Use Git branches.

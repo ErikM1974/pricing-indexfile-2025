@@ -7,6 +7,12 @@ test('runtime CSS census includes aliases, dynamic styles and explicitly served 
         cwd: ROOT, encoding: 'utf8', maxBuffer: 12 * 1024 * 1024, timeout: 30000,
     }));
     const sources = new Map(report.surfaces.map(surface => [surface.source, surface]));
+    // New tracked pages must join the shared-style checks instead of silently
+    // escaping them by being omitted from migration-manifest.json.
+    const applicationPages = report.surfaces.filter(surface => ['application', 'served-archive'].includes(surface.kind));
+    expect(applicationPages.length).toBeGreaterThan(0);
+    expect(applicationPages.filter(surface => surface.status !== 'verified-migration')
+        .map(({ source, status }) => ({ source, status }))).toEqual([]);
     const tracked = execFileSync('git', ['ls-files', '*.html'], { cwd: ROOT, encoding: 'utf8' }).trim().split('\n');
     expect(sources.size).toBe(tracked.length);
     expect(sources.get('pages/catalog.html').aliases).toEqual(expect.arrayContaining(['/catalog', '/catalog.html']));

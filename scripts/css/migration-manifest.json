@@ -1537,6 +1537,7 @@
     },
     {
       "source": "training/index.html",
+      "test": "tests/e2e/css-unification-training-final.spec.js",
       "styles": [
         "shared_components/css/tokens.css",
         "shared_components/css/components.css",
@@ -1559,6 +1560,7 @@
     },
     {
       "source": "training/sales-tax-code-trainer.html",
+      "test": "tests/e2e/css-unification-training-final.spec.js",
       "styles": [
         "shared_components/css/tokens.css",
         "shared_components/css/components.css",
@@ -1582,6 +1584,7 @@
     },
     {
       "source": "training/shopworks-customer-setup.html",
+      "test": "tests/e2e/css-unification-training-final.spec.js",
       "styles": [
         "shared_components/css/tokens.css",
         "shared_components/css/components.css",
@@ -1607,6 +1610,7 @@
     },
     {
       "source": "training/shopworks-customer-setup-enhanced.html",
+      "test": "tests/e2e/css-unification-training-final.spec.js",
       "styles": [
         "shared_components/css/tokens.css",
         "shared_components/css/components.css",
