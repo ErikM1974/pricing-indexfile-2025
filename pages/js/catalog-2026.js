@@ -1615,7 +1615,6 @@
     }
 
     function init() {
-        loadHolidayFeature();
         if (!window.ProductSearchService) {
             console.error('[Catalog] ProductSearchService missing — cannot start');
             var bootGrid = document.getElementById('resultsGrid');
@@ -1647,22 +1646,7 @@
         });
     }
 
-    // The campaign file owns the deadline; an expired promotion leaves the catalog automatically.
-    async function loadHolidayFeature() {
-        const feature = document.querySelector('.holiday-catalog-feature');
-        if (!feature) return;
-        try {
-            const response = await fetch('/api/christmas-gift-box/campaign', { signal: AbortSignal.timeout(10000) });
-            if (!response.ok) throw new Error('Campaign unavailable');
-            const campaign = await response.json();
-            if (!Number.isFinite(Date.parse(campaign.closesAt))) throw new Error('Campaign unavailable');
-            feature.hidden = Date.now() >= Date.parse(campaign.closesAt);
-            feature.querySelector('.holiday-catalog-deadline').textContent = 'Offer ends ' + campaign.deadlineLabel + ', Pacific time.';
-        } catch {
-            feature.querySelector('.holiday-catalog-deadline').textContent = 'Offer details could not load. Open the collection or contact our team.';
-        }
-    }
-
+    // Shared holiday-promotion.js owns campaign discovery and expiry.
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {

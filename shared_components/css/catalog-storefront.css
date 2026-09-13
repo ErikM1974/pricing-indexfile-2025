@@ -1,5 +1,17 @@
 /* Catalog commerce patterns. Shared primitives and masthead stay in their canonical owners. */
 @layer components.pages {
+:where([data-ui="unified"][data-catalog-storefront]) .holiday-catalog-feature {
+    display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-5);
+    margin-block: var(--space-5); padding: var(--space-5); border-radius: var(--radius-md);
+    background: var(--store-green-950); color: var(--color-on-brand); border-top: 6px solid var(--red-700);
+}
+:where([data-ui="unified"][data-catalog-storefront]) .holiday-catalog-copy { flex: 1 1 310px; }
+:where([data-ui="unified"][data-catalog-storefront]) .holiday-catalog-gift { font-size: var(--font-size-display); }
+:where([data-ui="unified"][data-catalog-storefront]) .holiday-catalog-feature strong { font-family: var(--font-store-display); font-size: var(--font-size-2xl); line-height: 1.2; }
+:where([data-ui="unified"][data-catalog-storefront]) .holiday-catalog-feature p { margin-block: var(--space-2); max-width: 65ch; }
+:where([data-ui="unified"][data-catalog-storefront]) .holiday-catalog-feature .btn { --ui-accent: var(--red-700); --ui-accent-hover: var(--red-800); }
+:where([data-ui="unified"][data-catalog-storefront]) .holiday-catalog-deadline { color: var(--green-200); font-size: var(--font-size-sm); }
+
 :where([data-ui="unified"][data-catalog-storefront]) .chip-btn {
     display: inline-flex; align-items: center; gap: 6px;
     background: var(--ui-surface); border: 1px solid var(--ui-line-strong);

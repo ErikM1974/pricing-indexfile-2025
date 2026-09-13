@@ -435,6 +435,7 @@
   "get /api/size-pricing []",
   "get /api/image-proxy []",
   "get /api/cart-integration.js []",
+  "get /api/christmas-gift-box/staff-invitation [ctx.requireStaff] (nested)",
   "get /api/christmas-gift-box/campaign [reads] (nested)",
   "get /api/christmas-gift-box/products/:style [reads] (nested)",
   "post /api/christmas-gift-box/gift-code [codes, smallBody] (nested)",

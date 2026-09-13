@@ -25,8 +25,8 @@
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
     <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.11.3">
     <link rel="stylesheet" href="/shared_components/css/storefront-shell.css?v=2026.09.11.3">
-    <link rel="stylesheet" href="/shared_components/css/catalog-storefront.css?v=2026.09.11.3">
-    <link rel="stylesheet" href="/pages/css/catalog-2026.css?v=2026.09.13.4">
+    <link rel="stylesheet" href="/shared_components/css/catalog-storefront.css?v=2026.09.13.5">
+    <link rel="stylesheet" href="/pages/css/catalog-2026.css?v=2026.09.13.5">
     <link rel="stylesheet" href="/shared_components/css/cart-drawer.css?v=2026.09.13.2">
     <script src="/config/app.config.js"></script>
 </head>
@@ -204,8 +204,9 @@
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <main id="main">
-        <aside class="holiday-catalog-feature wrap" aria-label="Holiday gift boxes">
-            <div><strong>Holiday gifts, sampled early.</strong><p>Try one gift box at our 8-piece embroidery pricing. Have an invitation? Apply your gift code.</p><span class="holiday-catalog-deadline">See the collection for current offer details.</span></div>
+        <aside class="holiday-catalog-feature wrap" data-holiday-promotion="public" aria-label="Holiday gift boxes">
+            <span class="holiday-catalog-gift" aria-hidden="true">🎁</span>
+            <div class="holiday-catalog-copy"><strong>Christmas gifting starts with one great box.</strong><p>Sample Carhartt favorites with your logo. One box at our 8-piece embroidery pricing, before you plan your team's holiday order.</p><span class="holiday-catalog-deadline" data-holiday-status role="status">See the collection for current offer details.</span></div>
             <a class="btn btn-primary" href="/christmas-bundles.html">Build a holiday gift box</a>
         </aside>
         <!-- Page header band (category landing mode swaps the title/breadcrumb) -->
@@ -379,7 +380,8 @@
     <script src="/shared_components/js/cart-drawer.js?v=2026.09.13.2" defer></script>
     <script src="/pages/js/catalog-samples.js?v=2026.08.26.9" defer></script>
     <script src="/shared_components/js/express-eligibility.js?v=2026.08.25.4" defer></script>
-    <script src="/pages/js/catalog-2026.js?v=2026.09.13.4" defer></script>
+    <script src="/pages/js/catalog-2026.js?v=2026.09.13.5" defer></script>
     <script src="/shared_components/js/catalog-storefront-navigation.js?v=2026.09.11.3" defer></script>
+    <script src="/shared_components/js/holiday-promotion.js?v=2026.09.13.5" defer></script>
 </body>
 </html>

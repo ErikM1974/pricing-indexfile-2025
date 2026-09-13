@@ -2,11 +2,16 @@ const {test,expect}=require('@playwright/test'),fs=require('node:fs'),path=requi
 const {open,snapshot,check}=require('./helpers/catalog-storefront-browser');
 const root=path.resolve(__dirname,'../..'),out=path.join(__dirname,'screenshots/css-unification'),capture=process.env.CAPTURE_CATALOG_STOREFRONT_ORIGINAL==='1',phase=capture?'original':'current';
 test.use({timezoneId:'America/Los_Angeles',locale:'en-US',reducedMotion:'reduce'});
-for(const mode of ['active','expired','failed'])test('holiday catalog promotion: '+mode,async({page})=>{
- const events=await open(page,{url:'/catalog',campaignExpired:mode==='expired',campaignFailed:mode==='failed'}),feature=page.locator('.holiday-catalog-feature');
- await expect(page.locator('.pcard')).toHaveCount(4);
+for(const url of ['/','/catalog'])for(const mode of ['active','expired','failed'])test('holiday catalog promotion '+url+': '+mode,async({page})=>{
+ const events=await open(page,{url,campaignExpired:mode==='expired',campaignFailed:mode==='failed'}),feature=page.locator('.holiday-catalog-feature');
+ if(url==='/catalog')await expect(page.locator('.pcard')).toHaveCount(4);
  if(mode==='expired')await expect(feature).toBeHidden();
  else {await expect(feature).toContainText(mode==='failed'?'Offer details could not load':'October 15, 2026');await expect(feature.locator('a')).toHaveAttribute('href','/christmas-bundles.html');}
+ if(mode==='active'){
+  for(const width of [1440,768,390,320]){await page.setViewportSize({width,height:1000});expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);await feature.screenshot({path:path.join(out,'holiday-public-'+(url==='/'?'home':'catalog')+'-'+width+'.png')});}
+  expect((await new AxeBuilder({page}).include('.holiday-catalog-feature').withTags(['wcag2a','wcag2aa']).analyze()).violations).toEqual([]);
+ }
+ expect(events.reads.some(r=>r.path==='/api/christmas-gift-box/staff-invitation')).toBe(false);
  check(expect,events);
 });
 async function evidence(page,name,events,{paper=true,noticeChecked=false}={}){

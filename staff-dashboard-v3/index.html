@@ -27,7 +27,7 @@
     -->
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
     <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.10.6">
-    <link rel="stylesheet" href="/shared_components/css/staff-home.css?v=2026.09.10.7">
+    <link rel="stylesheet" href="/shared_components/css/staff-home.css?v=2026.09.13.5">
 
     <!-- No config bootstrap: every dashboard read is a same-origin
          /api/staff/* or /api/mo/* or /api/crm-proxy/* path since 2026-08-27,
@@ -158,6 +158,11 @@
                     <div class="cp-results" id="cpResults" role="listbox" aria-label="Search results"></div>
                     <div class="cp-status" id="cpStatus"></div>
                 </div>
+            </section>
+
+            <section class="holiday-staff" data-holiday-promotion="staff" aria-label="Christmas gift boxes for customers">
+                <div><h2>🎁 Christmas gift boxes</h2><p>Invite selected customers to sample early. Their gift code covers the box and shipping.</p><a class="btn btn-primary" data-holiday-link href="https://www.teamnwca.com/christmas-bundles.html" target="_blank" rel="noopener">Open gift box</a> <a class="btn btn-ghost" href="/dashboards/quote-management.html">Review requests in Quotes</a></div>
+                <div><span>Customer invitation code</span><strong class="holiday-staff-code" data-holiday-code>Loading…</strong><div class="holiday-staff-actions"><button class="btn btn-primary" type="button" data-holiday-copy="code" disabled>Copy code</button><button class="btn btn-ghost" type="button" data-holiday-copy="link">Copy customer link</button></div><p data-holiday-status role="status">Checking the current invitation…</p><button class="btn btn-ghost" type="button" data-holiday-retry hidden>Retry invitation</button></div>
             </section>
 
             <!-- Pride Wall (2026-07-20 Phase 1) — ambient rotation of recent finished-product
@@ -747,5 +752,6 @@
          APP ENTRY (ES module)
          =================================================== -->
     <script type="module" src="/shared_components/js/staff-dashboard/core/dashboard-app.js?v=2026.09.10.7"></script>
+    <script src="/shared_components/js/holiday-promotion.js?v=2026.09.13.5" defer></script>
 </body>
 </html>
