@@ -6975,14 +6975,6 @@
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",
   "pendingRuntimeOwners": [
     {
-      "kind": "dynamic-css",
-      "owners": [
-        "shared_components/js/builders/dtg/pricing.js",
-        "shared_components/js/builders/dtf/methods-rows.js"
-      ],
-      "note": "Sample-cart notifications and garment form hosts reviewed. These remaining builder error/empty snippets were discovered during the final runtime census; other generated owners remain separately listed."
-    },
-    {
       "kind": "generated-document",
       "owners": [
         "shared_components/js/quote-formatter.js",
@@ -8782,6 +8774,46 @@
       ],
       "test": "tests/e2e/css-unification-sample-runtime.spec.js",
       "note": "Only two direct script hosts; sample checkout reads the stored cart independently. All 26 notification screens / 38 panels reviewed; existing complete catalog/product page evidence remains valid."
+    },
+    {
+      "kind": "dynamic-css",
+      "source": "shared_components/js/builders/dtg/pricing.js",
+      "status": "reviewed",
+      "hosts": [
+        "quote-builders/dtg-quote-builder.html"
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css"
+      ],
+      "states": [
+        "pricing-failure-and-refresh-recovery",
+        "1440-768-390-320-full-panels",
+        "complete-letter-documents",
+        "original-prices-and-payloads"
+      ],
+      "test": "tests/e2e/css-unification-quote-builder-alternate-workflows.spec.js",
+      "note": "Decorative inline declarations replaced with existing shared alert classes; complete builder stylesheet ownership remains in pilots."
+    },
+    {
+      "kind": "dynamic-css",
+      "source": "shared_components/js/builders/dtf/methods-rows.js",
+      "status": "reviewed",
+      "hosts": [
+        "quote-builders/dtf-quote-builder.html"
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css"
+      ],
+      "states": [
+        "extended-sizes-success-empty-error-rate-limit",
+        "1440-768-390-320-full-panels",
+        "complete-letter-documents",
+        "original-prices-and-payloads"
+      ],
+      "test": "tests/e2e/css-unification-quote-builder-workflows.spec.js",
+      "note": "Decorative inline declarations replaced with existing shared alert classes; complete builder stylesheet ownership remains in pilots."
     }
   ]
 }

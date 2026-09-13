@@ -1992,3 +1992,8 @@ Production remains v2026.09.12.1 / Heroku 2110 (215/225) until the final release
 ## Shared sample notifications and runtime census — September 12, 2026
 
 Sample-cart runtime reviewed on catalog/product: 5 targeted browser cases across final and existing drawer runs, 26 notification screens / 38 panels fully reviewed. Icons reuse one link; modal notifications remain visible and accessible; out-of-stock adds stay blocked. CSS lint now includes DTG and staff-home (283 files), with reviewed-owner inclusion checked against actual expanded paths. Runtime census now reads generated stylesheet links and ignores data-style attributes. Catalog source evidence reconciles the already-reviewed Quick Quote recommendation edits using identical original hashes. The served awareness archive is already reviewed and was removed from the stale pending list. Remaining: builder runtime error/empty snippets, generated documents, server pages, email/provider contracts, final full-app gates and release.
+
+
+## Builder runtime alerts — September 12, 2026
+
+DTG persistent pricing errors and DTF extended-size empty/error/rate-limit messages now use the shared alert styles. Six focused browser cases passed, three unit suites / 226 checks passed, and all current evidence was visually inspected: DTF 48 screenshots / four PDFs (eight pages), DTG four screenshots / one PDF (three pages). Original amounts, payloads, controls and refresh recovery are preserved. This closes the two named dynamic-CSS backlog owners; generated print, server pages, email/provider contracts and final whole-app gates/release remain.

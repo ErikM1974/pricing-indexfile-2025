@@ -1528,6 +1528,24 @@
       "before": "style=\"font-size:11px;color:#92400e;font-weight:600;margin-left:6px;\"",
       "after": "data-dtg-style=\"terms-note\"",
       "count": 1
+    },
+    {
+      "file": "shared_components/js/builders/dtg/pricing.js",
+      "before": "banner.style.cssText = 'margin:10px 0;padding:10px 14px;background:#fef2f2;border:1px solid #ef4444;border-left:4px solid #b91c1c;border-radius:6px;color:#991b1b;font-size:13px;font-weight:600;line-height:1.4;';",
+      "after": "banner.className = 'alert alert-error';",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/builders/dtf/methods-rows.js",
+      "before": "class=\"ext-popup-error\" style=\"padding: 20px; text-align: center; color: #c00;\"",
+      "after": "class=\"ext-popup-error alert alert-error\" role=\"alert\"",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/builders/dtf/methods-rows.js",
+      "before": "class=\"ext-popup-empty\" style=\"padding: 20px; text-align: center; color: #666;\"",
+      "after": "class=\"ext-popup-empty alert alert-info\" role=\"status\"",
+      "count": 1
     }
   ]
 }

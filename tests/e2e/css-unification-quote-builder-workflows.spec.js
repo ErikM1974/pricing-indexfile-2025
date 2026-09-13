@@ -21,7 +21,7 @@ async function addProduct(page,method,style='PC54'){
  await page.waitForLoadState('networkidle');
 }
 
-for(const method of ['embroidery','screenprint','dtf'])for(const scene of ['products','decoration','customer','review','workbench','colors','invoice','extended-sizes','customer-entered','save'])test('CSS quote builders: '+method+' '+scene,async({page,context})=>{
+for(const method of ['embroidery','screenprint','dtf'])for(const scene of ['products','decoration','customer','review','workbench','colors','invoice','extended-sizes','customer-entered','save',...(method==='dtf'?['extended-error','extended-empty','extended-rate-limit']:[])])test('CSS quote builders: '+method+' '+scene,async({page,context})=>{
  page.setDefaultTimeout(15000);
  // The local-only schema assertion rejects intentional null draft IDs in SCP/DTF.
  // Use a fully intercepted synthetic production origin for their original draft output.
@@ -32,8 +32,17 @@ for(const method of ['embroidery','screenprint','dtf'])for(const scene of ['prod
   await expect(page.locator('#toast-container')).toContainText('Color Chg rate is an estimate');
  }
  await addProduct(page,method);
+ if(scene.startsWith('extended-')&&scene!=='extended-sizes')await page.evaluate(scene=>{
+  window.ExtendedSizesConfig.getAvailableExtendedSizes=async()=>{
+   if(scene==='extended-empty')return [];
+   throw new Error(scene==='extended-rate-limit'?'RATE_LIMITED':'Synthetic extended-size failure');
+  };
+ },scene);
  if(scene==='colors')await page.locator('tr[data-style] .color-picker-selected').first().click();
- if(scene==='extended-sizes')await page.locator('tr[data-style] .xxxl-picker-btn').first().click();
+ if(scene.startsWith('extended-')) {
+  await page.locator('tr[data-style] .xxxl-picker-btn').first().click();
+  if(scene!=='extended-sizes')await expect(page.locator(scene==='extended-empty'?'.ext-popup-empty':'.ext-popup-error')).toContainText(scene==='extended-empty'?'No extended sizes available':scene==='extended-rate-limit'?'Too many requests':'Unable to load extended sizes');
+ }
  if(['decoration','customer','review'].includes(scene))await page.locator('.guided-step[data-step="'+({decoration:1,customer:2,review:3}[scene])+'"]').click();
  if(scene==='workbench')await page.locator('.guided-toggle').click();
  if(['invoice','customer-entered','save'].includes(scene)){

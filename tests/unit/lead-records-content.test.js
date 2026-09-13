@@ -48,7 +48,7 @@ test('retired styles have no remaining HTML consumer and dynamic art ownership s
     const imported = 'shared_components/css/art-intake.css';
     expect(fs.readFileSync(path.join(root, lead.dynamicStyles[0]), 'utf8')).toContain('/' + imported);
     expect(lead.measuredTriggeredCssBytes).toBe(lead.measuredRawCssBytes + [lead.dynamicStyles[0], imported].reduce((sum, file) => sum + Buffer.byteLength(fs.readFileSync(path.join(root, file), 'utf8').replace(/\r\n/g, '\n')), 0));
-    expect(manifest.pendingRuntimeOwners.find(p => p.kind === 'dynamic-css').owners).not.toContain('dashboards/js/lead-workspace.js');
+    expect(manifest.pendingRuntimeOwners.flatMap(p => p.owners)).not.toContain('dashboards/js/lead-workspace.js');
 });
 
 test.each([['lead', 'lead-workspace', 'test-leads-stub.js'], ['form-submissions', 'form-submissions', 'test-form-submissions-stub.js'], ['leads', 'leads', 'test-leads-stub.js']])('%s preview follows current markup, assets and mock boundary', (page, preview, stub) => {

@@ -1559,3 +1559,11 @@ Garment designer completion: page styles are scoped to the unified designer; art
 - tests/fixtures/quote-builders-dtg-detailed-save-failure-original-browser.json — immutable original synthetic populated builder workflow evidence.
 
 - tests/fixtures/quote-builders-dtg-detailed-assistant-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-dtf-extended-error-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-dtf-extended-empty-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-dtf-extended-rate-limit-original-browser.json — immutable original synthetic populated builder workflow evidence.
+
+- tests/fixtures/quote-builders-dtg-runtime-pricing-failure-original-browser.json — immutable original synthetic populated builder workflow evidence.

@@ -4,6 +4,31 @@ const {evidence}=require('./helpers/quote-builder-workflow-review');
 const original=process.env.CAPTURE_QUOTE_BUILDERS_ORIGINAL==='1';
 test.setTimeout(120000);
 test.use({timezoneId:'America/Los_Angeles',locale:'en-US',reducedMotion:'reduce'});
+test('CSS quote builders: dtg runtime-pricing-failure',async({page})=>{
+ const state={original,richCatalog:true,pricingFailed:true,url:'/quote-builders/dtg-quote-builder.html'};
+ const e=await open(page,state);
+ await page.waitForLoadState('networkidle');
+ await page.locator('.dtg-cc-add-default').first().click();
+ const qty=page.locator('.dtg-line-card input[data-size="M"]').first();await expect(qty).toBeEnabled();
+ await qty.fill('24');await qty.dispatchEvent('change');
+ await expect(page.locator('#dtg-price-error-banner')).toContainText('the total below is INCOMPLETE',{timeout:15000});
+ await evidence(page,'dtg-runtime-pricing-failure',e);
+ // Refresh is the actual recovery instruction; successful pricing must clear
+ // the failed-row warning, with no quote save or business call escaping.
+ page.removeAllListeners('dialog');
+ page.on('dialog',async dialog=>{
+  e.dialogs.push(dialog.message());
+  if(dialog.type()==='beforeunload')await dialog.accept();else await dialog.dismiss();
+ });
+ state.pricingFailed=false;await page.reload();await page.waitForLoadState('networkidle');
+ await page.locator('.dtg-cc-add-default').first().click();
+ const nextQty=page.locator('.dtg-line-card input[data-size="M"]').first();
+ await nextQty.fill('24');await nextQty.dispatchEvent('change');
+ await expect(page.locator('#dtgPriceSummary')).toContainText('$396.72');
+ await expect(page.locator('#dtg-price-error-banner')).toHaveCount(0);
+ check(expect,e);
+});
+
 for(const scene of ['catalog','catalog-detail','product','colors','customer','shipping','invoice','pricing-failure'])test('CSS quote builders: dtg '+scene,async({page,context})=>{
  page.setDefaultTimeout(15000);
  const e=await open(page,{original,realPreview:scene==='invoice'&&!original,richCatalog:true,pricingFailed:scene==='pricing-failure',url:'/quote-builders/dtg-quote-builder.html'});
