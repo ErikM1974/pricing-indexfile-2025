@@ -4,13 +4,19 @@
 
 Release v2026.09.13.4 contains this workflow. Erik approved $9 packaging, $25 shipping and free factory pickup on September 13; live Service_Codes and the invitation hash are configured. Source 1d1383751dc562bd691b454aaafdcfe2c2304c63 passed every required job in GitHub CI run 34772107742, including full browser checks, live pricing parity and holiday requests. The working checkpoint linked below records the production release and live verification.
 
+## Dashboard and catalog discovery
+
+September 13 update: prominent staff invitation panel below dashboard search, code and branded customer-link copy buttons, and a Quotes shortcut. Matching Christmas banners sit above the homepage and catalog. The invitation is read only after staff authentication and is withheld when missing, mismatched or expired. Public promotions share the campaign deadline and never request the private endpoint.
+
+Local verification: 55 affected browser cases passed, including both customer entry points, four widths, keyboard, contrast, staff copy failures/retry/expiry and existing dashboard/catalog workflows. The 271-suite unit/DOM/accessibility run plus corrected source-mapping and stylesheet checks covers 6,376 passing tests, four skipped. Lint, typecheck, build and production audit pass. Exact-source release CI and live verification are recorded in the external checkpoint.
+
 ## Business decisions
 
 - Public customers may request **one box at the embroidery eight-piece tier**; no eight-box minimum.
 - Paid requests include $9 packaging and $25 shipping, or $0 shipping for factory pickup. Read current charges from Service_Codes; do not hardcode these values into the page.
 - Invited customers use **one shared reusable gift code**. A valid invitation makes the entire box and shipping complimentary.
 - Campaign closes after **October 15, 2026, Pacific**: exclusive close is `2026-10-16T00:00:00-07:00`.
-- Feature the collection on the main catalog. Hide its promotion automatically after the close.
+- Festive collection links appear above the main homepage and catalog content. Shared promotion code hides both after the campaign close. Public banners never receive invitation credentials.
 - Customers choose a jacket, hoodie, beanie and gloves, supply company/contact and delivery details, and may upload a logo and share their holiday team size/date.
 - This is a **request for staff review**, with no checkout payment or automatic production push. Staff confirms artwork, stock, delivery, tax and any additional artwork charge, then creates the final normal quote/invoice.
 
@@ -39,7 +45,7 @@ Before shipping a swap, verify the new style's real catalog colors, inventory an
 
 ## Shared code and request persistence
 
-`CHRISTMAS_GIFT_CODE_SHA256` is configured on the app as the SHA-256 hex digest of the trimmed, uppercase invitation code. The secret signing key is existing SESSION_SECRET. The private invitation handoff is saved outside the repository in the working checkpoint directory, restricted to Erik's Windows account. Keep plaintext out of source, browser assets, logs and documentation. Give Erik the private file at release. Rotating its hash invalidates existing invitation grants.
+`CHRISTMAS_GIFT_CODE_SHA256` is configured on the app as the SHA-256 hex digest of the trimmed, uppercase invitation code. The secret signing key is existing SESSION_SECRET. The private invitation handoff is saved outside the repository in the working checkpoint directory, restricted to Erik's Windows account. Keep plaintext out of source, public browser assets, logs and documentation. `CHRISTMAS_GIFT_CODE` supplies the staff-only display; its normalized hash must match `CHRISTMAS_GIFT_CODE_SHA256`. Update both together when rotating. The authenticated, non-cacheable `/api/christmas-gift-box/staff-invitation` endpoint reveals the code only to staff. The prominent Staff Dashboard panel lets reps copy the code and the clean customer link separately. Give Erik the private file at release. Rotating its hash invalidates existing invitation grants.
 
 The server issues a 30-minute invitation grant and a 10-minute estimate, bounded by campaign close. Client totals and a client `complimentary` flag are ignored. Selections, delivery method, invitation and current prices must match when a new request is saved.
 

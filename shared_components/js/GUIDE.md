@@ -299,3 +299,5 @@ Polar Camel: laser-tumbler-simple.js owns latest color/inventory state, live-pol
 
 - staff-print.js also supplies required-asset readiness for the customer-supplied screen-print saved quote.
 `embroidery-quote-pricing.d.ts` describes the canonical calculator method consumed by lib/christmas-pricing.js. Keep its declaration aligned with the JavaScript implementation and calculator parity tests; it contains no pricing constants.
+
+- `holiday-promotion.js` — home/catalog campaign banner and authenticated staff invitation controls; campaign config owns expiry, server configuration owns the code.

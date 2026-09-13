@@ -66,6 +66,11 @@ module.exports = function register(app, ctx) {
         next();
     };
     app.get(
+        '/api/christmas-gift-box/staff-invitation',
+        ctx.requireStaff,
+        handle(() => service.staffInvitation())
+    );
+    app.get(
         '/api/christmas-gift-box/campaign',
         reads,
         handle(() => service.readCampaign())

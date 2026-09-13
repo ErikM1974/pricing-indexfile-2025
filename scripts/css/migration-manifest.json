@@ -5289,11 +5289,12 @@
         "original-role-links-goal-and-staff-data",
         "search-pins-and-quote-launcher",
         "directory-filter-focus-and-reopen",
-        "visible-empty-and-failed-reads"
+        "visible-empty-and-failed-reads",
+        "holiday-authenticated-invitation-copy-retry-expiry"
       ],
       "test": "tests/e2e/css-unification-staff-home.spec.js",
       "maxCssBytes": 106024,
-      "measuredRawCssBytes": 105000,
+      "measuredRawCssBytes": 105878,
       "baseline": {
         "commit": "9b6d76d6d77161818e73bd7caab56b0b02c342c9",
         "rawCssBytes": 246827,
@@ -5935,11 +5936,12 @@
         "quantity-pending-price-withheld",
         "exact-synthetic-cart-payloads",
         "sample-dialog-keyboard-and-axe",
-        "complete-letter-print"
+        "complete-letter-print",
+        "festive-holiday-discovery-active-expired-failed"
       ],
       "test": "tests/e2e/css-unification-catalog-storefront.spec.js",
       "maxCssBytes": 187222,
-      "measuredRawCssBytes": 185174,
+      "measuredRawCssBytes": 186305,
       "baseline": {
         "commit": "7ce2f00c6d25de153358a3754bf16ba649e83766",
         "rawCssBytes": 131546,
@@ -5972,11 +5974,12 @@
         "exact-synthetic-cart-payloads",
         "sample-dialog-keyboard-and-axe",
         "complete-letter-print",
-        "holiday-active-expired-failed"
+        "holiday-active-expired-failed",
+        "festive-holiday-discovery-active-expired-failed"
       ],
       "test": "tests/e2e/css-unification-catalog-storefront.spec.js",
       "maxCssBytes": 140552,
-      "measuredRawCssBytes": 139593,
+      "measuredRawCssBytes": 139930,
       "baseline": {
         "commit": "7ce2f00c6d25de153358a3754bf16ba649e83766",
         "rawCssBytes": 190195,

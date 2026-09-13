@@ -252,6 +252,102 @@
       "before": "    <script src=\"/shared_components/js/toast-notifications.js?v=2026.09.08.3\"></script>\n    <!-- Proxy host for product-image lookups (Rule 6) -->\n    <script src=\"/config/app.config.js\"></script>\n    <script src=\"/pages/js/quote-view.js?v=2026.09.10.9\"></script>\n</body>\n</html>\n",
       "after": "    <script src=\"/shared_components/js/toast-notifications.js?v=2026.09.08.3\"></script>\n    <!-- Proxy host for product-image lookups (Rule 6) -->\n    <script src=\"/config/app.config.js\"></script>\n    <script src=\"/pages/js/quote-view.js?v=2026.09.13.4\"></script>\n</body>\n</html>\n",
       "count": 1
+    },
+    {
+      "file": "pages/catalog.html",
+      "before": "        <aside class=\"holiday-catalog-feature wrap\" aria-label=\"Holiday gift boxes\">\n            <div><strong>Holiday gifts, sampled early.</strong><p>Try one gift box at our 8-piece embroidery pricing. Have an invitation? Apply your gift code.</p><span class=\"holiday-catalog-deadline\">See the collection for current offer details.</span></div>\n            <a class=\"btn btn-primary\" href=\"/christmas-bundles.html\">Build a holiday gift box</a>\n        </aside>",
+      "after": "        <aside class=\"holiday-catalog-feature wrap\" data-holiday-promotion=\"public\" aria-label=\"Holiday gift boxes\">\n            <span class=\"holiday-catalog-gift\" aria-hidden=\"true\">🎁</span>\n            <div class=\"holiday-catalog-copy\"><strong>Christmas gifting starts with one great box.</strong><p>Sample Carhartt favorites with your logo. One box at our 8-piece embroidery pricing, before you plan your team's holiday order.</p><span class=\"holiday-catalog-deadline\" data-holiday-status role=\"status\">See the collection for current offer details.</span></div>\n            <a class=\"btn btn-primary\" href=\"/christmas-bundles.html\">Build a holiday gift box</a>\n        </aside>",
+      "count": 1
+    },
+    {
+      "file": "index.html",
+      "before": "    <main id=\"main\">",
+      "after": "    <main id=\"main\">\n        <aside class=\"holiday-catalog-feature wrap\" data-holiday-promotion=\"public\" aria-label=\"Holiday gift boxes\">\n            <span class=\"holiday-catalog-gift\" aria-hidden=\"true\">🎁</span>\n            <div class=\"holiday-catalog-copy\"><strong>Christmas gifting starts with one great box.</strong><p>Sample Carhartt favorites with your logo. One box at our 8-piece embroidery pricing, before you plan your team's holiday order.</p><span class=\"holiday-catalog-deadline\" data-holiday-status role=\"status\">See the collection for current offer details.</span></div>\n            <a class=\"btn btn-primary\" href=\"/christmas-bundles.html\">Build a holiday gift box</a>\n        </aside>",
+      "count": 1
+    },
+    {
+      "file": "staff-dashboard-v3/index.html",
+      "before": "            <!-- Pride Wall (2026-07-20 Phase 1)",
+      "after": "            <section class=\"holiday-staff\" data-holiday-promotion=\"staff\" aria-label=\"Christmas gift boxes for customers\">\n                <div><h2>🎁 Christmas gift boxes</h2><p>Invite selected customers to sample early. Their gift code covers the box and shipping.</p><a class=\"btn btn-primary\" data-holiday-link href=\"https://www.teamnwca.com/christmas-bundles.html\" target=\"_blank\" rel=\"noopener\">Open gift box</a> <a class=\"btn btn-ghost\" href=\"/dashboards/quote-management.html\">Review requests in Quotes</a></div>\n                <div><span>Customer invitation code</span><strong class=\"holiday-staff-code\" data-holiday-code>Loading…</strong><div class=\"holiday-staff-actions\"><button class=\"btn btn-primary\" type=\"button\" data-holiday-copy=\"code\" disabled>Copy code</button><button class=\"btn btn-ghost\" type=\"button\" data-holiday-copy=\"link\">Copy customer link</button></div><p data-holiday-status role=\"status\">Checking the current invitation…</p><button class=\"btn btn-ghost\" type=\"button\" data-holiday-retry hidden>Retry invitation</button></div>\n            </section>\n\n            <!-- Pride Wall (2026-07-20 Phase 1)",
+      "count": 1
+    },
+    {
+      "file": "index.html",
+      "before": "</body>",
+      "after": "    <script src=\"/shared_components/js/holiday-promotion.js?v=2026.09.13.5\" defer></script>\n</body>",
+      "count": 1
+    },
+    {
+      "file": "pages/catalog.html",
+      "before": "</body>",
+      "after": "    <script src=\"/shared_components/js/holiday-promotion.js?v=2026.09.13.5\" defer></script>\n</body>",
+      "count": 1
+    },
+    {
+      "file": "staff-dashboard-v3/index.html",
+      "before": "</body>",
+      "after": "    <script src=\"/shared_components/js/holiday-promotion.js?v=2026.09.13.5\" defer></script>\n</body>",
+      "count": 1
+    },
+    {
+      "file": "pages/js/catalog-2026.js",
+      "before": "    function init() {\n        loadHolidayFeature();",
+      "after": "    function init() {",
+      "count": 1
+    },
+    {
+      "file": "pages/js/catalog-2026.js",
+      "before": "    // The campaign file owns the deadline; an expired promotion leaves the catalog automatically.\n    async function loadHolidayFeature() {\n        const feature = document.querySelector('.holiday-catalog-feature');\n        if (!feature) return;\n        try {\n            const response = await fetch('/api/christmas-gift-box/campaign', { signal: AbortSignal.timeout(10000) });\n            if (!response.ok) throw new Error('Campaign unavailable');\n            const campaign = await response.json();\n            if (!Number.isFinite(Date.parse(campaign.closesAt))) throw new Error('Campaign unavailable');\n            feature.hidden = Date.now() >= Date.parse(campaign.closesAt);\n            feature.querySelector('.holiday-catalog-deadline').textContent = 'Offer ends ' + campaign.deadlineLabel + ', Pacific time.';\n        } catch {\n            feature.querySelector('.holiday-catalog-deadline').textContent = 'Offer details could not load. Open the collection or contact our team.';\n        }\n    }\n\n    if (document.readyState",
+      "after": "    // Shared holiday-promotion.js owns campaign discovery and expiry.\n    if (document.readyState",
+      "count": 1
+    },
+    {
+      "file": "pages/css/catalog-2026.css",
+      "before": "@layer components.pages {\n:where([data-ui=\"unified\"][data-catalog-storefront=\"catalog\"]) .holiday-catalog-feature {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    flex-wrap: wrap;\n    gap: var(--space-4);\n    margin-block: var(--space-5);\n    padding: var(--space-5);\n    background: var(--ui-surface);\n    border: 1px solid var(--ui-line);\n    border-radius: var(--radius-md);\n}\n\n:where([data-ui=\"unified\"][data-catalog-storefront=\"catalog\"]) .holiday-catalog-feature strong { font-family: var(--font-store-display); font-size: var(--font-size-2xl); }\n:where([data-ui=\"unified\"][data-catalog-storefront=\"catalog\"]) .holiday-catalog-feature p { margin-block: var(--space-2); }\n:where([data-ui=\"unified\"][data-catalog-storefront=\"catalog\"]) .holiday-catalog-deadline { color: var(--ui-muted); font-size: var(--font-size-md); }\n\n:where([data-ui=\"unified\"][data-catalog-storefront=\"catalog\"]) .filters-rail {",
+      "after": "@layer components.pages {\n:where([data-ui=\"unified\"][data-catalog-storefront=\"catalog\"]) .filters-rail {",
+      "count": 1
+    },
+    {
+      "file": "index.html",
+      "before": "/shared_components/css/catalog-storefront.css?v=2026.09.11.3",
+      "after": "/shared_components/css/catalog-storefront.css?v=2026.09.13.5",
+      "count": 1
+    },
+    {
+      "file": "pages/catalog.html",
+      "before": "/shared_components/css/catalog-storefront.css?v=2026.09.11.3",
+      "after": "/shared_components/css/catalog-storefront.css?v=2026.09.13.5",
+      "count": 1
+    },
+    {
+      "file": "pages/catalog.html",
+      "before": "/pages/css/catalog-2026.css?v=2026.09.13.4",
+      "after": "/pages/css/catalog-2026.css?v=2026.09.13.5",
+      "count": 1
+    },
+    {
+      "file": "pages/catalog.html",
+      "before": "/pages/js/catalog-2026.js?v=2026.09.13.4",
+      "after": "/pages/js/catalog-2026.js?v=2026.09.13.5",
+      "count": 1
+    },
+    {
+      "file": "product.html",
+      "before": "/shared_components/css/catalog-storefront.css?v=2026.09.11.3",
+      "after": "/shared_components/css/catalog-storefront.css?v=2026.09.13.5",
+      "count": 1
+    },
+    {
+      "file": "staff-dashboard-v3/index.html",
+      "before": "/shared_components/css/staff-home.css?v=2026.09.10.7",
+      "after": "/shared_components/css/staff-home.css?v=2026.09.13.5",
+      "count": 1
+    },
+    {
+      "file": "server.js",
+      "before": "{ const ctx = { API_BASE_URL, fetch, withProxySecret, rateLimit, mintShareToken, quoteShareUrl, sendEmailJSTemplate }; require('./routes/christmas-gift-box')(app, ctx); }",
+      "after": "{ const ctx = { API_BASE_URL, fetch, withProxySecret, rateLimit, mintShareToken, quoteShareUrl, sendEmailJSTemplate, requireStaff }; require('./routes/christmas-gift-box')(app, ctx); }",
+      "count": 1
     }
   ]
 }

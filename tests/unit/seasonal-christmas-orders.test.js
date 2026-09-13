@@ -17,7 +17,7 @@ function factory(flags = {}) {
  let now = fixed;
  const ctx = {
   readCampaign: () => clone(campaign), now: () => now, signingSecret: 'synthetic-holiday-signing-secret',
-  giftCodeHash: crypto.createHash('sha256').update(code).digest('hex'),
+  giftCodeHash: crypto.createHash('sha256').update(code).digest('hex'), giftCode: flags.displayCode === undefined ? code : flags.displayCode,
   mintShareToken: () => 'synthetic-share-token', quoteShareUrl: id => 'https://example.invalid/quote/' + id + '?k=synthetic-share-token',
   sendEmailJSTemplate: async (template, params) => { state.emails.push({ template, params }); if (flags.email) throw new Error(flags.email); },
   makeApiRequest: async (endpoint, method = 'GET', body) => {
@@ -235,4 +235,26 @@ test('combined name and shipping fields stay inside the saved quote column limit
  await expect(f.service.submit(f.body)).rejects.toMatchObject({canRevise:true});expect(f.state.writes).toEqual([]);
  f.body.customer.firstName='Example';f.body.customer.shippingAddress='B'.repeat(121);
  await expect(f.service.submit(f.body)).rejects.toMatchObject({canRevise:true});expect(f.state.writes).toEqual([]);
+});
+
+
+test('staff invitation matches redemption and never changes the public campaign', () => {
+ const f=factory(); const result=f.service.staffInvitation();
+ expect(result).toEqual({code,closed:false,closesAt:campaign.closesAt,deadlineLabel:campaign.deadlineLabel});
+ expect(f.service.validateCode(result.code).applied).toBe(true);
+ expect(JSON.stringify(f.service.readCampaign())).not.toContain(code);
+ expect(result.promotionToken).toBeUndefined();
+});
+test('staff invitation with a mismatched code is withheld', () => {
+ expect(()=>factory({displayCode:'SYNTHETIC-STALE'}).service.staffInvitation()).toThrow('invitation code is unavailable');
+});
+test('expired staff invitations withhold the code', () => {
+ const f=factory(); f.advance(Date.parse(campaign.closesAt)-fixed);
+ expect(f.service.staffInvitation()).toEqual({closed:true,closesAt:campaign.closesAt,deadlineLabel:campaign.deadlineLabel});
+});
+test('the invitation display route requires staff authentication and cannot be cached', async () => {
+ const gate=jest.fn();const {handlers}=registered('christmas-gift-box',{requireStaff:gate,readCampaign:()=>clone(campaign),now:()=>fixed,giftCode:code,giftCodeHash:crypto.createHash('sha256').update(code).digest('hex'),signingSecret:'synthetic'});
+ const stack=handlers.get('get /api/christmas-gift-box/staff-invitation');expect(stack[0]).toBe(gate);
+ const res=response();res.set=jest.fn().mockReturnValue(res);await stack.at(-1)({},res);
+ expect(res.statusCode).toBe(200);expect(res.body.code).toBe(code);expect(res.set).toHaveBeenCalledWith('Cache-Control','no-store');
 });

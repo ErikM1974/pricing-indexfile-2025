@@ -1,6 +1,17 @@
 /* Staff home: one scoped layout over shared controls. Dark green is the agreed staff theme.
    The legacy staff-dashboard sheets remain only for three historical UI harnesses. */
 @layer components.pages {
+    :where([data-ui="unified"][data-surface="staff-home"]) .holiday-staff .btn-primary { color: var(--gray-900); }
+
+    :where([data-ui="unified"][data-surface="staff-home"]) .holiday-staff {
+        display: flex; flex-wrap: wrap; gap: var(--space-5); padding: var(--space-5);
+        margin-block: var(--space-4); border: 1px solid var(--ui-line); border-left: 6px solid var(--red-700);
+        border-radius: var(--radius-md); background: var(--ui-tint);
+    }
+    :where([data-ui="unified"][data-surface="staff-home"]) .holiday-staff > div { flex: 1 1 320px; min-width: 0; }
+    :where([data-ui="unified"][data-surface="staff-home"]) .holiday-staff-code { display: block; font-size: var(--font-size-display); letter-spacing: .12em; }
+    :where([data-ui="unified"][data-surface="staff-home"]) .holiday-staff-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+
     [data-ui="unified"][data-surface="staff-home"] {
         --ui-canvas: var(--gray-900);
         --ui-surface: var(--gray-800);

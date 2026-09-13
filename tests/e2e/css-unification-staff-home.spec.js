@@ -14,6 +14,7 @@ function stateFor(original, role='admin', mode='populated') {
         if (!u.pathname.startsWith('/api/')) return null;
         state.reads.push(u.pathname + u.search);
         const override=state.readOverride&&await state.readOverride(req,u);if(override)return override;
+        if (u.pathname === '/api/christmas-gift-box/staff-invitation') return { status:role?200:401, json:role?{code:'SYNTHETIC-INVITE',closed:false,closesAt:'2026-10-16T00:00:00-07:00',deadlineLabel:'October 15, 2026'}:{error:'Sign in required'} };
         if (u.pathname === '/api/crm-session/me') return { json: role ? { authenticated:true, firstName:'Cedar', name:'Cedar Example', email:'cedar@example.test', role, permissions:[role] } : { authenticated:false } };
         const known = ['/api/staff/employees','/api/staff/finished-photos/library','/api/staff/service-codes','/api/staff/daily-sales-by-rep-ytd','/api/mo/orders','/api/crm-proxy/ae-dashboard/due-dates-all'];
         if (!known.includes(u.pathname)) return null;
@@ -168,5 +169,23 @@ test('CSS final staff tools: Staff home keyboard search is accessible at every w
   await page.keyboard.press('ArrowDown');await expect(page.locator('#cpInput')).toHaveAttribute('aria-activedescendant',/cp-item-/);
   await page.keyboard.press('Escape');await expect(page.locator('#cpPanel')).toBeHidden();await expect(page.locator('#cpInput')).toHaveValue('');
  }
+ clean(events);
+});
+
+
+test('holiday staff invitation: copy controls, retry, expiry and four-width layout',async({page})=>{
+ const state=stateFor(false,'sales');let unavailable=true;
+ state.readOverride=async(_req,u)=>u.pathname==='/api/christmas-gift-box/staff-invitation'?{status:unavailable?503:200,json:unavailable?{error:'Synthetic outage'}:{code:'SYNTHETIC-INVITE',closed:false,closesAt:'2026-10-16T00:00:00-07:00',deadlineLabel:'October 15, 2026'}}:null;
+ await page.addInitScript(()=>Object.defineProperty(navigator,'clipboard',{value:{writeText:async text=>{window.__holidayCopied=text;}}}));
+ const events=await open(page,'staff-dashboard-v3/index.html',state);await settled(page);
+ const panel=page.locator('[data-holiday-promotion="staff"]');
+ await expect(panel).toContainText('Invitation code could not load');await expect(panel.getByRole('button',{name:'Copy code',exact:true})).toBeDisabled();
+ unavailable=false;await panel.getByRole('button',{name:'Retry invitation'}).click();await expect(panel.locator('[data-holiday-code]')).toHaveText('SYNTHETIC-INVITE');
+ await panel.getByRole('button',{name:'Copy code',exact:true}).click();expect(await page.evaluate(()=>window.__holidayCopied)).toBe('SYNTHETIC-INVITE');
+ await panel.getByRole('button',{name:'Copy customer link'}).click();expect(await page.evaluate(()=>window.__holidayCopied)).toBe('https://www.teamnwca.com/christmas-bundles.html');
+ await page.evaluate(()=>{navigator.clipboard.writeText=async()=>{throw Error('Denied');};});await panel.getByRole('button',{name:'Copy code',exact:true}).click();await expect(panel).toContainText('Copy was blocked');
+ for(const width of [1440,768,390,320]){await page.setViewportSize({width,height:1000});expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);await panel.screenshot({path:path.join(output,'holiday-staff-'+width+'.png')});}
+ await audit(page,'holiday staff invitation');
+ await page.clock.setFixedTime(new Date('2026-10-16T07:00:00Z'));await page.evaluate(()=>document.dispatchEvent(new Event('visibilitychange')));await expect(panel.locator('[data-holiday-code]')).toHaveText('Offer ended');await expect(panel.getByRole('button',{name:'Copy code',exact:true})).toBeDisabled();
  clean(events);
 });

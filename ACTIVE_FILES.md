@@ -1614,3 +1614,5 @@ Garment designer completion: page styles are scoped to the unified designer; art
 
 - `memory/HOLIDAY_GIFT_BOX_2026.md` — current holiday campaign, pricing/inventory contracts, request review, EmailJS setup and release prerequisites.
 - `shared_components/js/embroidery-quote-pricing.d.ts` — typed calculation boundary for the canonical legacy embroidery engine; no independent price rules.
+
+- `shared_components/js/holiday-promotion.js` — shared Christmas discovery/expiry on home and catalog; protected invitation display and copy controls on Staff Dashboard.

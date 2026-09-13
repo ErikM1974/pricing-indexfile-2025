@@ -33,7 +33,7 @@
     <!-- Styles consolidated into the scoped home layout owner (/catalog-search.css). -->
     <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.11.3">
     <link rel="stylesheet" href="/shared_components/css/storefront-shell.css?v=2026.09.11.3">
-    <link rel="stylesheet" href="/shared_components/css/catalog-storefront.css?v=2026.09.11.3">
+    <link rel="stylesheet" href="/shared_components/css/catalog-storefront.css?v=2026.09.13.5">
     <link rel="stylesheet" href="/shared_components/css/nwca-2026.css?v=2026.09.11.3">
     <!-- Styles consolidated into the scoped home layout owner (/shared_components/css/blog.css). -->
 
@@ -228,6 +228,11 @@
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <main id="main">
+        <aside class="holiday-catalog-feature wrap" data-holiday-promotion="public" aria-label="Holiday gift boxes">
+            <span class="holiday-catalog-gift" aria-hidden="true">🎁</span>
+            <div class="holiday-catalog-copy"><strong>Christmas gifting starts with one great box.</strong><p>Sample Carhartt favorites with your logo. One box at our 8-piece embroidery pricing, before you plan your team's holiday order.</p><span class="holiday-catalog-deadline" data-holiday-status role="status">See the collection for current offer details.</span></div>
+            <a class="btn btn-primary" href="/christmas-bundles.html">Build a holiday gift box</a>
+        </aside>
         <!-- Hero (hidden by catalog-search.js when results show) -->
         <section class="hero-section">
             <div class="hero-grid">
@@ -713,5 +718,6 @@
     <script src="/shared_components/js/quote-cart-store.js?v=2026.08.19.5" defer></script>
     <script src="/shared_components/js/blog-teaser.js?v=2026.07.12.4" defer></script>
     <script src="/shared_components/js/catalog-storefront-navigation.js?v=2026.09.11.3" defer></script>
+    <script src="/shared_components/js/holiday-promotion.js?v=2026.09.13.5" defer></script>
 </body>
 </html>
