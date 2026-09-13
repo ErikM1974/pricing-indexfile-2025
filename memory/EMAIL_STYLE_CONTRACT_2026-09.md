@@ -20,3 +20,9 @@ Ten Caspio/Jotform embedded surfaces remain externally owned: digitized-designs,
 
 - [Gmail CSS support](https://developers.google.com/workspace/gmail/design/css): unsupported properties/selectors can be ignored; browser output is not a substitute for mail-client review.
 - [EmailJS dynamic variables](https://www.emailjs.com/docs/user-guide/dynamic-variables-templates/): double braces escape variable content; triple braces intentionally inject HTML.
+
+## Provider access checked on 2026-09-13
+
+The existing Chrome sign-in reaches the EmailJS template list and the mockup approval editor (mockup_customer_approval). Its live recipient/sender settings and HTML were inspected without applying or saving changes. The list also shows template_golf_customer and template_golf_lead. The active Christmas form uses template_v80ysfp and template_sales_xmas; neither ID was visible in this signed-in account. Verify the intended account and template mapping before creating, replacing or publishing either Christmas email.
+
+Caspio reached its login page with no authenticated editor session. The known Jotform build link for form243095362828059 redirected to the public Monogram Form2026 instead of an editor. Neither provider was edited, and no form, upload, test email or customer message was submitted. Their editor access and mail-client review remain concrete follow-up requirements.

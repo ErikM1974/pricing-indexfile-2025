@@ -197,6 +197,18 @@
       "after": "/pages/js/garment-designer.js?v=2026.09.13.2",
       "count": 1,
       "reason": "Release asset version; resolved against its actual HTML consumer."
+    },
+    {
+      "file": "pages/css/garment-designer.css",
+      "before": "  opacity: 0;\n  pointer-events: none;\n  transition: opacity .25s;",
+      "after": "  opacity: 0;\n  visibility: hidden;\n  pointer-events: none;\n  transition: opacity .25s;",
+      "count": 1
+    },
+    {
+      "file": "pages/css/garment-designer.css",
+      "before": ":where([data-ui=\"unified\"][data-garment-designer]) [id=\"toast\"].show {\n  opacity: 1;\n}",
+      "after": ":where([data-ui=\"unified\"][data-garment-designer]) [id=\"toast\"].show {\n  opacity: 1;\n  visibility: visible;\n}\n\n@media (prefers-reduced-motion: reduce) {\n  :where([data-ui=\"unified\"][data-garment-designer]) [id=\"toast\"] {\n    transition: none;\n  }\n}",
+      "count": 1
     }
   ],
   "notes": "Original sources before garment designer migration; real embedded model photos preserved in source, synthetic artwork and contacts in browser fixtures.",

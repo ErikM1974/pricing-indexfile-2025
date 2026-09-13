@@ -54,3 +54,26 @@ for(const name of ['landing','front-placement','back-placement','shirt-colors','
  }
  await evidence(page,name,e);
 });
+
+test('CSS garment designer: action notices stay readable and hide their controls when dismissed',async({page})=>{
+ test.skip(capture,'Current notice presentation and keyboard behavior.');
+ const e=await open(page);
+ fs.mkdirSync(out,{recursive:true});
+ for(const width of [1440,768,390,320]){
+  await page.setViewportSize({width,height:1000});
+  await page.evaluate(()=>{
+   window.__noticeActions=0;
+   showToast('Example artwork ready',{label:'Undo',fn:()=>window.__noticeActions++});
+  });
+  const notice=page.locator('#toast'),action=notice.getByRole('button',{name:'Undo',exact:true});
+  await expect(notice).toBeVisible();await expect(notice).toHaveCSS('opacity','1');
+  const axe=await new AxeBuilder({page}).include('#toast').withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
+  expect(axe.violations.map(v=>v.id)).toEqual([]);
+  await page.screenshot({path:path.join(out,'garment-designer-action-notice-current-'+width+'.png'),fullPage:true});
+  await action.focus();await action.press('Enter');
+  expect(await page.evaluate(()=>window.__noticeActions)).toBe(1);
+  await expect(action).toBeHidden();await expect(notice).toBeHidden();
+  await page.screenshot({path:path.join(out,'garment-designer-dismissed-notice-current-'+width+'.png'),fullPage:true});
+ }
+ check(expect,e);
+});

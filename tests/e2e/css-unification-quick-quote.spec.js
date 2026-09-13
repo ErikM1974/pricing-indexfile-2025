@@ -112,7 +112,7 @@ for(const [name,mount]of [['dtf','dtf'],['screenprint','scp']])test('CSS Quick Q
  const e=await open(page,{safetyBuilder:mount,safetyRecs:true,url:'/quote-builders/'+name+'-quote-builder.html'});
  await page.evaluate(async id=>{window.__safetyHandoffs=[];await SafetyStripeRecs.render(id,{collapsible:true,onAdd:(style,color)=>window.__safetyHandoffs.push({style,color})});},mount+'-safety-recs');
  const panel=page.locator('#'+mount+'-safety-recs'),header=panel.locator('.ssr-head');
- expect(await page.locator('body').getAttribute('data-ui')).toBeNull();
+ await expect(page.locator('body')).toHaveAttribute('data-ui','unified');
  await header.focus();await header.press('Enter');await expect(header).toHaveAttribute('aria-expanded','true');
  for(const width of [1440,768,390,320]){
   await page.setViewportSize({width,height:1000});

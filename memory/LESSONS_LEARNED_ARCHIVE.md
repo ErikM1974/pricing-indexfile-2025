@@ -4473,3 +4473,18 @@ DTG test follow-up: initial product hydration can replace a number input between
 - Problem/root cause: quote audits defaulted missing comparison fields to zero/OK and truthy fallback replaced valid zero subtotals with older session values; table sorting required a mouse. Shared table sizing also wrapped amounts mid-number on phones.
 - Solution: validate the full saved comparison, surface errors/retry, preserve explicit zero with nullish fallback, use native sort buttons with aria-sort, and let complete numeric columns scroll. The generator owns Pricing Analysis markup and chart proportions; private financial JSON stays in memory.
 - Prevention: reverse mapped UI edits to original source/data hashes, compare all42rendered tables, test auth/empty/failure/zero/fallback states, and verify every printed page against original visible data. PDF text extraction can join words across hyphens; normalize punctuation while retaining every numeric token. Respect named CSS page size in PDF capture and check print rules after screen rules.
+
+## Purchasing views must distinguish missing ledgers from zero balances (2026-09-09)
+
+Problem/root cause: incomplete invoices looked empty, failed import logs were classified as loaded, delayed requests could replace newer selections, and partial printouts dropped failed lookups. Solution: validate source shapes, keep unknown status and disable unsafe actions, invalidate old responses, and print failure notes with complete invoices. Prevention: test malformed/empty/failed/recovered feeds, mock confirmation and exact CSV bytes, preserve pure money/CSV helpers and AE compatibility. Declare CSS sublayers after primitives; check money widths at768 as well as phones, and inspect all printed line-item columns/current filter values. Optional paid-status sync needs its own visible fallback state.
+
+### Photo failures must survive filtering (2026-09-09)
+- Problem: malformed 200 replies looked empty, failed refreshes retained stale counts, and manage action errors appeared inside a hidden upload step.
+- Root cause: unchecked response defaults, filters rerendered cached rows, and unrelated controls shared a status host.
+- Solution: validate complete photo responses, clear counts to unknown until success, guard late reads and give manage actions a visible status. Confirm mutation success explicitly.
+- Prevention: synthetic browser cases cover failure/filter/retry, native file compression and request payloads; original upload and URL helpers remain source locked.
+
+### Caspio design reports need actual provider boundaries (2026-09-09)
+- Problem/root cause: simplistic fixtures missed nested source definitions and generated unlayered ID styles; the existing digitized mobile form hid its fields. Provider replacement also detached the archive sticky observer.
+- Solution: keep original field names and handlers, hide only the cloned source definitions, rebind replaced forms, and isolate77 exact provider exceptions from the zero-exception local owner (275flags retired). Failed/empty searches clear loading without conflating errors with no results.
+- Prevention: real read-only searches verify provider markup; synthetic tests reproduce nested records, all select options, mobile precedence, pricing tiers, clipboard denial and current-value paper output. Match print exceptions by selector/property AND media context. Preserve six original controller/helper hashes outside31 recorded UI edits.

@@ -732,12 +732,20 @@
   font-weight: 600;
   z-index: 300;
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
   transition: opacity .25s;
 }
 
 :where([data-ui="unified"][data-garment-designer]) [id="toast"].show {
   opacity: 1;
+  visibility: visible;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :where([data-ui="unified"][data-garment-designer]) [id="toast"] {
+    transition: none;
+  }
 }
 
 :where([data-ui="unified"][data-garment-designer]) [id="toast"].has-action {

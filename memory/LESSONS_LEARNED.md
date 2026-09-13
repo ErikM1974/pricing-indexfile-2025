@@ -132,21 +132,6 @@ Problem: the CSS census omitted Jotform scripts and its external-owner backlog n
 
 Problem/root cause: malformed usage could appear as zero, partial schema could mark tables gone, and local review storage assumed every read/write succeeded. Solution: validate complete responses before rendering, preserve snapshot evidence and notes, distinguish unknown from zero, show export/retry paths and clear only recovered errors. Prevention: exercise malformed/partial/denied storage and successful recovery with synthetic records, preserve the original snapshot, and inspect current-value PDFs. Print long reports in block flow; inherited flex/min-height can create a blank trailing sheet even when PDF text is complete.
 
-## Purchasing views must distinguish missing ledgers from zero balances (2026-09-09)
-
-Problem/root cause: incomplete invoices looked empty, failed import logs were classified as loaded, delayed requests could replace newer selections, and partial printouts dropped failed lookups. Solution: validate source shapes, keep unknown status and disable unsafe actions, invalidate old responses, and print failure notes with complete invoices. Prevention: test malformed/empty/failed/recovered feeds, mock confirmation and exact CSV bytes, preserve pure money/CSV helpers and AE compatibility. Declare CSS sublayers after primitives; check money widths at768 as well as phones, and inspect all printed line-item columns/current filter values. Optional paid-status sync needs its own visible fallback state.
-
-### Photo failures must survive filtering (2026-09-09)
-- Problem: malformed 200 replies looked empty, failed refreshes retained stale counts, and manage action errors appeared inside a hidden upload step.
-- Root cause: unchecked response defaults, filters rerendered cached rows, and unrelated controls shared a status host.
-- Solution: validate complete photo responses, clear counts to unknown until success, guard late reads and give manage actions a visible status. Confirm mutation success explicitly.
-- Prevention: synthetic browser cases cover failure/filter/retry, native file compression and request payloads; original upload and URL helpers remain source locked.
-
-### Caspio design reports need actual provider boundaries (2026-09-09)
-- Problem/root cause: simplistic fixtures missed nested source definitions and generated unlayered ID styles; the existing digitized mobile form hid its fields. Provider replacement also detached the archive sticky observer.
-- Solution: keep original field names and handlers, hide only the cloned source definitions, rebind replaced forms, and isolate77 exact provider exceptions from the zero-exception local owner (275flags retired). Failed/empty searches clear loading without conflating errors with no results.
-- Prevention: real read-only searches verify provider markup; synthetic tests reproduce nested records, all select options, mobile precedence, pricing tiers, clipboard denial and current-value paper output. Match print exceptions by selector/property AND media context. Preserve six original controller/helper hashes outside31 recorded UI edits.
-
 ## Record workspaces need current-response checks before secondary writes (2026-09-10)
 
 - Problem/root cause: A stale linked quote can update the current lead after refresh; removed kit/art hosts can still receive asynchronous callbacks. Native dialog conversion and fixed banners can also lose focus or cover recovery controls.
@@ -252,3 +237,9 @@ Browser baselines must work from a fresh checkout. The tumbler export test previ
 - Problem/root cause: four provider templates repeated typography/colors and fixed widths; generic table traversal spread section padding into nested data cells. Incremental inline serialization could drift on repeated builds.
 - Solution: compile one ordered theme from canonical tokens into static inline output, mark only immediate card sections, and clear/replay theme-owned properties consistently. Preserve every variable, raw HTML slot, link and plain-text copy.
 - Prevention: immutable original hashes/content, idempotent compiler checks, structural section bounds, four widths, long names, blocked images and every PDF page. Local Chromium review does not certify mail clients or publish provider templates.
+
+## Faded action notices must leave keyboard navigation (2026-09-13)
+
+- Problem/root cause: the garment designer hid notices only with opacity, leaving their action controls in keyboard navigation; a full browser run also sampled the fading text during a contrast scan.
+- Solution: give dismissed notices an explicit hidden visibility state and honor reduced-motion preferences. Update old shared-safety checks to expect the now-migrated builder bodies.
+- Prevention: test the fully visible notice with contrast checks at four widths, activate its action by keyboard, and verify both the message and action are hidden afterward. Retain immutable originals and run the entire application gate before deployment.
