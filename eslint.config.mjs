@@ -18,6 +18,7 @@ const POLICY_UI_FILES = [
     'shared_components/js/policies/handbook-reader.js',
 ];
 const STAFF_REFERENCE_FILES = [
+    "dashboards/js/december-finish-line.js",
     "shared_components/js/staff-reference.js",
     "pages/data-entry-guide.js",
     "dashboards/js/forms-library.js",

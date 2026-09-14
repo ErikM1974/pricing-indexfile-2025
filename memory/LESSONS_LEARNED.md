@@ -1,5 +1,11 @@
 # LESSONS LEARNED
 
+## Private reports require an all-file boundary and honest live totals (2026-09-14)
+
+- Problem/root cause: an admin link alone does not protect report assets, and this repository is public. Adding recent invoices onto archived sales double-counts the same dates; operational sales do not equal reconciled accounting profit.
+- Solution: encrypt the reviewed generated package, keep the key in the hosted environment, and require admin on the shell and every report/download path before static mounts. Replace the whole recent invoice interval; preserve signed credits and exclude tax/shipping using source subtotals. Accept null subtotals as zero only when independently reconciled to a freight-only total.
+- Prevention: test anonymous and non-admin access to every asset type, encoded filenames, tampering/missing keys, exact allowlists, no-store headers, interval overlap and partial failures. Preserve original financial scripts/data/downloads, verify browser backup/restore and paper output, and label dated accounting, incomplete coverage and browser-local progress. Never put the decryption key in public CI.
+
 ## Evidence hashes must survive checkout line endings (2026-09-13)
 
 - Problem/root cause: an immutable JSON evidence check passed on Windows but failed on Linux because Git changed physical CRLF bytes to LF.
@@ -103,12 +109,6 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 - Solution: immediately invalidate prior requests, mark methods loading, clear totals/table and refresh handoff controls; retain the existing quantity normalization and pricing engines. A browser regression reconstructs the original defect and checks that the current page withholds price until the new sized result arrives.
 - Prevention: readiness must match both selected quantity and priced sizes. Immutable screenshots taken mid-debounce record transient states; retain them as defect evidence and capture a separate settled contract.
 - CSS lesson: an empty PostCSS selector list reads back as an empty selector string. Remove the rule explicitly before adding a page scope, or it can target the whole page. Keep drawer styles inside the drawer, test keyboard focus, and inspect every printed page for image overflow and footer-only sheets.
-
-## Customer account requests must retain ownership and persisted state (2026-09-10)
-
-- Problem/root cause: storage exceptions still reported Added; a successful batch cleared later additions; older color/minimum responses and request completion replaced newer UI; custom drawers/modals let keyboard focus escape.
-- Solution: report write failure, remove only the submitted list prefix, protect pending rows, track response generations and restore/contain dialog focus. Keep failed requests and notes available for exact retry; unavailable minimums stay visibly unknown while the rep can still quote. After a confirmed send, failed storage cleanup retains only unsent rows in memory and shows Sent with a reload warning; never invite a duplicate request.
-- Prevention: reproduce defects against immutable originals with delayed/rejected synthetic requests and unavailable storage. Keep pricing/date/quantity transformations unchanged. Inspect every paper page: complete descriptions, size labels with inputs, visible entered notes and no footer-only page.
 
 ## Customer and vendor status views must own pending requests and paper (2026-09-10)
 

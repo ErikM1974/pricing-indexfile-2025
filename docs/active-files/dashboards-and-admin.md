@@ -331,3 +331,23 @@ Polish + code-quality pass. Plan: `~/.claude/plans/this-is-a-big-parsed-unicorn.
 | `/employee-bundles/wcttr-bundle.html` | WCTTR (West Coast Truck and Trailer Repair) employee bundle labels | Caspio datapage | ✅ Active |
 
 [Back to the registry index](../../ACTIVE_FILES.md)
+
+## December 2026 Finish Line (2026-09-14)
+
+Admin-only dashboard, encrypted generated report package, live read-only sales aggregation, import tools and access/financial/visual checks. Imported report assets remain inside the authenticated encrypted package; no plaintext financial files or encryption keys are tracked.
+
+- `dashboards/december-finish-line.html`
+- `dashboards/css/december-finish-line.css`
+- `dashboards/js/december-finish-line.js`
+- `lib/december-finish-line.js`
+- `lib/december-finish-line-live.js`
+- `routes/december-finish-line.js`
+- `private/december-finish-line.enc`
+- `scripts/december-finish-line/import-package.py`
+- `scripts/december-finish-line/seal-package.js`
+- `tests/unit/december-finish-line.test.js`
+- `tests/unit/december-finish-line-live.test.js`
+- `tests/helpers/finish-line-source-mappings.js`
+- `tests/fixtures/finish-line-source-mappings.json`
+- `tests/e2e/css-unification-december-finish-line.spec.js`
+- `memory/december-finish-line.md`

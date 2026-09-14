@@ -33,7 +33,7 @@ function stateFor(original, role='admin', mode='populated') {
 function save(name, data) { fs.writeFileSync(path.join(output,'staff-final-tools-dashboard-'+name+'.json'),JSON.stringify(data,null,2)+'\n'); }
 function clean(events) { for (const key of ['errors','unknown','missing','writes']) expect(events[key],key).toEqual([]); }
 async function settled(page) { await expect(page.locator('#loadingOverlay')).toBeHidden(); await expect(page.locator('#goalCurrent')).not.toHaveText('Loading…'); await page.waitForLoadState('networkidle'); }
-// Preserve the original dashboard contract with only the requested seasonal label update.
+// Preserve the original dashboard contract with the recorded seasonal update.
 function currentDashboardContract(original) {
     const value=structuredClone(original);
     for (const link of value.links) if (link.href === '/christmas-bundles.html') {
@@ -42,7 +42,21 @@ function currentDashboardContract(original) {
     }
     return value;
 }
-async function snapshot(page) { return page.evaluate(()=>({active:document.querySelector('.ws-panel.is-on')?.dataset.ws,tabs:[...document.querySelectorAll('.ws-tab')].map(n=>({id:n.dataset.ws,text:n.textContent.replace(/\s+/g,' ').trim(),selected:n.getAttribute('aria-selected')})),goal:['goalCurrent','goalPercent','goalOf'].map(id=>({id,text:document.getElementById(id).textContent})),counts:['teamActiveCount','teamBdayCount','teamAnnivCount'].map(id=>({id,text:document.getElementById(id).textContent})),links:[...document.querySelectorAll('.ws-panel a[href]')].map(n=>({href:n.getAttribute('href'),text:n.textContent.replace(/\s+/g,' ').trim()}))})); }
+async function snapshot(page) {
+    const value = await page.evaluate(()=>({active:document.querySelector('.ws-panel.is-on')?.dataset.ws,tabs:[...document.querySelectorAll('.ws-tab')].map(n=>({id:n.dataset.ws,text:n.textContent.replace(/\s+/g,' ').trim(),selected:n.getAttribute('aria-selected')})),goal:['goalCurrent','goalPercent','goalOf'].map(id=>({id,text:document.getElementById(id).textContent})),counts:['teamActiveCount','teamBdayCount','teamAnnivCount'].map(id=>({id,text:document.getElementById(id).textContent})),links:[...document.querySelectorAll('.ws-panel a[href]')].map(n=>({href:n.getAttribute('href'),text:n.textContent.replace(/\s+/g,' ').trim()}))}));
+    // Assert the intentional new admin entry separately, then compare every
+    // pre-existing link/label to the immutable historical fixture.
+    const additions = value.links.filter(link => link.href === '/dashboards/december-finish-line.html');
+    const hasAdmin = await page.locator('#ws-admin').count();
+    if (hasAdmin) {
+        expect(additions.length).toBeGreaterThan(0);
+        expect(additions.length).toBeLessThanOrEqual(2); // Administration + generated Everything
+        for (const link of additions) expect(link.text).toContain('December 2026 Finish Line');
+        await expect(page.locator('#ws-admin a[href="/dashboards/december-finish-line.html"]')).toHaveCount(1);
+    } else expect(additions).toEqual([]);
+    value.links = value.links.filter(link => link.href !== '/dashboards/december-finish-line.html');
+    return value;
+}
 for (const original of [false]) {
     const edition=original?'original':'current';
     test('CSS final staff tools: Staff home '+edition+' workspaces search pins launcher and directory', async ({ page }) => {

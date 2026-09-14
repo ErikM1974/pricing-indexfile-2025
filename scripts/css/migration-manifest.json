@@ -6985,6 +6985,35 @@
         "rawCssBytes": 326706,
         "localCssRequests": 6
       }
+    },
+    {
+      "source": "dashboards/december-finish-line.html",
+      "family": "staff-admin",
+      "status": "migrated",
+      "route": "/dashboards/december-finish-line.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/utilities.css",
+        "dashboards/css/december-finish-line.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "admin-access",
+        "non-admin-denied",
+        "anonymous-denied",
+        "snapshot-library",
+        "live-sales",
+        "partial-failure",
+        "retry",
+        "expired-session",
+        "keyboard",
+        "four-widths",
+        "print"
+      ],
+      "test": "tests/e2e/css-unification-december-finish-line.spec.js",
+      "maxCssBytes": 64363,
+      "measuredRawCssBytes": 64363
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",

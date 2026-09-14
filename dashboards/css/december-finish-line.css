@@ -1,0 +1,37 @@
+@layer components.pages {
+    :where([data-ui="unified"][data-page="december-finish-line"]) .finish-primary { margin-bottom: var(--space-6); }
+    :where([data-ui="unified"][data-page="december-finish-line"]) .finish-live .data-table { min-width: 360px; }
+    :where([data-ui="unified"][data-page="december-finish-line"]) .finish-live .num { white-space: nowrap; }
+    :where([data-ui="unified"][data-page="december-finish-line"]) .finish-live { margin-bottom: var(--space-6); }
+    :where([data-ui="unified"][data-page="december-finish-line"]) .finish-live-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-4); }
+    :where([data-ui="unified"][data-page="december-finish-line"]) .finish-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-5); margin: var(--space-6) 0; }
+    :where([data-ui="unified"][data-page="december-finish-line"]) .finish-metrics dt { color: var(--ui-muted); }
+    :where([data-ui="unified"][data-page="december-finish-line"]) .finish-metrics dd { margin: var(--space-2) 0 0; font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); overflow-wrap: anywhere; }
+    :where([data-ui="unified"][data-page="december-finish-line"]) .finish-detail { margin-block: var(--space-5); }
+    :where([data-ui="unified"][data-page="december-finish-line"]) .finish-detail summary { cursor: pointer; color: var(--ui-accent); font-weight: var(--font-weight-semibold); }
+    :where([data-ui="unified"][data-page="december-finish-line"]) .finish-intro { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-3); margin-bottom: var(--space-5); }
+    :where([data-ui="unified"][data-page="december-finish-line"]) .finish-intro p { margin: 0; }
+    :where([data-ui="unified"][data-page="december-finish-line"]) .finish-main { display: flex; justify-content: space-between; align-items: center; gap: var(--space-6); border-left: 4px solid var(--ui-accent); }
+    :where([data-ui="unified"][data-page="december-finish-line"]) .finish-main p { max-width: 66ch; }
+    :where([data-ui="unified"][data-page="december-finish-line"]) .finish-main .btn { flex-shrink: 0; }
+    :where([data-ui="unified"][data-page="december-finish-line"]) .finish-snapshot { color: var(--ui-muted); font-size: var(--font-size-md); }
+    :where([data-ui="unified"][data-page="december-finish-line"]) .finish-library { margin-block: var(--space-7); }
+    :where([data-ui="unified"][data-page="december-finish-line"]) .finish-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--space-7); }
+    :where([data-ui="unified"][data-page="december-finish-line"]) .finish-link { display: grid; gap: var(--space-2); padding: var(--space-4) 0; color: var(--ui-accent); text-decoration: none; border-bottom: 1px solid var(--ui-line); overflow-wrap: anywhere; }
+    :where([data-ui="unified"][data-page="december-finish-line"]) .finish-link:hover strong { text-decoration: underline; }
+    :where([data-ui="unified"][data-page="december-finish-line"]) .finish-link span { color: var(--ui-muted); font-size: var(--font-size-md); }
+    :where([data-ui="unified"][data-page="december-finish-line"]) .finish-notes { display: block; }
+    :where([data-ui="unified"][data-page="december-finish-line"]) .finish-notes p { max-width: 80ch; }
+
+    @media (width <= 768px) {
+        :where([data-ui="unified"][data-page="december-finish-line"]) .finish-metrics { grid-template-columns: 1fr; gap: var(--space-4); }
+        :where([data-ui="unified"][data-page="december-finish-line"]) .finish-main { align-items: stretch; flex-direction: column; gap: var(--space-3); }
+        :where([data-ui="unified"][data-page="december-finish-line"]) .finish-links { grid-template-columns: 1fr; }
+    }
+
+    @media print {
+        :where([data-ui="unified"][data-page="december-finish-line"]) .finish-live-head .btn { display: none; }
+        :where([data-ui="unified"][data-page="december-finish-line"]) .finish-main .btn { display: none; }
+        :where([data-ui="unified"][data-page="december-finish-line"]) .finish-link { break-inside: avoid; }
+    }
+}
