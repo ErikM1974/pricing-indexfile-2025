@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow, noarchive">
+    <title>December 2026 Finish Line - Northwest Custom Apparel</title>
+    <link rel="icon" href="/favicon.png" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.14.1">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.14.1">
+    <link rel="stylesheet" href="/shared_components/css/utilities.css?v=2026.09.14.1">
+    <link rel="stylesheet" href="/dashboards/css/december-finish-line.css?v=2026.09.14.1">
+</head>
+<body data-ui="unified" data-surface="staff" data-department="brand" data-density="comfortable" data-page="december-finish-line">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="page-header">
+        <div class="page-header-inner">
+            <a href="/staff-dashboard.html" class="page-header-brand" title="Staff Dashboard">
+                <img src="/images/nwca-logo.png" alt="Northwest Custom Apparel" class="page-header-logo">
+            </a>
+            <h1 class="page-title">December 2026 Finish Line</h1>
+            <nav class="page-nav" aria-label="Page"><a href="/staff-dashboard.html#ws=admin" class="page-nav-link">Back to Administration</a></nav>
+        </div>
+    </header>
+    <main id="main" class="page-main">
+        <div class="finish-intro"><p>One place for the year-end plan, weekly priorities, and supporting reports.</p><span class="badge badge-ok">Admin access only</span></div>
+            <section id="finish-primary" class="card finish-main finish-primary" hidden aria-labelledby="finish-report-title">
+                <div><h2 id="finish-report-title" class="card-title">Your December Finish Line</h2>
+                    <p>Start with Erik’s weekly plan, then explore the profit simulator, customer priorities, monthly sales and overtime, and marketing plan.</p>
+                    <p class="finish-snapshot" id="finish-snapshot"></p>
+                </div>
+                <a id="finish-open" class="btn btn-primary">Open the full Finish Line</a>
+            </section>
+        <section class="card finish-live" aria-labelledby="finish-live-title">
+            <div class="finish-live-head"><div><h2 id="finish-live-title" class="card-title">Current sales progress</h2><p>ShopWorks invoices and your company sales goal in Caspio.</p></div><button class="btn btn-primary" id="finish-refresh" type="button">Refresh current data</button></div>
+            <p id="finish-live-status" role="status">Checking current sales and orders…</p>
+            <div id="finish-live-error" class="alert alert-error" role="alert" hidden></div>
+            <div id="finish-live-data" hidden>
+                <dl class="finish-metrics"><div><dt>2026 invoiced sales</dt><dd id="finish-sales">—</dd></div><div><dt>Company sales goal</dt><dd id="finish-goal">—</dd></div><div><dt>Sales still needed</dt><dd id="finish-remaining">—</dd></div></dl>
+                <p id="finish-progress"></p><p id="finish-sales-date" class="finish-snapshot"></p>
+                <details class="finish-detail"><summary>Monthly sales breakdown</summary>                <div class="table-wrap" role="region" aria-label="Monthly invoiced sales" tabindex="0"><table class="data-table"><thead><tr><th scope="col">2026 month</th><th scope="col" class="num">Invoiced sales</th><th scope="col" class="num">Invoices</th></tr></thead><tbody id="finish-months"></tbody></table></div></details>
+                <details class="finish-detail"><summary>Sales by assigned rep</summary><p>Company sales attribution across all channels. Webstore sales may be included; these are not the direct-sales quotas in the saved plan.</p><div class="table-wrap" role="region" aria-label="Sales by assigned rep" tabindex="0"><table class="data-table"><thead><tr><th scope="col">Assigned rep</th><th scope="col" class="num">Invoiced sales</th></tr></thead><tbody id="finish-reps"></tbody></table></div></details>
+                <p id="finish-workload"></p>
+                <details class="finish-detail"><summary>Sources, coverage and accounting comparison</summary><p id="finish-coverage"></p><p id="finish-financial-note"></p><p id="finish-comparison"></p><p>Order 133856 is excluded from detailed reads. Order 138925 remains unconfirmed upside and is excluded from achieved sales and recent work. Historical daily totals have no order IDs for independently checking these exclusions.</p><p>Payroll and receivables retain their saved statement dates. This page does not recalculate accounting profit from invoice totals.</p></details>
+            </div>
+        </section>
+        <p id="finish-loading" role="status">Opening the saved Finish Line package…</p>
+        <div id="finish-error" class="alert alert-error" role="alert" hidden>
+            <strong class="alert-title">Unable to open December Finish Line</strong>
+            <p id="finish-error-message">Please try again.</p>
+            <button id="finish-retry" type="button" class="btn btn-primary">Try again</button>
+            <a id="finish-login" class="btn btn-ghost" href="/auth/saml/login?next=%2Fdashboards%2Fdecember-finish-line.html" hidden>Sign in again</a>
+        </div>
+        <div id="finish-content" hidden>
+
+            <section class="finish-library" aria-labelledby="finish-library-title">
+                <h2 id="finish-library-title">Reports and sales books</h2>
+                <p>Open a report or download a prepared sales book. All documents require an admin login.</p>
+                <div id="finish-links" class="finish-links"></div>
+            </section>
+            <aside class="alert alert-info finish-notes" aria-labelledby="finish-notes-title">
+                <h2 id="finish-notes-title" class="alert-title">Using this saved plan</h2>
+                <p>Forecasts and campaign statuses are dated planning snapshots. They do not update automatically from accounting or order systems.</p>
+                <p>Weekly tracker progress saves in this browser. Use <strong>Download progress backup</strong> in Erik’s weekly plan to move your updates to another computer, then restore that backup there.</p>
+                <p>Original payroll and financial source documents remain in your private transfer folder.</p>
+            </aside>
+        </div>
+    </main>
+    <footer class="page-footer"><p>Northwest Custom Apparel · December 2026 planning</p></footer>
+    <script src="/dashboards/js/december-finish-line.js?v=2026.09.14.1" defer></script>
+</body>
+</html>

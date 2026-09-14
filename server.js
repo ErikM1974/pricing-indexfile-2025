@@ -1170,6 +1170,8 @@ const loadAssetManifest = createManifestLoader(path.join(__dirname, 'dist', 'ass
 const loadBuilderHtml = createHtmlLoader();
 
 // Blog — server-rendered for SEO, sitemaps, robots, static mounts — extracted to routes/blog.js (server split, 2026-09-07); registered here so the order is unchanged.
+// December Finish Line: private admin documents; must precede every static mount.
+{ const ctx = { SERVER_DIR: __dirname, path, requireCrmRole, CRM_API_BASE, CRM_API_SECRET, fetch }; require('./routes/december-finish-line')(app, ctx); }
 { const ctx = { HASHED_CALCULATOR_PATHS, HASHED_PAGES, HASHED_PAGES_UNDER_PAGES_MOUNT, HASHED_STAFF_UNDER_MOUNT, express, fs, gateStaffPage, loadAssetManifest, path, requireStaff, sendHashedHtml, staticOptions, SERVER_DIR: __dirname }; require('./routes/blog')(app, ctx); }
 // Site pages — staff dashboard, page gates, clean-URL storefront routes and redirects, sitemap — extracted to routes/pages.js (server split, 2026-09-07); registered here so the order is unchanged.
 { const ctx = { SERVER_DIR: __dirname, express, gateStaffDetailPage, gateStaffPage, noCacheHeaders, path, requireCustomer, requireStaff, sendHashedHtml, staticOptions }; require('./routes/pages')(app, ctx); }

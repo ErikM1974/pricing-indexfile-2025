@@ -1,0 +1,12 @@
+[
+  {
+    "file": "staff-dashboard-v3/index.html",
+    "before": "",
+    "after": "                            <a class=\"ws-link ws-row f-ref\" href=\"/dashboards/december-finish-line.html\" data-keywords=\"december finish line 2026 year end q4 profit sales goals marketing weekly plan\"><i class=\"ws-mk\" aria-hidden=\"true\"></i><span class=\"ws-nm\">December 2026 Finish Line</span><span class=\"ws-d\">current sales progress, year-end plan, reports and sales books</span><span class=\"ws-lock\">admin</span></a>\n"
+  },
+  {
+    "file": "server.js",
+    "before": "",
+    "after": "// December Finish Line: private admin documents; must precede every static mount.\n{ const ctx = { SERVER_DIR: __dirname, path, requireCrmRole, CRM_API_BASE, CRM_API_SECRET, fetch }; require('./routes/december-finish-line')(app, ctx); }\n"
+  }
+]
