@@ -32,7 +32,7 @@ async function open(page,state={}){
   if(p==='/api/inventory')return route.fulfill({status:state.stockFailed?503:200,json:['S','M','L','XL','2XL','3XL','4XL'].map(SIZE=>({SIZE,QTY:state.out?0:125}))});
   if(p==='/api/product-details'||p==='/api/color-swatches')return route.fulfill({status:state.productFailed?503:200,json:state.productEmpty?[]:details(style)});
   if(p==='/api/product-colors')return route.fulfill({status:state.productFailed?503:200,json:{...details(style)[0],styleNumber:style,productTitle:details(style)[0].PRODUCT_TITLE,colors:state.productEmpty?[]:details(style)}});
-  if(p==='/api/products/search'){const q=u.searchParams.get('q')||'PC54';return route.fulfill({json:{success:true,data:{products:[{styleNumber:q,productName:details(q)[0].PRODUCT_TITLE,images:{display:image}}]}}});}
+  if(p==='/api/products/search'){const q=u.searchParams.get('q')||'PC54';return route.fulfill({json:{success:true,data:{products:state.searchProducts||[{styleNumber:q,productName:details(q)[0].PRODUCT_TITLE,images:{display:image}}]}}});}
   if(p==='/api/stylesearch')return route.fulfill({json:['PC54','C112'].filter(s=>s.toLowerCase().includes((u.searchParams.get('term')||'').toLowerCase())).map(s=>({style:s,value:s,label:details(s)[0].PRODUCT_TITLE,thumb:image}))});
   if(p==='/api/size-pricing')return route.fulfill({json:sizePricing(style)});
   if(p==='/api/base-item-costs')return route.fulfill({json:{baseCosts:sizePricing(style)[0].basePrices}});

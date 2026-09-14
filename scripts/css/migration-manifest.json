@@ -6706,11 +6706,13 @@
         "shared-safety-panel-expanded-and-garment-handoff",
         "canonical-prices-and-approved-product-decoration-workflow",
         "actual-quantity-small-order-inclusive-customer-preview-print-and-PDF",
-        "complete-five-method-builder-handoff-and-local-input-draft"
+        "complete-five-method-builder-handoff-and-local-input-draft",
+        "1265x712-single-method-controls-and-price-breaks",
+        "exact-first-shared-search-copy-and-optional-quantity"
       ],
       "test": "tests/e2e/css-unification-quick-quote.spec.js",
       "maxCssBytes": 126108,
-      "measuredRawCssBytes": 124062,
+      "measuredRawCssBytes": 124183,
       "baseline": {
         "commit": "583372db",
         "rawCssBytes": 60371,
@@ -6745,7 +6747,7 @@
       ],
       "test": "tests/e2e/css-unification-quick-quote.spec.js",
       "maxCssBytes": 135448,
-      "measuredRawCssBytes": 133363,
+      "measuredRawCssBytes": 133484,
       "baseline": {
         "commit": "583372db",
         "rawCssBytes": 61878,

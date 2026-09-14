@@ -4506,3 +4506,16 @@ Problem/root cause: malformed usage could appear as zero, partial schema could m
 **Prevention:** Test catalog/custom round trips, row rebuilding, editing and loading after another order. Check narrow layouts, complete PDF values and multi-page headings; use the shared dialog lifecycle with native dialogs for keyboard focus and scroll restoration.
 
 **Personalization recovery follow-up:** Validate roster arrays before replacing current data; obsolete load/search/OCR/save responses must not change a newer view. Keep failed loads inert with visible retry, clear canceled OCR UI and preserve keyboard file access. Save success must match the API envelope; lock duplicate submissions and scope acknowledgments/navigation to the originating roster. Original native CSV and payload comparisons plus rejection/race tests prevent silent drift. Validate Excel groups/rows before replacing data; ignore obsolete files/views and imports preceding a save. Collect unsaved cells before adding a group; keep required-input errors inside native dialogs. Monogram ItemsJSON and save IDs/HTTP status must be validated before replacing names or clearing dirty state. Picker label clicks already dispatch native checkbox clicks; never toggle both. Return focus after Done/Escape, keep retry errors in place and preserve original proof fonts/colors when removing global print overrides.
+
+
+## Method dialogs need explicit state and spacing (2026-09-12)
+
+- Problem/root cause: DTF color controls kept aria-expanded true after selection; its distinct size-dialog body/footer and customer heading relied on removed legacy spacing. Long location names overflowed the phone summary.
+- Solution: synchronize picker open/close attributes, give the method-specific size grid and footer canonical spacing, align the customer header and wrap summary values. Native location and shipping controls share the existing keyboard delegation.
+- Prevention: compare original prices, fees, shipping and saved fields at four widths; test selection/Escape and native location keys, inspect complete size dialogs, every table column and all paper pages.
+
+## DTG hidden states and printable controls (2026-09-12)
+
+- Root cause: legacy flex/display rules exposed empty CRM notices, a design thumbnail without a design, expired share notifications and disabled assistant actions without quote output. Phone date fields and preflight values were clipped.
+- Fix: shared hidden/notification contracts, native keyboard controls, wrapping customer values and full-width dates; compact method-scoped print controls retain every financial value.
+- Prevention: test populated fees, locations, shipping, successful/failed saves and research-only replies against original fields/payloads. Inspect complete scroll areas and every printed page; assert intended hidden/disabled state before normalizing original visibility.

@@ -159,7 +159,7 @@
     }
 
     :where([data-ui="unified"][data-quick-quote="quick"])
-        :is(.hero, .qq-print-summary, .qq-workflow-actions, .qq-document-toolbar, .qq-document-options, .qq-foot, [id="qqQuickResults"], [id="qqSafetyRecs"], [id="qqDocumentStatus"], [id="qqExportError"]) {
+        :is(.hero, .qq-print-summary, .qq-workflow-actions, .qq-document-toolbar, .qq-document-options, .qq-foot, [id="qqQuickResults"], [id="qqSafetyRecs"], [id="qqDocumentStatus"], [id="qqExportError"], [id="qqCopyStatus"], [id="qqCopyFallback"], [id="qqDraftStatus"]) {
         display: none;
     }
 
