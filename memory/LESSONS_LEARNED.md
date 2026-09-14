@@ -6,6 +6,12 @@
 - Solution: encrypt the reviewed generated package, keep the key in the hosted environment, and require admin on the shell and every report/download path before static mounts. Replace the whole recent invoice interval; preserve signed credits and exclude tax/shipping using source subtotals. Accept null subtotals as zero only when independently reconciled to a freight-only total.
 - Prevention: test anonymous and non-admin access to every asset type, encoded filenames, tampering/missing keys, exact allowlists, no-store headers, interval overlap and partial failures. Preserve original financial scripts/data/downloads, verify browser backup/restore and paper output, and label dated accounting, incomplete coverage and browser-local progress. Never put the decryption key in public CI.
 
+## Fast price sheets need explicit sample quantities (2026-09-14)
+
+- Problem/root cause: the expanded estimate workflow pushed quantity breaks and everyday settings below the viewport. A tier's base "from" price could differ from the customer price at the displayed quantity.
+- Solution: compact left controls, one exact-first search, optional quantity and immediate customer tiers. Price every labeled sample through the existing engine; never show a sample order as the customer's requested total. Share one model across copy, screen, print and PDF.
+- Prevention: preserve canonical monetary functions and original hashes. Test replacement/search races, no-quantity draft restore, invalid quantities, copy fallback, 1265 × 712 geometry, four widths, every PDF page and real builder handoff totals. Trial with both reps before adding personal presets.
+
 ## Evidence hashes must survive checkout line endings (2026-09-13)
 
 - Problem/root cause: an immutable JSON evidence check passed on Windows but failed on Linux because Git changed physical CRLF bytes to LF.
@@ -190,18 +196,6 @@ Browser baselines must work from a fresh checkout. The tumbler export test previ
 - Problem/root cause: screen-print empty rows spanned only 13 of 14 columns, so horizontal scrolling clipped instructions; generic input padding overrode shipping currency spacing. Hidden native ink radios and mouse-only expanders blocked keyboard operation.
 - Solution: match both initial/reset column spans, use named shipping field styles with sufficient specificity, retain native focusable radios and reuse keyboard delegation for fees/order sections. Share artwork and customer controls with method-scoped layout rules.
 - Prevention: assert far-right scroll geometry, numeric text/currency clearance, arrow/Enter/Space operation, exact original prices and saved fields, every paper page, and all embroidery scenes after shared-style changes. Assert timed notices immediately at their trigger before comparing four-width layouts.
-
-## Method dialogs need explicit state and spacing (2026-09-12)
-
-- Problem/root cause: DTF color controls kept aria-expanded true after selection; its distinct size-dialog body/footer and customer heading relied on removed legacy spacing. Long location names overflowed the phone summary.
-- Solution: synchronize picker open/close attributes, give the method-specific size grid and footer canonical spacing, align the customer header and wrap summary values. Native location and shipping controls share the existing keyboard delegation.
-- Prevention: compare original prices, fees, shipping and saved fields at four widths; test selection/Escape and native location keys, inspect complete size dialogs, every table column and all paper pages.
-
-## DTG hidden states and printable controls (2026-09-12)
-
-- Root cause: legacy flex/display rules exposed empty CRM notices, a design thumbnail without a design, expired share notifications and disabled assistant actions without quote output. Phone date fields and preflight values were clipped.
-- Fix: shared hidden/notification contracts, native keyboard controls, wrapping customer values and full-width dates; compact method-scoped print controls retain every financial value.
-- Prevention: test populated fees, locations, shipping, successful/failed saves and research-only replies against original fields/payloads. Inspect complete scroll areas and every printed page; assert intended hidden/disabled state before normalizing original visibility.
 
 ## Notifications and runtime style ownership (2026-09-12)
 

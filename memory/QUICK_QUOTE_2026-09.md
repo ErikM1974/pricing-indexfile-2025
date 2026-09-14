@@ -1,11 +1,25 @@
-# Quick Quote and customer-inclusive pricing — September 13, 2026
+# Quick Quote and customer-inclusive pricing — September 2026
+
+## September 14 speed improvements (development; rep trial pending)
+
+Taneisha asked for the familiar left controls and quantity price breaks with fewer clicks and less scrolling. Erik approved the plan. Use September 8 as a layout reference; retain the September 13 pricing, document and supplier-photo fixes.
+
+- Default single-method Quick Quote has one style/name search path, exact matches first, Enter selection and closed suggestions after selection. Editing immediately invalidates old output. Additional product rows reuse the same search panel.
+- A compact method selector and native placement selectors replace expanded chips. Quantity is optional and sits just below the method so essential controls fit together on a laptop. No quantity means a price sheet without an invented order total; clicking a quantity in the table requests an exact total.
+- Every customer tier is priced through the canonical engine at its displayed quantity. The requested quantity replaces its range's sample. Keep inclusive small-order pricing and separate one-time setup. Remove the unqualified staff "from" teaser.
+- Product details and the quantity table lead the customer sheet. Copy prices, PDF and Print use the same document model. Copy has a selectable-text fallback. Hide copy/draft feedback in print.
+- Catalog quoting is directly beside Decoration. More settings summarizes active sleeves/dark garments/safety stripes. Compare decoration, optional customer details, favorites and explicit input-only restore remain available. Recommend/include/reorder controls appear only for multiple products; full-builder links require an actual quantity.
+- The desktop acceptance case uses 1265 × 712 with the method, quantity, front/back controls, first price table and download action visible together. Retain four-width, keyboard, pricing parity, stale-output and complete-PDF checks.
+- This branch is not a production deployment. Taneisha/Nika's observed trial and any usage-driven presets are the next phase; no rep preferences have been invented or messages sent.
+
+Validation: 337 unit/source/CSS checks passed; 56 browser cases validated across the workflow and family suites, including isolated successful reruns after two overlapping test runs collided during trace cleanup. JavaScript and CSS lint passed. Reviewed 1440/768/390/320 screenshots, the 1265 × 712 common DTF/embroidery controls, native print, a downloaded no-quantity sheet and both pages of the long multi-option PDF. All business requests used test fixtures. Live production data and rep timing trials remain release/trial checks.
 
 ## Approved behavior
 
 Erik requested a simpler workflow for Nika and Taneisha, clearer customer options and PDFs, and small-order/LTM charges inside customer per-piece prices across Quick Quote, all full builders and the main catalog. Retain the API's method-specific fees, thresholds and rounding; do not impose a new universal $50 rule.
 
-- Quick Quote defaults to Compare products. Compare decoration shows one garment across applicable methods. Both use the existing QuoteCartEngine and canonical pricing services.
-- Enter product by style/name, choose color and actual quantity, then decoration. Favorite/recent products and explicit restore of a 14-day input-only draft save repetition. No customer details or prices persist in the draft.
+- Quick Quote defaults to one decoration method and quantity price breaks. Compare decoration shows one garment across applicable methods. Both use the existing QuoteCartEngine and canonical pricing services.
+- Enter product by style/name, choose color and decoration; actual quantity is optional. Favorite/recent products and explicit restore of a 14-day input-only draft save repetition. No customer details or prices persist in the draft.
 - Each customer option is a separate estimate, never added together. Reps may recommend an option and exclude others. Optional customer/company/rep/contact/note fields carry to the customer output.
 - Screen, native print and downloadable PDF share `quick-quote-document.js`. Show actual quantity, inclusive per-piece price, setup and order total; standard sizes, 30-day validity, tax/shipping assumptions and independent-option wording are explicit.
 - Quantity comparison columns use actual quantities, including the requested quantity. Never show a tier's base unit with a separate LTM row that the customer must add.

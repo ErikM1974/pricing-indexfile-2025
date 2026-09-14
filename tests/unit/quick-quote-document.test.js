@@ -1,4 +1,4 @@
-const { model, html, chargeRows } = require('../../calculators/quick-quote/quick-quote-document');
+const { model, html, text, chargeRows } = require('../../calculators/quick-quote/quick-quote-document');
 const input = (method = 'emb', quantity = 5, total = 275) => ({
     method, key: method, product: { style: 'PC54', name: 'Cotton Tee' }, color: { name: 'Navy' }, description: 'Left chest: 8,000 stitches',
     preview: { ok: true, itemQuantity: quantity, groupTotal: total, ltm: { fee: 50 }, fees: [{ oneTime: true, label: 'Digitizing', amount: 100 }] },
@@ -23,4 +23,27 @@ test('customer fields and product content are escaped and unsafe image URLs omit
 });
 test('unavailable pricing cannot become a customer option', () => {
     const i = input(); i.preview.ok = false; expect(model([i]).options).toEqual([]);
+});
+
+const breaks = [
+    { label: '10-23', range: { min: 10, max: 23 }, sampleQuantity: 10, sampleUnit: 27, sampleSetup: 100 },
+    { label: '24-47', range: { min: 24, max: 47 }, sampleQuantity: 24, sampleUnit: 20, sampleSetup: 100 },
+];
+test('quantity browsing labels sampled prices and omits an unrequested total in screen and copy', () => {
+    const doc = model([{ ...input('dtf', 10, 370), quantityRequested: false, tiers: breaks }]);
+    for (const output of [html(doc), text(doc)]) {
+        expect(output).toContain('10–23'); expect(output).toContain('$27.00');
+        expect(output).toContain('$20.00'); expect(output).toContain('$100.00');
+        expect(output).not.toContain('Estimated total'); expect(output).not.toContain('$370.00');
+    }
+    expect(text(doc)).toContain('10–23 pieces — at 10: $27.00/piece; one-time setup $100.00');
+});
+test('an exact quantity within a range replaces only that sample in every customer format', () => {
+    const doc = model([{ ...input('dtf', 18, 541), tiers: breaks }]);
+    for (const output of [html(doc), text(doc)]) {
+        expect(output).toContain('$24.50'); expect(output).not.toContain('$27.00');
+        expect(output).toContain('$20.00'); expect(output).toContain('$541.00');
+    }
+    expect(text(doc)).toContain('10–23 pieces — at 18: $24.50/piece; one-time setup $100.00');
+    expect(text(doc)).toContain('Estimated total: $541.00');
 });

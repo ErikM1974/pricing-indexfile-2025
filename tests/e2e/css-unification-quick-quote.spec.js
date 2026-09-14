@@ -28,8 +28,21 @@ async function evidence(page,name,e){
    const current=states[i],old=before.states[i];
    expect(current.title).toBe(old.title);expect(current.url).toBe(old.url);
    for(const field of old.fields)expect(current.fields,name+' original input').toContainEqual(field);
-   const changed=new Set(['qqModeToggle','qqResults','qqSheet','qqLineHint','qqLinePrint','qqLineDownload']);
-   for(const [id,value]of Object.entries(old.ids))if(!changed.has(id))expect(current.ids[id],name+' '+id).toBe(value);
+   // Approved compact controls and copy. Their replacements are exercised in the
+   // speed workflow tests; immutable source hashes and pricing checks stay intact.
+   const changed=new Set(['qqModeToggle','qqResults','qqSheet','qqLineHint','qqLinePrint','qqLineDownload','qqLineMethodChips','qqLineAdd','qqLineList','qqPlacementLabel']);
+   if(name.startsWith('line-'))for(const id of ['qqEmbHint','qqFront','qqBack','qqPlacePresets'])changed.add(id);
+   for(const [id,value]of Object.entries(old.ids))if(!changed.has(id)){
+    let expected=value;
+    if(/^qqlc-/.test(id)){
+     // The product name now appears once in the customer sheet; the unqualified
+     // "from" teaser was removed in favor of explicitly sampled tier prices.
+     const productName=await page.locator('#'+id+' .qq-line-name').textContent();
+     expected=value.replace(productName+' ','').replace(/ from \$[\d,.]+\/pc$/,'');
+     expect(await page.locator('#qqSheet').textContent()).toContain(productName);
+    }
+    expect(current.ids[id],name+' '+id).toBe(expected);
+   }
    if(old.ids.qqResults){
     const money=text=>(text||'').replace(/ · order total \$[\d,.]+ \(now \$[\d,.]+\)/g,'').match(/\$[\d,.]+/g)||[];
     expect(money(current.ids.qqResults),name+' unchanged staff amounts').toEqual(money(old.ids.qqResults));
@@ -40,7 +53,13 @@ async function evidence(page,name,e){
     expect(current.links.map(identity),name+' original destination').toContainEqual(identity(link));
    }
   }
-  await expect(page.locator('#qqModeToggle')).toHaveText(/Compare products\s+Compare decoration/);
+  await expect(page.locator('#qqModeToggle')).toHaveText(/Quick Quote\s+Compare decoration/);
+  await expect(page.locator('#qqPlacementLabel')).toHaveText('Print locations');
+  if(name.startsWith('line-')){
+   await expect(page.locator('#qqLineMethod option')).toHaveText(['Embroidery','Cap embroidery','DTG print','Screen print','DTF transfer']);
+   await expect(page.locator('#qqLineQty')).toHaveValue('');
+   await expect(page.locator('#qqLineAdd')).toHaveText(name==='line-empty'?'+ Enter a style':'+ Add another product');
+  }
  }
  }
  await page.setViewportSize({width:1440,height:1000});await page.pdf({path:path.join(out,'quick-quote-'+name+'-'+phase+'.pdf'),format:'Letter',printBackground:true});
@@ -81,8 +100,8 @@ for(const mode of ['normal','cap','sizes','screenprint','pricing-failed','produc
 });
 for(const method of ['emb','dtg'])test('CSS Quick Quote: populated line sheet '+method,async({page})=>{
  const e=await open(page,{original:capture,url:'/calculators/quick-quote/index.html'});
- await page.locator('[data-line-method="'+method+'"]').click();await page.locator('#qqLineAdd').click();await page.locator('.qq-line-style').first().fill('PC54');
- await expect(page.locator('#qqSheet')).toContainText('$');await page.locator('#qqLineAdd').click();await page.locator('.qq-line-style').last().fill('PC61');
+ if(capture)await page.locator('[data-line-method="'+method+'"]').click();else await page.locator('#qqLineMethod').selectOption(method);await page.locator('#qqLineAdd').click();await page.locator('.qq-line-style').first().fill('PC54');if(!capture)await page.locator('.qq-line-style').first().press('Enter');
+ await expect(page.locator('#qqSheet')).toContainText('$');await page.locator('#qqLineAdd').click();await page.locator('.qq-line-style').last().fill('PC61');if(!capture)await page.locator('.qq-line-style').last().press('Enter');
  await expect(page.locator('.qq-sheet-item')).toHaveCount(2);await page.waitForLoadState('networkidle');await expect(page.locator('#qqLinePrint')).toBeEnabled();
  await page.locator('#qqLinePrint').click();await expect.poll(()=>page.evaluate(()=>window.__printCalls)).toBe(1);await evidence(page,'line-'+method,e);
 });
@@ -116,8 +135,8 @@ test('CSS Quick Quote: narrow line-sheet prices remain whole and keyboard scroll
  test.skip(capture,'Regression found during the phone visual review.');
  await page.setViewportSize({width:320,height:1000});
  const e=await open(page,{url:'/calculators/quick-quote/index.html'});
- await page.locator('[data-line-method="emb"]').click();
- await page.locator('#qqLineAdd').click();await page.locator('.qq-line-style').fill('PC54');
+ await page.locator('#qqLineMethod').selectOption('emb');
+ await page.locator('#qqLineAdd').click();await page.locator('.qq-line-style').fill('PC54');if(!capture)await page.locator('.qq-line-style').press('Enter');
  const region=page.locator('.qq-sheet-ladder-wrap').first();
  await expect(region).toContainText('$');
  const money=await region.locator('td').evaluateAll(cells=>cells.filter(cell=>/^\$\d/.test(cell.textContent.trim())).map(cell=>{
