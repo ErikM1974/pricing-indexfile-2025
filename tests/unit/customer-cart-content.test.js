@@ -1,3 +1,4 @@
+const restorePreQuickQuote = require('../helpers/quick-quote-source-mappings');
 const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto');
 const { JSDOM } = require('jsdom');
 const original = require('../fixtures/customer-cart-original-content.json');
@@ -31,7 +32,7 @@ test.each([
 });
 
 test.each(original.pages)('$file preserves original labels, fields, links and identifiers', record => {
-    let html = fs.readFileSync(path.join(root, record.file), 'utf8').replace(/\r\n/g, '\n');
+    let html = restorePreQuickQuote(record.file, fs.readFileSync(path.join(root, record.file), 'utf8').replace(/\r\n/g, '\n'));
     for (const change of original.changes.filter(c => c.file === record.file).reverse()) {
         expect(html.split(change.after).length - 1).toBe(change.count);
         html = html.split(change.after).join(change.before);
@@ -51,7 +52,7 @@ test.each(Object.keys(original.hashes).filter(f => !f.endsWith('.html')))('%s re
         expect(fs.existsSync(path.join(root, file))).toBe(false);
         return;
     }
-    let s = fs.readFileSync(path.join(root, file), 'utf8').replace(/\r\n/g, '\n');
+    let s = restorePreQuickQuote(file, fs.readFileSync(path.join(root, file), 'utf8').replace(/\r\n/g, '\n'));
     for (const change of original.changes.filter(c => c.file === file).reverse()) {
         expect(change.after).not.toBe('');
         expect(s.split(change.after).length - 1).toBe(change.count);

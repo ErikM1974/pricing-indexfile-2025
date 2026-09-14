@@ -724,7 +724,7 @@ function getSwatchStyle(color) {
 // ============================================
 
 /**
- * Render an LTM control panel with waive checkbox + display mode radio buttons.
+ * Staff fee control. Customer prices always include the applicable small-order charge.
  * @param {string} containerId - DOM id for the container div (must exist)
  * @param {object} options
  * @param {number} options.feeAmount - Current LTM fee dollar amount
@@ -739,8 +739,6 @@ function renderLtmControlPanel(containerId, options = {}) {
     const feeAmount = options.feeAmount || 0;
     const feeLabel = options.feeLabel || 'Small Order Fee';
     const enabled = options.defaultEnabled !== false;
-    const mode = options.defaultMode || 'builtin';
-    const prefix = containerId; // unique prefix for radio name groups
 
     // eslint-disable-next-line no-unsanitized/property -- audited (1.4): feeLabel escapeHtml-wrapped; rest numeric/internal ids
     container.innerHTML = `
@@ -756,18 +754,7 @@ function renderLtmControlPanel(containerId, options = {}) {
                     Apply small-batch fee (<span class="ltm-fee-display">$${feeAmount.toFixed(2)}</span>)
                     <span class="ltm-status-badge">${enabled ? 'Applied' : 'Waived'}</span>
                 </label>
-                <div class="ltm-mode-radios" ${!enabled ? 'style="opacity:0.4;pointer-events:none;"' : ''}>
-                    <label class="ltm-radio-label">
-                        <input type="radio" name="${prefix}-ltm-mode" value="builtin"
-                               ${mode === 'builtin' ? 'checked' : ''} ${!enabled ? 'disabled' : ''}>
-                        Built into price
-                    </label>
-                    <label class="ltm-radio-label">
-                        <input type="radio" name="${prefix}-ltm-mode" value="separate"
-                               ${mode === 'separate' ? 'checked' : ''} ${!enabled ? 'disabled' : ''}>
-                        Show as separate line item
-                    </label>
-                </div>
+                <p class="field-help">Included in the customer's per-piece price. Displayed unit prices are rounded; the order total retains the full charge.</p>
             </div>
         </div>
     `;
@@ -783,11 +770,10 @@ function getLtmControlState(containerId) {
     if (!container) return { enabled: true, displayMode: 'builtin' };
 
     const checkbox = container.querySelector('.ltm-apply-checkbox');
-    const checkedRadio = container.querySelector(`input[name="${containerId}-ltm-mode"]:checked`);
 
     return {
         enabled: checkbox ? checkbox.checked : true,
-        displayMode: checkedRadio ? checkedRadio.value : 'builtin'
+        displayMode: 'builtin'
     };
 }
 
@@ -816,7 +802,7 @@ function setLtmControlState(containerId, state = {}) {
     }
 
     if (state.displayMode) {
-        radios.forEach(r => { r.checked = (r.value === state.displayMode); });
+        radios.forEach(r => { r.checked = (r.value === 'builtin'); });
     }
 
     if (state.feeAmount !== undefined) {
@@ -1827,14 +1813,45 @@ function applyQuantityNudge(needed, categoryLabel, tbodyId) {
  *                          priced (single-qty mode sends the standard size, e.g. S:24)
  *   location=LC_FB         DTG ONLY — engine print-location code (front[_back])
  *
- * Method-specific config that is NOT transferred (rep re-enters in the builder):
- * stitch counts / additional logos (EMB), ink colors + dark garment (SCP), transfer
- * locations (DTF). Prefill flows through each builder's EXISTING add-product path,
+ *   decoration=JSON       validated version-1 method settings: logos/stitches, cap
+ *                          embellishment, print locations, inks, sleeves and garment flags.
+ * Legacy URLs without decoration retain builder defaults. Prefill uses the existing add-product path,
  * so pricing always comes from the same engine/services — never from these params.
  *
  * @returns {null | {style:string, color:string, colorName:string, qty:number,
  *                   sizeBreakdown:Object<string,number>, location:string}}
  */
+function parseQuickQuoteDecoration(raw) {
+    if (!raw) return null;
+    if (raw.length > 6000) throw new Error('Decoration details are too large. Return to Quick Quote.');
+    const d = JSON.parse(raw);
+    const integer = (n, min, max) => Number.isInteger(n) && n >= min && n <= max;
+    const fail = () => { throw new Error('Decoration details are invalid. Return to Quick Quote and open the full quote again.'); };
+    if (d?.version !== 1 || !['emb', 'capemb', 'dtg', 'scp', 'dtf'].includes(d.method)) return fail();
+    if (d.method === 'emb' || d.method === 'capemb') {
+        if (!d.primary || !integer(d.primary.stitchCount, 1000, 1000000) || typeof d.primary.needsDigitizing !== 'boolean'
+            || !['embroidery', '3d-puff', 'laser-patch'].includes(d.primary.embellishmentType)
+            || !Array.isArray(d.additional) || d.additional.length > (d.method === 'capemb' ? 1 : 20)
+            || d.additional.some(a => !integer(a.stitchCount, 1000, 1000000))) return fail();
+        return { version: 1, method: d.method, primary: { stitchCount: d.primary.stitchCount, needsDigitizing: d.primary.needsDigitizing, embellishmentType: d.primary.embellishmentType }, additional: d.additional.map(a => ({ stitchCount: a.stitchCount })) };
+    }
+    if (d.method === 'dtg') {
+        if (!['LC', 'FF', 'FB', 'JF', 'JB', 'LC_FB', 'FF_FB', 'JF_JB', 'LC_JB'].includes(d.location)) return fail();
+        return { version: 1, method: d.method, location: d.location };
+    }
+    if (d.method === 'dtf') {
+        const front = ['left-chest', 'center-front', 'full-front'], back = ['center-back', 'full-back'];
+        if (!Array.isArray(d.locations) || !d.locations.length || d.locations.length > 4 || new Set(d.locations).size !== d.locations.length
+            || d.locations.some(l => ![...front, ...back, 'left-sleeve', 'right-sleeve'].includes(l))
+            || d.locations.filter(l => front.includes(l)).length > 1 || d.locations.filter(l => back.includes(l)).length > 1) return fail();
+        return { version: 1, method: d.method, locations: [...d.locations] };
+    }
+    if (!['', 'LC', 'CF', 'FF', 'JF'].includes(d.front) || !['', 'CB', 'FB', 'JB'].includes(d.back) || (!d.front && !d.back)
+        || !['frontInk', 'backInk', 'sleeveInkL', 'sleeveInkR'].every(k => integer(d[k], 1, 6))
+        || !['left', 'right', 'dark', 'stripes'].every(k => typeof d[k] === 'boolean')) return fail();
+    return { version: 1, method: d.method, front: d.front, back: d.back, frontInk: d.frontInk, backInk: d.backInk, sleeveInkL: d.sleeveInkL, sleeveInkR: d.sleeveInkR, left: d.left, right: d.right, dark: d.dark, stripes: d.stripes };
+}
+
 function getQuickQuotePrefill() {
     let params;
     try { params = new URLSearchParams(window.location.search); } catch (_) { return null; }
@@ -1851,7 +1868,11 @@ function getQuickQuotePrefill() {
         if (size && q > 0) { sizeBreakdown[size] = (sizeBreakdown[size] || 0) + q; }
         else { console.warn('[QuickQuote] dropped malformed size pair (verify the builder qty):', pair); }
     });
+    let decoration = null, decorationError = '';
+    try { decoration = parseQuickQuoteDecoration(params.get('decoration')); }
+    catch (error) { decorationError = error.message; }
     return {
+        decoration, decorationError,
         style,
         color: (params.get('color') || '').trim(),
         colorName: (params.get('colorName') || '').trim(),
@@ -2643,7 +2664,7 @@ if (typeof window !== 'undefined') {
 
 // Node.js export (testing) — pure functions only
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { escapeHtml, formatPrice, cleanProductTitle, getSwatchStyle, parseRatePercent, parseBulkSizes, distributeProportionally, stashMethodSwitchPrefill, takeMethodSwitchPrefill, NON_SANMAR_VENDORS, vendorLabel, resolveNonSanmarPricingMode };
+    module.exports = { parseQuickQuoteDecoration, getQuickQuotePrefill, escapeHtml, formatPrice, cleanProductTitle, getSwatchStyle, parseRatePercent, parseBulkSizes, distributeProportionally, stashMethodSwitchPrefill, takeMethodSwitchPrefill, NON_SANMAR_VENDORS, vendorLabel, resolveNonSanmarPricingMode };
 }
 
 // QuoteBuilderUtils v3.1.0 loaded

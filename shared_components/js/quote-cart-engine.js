@@ -1075,6 +1075,8 @@
             perPieceSavings: savings,
             currentPerPiece: r2(perPieceBasis(gr)),
             nextPerPiece: r2(perPieceBasis(nextResult)),
+            currentTotal: gr.groupTotal,
+            nextTotal: nextResult.groupTotal,
             ltmDisappears: (gr.ltm && gr.ltm.fee > 0) && (!nextResult.ltm || !(nextResult.ltm.fee > 0))
         };
     }

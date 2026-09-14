@@ -1644,11 +1644,15 @@ function tryEditMode() {
 function tryQuickQuotePrefill() {
     const qqPrefill = (typeof getQuickQuotePrefill === 'function') ? getQuickQuotePrefill() : null;
     if (!qqPrefill || !qqPrefill.style) return false;
+    if (qqPrefill.decorationError || (qqPrefill.decoration && qqPrefill.decoration.method !== 'dtg')) {
+        if (typeof showToast === 'function') showToast(qqPrefill.decorationError || 'The decoration method does not match this builder.', 'error', 10000);
+        return true;
+    }
     ensureRowsAndRender();
     // locationCode was engine-whitelisted by Quick Quote (dtgCode());
     // fillFromQuote's sanitizeLocationState() re-guards anyway.
     fillFromQuote({
-        locationCode: qqPrefill.location || 'LC',
+        locationCode: qqPrefill.decoration?.location || qqPrefill.location || 'LC',
         lineItems: [{
             styleNumber: qqPrefill.style,
             // COLOR_NAME preferred — fillFromQuote fuzzy-matches display names

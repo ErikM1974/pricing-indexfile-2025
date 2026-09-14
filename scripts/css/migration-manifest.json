@@ -6699,16 +6699,18 @@
       "dynamicStyles": [],
       "states": [
         "1440-768-390-320",
-        "original-prices-content-fields-and-links",
         "line-sheet-and-quick-price-methods-sizes-and-failures",
         "keyboard-price-selection-quantity-and-scroll",
         "unknown-stock-visible-retry-and-stale-response-guard",
         "complete-paper-output-and-fresh-rate-card-selection",
-        "shared-safety-panel-expanded-and-garment-handoff"
+        "shared-safety-panel-expanded-and-garment-handoff",
+        "canonical-prices-and-approved-product-decoration-workflow",
+        "actual-quantity-small-order-inclusive-customer-preview-print-and-PDF",
+        "complete-five-method-builder-handoff-and-local-input-draft"
       ],
       "test": "tests/e2e/css-unification-quick-quote.spec.js",
       "maxCssBytes": 126108,
-      "measuredRawCssBytes": 124099,
+      "measuredRawCssBytes": 124062,
       "baseline": {
         "commit": "583372db",
         "rawCssBytes": 60371,
@@ -6743,7 +6745,7 @@
       ],
       "test": "tests/e2e/css-unification-quick-quote.spec.js",
       "maxCssBytes": 135448,
-      "measuredRawCssBytes": 133400,
+      "measuredRawCssBytes": 133363,
       "baseline": {
         "commit": "583372db",
         "rawCssBytes": 61878,

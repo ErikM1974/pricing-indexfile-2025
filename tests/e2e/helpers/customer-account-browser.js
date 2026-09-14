@@ -1,7 +1,8 @@
+const restorePreQuickQuote = require('../../helpers/quick-quote-source-mappings');
 const fs=require('node:fs'),path=require('node:path');
 const root=path.resolve(__dirname,'../../..'),source=require('../../fixtures/customer-account-original-content.json');
 const now='2026-09-10T19:00:00Z',style='PC54',image='/__account-fixture/product.svg',tabs=['overview','products','orders','invoices','logos','quotes','account'];
-function originalFile(file){let s=fs.readFileSync(path.join(root,file),'utf8').replace(/\r\n/g,'\n');for(const c of source.changes.filter(c=>c.file===file).reverse()){if(s.split(c.after).length-1!==c.count)throw Error('Original mapping drift '+file);s=s.split(c.after).join(c.before);}return s;}
+function originalFile(file){let s=restorePreQuickQuote(file, fs.readFileSync(path.join(root,file),'utf8').replace(/\r\n/g,'\n'));for(const c of source.changes.filter(c=>c.file===file).reverse()){if(s.split(c.after).length-1!==c.count)throw Error('Original mapping drift '+file);s=s.split(c.after).join(c.before);}return s;}
 function data(mode='normal'){
  const colors=[{name:'Navy',catalogColor:'Navy',totalQty:24,sizes:{S:2,M:4,L:6,XL:8,'2XL':3,'3XL':1},image,images:[{url:image,label:'Front'},{url:'/__account-fixture/back.svg',label:'Back'}],swatch:image},{name:'Brilliant Orange',catalogColor:'BrillOrng',totalQty:12,sizes:{S:1,M:2,L:3,XL:4,'2XL':2},image,swatch:image}];
  const product={style,title:'Core Cotton Tee',brand:'Port & Company',category:'T-Shirts',description:'A dependable cotton tee for every team.',colors};

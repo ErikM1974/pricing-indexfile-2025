@@ -23,11 +23,41 @@ import { applyDesignFromCache, showDesignThumbnail, lookupDesignNumber } from '.
 import { collectProductsFromTable, onShipMethodChange, recalculatePricing, updateTaxCalculation } from './pricing-sync.js';
 import { updateAdditionalCharges, updateDiscountType } from './quote-lifecycle.js';
 import { _syncALArrays, handleCapEmbellishmentChange, mapStitchCountToTierValue, updateNotesBadge } from './logo-config.js';
-import { addManualServiceRow, addNewRow, createChildRow, createServiceProductRow, dateFromInputValue, dateToInputValue, onSizeChange, onStyleChange, selectColor, updateCapLogoSectionVisibility, updateGarmentLogoSectionVisibility, updateLogoCardHeader } from './product-rows.js';
+import { addALLineItem, addManualServiceRow, addNewRow, createChildRow, createServiceProductRow, dateFromInputValue, dateToInputValue, onSizeChange, onStyleChange, selectColor, updateCapLogoSectionVisibility, updateGarmentLogoSectionVisibility, updateLogoCardHeader } from './product-rows.js';
 import { embState, EMB_DEFAULTS, SIZE06_EXTENDED_SIZES } from './state.js';
 
 // Module state — was window._* flags (Batch 3.4, 2026-07-09); nothing outside this file reads them.
 let _pendingLtmState = null;    // LTM panel state parked until the panel exists during restore
+
+export async function applyQuickQuotePrefillEmb(qq) {
+    if (qq.decorationError) throw new Error(qq.decorationError);
+    const d = qq.decoration;
+    if (d) {
+        if (!['emb', 'capemb'].includes(d.method)) throw new Error('The decoration method does not match this builder.');
+        const cap = d.method === 'capemb';
+        if (cap) {
+            /** @type {HTMLSelectElement} */ (document.getElementById('cap-embellishment-type')).value = d.primary.embellishmentType;
+            handleCapEmbellishmentChange();
+        }
+        const logo = cap ? embState.capPrimaryLogo : embState.primaryLogo;
+        logo.position = cap ? 'CF' : 'Left Chest';
+        const patch = cap && d.primary.embellishmentType === 'laser-patch';
+        logo.stitchCount = patch ? 0 : d.primary.stitchCount;
+        logo.needsDigitizing = !patch && d.primary.needsDigitizing;
+        const select = /** @type {HTMLSelectElement} */ (document.getElementById(cap ? 'cap-primary-stitches' : 'primary-stitches'));
+        // Keep the imported exact count, including counts between the standard tiers.
+        if (!patch) {
+            const value = String(d.primary.stitchCount);
+            const option = document.createElement('option'); option.value = value; option.textContent = d.primary.stitchCount.toLocaleString() + ' stitches (Quick Quote)';
+            option.dataset.quickQuote = 'true'; select.prepend(option); select.value = value;
+        }
+        /** @type {HTMLInputElement} */ (document.getElementById(cap ? 'cap-primary-digitizing' : 'primary-digitizing')).checked = logo.needsDigitizing;
+        if (!cap) /** @type {HTMLSelectElement} */ (document.getElementById('primary-position')).value = 'Left Chest';
+    }
+    await addProductFromQuote({ styleNumber: qq.style, color: qq.color || qq.colorName, sizeBreakdown: qq.sizeBreakdown });
+    if (d) for (const logo of d.additional) await addALLineItem(d.method === 'capemb' ? 'Cap Back' : 'Additional Logo', logo.stitchCount);
+    recalculatePricing();
+}
 
 export function initEmbroideryPersistence() {
     if (typeof QuotePersistence !== 'undefined') {

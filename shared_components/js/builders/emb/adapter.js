@@ -24,7 +24,7 @@ import { invalidateDesignGalleryCache } from './design-search.js';
 import { clearCustomerContextBanners, setupUnsavedChangesTracking, updateAdditionalCharges } from './quote-lifecycle.js';
 import { updateNotesBadge, updateStitchTierDropdownLabels, initStitchEstimators } from './logo-config.js';
 import { embState } from './state.js';
-import { initEmbroideryPersistence, loadQuoteForEditing, duplicateQuote, addProductFromQuote,
+import { initEmbroideryPersistence, loadQuoteForEditing, duplicateQuote, addProductFromQuote, applyQuickQuotePrefillEmb,
          restoreEmbroideryDraft } from './persistence.js';
 
 export class EmbAdapter {
@@ -456,17 +456,13 @@ export class EmbAdapter {
                 initEmbroideryPersistence();
                 if (typeof setQuoteDateDefaults === 'function') setQuoteDateDefaults();
                 try {
-                    await addProductFromQuote({
-                        styleNumber: qqPrefill.style,
-                        color: qqPrefill.color || qqPrefill.colorName,
-                        sizeBreakdown: qqPrefill.sizeBreakdown
-                    });
+                    await applyQuickQuotePrefillEmb(qqPrefill);
                     showToast('Loaded ' + qqPrefill.style + ' from Quick Quote — verify color, quantities & pricing', 'info', 6000);
+                    if (typeof clearQuickQuoteParams === 'function') clearQuickQuoteParams();
                 } catch (e) {
                     console.error('[QuickQuote prefill] failed:', e);
-                    showToast('Could not prefill ' + qqPrefill.style + ' from Quick Quote — add it manually', 'warning', 6000);
+                    showToast('Could not prefill ' + qqPrefill.style + ': ' + e.message, 'warning', 6000);
                 }
-                if (typeof clearQuickQuoteParams === 'function') clearQuickQuoteParams();
             } else if (typeof takeMethodSwitchPrefill === 'function' && (window._msPrefillEmb = takeMethodSwitchPrefill())) {
                 // Mid-call method switch (?from=methodswitch — expert audit 2026-07-07):
                 // customer + product rows carried over from another builder; each row

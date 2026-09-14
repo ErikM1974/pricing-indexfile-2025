@@ -127,6 +127,8 @@ jobs:
         run: npx playwright test --config tests/e2e/playwright.config.js money-path calculator-parity
       - name: Holiday gift-box customer requests (mocked writes and email)
         run: npx playwright test --config tests/e2e/playwright.config.js seasonal-christmas-behavior
+      - name: Quick Quote customer prices, PDFs and builder handoffs (mocked services)
+        run: npx playwright test --config tests/e2e/playwright.config.js quick-quote-workflow --workers=3
       - name: Money path + calculator parity skipped (no CRM_API_SECRET in Actions secrets)
         if: ${{ env.CRM_API_SECRET == '' }}
         run: echo "::warning::CRM_API_SECRET is not set for this repository — the live-engine specs did not run here; the /deploy pre-flight runs them locally"

@@ -1,3 +1,4 @@
+const restorePreQuickQuote = require('../helpers/quick-quote-source-mappings');
 const restorePreHoliday = require('../helpers/holiday-source-mappings');
 const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto');
 const { JSDOM } = require('jsdom');
@@ -6,7 +7,7 @@ const root = path.resolve(__dirname, '../..'), norm = s => s.replace(/\s+/g, ' '
 const hash = s => crypto.createHash('sha256').update(s).digest('hex');
 
 test.each(original.pages)('$file preserves original labels, fields, links and identifiers', record => {
-    let html = restorePreHoliday(record.file, fs.readFileSync(path.join(root, record.file), 'utf8').replace(/\r\n/g, '\n'));
+    let html = restorePreHoliday(record.file, restorePreQuickQuote(record.file, fs.readFileSync(path.join(root, record.file), 'utf8').replace(/\r\n/g, '\n')));
     for (const change of original.changes.filter(c => c.file === record.file).reverse()) {
         expect(html.split(change.after).length - 1).toBe(change.count);
         html = html.split(change.after).join(change.before);
@@ -26,7 +27,7 @@ test.each(Object.keys(original.hashes).filter(f => !f.endsWith('.html')))('%s re
         expect(fs.existsSync(path.join(root, file))).toBe(false);
         return;
     }
-    let s = restorePreHoliday(file, fs.readFileSync(path.join(root, file), 'utf8').replace(/\r\n/g, '\n'));
+    let s = restorePreHoliday(file, restorePreQuickQuote(file, fs.readFileSync(path.join(root, file), 'utf8').replace(/\r\n/g, '\n')));
     // Reverse the later shared artwork-form migration before this earlier baseline.
     for (const change of require('../fixtures/garment-designer-original-content.json').changes.filter(c => c.file === file).reverse()) {
         expect(s.split(change.after).length - 1).toBe(change.count);

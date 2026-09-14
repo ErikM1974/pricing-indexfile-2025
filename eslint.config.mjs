@@ -27,7 +27,7 @@ const STAFF_REFERENCE_FILES = [
 const MAGIC_LINK_FILES = ['pages/js/customer-login.js', 'pages/js/vendor-login.js'];
 const CATALOG_DISCOVERY_FILES = ['brands.js', 'pages/js/fall-catalog-2026.js'];
 const CONTRACT_UI_FILES = ['shared_components/js/contract-calculator-ui.js'];
-const QUICK_QUOTE_UI_FILES = ['calculators/quick-quote/quick-quote-ui.js'];
+const QUICK_QUOTE_UI_FILES = ['calculators/quick-quote/quick-quote-ui.js', 'calculators/quick-quote/quick-quote-document.js', 'calculators/quick-quote/quick-quote-workspace.js'];
 const EMBROIDERY_REFERENCE_UI_FILES = ['calculators/embroidery-pricing-all/embroidery-reference-ui.js'];
 const GARMENT_DESIGNER_UI_FILES = ['pages/js/garment-designer-ui.js'];
 const STRICT_FILES = [
@@ -80,6 +80,7 @@ const LEGACY_ESM = [
 ];
 
 export default [
+    { files: ['calculators/quick-quote/quick-quote-document.js'], languageOptions: { globals: { module: 'readonly' } } },
     { files: ['calculators/js/christmas-bundles.js', 'calculators/js/christmas-bundle-order.js', 'calculators/js/christmas-campaign.js'], languageOptions: { sourceType: 'script', globals: { ...globals.browser, module: 'readonly' } }, rules: { ...js.configs.recommended.rules, 'no-undef': 'error', 'no-unused-vars': ['error', { vars: 'local', argsIgnorePattern: '^_', caughtErrors: 'none' }] } },
     { files: ['calculators/js/christmas-bundles.js'], languageOptions: { globals: { ChristmasBundleQuoteService: 'readonly' } } },
     { files: ['calculators/breast-cancer-awareness-bundle.js', 'calculators/breast-cancer-bundle-service.js'], languageOptions: { sourceType: 'script', globals: { ...globals.browser, emailjs: 'readonly' } }, rules: { 'no-undef': 'error', 'no-unused-vars': ['error', { vars: 'local', argsIgnorePattern: '^_', caughtErrors: 'none' }] } },

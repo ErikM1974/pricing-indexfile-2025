@@ -178,14 +178,14 @@ describe('the full price table is open by default', () => {
 });
 
 /**
- * Small-order fee row.
+ * Inclusive small-order quantity table.
  *
  * Rendering the matrix needs an engine, so this block stubs one. The ladder
  * mirrors the real CT103828 embroidery data: 1-7 and 8-23 are BOTH $177.50
  * (identical Caspio decoration cost) and differ only by the $50 fee — the
- * exact case the fee styling exists to make legible.
+ * case that must show the fee inside each actual-quantity price.
  */
-describe('small-order fee row', () => {
+describe('inclusive small-order quantity table', () => {
     const LADDER = [
         { label: '1-7', min: 1, max: 7, price: 177.50, ltm: 50 },
         { label: '8-23', min: 8, max: 23, price: 177.50, ltm: 0 },
@@ -247,7 +247,7 @@ describe('small-order fee row', () => {
     async function waitForTable() {
         for (let i = 0; i < 80; i++) {
             const table = document.querySelector('#cfgMatrix .tier-table');
-            if (table && table.querySelectorAll('tbody tr').length >= 2) return table;
+            if (table && table.querySelectorAll('tbody tr').length === 1) return table;
             await new Promise(function (r) { setTimeout(r, 10); });
         }
         throw new Error('matrix table never rendered: ' + document.getElementById('cfgMatrix').innerHTML);
@@ -258,97 +258,56 @@ describe('small-order fee row', () => {
         delete window.EmbroideryPricingService;
     });
 
-    test('the fee is a pill, and the free tiers say "No fee" — never a bare em dash', async () => {
+    test('shows actual quantities and inclusive engine prices with no extra fee row', async () => {
         stubEngine();
         window.PdpConfigurator.init(ctx(EMB_ONLY));
         const table = await waitForTable();
-
-        const feeCells = Array.from(table.querySelectorAll('tbody tr:nth-child(2) td')).slice(1);
-        expect(feeCells).toHaveLength(5);
-
-        // 1-7 carries the charge, as a pill with its "per order" unit spelled out.
-        expect(feeCells[0].querySelector('.tier-fee-yes').textContent).toBe('+$50.00');
-        expect(feeCells[0].querySelector('.tier-fee-unit').textContent).toBe('per order');
-
-        // Every other tier states the absence explicitly.
-        feeCells.slice(1).forEach(function (td) {
-            expect(td.querySelector('.tier-fee-no').textContent).toBe('No fee');
-            expect(td.textContent).not.toContain('—');
-        });
+        expect([...table.querySelectorAll('thead th')].map(c => c.textContent)).toEqual(['At quantity', '1', '8', '24', '48', '72']);
+        expect([...table.querySelectorAll('tbody td')].map(c => c.textContent)).toEqual(['Price per piece', '$227.50', '$177.50', '$173.50', '$172.50', '$171.50']);
+        expect(table.querySelectorAll('tbody tr')).toHaveLength(1);
     });
 
-    test('the note names the threshold and, here, that the fee IS the whole difference', async () => {
+    test('explains included small-order pricing before the quantity table', async () => {
         stubEngine();
         window.PdpConfigurator.init(ctx(EMB_ONLY));
         await waitForTable();
-
-        const note = document.querySelector('#cfgMatrix .pdp-cfg-fee-note');
-        expect(note).not.toBeNull();
-        expect(note.textContent).toContain('Orders under 8 pieces add a one-time $50.00 small-order fee.');
-
-        // It frames the numbers, so it must come BEFORE the table, not after.
-        const table = document.querySelector('#cfgMatrix .table-wrap');
-        expect(note.compareDocumentPosition(table) & window.Node.DOCUMENT_POSITION_FOLLOWING)
-            .toBeTruthy();
-        // 1-7 and 8-23 are both $177.50, so the identical-price clause applies.
-        expect(note.textContent).toContain('At 1-7 and 8-23 the per-piece price is identical');
-        expect(note.textContent).toContain('the fee is the whole difference');
+        const note = document.querySelector('#cfgMatrix .pdp-panel-note');
+        expect(note.textContent).toContain('small-order pricing included');
+        expect(note.textContent).toContain('One-time artwork or setup');
+        expect(note.compareDocumentPosition(document.querySelector('#cfgMatrix .table-wrap')) & window.Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+        expect(note.textContent).not.toContain('add a one-time $50');
     });
 
-    test('the identical-price clause is dropped when the prices actually differ', async () => {
-        stubEngine([
-            { label: '1-7', min: 1, max: 7, price: 190.00, ltm: 50 },
-            { label: '8-23', min: 8, max: 23, price: 177.50, ltm: 0 },
-            { label: '24-47', min: 24, max: 47, price: 173.50, ltm: 0 },
-            { label: '48-71', min: 48, max: 71, price: 172.50, ltm: 0 },
-            { label: '72+', min: 72, max: Infinity, price: 171.50, ltm: 0 }
-        ]);
+    test('uses the engine price when both the tier base and fee change', async () => {
+        stubEngine(LADDER.map((t, i) => i === 0 ? { ...t, price: 190 } : t));
         window.PdpConfigurator.init(ctx(EMB_ONLY));
-        await waitForTable();
-
-        const note = document.querySelector('#cfgMatrix .pdp-cfg-fee-note');
-        expect(note.textContent).toContain('Orders under 8 pieces add a one-time $50.00 small-order fee.');
-        expect(note.textContent).not.toContain('identical');
+        const table = await waitForTable();
+        expect(table.querySelector('tbody td:nth-child(2)').textContent).toBe('$240.00');
+        expect(table.querySelector('tbody td:nth-child(3)').textContent).toBe('$177.50');
     });
 
-    test('a ladder with no small-order fee renders neither the row nor the note', async () => {
-        stubEngine(LADDER.map(function (t) { return Object.assign({}, t, { ltm: 0 }); }));
+    test('a ladder without small-order fees displays unchanged base prices', async () => {
+        stubEngine(LADDER.map(t => ({ ...t, ltm: 0 })));
         window.PdpConfigurator.init(ctx(EMB_ONLY));
-        const table = await waitForTable().catch(function () { return null; });
-
-        // Only the price row survives, and no fee note is emitted.
-        const rows = document.querySelectorAll('#cfgMatrix .tier-table tbody tr');
-        expect(rows).toHaveLength(1);
-        expect(document.querySelector('#cfgMatrix .pdp-cfg-fee-note')).toBeNull();
-        expect(table === null || rows.length === 1).toBe(true);
+        const table = await waitForTable();
+        expect(table.querySelectorAll('tbody tr')).toHaveLength(1);
+        expect(table.querySelector('tbody td:nth-child(2)').textContent).toBe('$177.50');
     });
 
-    test('the fee styling does not steal the active-tier highlight', async () => {
+    test('quantity changes update the highlighted quantity and its inclusive price', async () => {
         stubEngine();
         window.PdpConfigurator.init(ctx(EMB_ONLY));
         await waitForTable();
-
-        // Default qty 24 highlights its own tier.
-        expect(document.querySelector('#cfgMatrix thead th.is-active-tier').textContent).toBe('24-47');
-
-        // Drop to 4: that column is now BOTH the active tier and the fee tier.
-        // The qty input debounces 350ms before repricing, hence the poll.
+        expect(document.querySelector('#cfgMatrix thead th.is-active-tier').textContent).toBe('24');
         const input = document.getElementById('cfgQtyInput');
         input.value = '4';
         input.dispatchEvent(new window.Event('input', { bubbles: true }));
-
-        let activeHeader = null;
         for (let i = 0; i < 150; i++) {
-            activeHeader = document.querySelector('#cfgMatrix thead th.is-active-tier');
-            if (activeHeader && activeHeader.textContent === '1-7') break;
-            await new Promise(function (r) { setTimeout(r, 10); });
+            if (document.querySelector('#cfgMatrix thead th.is-active-tier')?.textContent === '4') break;
+            await new Promise(r => setTimeout(r, 10));
         }
-        expect(activeHeader).not.toBeNull();
-        expect(activeHeader.textContent).toBe('1-7');
-
-        // The fee cell in that column keeps BOTH signals: the highlight and the pill.
-        const feeCell = document.querySelector('#cfgMatrix tbody tr:nth-child(2) td:nth-child(2)');
-        expect(feeCell.classList.contains('is-active-tier')).toBe(true);
-        expect(feeCell.querySelector('.tier-fee-yes').textContent).toBe('+$50.00');
+        expect(document.querySelector('#cfgMatrix thead th.is-active-tier').textContent).toBe('4');
+        expect(document.querySelector('#cfgMatrix tbody td.is-active-tier').textContent).toBe('$190.00');
+        expect(window.PdpConfigurator.getSelection().price.perPiece).toBe(190);
     });
 });

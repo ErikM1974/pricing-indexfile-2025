@@ -44,6 +44,8 @@ export const SCREEN_FEE = 30.00; // $30 per screen
 // Print location display names
 export const LOCATION_NAMES = {
     'LC': 'Left Chest',
+    'CF': 'Center Front',
+    'CB': 'Center Back',
     'FF': 'Full Front',
     'JF': 'Jumbo Front',
     'FB': 'Full Back',

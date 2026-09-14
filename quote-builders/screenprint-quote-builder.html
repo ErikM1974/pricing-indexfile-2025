@@ -122,7 +122,7 @@
                         <!-- Front Location with Ink Colors -->
                         <div class="location-group location-group-card">
                             <div class="section-label">
-                                <i class="fas fa-check-circle qb-c-qb-green-2" aria-hidden="true"></i> FRONT LOCATION
+                                <i class="fas fa-check-circle qb-c-qb-green-2" aria-hidden="true"></i> PRIMARY PRINT
                             </div>
                             <div class="d-flex flex-column gap-2 mb-3">
                                 <label class="location-radio">
@@ -138,6 +138,13 @@
                                     <span>Jumbo Front <span class="hint-text">(16" x 20")</span></span>
                                 </label>
                             </div>
+                            <details class="mb-3">
+                                <summary>Center or back-only placement</summary>
+                                <label class="location-radio"><input type="radio" name="front-location" value="CF" data-change="updatePrintConfig"><span>Center front</span></label>
+                                <label class="location-radio"><input type="radio" name="front-location" value="CB" data-change="updatePrintConfig"><span>Center back only</span></label>
+                                <label class="location-radio"><input type="radio" name="front-location" value="FB" data-change="updatePrintConfig"><span>Full back only</span></label>
+                                <label class="location-radio"><input type="radio" name="front-location" value="JB" data-change="updatePrintConfig"><span>Jumbo back only</span></label>
+                            </details>
                             <!-- Ink Colors for Front -->
                             <div class="border-top qb-pt-10">
                                 <div class="hint-text mb-2">INK COLORS</div>
@@ -163,6 +170,7 @@
                                     <input type="radio" name="back-location" value="" checked data-change="updatePrintConfig">
                                     <span>None</span>
                                 </label>
+                                <label class="location-radio"><input type="radio" name="back-location" value="CB" data-change="updatePrintConfig"><span>Center back</span></label>
                                 <label class="location-radio">
                                     <input type="radio" name="back-location" value="FB" data-change="updatePrintConfig">
                                     <span>Full Back <span class="qb-c-qb-gray-fs-11">(12" x 16")</span></span>
@@ -781,7 +789,7 @@
 
     <!-- Core Dependencies -->
     <script src="/shared_components/js/product-category-filter.js?v=2026.09.06.37"></script>
-    <script src="/shared_components/js/quote-builder-utils.js?v=2026.09.13.2"></script>
+    <script src="/shared_components/js/quote-builder-utils.js?v=2026.09.13.6"></script>
     <script src="/shared_components/js/exact-match-search.js?v=2026.09.06.37"></script>
     <script src="/shared_components/js/quote-share-modal.js?v=2026.09.06.22"></script>
     <script src="/shared_components/js/screenprint-pricing-service.js?v=2026.09.06.44"></script>

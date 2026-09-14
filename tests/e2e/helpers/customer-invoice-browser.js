@@ -1,3 +1,4 @@
+const restorePreQuickQuote = require('../../helpers/quick-quote-source-mappings');
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const source=require('../../fixtures/customer-documents-original-content.json'),root=path.resolve(__dirname,'../../..');
 const invoice={
@@ -23,6 +24,7 @@ function data(mode){
 function originalFile(file){
  const record=source.pages.find(p=>p.file===file),retired=(source.retiredStyles||[]).find(p=>p.file===file);
  let s=record?record.html:retired?retired.css:fs.readFileSync(path.join(root,file),'utf8').replace(/\r\n/g,'\n');
+ if(!record&&!retired)s=restorePreQuickQuote(file,s);
  if(!record&&!retired)for(const c of source.changes.filter(c=>c.file===file).reverse())s=s.split(c.after).join(c.before);
  if(crypto.createHash('sha256').update(s).digest('hex')!==source.hashes[file])throw Error('Original mismatch '+file);
  return s;

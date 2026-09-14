@@ -113,7 +113,8 @@ async function _resolveLtmState(productList, totalQty) {
     const ltmEnabled = wouldHaveLTM ? ltmState.enabled : true;
     const ltmDisplayMode = ltmState.displayMode || 'builtin';
     const ltmFee = (wouldHaveLTM && ltmEnabled) ? baseLtmFee : 0;
-    const perUnitLTM = ltmFee > 0 ? Math.floor(ltmFee / totalQty * 100) / 100 : 0;
+    // Preserve the exact fee in the order total. Round only the displayed unit price.
+    const perUnitLTM = ltmFee > 0 && totalQty > 0 ? ltmFee / totalQty : 0;
     return { ltmEnabled, ltmDisplayMode, ltmFee, perUnitLTM };
 }
 
@@ -292,6 +293,7 @@ function _paintProductSizes(product, tierData, additionalPricePerPiece, sleeveAd
         if (!isExtendedSize) {
             const priceCell = document.getElementById(`row-price-${rowId}`);
             if (priceCell) {
+                priceCell.dataset.exactUnitPrice = String(displayPrice);
                 priceCell.textContent = `$${displayPrice.toFixed(2)}`;
             }
         } else {
@@ -300,6 +302,7 @@ function _paintProductSizes(product, tierData, additionalPricePerPiece, sleeveAd
             if (childRowId) {
                 const childPriceCell = document.getElementById(`row-price-${childRowId}`);
                 if (childPriceCell) {
+                    childPriceCell.dataset.exactUnitPrice = String(displayPrice);
                     childPriceCell.textContent = `$${displayPrice.toFixed(2)}`;
                 }
                 // Update child row total (qty × price)

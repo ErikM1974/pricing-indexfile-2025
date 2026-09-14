@@ -1605,9 +1605,9 @@ class QuoteViewPage {
         productGroup.items.forEach(item => {
             const breakdown = this.parseSizeBreakdown(item.SizeBreakdown);
             // Calculate per-unit price from stored LineTotal when available (ensures unit × qty = total)
-            const unitPrice = item.BaseUnitPrice || item.FinalUnitPrice || 0;
-            const perUnitTotal = (item.LineTotal && item.Quantity > 0)
-                ? item.LineTotal / item.Quantity
+            const unitPrice = Number(item.FinalUnitPrice ?? item.BaseUnitPrice ?? 0);
+            const perUnitTotal = (item.LineTotal != null && item.LineTotal !== '' && Number.isFinite(Number(item.LineTotal)) && Number(item.Quantity) > 0)
+                ? Number(item.LineTotal) / Number(item.Quantity)
                 : unitPrice;
 
             Object.entries(breakdown).forEach(([size, qty]) => {
@@ -1616,10 +1616,9 @@ class QuoteViewPage {
                         allSizes[size] = { qty: 0, price: 0, total: 0 };
                     }
                     allSizes[size].qty += qty;
-                    // Use BaseUnitPrice so LTM is shown separately in LTM-G row
-                    allSizes[size].price = unitPrice;
                     // Use proportional LineTotal to ensure unit × qty = total
                     allSizes[size].total += (qty * perUnitTotal);
+                    allSizes[size].price = allSizes[size].total / allSizes[size].qty;
                 }
             });
         });
@@ -1656,14 +1655,12 @@ class QuoteViewPage {
         const standardSizes = ['S', 'M', 'L', 'XL'];
         const stdSizeData = {};
         let stdQty = 0;
-        let stdPrice = 0;
         let stdTotal = 0;
 
         standardSizes.forEach(size => {
             if (allSizes[size]) {
                 stdSizeData[size] = allSizes[size].qty;
                 stdQty += allSizes[size].qty;
-                stdPrice = allSizes[size].price; // All standard sizes same price
                 stdTotal += allSizes[size].total;
             }
         });
@@ -1675,7 +1672,7 @@ class QuoteViewPage {
                 color: productGroup.color,
                 sizes: stdSizeData,
                 qty: stdQty,
-                unitPrice: stdPrice,
+                unitPrice: stdTotal / stdQty,
                 lineTotal: stdTotal,
                 isFirstRow: true,
                 groupIndex: groupIndex

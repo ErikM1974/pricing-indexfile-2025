@@ -52,6 +52,9 @@ async function evidence(page,name,events,{paper=true,noticeChecked=false}={}){
    // button on desktop. Its repaired visibility is checked explicitly below.
    if(states[i].width===1440)delete expectedIds.filtersClose;
    const actualIds={...states[i].ids};
+   // Approved customer price table now shows exact quantities with LTM included.
+   // Headline prices, stored selection and every other field remain historical locks.
+   if(name.startsWith('product')){delete expectedIds.cfgMatrix;delete actualIds.cfgMatrix;}
    if(noticeChecked){delete expectedIds.toastStack;delete actualIds.toastStack;}
    expect(actualIds,name+' ids').toEqual(expectedIds);
    for(const k of ['title','url','fields','selection'])expect(states[i][k],name+' '+k).toEqual(before.states[i][k]);
@@ -66,6 +69,17 @@ for(const [name,url]of [['home','/'],['catalog','/catalog'],['product','/product
  if(name==='catalog')await expect(page.locator('.pcard')).toHaveCount(4);
  if(name==='product'){await expect(page.locator('#productTitle')).not.toHaveText('Loading…');await page.waitForFunction(()=>window.PdpConfigurator?.getSelection()?.price);}
  await evidence(page,name,events);
+});
+
+for(const [method,qty]of [['emb',7],['capemb',7],['dtg',23],['dtf',23],['scp',37]])test('catalog quantity prices include small-order pricing: '+method,async({page})=>{
+ const e=await open(page,{url:'/product.html?style='+(method==='capemb'?'C112':'PC61'),allMethods:true,completeDtg:true});
+ await productReady(page);await page.locator('[data-method="'+method+'"]').click();
+ await page.locator('#cfgQtyInput').fill(String(qty));await page.locator('#cfgQtyInput').blur();await productReady(page,method,qty);
+ await expect(page.locator('#cfgMatrix')).toContainText('At quantity');
+ await expect(page.locator('#cfgMatrix tbody td.is-active-tier')).toHaveText(await page.evaluate(()=>'$'+window.PdpConfigurator.getSelection().price.perPiece.toFixed(2)));
+ await expect(page.locator('#cfgMatrix th.is-active-tier')).toHaveText(String(qty));
+ await expect(page.locator('#cfgMatrix')).not.toContainText('Small-order fee');
+ check(expect,e);
 });
 
 async function productReady(page,method,qty){

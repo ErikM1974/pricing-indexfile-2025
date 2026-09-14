@@ -74,6 +74,18 @@ async function fillQuote(page){
  await page.locator('#qcSaveBtn').click();
  for(const [id,value]of Object.entries({qcSvName:'Casey Example',qcSvEmail:'customer@example.test',qcSvPhone:'2535550142',qcSvCompany:'Example Team',qcSvNotes:'Please preserve both locations, all sizes, and the reference artwork.'}))await page.locator('#'+id).fill(value);
 }
+
+test('Customer small-order price stays inclusive through cart and saved quote',async({page})=>{
+ const events=await open(page,{kind:'quote',mode:'SCP',smallOrder:true});await ready(page,'quote','SCP');
+ await expect(page.locator('.qc-line-total')).toHaveText('$162.50');
+ await expect(page.locator('.qc-fee-row')).toHaveCount(0);
+ await expect(page.locator('#qcTotalsBody')).toContainText('$162.50');
+ await fillQuote(page);await page.locator('[data-save-act="submit"]').click();
+ await expect(page.locator('#qcSavePanel')).toContainText('WQ-2026-1042 saved');
+ const rows=events.actions.filter(a=>a.path==='/api/quote_items').map(a=>JSON.parse(a.body));
+ expect(rows.length).toBe(2);expect(rows.every(r=>r.HasLTM==='Yes'&&r.StyleNumber!=='LTM')).toBe(true);
+ expect(rows.reduce((sum,r)=>sum+Math.round(r.LineTotal*100),0)).toBe(16250);check(expect,events);
+});
 test('CSS customer carts workflow: free sample request and reference logo',async({page})=>{
  const events=await open(page,{kind:'sample',mode:'free',original:capture});await ready(page,'sample','free');await fillSample(page,true);
  await page.locator('#logoUpload').setInputFiles({name:'example-logo.svg',mimeType:'image/svg+xml',buffer:Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><rect width="10" height="10" fill="green"/></svg>')});

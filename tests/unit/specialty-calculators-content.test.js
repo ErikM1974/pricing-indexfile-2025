@@ -1,7 +1,8 @@
+const restorePreQuickQuote = require('../helpers/quick-quote-source-mappings');
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto'),original=require('../fixtures/specialty-calculators-original-content.json'),root=path.resolve(__dirname,'../..');
 describe('specialty calculators preserve original source',()=>{
  test.each(Object.entries(original.hashes))('%s changes only through reversible reviewed mappings',(file,hash)=>{
- let source=fs.readFileSync(path.join(root,file),'utf8').replace(/\r\n/g,'\n');for(const c of original.changes.filter(c=>c.file===file).reverse()){expect(source.split(c.after).length-1).toBe(c.count);source=source.split(c.after).join(c.before);}expect(crypto.createHash('sha256').update(source).digest('hex')).toBe(hash);
+ let source=restorePreQuickQuote(file, fs.readFileSync(path.join(root,file),'utf8').replace(/\r\n/g,'\n'));for(const c of original.changes.filter(c=>c.file===file).reverse()){expect(source.split(c.after).length-1).toBe(c.count);source=source.split(c.after).join(c.before);}expect(crypto.createHash('sha256').update(source).digest('hex')).toBe(hash);
  });
 });
 
@@ -23,7 +24,7 @@ test('Polar Camel quote arithmetic and engraving template stay exact',()=>{
 
 test('Safety Stripe image mappings and quote identifiers remain exact',()=>{
  const sourceFile='calculators/safety-stripe-calculator.js',serviceFile='calculators/safety-stripe-creator-service.js';
- const prior=file=>{let text=fs.readFileSync(path.join(root,file),'utf8').replace(/\r\n/g,'\n');for(const c of original.changes.filter(c=>c.file===file).reverse())text=text.split(c.after).join(c.before);return text;};
+ const prior=file=>{let text=restorePreQuickQuote(file, fs.readFileSync(path.join(root,file),'utf8').replace(/\r\n/g,'\n'));for(const c of original.changes.filter(c=>c.file===file).reverse())text=text.split(c.after).join(c.before);return text;};
  const now=fs.readFileSync(path.join(root,sourceFile),'utf8').replace(/\r\n/g,'\n'),then=prior(sourceFile),imageMap=s=>s.slice(s.indexOf('const STRIPE_IMAGES ='),s.indexOf('// Current design state'));
  expect(imageMap(now)).toBe(imageMap(then));
  const method=(text,name)=>{const ast=require('acorn').parse(text,{ecmaVersion:'latest'}),cls=ast.body.find(n=>n.type==='ClassDeclaration'),fn=cls.body.body.find(n=>n.key.name===name);return text.slice(fn.value.body.start,fn.value.body.end);};

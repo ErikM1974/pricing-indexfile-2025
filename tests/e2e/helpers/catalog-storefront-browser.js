@@ -1,3 +1,4 @@
+const restorePreQuickQuote = require('../../helpers/quick-quote-source-mappings');
 const fs=require('node:fs'),path=require('node:path');
 const restorePreHoliday=require('../../helpers/holiday-source-mappings');
 const root=path.resolve(__dirname,'../../..'),original=require('../../fixtures/catalog-storefront-original-content.json');
@@ -15,7 +16,7 @@ for(const PrintLocationCode of ['FF','FB'])for(const [TierLabel,PrintCost]of [['
 const colors=[{name:'Jet Black',catalog:'JetBlack'},{name:'Brilliant Orange',catalog:'BrillOrng'}],sizes=['S','M','L','XL','2XL','3XL'];
 const garment='<svg xmlns="http://www.w3.org/2000/svg" width="600" height="720"><rect width="600" height="720" fill="white"/><path d="M175 80L235 60Q300 125 365 60L425 80L545 200L455 285L415 240L425 640L175 640L185 240L145 285L55 200Z" fill="#263b46"/></svg>';
 const image='/__catalog-fixture/garment.svg';
-function source(file){let s=restorePreHoliday(file,fs.readFileSync(path.join(root,file),'utf8').replace(/\r\n/g,'\n'));for(const c of original.changes.filter(c=>c.file===file).reverse()){if(s.split(c.after).length-1!==c.count)throw Error('Original mapping drift '+file);s=s.split(c.after).join(c.before);}return s;}
+function source(file){let s=restorePreHoliday(file, restorePreQuickQuote(file,fs.readFileSync(path.join(root,file),'utf8').replace(/\r\n/g,'\n')));for(const c of original.changes.filter(c=>c.file===file).reverse()){if(s.split(c.after).length-1!==c.count)throw Error('Original mapping drift '+file);s=s.split(c.after).join(c.before);}return s;}
 function products(){return ['PC61','PC54','K500','C112'].map((styleNumber,i)=>({styleNumber,productName:['Core Cotton Tee','Essential Cotton Tee','Silk Touch Polo','Embroidered Cap'][i],brand:i===2?'Port Authority':'Port & Company',category:i===3?'Caps':i===2?'Polos/Knits':'T-Shirts',subcategory:'100% Cotton',description:'Comfortable, durable 100% cotton apparel for the whole team.',displayPriceLabel:['$19.25 with embroidery','$18.75 with embroidery','$25.50 with embroidery','$22.50 with embroidery'][i],images:{main:image,display:image,thumbnail:image},colors:colors.map(c=>({name:c.name,catalogColor:c.catalog,swatchUrl:image,productImageUrl:image})),sizes:i===3?['OSFA']:sizes,features:{isTopSeller:i<2,isNew:i===2}}));}
 function details(style){const p=products().find(p=>p.styleNumber===style)||products()[0];return colors.map(c=>({STYLE:style,PRODUCT_TITLE:p.productName,BRAND_NAME:p.brand,CATEGORY_NAME:p.category,SUBCATEGORY_NAME:p.subcategory,PRODUCT_DESCRIPTION:p.description,PRODUCT_STATUS:'Active',CATALOG_COLOR:c.catalog,COLOR_NAME:c.name,COLOR_SQUARE_IMAGE:image,FRONT_MODEL:image,BACK_MODEL:image,FRONT_FLAT:image,BACK_FLAT:image,PRODUCT_IMAGE:image}));}
 async function open(page,state={}){

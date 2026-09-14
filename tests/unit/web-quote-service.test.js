@@ -78,9 +78,7 @@ function mixedResult() {
     return { groups, grandTotal: 673, warnings: [], errors: [] };
 }
 
-// SCP itemized-LTM scenario (worked-example style): 20 pcs, base $14.50/pc,
-// $75 LTM ITEMIZED + 2-screen setup $60 — product rows foot at BASE price,
-// the fees carry LTM + SPSU.
+// The engine retains its internal SCP fee breakdown; customer rows bake in LTM.
 function scpResult() {
     return {
         groups: [{
@@ -386,8 +384,28 @@ describe('quote_items payload (mixed EMB+DTG golden)', () => {
     });
 });
 
-describe('SCP itemized-LTM convention', () => {
-    test('product rows bill at BASE unit; LTM + SPSU save as fee rows; everything foots', async () => {
+describe('SCP customer small-order inclusive pricing', () => {
+    test('seven size rows allocate fractional cents without losing or duplicating the small-order charge', () => {
+        const result = scpResult();
+        const group = result.groups[0];
+        group.pooledQty = 7;
+        group.lines = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL'].map(size => ({
+            itemId: 'item-scp', styleNumber: 'PC54', color: 'Navy', size, qty: 1,
+            baseUnit: 25, effectiveUnit: 25 + 50 / 7, lineTotal: 25
+        }));
+        group.ltm = { fee: 50, perUnit: 50 / 7, mode: 'itemized' };
+        group.fees = [{ code: 'LTM', amount: 50, oneTime: false }];
+        group.groupTotal = result.grandTotal = 225;
+        const svc = makeService(makeMocks());
+        const payloads = svc.buildPayloads({ quoteId: 'ROUNDING-TEST', result, storeItems: [] });
+        expect(payloads.items).toHaveLength(7);
+        expect(payloads.items.every(item => item.StyleNumber === 'PC54' && item.HasLTM === 'Yes')).toBe(true);
+        expect(payloads.items.reduce((sum, item) => sum + Math.round(item.LineTotal * 100), 0)).toBe(22500);
+        expect(new Set(payloads.items.map(item => item.LineTotal))).toEqual(new Set([32.14, 32.15]));
+        expect(svc.assertFooting(result, payloads.items).ok).toBe(true);
+    });
+
+    test('product rows include LTM; only one-time setup is separate and everything foots', async () => {
         const mocks = makeMocks({ freshResult: scpResult() });
         const svc = makeService(mocks);
         const res = await svc.saveQuote(savePayload({
@@ -401,13 +419,12 @@ describe('SCP itemized-LTM convention', () => {
         }));
         expect(res.success).toBe(true);
         const items = mocks.posts.items;
-        expect(items.map((i) => i.StyleNumber)).toEqual(['PC54', 'SPSU', 'LTM']);
+        expect(items.map((i) => i.StyleNumber)).toEqual(['PC54', 'SPSU']);
         expect(items[0]).toMatchObject({
-            EmbellishmentType: 'screenprint', HasLTM: 'No', LTMPerUnit: 0,
-            FinalUnitPrice: 14.5, LineTotal: 290 // BASE price — LTM is its own row
+            EmbellishmentType: 'screenprint', HasLTM: 'Yes', LTMPerUnit: 3.75,
+            FinalUnitPrice: 18.25, LineTotal: 365
         });
         expect(items[1]).toMatchObject({ EmbellishmentType: 'fee', LineTotal: 60 });
-        expect(items[2]).toMatchObject({ EmbellishmentType: 'fee', LineTotal: 75, ProductName: 'Small order fee' });
         expect(items.reduce((s, r) => s + r.LineTotal, 0)).toBe(425); // groupTotal + grandTotal
     });
 });
