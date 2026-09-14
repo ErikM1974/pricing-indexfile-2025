@@ -979,6 +979,55 @@
       "after": "            }\n        } catch (_) { }\n        renderMode();\n        renderLineMethods();\n        renderLineList();\n        renderConfigControls();\n        renderLinePreview();\n        renderResults();\n    }\n\n    if (document.readyState === 'loading') {\n",
       "count": 1,
       "stage": "speed-2026-09-14"
+    },
+    {
+      "file": "calculators/quick-quote/dtf-prints-prototype.html",
+      "before": "    <link rel=\"stylesheet\" href=\"/calculators/quick-quote/quick-quote.css?v=2026.09.13.6\">\n",
+      "after": "    <link rel=\"stylesheet\" href=\"/calculators/quick-quote/quick-quote.css?v=2026.09.14.2\">\n",
+      "count": 1,
+      "stage": "release-2026.09.14.2"
+    },
+    {
+      "file": "calculators/quick-quote/dtf-prints-prototype.html",
+      "before": "    <link rel=\"stylesheet\" href=\"/calculators/quick-quote/linesheet-print.css?v=2026.09.13.6\" media=\"print\">\n",
+      "after": "    <link rel=\"stylesheet\" href=\"/calculators/quick-quote/linesheet-print.css?v=2026.09.14.2\" media=\"print\">\n",
+      "count": 1,
+      "stage": "release-2026.09.14.2"
+    },
+    {
+      "file": "calculators/quick-quote/index.html",
+      "before": "    <link rel=\"stylesheet\" href=\"/calculators/quick-quote/quick-quote.css?v=2026.09.14.1\">\n",
+      "after": "    <link rel=\"stylesheet\" href=\"/calculators/quick-quote/quick-quote.css?v=2026.09.14.2\">\n",
+      "count": 1,
+      "stage": "release-2026.09.14.2"
+    },
+    {
+      "file": "calculators/quick-quote/index.html",
+      "before": "    <link rel=\"stylesheet\" href=\"/calculators/quick-quote/linesheet-print.css?v=2026.09.14.1\" media=\"print\">\n",
+      "after": "    <link rel=\"stylesheet\" href=\"/calculators/quick-quote/linesheet-print.css?v=2026.09.14.2\" media=\"print\">\n",
+      "count": 1,
+      "stage": "release-2026.09.14.2"
+    },
+    {
+      "file": "calculators/quick-quote/index.html",
+      "before": "    <script src=\"/calculators/quick-quote/quick-quote-document.js?v=2026.09.14.1\"></script>\n",
+      "after": "    <script src=\"/calculators/quick-quote/quick-quote-document.js?v=2026.09.14.2\"></script>\n",
+      "count": 1,
+      "stage": "release-2026.09.14.2"
+    },
+    {
+      "file": "calculators/quick-quote/index.html",
+      "before": "    <script src=\"/calculators/quick-quote/quick-quote-workspace.js?v=2026.09.14.1\"></script>\n",
+      "after": "    <script src=\"/calculators/quick-quote/quick-quote-workspace.js?v=2026.09.14.2\"></script>\n",
+      "count": 1,
+      "stage": "release-2026.09.14.2"
+    },
+    {
+      "file": "calculators/quick-quote/index.html",
+      "before": "    <script src=\"/calculators/quick-quote/quick-quote.js?v=2026.09.14.1\"></script>\n",
+      "after": "    <script src=\"/calculators/quick-quote/quick-quote.js?v=2026.09.14.2\"></script>\n",
+      "count": 1,
+      "stage": "release-2026.09.14.2"
     }
   ]
 }

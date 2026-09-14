@@ -1,6 +1,6 @@
 # Quick Quote and customer-inclusive pricing — September 2026
 
-## September 14 speed improvements (development; rep trial pending)
+## September 14 speed improvements (release v2026.09.14.2; rep trial pending)
 
 Taneisha asked for the familiar left controls and quantity price breaks with fewer clicks and less scrolling. Erik approved the plan. Use September 8 as a layout reference; retain the September 13 pricing, document and supplier-photo fixes.
 
@@ -10,7 +10,7 @@ Taneisha asked for the familiar left controls and quantity price breaks with few
 - Product details and the quantity table lead the customer sheet. Copy prices, PDF and Print use the same document model. Copy has a selectable-text fallback. Hide copy/draft feedback in print.
 - Catalog quoting is directly beside Decoration. More settings summarizes active sleeves/dark garments/safety stripes. Compare decoration, optional customer details, favorites and explicit input-only restore remain available. Recommend/include/reorder controls appear only for multiple products; full-builder links require an actual quantity.
 - The desktop acceptance case uses 1265 × 712 with the method, quantity, front/back controls, first price table and download action visible together. Retain four-width, keyboard, pricing parity, stale-output and complete-PDF checks.
-- This branch is not a production deployment. Taneisha/Nika's observed trial and any usage-driven presets are the next phase; no rep preferences have been invented or messages sent.
+- Prepared for the approved v2026.09.14.2 deployment; verify the release before recording it live. Taneisha/Nika's observed trial and any usage-driven presets are the next phase; no rep preferences have been invented or messages sent.
 
 Validation: 337 unit/source/CSS checks passed; 56 browser cases validated across the workflow and family suites, including isolated successful reruns after two overlapping test runs collided during trace cleanup. JavaScript and CSS lint passed. Reviewed 1440/768/390/320 screenshots, the 1265 × 712 common DTF/embroidery controls, native print, a downloaded no-quantity sheet and both pages of the long multi-option PDF. All business requests used test fixtures. Live production data and rep timing trials remain release/trial checks.
 
@@ -47,7 +47,11 @@ Erik requested a simpler workflow for Nika and Taneisha, clearer customer option
 - Shared CSS tokens and page-family owners remain in place; Quick Quote stylesheet payload decreased, budgets were not raised. Four viewport widths, keyboard/axe checks and complete PDF pages reviewed.
 - All test writes, email, quote allocation and checkout are intercepted. No real orders or customer emails are created during validation.
 
-## Release checkpoint
+## September 14 release checkpoint
+
+Prepared v2026.09.14.2 from production v2026.09.14.1 (56a93a0f / Heroku 2119), preserving the existing December Finish Line release. Local checks passed on Node 22.23.2: 276 unit/DOM/accessibility suites, 6,427 passed and 26 existing skips; strict lint, types, 287-file CSS lint, build and production dependency audit clean. Startup returned HTTP 200. The exact source commit must pass the full release CI before deployment; record the deployed SHA and live checks in external session memory. Rep trials remain pending.
+
+## September 13 release checkpoint (historical)
 
 Prepared for v2026.09.13.6; not live until release verification is recorded. Previous live version is v2026.09.13.5 / Heroku 2116.
 Local development gates and release CI must pass on the committed source before deployment. The external session memory links this topic and records final release evidence.
