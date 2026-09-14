@@ -49,7 +49,7 @@ async function finishLiveSummary(){
 finishLiveSummary();
 setInterval(()=>{if(!document.hidden)finishLiveSummary();},300000);
 """
-CHROME = """.finish-report-bar{position:relative;z-index:20;display:flex;flex-wrap:wrap;gap:var(--space-3);padding:var(--space-3) var(--space-5);background:var(--ui-surface);color:var(--ui-ink);border-bottom:1px solid var(--ui-line);font:var(--font-size-md)/var(--line-height-base) 'Segoe UI',sans-serif}.finish-report-bar a{color:var(--ui-accent);text-decoration:underline}.finish-report-bar span{color:var(--ui-muted)}.finish-source-reference{font-size:inherit}.chapter.op,.chapter.mp{background:var(--ui-surface)} @media print{html,body{background:white}.finish-report-bar{display:none}#opPrintSheet{border:0;border-radius:0}} @media(prefers-reduced-motion:reduce){.chapter{animation:none}}"""
+CHROME = """.finish-report-bar{position:relative;z-index:20;display:flex;flex-wrap:wrap;gap:var(--space-3);padding:var(--space-3) var(--space-5);background:var(--ui-surface);color:var(--ui-ink);border-bottom:1px solid var(--ui-line);font:var(--font-size-md)/var(--line-height-base) 'Segoe UI',sans-serif}.finish-report-bar a{color:var(--ui-accent);text-decoration:underline}.finish-report-bar span{color:var(--ui-muted)}.finish-source-reference{font-size:inherit}.chapter.op,.chapter.mp{background:var(--ui-surface)} @media print{:root{color-scheme:light}html,body{background:white}.finish-report-bar{display:none}#opPrintSheet{border:0;border-radius:0}} @media(prefers-reduced-motion:reduce){.chapter{animation:none}}"""
 
 
 def package(zip_path, selection, snapshot_label):
