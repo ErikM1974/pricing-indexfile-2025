@@ -1,3 +1,8 @@
+## v2026.09.14.1 (2026.09.14)
+
+- Deploy v2026.09.14.1: Add private December Finish Line reports and live sales
+- Deploy v2026.09.14.1: Keep private report print margins white
+
 ## v2026.09.13.6 (2026.09.13)
 
 - Deploy v2026.09.13.6: simplify Quick Quote and include small-order fees in customer prices
