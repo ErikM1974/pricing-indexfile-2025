@@ -1,3 +1,8 @@
+## v2026.09.13.6 (2026.09.13)
+
+- Deploy v2026.09.13.6: simplify Quick Quote and include small-order fees in customer prices
+- Deploy v2026.09.13.6: embed supplier photos reliably in customer PDFs
+
 ## v2026.09.13.5 (2026.09.13)
 
 - Deploy v2026.09.13.5: feature holiday gift boxes on staff and customer homepages
