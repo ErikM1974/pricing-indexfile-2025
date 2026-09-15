@@ -26,6 +26,7 @@ function load(opts = {}) {
         CRM_API_BASE: 'https://proxy.example.test',
         PUBLIC_SITE_ORIGIN: 'https://www.teamnwca.com',
         SERVER_DIR: path.join(__dirname, '../..'),
+        crypto, fs, path,
         escapeHTMLSrv: esc,
         fetch: async (url, init) => { fetches.push({ url, init }); return opts.fetchImpl ? opts.fetchImpl(url, init) : { ok: true, status: 200, json: async () => ({}) }; },
         rateLimit: (o) => ({ limiter: o }),

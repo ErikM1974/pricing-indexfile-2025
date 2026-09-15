@@ -119,9 +119,11 @@ describe('forms inbox: waivers', () => {
 });
 
 describe('server: waiver email routes', () => {
-    test('registered after the holiday box routes and locked in the route table', () => {
+    test('registered after the quote-delete routes and locked in the route table', () => {
         const server = read('server.js');
-        expect(server).toMatch(/require\('\.\/routes\/christmas-gift-box'\)\(app, ctx\); \}\r?\n\/\/ Customer-Supplied Garment Liability Waiver emails[^\n]*\r?\n\{ const ctx = \{ CRM_API_BASE, PUBLIC_SITE_ORIGIN, SERVER_DIR: __dirname, escapeHTMLSrv, fetch, rateLimit, requireStaff, sendEmailJSTemplate, withProxySecret \}; require\('\.\/routes\/garment-waiver'\)\(app, ctx\); \}/);
+        expect(server).toMatch(/require\('\.\/routes\/quote-delete'\)\(app, ctx\); \}\r?\n\/\/ Customer-Supplied Garment Liability Waiver emails[^\n]*\r?\n\{ const ctx = \{ CRM_API_BASE, PUBLIC_SITE_ORIGIN, SERVER_DIR: __dirname, crypto, escapeHTMLSrv, fetch, fs, path, rateLimit, requireStaff, sendEmailJSTemplate, withProxySecret \}; require\('\.\/routes\/garment-waiver'\)\(app, ctx\); \}/);
+        // route modules never declare module-level requires: the test helper inlines them into server.js as one source
+        expect(route).not.toMatch(/^const (fs|path|crypto) = require/m);
         const table = JSON.parse(read('tests/fixtures/server-route-table.json'));
         expect(table).toContain('post /api/garment-waiver/send-link [requireStaff, sendLinkLimiter] (nested)');
         expect(table).toContain('post /api/garment-waiver/signed [signedLimiter] (nested)');

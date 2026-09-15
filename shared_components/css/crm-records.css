@@ -500,7 +500,11 @@
 
     :where([data-ui="unified"][data-crm-record]) .badge--nam,
     :where([data-ui="unified"][data-crm-record]) .badge--crd,
-    :where([data-ui="unified"][data-crm-record]) .badge--srq,
+    :where([data-ui="unified"][data-crm-record]) .badge--srq {
+        background: var(--color-ruth-tint);
+        color: var(--indigo-700);
+    }
+
     :where([data-ui="unified"][data-crm-record]) .badge--wvr {
         background: var(--color-ruth-tint);
         color: var(--indigo-700);

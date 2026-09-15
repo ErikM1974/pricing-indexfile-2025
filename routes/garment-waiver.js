@@ -29,12 +29,8 @@
  * The global JSON body parser (server.js) has already run by the time these
  * routes execute, so no per-route parser is mounted here.
  */
-const fs = require('fs');
-const path = require('path');
-const crypto = require('crypto');
-
 module.exports = function register(app, ctx) {
-    const { CRM_API_BASE, PUBLIC_SITE_ORIGIN, SERVER_DIR, escapeHTMLSrv, fetch, rateLimit, requireStaff, sendEmailJSTemplate, withProxySecret } = ctx;
+    const { CRM_API_BASE, PUBLIC_SITE_ORIGIN, SERVER_DIR, crypto, escapeHTMLSrv, fetch, fs, path, rateLimit, requireStaff, sendEmailJSTemplate, withProxySecret } = ctx;
 
     const TEMPLATE = process.env.EMAILJS_TEMPLATE_GARMENT_WAIVER || 'template_garment_waiver';
     const PAGE_PATH = '/pages/forms/garment-liability-waiver.html';
