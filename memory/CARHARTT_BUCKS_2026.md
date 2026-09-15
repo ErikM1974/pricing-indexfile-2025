@@ -2,6 +2,8 @@
 
 Source: Erik's Carhartt Bucks.png; approved September 15, 2026.
 
+Header branding uses the exact NWCA logo asset from the main homepage (`https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1`), with proportional shared header sizing. The favicon is for the browser tab only.
+
 ## Plan
 
 - [x] Public /carhartt-bucks page, homepage priority banner, replacement seasonal tile, Custom Carhartt placement.
