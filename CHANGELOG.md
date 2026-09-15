@@ -1,3 +1,8 @@
+## v2026.09.15.3 (2026-09-15)
+
+- Deploy v2026.09.15.3: Promote Carhartt Bucks showroom visits and equip sales reps
+- Deploy v2026.09.15.3: Assert campaign navigation additions against preserved site contracts
+
 ## v2026.09.15.1 (2026-09-15)
 
 - Polish Quick Quote customer PDF layout and pagination
