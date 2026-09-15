@@ -1,3 +1,10 @@
+## v2026.09.15.7 (2026.09.15)
+
+- Add the customer-supplied garment liability waiver e-signature
+- Deploy v2026.09.15.6: 6 files (form-submissions.html,lead.html,marketing-shipments.html,...)
+- Fix the source locks around the garment-waiver registration
+- Deploy v2026.09.15.7: 6 files (form-submissions.html,lead.html,marketing-shipments.html,...)
+
 ## v2026.09.15.4 (2026-09-15)
 
 - Deploy v2026.09.15.4: Use the homepage NWCA logo on Carhartt Bucks pages
