@@ -306,7 +306,7 @@ describe('2026-09-04 review — the things that must not regress', () => {
     test('shared primitives precede the single scoped Staff Dashboard layout', () => {
         const hrefs = [...dash.querySelectorAll('link[rel="stylesheet"][href^="/shared_components/css/"]')]
             .map(l => l.getAttribute('href').split('?')[0]);
-        expect(hrefs).toEqual(['/shared_components/css/tokens.css','/shared_components/css/components.css','/shared_components/css/staff-home.css']);
+        expect(hrefs).toEqual(['/shared_components/css/tokens.css','/shared_components/css/components.css','/shared_components/css/staff-home.css','/shared_components/css/carhartt-bucks.css']);
         expect(dash.body.dataset.ui).toBe('unified');
         expect(dash.documentElement.dataset.theme).toBe('dark');
         expect(dash.documentElement.dataset.accent).toBe('green');

@@ -306,6 +306,12 @@ app.get(['/custom-banners', '/custom-banners.html', '/banners'], (req, res) => {
 // Custom Carhartt — static SEO brand landing page (2026-07-12): curated
 // top-sellers grid + FAQ + ItemList/FAQPage schema. Targets "custom carhartt
 // embroidered" buying-intent queries; content is fully static on purpose.
+// Carhartt Bucks: public offer; staff toolkit uses the existing /dashboards HTML gate.
+app.get(['/carhartt-bucks', '/carhartt-bucks.html'], (req, res) => {
+  noCacheHeaders(res);
+  res.sendFile(path.join(SERVER_DIR, 'pages', 'carhartt-bucks.html'));
+});
+
 app.get(['/custom-carhartt', '/custom-carhartt.html'], (req, res) => {
   res.sendFile(path.join(SERVER_DIR, 'pages', 'custom-carhartt.html'));
 });
@@ -460,7 +466,7 @@ app.get(['/event-webstores', '/event-webstores.html'], (req, res) => {
 // pages that aren't in the blog or product sitemaps. Listed in robots.txt.
 app.get('/sitemap-pages.xml', (req, res) => {
   const pages = [
-    '/', '/custom-carhartt', '/custom-richardson', '/custom-nike', '/custom-new-era', '/custom-sport-tek', '/custom-ogio', '/custom-district', '/custom-port-authority', '/custom-port-and-company', '/custom-cornerstone', '/custom-north-face', '/custom-gildan', '/custom-eddie-bauer', '/custom-travismathew', '/custom-bella-canvas', '/golf-tournament-apparel', '/custom-safety-apparel', '/company-webstores', '/construction-webstores', '/restaurant-webstores', '/property-management-webstores', '/industrial-webstores', '/retail-webstores', '/government-webstores', '/team-webstores', '/school-spirit-webstores', '/fundraising-webstores', '/college-webstores', '/event-webstores', '/custom-tees', '/custom-caps', '/custom-stickers', '/custom-banners', '/blog',
+    '/', '/carhartt-bucks', '/custom-carhartt', '/custom-richardson', '/custom-nike', '/custom-new-era', '/custom-sport-tek', '/custom-ogio', '/custom-district', '/custom-port-authority', '/custom-port-and-company', '/custom-cornerstone', '/custom-north-face', '/custom-gildan', '/custom-eddie-bauer', '/custom-travismathew', '/custom-bella-canvas', '/golf-tournament-apparel', '/custom-safety-apparel', '/company-webstores', '/construction-webstores', '/restaurant-webstores', '/property-management-webstores', '/industrial-webstores', '/retail-webstores', '/government-webstores', '/team-webstores', '/school-spirit-webstores', '/fundraising-webstores', '/college-webstores', '/event-webstores', '/custom-tees', '/custom-caps', '/custom-stickers', '/custom-banners', '/blog',
     '/brands.html', '/catalog?topSellers=1',
     '/pages/request-a-quote.html', '/pages/webstore-inquiry.html',
   ];

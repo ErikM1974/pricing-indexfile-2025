@@ -2,7 +2,7 @@ const fs=require('node:fs'),path=require('node:path'),{JSDOM}=require('jsdom');
 const root=path.resolve(__dirname,'../..'),fixture=require('../fixtures/staff-reference-original-content.json');
 const norm=s=>s.replace(/\s+/g,' ').trim();
 test.each(fixture.pages)('$file preserves published reference text, links, fields and images',entry=>{
-    const d=new JSDOM(fs.readFileSync(path.join(root,entry.file),'utf8')).window.document;
+    const d=new JSDOM(require('../helpers/carhartt-bucks-source-mappings')(entry.file, fs.readFileSync(path.join(root,entry.file),'utf8'))).window.document;
     expect(d.title).toBe(entry.title);expect(norm(d.querySelector('main').textContent)).toBe(entry.mainText);
     const links=[...d.querySelectorAll('a[href]')].map(e=>({href:e.getAttribute('href'),label:norm(e.textContent)}));
     for(const link of entry.links)expect(links).toContainEqual(link);

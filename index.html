@@ -41,6 +41,7 @@
          nwcustomapparel.net into ONE business in Google's knowledge graph.
          The WordPress site carries the mirror-image schema pointing here. -->
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Northwest Custom Apparel","url":"https://www.teamnwca.com/","logo":"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png","telephone":"253-922-5793","address":{"@type":"PostalAddress","streetAddress":"2025 Freeman Rd E","addressLocality":"Milton","addressRegion":"WA","postalCode":"98354","addressCountry":"US"},"sameAs":["https://nwcustomapparel.net/"]}</script>
+    <link rel="stylesheet" href="/shared_components/css/carhartt-bucks.css?v=2026.09.15.3">
 </head>
 <body data-ui="unified" data-storefront data-catalog-storefront="home">
     <a class="skip-link" href="#main">Skip to content</a>
@@ -228,10 +229,10 @@
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <main id="main">
-        <aside class="holiday-catalog-feature wrap" data-holiday-promotion="public" aria-label="Holiday gift boxes">
-            <span class="holiday-catalog-gift" aria-hidden="true">🎁</span>
-            <div class="holiday-catalog-copy"><strong>Christmas gifting starts with one great box.</strong><p>Sample Carhartt favorites with your logo. One box at our 8-piece embroidery pricing, before you plan your team's holiday order.</p><span class="holiday-catalog-deadline" data-holiday-status role="status">See the collection for current offer details.</span></div>
-            <a class="btn btn-primary" href="/christmas-bundles.html">Build a holiday gift box</a>
+        <aside class="cb-banner wrap" data-cb-phase="visit redeem" aria-label="Carhartt Bucks showroom offer">
+            <div class="cb-banner-copy"><h2 data-cb-title>Visit our showroom. Get $100 Carhartt Bucks.</h2><p>Visit by September 30, 2026. Place a qualifying Carhartt order of $1,000 or more by October 15, 2026, for $100 credit toward that order.</p><p class="cb-terms">One certificate per company. Cannot be combined with other offers.</p><p data-cb-status>Visit by September 30. Order by October 15, 2026.</p></div>
+            <a class="btn btn-primary" data-cb-phase="visit" href="/carhartt-bucks#visit">Plan Your Showroom Visit</a>
+            <a class="btn btn-primary" data-cb-phase="redeem" href="/carhartt-bucks" hidden>See Redemption Details</a>
         </aside>
         <!-- Hero (hidden by catalog-search.js when results show) -->
         <section class="hero-section">
@@ -373,20 +374,17 @@
                     </a>
                 </div>
             </section>
-            <section class="band">
-                <div class="wrap">
-                    <a class="duo-golf" href="/golf-tournament-apparel?utm_source=homepage&amp;utm_campaign=golf-2026-q2&amp;utm_medium=hero">
-                        <img class="duo-golf-img" src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9388098"
-                             alt="" width="720" height="300" loading="lazy">
-                        <div class="duo-golf-body">
-                            <span class="duo-badge">⛳ Summer 2026</span>
-                            <h3>Tournament outfitting, concierge-style</h3>
-                            <p>Free $100 logo digitizing plus a free OGIO Vision 2.0 golf bag ($239 value) on tournament orders of $2,000+. TravisMathew, Nike &amp; OGIO — we handle every detail.</p>
-                            <span class="duo-golf-cta">See tournament apparel →</span>
-                        </div>
-                    </a>
+            <section class="band" data-cb-phase="visit">
+                <div class="wrap cb-banner">
+                    <div class="cb-banner-copy"><h2>$100 toward your team’s Carhartt order</h2><p>See the gear in our Milton showroom and plan your holiday gifts. Visit by September 30; order $1,000 or more in qualifying Carhartt by October 15, 2026.</p><p class="cb-terms">One certificate per company. Cannot be combined with other offers.</p></div>
+                    <a class="btn btn-primary" href="/carhartt-bucks">See Carhartt Bucks Details</a>
                 </div>
             </section>
+        <aside class="holiday-catalog-feature wrap" data-holiday-promotion="public" aria-label="Holiday gift boxes">
+            <span class="holiday-catalog-gift" aria-hidden="true">🎁</span>
+            <div class="holiday-catalog-copy"><strong>Christmas gifting starts with one great box.</strong><p>Sample Carhartt favorites with your logo. One box at our 8-piece embroidery pricing, before you plan your team's holiday order.</p><span class="holiday-catalog-deadline" data-holiday-status role="status">See the collection for current offer details.</span></div>
+            <a class="btn btn-primary" href="/christmas-bundles.html">Build a holiday gift box</a>
+        </aside>
 
             <section class="band">
                 <div class="wrap">
@@ -719,5 +717,6 @@
     <script src="/shared_components/js/blog-teaser.js?v=2026.07.12.4" defer></script>
     <script src="/shared_components/js/catalog-storefront-navigation.js?v=2026.09.11.3" defer></script>
     <script src="/shared_components/js/holiday-promotion.js?v=2026.09.13.5" defer></script>
+    <script src="/shared_components/js/carhartt-bucks.js?v=2026.09.15.3" defer></script>
 </body>
 </html>

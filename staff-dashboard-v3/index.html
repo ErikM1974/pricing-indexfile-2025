@@ -33,6 +33,7 @@
          /api/staff/* or /api/mo/* or /api/crm-proxy/* path since 2026-08-27,
          so nothing on this page needs the proxy base URL. -->
     <script src="/config/app.config.js"></script>
+    <link rel="stylesheet" href="/shared_components/css/carhartt-bucks.css?v=2026.09.15.3">
 </head>
 <body data-ui="unified" data-surface="staff-home">
 
@@ -160,6 +161,10 @@
                 </div>
             </section>
 
+            <section class="cb-banner" aria-label="Carhartt Bucks rep resources" data-cb-tools>
+                <div class="cb-banner-copy"><h2>Carhartt Bucks — Invite Customers</h2><p data-cb-status>Visit by September 30. Order by October 15, 2026.</p><p>$100 credit on a qualifying $1,000+ Carhartt order. One certificate per company; cannot be combined with other offers.</p><p class="cb-copy-status" data-cb-copy-status role="status"></p></div>
+                <div class="cb-actions"><a class="btn btn-primary" href="/dashboards/carhartt-bucks.html">Open Rep Toolkit</a><button type="button" class="btn btn-ghost" data-cb-copy="link">Copy Customer Link</button><a class="btn btn-ghost" href="/forms/carhartt-bucks-certificate.pdf" download>Download Certificate</a></div>
+            </section>
             <section class="holiday-staff" data-holiday-promotion="staff" aria-label="Christmas gift boxes for customers">
                 <div><h2>🎁 Christmas gift boxes</h2><p>Invite selected customers to sample early. Their gift code covers the box and shipping.</p><a class="btn btn-primary" data-holiday-link href="https://www.teamnwca.com/christmas-bundles.html" target="_blank" rel="noopener">Open gift box</a> <a class="btn btn-ghost" href="/dashboards/quote-management.html">Review requests in Quotes</a></div>
                 <div><span>Customer invitation code</span><strong class="holiday-staff-code" data-holiday-code>Loading…</strong><div class="holiday-staff-actions"><button class="btn btn-primary" type="button" data-holiday-copy="code" disabled>Copy code</button><button class="btn btn-ghost" type="button" data-holiday-copy="link">Copy customer link</button></div><p data-holiday-status role="status">Checking the current invitation…</p><button class="btn btn-ghost" type="button" data-holiday-retry hidden>Retry invitation</button></div>
@@ -210,6 +215,7 @@
                  =================================================== -->
             <section class="ws-panel" id="ws-sales" data-ws="sales" role="tabpanel" aria-labelledby="ws-tab-sales">
                 <div class="ws-head"><h2>Sales</h2><p>Quote it, price it, follow up. What Nika and Taneisha open all day.</p></div>
+                <a class="ws-link ws-row f-store" href="/dashboards/carhartt-bucks.html" data-keywords="showroom reward certificate promotion Carhartt Bucks"><i class="ws-mk" aria-hidden="true"></i><span class="ws-nm">Carhartt Bucks Rep Toolkit</span><span class="ws-d">invite customers, print certificates, record visits</span></a>
                 <div class="ws-grid">
 
                     <!-- Most used (Erik, 2026-09-03): the two pages Nika and Taneisha open first
@@ -754,5 +760,6 @@
          =================================================== -->
     <script type="module" src="/shared_components/js/staff-dashboard/core/dashboard-app.js?v=2026.09.10.7"></script>
     <script src="/shared_components/js/holiday-promotion.js?v=2026.09.13.5" defer></script>
+    <script src="/shared_components/js/carhartt-bucks.js?v=2026.09.15.3" defer></script>
 </body>
 </html>

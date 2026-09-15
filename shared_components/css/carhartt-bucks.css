@@ -1,0 +1,64 @@
+/* Carhartt Bucks: shared campaign placement and page arrangements. */
+@layer components.pages {
+    :where([data-ui="unified"]) .cb-banner {
+        --ui-accent: var(--store-green-700);
+        --ui-accent-hover: var(--store-green-900);
+        --ui-tint: var(--store-green-100);
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: var(--space-4);
+        padding: var(--space-5);
+        margin-block: var(--space-4);
+        color: var(--store-green-950);
+        background: var(--amber-100);
+        border-inline-start: 6px solid var(--amber-500);
+        border-radius: var(--radius-md);
+    }
+
+    :where([data-ui="unified"]) .cb-banner-copy { flex: 1 1 360px; }
+    :where([data-ui="unified"]) .cb-banner h2 { margin: 0 0 var(--space-2); font-size: var(--font-size-2xl); line-height: var(--line-height-tight); }
+    :where([data-ui="unified"]) .cb-banner p { margin: var(--space-2) 0 0; }
+    :where([data-ui="unified"]) .cb-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); margin-block: var(--space-4); }
+    :where([data-ui="unified"]) .cb-terms { font-size: var(--font-size-md); line-height: var(--line-height-base); }
+    :where([data-ui="unified"]) .cb-copy-status { min-height: 1.5em; overflow-wrap: anywhere; }
+    :where([data-ui="unified"]) .cb-link { overflow-wrap: anywhere; }
+
+    :where([data-ui="unified"][data-carhartt-page]) .cb-wrap { width: min(1160px, calc(100% - var(--space-5) * 2)); margin-inline: auto; }
+    :where([data-ui="unified"][data-carhartt-page]) .cb-hero { padding-block: var(--space-7); }
+    :where([data-ui="unified"][data-carhartt-page]) .cb-hero-grid { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.8fr); gap: var(--space-7); align-items: center; }
+    :where([data-ui="unified"][data-carhartt-page]) .cb-hero h1 { font-size: clamp(2rem, 4.3vw, 3.25rem); line-height: var(--line-height-tight); color: var(--store-green-950); margin: var(--space-3) 0 var(--space-5); }
+    :where([data-ui="unified"][data-carhartt-page]) .cb-lede { max-width: 55ch; font-size: var(--font-size-xl); line-height: var(--line-height-base); }
+    :where([data-ui="unified"][data-carhartt-page]) .cb-flyer { margin: 0; }
+    :where([data-ui="unified"][data-carhartt-page]) .cb-flyer img { display: block; width: 100%; height: auto; border: 1px solid var(--ui-line); box-shadow: var(--shadow-md); }
+    :where([data-ui="unified"][data-carhartt-page]) .cb-flyer figcaption { font-size: var(--font-size-md); margin-top: var(--space-3); }
+    :where([data-ui="unified"][data-carhartt-page]) .cb-section { padding-block: var(--space-6); border-top: 1px solid var(--ui-line); }
+    :where([data-ui="unified"][data-carhartt-page]) .cb-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-5); padding: 0; list-style: none; }
+    :where([data-ui="unified"][data-carhartt-page]) .cb-steps li { padding-inline-start: var(--space-4); border-inline-start: 4px solid var(--amber-500); }
+    :where([data-ui="unified"][data-carhartt-page]) .cb-steps h3 { margin-top: 0; font-size: var(--font-size-xl); }
+    :where([data-ui="unified"][data-carhartt-page]) .cb-contact-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-6); }
+    :where([data-ui="unified"][data-carhartt-page]) address { font-style: normal; font-size: var(--font-size-lg); }
+    :where([data-ui="unified"][data-carhartt-page]) .cb-reps { display: grid; gap: var(--space-3); }
+    :where([data-ui="unified"][data-carhartt-page]) .cb-reps a { overflow-wrap: anywhere; }
+    :where([data-ui="unified"][data-carhartt-page]) .cb-reps strong { display: block; }
+    :where([data-ui="unified"][data-carhartt-page]) .cb-resource { margin-block: var(--space-5); }
+    :where([data-ui="unified"][data-carhartt-page]) .cb-resource textarea { width: 100%; min-height: 190px; }
+    :where([data-ui="unified"][data-carhartt-page]) .cb-resource .cb-note { min-height: 310px; }
+
+    @media (width <= 768px) {
+        :where([data-ui="unified"][data-carhartt-page]) .cb-hero-grid,
+        :where([data-ui="unified"][data-carhartt-page]) .cb-contact-grid,
+        :where([data-ui="unified"][data-carhartt-page]) .cb-steps { grid-template-columns: minmax(0, 1fr); }
+        :where([data-ui="unified"][data-carhartt-page]) .cb-flyer { max-width: 440px; }
+        :where([data-ui="unified"][data-carhartt-page]) .cb-hero { padding-block: var(--space-5); }
+    }
+
+    @media print {
+        :where([data-ui="unified"]) .cb-actions,
+        :where([data-ui="unified"]) .cb-copy-status { display: none; }
+        :where([data-ui="unified"][data-carhartt-page]) .cb-hero-grid { display: block; }
+        :where([data-ui="unified"][data-carhartt-page]) .cb-flyer { break-before: page; max-width: 440px; }
+    }
+}

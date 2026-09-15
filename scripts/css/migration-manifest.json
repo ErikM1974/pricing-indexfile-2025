@@ -2355,7 +2355,8 @@
         "shared_components/css/tokens.css",
         "shared_components/css/components.css",
         "shared_components/css/storefront-shell.css",
-        "pages/css/brand-guide.css"
+        "pages/css/brand-guide.css",
+        "shared_components/css/carhartt-bucks.css"
       ],
       "dynamicStyles": [],
       "states": [
@@ -2363,16 +2364,17 @@
         "native-dialog",
         "search",
         "original-content",
-        "complete-print"
+        "complete-print",
+        "carhartt-bucks-discovery-and-deadlines"
       ],
       "test": "tests/e2e/css-unification-brand-guides.spec.js",
-      "maxCssBytes": 74284,
+      "maxCssBytes": 79156,
       "baseline": {
         "commit": "b417e03de7f9db0aea8bd6f485b2c2c947bd207b",
         "rawCssBytes": 65000,
         "localCssRequests": 3
       },
-      "measuredRawCssBytes": 72784
+      "measuredRawCssBytes": 77660
     },
     {
       "source": "pages/custom-cornerstone.html",
@@ -2834,7 +2836,8 @@
         "shared_components/css/tokens.css",
         "shared_components/css/components.css",
         "shared_components/css/staff-reference.css",
-        "dashboards/css/forms-library.css"
+        "dashboards/css/forms-library.css",
+        "shared_components/css/carhartt-bucks.css"
       ],
       "dynamicStyles": [],
       "states": [
@@ -2843,16 +2846,17 @@
         "source-warnings",
         "failure-retry",
         "complete-print",
-        "original-content"
+        "original-content",
+        "carhartt-bucks-discovery-and-deadlines"
       ],
       "test": "tests/e2e/css-unification-staff-reference.spec.js",
-      "maxCssBytes": 61801,
+      "maxCssBytes": 66673,
       "baseline": {
         "commit": "a6d59feca31b1a4419c1f963bb91c063e7d03539",
         "rawCssBytes": 159117,
         "localCssRequests": 4
       },
-      "measuredRawCssBytes": 59801
+      "measuredRawCssBytes": 64699
     },
     {
       "source": "pages/data-entry-guide.html",
@@ -5278,7 +5282,8 @@
       "styles": [
         "shared_components/css/tokens.css",
         "shared_components/css/components.css",
-        "shared_components/css/staff-home.css"
+        "shared_components/css/staff-home.css",
+        "shared_components/css/carhartt-bucks.css"
       ],
       "dynamicStyles": [],
       "dynamicTokens": [
@@ -5290,11 +5295,12 @@
         "search-pins-and-quote-launcher",
         "directory-filter-focus-and-reopen",
         "visible-empty-and-failed-reads",
-        "holiday-authenticated-invitation-copy-retry-expiry"
+        "holiday-authenticated-invitation-copy-retry-expiry",
+        "carhartt-bucks-discovery-and-deadlines"
       ],
       "test": "tests/e2e/css-unification-staff-home.spec.js",
-      "maxCssBytes": 106024,
-      "measuredRawCssBytes": 105878,
+      "maxCssBytes": 110896,
+      "measuredRawCssBytes": 110750,
       "baseline": {
         "commit": "9b6d76d6d77161818e73bd7caab56b0b02c342c9",
         "rawCssBytes": 246827,
@@ -5922,7 +5928,8 @@
         "shared_components/css/components.css",
         "shared_components/css/storefront-shell.css",
         "shared_components/css/catalog-storefront.css",
-        "shared_components/css/nwca-2026.css"
+        "shared_components/css/nwca-2026.css",
+        "shared_components/css/carhartt-bucks.css"
       ],
       "dynamicStyles": [],
       "states": [
@@ -5937,11 +5944,12 @@
         "exact-synthetic-cart-payloads",
         "sample-dialog-keyboard-and-axe",
         "complete-letter-print",
-        "festive-holiday-discovery-active-expired-failed"
+        "festive-holiday-discovery-active-expired-failed",
+        "carhartt-bucks-discovery-and-deadlines"
       ],
       "test": "tests/e2e/css-unification-catalog-storefront.spec.js",
-      "maxCssBytes": 187222,
-      "measuredRawCssBytes": 186305,
+      "maxCssBytes": 192094,
+      "measuredRawCssBytes": 191177,
       "baseline": {
         "commit": "7ce2f00c6d25de153358a3754bf16ba649e83766",
         "rawCssBytes": 131546,
@@ -7016,6 +7024,54 @@
       "test": "tests/e2e/css-unification-december-finish-line.spec.js",
       "maxCssBytes": 64363,
       "measuredRawCssBytes": 64363
+    },
+    {
+      "source": "pages/carhartt-bucks.html",
+      "family": "campaign-storefront",
+      "status": "reviewed",
+      "route": "/carhartt-bucks",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/campaign-storefront.css",
+        "shared_components/css/carhartt-bucks.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "clipboard-success-denied",
+        "visit-redemption-expired",
+        "public-downloads",
+        "staff-gate"
+      ],
+      "test": "tests/e2e/css-unification-carhartt-bucks.spec.js",
+      "maxCssBytes": 136664,
+      "measuredRawCssBytes": 136664
+    },
+    {
+      "source": "dashboards/carhartt-bucks.html",
+      "family": "staff-reference",
+      "status": "reviewed",
+      "route": "/dashboards/carhartt-bucks.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/utilities.css",
+        "shared_components/css/carhartt-bucks.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "clipboard-success-denied",
+        "visit-redemption-expired",
+        "public-downloads",
+        "staff-gate"
+      ],
+      "test": "tests/e2e/css-unification-carhartt-bucks.spec.js",
+      "maxCssBytes": 63324,
+      "measuredRawCssBytes": 63324
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",
@@ -8054,25 +8110,25 @@
         [
           "IMG",
           "/training/images/sanmar-purchasing/line-items-get-cost.png",
-          "ShopWorks Line Items window on the Behavior tab for a PC55 tee — Product Source shows vendor 1002 SANMAR with Allow purchase selected, and the blue Get Cost from Vendor button is circled in red",
+          "ShopWorks Line Items window on the Behavior tab for a PC55 tee \u2014 Product Source shows vendor 1002 SANMAR with Allow purchase selected, and the blue Get Cost from Vendor button is circled in red",
           null
         ],
         [
           "IMG",
           "/training/images/sanmar-purchasing/get-cost-window.png",
-          "Get Cost from SANMAR window with numbered steps — 1 select color from a dropdown showing Dark Hthr Grey, 2 select vendor 1002, 3 Get Cost button, 4 Apply Cost button",
+          "Get Cost from SANMAR window with numbered steps \u2014 1 select color from a dropdown showing Dark Hthr Grey, 2 select vendor 1002, 3 Get Cost button, 4 Apply Cost button",
           null
         ],
         [
           "IMG",
           "/training/images/sanmar-purchasing/one-line-per-size.png",
-          "Order line items showing sizes split into separate lines — K540 for standard sizes plus K540_2X, TLK540_XLT and TLK540_2XLT lines in Black and Navy, with special-size quantities keyed in the XXL and XXXL columns",
+          "Order line items showing sizes split into separate lines \u2014 K540 for standard sizes plus K540_2X, TLK540_XLT and TLK540_2XLT lines in Black and Navy, with special-size quantities keyed in the XXL and XXXL columns",
           null
         ],
         [
           "IMG",
           "/training/images/sanmar-purchasing/purchasing-tab-add.png",
-          "ShopWorks Purchasing tab — Products to Purchase lists PC55, PC55_2X and PC55_3X with unit cost and vendor 1002, and the Add button under Product POs for This Order is circled in red",
+          "ShopWorks Purchasing tab \u2014 Products to Purchase lists PC55, PC55_2X and PC55_3X with unit cost and vendor 1002, and the Add button under Product POs for This Order is circled in red",
           null
         ],
         [
@@ -8084,13 +8140,13 @@
         [
           "IMG",
           "/training/images/sanmar-purchasing/po-fill-buttons.png",
-          "Purchase order details form with red circles marking the Pick button for Vendor Contact, the green fill button for Ship To, and the Ship Method dropdown — phone, fax and Net 30 terms are already filled in automatically",
+          "Purchase order details form with red circles marking the Pick button for Vendor Contact, the green fill button for Ship To, and the Ship Method dropdown \u2014 phone, fax and Net 30 terms are already filled in automatically",
           null
         ],
         [
           "IMG",
           "/training/images/sanmar-purchasing/send-po.png",
-          "Completed purchase order for vendor 1002 SANMAR — contact Dave Brown, ship-to Northwest Embroidery Inc in Milton WA, ship method PSST, PO number 86738 — with the Send PO button on the right panel circled in red",
+          "Completed purchase order for vendor 1002 SANMAR \u2014 contact Dave Brown, ship-to Northwest Embroidery Inc in Milton WA, ship method PSST, PO number 86738 \u2014 with the Send PO button on the right panel circled in red",
           null
         ],
         [
@@ -8103,13 +8159,13 @@
           "IFRAME",
           "https://fast.wistia.net/embed/iframe/53fo8q4vtm",
           null,
-          "ShopWorks Core Training — Session 5: Purchasing and Inventory (OnSite Ver. 13)"
+          "ShopWorks Core Training \u2014 Session 5: Purchasing and Inventory (OnSite Ver. 13)"
         ],
         [
           "IFRAME",
           "https://fast.wistia.net/embed/iframe/o2mkh2dpbx",
           null,
-          "ShopWorks Core Training — Session 5: Purchasing and Inventory (OnSite Ver. 14)"
+          "ShopWorks Core Training \u2014 Session 5: Purchasing and Inventory (OnSite Ver. 14)"
         ]
       ]
     }
