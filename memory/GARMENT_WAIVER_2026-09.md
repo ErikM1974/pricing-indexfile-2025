@@ -6,6 +6,12 @@ and have to replace it … have it so we can send a link and the customer can el
 it on our forms site … should the sales rep be able to press an email customer button right from the form
 and it emails the form to them, maybe use email.js."
 
+## Status
+
+**LIVE 2026-09-15**: proxy v2026.09.15.1 (`7869c82`) then app v2026.09.15.7 (`0216ca93`, Heroku v2124).
+Forms_Library row PK 120 (`garment-liability-waiver`, Customer Intake) added through the admin forwarder.
+First live send: staff panel emailed a link to erik@ (`[garment-waiver] link emailed …` in the app logs).
+
 ## What shipped
 
 | Piece | Where | Notes |
