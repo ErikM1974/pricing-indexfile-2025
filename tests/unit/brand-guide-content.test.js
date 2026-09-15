@@ -3,7 +3,7 @@ const root=path.resolve(__dirname,'../..'),fixture=require('../fixtures/brand-gu
 const norm=s=>s.replace(/\s+/g,' ').trim();
 
 test.each(fixture.pages)('$file retains original brand copy, products, search and SEO',entry=>{
-    const d=new JSDOM(fs.readFileSync(path.join(root,entry.file),'utf8')).window.document;
+    const d=new JSDOM(require('../helpers/carhartt-bucks-source-mappings')(entry.file, fs.readFileSync(path.join(root,entry.file),'utf8'))).window.document;
     expect(d.title).toBe(entry.title);
     expect(norm(d.querySelector('main').textContent)).toBe(entry.mainText);
     expect([...d.querySelectorAll('a[href]')].map(e=>({href:e.getAttribute('href'),label:norm(e.textContent)}))).toEqual(entry.links);

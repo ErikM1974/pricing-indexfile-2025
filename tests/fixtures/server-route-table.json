@@ -258,6 +258,7 @@
   "get * [['/custom-caps', '/custom-caps.html']]",
   "get * [['/custom-stickers', '/custom-stickers.html', '/stickers']]",
   "get * [['/custom-banners', '/custom-banners.html', '/banners']]",
+  "get * [['/carhartt-bucks', '/carhartt-bucks.html']]",
   "get * [['/custom-carhartt', '/custom-carhartt.html']]",
   "get * [['/custom-richardson', '/custom-richardson.html']]",
   "get * [['/custom-nike', '/custom-nike.html']]",

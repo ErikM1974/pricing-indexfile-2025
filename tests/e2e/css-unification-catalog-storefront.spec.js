@@ -44,8 +44,16 @@ async function evidence(page,name,events,{paper=true,noticeChecked=false}={}){
   // Successful-add notices expire after eight seconds. Check their exact original
   // text, destination and keyboard dismissal before this multi-viewport capture.
   const noticeLink=link=>noticeChecked&&link.href==='/quote-cart'&&/^(?:Set sizes & view quote|View quote) \(\d+\)$/.test(link.text);
-  // The authorized holiday feature has its own active/expired/failure tests below.
-  const contentLinks=links=>links.filter(link=>!navigation.includes(JSON.stringify(link))&&!noticeLink(link)&&!(link.href==='/christmas-bundles.html'&&link.text==='Build a holiday gift box'));
+  // Assert the approved seasonal replacement, retaining every other historical link.
+  const isHome=new URL(page.url()).pathname==='/',oldSeasonalHref='/golf-tournament-apparel?utm_source=homepage&utm_campaign=golf-2026-q2&utm_medium=hero';
+  const campaignLink=link=>isHome&&((link.href==='/carhartt-bucks#visit'&&link.text==='Plan Your Showroom Visit')||(link.href==='/carhartt-bucks'&&['See Carhartt Bucks Details','See Redemption Details'].includes(link.text)));
+  if(isHome){
+   await expect(page.locator('a[href="'+oldSeasonalHref+'"]')).toHaveCount(0);
+   await expect(page.locator('a[href="/carhartt-bucks#visit"]')).toHaveText('Plan Your Showroom Visit');
+   await expect(page.getByRole('link',{name:'See Carhartt Bucks Details',exact:true})).toHaveAttribute('href','/carhartt-bucks');
+  }
+  // The holiday and Carhartt features have dedicated date-state browser coverage.
+  const contentLinks=links=>links.filter(link=>!navigation.includes(JSON.stringify(link))&&!noticeLink(link)&&!(link.href==='/christmas-bundles.html'&&link.text==='Build a holiday gift box')&&!campaignLink(link)&&!(isHome&&link.href===oldSeasonalHref));
   for(let i=0;i<states.length;i++){
    const expectedIds={...before.states[i].ids};
    // The legacy sample-drawer stylesheet exposed the mobile-only filter close

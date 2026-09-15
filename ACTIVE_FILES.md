@@ -303,6 +303,25 @@ CRM browser guard: tests/e2e/css-unification-crm-workspaces.spec.js verifies six
 
 CRM lifecycle review: six application pages use shared_components/css/crm-accounts.css and crm-pipeline.css; the two existing scorecard/category tests/ui HTML previews now mirror the production markup/assets and retain their stub controllers. Four obsolete sheets retired: dashboards/css/house-accounts.css, dashboards/css/rep-crm.css, dashboards/css/lead-scorecard.css, dashboards/css/unqualified-leads.css. dashboards/css/leads.css is retained unchanged for the excluded lead-detail page. scripts/css/migration-manifest.json records the six reviewed style graphs and budgets; tests/unit/sales-small-pages.test.js follows the new owners. 88mapped controller edits reverse17original hashes, and31focused browser scenarios pass. Paper/visual approval and full integration gates are being finalized; this does not raise the live count.
 
+
+## Carhartt Bucks showroom campaign (2026-09-15)
+
+| File | Purpose |
+|---|---|
+| `/pages/carhartt-bucks.html` | Public showroom offer at /carhartt-bucks |
+| `/dashboards/carhartt-bucks.html` | Staff rep toolkit with invitations and visit notes |
+| `/shared_components/css/carhartt-bucks.css` | Shared campaign placements and page arrangements |
+| `/shared_components/js/carhartt-bucks.js` | Pacific deadlines and accessible clipboard actions |
+| `/images/promotions/carhartt-bucks-2026.png` | Original approved flyer, unchanged |
+| `/forms/carhartt-bucks-certificate.pdf` | Letter-size printable original certificate |
+| `/forms/carhartt-bucks-visit-log.pdf` | Blank printable visit and redemption log |
+| `/scripts/build-carhartt-bucks-pdfs.py` | Regenerate campaign print resources |
+| `/memory/CARHARTT_BUCKS_2026.md` | Campaign terms, lifecycle and verification record |
+| `/tests/helpers/carhartt-bucks-source-mappings.js` | Restore approved changes for original-content checks |
+| `/tests/fixtures/carhartt-bucks-source-mappings.json` | Exact reversible campaign changes against fc126c23 |
+| `/tests/unit/carhartt-bucks.test.js` | Date boundary and clipboard behavior checks |
+| `/tests/e2e/css-unification-carhartt-bucks.spec.js` | Responsive campaign, actions and access checks |
+
 ## CRM workspaces reviewed — candidate v2026.09.09.19
 
 Six pages: House Accounts, Nika CRM, Taneisha CRM, Leads, Lead Scorecard and Unqualified Leads. Two scoped canonical owners (crm-accounts.css/crm-pipeline.css), Public Sans, navy/gold headers, consistent controls/tables, native account/house dialogs and independent contact links. Four legacy sheets/7important declarations retired; new owners zero. Existing scorecard/category test previews mirror production main markup/assets and keep stub controllers. Excluded lead detail HTML/controller/leads.css remain unchanged.

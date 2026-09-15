@@ -54,7 +54,12 @@ async function snapshot(page) {
         for (const link of additions) expect(link.text).toContain('December 2026 Finish Line');
         await expect(page.locator('#ws-admin a[href="/dashboards/december-finish-line.html"]')).toHaveCount(1);
     } else expect(additions).toEqual([]);
-    value.links = value.links.filter(link => link.href !== '/dashboards/december-finish-line.html');
+    const campaignLinks = value.links.filter(link => link.href === '/dashboards/carhartt-bucks.html');
+    expect(campaignLinks.length).toBeGreaterThan(0);
+    expect(campaignLinks.length).toBeLessThanOrEqual(2); // Sales + generated Everything
+    for (const link of campaignLinks) expect(link.text).toBe('Carhartt Bucks Rep Toolkitinvite customers, print certificates, record visits');
+    await expect(page.locator('#ws-sales a[href="/dashboards/carhartt-bucks.html"]')).toHaveCount(1);
+    value.links = value.links.filter(link => !['/dashboards/december-finish-line.html', '/dashboards/carhartt-bucks.html'].includes(link.href));
     return value;
 }
 for (const original of [false]) {
