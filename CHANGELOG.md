@@ -1,3 +1,8 @@
+## v2026.09.14.2 (2026-09-15)
+
+- Restore fast Quick Quote controls and quantity price sheets
+- Deploy v2026.09.14.2: Restore fast Quick Quote controls and quantity price sheets
+
 ## v2026.09.14.1 (2026.09.14)
 
 - Deploy v2026.09.14.1: Add private December Finish Line reports and live sales
