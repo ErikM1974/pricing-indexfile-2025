@@ -1,3 +1,8 @@
+## v2026.09.15.1 (2026-09-15)
+
+- Polish Quick Quote customer PDF layout and pagination
+- Deploy v2026.09.15.1: Improve customer Quick Quote PDFs
+
 ## v2026.09.14.2 (2026-09-15)
 
 - Restore fast Quick Quote controls and quantity price sheets
