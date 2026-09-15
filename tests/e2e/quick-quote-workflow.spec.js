@@ -5,6 +5,80 @@ const path = require('node:path');
 const { open: openBuilder, check: checkBuilder } = require('./helpers/quote-builders-browser');
 test.use({ timezoneId: 'America/Los_Angeles', locale: 'en-US', reducedMotion: 'reduce' });
 
+async function inspectPdf(page, longContent = false) {
+    await page.evaluate(longContent => {
+        const original = window.QuickQuoteDocument.pdf;
+        window.QuickQuoteDocument.pdf = async (model, Library, getImage) => {
+            if (longContent) {
+                model.options.forEach(option => { option.description += ' Additional decoration details for this product.'.repeat(30); });
+                model.notes = 'Please confirm the artwork and sizes before ordering. '.repeat(150) + 'End of customer notes.';
+            }
+            const before = JSON.stringify(model), text = [], images = [];
+            function ObservedLibrary(options) {
+                const file = new Library(options), write = file.text.bind(file), addImage = file.addImage.bind(file);
+                file.text = (value, x, y, settings) => { text.push({ value: [value].flat().join('\n'), x, y, page: file.getNumberOfPages() }); return write(value, x, y, settings); };
+                file.addImage = (...args) => { images.push({ width: args[4], height: args[5] }); return addImage(...args); };
+                return file;
+            }
+            const file = await original(model, ObservedLibrary, getImage);
+            window.__pdfReview = { text, images, pages: file.getNumberOfPages(), unchanged: JSON.stringify(model) === before };
+            return file;
+        };
+    }, longContent);
+}
+
+test('customer PDF preserves sampled quantity prices and includes the brand and product images', async ({ page }) => {
+    const e = await open(page, { url: '/calculators/quick-quote/index.html' });
+    await page.locator('#qqProductSearch').fill('PC54'); await page.locator('#qqSearchResults button').first().click();
+    await expect(page.locator('#qqLineDownload')).toBeEnabled();
+    const prices = await page.locator('.qq-sheet-ladder tbody tr').nth(1).locator('td').allTextContents();
+    const quantities = await page.locator('.qq-sheet-ladder button').allTextContents();
+    await inspectPdf(page);
+    const pending = page.waitForEvent('download'); await page.locator('#qqLineDownload').click(); await pending;
+    const review = await page.evaluate(() => window.__pdfReview), text = review.text.map(row => row.value).join('\n');
+    for (const price of prices) expect(text).toContain(price);
+    for (const quantity of quantities) expect(text).toContain(quantity + (Number(quantity) === 1 ? ' piece' : ' pieces'));
+    expect(text).toContain('Priced at'); expect(text).not.toContain('Estimated total');
+    expect(text.match(/sales@nwcustomapparel.com/g)).toHaveLength(1);
+    expect(review.images).toEqual(expect.arrayContaining([{ width: 80, height: 44 }, { width: 114, height: 133 }]));
+    expect(review.unchanged).toBe(true); expect(review.pages).toBe(1); check(expect, e);
+});
+
+test('customer PDF shows the selected quantity and one-time setup separately', async ({ page }) => {
+    const e = await open(page, { url: '/calculators/quick-quote/index.html' });
+    await page.locator('#qqProductSearch').fill('PC54'); await page.locator('#qqSearchResults button').first().click();
+    await page.locator('#qqLineQty').fill('18'); await page.locator('#qqEmbDigitizing').check();
+    await expect(page.locator('#qqLineDownload')).toBeEnabled();
+    const prices = await page.locator('.qq-sheet-ladder tbody td').allTextContents();
+    const total = await page.locator('.qq-document-total dd').textContent();
+    await inspectPdf(page);
+    const pending = page.waitForEvent('download'); await page.locator('#qqLineDownload').click();
+    await (await pending).saveAs(path.join(__dirname, 'screenshots/css-unification/quick-quote-pdf-setup.pdf'));
+    const review = await page.evaluate(() => window.__pdfReview), text = review.text.map(row => row.value).join('\n');
+    for (const price of prices.filter(value => value.startsWith('$'))) expect(text).toContain(price);
+    expect(text).toContain('18 pieces'); expect(text).toContain('One-time setup'); expect(text).toContain(total);
+    expect(review.unchanged).toBe(true); expect(review.pages).toBe(1); check(expect, e);
+});
+
+test('customer PDF flows long descriptions and notes across pages without losing totals', async ({ page }) => {
+    const e = await open(page, { url: '/calculators/quick-quote/index.html?mode=quick&style=PC54&qty=24' });
+    await expect(page.locator('#qqLineDownload')).toBeEnabled();
+    const totals = await page.locator('.qq-document-total dd').allTextContents();
+    await inspectPdf(page, true);
+    const pending = page.waitForEvent('download'); await page.locator('#qqLineDownload').click();
+    await (await pending).saveAs(path.join(__dirname, 'screenshots/css-unification/quick-quote-pdf-long-content.pdf'));
+    const review = await page.evaluate(() => window.__pdfReview), text = review.text.map(row => row.value).join('\n');
+    for (const total of totals) expect(text).toContain(total);
+    expect(text.match(/Estimated total/g)).toHaveLength(totals.length);
+    expect(text).toContain('End of customer notes.'); expect(text).toContain('Each option is a separate estimate');
+    expect(review.pages).toBeGreaterThan(2); expect(review.unchanged).toBe(true);
+    for (const row of review.text) {
+        expect(row.y).toBeGreaterThanOrEqual(40);
+        expect(row.y).toBeLessThanOrEqual(/^Page \d+ of/.test(row.value) ? 758 : 714);
+    }
+    check(expect, e);
+});
+
 test('fast quote ranks exact styles, closes search, and shows all prices without a quantity', async ({ page }) => {
     await page.setViewportSize({ width: 1265, height: 712 });
     const e = await open(page, { url: '/calculators/quick-quote/index.html', searchProducts: [

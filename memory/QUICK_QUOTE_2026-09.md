@@ -47,6 +47,16 @@ Erik requested a simpler workflow for Nika and Taneisha, clearer customer option
 - Shared CSS tokens and page-family owners remain in place; Quick Quote stylesheet payload decreased, budgets were not raised. Four viewport widths, keyboard/axe checks and complete PDF pages reviewed.
 - All test writes, email, quote allocation and checkout are intercepted. No real orders or customer emails are created during validation.
 
+## September 15 customer PDF presentation
+
+- The shared download renderer now uses the existing `/images/nwca-logo.png`, a larger 114 x 133 pt garment photo (96 x 112 pt when a quantity table and order total share a page), a branded heading and aligned validity dates. The image loader renders 360 x 420 px product images and a separate landscape canvas for the logo.
+- Quantity tables explicitly show the range, priced-at quantity, per-piece amount and any one-time setup. The selected quantity column is shaded. Never imply a sampled price applies unchanged across a whole range, and never invent an order total when no quantity was requested.
+- Totals still use the original model and `chargeRows()` amounts. Product notes, sizes, independent-option wording, estimate intent and tax/shipping assumptions are preserved. One contact block follows the document; page numbers remain at the bottom.
+- Measured rows and flowing long descriptions/notes reserve footer space; ordinary options stay together when they fit. The browser regression records actual jsPDF text placement and verifies the renderer does not mutate quote data.
+- User review output reproduces Erik's supplied J790 PDF with its original September 15 / October 15 dates and $133/$83/$79/$78/$77 sample prices. The source PDF is unchanged. No new pricing calculation or business write was made for that review copy.
+- Validation: 31 unique workflow browser cases passed (30-case full run, then four PDF cases after final layout changes); 330 focused unit/source/pricing/CSS checks passed, with the runtime inventory passing alone after a resource-contention timeout. Strict source lint, typecheck, 287-file CSS lint and the 397-asset build passed. Rendered J790 (one page), setup-fee quote (one page), three-option quote (three pages) and long-content stress case (six pages); verified original J790 money/date parity and text bounds.
+- Release v2026.09.15.1 prepared with both document/workspace script cache versions refreshed and reversible historical mappings preserved. Full local release checks: 276 unit/DOM/accessibility suites, 6,427 tests passed and 26 existing skips; strict lint and types passed. The exact source must pass full release CI before production publication. Final deployment SHA, Heroku release and live PDF evidence are recorded in the external Quick Quote resume checkpoint.
+
 ## September 14 release checkpoint
 
 Prepared v2026.09.14.2 from production v2026.09.14.1 (56a93a0f / Heroku 2119), preserving the existing December Finish Line release. Local checks passed on Node 22.23.2: 276 unit/DOM/accessibility suites, 6,427 passed and 26 existing skips; strict lint, types, 287-file CSS lint, build and production dependency audit clean. Startup returned HTTP 200. The exact source commit must pass the full release CI before deployment; record the deployed SHA and live checks in external session memory. Rep trials remain pending.
