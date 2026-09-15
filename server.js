@@ -1413,6 +1413,8 @@ function originalQueryString(req) {
 // Quote data plane relays (quote_sessions / quote_items / quote_analytics postures + sequence mint) — extracted to routes/quote-plane.js (server split, 2026-09-07); registered here so the order is unchanged.
 // Holiday campaign: public products, server-verified invitations/estimates and review-only quote requests.
 { const ctx = { API_BASE_URL, fetch, withProxySecret, rateLimit, mintShareToken, quoteShareUrl, sendEmailJSTemplate, requireStaff }; require('./routes/christmas-gift-box')(app, ctx); }
+// Customer-Supplied Garment Liability Waiver emails (staff sends the e-sign link; customer copy + rep notice after signing) — routes/garment-waiver.js (2026-09-15).
+{ const ctx = { CRM_API_BASE, PUBLIC_SITE_ORIGIN, SERVER_DIR: __dirname, escapeHTMLSrv, fetch, rateLimit, requireStaff, sendEmailJSTemplate, withProxySecret }; require('./routes/garment-waiver')(app, ctx); }
 { const ctx = { makeApiRequest, originalQueryString, quotePlaneWriteLimiter, quoteScopedOrStaff, requireStaff, sanitizeFilterInput }; require('./routes/quote-plane')(app, ctx); }
 // ============================================================================
 // Quote delete — role-based server-side enforcement + quote push previews — extracted to routes/quote-delete.js (server split, 2026-09-07); registered here so the order is unchanged.

@@ -8,6 +8,13 @@
 - `lib/christmas-gift-box.js` — server-verified gift invitations, estimates, quote persistence and confirmation delivery.
 - `routes/christmas-gift-box.js` — bounded public campaign, inventory, estimate and request routes.
 
+- `pages/forms/garment-liability-waiver.html` (+ `.css`, `.js`) — **NEW (2026-09-15)** Customer-Supplied Garment Liability Waiver: customer e-signature page (typed name + optional drawn signature + consent → proxy `/api/form-submissions` formId `garment-waiver`, GLW → Forms Inbox “Waivers”) with a staff send panel (email or copy the prefilled link). Printable-forms family; full rows in `docs/active-files/entry-points.md`.
+- `routes/garment-waiver.js` — **NEW (2026-09-15)** waiver emails: staff `POST /api/garment-waiver/send-link` (server-built prefilled link via EmailJS `template_garment_waiver`); public rate-limited `POST /api/garment-waiver/signed` (re-reads the Form_Submissions row through the proxy, then customer copy + rep notice). `routes/crm-proxy.js` also gained the admin-only `/api/crm-proxy/forms-library*` forwarder so a signed-in admin can add a Forms Library row without the proxy secret.
+- `tests/unit/garment-liability-waiver.test.js`, `tests/unit/garment-waiver-route.test.js` — waiver page/Inbox/manifest source locks and the email routes with the transport mocked; browser flow in `tests/e2e/css-unification-printable-forms.spec.js`.
+- `pages/forms/garment-liability-waiver.txt` — **NEW (2026-09-15)** canonical waiver wording (the page's `#waiverText` text, locked equal by the unit test); `routes/garment-waiver.js` hashes it to flag a signed record whose stored text differs. Regenerate when the wording changes.
+- `forms/customer-supplied-garment-liability-waiver.pdf` — **NEW (2026-09-15)** blank printable waiver (2 pages) rendered from the e-sign page's print CSS; the Forms Library “Download / Print PDF” target.
+- `memory/GARMENT_WAIVER_2026-09.md` — what the waiver stores, the email template contract, statuses and gotchas.
+
 - tests/e2e/seasonal-christmas-behavior.spec.js — synthetic 2026 catalog, inventory, keyboard, delivery, captured order, upload and email retry checks.
 
 - `shared_components/js/core-calculator-ui.js` — scoped canonical control classes, keyboard actions, state announcements and table scrolling for five public calculators; no pricing calculations.

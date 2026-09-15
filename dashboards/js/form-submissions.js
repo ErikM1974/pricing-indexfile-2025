@@ -17,6 +17,7 @@
 
     var FORM_META = {
         'garment-drop-off': { label: 'Drop-Off', icon: 'fa-box-open', cls: 'badge--drp' },
+        'garment-waiver': { label: 'Waiver', icon: 'fa-file-signature', cls: 'badge--wvr' },
         'artwork-request': { label: 'Artwork', icon: 'fa-palette', cls: 'badge--art' },
         'name-personalization': { label: 'Name List', icon: 'fa-signature', cls: 'badge--nam' },
         'sample-checkout': { label: 'Samples', icon: 'fa-shirt', cls: 'badge--smp' },
@@ -74,6 +75,8 @@
         'Quoted': 'status--art',
         'Won': 'status--done',
         'Lost': 'status--muted',
+        'Signed': 'status--new',
+        'Attached to Order': 'status--done',
     };
 
     var STATUS_CHOICES = {
@@ -100,6 +103,9 @@
         // so closing a lead from the Inbox would silently bank it as a $0 win.
         'manual-lead': ['New', 'Contacted', 'Quoted', 'Won', 'Lost', 'Archived'],
         'sample-request': ['New', 'Contacted', 'Quoted', 'Won', 'Lost', 'Archived'],
+        // Signed e-waivers (pages/forms/garment-liability-waiver.html): default 'Signed'; staff move it once the
+        // reference is on the ShopWorks order. Never 'Completed' (a WON status on the lead boards).
+        'garment-waiver': ['Signed', 'Attached to Order', 'Archived'],
     };
 
     var state = {
@@ -512,6 +518,27 @@
             html += '<h3 class="detail-subhead">' + esc(pair[0]) + '</h3><p class="detail-note">' + esc(pair[1]) + '</p>';
         });
 
+        // e-signature evidence (garment-waiver): typed name, client + server timestamps,
+        // IP / browser stamped by the proxy, waiver version + text hash, drawn image.
+        if (payload.signature && typeof payload.signature === 'object') {
+            var sig = payload.signature;
+            var audit = (payload.audit && typeof payload.audit === 'object') ? payload.audit : {};
+            // 'server' rows come from the proxy's audit stamp; 'device' rows are whatever the browser sent.
+            var sigRows = [
+                ['Typed name', sig.typedName], ['Signed (device clock)', sig.signedAtPacific || sig.signedAt],
+                ['Received (server)', audit.receivedAt ? fmtStamp(audit.receivedAt) : ''], ['IP address (server)', audit.ip],
+                ['Browser (server)', audit.userAgent], ['Browser (device-reported)', sig.userAgent],
+                ['Waiver version', sig.waiverVersion], ['Text SHA-256 (server)', audit.textSha256], ['Text SHA-256 (device-reported)', sig.textSha256],
+            ];
+            html += '<h3 class="detail-subhead">Electronic Signature</h3><div class="detail-fields detail-signature">' + sigRows.map(function (pair) {
+                if (!pair[1]) return '';
+                return '<div class="detail-field"><span>' + esc(pair[0]) + '</span><strong>' + esc(pair[1]) + '</strong></div>';
+            }).join('') + '</div>';
+            if (isSafePngDataUrl(sig.drawn)) {
+                html += '<p class="detail-signature-img-wrap"><img class="detail-signature-img" alt="Drawn signature" src="' + esc(sig.drawn) + '"></p>';
+            }
+        }
+
         var body = document.getElementById('detailBody');
         body.innerHTML = html;
 
@@ -844,6 +871,11 @@
     }
 
     // ---------- util ----------
+
+    // Only a well-formed PNG data URL from the signature pad is ever rendered (payload text is customer-supplied).
+    function isSafePngDataUrl(value) {
+        return typeof value === 'string' && value.length <= 60000 && /^data:image\/png;base64,[A-Za-z0-9+/]+=*$/.test(value);
+    }
 
     function esc(value) {
         return String(value == null ? '' : value)

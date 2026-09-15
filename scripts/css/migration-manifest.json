@@ -936,6 +936,31 @@
       "test": "tests/e2e/css-unification-printable-forms.spec.js"
     },
     {
+      "source": "pages/forms/garment-liability-waiver.html",
+      "family": "printable-forms",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/printable-forms.css",
+        "pages/forms/garment-liability-waiver.css"
+      ],
+      "baselineCssBytes": 95866,
+      "currentCssBytes": 95866,
+      "maxCssBytes": 99701,
+      "states": [
+        "blank",
+        "keyboard",
+        "phone fields/tables",
+        "clear/cancel",
+        "populated print",
+        "validation",
+        "failed sign keeps entry",
+        "signed lock + stamp",
+        "staff send-link panel"
+      ],
+      "test": "tests/e2e/css-unification-printable-forms.spec.js"
+    },
+    {
       "source": "pages/forms/injury-report-form.html",
       "family": "printable-forms",
       "styles": [
@@ -7893,6 +7918,11 @@
     {
       "source": "pages/forms/garment-drop-off-form.html",
       "sha256": "3fc159d64e6f5851d4b6238acb634a0fac639c2e9204c202f42d2cfeb7fa2c57",
+      "blankPrintPages": 2
+    },
+    {
+      "source": "pages/forms/garment-liability-waiver.html",
+      "sha256": "c52a465840aadaf7ba6204e6e6b387e95698114df7e26a98bd58ba3b11cab7eb",
       "blankPrintPages": 2
     },
     {
