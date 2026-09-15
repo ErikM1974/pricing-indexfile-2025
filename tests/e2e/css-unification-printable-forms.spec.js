@@ -7,13 +7,18 @@ const forms = require('../../scripts/css/migration-manifest.json').printableForm
 test.describe.configure({ mode: 'parallel' });
 const company = { id_Customer: 123456, Company_Name: 'CSS Review Company', City: 'Milton', State: 'WA', Sales_Rep: 'Test Rep', Customer_Warning: 'Fixture warning', Is_Tax_Exempt: true, contacts: [{ ct_NameFull: 'Taylor Example', Email: 'taylor@example.test', Phone_Best: '2535550142' }] };
 
-async function fixture(page, source) {
-    const state = { errors: [], unexpectedWrites: [], submissions: [], saveMode: 'failure', contactMode: 'success', styleMode: 'success', colorMode: 'success', taxMode: 'success', taxRequests: [] };
+async function fixture(page, source, opts) {
+    const state = { errors: [], unexpectedWrites: [], submissions: [], saveMode: 'failure', contactMode: 'success', styleMode: 'success', colorMode: 'success', taxMode: 'success', taxRequests: [], staff: !!(opts && opts.staff), waiverMode: 'failure', waiverCalls: [] };
     await page.addInitScript(() => { window.__printCalls = 0; window.print = () => { window.__printCalls++; }; });
     page.on('pageerror', error => state.errors.push(error.message));
     await page.route('**/*', route => {
         const request = route.request(), url = new URL(request.url());
         if (!['GET', 'HEAD'].includes(request.method())) {
+            if (url.pathname.startsWith('/api/garment-waiver/')) {
+                state.waiverCalls.push({ path: url.pathname, body: request.postDataJSON() });
+                if (state.waiverMode === 'notfound') return route.fulfill({ status: 404, json: { error: 'Waiver not found' } });
+                return route.fulfill(state.waiverMode === 'failure' ? { status: 502, json: { error: 'Fixture email failure' } } : { json: { sent: true, link: 'https://review.example.test/waiver' } });
+            }
             if (url.pathname === '/api/tax-rates/lookup') { state.taxRequests.push(request.postDataJSON()); return route.fulfill(state.taxMode === 'failure' ? { status: 503, json: { success: false, error: 'Fixture tax failure' } } : { json: { success: true, taxRate: 10, locationCode: 'Fixture rate' } }); }
             if (url.pathname === '/api/form-submissions' && request.method() === 'POST') {
                 state.submissions.push(request.postDataJSON());
@@ -24,7 +29,7 @@ async function fixture(page, source) {
             state.unexpectedWrites.push(url.pathname);
             return route.fulfill({ status: 503, json: { error: 'Business writes blocked in form fixtures' } });
         }
-        if (url.pathname === '/api/crm-session/me') return route.fulfill({ json: { authenticated: false } });
+        if (url.pathname === '/api/crm-session/me') return route.fulfill({ json: state.staff ? { authenticated: true, name: 'Test Rep', firstName: 'Test', email: 'rep@nwcustomapparel.com', role: 'sales', permissions: [] } : { authenticated: false } });
         if (url.pathname === '/api/company-contacts-2026/search') return route.fulfill(state.contactMode === 'failure' ? { status: 503, json: { error: 'Fixture lookup failure' } } : { json: { companies: [company] } });
         if (url.pathname === '/api/stylesearch') return route.fulfill(state.styleMode === 'failure' ? { status: 503, json: { error: 'Fixture style failure' } } : { json: [{ value: url.searchParams.get('term') || 'PC54', label: 'Fixture Cotton Tee' }] });
         if (url.pathname === '/api/product-colors') return route.fulfill(state.colorMode === 'failure' ? { status: 503, json: { error: 'Fixture colors unavailable' } } : state.colorMode === 'empty' ? { json: { colors: [] } } : { json: { colors: [{ COLOR_NAME: 'Midnight Navy', CATALOG_COLOR: 'Navy', COLOR_SQUARE_IMAGE: '' }, { COLOR_NAME: 'Red', CATALOG_COLOR: 'Red', COLOR_SQUARE_IMAGE: '' }] } });
@@ -293,5 +298,105 @@ test('CSS printable: the shared style helper preserves the public quote form men
         await expect(page.locator('#fldProduct')).toHaveValue('Fixture Cotton Tee');
         await expect(page.locator('#fldStyle')).toHaveValue('PC54');
     }
+    expect(state.errors).toEqual([]); expect(state.unexpectedWrites).toEqual([]); expect(state.submissions).toEqual([]);
+});
+
+test('CSS printable: garment waiver validates, keeps the entry on a failed sign, then locks and stamps after signing', async ({ page }) => {
+    const state = await fixture(page, 'pages/forms/garment-liability-waiver.html');
+    await expect(page.locator('#staffSendPanel')).toBeHidden();
+    await expect(page.locator('#fldSignDate')).not.toHaveValue('');
+    await page.locator('#fldContact').fill('Taylor Example');
+    await page.locator('#fldEmail').fill('taylor@example.test');
+    await page.locator('#fldGarments').fill('12 Carhartt J130 jackets, brown');
+    await page.locator('#decoEmbroidery').check();
+    await page.locator('#signWaiverBtn').click();
+    await expect(page.locator('.waiver-banner')).toContainText('type your full name');
+    await expect(page.locator('#fldSignedName')).toBeFocused();
+    await page.locator('#fldSignedName').fill('Taylor Example');
+    await page.locator('#signWaiverBtn').click();
+    await expect(page.locator('.waiver-banner')).toContainText('tick the box');
+    await page.locator('#chkAgree').check();
+    const box = await page.locator('#sigPad').boundingBox();
+    await page.mouse.move(box.x + 30, box.y + 90); await page.mouse.down();
+    await page.mouse.move(box.x + 120, box.y + 50, { steps: 8 }); await page.mouse.move(box.x + 220, box.y + 110, { steps: 8 }); await page.mouse.up();
+    state.saveMode = 'failure';
+    await page.locator('#signWaiverBtn').click();
+    await expect(page.locator('.waiver-banner')).toContainText('did not go through');
+    await expect(page.locator('#fldSignedName')).toHaveValue('Taylor Example');
+    await expect(page.locator('#chkAgree')).toBeChecked();
+    await expect(page.locator('#signWaiverBtn')).toBeEnabled();
+    await layout(page, 'garment-waiver-error');
+    // the proxy answered 201 but the server cannot find the row (honeypot fake-success shape) → unlock, say so
+    state.saveMode = 'success'; state.waiverMode = 'notfound';
+    await page.locator('#signWaiverBtn').click();
+    await expect(page.locator('.waiver-banner')).toContainText('could not confirm your signature was recorded');
+    await expect(page.locator('#signedPanel')).toBeHidden();
+    await expect(page.locator('#signWaiverBtn')).toBeEnabled();
+    await expect(page.locator('#fldSignedName')).toHaveJSProperty('readOnly', false);
+    await expect(page.locator('#chkAgree')).toBeChecked();
+    state.waiverMode = 'failure';
+    await page.locator('#signWaiverBtn').click();
+    await expect(page.locator('#signedPanel')).toBeVisible();
+    await expect(page.locator('#signedRef')).toHaveText('CSS-REVIEW-001');
+    await expect(page.locator('#sigStamp')).toContainText('Electronically signed by Taylor Example');
+    await expect(page.locator('#sigStamp')).toContainText('CSS-REVIEW-001');
+    await expect(page.locator('#signedCopyNote')).toContainText('could not email your copy');
+    await expect(page.locator('#fldSignedName')).toHaveJSProperty('readOnly', true);
+    await expect(page.locator('#chkAgree')).toBeDisabled();
+    await expect(page.locator('#signRow')).toBeHidden();
+    expect(state.submissions).toHaveLength(3);
+    expect(state.submissions[2]).toMatchObject({ formId: 'garment-waiver', company: 'Taylor Example', contactName: 'Taylor Example', email: 'taylor@example.test', hp: '' });
+    expect(state.submissions[2].summary).toContain('Signed by Taylor Example');
+    const sig = state.submissions[2].payload.signature;
+    expect(sig.typedName).toBe('Taylor Example');
+    expect(sig.waiverVersion).toBe('2026-09-15');
+    expect(sig.drawn).toMatch(/^data:image\/png;base64,[A-Za-z0-9+/]+=*$/);
+    expect(sig.drawn.length).toBeLessThanOrEqual(30000);
+    expect(sig.textSha256).toMatch(/^[0-9a-f]{64}$/);
+    expect(state.submissions[2].payload.checks).toHaveLength(2);
+    expect(JSON.stringify(state.submissions[2].payload.notes)).toContain('Waiver Text (as signed)');
+    expect(JSON.stringify(state.submissions[2].payload.notes)).toContain('12 Carhartt J130 jackets');
+    expect(state.waiverCalls).toEqual([{ path: '/api/garment-waiver/signed', body: { submissionId: 'CSS-REVIEW-001', email: 'taylor@example.test' } }, { path: '/api/garment-waiver/signed', body: { submissionId: 'CSS-REVIEW-001', email: 'taylor@example.test' } }]);
+    await layout(page, 'garment-waiver-signed');
+    await page.emulateMedia({ media: 'print' });
+    await expect(page.locator('#sigStamp')).toBeVisible();
+    await expect(page.locator('#signedPanel')).toBeHidden();
+    await expect(page.locator('.form-toolbar')).toBeHidden();
+    expect(state.errors).toEqual([]); expect(state.unexpectedWrites).toEqual([]);
+});
+
+test('CSS printable: garment waiver staff panel builds the customer link, emails it, and the link prefills the customer page', async ({ page }) => {
+    const state = await fixture(page, 'pages/forms/garment-liability-waiver.html', { staff: true });
+    await expect(page.locator('#staffSendPanel')).toBeVisible();
+    await expect(page.locator('#fldRep')).toHaveValue('Test Rep');
+    await expect(page.locator('#toolbarHomeLink')).toHaveAttribute('href', '/dashboards/forms-library.html');
+    await page.locator('#emailLinkBtn').click();
+    await expect(page.locator('#sendLinkStatus')).toContainText('email address first');
+    await page.locator('#fldCompany').fill('CSS Review Company');
+    await page.locator('#fldContact').fill('Taylor Example');
+    await page.locator('#fldEmail').fill('taylor@example.test');
+    await page.locator('#fldOrderRef').fill('WO 143001');
+    await page.locator('#decoScreen').check();
+    await expect(page.locator('#customerLinkPreview')).toContainText('/pages/forms/garment-liability-waiver.html?c=CSS+Review+Company&n=Taylor+Example&e=taylor%40example.test&o=WO+143001&r=Test+Rep&re=rep%40nwcustomapparel.com&m=scr');
+    state.waiverMode = 'failure';
+    await page.locator('#emailLinkBtn').click();
+    await expect(page.locator('#sendLinkStatus')).toContainText('NOT sent');
+    await expect(page.locator('#sendLinkStatus')).toHaveClass(/is-error/);
+    state.waiverMode = 'success';
+    await page.locator('#emailLinkBtn').click();
+    await expect(page.locator('#sendLinkStatus')).toContainText('Sent to taylor@example.test');
+    expect(state.waiverCalls.map(c => c.path)).toEqual(['/api/garment-waiver/send-link', '/api/garment-waiver/send-link']);
+    expect(state.waiverCalls[1].body).toMatchObject({ to: 'taylor@example.test', customerName: 'Taylor Example', company: 'CSS Review Company', orderRef: 'WO 143001', rep: 'Test Rep', methods: ['scr'] });
+    await layout(page, 'garment-waiver-staff');
+    await page.goto('/pages/forms/garment-liability-waiver.html?c=Prefilled+Co&n=Jordan+Example&e=jordan%40example.test&p=253-555-0100&o=WO+9&g=6+jackets&q=6&r=Test+Rep&re=rep%40nwcustomapparel.com&m=emb,dtf');
+    await expect(page.locator('#fldCompany')).toHaveValue('Prefilled Co');
+    await expect(page.locator('#fldContact')).toHaveValue('Jordan Example');
+    await expect(page.locator('#fldEmail')).toHaveValue('jordan@example.test');
+    await expect(page.locator('#fldGarments')).toHaveValue('6 jackets');
+    await expect(page.locator('#fldCount')).toHaveValue('6');
+    await expect(page.locator('#fldRepEmail')).toHaveValue('rep@nwcustomapparel.com');
+    await expect(page.locator('#decoEmbroidery')).toBeChecked();
+    await expect(page.locator('#decoDtf')).toBeChecked();
+    await expect(page.locator('#decoScreen')).not.toBeChecked();
     expect(state.errors).toEqual([]); expect(state.unexpectedWrites).toEqual([]); expect(state.submissions).toEqual([]);
 });

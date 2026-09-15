@@ -119,3 +119,4 @@ Last Updated: 2026-09-03 (/memory-maintain: MEMORY.md 24.0→~19 KB — Sept shi
 - [`HANDOVER_FOLLOWUPS_2026-09.md`](HANDOVER_FOLLOWUPS_2026-09.md) — dispositions for remaining markers and separate design/runtime backlogs.
 
 - [Carhartt Bucks 2026](CARHARTT_BUCKS_2026.md) — showroom offer, rep toolkit, certificates and Pacific deadlines.
+- [Garment liability waiver e-sign](GARMENT_WAIVER_2026-09.md) — customer e-signature page, evidence stored, EmailJS template contract, Inbox statuses, gotchas.

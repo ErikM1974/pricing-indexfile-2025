@@ -46,7 +46,7 @@ describe('forms inbox', () => {
         expect(html).toMatch(/data-form="quote-request,sample-request,manual-lead" aria-pressed="false">Leads<\/button>/);
         expect(js).toMatch(/state\.formFilter\.split\(','\)\.indexOf\(s\.Form_ID\) === -1/);
         expect(js).toMatch(/function setFormFilter\(value\)/);
-        expect((html.match(/class="inbox-chip[^"]*" data-form="[^"]*" aria-pressed="(true|false)"/g) || []).length).toBe(10);
+        expect((html.match(/class="inbox-chip[^"]*" data-form="[^"]*" aria-pressed="(true|false)"/g) || []).length).toBe(11);
         expect(html).toMatch(/<div class="inbox-tabs no-print" role="tablist" aria-label="Inbox views">/);
         expect(html).toMatch(/id="tab-samples" data-view="samples" role="tab" aria-selected="false" tabindex="-1" aria-controls="viewSamples"/);
         expect(html).toMatch(/id="viewSamples" class="dash-card" role="tabpanel" aria-labelledby="tab-samples" hidden/);

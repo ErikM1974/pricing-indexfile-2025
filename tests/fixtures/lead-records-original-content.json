@@ -156,7 +156,7 @@
         "dashboards/js/form-submissions.js"
       ],
       "cssBytes": 167810,
-      "bodyTextSha": "f2e68d06b480779b46b66726d6c8560980eda85f5dd3f5c5cc1002559ddb40ba",
+      "bodyTextSha": "d5b90b700ee4674ab958398868600ca9aee0d05d63cf8089cb3d34d7210c5392",
       "tableHashes": [
         "30314bd0dbab13e8dce660697f5e030cfa7c6f32c7f2d4cc9365542f8b98d184",
         "a7e2ceced2dad61aeb1bbc5249dba6a5a8928e49790fe01b4fc183f08434bf35"
@@ -897,6 +897,36 @@
       "after": "/shared_components/css/crm-records.css?v=2026.09.13.2",
       "count": 1,
       "reason": "Release asset version; resolved against its actual HTML consumer."
+    },
+    {
+      "file": "dashboards/js/form-submissions.js",
+      "before": "        'garment-drop-off': { label: 'Drop-Off', icon: 'fa-box-open', cls: 'badge--drp' },\n",
+      "after": "        'garment-drop-off': { label: 'Drop-Off', icon: 'fa-box-open', cls: 'badge--drp' },\n        'garment-waiver': { label: 'Waiver', icon: 'fa-file-signature', cls: 'badge--wvr' },\n",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/form-submissions.js",
+      "before": "        'Lost': 'status--muted',\n    };",
+      "after": "        'Lost': 'status--muted',\n        'Signed': 'status--new',\n        'Attached to Order': 'status--done',\n    };",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/form-submissions.js",
+      "before": "        'sample-request': ['New', 'Contacted', 'Quoted', 'Won', 'Lost', 'Archived'],\n    };",
+      "after": "        'sample-request': ['New', 'Contacted', 'Quoted', 'Won', 'Lost', 'Archived'],\n        // Signed e-waivers (pages/forms/garment-liability-waiver.html): default 'Signed'; staff move it once the\n        // reference is on the ShopWorks order. Never 'Completed' (a WON status on the lead boards).\n        'garment-waiver': ['Signed', 'Attached to Order', 'Archived'],\n    };",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/form-submissions.js",
+      "before": "        // notes\n        (payload.notes || []).forEach(function (pair) {\n            if (!pair[1]) return;\n            html += '<h3 class=\"detail-subhead\">' + esc(pair[0]) + '</h3><p class=\"detail-note\">' + esc(pair[1]) + '</p>';\n        });\n",
+      "after": "        // notes\n        (payload.notes || []).forEach(function (pair) {\n            if (!pair[1]) return;\n            html += '<h3 class=\"detail-subhead\">' + esc(pair[0]) + '</h3><p class=\"detail-note\">' + esc(pair[1]) + '</p>';\n        });\n\n        // e-signature evidence (garment-waiver): typed name, client + server timestamps,\n        // IP / browser stamped by the proxy, waiver version + text hash, drawn image.\n        if (payload.signature && typeof payload.signature === 'object') {\n            var sig = payload.signature;\n            var audit = (payload.audit && typeof payload.audit === 'object') ? payload.audit : {};\n            // 'server' rows come from the proxy's audit stamp; 'device' rows are whatever the browser sent.\n            var sigRows = [\n                ['Typed name', sig.typedName], ['Signed (device clock)', sig.signedAtPacific || sig.signedAt],\n                ['Received (server)', audit.receivedAt ? fmtStamp(audit.receivedAt) : ''], ['IP address (server)', audit.ip],\n                ['Browser (server)', audit.userAgent], ['Browser (device-reported)', sig.userAgent],\n                ['Waiver version', sig.waiverVersion], ['Text SHA-256 (server)', audit.textSha256], ['Text SHA-256 (device-reported)', sig.textSha256],\n            ];\n            html += '<h3 class=\"detail-subhead\">Electronic Signature</h3><div class=\"detail-fields detail-signature\">' + sigRows.map(function (pair) {\n                if (!pair[1]) return '';\n                return '<div class=\"detail-field\"><span>' + esc(pair[0]) + '</span><strong>' + esc(pair[1]) + '</strong></div>';\n            }).join('') + '</div>';\n            if (isSafePngDataUrl(sig.drawn)) {\n                html += '<p class=\"detail-signature-img-wrap\"><img class=\"detail-signature-img\" alt=\"Drawn signature\" src=\"' + esc(sig.drawn) + '\"></p>';\n            }\n        }\n",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/form-submissions.js",
+      "before": "    function esc(value) {\n",
+      "after": "    // Only a well-formed PNG data URL from the signature pad is ever rendered (payload text is customer-supplied).\n    function isSafePngDataUrl(value) {\n        return typeof value === 'string' && value.length <= 60000 && /^data:image\\/png;base64,[A-Za-z0-9+/]+=*$/.test(value);\n    }\n\n    function esc(value) {\n",
+      "count": 1
     }
   ],
   "retiredStyles": [

@@ -1417,6 +1417,8 @@ function originalQueryString(req) {
 // ============================================================================
 // Quote delete — role-based server-side enforcement + quote push previews — extracted to routes/quote-delete.js (server split, 2026-09-07); registered here so the order is unchanged.
 { const ctx = { CASPIO_PROXY_BASE, CRM_API_SECRET, fetch, makeApiRequest, originalQueryString, quotePlaneWriteLimiter, quoteScopedOrStaff, rateLimit, requireStaff, sanitizeFilterInput, withProxySecret }; require('./routes/quote-delete')(app, ctx); }
+// Customer-Supplied Garment Liability Waiver emails (staff sends the e-sign link; customer copy + rep notice after signing) — routes/garment-waiver.js (2026-09-15).
+{ const ctx = { CRM_API_BASE, PUBLIC_SITE_ORIGIN, SERVER_DIR: __dirname, crypto, escapeHTMLSrv, fetch, fs, path, rateLimit, requireStaff, sendEmailJSTemplate, withProxySecret }; require('./routes/garment-waiver')(app, ctx); }
 // Public quote view API (no authentication) — extracted to routes/public-quote.js (server split, 2026-09-07); registered here so the order is unchanged.
 { const ctx = { SOFT_DELETE_RETENTION_DAYS, gateStaffDetailPage, makeApiRequest, path, sanitizeFilterInput, SERVER_DIR: __dirname }; require('./routes/public-quote')(app, ctx); }
 // Public banner presets (custom-banners boot payload) — extracted to routes/banner-presets.js (server split, 2026-09-07); registered here so the order is unchanged.

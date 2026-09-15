@@ -505,6 +505,11 @@
         color: var(--indigo-700);
     }
 
+    :where([data-ui="unified"][data-crm-record]) .badge--wvr {
+        background: var(--color-ruth-tint);
+        color: var(--indigo-700);
+    }
+
     :where([data-ui="unified"][data-crm-record]) .badge--aeo,
     :where([data-ui="unified"][data-crm-record]) .badge--onb,
     :where([data-ui="unified"][data-crm-record]) .badge--qrq,
@@ -660,6 +665,20 @@
         margin: var(--space-5) 0 var(--space-3);
         font-size: var(--font-size-lg);
         font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .detail-signature-img-wrap {
+        margin: var(--space-2) 0 var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-crm-record]) .detail-signature-img {
+        display: block;
+        max-width: 320px;
+        max-height: 120px;
+        padding: var(--space-2);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+        background: var(--ui-surface);
     }
 
     :where([data-ui="unified"][data-crm-record]) .detail-note {

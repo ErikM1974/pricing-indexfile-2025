@@ -113,6 +113,12 @@
       "before": "        :where([data-ui=\"unified\"]) .blog-prose :is(h2, h3) { margin-top: var(--space-5); }\n        :where([data-ui=\"unified\"]) .blog-cta",
       "after": "        :where([data-ui=\"unified\"]) .blog-cta",
       "count": 1
+    },
+    {
+      "file": "server.js",
+      "before": "{ const ctx = { CASPIO_PROXY_BASE, CRM_API_SECRET, fetch, makeApiRequest, originalQueryString, quotePlaneWriteLimiter, quoteScopedOrStaff, rateLimit, requireStaff, sanitizeFilterInput, withProxySecret }; require('./routes/quote-delete')(app, ctx); }\n",
+      "after": "{ const ctx = { CASPIO_PROXY_BASE, CRM_API_SECRET, fetch, makeApiRequest, originalQueryString, quotePlaneWriteLimiter, quoteScopedOrStaff, rateLimit, requireStaff, sanitizeFilterInput, withProxySecret }; require('./routes/quote-delete')(app, ctx); }\n// Customer-Supplied Garment Liability Waiver emails (staff sends the e-sign link; customer copy + rep notice after signing) — routes/garment-waiver.js (2026-09-15).\n{ const ctx = { CRM_API_BASE, PUBLIC_SITE_ORIGIN, SERVER_DIR: __dirname, crypto, escapeHTMLSrv, fetch, fs, path, rateLimit, requireStaff, sendEmailJSTemplate, withProxySecret }; require('./routes/garment-waiver')(app, ctx); }\n",
+      "count": 1
     }
   ]
 }

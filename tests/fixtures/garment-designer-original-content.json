@@ -209,6 +209,18 @@
       "before": ":where([data-ui=\"unified\"][data-garment-designer]) [id=\"toast\"].show {\n  opacity: 1;\n}",
       "after": ":where([data-ui=\"unified\"][data-garment-designer]) [id=\"toast\"].show {\n  opacity: 1;\n  visibility: visible;\n}\n\n@media (prefers-reduced-motion: reduce) {\n  :where([data-ui=\"unified\"][data-garment-designer]) [id=\"toast\"] {\n    transition: none;\n  }\n}",
       "count": 1
+    },
+    {
+      "file": "shared_components/css/crm-records.css",
+      "before": "    :where([data-ui=\"unified\"][data-crm-record]) .badge--srq {\n        background: var(--color-ruth-tint);\n        color: var(--indigo-700);\n    }\n",
+      "after": "    :where([data-ui=\"unified\"][data-crm-record]) .badge--srq {\n        background: var(--color-ruth-tint);\n        color: var(--indigo-700);\n    }\n\n    :where([data-ui=\"unified\"][data-crm-record]) .badge--wvr {\n        background: var(--color-ruth-tint);\n        color: var(--indigo-700);\n    }\n",
+      "count": 1
+    },
+    {
+      "file": "shared_components/css/crm-records.css",
+      "before": "    :where([data-ui=\"unified\"][data-crm-record]) .detail-note {",
+      "after": "    :where([data-ui=\"unified\"][data-crm-record]) .detail-signature-img-wrap {\n        margin: var(--space-2) 0 var(--space-4);\n    }\n\n    :where([data-ui=\"unified\"][data-crm-record]) .detail-signature-img {\n        display: block;\n        max-width: 320px;\n        max-height: 120px;\n        padding: var(--space-2);\n        border: 1px solid var(--ui-line);\n        border-radius: var(--radius-sm);\n        background: var(--ui-surface);\n    }\n\n    :where([data-ui=\"unified\"][data-crm-record]) .detail-note {",
+      "count": 1
     }
   ],
   "notes": "Original sources before garment designer migration; real embedded model photos preserved in source, synthetic artwork and contacts in browser fixtures.",

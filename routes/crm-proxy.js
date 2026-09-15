@@ -112,6 +112,11 @@ app.all('/api/crm-proxy/policies*', ...createCrmProxy('policies', ['policies-adm
 // /api/policy-comments-public on the proxy directly, no role gate.
 app.all('/api/crm-proxy/policy-comments*', ...createCrmProxy('policy-comments', ['policies-admin']));
 
+// Forms Library registry (Caspio Forms_Library) writes — ADMIN ONLY (2026-09-15). Lets an admin add or
+// edit a form row from a signed-in browser without holding the proxy secret; reads stay public on
+// the proxy (the Forms Library page fetches /api/forms-library directly).
+app.all('/api/crm-proxy/forms-library*', ...createCrmProxy('forms-library', ['admin']));
+
 // RBAC admin CRUD — ADMIN ONLY. Powers the Access-Admin UI (edits Staff_App_Roles +
 // Staff_Page_Access on the proxy). requireCrmRole(['admin']) + the proxy's secret gate.
 app.all('/api/crm-proxy/admin-rbac*', ...createCrmProxy('admin-rbac', ['admin']));
