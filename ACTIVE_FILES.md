@@ -1617,10 +1617,10 @@ Garment designer completion: page styles are scoped to the unified designer; art
 
 - `shared_components/js/holiday-promotion.js` — shared Christmas discovery/expiry on home and catalog; protected invitation display and copy controls on Staff Dashboard.
 
-- calculators/quick-quote/quick-quote-document.js — common price-sheet/estimate model for screen, copied text, paper and PDF; optional quantity and canonical engine totals.
-- calculators/quick-quote/quick-quote-workspace.js — shared exact-first product search, browser favorites/input drafts, optional customer details, compact customer options and copy/export controls.
+- calculators/quick-quote/quick-quote-document.js — common price-sheet/estimate model; branded customer PDF with quantity tables, exact engine totals, product photos and measured page flow (PDF polish 2026-09-15).
+- calculators/quick-quote/quick-quote-workspace.js — shared exact-first product search, favorites/input drafts, customer details and exports; high-resolution product and local-brand image loading for PDF.
 
-- tests/e2e/quick-quote-workflow.spec.js — synthetic five-method customer documents, laptop layout, search/replacement, copy, accessibility, builder handoff and stale-output regressions.
+- tests/e2e/quick-quote-workflow.spec.js — synthetic five-method documents, search, accessibility, builder handoff and stale-output regressions; real PDF sampled-price/brand checks and long-content pagination.
 - tests/unit/quick-quote-document.test.js — optional/exact quantities, copied price parity, customer totals, inclusive small-order pricing and escaping checks.
 
 - tests/unit/quick-quote-handoff.test.js — versioned decoration validation and legacy handoff compatibility.

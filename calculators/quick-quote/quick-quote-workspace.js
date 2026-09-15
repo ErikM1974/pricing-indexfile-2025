@@ -189,20 +189,20 @@
         }).catch(error => { libraryPromise = null; throw error; });
         return libraryPromise;
     }
-    async function imageData(url) {
+    async function imageData(url, { width = 360, height = 420 } = {}) {
         const image = new Image(); image.crossOrigin = 'anonymous'; image.referrerPolicy = 'no-referrer';
-        const timeout = new Promise((_, reject) => { image._deadline = setTimeout(() => reject(new Error('A product photo could not load. Retry the download.')), 15000); });
+        const timeout = new Promise((_, reject) => { image._deadline = setTimeout(() => reject(new Error('An estimate image could not load. Retry the download.')), 15000); });
         // Supplier images display cross-origin but cannot be read by a PDF canvas.
         // Use the existing same-origin image relay for external product photos.
         const source = new URL(url, window.location.href);
         image.src = source.origin === window.location.origin ? source.href : '/api/image-proxy?url=' + encodeURIComponent(source.href);
         try {
             await Promise.race([image.decode(), timeout]);
-            const canvas = document.createElement('canvas'); canvas.width = 180; canvas.height = 210;
-            const ctx = canvas.getContext('2d'); ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, 180, 210);
-            const scale = Math.min(180 / image.naturalWidth, 210 / image.naturalHeight);
+            const canvas = document.createElement('canvas'); canvas.width = width; canvas.height = height;
+            const ctx = canvas.getContext('2d'); ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, width, height);
+            const scale = Math.min(width / image.naturalWidth, height / image.naturalHeight);
             const w = image.naturalWidth * scale, h = image.naturalHeight * scale;
-            ctx.drawImage(image, (180 - w) / 2, (210 - h) / 2, w, h); return canvas.toDataURL('image/png');
+            ctx.drawImage(image, (width - w) / 2, (height - h) / 2, w, h); return canvas.toDataURL('image/png');
         } finally { clearTimeout(image._deadline); }
     }
     async function exportDocument(download) {
