@@ -1028,6 +1028,20 @@
       "after": "    <script src=\"/calculators/quick-quote/quick-quote.js?v=2026.09.14.2\"></script>\n",
       "count": 1,
       "stage": "release-2026.09.14.2"
+    },
+    {
+      "file": "calculators/quick-quote/index.html",
+      "before": "    <script src=\"/calculators/quick-quote/quick-quote-document.js?v=2026.09.14.2\"></script>\n",
+      "after": "    <script src=\"/calculators/quick-quote/quick-quote-document.js?v=2026.09.15.1\"></script>\n",
+      "count": 1,
+      "stage": "release-2026.09.15.1"
+    },
+    {
+      "file": "calculators/quick-quote/index.html",
+      "before": "    <script src=\"/calculators/quick-quote/quick-quote-workspace.js?v=2026.09.14.2\"></script>\n",
+      "after": "    <script src=\"/calculators/quick-quote/quick-quote-workspace.js?v=2026.09.15.1\"></script>\n",
+      "count": 1,
+      "stage": "release-2026.09.15.1"
     }
   ]
 }
