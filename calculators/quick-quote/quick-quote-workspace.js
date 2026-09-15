@@ -5,7 +5,7 @@
     const storageKeys = { draft: 'nwca-quick-quote-inputs', products: 'nwca-quick-quote-products' };
     let bridge, scheduled = false, documentModel, busy = false, restoring = false, draftTimer, searchTimer, searchSeq = 0;
     let recommendation = '', excluded = new Set(), context = '', lastOptions = '', libraryPromise;
-    let draftAvailable = false;
+    let draftAvailable = false, searchInput, searchMatches = [], lastCopy = '', toolsMode;
     const doc = () => window.QuickQuoteDocument;
     function read(key) { try { return JSON.parse(localStorage.getItem(key) || 'null'); } catch { return null; } }
     function write(key, value) {
@@ -36,12 +36,12 @@
             const options = $('qqDocumentOptions'); options.replaceChildren(); lastOptions = optionsKey;
             for (const o of all) {
                 const row = document.createElement('div'); row.className = 'qq-option-control';
-                const label = document.createElement('label'); label.className = 'qq-check';
+                const label = document.createElement('label'); label.className = 'qq-check'; label.hidden = all.length === 1;
                 const check = document.createElement('input'); check.type = 'checkbox'; check.checked = !excluded.has(o.key); check.dataset.option = o.key;
                 check.addEventListener('change', () => { if (check.checked) excluded.delete(o.key); else excluded.add(o.key); refresh(); });
                 label.append(check, document.createTextNode(s.mode === 'quick' ? doc().names[o.method] : o.product.style)); row.append(label);
                 const recommend = button('Recommend', () => { recommendation = recommendation === o.key ? '' : o.key; refresh(); });
-                recommend.dataset.recommend = o.key; row.append(recommend);
+                recommend.dataset.recommend = o.key; recommend.hidden = all.length === 1; row.append(recommend);
                 if (o.builderHref) { const link = document.createElement('a'); link.className = 'btn btn-ghost'; link.href = o.builderHref; link.textContent = 'Full quote'; link.title = 'Continue with ' + o.product.style + ' and these decoration settings'; row.append(link); }
                 options.append(row);
             }
@@ -49,14 +49,24 @@
         document.querySelectorAll('[data-recommend]').forEach(b => { b.setAttribute('aria-pressed', String(b.dataset.recommend === recommendation)); b.textContent = b.dataset.recommend === recommendation ? 'Recommended' : 'Recommend'; });
         const pending = bridge.pending(), errors = bridge.errors();
         documentModel = doc().model(all.filter(o => !excluded.has(o.key)), details());
-        const ready = !pending && documentModel.options.length > 0;
-        $('qqDocumentStatus').textContent = errors.length ? errors.join(' ') : pending ? 'Checking current prices. The estimate will be ready when every product finishes.' : !inputs.length ? 'Add a product to see your customer estimate.' : !documentModel.options.length ? 'Select at least one option to include.' : 'Ready to share. Every total includes the order charges shown below.';
+        const ready = !pending && !errors.length && documentModel.options.length > 0;
+        $('qqDocumentStatus').textContent = errors.length ? errors.join(' ') : pending ? 'Checking products and prices…' : !inputs.length ? 'Enter a style or product name to see price breaks.' : !documentModel.options.length ? 'Select at least one option to include.' : '';
         $('qqSheet').hidden = !ready;
         // Renderer escapes every external string and validates image URLs.
         // eslint-disable-next-line no-unsanitized/property
         $('qqSheet').innerHTML = ready ? doc().html(documentModel) : '';
-        $('qqLineDownload').disabled = busy || !ready; $('qqLinePrint').disabled = busy || !ready;
-        $('qqPreview').disabled = !ready;
+        $('qqLineDownload').disabled = busy || !ready; $('qqLinePrint').disabled = busy || !ready; $('qqCopy').disabled = busy || !ready;
+        if (!ready || lastCopy && lastCopy !== doc().text(documentModel)) { $('qqCopyFallback').hidden = true; $('qqCopyText').value = ''; $('qqCopyStatus').textContent = ''; lastCopy = ''; }
+        const extras = [];
+        if ((s.mode === 'quick' || ['dtf', 'scp'].includes(s.lineMethod)) && (s.sleeves.left || s.sleeves.right)) extras.push([s.sleeves.left ? 'left' : '', s.sleeves.right ? 'right' : ''].filter(Boolean).join(' + ') + ' sleeve');
+        if (s.adv.scpDark && (s.mode === 'quick' || s.lineMethod === 'scp')) extras.push('dark garment');
+        if (s.adv.scpStripes && (s.mode === 'quick' || s.lineMethod === 'scp')) extras.push('safety stripes');
+        $('qqExtraSummary').textContent = extras.length ? '· ' + extras.join(', ') : '';
+        $('qqMoreSettings').hidden = ![...$('qqExtraControls').children].some(node => !node.hidden);
+        $('qqProductFinder').hidden = s.mode === 'linesheet' && s.lineStyles.length > 0;
+        if (toolsMode !== s.mode) { toolsMode = s.mode; $('qqMoreTools').open = s.mode === 'quick'; }
+        const selected = s.mode === 'linesheet' ? s.lineStyles.find(row => row.product) : { product: s.product, color: s.color };
+        $('qqCatalogLink').href = selected?.product ? '/product.html?style=' + encodeURIComponent(selected.product.style) + '&color=' + encodeURIComponent(selected.color?.catalog || '') : '/';
         rememberProducts(inputs);
         if (!restoring && !draftAvailable) { clearTimeout(draftTimer); draftTimer = setTimeout(saveDraft, 700); }
     }
@@ -76,20 +86,25 @@
         const key = JSON.stringify(list); if (key === savedKey) return; savedKey = key;
         const area = $('qqSavedProducts'); area.replaceChildren();
         if (!list.length) return;
-        const title = document.createElement('p'); title.className = 'field-help'; title.textContent = 'Favorites & recent products · this browser'; area.append(title);
+        const title = document.createElement('span'); title.className = 'field-help'; title.textContent = 'Recent & favorites'; area.append(title);
         for (const p of [...list].sort((a, b) => Number(b.favorite) - Number(a.favorite)).slice(0, 6)) {
             const row = document.createElement('div'); row.className = 'qq-saved-product';
-            row.append(button(p.style, () => choose(p.style)));
+            row.append(button(p.style, () => choose(p.style, $('qqProductSearch'))));
             const star = button(p.favorite ? '★' : '☆', () => { p.favorite = !p.favorite; write(storageKeys.products, list); renderSavedProducts(list); });
             star.setAttribute('aria-label', (p.favorite ? 'Remove favorite ' : 'Favorite ') + p.style); star.setAttribute('aria-pressed', String(!!p.favorite)); row.append(star); area.append(row);
         }
     }
-    function choose(style) {
-        try { bridge.choose(style); $('qqSearchStatus').textContent = 'Added ' + style + '. Choose its color below.'; }
-        catch (error) { $('qqSearchStatus').textContent = error.message; }
+    function choose(style, target = searchInput) {
+        try {
+            ++searchSeq; clearTimeout(searchTimer);
+            bridge.choose(style, target?.isConnected ? Number(target.dataset.uid) || undefined : undefined);
+            $('qqSearchPanel').hidden = true; $('qqSearchResults').replaceChildren(); searchMatches = [];
+            $('qqSearchStatus').textContent = '';
+        }
+        catch (error) { $('qqSearchPanel').hidden = false; $('qqSearchStatus').textContent = error.message; }
     }
     async function search() {
-        const query = $('qqProductSearch').value.trim(), seq = ++searchSeq;
+        const target = searchInput, query = target.value.trim(), seq = ++searchSeq;
         $('qqSearchResults').replaceChildren();
         if (query.length < 2) { $('qqSearchStatus').textContent = ''; return; }
         $('qqSearchStatus').textContent = 'Searching products…';
@@ -97,15 +112,41 @@
             const response = await fetch(window.APP_CONFIG.API.BASE_URL + '/api/products/search?q=' + encodeURIComponent(query) + '&limit=8', { signal: AbortSignal.timeout(12000) });
             if (!response.ok) throw new Error('Product search is unavailable. Retry or enter the style number below.');
             const data = await response.json();
-            if (seq !== searchSeq) return;
+            if (seq !== searchSeq || !target.isConnected) return;
             const products = data.data?.products || data.products || [];
-            for (const product of products.slice(0, 8)) {
+            const styleOf = product => product.styleNumber || product.STYLE || '';
+            products.sort((a, b) => Number(styleOf(b).toUpperCase() === query.toUpperCase()) - Number(styleOf(a).toUpperCase() === query.toUpperCase()));
+            searchMatches = [];
+            for (const product of products.slice(0, 5)) {
                 const style = product.styleNumber || product.STYLE;
                 if (!/^[A-Z0-9._-]{1,40}$/i.test(style || '')) continue;
-                $('qqSearchResults').append(button(style + ' · ' + (product.productName || product.PRODUCT_TITLE || style), () => choose(style)));
+                searchMatches.push(style);
+                $('qqSearchResults').append(button(style + ' · ' + (product.productName || product.PRODUCT_TITLE || style), () => choose(style, target)));
             }
             $('qqSearchStatus').textContent = $('qqSearchResults').children.length ? 'Choose a product to add it.' : 'No matching products. Try a style number or a different name.';
         } catch (error) { if (seq === searchSeq) $('qqSearchStatus').textContent = error.message; }
+    }
+    function queueSearch(input) {
+        searchInput = input; ++searchSeq; clearTimeout(searchTimer); searchMatches = [];
+        const panel = $('qqSearchPanel');
+        (input.closest('.qq-line-head') || $('qqProductFinder')).after(panel);
+        panel.hidden = !input.value.trim(); $('qqSearchResults').replaceChildren(); $('qqSearchStatus').textContent = '';
+        searchTimer = setTimeout(search, 250);
+    }
+    function searchKey(event) {
+        const input = event.target.closest('#qqProductSearch, .qq-line-style'); if (!input) return;
+        if (event.key === 'Escape') { ++searchSeq; clearTimeout(searchTimer); $('qqSearchPanel').hidden = true; return; }
+        if (event.key === 'ArrowDown' && !$('qqSearchPanel').hidden) { event.preventDefault(); $('qqSearchResults').querySelector('button')?.focus(); return; }
+        if (event.key !== 'Enter') return;
+        event.preventDefault();
+        const query = input.value.trim();
+        const matches = input === searchInput ? searchMatches : [];
+        const exact = matches.find(style => style.toUpperCase() === query.toUpperCase());
+        if (exact) choose(exact, input);
+        else if (matches.length && !/\d/.test(query)) choose(matches[0], input);
+        else if (/^[A-Z0-9._-]{1,40}$/i.test(query)) choose(query.toUpperCase(), input);
+        else if (matches.length) choose(matches[0], input);
+        else queueSearch(input);
     }
     function saveDraft() {
         const s = bridge.state;
@@ -122,7 +163,7 @@
             && Array.isArray(d.products) && d.products.length > 0 && d.products.length <= 6 && d.products.every(p => /^[A-Z0-9._-]{1,40}$/i.test(p.style || '') && typeof p.color === 'string' && p.color.length <= 100)
             && ['', 'LC', 'CF', 'FF', 'JF'].includes(d.front) && ['', 'CB', 'FB', 'JB'].includes(d.back)
             && ['emb', 'capemb', 'dtg', 'scp', 'dtf'].includes(d.lineMethod) && ['embroidery', '3d-puff', 'laser-patch'].includes(d.capEmb)
-            && ['frontInk', 'backInk', 'sleeveInkL', 'sleeveInkR'].every(k => int(d[k], 1, 6)) && int(d.qty, 1, 100000) && int(d.lineQty, 1, 100000)
+            && ['frontInk', 'backInk', 'sleeveInkL', 'sleeveInkR'].every(k => int(d[k], 1, 6)) && int(d.qty, 1, 100000) && (d.lineQty === null || int(d.lineQty, 1, 100000))
             && d.adv && int(d.adv.embStitch, 1000, 1000000) && typeof d.adv.digitizing === 'boolean' && typeof d.adv.scpDark === 'boolean' && typeof d.adv.scpStripes === 'boolean'
             && d.sleeves && typeof d.sleeves.left === 'boolean' && typeof d.sleeves.right === 'boolean'
             && Array.isArray(d.embAddl) && d.embAddl.length <= 20 && d.embAddl.every(a => int(a.stitch, 1000, 1000000))
@@ -183,13 +224,29 @@
         } catch (error) { $('qqExportError').hidden = false; $('qqExportError').textContent = error.message || 'The document could not be prepared. Please try again.'; }
         finally { busy = false; $('qqLineDownload').textContent = 'Download PDF'; refresh(); }
     }
+    async function copyPrices() {
+        render(); if (bridge.pending() || bridge.errors().length || !documentModel?.options.length) return;
+        const content = doc().text(documentModel); lastCopy = content;
+        try { await navigator.clipboard.writeText(content); if (lastCopy === content) $('qqCopyStatus').textContent = 'Prices copied. Ready to paste into your message.'; }
+        catch {
+            if (lastCopy !== content) return;
+            $('qqCopyStatus').textContent = 'Clipboard access is unavailable. Select and copy the text below.';
+            $('qqCopyFallback').hidden = false; $('qqCopyText').value = content; $('qqCopyText').focus(); $('qqCopyText').select();
+        }
+    }
     function mount(api) {
         bridge = api;
         document.querySelector('.qq-inputs').append(document.querySelector('.qq-customer-details'));
-        $('qqProductSearch').addEventListener('input', () => { ++searchSeq; clearTimeout(searchTimer); searchTimer = setTimeout(search, 300); });
+        document.querySelector('.qq-inputs').append($('qqSavedProducts'));
+        const quantityField = document.querySelector('.qq-line-quantity'); $('qqLineMethodField').after(quantityField);
+        for (const id of ['qqSleeveRow', 'qqScpOptsField']) $('qqExtraControls').append($(id));
+        searchInput = $('qqProductSearch');
+        document.querySelector('.qq-inputs').addEventListener('input', event => { const input = event.target.closest('#qqProductSearch, .qq-line-style'); if (input) queueSearch(input); });
+        document.querySelector('.qq-inputs').addEventListener('keydown', searchKey);
         for (const id of ['qqCustomerName', 'qqCompanyName', 'qqRepName', 'qqRepEmail', 'qqCustomerNotes', 'qqShowBreaks']) $(id).addEventListener('input', refresh);
         $('qqLineDownload').addEventListener('click', () => exportDocument(true)); $('qqLinePrint').addEventListener('click', () => exportDocument(false));
-        $('qqPreview').addEventListener('click', () => { $('qqCustomerPreview').scrollIntoView({ block: 'start', behavior: 'smooth' }); $('qqCustomerPreview').tabIndex = -1; $('qqCustomerPreview').focus({ preventScroll: true }); });
+        $('qqCopy').addEventListener('click', copyPrices);
+        $('qqSheet').addEventListener('click', event => { const button = event.target.closest('[data-quote-quantity]'); if (button && bridge.state.mode === 'linesheet') { bridge.setQuantity(Number(button.dataset.quoteQuantity)); $('qqLineQty').focus({ preventScroll: true }); } });
         $('qqRestore').addEventListener('click', restore);
         $('qqDiscard').addEventListener('click', () => { try { localStorage.removeItem(storageKeys.draft); } catch { /* visible storage failure appears on the next save */ } draftAvailable = false; $('qqRestoreDraft').hidden = true; });
         draftAvailable = validDraft(read(storageKeys.draft)) && !new URLSearchParams(location.search).has('style');

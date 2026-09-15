@@ -14,12 +14,12 @@
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
     <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.12.2">
     <link rel="stylesheet" href="/shared_components/css/utilities.css?v=2026.09.12.2">
-    <link rel="stylesheet" href="/calculators/quick-quote/quick-quote.css?v=2026.09.13.6">
+    <link rel="stylesheet" href="/calculators/quick-quote/quick-quote.css?v=2026.09.14.2">
     <link rel="stylesheet" href="/shared_components/css/safety-stripe-recs.css?v=2026.09.13.2">
-    <link rel="stylesheet" href="/calculators/quick-quote/linesheet-print.css?v=2026.09.13.6" media="print">
+    <link rel="stylesheet" href="/calculators/quick-quote/linesheet-print.css?v=2026.09.14.2" media="print">
     <link rel="stylesheet" href="/shared_components/css/embroidery-quote-pricing.css?v=2026.09.07.8">
 </head>
-<body data-ui="unified" data-quick-quote="quick" data-surface="staff" data-density="comfortable">
+<body data-ui="unified" data-quick-quote="quick" data-surface="staff" data-density="compact">
 
     <!-- ========== Top bar ========== -->
     <header class="topbar">
@@ -42,9 +42,8 @@
 
         <section class="hero">
             <div>
-                <div class="eyebrow">A clear answer while your customer is on the phone</div>
                 <h1 class="page-title">Quick Quote</h1>
-                <p class="lede">Compare products or decoration, then share a clear estimate. No customer record required.</p>
+                <p class="lede">Choose a product and decoration to see price breaks.</p>
             </div>
         </section>
 
@@ -58,21 +57,16 @@
             <!-- ===== Inputs ===== -->
             <div class="qq-panel qq-inputs">
 
-                <!-- Mode: Line Sheet (one method, many styles -> PDF; the DEFAULT) vs Quick Price (one style, every method) -->
-                <div class="qq-mode-toggle" id="qqModeToggle" role="group" aria-label="Quote mode">
-                    <button type="button" class="is-active" data-mode="linesheet">Compare products</button>
-                    <button type="button" data-mode="quick">Compare decoration</button>
-                </div>
-
-                <p class="field-help" id="qqModeHelp">Different products, one decoration method. Each option is priced separately.</p>
+                <p class="field-help" id="qqModeHelp" hidden></p>
                 <div id="qqRestoreDraft" class="alert-info" hidden><p>An unfinished estimate is available on this browser. Restore its inputs and check fresh prices.</p><button type="button" class="btn btn-ghost" id="qqRestore">Restore draft</button><button type="button" class="btn btn-ghost" id="qqDiscard">Discard</button></div>
-                <details class="qq-product-finder" open>
-                    <summary>Find a product</summary>
-                    <div class="field"><label for="qqProductSearch">Search by name or style</label><input id="qqProductSearch" class="input" type="search" autocomplete="off" placeholder="Carhartt jacket, polo, PC61" aria-describedby="qqSearchStatus"></div>
+                <div class="qq-product-finder" id="qqProductFinder">
+                    <div class="field"><label for="qqProductSearch">Product</label><input id="qqProductSearch" class="input" type="search" autocomplete="off" placeholder="Style or name, e.g. PC55" aria-describedby="qqSearchStatus"></div>
+                </div>
+                <div id="qqSearchPanel" hidden>
                     <p id="qqSearchStatus" role="status" class="field-help"></p>
                     <div id="qqSearchResults" class="qq-search-results"></div>
-                    <div id="qqSavedProducts" class="qq-saved-products"></div>
-                </details>
+                </div>
+                <div id="qqSavedProducts" class="qq-saved-products"></div>
                 <details class="qq-customer-details">
                     <summary>Customer &amp; rep details <span class="muted">(optional)</span></summary>
                     <div class="field"><label for="qqCustomerName">Customer name</label><input id="qqCustomerName" class="input" maxlength="100" autocomplete="off"></div>
@@ -85,18 +79,16 @@
                 <!-- LINE SHEET: the style list (add up to 6) + actions — line mode only -->
                 <div id="qqLineStylesField" hidden>
                     <div class="field">
-                        <label>Products <span class="muted">&middot; up to 6 alternatives</span></label>
-                        <div id="qqLineList" class="qq-line-list"></div>
+                        <div id="qqLineList" class="qq-line-list" role="group" aria-label="Products"></div>
                         <button type="button" id="qqLineAdd" class="qq-link-btn">+ Add style</button>
                     </div>
-                    <p class="qq-line-hint">Each product is a separate option. Choose a product to continue in the full quote builder.</p>
-                    <div class="field"><label for="qqLineQty">Requested quantity for each option</label><input id="qqLineQty" class="input num" type="number" min="1" max="100000" step="1" value="24"><p class="field-help">Standard sizes for comparison. Confirm the size mix in the full quote.</p></div>
+                    <div class="field qq-line-quantity"><label for="qqLineQty">Exact quantity <span class="muted">(optional)</span></label><input id="qqLineQty" class="input num" type="number" min="1" max="100000" step="1" placeholder="For an exact total"></div>
                 </div>
 
                 <!-- LINE SHEET: imprint method selector (locks the sheet to one method) — line mode only -->
                 <div class="field" id="qqLineMethodField" hidden>
-                    <label>Imprint method <span class="muted">&middot; one per sheet</span></label>
-                    <div class="qq-chips" id="qqLineMethodChips" role="group" aria-label="Imprint method"></div>
+                    <label for="qqLineMethod">Decoration <a href="/" id="qqCatalogLink">Catalog quoting</a></label>
+                    <select id="qqLineMethod" class="field-select"></select>
                 </div>
 
                 <!-- QUICK PRICE inputs (style + color + quantity) — quick mode only -->
@@ -149,7 +141,6 @@
 
                 <!-- DECORATION (shared config) — embroidery / placement / ink / SCP options; auto-hides when empty -->
                 <div class="qq-section qq-deco" id="qqDecoSection">
-                <div class="qq-section-title">Decoration</div>
 
                 <!-- Embroidery: logo-based (primary + additional logos), not placement-based -->
                 <div class="field qq-emb" id="qqEmbField" hidden>
@@ -159,14 +150,14 @@
                         <div class="qq-chips" id="qqCapEmbType" role="group" aria-label="Cap embellishment"></div>
                     </div>
                     <div id="qqEmbLogos" class="qq-emb-logos"></div>
-                    <button type="button" id="qqEmbAddBtn" class="qq-link-btn">+ Add another logo</button>
                     <label class="qq-check qq-emb-dig"><input type="checkbox" id="qqEmbDigitizing"> New logo — add one-time digitizing</label>
+                    <button type="button" id="qqEmbAddBtn" class="qq-link-btn">+ Add another logo</button>
                     <p class="qq-emb-hint" id="qqEmbHint"></p>
                     <p class="qq-emb-warn" id="qqEmbWarn" hidden></p>
                 </div>
 
                 <div class="field" id="qqPlacementField" hidden>
-                    <label id="qqPlacementLabel">Where does the print go? <span class="muted">· DTG / screen print / DTF</span></label>
+                    <label id="qqPlacementLabel">Print locations</label>
                     <div class="qq-place-presets" id="qqPlacePresets" role="group" aria-label="Common placements">
                         <button type="button" data-front="LC" data-back="">Left chest</button>
                         <button type="button" data-front="LC" data-back="FB">Front + back</button>
@@ -175,7 +166,7 @@
                     <div class="qq-place-row"><span class="qq-place-lbl">Front</span><div class="qq-chips" id="qqFront" role="group" aria-label="Front placement"></div></div>
                     <div class="qq-place-row"><span class="qq-place-lbl">Back</span><div class="qq-chips" id="qqBack" role="group" aria-label="Back placement"></div></div>
                     <div class="qq-place-row" id="qqSleeveRow"><span class="qq-place-lbl" id="qqSleeveLabel">Sleeves</span><div class="qq-sleeves"><span class="qq-sleeve-grp"><label class="qq-check"><input type="checkbox" id="qqSleeveL"> Left</label><span class="qq-sleeve-ink" id="qqSleeveInkLWrap" hidden><input id="qqSleeveInkL" class="input num" type="number" min="1" max="6" step="1" value="1" aria-label="Left sleeve ink colors"><span class="qq-ink-lbl">colors</span></span></span><span class="qq-sleeve-grp"><label class="qq-check"><input type="checkbox" id="qqSleeveR"> Right</label><span class="qq-sleeve-ink" id="qqSleeveInkRWrap" hidden><input id="qqSleeveInkR" class="input num" type="number" min="1" max="6" step="1" value="1" aria-label="Right sleeve ink colors"><span class="qq-ink-lbl">colors</span></span></span></div></div>
-                    <p class="qq-place-note">Pick any front + back. Screen print prices by ink colors (front size doesn't change it). A sleeve is a DTF add-on (≤5×5" transfer) and/or a screen-print add-location; for an embroidered sleeve logo, add it under Embroidery logos.</p>
+                    <p class="qq-place-note">Print dimensions are shown on each placement.</p>
                 </div>
 
                 <!-- SCP ink colors — separate front + back (each color = 1 screen); SCP-eligible only -->
@@ -203,6 +194,14 @@
                 </div>
 
                 </div><!-- /qqDecoSection -->
+                <details class="qq-more-settings" id="qqMoreSettings"><summary>More settings <span id="qqExtraSummary" class="muted"></span></summary><div id="qqExtraControls"></div></details>
+                <details class="qq-more-tools" id="qqMoreTools">
+                    <summary>More quoting tools</summary>
+                    <div class="qq-mode-toggle" id="qqModeToggle" role="group" aria-label="Quote mode">
+                        <button type="button" class="is-active" data-mode="linesheet">Quick Quote</button>
+                        <button type="button" data-mode="quick">Compare decoration</button>
+                    </div>
+                </details>
 
 
 
@@ -229,12 +228,17 @@
                 <div id="qqLineResults" hidden></div>
                 <section id="qqCustomerPreview" class="qq-customer-preview" aria-label="Customer estimate preview">
                     <div class="qq-document-toolbar">
-                        <h2>Customer preview</h2>
-                        <label class="qq-check"><input type="checkbox" id="qqShowBreaks" checked> Include quantity breaks</label>
+                        <h2>Price breaks</h2>
+                        <div class="qq-workflow-actions" aria-label="Estimate actions">
+                            <button type="button" id="qqCopy" class="btn" disabled>Copy prices</button>
+                            <button type="button" id="qqLineDownload" class="btn btn-primary" disabled>Download PDF</button>
+                            <button type="button" id="qqLinePrint" class="btn btn-ghost" disabled>Print</button>
+                        </div>
+                        <label class="qq-check" hidden><input type="checkbox" id="qqShowBreaks" checked> Include quantity breaks</label>
                     </div>
-                    <div id="qqDocumentOptions" class="qq-document-options"></div>
                     <p id="qqDocumentStatus" class="field-help" role="status"></p>
                     <div class="qq-sheet" id="qqSheet"></div>
+                    <div id="qqDocumentOptions" class="qq-document-options"></div>
                 </section>
                 <!-- Recommended safety apparel — sibling of BOTH result panels so it shows in
                      either mode (Quick Price or Line Sheet) when screen print + safety stripes are on -->
@@ -243,12 +247,9 @@
 
         </section>
 
-        <div class="qq-workflow-actions" aria-label="Estimate actions">
-            <p id="qqDraftStatus" role="status">Prices are checked live.</p>
-            <button type="button" id="qqPreview" class="btn btn-ghost">Customer preview</button>
-            <button type="button" id="qqLinePrint" class="btn btn-ghost" disabled>Print</button>
-            <button type="button" id="qqLineDownload" class="btn btn-primary" disabled>Download PDF</button>
-        </div>
+        <p id="qqDraftStatus" class="field-help" role="status">Prices are checked live.</p>
+        <p id="qqCopyStatus" class="field-help" role="status"></p>
+        <div id="qqCopyFallback" hidden><label for="qqCopyText">Select and copy these prices</label><textarea id="qqCopyText" class="field-input" rows="6" readonly></textarea></div>
         <p id="qqExportError" class="alert-error" role="alert" hidden></p>
     </main>
 
@@ -270,9 +271,9 @@
     <script src="/shared_components/js/quote-cart-engine.js?v=2026.09.13.6"></script>
     <!-- Page logic -->
     <script src="/shared_components/js/safety-stripe-recs.js?v=2026.09.13.2"></script>
-    <script src="/calculators/quick-quote/quick-quote-document.js?v=2026.09.13.6"></script>
-    <script src="/calculators/quick-quote/quick-quote-workspace.js?v=2026.09.13.6"></script>
+    <script src="/calculators/quick-quote/quick-quote-document.js?v=2026.09.14.2"></script>
+    <script src="/calculators/quick-quote/quick-quote-workspace.js?v=2026.09.14.2"></script>
     <script src="/calculators/quick-quote/quick-quote-ui.js?v=2026.09.13.6"></script>
-    <script src="/calculators/quick-quote/quick-quote.js?v=2026.09.13.6"></script>
+    <script src="/calculators/quick-quote/quick-quote.js?v=2026.09.14.2"></script>
 </body>
 </html>

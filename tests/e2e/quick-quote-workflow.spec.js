@@ -5,13 +5,112 @@ const path = require('node:path');
 const { open: openBuilder, check: checkBuilder } = require('./helpers/quote-builders-browser');
 test.use({ timezoneId: 'America/Los_Angeles', locale: 'en-US', reducedMotion: 'reduce' });
 
+test('fast quote ranks exact styles, closes search, and shows all prices without a quantity', async ({ page }) => {
+    await page.setViewportSize({ width: 1265, height: 712 });
+    const e = await open(page, { url: '/calculators/quick-quote/index.html', searchProducts: [
+        { styleNumber: 'PC55P', productName: 'Pocket Tee' }, { styleNumber: 'PC55LS', productName: 'Long Sleeve' },
+        { styleNumber: 'PC55', productName: 'Core Blend Tee' },
+    ] });
+    await page.locator('#qqLineMethod').selectOption('dtf');
+    await page.locator('#qqProductSearch').fill('PC55');
+    await expect(page.locator('#qqSearchResults button').first()).toHaveText('PC55 · Core Blend Tee');
+    await page.locator('#qqProductSearch').press('Enter');
+    await expect(page.locator('#qqCopy')).toBeEnabled();
+    await expect(page.locator('#qqSearchPanel')).toBeHidden();
+    await expect(page.locator('#qqProductFinder')).toBeHidden();
+    await expect(page.locator('#qqLineQty')).toHaveValue('');
+    await expect(page.locator('.qq-document-total')).toHaveCount(0);
+    await expect(page.locator('.qq-line-mv').first()).toBeHidden();
+    await expect(page.locator('#qqCatalogLink')).toBeVisible();
+    for (const selector of ['#qqLineMethod', '[data-placement="front"]', '[data-placement="back"]', '#qqLineQty', '.qq-sheet-ladder', '#qqLineDownload']) {
+        const bounds = await page.locator(selector).boundingBox();
+        expect(bounds.y, selector).toBeGreaterThanOrEqual(0);
+        expect(bounds.y + bounds.height, selector).toBeLessThanOrEqual(712);
+    }
+    await page.screenshot({ path: path.join(__dirname, 'screenshots/css-unification/quick-quote-speed-laptop.png'), fullPage: true });
+    await page.getByRole('button', { name: 'Use 24 pieces for PC55', exact: true }).click();
+    await expect(page.locator('#qqLineQty')).toHaveValue('24');
+    await expect(page.locator('#qqLineQty')).toBeFocused();
+    await expect(page.locator('.qq-document-total')).toBeVisible();
+    await page.locator('#qqLineQty').fill('18');
+    await expect(page.locator('#qqCopy')).toBeEnabled();
+    await expect(page.getByRole('button', { name: 'Use 18 pieces for PC55', exact: true })).toBeVisible();
+    await page.evaluate(() => Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: async value => { window.__copiedPrices = value; } } }));
+    await page.locator('#qqCopy').click();
+    const copied = await page.evaluate(() => window.__copiedPrices);
+    expect(copied).toContain('10–23 pieces — at 18:');
+    expect(copied).toContain(await page.locator('.qq-document-total dd').textContent());
+    for (const price of await page.locator('.qq-sheet-ladder tbody tr').filter({ hasText: 'Per piece' }).locator('td').allTextContents()) expect(copied).toContain(price);
+    await page.locator('#qqLineQty').fill('0');
+    await expect(page.locator('#qqCopy')).toBeDisabled();
+    await expect(page.locator('#qqSheet')).toBeHidden();
+    await expect(page.locator('#qqDocumentStatus')).toContainText('whole quantity');
+    check(expect, e);
+});
+
+test('replacement and additional products share one search and preserve decoration', async ({ page }) => {
+    const e = await open(page, { url: '/calculators/quick-quote/index.html' });
+    await page.locator('#qqLineMethod').selectOption('dtf');
+    await page.locator('[data-placement="back"]').selectOption('CB');
+    await page.locator('#qqProductSearch').fill('PC55'); await page.locator('#qqProductSearch').press('Enter');
+    await expect(page.locator('#qqCopy')).toBeEnabled();
+    await page.locator('.qq-line-style').fill('PC61');
+    await expect(page.locator('#qqCopy')).toBeDisabled();
+    await page.locator('#qqSearchResults button').first().click();
+    await expect(page.locator('.qq-sheet-item')).toHaveCount(1);
+    await expect(page.locator('#qqSheet')).toContainText('PC61');
+    await page.locator('#qqLineAdd').click();
+    await page.locator('.qq-line-style').last().fill('PC54'); await page.locator('.qq-line-style').last().press('Enter');
+    await expect(page.locator('.qq-sheet-item')).toHaveCount(2);
+    await expect(page.locator('[data-placement="back"]')).toHaveValue('CB');
+    await expect(page.locator('#qqSearchPanel')).toHaveCount(1);
+    await expect(page.locator('#qqSearchPanel')).toBeHidden();
+    await expect(page.locator('[data-recommend]').first()).toBeVisible();
+    await page.locator('.qq-line-row').first().locator('.qq-line-rm').click();
+    await expect(page.locator('.qq-sheet-item')).toHaveCount(1);
+    await page.locator('.qq-line-style').fill('PC55'); await page.locator('.qq-line-style').press('Enter');
+    await expect(page.locator('#qqSheet')).toContainText('PC55');
+    check(expect, e);
+});
+
+test('copy fallback is selectable and absent from print', async ({ page }) => {
+    const e = await open(page, { url: '/calculators/quick-quote/index.html' });
+    await page.locator('#qqProductSearch').fill('PC54'); await page.locator('#qqProductSearch').press('Enter');
+    await expect(page.locator('#qqCopy')).toBeEnabled();
+    await page.evaluate(() => Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: async () => { throw new Error('blocked'); } } }));
+    await page.locator('#qqCopy').click();
+    await expect(page.locator('#qqCopyText')).toBeVisible();
+    await expect(page.locator('#qqCopyText')).toHaveValue(/PC54/);
+    await page.emulateMedia({ media: 'print' });
+    await expect(page.locator('#qqCopyFallback')).toBeHidden();
+    await expect(page.locator('#qqCopyStatus')).toBeHidden();
+    await expect(page.locator('#qqSheet')).toBeVisible();
+    check(expect, e);
+});
+
+test('a product name selects its suggestion with Enter', async ({ page }) => {
+    await page.setViewportSize({ width: 1265, height: 712 });
+    const e = await open(page, { url: '/calculators/quick-quote/index.html', searchProducts: [{ styleNumber: 'PC54', productName: 'Cotton Tee' }] });
+    await page.locator('#qqProductSearch').fill('tee');
+    await expect(page.locator('#qqSearchResults button')).toHaveText('PC54 · Cotton Tee');
+    await page.locator('#qqProductSearch').press('Enter');
+    await expect(page.locator('#qqCopy')).toBeEnabled();
+    await expect(page.locator('.qq-line-style')).toHaveValue('PC54');
+    await expect(page.locator('#qqSearchPanel')).toBeHidden();
+    for (const selector of ['#qqLineQty', '[data-logo="primary"]', '#qqEmbDigitizing', '.qq-sheet-ladder']) {
+        const bounds = await page.locator(selector).boundingBox();
+        expect(bounds.y + bounds.height, selector).toBeLessThanOrEqual(712);
+    }
+    check(expect, e);
+});
+
 for (const method of ['emb', 'capemb', 'dtg', 'scp', 'dtf']) test('customer estimate includes actual totals and fees: ' + method, async ({ page }) => {
     const e = await open(page, { url: '/calculators/quick-quote/index.html' });
-    await page.locator('[data-line-method="' + method + '"]').click();
+    await page.locator('#qqLineMethod').selectOption(method);
     await page.locator('#qqLineQty').fill(method === 'scp' ? '24' : method === 'dtf' ? '10' : '5');
     if (method === 'emb' || method === 'capemb') await page.locator('#qqEmbDigitizing').check();
     await page.locator('#qqLineAdd').click();
-    await page.locator('.qq-line-style').fill(method === 'capemb' ? 'C112' : 'PC54');
+    await page.locator('.qq-line-style').fill(method === 'capemb' ? 'C112' : 'PC54'); await page.locator('.qq-line-style').press('Enter');
     await expect(page.locator('#qqLinePrint')).toBeEnabled();
     await expect(page.locator('#qqSheet')).toContainText('Estimated total');
     await expect(page.locator('#qqSheet')).toContainText('Valid through Oct 12, 2026');
@@ -33,9 +132,9 @@ for (const method of ['emb', 'capemb', 'dtg', 'scp', 'dtf']) test('customer esti
 
 for (const [method, quantity] of [['emb', 3], ['emb', 7], ['capemb', 3], ['capemb', 7], ['dtg', 23], ['dtf', 23], ['scp', 24], ['scp', 37]]) test('small-order price survives the full builder and PDF: ' + method + ' ' + quantity, async ({ page, context }) => {
     const e = await open(page, { url: '/calculators/quick-quote/index.html' });
-    await page.locator('[data-line-method="' + method + '"]').click();
+    await page.locator('#qqLineMethod').selectOption(method);
     await page.locator('#qqLineQty').fill(String(quantity));
-    await page.locator('#qqLineAdd').click(); await page.locator('.qq-line-style').fill(method === 'capemb' ? 'C112' : 'PC54');
+    await page.locator('#qqLineAdd').click(); await page.locator('.qq-line-style').fill(method === 'capemb' ? 'C112' : 'PC54'); await page.locator('.qq-line-style').press('Enter');
     await expect(page.locator('#qqLinePrint')).toBeEnabled();
     const expectedText = await page.locator('.qq-document-total dd').textContent(), expectedTotal = Number(expectedText.replace(/[$,]/g, ''));
     const href = await page.locator('#qqDocumentOptions a').getAttribute('href');
@@ -83,15 +182,17 @@ test('reps choose and recommend customer options; a multi-option PDF keeps them 
 
 test('editing a priced product immediately prevents stale output', async ({ page }) => {
     const e = await open(page, { url: '/calculators/quick-quote/index.html' });
-    await page.locator('#qqLineAdd').click(); await page.locator('.qq-line-style').fill('PC54');
+    await page.locator('#qqLineAdd').click(); await page.locator('.qq-line-style').fill('PC54'); await page.locator('.qq-line-style').press('Enter');
     await expect(page.locator('#qqLinePrint')).toBeEnabled();
     await page.locator('.qq-line-style').fill('PC61');
     await expect(page.locator('#qqLinePrint')).toBeDisabled();
     await expect(page.locator('#qqSheet')).toBeHidden();
+    await page.locator('.qq-line-style').press('Enter');
     await expect(page.locator('#qqLinePrint')).toBeEnabled();
     await expect(page.locator('#qqSheet')).toContainText('PC61');
     await page.locator('#qqLineQty').fill('');
-    await expect(page.locator('#qqLinePrint')).toBeDisabled();
+    await expect(page.locator('#qqLinePrint')).toBeEnabled();
+    await expect(page.locator('.qq-document-total')).toHaveCount(0);
     check(expect, e);
 });
 
@@ -140,7 +241,8 @@ test('customer PDF downloads a real document and local draft restores fresh inpu
 for (const method of ['emb', 'capemb', 'cap-puff', 'cap-patch', 'dtf', 'scp', 'scp-back']) test('full builder retains decoration from customer option: ' + method, async ({ page, context }) => {
     const actual = method === 'scp-back' ? 'scp' : method.startsWith('cap-') ? 'capemb' : method;
     const e = await open(page, { url: '/calculators/quick-quote/index.html' });
-    await page.locator('[data-line-method="' + actual + '"]').click();
+    await page.locator('#qqLineMethod').selectOption(actual);
+    await page.locator('#qqLineQty').fill('24');
     if (['emb', 'capemb'].includes(actual)) {
         if (method === 'cap-puff' || method === 'cap-patch') await page.locator('[data-cap-emb="' + (method === 'cap-puff' ? '3d-puff' : 'laser-patch') + '"]').click();
         await page.locator('[data-logo="primary"]').fill('11000');
@@ -148,15 +250,16 @@ for (const method of ['emb', 'capemb', 'cap-puff', 'cap-patch', 'dtf', 'scp', 's
         await page.locator('#qqEmbAddBtn').click();
         if (actual === 'emb') await page.locator('#qqEmbAddBtn').click();
     } else {
-        await page.locator('[data-kind="back"][data-code="FB"]').click();
+        await page.locator('[data-placement="back"]').selectOption('FB');
+        await page.locator('#qqMoreSettings summary').click();
         await page.locator('#qqSleeveL').check();
         if (actual === 'scp') {
             await page.locator('#qqInkFront').fill('3'); await page.locator('#qqInkBack').fill('2');
             await page.locator('#qqSleeveInkL').fill('4'); await page.locator('#qqScpDark').check();
-            if (method === 'scp-back') await page.locator('[data-kind="front"][data-code=""]').click();
+            if (method === 'scp-back') await page.locator('[data-placement="front"]').selectOption('');
         }
     }
-    await page.locator('#qqLineAdd').click(); await page.locator('.qq-line-style').fill(actual === 'capemb' ? 'C112' : 'PC54');
+    await page.locator('#qqLineAdd').click(); await page.locator('.qq-line-style').fill(actual === 'capemb' ? 'C112' : 'PC54'); await page.locator('.qq-line-style').press('Enter');
     await expect(page.locator('#qqLinePrint')).toBeEnabled();
     const href = await page.locator('#qqDocumentOptions a').getAttribute('href');
     const expectedTotal = await page.locator('.qq-document-total dd').textContent();
