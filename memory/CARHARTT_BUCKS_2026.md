@@ -8,8 +8,8 @@ Source: Erik's Carhartt Bucks.png; approved September 15, 2026.
 - [x] Staff Dashboard / Sales access, rep toolkit, printable certificate, Forms Library entry, and printable visit log.
 - [x] Pacific-time visit / redemption / expired states; accessible clipboard feedback.
 - [x] Mobile/desktop, date boundaries, download, staff access, CSS/build and local deterministic checks.
-- [ ] Exact-source GitHub CI release gate.
-- [ ] Publish and verify production routes/assets.
+
+Publication requires a successful exact-source GitHub CI run, then release-tag and Heroku status verification. Release evidence is recorded in GitHub Actions and Heroku release history.
 
 ## Offer and design
 
@@ -25,4 +25,4 @@ Visit phase ends 2026-10-01T00:00:00-07:00. Redemption ends 2026-10-16T00:00:00-
 
 ## Verification
 
-Both one-page PDFs rendered and visually reviewed. Six focused browser cases cover four widths (1440/768/390/320), public/staff pages, four discovery placements, WCAG AA checks, clipboard success/denial, Pacific boundaries, public downloads and anonymous staff denial. The light promotion banner supplies its own canonical accent tokens so dark staff theme buttons retain contrast. Source mappings preserve original brand, catalog and staff content fixtures. Shared CSS adds one necessary campaign owner; manifest budgets increase by that owner’s measured bytes only. Release target: v2026.09.15.3; Local lint/typecheck passed; unit suite 265 suites / 6,355 passed / 26 existing skips; DOM+a11y 12 suites / 92 passed. Exact-source GitHub CI and live verification pending.
+Both one-page PDFs rendered and visually reviewed. Six focused browser cases cover four widths (1440/768/390/320), public/staff pages, four discovery placements, WCAG AA checks, clipboard success/denial, Pacific boundaries, public downloads and anonymous staff denial. The light promotion banner supplies its own canonical accent tokens so dark staff theme buttons retain contrast. Source mappings preserve original brand, catalog and staff content fixtures. Browser navigation contracts explicitly assert the approved campaign links and compare every other historical link. Shared CSS adds one necessary campaign owner; manifest budgets increase by that owner’s measured bytes only. Release target: v2026.09.15.3; local lint/typecheck passed; unit suite 265 suites / 6,355 passed / 26 existing skips; DOM+a11y 12 suites / 92 passed; live pricing and quote-path browser checks 12 passed.
