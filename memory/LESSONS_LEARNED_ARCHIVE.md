@@ -4506,3 +4506,46 @@ Problem/root cause: malformed usage could appear as zero, partial schema could m
 **Prevention:** Test catalog/custom round trips, row rebuilding, editing and loading after another order. Check narrow layouts, complete PDF values and multi-page headings; use the shared dialog lifecycle with native dialogs for keyboard focus and scroll restoration.
 
 **Personalization recovery follow-up:** Validate roster arrays before replacing current data; obsolete load/search/OCR/save responses must not change a newer view. Keep failed loads inert with visible retry, clear canceled OCR UI and preserve keyboard file access. Save success must match the API envelope; lock duplicate submissions and scope acknowledgments/navigation to the originating roster. Original native CSV and payload comparisons plus rejection/race tests prevent silent drift. Validate Excel groups/rows before replacing data; ignore obsolete files/views and imports preceding a save. Collect unsaved cells before adding a group; keep required-input errors inside native dialogs. Monogram ItemsJSON and save IDs/HTTP status must be validated before replacing names or clearing dirty state. Picker label clicks already dispatch native checkbox clicks; never toggle both. Return focus after Done/Escape, keep retry errors in place and preserve original proof fonts/colors when removing global print overrides.
+
+## Archived 2026-09-14
+
+## Customer account requests must retain ownership and persisted state (2026-09-10)
+
+- Problem/root cause: storage exceptions still reported Added; a successful batch cleared later additions; older color/minimum responses and request completion replaced newer UI; custom drawers/modals let keyboard focus escape.
+- Solution: report write failure, remove only the submitted list prefix, protect pending rows, track response generations and restore/contain dialog focus. Keep failed requests and notes available for exact retry; unavailable minimums stay visibly unknown while the rep can still quote. After a confirmed send, failed storage cleanup retains only unsent rows in memory and shows Sent with a reload warning; never invite a duplicate request.
+- Prevention: reproduce defects against immutable originals with delayed/rejected synthetic requests and unavailable storage. Keep pricing/date/quantity transformations unchanged. Inspect every paper page: complete descriptions, size labels with inputs, visible entered notes and no footer-only page.
+
+## Method dialogs need explicit state and spacing (2026-09-12)
+
+- Problem/root cause: DTF color controls kept aria-expanded true after selection; its distinct size-dialog body/footer and customer heading relied on removed legacy spacing. Long location names overflowed the phone summary.
+- Solution: synchronize picker open/close attributes, give the method-specific size grid and footer canonical spacing, align the customer header and wrap summary values. Native location and shipping controls share the existing keyboard delegation.
+- Prevention: compare original prices, fees, shipping and saved fields at four widths; test selection/Escape and native location keys, inspect complete size dialogs, every table column and all paper pages.
+
+## DTG hidden states and printable controls (2026-09-12)
+
+- Root cause: legacy flex/display rules exposed empty CRM notices, a design thumbnail without a design, expired share notifications and disabled assistant actions without quote output. Phone date fields and preflight values were clipped.
+- Fix: shared hidden/notification contracts, native keyboard controls, wrapping customer values and full-width dates; compact method-scoped print controls retain every financial value.
+- Prevention: test populated fees, locations, shipping, successful/failed saves and research-only replies against original fields/payloads. Inspect complete scroll areas and every printed page; assert intended hidden/disabled state before normalizing original visibility.
+
+## Customer and vendor status views must own pending requests and paper (2026-09-10)
+
+- Problem/root cause: disabling Post did not guard Ctrl+Enter; late job errors escaped into the list, and pending note completion could reopen a prior job. Shared shell print rules hid branding; prefix class edits accidentally styled count labels as buttons.
+- Solution: guard the pending note in the controller, retain drafts per job, use request generations and verify the selected job before updating UI. Native job buttons share one activation path. Reuse scoped components and preserve print headers, whole rows and complete totals.
+- Migration guards must follow shared visibility/focus ownership and native controls; assert DOM semantics instead of class order or removed custom key handlers, while retaining real-browser hidden/keyboard/phone checks. A print-cancellation test must create an actual QA error (missing size), assert the confirmation and await its dismissal; missing-thread warnings do not block printing, and checking before an asynchronous print finishes is a false pass.
+- Prevention: synthetic delayed/failure/retry/keyboard/late-navigation tests with exact original request bodies; compare class tokens exactly, preserve source hashes and fixed label-case exceptions, and visually inspect every paper page. Remove empty-space margins without changing preserved empty element contracts.
+
+## Quote lists must retain failure and action ownership (2026-09-10)
+
+- Problem/root cause: local filtering replaced failed-load feedback with an empty list; delayed inbound/date-window responses could restore obsolete rows. Native-dialog cancellation could not return focus to a trigger disabled before confirmation. Delete authentication recovery called a removed helper.
+- Solution: retain load failure until a successful retry, clear dependent data and guard render generations. Claim action ownership before confirmation but disable the trigger only after acceptance; contain focus and preserve cancellation. Reject repeated pending sends/deletes and show expired-session feedback without retrying a write.
+- Prevention: synthetic success→failure→filter→retry and reordered reads; keyboard/focus tests at four widths; blocked/expired/pending write tests and exact original payload comparisons. Verify one box label per page, quantities and IDs as well as total PDF text.
+
+## Shared staff dialogs and print jobs (2026-09-10)
+
+An afterprint handler must clear its fallback timer and remove only its own captured sheet; otherwise an old timer can delete the next document. Use page (not always) for modern break-before/after so box labels and rep reports actually separate in Chromium. Native dialog errors belong inside the dialog; guard obsolete previews and keep pending sends from closing or accepting duplicate actions. Mark lazy tabs mounted only when their delayed loader actually runs. Render PDFs with nonzero synthetic costs and multi-box data, check per-page identifiers and totals, and inspect white paper backgrounds.
+
+## Reporting freshness must describe the rendered result (2026-09-10)
+
+- Problem/root cause: controllers caught API failures but resolved without a failure value, so Company Numbers labelled failed reads Updated and retained old totals, dates and charts. A recovered sample list kept its old error, and late revenue windows could overwrite a newer selection.
+- Solution: shared controllers announce actual results (including direct Retry and fallback goals), clear dependent stale displays on failure, remove recovered errors, and render only the latest revenue request. The header distinguishes incomplete reads.
+- Prevention: test initial failure and failure after success, recovery, partial comparison/fallback goals and delayed success/error with synthetic records. Preserve exact money/date-window results. Runtime SVG variables need a scoped alias when replacing the legacy theme; print checks must retain production amounts and blanks status that the old mobile cascade hid.
