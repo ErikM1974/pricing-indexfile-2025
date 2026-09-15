@@ -10,7 +10,8 @@ and it emails the form to them, maybe use email.js."
 
 **LIVE 2026-09-15**: proxy v2026.09.15.1 (`7869c82`) then app v2026.09.15.7 (`0216ca93`, Heroku v2124).
 Forms_Library row PK 120 (`garment-liability-waiver`, Customer Intake) added through the admin forwarder.
-First live send: staff panel emailed a link to erik@ (`[garment-waiver] link emailed …` in the app logs).
+First live send: staff panel emailed a link to erik@ (EmailJS history: OK via the Outlook service, 3:45 PM).
+First live signature: **GLW0915-4943** (Erik, order TEST-WAIVER, 9/15/2026 3:54 PM PT) — copy + rep notice sent; archive it in the Inbox.
 
 ## What shipped
 
@@ -56,6 +57,8 @@ Service) is the source of the numbers and should be kept in step.
 
 - 🔑 The customer page POSTs straight to the proxy (`APP_CONFIG.API.BASE_URL`), so the **proxy must be
   deployed before the app** — otherwise every sign attempt 400s with "formId must be one of …".
+- 🔑 Delivery proof = EmailJS **Email History** (dashboard.emailjs.com/admin/history): the server sends through the
+  `service_1c4k67j` **Outlook** service, so the mail lands in the M365 mailbox — the Gmail connector never sees it.
 - 🔑 EmailJS from Heroku only: `api.emailjs.com` is unreachable from the LAN, so the send-link / signed
   routes can only be proven live (`heroku logs` show `[garment-waiver] link emailed …`).
 - 🔑 A rep opening the page also gets the staff panel; that is fine for counter signing on a tablet.
