@@ -35,7 +35,7 @@
  *     "not available for this placement" state (no layout jumps).
  *
  * Public API (consumed by product/js/product-2026.js):
- *   PdpConfigurator.init(ctx)      ctx = { style, isCap, productName,
+ *   PdpConfigurator.init(ctx)      ctx = { style, isCap, isFlat, productName,
  *                                    eligibility, getColor(), onChange() }
  *   PdpConfigurator.setColor()     re-price after a swatch change (EMB
  *                                    prices per color via /api/size-pricing)
@@ -141,6 +141,14 @@
         { key: 'front', label: 'Front', sub: 'Front logo' },
         { key: 'frontBack', label: 'Front + back', sub: 'Front + back logos' }
     ];
+    // Flat headwear (beanies, headbands — ctx.isFlat) is priced as garment
+    // embroidery, so it keeps the garment keys and engine inputs; only the chip
+    // words change ("Left chest" means nothing on a beanie).
+    const FLAT_HEADWEAR_WORDS = {
+        leftChest: { label: 'Front', sub: 'Front logo' },
+        back: { label: 'Back', sub: 'Back logo' },
+        frontBack: { label: 'Front + back', sub: 'Front + back logos' }
+    };
 
     const DTG_CODES = { leftChest: 'LC', fullFront: 'FF', back: 'FB', frontBack: 'LC_FB' };
     const DTF_KEYS = {
@@ -665,7 +673,11 @@
      * list rather than a placement-less configurator.
      */
     function currentLocations() {
-        const all = state.ctx.isCap ? CAP_LOCATIONS : GARMENT_LOCATIONS;
+        const all = state.ctx.isCap ? CAP_LOCATIONS
+            : state.ctx.isFlat ? GARMENT_LOCATIONS.map(function (l) {
+                return Object.assign({}, l, FLAT_HEADWEAR_WORDS[l.key]);
+            })
+            : GARMENT_LOCATIONS;
         const live = all.filter(function (l) {
             return state.methods.some(function (m) {
                 return METHODS[m.id] && METHODS[m.id].supports[l.key];
@@ -1267,6 +1279,7 @@
      * @param {Object} ctx
      *   style        style number (required)
      *   isCap        cap product → cap placements + cap-embroidery pricing
+     *   isFlat       flat headwear (beanie, headband) → garment pricing, "Front" chip words
      *   productName  display name for CTAs
      *   eligibility  DecorationMethods.eligibleFor() result (garments; null for caps)
      *   getColor     () → { name: COLOR_NAME, catalog: CATALOG_COLOR } | null

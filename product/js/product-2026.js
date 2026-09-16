@@ -16,6 +16,11 @@
  *     cotton gate ('warn' → blend note on the chip, 'no' → chip absent);
  *     rules unavailable → embroidery-only chip + visible alert-warn
  *     (methodAlert). Caps branch: cap placements + cap-embroidery pricing.
+ *   - CAP vs GARMENT via the shared HeadwearClassifier
+ *     (shared_components/js/headwear-classifier.js — the one rule every price
+ *     surface uses): isCap → caps branch; flat headwear (beanies, headbands,
+ *     gaiters…) → garment embroidery only, without the category rules;
+ *     module missing → visible pricing error, never a keyword guess.
  *
  * URL contract (preserved from the legacy /product app):
  *   ?style= | ?StyleNumber=    style number (required)
@@ -51,6 +56,7 @@
         selected: null,
         view: 'front_model',
         isCap: false,
+        headwear: null,     // HeadwearClassifier.classify() result; null when the module did not load
         inventoryRows: null, // raw rows from /api/sanmar/inventory (all colors)
         decoration: null    // DecorationMethods.eligibleFor() result (garments only)
     };
@@ -186,15 +192,32 @@
             status: first.PRODUCT_STATUS || ''
         };
         state.colors = Array.from(colorMap.values());
-        state.isCap = detectCap(state.product, state.style);
+        state.headwear = detectHeadwear(state.product, state.style);
+        state.isCap = !!(state.headwear && state.headwear.isCap);
     }
 
-    function detectCap(product, style) {
-        if (product.category === 'Caps') return true;
-        if (product.category) return false;
-        // Empty category (e.g. Richardson rows in Sanmar_Bulk): numeric style or "cap" in title
-        if (/^\d{2,3}$/.test(style)) return true;
-        return /\bcaps?\b/i.test(product.title || '');
+    /**
+     * Cap vs garment embroidery — the ONE shared rule (Erik 2026-09-16). SanMar
+     * leaves CATEGORY_NAME blank on Richardson caps and most visors, and Youth/
+     * Ladies caps carry "Caps" only in the subcategory, so the classifier reads
+     * the title, subcategory and description too. isCap → cap embroidery;
+     * anything else (flat headwear included) → garment embroidery.
+     * Returns null when the module didn't load: initConfigurator() shows a
+     * visible pricing error rather than guessing (Rule 4).
+     */
+    function detectHeadwear(product, style) {
+        const classifier = window.HeadwearClassifier;
+        if (!classifier || typeof classifier.classify !== 'function') {
+            console.error('[product-2026] HeadwearClassifier module missing — cannot choose cap or garment pricing');
+            return null;
+        }
+        return classifier.classify({
+            STYLE: style,
+            PRODUCT_TITLE: product.title,
+            CATEGORY_NAME: product.category,
+            SUBCATEGORY_NAME: product.subcategory,
+            PRODUCT_DESCRIPTION: product.description
+        });
     }
 
     function pickInitialColor(colorParam) {
@@ -542,12 +565,32 @@
     }
 
     /**
+     * Flat headwear (beanies, headbands, gaiters…) is embroidered flat and priced
+     * as garment embroidery. The live "Caps" decoration rule turns every method
+     * off, so the category rules are not asked — the same embroidery-only set
+     * Quick Quote uses (calculators/quick-quote/quick-quote.js resolveEligibility).
+     */
+    function flatHeadwearEligibility() {
+        return { EMB: true, DTG: 'no', SCP: false, DTF: false, source: 'flat-headwear' };
+    }
+
+    /**
      * Resolve eligibility, then hand pricing entirely to the configurator.
      * Eligibility gating decides which method chips render; the configurator
      * + QuoteCartEngine own every price (never computed in page code).
      */
     async function initConfigurator() {
-        state.decoration = state.isCap ? null : await getEligibility();
+        if (!state.headwear) {
+            // No shared cap/garment rule → no way to pick the right pricing. Say so; never guess.
+            state.decoration = null;
+            $('methodAlert').innerHTML = alertHtml('error', 'Unable to load live pricing',
+                'The product type check didn\'t load, so we can\'t tell which embroidery pricing applies. '
+                + 'Please refresh, or call 253-922-5793 for a quote — we never guess at prices.');
+            return;
+        }
+        if (state.isCap) state.decoration = null;
+        else if (state.headwear.isFlat) state.decoration = flatHeadwearEligibility();
+        else state.decoration = await getEligibility();
         renderMethodAlert();
 
         if (!window.PdpConfigurator) {
@@ -561,6 +604,7 @@
         window.PdpConfigurator.init({
             style: state.style,
             isCap: state.isCap,
+            isFlat: state.headwear.isFlat === true,
             productName: state.product.name || state.style,
             eligibility: state.decoration,
             getColor: function () {
@@ -593,13 +637,20 @@
         });
     }
 
-    /** Visible warning whenever eligibility fell back to the safe set. */
+    /**
+     * Visible warning whenever eligibility fell back to the safe set; a short
+     * note when flat headwear is limited to embroidery on purpose.
+     */
     function renderMethodAlert() {
         const slot = $('methodAlert');
         if (!slot) return;
-        if (!state.isCap && state.decoration && state.decoration.source === 'fallback') {
+        const source = !state.isCap && state.decoration ? state.decoration.source : null;
+        if (source === 'fallback') {
             slot.innerHTML = alertHtml('warn', 'Showing embroidery pricing',
                 'Other decoration options may be available for this garment — call 253-922-5793 and a real person will confirm.');
+        } else if (source === 'flat-headwear') {
+            slot.innerHTML = '<p class="pdp-panel-note" id="flatHeadwearNote">'
+                + 'Beanies and other soft headwear are embroidered flat, so embroidery is the decoration we offer for this style.</p>';
         } else {
             slot.innerHTML = '';
         }

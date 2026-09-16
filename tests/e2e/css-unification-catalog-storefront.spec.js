@@ -96,6 +96,53 @@ async function productReady(page,method,qty){
  // the other method cards are ready for the immutable visible-content snapshot.
  await expect(page.locator('#cfgMethods')).not.toContainText('Getting your live price…');
 }
+// Cap vs garment embroidery comes from the shared headwear classifier (Erik 2026-09-16).
+// The beanie runs under the live-like Caps rule (every method off): only the flat path prices it.
+test('catalog storefront headwear: beanie CP90 is flat garment embroidery labelled Front',async({page})=>{
+ const events=await open(page,{url:'/product.html?style=CP90',allMethods:true,liveCapsRule:true});
+ await productReady(page);
+ await expect(page.locator('#cfgMethods [data-method]')).toHaveCount(1);
+ await expect(page.locator('#cfgMethods [data-method="emb"]')).toBeVisible();
+ await expect(page.locator('#flatHeadwearNote')).toContainText('Beanies and other soft headwear are embroidered flat');
+ await expect(page.locator('#cfgLocations [data-loc]')).toHaveText([/^Front\s*Front logo$/,/^Back\s*Back logo$/,/^Front \+ back\s*Front \+ back logos$/]);
+ await expect(page.locator('#cfgInkRow')).toBeHidden();
+ await expect(page.locator('#cfgMatrix')).toContainText('Price per piece');
+ expect(await page.evaluate(()=>window.PdpConfigurator.getSelection())).toMatchObject({methodId:'emb',engineMethod:'EMB',isCap:false,locationKey:'leftChest',locationLabel:'Front'});
+ const bundles=events.reads.filter(r=>r.path==='/api/pricing-bundle').map(r=>new URLSearchParams(r.query).get('method'));
+ expect(bundles).toContain('EMB');expect(bundles).not.toContain('CAP');
+ expect(events.reads.some(r=>r.path==='/api/decoration-methods'),'flat headwear never asks the Caps rule').toBe(false);
+ fs.mkdirSync(out,{recursive:true});
+ for(const width of [1440,768,390,320]){
+  await page.setViewportSize({width,height:1000});
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+  await page.locator('section[aria-labelledby="pricingHeading"]').screenshot({path:path.join(out,'catalog-storefront-headwear-CP90-'+width+'.png')});
+ }
+ expect((await new AxeBuilder({page}).include('section[aria-labelledby="pricingHeading"]').withTags(['wcag2a','wcag2aa','wcag21aa']).analyze()).violations.map(v=>v.id)).toEqual([]);
+ await page.setViewportSize({width:1440,height:1000});
+ await page.locator('#cfgAddToQuote').click();
+ expect(await page.evaluate(()=>window.QuoteCartStore.getItems())).toMatchObject([{style:'CP90',method:'EMB',placement:'leftChest',placementLabel:'Front',isCap:false}]);
+ check(expect,events);
+});
+test('catalog storefront headwear: blank-category Richardson 112FPR is priced as a cap',async({page})=>{
+ const events=await open(page,{url:'/product.html?style=112FPR',allMethods:true});
+ await productReady(page);
+ await expect(page.locator('#cfgMethods [data-method]')).toHaveCount(1);
+ await expect(page.locator('#cfgMethods [data-method="capemb"]')).toBeVisible();
+ await expect(page.locator('#cfgLocations [data-loc]')).toHaveText([/^Front\s*Front logo$/,/^Front \+ back\s*Front \+ back logos$/]);
+ await expect(page.locator('#methodAlert')).toBeEmpty();
+ await expect(page.locator('#cfgMatrix')).toContainText('Price per cap');
+ expect(await page.evaluate(()=>window.PdpConfigurator.getSelection())).toMatchObject({methodId:'capemb',engineMethod:'CAP',isCap:true,locationKey:'front'});
+ expect(events.reads.filter(r=>r.path==='/api/pricing-bundle').map(r=>new URLSearchParams(r.query).get('method'))).toContain('CAP');
+ expect(events.reads.some(r=>r.path==='/api/decoration-methods'),'caps never ask the category rules').toBe(false);
+ await page.setViewportSize({width:390,height:1000});
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+ await page.locator('section[aria-labelledby="pricingHeading"]').screenshot({path:path.join(out,'catalog-storefront-headwear-112FPR-390.png')});
+ await page.setViewportSize({width:1440,height:1000});
+ await page.locator('#cfgAddToQuote').click();
+ expect(await page.evaluate(()=>window.QuoteCartStore.getItems())).toMatchObject([{style:'112FPR',method:'CAP',placement:'front',isCap:true}]);
+ check(expect,events);
+});
+
 async function remember(page,events,label){events.actions.push({label,selection:await page.evaluate(()=>window.PdpConfigurator?.getSelection()||null),url:new URL(page.url()).pathname+new URL(page.url()).search});}
 
 test('CSS catalog storefront: catalog filters sorting history and quick view',async({page})=>{
