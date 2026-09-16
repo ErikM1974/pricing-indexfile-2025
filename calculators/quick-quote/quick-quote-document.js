@@ -48,6 +48,7 @@
             rep: String(details.rep || '').trim(), email: String(details.email || '').trim(),
             notes: String(details.notes || '').trim(), date: date(now), expires: date(expiry),
             showBreaks: details.showBreaks !== false,
+            release: /^\d{4}\.\d{2}\.\d{2}\.\d+$/.test(details.release || '') ? details.release : '',
             smallBatch: options.some(o => o.tiers.some(t => t.ltmFee > 0)),
             terms: 'Estimate only · pricing valid 30 days · confirm stock & sizes at order time.',
             assumptions: (options.some(o => o.sizes) ? 'Priced for the sizes listed.' : 'Standard sizes shown; 2XL and up may cost more.')
@@ -250,7 +251,8 @@
             file.setPage(page);
             write('Page ' + page + ' of ' + pages, right, 750, 8, false, 100, colors.muted, 'right');
         }
-        file.setProperties({ title: 'NWCA ' + doc.title, author: doc.rep || 'Northwest Custom Apparel' });
+        // The Quick Quote version stays out of the customer's view; it is only in the file properties.
+        file.setProperties({ title: 'NWCA ' + doc.title, author: doc.rep || 'Northwest Custom Apparel', creator: 'NWCA Quick Quote' + (doc.release ? ' ' + doc.release : '') });
         return file;
     }
     const api = { model, html, pdf, text, option, exactText, money, escape, names };

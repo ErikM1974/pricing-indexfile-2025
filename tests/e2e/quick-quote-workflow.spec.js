@@ -245,6 +245,63 @@ test('Ctrl+P while prices update prints a notice, never the old prices', async (
     check(expect, e);
 });
 
+// Erik 2026-09-16: reps quote the version in feedback, and a one-time badge says something changed.
+test('the version line names the release and What’s new clears the Updated badge', async ({ page }) => {
+    const e = await open(page, { url: '/calculators/quick-quote/index.html' });
+    const version = (await page.locator('#qqRelease').getAttribute('data-release')).split('?v=')[1];
+    await expect(page.locator('#qqReleaseLabel')).toHaveText(/^Version \d{4}\.\d{2}\.\d{2}\.\d+ · Updated [A-Z][a-z]{2} \d{1,2}, \d{4}$/);
+    await expect(page.locator('#qqReleaseLabel')).toContainText('Version ' + version + ' ·');
+    await expect(page.locator('#qqReleaseBadge')).toBeVisible();
+    await expect(page.locator('#qqReleaseNotes')).toBeHidden();
+    // What's new floats over the page: opening it never moves the form.
+    const before = await page.locator('#qqModeToggle').boundingBox();
+    await page.locator('#qqReleaseToggle').click();
+    await expect(page.locator('#qqReleaseToggle')).toHaveAttribute('aria-expanded', 'true');
+    expect(await page.locator('#qqModeToggle').boundingBox()).toEqual(before);
+    await expect(page.locator('#qqReleaseNotes li').first()).toBeVisible();
+    await expect(page.locator('#qqReleaseNotes h2').last()).toBeHidden();
+    await page.locator('#qqReleaseNotes summary').click();
+    await expect(page.locator('#qqReleaseNotes h2').last()).toHaveText('Version 2026.09.16.2 · Sep 16, 2026');
+    await expect(page.locator('#qqReleaseNotes h2').last()).toBeVisible();
+    await expect(page.locator('#qqReleaseBadge')).toBeHidden();
+    const axe = await new AxeBuilder({ page }).include('#qqRelease').withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
+    expect(axe.violations.map(v => v.id)).toEqual([]);
+    // The floating list stays inside the window at every width (reopened so it is placed for it).
+    for (const width of [1440, 990, 900, 768, 390, 320]) {
+        await page.setViewportSize({ width, height: 800 });
+        await page.locator('#qqReleaseToggle').click();
+        await page.locator('#qqReleaseToggle').click();
+        await expect(page.locator('#qqReleaseNotes')).toBeVisible();
+        expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), width + 'px no sideways scroll').toBe(true);
+        const notes = await page.locator('#qqReleaseNotes').boundingBox();
+        expect(notes.x, width + 'px left edge').toBeGreaterThanOrEqual(0);
+        expect(notes.x + notes.width, width + 'px right edge').toBeLessThanOrEqual(width);
+    }
+    // Tabbing out of the list closes it.
+    await page.locator('#qqReleaseNotes summary').focus();
+    await page.keyboard.press('Shift+Tab');
+    await page.keyboard.press('Shift+Tab');
+    await expect(page.locator('#qqReleaseNotes')).toBeHidden();
+    await page.locator('#qqReleaseToggle').click();
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#qqReleaseNotes')).toBeHidden();
+    await expect(page.locator('#qqReleaseToggle')).toBeFocused();
+    await page.locator('#qqReleaseToggle').click();
+    await page.locator('.page-title').click();
+    await expect(page.locator('#qqReleaseNotes')).toBeHidden();
+    // The line shares the subtitle's row on a laptop, so the form keeps its place.
+    await page.setViewportSize({ width: 1265, height: 712 });
+    const [lede, release] = await Promise.all([page.locator('.lede').boundingBox(), page.locator('#qqRelease').boundingBox()]);
+    expect(release.x).toBeGreaterThan(lede.x + lede.width);
+    await page.reload();
+    await expect(page.locator('#qqReleaseLabel')).toContainText('Version ' + version + ' ·');
+    await expect(page.locator('#qqReleaseBadge')).toBeHidden();
+    await page.emulateMedia({ media: 'print' });
+    await expect(page.locator('#qqRelease')).toBeHidden();
+    await page.emulateMedia({ media: 'screen' });
+    check(expect, e);
+});
+
 // Erik 2026-09-16: beanies are flat embroidery everywhere, the same as the Embroidery builder.
 test('beanies price as flat embroidery on every sheet and in Quick Price', async ({ page }) => {
     const e = await open(page, { url: '/calculators/quick-quote/index.html' });

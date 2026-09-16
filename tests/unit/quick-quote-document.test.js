@@ -142,6 +142,26 @@ test('unavailable pricing or malformed breaks cannot reach the customer', () => 
     expect(o.tiers).toHaveLength(4);
 });
 
+test('the Quick Quote version goes into the PDF file properties only', async () => {
+    const properties = [];
+    class FakePdf {
+        constructor() { this.pages = 1; }
+        setLineHeightFactor() {} setFont() {} setFontSize() {} setTextColor() {} setDrawColor() {} setLineWidth() {} setFillColor() {}
+        line() {} rect() {} addImage() {} setPage() {} addPage() {} text() {}
+        setProperties(value) { properties.push(value); }
+        getNumberOfPages() { return this.pages; }
+        splitTextToSize(value) { return [value]; }
+    }
+    const doc = sheet([input()], { release: '2026.09.16.3' });
+    await pdf(doc, FakePdf, async () => null);
+    expect(properties[0]).toMatchObject({ title: 'NWCA Line Sheet', creator: 'NWCA Quick Quote 2026.09.16.3' });
+    expect(html(doc)).not.toContain('2026.09.16.3');
+    expect(text(doc)).not.toContain('2026.09.16.3');
+    expect(sheet([input()], { release: '<b>1</b>' }).release).toBe('');
+    await pdf(sheet([input()]), FakePdf, async () => null);
+    expect(properties[1].creator).toBe('NWCA Quick Quote');
+});
+
 test('the PDF writes the same table rows and exact line as the screen', async () => {
     const written = [];
     class FakePdf {

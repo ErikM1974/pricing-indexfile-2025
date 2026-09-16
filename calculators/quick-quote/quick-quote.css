@@ -1782,8 +1782,74 @@
         border-radius: var(--radius-sm);
     }
 
-    :where([data-ui="unified"][data-quick-quote]) :is(.qq-draft-note, .qq-line-row) .qq-link-btn {
+    :where([data-ui="unified"][data-quick-quote]) :is(.qq-draft-note, .qq-line-row, .qq-release) .qq-link-btn {
         padding: 0;
+    }
+
+    /* The version line shares the subtitle's row when there is room, so the form doesn't move. */
+    :where([data-ui="unified"][data-quick-quote]) .qq-hero-text {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        column-gap: var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-hero-text .page-title {
+        flex-basis: 100%;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-release {
+        position: relative;
+        margin-top: var(--space-1);
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0 var(--space-3);
+        font-size: var(--font-size-sm);
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-release-badge {
+        margin-left: var(--space-1);
+        padding: 0 var(--space-2);
+        border-radius: var(--radius-sm);
+        background: var(--ui-tint);
+        color: var(--ui-accent-hover);
+        font-weight: 600;
+    }
+
+    /* What's new floats over the page, so opening it never moves the form. */
+    :where([data-ui="unified"][data-quick-quote]) .qq-release-notes {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        z-index: var(--z-overlay);
+        width: min(30rem, calc(100vw - 2 * var(--space-4)));
+        max-height: min(28rem, 70vh);
+        overflow: auto;
+        padding: var(--space-3) var(--space-4) var(--space-1);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+        background: var(--ui-surface);
+        box-shadow: var(--shadow-md);
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-release-earlier summary {
+        margin-bottom: var(--space-2);
+        color: var(--ui-accent-hover);
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-release-entry h2 {
+        margin: 0;
+        font-size: var(--font-size-sm);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-release-entry ul {
+        margin: var(--space-1) 0 var(--space-3);
+        padding-left: var(--space-5);
     }
 
     :where([data-ui="unified"][data-quick-quote]) :is(.qq-elig-note, [id="qqDocumentStatus"].is-error) {

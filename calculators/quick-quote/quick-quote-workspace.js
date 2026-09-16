@@ -20,7 +20,8 @@
     }
     function details() {
         return { mode: bridge.state.mode, method: bridge.method(), subtitle: bridge.subtitle(), customer: $('qqCustomerName').value, company: $('qqCompanyName').value,
-            rep: $('qqRepName').value, email: $('qqRepEmail').value, notes: $('qqCustomerNotes').value, showBreaks: $('qqShowBreaks').checked };
+            rep: $('qqRepName').value, email: $('qqRepEmail').value, notes: $('qqCustomerNotes').value, showBreaks: $('qqShowBreaks').checked,
+            release: window.QuickQuoteReleases ? window.QuickQuoteReleases.current() : '' };
     }
     function refresh() {
         if (!bridge || scheduled) return;
