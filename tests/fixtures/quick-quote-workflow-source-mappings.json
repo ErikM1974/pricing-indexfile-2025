@@ -1,5 +1,5 @@
 {
-  "description": "Authorized September 13, 2026 Quick Quote redesign. Apply before historical CSS mappings. Original hashes remain immutable; current pricing/handoffs tested independently. classic-restore-2026-09-16: Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings. release-2026.09.16.2: Deploy v2026.09.16.2 cache-bust of the Quick Quote assets.",
+  "description": "Authorized September 13, 2026 Quick Quote redesign. Apply before historical CSS mappings. Original hashes remain immutable; current pricing/handoffs tested independently. classic-restore-2026-09-16: Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings. release-2026.09.16.2: Deploy v2026.09.16.2 cache-bust of the Quick Quote assets. release-notes-2026-09-16: Erik approved 2026-09-16: Quick Quote shows its version (from the deploy's cache-bust), a What's new list and a one-time Updated badge for Nika and Taneisha's trial. release-2026.09.16.3: Deploy v2026.09.16.3 cache-bust of the Quick Quote assets.",
   "changes": [
     {
       "file": "calculators/quick-quote/dtf-prints-prototype.html",
@@ -1786,6 +1786,70 @@
       "count": 1,
       "stage": "release-2026.09.16.2",
       "reason": "Deploy v2026.09.16.2 cache-bust of the Quick Quote assets."
+    },
+    {
+      "file": "calculators/quick-quote/index.html",
+      "before": "            <div>\n                <h1 class=\"page-title\">Quick Quote</h1>\n                <p class=\"lede\">Pick a method, type style numbers and send the price breaks.</p>",
+      "after": "            <div class=\"qq-hero-text\">\n                <h1 class=\"page-title\">Quick Quote</h1>\n                <p class=\"lede\">Pick a method, type style numbers and send the price breaks.</p>\n                <!-- data-release: /deploy rewrites its ?v= with the script tag below (quick-quote-releases.js). -->\n                <div class=\"qq-release\" id=\"qqRelease\" data-release=\"/calculators/quick-quote/quick-quote-releases.js?v=2026.09.16.2\" hidden>\n                    <span id=\"qqReleaseLabel\"></span>\n                    <button type=\"button\" class=\"qq-link-btn\" id=\"qqReleaseToggle\" aria-expanded=\"false\" aria-controls=\"qqReleaseNotes\">What’s new <span aria-hidden=\"true\">▾</span><span class=\"qq-release-badge\" id=\"qqReleaseBadge\" hidden>Updated</span></button>\n                    <div class=\"qq-release-notes\" id=\"qqReleaseNotes\" hidden></div>\n                </div>",
+      "count": 1,
+      "stage": "release-notes-2026-09-16",
+      "reason": "Erik approved 2026-09-16: Quick Quote shows its version (from the deploy's cache-bust), a What's new list and a one-time Updated badge for Nika and Taneisha's trial."
+    },
+    {
+      "file": "calculators/quick-quote/index.html",
+      "before": "    <script src=\"/shared_components/js/safety-stripe-recs.js?v=2026.09.13.2\"></script>\n    <script src=\"/calculators/quick-quote/quick-quote-document.js?v=2026.09.16.2\"></script>",
+      "after": "    <script src=\"/shared_components/js/safety-stripe-recs.js?v=2026.09.13.2\"></script>\n    <script src=\"/calculators/quick-quote/quick-quote-releases.js?v=2026.09.16.2\"></script>\n    <script src=\"/calculators/quick-quote/quick-quote-document.js?v=2026.09.16.2\"></script>",
+      "count": 1,
+      "stage": "release-notes-2026-09-16",
+      "reason": "Erik approved 2026-09-16: Quick Quote shows its version (from the deploy's cache-bust), a What's new list and a one-time Updated badge for Nika and Taneisha's trial."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.css",
+      "before": "    :where([data-ui=\"unified\"][data-quick-quote]) :is(.qq-draft-note, .qq-line-row) .qq-link-btn {\n        padding: 0;",
+      "after": "    :where([data-ui=\"unified\"][data-quick-quote]) :is(.qq-draft-note, .qq-line-row, .qq-release) .qq-link-btn {\n        padding: 0;\n    }\n\n    /* The version line shares the subtitle's row when there is room, so the form doesn't move. */\n    :where([data-ui=\"unified\"][data-quick-quote]) .qq-hero-text {\n        display: flex;\n        flex-wrap: wrap;\n        align-items: center;\n        column-gap: var(--space-5);\n    }\n\n    :where([data-ui=\"unified\"][data-quick-quote]) .qq-hero-text .page-title {\n        flex-basis: 100%;\n    }\n\n    :where([data-ui=\"unified\"][data-quick-quote]) .qq-release {\n        position: relative;\n        margin-top: var(--space-1);\n        display: flex;\n        flex-wrap: wrap;\n        align-items: center;\n        gap: 0 var(--space-3);\n        font-size: var(--font-size-sm);\n        color: var(--ui-muted);\n    }\n\n    :where([data-ui=\"unified\"][data-quick-quote]) .qq-release-badge {\n        margin-left: var(--space-1);\n        padding: 0 var(--space-2);\n        border-radius: var(--radius-sm);\n        background: var(--ui-tint);\n        color: var(--ui-accent-hover);\n        font-weight: 600;\n    }\n\n    /* What's new floats over the page, so opening it never moves the form. */\n    :where([data-ui=\"unified\"][data-quick-quote]) .qq-release-notes {\n        position: absolute;\n        top: 100%;\n        left: 0;\n        z-index: var(--z-overlay);\n        width: min(30rem, calc(100vw - 2 * var(--space-4)));\n        max-height: min(28rem, 70vh);\n        overflow: auto;\n        padding: var(--space-3) var(--space-4) var(--space-1);\n        border: 1px solid var(--ui-line);\n        border-radius: var(--radius-sm);\n        background: var(--ui-surface);\n        box-shadow: var(--shadow-md);\n        color: var(--ui-ink);\n    }\n\n    :where([data-ui=\"unified\"][data-quick-quote]) .qq-release-earlier summary {\n        margin-bottom: var(--space-2);\n        color: var(--ui-accent-hover);\n        font-weight: 600;\n        cursor: pointer;\n    }\n\n    :where([data-ui=\"unified\"][data-quick-quote]) .qq-release-entry h2 {\n        margin: 0;\n        font-size: var(--font-size-sm);\n    }\n\n    :where([data-ui=\"unified\"][data-quick-quote]) .qq-release-entry ul {\n        margin: var(--space-1) 0 var(--space-3);\n        padding-left: var(--space-5);",
+      "count": 1,
+      "stage": "release-notes-2026-09-16",
+      "reason": "Erik approved 2026-09-16: Quick Quote shows its version (from the deploy's cache-bust), a What's new list and a one-time Updated badge for Nika and Taneisha's trial."
+    },
+    {
+      "file": "calculators/quick-quote/linesheet-print.css",
+      "before": "            .hero .lede,\n            .proto-banner,",
+      "after": "            .hero .lede,\n            .qq-release,\n            .proto-banner,",
+      "count": 1,
+      "stage": "release-notes-2026-09-16",
+      "reason": "Erik approved 2026-09-16: Quick Quote shows its version (from the deploy's cache-bust), a What's new list and a one-time Updated badge for Nika and Taneisha's trial."
+    },
+    {
+      "file": "calculators/quick-quote/index.html",
+      "before": "    <link rel=\"stylesheet\" href=\"/calculators/quick-quote/quick-quote.css?v=2026.09.16.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/safety-stripe-recs.css?v=2026.09.13.2\">\n    <link rel=\"stylesheet\" href=\"/calculators/quick-quote/linesheet-print.css?v=2026.09.16.2\" media=\"print\">",
+      "after": "    <link rel=\"stylesheet\" href=\"/calculators/quick-quote/quick-quote.css?v=2026.09.16.3\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/safety-stripe-recs.css?v=2026.09.13.2\">\n    <link rel=\"stylesheet\" href=\"/calculators/quick-quote/linesheet-print.css?v=2026.09.16.3\" media=\"print\">",
+      "count": 1,
+      "stage": "release-2026.09.16.3",
+      "reason": "Deploy v2026.09.16.3 cache-bust of the Quick Quote assets."
+    },
+    {
+      "file": "calculators/quick-quote/index.html",
+      "before": "                <div class=\"qq-release\" id=\"qqRelease\" data-release=\"/calculators/quick-quote/quick-quote-releases.js?v=2026.09.16.2\" hidden>",
+      "after": "                <div class=\"qq-release\" id=\"qqRelease\" data-release=\"/calculators/quick-quote/quick-quote-releases.js?v=2026.09.16.3\" hidden>",
+      "count": 1,
+      "stage": "release-2026.09.16.3",
+      "reason": "Deploy v2026.09.16.3 cache-bust of the Quick Quote assets."
+    },
+    {
+      "file": "calculators/quick-quote/index.html",
+      "before": "    <script src=\"/calculators/quick-quote/quick-quote-releases.js?v=2026.09.16.2\"></script>\n    <script src=\"/calculators/quick-quote/quick-quote-document.js?v=2026.09.16.2\"></script>\n    <script src=\"/calculators/quick-quote/quick-quote-workspace.js?v=2026.09.16.2\"></script>",
+      "after": "    <script src=\"/calculators/quick-quote/quick-quote-releases.js?v=2026.09.16.3\"></script>\n    <script src=\"/calculators/quick-quote/quick-quote-document.js?v=2026.09.16.3\"></script>\n    <script src=\"/calculators/quick-quote/quick-quote-workspace.js?v=2026.09.16.3\"></script>",
+      "count": 1,
+      "stage": "release-2026.09.16.3",
+      "reason": "Deploy v2026.09.16.3 cache-bust of the Quick Quote assets."
+    },
+    {
+      "file": "calculators/quick-quote/dtf-prints-prototype.html",
+      "before": "    <link rel=\"stylesheet\" href=\"/calculators/quick-quote/quick-quote.css?v=2026.09.16.2\">\n    <link rel=\"stylesheet\" href=\"/calculators/quick-quote/dtf-prints-prototype.css?v=2026.09.13.2\">\n    <link rel=\"stylesheet\" href=\"/calculators/quick-quote/linesheet-print.css?v=2026.09.16.2\" media=\"print\">",
+      "after": "    <link rel=\"stylesheet\" href=\"/calculators/quick-quote/quick-quote.css?v=2026.09.16.3\">\n    <link rel=\"stylesheet\" href=\"/calculators/quick-quote/dtf-prints-prototype.css?v=2026.09.13.2\">\n    <link rel=\"stylesheet\" href=\"/calculators/quick-quote/linesheet-print.css?v=2026.09.16.3\" media=\"print\">",
+      "count": 1,
+      "stage": "release-2026.09.16.3",
+      "reason": "Deploy v2026.09.16.3 cache-bust of the Quick Quote assets."
     }
   ]
 }

@@ -2,6 +2,30 @@ const {test,expect}=require('@playwright/test'),fs=require('node:fs'),path=requi
 const {open,snapshot,check}=require('./helpers/quick-quote-browser');
 const root=path.resolve(__dirname,'../..'),out=path.join(__dirname,'screenshots/css-unification'),capture=process.env.CAPTURE_QUICK_QUOTE_ORIGINAL==='1',phase=capture?'original':'current';
 test.use({timezoneId:'America/Los_Angeles',locale:'en-US',reducedMotion:'reduce'});
+// The page fires its engine/pricing reads concurrently, so their arrival order varies run to run
+// (2026-09-16: unmodified 556721b1 failed on reordered, identical entries). Compare reads as a
+// multiset — same entries, same counts, any order — keys sorted so a request's shape is its identity.
+const canonical=v=>JSON.stringify(v,(k,x)=>x&&typeof x==='object'&&!Array.isArray(x)?Object.fromEntries(Object.keys(x).sort().map(key=>[key,x[key]])):x);
+const unordered=record=>({...record,reads:record.reads.map(canonical).sort()});
+// The original page's pricing warning (#pricing-api-warning) pulses forever (opacity 1 → 0.85, no
+// reduced-motion rule), so axe's colour-contrast verdict for the buttons inside it depends on the
+// frame it samples (4.3–4.4 vs 4.5). Only those readings are set aside, on both sides; the banner's
+// colours are checked instead at a fixed frame, and every other rule, node and field stays exact.
+const FLICKERING=['pricing-api-warning'];
+async function animatedContrast(page,records){
+ const targets=[...new Set(records.flatMap(r=>r.states.flatMap(s=>s.violations.filter(v=>v.id==='color-contrast').flatMap(v=>v.nodes.map(n=>JSON.stringify(n))))))];
+ const animated=new Set(await page.evaluate(({targets,ids})=>{
+  const pulsing=document.getAnimations().filter(a=>a.effect&&a.effect.target&&ids.includes(a.effect.target.id)&&a.effect.getComputedTiming().iterations===Infinity).map(a=>a.effect.target);
+  return targets.filter(t=>{const path=JSON.parse(t),el=path.length===1&&typeof path[0]==='string'&&document.querySelectorAll(path[0]).length===1&&document.querySelector(path[0]);return !!el&&pulsing.some(p=>p.contains(el));});
+ },{targets,ids:FLICKERING}));
+ if(animated.size){
+  await page.evaluate(ids=>document.getAnimations().forEach(a=>{if(a.effect&&a.effect.target&&ids.includes(a.effect.target.id)){a.pause();a.currentTime=0;}}),FLICKERING);
+  const still=await FLICKERING.reduce((axe,id)=>axe.include('#'+id),new AxeBuilder({page})).withRules(['color-contrast']).analyze();
+  expect(still.violations.map(v=>({id:v.id,nodes:v.nodes.map(n=>n.target)})),'pricing warning colours at a fixed frame').toEqual([]);
+ }
+ return animated;
+}
+const steady=(record,animated)=>({...record,states:record.states.map(s=>({...s,violations:s.violations.map(v=>v.id==='color-contrast'?{...v,nodes:v.nodes.filter(n=>!animated.has(JSON.stringify(n)))}:v).filter(v=>v.nodes.length)}))});
 async function evidence(page,name,e){
  const states=[];fs.mkdirSync(out,{recursive:true});
  await page.locator('img[loading="lazy"]').evaluateAll(ns=>ns.forEach(n=>{n.loading='eager';}));
@@ -12,8 +36,8 @@ async function evidence(page,name,e){
   if(!capture){expect(s.overflow).toBe(false);expect(axe.violations.map(v=>({id:v.id,nodes:v.nodes.map(n=>n.target)}))).toEqual([]);}
   await page.screenshot({path:path.join(out,'quick-quote-'+name+'-'+phase+'-'+width+'.png'),fullPage:true});
  }
- check(expect,e);const record={name,states,reads:e.reads,dialogs:e.dialogs},file='tests/fixtures/quick-quote-'+name+'-original-browser.json';
- if(capture){if(fs.existsSync(path.join(root,file)))expect(record).toEqual(JSON.parse(fs.readFileSync(path.join(root,file),'utf8')));else{fs.writeFileSync(path.join(root,file),JSON.stringify(record,null,2)+'\n');fs.appendFileSync(path.join(root,'ACTIVE_FILES.md'),'\n- '+file+' — immutable Quick Quote synthetic browser evidence.\n');}}
+ check(expect,e);const record={name,states,reads:[...e.reads],dialogs:e.dialogs},file='tests/fixtures/quick-quote-'+name+'-original-browser.json';
+ if(capture){if(fs.existsSync(path.join(root,file))){const saved=JSON.parse(fs.readFileSync(path.join(root,file),'utf8')),animated=await animatedContrast(page,[record,saved]);expect(steady(unordered(record),animated)).toEqual(steady(unordered(saved),animated));}else{fs.writeFileSync(path.join(root,file),JSON.stringify(record,null,2)+'\n');fs.appendFileSync(path.join(root,'ACTIVE_FILES.md'),'\n- '+file+' — immutable Quick Quote synthetic browser evidence.\n');}}
  else{const before=JSON.parse(fs.readFileSync(path.join(root,file),'utf8'));
  // These unavailable controls used to leak through the native hidden attribute.
  // Only their visibility changes; all active inputs, content and prices must match.

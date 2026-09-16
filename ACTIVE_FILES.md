@@ -1645,12 +1645,14 @@ Garment designer completion: page styles are scoped to the unified designer; art
 
 - calculators/quick-quote/quick-quote-document.js — line sheet / estimate model shared by screen, copy text and PDF: last week's Qty · Per pc · Small-batch fee table plus an optional exact-quantity all-in line equal to the engine total (classic restore 2026-09-16).
 - calculators/quick-quote/quick-quote-workspace.js — sheet rendering (kept on screen, dimmed, while prices update), product-name suggestions for style boxes, recent/favorite styles, input-only drafts, customer details, copy/print/PDF exports (a missing photo is left out with a note).
+- calculators/quick-quote/quick-quote-releases.js — Quick Quote's version line, "What's new" list and one-time Updated badge (2026-09-16). The version comes from index.html #qqRelease data-release, which /deploy's cache-bust rewrites with this script's ?v=; add a new first entry for every Quick Quote change.
 - `shared_components/js/headwear-classifier.js` — cap / flat headwear / garment decision from category, subcategory, title and (blank category only) cap shapes and description; handles Richardson caps with no category. First consumer: Quick Quote (2026-09-16).
 
 - tests/e2e/quick-quote-workflow.spec.js — restored line-sheet flow (typed styles, one-tap methods/placements, 1265×712 fit), five-method sheets with accessibility, builder total parity (incl. a beanie priced as flat embroidery), cap and beanie routing, blank-category warnings, search suggestions, stale-output, PDF/photo/draft regressions.
 - tests/unit/quick-quote-document.test.js — Qty/Per pc/Small-batch fee table, exact-quantity totals per method, setup display, cap wording, per-row decoration, escaping and PDF rows.
 - tests/unit/headwear-classifier.test.js — cap/flat/garment decisions on 60 live catalog rows plus Richardson, "cap sleeve", shape-word and garment-word guards.
 - tests/unit/quick-quote-ladder.test.js — runs Quick Quote's real probeLadder against fake DTF/EMB/DTG engines: fee-row prices never under-quote any quantity, moved tiers re-anchor, failures in any pass are reported.
+- tests/unit/quick-quote-releases.test.js — Quick Quote version line: the release marker matches the script tag, a code change without a new "What's new" fingerprint fails, entries are ordered and price-free, badge/storage behaviour.
 - tests/fixtures/headwear-classifier-rows.json — live product rows captured 2026-09-16 for the headwear classifier test.
 
 - tests/unit/quick-quote-handoff.test.js — versioned decoration validation and legacy handoff compatibility.

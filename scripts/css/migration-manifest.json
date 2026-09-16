@@ -6743,11 +6743,12 @@
         "1265x712-single-method-controls-and-price-breaks",
         "exact-first-shared-search-copy-and-optional-quantity",
         "classic-line-sheet-typed-styles-one-tap-methods-fee-row-2026-09-16",
-        "cap-routing-blank-category-warnings-and-updating-sheet"
+        "cap-routing-blank-category-warnings-and-updating-sheet",
+        "version-line-whats-new-and-updated-badge-2026-09-16"
       ],
       "test": "tests/e2e/css-unification-quick-quote.spec.js",
-      "maxCssBytes": 126108,
-      "measuredRawCssBytes": 125972,
+      "maxCssBytes": 128219,
+      "measuredRawCssBytes": 128083,
       "baseline": {
         "commit": "583372db",
         "rawCssBytes": 60371,
@@ -6781,8 +6782,8 @@
         "shared-safety-panel-expanded-and-garment-handoff"
       ],
       "test": "tests/e2e/css-unification-quick-quote.spec.js",
-      "maxCssBytes": 135448,
-      "measuredRawCssBytes": 135273,
+      "maxCssBytes": 137559,
+      "measuredRawCssBytes": 137384,
       "baseline": {
         "commit": "583372db",
         "rawCssBytes": 61878,
