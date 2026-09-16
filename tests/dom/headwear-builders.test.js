@@ -4,7 +4,10 @@
  *   • EMB + SCP onStyleChange classify with everything /api/product-colors carries
  *     (SUBCATEGORY_NAME, PRODUCT_DESCRIPTION, productTitle) through the shared rule.
  *   • The ShopWorks import maps cap sizes from the ROW's cap flag only — no second guess.
- *   • DTF search hides caps by the shared rule on the suggestion label.
+ *   • DTF search hides a row only when the old keyword rule AND the shared rule both call
+ *     it a cap (nothing it listed before disappears), and an exact hidden style says why.
+ *   • A ShopWorks vendor product is filed under Caps from the same text the import prices
+ *     from, and loads on the same side every later time.
  *   • A reopened EMB quote whose prices moved shows a visible notice, and says
  *     "now priced as a garment/cap" only when the saved quote proves the old side.
  */
@@ -36,8 +39,10 @@ globalThis.showToast = recordToast;
 const childRows = [];
 globalThis.createOrUpdateExtendedChildRow = (rowId, size, qty) => childRows.push([size, qty]);
 
-// The real shared rule, loaded before the bundles exactly like the pages do.
+// The real shared rule (and, for DTF search, the old keyword rule), loaded before the
+// bundles exactly like the pages do.
 require('../../shared_components/js/headwear-classifier.js');
+require('../../shared_components/js/product-category-filter.js');
 const { rows } = require('../fixtures/headwear-classifier-rows.json');
 
 const bundle = (name) => require(path.join(__dirname, '.bundles', name));
@@ -160,54 +165,208 @@ describe('ShopWorks import: cap size mapping trusts the row flag only', () => {
         expect(emb.parseShopWorksDescription('Duck Trucker Jacket, Brown', 'J1').category).toBe('Outerwear');
         expect(emb.parseShopWorksDescription("Women's Cap Sleeve Tee, White", 'LT1').category).toBe('T-Shirts');
     });
-});
 
-describe('DTF search hides caps by the shared rule', () => {
-    let DTFQuoteProducts;
-    beforeAll(() => {
-        const src = fs.readFileSync(path.join(__dirname, '../../shared_components/js/dtf-quote-products.js'), 'utf8');
-        window.APP_CONFIG = window.APP_CONFIG || { API: { BASE_URL: 'http://test.invalid/api-base' } };
-        window.DTFQuotePricing = function DTFQuotePricing() {};
-        DTFQuoteProducts = new Function(`${src}\nreturn DTFQuoteProducts;`)();
-    });
-    const label = (style) => { const r = fixtureRow(style); return { value: r.STYLE, label: `${r.STYLE} - ${r.PRODUCT_TITLE}` }; };
-
-    test('the ExactMatchSearch filter drops caps and keeps garments and flat headwear', () => {
-        let config;
-        window.ExactMatchSearch = function ExactMatchSearch(c) { config = c; };
-        const manager = new DTFQuoteProducts();
-        expect(manager.initializeExactMatchSearch(() => {}, () => {})).toBe(true);
-        const keep = (style) => config.filterFunction(label(style));
-        expect(keep('C112')).toBe(false);
-        expect(keep('112FPR')).toBe(false);    // Richardson five-panel: was shown before
-        expect(keep('STC57')).toBe(false);     // visor
-        expect(keep('PC54')).toBe(true);
-        expect(keep('MM3032')).toBe(true);     // "Capital" blazer: was hidden before
-        expect(keep('CP90')).toBe(true);       // flat headwear stays searchable, as before
-        expect(config.filterFunction({ value: 'X', label: 'X - Sport-Tek Fitted Tee' })).toBe(true);
-        expect(config.filterFunction({ value: 'Y', label: 'Y - Baseball Tee' })).toBe(true);
+    test('the cap word in the brand counts: the whole description is classified, as the import prices it', () => {
+        expect(emb.parseShopWorksDescription('Pacific Headwear P747 Perforated, Black', 'P747'))
+            .toEqual({ brand: 'Pacific Headwear', name: 'P747 Perforated', color: 'Black', category: 'Caps' });
+        expect(emb.parseShopWorksDescription('Outdoor Cap OC771 Cotton Twill, Khaki', 'OC771'))
+            .toEqual({ brand: 'Outdoor Cap', name: 'OC771 Cotton Twill', color: 'Khaki', category: 'Caps' });
+        // The ShopWorks service prefix is not a cap word, same as the import's pricing.
+        expect(emb.parseShopWorksDescription('Di. Embroider Cap - T-shirt', 'X9').category).toBe('T-Shirts');
     });
 
-    test('the legacy search filters the same way', async () => {
-        window.fetch = global.fetch = jest.fn(() => Promise.resolve({ ok: true, json: () => Promise.resolve(['C112', 'PC54', 'MM3032'].map(label)) }));
-        const found = await new DTFQuoteProducts().searchProducts('PC');
-        expect(found.map(p => p.value).sort()).toEqual(['MM3032', 'PC54']);
+    // What forceImportAsNonSanmar prices from, and what populateNonSanmarRow reads back later
+    // (the saved ProductName + Category) — the two must agree for every description.
+    const DESCRIPTIONS = [
+        ['Pacific Headwear P747 Perforated, Black', 'P747'],
+        ['Outdoor Cap OC771 Cotton Twill, Khaki', 'OC771'],
+        ['Richardson Trucker Cap 112, Black', '112'],
+        ['Richardson Hood River 173, Black', '173'],   // a cap only by its style; "hood" is flat inside Caps
+        ['Port Authority Knit Beanie, Navy', 'CP90'],
+        ['Kitchen Skull Cap: Edwards, Black', 'SK1'],
+        ['Duck Trucker Jacket, Brown', 'J1'],
+        ["Women's Cap Sleeve Tee, White", 'LT1'],
+        ['Di. Embroider Cap - T-shirt', 'X9'],
+        ['Pacific Headwear Knit Headband, Grey', 'PH1'],
+    ];
+    test.each(DESCRIPTIONS)('%s keeps the side it was imported on when it loads again', (description, partNumber) => {
+        const importedCap = emb.isCapProduct(partNumber, description);
+        const parsed = emb.parseShopWorksDescription(description, partNumber);
+        const saved = { StyleNumber: partNumber, ProductName: parsed.name || description, Category: parsed.category, DefaultColors: 'Black' };
+        expect(emb.isCapProduct(saved.StyleNumber, saved.ProductName, saved.Category)).toBe(importedCap);
+        const row = mountRow();
+        emb.populateNonSanmarRow(row, 1, saved);
+        expect(row.dataset.isCap).toBe(String(importedCap));
     });
 
-    test('a missing classifier is a visible error, not a keyword guess', async () => {
+    test('the Pacific Headwear and Outdoor Cap examples are caps on import and on every later load', () => {
+        for (const [description, partNumber] of DESCRIPTIONS.slice(0, 2)) {
+            expect(emb.isCapProduct(partNumber, description)).toBe(true);
+            const parsed = emb.parseShopWorksDescription(description, partNumber);
+            const row = mountRow();
+            emb.populateNonSanmarRow(row, 1, { StyleNumber: partNumber, ProductName: parsed.name, Category: parsed.category, DefaultColors: 'Black' });
+            expect(row.dataset.isCap).toBe('true');
+        }
+        // Hood River stays a cap because it is filed without a category.
+        expect(emb.parseShopWorksDescription('Richardson Hood River 173, Black', '173').category).toBe('');
+    });
+
+    test('filing a vendor product without the shared rule is a visible error', () => {
         const saved = window.HeadwearClassifier;
         const shown = [];
         globalThis.showToast = (message, type) => shown.push(type);
         delete window.HeadwearClassifier;
         try {
-            expect(() => new DTFQuoteProducts().isCapSuggestion(label('C112'))).toThrow(/cap\/garment check did not load/);
-            window.fetch = global.fetch = jest.fn(() => Promise.resolve({ ok: true, json: () => Promise.resolve([label('C112')]) }));
-            expect(await new DTFQuoteProducts().searchProducts('C1')).toEqual([]);
-            expect(shown).toEqual(['error', 'error']);
+            expect(() => emb.parseShopWorksDescription('Pacific Headwear P747 Perforated, Black', 'P747')).toThrow(/cap\/garment check did not load/);
+            expect(shown).toEqual(['error']);
         } finally {
             window.HeadwearClassifier = saved;
             globalThis.showToast = recordToast;
         }
+    });
+});
+
+describe('DTF search hides a row only when both cap rules agree', () => {
+    let DTFQuoteProducts;
+    let DTFQuoteBuilder;
+    let RealExactMatchSearch;
+    beforeAll(() => {
+        const src = fs.readFileSync(path.join(__dirname, '../../shared_components/js/dtf-quote-products.js'), 'utf8');
+        window.APP_CONFIG = window.APP_CONFIG || { API: { BASE_URL: 'http://test.invalid/api-base' } };
+        window.DTFQuotePricing = function DTFQuotePricing() {};
+        DTFQuoteProducts = new Function(`${src}\nreturn DTFQuoteProducts;`)();
+        RealExactMatchSearch = require('../../shared_components/js/exact-match-search.js');
+        ({ DTFQuoteBuilder } = bundle('dtf-quote-builder-class.cjs'));
+    });
+    const label = (style) => { const r = fixtureRow(style); return { value: r.STYLE, label: `${r.STYLE} - ${r.PRODUCT_TITLE}` }; };
+    // The filter the search module is given, exactly as the page wires it.
+    const searchFilter = () => {
+        let config;
+        window.ExactMatchSearch = function ExactMatchSearch(c) { config = c; };
+        const manager = new DTFQuoteProducts();
+        expect(manager.initializeExactMatchSearch(() => {}, () => {})).toBe(true);
+        return config;
+    };
+
+    test('caps both rules agree on stay hidden; everything listed before stays listed', () => {
+        const config = searchFilter();
+        const keep = (style) => config.filterFunction(label(style));
+        expect(keep('C112')).toBe(false);
+        expect(keep('112')).toBe(false);
+        expect(keep('STC57')).toBe(false);     // visor
+        expect(keep('PC54')).toBe(true);
+        expect(keep('CP90')).toBe(true);       // flat headwear stays searchable, as before
+        // Listed before (the keyword rule never called them caps) — still listed.
+        for (const style of ['C975', 'NKBFN6319', '810', '112FPR', '169']) expect([style, keep(style)]).toEqual([style, true]);
+        // Hidden before by the keyword list, not caps by the shared rule — listed now.
+        for (const style of ['MM3032', 'WW3040', 'HT01']) expect([style, keep(style)]).toEqual([style, true]);
+        expect(config.filterFunction({ value: 'X', label: 'X - Sport-Tek Fitted Tee' })).toBe(true);
+        expect(config.filterFunction({ value: 'Y', label: 'Y - Baseball Tee' })).toBe(true);
+    });
+
+    test('nothing the keyword rule listed is hidden now (every classifier fixture row)', () => {
+        const config = searchFilter();
+        let checked = 0;
+        for (const { row } of rows) {
+            const item = { value: row.STYLE, label: `${row.STYLE} - ${row.PRODUCT_TITLE}` };
+            if (window.ProductCategoryFilter.isStructuredCap(item)) continue;
+            expect([row.STYLE, config.filterFunction(item)]).toEqual([row.STYLE, true]);
+            checked++;
+        }
+        expect(checked).toBeGreaterThan(10);
+    });
+
+    test('the legacy search filters the same way', async () => {
+        window.fetch = global.fetch = jest.fn(() => Promise.resolve({ ok: true, json: () => Promise.resolve(['C112', 'PC54', 'MM3032', '112FPR'].map(label)) }));
+        const found = await new DTFQuoteProducts().searchProducts('PC');
+        expect(found.map(p => p.value).sort()).toEqual(['112FPR', 'MM3032', 'PC54']);
+    });
+
+    test.each([
+        ['HeadwearClassifier'],
+        ['ProductCategoryFilter'],
+    ])('a missing %s is a visible error, not a guess', async (name) => {
+        const saved = window[name];
+        const shown = [];
+        globalThis.showToast = (message, type) => shown.push(type);
+        delete window[name];
+        try {
+            expect(() => new DTFQuoteProducts().isCapSuggestion(label('C112'))).toThrow(/cap\/garment check did not load/);
+            expect(() => new DTFQuoteProducts().isCapSuggestion(label('PC54'))).toThrow(/cap\/garment check did not load/);
+            window.fetch = global.fetch = jest.fn(() => Promise.resolve({ ok: true, json: () => Promise.resolve([label('C112')]) }));
+            expect(await new DTFQuoteProducts().searchProducts('C1')).toEqual([]);
+            expect(shown).toEqual(['error', 'error', 'error']);
+        } finally {
+            window[name] = saved;
+            globalThis.showToast = recordToast;
+        }
+    });
+
+    describe('the search box says why a hidden cap is missing', () => {
+        const RESULTS = {
+            C112: ['C112', 'STC57'],   // the exact style and another cap — all hidden
+            C11: ['C112', '112'],      // only caps, none typed exactly
+            ZZ: [],                    // nothing at all
+            PC54: ['PC54'],
+        };
+        let builder;
+        let searchCalls;
+        const box = () => /** @type {HTMLInputElement} */ (document.getElementById('product-search'));
+        const suggestions = () => document.getElementById('search-suggestions');
+        const settle = () => new Promise(resolve => setTimeout(resolve, 0));
+        async function search(text) {
+            box().value = text;
+            box().dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+            await settle();
+            await settle();
+        }
+
+        beforeEach(() => {
+            window.ExactMatchSearch = RealExactMatchSearch;
+            document.body.innerHTML = `
+                <div class="search-input-wrapper">
+                  <input id="product-search" type="text">
+                  <div id="search-suggestions" class="search-suggestions"></div>
+                </div>`;
+            searchCalls = [];
+            window.fetch = global.fetch = jest.fn((url) => {
+                const term = new URL(String(url)).searchParams.get('term');
+                searchCalls.push(term);
+                return Promise.resolve({ ok: true, json: () => Promise.resolve((RESULTS[term] || []).map(label)) });
+            });
+            builder = Object.assign(Object.create(DTFQuoteBuilder.prototype), {
+                productsManager: new DTFQuoteProducts(),
+                selectProduct: jest.fn(),
+            });
+            builder.setupSearchListeners();
+        });
+
+        test('an exact hidden style names itself', async () => {
+            await search('c112');
+            expect(suggestions().style.display).toBe('block');
+            expect(suggestions().querySelector('.no-results').textContent).toBe('C112 is a cap — DTF search doesn’t list caps.');
+            expect(builder.selectProduct).not.toHaveBeenCalled();
+        });
+
+        test('a repeat search (served from the search cache) still says why', async () => {
+            await search('C112');
+            await search('PC54');
+            await search(' C112 ');
+            expect(searchCalls).toEqual(['C112', 'PC54']);
+            expect(suggestions().querySelector('.no-results').textContent).toBe('C112 is a cap — DTF search doesn’t list caps.');
+        });
+
+        test('only caps match, none typed exactly', async () => {
+            await search('C11');
+            expect(suggestions().querySelector('.no-results').textContent).toBe('Only caps match C11 — DTF search doesn’t list caps.');
+        });
+
+        test('no results at all is still "No products found"; a listed style still loads', async () => {
+            await search('ZZ');
+            expect(suggestions().querySelector('.no-results').textContent).toBe('No products found');
+            await search('PC54');
+            expect(builder.selectProduct).toHaveBeenCalledWith('PC54');
+        });
     });
 });
 
@@ -288,17 +447,21 @@ describe('reopened EMB quote: price change notice', () => {
         expect(embPersistence.describeRepricedProducts(saved, now)).toEqual([]);
     });
 
-    test('the notice is a persistent, dismissible banner above the products, text only', () => {
-        document.body.innerHTML = '<main><div class="product-table-wrapper"><table id="product-table"></table></div></main>';
+    const TABLE = '<main><div class="product-table-wrapper" role="region" tabindex="0"><table id="product-table"></table></div><button id="elsewhere">x</button></main>';
+    const filled = () => new Promise(resolve => setTimeout(resolve, 60));
+
+    test('the notice is a persistent, dismissible banner above the products, text only', async () => {
+        document.body.innerHTML = TABLE;
         const banner = embPersistence.showRepricedNotice(['CP90 is now priced as a garment ($15.00 → $12.50)', '<img src=x>: $1.00 → $2.00']);
         expect(banner.id).toBe('reopen-price-notice');
         expect(banner.className).toBe('import-summary-banner banner-warning');
-        expect(banner.getAttribute('role')).toBe('status');
         expect(banner.nextElementSibling.className).toBe('product-table-wrapper');
+        await filled();
         expect(banner.querySelector('.banner-title').textContent).toBe('Prices changed from the saved quote');
         expect(banner.textContent).toContain('CP90 is now priced as a garment ($15.00 → $12.50)');
+        expect(banner.textContent).toContain('The saved quote keeps its old prices until you save a revision.');
         expect(banner.querySelector('img')).toBeNull();
-        expect(toasts.some(t => t.type === 'warning' && t.message.includes('CP90 is now priced as a garment'))).toBe(true);
+        expect(toasts).toContainEqual({ message: 'Prices changed from the saved quote — see the notice above the products.', type: 'warning' });
         // One notice at a time; no changes → no notice.
         embPersistence.showRepricedNotice(['C112: $1.00 → $2.00']);
         expect(document.querySelectorAll('#reopen-price-notice')).toHaveLength(1);
@@ -306,5 +469,63 @@ describe('reopened EMB quote: price change notice', () => {
         expect(document.getElementById('reopen-price-notice')).toBeNull();
         embPersistence.showRepricedNotice(['C112: $1.00 → $2.00']).querySelector('.btn-dismiss-banner').click();
         expect(document.getElementById('reopen-price-notice')).toBeNull();
+    });
+
+    test('the text is announced: an empty polite live region goes in first and is filled after insertion', async () => {
+        document.body.innerHTML = TABLE;
+        const banner = embPersistence.showRepricedNotice(['CP90: $15.00 → $12.50']);
+        expect(banner.hasAttribute('role')).toBe(false);
+        const live = banner.querySelector('[aria-live]');
+        expect(live.getAttribute('role')).toBe('status');
+        expect(live.getAttribute('aria-live')).toBe('polite');
+        expect(live.getAttribute('aria-atomic')).toBe('true');
+        expect(live.isConnected).toBe(true);
+        expect(live.textContent).toBe('');   // inserted empty…
+        await filled();
+        expect(live.querySelector('.banner-title').textContent).toBe('Prices changed from the saved quote');   // …then filled
+        expect(live.textContent).toContain('CP90: $15.00 → $12.50');
+        // Dismiss is not part of what is read out.
+        expect(live.contains(banner.querySelector('.btn-dismiss-banner'))).toBe(false);
+        // A notice removed before the fill never writes into the detached region.
+        const gone = embPersistence.showRepricedNotice(['C112: $1.00 → $2.00']);
+        embPersistence.clearRepricedNotice();
+        await filled();
+        expect(gone.querySelector('[aria-live]').textContent).toBe('');
+    });
+
+    test('a duplicated quote is worded as a new quote', async () => {
+        document.body.innerHTML = TABLE;
+        const banner = embPersistence.showRepricedNotice(['CP90: $15.00 → $12.50'], { forDuplicate: true });
+        await filled();
+        expect(banner.querySelector('.banner-title').textContent).toBe('Prices changed from the original quote');
+        expect(banner.textContent).toContain('Saving creates a new quote at these prices.');
+        expect(banner.textContent).not.toContain('save a revision');
+        expect(toasts).toContainEqual({ message: 'Prices changed from the original quote — see the notice above the products.', type: 'warning' });
+    });
+
+    test('Dismiss moves keyboard focus to the product table, not <body>', () => {
+        document.body.innerHTML = TABLE;
+        const wrapper = document.querySelector('.product-table-wrapper');
+        const dismiss = embPersistence.showRepricedNotice(['CP90: $15.00 → $12.50']).querySelector('.btn-dismiss-banner');
+        dismiss.focus();
+        expect(document.activeElement).toBe(dismiss);
+        dismiss.click();
+        expect(document.activeElement).toBe(wrapper);
+        expect(wrapper.getAttribute('tabindex')).toBe('0');   // the page's own tab stop, unchanged
+        // A click that never focused the button (Safari) leaves focus where it was.
+        const elsewhere = document.getElementById('elsewhere');
+        elsewhere.focus();
+        embPersistence.showRepricedNotice(['CP90: $15.00 → $12.50']).querySelector('.btn-dismiss-banner').click();
+        expect(document.activeElement).toBe(elsewhere);
+    });
+
+    test('with no scroll wrapper, the table itself takes focus', () => {
+        document.body.innerHTML = '<table id="product-table"></table>';
+        const dismiss = embPersistence.showRepricedNotice(['CP90: $15.00 → $12.50']).querySelector('.btn-dismiss-banner');
+        dismiss.focus();
+        dismiss.click();
+        const table = document.getElementById('product-table');
+        expect(document.activeElement).toBe(table);
+        expect(table.getAttribute('tabindex')).toBe('-1');
     });
 });

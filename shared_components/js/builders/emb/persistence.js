@@ -711,7 +711,7 @@ export async function loadQuoteForEditing(quoteId, opts = {}) {
 
         // Today's rules can price a saved product differently (Erik 2026-09-16: beanies and
         // other flat headwear moved to garment pricing) — show the rep what moved.
-        await noticeRepricedProducts(session, items, repricing);
+        await noticeRepricedProducts(session, items, repricing, opts);
 
     } catch (error) {
         console.error('[EditMode] Error loading quote:', error);
@@ -841,23 +841,47 @@ export function describeRepricedProducts(saved, pricing) {
     return changes;
 }
 
+// The notice text goes into its live region this long after the region is on the page — the
+// same pause the builders' announce() helper uses. A live region that arrives already holding
+// its text is often not read out.
+const REPRICED_ANNOUNCE_DELAY_MS = 30;
+
+/**
+ * Where the notice sits: just above the product table (its scroll wrapper when present).
+ * @returns {HTMLElement|null}
+ */
+function repricedNoticeAnchor() {
+    const table = document.getElementById('product-table');
+    return table ? (/** @type {HTMLElement|null} */ (table.closest('.product-table-wrapper')) || table) : null;
+}
+
 /**
  * Persistent notice above the product table, built from the EMB builder's existing
  * notice component (.import-summary-banner.banner-warning). Text only — no markup
  * from data. Replaces any earlier notice; no changes → no notice.
+ *   • The text is announced politely: an EMPTY live region is inserted first and filled
+ *     after insertion. The Dismiss button stays outside it.
+ *   • Dismiss moves keyboard focus to the product table wrapper (tabindex=0), not <body>.
+ *   • A duplicated quote saves as a NEW quote, so its note says that.
  * @param {string[]} changes
+ * @param {{forDuplicate?: boolean}} [opts]
  * @returns {HTMLElement|null}
  */
-export function showRepricedNotice(changes) {
+export function showRepricedNotice(changes, opts = {}) {
     clearRepricedNotice();
     if (!changes || changes.length === 0) return null;
+    const forDuplicate = !!(opts && opts.forDuplicate);
+    const heading = forDuplicate ? 'Prices changed from the original quote' : 'Prices changed from the saved quote';
     const banner = document.createElement('div');
     banner.id = REPRICED_NOTICE_ID;
     banner.className = 'import-summary-banner banner-warning';
-    banner.setAttribute('role', 'status');
+    const message = document.createElement('div');
+    message.setAttribute('role', 'status');
+    message.setAttribute('aria-live', 'polite');
+    message.setAttribute('aria-atomic', 'true');
     const title = document.createElement('div');
     title.className = 'banner-title';
-    title.textContent = 'Prices changed from the saved quote';
+    title.textContent = heading;
     const detail = document.createElement('div');
     detail.className = 'banner-detail';
     for (const text of changes) {
@@ -866,21 +890,37 @@ export function showRepricedNotice(changes) {
         detail.appendChild(line);
     }
     const note = document.createElement('div');
-    note.textContent = 'These are today\'s prices. The saved quote keeps its old prices until you save a revision.';
+    note.textContent = forDuplicate
+        ? 'These are today\'s prices. Saving creates a new quote at these prices.'
+        : 'These are today\'s prices. The saved quote keeps its old prices until you save a revision.';
     detail.appendChild(note);
     const dismiss = document.createElement('button');
     dismiss.type = 'button';
     dismiss.className = 'btn-dismiss-banner';
     dismiss.textContent = 'Dismiss';
     dismiss.setAttribute('aria-label', 'Dismiss the price change notice');
-    dismiss.addEventListener('click', () => banner.remove());
-    banner.append(title, detail, dismiss);
-    const table = document.getElementById('product-table');
-    const anchor = table ? (table.closest('.product-table-wrapper') || table) : null;
+    dismiss.addEventListener('click', () => {
+        const hadFocus = banner.contains(document.activeElement);
+        banner.remove();
+        if (hadFocus) focusProductTable();
+    });
+    banner.append(message, dismiss);
+    const anchor = repricedNoticeAnchor();
     if (anchor && anchor.parentElement) anchor.parentElement.insertBefore(banner, anchor);
     else document.body.prepend(banner);
-    showToast(`Prices changed from the saved quote: ${changes.join('; ')}`, 'warning', 10000);
+    setTimeout(() => {
+        if (message.isConnected && !message.hasChildNodes()) message.append(title, detail);
+    }, REPRICED_ANNOUNCE_DELAY_MS);
+    showToast(`${heading} — see the notice above the products.`, 'warning', 10000);
     return banner;
+}
+
+/** After Dismiss: keyboard focus lands on the products the notice was about. */
+function focusProductTable() {
+    const target = repricedNoticeAnchor();
+    if (!target) return;
+    if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
+    target.focus();
 }
 
 /** Remove the notice (new quote / another quote loaded). */
@@ -894,7 +934,7 @@ export function clearRepricedNotice() {
  * (collectProductsFromTable + buildLogoConfiguration + the LTM panel) and compare each
  * product with what the quote saved. Never blocks the load; a failed comparison says so.
  */
-async function noticeRepricedProducts(session, items, repricing) {
+async function noticeRepricedProducts(session, items, repricing, opts = {}) {
     clearRepricedNotice();
     try {
         try { await repricing; } catch (_) { /* recalculatePricing surfaces its own failure */ }
@@ -908,7 +948,7 @@ async function noticeRepricedProducts(session, items, repricing) {
             pricing = await embState.pricingCalculator.calculateQuote(products, allLogos, logoConfigs, { ltmEnabled });
             if (!pricing || pricing.success === false) return;   // the reprice already showed the pricing error
         }
-        showRepricedNotice(describeRepricedProducts(saved, pricing));
+        showRepricedNotice(describeRepricedProducts(saved, pricing), { forDuplicate: !!opts.forDuplicate });
     } catch (error) {
         console.error('[EditMode] Could not compare prices with the saved quote:', error);
         showToast('Could not compare prices with the saved quote — check each line before saving.', 'warning', 8000);

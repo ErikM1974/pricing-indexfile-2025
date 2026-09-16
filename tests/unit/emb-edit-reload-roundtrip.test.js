@@ -466,9 +466,12 @@ describe('reopened quote — the shared headwear rule reprices, and the rep sees
     expect(row.dataset.osfaQty).toBe('24');
     const notice = window.document.getElementById('reopen-price-notice');
     expect(notice).toBeTruthy();
-    expect(notice.getAttribute('role')).toBe('status');
-    expect(notice.textContent).toContain('Prices changed from the saved quote');
-    expect(notice.textContent).toContain('CP90 is now priced as a garment ($15.00 → $12.50)');
+    // Read out politely from its own live region (filled after insertion); Dismiss is outside it.
+    const live = notice.querySelector('[role="status"][aria-live="polite"]');
+    expect(live).toBeTruthy();
+    expect(live.textContent).toContain('Prices changed from the saved quote');
+    expect(live.textContent).toContain('CP90 is now priced as a garment ($15.00 → $12.50)');
+    expect(live.textContent).toContain('The saved quote keeps its old prices until you save a revision.');
     // Sits above the products, and a new quote clears it.
     expect(notice.nextElementSibling.classList.contains('product-table-wrapper')).toBe(true);
     window.resetQuote();
@@ -486,5 +489,20 @@ describe('reopened quote — the shared headwear rule reprices, and the rep sees
     const notice = window.document.getElementById('reopen-price-notice');
     expect(notice.textContent).toContain('CP90: $15.00 → $12.50');
     expect(notice.textContent).not.toContain('now priced as');
+  });
+
+  test('a duplicated quote says saving creates a NEW quote, not a revision', async () => {
+    const session = { ...beanieSession, QuoteID: 'EMB-HW-4' };
+    const built = await buildBuilder(beanieRoutes(session));
+    built.window.__embTest.pricingCalculator = engine(12.5);
+    await built.window.duplicateQuote(session.QuoteID);
+    await flush();
+    expect(built.window.__embTest.editingQuoteId).toBeNull();
+    const notice = built.window.document.getElementById('reopen-price-notice');
+    expect(notice).toBeTruthy();
+    expect(notice.textContent).toContain('Prices changed from the original quote');
+    expect(notice.textContent).toContain('CP90 is now priced as a garment ($15.00 → $12.50)');
+    expect(notice.textContent).toContain('Saving creates a new quote at these prices.');
+    expect(notice.textContent).not.toContain('save a revision');
   });
 });

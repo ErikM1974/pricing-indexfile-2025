@@ -1739,16 +1739,23 @@ export function parseShopWorksDescription(description, _partNumber) {
         }
     }
 
-    // Category detection. Headwear follows the shared rule (Erik 2026-09-16) so a saved vendor
-    // product is never filed under "Caps" when the builder would price it as a garment
-    // ("Trucker Jacket", "Cap Sleeve Tee"); caps AND flat headwear go under Caps, as SanMar
-    // files them — the rule still prices beanies/headbands as garments from their title.
+    // Category detection. Headwear follows the shared rule (Erik 2026-09-16) on the SAME text
+    // the ShopWorks import prices from (forceImportAsNonSanmar: isCapProduct(partNumber,
+    // description)) — the whole description, so "Pacific Headwear P747 Perforated" and
+    // "Outdoor Cap OC771" are filed under Caps even though the brand holds the cap word, and
+    // the saved product (Category "Caps") loads as a cap every later time. Never files a
+    // garment under Caps ("Trucker Jacket", "Cap Sleeve Tee"). Caps AND flat headwear go
+    // under Caps, as SanMar files them; the rule still prices beanies/headbands as garments.
     const combined = `${result.name} ${desc}`.toLowerCase();
-    const headwearTitle = result.name || desc;
-    const isCap = isCapProduct(_partNumber || '', headwearTitle);   // throws visibly without the shared rule
-    const isFlat = !isCap && HeadwearClassifier.classify({ STYLE: _partNumber || '', PRODUCT_TITLE: headwearTitle }).isFlat;
+    const isCap = isCapProduct(_partNumber || '', description);   // throws visibly without the shared rule
+    const isFlat = !isCap && HeadwearClassifier.classify({ STYLE: _partNumber || '', PRODUCT_TITLE: description }).isFlat;
     if (isCap || isFlat) {
-        result.category = 'Caps';
+        // A later load prices from the saved ProductName + Category (populateNonSanmarRow).
+        // Inside "Caps" a hood is flat ("Richardson Hood River 173" is a cap by its style), so
+        // leave the category blank when only that keeps the product on its imported side.
+        const savedName = result.name || desc;
+        const loadsAsCap = (category) => isCapProduct(_partNumber || '', savedName, category);
+        result.category = loadsAsCap('Caps') !== isCap && loadsAsCap('') === isCap ? '' : 'Caps';
     } else if (/\b(tee|t-shirt|tshirt)\b/.test(combined)) {
         result.category = 'T-Shirts';
     } else if (/\b(polo|pique)\b/.test(combined)) {

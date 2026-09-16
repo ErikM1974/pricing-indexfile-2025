@@ -235,7 +235,12 @@ export const rowsMethods = {
         if (!suggestionsContainer) return;
 
         if (!products || products.length === 0) {
-            suggestionsContainer.innerHTML = '<div class="no-results">No products found</div>';
+            // A style the cap filter hid says why (Erik 2026-09-16), not a bare "No products found".
+            const empty = document.createElement('div');
+            empty.className = 'no-results';
+            empty.textContent = (searchInput && this.productsManager.hiddenSearchMessage(searchInput.value)) || 'No products found';
+            suggestionsContainer.textContent = '';
+            suggestionsContainer.appendChild(empty);
             suggestionsContainer.style.display = 'block';
             return;
         }
