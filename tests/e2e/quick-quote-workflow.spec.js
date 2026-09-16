@@ -349,6 +349,50 @@ test('soft headwear prices as flat embroidery on every sheet and in Quick Price'
     check(expect, e);
 });
 
+// Live rules (2026-09-16): only flat headwear in "Caps" is embroidery only. A gaiter in Personal
+// Protection keeps that category's methods (embroidery, screen print, DTF; no DTG) — no new print blocks.
+test('a gaiter outside "Caps" keeps its category’s print methods; a beanie stays embroidery only', async ({ page }) => {
+    const e = await open(page, { url: '/calculators/quick-quote/index.html' });
+    await page.locator('[data-mode="quick"]').click();
+    await page.locator('#qqStyle').fill('FS07');
+    await expect(page.locator('#qqProductName')).toHaveText('Port Authority Fleece Neck Gaiter');
+    await expect(page.locator('.qq-card[data-method]')).toHaveCount(3);
+    for (const method of ['emb', 'scp', 'dtf']) {
+        await expect(page.locator('.qq-card[data-method="' + method + '"]')).toContainText('/pc');
+        await expect(page.locator('.qq-card[data-method="' + method + '"]')).not.toHaveClass(/is-error|is-unavailable/);
+    }
+    await expect(page.locator('.qq-card[data-method="dtg"]')).toHaveCount(0);
+    await expect(page.locator('.qq-card[data-method="capemb"]')).toHaveCount(0);
+    await expect(page.locator('.qq-elig-note')).toHaveCount(0);
+    await expect(page.locator('#qqPlacementField')).toBeVisible();
+    await expect(page.locator('#qqFront [data-code="LC"]')).toBeVisible();
+    await expect(page.locator('#qqInkField')).toBeVisible();
+    await expect(page.locator('.qq-emb-pos').first()).toHaveText('Front');
+    // Line sheet: the gaiter screen prints; DTG follows the category rule; cap embroidery is flat embroidery.
+    await page.locator('[data-mode="linesheet"]').click();
+    await methodChip(page, 'scp');
+    await typeStyle(page, 'FS07');
+    await expect(page.locator('.qq-sheet-item')).toHaveCount(1);
+    await expect(page.locator('.qq-line-stat.err')).toHaveCount(0);
+    await expect(page.locator('#qqLineDownload')).toBeEnabled();
+    await methodChip(page, 'dtg');
+    await expect(page.locator('.qq-line-row').first()).toContainText('DTG print isn’t offered for Personal Protection.');
+    await expect(page.locator('.qq-line-row').first()).not.toContainText('is headwear');
+    await methodChip(page, 'capemb');
+    await expect(page.locator('.qq-line-row').first()).toContainText('Priced as embroidery — soft headwear is flat embroidery, as in the Embroidery builder.');
+    await expect(page.locator('.qq-line-row').first()).not.toContainText('Not confirmed from the catalog');
+    await expect(page.locator('.qq-sheet-item .qq-sheet-method')).toContainText('Embroidery · Front 8,000 stitches');
+    // The beanie in "Caps" stays embroidery only, with no print placements.
+    await page.locator('[data-mode="quick"]').click();
+    await page.locator('#qqStyle').fill('CP90');
+    await expect(page.locator('#qqProductName')).toHaveText('Knit Beanie');
+    await expect(page.locator('.qq-elig-note')).toHaveText('Beanies, headbands and other soft headwear are priced as flat embroidery, the same as the Embroidery builder.');
+    await expect(page.locator('.qq-card[data-method]')).toHaveCount(1);
+    await expect(page.locator('.qq-card[data-method="emb"]')).toContainText('/pc');
+    await expect(page.locator('#qqPlacementField')).toBeHidden();
+    check(expect, e);
+});
+
 test('copy fallback is selectable and absent from print', async ({ page }) => {
     const e = await open(page, { url: '/calculators/quick-quote/index.html' });
     await typeStyle(page, 'PC54'); await page.locator('.qq-line-style').press('Enter');
@@ -397,6 +441,15 @@ test('a garment with no category warns instead of blocking print methods', async
     await typeStyle(page, 'BC3001');
     await expect(page.locator('#qqLineDownload')).toBeEnabled();
     await expect(page.locator('.qq-line-row').first()).toContainText('This category isn’t in our decoration rules — confirm DTF transfer works for it.');
+    await expect(page.locator('.qq-line-row').first()).not.toContainText('Not confirmed from the catalog');
+    // Embroidery follows the shared classifier as returned: an unconfirmed garment on a cap sheet
+    // prices as garment embroidery, and the row says the catalog did not confirm it.
+    await methodChip(page, 'capemb');
+    await expect(page.locator('.qq-line-row').first()).toContainText('Priced as embroidery.');
+    await expect(page.locator('.qq-line-row').first()).toContainText('Not confirmed from the catalog — check the product.');
+    await expect(page.locator('.qq-sheet-item .qq-sheet-method')).toContainText('Embroidery · Left chest 8,000 stitches');
+    await expect(page.locator('.qq-sheet-ladder tbody tr').first().locator('th')).toHaveText('Per pc');
+    await expect(page.locator('#qqLineDownload')).toBeEnabled();
     await page.locator('[data-mode="quick"]').click();
     await page.locator('#qqStyle').fill('BC3001');
     await expect(page.locator('.qq-elig-note')).toContainText('only embroidery is shown');

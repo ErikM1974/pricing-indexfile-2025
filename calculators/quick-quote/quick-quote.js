@@ -337,6 +337,12 @@
 
     function sizeList() { return (state.product && state.product.sizes) || []; }
     function isFlatHeadwear(product) { return !!(product && product.headwear && product.headwear.isFlat); }
+    // Only flat headwear in "Caps" (beanies and the like) is embroidery only. Flat items in other
+    // categories (gaiters in Personal Protection, headbands in Accessories) keep their category's methods.
+    function inCapsCategory(product) {
+        return !!product && [product.category, product.subcategory].some(function (c) { return /^\s*caps\s*$/i.test(c || ''); });
+    }
+    function flatEmbroideryOnly(product) { return isFlatHeadwear(product) && inCapsCategory(product); }
     function oneSize(product) { return !!(product && product.isCap) || isFlatHeadwear(product); }
     function frontLogoLabel(cap, product) { return cap ? 'Cap front' : isFlatHeadwear(product) ? 'Front' : 'Left chest'; }
     function defaultSizes() { return oneSize(state.product) ? ['OSFA'] : ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL']; }
@@ -472,9 +478,9 @@
 
     function resolveEligibility(product) {
         if (product.isCap) return Promise.resolve(null); // caps → cap embroidery only
-        // Flat headwear → garment embroidery only (the "Caps" category rule lists no garment methods).
-        if (isFlatHeadwear(product)) return Promise.resolve({ EMB: true, DTG: 'no', SCP: false, DTF: false, source: 'flat-headwear' });
-        return categoryEligibility(product);
+        // Flat headwear in "Caps" → garment embroidery only (the "Caps" category rule lists no garment methods).
+        if (flatEmbroideryOnly(product)) return Promise.resolve({ EMB: true, DTG: 'no', SCP: false, DTF: false, source: 'flat-headwear' });
+        return categoryEligibility(product); // other flat items follow their category, like any garment
     }
     // The category rules for any product (never null); the line sheet also asks this for unconfirmed caps.
     function categoryEligibility(product) {
@@ -1472,8 +1478,9 @@
     }
     function renderPlacementVisibility() {
         var pf = $('qqPlacementField'); if (!pf) return;
-        if (state.mode === 'linesheet') pf.hidden = !(hasActive('dtg') || hasActive('scp') || hasActive('dtf'));
-        else pf.hidden = oneSize(state.product);
+        var printing = hasActive('dtg') || hasActive('scp') || hasActive('dtf');
+        // Quick Price: one-size products hide it only when no print method is offered (a gaiter can be screen printed).
+        pf.hidden = state.mode === 'linesheet' ? !printing : oneSize(state.product) && !printing;
         renderSleeveRow();
     }
     // Sleeve row: DTF (≤5×5" transfer, priced like a left chest) and/or screen print (each sleeve =
@@ -1735,33 +1742,34 @@
         if (!row) return;
         row._ptok = ++state.lineSeq; row.preview = null; row.tiers = null; row.pricing = true;
     }
-    // Embroidery follows a confirmed product (cap → cap embroidery; garment or flat headwear →
-    // embroidery), as the Embroidery builder does per row with the same shared classifier.
-    // Unconfirmed products keep the rep's choice.
+    // Embroidery follows the product (cap → cap embroidery; garment or flat headwear → embroidery),
+    // as the Embroidery builder does per row with the same shared classifier — its isCap as returned,
+    // even when it is not confident (the row then says so).
     function lineMethodFor(row) {
         var m = state.lineMethod, h = row.product && row.product.headwear;
-        if ((m !== 'emb' && m !== 'capemb') || !h || !h.confident) return m;
+        if ((m !== 'emb' && m !== 'capemb') || !h) return m;
         return h.isCap ? 'capemb' : 'emb';
     }
     async function priceLineRow(row) {
         invalidateLine(row);
         if (!state.lineMethod || !row.product) { row.pricing = false; updateLineRow(row); renderLinePreview(); return; }
         var token = row._ptok, method = lineMethodFor(row), def = METHODS[method];
-        var product = row.product, color = row.color, qty = state.lineQty, headwear = product.headwear || {}, flat = isFlatHeadwear(product);
+        var product = row.product, color = row.color, qty = state.lineQty, headwear = product.headwear || {}, flat = isFlatHeadwear(product), flatOnly = flatEmbroideryOnly(product);
         row.pricedVersion = configVersion;
         var embroidery = method === 'emb' || method === 'capemb', notices = [];
         row.method = method; row.error = ''; row.notice = '';
         updateLineRow(row); notifyWorkspace();
         try {
             if (qty !== null && (!Number.isInteger(qty) || qty < 1 || qty > 100000)) throw new Error('Enter a whole quantity between 1 and 100,000, or leave it blank for price breaks.');
-            if ((product.isCap || flat) && headwear.confident && !embroidery) throw new Error(product.style + (flat ? ' is headwear' : ' is a cap') + ' — choose Embroidery or Cap embroidery.');
+            if ((product.isCap || flatOnly) && headwear.confident && !embroidery) throw new Error(product.style + (flatOnly ? ' is headwear' : ' is a cap') + ' — choose Embroidery or Cap embroidery.');
             if (method === 'capemb' && state.embAddl.length > 1) throw new Error('Caps take one extra logo (cap back). Remove the other logos to price ' + product.style + '.');
             var methodWords = def.label.replace(/^[A-Z](?=[a-z])/, function (c) { return c.toLowerCase(); }); // "DTG print" keeps its capitals
             if (method !== state.lineMethod) notices.push('Priced as ' + methodWords + (flat ? ' — soft headwear is flat embroidery, as in the Embroidery builder.' : '.'));
-            else if (method === 'capemb' && !headwear.confident) notices.push('Not confirmed as a cap — priced as cap embroidery, as chosen.');
+            if (embroidery && !headwear.confident) notices.push('Not confirmed from the catalog — check the product.');
             if (row.colorChanged) notices.push('The saved color is no longer offered — check the color.');
-            // Cap pricing and flat headwear skip the category rules (the "Caps" rule lists no garment methods).
-            if (method !== 'capemb' && !(embroidery && (product.isCap || flat))) {
+            // Cap pricing and flat headwear in "Caps" skip the category rules (the "Caps" rule lists no
+            // garment methods); other flat items (gaiters, headbands) follow their category like any garment.
+            if (method !== 'capemb' && !(embroidery && (product.isCap || flatOnly))) {
                 var eligibility = await categoryEligibility(product);
                 if (row._ptok !== token) return;
                 // decoration-methods.js contract: an unknown category is a visible warning, never a block.
