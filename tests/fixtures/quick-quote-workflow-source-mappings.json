@@ -1,5 +1,5 @@
 {
-  "description": "Authorized September 13, 2026 Quick Quote redesign. Apply before historical CSS mappings. Original hashes remain immutable; current pricing/handoffs tested independently. classic-restore-2026-09-16: Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings. release-2026.09.16.2: Deploy v2026.09.16.2 cache-bust of the Quick Quote assets. release-notes-2026-09-16: Erik approved 2026-09-16: Quick Quote shows its version (from the deploy's cache-bust), a What's new list and a one-time Updated badge for Nika and Taneisha's trial. release-2026.09.16.3: Deploy v2026.09.16.3 cache-bust of the Quick Quote assets.",
+  "description": "Authorized September 13, 2026 Quick Quote redesign. Apply before historical CSS mappings. Original hashes remain immutable; current pricing/handoffs tested independently. classic-restore-2026-09-16: Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings. release-2026.09.16.2: Deploy v2026.09.16.2 cache-bust of the Quick Quote assets. release-notes-2026-09-16: Erik approved 2026-09-16: Quick Quote shows its version (from the deploy's cache-bust), a What's new list and a one-time Updated badge for Nika and Taneisha's trial. release-2026.09.16.3: Deploy v2026.09.16.3 cache-bust of the Quick Quote assets. headwear-alignment-2026-09-16: Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps.",
   "changes": [
     {
       "file": "calculators/quick-quote/dtf-prints-prototype.html",
@@ -1850,6 +1850,486 @@
       "count": 1,
       "stage": "release-2026.09.16.3",
       "reason": "Deploy v2026.09.16.3 cache-bust of the Quick Quote assets."
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "    <script src=\"/shared_components/js/product-category-filter.js?v=2026.09.06.37\"></script>\n    <script src=\"/shared_components/js/dtf-pricing-service.js?v=2026.09.06.37\"></script>",
+      "after": "    <script src=\"/shared_components/js/product-category-filter.js?v=2026.09.06.37\"></script>\n    <!-- Cap vs garment: one shared rule for every price surface (Erik 2026-09-16) -->\n    <script src=\"/shared_components/js/headwear-classifier.js?v=2026.09.16.3\"></script>\n    <script src=\"/shared_components/js/dtf-pricing-service.js?v=2026.09.06.37\"></script>",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "    <script src=\"/shared_components/js/sku-validation-service.js?v=2026.09.06.37\"></script>\n",
+      "after": "    <script src=\"/shared_components/js/sku-validation-service.js?v=2026.09.06.37\"></script>\n    <!-- Cap vs garment: one shared rule for every price surface (Erik 2026-09-16) -->\n    <script src=\"/shared_components/js/headwear-classifier.js?v=2026.09.16.3\"></script>\n",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "    <script src=\"/shared_components/js/sku-validation-service.js?v=2026.09.06.37\"></script>\n    <script src=\"/shared_components/js/quote-pricing-data.js?v=2026.06.27.1\"></script>",
+      "after": "    <script src=\"/shared_components/js/sku-validation-service.js?v=2026.09.06.37\"></script>\n    <!-- Cap vs garment: one shared rule for every price surface (Erik 2026-09-16) -->\n    <script src=\"/shared_components/js/headwear-classifier.js?v=2026.09.16.3\"></script>\n    <script src=\"/shared_components/js/quote-pricing-data.js?v=2026.06.27.1\"></script>",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "shared_components/js/builders/dtf/methods-rows.js",
+      "before": "            suggestionsContainer.innerHTML = '<div class=\"no-results\">No products found</div>';",
+      "after": "            // A style the cap filter hid says why (Erik 2026-09-16), not a bare \"No products found\".\n            const empty = document.createElement('div');\n            empty.className = 'no-results';\n            empty.textContent = (searchInput && this.productsManager.hiddenSearchMessage(searchInput.value)) || 'No products found';\n            suggestionsContainer.textContent = '';\n            suggestionsContainer.appendChild(empty);",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "shared_components/js/builders/emb/persistence.js",
+      "before": "   updateArtworkCharges, Event */\nimport { applyDesignFromCache, showDesignThumbnail, lookupDesignNumber } from './design-search.js';",
+      "after": "   updateArtworkCharges, Event */\n// Reopened-quote price check (2026-09-16) prices with the save path's own logo inputs.\nimport { buildLogoConfiguration } from './pricing-sync.js';\nimport { applyDesignFromCache, showDesignThumbnail, lookupDesignNumber } from './design-search.js';",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "shared_components/js/builders/emb/persistence.js",
+      "before": "        recalculatePricing();",
+      "after": "        let repricing = recalculatePricing();",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "shared_components/js/builders/emb/persistence.js",
+      "before": "            recalculatePricing();",
+      "after": "            repricing = recalculatePricing();",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "shared_components/js/builders/emb/persistence.js",
+      "before": "\n    } catch (error) {",
+      "after": "\n        // Today's rules can price a saved product differently (Erik 2026-09-16: beanies and\n        // other flat headwear moved to garment pricing) — show the rep what moved.\n        await noticeRepricedProducts(session, items, repricing, opts);\n\n    } catch (error) {",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "shared_components/js/builders/emb/persistence.js",
+      "before": "        window._restoringQuote = false;  // restore complete — re-enable live tax lookups for the rep\n    }",
+      "after": "        window._restoringQuote = false;  // restore complete — re-enable live tax lookups for the rep\n    }\n}\n\n// ============================================================\n// REOPENED QUOTE — PRICE CHANGE NOTICE (Erik 2026-09-16)\n// ============================================================\n// A reopened quote reprices with today's data and rules, including the shared cap/garment\n// rule (headwear-classifier.js) that moved beanies, headbands and other flat headwear onto\n// garment pricing. The rep must SEE any product whose price moved before a Save Revision\n// writes it. Pushed quotes never open here (assertQuoteEditable) and the customer quote view\n// reads the saved rows, so neither changes until a revision is saved.\n\nconst REPRICED_NOTICE_ID = 'reopen-price-notice';\nconst money = (n) => `$${n.toFixed(2)}`;\n// Same rounding the save applies to FinalUnitPrice (embroidery-quote-service.js).\nconst savedUnit = (n) => parseFloat(Number(n).toFixed(2));\n\n/**\n * The saved product lines, grouped per style + colour, with the cap/garment side each was\n * priced on when that can be proven. The save writes every garment line before any cap line\n * (calculateQuote prices garments first) and stores both piece counts on the session\n * (ALGarmentQty / ALCapQty), so the running quantity in LineNumber order says which side a\n * line was on. When the counts don't add up, `savedCap` is null and the notice only lists\n * the price change.\n * @returns {Map<string, {style: string, color: string, lines: {unit: number, qty: number}[], savedCap: boolean|null}>}\n */\nexport function savedProductGroups(session, items) {\n    const lines = (items || []).filter(isSavedProductItem)\n        .map((item, index) => ({ item, index }))\n        .sort((a, b) => ((Number(a.item.LineNumber) || 0) - (Number(b.item.LineNumber) || 0)) || (a.index - b.index))\n        .map(({ item }) => item);\n    const counted = (v) => v !== null && v !== undefined && v !== '' && Number.isFinite(Number(v));\n    const garmentQty = Number(session && session.ALGarmentQty);\n    const capQty = Number(session && session.ALCapQty);\n    const total = lines.reduce((sum, item) => sum + (Number(item.Quantity) || 0), 0);\n    let sidesKnown = total > 0 && counted(session && session.ALGarmentQty) && counted(session && session.ALCapQty)\n        && total === garmentQty + capQty;\n    const sides = new Map();\n    const groups = new Map();\n    let running = 0;\n    for (const item of lines) {\n        const qty = Number(item.Quantity) || 0;\n        const side = running < garmentQty ? 'garment' : 'cap';\n        running += qty;\n        if (side === 'garment' && running > garmentQty) sidesKnown = false;   // a line straddles the split\n        const key = `${item.StyleNumber}|${item.Color}`;\n        if (!groups.has(key)) {\n            groups.set(key, { style: item.StyleNumber, color: item.Color || '', lines: [], savedCap: null });\n            sides.set(key, new Set());\n        }\n        groups.get(key).lines.push({ unit: Number(item.FinalUnitPrice), qty });\n        sides.get(key).add(side);\n    }\n    for (const [key, group] of groups) {\n        const seen = sides.get(key);\n        group.savedCap = sidesKnown && seen.size === 1 ? seen.has('cap') : null;\n    }\n    return groups;\n}\n\n/** Lowest and average unit price of a set of lines (null when nothing is priced). */\nfunction priceSummary(lines) {\n    const priced = (lines || []).filter(l => Number.isFinite(l.unit) && l.qty > 0);\n    if (priced.length === 0) return null;\n    const qty = priced.reduce((sum, l) => sum + l.qty, 0);\n    const cents = priced.reduce((sum, l) => sum + Math.round(l.unit * 100) * l.qty, 0);\n    return { base: Math.min(...priced.map(l => l.unit)), average: cents / qty / 100 };\n}\n\n/** The same groups from a fresh engine result (the unit price a save would write). */\nfunction repricedProductGroups(pricing) {\n    const groups = new Map();\n    for (const pp of (pricing && pricing.products) || []) {\n        const product = pp.product || {};\n        const key = `${product.style}|${product.color}`;\n        if (!groups.has(key)) groups.set(key, { isCap: product.isCap === true, lines: [] });\n        for (const li of pp.lineItems || []) {\n            groups.get(key).lines.push({ unit: savedUnit(li.unitPriceWithLTM || li.unitPrice || 0), qty: Number(li.quantity) || 0 });\n        }\n    }\n    return groups;\n}\n\n/**\n * One sentence per product whose price moved. \"now priced as a garment/cap\" only when the\n * saved side is proven (savedProductGroups); otherwise just the price change.\n * @param {Map<string, any>} saved - savedProductGroups()\n * @param {{products?: any[]}} pricing - calculateQuote() result for the restored rows\n * @returns {string[]}\n */\nexport function describeRepricedProducts(saved, pricing) {\n    const repriced = repricedProductGroups(pricing);\n    const perStyle = {};\n    for (const group of saved.values()) perStyle[group.style] = (perStyle[group.style] || 0) + 1;\n    const changes = [];\n    for (const [key, group] of saved) {\n        const before = priceSummary(group.lines);\n        if (!before) continue;\n        const label = perStyle[group.style] > 1 && group.color ? `${group.style} ${group.color}` : group.style;\n        const now = repriced.get(key);\n        const after = now ? priceSummary(now.lines) : null;\n        if (!after) {\n            changes.push(`${label} could not be repriced — check that line before saving`);\n            continue;\n        }\n        const baseMoved = Math.abs(after.base - before.base) >= 0.005;\n        if (!baseMoved && Math.abs(after.average - before.average) < 0.005) continue;\n        const price = baseMoved\n            ? `${money(before.base)} → ${money(after.base)}`\n            : `average ${money(before.average)} → ${money(after.average)}`;\n        const switched = group.savedCap !== null && group.savedCap !== now.isCap;\n        changes.push(switched\n            ? `${label} is now priced as a ${now.isCap ? 'cap' : 'garment'} (${price})`\n            : `${label}: ${price}`);\n    }\n    return changes;\n}\n\n// The notice text goes into its live region this long after the region is on the page — the\n// same pause the builders' announce() helper uses. A live region that arrives already holding\n// its text is often not read out.\nconst REPRICED_ANNOUNCE_DELAY_MS = 30;\n\n/**\n * Where the notice sits: just above the product table (its scroll wrapper when present).\n * @returns {HTMLElement|null}\n */\nfunction repricedNoticeAnchor() {\n    const table = document.getElementById('product-table');\n    return table ? (/** @type {HTMLElement|null} */ (table.closest('.product-table-wrapper')) || table) : null;\n}\n\n/**\n * Persistent notice above the product table, built from the EMB builder's existing\n * notice component (.import-summary-banner.banner-warning). Text only — no markup\n * from data. Replaces any earlier notice; no changes → no notice.\n *   • The text is announced politely: an EMPTY live region is inserted first and filled\n *     after insertion. The Dismiss button stays outside it.\n *   • Dismiss moves keyboard focus to the product table wrapper (tabindex=0), not <body>.\n *   • A duplicated quote saves as a NEW quote, so its note says that.\n * @param {string[]} changes\n * @param {{forDuplicate?: boolean}} [opts]\n * @returns {HTMLElement|null}\n */\nexport function showRepricedNotice(changes, opts = {}) {\n    clearRepricedNotice();\n    if (!changes || changes.length === 0) return null;\n    const forDuplicate = !!(opts && opts.forDuplicate);\n    const heading = forDuplicate ? 'Prices changed from the original quote' : 'Prices changed from the saved quote';\n    const banner = document.createElement('div');\n    banner.id = REPRICED_NOTICE_ID;\n    banner.className = 'import-summary-banner banner-warning';\n    const message = document.createElement('div');\n    message.setAttribute('role', 'status');\n    message.setAttribute('aria-live', 'polite');\n    message.setAttribute('aria-atomic', 'true');\n    const title = document.createElement('div');\n    title.className = 'banner-title';\n    title.textContent = heading;\n    const detail = document.createElement('div');\n    detail.className = 'banner-detail';\n    for (const text of changes) {\n        const line = document.createElement('div');\n        line.textContent = text;\n        detail.appendChild(line);\n    }\n    const note = document.createElement('div');\n    note.textContent = forDuplicate\n        ? 'These are today\\'s prices. Saving creates a new quote at these prices.'\n        : 'These are today\\'s prices. The saved quote keeps its old prices until you save a revision.';\n    detail.appendChild(note);\n    const dismiss = document.createElement('button');\n    dismiss.type = 'button';\n    dismiss.className = 'btn-dismiss-banner';\n    dismiss.textContent = 'Dismiss';\n    dismiss.setAttribute('aria-label', 'Dismiss the price change notice');\n    dismiss.addEventListener('click', () => {\n        const hadFocus = banner.contains(document.activeElement);\n        banner.remove();\n        if (hadFocus) focusProductTable();\n    });\n    banner.append(message, dismiss);\n    const anchor = repricedNoticeAnchor();\n    if (anchor && anchor.parentElement) anchor.parentElement.insertBefore(banner, anchor);\n    else document.body.prepend(banner);\n    setTimeout(() => {\n        if (message.isConnected && !message.hasChildNodes()) message.append(title, detail);\n    }, REPRICED_ANNOUNCE_DELAY_MS);\n    showToast(`${heading} — see the notice above the products.`, 'warning', 10000);\n    return banner;\n}\n\n/** After Dismiss: keyboard focus lands on the products the notice was about. */\nfunction focusProductTable() {\n    const target = repricedNoticeAnchor();\n    if (!target) return;\n    if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');\n    target.focus();\n}\n\n/** Remove the notice (new quote / another quote loaded). */\nexport function clearRepricedNotice() {\n    const existing = document.getElementById(REPRICED_NOTICE_ID);\n    if (existing) existing.remove();\n}\n\n/**\n * After a reload has repriced, price the restored rows with the SAVE path's inputs\n * (collectProductsFromTable + buildLogoConfiguration + the LTM panel) and compare each\n * product with what the quote saved. Never blocks the load; a failed comparison says so.\n */\nasync function noticeRepricedProducts(session, items, repricing, opts = {}) {\n    clearRepricedNotice();\n    try {\n        try { await repricing; } catch (_) { /* recalculatePricing surfaces its own failure */ }\n        const saved = savedProductGroups(session, items);\n        if (saved.size === 0 || !embState.pricingCalculator) return;\n        const products = collectProductsFromTable().filter(p => !p.isService);\n        let pricing = { products: [] };\n        if (products.length > 0) {\n            const { logoConfigs, allLogos } = buildLogoConfiguration();\n            const ltmEnabled = getLtmControlState('emb-ltm-panel').enabled;\n            pricing = await embState.pricingCalculator.calculateQuote(products, allLogos, logoConfigs, { ltmEnabled });\n            if (!pricing || pricing.success === false) return;   // the reprice already showed the pricing error\n        }\n        showRepricedNotice(describeRepricedProducts(saved, pricing), { forDuplicate: !!opts.forDuplicate });\n    } catch (error) {\n        console.error('[EditMode] Could not compare prices with the saved quote:', error);\n        showToast('Could not compare prices with the saved quote — check each line before saving.', 'warning', 8000);\n    }",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "shared_components/js/builders/emb/persistence.js",
+      "before": "\n/**",
+      "after": "\n// Service items to create as service product rows (2026-02 refactor)\nconst SERVICE_STYLE_NUMBERS = [\n    'DECG', 'DECC', 'AL', 'AL-CAP', 'DECG-FB', 'CB', 'CS', 'Monogram', 'AS-Garm', 'AS-CAP',\n    '3D-EMB', 'Laser Patch', 'Name/Number', 'WEIGHT', 'SEG', 'SECC', 'DT', 'CTR-GARMT', 'CTR-CAP',\n    // Legacy backward-compat (old quotes):\n    'FB', 'MONOGRAM', 'AS-GARM', 'NAME'\n];\n\n/** A saved quote_items row that restores as a product row (not a service/fee row). */\nfunction isSavedProductItem(item) {\n    return item.EmbellishmentType === 'embroidery' &&\n        !!item.StyleNumber &&\n        !item.StyleNumber.startsWith('AL-') &&\n        !SERVICE_STYLE_NUMBERS.includes(item.StyleNumber);\n}\n\n/**",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "shared_components/js/builders/emb/persistence.js",
+      "before": "async function populateProducts(items) {\n    // Service items to create as service product rows (2026-02 refactor)\n    const SERVICE_STYLE_NUMBERS = [\n        'DECG', 'DECC', 'AL', 'AL-CAP', 'DECG-FB', 'CB', 'CS', 'Monogram', 'AS-Garm', 'AS-CAP',\n        '3D-EMB', 'Laser Patch', 'Name/Number', 'WEIGHT', 'SEG', 'SECC', 'DT', 'CTR-GARMT', 'CTR-CAP',\n        // Legacy backward-compat (old quotes):\n        'FB', 'MONOGRAM', 'AS-GARM', 'NAME'\n    ];\n\n    // Separate service items from regular products",
+      "after": "async function populateProducts(items) {\n    // Separate service items from regular products",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "shared_components/js/builders/emb/persistence.js",
+      "before": "    const productItems = items.filter(item =>\n        item.EmbellishmentType === 'embroidery' &&\n        item.StyleNumber &&\n        !item.StyleNumber.startsWith('AL-') &&\n        !SERVICE_STYLE_NUMBERS.includes(item.StyleNumber)\n    );",
+      "after": "    const productItems = items.filter(isSavedProductItem);",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "shared_components/js/builders/emb/product-rows.js",
+      "before": "   ProductCategoryFilter, SKUValidationService, SIZE_TO_SUFFIX,",
+      "after": "   HeadwearClassifier, SKUValidationService, SIZE_TO_SUFFIX,",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "shared_components/js/builders/emb/product-rows.js",
+      "before": "            // Check for cap products using CATEGORY_NAME (definitive) or pattern matching (fallback)\n            const isCap = isCapProduct(styleNumber, product.PRODUCT_TITLE, categoryName);",
+      "after": "            // Cap vs garment: the shared headwear rule over everything this response carries\n            // (a blank category is common — every Richardson cap — so the subcategory and\n            // description matter). Flat headwear prices as garment embroidery.\n            const isCap = isCapProduct(styleNumber, colorsData.productTitle || colorsData.PRODUCT_TITLE || product.PRODUCT_TITLE, categoryName, {\n                subcategory: colorsData.SUBCATEGORY_NAME || '',\n                description: colorsData.PRODUCT_DESCRIPTION || '',\n            });",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "shared_components/js/builders/emb/product-rows.js",
+      "before": "\n    const isCap = isCapProduct(item.style, label, '');",
+      "after": "\n    // Only a style and a typed description here — the shared headwear rule reads both.\n    const isCap = isCapProduct(item.style, label, '');",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "shared_components/js/builders/emb/product-rows.js",
+      "before": "    // Detect cap vs garment\n    const isCap = isCapProduct(product.StyleNumber, product.ProductName, product.Category || '');",
+      "after": "    // Detect cap vs garment (shared headwear rule — flat headwear prices as a garment)\n    const isCap = isCapProduct(product.StyleNumber, product.ProductName, product.Category || '', { description: product.Description || '' });",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "shared_components/js/builders/emb/product-rows.js",
+      "before": "    // Category detection from keywords\n    const combined = `${result.name} ${desc}`.toLowerCase();\n    if (/\\b(cap|hat|beanie|visor|snapback|trucker|headwear|skull cap)\\b/.test(combined)) {\n        result.category = 'Caps';",
+      "after": "    // Category detection. Headwear follows the shared rule (Erik 2026-09-16) on the SAME text\n    // the ShopWorks import prices from (forceImportAsNonSanmar: isCapProduct(partNumber,\n    // description)) — the whole description, so \"Pacific Headwear P747 Perforated\" and\n    // \"Outdoor Cap OC771\" are filed under Caps even though the brand holds the cap word, and\n    // the saved product (Category \"Caps\") loads as a cap every later time. Never files a\n    // garment under Caps (\"Trucker Jacket\", \"Cap Sleeve Tee\"). Caps AND flat headwear go\n    // under Caps, as SanMar files them; the rule still prices beanies/headbands as garments.\n    const combined = `${result.name} ${desc}`.toLowerCase();\n    const isCap = isCapProduct(_partNumber || '', description);   // throws visibly without the shared rule\n    const isFlat = !isCap && HeadwearClassifier.classify({ STYLE: _partNumber || '', PRODUCT_TITLE: description }).isFlat;\n    if (isCap || isFlat) {\n        // A later load prices from the saved ProductName + Category (populateNonSanmarRow).\n        // Inside \"Caps\" a hood is flat (\"Richardson Hood River 173\" is a cap by its style), so\n        // leave the category blank when only that keeps the product on its imported side.\n        const savedName = result.name || desc;\n        const loadsAsCap = (category) => isCapProduct(_partNumber || '', savedName, category);\n        result.category = loadsAsCap('Caps') !== isCap && loadsAsCap('') === isCap ? '' : 'Caps';",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "shared_components/js/builders/emb/product-rows.js",
+      "before": " * Check if a style number is a cap/hat product\n * @param {string} style - Style number\n * @param {string} productTitle - Product title/description\n * @param {string} categoryName - CATEGORY_NAME from SanMar API (most reliable)\n * @returns {boolean} True if cap/hat\n */\nexport function isCapProduct(style, productTitle = '', categoryName = '') {\n    // PRIORITY: Flat headwear (beanies, knit caps) use garment pricing, NOT cap pricing\n    // Matches ProductCategoryFilter used by calculator pages\n    if (typeof ProductCategoryFilter !== 'undefined' && productTitle) {\n        if (ProductCategoryFilter.isFlatHeadwear({ PRODUCT_TITLE: productTitle })) {\n            return false;\n        }\n    }\n\n    // BEST METHOD: Check CATEGORY_NAME from SanMar API\n    // SanMar categorizes all caps/hats under \"Caps\" category\n    if (categoryName && categoryName.toLowerCase() === 'caps') {\n        return true;\n    }\n\n    // FALLBACK: Pattern matching for cases where category isn't available\n    if (!style) return false;\n    const styleUpper = style.toUpperCase();\n    const titleUpper = (productTitle || '').toUpperCase();\n\n    // Check style patterns:\n    // CP* caps (CP80, CP90, etc)\n    // NE* caps (NE1000, NE400)\n    // C+digit (C112, C118)\n    // Richardson styles (112, 110, 115, etc) - numeric only\n    if (/^C[P0-9]/.test(styleUpper) || styleUpper.startsWith('NE')) {\n        return true;\n    }\n\n    // Richardson caps - 2-3 digit numeric styles (100-999)\n    if (/^\\d{2,3}$/.test(styleUpper)) {\n        return true;\n    }\n\n    // Check title keywords — but first strip DECG/service prefixes so\n    // \"Di. Embroider Cap - T-shirt\" doesn't match on \"Cap\" in the prefix\n    const strippedTitle = titleUpper.replace(/^DI\\.\\s*EMBROIDER\\s+(CAP|GARMENT)\\s*-\\s*/i, '');\n    if (strippedTitle.includes('CAP') || strippedTitle.includes('HAT') ||\n        strippedTitle.includes('BEANIE') || strippedTitle.includes('SNAPBACK') ||\n        strippedTitle.includes('TRUCKER') || strippedTitle.includes('RICHARDSON')) {\n        return true;\n    }\n\n    return false;",
+      "after": " * Is this product priced as cap embroidery? ONE rule for every price surface:\n * HeadwearClassifier (shared_components/js/headwear-classifier.js, Erik 2026-09-16).\n * Beanies, knit caps, headbands, gaiters and the other flat headwear are NOT caps —\n * they price as garment embroidery. Visors are caps. isCap is used as returned, even\n * when the classifier is not confident.\n * @param {string} style - Style number\n * @param {string} productTitle - Product title (the stylesearch label \"STYLE - TITLE\",\n *   a vendor product name, or a ShopWorks description)\n * @param {string} categoryName - CATEGORY_NAME from SanMar API\n * @param {{subcategory?: string, description?: string}} [details] - SUBCATEGORY_NAME and\n *   PRODUCT_DESCRIPTION when the caller has them (/api/product-colors)\n * @returns {boolean} True when the product takes cap embroidery pricing\n */\nexport function isCapProduct(style, productTitle = '', categoryName = '', details = {}) {\n    // Rule 4: never fall back to the old keyword rules — a missing classifier is a visible error.\n    if (typeof HeadwearClassifier === 'undefined' || !HeadwearClassifier || typeof HeadwearClassifier.classify !== 'function') {\n        const message = 'The cap/garment check did not load, so this product cannot be priced. Refresh the page.';\n        if (typeof showToast === 'function') showToast(message, 'error', 8000);\n        throw new Error(message);\n    }\n    // ShopWorks service descriptions (\"Di. Embroider Cap - T-shirt\") name the SERVICE first;\n    // strip that prefix so the word \"Cap\" doesn't make a T-shirt a cap.\n    const title = String(productTitle || '').replace(/^DI\\.\\s*EMBROIDER\\s+(CAP|GARMENT)\\s*-\\s*/i, '');\n    const extra = details || {};\n    return HeadwearClassifier.classify({\n        STYLE: style || '',\n        PRODUCT_TITLE: title,\n        CATEGORY_NAME: categoryName || '',\n        SUBCATEGORY_NAME: extra.subcategory || '',\n        PRODUCT_DESCRIPTION: extra.description || '',\n    }).isCap === true;",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "shared_components/js/builders/emb/quote-lifecycle.js",
+      "before": "import { updateLogoCardHeader } from './product-rows.js';\nimport { embState, EMB_DEFAULTS } from './state.js';",
+      "after": "import { updateLogoCardHeader } from './product-rows.js';\nimport { clearRepricedNotice } from './persistence.js';\nimport { embState, EMB_DEFAULTS } from './state.js';",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "shared_components/js/builders/emb/quote-lifecycle.js",
+      "before": "    clearCustomerContextBanners();  // P2-8: don't bleed the prior customer's CRM banners into a new quote\n    // Hide + zero the sidebar TOTAL bar (re-shown on first recalc)",
+      "after": "    clearCustomerContextBanners();  // P2-8: don't bleed the prior customer's CRM banners into a new quote\n    clearRepricedNotice();          // the reopened quote's \"prices changed\" notice belongs to that quote\n    // Hide + zero the sidebar TOTAL bar (re-shown on first recalc)",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "shared_components/js/builders/emb/shopworks-import.js",
+      "before": "    for (const product of data.products) {\n        const isCap = isCapProduct(product.partNumber, product.description || '');",
+      "after": "    for (const product of data.products) {\n        // Only the part number and ShopWorks description exist at this point; the rows built\n        // later re-check with the full catalog data (onStyleChange).\n        const isCap = isCapProduct(product.partNumber, product.description || '');",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "shared_components/js/builders/emb/shopworks-import.js",
+      "before": "    // Detect cap vs garment and enable appropriate size inputs",
+      "after": "    // Detect cap vs garment (shared headwear rule) and enable appropriate size inputs",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "shared_components/js/builders/emb/shopworks-import.js",
+      "before": "function applyImportedSizes(row, rowId, product, sellPriceOverride, sellPriceOverrides) {",
+      "after": "export function applyImportedSizes(row, rowId, product, sellPriceOverride, sellPriceOverrides) {",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "shared_components/js/builders/emb/shopworks-import.js",
+      "before": "    // Detect if this is a cap product for size mapping\n    const isCapRow = row.dataset.isCap === 'true' ||\n                     isCapProduct(product.partNumber, product.description || '');",
+      "after": "    // Cap size mapping follows the row's own cap flag — set by onStyleChange / the vendor\n    // path from the shared headwear rule. A second guess here from the ShopWorks text alone\n    // could disagree with the row's pricing (a beanie row mapped to cap sizes).\n    const isCapRow = row.dataset.isCap === 'true';",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "shared_components/js/builders/scp/product-rows.js",
+      "before": "   SKUValidationService, ProductCategoryFilter, cleanProductTitle,",
+      "after": "   SKUValidationService, HeadwearClassifier, cleanProductTitle,",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "shared_components/js/builders/scp/product-rows.js",
+      "before": "            // Screen Print can print both garments and caps\n            const isCap = isCapProduct(styleNumber, product.PRODUCT_TITLE, categoryName);",
+      "after": "            // Screen Print can print both garments and caps (shared headwear rule, same\n            // inputs as the EMB builder — Rule 8)\n            const isCap = isCapProduct(styleNumber, colorsData.productTitle || colorsData.PRODUCT_TITLE || product.PRODUCT_TITLE, categoryName, {\n                subcategory: colorsData.SUBCATEGORY_NAME || '',\n                description: colorsData.PRODUCT_DESCRIPTION || '',\n            });",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "shared_components/js/builders/scp/product-rows.js",
+      "before": " * Check if a style number is a cap/hat product\n * @param {string} style - Style number\n * @param {string} productTitle - Product title/description\n * @param {string} categoryName - CATEGORY_NAME from SanMar API (most reliable)\n * @returns {boolean} True if cap/hat\n */\nfunction isCapProduct(style, productTitle = '', categoryName = '') {\n    // PRIORITY: Flat headwear (beanies, knit caps) use garment pricing, NOT cap pricing\n    if (typeof ProductCategoryFilter !== 'undefined' && productTitle) {\n        if (ProductCategoryFilter.isFlatHeadwear({ PRODUCT_TITLE: productTitle })) {\n            return false;\n        }\n    }\n\n    // BEST METHOD: Check CATEGORY_NAME from SanMar API\n    // SanMar categorizes all caps/hats under \"Caps\" category\n    if (categoryName && categoryName.toLowerCase() === 'caps') {\n        return true;\n    }\n\n    // FALLBACK: Pattern matching for cases where category isn't available\n    if (!style) return false;\n    const styleUpper = style.toUpperCase();\n    const titleUpper = (productTitle || '').toUpperCase();\n\n    // Check style patterns:\n    // CP* caps (CP80, CP90, etc)\n    // NE* caps (NE1000, NE400)\n    // C+digit (C112, C118)\n    // Richardson styles (112, 110, 115, etc) - numeric only\n    if (/^C[P0-9]/.test(styleUpper) || styleUpper.startsWith('NE')) {\n        return true;\n    }\n\n    // Richardson caps - 2-3 digit numeric styles (100-999)\n    if (/^\\d{2,3}$/.test(styleUpper)) {\n        return true;\n    }\n\n    // Check title keywords\n    if (titleUpper.includes('CAP') || titleUpper.includes('HAT') ||\n        titleUpper.includes('BEANIE') || titleUpper.includes('SNAPBACK') ||\n        titleUpper.includes('TRUCKER') || titleUpper.includes('RICHARDSON')) {\n        return true;\n    }\n\n    return false;",
+      "after": " * Is this product a cap? Same rule as the EMB builder and every price surface:\n * HeadwearClassifier (shared_components/js/headwear-classifier.js, Erik 2026-09-16).\n * Flat headwear (beanies, headbands, gaiters) is NOT a cap; visors are. Screen print\n * keeps accepting caps — this only sets the row's cap flag. (Rule 8: mirrors\n * builders/emb/product-rows.js isCapProduct.)\n * @param {string} style - Style number\n * @param {string} productTitle - Product title (the stylesearch label \"STYLE - TITLE\")\n * @param {string} categoryName - CATEGORY_NAME from SanMar API\n * @param {{subcategory?: string, description?: string}} [details] - SUBCATEGORY_NAME and\n *   PRODUCT_DESCRIPTION when the caller has them (/api/product-colors)\n * @returns {boolean} True when the product is a cap\n */\nexport function isCapProduct(style, productTitle = '', categoryName = '', details = {}) {\n    // Rule 4: never fall back to the old keyword rules — a missing classifier is a visible error.\n    if (typeof HeadwearClassifier === 'undefined' || !HeadwearClassifier || typeof HeadwearClassifier.classify !== 'function') {\n        const message = 'The cap/garment check did not load, so this product cannot be added. Refresh the page.';\n        if (typeof showToast === 'function') showToast(message, 'error', 8000);\n        throw new Error(message);\n    }\n    // Same service-prefix strip as the EMB builder (\"Di. Embroider Cap - T-shirt\").\n    const title = String(productTitle || '').replace(/^DI\\.\\s*EMBROIDER\\s+(CAP|GARMENT)\\s*-\\s*/i, '');\n    const extra = details || {};\n    return HeadwearClassifier.classify({\n        STYLE: style || '',\n        PRODUCT_TITLE: title,\n        CATEGORY_NAME: categoryName || '',\n        SUBCATEGORY_NAME: extra.subcategory || '',\n        PRODUCT_DESCRIPTION: extra.description || '',\n    }).isCap === true;",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "shared_components/js/dtf-quote-products.js",
+      "before": "        this.exactMatchSearch = null;\n",
+      "after": "        this.exactMatchSearch = null;\n        // Searches the cap filter emptied: normalized query → what to tell the rep\n        this.hiddenCapSearches = new Map();\n",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "shared_components/js/dtf-quote-products.js",
+      "before": "            filterFunction: (item) => {\n                // Filter out caps (caps can't have DTF transfers)\n                // Use shared ProductCategoryFilter for comprehensive cap detection\n                if (typeof ProductCategoryFilter !== 'undefined') {\n                    return !ProductCategoryFilter.isStructuredCap(item);\n                }\n                // Fallback if utility not loaded (shouldn't happen)\n                const label = (item.label || '').toUpperCase();\n                return !(label.includes('CAP') || label.includes('HAT') || label.includes('BEANIE'));\n            }",
+      "after": "            // Caps can't take DTF transfers, so they stay out of the search\n            filterFunction: (item) => !this.isCapSuggestion(item),\n            // Every result was a hidden cap: say so instead of a bare \"No products found\"\n            onFilteredOut: (items, query) => this.rememberHiddenCaps(items, query)",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "shared_components/js/dtf-quote-products.js",
+      "before": "        return true;\n    }",
+      "after": "        return true;\n    }\n\n    /**\n     * Does DTF search hide this style-search suggestion as a cap? Caps can't take DTF transfers.\n     * Erik 2026-09-16: keep every style the search showed before. A row is hidden only when BOTH\n     * the old keyword rule (ProductCategoryFilter.isStructuredCap) AND the shared rule\n     * (HeadwearClassifier) call it a cap, so bucket hats and Richardson five/seven-panel or\n     * wide-brim styles stay listed, and garments the keyword list hid (\"Capital\" blazer,\n     * \"Fitted Tee\", \"Baseball Tee\", scrub caps, skull caps) come back.\n     * A missing helper is a visible error, never a guess (Rule 4).\n     * @param {{value?: string, label?: string}} item - /api/stylesearch row (\"STYLE - TITLE\" label)\n     * @returns {boolean}\n     */\n    isCapSuggestion(item) {\n        const classifier = typeof window !== 'undefined' ? window.HeadwearClassifier : null;\n        const keywordRule = typeof window !== 'undefined' ? window.ProductCategoryFilter : null;\n        if (!classifier || typeof classifier.classify !== 'function' ||\n            !keywordRule || typeof keywordRule.isStructuredCap !== 'function') {\n            const message = 'The cap/garment check did not load, so product search is unavailable. Refresh the page.';\n            if (typeof window !== 'undefined' && typeof window.showToast === 'function') window.showToast(message, 'error', 8000);\n            throw new Error(message);\n        }\n        const row = item || {};\n        return keywordRule.isStructuredCap(row) === true &&\n            classifier.classify({ PRODUCT_TITLE: row.label || '', STYLE: row.value || '' }).isCap === true;\n    }\n\n    /** The search module's query form (trimmed, no spaces, upper case). */\n    normalizeSearchQuery(query) {\n        return String(query == null ? '' : query).trim().replace(/\\s+/g, '').toUpperCase();\n    }\n\n    /**\n     * ExactMatchSearch onFilteredOut: every result for `query` was a cap the search hides.\n     * Remembered per query because the search caches the emptied result and does not call\n     * the hook again for a repeat search.\n     * @param {Array<{value?: string}>} items - the hidden rows\n     * @param {string} query - the normalized query\n     */\n    rememberHiddenCaps(items, query) {\n        const key = this.normalizeSearchQuery(query);\n        if (!key || !items || items.length === 0) return;\n        const exact = items.find(item => this.normalizeSearchQuery(item && item.value) === key);\n        this.hiddenCapSearches.delete(key);   // re-insert as newest; the oldest goes past 50\n        this.hiddenCapSearches.set(key, exact\n            ? `${exact.value} is a cap — DTF search doesn’t list caps.`\n            : `Only caps match ${key} — DTF search doesn’t list caps.`);\n        if (this.hiddenCapSearches.size > 50) this.hiddenCapSearches.delete(this.hiddenCapSearches.keys().next().value);\n    }\n\n    /**\n     * What to show instead of \"No products found\" for this search text, or null.\n     * @param {string} query - the search box text\n     * @returns {string|null}\n     */\n    hiddenSearchMessage(query) {\n        return this.hiddenCapSearches.get(this.normalizeSearchQuery(query)) || null;\n    }",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "shared_components/js/dtf-quote-products.js",
+      "before": "            // Filter out caps using shared utility\n            const filteredSuggestions = suggestions.filter(item => {\n                if (typeof ProductCategoryFilter !== 'undefined') {\n                    return !ProductCategoryFilter.isStructuredCap(item);\n                }\n                // Fallback\n                const label = (item.label || '').toUpperCase();\n                return !(label.includes('CAP') || label.includes('HAT') || label.includes('BEANIE'));\n            });",
+      "after": "            // Filter out caps using the shared headwear rule\n            const filteredSuggestions = suggestions.filter(item => !this.isCapSuggestion(item));",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "product/js/pdp-configurator.js",
+      "before": " *                            Front + back) + SCP ink-colors stepper (1-4,",
+      "after": " *                            Front + back · flat headwear: Front only)\n *                            + SCP ink-colors stepper (1-4,",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "product/js/pdp-configurator.js",
+      "before": " *   PdpConfigurator.init(ctx)      ctx = { style, isCap, productName,",
+      "after": " *   PdpConfigurator.init(ctx)      ctx = { style, isCap, isFlat, productName,",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "product/js/pdp-configurator.js",
+      "before": " *   PdpConfigurator.getSelection() current selection for the quote CTA\n */",
+      "after": " *   PdpConfigurator.getSelection() current selection for the quote CTA\n *   PdpConfigurator.getLocations() placement chips on this page\n *                                    ([{ key, label, sub }], [] before init)\n */",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "product/js/pdp-configurator.js",
+      "before": "        { key: 'frontBack', label: 'Front + back', sub: 'Front + back logos' }\n    ];",
+      "after": "        { key: 'frontBack', label: 'Front + back', sub: 'Front + back logos' }\n    ];\n    // Flat headwear (beanies, headbands, gaiters — ctx.isFlat) has ONE placement,\n    // the front (Erik 2026-09-16). It is priced as garment embroidery, so it keeps\n    // the garment leftChest key and engine inputs; only the words change\n    // (\"Left chest\" means nothing on a beanie).\n    const FLAT_HEADWEAR_LOCATIONS = [\n        { key: 'leftChest', label: 'Front', sub: 'Front logo' }\n    ];",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "product/js/pdp-configurator.js",
+      "before": "        const all = state.ctx.isCap ? CAP_LOCATIONS : GARMENT_LOCATIONS;",
+      "after": "        const all = state.ctx.isCap ? CAP_LOCATIONS\n            : state.ctx.isFlat ? FLAT_HEADWEAR_LOCATIONS\n            : GARMENT_LOCATIONS;",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "product/js/pdp-configurator.js",
+      "before": "     *   isCap        cap product → cap placements + cap-embroidery pricing\n     *   productName  display name for CTAs",
+      "after": "     *   isCap        cap product → cap placements + cap-embroidery pricing\n     *   isFlat       flat headwear (beanie, headband, gaiter) → garment pricing, one \"Front\" chip\n     *   productName  display name for CTAs",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "product/js/pdp-configurator.js",
+      "before": "    window.PdpConfigurator = {\n        init: init,\n        setColor: setColor,\n        getSelection: getSelection",
+      "after": "    /**\n     * The placement chips this page offers (copies). The product page words its\n     * quote-conflict message with these, so a beanie page says \"Front\" and a\n     * tee page says \"Left chest\" for the same stored key.\n     */\n    function getLocations() {\n        if (!state.initialized || !state.ctx) return [];\n        return currentLocations().map(function (l) {\n            return { key: l.key, label: l.label, sub: l.sub };\n        });\n    }\n\n    window.PdpConfigurator = {\n        init: init,\n        setColor: setColor,\n        getSelection: getSelection,\n        getLocations: getLocations",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "product/js/product-2026.js",
+      "before": " *     (methodAlert). Caps branch: cap placements + cap-embroidery pricing.\n *",
+      "after": " *     (methodAlert). Caps branch: cap placements + cap-embroidery pricing.\n *   - CAP vs GARMENT via the shared HeadwearClassifier\n *     (shared_components/js/headwear-classifier.js — the one rule every price\n *     surface uses): isCap → caps branch; flat headwear (beanies, headbands,\n *     gaiters…) → garment embroidery with one \"Front\" placement. Flat items in\n *     Caps (category or subcategory) are embroidery only, without the category\n *     rules (the live Caps rule turns every method off); flat items elsewhere\n *     (Personal Protection gaiters, Accessories headbands, Workwear beanies)\n *     keep their category's rules. Module missing → visible pricing error,\n *     never a keyword guess.\n *",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "product/js/product-2026.js",
+      "before": "        isCap: false,\n        inventoryRows: null, // raw rows from /api/sanmar/inventory (all colors)",
+      "after": "        isCap: false,\n        headwear: null,     // HeadwearClassifier.classify() result; null when the module did not load\n        inventoryRows: null, // raw rows from /api/sanmar/inventory (all colors)",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "product/js/product-2026.js",
+      "before": "        state.isCap = detectCap(state.product, state.style);\n    }\n\n    function detectCap(product, style) {\n        if (product.category === 'Caps') return true;\n        if (product.category) return false;\n        // Empty category (e.g. Richardson rows in Sanmar_Bulk): numeric style or \"cap\" in title\n        if (/^\\d{2,3}$/.test(style)) return true;\n        return /\\bcaps?\\b/i.test(product.title || '');",
+      "after": "        state.headwear = detectHeadwear(state.product, state.style);\n        state.isCap = !!(state.headwear && state.headwear.isCap);\n    }\n\n    /**\n     * Cap vs garment embroidery — the ONE shared rule (Erik 2026-09-16). SanMar\n     * leaves CATEGORY_NAME blank on Richardson caps and most visors, and Youth/\n     * Ladies caps carry \"Caps\" only in the subcategory, so the classifier reads\n     * the title, subcategory and description too. isCap → cap embroidery;\n     * anything else (flat headwear included) → garment embroidery.\n     * Returns null when the module didn't load: initConfigurator() shows a\n     * visible pricing error rather than guessing (Rule 4).\n     */\n    function detectHeadwear(product, style) {\n        const classifier = window.HeadwearClassifier;\n        if (!classifier || typeof classifier.classify !== 'function') {\n            console.error('[product-2026] HeadwearClassifier module missing — cannot choose cap or garment pricing');\n            return null;\n        }\n        return classifier.classify({\n            STYLE: style,\n            PRODUCT_TITLE: product.title,\n            CATEGORY_NAME: product.category,\n            SUBCATEGORY_NAME: product.subcategory,\n            PRODUCT_DESCRIPTION: product.description\n        });\n    }\n\n    /** CATEGORY_NAME or SUBCATEGORY_NAME is \"Caps\" (Youth/Caps and Ladies/Caps included). */\n    function inCapsCategory(product) {\n        return !!product && (/^caps$/i.test(product.category || '') || /^caps$/i.test(product.subcategory || ''));\n    }\n\n    /**\n     * Embroidery is the only decoration offered: caps, and flat headwear listed\n     * under Caps (beanies, Caps-category headbands). Flat items in other\n     * categories keep that category's decoration rules (Erik 2026-09-16: no new\n     * blocks on print methods).\n     */\n    function embroideryOnlyHeadwear() {\n        if (state.isCap) return true;\n        return !!(state.headwear && state.headwear.isFlat && inCapsCategory(state.product));",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "product/js/product-2026.js",
+      "before": "            + (state.isCap ? '' : ', screen print, DTG, and DTF') + ' from Northwest Custom Apparel, Milton WA.';",
+      "after": "            + (embroideryOnlyHeadwear() ? '' : ', screen print, DTG, and DTF') + ' from Northwest Custom Apparel, Milton WA.';",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "product/js/product-2026.js",
+      "before": "    /**\n     * Resolve eligibility, then hand pricing entirely to the configurator.",
+      "after": "    /**\n     * Flat headwear listed under Caps (beanies, Caps-category headbands) is\n     * embroidered flat and priced as garment embroidery. The live \"Caps\"\n     * decoration rule turns every method off, so that rule is not asked:\n     * embroidery only. Flat items in any other category never come here —\n     * they take getEligibility() like every garment.\n     */\n    function flatHeadwearEligibility() {\n        return { EMB: true, DTG: 'no', SCP: false, DTF: false, source: 'flat-headwear' };\n    }\n\n    /**\n     * Resolve eligibility, then hand pricing entirely to the configurator.",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "product/js/product-2026.js",
+      "before": "        state.decoration = state.isCap ? null : await getEligibility();",
+      "after": "        if (!state.headwear) {\n            // No shared cap/garment rule → no way to pick the right pricing. Say so; never guess.\n            state.decoration = null;\n            $('methodAlert').innerHTML = alertHtml('error', 'Unable to load live pricing',\n                'The product type check didn\\'t load, so we can\\'t tell which embroidery pricing applies. '\n                + 'Please refresh, or call 253-922-5793 for a quote — we never guess at prices.');\n            return;\n        }\n        if (state.isCap) state.decoration = null;\n        else if (embroideryOnlyHeadwear()) state.decoration = flatHeadwearEligibility();\n        else state.decoration = await getEligibility();",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "product/js/product-2026.js",
+      "before": "            isCap: state.isCap,\n            productName: state.product.name || state.style,",
+      "after": "            isCap: state.isCap,\n            isFlat: state.headwear.isFlat === true,\n            productName: state.product.name || state.style,",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "product/js/product-2026.js",
+      "before": "    /** Visible warning whenever eligibility fell back to the safe set. */\n    function renderMethodAlert() {\n        const slot = $('methodAlert');\n        if (!slot) return;\n        if (!state.isCap && state.decoration && state.decoration.source === 'fallback') {\n            slot.innerHTML = alertHtml('warn', 'Showing embroidery pricing',\n                'Other decoration options may be available for this garment — call 253-922-5793 and a real person will confirm.');",
+      "after": "    /**\n     * Visible warning whenever eligibility fell back to the safe set; a short\n     * note only where flat headwear is embroidery-only on purpose (listed under\n     * Caps) — flat items in other categories show their category's methods.\n     */\n    function renderMethodAlert() {\n        const slot = $('methodAlert');\n        if (!slot) return;\n        const source = !state.isCap && state.decoration ? state.decoration.source : null;\n        if (source === 'fallback') {\n            slot.innerHTML = alertHtml('warn', 'Showing embroidery pricing',\n                'Other decoration options may be available for this garment — call 253-922-5793 and a real person will confirm.');\n        } else if (source === 'flat-headwear') {\n            slot.innerHTML = '<p class=\"pdp-panel-note\" id=\"flatHeadwearNote\">'\n                + 'Beanies and other soft headwear are embroidered flat, so embroidery is the decoration we offer for this style.</p>';",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "product/js/product-2026.js",
+      "before": "     * a mismatched add would price a configuration staff can't reproduce.\n     */",
+      "after": "     * a mismatched add would price a configuration staff can't reproduce.\n     * The placement is named with THIS page's chip for the stored key, never the\n     * stored label: a tee and a beanie share the leftChest key but call it\n     * \"Left chest\" and \"Front\", and the shopper can only pick what this page shows.\n     */",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "product/js/product-2026.js",
+      "before": "            return 'Your quote\\'s ' + (sel.methodLabel || 'decorated') + ' pieces use \"'\n                + (first.placementLabel || first.placement)",
+      "after": "            const pieces = 'Your quote\\'s ' + (sel.methodLabel || 'decorated') + ' pieces use ';\n            const label = pagePlacementLabel(first.placement);\n            if (!label) {\n                return pieces + 'a placement this style doesn\\'t offer — one placement per decoration type '\n                    + 'so quantities pool for the discount. Email us to price this style with a different layout.';\n            }\n            return pieces + '\"' + label",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "product/js/product-2026.js",
+      "before": "        return null;\n    }",
+      "after": "        return null;\n    }\n\n    /** This page's chip label for a placement key, or null when the page doesn't offer it. */\n    function pagePlacementLabel(key) {\n        const cfg = window.PdpConfigurator;\n        const locations = cfg && typeof cfg.getLocations === 'function' ? cfg.getLocations() : [];\n        const hit = locations.filter(function (l) { return l.key === key; })[0];\n        return hit ? hit.label : null;\n    }\n\n    // Size labels that mean \"one size\" — the cart shows no size grid for them.\n    const ONE_SIZE = /^(OSFA|OSFM|OS|O\\/S|ONE ?SIZE|ADJ)$/i;\n\n    /** Distinct stock sizes for the selected color, or null when the stock feed has none. */\n    function selectedColorSizes() {\n        if (!state.inventoryRows || !state.selected) return null;\n        const want = normColor(state.selected.catalog);\n        const sizes = new Set();\n        state.inventoryRows.forEach(function (r) {\n            const size = String(r.size || '').trim();\n            if (size && normColor(r.color) === want) sizes.add(size);\n        });\n        return sizes.size ? Array.from(sizes) : null;\n    }\n\n    /**\n     * Will the quote cart ask for sizes on this line? Never for caps; garments\n     * always land on one standard size and are split in the cart's size grid;\n     * flat headwear only when the style comes in more than one size (the cart\n     * shows its grid for two or more sizes). Stock feed unavailable → judge by\n     * the size the engine priced.\n     */\n    function cartAsksForSizes(sel) {\n        if (sel.isCap) return false;\n        if (!state.headwear || !state.headwear.isFlat) return true;\n        const sizes = selectedColorSizes();\n        if (sizes) return sizes.length > 1;\n        const priced = Object.keys(sel.sizes || {});\n        return !(priced.length === 1 && ONE_SIZE.test(priced[0]));\n    }",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "product/js/product-2026.js",
+      "before": "        // where the customer distributes them (2026-08-19), so say so.\n        const cta = sel.isCap ? 'View quote' : 'Set sizes &amp; view quote';",
+      "after": "        // where the customer distributes them (2026-08-19), so say so. Caps and\n        // one-size flat headwear have no sizes to set.\n        const cta = cartAsksForSizes(sel) ? 'Set sizes &amp; view quote' : 'View quote';",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "calculators/quick-quote/index.html",
+      "before": "    <script src=\"/shared_components/js/product-category-filter.js?v=2026.09.06.37\"></script>\n    <script src=\"/shared_components/js/headwear-classifier.js?v=2026.09.16.2\"></script>",
+      "after": "    <script src=\"/shared_components/js/headwear-classifier.js?v=2026.09.16.3\"></script>",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "    function isFlatHeadwear(product) { return !!(product && product.headwear && product.headwear.isFlat); }\n    function oneSize(product) { return !!(product && product.isCap) || isFlatHeadwear(product); }",
+      "after": "    function isFlatHeadwear(product) { return !!(product && product.headwear && product.headwear.isFlat); }\n    // Only flat headwear in \"Caps\" (beanies and the like) is embroidery only. Flat items in other\n    // categories (gaiters in Personal Protection, headbands in Accessories) keep their category's methods.\n    function inCapsCategory(product) {\n        return !!product && [product.category, product.subcategory].some(function (c) { return /^\\s*caps\\s*$/i.test(c || ''); });\n    }\n    function flatEmbroideryOnly(product) { return isFlatHeadwear(product) && inCapsCategory(product); }\n    function oneSize(product) { return !!(product && product.isCap) || isFlatHeadwear(product); }",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "    // Cap vs garment comes from the shared classifier: Richardson caps have no category and\n    // Richardson/New Era also sell apparel. Flat headwear (beanies, knit caps) is not a cap: it is\n    // one size and priced as flat (garment) embroidery, as the EMB builder does (Erik 2026-09-16).\n    function classifyHeadwear(meta) {\n        if (!window.HeadwearClassifier) throw lookupError('The product type check did not load. Refresh the page.', false);\n        return window.HeadwearClassifier.classify(meta);\n    }\n    // Rule 9: flat only when the EMB builder agrees. Its isCapProduct() asks ProductCategoryFilter about\n    // the style-search label (\"STYLE - TITLE\") before the category, so fleece headbands, gaiters and skull\n    // caps in \"Caps\" stay caps there — and here. Blank-category ones keep the rep's choice on a line sheet.\n    function matchBuilderFlat(headwear, style, title) {\n        if (!headwear.isFlat) return headwear;\n        if (!window.ProductCategoryFilter) throw lookupError('The product type check did not load. Refresh the page.', false);\n        if (window.ProductCategoryFilter.isFlatHeadwear({ PRODUCT_TITLE: style + ' - ' + title })) return headwear;\n        return Object.assign({}, headwear, { kind: 'cap', isCap: true, isFlat: false, confident: headwear.reason === 'category', reason: 'builder' });",
+      "after": "    // Cap vs garment comes from the shared classifier, the one rule every price surface uses\n    // (Rule 9): Richardson caps have no category and Richardson/New Era also sell apparel. Soft\n    // headwear (beanies, headbands, gaiters, face masks, skull and scrub caps) is not a cap: it is\n    // one size and priced as flat (garment) embroidery, as the Embroidery builder does (Erik 2026-09-16).\n    // Only isCap picks cap pricing, even when the classifier is not confident.\n    function classifyHeadwear(meta) {\n        if (!window.HeadwearClassifier) throw lookupError('The product type check did not load. Refresh the page.', false);\n        return window.HeadwearClassifier.classify(meta);",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "                var headwear = matchBuilderFlat(classifyHeadwear(meta), style, meta.PRODUCT_TITLE || '');",
+      "after": "                var headwear = classifyHeadwear(meta);",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "        // Flat headwear → garment embroidery only (the \"Caps\" category rule lists no garment methods).\n        if (isFlatHeadwear(product)) return Promise.resolve({ EMB: true, DTG: 'no', SCP: false, DTF: false, source: 'flat-headwear' });\n        return categoryEligibility(product);",
+      "after": "        // Flat headwear in \"Caps\" → garment embroidery only (the \"Caps\" category rule lists no garment methods).\n        if (flatEmbroideryOnly(product)) return Promise.resolve({ EMB: true, DTG: 'no', SCP: false, DTF: false, source: 'flat-headwear' });\n        return categoryEligibility(product); // other flat items follow their category, like any garment",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "            ? '<p class=\"qq-elig-note\" role=\"status\">Beanies and knit caps are priced as flat embroidery, the same as the Embroidery builder.</p>'",
+      "after": "            ? '<p class=\"qq-elig-note\" role=\"status\">Beanies, headbands and other soft headwear are priced as flat embroidery, the same as the Embroidery builder.</p>'",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "        if (state.mode === 'linesheet') pf.hidden = !(hasActive('dtg') || hasActive('scp') || hasActive('dtf'));\n        else pf.hidden = oneSize(state.product);",
+      "after": "        var printing = hasActive('dtg') || hasActive('scp') || hasActive('dtf');\n        // Quick Price: one-size products hide it only when no print method is offered (a gaiter can be screen printed).\n        pf.hidden = state.mode === 'linesheet' ? !printing : oneSize(state.product) && !printing;",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "    // Embroidery follows a confirmed product (cap → cap embroidery; garment or flat headwear →\n    // embroidery), as the EMB builder does per row. The builder's own cap check still differs on\n    // some styles (New Era and Richardson apparel, visors). Unconfirmed products keep the rep's choice.\n    function lineMethodFor(row) {\n        var m = state.lineMethod, h = row.product && row.product.headwear;\n        if ((m !== 'emb' && m !== 'capemb') || !h || !h.confident) return m;",
+      "after": "    // Embroidery follows the product (cap → cap embroidery; garment or flat headwear → embroidery),\n    // as the Embroidery builder does per row with the same shared classifier — its isCap as returned,\n    // even when it is not confident (the row then says so).\n    function lineMethodFor(row) {\n        var m = state.lineMethod, h = row.product && row.product.headwear;\n        if ((m !== 'emb' && m !== 'capemb') || !h) return m;",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "        var product = row.product, color = row.color, qty = state.lineQty, headwear = product.headwear || {}, flat = isFlatHeadwear(product);",
+      "after": "        var product = row.product, color = row.color, qty = state.lineQty, headwear = product.headwear || {}, flat = isFlatHeadwear(product), flatOnly = flatEmbroideryOnly(product);",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "            if ((product.isCap || flat) && headwear.confident && !embroidery) throw new Error(product.style + (flat ? ' is headwear' : ' is a cap') + ' — choose Embroidery or Cap embroidery.');\n            if (method === 'capemb' && state.embAddl.length > 1) throw new Error('Caps take one extra logo (cap back). Remove the other logos to price ' + product.style + '.');\n            var methodWords = def.label.replace(/^[A-Z](?=[a-z])/, function (c) { return c.toLowerCase(); }); // \"DTG print\" keeps its capitals\n            if (method !== state.lineMethod) notices.push('Priced as ' + methodWords + (flat ? ' — beanies are flat embroidery, as in the Embroidery builder.' : '.'));\n            else if (method === 'capemb' && !headwear.confident) notices.push('Not confirmed as a cap — priced as cap embroidery, as chosen.');\n            if (row.colorChanged) notices.push('The saved color is no longer offered — check the color.');\n            // Cap pricing and flat headwear skip the category rules (the \"Caps\" rule lists no garment methods).\n            if (method !== 'capemb' && !(embroidery && (product.isCap || flat))) {",
+      "after": "            if ((product.isCap || flatOnly) && headwear.confident && !embroidery) throw new Error(product.style + (flatOnly ? ' is headwear' : ' is a cap') + ' — choose Embroidery or Cap embroidery.');\n            if (method === 'capemb' && state.embAddl.length > 1) throw new Error('Caps take one extra logo (cap back). Remove the other logos to price ' + product.style + '.');\n            var methodWords = def.label.replace(/^[A-Z](?=[a-z])/, function (c) { return c.toLowerCase(); }); // \"DTG print\" keeps its capitals\n            if (method !== state.lineMethod) notices.push('Priced as ' + methodWords + (flat ? ' — soft headwear is flat embroidery, as in the Embroidery builder.' : '.'));\n            if (embroidery && !headwear.confident) notices.push('Not confirmed from the catalog — check the product.');\n            if (row.colorChanged) notices.push('The saved color is no longer offered — check the color.');\n            // Cap pricing and flat headwear in \"Caps\" skip the category rules (the \"Caps\" rule lists no\n            // garment methods); other flat items (gaiters, headbands) follow their category like any garment.\n            if (method !== 'capemb' && !(embroidery && (product.isCap || flatOnly))) {",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
     }
   ]
 }

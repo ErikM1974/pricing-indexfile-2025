@@ -96,7 +96,7 @@ describe.each([
 test('the builder pages load the classifier before the builder code', () => {
     const fs = require('fs');
     const root = path.join(__dirname, '../..');
-    const tag = '/shared_components/js/headwear-classifier.js?v=2026.09.16.3';
+    const tag = '/shared_components/js/headwear-classifier.js?v='; // /deploy moves the version
     for (const [page, consumer] of [
         ['embroidery-quote-builder.html', '/shared_components/js/builders/emb/index.js'],
         ['screenprint-quote-builder.html', '/shared_components/js/builders/scp/index.js'],

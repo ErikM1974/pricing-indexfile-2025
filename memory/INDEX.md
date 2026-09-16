@@ -23,6 +23,8 @@ Last Updated: 2026-09-03 (/memory-maintain: MEMORY.md 24.0→~19 KB — Sept shi
 | [`DURABLE_GOTCHAS.md`](DURABLE_GOTCHAS.md) | The expensive traps, by trigger (verification / auth / JS / deploy / API) — moved out of the auto-loaded index 2026-08-12 |
 | [`EMBROIDERY_PRICING_REALIZATION.md`](EMBROIDERY_PRICING_REALIZATION.md) | 85% realization, the $442K gap — pricing is sound, it is not being charged |
 | [`EMBROIDERY_STITCH_COST_2026-09.md`](EMBROIDERY_STITCH_COST_2026-09.md) | Cost per 1,000 stitches, 5K vs 8K logo, handling/setup fit from logs, worst-case multiplier, full absorption |
+| [`HEADWEAR_ALIGNMENT_2026-09.md`](HEADWEAR_ALIGNMENT_2026-09.md) | One cap/flat/garment rule (shared classifier) across builders, product page, calculators and Quick Quote — Erik's rules, what is wired where, second-pass list |
+| [`QUICK_QUOTE_2026-09.md`](QUICK_QUOTE_2026-09.md) | Quick Quote: classic line sheet restore, version line/What's new, release fixture rules, small-order display decisions |
 | [`LESSONS_LEARNED.md`](LESSONS_LEARNED.md) | Active bug log — problem/root cause/fix/prevention (cap 300 lines) |
 | [`LESSONS_LEARNED_ARCHIVE.md`](LESSONS_LEARNED_ARCHIVE.md) | Aged-out lessons (unbounded) |
 | [`MEMORY_SYSTEM.md`](MEMORY_SYSTEM.md) | **How the memory system works** (not what is in it) — where a new fact goes, the 6 surfaces and when each loads, size budgets, which tree is canonical |

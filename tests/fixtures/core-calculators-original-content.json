@@ -1237,6 +1237,110 @@
       "after": "/shared_components/js/screenprint-pricing-v2.js?v=2026.09.12.1",
       "count": 1,
       "reason": "Refetch the focus correction with the seasonal release."
+    },
+    {
+      "file": "calculators/cap-embroidery-pricing-integrated.html",
+      "before": "    <script src=\"/shared_components/js/product-category-filter.js?v=2026.09.06.37\"></script>",
+      "after": "    <script src=\"/shared_components/js/headwear-classifier.js?v=2026.09.16.3\"></script>",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "calculators/embroidery-pricing.html",
+      "before": "    <script src=\"/shared_components/js/product-category-filter.js?v=2026.09.06.37\"></script>",
+      "after": "    <script src=\"/shared_components/js/headwear-classifier.js?v=2026.09.16.3\"></script>",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "calculators/js/cap-embroidery-pricing-integrated-page.js",
+      "before": "                // Use shared utility for filtering\n                if (ProductCategoryFilter.isFlatHeadwear(item)) {\n                    beanieResults.push(item);\n                } else if (ProductCategoryFilter.isStructuredCap(item)) {\n                    capResults.push(item);",
+      "after": "                // Suggestion rows carry only a label and the style number, so the label is the title and the\n                // value is the style (3-digit Richardson caps like 220, 173 sort as caps). Garments are left out.\n                const headwear = classifyHeadwear({ PRODUCT_TITLE: item.label, STYLE: item.value });\n                if (headwear.isCap) {\n                    capResults.push(item);\n                } else if (headwear.isFlat) {\n                    beanieResults.push(item);",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "calculators/js/cap-embroidery-pricing-integrated-page.js",
+      "before": "            resultsContainer.innerHTML = '<div class=\"search-no-results\">Search failed. Please try again.</div>';\n        }",
+      "after": "            resultsContainer.innerHTML = '<div class=\"search-no-results\">Search failed. Please try again.</div>';\n            if (error.headwearClassifierMissing) showApiError(error.message);\n        }",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "calculators/js/cap-embroidery-pricing-integrated-page.js",
+      "before": "\n// Load cap product data",
+      "after": "\n// Cap vs garment embroidery is ONE rule on every price surface (Erik 2026-09-16):\n// shared_components/js/headwear-classifier.js. Only isCap prices here; beanies, knit/skull caps,\n// headbands and garments go to flat embroidery. A missing classifier is a visible error,\n// never the old keyword guess (Rule 4).\nfunction classifyHeadwear(row) {\n    const classifier = window.HeadwearClassifier;\n    if (!classifier || typeof classifier.classify !== 'function') {\n        const error = new Error('The product type check did not load, so this page cannot tell caps from garments. Please refresh the page.');\n        error.headwearClassifierMissing = true;\n        throw error;\n    }\n    return classifier.classify(row);\n}\n\n// Load cap product data",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "calculators/js/cap-embroidery-pricing-integrated-page.js",
+      "before": "        // Validate that this is actually a cap product\n        const productTitle = (currentProduct.PRODUCT_TITLE || currentProduct.ProductTitle || '').toLowerCase();\n        const productDescription = (currentProduct.PRODUCT_DESCRIPTION || currentProduct.Description || '').toLowerCase();\n        const category = (currentProduct.CATEGORY || currentProduct.Category || '').toLowerCase();\n        const brand = currentProduct.BRAND_NAME || currentProduct.BRAND || currentProduct.Brand || '';\n\n        // Use shared utility for filtering\n        if (ProductCategoryFilter.isFlatHeadwear(currentProduct)) {",
+      "after": "        // Validate that this is actually a cap product (visors and bucket hats included)\n        const brand = currentProduct.BRAND_NAME || currentProduct.BRAND || currentProduct.Brand || '';\n        const headwear = classifyHeadwear(currentProduct);\n\n        if (headwear.isFlat) {",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "calculators/js/cap-embroidery-pricing-integrated-page.js",
+      "before": "        if (!ProductCategoryFilter.isStructuredCap(currentProduct)) {",
+      "after": "        if (!headwear.isCap) {",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "calculators/js/cap-embroidery-pricing-integrated-page.js",
+      "before": "        Cap embroidery pricing is only for structured caps like baseball caps and trucker hats.",
+      "after": "        Cap embroidery pricing is for caps, visors and bucket hats.",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "calculators/js/embroidery-pricing-page.js",
+      "before": "            // Separate caps and non-caps",
+      "after": "            // Separate caps and non-caps. Suggestion rows carry only a label and the style number, so the\n            // label is the title and the value is the style (3-digit Richardson caps like 220, 173 sort as caps).\n            // Flat headwear (beanies, knit/skull caps, headbands) and garments both price here.",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "calculators/js/embroidery-pricing-page.js",
+      "before": "                // Use shared utility for filtering\n                if (ProductCategoryFilter.isFlatHeadwear(result)) {\n                    flatResults.push(result);\n                } else if (ProductCategoryFilter.isStructuredCap(result)) {",
+      "after": "                if (classifyHeadwear({ PRODUCT_TITLE: result.label, STYLE: result.value }).isCap) {",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "calculators/js/embroidery-pricing-page.js",
+      "before": "            showApiError('Search service is temporarily unavailable. Please try again later.');",
+      "after": "            showApiError(error.headwearClassifierMissing ? error.message : 'Search service is temporarily unavailable. Please try again later.');",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "calculators/js/embroidery-pricing-page.js",
+      "before": "// Validate if product is a cap and should use cap pricing\nfunction validateProductType(product, styleNumber) {\n    // Get product title and description for validation\n    const productTitle = (product.PRODUCT_TITLE || product.ProductTitle || '').toLowerCase();\n    const description = (product.PRODUCT_DESCRIPTION || product.Description || '').toLowerCase();\n    const category = (product.CATEGORY || product.Category || '').toLowerCase();\n\n\n    // Use shared utility for filtering\n    if (ProductCategoryFilter.isFlatHeadwear(product)) {\n        return true; // Valid for flat embroidery\n    }\n\n    if (ProductCategoryFilter.isStructuredCap(product)) {\n        const productName = product.PRODUCT_TITLE || product.ProductTitle || `Style ${styleNumber}`;\n        const reason = 'This product is a structured cap and requires cap embroidery pricing.';",
+      "after": "// Cap vs garment embroidery is ONE rule on every price surface (Erik 2026-09-16):\n// shared_components/js/headwear-classifier.js. isCap → cap pricing; flat headwear and garments → this page.\n// A missing classifier is a visible error, never the old keyword guess (Rule 4).\nfunction classifyHeadwear(row) {\n    const classifier = window.HeadwearClassifier;\n    if (!classifier || typeof classifier.classify !== 'function') {\n        const error = new Error('The product type check did not load, so this page cannot tell caps from garments. Please refresh the page.');\n        error.headwearClassifierMissing = true;\n        throw error;\n    }\n    return classifier.classify(row);\n}\n\n// Validate if product is a cap and should use cap pricing\nfunction validateProductType(product, styleNumber) {\n    // Beanies, knit/skull caps, headbands, gaiters and every garment stay here; caps and visors leave.\n    if (classifyHeadwear(product).isCap) {\n        const productName = product.PRODUCT_TITLE || product.ProductTitle || `Style ${styleNumber}`;\n        const reason = 'This product is headwear (a cap, visor or bucket hat) and uses cap embroidery pricing.';",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "calculators/js/embroidery-pricing-page.js",
+      "before": "\n// Show product sections",
+      "after": "\n// Hide the spinner when the cap overlay stops the load. loadProduct always called this, but it was\n// never defined, so a cap on this page showed \"hideLoading is not defined\" behind the overlay.\nfunction hideLoading() {\n    loadingState.style.display = 'none';\n}\n\n// Show product sections",
+      "count": 1,
+      "stage": "headwear-alignment-2026-09-16",
+      "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
     }
   ],
   "retiredStyles": []

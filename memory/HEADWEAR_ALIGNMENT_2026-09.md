@@ -1,0 +1,23 @@
+# One headwear rule for every price surface — September 2026
+
+**Why (Erik, 2026-09-16):** five surfaces decided "cap or garment embroidery?" their own way. Across 2,484 live styles the embroidery and screen print builders were wrong on 85 (New Era `NE*` apparel, Richardson apparel, "Capital"/"Crosshatch"/"Hatch" titles, Gildan 980, bandanas, blank-category visors, fleece headbands), the product page on 86 (every beanie priced as a cap; blank-category Richardson caps, visors and Youth/Ladies caps priced as garments), the public embroidery calculators on 297 ("capacity" in a bag description matched "cap"), and Quick Quote on 8. After the change all of them agree on all 2,484 (`tests/unit/headwear-surfaces-parity.test.js`, plus a one-off full-sample run).
+
+## The rule
+- `shared_components/js/headwear-classifier.js` → `HeadwearClassifier.classify(row)`; `isCap === true` → cap embroidery pricing, anything else (flat headwear included) → garment embroidery. Used as returned, even when `confident` is false. A missing classifier is a visible error everywhere — never the old keyword lists.
+- **Erik's rules:** beanies, knit caps, fleece hats, headbands, gaiters, face masks, helmet liners, skull caps, scrub caps and the Caps-category duck hood (CT102368) are **flat**; visors are **caps**; bandanas and apparel are **garments**. A hood is flat only inside "Caps" ("Richardson Hood River 173" is a cap).
+- **Embroidery only** applies to caps and to flat items listed under **Caps** (category or subcategory). Flat items elsewhere keep their category's decoration rules (live 2026-09-16: Personal Protection allows EMB + SCP + DTF; Accessories and Workwear are EMB only) — Erik: no new print blocks.
+
+## Where it is wired
+- **EMB / SCP builders:** `isCapProduct(style, title, category, {subcategory, description})` in `builders/{emb,scp}/product-rows.js` delegates to the classifier; `onStyleChange` passes the `/api/product-colors` fields. ShopWorks `applyImportedSizes` trusts the row flag; vendor filing classifies the full ShopWorks description (so "Pacific Headwear P747…" stays a cap on reload).
+- **Reopened EMB quotes** reprice with the current rule and show a dismissible notice listing changed prices ("NEA100 is now priced as a garment" when the saved garment/cap counts prove the old side; duplicates say "Saving creates a new quote"). Customer quote links keep their saved prices.
+- **DTF builder search** (Erik): hides a style only when BOTH the old keyword list and the classifier call it a cap — nothing visible before is hidden; mislabelled garments ("Capital", "Fitted Tee") show again. A hidden exact style shows a message.
+- **Product page:** `detectHeadwear()` in `product/js/product-2026.js`; flat headwear offers one placement, **Front** (Erik); Caps-listed flat items are embroidery only with a note.
+- **Embroidery calculators:** both page gates and search sorting classify (search passes `STYLE` too); copy says "headwear (a cap, visor or bucket hat)". Also fixed a `hideLoading is not defined` crash when a cap opened the flat calculator.
+- **Quick Quote:** `matchBuilderFlat` and the `product-category-filter.js` tag are gone; the line sheet routes embroidery by `isCap` and says "Not confirmed from the catalog — check the product." when unsure.
+- `product-category-filter.js` is no longer a pricing authority; it remains loaded on the builder pages and is used only by the DTF search's "was it hidden before" check.
+
+## Not in this pass (Erik chose a second pass)
+- Proxy catalog card prices (`/api/products/search`) and `/api/decorated-cap-prices` (Richardson brand rule), the homepage Richardson quick view (`catalog-search.js`), the ShopWorks import parser (`shopworks-import-parser.js` DECG/OSFA checks), Richardson Direct (`calculators/richardson-factory-direct.js` prices its beanies/headband as caps), the unlinked DTF prints prototype (style-prefix rule, hash-locked), customer-portal upgrade prices (`pages/js/customer-product.js`, always garment).
+- Print methods on caps (DTG/DTF/SCP builders and calculators still accept caps) — Erik: keep as today.
+- Quote-cart items saved before the release keep their old method for the cart's 24-hour lifetime.
+- HT01 "Skull Cap" (colour "As shown") had no cap size pricing on 2026-09-16 — a catalog data gap; it now prices as flat embroidery, so re-check it once live.

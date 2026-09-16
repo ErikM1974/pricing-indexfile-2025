@@ -139,7 +139,7 @@ describe('Quick Quote ↔ configurator engine-wiring parity (Rule #7)', () => {
         expect(QQ).not.toContain('ProductCategoryFilter');
         const HTML = fs.readFileSync(path.join(ROOT, 'calculators', 'quick-quote', 'index.html'), 'utf8');
         expect(HTML).not.toContain('/shared_components/js/product-category-filter.js');
-        expect(HTML).toContain('<script src="/shared_components/js/headwear-classifier.js?v=2026.09.16.3"></script>');
+        expect(HTML).toMatch(/<script src="\/shared_components\/js\/headwear-classifier\.js\?v=[\d.]+"><\/script>/); // /deploy moves the version
     });
 
     // Live rules (2026-09-16): "Caps" allows no garment method, but Personal Protection allows EMB,
