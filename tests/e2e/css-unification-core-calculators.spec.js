@@ -121,6 +121,27 @@ for(const key of Object.keys(pages))test('CSS core calculators: '+key+' search r
  await search.fill('ZZZZ');await expect(page.locator('.search-results.active')).toContainText(/No .*found|No .*match/i);await search.press('Escape');
  await search.fill(style);await expect(result).toBeVisible();await search.press('ArrowDown');await search.press('Enter');await expect(page).toHaveURL(new RegExp('StyleNumber='+style));await settled(page,key);check(expect,e);
 });
+// Erik 2026-09-16: both embroidery calculators decide cap vs garment with the shared headwear classifier.
+for(const [key,style,target] of [['emb','C112','/pricing/cap-embroidery?StyleNumber=C112'],['cap','PC54','/pricing/embroidery?StyleNumber=PC54']])test('CSS core calculators: '+key+' sends '+style+' to its own calculator',async({page})=>{
+ const e=await open(page,{url:'/calculators/'+pages[key]+'.html?StyleNumber='+style});
+ expect(await page.evaluate(()=>typeof window.HeadwearClassifier?.classify)).toBe('function');
+ const overlay=page.locator('#productMismatchOverlay');await expect(overlay).toBeVisible();await expect(overlay).toContainText('Wrong Pricing Calculator');
+ await expect(page.locator('#redirectButton')).toHaveAttribute('href',target);
+ await expect(page.locator('#loadingState')).toBeHidden();await expect(page.locator('#apiErrorNotification')).toBeHidden();
+ for(const width of [1440,320]){await page.setViewportSize({width,height:900});expect((await snapshot(page)).overflow).toBe(false);await page.screenshot({path:path.join(out,'core-calculators-'+key+'-other-calculator-'+width+'.png')});}
+ check(expect,e);
+});
+for(const [key,term,text] of [['emb','C112',/Found 1 cap item\(s\)\. Please use the\s+Cap Embroidery Pricing\s+page/],['cap','PC54',/No cap styles found/]])test('CSS core calculators: '+key+' search keeps '+term+' off its results',async({page})=>{
+ const e=await start(page,key);await page.locator('#styleSearch').fill(term);
+ await expect(page.locator('.search-results.active')).toContainText(text);await expect(page.locator('.search-result-item')).toHaveCount(0);check(expect,e);
+});
+for(const key of ['emb','cap'])test('CSS core calculators: '+key+' shows an error when the headwear classifier is missing',async({page})=>{
+ await page.route('**/shared_components/js/headwear-classifier.js*',route=>route.fulfill({status:404,body:''}));
+ const e=await open(page,{url:'/calculators/'+pages[key]+'.html?StyleNumber='+(key==='cap'?'C112':'PC54')});
+ await expect(page.locator('#apiErrorNotification')).toBeVisible();await expect(page.locator('#errorMessage')).toContainText('product type check did not load');
+ await expect(page.locator('#productMismatchOverlay')).toHaveCount(0);await expect(page.locator('#pricingSection')).toBeHidden();
+ await page.setViewportSize({width:320,height:900});expect((await snapshot(page)).overflow).toBe(false);check(expect,e);
+});
 test('CSS core calculators: dtf size guide opens with keyboard',async({page})=>{
  const e=await start(page,'dtf');const button=page.getByRole('button',{name:'Size Guide',exact:true});await button.focus();await button.press('Enter');
  await expect(page.locator('#collapseGuide')).toBeVisible();await expect(page.locator('#collapseGuide')).toContainText('Maximum size for full coverage designs');

@@ -83,11 +83,12 @@ function setupSearch() {
             const beanieResults = [];
 
             results.forEach(item => {
-                // Use shared utility for filtering
-                if (ProductCategoryFilter.isFlatHeadwear(item)) {
-                    beanieResults.push(item);
-                } else if (ProductCategoryFilter.isStructuredCap(item)) {
+                // Suggestion rows only carry a label, so the label is the title. Garments are left out.
+                const headwear = classifyHeadwear({ PRODUCT_TITLE: item.label });
+                if (headwear.isCap) {
                     capResults.push(item);
+                } else if (headwear.isFlat) {
+                    beanieResults.push(item);
                 }
             });
 
@@ -138,6 +139,7 @@ function setupSearch() {
         } catch (error) {
             console.error('Search error:', error);
             resultsContainer.innerHTML = '<div class="search-no-results">Search failed. Please try again.</div>';
+            if (error.headwearClassifierMissing) showApiError(error.message);
         }
     }
 
@@ -173,6 +175,20 @@ function setupSearch() {
     });
 }
 
+// Cap vs garment embroidery is ONE rule on every price surface (Erik 2026-09-16):
+// shared_components/js/headwear-classifier.js. Only isCap prices here; beanies, knit/skull caps,
+// headbands and garments go to flat embroidery. A missing classifier is a visible error,
+// never the old keyword guess (Rule 4).
+function classifyHeadwear(row) {
+    const classifier = window.HeadwearClassifier;
+    if (!classifier || typeof classifier.classify !== 'function') {
+        const error = new Error('The product type check did not load, so this page cannot tell caps from garments. Please refresh the page.');
+        error.headwearClassifierMissing = true;
+        throw error;
+    }
+    return classifier.classify(row);
+}
+
 // Load cap product data
 async function loadCapProduct(styleNumber) {
 
@@ -199,14 +215,11 @@ async function loadCapProduct(styleNumber) {
 
         currentProduct = productArray[0];
 
-        // Validate that this is actually a cap product
-        const productTitle = (currentProduct.PRODUCT_TITLE || currentProduct.ProductTitle || '').toLowerCase();
-        const productDescription = (currentProduct.PRODUCT_DESCRIPTION || currentProduct.Description || '').toLowerCase();
-        const category = (currentProduct.CATEGORY || currentProduct.Category || '').toLowerCase();
+        // Validate that this is actually a cap product (visors and bucket hats included)
         const brand = currentProduct.BRAND_NAME || currentProduct.BRAND || currentProduct.Brand || '';
+        const headwear = classifyHeadwear(currentProduct);
 
-        // Use shared utility for filtering
-        if (ProductCategoryFilter.isFlatHeadwear(currentProduct)) {
+        if (headwear.isFlat) {
             showProductMismatchOverlay(
                 styleNumber,
                 `${brand} ${currentProduct.PRODUCT_TITLE || currentProduct.ProductTitle || styleNumber}`,
@@ -215,7 +228,7 @@ async function loadCapProduct(styleNumber) {
             return; // Stop loading the rest of the page
         }
 
-        if (!ProductCategoryFilter.isStructuredCap(currentProduct)) {
+        if (!headwear.isCap) {
             // This is not a cap - likely a shirt or other item
             showProductMismatchOverlay(
                 styleNumber,
