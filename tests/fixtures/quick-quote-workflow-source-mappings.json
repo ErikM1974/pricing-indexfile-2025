@@ -1,5 +1,5 @@
 {
-  "description": "Authorized September 13, 2026 Quick Quote redesign. Apply before historical CSS mappings. Original hashes remain immutable; current pricing/handoffs tested independently. classic-restore-2026-09-16: Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings.",
+  "description": "Authorized September 13, 2026 Quick Quote redesign. Apply before historical CSS mappings. Original hashes remain immutable; current pricing/handoffs tested independently. classic-restore-2026-09-16: Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings. release-2026.09.16.2: Deploy v2026.09.16.2 cache-bust of the Quick Quote assets.",
   "changes": [
     {
       "file": "calculators/quick-quote/dtf-prints-prototype.html",
@@ -1754,6 +1754,38 @@
       "count": 1,
       "stage": "classic-restore-2026-09-16",
       "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/index.html",
+      "before": "    <link rel=\"stylesheet\" href=\"/calculators/quick-quote/quick-quote.css?v=2026.09.16.1\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/safety-stripe-recs.css?v=2026.09.13.2\">\n    <link rel=\"stylesheet\" href=\"/calculators/quick-quote/linesheet-print.css?v=2026.09.16.1\" media=\"print\">",
+      "after": "    <link rel=\"stylesheet\" href=\"/calculators/quick-quote/quick-quote.css?v=2026.09.16.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/safety-stripe-recs.css?v=2026.09.13.2\">\n    <link rel=\"stylesheet\" href=\"/calculators/quick-quote/linesheet-print.css?v=2026.09.16.2\" media=\"print\">",
+      "count": 1,
+      "stage": "release-2026.09.16.2",
+      "reason": "Deploy v2026.09.16.2 cache-bust of the Quick Quote assets."
+    },
+    {
+      "file": "calculators/quick-quote/index.html",
+      "before": "    <script src=\"/shared_components/js/headwear-classifier.js?v=2026.09.16.1\"></script>",
+      "after": "    <script src=\"/shared_components/js/headwear-classifier.js?v=2026.09.16.2\"></script>",
+      "count": 1,
+      "stage": "release-2026.09.16.2",
+      "reason": "Deploy v2026.09.16.2 cache-bust of the Quick Quote assets."
+    },
+    {
+      "file": "calculators/quick-quote/index.html",
+      "before": "    <script src=\"/calculators/quick-quote/quick-quote-document.js?v=2026.09.16.1\"></script>\n    <script src=\"/calculators/quick-quote/quick-quote-workspace.js?v=2026.09.16.1\"></script>\n    <script src=\"/calculators/quick-quote/quick-quote-ui.js?v=2026.09.13.6\"></script>\n    <script src=\"/calculators/quick-quote/quick-quote.js?v=2026.09.16.1\"></script>",
+      "after": "    <script src=\"/calculators/quick-quote/quick-quote-document.js?v=2026.09.16.2\"></script>\n    <script src=\"/calculators/quick-quote/quick-quote-workspace.js?v=2026.09.16.2\"></script>\n    <script src=\"/calculators/quick-quote/quick-quote-ui.js?v=2026.09.13.6\"></script>\n    <script src=\"/calculators/quick-quote/quick-quote.js?v=2026.09.16.2\"></script>",
+      "count": 1,
+      "stage": "release-2026.09.16.2",
+      "reason": "Deploy v2026.09.16.2 cache-bust of the Quick Quote assets."
+    },
+    {
+      "file": "calculators/quick-quote/dtf-prints-prototype.html",
+      "before": "    <link rel=\"stylesheet\" href=\"/calculators/quick-quote/quick-quote.css?v=2026.09.14.2\">\n    <link rel=\"stylesheet\" href=\"/calculators/quick-quote/dtf-prints-prototype.css?v=2026.09.13.2\">\n    <link rel=\"stylesheet\" href=\"/calculators/quick-quote/linesheet-print.css?v=2026.09.14.2\" media=\"print\">",
+      "after": "    <link rel=\"stylesheet\" href=\"/calculators/quick-quote/quick-quote.css?v=2026.09.16.2\">\n    <link rel=\"stylesheet\" href=\"/calculators/quick-quote/dtf-prints-prototype.css?v=2026.09.13.2\">\n    <link rel=\"stylesheet\" href=\"/calculators/quick-quote/linesheet-print.css?v=2026.09.16.2\" media=\"print\">",
+      "count": 1,
+      "stage": "release-2026.09.16.2",
+      "reason": "Deploy v2026.09.16.2 cache-bust of the Quick Quote assets."
     }
   ]
 }
