@@ -1,5 +1,5 @@
 {
-  "description": "Authorized September 13, 2026 Quick Quote redesign. Apply before historical CSS mappings. Original hashes remain immutable; current pricing/handoffs tested independently. classic-restore-2026-09-16: Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings. release-2026.09.16.2: Deploy v2026.09.16.2 cache-bust of the Quick Quote assets. release-notes-2026-09-16: Erik approved 2026-09-16: Quick Quote shows its version (from the deploy's cache-bust), a What's new list and a one-time Updated badge for Nika and Taneisha's trial. release-2026.09.16.3: Deploy v2026.09.16.3 cache-bust of the Quick Quote assets. headwear-alignment-2026-09-16: Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps.",
+  "description": "Authorized September 13, 2026 Quick Quote redesign. Apply before historical CSS mappings. Original hashes remain immutable; current pricing/handoffs tested independently. classic-restore-2026-09-16: Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings. release-2026.09.16.2: Deploy v2026.09.16.2 cache-bust of the Quick Quote assets. release-notes-2026-09-16: Erik approved 2026-09-16: Quick Quote shows its version (from the deploy's cache-bust), a What's new list and a one-time Updated badge for Nika and Taneisha's trial. release-2026.09.16.3: Deploy v2026.09.16.3 cache-bust of the Quick Quote assets. headwear-alignment-2026-09-16: Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps. release-2026.09.16.4: Deploy v2026.09.16.4 cache-bust of the headwear alignment assets.",
   "changes": [
     {
       "file": "calculators/quick-quote/dtf-prints-prototype.html",
@@ -2378,6 +2378,78 @@
       "count": 1,
       "stage": "headwear-alignment-2026-09-16",
       "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "product.html",
+      "before": "    <script src=\"/shared_components/js/headwear-classifier.js?v=2026.09.16.3\" defer></script>",
+      "after": "    <script src=\"/shared_components/js/headwear-classifier.js?v=2026.09.16.4\" defer></script>",
+      "count": 1,
+      "stage": "release-2026.09.16.4",
+      "reason": "Deploy v2026.09.16.4 cache-bust of the headwear alignment assets."
+    },
+    {
+      "file": "product.html",
+      "before": "    <script src=\"/product/js/pdp-configurator.js?v=2026.09.13.6\" defer></script>",
+      "after": "    <script src=\"/product/js/pdp-configurator.js?v=2026.09.16.4\" defer></script>",
+      "count": 1,
+      "stage": "release-2026.09.16.4",
+      "reason": "Deploy v2026.09.16.4 cache-bust of the headwear alignment assets."
+    },
+    {
+      "file": "product.html",
+      "before": "    <script src=\"/product/js/product-2026.js?v=2026.09.06.31\" defer></script>",
+      "after": "    <script src=\"/product/js/product-2026.js?v=2026.09.16.4\" defer></script>",
+      "count": 1,
+      "stage": "release-2026.09.16.4",
+      "reason": "Deploy v2026.09.16.4 cache-bust of the headwear alignment assets."
+    },
+    {
+      "file": "calculators/quick-quote/index.html",
+      "before": "                <div class=\"qq-release\" id=\"qqRelease\" data-release=\"/calculators/quick-quote/quick-quote-releases.js?v=2026.09.16.3\" hidden>",
+      "after": "                <div class=\"qq-release\" id=\"qqRelease\" data-release=\"/calculators/quick-quote/quick-quote-releases.js?v=2026.09.16.4\" hidden>",
+      "count": 1,
+      "stage": "release-2026.09.16.4",
+      "reason": "Deploy v2026.09.16.4 cache-bust of the headwear alignment assets."
+    },
+    {
+      "file": "calculators/quick-quote/index.html",
+      "before": "    <script src=\"/shared_components/js/headwear-classifier.js?v=2026.09.16.3\"></script>",
+      "after": "    <script src=\"/shared_components/js/headwear-classifier.js?v=2026.09.16.4\"></script>",
+      "count": 1,
+      "stage": "release-2026.09.16.4",
+      "reason": "Deploy v2026.09.16.4 cache-bust of the headwear alignment assets."
+    },
+    {
+      "file": "calculators/quick-quote/index.html",
+      "before": "    <script src=\"/calculators/quick-quote/quick-quote-releases.js?v=2026.09.16.3\"></script>\n    <script src=\"/calculators/quick-quote/quick-quote-document.js?v=2026.09.16.3\"></script>\n    <script src=\"/calculators/quick-quote/quick-quote-workspace.js?v=2026.09.16.3\"></script>\n    <script src=\"/calculators/quick-quote/quick-quote-ui.js?v=2026.09.13.6\"></script>\n    <script src=\"/calculators/quick-quote/quick-quote.js?v=2026.09.16.2\"></script>",
+      "after": "    <script src=\"/calculators/quick-quote/quick-quote-releases.js?v=2026.09.16.4\"></script>\n    <script src=\"/calculators/quick-quote/quick-quote-document.js?v=2026.09.16.3\"></script>\n    <script src=\"/calculators/quick-quote/quick-quote-workspace.js?v=2026.09.16.3\"></script>\n    <script src=\"/calculators/quick-quote/quick-quote-ui.js?v=2026.09.13.6\"></script>\n    <script src=\"/calculators/quick-quote/quick-quote.js?v=2026.09.16.4\"></script>",
+      "count": 1,
+      "stage": "release-2026.09.16.4",
+      "reason": "Deploy v2026.09.16.4 cache-bust of the headwear alignment assets."
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "    <script src=\"/shared_components/js/headwear-classifier.js?v=2026.09.16.3\"></script>\n    <script src=\"/shared_components/js/dtf-pricing-service.js?v=2026.09.06.37\"></script>\n    <script src=\"/shared_components/js/dtf-quote-pricing.js?v=2026.09.06.37\"></script>\n    <script src=\"/shared_components/js/dtf-quote-products.js?v=2026.09.06.37\"></script>",
+      "after": "    <script src=\"/shared_components/js/headwear-classifier.js?v=2026.09.16.4\"></script>\n    <script src=\"/shared_components/js/dtf-pricing-service.js?v=2026.09.06.37\"></script>\n    <script src=\"/shared_components/js/dtf-quote-pricing.js?v=2026.09.06.37\"></script>\n    <script src=\"/shared_components/js/dtf-quote-products.js?v=2026.09.16.4\"></script>",
+      "count": 1,
+      "stage": "release-2026.09.16.4",
+      "reason": "Deploy v2026.09.16.4 cache-bust of the headwear alignment assets."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "    <script src=\"/shared_components/js/headwear-classifier.js?v=2026.09.16.3\"></script>",
+      "after": "    <script src=\"/shared_components/js/headwear-classifier.js?v=2026.09.16.4\"></script>",
+      "count": 1,
+      "stage": "release-2026.09.16.4",
+      "reason": "Deploy v2026.09.16.4 cache-bust of the headwear alignment assets."
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "    <script src=\"/shared_components/js/headwear-classifier.js?v=2026.09.16.3\"></script>",
+      "after": "    <script src=\"/shared_components/js/headwear-classifier.js?v=2026.09.16.4\"></script>",
+      "count": 1,
+      "stage": "release-2026.09.16.4",
+      "reason": "Deploy v2026.09.16.4 cache-bust of the headwear alignment assets."
     }
   ]
 }

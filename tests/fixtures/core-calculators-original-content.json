@@ -1341,6 +1341,22 @@
       "count": 1,
       "stage": "headwear-alignment-2026-09-16",
       "reason": "Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps."
+    },
+    {
+      "file": "calculators/embroidery-pricing.html",
+      "before": "    <script src=\"/shared_components/js/headwear-classifier.js?v=2026.09.16.3\"></script>\n    <script src=\"/shared_components/js/embroidery-pricing-service.js?v=2026.09.06.31\"></script>\n    <script src=\"/shared_components/js/manual-mode-indicator.js?v=2026.09.06.19\"></script>\n    <script src=\"/calculators/js/embroidery-pricing-page.js?v=2026.09.11.5\"></script>",
+      "after": "    <script src=\"/shared_components/js/headwear-classifier.js?v=2026.09.16.4\"></script>\n    <script src=\"/shared_components/js/embroidery-pricing-service.js?v=2026.09.06.31\"></script>\n    <script src=\"/shared_components/js/manual-mode-indicator.js?v=2026.09.06.19\"></script>\n    <script src=\"/calculators/js/embroidery-pricing-page.js?v=2026.09.16.4\"></script>",
+      "count": 1,
+      "stage": "release-2026.09.16.4",
+      "reason": "Deploy v2026.09.16.4 cache-bust of the headwear alignment assets."
+    },
+    {
+      "file": "calculators/cap-embroidery-pricing-integrated.html",
+      "before": "    <script src=\"/shared_components/js/headwear-classifier.js?v=2026.09.16.3\"></script>\n    <script src=\"/shared_components/js/cap-embroidery-pricing-service.js?v=2026.09.06.31\"></script>\n    <script src=\"/shared_components/js/manual-mode-indicator.js?v=2026.09.06.19\"></script>\n    <script src=\"/calculators/js/cap-embroidery-pricing-integrated-page.js?v=2026.09.11.5\"></script>",
+      "after": "    <script src=\"/shared_components/js/headwear-classifier.js?v=2026.09.16.4\"></script>\n    <script src=\"/shared_components/js/cap-embroidery-pricing-service.js?v=2026.09.06.31\"></script>\n    <script src=\"/shared_components/js/manual-mode-indicator.js?v=2026.09.06.19\"></script>\n    <script src=\"/calculators/js/cap-embroidery-pricing-integrated-page.js?v=2026.09.16.4\"></script>",
+      "count": 1,
+      "stage": "release-2026.09.16.4",
+      "reason": "Deploy v2026.09.16.4 cache-bust of the headwear alignment assets."
     }
   ],
   "retiredStyles": []
