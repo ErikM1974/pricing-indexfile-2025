@@ -1,5 +1,11 @@
 # LESSONS LEARNED
 
+## Browser evidence must not pin the order of concurrent requests (2026-09-16)
+
+- Problem/root cause: `CAPTURE_QUICK_QUOTE_ORIGINAL=1` compared each state's whole record with `toEqual`, including `reads` (every mocked `/api` request in arrival order). Quick Quote fires its pricing-bundle, DTG-pricing and inventory reads concurrently, so five capture states (quick price normal/screenprint/pricing-failed/stock-failed, safety) failed on unmodified 556721b1 with the same entries reordered, even with one worker. The pricing-failed state had a second cause: the original page's `#pricing-api-warning` banner pulses forever (2 s, ignores reduced motion), so axe's colour-contrast result for its two buttons (4.3–4.4 against 4.5) depends on the frame it samples and moved between viewport states.
+- Solution: `tests/e2e/css-unification-quick-quote.spec.js` compares `reads` as a multiset (key-sorted JSON strings, sorted, duplicates kept), and sets aside colour-contrast nodes inside the allowlisted forever-pulsing banner (`FLICKERING`), on both sides, while re-checking that banner's colours with its animation paused at a fixed frame. Every other rule, node, id, field, link and table stays exact; the immutable `*-original-browser.json` fixtures are untouched.
+- Prevention: a request log compared across runs records *what* was asked, not *when* — compare it unordered unless the order is the behaviour under test (then assert that order directly). A contrast reading taken during an animation is a sample, not a page property. About 19 other css-unification specs record `reads`; if one fails on a pure reorder, use the same comparison instead of regenerating evidence.
+
 ## Removing a worktree deletes through a node_modules junction (2026-09-16)
 
 - Problem/root cause: two throwaway comparison worktrees had `node_modules` as a Windows junction to the release worktree's `node_modules`. `git worktree remove` (clean trees, no `--force`) deleted the ignored junction's *target contents*, emptying `.codex/worktrees/quick-quote-release/node_modules`. Nothing failed until the next test run: `npm run build` said "esbuild unavailable" and `npx playwright` downloaded a stray copy.
