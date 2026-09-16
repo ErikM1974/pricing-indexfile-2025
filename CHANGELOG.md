@@ -1,3 +1,16 @@
+## v2026.09.16.2 (2026.09.16)
+
+- Memory: garment waiver e-sign is live (proxy v2026.09.15.1, app v2026.09.15.7)
+- Memory: first live garment-waiver signature and where to prove email delivery
+- Memory: 2026 Canva meeting/huddle policy gap review (report only)
+- Memory: policies hub synced with 2026 huddles (16 drafts, 28 appended policies, write-path gotchas)
+- Memory: correct /api/files limiter note (120 req/15 min per IP, GET reads counted, no secret exemption)
+- Memory: /api/files limiter live in proxy v2026.09.15.2; limiter lesson added, two 09-10 lessons archived
+- Memory: 16 hub drafts published 2026-09-15 (handbook check, Caspio verification, resolutions)
+- Quick Quote: restore last week's line sheet for Nika and Taneisha
+- Quick Quote: price beanies as flat embroidery, like the Embroidery builder
+- Deploy v2026.09.16.2: Restore last week's Quick Quote line sheet; beanies priced as flat embroidery
+
 ## v2026.09.15.7 (2026.09.15)
 
 - Add the customer-supplied garment liability waiver e-signature
