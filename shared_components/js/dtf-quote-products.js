@@ -49,20 +49,31 @@ class DTFQuoteProducts {
             onNavigate: options.onNavigate || null,
             onSelect: options.onSelect || null,
             onClose: options.onClose || null,
-            filterFunction: (item) => {
-                // Filter out caps (caps can't have DTF transfers)
-                // Use shared ProductCategoryFilter for comprehensive cap detection
-                if (typeof ProductCategoryFilter !== 'undefined') {
-                    return !ProductCategoryFilter.isStructuredCap(item);
-                }
-                // Fallback if utility not loaded (shouldn't happen)
-                const label = (item.label || '').toUpperCase();
-                return !(label.includes('CAP') || label.includes('HAT') || label.includes('BEANIE'));
-            }
+            // Caps can't take DTF transfers, so they stay out of the search (shared headwear rule)
+            filterFunction: (item) => !this.isCapSuggestion(item)
         });
 
         dtfquotprodLog('[DTFQuoteProducts] Exact match search initialized with keyboard navigation');
         return true;
+    }
+
+    /**
+     * Is this style-search suggestion a cap? Caps can't take DTF transfers, so they are hidden
+     * from the DTF search. One rule for every surface: HeadwearClassifier (Erik 2026-09-16) on
+     * the suggestion label ("STYLE - TITLE"). Flat headwear (beanies, headbands) is not a cap
+     * and stays searchable; "Capital" / "Fitted Tee" / "Baseball Tee" garments are not caps.
+     * A missing classifier is a visible error, never a keyword guess (Rule 4).
+     * @param {{label?: string}} item - /api/stylesearch row
+     * @returns {boolean}
+     */
+    isCapSuggestion(item) {
+        const classifier = typeof window !== 'undefined' ? window.HeadwearClassifier : null;
+        if (!classifier || typeof classifier.classify !== 'function') {
+            const message = 'The cap/garment check did not load, so product search is unavailable. Refresh the page.';
+            if (typeof window !== 'undefined' && typeof window.showToast === 'function') window.showToast(message, 'error', 8000);
+            throw new Error(message);
+        }
+        return classifier.classify({ PRODUCT_TITLE: (item && item.label) || '' }).isCap === true;
     }
 
     /**
@@ -112,15 +123,8 @@ class DTFQuoteProducts {
 
             const suggestions = await response.json();
 
-            // Filter out caps using shared utility
-            const filteredSuggestions = suggestions.filter(item => {
-                if (typeof ProductCategoryFilter !== 'undefined') {
-                    return !ProductCategoryFilter.isStructuredCap(item);
-                }
-                // Fallback
-                const label = (item.label || '').toUpperCase();
-                return !(label.includes('CAP') || label.includes('HAT') || label.includes('BEANIE'));
-            });
+            // Filter out caps using the shared headwear rule
+            const filteredSuggestions = suggestions.filter(item => !this.isCapSuggestion(item));
 
             // Transform to product format
             const products = filteredSuggestions.map(item => ({

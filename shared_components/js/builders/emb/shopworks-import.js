@@ -966,6 +966,8 @@ async function buildReviewPayload(data, additionalLogos, progress) {
     }, 0);
 
     for (const product of data.products) {
+        // Only the part number and ShopWorks description exist at this point; the rows built
+        // later re-check with the full catalog data (onStyleChange).
         const isCap = isCapProduct(product.partNumber, product.description || '');
         let sizePrices = null;
         if (embState.pricingCalculator) {
@@ -1974,7 +1976,7 @@ async function forceImportAsNonSanmar(row, rowId, product, sellPriceOverride, se
         row.dataset.productName = importData.description;
     }
 
-    // Detect cap vs garment and enable appropriate size inputs
+    // Detect cap vs garment (shared headwear rule) and enable appropriate size inputs
     const isCap = isCapProduct(product.partNumber, product.description || '');
     if (isCap) {
         row.dataset.isCap = 'true';
@@ -2077,15 +2079,16 @@ async function selectImportedColor(row, rowId, product, sellPriceOverride) {
  * rows for extended/2XL/XXL sizes (with per-size sell overrides), standard
  * sizes straight into parent inputs.
  */
-function applyImportedSizes(row, rowId, product, sellPriceOverride, sellPriceOverrides) {
+export function applyImportedSizes(row, rowId, product, sellPriceOverride, sellPriceOverrides) {
     // 5. Set sizes (inputs should now be enabled from selectColor)
     // Extended sizes (from SIZE06_EXTENDED_SIZES) need child rows, not direct input
     // Also: 2XL typically uses Size05 column, but if disabled, treat it as extended size
     const IMPORT_EXTENDED_SIZES = [...SIZE06_EXTENDED_SIZES, '2XL', 'XXL'];  // 2XL/XXL: Size05-column child rows, deliberately not in the Size06 list (Batch 2.0)
 
-    // Detect if this is a cap product for size mapping
-    const isCapRow = row.dataset.isCap === 'true' ||
-                     isCapProduct(product.partNumber, product.description || '');
+    // Cap size mapping follows the row's own cap flag — set by onStyleChange / the vendor
+    // path from the shared headwear rule. A second guess here from the ShopWorks text alone
+    // could disagree with the row's pricing (a beanie row mapped to cap sizes).
+    const isCapRow = row.dataset.isCap === 'true';
 
     // Cap size mapping: ShopWorks uses S, M, L but caps have S/M, M/L, L/XL, OSFA
     const CAP_SIZE_MAP = {

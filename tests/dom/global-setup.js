@@ -25,6 +25,8 @@ const ENTRIES = {
     'emb-persistence.cjs': 'shared_components/js/builders/emb/persistence.js',
     'emb-pricing-sync.cjs': 'shared_components/js/builders/emb/pricing-sync.js',
     'emb-product-rows.cjs': 'shared_components/js/builders/emb/product-rows.js',
+    'emb-shopworks-import.cjs': 'shared_components/js/builders/emb/shopworks-import.js',
+    'scp-product-rows.cjs': 'shared_components/js/builders/scp/product-rows.js',
     'shared-service-codes.cjs': 'shared_components/js/builders/shared/service-codes.js',
 };
 

@@ -19,6 +19,8 @@
    QuotePersistence, QuoteSession, getLtmControlState, setLtmControlState,
    assertQuoteEditable, updateEditModeUI, setQuoteDateDefaults, markAsUnsaved,
    updateArtworkCharges, Event */
+// Reopened-quote price check (2026-09-16) prices with the save path's own logo inputs.
+import { buildLogoConfiguration } from './pricing-sync.js';
 import { applyDesignFromCache, showDesignThumbnail, lookupDesignNumber } from './design-search.js';
 import { collectProductsFromTable, onShipMethodChange, recalculatePricing, updateTaxCalculation } from './pricing-sync.js';
 import { updateAdditionalCharges, updateDiscountType } from './quote-lifecycle.js';
@@ -670,14 +672,14 @@ export async function loadQuoteForEditing(quoteId, opts = {}) {
         _restoreTaxShipLtm(session, items);
 
         // Recalculate pricing to update totals
-        recalculatePricing();
+        let repricing = recalculatePricing();
 
         // Apply pending LTM state after panel is rendered
         if (_pendingLtmState) {
             setLtmControlState('emb-ltm-panel', _pendingLtmState);
             _pendingLtmState = null;
             // Re-run pricing with the restored state
-            recalculatePricing();
+            repricing = recalculatePricing();
         }
 
         if (!opts.forDuplicate) showToast(`Editing ${quoteId} (Rev ${embState.editingRevision})`, 'success');
@@ -707,6 +709,10 @@ export async function loadQuoteForEditing(quoteId, opts = {}) {
             } catch (_) { /* telemetry only */ }
         })();
 
+        // Today's rules can price a saved product differently (Erik 2026-09-16: beanies and
+        // other flat headwear moved to garment pricing) — show the rep what moved.
+        await noticeRepricedProducts(session, items, repricing);
+
     } catch (error) {
         console.error('[EditMode] Error loading quote:', error);
         showToast('Error loading quote: ' + error.message, 'error');
@@ -717,6 +723,195 @@ export async function loadQuoteForEditing(quoteId, opts = {}) {
     } finally {
          
         window._restoringQuote = false;  // restore complete — re-enable live tax lookups for the rep
+    }
+}
+
+// ============================================================
+// REOPENED QUOTE — PRICE CHANGE NOTICE (Erik 2026-09-16)
+// ============================================================
+// A reopened quote reprices with today's data and rules, including the shared cap/garment
+// rule (headwear-classifier.js) that moved beanies, headbands and other flat headwear onto
+// garment pricing. The rep must SEE any product whose price moved before a Save Revision
+// writes it. Pushed quotes never open here (assertQuoteEditable) and the customer quote view
+// reads the saved rows, so neither changes until a revision is saved.
+
+const REPRICED_NOTICE_ID = 'reopen-price-notice';
+const money = (n) => `$${n.toFixed(2)}`;
+// Same rounding the save applies to FinalUnitPrice (embroidery-quote-service.js).
+const savedUnit = (n) => parseFloat(Number(n).toFixed(2));
+
+/**
+ * The saved product lines, grouped per style + colour, with the cap/garment side each was
+ * priced on when that can be proven. The save writes every garment line before any cap line
+ * (calculateQuote prices garments first) and stores both piece counts on the session
+ * (ALGarmentQty / ALCapQty), so the running quantity in LineNumber order says which side a
+ * line was on. When the counts don't add up, `savedCap` is null and the notice only lists
+ * the price change.
+ * @returns {Map<string, {style: string, color: string, lines: {unit: number, qty: number}[], savedCap: boolean|null}>}
+ */
+export function savedProductGroups(session, items) {
+    const lines = (items || []).filter(isSavedProductItem)
+        .map((item, index) => ({ item, index }))
+        .sort((a, b) => ((Number(a.item.LineNumber) || 0) - (Number(b.item.LineNumber) || 0)) || (a.index - b.index))
+        .map(({ item }) => item);
+    const counted = (v) => v !== null && v !== undefined && v !== '' && Number.isFinite(Number(v));
+    const garmentQty = Number(session && session.ALGarmentQty);
+    const capQty = Number(session && session.ALCapQty);
+    const total = lines.reduce((sum, item) => sum + (Number(item.Quantity) || 0), 0);
+    let sidesKnown = total > 0 && counted(session && session.ALGarmentQty) && counted(session && session.ALCapQty)
+        && total === garmentQty + capQty;
+    const sides = new Map();
+    const groups = new Map();
+    let running = 0;
+    for (const item of lines) {
+        const qty = Number(item.Quantity) || 0;
+        const side = running < garmentQty ? 'garment' : 'cap';
+        running += qty;
+        if (side === 'garment' && running > garmentQty) sidesKnown = false;   // a line straddles the split
+        const key = `${item.StyleNumber}|${item.Color}`;
+        if (!groups.has(key)) {
+            groups.set(key, { style: item.StyleNumber, color: item.Color || '', lines: [], savedCap: null });
+            sides.set(key, new Set());
+        }
+        groups.get(key).lines.push({ unit: Number(item.FinalUnitPrice), qty });
+        sides.get(key).add(side);
+    }
+    for (const [key, group] of groups) {
+        const seen = sides.get(key);
+        group.savedCap = sidesKnown && seen.size === 1 ? seen.has('cap') : null;
+    }
+    return groups;
+}
+
+/** Lowest and average unit price of a set of lines (null when nothing is priced). */
+function priceSummary(lines) {
+    const priced = (lines || []).filter(l => Number.isFinite(l.unit) && l.qty > 0);
+    if (priced.length === 0) return null;
+    const qty = priced.reduce((sum, l) => sum + l.qty, 0);
+    const cents = priced.reduce((sum, l) => sum + Math.round(l.unit * 100) * l.qty, 0);
+    return { base: Math.min(...priced.map(l => l.unit)), average: cents / qty / 100 };
+}
+
+/** The same groups from a fresh engine result (the unit price a save would write). */
+function repricedProductGroups(pricing) {
+    const groups = new Map();
+    for (const pp of (pricing && pricing.products) || []) {
+        const product = pp.product || {};
+        const key = `${product.style}|${product.color}`;
+        if (!groups.has(key)) groups.set(key, { isCap: product.isCap === true, lines: [] });
+        for (const li of pp.lineItems || []) {
+            groups.get(key).lines.push({ unit: savedUnit(li.unitPriceWithLTM || li.unitPrice || 0), qty: Number(li.quantity) || 0 });
+        }
+    }
+    return groups;
+}
+
+/**
+ * One sentence per product whose price moved. "now priced as a garment/cap" only when the
+ * saved side is proven (savedProductGroups); otherwise just the price change.
+ * @param {Map<string, any>} saved - savedProductGroups()
+ * @param {{products?: any[]}} pricing - calculateQuote() result for the restored rows
+ * @returns {string[]}
+ */
+export function describeRepricedProducts(saved, pricing) {
+    const repriced = repricedProductGroups(pricing);
+    const perStyle = {};
+    for (const group of saved.values()) perStyle[group.style] = (perStyle[group.style] || 0) + 1;
+    const changes = [];
+    for (const [key, group] of saved) {
+        const before = priceSummary(group.lines);
+        if (!before) continue;
+        const label = perStyle[group.style] > 1 && group.color ? `${group.style} ${group.color}` : group.style;
+        const now = repriced.get(key);
+        const after = now ? priceSummary(now.lines) : null;
+        if (!after) {
+            changes.push(`${label} could not be repriced — check that line before saving`);
+            continue;
+        }
+        const baseMoved = Math.abs(after.base - before.base) >= 0.005;
+        if (!baseMoved && Math.abs(after.average - before.average) < 0.005) continue;
+        const price = baseMoved
+            ? `${money(before.base)} → ${money(after.base)}`
+            : `average ${money(before.average)} → ${money(after.average)}`;
+        const switched = group.savedCap !== null && group.savedCap !== now.isCap;
+        changes.push(switched
+            ? `${label} is now priced as a ${now.isCap ? 'cap' : 'garment'} (${price})`
+            : `${label}: ${price}`);
+    }
+    return changes;
+}
+
+/**
+ * Persistent notice above the product table, built from the EMB builder's existing
+ * notice component (.import-summary-banner.banner-warning). Text only — no markup
+ * from data. Replaces any earlier notice; no changes → no notice.
+ * @param {string[]} changes
+ * @returns {HTMLElement|null}
+ */
+export function showRepricedNotice(changes) {
+    clearRepricedNotice();
+    if (!changes || changes.length === 0) return null;
+    const banner = document.createElement('div');
+    banner.id = REPRICED_NOTICE_ID;
+    banner.className = 'import-summary-banner banner-warning';
+    banner.setAttribute('role', 'status');
+    const title = document.createElement('div');
+    title.className = 'banner-title';
+    title.textContent = 'Prices changed from the saved quote';
+    const detail = document.createElement('div');
+    detail.className = 'banner-detail';
+    for (const text of changes) {
+        const line = document.createElement('div');
+        line.textContent = text;
+        detail.appendChild(line);
+    }
+    const note = document.createElement('div');
+    note.textContent = 'These are today\'s prices. The saved quote keeps its old prices until you save a revision.';
+    detail.appendChild(note);
+    const dismiss = document.createElement('button');
+    dismiss.type = 'button';
+    dismiss.className = 'btn-dismiss-banner';
+    dismiss.textContent = 'Dismiss';
+    dismiss.setAttribute('aria-label', 'Dismiss the price change notice');
+    dismiss.addEventListener('click', () => banner.remove());
+    banner.append(title, detail, dismiss);
+    const table = document.getElementById('product-table');
+    const anchor = table ? (table.closest('.product-table-wrapper') || table) : null;
+    if (anchor && anchor.parentElement) anchor.parentElement.insertBefore(banner, anchor);
+    else document.body.prepend(banner);
+    showToast(`Prices changed from the saved quote: ${changes.join('; ')}`, 'warning', 10000);
+    return banner;
+}
+
+/** Remove the notice (new quote / another quote loaded). */
+export function clearRepricedNotice() {
+    const existing = document.getElementById(REPRICED_NOTICE_ID);
+    if (existing) existing.remove();
+}
+
+/**
+ * After a reload has repriced, price the restored rows with the SAVE path's inputs
+ * (collectProductsFromTable + buildLogoConfiguration + the LTM panel) and compare each
+ * product with what the quote saved. Never blocks the load; a failed comparison says so.
+ */
+async function noticeRepricedProducts(session, items, repricing) {
+    clearRepricedNotice();
+    try {
+        try { await repricing; } catch (_) { /* recalculatePricing surfaces its own failure */ }
+        const saved = savedProductGroups(session, items);
+        if (saved.size === 0 || !embState.pricingCalculator) return;
+        const products = collectProductsFromTable().filter(p => !p.isService);
+        let pricing = { products: [] };
+        if (products.length > 0) {
+            const { logoConfigs, allLogos } = buildLogoConfiguration();
+            const ltmEnabled = getLtmControlState('emb-ltm-panel').enabled;
+            pricing = await embState.pricingCalculator.calculateQuote(products, allLogos, logoConfigs, { ltmEnabled });
+            if (!pricing || pricing.success === false) return;   // the reprice already showed the pricing error
+        }
+        showRepricedNotice(describeRepricedProducts(saved, pricing));
+    } catch (error) {
+        console.error('[EditMode] Could not compare prices with the saved quote:', error);
+        showToast('Could not compare prices with the saved quote — check each line before saving.', 'warning', 8000);
     }
 }
 
@@ -968,19 +1163,27 @@ function _restoreCustomerSuppliedRow(serviceRow, serviceItem, serviceType) {
     if (serviceItem.Notes) serviceRow.dataset.csNotes = serviceItem.Notes;
 }
 
+// Service items to create as service product rows (2026-02 refactor)
+const SERVICE_STYLE_NUMBERS = [
+    'DECG', 'DECC', 'AL', 'AL-CAP', 'DECG-FB', 'CB', 'CS', 'Monogram', 'AS-Garm', 'AS-CAP',
+    '3D-EMB', 'Laser Patch', 'Name/Number', 'WEIGHT', 'SEG', 'SECC', 'DT', 'CTR-GARMT', 'CTR-CAP',
+    // Legacy backward-compat (old quotes):
+    'FB', 'MONOGRAM', 'AS-GARM', 'NAME'
+];
+
+/** A saved quote_items row that restores as a product row (not a service/fee row). */
+function isSavedProductItem(item) {
+    return item.EmbellishmentType === 'embroidery' &&
+        !!item.StyleNumber &&
+        !item.StyleNumber.startsWith('AL-') &&
+        !SERVICE_STYLE_NUMBERS.includes(item.StyleNumber);
+}
+
 /**
  * Populate products from line items
  * Handles regular products AND service items (DECG, DECC, MONOGRAM)
  */
 async function populateProducts(items) {
-    // Service items to create as service product rows (2026-02 refactor)
-    const SERVICE_STYLE_NUMBERS = [
-        'DECG', 'DECC', 'AL', 'AL-CAP', 'DECG-FB', 'CB', 'CS', 'Monogram', 'AS-Garm', 'AS-CAP',
-        '3D-EMB', 'Laser Patch', 'Name/Number', 'WEIGHT', 'SEG', 'SECC', 'DT', 'CTR-GARMT', 'CTR-CAP',
-        // Legacy backward-compat (old quotes):
-        'FB', 'MONOGRAM', 'AS-GARM', 'NAME'
-    ];
-
     // Separate service items from regular products
     const serviceItems = items.filter(item =>
         SERVICE_STYLE_NUMBERS.includes(item.StyleNumber) ||
@@ -990,12 +1193,7 @@ async function populateProducts(items) {
     );
 
     // Filter to only regular product items
-    const productItems = items.filter(item =>
-        item.EmbellishmentType === 'embroidery' &&
-        item.StyleNumber &&
-        !item.StyleNumber.startsWith('AL-') &&
-        !SERVICE_STYLE_NUMBERS.includes(item.StyleNumber)
-    );
+    const productItems = items.filter(isSavedProductItem);
 
     // Group items by StyleNumber + Color to consolidate size quantities
     const productGroups = {};

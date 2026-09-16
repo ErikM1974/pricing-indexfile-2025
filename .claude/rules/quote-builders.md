@@ -30,7 +30,8 @@ Loads automatically when you open any of the 4 quote builders or their shared fi
 
 ## EMB specifics (if touching the EMB builder)
 - LTM threshold **qty ≤ 7** (NOT `< 24` like DTG/DTF). 5 tiers + per-tier `MarginDenominator` from Caspio `Pricing_Tiers` — **never hardcode**; read `GET /api/pricing-tiers?method=EmbroideryShirts`. Measured live 2026-07-30: **0.53 on every tier, shirts and caps** (the old "0.55 tier 1-7" offset is retired). `LTM_Fee $50` at qty 1-7, added **once at grandTotal**, not baked per-piece. Caps and garments tier **separately**.
-- `Embroidery_Costs` uses `StitchCount` (NOT `StitchCountRange`). Beanie = flat, NOT cap (`ProductCategoryFilter.isFlatHeadwear()`).
+- `Embroidery_Costs` uses `StitchCount` (NOT `StitchCountRange`).
+- **Cap vs garment = ONE shared rule, `shared_components/js/headwear-classifier.js`** (Erik 2026-09-16): `HeadwearClassifier.classify(row).isCap === true` → cap pricing, anything else (flat headwear included) → garment pricing. Beanies, knit caps, fleece hats, headbands, gaiters, face masks, helmet liners, skull caps, scrub caps and the Caps-category duck hood are FLAT; visors are caps; bandanas and New Era/Richardson apparel are garments. EMB + SCP `isCapProduct()` delegate to it (pass `SUBCATEGORY_NAME` / `PRODUCT_DESCRIPTION` from `/api/product-colors`); DTF hides `classify({PRODUCT_TITLE: label}).isCap` from its search. The page loads the classifier before the builder bundle; a missing classifier is a visible error, never the old keyword rules. `ProductCategoryFilter` no longer decides cap vs garment in any builder. A reopened EMB quote reprices with the rule and shows a "Prices changed from the saved quote" notice (`persistence.js`).
 
 ## Quantity nudge tiers
 DTG 12/24/48/72 · DTF 10/24/48/72 · SCP 24/48/72/145 (2026-06-19 remap — old 24/37/73/145 labels linger only in the stale `SCREENPRINT_TIERS` fallback) · EMB 8/24/48/72.
