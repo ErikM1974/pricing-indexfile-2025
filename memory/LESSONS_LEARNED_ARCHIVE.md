@@ -4,6 +4,13 @@ Resolved entries aged out of `LESSONS_LEARNED.md` (300-line cap). Newest first. 
 
 ---
 
+## Archived 2026-09-16
+## Fast price sheets need explicit sample quantities (2026-09-14, superseded 2026-09-16 by the classic line-sheet restore)
+
+- Problem/root cause: the expanded estimate workflow pushed quantity breaks and everyday settings below the viewport. A tier's base "from" price could differ from the customer price at the displayed quantity.
+- Solution: compact left controls, one exact-first search, optional quantity and immediate customer tiers. Price every labeled sample through the existing engine; never show a sample order as the customer's requested total. Share one model across copy, screen, print and PDF.
+- Prevention: preserve canonical monetary functions and original hashes. Test replacement/search races, no-quantity draft restore, invalid quantities, copy fallback, 1265 × 712 geometry, four widths, every PDF page and real builder handoff totals. Trial with both reps before adding personal presets.
+
 ## Archived 2026-09-07
 ## 2026-09-06 — Adding `<main>` to 96 pages found two markup bugs a browser had been hiding (`v2026.09.06.51`)
 
@@ -4539,3 +4546,13 @@ Problem/root cause: malformed usage could appear as zero, partial schema could m
 - Problem/root cause: local filtering replaced failed-load feedback with an empty list; delayed inbound/date-window responses could restore obsolete rows. Native-dialog cancellation could not return focus to a trigger disabled before confirmation. Delete authentication recovery called a removed helper.
 - Solution: retain load failure until a successful retry, clear dependent data and guard render generations. Claim action ownership before confirmation but disable the trigger only after acceptance; contain focus and preserve cancellation. Reject repeated pending sends/deletes and show expired-session feedback without retrying a write.
 - Prevention: synthetic success→failure→filter→retry and reordered reads; keyboard/focus tests at four widths; blocked/expired/pending write tests and exact original payload comparisons. Verify one box label per page, quantities and IDs as well as total PDF text.
+
+## Shared staff dialogs and print jobs (2026-09-10)
+
+An afterprint handler must clear its fallback timer and remove only its own captured sheet; otherwise an old timer can delete the next document. Use page (not always) for modern break-before/after so box labels and rep reports actually separate in Chromium. Native dialog errors belong inside the dialog; guard obsolete previews and keep pending sends from closing or accepting duplicate actions. Mark lazy tabs mounted only when their delayed loader actually runs. Render PDFs with nonzero synthetic costs and multi-box data, check per-page identifiers and totals, and inspect white paper backgrounds.
+
+## Reporting freshness must describe the rendered result (2026-09-10)
+
+- Problem/root cause: controllers caught API failures but resolved without a failure value, so Company Numbers labelled failed reads Updated and retained old totals, dates and charts. A recovered sample list kept its old error, and late revenue windows could overwrite a newer selection.
+- Solution: shared controllers announce actual results (including direct Retry and fallback goals), clear dependent stale displays on failure, remove recovered errors, and render only the latest revenue request. The header distinguishes incomplete reads.
+- Prevention: test initial failure and failure after success, recovery, partial comparison/fallback goals and delayed success/error with synthetic records. Preserve exact money/date-window results. Runtime SVG variables need a scoped alias when replacing the legacy theme; print checks must retain production amounts and blanks status that the old mobile cascade hid.

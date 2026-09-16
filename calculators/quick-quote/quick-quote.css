@@ -120,7 +120,7 @@
 
     :where([data-ui="unified"][data-quick-quote]) .qq-grid {
         display: grid;
-        grid-template-columns: 300px minmax(0, 1fr);
+        grid-template-columns: minmax(320px, 0.85fr) minmax(0, 1.15fr);
         gap: var(--space-5);
         align-items: start;
     }
@@ -141,6 +141,10 @@
 
     :where([data-ui="unified"][data-quick-quote]) .qq-results {
         min-width: 0;
+        position: sticky;
+        top: var(--space-4);
+        max-height: calc(100vh - 2 * var(--space-4));
+        overflow: auto;
     }
 
     @media (width <= 820px) {
@@ -155,7 +159,7 @@
         margin-bottom: 16px;
     }
 
-    :where([data-ui="unified"][data-quick-quote]) .field > label {
+    :where([data-ui="unified"][data-quick-quote]) :is(.field > label, .qq-label) {
         display: block;
         font-size: 13px;
         font-weight: 500;
@@ -1442,7 +1446,7 @@
         font-weight: 700;
     }
 
-    :where([data-ui="unified"][data-quick-quote]) :is(.qq-sheet-sub, .qq-document-date, .qq-document-assumptions, .qq-document-unit, .qq-sheet-foot, .qq-option-label) {
+    :where([data-ui="unified"][data-quick-quote]) :is(.qq-sheet-sub, .qq-document-date, .qq-sheet-foot, .qq-option-label, .qq-sheet-note, .qq-sheet-color) {
         font-size: var(--font-size-sm);
         color: var(--ui-muted);
         line-height: 1.6;
@@ -1454,28 +1458,32 @@
     }
 
     :where([data-ui="unified"][data-quick-quote]) .qq-sheet-item {
-        display: block;
+        display: flex;
+        align-items: flex-start;
+        gap: var(--space-4);
         padding: var(--space-4) 0;
         border-bottom: 1px solid var(--ui-line);
         break-inside: avoid;
     }
 
-    :where([data-ui="unified"][data-quick-quote]) :is(.qq-document-product, .qq-document-decoration) {
-        display: flex;
-        align-items: center;
-        gap: var(--space-4);
-        margin-bottom: var(--space-4);
+    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-item-main {
+        flex: 1;
+        min-width: 0;
     }
 
-    :where([data-ui="unified"][data-quick-quote]) .qq-document-product h2 {
-        font-size: var(--font-size-lg);
-        line-height: 1.3;
-        margin: var(--space-1) 0;
+    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-item-head {
+        font-size: var(--font-size-md);
+        margin: 0 0 var(--space-2);
     }
 
-    :where([data-ui="unified"][data-quick-quote]) :is(.qq-document-product, .qq-document-decoration) p {
+    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-color {
+        font-weight: 400;
+        margin-left: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) :is(.qq-sheet-method, .qq-sheet-note, .qq-sheet-exact) {
         font-size: var(--font-size-sm);
-        margin: var(--space-1) 0;
+        margin: var(--space-2) 0 0;
     }
 
     :where([data-ui="unified"][data-quick-quote]) .qq-sheet-img {
@@ -1485,35 +1493,28 @@
         flex: none;
     }
 
-
-
-
-    :where([data-ui="unified"][data-quick-quote]) .qq-document-charges {
-        margin: var(--space-3) 0;
-        font-size: var(--font-size-sm);
+    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-logo {
+        width: 88px;
+        height: 48px;
+        object-fit: contain;
+        flex: none;
     }
 
-    :where([data-ui="unified"][data-quick-quote]) .qq-document-charges > div {
-        display: flex;
-        justify-content: space-between;
-        gap: var(--space-4);
-        padding: var(--space-1) 0;
+    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-htext {
+        flex: 1;
     }
 
-    :where([data-ui="unified"][data-quick-quote]) .qq-document-charges dd {
-        margin: 0;
-        font-variant-numeric: tabular-nums;
-        white-space: nowrap;
+    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-ladder .warn {
+        color: var(--color-warning-ink);
+        font-weight: 600;
     }
 
-    :where([data-ui="unified"][data-quick-quote]) .qq-document-total {
-        border-top: 1px solid var(--ui-line);
-        font-weight: 700;
-        font-size: var(--font-size-lg);
+    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-ladder tbody th {
+        text-align: left;
     }
 
-    :where([data-ui="unified"][data-quick-quote]) .qq-document-unit {
-        margin: var(--space-2) 0 var(--space-4);
+    :where([data-ui="unified"][data-quick-quote]) .qq-sheet.is-updating {
+        opacity: 0.55;
     }
 
     :where([data-ui="unified"][data-quick-quote]) .qq-sheet-ladder {
@@ -1530,13 +1531,7 @@
         text-align: center;
     }
 
-    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-ladder caption {
-        text-align: left;
-        white-space: normal;
-        padding-bottom: var(--space-2);
-    }
-
-    :where([data-ui="unified"][data-quick-quote]) .qq-sheet-ladder .is-current {
+        :where([data-ui="unified"][data-quick-quote]) .qq-sheet-ladder .is-current {
         background: var(--ui-tint);
         color: var(--ui-accent-hover);
     }
@@ -1580,7 +1575,7 @@
         :where([data-ui="unified"][data-quick-quote]) .qq-place-chip,
         :where([data-ui="unified"][data-quick-quote]) .qq-qty-presets button,
         :where([data-ui="unified"][data-quick-quote]) .qq-place-presets button {
-            min-height: 40px;
+            min-height: var(--ui-control-height);
             display: inline-flex;
             align-items: center;
         }
@@ -1758,13 +1753,80 @@
         display: none;
     }
 
-    :where([data-ui="unified"][data-quick-quote]) :is(.qq-product-finder, .qq-customer-details) {
+    :where([data-ui="unified"][data-quick-quote]) .qq-customer-details summary {
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) :is(.qq-draft-note, .qq-field-head) {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: var(--space-1) var(--space-3);
         margin-bottom: var(--space-3);
     }
 
-    :where([data-ui="unified"][data-quick-quote]) :is(.qq-product-finder, .qq-customer-details) summary {
-        cursor: pointer;
-        font-weight: 600;
+    :where([data-ui="unified"][data-quick-quote]) .qq-field-head {
+        justify-content: space-between;
+        margin-bottom: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-field-head .qq-label {
+        margin: 0;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-draft-note {
+        font-size: var(--font-size-sm);
+        padding: var(--space-2) var(--space-3);
+        background: var(--ui-tint);
+        border-radius: var(--radius-sm);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) :is(.qq-draft-note, .qq-line-row) .qq-link-btn {
+        padding: 0;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) :is(.qq-elig-note, [id="qqDocumentStatus"].is-error) {
+        color: var(--color-warning-ink);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-elig-note {
+        margin: 0;
+        padding: var(--space-2) var(--space-3);
+        background: var(--color-warning-bg);
+        border-radius: var(--radius-sm);
+        font-size: var(--font-size-sm);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-line-quantity {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: var(--space-2);
+        margin: 0;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-line-quantity > label {
+        margin: 0;
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-line-quantity .input {
+        width: 120px;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-saved-title {
+        font-size: var(--font-size-sm);
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-saved-product {
+        gap: 0;
+    }
+
+    :where([data-ui="unified"][data-quick-quote]) .qq-saved-product .btn {
+        min-width: var(--ui-control-height);
+        padding-inline: var(--space-2);
     }
 
     :where([data-ui="unified"][data-quick-quote]) :is(.qq-search-results, .qq-saved-products) {
@@ -1780,11 +1842,7 @@
         white-space: normal;
     }
 
-    :where([data-ui="unified"][data-quick-quote]) .qq-saved-products > p {
-        width: 100%;
-    }
-
-    :where([data-ui="unified"][data-quick-quote]) :is(.qq-saved-product, .qq-option-control, .qq-document-toolbar, .qq-workflow-actions) {
+        :where([data-ui="unified"][data-quick-quote]) :is(.qq-saved-products, .qq-saved-product, .qq-option-control, .qq-document-toolbar, .qq-workflow-actions) {
         display: flex;
         align-items: center;
         flex-wrap: wrap;
@@ -1801,21 +1859,16 @@
         min-width: 130px;
     }
 
+    :where([data-ui="unified"][data-quick-quote]) .qq-document-toolbar {
+        gap: var(--space-3);
+        margin-bottom: var(--space-2);
+    }
+
     :where([data-ui="unified"][data-quick-quote]) .qq-document-toolbar h2 {
         font-size: var(--font-size-lg);
         margin: 0 auto 0 0;
     }
 
-    :where([data-ui="unified"][data-quick-quote]) .qq-workflow-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: var(--space-2);
-    }
-
-
-    :where([data-ui="unified"][data-quick-quote]) .qq-customer-preview {
-        scroll-margin-top: var(--space-4);
-    }
 
 }
 
@@ -1846,15 +1899,7 @@
     }
 
     :where([data-ui="unified"][data-quick-quote="quick"]) [id="qqCatalogLink"] {
-        float: right;
         font-size: var(--font-size-sm);
-    }
-
-    :where([data-ui="unified"][data-quick-quote="quick"]) .qq-line-thumb,
-    :where([data-ui="unified"][data-quick-quote="quick"]) .qq-line-name,
-    :where([data-ui="unified"][data-quick-quote="quick"]) .qq-single-product .qq-line-mv,
-    :where([data-ui="unified"][data-quick-quote="quick"]).qq-mode-line :is([id="qqPlacePresets"], .qq-place-note) {
-        display: none;
     }
 
     :where([data-ui="unified"][data-quick-quote="quick"]) .qq-section {
@@ -1870,6 +1915,10 @@
         margin-bottom: var(--space-2);
     }
 
+    :where([data-ui="unified"][data-quick-quote="quick"]) [id="qqSleeveRow"] {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
     :where([data-ui="unified"][data-quick-quote="quick"]) .qq-emb-row {
         padding: var(--space-2);
     }
@@ -1879,7 +1928,7 @@
         margin-bottom: var(--space-1);
     }
 
-    :where([data-ui="unified"][data-quick-quote="quick"]) :is(.qq-more-settings, .qq-more-tools, .qq-customer-details) {
+    :where([data-ui="unified"][data-quick-quote="quick"]) .qq-customer-details {
         border-top: 1px solid var(--ui-line);
         padding-top: var(--space-3);
         margin-top: var(--space-3);
@@ -1891,12 +1940,11 @@
 
     :where([data-ui="unified"][data-quick-quote="quick"]) .qq-saved-products {
         align-items: center;
-        margin-top: var(--space-4);
+        margin: 0 0 var(--space-3);
     }
 
-    :where([data-ui="unified"][data-quick-quote="quick"]) .qq-document-sizes {
-        font-size: var(--font-size-sm);
-        color: var(--ui-muted);
+    :where([data-ui="unified"][data-quick-quote="quick"]):not(.qq-mode-line) [id="qqSheet"] {
+        display: none;
     }
 
     :where([data-ui="unified"][data-quick-quote="quick"]) [id="qqSearchPanel"] {
@@ -1904,6 +1952,14 @@
     }
 
     @media (width <= 480px) {
+        :where([data-ui="unified"][data-quick-quote="quick"]) .qq-sheet-item {
+            flex-wrap: wrap;
+        }
+
+        :where([data-ui="unified"][data-quick-quote="quick"]) .qq-sheet-item-main {
+            flex-basis: 100%;
+        }
+
         :where([data-ui="unified"][data-quick-quote="quick"]) .qq-sheet-head {
             flex-direction: column;
             gap: var(--space-2);

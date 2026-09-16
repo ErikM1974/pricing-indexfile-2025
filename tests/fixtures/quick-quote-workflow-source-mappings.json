@@ -1,5 +1,5 @@
 {
-  "description": "Authorized September 13, 2026 Quick Quote redesign. Apply before historical CSS mappings. Original hashes remain immutable; current pricing/handoffs tested independently.",
+  "description": "Authorized September 13, 2026 Quick Quote redesign. Apply before historical CSS mappings. Original hashes remain immutable; current pricing/handoffs tested independently. classic-restore-2026-09-16: Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings. release-2026.09.16.2: Deploy v2026.09.16.2 cache-bust of the Quick Quote assets.",
   "changes": [
     {
       "file": "calculators/quick-quote/dtf-prints-prototype.html",
@@ -1042,6 +1042,750 @@
       "after": "    <script src=\"/calculators/quick-quote/quick-quote-workspace.js?v=2026.09.15.1\"></script>\n",
       "count": 1,
       "stage": "release-2026.09.15.1"
+    },
+    {
+      "file": "calculators/quick-quote/index.html",
+      "before": "    <link rel=\"stylesheet\" href=\"/calculators/quick-quote/quick-quote.css?v=2026.09.14.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/safety-stripe-recs.css?v=2026.09.13.2\">\n    <link rel=\"stylesheet\" href=\"/calculators/quick-quote/linesheet-print.css?v=2026.09.14.2\" media=\"print\">",
+      "after": "    <link rel=\"stylesheet\" href=\"/calculators/quick-quote/quick-quote.css?v=2026.09.16.1\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/safety-stripe-recs.css?v=2026.09.13.2\">\n    <link rel=\"stylesheet\" href=\"/calculators/quick-quote/linesheet-print.css?v=2026.09.16.1\" media=\"print\">",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/index.html",
+      "before": "                <p class=\"lede\">Choose a product and decoration to see price breaks.</p>",
+      "after": "                <p class=\"lede\">Pick a method, type style numbers and send the price breaks.</p>",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/index.html",
+      "before": "                <p class=\"field-help\" id=\"qqModeHelp\" hidden></p>\n                <div id=\"qqRestoreDraft\" class=\"alert-info\" hidden><p>An unfinished estimate is available on this browser. Restore its inputs and check fresh prices.</p><button type=\"button\" class=\"btn btn-ghost\" id=\"qqRestore\">Restore draft</button><button type=\"button\" class=\"btn btn-ghost\" id=\"qqDiscard\">Discard</button></div>\n                <div class=\"qq-product-finder\" id=\"qqProductFinder\">\n                    <div class=\"field\"><label for=\"qqProductSearch\">Product</label><input id=\"qqProductSearch\" class=\"input\" type=\"search\" autocomplete=\"off\" placeholder=\"Style or name, e.g. PC55\" aria-describedby=\"qqSearchStatus\"></div>\n                </div>\n                <div id=\"qqSearchPanel\" hidden>\n                    <p id=\"qqSearchStatus\" role=\"status\" class=\"field-help\"></p>\n                    <div id=\"qqSearchResults\" class=\"qq-search-results\"></div>\n                </div>\n                <div id=\"qqSavedProducts\" class=\"qq-saved-products\"></div>\n                <details class=\"qq-customer-details\">\n                    <summary>Customer &amp; rep details <span class=\"muted\">(optional)</span></summary>\n                    <div class=\"field\"><label for=\"qqCustomerName\">Customer name</label><input id=\"qqCustomerName\" class=\"input\" maxlength=\"100\" autocomplete=\"off\"></div>\n                    <div class=\"field\"><label for=\"qqCompanyName\">Company</label><input id=\"qqCompanyName\" class=\"input\" maxlength=\"120\" autocomplete=\"off\"></div>\n                    <div class=\"field\"><label for=\"qqRepName\">Prepared by</label><input id=\"qqRepName\" class=\"input\" maxlength=\"100\" autocomplete=\"off\" list=\"qqRepNames\"><datalist id=\"qqRepNames\"><option value=\"Nika\"><option value=\"Taneisha\"></datalist></div>\n                    <div class=\"field\"><label for=\"qqRepEmail\">Rep email</label><input id=\"qqRepEmail\" class=\"input\" type=\"email\" maxlength=\"150\" placeholder=\"sales@nwcustomapparel.com\" autocomplete=\"off\"></div>\n                    <div class=\"field\"><label for=\"qqCustomerNotes\">Note for your customer</label><textarea id=\"qqCustomerNotes\" class=\"input\" maxlength=\"400\" rows=\"3\"></textarea></div>\n                </details>\n\n                <!-- LINE SHEET: the style list (add up to 6) + actions — line mode only -->\n                <div id=\"qqLineStylesField\" hidden>\n                    <div class=\"field\">\n                        <div id=\"qqLineList\" class=\"qq-line-list\" role=\"group\" aria-label=\"Products\"></div>\n                        <button type=\"button\" id=\"qqLineAdd\" class=\"qq-link-btn\">+ Add style</button>\n                    </div>\n                    <div class=\"field qq-line-quantity\"><label for=\"qqLineQty\">Exact quantity <span class=\"muted\">(optional)</span></label><input id=\"qqLineQty\" class=\"input num\" type=\"number\" min=\"1\" max=\"100000\" step=\"1\" placeholder=\"For an exact total\"></div>\n                </div>\n\n                <!-- LINE SHEET: imprint method selector (locks the sheet to one method) — line mode only -->\n                <div class=\"field\" id=\"qqLineMethodField\" hidden>\n                    <label for=\"qqLineMethod\">Decoration <a href=\"/\" id=\"qqCatalogLink\">Catalog quoting</a></label>\n                    <select id=\"qqLineMethod\" class=\"field-select\"></select>",
+      "after": "                <div id=\"qqRestoreDraft\" class=\"qq-draft-note\" hidden><span>You have an unfinished quote saved on this browser.</span><button type=\"button\" class=\"qq-link-btn\" id=\"qqRestore\">Restore it</button><button type=\"button\" class=\"qq-link-btn\" id=\"qqDiscard\">Discard</button></div>\n\n                <!-- Mode: Line Sheet (one method, many styles -> PDF; the DEFAULT) vs Quick Price (one style, every method) -->\n                <div class=\"qq-mode-toggle\" id=\"qqModeToggle\" role=\"group\" aria-label=\"Quote mode\">\n                    <button type=\"button\" class=\"is-active\" data-mode=\"linesheet\">Line Sheet</button>\n                    <button type=\"button\" data-mode=\"quick\">Quick Price</button>\n                </div>\n\n                <!-- LINE SHEET: imprint method (one tap; locks the sheet to one method) — line mode only -->\n                <div class=\"field\" id=\"qqLineMethodField\" hidden>\n                    <div class=\"qq-field-head\"><span class=\"qq-label\" id=\"qqLineMethodLabel\">Imprint method <span class=\"muted\">· one per sheet</span></span><a href=\"/catalog\" id=\"qqCatalogLink\" target=\"_blank\" rel=\"noopener\">Catalog quoting</a></div>\n                    <div class=\"qq-chips\" id=\"qqLineMethodChips\" role=\"group\" aria-labelledby=\"qqLineMethodLabel\"></div>\n                </div>\n\n                <!-- LINE SHEET: the style list (up to 6, each priced on its own) — line mode only -->\n                <div id=\"qqLineStylesField\" hidden>\n                    <div class=\"field\">\n                        <span class=\"qq-label\" id=\"qqLineListLabel\">Styles <span class=\"muted\">· up to 6, each priced on its own</span></span>\n                        <div id=\"qqLineList\" class=\"qq-line-list\" role=\"group\" aria-labelledby=\"qqLineListLabel\"></div>\n                        <button type=\"button\" id=\"qqLineAdd\" class=\"qq-link-btn\">+ Add style</button>\n                    </div>",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/index.html",
+      "before": "                    <input id=\"qqStyle\" class=\"input\" type=\"text\" inputmode=\"text\" autocomplete=\"off\"",
+      "after": "                    <input id=\"qqStyle\" class=\"input\" type=\"text\" inputmode=\"text\" autocomplete=\"off\" spellcheck=\"false\"",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/index.html",
+      "before": "                <div class=\"qq-section qq-deco\" id=\"qqDecoSection\">\n",
+      "after": "                <div class=\"qq-section qq-deco\" id=\"qqDecoSection\">\n                <div class=\"qq-section-title\">Decoration</div>\n",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/index.html",
+      "before": "                    <label class=\"qq-check qq-emb-dig\"><input type=\"checkbox\" id=\"qqEmbDigitizing\"> New logo — add one-time digitizing</label>\n                    <button type=\"button\" id=\"qqEmbAddBtn\" class=\"qq-link-btn\">+ Add another logo</button>",
+      "after": "                    <button type=\"button\" id=\"qqEmbAddBtn\" class=\"qq-link-btn\">+ Add another logo</button>\n                    <label class=\"qq-check qq-emb-dig\"><input type=\"checkbox\" id=\"qqEmbDigitizing\"> New logo — add one-time digitizing</label>",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/index.html",
+      "before": "                    <label id=\"qqPlacementLabel\">Print locations</label>",
+      "after": "                    <label id=\"qqPlacementLabel\">Where does the print go?</label>",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/index.html",
+      "before": "                    <p class=\"qq-place-note\">Print dimensions are shown on each placement.</p>",
+      "after": "                    <p class=\"qq-place-note\">Print sizes are shown on each placement. For an embroidered sleeve logo, add it under Embroidery logos.</p>",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/index.html",
+      "before": "                    <p class=\"qq-ink-note\">Each color = 1 screen (one-time setup shown in your estimate). Back prices on its own — 3 front + 1 back costs less than 3&nbsp;+&nbsp;3.</p>",
+      "after": "                    <p class=\"qq-ink-note\">Each color = 1 screen (one-time setup shown on the sheet). Back prices on its own — 3 front + 1 back costs less than 3&nbsp;+&nbsp;3.</p>",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/index.html",
+      "before": "                <details class=\"qq-more-settings\" id=\"qqMoreSettings\"><summary>More settings <span id=\"qqExtraSummary\" class=\"muted\"></span></summary><div id=\"qqExtraControls\"></div></details>\n                <details class=\"qq-more-tools\" id=\"qqMoreTools\">\n                    <summary>More quoting tools</summary>\n                    <div class=\"qq-mode-toggle\" id=\"qqModeToggle\" role=\"group\" aria-label=\"Quote mode\">\n                        <button type=\"button\" class=\"is-active\" data-mode=\"linesheet\">Quick Quote</button>\n                        <button type=\"button\" data-mode=\"quick\">Compare decoration</button>\n                    </div>\n                </details>\n\n",
+      "after": "\n                <!-- Name search suggestions; moved under whichever style box is being typed in -->\n                <div id=\"qqSearchPanel\" class=\"qq-search-panel\" hidden>\n                    <p id=\"qqSearchStatus\" role=\"status\" class=\"field-help\"></p>\n                    <div id=\"qqSearchResults\" class=\"qq-search-results\"></div>\n                </div>\n                <div id=\"qqSavedProducts\" class=\"qq-saved-products\"></div>\n\n                <details class=\"qq-customer-details\">\n                    <summary>Customer &amp; rep details <span class=\"muted\">(optional, printed on the sheet)</span></summary>\n                    <div class=\"field\"><label for=\"qqCustomerName\">Customer name</label><input id=\"qqCustomerName\" class=\"input\" maxlength=\"100\" autocomplete=\"off\"></div>\n                    <div class=\"field\"><label for=\"qqCompanyName\">Company</label><input id=\"qqCompanyName\" class=\"input\" maxlength=\"120\" autocomplete=\"off\"></div>\n                    <div class=\"field\"><label for=\"qqRepName\">Prepared by</label><input id=\"qqRepName\" class=\"input\" maxlength=\"100\" autocomplete=\"off\" list=\"qqRepNames\"><datalist id=\"qqRepNames\"><option value=\"Nika\"><option value=\"Taneisha\"></datalist></div>\n                    <div class=\"field\"><label for=\"qqRepEmail\">Rep email</label><input id=\"qqRepEmail\" class=\"input\" type=\"email\" maxlength=\"150\" placeholder=\"sales@nwcustomapparel.com\" autocomplete=\"off\"></div>\n                    <div class=\"field\"><label for=\"qqCustomerNotes\">Note for your customer</label><textarea id=\"qqCustomerNotes\" class=\"input\" maxlength=\"400\" rows=\"3\"></textarea></div>\n                </details>",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/index.html",
+      "before": "                <!-- LINE SHEET preview (becomes the PDF via Download / Print) -->\n                <div id=\"qqLineResults\" hidden></div>\n                <section id=\"qqCustomerPreview\" class=\"qq-customer-preview\" aria-label=\"Customer estimate preview\">\n                    <div class=\"qq-document-toolbar\">\n                        <h2>Price breaks</h2>\n                        <div class=\"qq-workflow-actions\" aria-label=\"Estimate actions\">",
+      "after": "                <div id=\"qqLineResults\" hidden></div>\n                <!-- LINE SHEET (and the Quick Price customer estimate) — becomes the PDF / print / copied text -->\n                <section id=\"qqCustomerPreview\" class=\"qq-customer-preview\" aria-labelledby=\"qqDocumentTitle\">\n                    <div class=\"qq-document-toolbar\">\n                        <h2 id=\"qqDocumentTitle\">Line sheet</h2>\n                        <div class=\"field qq-line-quantity\"><label for=\"qqLineQty\">Exact qty</label><input id=\"qqLineQty\" class=\"input num\" type=\"number\" min=\"1\" max=\"100000\" step=\"1\" placeholder=\"Optional\" aria-describedby=\"qqLineQtyHelp\"><span id=\"qqLineQtyHelp\" class=\"sr-only\">Adds an all-in price and total for that quantity</span></div>\n                        <div class=\"qq-workflow-actions\" aria-label=\"Sheet actions\">",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/index.html",
+      "before": "                    <div class=\"qq-sheet\" id=\"qqSheet\"></div>",
+      "after": "                    <p id=\"qqExportError\" class=\"alert-error\" role=\"alert\" hidden></p>\n                    <p id=\"qqCopyStatus\" class=\"field-help\" role=\"status\"></p>\n                    <div id=\"qqCopyFallback\" hidden><label for=\"qqCopyText\">Select and copy these prices</label><textarea id=\"qqCopyText\" class=\"field-input\" rows=\"6\" readonly></textarea></div>\n                    <div class=\"qq-sheet\" id=\"qqSheet\" hidden></div>",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/index.html",
+      "before": "        <p id=\"qqDraftStatus\" class=\"field-help\" role=\"status\">Prices are checked live.</p>\n        <p id=\"qqCopyStatus\" class=\"field-help\" role=\"status\"></p>\n        <div id=\"qqCopyFallback\" hidden><label for=\"qqCopyText\">Select and copy these prices</label><textarea id=\"qqCopyText\" class=\"field-input\" rows=\"6\" readonly></textarea></div>\n        <p id=\"qqExportError\" class=\"alert-error\" role=\"alert\" hidden></p>\n    </main>",
+      "after": "        <p id=\"qqDraftStatus\" class=\"field-help\" role=\"status\">Prices are checked live.</p>\n    </main>",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/index.html",
+      "before": "    <!-- Method eligibility -->\n    <script src=\"/shared_components/js/decoration-methods.js?v=2026.09.06.31\"></script>",
+      "after": "    <!-- Method eligibility + cap/garment classification -->\n    <script src=\"/shared_components/js/decoration-methods.js?v=2026.09.06.31\"></script>\n    <script src=\"/shared_components/js/product-category-filter.js?v=2026.09.06.37\"></script>\n    <script src=\"/shared_components/js/headwear-classifier.js?v=2026.09.16.1\"></script>",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/index.html",
+      "before": "    <script src=\"/calculators/quick-quote/quick-quote-document.js?v=2026.09.15.1\"></script>\n    <script src=\"/calculators/quick-quote/quick-quote-workspace.js?v=2026.09.15.1\"></script>\n    <script src=\"/calculators/quick-quote/quick-quote-ui.js?v=2026.09.13.6\"></script>\n    <script src=\"/calculators/quick-quote/quick-quote.js?v=2026.09.14.2\"></script>",
+      "after": "    <script src=\"/calculators/quick-quote/quick-quote-document.js?v=2026.09.16.1\"></script>\n    <script src=\"/calculators/quick-quote/quick-quote-workspace.js?v=2026.09.16.1\"></script>\n    <script src=\"/calculators/quick-quote/quick-quote-ui.js?v=2026.09.13.6\"></script>\n    <script src=\"/calculators/quick-quote/quick-quote.js?v=2026.09.16.1\"></script>",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "        if (!state.scpDarkUserSet) state.adv.scpDark = state.color ? isDarkGarment(state.color.name) : false;",
+      "after": "        var was = !!state.adv.scpDark;\n        if (!state.scpDarkUserSet) state.adv.scpDark = state.color ? isDarkGarment(state.color.name) : false;\n        if (was !== !!state.adv.scpDark) ++configVersion; // shared with the line sheet",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "    function defaultSizes() { return (state.product && state.product.isCap) ? ['OSFA'] : ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL']; }",
+      "after": "    function isFlatHeadwear(product) { return !!(product && product.headwear && product.headwear.isFlat); }\n    function oneSize(product) { return !!(product && product.isCap) || isFlatHeadwear(product); }\n    function frontLogoLabel(cap, product) { return cap ? 'Cap front' : isFlatHeadwear(product) ? 'Front' : 'Left chest'; }\n    function defaultSizes() { return oneSize(state.product) ? ['OSFA'] : ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL']; }",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "    function isCapProduct(category, title, style) {\n        return /cap|hat|beanie|visor/i.test(category || '')\n            || /\\bcaps?\\b|beanie|trucker|snapback/i.test(title || '')\n            || /^(c\\d{2,4}|ne\\d{3,4})$/i.test(style || '');",
+      "after": "    // Cap vs garment comes from the shared classifier: Richardson caps have no category and\n    // Richardson/New Era also sell apparel. Flat headwear (beanies, knit caps) is not a cap: it is\n    // one size and priced as flat (garment) embroidery, as the EMB builder does (Erik 2026-09-16).\n    function classifyHeadwear(meta) {\n        if (!window.HeadwearClassifier) throw lookupError('The product type check did not load. Refresh the page.', false);\n        return window.HeadwearClassifier.classify(meta);\n    }\n    // Rule 9: flat only when the EMB builder agrees. Its isCapProduct() asks ProductCategoryFilter about\n    // the style-search label (\"STYLE - TITLE\") before the category, so fleece headbands, gaiters and skull\n    // caps in \"Caps\" stay caps there — and here. Blank-category ones keep the rep's choice on a line sheet.\n    function matchBuilderFlat(headwear, style, title) {\n        if (!headwear.isFlat) return headwear;\n        if (!window.ProductCategoryFilter) throw lookupError('The product type check did not load. Refresh the page.', false);\n        if (window.ProductCategoryFilter.isFlatHeadwear({ PRODUCT_TITLE: style + ' - ' + title })) return headwear;\n        return Object.assign({}, headwear, { kind: 'cap', isCap: true, isFlat: false, confident: headwear.reason === 'category', reason: 'builder' });\n    }\n    function lookupError(message, notFound) {\n        var err = new Error(message); err.notFound = notFound; return err;\n    }\n    // A style number has a digit and no spaces; anything else is searched by name.\n    function looksLikeStyle(value) {\n        return /^[A-Z0-9._/-]{2,20}$/i.test(value) && /\\d/.test(value);\n    }\n    function lookupMessage(err, style) {\n        if (err && err.notFound) return 'No product found for ' + style + '.';\n        if (err && err.notFound === false) return err.message;\n        return 'Product lookup failed. Check your connection and try again.';",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "    var sizeSeq = 0;\n",
+      "after": "    var sizeSeq = 0;\n    var LOOKUP_PAUSE = 450;     // ms after the last keystroke before a typed style is looked up\n    var quickStyleTimer;\n",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "            .then(function (r) { if (!r.ok) throw new Error('not found (' + r.status + ')'); return r.json(); })\n            .then(function (rows) {\n                if (!Array.isArray(rows) || rows.length === 0) throw new Error('no product');",
+      "after": "            .then(function (r) {\n                if (r.status === 404) throw lookupError('No product found for ' + style + '.', true);\n                if (!r.ok) throw lookupError('Product lookup failed (' + r.status + '). Try again.', false);\n                return r.json();\n            })\n            .then(function (rows) {\n                if (!Array.isArray(rows) || rows.length === 0) throw lookupError('No product found for ' + style + '.', true);",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "                var cap = isCapProduct(category, title, style);",
+      "after": "                var headwear = matchBuilderFlat(classifyHeadwear(meta), style, meta.PRODUCT_TITLE || '');\n                var cap = headwear.isCap;",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "                    style: style, name: cleanName(title, style), isCap: cap,",
+      "after": "                    style: style, name: cleanName(title, style), isCap: cap, headwear: headwear,",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "                    if (token !== lookupSeq) return;\n                    applyProduct(elig);",
+      "after": "                    if (token !== lookupSeq) return;\n                    state.product.eligibility = elig;\n                    applyProduct(elig);",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "                statusEl.innerHTML = '<span class=\"err\">Couldn\\'t find “' + esc(style) + '” — check the style number.</span>';\n                renderAll();",
+      "after": "                statusEl.innerHTML = '<span class=\"err\">' + esc(err && err.notFound\n                    ? 'Couldn’t find “' + style + '” — check the style number.'\n                    : lookupMessage(err, style)) + '</span>';\n                renderAll();\n                if (err && err.notFound && window.QuickQuoteWorkspace) window.QuickQuoteWorkspace.suggest($('qqStyle'));",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "        if (product.isCap) return Promise.resolve(null); // caps → cap embroidery only\n        if (!window.DecorationMethods || typeof window.DecorationMethods.eligibleFor !== 'function') {",
+      "after": "        if (product.isCap) return Promise.resolve(null); // caps → cap embroidery only\n        // Flat headwear → garment embroidery only (the \"Caps\" category rule lists no garment methods).\n        if (isFlatHeadwear(product)) return Promise.resolve({ EMB: true, DTG: 'no', SCP: false, DTF: false, source: 'flat-headwear' });\n        return categoryEligibility(product);\n    }\n    // The category rules for any product (never null); the line sheet also asks this for unconfirmed caps.\n    function categoryEligibility(product) {\n        if (!window.DecorationMethods || typeof window.DecorationMethods.eligibleFor !== 'function') {",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "            return Promise.resolve(p);\n        } catch (e) {\n            return Promise.resolve({ EMB: true, DTG: 'no', SCP: false, DTF: false, source: 'fallback' });\n        }",
+      "after": "            // A rules failure is the same embroidery-only fallback, which callers must announce.\n            // categoriesFor() is null only when the rules feed itself did not load.\n            return Promise.resolve(p).catch(function () { return { EMB: true, DTG: 'no', SCP: false, DTF: false, source: 'fallback' }; })\n                .then(function (elig) {\n                    if (!elig || elig.source !== 'fallback' || typeof window.DecorationMethods.categoriesFor !== 'function') return elig;\n                    return Promise.resolve(window.DecorationMethods.categoriesFor('emb')).catch(function () { return null; })\n                        .then(function (list) { return Object.assign({}, elig, { rulesDown: !list }); });\n                });\n        } catch (e) {\n            return Promise.resolve({ EMB: true, DTG: 'no', SCP: false, DTF: false, source: 'fallback' });\n        }\n    }\n    // DTG eligibility is 'yes' | 'warn' | 'no'; the other methods are booleans.\n    function methodAllowed(elig, key) {\n        var v = elig && elig[key];\n        return v === true || v === 'yes' || v === 'warn';",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "    function applyProduct(elig) {\n        if (state.product.isCap) {",
+      "after": "    function applyProduct(elig) {\n        ++configVersion; // resets placements, logos and cap style shared with the line sheet\n        if (state.product.isCap) {",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "    function repriceAll() {\n        if (!state.product || state.methods.length === 0) { renderResults(); return; }",
+      "after": "    function repriceAll() {\n        state.quickVersion = configVersion;\n        if (!state.product || state.methods.length === 0) { renderResults(); return; }",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "        state.results = {};\n        state.methods.forEach(function (m) { priceMethod(m.id, token); });",
+      "after": "        state.results = {};\n        state.quickVersion = configVersion;\n        state.methods.forEach(function (m) { priceMethod(m.id, token); });",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "            var m = sizeMethod();\n            if (state.mode === 'linesheet') return '<select class=\"field-select\" data-placement=\"' + kind + '\" aria-label=\"' + (kind === 'front' ? 'Front placement' : 'Back placement') + '\">'\n                + opts.map(function (o) { var size = chipSize(m, o.code, kind); return '<option value=\"' + esc(o.code) + '\"' + (o.code === sel ? ' selected' : '') + '>' + esc(o.label + (size ? ' · ' + size : '')) + '</option>'; }).join('') + '</select>';\n            return opts.map(function (o) {",
+      "after": "            var m = sizeMethod();\n            return opts.map(function (o) {",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "        $('qqFront').innerHTML = chips(FRONT_OPTS, state.front, 'front');\n        $('qqBack').innerHTML = chips(BACK_OPTS, state.back, 'back');",
+      "after": "        keepFocus($('qqFront'), function () { $('qqFront').innerHTML = chips(FRONT_OPTS, state.front, 'front'); });\n        keepFocus($('qqBack'), function () { $('qqBack').innerHTML = chips(BACK_OPTS, state.back, 'back'); });",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "            $('qqCapEmbType').innerHTML = CAP_EMB_OPTS.map(function (o) {\n                return '<button type=\"button\" class=\"qq-place-chip' + (o.code === state.capEmb ? ' is-active' : '')\n                    + '\" data-cap-emb=\"' + o.code + '\">' + esc(o.label) + '</button>';\n            }).join('');\n        } else {\n            capWrap.hidden = true;\n        }\n        var rows = [embLogoRow('primary', isCap ? 'Cap front' : 'Left chest', state.adv.embStitch, false)];",
+      "after": "            keepFocus($('qqCapEmbType'), function () {\n                $('qqCapEmbType').innerHTML = CAP_EMB_OPTS.map(function (o) {\n                    return '<button type=\"button\" class=\"qq-place-chip' + (o.code === state.capEmb ? ' is-active' : '')\n                        + '\" data-cap-emb=\"' + o.code + '\">' + esc(o.label) + '</button>';\n                }).join('');\n            });\n        } else {\n            capWrap.hidden = true;\n        }\n        var rows = [embLogoRow('primary', frontLogoLabel(isCap, state.mode === 'linesheet' ? null : state.product), state.adv.embStitch, false)];",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "    // Engine-authoritative: prices a representative qty in each tier through the\n    // SAME singleItemPreview() the cards use, so the ladder can't disagree with\n    // the quote. The base unit is constant within a tier; the small-batch (LTM)\n    // fee is shown on its own row, mirroring our standard pricing matrix.\n    // ============================================================\n    // Each method's LOWEST probe must land inside its small-batch (LTM) tier so the matrix + line\n    // sheet surface the \"+$50 small-batch\" row: EMB 1-7 (probe 4), DTG 1-11 (probe 6), DTF 10-23\n    // (probe 15), SCP 24-47 (probe 24). DTG used to start at 12 and skipped its 1-11 LTM tier.\n    var PROBE_QTYS = { emb: [4, 12, 36, 60, 100], capemb: [4, 12, 36, 60, 100], dtg: [6, 12, 36, 60, 100], scp: [24, 50, 100, 200], dtf: [15, 36, 60, 100] };",
+      "after": "    // Engine-authoritative: prices each tier through the SAME singleItemPreview()\n    // the cards use, so the ladder can't disagree with the quote. The small-batch\n    // (LTM) fee is shown on its own row, mirroring our standard pricing matrix.\n    // ============================================================\n    // Probe each tier at its LOWEST quantity (today's Caspio tiers). Freight and small-batch\n    // shares only fall as quantity rises inside a tier — DTF freight steps at 50/100/200 — so\n    // the first quantity is the tier's highest price and exactly what the builder charges there.\n    // The lowest probe lands in the small-batch tier: EMB 1-7, DTG 1-11, DTF 10-23, SCP 24-47.\n    var PROBE_QTYS = { emb: [1, 8, 24, 48, 72], capemb: [1, 8, 24, 48, 72], dtg: [1, 12, 24, 48, 72], scp: [24, 48, 72, 145], dtf: [10, 24, 48, 72] };",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "    // config. Returns [{label, base, ltmFee, range}] sorted by tier. Prices a representative qty in\n    // each tier through the SAME singleItemPreview() the cards use, so a ladder can't disagree with\n    // a live quote. Shared by the Quick-Price matrix AND the Line Sheet (one ladder per style).",
+      "after": "    // config. Returns [{label, base, ltmFee, range, setup, preview}] sorted by tier, each priced\n    // through the SAME singleItemPreview() the cards use, so a ladder can't disagree with a live\n    // quote. Shared by the Quick-Price matrix AND the Line Sheet (one ladder per style).\n    // Throws when the engine could not be reached, so a column never silently disappears.",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "\n        // Probe ONE qty and, if new, record its tier row. Base = everything that scales",
+      "after": "        var probeMode = 'discover'; // discover: first price per tier · anchor: tier minimum wins · highest: larger base wins\n        var failure = null;\n\n        // Probe ONE qty and record its tier row. Base = everything that scales",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "        // the 3 surfaces can't disagree. Guarded by `!byTier[label]` → additive only:\n        // re-probing an already-seen tier can NEVER overwrite/change its recorded price.",
+      "after": "        // the 3 surfaces can't disagree. probeMode decides whether a later probe of an\n        // already-seen tier may replace its row (see the steps below).",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "            } catch (e) { preview = null; }",
+      "after": "            } catch (e) { failure = e; preview = null; }\n            // Only \"below the minimum order\" means no price at this quantity; anything else is a failure.\n            if (preview && !preview.ok && (!preview.error || preview.error.code !== 'BELOW_MINIMUM')) failure = preview.error || new Error('pricing failed');",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "            if (byTier[label]) return;\n            var oneTimeT = (preview.fees || []).reduce(function (s, f) { return s + (f.oneTime ? (Number(f.amount) || 0) : 0); }, 0);\n            var ltmFlat = (preview.ltm && preview.ltm.fee) || 0;\n            var base = Math.max(0, (preview.groupTotal - oneTimeT - ltmFlat) / pq);\n            byTier[label] = { label: label, base: r2(base), ltmFee: ltmFlat, range: parseRange(label), sampleQuantity: pq, sampleUnit: (preview.groupTotal - oneTimeT) / pq };\n        }\n\n        // 1) Bootstrap: probe the hardcoded representative qtys (one inside each tier we",
+      "after": "            var prior = byTier[label];\n            if (prior && probeMode === 'discover') return;\n            var oneTimeT = (preview.fees || []).reduce(function (s, f) { return s + (f.oneTime ? (Number(f.amount) || 0) : 0); }, 0);\n            var ltmFlat = (preview.ltm && preview.ltm.fee) || 0;\n            var base = Math.max(0, (preview.groupTotal - oneTimeT - ltmFlat) / pq);\n            if (prior && probeMode === 'highest' && !(base > prior.exactBase)) return;\n            byTier[label] = { label: label, base: r2(base), exactBase: base, ltmFee: ltmFlat, range: parseRange(label), sampleQuantity: pq, setup: r2(oneTimeT), preview: preview };\n        }\n\n        // 1) Bootstrap: probe the representative qtys (the lowest quantity of each tier we",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "        //    tier) can't silently drop a row from the ladder. Purely additive — tiers\n        //    already covered above are skipped by the `!byTier[label]` guard, and a\n        //    tier's base is constant within it, so this never changes an existing row.",
+      "after": "        //    tier) can't silently drop a row from the ladder.",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "                .sort(function (a, b) { return a - b; });\n            for (var j = 0; j < missing.length; j++) {",
+      "after": "                .sort(function (a, b) { return a - b; });\n            probeMode = 'self-heal';\n            for (var j = 0; j < missing.length; j++) {",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "        return Object.keys(byTier).map(function (k) { return byTier[k]; }).sort(function (a, b) { return a.range.min - b.range.min; });",
+      "after": "        // 3) If a tier moved, re-price it at its new lowest quantity (the tier's highest price).\n        probeMode = 'anchor';\n        var moved = Object.keys(byTier).map(function (k) { return byTier[k]; })\n            .filter(function (t) { return t.range.min > 0 && t.sampleQuantity !== t.range.min; });\n        for (var k = 0; k < moved.length; k++) {\n            await probeQty(moved[k].range.min);\n        }\n\n        // 4) DTF rounds each piece up after spreading the small-batch fee, so its fee-free price\n        //    drifts inside that tier. Keep the highest, so \"per pc × qty + fee\" never under-quotes.\n        if (id === 'dtf') {\n            probeMode = 'highest';\n            var small = Object.keys(byTier).map(function (k2) { return byTier[k2]; })\n                .filter(function (t) { return t.ltmFee > 0 && isFinite(t.range.max) && t.range.max - t.range.min <= 60; });\n            for (var s = 0; s < small.length; s++) {\n                for (var q = small[s].range.min + 1; q <= small[s].range.max; q++) await probeQty(q);\n            }\n        }\n\n        if (failure) throw new Error('Some quantity prices could not be checked. Try again.');\n        // Where the fee is added on paper, round the per-piece price up to the cent so\n        // \"per pc × qty + fee\" is never below the engine total.\n        return Object.keys(byTier).map(function (k3) {\n            var t = byTier[k3];\n            if (t.ltmFee > 0) t.base = Math.max(t.base, Math.ceil(t.exactBase * 100 - 1e-6) / 100);\n            return t;\n        }).sort(function (a, b) { return a.range.min - b.range.min; });",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "        box.innerHTML = '<p class=\"qq-matrix-title\">Price breaks — ' + esc(def.label) + '</p><div class=\"qq-skeleton\" style=\"height:84px\"></div>';",
+      "after": "        box.innerHTML = '<p class=\"qq-matrix-title\">Price breaks — ' + esc(def.label) + '</p><div class=\"qq-skeleton\"></div>';",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "        _ladderCache[key] = tiers;\n        // only paint if this is still the current selection/config\n        if (state.selectedMethod === id && ladderKey(id) === key) paintMatrix(id, tiers);",
+      "after": "        if (tiers.length && ladderKey(id) === key) _ladderCache[key] = tiers;   // failures and mixed-setting tables are never cached\n        // only paint if this is still the current selection/config\n        if (state.selectedMethod !== id || ladderKey(id) !== key) return;\n        if (tiers.length) paintMatrix(id, tiers);\n        else box.innerHTML = '<p class=\"qq-matrix-title\">Price breaks — ' + esc(def.label) + '</p><p class=\"qq-matrix-msg\">Price breaks could not be loaded. <button type=\"button\" class=\"qq-link-btn qq-matrix-retry\">Retry</button></p>';",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "        box.innerHTML = state.methods.map(function (m) {",
+      "after": "        // decoration-methods.js contract: an unknown category must say that only embroidery is shown.\n        var elig = state.product.eligibility;\n        var eligNote = elig && elig.source === 'fallback'\n            ? '<p class=\"qq-elig-note\" role=\"status\">' + (elig.rulesDown\n                ? 'Decoration rules didn’t load, so only embroidery is shown. Refresh to see the other methods.'\n                : 'This product’s category isn’t in our decoration rules, so only embroidery is shown. Other methods may work — confirm before quoting, or price one on the Line Sheet.') + '</p>'\n            : elig && elig.source === 'flat-headwear'\n            ? '<p class=\"qq-elig-note\" role=\"status\">Beanies and knit caps are priced as flat embroidery, the same as the Embroidery builder.</p>'\n            : '';\n        box.innerHTML = eligNote + state.methods.map(function (m) {",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "                    if (state.lineStyles.length >= LINE_MAX) return;  // sheet full\n                    addLineStyle();\n                    var last = state.lineStyles[state.lineStyles.length - 1];\n                    if (last) {\n                        var inp = document.querySelector('.qq-line-row[data-uid=\"' + last.uid + '\"] .qq-line-style');\n                        if (inp) inp.value = style;\n                        onLineStyleInput(last.uid, style);",
+      "after": "                    var target = addLineStyle(false);   // null when the sheet is full\n                    if (target) {\n                        var inp = document.querySelector('.qq-line-row[data-uid=\"' + target.uid + '\"] .qq-line-style');\n                        if (inp) inp.value = style;\n                        onLineStyleInput(target.uid, style);",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "        else pf.hidden = !!(state.product && state.product.isCap);",
+      "after": "        else pf.hidden = oneSize(state.product);",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "    function repriceActive() { if (state.mode === 'linesheet') repriceLineAll(); else repriceAll(); }\n    var scheduleActivePrice = debounce(repriceActive, 350);\n    function repriceActiveDebounced() {",
+      "after": "    var configVersion = 0;   // bumps on every decoration/quantity change\n    function repriceActive() { ++configVersion; if (state.mode === 'linesheet') repriceLineAll(); else repriceAll(); }\n    var scheduleActivePrice = debounce(function () {\n        if (state.mode !== 'linesheet') { repriceAll(); return; }\n        // A row looked up while the typing pause ran was already priced with these settings.\n        state.lineStyles.forEach(function (row) { if (row.product && row.pricedVersion !== configVersion) priceLineRow(row); });\n        renderLinePreview();\n    }, 350);\n    function repriceActiveDebounced() {\n        ++configVersion;",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "        renderMode();\n        renderConfigControls();",
+      "after": "        // A cap style chosen in Quick Price must not ride along on an Embroidery sheet's caps.\n        if (mode === 'linesheet' && state.lineMethod !== 'capemb' && state.capEmb !== 'embroidery') { state.capEmb = 'embroidery'; ++configVersion; }\n        renderMode();\n        renderConfigControls();\n        // Both modes share decoration settings: re-price anything priced with older ones.\n        if (mode === 'linesheet') state.lineStyles.forEach(function (row) { if (row.product && row.pricedVersion !== configVersion) priceLineRow(row); });\n        else if (state.product && state.quickVersion !== configVersion) repriceAll();",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "    // ---- method selector ----\n    function renderLineMethods() {\n        var box = $('qqLineMethod'); if (!box) return;\n        box.innerHTML = LINE_METHODS.map(function (m) {\n            return '<option value=\"' + m.id + '\"' + (m.id === state.lineMethod ? ' selected' : '') + '>' + esc(m.label) + '</option>';\n        }).join('');\n    }\n    function setLineMethod(id) {",
+      "after": "    // Chip groups are rebuilt on every choice; keep keyboard focus on the same chip.\n    function keepFocus(host, render) {\n        var active = document.activeElement, selector = null;\n        if (host && active && host.contains(active)) {\n            selector = ['data-line-method', 'data-cap-emb'].filter(function (a) { return active.hasAttribute(a); })\n                .map(function (a) { return '[' + a + '=\"' + active.getAttribute(a) + '\"]'; })[0]\n                || (active.hasAttribute('data-kind') ? '[data-kind=\"' + active.getAttribute('data-kind') + '\"][data-code=\"' + active.getAttribute('data-code') + '\"]' : null);\n        }\n        render();\n        var next = selector && host.querySelector(selector);\n        if (next) next.focus({ preventScroll: true });\n    }\n\n    // ---- method selector (one tap) ----\n    function renderLineMethods() {\n        var box = $('qqLineMethodChips'); if (!box) return;\n        keepFocus(box, function () {\n            box.innerHTML = LINE_METHODS.map(function (m) {\n                return '<button type=\"button\" class=\"qq-place-chip' + (m.id === state.lineMethod ? ' is-active' : '')\n                    + '\" data-line-method=\"' + m.id + '\">' + esc(m.label) + '</button>';\n            }).join('');\n        });\n    }\n    function setLineMethod(id) {\n        if (!METHODS[id] || id === state.lineMethod) return;",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "        if (id === 'emb' || id === 'capemb') { state.adv.embStitch = 8000; state.embAddl = []; state.capEmb = 'embroidery'; }\n        renderLineMethods();",
+      "after": "        if (id === 'emb' || id === 'capemb') { state.adv.embStitch = 8000; state.embAddl = []; state.capEmb = 'embroidery'; }\n        ++configVersion;\n        renderLineMethods();",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "    function addLineStyle() {\n        if (state.lineStyles.length >= LINE_MAX) return;\n        state.lineStyles.push({ uid: ++_lineUid, raw: '', product: null, color: null, status: 'empty', tiers: null, pricing: false, error: '' });\n        renderLineList();\n        var inp = document.querySelector('.qq-line-row:last-child .qq-line-style'); if (inp) inp.focus();\n    }\n    function removeLineStyle(uid) {\n        state.lineStyles = state.lineStyles.filter(function (r) { return r.uid !== uid; });\n        renderLineList(); renderLinePreview();",
+      "after": "    // Returns the row to type into: an existing blank row, else a new one (null when full).\n    function addLineStyle(focus) {\n        var row = state.lineStyles.filter(function (r) { return !r.raw.trim(); })[0];\n        if (!row) {\n            if (state.lineStyles.length >= LINE_MAX) return null;\n            row = { uid: ++_lineUid, raw: '', product: null, color: null, status: 'empty', tiers: null, pricing: false, error: '', notice: '', _tok: 0, _ptok: 0 };\n            state.lineStyles.push(row);\n            renderLineList();\n        }\n        if (focus !== false) { var inp = document.querySelector('.qq-line-style[data-uid=\"' + row.uid + '\"]'); if (inp) inp.focus(); }\n        return row;\n    }\n    function removeLineStyle(uid) {\n        var row = lineRow(uid); if (row) { clearTimeout(row._lookup); invalidateLine(row); ++row._tok; }\n        var index = state.lineStyles.indexOf(row);\n        state.lineStyles = state.lineStyles.filter(function (r) { return r.uid !== uid; });\n        if (state.lineStyles.length) renderLineList(); else addLineStyle(false); // always one row ready to type into\n        var next = state.lineStyles[Math.min(Math.max(index, 0), state.lineStyles.length - 1)];\n        var input = next && document.querySelector('.qq-line-style[data-uid=\"' + next.uid + '\"]');\n        if (input) input.focus({ preventScroll: true });\n        renderLinePreview();",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "        renderLineList(); renderLinePreview();\n    }",
+      "after": "        renderLineList(); renderLinePreview();\n        var moved = document.querySelector('.qq-line-mv[data-uid=\"' + uid + '\"][data-dir=\"' + dir + '\"]');\n        if (moved && moved.disabled) moved = document.querySelector('.qq-line-mv[data-uid=\"' + uid + '\"][data-dir=\"' + (-dir) + '\"]');\n        if (moved) moved.focus({ preventScroll: true });\n    }",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "        if (searchPanel) { $('qqProductFinder').after(searchPanel); searchPanel.hidden = true; }\n        if (!state.lineStyles.length) {\n            box.innerHTML = '';\n        } else {\n            box.innerHTML = state.lineStyles.map(function (r, idx) {\n                return '<div class=\"qq-line-row\" data-uid=\"' + r.uid + '\">'\n                    + '<div class=\"qq-line-head\">'\n                    + '<input class=\"qq-line-style input\" type=\"text\" inputmode=\"text\" autocomplete=\"off\" placeholder=\"Style or product name\" value=\"' + esc(r.raw) + '\" data-uid=\"' + r.uid + '\">'\n                    + '<div class=\"qq-line-ctrls\">'\n                    + '<button type=\"button\" class=\"qq-line-mv\" data-uid=\"' + r.uid + '\" data-dir=\"-1\" aria-label=\"Move up\"' + (idx === 0 ? ' disabled' : '') + '>&uarr;</button>'\n                    + '<button type=\"button\" class=\"qq-line-mv\" data-uid=\"' + r.uid + '\" data-dir=\"1\" aria-label=\"Move down\"' + (idx === state.lineStyles.length - 1 ? ' disabled' : '') + '>&darr;</button>'\n                    + '<button type=\"button\" class=\"qq-line-rm\" data-uid=\"' + r.uid + '\" aria-label=\"Remove style\">&times;</button>'\n                    + '</div></div>'\n                    + '<div class=\"qq-line-content\" id=\"qqlc-' + r.uid + '\"></div>'\n                    + '</div>';\n            }).join('');\n            state.lineStyles.forEach(updateLineRow);\n        }",
+      "after": "        if (searchPanel && box.contains(searchPanel)) { box.after(searchPanel); searchPanel.hidden = true; }\n        box.innerHTML = state.lineStyles.map(function (r, idx) {\n            return '<div class=\"qq-line-row\" data-uid=\"' + r.uid + '\">'\n                + '<div class=\"qq-line-head\">'\n                + '<input class=\"qq-line-style input\" type=\"text\" inputmode=\"text\" autocomplete=\"off\" spellcheck=\"false\" placeholder=\"Style #, e.g. PC55\" value=\"' + esc(r.raw) + '\" data-uid=\"' + r.uid + '\">'\n                + '<div class=\"qq-line-ctrls\">'\n                + '<button type=\"button\" class=\"qq-line-mv\" data-uid=\"' + r.uid + '\" data-dir=\"-1\" aria-label=\"Move up\"' + (idx === 0 ? ' disabled' : '') + '>&uarr;</button>'\n                + '<button type=\"button\" class=\"qq-line-mv\" data-uid=\"' + r.uid + '\" data-dir=\"1\" aria-label=\"Move down\"' + (idx === state.lineStyles.length - 1 ? ' disabled' : '') + '>&darr;</button>'\n                + '<button type=\"button\" class=\"qq-line-rm\" data-uid=\"' + r.uid + '\" aria-label=\"Remove style\">&times;</button>'\n                + '</div></div>'\n                + '<div class=\"qq-line-content\" id=\"qqlc-' + r.uid + '\"></div>'\n                + '</div>';\n        }).join('');\n        state.lineStyles.forEach(updateLineRow);\n        var searching = state.lineStyles.filter(function (r) { return r.status === 'search'; })[0];\n        if (searching && window.QuickQuoteWorkspace) window.QuickQuoteWorkspace.reattach(document.querySelector('.qq-line-style[data-uid=\"' + searching.uid + '\"]'));",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "        if (row.status === 'error') { el.innerHTML = '<span class=\"qq-line-stat err\">' + esc(row.error || 'Not found') + '</span>'; return; }\n        var img = row.color && row.color.image;\n        var thumb = img\n            ? '<img class=\"qq-line-thumb\" src=\"' + esc(img) + '\" alt=\"\" referrerpolicy=\"no-referrer\" onerror=\"this.style.visibility=\\'hidden\\'\">'\n            : '<span class=\"qq-line-thumb is-empty\"></span>';\n        var colorSel = '';\n        if (row.product && row.product.colors.length) {\n            colorSel = '<select class=\"qq-line-color\" data-uid=\"' + row.uid + '\" aria-label=\"Color\">'",
+      "after": "        if (row.status === 'search') { el.innerHTML = '<span class=\"qq-line-stat\">Choose a product below, or type a style number.</span>'; return; }\n        if (row.status === 'error') {\n            el.innerHTML = '<span class=\"qq-line-stat err\">' + esc(row.error || 'No product found.') + '</span>'\n                + (row.retry ? '<button type=\"button\" class=\"qq-link-btn qq-line-retry\" data-uid=\"' + row.uid + '\">Retry</button>' : '');\n            return;\n        }\n        var img = row.color && row.color.image;\n        var thumb = img\n            ? '<img class=\"qq-line-thumb\" src=\"' + esc(img) + '\" alt=\"\" referrerpolicy=\"no-referrer\">'\n            : '<span class=\"qq-line-thumb is-empty\"></span>';\n        var colorSel = '';\n        if (row.product && row.product.colors.length) {\n            colorSel = '<select class=\"qq-line-color\" data-uid=\"' + row.uid + '\" aria-label=\"Color for ' + esc(row.product.style) + '\">'",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "        var price = row.error ? '<span class=\"qq-line-stat err\">' + esc(row.error) + '</span>'\n            : row.pricing ? '<span class=\"qq-line-stat loading\">Pricing&hellip;</span>' : '';\n        el.innerHTML = thumb + '<div class=\"qq-line-meta\"><span class=\"qq-line-name\">' + esc(row.product.name) + '</span>' + colorSel + price + '</div>';\n    }\n    function updateLineActions() {\n        var n = state.lineStyles.length;\n        $('qqLineAdd').disabled = n >= LINE_MAX;\n        $('qqLineAdd').textContent = n >= LINE_MAX ? 'Max ' + LINE_MAX + ' products' : n ? '+ Add another product' : '+ Enter a style';\n        $('qqProductFinder').hidden = state.mode === 'linesheet' && n > 0;\n        $('qqLineList').classList.toggle('qq-single-product', n === 1);",
+      "after": "        var status = row.error ? '<span class=\"qq-line-stat err\">' + esc(row.error) + '</span>'\n            : row.pricing ? '<span class=\"qq-line-stat loading\">Pricing&hellip;</span>'\n            : row.notice ? '<span class=\"qq-line-stat\">' + esc(row.notice) + '</span>' : '';\n        // Re-rendering replaces the color menu; keep keyboard focus on it.\n        var hadFocus = document.activeElement && document.activeElement.matches('.qq-line-color[data-uid=\"' + row.uid + '\"]');\n        el.innerHTML = thumb + '<div class=\"qq-line-meta\"><span class=\"qq-line-name\">' + esc(row.product.name) + '</span>' + colorSel + status + '</div>';\n        if (hadFocus) { var sel = el.querySelector('.qq-line-color'); if (sel) sel.focus({ preventScroll: true }); }\n    }\n    function updateLineActions() {\n        var full = state.lineStyles.length >= LINE_MAX && state.lineStyles.every(function (r) { return r.raw.trim(); });\n        $('qqLineAdd').disabled = full;\n        $('qqLineAdd').textContent = full ? 'Max ' + LINE_MAX + ' styles' : '+ Add style';",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "        invalidateLine(row);\n        row.raw = raw;\n        var style = String(raw || '').trim().toUpperCase();\n        if (!style) { row.product = null; row.color = null; row.status = 'empty'; row.tiers = null; updateLineRow(row); updateLineActions(); renderLinePreview(); return; }\n        row.status = 'loading'; row.error = ''; updateLineRow(row);\n        var token = ++state.lineSeq; row._tok = token;\n        fetchProduct(style).then(function (product) {\n            if (row._tok !== token) return;\n            row.product = product;\n            row.color = product.colors.length ? product.colors[0] : null;\n            row.status = 'ok'; row.tiers = null;\n            return loadProductSizes(product).then(function () {\n                if (row._tok !== token) return;\n                updateLineRow(row);\n                priceLineRow(row);\n            });\n        }).catch(function () {\n            if (row._tok !== token) return;\n            row.product = null; row.color = null; row.status = 'error'; row.error = 'Not found'; row.tiers = null;\n            updateLineRow(row); updateLineActions(); renderLinePreview();",
+      "after": "        clearTimeout(row._lookup);\n        invalidateLine(row); row.pricing = false;\n        row.raw = raw;\n        var style = String(raw || '').trim().toUpperCase();\n        row.product = null; row.color = null; row.tiers = null; row.error = ''; row.notice = ''; row.retry = false;\n        if (!style) { row.status = 'empty'; ++row._tok; updateLineRow(row); updateLineActions(); renderLinePreview(); return; }\n        row.status = 'loading'; updateLineRow(row); notifyWorkspace();\n        var token = ++state.lineSeq; row._tok = token;\n        fetchProduct(style).then(function (product) {\n            if (row._tok !== token) return;\n            return loadProductSizes(product).then(function () {\n                if (row._tok !== token) return;\n                row.product = product;\n                row.color = product.colors.length ? product.colors[0] : null;\n                row.status = 'ok';\n                updateLineRow(row);\n                priceLineRow(row);\n            });\n        }).catch(function (err) {\n            if (row._tok !== token) return;\n            row.status = 'error'; row.error = lookupMessage(err, style); row.retry = !(err && err.notFound);\n            updateLineRow(row); updateLineActions(); renderLinePreview();\n            if (err && err.notFound && window.QuickQuoteWorkspace) window.QuickQuoteWorkspace.suggest(document.querySelector('.qq-line-style[data-uid=\"' + uid + '\"]'));",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "        row.tiers = null;\n        updateLineRow(row);",
+      "after": "        row.tiers = null; row.colorChanged = false;",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "        var fallback = product.isCap ? ['OSFA'] : ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'];",
+      "after": "        var fallback = oneSize(product) ? ['OSFA'] : ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'];",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "    async function priceLineRow(row) {\n        invalidateLine(row);\n        if (!state.lineMethod || !row.product) { renderLinePreview(); return; }\n        var token = row._ptok, method = state.lineMethod, def = METHODS[method];\n        var product = row.product, color = row.color, qty = state.lineQty;\n        row.error = ''; updateLineRow(row); notifyWorkspace();\n        try {\n            if (qty !== null && (!Number.isInteger(qty) || qty < 1 || qty > 100000)) throw new Error('Enter a whole quantity between 1 and 100,000, or leave it blank for price breaks.');\n            if (product.isCap !== (method === 'capemb')) throw new Error(product.isCap ? 'Choose cap embroidery for this cap.' : 'Choose a garment decoration method for this product.');\n            var eligibility = await resolveEligibility(product);\n            if (!product.isCap && !eligibility[def.engineMethod]) throw new Error('This decoration is not available for this product.');\n            if (def.available && !def.available()) throw new Error('Choose a supported decoration placement.');\n            if (row._ptok !== token) return;",
+      "after": "    // Embroidery follows a confirmed product (cap → cap embroidery; garment or flat headwear →\n    // embroidery), as the EMB builder does per row. The builder's own cap check still differs on\n    // some styles (New Era and Richardson apparel, visors). Unconfirmed products keep the rep's choice.\n    function lineMethodFor(row) {\n        var m = state.lineMethod, h = row.product && row.product.headwear;\n        if ((m !== 'emb' && m !== 'capemb') || !h || !h.confident) return m;\n        return h.isCap ? 'capemb' : 'emb';\n    }\n    async function priceLineRow(row) {\n        invalidateLine(row);\n        if (!state.lineMethod || !row.product) { row.pricing = false; updateLineRow(row); renderLinePreview(); return; }\n        var token = row._ptok, method = lineMethodFor(row), def = METHODS[method];\n        var product = row.product, color = row.color, qty = state.lineQty, headwear = product.headwear || {}, flat = isFlatHeadwear(product);\n        row.pricedVersion = configVersion;\n        var embroidery = method === 'emb' || method === 'capemb', notices = [];\n        row.method = method; row.error = ''; row.notice = '';\n        updateLineRow(row); notifyWorkspace();\n        try {\n            if (qty !== null && (!Number.isInteger(qty) || qty < 1 || qty > 100000)) throw new Error('Enter a whole quantity between 1 and 100,000, or leave it blank for price breaks.');\n            if ((product.isCap || flat) && headwear.confident && !embroidery) throw new Error(product.style + (flat ? ' is headwear' : ' is a cap') + ' — choose Embroidery or Cap embroidery.');\n            if (method === 'capemb' && state.embAddl.length > 1) throw new Error('Caps take one extra logo (cap back). Remove the other logos to price ' + product.style + '.');\n            var methodWords = def.label.replace(/^[A-Z](?=[a-z])/, function (c) { return c.toLowerCase(); }); // \"DTG print\" keeps its capitals\n            if (method !== state.lineMethod) notices.push('Priced as ' + methodWords + (flat ? ' — beanies are flat embroidery, as in the Embroidery builder.' : '.'));\n            else if (method === 'capemb' && !headwear.confident) notices.push('Not confirmed as a cap — priced as cap embroidery, as chosen.');\n            if (row.colorChanged) notices.push('The saved color is no longer offered — check the color.');\n            // Cap pricing and flat headwear skip the category rules (the \"Caps\" rule lists no garment methods).\n            if (method !== 'capemb' && !(embroidery && (product.isCap || flat))) {\n                var eligibility = await categoryEligibility(product);\n                if (row._ptok !== token) return;\n                // decoration-methods.js contract: an unknown category is a visible warning, never a block.\n                if (eligibility.source === 'fallback') {\n                    if (eligibility.rulesDown) notices.push('Decoration rules didn’t load — confirm ' + methodWords + ' works for this product, or refresh.');\n                    else if (!methodAllowed(eligibility, def.engineMethod)) notices.push('This category isn’t in our decoration rules — confirm ' + methodWords + ' works for it.');\n                }\n                else if (!methodAllowed(eligibility, def.engineMethod)) throw new Error(def.label + ' isn’t offered for ' + (product.category || 'this product') + '.');\n                else if (eligibility[def.engineMethod] === 'warn') notices.push('Check the fabric — DTG prints best on cotton.');\n            }\n            if (def.available && !def.available()) throw new Error('Choose a supported decoration placement.');",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "            // Customer columns show real quantities, starting at the API's tier minimum.\n            // Ask the engine again: freight and small-order shares can vary within a tier.\n            var customerTiers = await Promise.all(values[0].map(async function (tier) {\n                var sampleSizes = {}; sampleSizes[stdSizeFor(product)] = tier.range.min;\n                var sample = await window.QuoteCartEngine.singleItemPreview(buildItemFor(def, product, color, sampleSizes), { groups: def.groups(), deps: engineDeps(), nudge: false });\n                if (!sample.ok) throw new Error(sample.error?.message || 'A quantity price is unavailable. Try again.');\n                var setup = (sample.fees || []).reduce(function (sum, fee) { return sum + (fee.oneTime ? Number(fee.amount) : 0); }, 0);\n                return Object.assign({}, tier, { sampleQuantity: tier.range.min, sampleUnit: (sample.groupTotal - setup) / tier.range.min, sampleSetup: setup, samplePreview: sample });\n            }));\n            if (row._ptok !== token) return;\n            row.tiers = customerTiers; row.preview = values[1] || customerTiers[0].samplePreview; row.pricing = false;\n        } catch (error) {\n            if (row._ptok !== token) return;\n            row.tiers = []; row.preview = null; row.pricing = false; row.error = error.message;",
+      "after": "            row.tiers = values[0]; row.preview = values[1] || values[0][0].preview; row.pricing = false; row.notice = notices.join(' ');\n        } catch (error) {\n            if (row._ptok !== token) return;\n            row.tiers = []; row.preview = null; row.pricing = false; row.error = (error && error.message) || 'Pricing unavailable. Try again.';",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "    function decorationDescription(id) {\n        if (id === 'emb' || id === 'capemb') {\n            var primary = id === 'capemb' ? 'Cap front' : 'Left chest';\n            return primary + ': ' + state.adv.embStitch.toLocaleString() + ' stitches'\n                + state.embAddl.map(function (a, i) { return '; ' + (id === 'capemb' ? 'Cap back' : 'Additional logo ' + (i + 1)) + ': ' + Number(a.stitch).toLocaleString() + ' stitches'; }).join('')\n                + (id === 'capemb' ? '; ' + state.capEmb.replace(/-/g, ' ') : '')\n                + (state.adv.digitizing ? '. New logo digitizing included below.' : '. Existing embroidery-ready artwork assumed.');",
+      "after": "    function stitchText(n) { return (num(n) || 8000).toLocaleString('en-US') + ' stitches'; }\n    function decorationDescription(id, product) {\n        if (id === 'emb' || id === 'capemb') {\n            var cap = id === 'capemb';\n            var parts = [frontLogoLabel(cap, product) + ' ' + stitchText(state.adv.embStitch)];\n            state.embAddl.forEach(function (a) { parts.push((cap ? 'cap back ' : 'additional logo ') + stitchText(a.stitch)); });\n            if (cap && state.capEmb !== 'embroidery') parts.push(state.capEmb === '3d-puff' ? '3D puff' : 'laser patch');\n            if (state.adv.digitizing) parts.push('new-logo digitizing');\n            return parts.join(', ');",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "                if (state.mode === 'linesheet') return state.lineStyles.filter(function (r) { return r.product && r.preview && !r.pricing; }).map(function (r) {\n                    return { key: String(r.uid), product: r.product, color: r.color, method: state.lineMethod, preview: r.preview, tiers: r.tiers, quantityRequested: state.lineQty !== null,\n                        description: decorationDescription(state.lineMethod), placements: configPlacements(state.lineMethod), sizes: 'Standard-size pricing; extended sizes may cost more.', builderHref: state.lineQty === null ? '' : builderHrefFor(state.lineMethod, r.product, r.color, { [stdSizeFor(r.product)]: state.lineQty }) };\n                });\n                return state.methods.filter(function (m) { return state.results[m.id]?.status === 'ok'; }).map(function (m) {\n                    return { key: m.id, product: state.product, color: state.color, method: m.id, preview: state.results[m.id].preview,\n                        description: decorationDescription(m.id), placements: configPlacements(m.id), sizes: state.useSizes ? 'Sizes: ' + Object.entries(currentSizes()).filter(function (p) { return p[1] > 0; }).map(function (p) { return p[0] + ': ' + p[1]; }).join(', ') : 'Standard-size pricing; extended sizes may cost more.', builderHref: builderHref(m.id) };\n                });\n            },\n            pending: function () { return state.mode === 'linesheet' ? state.lineStyles.some(function (r) { return r.raw.trim() && (!r.preview || r.pricing || r.status !== 'ok'); }) : state.methods.some(function (m) { return !state.results[m.id] || state.results[m.id].status === 'loading'; }); },\n            errors: function () { return state.mode === 'linesheet' ? state.lineStyles.filter(function (r) { return r.error; }).map(function (r) { return r.raw + ': ' + r.error; }) : []; },\n            choose: function (style, uid) {\n                if (state.mode === 'linesheet') {\n                    var row = uid ? lineRow(uid) : null;\n                    if (!row) { if (state.lineStyles.length >= LINE_MAX) throw new Error('Remove an option before adding another product.'); addLineStyle(); row = state.lineStyles[state.lineStyles.length - 1]; }\n                    document.querySelector('.qq-line-style[data-uid=\"' + row.uid + '\"]').value = style;\n                    onLineStyleInput(row.uid, style);\n                } else { $('qqStyle').value = style; lookupStyle(style); }",
+      "after": "                if (state.mode === 'linesheet') return state.lineStyles.filter(function (r) { return r.status === 'ok' && r.product && r.preview && !r.pricing && !r.error; }).map(function (r) {\n                    var m = r.method || state.lineMethod, sizes = {};\n                    sizes[stdSizeFor(r.product)] = state.lineQty;\n                    return { key: String(r.uid), product: r.product, color: r.color, method: m, preview: r.preview, tiers: r.tiers, quantityRequested: state.lineQty !== null,\n                        unitWord: m === 'capemb' ? 'cap' : 'pc', description: decorationDescription(m, r.product),\n                        builderHref: state.lineQty === null ? '' : builderHrefFor(m, r.product, r.color, sizes) };\n                });\n                var sizeMix = state.useSizes ? 'Sizes: ' + Object.entries(currentSizes()).map(function (p) { return p[0] + ' ' + p[1]; }).join(', ') : '';\n                return state.methods.filter(function (m) { return state.results[m.id]?.status === 'ok'; }).map(function (m) {\n                    return { key: m.id, product: state.product, color: state.color, method: m.id, preview: state.results[m.id].preview, sizes: sizeMix,\n                        unitWord: state.product.isCap ? 'cap' : 'pc', description: decorationDescription(m.id, state.product), builderHref: builderHref(m.id) };\n                });\n            },\n            // The sheet header names the method and its decoration once for the whole sheet.\n            subtitle: function () { return state.mode === 'linesheet' && state.lineMethod ? METHODS[state.lineMethod].label + ' · ' + decorationDescription(state.lineMethod) : ''; },\n            method: function () { return state.mode === 'linesheet' ? state.lineMethod : ''; },\n            pending: function () {\n                if (state.mode !== 'linesheet') {\n                    if (!state.product) return false;\n                    return state.quickVersion !== configVersion || state.methods.some(function (m) { return !state.results[m.id] || state.results[m.id].status === 'loading'; });\n                }\n                return state.lineStyles.some(function (r) { return r.status === 'loading' || (r.status === 'ok' && !r.error && (r.pricing || !r.preview || r.pricedVersion !== configVersion)); });\n            },\n            errors: function () {\n                if (state.mode !== 'linesheet') return [];\n                return state.lineStyles.filter(function (r) { return r.error || r.status === 'search'; }).map(function (r) {\n                    var name = r.product ? r.product.style : r.raw.trim().toUpperCase();\n                    if (r.status === 'search') return '“' + r.raw.trim() + '”: choose a product from the list or type a style number.';\n                    return r.error.indexOf(name) >= 0 ? r.error : name + ': ' + r.error;\n                });\n            },\n            choose: function (style, uid) {\n                if (state.mode === 'linesheet') {\n                    var row = uid ? lineRow(uid) : null;\n                    if (!row) row = state.lineStyles.filter(function (r) { return r.status === 'search'; })[0] || addLineStyle(false);\n                    if (!row) throw new Error('A sheet holds ' + LINE_MAX + ' styles. Remove one to add another.');\n                    document.querySelector('.qq-line-style[data-uid=\"' + row.uid + '\"]').value = style;\n                    onLineStyleInput(row.uid, style);\n                } else { $('qqStyle').value = style; lookupStyle(style); }\n            },\n            // Enter in a style box: look it up now instead of waiting for the typing pause.\n            commit: function (input) {\n                var style = input.value.trim().toUpperCase();\n                if (input.id === 'qqStyle') {\n                    clearTimeout(quickStyleTimer);\n                    if (!(state.product && state.product.style === style)) lookupStyle(input.value);\n                    return;\n                }\n                var row = lineRow(Number(input.dataset.uid)); if (!row) return;\n                clearTimeout(row._lookup);\n                if (!(row.product && row.product.style === style && row.status === 'ok')) onLineStyleInput(row.uid, input.value);",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "    function configPlacements(id) {\n        if (id === 'emb' || id === 'capemb') return [id === 'capemb' ? 'Cap front' : 'Left chest'].concat(state.embAddl.map(function () { return id === 'capemb' ? 'Cap back' : 'Additional logo'; }));\n        if (id === 'dtf') return dtfLocations().map(function (loc) { return DTF_LOC_LABEL[loc]; });\n        return [FRONT_LABELS[state.front], BACK_LABELS[state.back]].filter(Boolean).concat(id === 'scp' ? [state.sleeves.left ? 'Left sleeve' : '', state.sleeves.right ? 'Right sleeve' : ''].filter(Boolean) : []);\n    }\n    async function restoreWorkspaceInputs(draft) {\n        setMode(draft.mode === 'quick' ? 'quick' : 'linesheet');\n        var fields = ['front', 'back', 'sleeves', 'frontInk', 'backInk', 'sleeveInkL', 'sleeveInkR', 'adv', 'embAddl', 'capEmb', 'qty', 'sizes', 'useSizes', 'lineQty', 'scpDarkUserSet'];\n        function config() { fields.forEach(function (key) { if (Object.prototype.hasOwnProperty.call(draft, key)) state[key] = draft[key]; }); $('qqQty').value = state.qty; $('qqLineQty').value = state.lineQty; renderConfigControls(); }\n        if (state.mode === 'linesheet') {\n            state.lineStyles = []; state.lineMethod = draft.lineMethod || 'emb'; config(); renderLineMethods();\n            for (var saved of (draft.products || []).slice(0, LINE_MAX)) {\n                addLineStyle(); var row = state.lineStyles[state.lineStyles.length - 1]; row.raw = saved.style; row.product = await fetchProduct(saved.style); await loadProductSizes(row.product);\n                row.color = row.product.colors.find(function (c) { return c.catalog === saved.color; });\n                if (!row.color) throw new Error('A saved color is no longer available. Choose it again.');\n                row.status = 'ok';\n            }\n            renderLineList(); repriceLineAll();\n        } else if (draft.products?.length) {\n            var savedProduct = draft.products[0]; state.product = await fetchProduct(savedProduct.style); await loadProductSizes(state.product);\n            applyProduct(await resolveEligibility(state.product)); config();\n            state.color = state.product.colors.find(function (c) { return c.catalog === savedProduct.color; });\n            if (!state.color) throw new Error('A saved color is no longer available. Choose it again.');",
+      "after": "    async function restoreWorkspaceInputs(draft) {\n        setMode(draft.mode === 'quick' ? 'quick' : 'linesheet');\n        var fields = ['front', 'back', 'sleeves', 'frontInk', 'backInk', 'sleeveInkL', 'sleeveInkR', 'adv', 'embAddl', 'capEmb', 'qty', 'sizes', 'useSizes', 'lineQty', 'scpDarkUserSet'];\n        function config() {\n            fields.forEach(function (key) { if (Object.prototype.hasOwnProperty.call(draft, key)) state[key] = draft[key]; });\n            if (state.mode === 'linesheet' && state.lineMethod !== 'capemb') state.capEmb = 'embroidery';\n            ++configVersion;\n            $('qqQty').value = state.qty; $('qqLineQty').value = state.lineQty; renderConfigControls();\n        }\n        if (state.mode === 'linesheet') {\n            state.lineStyles = []; state.lineMethod = draft.lineMethod || 'emb'; config(); renderLineMethods();\n            // Each saved style restores on its own; one discontinued style never blocks the rest.\n            for (var saved of (draft.products || []).slice(0, LINE_MAX)) {\n                var row = addLineStyle(false); row.raw = saved.style;\n                try {\n                    var product = await fetchProduct(saved.style); await loadProductSizes(product);\n                    row.product = product; row.status = 'ok';\n                    row.color = product.colors.find(function (c) { return c.catalog === saved.color; }) || product.colors[0] || null;\n                    row.colorChanged = !!row.color && row.color.catalog !== saved.color;\n                } catch (err) {\n                    row.status = 'error'; row.error = lookupMessage(err, saved.style); row.retry = !(err && err.notFound);\n                }\n            }\n            if (!state.lineStyles.length) addLineStyle(false);\n            renderLineList(); repriceLineAll();\n        } else if (draft.products?.length) {\n            var savedProduct = draft.products[0]; state.product = await fetchProduct(savedProduct.style); await loadProductSizes(state.product);\n            var elig = await resolveEligibility(state.product);\n            state.product.eligibility = elig; applyProduct(elig); config();\n            state.color = state.product.colors.find(function (c) { return c.catalog === savedProduct.color; }) || state.product.colors[0] || null;\n            if (state.color && state.color.catalog !== savedProduct.color) $('qqStyleStatus').innerHTML = '<span class=\"err\">The saved color is no longer offered — check the color.</span>';",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "        var scheduleLookup = debounce(function (value) { lookupStyle(value); }, 450);\n        $('qqStyle').addEventListener('input', function (e) { ++lookupSeq; ++sizeSeq; state.product = null; invalidateQuick(); scheduleLookup(e.target.value); });",
+      "after": "        $('qqStyle').addEventListener('input', function (e) {\n            ++lookupSeq; ++sizeSeq; state.product = null; invalidateQuick();\n            clearTimeout(quickStyleTimer);\n            var value = e.target.value.trim();\n            // Product names are searched by the workspace; style numbers price after a short pause.\n            if (value && !looksLikeStyle(value)) {\n                $('qqStyleStatus').innerHTML = '<span class=\"loading\">Choose a product below, or type a style number.</span>';\n                renderAll();\n                return;\n            }\n            quickStyleTimer = setTimeout(function () { lookupStyle(e.target.value); }, LOOKUP_PAUSE);\n        });",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "        $('qqBack').addEventListener('click', onPlaceChip);\n        [$('qqFront'), $('qqBack')].forEach(function (host) {\n            host.addEventListener('change', function (event) {\n                var input = event.target.closest('[data-placement]'); if (!input) return;\n                if (input.dataset.placement === 'front') state.front = input.value; else state.back = input.value;\n                var placementKind = input.dataset.placement;\n                renderPlacements();\n                document.querySelector('[data-placement=\"' + placementKind + '\"]')?.focus();\n                repriceActive();\n            });\n        });\n        $('qqSleeveL').addEventListener('change', function (e) { state.sleeves.left = e.target.checked; renderSleeveRow(); repriceActive(); });",
+      "after": "        $('qqBack').addEventListener('click', onPlaceChip);\n        $('qqSleeveL').addEventListener('change', function (e) { state.sleeves.left = e.target.checked; renderSleeveRow(); repriceActive(); });",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "        $('qqLineMethod').addEventListener('change', function (e) { setLineMethod(e.target.value); });\n        $('qqLineAdd').addEventListener('click', addLineStyle);\n        // The workspace's shared search handles both exact styles and product names.\n        $('qqLineList').addEventListener('input', function (e) {\n            var si = e.target.closest('.qq-line-style');\n            if (si) { var row = lineRow(Number(si.getAttribute('data-uid'))); invalidateLine(row); row.raw = si.value; row.product = null; row.status = 'empty'; row.error = ''; ++row._tok; updateLineRow(row); notifyWorkspace(); }",
+      "after": "        $('qqLineMethodChips').addEventListener('click', function (e) {\n            var b = e.target.closest('[data-line-method]'); if (!b) return;\n            setLineMethod(b.getAttribute('data-line-method'));\n        });\n        $('qqLineAdd').addEventListener('click', function () { addLineStyle(); });\n        // Typing a style number looks it up after a pause (each row keeps its own timer);\n        // a product name is searched by the workspace instead.\n        $('qqLineList').addEventListener('input', function (e) {\n            var si = e.target.closest('.qq-line-style'); if (!si) return;\n            var row = lineRow(Number(si.getAttribute('data-uid'))); if (!row) return;\n            var value = si.value.trim();\n            clearTimeout(row._lookup);\n            invalidateLine(row); row.pricing = false; ++row._tok;\n            row.raw = si.value; row.product = null; row.color = null; row.tiers = null; row.error = ''; row.notice = ''; row.retry = false;\n            row.status = !value ? 'empty' : looksLikeStyle(value) ? 'loading' : 'search';\n            updateLineRow(row); updateLineActions();\n            if (row.status === 'loading') row._lookup = setTimeout(function () { onLineStyleInput(row.uid, si.value); }, LOOKUP_PAUSE);",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "        });",
+      "after": "            var retry = e.target.closest('.qq-line-retry'); if (retry) { var row = lineRow(Number(retry.getAttribute('data-uid'))); if (row) onLineStyleInput(row.uid, row.raw); }\n        });\n        // A product photo that fails to load is hidden rather than shown broken.\n        $('qqLineList').addEventListener('error', function (e) {\n            if (e.target.matches && e.target.matches('img.qq-line-thumb')) { e.target.removeAttribute('src'); e.target.classList.add('is-empty'); }\n        }, true);\n        $('qqMatrix').addEventListener('click', function (e) { if (e.target.closest('.qq-matrix-retry')) renderMatrix(); });",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "        } catch (_) { }\n        renderMode();\n        renderLineMethods();",
+      "after": "        } catch (err) { console.error('[quick-quote] could not read the page link settings:', err); }\n        renderMode();\n        renderLineMethods();\n        if (!state.lineStyles.length) addLineStyle(false);   // one row ready to type into",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "        renderResults();\n    }",
+      "after": "        renderResults();\n        // Line Sheet opens ready for a style number.\n        var first = document.querySelector('.qq-line-style');\n        if (state.mode === 'linesheet' && first && document.activeElement === document.body) first.focus({ preventScroll: true });\n    }",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.css",
+      "before": "        grid-template-columns: 300px minmax(0, 1fr);",
+      "after": "        grid-template-columns: minmax(320px, 0.85fr) minmax(0, 1.15fr);",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.css",
+      "before": "        min-width: 0;\n    }",
+      "after": "        min-width: 0;\n        position: sticky;\n        top: var(--space-4);\n        max-height: calc(100vh - 2 * var(--space-4));\n        overflow: auto;\n    }",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.css",
+      "before": "    :where([data-ui=\"unified\"][data-quick-quote]) .field > label {",
+      "after": "    :where([data-ui=\"unified\"][data-quick-quote]) :is(.field > label, .qq-label) {",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.css",
+      "before": "    :where([data-ui=\"unified\"][data-quick-quote]) :is(.qq-sheet-sub, .qq-document-date, .qq-document-assumptions, .qq-document-unit, .qq-sheet-foot, .qq-option-label) {",
+      "after": "    :where([data-ui=\"unified\"][data-quick-quote]) :is(.qq-sheet-sub, .qq-document-date, .qq-sheet-foot, .qq-option-label, .qq-sheet-note, .qq-sheet-color) {",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.css",
+      "before": "        display: block;",
+      "after": "        display: flex;\n        align-items: flex-start;\n        gap: var(--space-4);",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.css",
+      "before": "    :where([data-ui=\"unified\"][data-quick-quote]) :is(.qq-document-product, .qq-document-decoration) {\n        display: flex;\n        align-items: center;\n        gap: var(--space-4);\n        margin-bottom: var(--space-4);\n    }\n\n    :where([data-ui=\"unified\"][data-quick-quote]) .qq-document-product h2 {\n        font-size: var(--font-size-lg);\n        line-height: 1.3;\n        margin: var(--space-1) 0;\n    }\n\n    :where([data-ui=\"unified\"][data-quick-quote]) :is(.qq-document-product, .qq-document-decoration) p {\n        font-size: var(--font-size-sm);\n        margin: var(--space-1) 0;",
+      "after": "    :where([data-ui=\"unified\"][data-quick-quote]) .qq-sheet-item-main {\n        flex: 1;\n        min-width: 0;\n    }\n\n    :where([data-ui=\"unified\"][data-quick-quote]) .qq-sheet-item-head {\n        font-size: var(--font-size-md);\n        margin: 0 0 var(--space-2);\n    }\n\n    :where([data-ui=\"unified\"][data-quick-quote]) .qq-sheet-color {\n        font-weight: 400;\n        margin-left: var(--space-2);\n    }\n\n    :where([data-ui=\"unified\"][data-quick-quote]) :is(.qq-sheet-method, .qq-sheet-note, .qq-sheet-exact) {\n        font-size: var(--font-size-sm);\n        margin: var(--space-2) 0 0;",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.css",
+      "before": "\n\n\n    :where([data-ui=\"unified\"][data-quick-quote]) .qq-document-charges {\n        margin: var(--space-3) 0;\n        font-size: var(--font-size-sm);\n    }\n\n    :where([data-ui=\"unified\"][data-quick-quote]) .qq-document-charges > div {\n        display: flex;\n        justify-content: space-between;\n        gap: var(--space-4);\n        padding: var(--space-1) 0;\n    }\n\n    :where([data-ui=\"unified\"][data-quick-quote]) .qq-document-charges dd {\n        margin: 0;\n        font-variant-numeric: tabular-nums;\n        white-space: nowrap;\n    }\n\n    :where([data-ui=\"unified\"][data-quick-quote]) .qq-document-total {\n        border-top: 1px solid var(--ui-line);\n        font-weight: 700;\n        font-size: var(--font-size-lg);\n    }\n\n    :where([data-ui=\"unified\"][data-quick-quote]) .qq-document-unit {\n        margin: var(--space-2) 0 var(--space-4);",
+      "after": "    :where([data-ui=\"unified\"][data-quick-quote]) .qq-sheet-logo {\n        width: 88px;\n        height: 48px;\n        object-fit: contain;\n        flex: none;\n    }\n\n    :where([data-ui=\"unified\"][data-quick-quote]) .qq-sheet-htext {\n        flex: 1;\n    }\n\n    :where([data-ui=\"unified\"][data-quick-quote]) .qq-sheet-ladder .warn {\n        color: var(--color-warning-ink);\n        font-weight: 600;\n    }\n\n    :where([data-ui=\"unified\"][data-quick-quote]) .qq-sheet-ladder tbody th {\n        text-align: left;\n    }\n\n    :where([data-ui=\"unified\"][data-quick-quote]) .qq-sheet.is-updating {\n        opacity: 0.55;",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.css",
+      "before": "    :where([data-ui=\"unified\"][data-quick-quote]) .qq-sheet-ladder caption {\n        text-align: left;\n        white-space: normal;\n        padding-bottom: var(--space-2);\n    }\n\n    :where([data-ui=\"unified\"][data-quick-quote]) .qq-sheet-ladder .is-current {",
+      "after": "        :where([data-ui=\"unified\"][data-quick-quote]) .qq-sheet-ladder .is-current {",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.css",
+      "before": "            min-height: 40px;",
+      "after": "            min-height: var(--ui-control-height);",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.css",
+      "before": "    :where([data-ui=\"unified\"][data-quick-quote]) :is(.qq-product-finder, .qq-customer-details) {\n        margin-bottom: var(--space-3);\n    }\n\n    :where([data-ui=\"unified\"][data-quick-quote]) :is(.qq-product-finder, .qq-customer-details) summary {\n        cursor: pointer;\n        font-weight: 600;",
+      "after": "    :where([data-ui=\"unified\"][data-quick-quote]) .qq-customer-details summary {\n        cursor: pointer;\n        font-weight: 600;\n    }\n\n    :where([data-ui=\"unified\"][data-quick-quote]) :is(.qq-draft-note, .qq-field-head) {\n        display: flex;\n        flex-wrap: wrap;\n        align-items: baseline;\n        gap: var(--space-1) var(--space-3);\n        margin-bottom: var(--space-3);\n    }\n\n    :where([data-ui=\"unified\"][data-quick-quote]) .qq-field-head {\n        justify-content: space-between;\n        margin-bottom: var(--space-2);\n    }\n\n    :where([data-ui=\"unified\"][data-quick-quote]) .qq-field-head .qq-label {\n        margin: 0;\n    }\n\n    :where([data-ui=\"unified\"][data-quick-quote]) .qq-draft-note {\n        font-size: var(--font-size-sm);\n        padding: var(--space-2) var(--space-3);\n        background: var(--ui-tint);\n        border-radius: var(--radius-sm);\n    }\n\n    :where([data-ui=\"unified\"][data-quick-quote]) :is(.qq-draft-note, .qq-line-row) .qq-link-btn {\n        padding: 0;\n    }\n\n    :where([data-ui=\"unified\"][data-quick-quote]) :is(.qq-elig-note, [id=\"qqDocumentStatus\"].is-error) {\n        color: var(--color-warning-ink);\n    }\n\n    :where([data-ui=\"unified\"][data-quick-quote]) .qq-elig-note {\n        margin: 0;\n        padding: var(--space-2) var(--space-3);\n        background: var(--color-warning-bg);\n        border-radius: var(--radius-sm);\n        font-size: var(--font-size-sm);\n    }\n\n    :where([data-ui=\"unified\"][data-quick-quote]) .qq-line-quantity {\n        display: flex;\n        flex-direction: row;\n        align-items: center;\n        gap: var(--space-2);\n        margin: 0;\n    }\n\n    :where([data-ui=\"unified\"][data-quick-quote]) .qq-line-quantity > label {\n        margin: 0;\n        white-space: nowrap;\n    }\n\n    :where([data-ui=\"unified\"][data-quick-quote]) .qq-line-quantity .input {\n        width: 120px;\n    }\n\n    :where([data-ui=\"unified\"][data-quick-quote]) .qq-saved-title {\n        font-size: var(--font-size-sm);\n        color: var(--ui-muted);\n    }\n\n    :where([data-ui=\"unified\"][data-quick-quote]) .qq-saved-product {\n        gap: 0;\n    }\n\n    :where([data-ui=\"unified\"][data-quick-quote]) .qq-saved-product .btn {\n        min-width: var(--ui-control-height);\n        padding-inline: var(--space-2);",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.css",
+      "before": "    :where([data-ui=\"unified\"][data-quick-quote]) .qq-saved-products > p {\n        width: 100%;\n    }\n\n    :where([data-ui=\"unified\"][data-quick-quote]) :is(.qq-saved-product, .qq-option-control, .qq-document-toolbar, .qq-workflow-actions) {",
+      "after": "        :where([data-ui=\"unified\"][data-quick-quote]) :is(.qq-saved-products, .qq-saved-product, .qq-option-control, .qq-document-toolbar, .qq-workflow-actions) {",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.css",
+      "before": "\n    :where([data-ui=\"unified\"][data-quick-quote]) .qq-document-toolbar h2 {",
+      "after": "\n    :where([data-ui=\"unified\"][data-quick-quote]) .qq-document-toolbar {\n        gap: var(--space-3);\n        margin-bottom: var(--space-2);\n    }\n\n    :where([data-ui=\"unified\"][data-quick-quote]) .qq-document-toolbar h2 {",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.css",
+      "before": "    }\n\n    :where([data-ui=\"unified\"][data-quick-quote]) .qq-workflow-actions {\n        display: flex;\n        flex-wrap: wrap;\n        gap: var(--space-2);\n    }\n\n\n    :where([data-ui=\"unified\"][data-quick-quote]) .qq-customer-preview {\n        scroll-margin-top: var(--space-4);\n    }\n\n}",
+      "after": "    }\n\n\n}",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.css",
+      "before": "    :where([data-ui=\"unified\"][data-quick-quote=\"quick\"]) [id=\"qqCatalogLink\"] {\n        float: right;\n        font-size: var(--font-size-sm);\n    }\n\n    :where([data-ui=\"unified\"][data-quick-quote=\"quick\"]) .qq-line-thumb,\n    :where([data-ui=\"unified\"][data-quick-quote=\"quick\"]) .qq-line-name,\n    :where([data-ui=\"unified\"][data-quick-quote=\"quick\"]) .qq-single-product .qq-line-mv,\n    :where([data-ui=\"unified\"][data-quick-quote=\"quick\"]).qq-mode-line :is([id=\"qqPlacePresets\"], .qq-place-note) {\n        display: none;\n    }",
+      "after": "    :where([data-ui=\"unified\"][data-quick-quote=\"quick\"]) [id=\"qqCatalogLink\"] {\n        font-size: var(--font-size-sm);\n    }",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.css",
+      "before": "\n    :where([data-ui=\"unified\"][data-quick-quote=\"quick\"]) .qq-emb-row {",
+      "after": "\n    :where([data-ui=\"unified\"][data-quick-quote=\"quick\"]) [id=\"qqSleeveRow\"] {\n        grid-template-columns: minmax(0, 1fr);\n    }\n\n    :where([data-ui=\"unified\"][data-quick-quote=\"quick\"]) .qq-emb-row {",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.css",
+      "before": "    :where([data-ui=\"unified\"][data-quick-quote=\"quick\"]) :is(.qq-more-settings, .qq-more-tools, .qq-customer-details) {",
+      "after": "    :where([data-ui=\"unified\"][data-quick-quote=\"quick\"]) .qq-customer-details {",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.css",
+      "before": "        margin-top: var(--space-4);\n    }\n\n    :where([data-ui=\"unified\"][data-quick-quote=\"quick\"]) .qq-document-sizes {\n        font-size: var(--font-size-sm);\n        color: var(--ui-muted);",
+      "after": "        margin: 0 0 var(--space-3);\n    }\n\n    :where([data-ui=\"unified\"][data-quick-quote=\"quick\"]):not(.qq-mode-line) [id=\"qqSheet\"] {\n        display: none;",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.css",
+      "before": "    @media (width <= 480px) {\n        :where([data-ui=\"unified\"][data-quick-quote=\"quick\"]) .qq-sheet-head {",
+      "after": "    @media (width <= 480px) {\n        :where([data-ui=\"unified\"][data-quick-quote=\"quick\"]) .qq-sheet-item {\n            flex-wrap: wrap;\n        }\n\n        :where([data-ui=\"unified\"][data-quick-quote=\"quick\"]) .qq-sheet-item-main {\n            flex-basis: 100%;\n        }\n\n        :where([data-ui=\"unified\"][data-quick-quote=\"quick\"]) .qq-sheet-head {",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/linesheet-print.css",
+      "before": "    :where([data-ui=\"unified\"][data-quick-quote]) .qq-sheet-item {\n        display: block;\n        break-inside: avoid;",
+      "after": "    :where([data-ui=\"unified\"][data-quick-quote]) .qq-sheet-item {\n        display: flex;\n        break-inside: avoid;",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/linesheet-print.css",
+      "before": "    }\n}",
+      "after": "    }\n\n    /* The Quick Price estimate is hidden on screen (cards show the prices) but prints. */\n    :where([data-ui=\"unified\"][data-quick-quote=\"quick\"]):not(.qq-mode-line) [id=\"qqSheet\"] {\n        display: block;\n    }\n}",
+      "count": 1,
+      "stage": "classic-restore-2026-09-16",
+      "reason": "Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings."
+    },
+    {
+      "file": "calculators/quick-quote/index.html",
+      "before": "    <link rel=\"stylesheet\" href=\"/calculators/quick-quote/quick-quote.css?v=2026.09.16.1\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/safety-stripe-recs.css?v=2026.09.13.2\">\n    <link rel=\"stylesheet\" href=\"/calculators/quick-quote/linesheet-print.css?v=2026.09.16.1\" media=\"print\">",
+      "after": "    <link rel=\"stylesheet\" href=\"/calculators/quick-quote/quick-quote.css?v=2026.09.16.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/safety-stripe-recs.css?v=2026.09.13.2\">\n    <link rel=\"stylesheet\" href=\"/calculators/quick-quote/linesheet-print.css?v=2026.09.16.2\" media=\"print\">",
+      "count": 1,
+      "stage": "release-2026.09.16.2",
+      "reason": "Deploy v2026.09.16.2 cache-bust of the Quick Quote assets."
+    },
+    {
+      "file": "calculators/quick-quote/index.html",
+      "before": "    <script src=\"/shared_components/js/headwear-classifier.js?v=2026.09.16.1\"></script>",
+      "after": "    <script src=\"/shared_components/js/headwear-classifier.js?v=2026.09.16.2\"></script>",
+      "count": 1,
+      "stage": "release-2026.09.16.2",
+      "reason": "Deploy v2026.09.16.2 cache-bust of the Quick Quote assets."
+    },
+    {
+      "file": "calculators/quick-quote/index.html",
+      "before": "    <script src=\"/calculators/quick-quote/quick-quote-document.js?v=2026.09.16.1\"></script>\n    <script src=\"/calculators/quick-quote/quick-quote-workspace.js?v=2026.09.16.1\"></script>\n    <script src=\"/calculators/quick-quote/quick-quote-ui.js?v=2026.09.13.6\"></script>\n    <script src=\"/calculators/quick-quote/quick-quote.js?v=2026.09.16.1\"></script>",
+      "after": "    <script src=\"/calculators/quick-quote/quick-quote-document.js?v=2026.09.16.2\"></script>\n    <script src=\"/calculators/quick-quote/quick-quote-workspace.js?v=2026.09.16.2\"></script>\n    <script src=\"/calculators/quick-quote/quick-quote-ui.js?v=2026.09.13.6\"></script>\n    <script src=\"/calculators/quick-quote/quick-quote.js?v=2026.09.16.2\"></script>",
+      "count": 1,
+      "stage": "release-2026.09.16.2",
+      "reason": "Deploy v2026.09.16.2 cache-bust of the Quick Quote assets."
+    },
+    {
+      "file": "calculators/quick-quote/dtf-prints-prototype.html",
+      "before": "    <link rel=\"stylesheet\" href=\"/calculators/quick-quote/quick-quote.css?v=2026.09.14.2\">\n    <link rel=\"stylesheet\" href=\"/calculators/quick-quote/dtf-prints-prototype.css?v=2026.09.13.2\">\n    <link rel=\"stylesheet\" href=\"/calculators/quick-quote/linesheet-print.css?v=2026.09.14.2\" media=\"print\">",
+      "after": "    <link rel=\"stylesheet\" href=\"/calculators/quick-quote/quick-quote.css?v=2026.09.16.2\">\n    <link rel=\"stylesheet\" href=\"/calculators/quick-quote/dtf-prints-prototype.css?v=2026.09.13.2\">\n    <link rel=\"stylesheet\" href=\"/calculators/quick-quote/linesheet-print.css?v=2026.09.16.2\" media=\"print\">",
+      "count": 1,
+      "stage": "release-2026.09.16.2",
+      "reason": "Deploy v2026.09.16.2 cache-bust of the Quick Quote assets."
     }
   ]
 }

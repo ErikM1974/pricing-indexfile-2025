@@ -1,0 +1,605 @@
+{
+ "description": "Live /api/product-details and /api/products/search rows captured 2026-09-16 (descriptions trimmed around the signal). Expected kinds are Quick Quote's intended routing; beanies/knit caps are flat headwear as in the EMB builder rule. The builder's own isCapProduct still differs on some rows (New Era/Richardson apparel, Crosshatch, visors) - see memory/QUICK_QUOTE_2026-09.md.",
+ "rows": [
+  {
+   "expected": "cap",
+   "row": {
+    "STYLE": "C112",
+    "PRODUCT_TITLE": "Port Authority Snapback Trucker Cap. C112",
+    "CATEGORY_NAME": "Caps",
+    "SUBCATEGORY_NAME": "Mesh Back",
+    "PRODUCT_DESCRIPTION": "The single most-decorated style in our shop's history — over 14,000 of these trucker caps across nearly 300 orders. The"
+   }
+  },
+  {
+   "expected": "cap",
+   "row": {
+    "STYLE": "NE1000",
+    "PRODUCT_TITLE": "New Era - Structured Stretch Cotton Cap. NE1000",
+    "CATEGORY_NAME": "Caps",
+    "SUBCATEGORY_NAME": "Performance/ Athletic",
+    "PRODUCT_DESCRIPTION": "The Structured Stretch Cotton Cap is our best-selling New Era, full stop — roughly 2,500 embroidered across nearly a hun"
+   }
+  },
+  {
+   "expected": "cap",
+   "row": {
+    "STYLE": "STC10",
+    "PRODUCT_TITLE": "Sport-Tek Dry Zone Nylon Cap. STC10",
+    "CATEGORY_NAME": "Caps",
+    "SUBCATEGORY_NAME": "Performance/ Athletic",
+    "PRODUCT_DESCRIPTION": "All the Dry Zone moisture-wicking performance you love in Sport-Tek apparel in caps designed for adults and youth.     F"
+   }
+  },
+  {
+   "expected": "cap",
+   "row": {
+    "STYLE": "110",
+    "PRODUCT_TITLE": "R-Flex Cap",
+    "CATEGORY_NAME": "Caps",
+    "SUBCATEGORY_NAME": "",
+    "PRODUCT_DESCRIPTION": ""
+   }
+  },
+  {
+   "expected": "cap",
+   "row": {
+    "STYLE": "YC914",
+    "PRODUCT_TITLE": "Port Authority Youth Six-Panel Unstructured Twill Cap. YC914",
+    "CATEGORY_NAME": "Youth",
+    "SUBCATEGORY_NAME": "Caps",
+    "PRODUCT_DESCRIPTION": "An unstructured version of our popular structured twill cap  this value-priced style has a low profile and plenty of col"
+   }
+  },
+  {
+   "expected": "cap",
+   "row": {
+    "STYLE": "LC111",
+    "PRODUCT_TITLE": "Port Authority Snapback Ponytail Trucker Cap LC111",
+    "CATEGORY_NAME": "Ladies",
+    "SUBCATEGORY_NAME": "Caps",
+    "PRODUCT_DESCRIPTION": "Keyhole opening for high ponies or buns     Structured     Mid-profile     7-position adjustable snapback closure"
+   }
+  },
+  {
+   "expected": "cap",
+   "row": {
+    "STYLE": "112",
+    "PRODUCT_TITLE": "Richardson Trucker Cap 112",
+    "CATEGORY_NAME": "",
+    "SUBCATEGORY_NAME": "",
+    "PRODUCT_DESCRIPTION": "op's history: nearly 8,000 decorated across 211 orders. The pre-curved bill, structured front, and snapback fit made it the industry standar"
+   }
+  },
+  {
+   "expected": "cap",
+   "row": {
+    "STYLE": "112FP",
+    "PRODUCT_TITLE": "Richardson Five-Panel Trucker 112FP",
+    "CATEGORY_NAME": "",
+    "SUBCATEGORY_NAME": "",
+    "PRODUCT_DESCRIPTION": "mesh back     5 panels     Structured     Mid Pro shape     Precurved bill     Contrast stitch at bill     Adjustable snapback closure     C"
+   }
+  },
+  {
+   "expected": "cap",
+   "row": {
+    "STYLE": "112FPR",
+    "PRODUCT_TITLE": "Richardson Five-Panel with Rope 112FPR",
+    "CATEGORY_NAME": "",
+    "SUBCATEGORY_NAME": "",
+    "PRODUCT_DESCRIPTION": "mesh back     5 panels     Structured     Mid Pro shape     Precurved bill     Bill rope provides a classic cap accent     Adjustable snapba"
+   }
+  },
+  {
+   "expected": "cap",
+   "row": {
+    "STYLE": "168",
+    "PRODUCT_TITLE": "Richardson 7-Panel Trucker 168",
+    "CATEGORY_NAME": "",
+    "SUBCATEGORY_NAME": "",
+    "PRODUCT_DESCRIPTION": "A contemporary seven-panel trucker with a flat bill  seamless front panel and Hi Pro shape. This cap is the ideal canvas f"
+   }
+  },
+  {
+   "expected": "cap",
+   "row": {
+    "STYLE": "169",
+    "PRODUCT_TITLE": "Richardson Cannon 7-Panel Flatbill 169",
+    "CATEGORY_NAME": "",
+    "SUBCATEGORY_NAME": "",
+    "PRODUCT_DESCRIPTION": "red     High Pro shape     Laser-perforated mesh panels     Flat bill     Adjustable snapback closure     Stay-Dri sweatband"
+   }
+  },
+  {
+   "expected": "cap",
+   "row": {
+    "STYLE": "810",
+    "PRODUCT_TITLE": "Richardson Lite Wide Brim Hat 810",
+    "CATEGORY_NAME": "",
+    "SUBCATEGORY_NAME": "",
+    "PRODUCT_DESCRIPTION": "100% polyester     2.5-inch brim     UPF 35     Stay-Dri sweatband     Bungee with toggle closure"
+   }
+  },
+  {
+   "expected": "cap",
+   "row": {
+    "STYLE": "C975",
+    "PRODUCT_TITLE": "Port Authority Twill Classic Bucket Hat C975",
+    "CATEGORY_NAME": "",
+    "SUBCATEGORY_NAME": "",
+    "PRODUCT_DESCRIPTION": "100% cotton twill     Unstructured     Relaxed  classic fit     Longer brim     Eyelets for breathability"
+   }
+  },
+  {
+   "expected": "cap",
+   "row": {
+    "STYLE": "NKBFN6319",
+    "PRODUCT_TITLE": "Nike Swoosh Bucket Hat NKBFN6319",
+    "CATEGORY_NAME": "",
+    "SUBCATEGORY_NAME": "",
+    "PRODUCT_DESCRIPTION": "With 360-degree coverage  this bucket hat looks cool while it helps keep you cool     Features an embroidered Swoosh log"
+   }
+  },
+  {
+   "expected": "cap",
+   "row": {
+    "STYLE": "STC57",
+    "PRODUCT_TITLE": "Sport-Tek Repeat Visor STC57",
+    "CATEGORY_NAME": "",
+    "SUBCATEGORY_NAME": "",
+    "PRODUCT_DESCRIPTION": "95/5 polyester/spandex     Moisture-wicking sweatband     Contrast mesh trim detail (Black/Black is tonal)     Dyed-to-match"
+   }
+  },
+  {
+   "expected": "cap",
+   "row": {
+    "STYLE": "NKFB6446",
+    "PRODUCT_TITLE": "Nike Dri-FIT Ace Visor NKFB6446",
+    "CATEGORY_NAME": "",
+    "SUBCATEGORY_NAME": "",
+    "PRODUCT_DESCRIPTION": "A high-performance  three-panel visor built with Dri-FIT moisture management technology. Contrast stitching adds interes"
+   }
+  },
+  {
+   "expected": "cap",
+   "row": {
+    "STYLE": "C836",
+    "PRODUCT_TITLE": "Port Authority Enhanced Visibility Cap. C836",
+    "CATEGORY_NAME": "Workwear",
+    "SUBCATEGORY_NAME": "Safety",
+    "PRODUCT_DESCRIPTION": "back crown and closure. Features a moisture-wicking CoolMax sweatband.     Fabric: 100% fluorescent polyester     Structure: Lightly structu"
+   }
+  },
+  {
+   "expected": "cap",
+   "row": {
+    "STYLE": "CS802",
+    "PRODUCT_TITLE": "CornerStone ANSI 107 Safety Cap. CS802",
+    "CATEGORY_NAME": "Workwear",
+    "SUBCATEGORY_NAME": "Safety",
+    "PRODUCT_DESCRIPTION": "55/45 polyester/polypropylene     Lightly structured     Low-profile     ANSI/ISEA 107-2015 certified accessory     1-inch reflective ban"
+   }
+  },
+  {
+   "expected": "cap",
+   "row": {
+    "STYLE": "220",
+    "PRODUCT_TITLE": "Richardson Relaxed Performance Lite 220",
+    "CATEGORY_NAME": "",
+    "SUBCATEGORY_NAME": "",
+    "PRODUCT_DESCRIPTION": "olyester     Unstructured     Relaxed     Mid Pro shape     Precurved bill     UPF 35     Hook and loop backstrap with D-ring closure     St"
+   }
+  },
+  {
+   "expected": "cap",
+   "row": {
+    "STYLE": "225",
+    "PRODUCT_TITLE": "Richardson Casual Performance Lite 225",
+    "CATEGORY_NAME": "",
+    "SUBCATEGORY_NAME": "",
+    "PRODUCT_DESCRIPTION": "ng Stay-Dri moisture management technology in the crown and sweatband  this lightly structured cap wicks away moisture and offers a UPF 35 r"
+   }
+  },
+  {
+   "expected": "cap",
+   "row": {
+    "STYLE": "326",
+    "PRODUCT_TITLE": "Richardson Peached Cotton Twill 326",
+    "CATEGORY_NAME": "",
+    "SUBCATEGORY_NAME": "",
+    "PRODUCT_DESCRIPTION": "each-brushed cotton twill with an adjustable cloth hideaway backstrap.     100% peached cotton twill     Unstructured     Relaxed shape"
+   }
+  },
+  {
+   "expected": "cap",
+   "row": {
+    "STYLE": "173",
+    "PRODUCT_TITLE": "Richardson Hood River 173",
+    "CATEGORY_NAME": "",
+    "SUBCATEGORY_NAME": "",
+    "PRODUCT_DESCRIPTION": "spandex Sportmesh back     Structured     Mid Pro shape     Precurved bill     R-Flex adjustable snapback closure     Stay-Dri sweatband"
+   }
+  },
+  {
+   "expected": "cap",
+   "row": {
+    "STYLE": "336",
+    "PRODUCT_TITLE": "Richardson Burnside 336",
+    "CATEGORY_NAME": "",
+    "SUBCATEGORY_NAME": "",
+    "PRODUCT_DESCRIPTION": "on canvas     5 panels     Structured     Mid Pro shape     Precurved bill     Anti-corrosion metal eyelets     Adjustable snapback closure"
+   }
+  },
+  {
+   "expected": "cap",
+   "row": {
+    "STYLE": "112WH",
+    "PRODUCT_TITLE": "Richardson Hawthorne 112WH",
+    "CATEGORY_NAME": "",
+    "SUBCATEGORY_NAME": "",
+    "PRODUCT_DESCRIPTION": "mesh back     5 panels     Structured     Mid Pro shape     Precurved bill     Adjustable snapback closure     Cotton sweatband"
+   }
+  },
+  {
+   "expected": "flat",
+   "row": {
+    "STYLE": "CP90",
+    "PRODUCT_TITLE": "Port Authority Knit Cap. CP90",
+    "CATEGORY_NAME": "Caps",
+    "SUBCATEGORY_NAME": "Fleece/Beanies",
+    "PRODUCT_DESCRIPTION": "The Port & Company Knit Cap is the winter workhorse: a snug acrylic beanie that takes a surprisingly sharp embroidered l"
+   }
+  },
+  {
+   "expected": "flat",
+   "row": {
+    "STYLE": "CP91",
+    "PRODUCT_TITLE": "Port Authority Beanie Cap. CP91",
+    "CATEGORY_NAME": "Caps",
+    "SUBCATEGORY_NAME": "Fleece/Beanies",
+    "PRODUCT_DESCRIPTION": "The Port Authority Beanie Cap is the value knit at a 79% margin — the straightforward beanie for winter crew orders and"
+   }
+  },
+  {
+   "expected": "flat",
+   "row": {
+    "STYLE": "NE900",
+    "PRODUCT_TITLE": "New Era Knit Beanie. NE900",
+    "CATEGORY_NAME": "Caps",
+    "SUBCATEGORY_NAME": "Fleece/Beanies",
+    "PRODUCT_DESCRIPTION": "The Knit Beanie is New Era's straightforward winter staple — a clean cuffed knit that takes a tight embroidered logo on"
+   }
+  },
+  {
+   "expected": "flat",
+   "row": {
+    "STYLE": "C939",
+    "PRODUCT_TITLE": "Port Authority Knit Cuff Beanie C939",
+    "CATEGORY_NAME": "Caps",
+    "SUBCATEGORY_NAME": "Fleece/Beanies",
+    "PRODUCT_DESCRIPTION": "Fabric: 100% acrylic interlock (Black  Dress Blue Navy)  50/50 acrylic/poly interlock (Heathers)"
+   }
+  },
+  {
+   "expected": "flat",
+   "row": {
+    "STYLE": "DT618",
+    "PRODUCT_TITLE": "District Slouch Beanie DT618",
+    "CATEGORY_NAME": "Caps",
+    "SUBCATEGORY_NAME": "Fleece/Beanies",
+    "PRODUCT_DESCRIPTION": "55/45 acrylic/poly     70/30 poly/acrylic (Light Grey Heather)     100% cotton (Dip-Dye)"
+   }
+  },
+  {
+   "expected": "flat",
+   "row": {
+    "STYLE": "CT104597",
+    "PRODUCT_TITLE": "Carhartt Watch Cap 2.0 CT104597",
+    "CATEGORY_NAME": "Caps",
+    "SUBCATEGORY_NAME": "Canvas",
+    "PRODUCT_DESCRIPTION": "Over 1,100 Watch Cap 2.0s have gone through our embroidery heads — it's the beanie Northwest crews actually ask for by n"
+   }
+  },
+  {
+   "expected": "flat",
+   "row": {
+    "STYLE": "CTA207",
+    "PRODUCT_TITLE": "Carhartt Fleece Hat. CTA207",
+    "CATEGORY_NAME": "Caps",
+    "SUBCATEGORY_NAME": "Fleece/Beanies",
+    "PRODUCT_DESCRIPTION": "Wear it with pride. Wear it when the icy wind blows on the job site.     100% polyester fleece for warmth     Carhartt l"
+   }
+  },
+  {
+   "expected": "flat",
+   "row": {
+    "STYLE": "C916",
+    "PRODUCT_TITLE": "Port Authority Two-Color Fleece Headband. C916",
+    "CATEGORY_NAME": "Caps",
+    "SUBCATEGORY_NAME": "Fleece/Beanies",
+    "PRODUCT_DESCRIPTION": "Lightweight  yet toasty warm  our solid fleece headband has a stylish black binding and is a welcome alternative to a kn"
+   }
+  },
+  {
+   "expected": "flat",
+   "row": {
+    "STYLE": "NE908",
+    "PRODUCT_TITLE": "New Era Core Classic Cuff Beanie NE908",
+    "CATEGORY_NAME": "",
+    "SUBCATEGORY_NAME": "",
+    "PRODUCT_DESCRIPTION": "With its thick rib knit  this classic beanie offers a great fit and cozy warmth.     100% acrylic     Tonal embroidered"
+   }
+  },
+  {
+   "expected": "flat",
+   "row": {
+    "STYLE": "C991",
+    "PRODUCT_TITLE": "Port Authority Alpine Pom Beanie C991",
+    "CATEGORY_NAME": "",
+    "SUBCATEGORY_NAME": "",
+    "PRODUCT_DESCRIPTION": "100% acrylic     Double layered for warmth     Eye-catching knit pattern     Five darts at crown for shaping     Adjusta"
+   }
+  },
+  {
+   "expected": "flat",
+   "row": {
+    "STYLE": "HT01",
+    "PRODUCT_TITLE": "Skull Cap",
+    "CATEGORY_NAME": "Caps",
+    "SUBCATEGORY_NAME": "",
+    "PRODUCT_DESCRIPTION": ""
+   }
+  },
+  {
+   "expected": "garment",
+   "row": {
+    "STYLE": "PC54",
+    "PRODUCT_TITLE": "Port & Co Core Cotton Tee. PC54",
+    "CATEGORY_NAME": "T-Shirts",
+    "SUBCATEGORY_NAME": "100% Cotton",
+    "PRODUCT_DESCRIPTION": "The Port & Company Core Cotton Tee is the straightforward 100% cotton crewneck that anchors thousands of our orders — so"
+   }
+  },
+  {
+   "expected": "garment",
+   "row": {
+    "STYLE": "PC55",
+    "PRODUCT_TITLE": "Port & Co Core Blend Tee. PC55",
+    "CATEGORY_NAME": "T-Shirts",
+    "SUBCATEGORY_NAME": "50/50 Blend",
+    "PRODUCT_DESCRIPTION": "The Port & Company Core Blend Tee is the shirt we print more than any other for Northwest crews — a cotton-poly blend th"
+   }
+  },
+  {
+   "expected": "garment",
+   "row": {
+    "STYLE": "L500",
+    "PRODUCT_TITLE": "Port Authority Women's Silk Touch Polo. L500",
+    "CATEGORY_NAME": "Polos/Knits",
+    "SUBCATEGORY_NAME": "Silk Touch&#153;",
+    "PRODUCT_DESCRIPTION": "The Women's Silk Touch Polo is the tailored half of the most classic uniform polo in the catalog — 300-plus embroidered"
+   }
+  },
+  {
+   "expected": "garment",
+   "row": {
+    "STYLE": "LST350",
+    "PRODUCT_TITLE": "Sport-Tek Women's PosiCharge Competitor Tee. LST350",
+    "CATEGORY_NAME": "Ladies",
+    "SUBCATEGORY_NAME": "T-Shirts",
+    "PRODUCT_DESCRIPTION": "Lightweight  roomy and highly breathable  these moisture-wicking  value-priced tees feature PosiCharge technology to loc"
+   }
+  },
+  {
+   "expected": "garment",
+   "row": {
+    "STYLE": "NEA100",
+    "PRODUCT_TITLE": "New Era Heritage Blend Crew Tee. NEA100",
+    "CATEGORY_NAME": "T-Shirts",
+    "SUBCATEGORY_NAME": "Fashion",
+    "PRODUCT_DESCRIPTION": "The Heritage Blend Crew Tee is New Era's soft everyday t-shirt — 53 separate orders through our shop, which for a tee me"
+   }
+  },
+  {
+   "expected": "garment",
+   "row": {
+    "STYLE": "NEA510",
+    "PRODUCT_TITLE": "New Era Tri-Blend Fleece Pullover Hoodie. NEA510",
+    "CATEGORY_NAME": "Sweatshirts/Fleece",
+    "SUBCATEGORY_NAME": "Hoodie",
+    "PRODUCT_DESCRIPTION": "The Tri-Blend Fleece Pullover Hoodie is the soft one — New Era's tri-blend fleece has that broken-in, boutique-store han"
+   }
+  },
+  {
+   "expected": "garment",
+   "row": {
+    "STYLE": "NEA220",
+    "PRODUCT_TITLE": "New Era Diamond Era Full-Button Jersey. NEA220",
+    "CATEGORY_NAME": "Activewear",
+    "SUBCATEGORY_NAME": "Performance",
+    "PRODUCT_DESCRIPTION": "Created from the same Diamond Era textured fabric as our iconic baseball caps  this moisture-wicking  snag-resistant jer"
+   }
+  },
+  {
+   "expected": "garment",
+   "row": {
+    "STYLE": "RA7110SS",
+    "PRODUCT_TITLE": "Richardson Clutch Short Sleeve Tee RA7110SS",
+    "CATEGORY_NAME": "",
+    "SUBCATEGORY_NAME": "",
+    "PRODUCT_DESCRIPTION": "This breathable tee  constructed with a lightweight polyester/spandex performance fabric  offers moisture wicking and od"
+   }
+  },
+  {
+   "expected": "garment",
+   "row": {
+    "STYLE": "RA7400FZH",
+    "PRODUCT_TITLE": "Richardson Barrage Hooded Wind Jacket RA7400FZH",
+    "CATEGORY_NAME": "",
+    "SUBCATEGORY_NAME": "",
+    "PRODUCT_DESCRIPTION": "When performance counts  this wind jacket is a shield against the elements with 4-way stretch fabric and durable water r"
+   }
+  },
+  {
+   "expected": "garment",
+   "row": {
+    "STYLE": "EB532",
+    "PRODUCT_TITLE": "Eddie Bauer Shaded Crosshatch Soft Shell Jacket. EB532",
+    "CATEGORY_NAME": "Outerwear",
+    "SUBCATEGORY_NAME": "Soft Shells",
+    "PRODUCT_DESCRIPTION": "Gear up for the office or a weekend adventure in this soft shell that offers water protection and breathability performa"
+   }
+  },
+  {
+   "expected": "garment",
+   "row": {
+    "STYLE": "S640",
+    "PRODUCT_TITLE": "Port Authority Crosshatch Easy Care Shirt. S640",
+    "CATEGORY_NAME": "Woven Shirts",
+    "SUBCATEGORY_NAME": "Premium Wovens",
+    "PRODUCT_DESCRIPTION": "With a beautiful two--color weave--not to mention wrinkle resistance--this poplin shirt has a pleasing texture and truly"
+   }
+  },
+  {
+   "expected": "garment",
+   "row": {
+    "STYLE": "91001",
+    "PRODUCT_TITLE": "OGIO Hatch Pack. 91001",
+    "CATEGORY_NAME": "Bags",
+    "SUBCATEGORY_NAME": "Backpacks",
+    "PRODUCT_DESCRIPTION": "Designed with maximum space utilization and smart organization  this pack lets you carry office or travel must-haves in"
+   }
+  },
+  {
+   "expected": "garment",
+   "row": {
+    "STYLE": "MM3032",
+    "PRODUCT_TITLE": "Mercer+Mettle Capital Tech Blazer MM3032",
+    "CATEGORY_NAME": "",
+    "SUBCATEGORY_NAME": "",
+    "PRODUCT_DESCRIPTION": "Inspired by modern suiting  this polished  professional blazer delivers all-day comfort while performing with moisture w"
+   }
+  },
+  {
+   "expected": "garment",
+   "row": {
+    "STYLE": "BC1010",
+    "PRODUCT_TITLE": "BELLA+CANVAS Women's Micro Rib Baby Tee BC1010",
+    "CATEGORY_NAME": "",
+    "SUBCATEGORY_NAME": "",
+    "PRODUCT_DESCRIPTION": "Stretch fit     Crewneck binding     Set-in cap sleeve     1x1 micro rib     Side seamed     Mid-length     Tear-away label"
+   }
+  },
+  {
+   "expected": "garment",
+   "row": {
+    "STYLE": "OR322228",
+    "PRODUCT_TITLE": "LIMITED EDITION Outdoor Research 800 Tech Down Jacket OR322228",
+    "CATEGORY_NAME": "",
+    "SUBCATEGORY_NAME": "",
+    "PRODUCT_DESCRIPTION": "ng behind center front zipper     Zippered hand pockets     Low-Pro Binding at cuffs     Contrast heat transfer OR logo on left sleeve     D"
+   }
+  },
+  {
+   "expected": "garment",
+   "row": {
+    "STYLE": "980",
+    "PRODUCT_TITLE": "Gildan 100% Ring Spun Cotton T-Shirt. 980",
+    "CATEGORY_NAME": "T-Shirts",
+    "SUBCATEGORY_NAME": "Ring Spun",
+    "PRODUCT_DESCRIPTION": "4.5-ounce  100% ring spun cotton     65/35 poly/ring spun cotton (Heather Blue  Heather Dark Grey  Heather Green  Heathe"
+   }
+  },
+  {
+   "expected": "garment",
+   "row": {
+    "STYLE": "C12M",
+    "PRODUCT_TITLE": "Jerzees Rugged Unisex Crewneck Sweatshirt C12M",
+    "CATEGORY_NAME": "",
+    "SUBCATEGORY_NAME": "",
+    "PRODUCT_DESCRIPTION": "12-ounce  69/31 cotton/polyester  3-end fleece     65/35 cotton/polyester (Athletic Heather)     100% cotton face     Ma"
+   }
+  },
+  {
+   "expected": "garment",
+   "row": {
+    "STYLE": "363M",
+    "PRODUCT_TITLE": "Jerzees Classics Unisex Cotton T-Shirt 363M",
+    "CATEGORY_NAME": "",
+    "SUBCATEGORY_NAME": "",
+    "PRODUCT_DESCRIPTION": "4.7-ounce  100% cotton jersey     60/40 CVC cotton/polyester (Heathers  Neon Pink  Safety Green  Safety Orange)     90/1"
+   }
+  },
+  {
+   "expected": "garment",
+   "row": {
+    "STYLE": "437B",
+    "PRODUCT_TITLE": "Jerzees Youth Dri-Power Sport Shirt 437B",
+    "CATEGORY_NAME": "",
+    "SUBCATEGORY_NAME": "",
+    "PRODUCT_DESCRIPTION": "5.4-ounce  50/50 cotton/polyester jersey     Made with sustainably sourced  USA-grown cotton     Moisture-wicking for al"
+   }
+  },
+  {
+   "expected": "garment",
+   "row": {
+    "STYLE": "C960",
+    "PRODUCT_TITLE": "Port Authority Cotton Bandana C960",
+    "CATEGORY_NAME": "Personal Protection",
+    "SUBCATEGORY_NAME": "Face Coverings",
+    "PRODUCT_DESCRIPTION": "This bandana serves as a multifunctional  versatile face covering as well as a headband and neckerchief. Fold bandana di"
+   }
+  },
+  {
+   "expected": "garment",
+   "row": {
+    "STYLE": "C965",
+    "PRODUCT_TITLE": "Port Authority Large Bandana C965",
+    "CATEGORY_NAME": "Personal Protection",
+    "SUBCATEGORY_NAME": "Face Coverings",
+    "PRODUCT_DESCRIPTION": "Sized larger than an average bandana  this durable bandana offers more face covering and decoration space. Versatile and"
+   }
+  },
+  {
+   "expected": "garment",
+   "row": {
+    "STYLE": "C910",
+    "PRODUCT_TITLE": "Port Authority R-Tek Stretch Fleece Headband. C910",
+    "CATEGORY_NAME": "Accessories",
+    "SUBCATEGORY_NAME": "Other",
+    "PRODUCT_DESCRIPTION": "With a touch of spandex for stretch  this cool-weather accessory keeps your ears covered and has plenty of room for your"
+   }
+  },
+  {
+   "expected": "garment",
+   "row": {
+    "STYLE": "STA35",
+    "PRODUCT_TITLE": "Sport-Tek PosiCharge Competitor Headband. STA35",
+    "CATEGORY_NAME": "Accessories",
+    "SUBCATEGORY_NAME": "Other",
+    "PRODUCT_DESCRIPTION": "Top off our other PosiCharge Competitor styles with this moisture-wicking headband that narrows in the back to fit more"
+   }
+  },
+  {
+   "expected": "garment",
+   "row": {
+    "STYLE": "WW3040",
+    "PRODUCT_TITLE": "Wink WorkFlex Scrub Cap WW3040",
+    "CATEGORY_NAME": "Workwear",
+    "SUBCATEGORY_NAME": "Medical/Scrubs",
+    "PRODUCT_DESCRIPTION": "65/35 poly/cotton     Mechanical stretch     Back tie closure     Covered elastic band     Wink heat transfer logo at ba"
+   }
+  },
+  {
+   "expected": "garment",
+   "row": {
+    "STYLE": "CS800",
+    "PRODUCT_TITLE": "CornerStone - Enhanced Visibility Beanie with Reflective Stripe. CS800",
+    "CATEGORY_NAME": "Workwear",
+    "SUBCATEGORY_NAME": "Safety",
+    "PRODUCT_DESCRIPTION": "This non-ANSI certified beanie features 3M reflective yarn for superior reflective capability.     99/1 acrylic/other fi"
+   }
+  }
+ ]
+}
