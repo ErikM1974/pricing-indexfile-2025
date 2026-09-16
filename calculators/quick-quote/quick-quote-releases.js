@@ -24,7 +24,14 @@
     const ENTRIES = [
         {
             version: null,
-            fingerprint: '2148889f2625c9cb',
+            fingerprint: '25e4808f39171fdf',
+            notes: [
+                'Headbands, gaiters, face masks, skull caps and scrub caps now price as flat embroidery, the same as the Quote Builder.',
+                'New Era and Richardson apparel now price as garments in the Quote Builder too, so Full quote keeps the same price.',
+            ],
+        },
+        {
+            version: '2026.09.16.3',
             notes: [
                 'This version line and What’s new. Please mention the version when you send feedback.',
             ],

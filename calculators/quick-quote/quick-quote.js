@@ -365,21 +365,14 @@
     // ============================================================
     // STYLE LOOKUP
     // ============================================================
-    // Cap vs garment comes from the shared classifier: Richardson caps have no category and
-    // Richardson/New Era also sell apparel. Flat headwear (beanies, knit caps) is not a cap: it is
-    // one size and priced as flat (garment) embroidery, as the EMB builder does (Erik 2026-09-16).
+    // Cap vs garment comes from the shared classifier, the one rule every price surface uses
+    // (Rule 9): Richardson caps have no category and Richardson/New Era also sell apparel. Soft
+    // headwear (beanies, headbands, gaiters, face masks, skull and scrub caps) is not a cap: it is
+    // one size and priced as flat (garment) embroidery, as the Embroidery builder does (Erik 2026-09-16).
+    // Only isCap picks cap pricing, even when the classifier is not confident.
     function classifyHeadwear(meta) {
         if (!window.HeadwearClassifier) throw lookupError('The product type check did not load. Refresh the page.', false);
         return window.HeadwearClassifier.classify(meta);
-    }
-    // Rule 9: flat only when the EMB builder agrees. Its isCapProduct() asks ProductCategoryFilter about
-    // the style-search label ("STYLE - TITLE") before the category, so fleece headbands, gaiters and skull
-    // caps in "Caps" stay caps there — and here. Blank-category ones keep the rep's choice on a line sheet.
-    function matchBuilderFlat(headwear, style, title) {
-        if (!headwear.isFlat) return headwear;
-        if (!window.ProductCategoryFilter) throw lookupError('The product type check did not load. Refresh the page.', false);
-        if (window.ProductCategoryFilter.isFlatHeadwear({ PRODUCT_TITLE: style + ' - ' + title })) return headwear;
-        return Object.assign({}, headwear, { kind: 'cap', isCap: true, isFlat: false, confident: headwear.reason === 'category', reason: 'builder' });
     }
     function lookupError(message, notFound) {
         var err = new Error(message); err.notFound = notFound; return err;
@@ -416,7 +409,7 @@
                 var category = meta.CATEGORY_NAME || '';
                 var subcat = meta.SUBCATEGORY_NAME || '';
                 var desc = meta.PRODUCT_DESCRIPTION || '';
-                var headwear = matchBuilderFlat(classifyHeadwear(meta), style, meta.PRODUCT_TITLE || '');
+                var headwear = classifyHeadwear(meta);
                 var cap = headwear.isCap;
                 // unique colors keyed by CATALOG_COLOR (+ swatch & image for the picker / line sheet)
                 var seen = {}, colors = [];
@@ -1184,7 +1177,7 @@
                 ? 'Decoration rules didn’t load, so only embroidery is shown. Refresh to see the other methods.'
                 : 'This product’s category isn’t in our decoration rules, so only embroidery is shown. Other methods may work — confirm before quoting, or price one on the Line Sheet.') + '</p>'
             : elig && elig.source === 'flat-headwear'
-            ? '<p class="qq-elig-note" role="status">Beanies and knit caps are priced as flat embroidery, the same as the Embroidery builder.</p>'
+            ? '<p class="qq-elig-note" role="status">Beanies, headbands and other soft headwear are priced as flat embroidery, the same as the Embroidery builder.</p>'
             : '';
         box.innerHTML = eligNote + state.methods.map(function (m) {
             var changed = !!(state.flashUntil[m.id] && nowT < state.flashUntil[m.id]);
@@ -1743,8 +1736,8 @@
         row._ptok = ++state.lineSeq; row.preview = null; row.tiers = null; row.pricing = true;
     }
     // Embroidery follows a confirmed product (cap → cap embroidery; garment or flat headwear →
-    // embroidery), as the EMB builder does per row. The builder's own cap check still differs on
-    // some styles (New Era and Richardson apparel, visors). Unconfirmed products keep the rep's choice.
+    // embroidery), as the Embroidery builder does per row with the same shared classifier.
+    // Unconfirmed products keep the rep's choice.
     function lineMethodFor(row) {
         var m = state.lineMethod, h = row.product && row.product.headwear;
         if ((m !== 'emb' && m !== 'capemb') || !h || !h.confident) return m;
@@ -1764,7 +1757,7 @@
             if ((product.isCap || flat) && headwear.confident && !embroidery) throw new Error(product.style + (flat ? ' is headwear' : ' is a cap') + ' — choose Embroidery or Cap embroidery.');
             if (method === 'capemb' && state.embAddl.length > 1) throw new Error('Caps take one extra logo (cap back). Remove the other logos to price ' + product.style + '.');
             var methodWords = def.label.replace(/^[A-Z](?=[a-z])/, function (c) { return c.toLowerCase(); }); // "DTG print" keeps its capitals
-            if (method !== state.lineMethod) notices.push('Priced as ' + methodWords + (flat ? ' — beanies are flat embroidery, as in the Embroidery builder.' : '.'));
+            if (method !== state.lineMethod) notices.push('Priced as ' + methodWords + (flat ? ' — soft headwear is flat embroidery, as in the Embroidery builder.' : '.'));
             else if (method === 'capemb' && !headwear.confident) notices.push('Not confirmed as a cap — priced as cap embroidery, as chosen.');
             if (row.colorChanged) notices.push('The saved color is no longer offered — check the color.');
             // Cap pricing and flat headwear skip the category rules (the "Caps" rule lists no garment methods).

@@ -302,8 +302,9 @@ test('the version line names the release and What’s new clears the Updated bad
     check(expect, e);
 });
 
-// Erik 2026-09-16: beanies are flat embroidery everywhere, the same as the Embroidery builder.
-test('beanies price as flat embroidery on every sheet and in Quick Price', async ({ page }) => {
+// Erik 2026-09-16: soft headwear (beanies, headbands, gaiters, skull caps...) is flat embroidery
+// everywhere, the same as the Embroidery builder — one shared classifier decides it.
+test('soft headwear prices as flat embroidery on every sheet and in Quick Price', async ({ page }) => {
     const e = await open(page, { url: '/calculators/quick-quote/index.html' });
     await typeStyle(page, 'CP90');
     await expect(page.locator('#qqLineDownload')).toBeEnabled();
@@ -312,7 +313,7 @@ test('beanies price as flat embroidery on every sheet and in Quick Price', async
     await expect(ladder.locator('th')).toHaveText('Per pc');
     const flatPrices = await ladder.locator('td').allTextContents();
     await methodChip(page, 'capemb');
-    await expect(page.locator('.qq-line-row').first()).toContainText('Priced as embroidery — beanies are flat embroidery, as in the Embroidery builder.');
+    await expect(page.locator('.qq-line-row').first()).toContainText('Priced as embroidery — soft headwear is flat embroidery, as in the Embroidery builder.');
     await expect(page.locator('.qq-sheet-item .qq-sheet-method')).toContainText('Embroidery · Front 8,000 stitches');
     await expect(page.locator('#qqLineDownload')).toBeEnabled();
     await expect(ladder.locator('th')).toHaveText('Per pc');
@@ -321,17 +322,30 @@ test('beanies price as flat embroidery on every sheet and in Quick Price', async
     await expect(page.locator('.qq-line-row').first()).toContainText('CP90 is headwear — choose Embroidery or Cap embroidery.');
     await page.locator('[data-mode="quick"]').click();
     await page.locator('#qqStyle').fill('CP90');
-    await expect(page.locator('.qq-elig-note')).toHaveText('Beanies and knit caps are priced as flat embroidery, the same as the Embroidery builder.');
+    const flatNote = 'Beanies, headbands and other soft headwear are priced as flat embroidery, the same as the Embroidery builder.';
+    await expect(page.locator('.qq-elig-note')).toHaveText(flatNote);
     await expect(page.locator('.qq-card[data-method]')).toHaveCount(1);
     await expect(page.locator('.qq-card[data-method="emb"]')).toContainText('/pc');
     await expect(page.locator('.qq-card[data-method="emb"]')).not.toHaveClass(/is-error|is-unavailable/);
     await expect(page.locator('.qq-emb-pos').first()).toHaveText('Front');
     await expect(page.locator('#qqPlacementField')).toBeHidden();
-    // A fleece headband in "Caps" is a cap in the Embroidery builder, so it stays a cap here.
+    // A fleece headband in "Caps" is flat too (Erik 2026-09-16), the same as the beanie.
     await page.locator('#qqStyle').fill('C916');
-    await expect(page.locator('.qq-card[data-method="capemb"]')).toContainText('/cap');
+    await expect(page.locator('#qqProductName')).toHaveText('Port Authority Two-Color Fleece Headband');
+    await expect(page.locator('.qq-elig-note')).toHaveText(flatNote);
     await expect(page.locator('.qq-card[data-method]')).toHaveCount(1);
-    await expect(page.locator('.qq-elig-note')).toHaveCount(0);
+    await expect(page.locator('.qq-card[data-method="emb"]')).toContainText('/pc');
+    await expect(page.locator('.qq-card[data-method="emb"]')).not.toHaveClass(/is-error|is-unavailable/);
+    await expect(page.locator('.qq-card[data-method="capemb"]')).toHaveCount(0);
+    await expect(page.locator('.qq-emb-pos').first()).toHaveText('Front');
+    await expect(page.locator('#qqPlacementField')).toBeHidden();
+    // On a line sheet the headband follows the beanie: cap embroidery re-routes to flat embroidery.
+    await page.locator('[data-mode="linesheet"]').click();
+    await typeStyle(page, 'C916');
+    await methodChip(page, 'capemb');
+    await expect(page.locator('.qq-line-row').first()).toContainText('Priced as embroidery — soft headwear is flat embroidery, as in the Embroidery builder.');
+    await expect(page.locator('.qq-sheet-item .qq-sheet-method')).toContainText('Embroidery · Front 8,000 stitches');
+    await expect(page.locator('.qq-sheet-ladder tbody tr').first().locator('th')).toHaveText('Per pc');
     check(expect, e);
 });
 
@@ -416,7 +430,9 @@ for (const method of ['emb', 'capemb', 'dtg', 'scp', 'dtf']) test('customer shee
     check(expect, e);
 });
 
-for (const [method, quantity, style] of [['emb', 3], ['emb', 7], ['emb', 3, 'CP90'], ['capemb', 3, 'CP90'], ['emb', 7, 'CP90'], ['emb', 3, 'C916'], ['capemb', 3], ['capemb', 7], ['dtg', 23], ['dtf', 23], ['scp', 24], ['scp', 37]]) test('small-order price survives the full builder: ' + method + ' ' + quantity + (style ? ' ' + style : ''), async ({ page, context }) => {
+// Flat headwear (CP90 beanie, C916 fleece headband in "Caps") hands off as flat embroidery, whichever
+// embroidery chip the rep picked: the builder uses the same shared classifier.
+for (const [method, quantity, style] of [['emb', 3], ['emb', 7], ['emb', 3, 'CP90'], ['capemb', 3, 'CP90'], ['emb', 7, 'CP90'], ['emb', 3, 'C916'], ['capemb', 3, 'C916'], ['capemb', 3], ['capemb', 7], ['dtg', 23], ['dtf', 23], ['scp', 24], ['scp', 37]]) test('small-order price survives the full builder: ' + method + ' ' + quantity + (style ? ' ' + style : ''), async ({ page, context }) => {
     const e = await open(page, { url: '/calculators/quick-quote/index.html' });
     await methodChip(page, method);
     await page.locator('#qqLineQty').fill(String(quantity));
