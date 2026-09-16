@@ -122,10 +122,10 @@ for(const key of Object.keys(pages))test('CSS core calculators: '+key+' search r
  await search.fill(style);await expect(result).toBeVisible();await search.press('ArrowDown');await search.press('Enter');await expect(page).toHaveURL(new RegExp('StyleNumber='+style));await settled(page,key);check(expect,e);
 });
 // Erik 2026-09-16: both embroidery calculators decide cap vs garment with the shared headwear classifier.
-for(const [key,style,target] of [['emb','C112','/pricing/cap-embroidery?StyleNumber=C112'],['cap','PC54','/pricing/embroidery?StyleNumber=PC54']])test('CSS core calculators: '+key+' sends '+style+' to its own calculator',async({page})=>{
+for(const [key,style,target,copy] of [['emb','C112','/pricing/cap-embroidery?StyleNumber=C112','This product is headwear (a cap, visor or bucket hat) and uses cap embroidery pricing.'],['cap','PC54','/pricing/embroidery?StyleNumber=PC54','Cap embroidery pricing is for caps, visors and bucket hats.']])test('CSS core calculators: '+key+' sends '+style+' to its own calculator',async({page})=>{
  const e=await open(page,{url:'/calculators/'+pages[key]+'.html?StyleNumber='+style});
  expect(await page.evaluate(()=>typeof window.HeadwearClassifier?.classify)).toBe('function');
- const overlay=page.locator('#productMismatchOverlay');await expect(overlay).toBeVisible();await expect(overlay).toContainText('Wrong Pricing Calculator');
+ const overlay=page.locator('#productMismatchOverlay');await expect(overlay).toBeVisible();await expect(overlay).toContainText('Wrong Pricing Calculator');await expect(overlay).toContainText(copy);
  await expect(page.locator('#redirectButton')).toHaveAttribute('href',target);
  await expect(page.locator('#loadingState')).toBeHidden();await expect(page.locator('#apiErrorNotification')).toBeHidden();
  for(const width of [1440,320]){await page.setViewportSize({width,height:900});expect((await snapshot(page)).overflow).toBe(false);await page.screenshot({path:path.join(out,'core-calculators-'+key+'-other-calculator-'+width+'.png')});}
@@ -134,6 +134,13 @@ for(const [key,style,target] of [['emb','C112','/pricing/cap-embroidery?StyleNum
 for(const [key,term,text] of [['emb','C112',/Found 1 cap item\(s\)\. Please use the\s+Cap Embroidery Pricing\s+page/],['cap','PC54',/No cap styles found/]])test('CSS core calculators: '+key+' search keeps '+term+' off its results',async({page})=>{
  const e=await start(page,key);await page.locator('#styleSearch').fill(term);
  await expect(page.locator('.search-results.active')).toContainText(text);await expect(page.locator('.search-result-item')).toHaveCount(0);check(expect,e);
+});
+// Suggestion rows carry the style number: blank-category Richardson 220 has no cap word in its title.
+for(const [key,listed,text] of [['emb',0,/Found 1 cap item\(s\)\. Please use the\s+Cap Embroidery Pricing\s+page/],['cap',1,/220 - Richardson Relaxed Performance Lite 220/]])test('CSS core calculators: '+key+' sorts Richardson 220 as a cap from its style number',async({page})=>{
+ const e=await start(page,key);
+ await page.route('**/api/stylesearch?*',route=>route.fulfill({json:[{style:'220',value:'220',label:'220 - Richardson Relaxed Performance Lite 220'}]}));
+ await page.locator('#styleSearch').fill('220');
+ await expect(page.locator('.search-results.active')).toContainText(text);await expect(page.locator('.search-result-item')).toHaveCount(listed);check(expect,e);
 });
 for(const key of ['emb','cap'])test('CSS core calculators: '+key+' shows an error when the headwear classifier is missing',async({page})=>{
  await page.route('**/shared_components/js/headwear-classifier.js*',route=>route.fulfill({status:404,body:''}));

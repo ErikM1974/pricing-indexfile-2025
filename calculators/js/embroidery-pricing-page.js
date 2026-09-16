@@ -82,13 +82,14 @@ function setupSearch() {
 
             const results = await response.json();
 
-            // Separate caps and non-caps. Suggestion rows only carry a label, so the label is the title.
+            // Separate caps and non-caps. Suggestion rows carry only a label and the style number, so the
+            // label is the title and the value is the style (3-digit Richardson caps like 220, 173 sort as caps).
             // Flat headwear (beanies, knit/skull caps, headbands) and garments both price here.
             const capResults = [];
             const flatResults = [];
 
             results.forEach(result => {
-                if (classifyHeadwear({ PRODUCT_TITLE: result.label }).isCap) {
+                if (classifyHeadwear({ PRODUCT_TITLE: result.label, STYLE: result.value }).isCap) {
                     capResults.push(result);
                 } else {
                     flatResults.push(result);
@@ -348,7 +349,7 @@ function validateProductType(product, styleNumber) {
     // Beanies, knit/skull caps, headbands, gaiters and every garment stay here; caps and visors leave.
     if (classifyHeadwear(product).isCap) {
         const productName = product.PRODUCT_TITLE || product.ProductTitle || `Style ${styleNumber}`;
-        const reason = 'This product is a structured cap and requires cap embroidery pricing.';
+        const reason = 'This product is headwear (a cap, visor or bucket hat) and uses cap embroidery pricing.';
         showProductMismatchOverlay(styleNumber, productName, reason);
         return false; // Invalid for flat embroidery
     }

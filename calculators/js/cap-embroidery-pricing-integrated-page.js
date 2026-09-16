@@ -83,8 +83,9 @@ function setupSearch() {
             const beanieResults = [];
 
             results.forEach(item => {
-                // Suggestion rows only carry a label, so the label is the title. Garments are left out.
-                const headwear = classifyHeadwear({ PRODUCT_TITLE: item.label });
+                // Suggestion rows carry only a label and the style number, so the label is the title and the
+                // value is the style (3-digit Richardson caps like 220, 173 sort as caps). Garments are left out.
+                const headwear = classifyHeadwear({ PRODUCT_TITLE: item.label, STYLE: item.value });
                 if (headwear.isCap) {
                     capResults.push(item);
                 } else if (headwear.isFlat) {
@@ -835,7 +836,7 @@ function showProductMismatchOverlay(styleNumber, productName, reason) {
     document.getElementById('mismatchMessage').innerHTML = `
         <strong>${productName}</strong><br><br>
         ${reason}<br><br>
-        Cap embroidery pricing is only for structured caps like baseball caps and trucker hats.
+        Cap embroidery pricing is for caps, visors and bucket hats.
     `;
 
     document.getElementById('redirectButton').href = `/pricing/embroidery?StyleNumber=${styleNumber}`;

@@ -99,7 +99,7 @@ describe('product gates use the shared headwear classifier on the full product-d
         expect(accepted(flat)).toBe(expected !== 'cap');
         if (expected === 'cap') {
             expect(flat.overlay).toHaveBeenCalledWith(row.STYLE, row.PRODUCT_TITLE,
-                'This product is a structured cap and requires cap embroidery pricing.');
+                'This product is headwear (a cap, visor or bucket hat) and uses cap embroidery pricing.');
             expect(flat.element('apiErrorNotification').style.display).not.toBe('flex');
             expect(flat.element('loading').style.display).toBe('none');
         }
@@ -153,18 +153,22 @@ describe('product gates use the shared headwear classifier on the full product-d
     });
 });
 
-describe('search suggestions are sorted by the classifier on their label', () => {
-    const suggestions = rows.map(r => ({ value: r.row.STYLE, label: r.row.PRODUCT_TITLE }))
-        .concat([{ value: 'TOTE1', label: 'Canvas Tote' }]);
-    const labelKind = s => HeadwearClassifier.classify({ PRODUCT_TITLE: s.label }).kind;
+describe('search suggestions are sorted by the classifier on their label and style number', () => {
+    // /api/stylesearch rows are { value: STYLE, label: 'STYLE - PRODUCT_TITLE' } (proxy src/routes/products.js).
+    const suggestion = (style, title) => ({ value: style, label: `${style} - ${title}` });
+    const suggestions = rows.map(r => suggestion(r.row.STYLE, r.row.PRODUCT_TITLE))
+        .concat([suggestion('TOTE1', 'Canvas Tote')]);
+    const labelKind = s => HeadwearClassifier.classify({ PRODUCT_TITLE: s.label, STYLE: s.value }).kind;
+    // Blank-category Richardson caps whose titles carry no cap word: only the style number says cap.
+    const RICHARDSON_NUMBERED = ['220', '225', '326', '173', '336'];
 
     test('flat calculator lists flat headwear and garments, and points caps to the cap page', async () => {
         const { html, listed } = await calculator('flat', { suggestions }).search('ca');
         const caps = suggestions.filter(s => labelKind(s) === 'cap');
         expect(listed).toEqual(suggestions.filter(s => labelKind(s) !== 'cap').map(s => s.value));
         expect(html).toContain(`Found ${caps.length} cap item(s).`);
-        for (const style of ['CP90', 'HT01', 'C916', 'TOTE1', 'NEA220', 'MM3032']) expect(listed).toContain(style);
-        for (const style of ['C975', 'NKFB6446', 'C112']) expect(listed).not.toContain(style);
+        for (const style of ['CP90', 'HT01', 'C916', 'TOTE1', 'NEA220', 'MM3032', '980']) expect(listed).toContain(style);
+        for (const style of ['C975', 'NKFB6446', 'C112', ...RICHARDSON_NUMBERED]) expect(listed).not.toContain(style);
     });
 
     test('cap calculator lists caps, counts flat headwear, and leaves garments out', async () => {
@@ -172,13 +176,26 @@ describe('search suggestions are sorted by the classifier on their label', () =>
         const flats = suggestions.filter(s => labelKind(s) === 'flat');
         expect(listed).toEqual(suggestions.filter(s => labelKind(s) === 'cap').map(s => s.value));
         expect(html).toContain(`Found ${flats.length} beanie/knit item(s).`);
-        for (const style of ['C975', 'NKFB6446', 'C112']) expect(listed).toContain(style);
-        for (const style of ['CP90', 'HT01', 'C916', 'TOTE1', 'NEA220', 'MM3032']) expect(listed).not.toContain(style);
+        for (const style of ['C975', 'NKFB6446', 'C112', ...RICHARDSON_NUMBERED]) expect(listed).toContain(style);
+        for (const style of ['CP90', 'HT01', 'C916', 'TOTE1', 'NEA220', 'MM3032', '980']) expect(listed).not.toContain(style);
+    });
+
+    test.each(RICHARDSON_NUMBERED)('Richardson %s sorts as a cap from its style number, not its label alone', async style => {
+        const { row } = rows.find(r => r.row.STYLE === style);
+        const only = [suggestion(style, row.PRODUCT_TITLE)];
+        expect(HeadwearClassifier.classify({ PRODUCT_TITLE: only[0].label }).kind).toBe('garment');
+        expect(labelKind(only[0])).toBe('cap');
+
+        const cap = await calculator('cap', { suggestions: only }).search(style);
+        expect(cap.listed).toEqual([style]);
+        const flat = await calculator('flat', { suggestions: only }).search(style);
+        expect(flat.listed).toEqual([]);
+        expect(flat.html).toContain('Found 1 cap item(s). Please use the');
     });
 
     test('every title-decided fixture row sorts the same from its label alone', () => {
         for (const r of rows.filter(x => HeadwearClassifier.classify(x.row).reason === 'title')) {
-            expect([r.row.STYLE, labelKind({ label: r.row.PRODUCT_TITLE })]).toEqual([r.row.STYLE, r.expected]);
+            expect([r.row.STYLE, labelKind(suggestion(r.row.STYLE, r.row.PRODUCT_TITLE))]).toEqual([r.row.STYLE, r.expected]);
         }
     });
 
