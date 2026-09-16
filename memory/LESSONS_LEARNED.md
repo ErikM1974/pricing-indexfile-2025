@@ -1,5 +1,11 @@
 # LESSONS LEARNED
 
+## Shared per-IP limiters must scope by method and caller (2026-09-15)
+
+- Problem/root cause: the proxy's 120-per-15-minute write limiter on `/api/files` counted GET image reads and exempted nobody, and the whole office shares one NAT IP. A secret-bearing Policies Hub batch upload 429'd 100%, and slide-heavy hub pages could break their own images with no batch running. The swarm's upload script never sent the secret, and the earlier memory note had the cap as ~60 with reads unlimited.
+- Solution: `hasCrmSecret` skip + `meterWritesOnly` wrapper in the proxy middleware, wired onto `writeLimiter`; file GETs now send a one-year immutable Cache-Control. Locked by the proxy's files-write-limiter and files-get-cache-control jest suites.
+- Prevention: before blaming a client, read the limiter's own `RateLimit-Policy` header on one probe. Every `/api`-mounted limiter decides its method scope and secret exemption explicitly. A shared-IP office makes any per-IP cap office-wide.
+
 ## Campaign headers must use the actual site logo (2026-09-15)
 
 - Problem/root cause: the Carhartt Bucks headers reused a template favicon instead of the homepage's full NWCA logo.
@@ -121,16 +127,6 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 - Solution: immediately invalidate prior requests, mark methods loading, clear totals/table and refresh handoff controls; retain the existing quantity normalization and pricing engines. A browser regression reconstructs the original defect and checks that the current page withholds price until the new sized result arrives.
 - Prevention: readiness must match both selected quantity and priced sizes. Immutable screenshots taken mid-debounce record transient states; retain them as defect evidence and capture a separate settled contract.
 - CSS lesson: an empty PostCSS selector list reads back as an empty selector string. Remove the rule explicitly before adding a page scope, or it can target the whole page. Keep drawer styles inside the drawer, test keyboard focus, and inspect every printed page for image overflow and footer-only sheets.
-
-## Reporting freshness must describe the rendered result (2026-09-10)
-
-- Problem/root cause: controllers caught API failures but resolved without a failure value, so Company Numbers labelled failed reads Updated and retained old totals, dates and charts. A recovered sample list kept its old error, and late revenue windows could overwrite a newer selection.
-- Solution: shared controllers announce actual results (including direct Retry and fallback goals), clear dependent stale displays on failure, remove recovered errors, and render only the latest revenue request. The header distinguishes incomplete reads.
-- Prevention: test initial failure and failure after success, recovery, partial comparison/fallback goals and delayed success/error with synthetic records. Preserve exact money/date-window results. Runtime SVG variables need a scoped alias when replacing the legacy theme; print checks must retain production amounts and blanks status that the old mobile cascade hid.
-
-## Shared staff dialogs and print jobs (2026-09-10)
-
-An afterprint handler must clear its fallback timer and remove only its own captured sheet; otherwise an old timer can delete the next document. Use page (not always) for modern break-before/after so box labels and rep reports actually separate in Chromium. Native dialog errors belong inside the dialog; guard obsolete previews and keep pending sends from closing or accepting duplicate actions. Mark lazy tabs mounted only when their delayed loader actually runs. Render PDFs with nonzero synthetic costs and multi-box data, check per-page identifiers and totals, and inspect white paper backgrounds.
 
 ## CRM UI recovery and print (2026-09-09, archived)
 Full entry in LESSONS_LEARNED_ARCHIVE.md; preserve asynchronous view ownership and native dialog/table semantics.
