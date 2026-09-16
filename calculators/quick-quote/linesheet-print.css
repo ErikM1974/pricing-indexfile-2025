@@ -97,7 +97,7 @@
     }
 
     :where([data-ui="unified"][data-quick-quote]) .qq-sheet-item {
-        display: block;
+        display: flex;
         break-inside: avoid;
         padding: 12px 0;
     }
@@ -171,5 +171,10 @@
 
     :where([data-ui="unified"][data-quick-quote="quick"]) .qq-sheet-item {
         padding: 12px 0;
+    }
+
+    /* The Quick Price estimate is hidden on screen (cards show the prices) but prints. */
+    :where([data-ui="unified"][data-quick-quote="quick"]):not(.qq-mode-line) [id="qqSheet"] {
+        display: block;
     }
 }

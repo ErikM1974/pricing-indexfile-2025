@@ -153,6 +153,7 @@
 | File | Purpose |
 |------|---------|
 | `decoration-methods.js` | Decoration method eligibility (NEW 2026-06-11) — `/api/decoration-methods` rules+overrides, sessionStorage 1h cache. `eligibleFor(product)` → EMB/SCP/DTF bools + DTG 'yes'/'warn'/'no' cotton gate; `categoriesFor(method)` feeds the /catalog Decoration filter. API down → embroidery-only fallback (`source:'fallback'` — caller MUST show a visible warning). Used by product.html + /catalog. |
+| `headwear-classifier.js` | Cap / flat headwear / garment (NEW 2026-09-16) — `HeadwearClassifier.classify(row)` → `{kind, isCap, isFlat, confident, reason}` from CATEGORY/SUBCATEGORY, title (minus "cap sleeve") and, only when the category is blank, cap shapes (trucker, 5–7 panel, bucket) and description anatomy — unless the title has a garment word (jacket, bag, tee…), which makes it an unconfident garment. Richardson caps have no category; Richardson/New Era also sell apparel, so brand and style prefixes are not used. Last resort: a bare 2–3 digit style is an unconfident cap (as the EMB builder assumes). `confident:false` = callers keep the rep's choice (Quick Quote still treats an unconfident cap as a cap in Quick Price). Used by Quick Quote; the EMB/SCP builders and product page still have their own checks (follow-up). |
 | `product-category-filter.js` | Category-based filtering |
 | `product-pricing-ui.js` | Product pricing display |
 | `universal-product-display.js` | Universal product display component |

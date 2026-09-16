@@ -1643,11 +1643,15 @@ Garment designer completion: page styles are scoped to the unified designer; art
 
 - `shared_components/js/holiday-promotion.js` — shared Christmas discovery/expiry on home and catalog; protected invitation display and copy controls on Staff Dashboard.
 
-- calculators/quick-quote/quick-quote-document.js — common price-sheet/estimate model; branded customer PDF with quantity tables, exact engine totals, product photos and measured page flow (PDF polish 2026-09-15).
-- calculators/quick-quote/quick-quote-workspace.js — shared exact-first product search, favorites/input drafts, customer details and exports; high-resolution product and local-brand image loading for PDF.
+- calculators/quick-quote/quick-quote-document.js — line sheet / estimate model shared by screen, copy text and PDF: last week's Qty · Per pc · Small-batch fee table plus an optional exact-quantity all-in line equal to the engine total (classic restore 2026-09-16).
+- calculators/quick-quote/quick-quote-workspace.js — sheet rendering (kept on screen, dimmed, while prices update), product-name suggestions for style boxes, recent/favorite styles, input-only drafts, customer details, copy/print/PDF exports (a missing photo is left out with a note).
+- `shared_components/js/headwear-classifier.js` — cap / flat headwear / garment decision from category, subcategory, title and (blank category only) cap shapes and description; handles Richardson caps with no category. First consumer: Quick Quote (2026-09-16).
 
-- tests/e2e/quick-quote-workflow.spec.js — synthetic five-method documents, search, accessibility, builder handoff and stale-output regressions; real PDF sampled-price/brand checks and long-content pagination.
-- tests/unit/quick-quote-document.test.js — optional/exact quantities, copied price parity, customer totals, inclusive small-order pricing and escaping checks.
+- tests/e2e/quick-quote-workflow.spec.js — restored line-sheet flow (typed styles, one-tap methods/placements, 1265×712 fit), five-method sheets with accessibility, builder total parity, cap routing, blank-category warnings, search suggestions, stale-output, PDF/photo/draft regressions.
+- tests/unit/quick-quote-document.test.js — Qty/Per pc/Small-batch fee table, exact-quantity totals per method, setup display, cap wording, per-row decoration, escaping and PDF rows.
+- tests/unit/headwear-classifier.test.js — cap/flat/garment decisions on 60 live catalog rows plus Richardson, "cap sleeve", shape-word and garment-word guards.
+- tests/unit/quick-quote-ladder.test.js — runs Quick Quote's real probeLadder against fake DTF/EMB/DTG engines: fee-row prices never under-quote any quantity, moved tiers re-anchor, failures in any pass are reported.
+- tests/fixtures/headwear-classifier-rows.json — live product rows captured 2026-09-16 for the headwear classifier test.
 
 - tests/unit/quick-quote-handoff.test.js — versioned decoration validation and legacy handoff compatibility.
 

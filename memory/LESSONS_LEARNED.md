@@ -1,5 +1,11 @@
 # LESSONS LEARNED
 
+## A redesign the reps never tried can hide a pricing dead end (2026-09-16)
+
+- Problem/root cause: the Sept 13 Quick Quote redesign (and its Sept 14 "speed" pass) shipped without a rep trial. Nika could not price 112FPR: a new hard block required `product.isCap` to match the method, and the local cap regex missed Richardson caps (blank `CATEGORY_NAME`, title "Five-Panel with Rope"); the only method left priced the cap as a shirt. The same check never blocked DTG (`eligibility.DTG` is the string `'no'`) but blocked screen print/DTF on every blank-category garment. Browser mocks had only `Caps`/`T-Shirts`, so 59 cases passed.
+- Solution: restored last week's line-sheet workflow on today's code; shared `headwear-classifier.js` (category → title → blank-category shapes/description; never brand; a bare numeric style only as a low-confidence last resort); embroidery rows route by confirmed product, unconfirmed keep the rep's choice; `methodAllowed()` reads yes/warn/no; unknown category warns. Price breaks probe each tier's lowest quantity (DTF freight steps inside tiers), the DTF small-batch tier keeps its highest fee-free base, and fee tiers round up to the cent. An adversarial review then caught mode switches leaving old prices under new decoration text (both modes share settings) — fixed with a settings version.
+- Prevention: put a new quoting UI in front of the reps who use it before deploying; ask for their actual click path. Browser mocks must include blank-category products. Never hard-block on a heuristic — block only on confirmed data, otherwise warn. A "per pc + fee" table must be checked against the engine at every quantity in the tier, not one sample. Any cached or displayed price needs the version of the settings it was priced with.
+
 ## Shared per-IP limiters must scope by method and caller (2026-09-15)
 
 - Problem/root cause: the proxy's 120-per-15-minute write limiter on `/api/files` counted GET image reads and exempted nobody, and the whole office shares one NAT IP. A secret-bearing Policies Hub batch upload 429'd 100%, and slide-heavy hub pages could break their own images with no batch running. The swarm's upload script never sent the secret, and the earlier memory note had the cap as ~60 with reads unlimited.
@@ -17,12 +23,6 @@
 - Problem/root cause: an admin link alone does not protect report assets, and this repository is public. Adding recent invoices onto archived sales double-counts the same dates; operational sales do not equal reconciled accounting profit.
 - Solution: encrypt the reviewed generated package, keep the key in the hosted environment, and require admin on the shell and every report/download path before static mounts. Replace the whole recent invoice interval; preserve signed credits and exclude tax/shipping using source subtotals. Accept null subtotals as zero only when independently reconciled to a freight-only total.
 - Prevention: test anonymous and non-admin access to every asset type, encoded filenames, tampering/missing keys, exact allowlists, no-store headers, interval overlap and partial failures. Preserve original financial scripts/data/downloads, verify browser backup/restore and paper output, and label dated accounting, incomplete coverage and browser-local progress. Never put the decryption key in public CI.
-
-## Fast price sheets need explicit sample quantities (2026-09-14)
-
-- Problem/root cause: the expanded estimate workflow pushed quantity breaks and everyday settings below the viewport. A tier's base "from" price could differ from the customer price at the displayed quantity.
-- Solution: compact left controls, one exact-first search, optional quantity and immediate customer tiers. Price every labeled sample through the existing engine; never show a sample order as the customer's requested total. Share one model across copy, screen, print and PDF.
-- Prevention: preserve canonical monetary functions and original hashes. Test replacement/search races, no-quantity draft restore, invalid quantities, copy fallback, 1265 × 712 geometry, four widths, every PDF page and real builder handoff totals. Trial with both reps before adding personal presets.
 
 ## Evidence hashes must survive checkout line endings (2026-09-13)
 

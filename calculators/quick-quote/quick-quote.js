@@ -135,7 +135,9 @@
         return /black|navy|royal|red|maroon|cardinal|forest|hunter|charcoal|graphite|purple|brown|chocolate|burgundy|wine|midnight|olive|teal|dark|deep|bottle/i.test(String(name || ''));
     }
     function maybeSuggestDark() {
+        var was = !!state.adv.scpDark;
         if (!state.scpDarkUserSet) state.adv.scpDark = state.color ? isDarkGarment(state.color.name) : false;
+        if (was !== !!state.adv.scpDark) ++configVersion; // shared with the line sheet
         var cb = $('qqScpDark'); if (cb) cb.checked = !!state.adv.scpDark;
     }
 
@@ -360,29 +362,51 @@
     // ============================================================
     // STYLE LOOKUP
     // ============================================================
-    function isCapProduct(category, title, style) {
-        return /cap|hat|beanie|visor/i.test(category || '')
-            || /\bcaps?\b|beanie|trucker|snapback/i.test(title || '')
-            || /^(c\d{2,4}|ne\d{3,4})$/i.test(style || '');
+    // Cap vs garment comes from the shared classifier: Richardson caps have no category and
+    // Richardson/New Era also sell apparel. Flat headwear (beanies) counts as a cap in Quick
+    // Price (cap pricing, as before); a line sheet prices it by the chosen embroidery method.
+    // The EMB builder prices it flat — Erik to decide; see memory/QUICK_QUOTE_2026-09.md.
+    function classifyHeadwear(meta) {
+        if (!window.HeadwearClassifier) throw lookupError('The product type check did not load. Refresh the page.', false);
+        return window.HeadwearClassifier.classify(meta);
+    }
+    function lookupError(message, notFound) {
+        var err = new Error(message); err.notFound = notFound; return err;
+    }
+    // A style number has a digit and no spaces; anything else is searched by name.
+    function looksLikeStyle(value) {
+        return /^[A-Z0-9._/-]{2,20}$/i.test(value) && /\d/.test(value);
+    }
+    function lookupMessage(err, style) {
+        if (err && err.notFound) return 'No product found for ' + style + '.';
+        if (err && err.notFound === false) return err.message;
+        return 'Product lookup failed. Check your connection and try again.';
     }
 
     var lookupSeq = 0;
     var sizeSeq = 0;
+    var LOOKUP_PAUSE = 450;     // ms after the last keystroke before a typed style is looked up
+    var quickStyleTimer;
 
     // Fetch + normalize a product (style -> { style, name, isCap, colors:[{name,catalog,swatch,image}] }).
     // Pure: returns the product, mutates no global state — so BOTH the single-style lookup (Quick Price)
     // and the Line Sheet's per-row add-style can reuse it.
     function fetchProduct(style) {
         return fetch(API_BASE + '/api/product-details?styleNumber=' + encodeURIComponent(style))
-            .then(function (r) { if (!r.ok) throw new Error('not found (' + r.status + ')'); return r.json(); })
+            .then(function (r) {
+                if (r.status === 404) throw lookupError('No product found for ' + style + '.', true);
+                if (!r.ok) throw lookupError('Product lookup failed (' + r.status + '). Try again.', false);
+                return r.json();
+            })
             .then(function (rows) {
-                if (!Array.isArray(rows) || rows.length === 0) throw new Error('no product');
+                if (!Array.isArray(rows) || rows.length === 0) throw lookupError('No product found for ' + style + '.', true);
                 var meta = rows[0];
                 var title = meta.PRODUCT_TITLE || style;
                 var category = meta.CATEGORY_NAME || '';
                 var subcat = meta.SUBCATEGORY_NAME || '';
                 var desc = meta.PRODUCT_DESCRIPTION || '';
-                var cap = isCapProduct(category, title, style);
+                var headwear = classifyHeadwear(meta);
+                var cap = headwear.isCap || headwear.isFlat;
                 // unique colors keyed by CATALOG_COLOR (+ swatch & image for the picker / line sheet)
                 var seen = {}, colors = [];
                 rows.forEach(function (row) {
@@ -395,7 +419,7 @@
                     });
                 });
                 return {
-                    style: style, name: cleanName(title, style), isCap: cap,
+                    style: style, name: cleanName(title, style), isCap: cap, headwear: headwear,
                     category: category, subcategory: subcat, description: desc,
                     colors: colors, sizes: null
                 };
@@ -422,6 +446,7 @@
 
                 return resolveEligibility(state.product).then(function (elig) {
                     if (token !== lookupSeq) return;
+                    state.product.eligibility = elig;
                     applyProduct(elig);
                     loadSizes(); // refines the real size run for this style/color, then reprices
                 });
@@ -429,8 +454,11 @@
             .catch(function (err) {
                 if (token !== lookupSeq) return;
                 state.product = null;
-                statusEl.innerHTML = '<span class="err">Couldn\'t find “' + esc(style) + '” — check the style number.</span>';
+                statusEl.innerHTML = '<span class="err">' + esc(err && err.notFound
+                    ? 'Couldn’t find “' + style + '” — check the style number.'
+                    : lookupMessage(err, style)) + '</span>';
                 renderAll();
+                if (err && err.notFound && window.QuickQuoteWorkspace) window.QuickQuoteWorkspace.suggest($('qqStyle'));
             });
     }
 
@@ -440,6 +468,10 @@
 
     function resolveEligibility(product) {
         if (product.isCap) return Promise.resolve(null); // caps → cap embroidery only
+        return categoryEligibility(product);
+    }
+    // The category rules for any product (never null); the line sheet also asks this for unconfirmed caps.
+    function categoryEligibility(product) {
         if (!window.DecorationMethods || typeof window.DecorationMethods.eligibleFor !== 'function') {
             return Promise.resolve({ EMB: true, DTG: 'no', SCP: false, DTF: false, source: 'fallback' });
         }
@@ -448,10 +480,22 @@
                 STYLE: product.style, CATEGORY_NAME: product.category,
                 SUBCATEGORY_NAME: product.subcategory, PRODUCT_DESCRIPTION: product.description
             });
-            return Promise.resolve(p);
+            // A rules failure is the same embroidery-only fallback, which callers must announce.
+            // categoriesFor() is null only when the rules feed itself did not load.
+            return Promise.resolve(p).catch(function () { return { EMB: true, DTG: 'no', SCP: false, DTF: false, source: 'fallback' }; })
+                .then(function (elig) {
+                    if (!elig || elig.source !== 'fallback' || typeof window.DecorationMethods.categoriesFor !== 'function') return elig;
+                    return Promise.resolve(window.DecorationMethods.categoriesFor('emb')).catch(function () { return null; })
+                        .then(function (list) { return Object.assign({}, elig, { rulesDown: !list }); });
+                });
         } catch (e) {
             return Promise.resolve({ EMB: true, DTG: 'no', SCP: false, DTF: false, source: 'fallback' });
         }
+    }
+    // DTG eligibility is 'yes' | 'warn' | 'no'; the other methods are booleans.
+    function methodAllowed(elig, key) {
+        var v = elig && elig[key];
+        return v === true || v === 'yes' || v === 'warn';
     }
 
     // Real per-style size run (XS–6XL, tall, youth, OSFA…) — same endpoint the
@@ -497,6 +541,7 @@
     }
 
     function applyProduct(elig) {
+        ++configVersion; // resets placements, logos and cap style shared with the line sheet
         if (state.product.isCap) {
             state.methods = [{ id: 'capemb' }];
             state.front = 'LC'; state.back = ''; state.sleeves = { left: false, right: false };
@@ -680,10 +725,12 @@
     }
 
     function repriceAll() {
+        state.quickVersion = configVersion;
         if (!state.product || state.methods.length === 0) { renderResults(); return; }
         if (totalQty() <= 0) { state.results = {}; renderResults(); return; }
         var token = ++state.seq;
         state.results = {};
+        state.quickVersion = configVersion;
         state.methods.forEach(function (m) { priceMethod(m.id, token); });
     }
     function invalidateQuick() { ++state.seq; state.results = {}; renderResults(); }
@@ -789,8 +836,6 @@
     function renderPlacements() {
         function chips(opts, sel, kind) {
             var m = sizeMethod();
-            if (state.mode === 'linesheet') return '<select class="field-select" data-placement="' + kind + '" aria-label="' + (kind === 'front' ? 'Front placement' : 'Back placement') + '">'
-                + opts.map(function (o) { var size = chipSize(m, o.code, kind); return '<option value="' + esc(o.code) + '"' + (o.code === sel ? ' selected' : '') + '>' + esc(o.label + (size ? ' · ' + size : '')) + '</option>'; }).join('') + '</select>';
             return opts.map(function (o) {
                 var sz = chipSize(m, o.code, kind);
                 return '<button type="button" class="qq-place-chip' + (o.code === sel ? ' is-active' : '') + (sz ? ' has-size' : '')
@@ -798,8 +843,8 @@
                     + (sz ? '<span class="qq-chip-size">' + esc(sz) + '</span>' : '') + '</button>';
             }).join('');
         }
-        $('qqFront').innerHTML = chips(FRONT_OPTS, state.front, 'front');
-        $('qqBack').innerHTML = chips(BACK_OPTS, state.back, 'back');
+        keepFocus($('qqFront'), function () { $('qqFront').innerHTML = chips(FRONT_OPTS, state.front, 'front'); });
+        keepFocus($('qqBack'), function () { $('qqBack').innerHTML = chips(BACK_OPTS, state.back, 'back'); });
         var sl = $('qqSleeveL'), sr = $('qqSleeveR');
         if (sl) sl.checked = !!state.sleeves.left;
         if (sr) sr.checked = !!state.sleeves.right;
@@ -873,10 +918,12 @@
         var capWrap = $('qqCapEmbWrap');
         if (isCap) {
             capWrap.hidden = false;
-            $('qqCapEmbType').innerHTML = CAP_EMB_OPTS.map(function (o) {
-                return '<button type="button" class="qq-place-chip' + (o.code === state.capEmb ? ' is-active' : '')
-                    + '" data-cap-emb="' + o.code + '">' + esc(o.label) + '</button>';
-            }).join('');
+            keepFocus($('qqCapEmbType'), function () {
+                $('qqCapEmbType').innerHTML = CAP_EMB_OPTS.map(function (o) {
+                    return '<button type="button" class="qq-place-chip' + (o.code === state.capEmb ? ' is-active' : '')
+                        + '" data-cap-emb="' + o.code + '">' + esc(o.label) + '</button>';
+                }).join('');
+            });
         } else {
             capWrap.hidden = true;
         }
@@ -906,15 +953,15 @@
 
     // ============================================================
     // PRICE-BREAKS MATRIX (selected method)
-    // Engine-authoritative: prices a representative qty in each tier through the
-    // SAME singleItemPreview() the cards use, so the ladder can't disagree with
-    // the quote. The base unit is constant within a tier; the small-batch (LTM)
-    // fee is shown on its own row, mirroring our standard pricing matrix.
+    // Engine-authoritative: prices each tier through the SAME singleItemPreview()
+    // the cards use, so the ladder can't disagree with the quote. The small-batch
+    // (LTM) fee is shown on its own row, mirroring our standard pricing matrix.
     // ============================================================
-    // Each method's LOWEST probe must land inside its small-batch (LTM) tier so the matrix + line
-    // sheet surface the "+$50 small-batch" row: EMB 1-7 (probe 4), DTG 1-11 (probe 6), DTF 10-23
-    // (probe 15), SCP 24-47 (probe 24). DTG used to start at 12 and skipped its 1-11 LTM tier.
-    var PROBE_QTYS = { emb: [4, 12, 36, 60, 100], capemb: [4, 12, 36, 60, 100], dtg: [6, 12, 36, 60, 100], scp: [24, 50, 100, 200], dtf: [15, 36, 60, 100] };
+    // Probe each tier at its LOWEST quantity (today's Caspio tiers). Freight and small-batch
+    // shares only fall as quantity rises inside a tier — DTF freight steps at 50/100/200 — so
+    // the first quantity is the tier's highest price and exactly what the builder charges there.
+    // The lowest probe lands in the small-batch tier: EMB 1-7, DTG 1-11, DTF 10-23, SCP 24-47.
+    var PROBE_QTYS = { emb: [1, 8, 24, 48, 72], capemb: [1, 8, 24, 48, 72], dtg: [1, 12, 24, 48, 72], scp: [24, 48, 72, 145], dtf: [10, 24, 48, 72] };
     var _ladderCache = {};
     var _ladderFetching = {};
 
@@ -932,9 +979,10 @@
     }
 
     // Engine-probe a per-piece price ladder for a product+color under a method's CURRENT shared
-    // config. Returns [{label, base, ltmFee, range}] sorted by tier. Prices a representative qty in
-    // each tier through the SAME singleItemPreview() the cards use, so a ladder can't disagree with
-    // a live quote. Shared by the Quick-Price matrix AND the Line Sheet (one ladder per style).
+    // config. Returns [{label, base, ltmFee, range, setup, preview}] sorted by tier, each priced
+    // through the SAME singleItemPreview() the cards use, so a ladder can't disagree with a live
+    // quote. Shared by the Quick-Price matrix AND the Line Sheet (one ladder per style).
+    // Throws when the engine could not be reached, so a column never silently disappears.
     async function probeLadder(id, product, color) {
         var def = METHODS[id];
         if (!def || !product || !window.QuoteCartEngine) return [];
@@ -942,35 +990,41 @@
         var size = stdSizeFor(product);
         var byTier = {};
         var lastTierTable = null;   // discovered from the engine's own trace (live Caspio tiers)
+        var probeMode = 'discover'; // discover: first price per tier · anchor: tier minimum wins · highest: larger base wins
+        var failure = null;
 
-        // Probe ONE qty and, if new, record its tier row. Base = everything that scales
+        // Probe ONE qty and record its tier row. Base = everything that scales
         // with qty EXCEPT the one-time setup fees and the flat small-batch (LTM) fee,
         // which is disclosed on its own row. Derive from groupTotal (which already folds
         // in per-piece service lines — stitch surcharge, AL — and any cap upcharge) so it
         // is mode-agnostic: correct whether the engine's baseUnit is LTM-stripped
         // (EMB/SCP/DTG) OR LTM-inclusive (DTF). Mirrors pdp-configurator.js probe math so
-        // the 3 surfaces can't disagree. Guarded by `!byTier[label]` → additive only:
-        // re-probing an already-seen tier can NEVER overwrite/change its recorded price.
+        // the 3 surfaces can't disagree. probeMode decides whether a later probe of an
+        // already-seen tier may replace its row (see the steps below).
         async function probeQty(pq) {
             var sz = {}; sz[size] = pq;
             var item = buildItemFor(def, product, color, sz);
             var preview;
             try {
                 preview = await window.QuoteCartEngine.singleItemPreview(item, { groups: def.groups(), deps: engineDeps(), nudge: false });
-            } catch (e) { preview = null; }
+            } catch (e) { failure = e; preview = null; }
+            // Only "below the minimum order" means no price at this quantity; anything else is a failure.
+            if (preview && !preview.ok && (!preview.error || preview.error.code !== 'BELOW_MINIMUM')) failure = preview.error || new Error('pricing failed');
             if (!(preview && preview.ok && preview.lines && preview.lines.length)) return;
             if (preview.trace && preview.trace.tierTable && preview.trace.tierTable.length) {
                 lastTierTable = preview.trace.tierTable;
             }
             var label = preview.tierLabel || ('q' + pq);
-            if (byTier[label]) return;
+            var prior = byTier[label];
+            if (prior && probeMode === 'discover') return;
             var oneTimeT = (preview.fees || []).reduce(function (s, f) { return s + (f.oneTime ? (Number(f.amount) || 0) : 0); }, 0);
             var ltmFlat = (preview.ltm && preview.ltm.fee) || 0;
             var base = Math.max(0, (preview.groupTotal - oneTimeT - ltmFlat) / pq);
-            byTier[label] = { label: label, base: r2(base), ltmFee: ltmFlat, range: parseRange(label), sampleQuantity: pq, sampleUnit: (preview.groupTotal - oneTimeT) / pq };
+            if (prior && probeMode === 'highest' && !(base > prior.exactBase)) return;
+            byTier[label] = { label: label, base: r2(base), exactBase: base, ltmFee: ltmFlat, range: parseRange(label), sampleQuantity: pq, setup: r2(oneTimeT), preview: preview };
         }
 
-        // 1) Bootstrap: probe the hardcoded representative qtys (one inside each tier we
+        // 1) Bootstrap: probe the representative qtys (the lowest quantity of each tier we
         //    KNOW about today). These also make the engine hand back its live tierTable.
         for (var i = 0; i < probes.length; i++) {
             await probeQty(probes[i]);
@@ -978,9 +1032,7 @@
 
         // 2) Self-heal against a Caspio tier restructure: probe the min qty of any LIVE
         //    tier the constants didn't already land in, so a re-tiering (added/renamed
-        //    tier) can't silently drop a row from the ladder. Purely additive — tiers
-        //    already covered above are skipped by the `!byTier[label]` guard, and a
-        //    tier's base is constant within it, so this never changes an existing row.
+        //    tier) can't silently drop a row from the ladder.
         if (lastTierTable) {
             var seenMins = {};
             Object.keys(byTier).forEach(function (k) { seenMins[byTier[k].range.min] = true; });
@@ -988,12 +1040,39 @@
                 .map(function (t) { return Number(t.minQty); })
                 .filter(function (m) { return Number.isFinite(m) && m > 0 && !seenMins[m]; })
                 .sort(function (a, b) { return a - b; });
+            probeMode = 'self-heal';
             for (var j = 0; j < missing.length; j++) {
                 await probeQty(missing[j]);
             }
         }
 
-        return Object.keys(byTier).map(function (k) { return byTier[k]; }).sort(function (a, b) { return a.range.min - b.range.min; });
+        // 3) If a tier moved, re-price it at its new lowest quantity (the tier's highest price).
+        probeMode = 'anchor';
+        var moved = Object.keys(byTier).map(function (k) { return byTier[k]; })
+            .filter(function (t) { return t.range.min > 0 && t.sampleQuantity !== t.range.min; });
+        for (var k = 0; k < moved.length; k++) {
+            await probeQty(moved[k].range.min);
+        }
+
+        // 4) DTF rounds each piece up after spreading the small-batch fee, so its fee-free price
+        //    drifts inside that tier. Keep the highest, so "per pc × qty + fee" never under-quotes.
+        if (id === 'dtf') {
+            probeMode = 'highest';
+            var small = Object.keys(byTier).map(function (k2) { return byTier[k2]; })
+                .filter(function (t) { return t.ltmFee > 0 && isFinite(t.range.max) && t.range.max - t.range.min <= 60; });
+            for (var s = 0; s < small.length; s++) {
+                for (var q = small[s].range.min + 1; q <= small[s].range.max; q++) await probeQty(q);
+            }
+        }
+
+        if (failure) throw new Error('Some quantity prices could not be checked. Try again.');
+        // Where the fee is added on paper, round the per-piece price up to the cent so
+        // "per pc × qty + fee" is never below the engine total.
+        return Object.keys(byTier).map(function (k3) {
+            var t = byTier[k3];
+            if (t.ltmFee > 0) t.base = Math.max(t.base, Math.ceil(t.exactBase * 100 - 1e-6) / 100);
+            return t;
+        }).sort(function (a, b) { return a.range.min - b.range.min; });
     }
 
     async function renderMatrix() {
@@ -1010,14 +1089,16 @@
         if (_ladderCache[key]) { paintMatrix(id, _ladderCache[key]); return; }
         if (_ladderFetching[key]) { return; } // a probe for this exact config is already running
         _ladderFetching[key] = true;
-        box.innerHTML = '<p class="qq-matrix-title">Price breaks — ' + esc(def.label) + '</p><div class="qq-skeleton" style="height:84px"></div>';
+        box.innerHTML = '<p class="qq-matrix-title">Price breaks — ' + esc(def.label) + '</p><div class="qq-skeleton"></div>';
         var tiers = [];
         try { tiers = await probeLadder(id, state.product, state.color); }
         catch (err) { console.error('[quick-quote] price-breaks build failed:', err); }
         finally { delete _ladderFetching[key]; }
-        _ladderCache[key] = tiers;
+        if (tiers.length && ladderKey(id) === key) _ladderCache[key] = tiers;   // failures and mixed-setting tables are never cached
         // only paint if this is still the current selection/config
-        if (state.selectedMethod === id && ladderKey(id) === key) paintMatrix(id, tiers);
+        if (state.selectedMethod !== id || ladderKey(id) !== key) return;
+        if (tiers.length) paintMatrix(id, tiers);
+        else box.innerHTML = '<p class="qq-matrix-title">Price breaks — ' + esc(def.label) + '</p><p class="qq-matrix-msg">Price breaks could not be loaded. <button type="button" class="qq-link-btn qq-matrix-retry">Retry</button></p>';
     }
 
     function paintMatrix(id, tiers) {
@@ -1083,7 +1164,14 @@
             if (state.prevPP[m.id] != null && state.prevPP[m.id] !== pp) state.flashUntil[m.id] = nowT + 600;
             state.prevPP[m.id] = pp;
         });
-        box.innerHTML = state.methods.map(function (m) {
+        // decoration-methods.js contract: an unknown category must say that only embroidery is shown.
+        var elig = state.product.eligibility;
+        var eligNote = elig && elig.source === 'fallback'
+            ? '<p class="qq-elig-note" role="status">' + (elig.rulesDown
+                ? 'Decoration rules didn’t load, so only embroidery is shown. Refresh to see the other methods.'
+                : 'This product’s category isn’t in our decoration rules, so only embroidery is shown. Other methods may work — confirm before quoting, or price one on the Line Sheet.') + '</p>'
+            : '';
+        box.innerHTML = eligNote + state.methods.map(function (m) {
             var changed = !!(state.flashUntil[m.id] && nowT < state.flashUntil[m.id]);
             return renderCard(m.id, m.id === bestId, changed);
         }).join('');
@@ -1118,13 +1206,11 @@
                              : 'Popular hi-vis garments — click to price one here',
             onAdd: function (style) {
                 if (state.mode === 'linesheet') {
-                    if (state.lineStyles.length >= LINE_MAX) return;  // sheet full
-                    addLineStyle();
-                    var last = state.lineStyles[state.lineStyles.length - 1];
-                    if (last) {
-                        var inp = document.querySelector('.qq-line-row[data-uid="' + last.uid + '"] .qq-line-style');
+                    var target = addLineStyle(false);   // null when the sheet is full
+                    if (target) {
+                        var inp = document.querySelector('.qq-line-row[data-uid="' + target.uid + '"] .qq-line-style');
                         if (inp) inp.value = style;
-                        onLineStyleInput(last.uid, style);
+                        onLineStyleInput(target.uid, style);
                     }
                 } else {
                     var input = document.getElementById('qqStyle');
@@ -1399,9 +1485,16 @@
         var lWrap = $('qqSleeveInkLWrap'); if (lWrap) lWrap.hidden = !(scp && state.sleeves.left);
         var rWrap = $('qqSleeveInkRWrap'); if (rWrap) rWrap.hidden = !(scp && state.sleeves.right);
     }
-    function repriceActive() { if (state.mode === 'linesheet') repriceLineAll(); else repriceAll(); }
-    var scheduleActivePrice = debounce(repriceActive, 350);
+    var configVersion = 0;   // bumps on every decoration/quantity change
+    function repriceActive() { ++configVersion; if (state.mode === 'linesheet') repriceLineAll(); else repriceAll(); }
+    var scheduleActivePrice = debounce(function () {
+        if (state.mode !== 'linesheet') { repriceAll(); return; }
+        // A row looked up while the typing pause ran was already priced with these settings.
+        state.lineStyles.forEach(function (row) { if (row.product && row.pricedVersion !== configVersion) priceLineRow(row); });
+        renderLinePreview();
+    }, 350);
     function repriceActiveDebounced() {
+        ++configVersion;
         if (state.mode === 'linesheet') state.lineStyles.forEach(invalidateLine);
         else invalidateQuick();
         notifyWorkspace(); scheduleActivePrice();
@@ -1418,8 +1511,13 @@
     function setMode(mode) {
         if (mode === state.mode) return;
         state.mode = mode;
+        // A cap style chosen in Quick Price must not ride along on an Embroidery sheet's caps.
+        if (mode === 'linesheet' && state.lineMethod !== 'capemb' && state.capEmb !== 'embroidery') { state.capEmb = 'embroidery'; ++configVersion; }
         renderMode();
         renderConfigControls();
+        // Both modes share decoration settings: re-price anything priced with older ones.
+        if (mode === 'linesheet') state.lineStyles.forEach(function (row) { if (row.product && row.pricedVersion !== configVersion) priceLineRow(row); });
+        else if (state.product && state.quickVersion !== configVersion) repriceAll();
         renderAll();
     }
     function renderMode() {
@@ -1437,20 +1535,38 @@
         document.querySelector('.qq-line-quantity').hidden = !line;
     }
 
-    // ---- method selector ----
+    // Chip groups are rebuilt on every choice; keep keyboard focus on the same chip.
+    function keepFocus(host, render) {
+        var active = document.activeElement, selector = null;
+        if (host && active && host.contains(active)) {
+            selector = ['data-line-method', 'data-cap-emb'].filter(function (a) { return active.hasAttribute(a); })
+                .map(function (a) { return '[' + a + '="' + active.getAttribute(a) + '"]'; })[0]
+                || (active.hasAttribute('data-kind') ? '[data-kind="' + active.getAttribute('data-kind') + '"][data-code="' + active.getAttribute('data-code') + '"]' : null);
+        }
+        render();
+        var next = selector && host.querySelector(selector);
+        if (next) next.focus({ preventScroll: true });
+    }
+
+    // ---- method selector (one tap) ----
     function renderLineMethods() {
-        var box = $('qqLineMethod'); if (!box) return;
-        box.innerHTML = LINE_METHODS.map(function (m) {
-            return '<option value="' + m.id + '"' + (m.id === state.lineMethod ? ' selected' : '') + '>' + esc(m.label) + '</option>';
-        }).join('');
+        var box = $('qqLineMethodChips'); if (!box) return;
+        keepFocus(box, function () {
+            box.innerHTML = LINE_METHODS.map(function (m) {
+                return '<button type="button" class="qq-place-chip' + (m.id === state.lineMethod ? ' is-active' : '')
+                    + '" data-line-method="' + m.id + '">' + esc(m.label) + '</button>';
+            }).join('');
+        });
     }
     function setLineMethod(id) {
+        if (!METHODS[id] || id === state.lineMethod) return;
         state.lineMethod = id;
         if (id === 'scp' || id === 'dtg' || id === 'dtf') {
             state.front = 'LC'; state.back = ''; state.sleeves = { left: false, right: false };
             if (id === 'scp') { state.frontInk = 1; state.backInk = 1; }
         }
         if (id === 'emb' || id === 'capemb') { state.adv.embStitch = 8000; state.embAddl = []; state.capEmb = 'embroidery'; }
+        ++configVersion;
         renderLineMethods();
         renderConfigControls();
         repriceLineAll();
@@ -1459,15 +1575,27 @@
 
     // ---- style list (input panel) ----
     function lineRow(uid) { return state.lineStyles.filter(function (r) { return r.uid === uid; })[0]; }
-    function addLineStyle() {
-        if (state.lineStyles.length >= LINE_MAX) return;
-        state.lineStyles.push({ uid: ++_lineUid, raw: '', product: null, color: null, status: 'empty', tiers: null, pricing: false, error: '' });
-        renderLineList();
-        var inp = document.querySelector('.qq-line-row:last-child .qq-line-style'); if (inp) inp.focus();
+    // Returns the row to type into: an existing blank row, else a new one (null when full).
+    function addLineStyle(focus) {
+        var row = state.lineStyles.filter(function (r) { return !r.raw.trim(); })[0];
+        if (!row) {
+            if (state.lineStyles.length >= LINE_MAX) return null;
+            row = { uid: ++_lineUid, raw: '', product: null, color: null, status: 'empty', tiers: null, pricing: false, error: '', notice: '', _tok: 0, _ptok: 0 };
+            state.lineStyles.push(row);
+            renderLineList();
+        }
+        if (focus !== false) { var inp = document.querySelector('.qq-line-style[data-uid="' + row.uid + '"]'); if (inp) inp.focus(); }
+        return row;
     }
     function removeLineStyle(uid) {
+        var row = lineRow(uid); if (row) { clearTimeout(row._lookup); invalidateLine(row); ++row._tok; }
+        var index = state.lineStyles.indexOf(row);
         state.lineStyles = state.lineStyles.filter(function (r) { return r.uid !== uid; });
-        renderLineList(); renderLinePreview();
+        if (state.lineStyles.length) renderLineList(); else addLineStyle(false); // always one row ready to type into
+        var next = state.lineStyles[Math.min(Math.max(index, 0), state.lineStyles.length - 1)];
+        var input = next && document.querySelector('.qq-line-style[data-uid="' + next.uid + '"]');
+        if (input) input.focus({ preventScroll: true });
+        renderLinePreview();
     }
     function moveLineStyle(uid, dir) {
         var i = state.lineStyles.findIndex(function (r) { return r.uid === uid; });
@@ -1475,6 +1603,9 @@
         if (i < 0 || j < 0 || j >= state.lineStyles.length) return;
         var a = state.lineStyles[i]; state.lineStyles[i] = state.lineStyles[j]; state.lineStyles[j] = a;
         renderLineList(); renderLinePreview();
+        var moved = document.querySelector('.qq-line-mv[data-uid="' + uid + '"][data-dir="' + dir + '"]');
+        if (moved && moved.disabled) moved = document.querySelector('.qq-line-mv[data-uid="' + uid + '"][data-dir="' + (-dir) + '"]');
+        if (moved) moved.focus({ preventScroll: true });
     }
 
     // renderLineList renders the row SHELLS (style input + controls) — called only on add/remove/move
@@ -1482,84 +1613,91 @@
     function renderLineList() {
         var box = $('qqLineList'); if (!box) return;
         var searchPanel = $('qqSearchPanel');
-        if (searchPanel) { $('qqProductFinder').after(searchPanel); searchPanel.hidden = true; }
-        if (!state.lineStyles.length) {
-            box.innerHTML = '';
-        } else {
-            box.innerHTML = state.lineStyles.map(function (r, idx) {
-                return '<div class="qq-line-row" data-uid="' + r.uid + '">'
-                    + '<div class="qq-line-head">'
-                    + '<input class="qq-line-style input" type="text" inputmode="text" autocomplete="off" placeholder="Style or product name" value="' + esc(r.raw) + '" data-uid="' + r.uid + '">'
-                    + '<div class="qq-line-ctrls">'
-                    + '<button type="button" class="qq-line-mv" data-uid="' + r.uid + '" data-dir="-1" aria-label="Move up"' + (idx === 0 ? ' disabled' : '') + '>&uarr;</button>'
-                    + '<button type="button" class="qq-line-mv" data-uid="' + r.uid + '" data-dir="1" aria-label="Move down"' + (idx === state.lineStyles.length - 1 ? ' disabled' : '') + '>&darr;</button>'
-                    + '<button type="button" class="qq-line-rm" data-uid="' + r.uid + '" aria-label="Remove style">&times;</button>'
-                    + '</div></div>'
-                    + '<div class="qq-line-content" id="qqlc-' + r.uid + '"></div>'
-                    + '</div>';
-            }).join('');
-            state.lineStyles.forEach(updateLineRow);
-        }
+        if (searchPanel && box.contains(searchPanel)) { box.after(searchPanel); searchPanel.hidden = true; }
+        box.innerHTML = state.lineStyles.map(function (r, idx) {
+            return '<div class="qq-line-row" data-uid="' + r.uid + '">'
+                + '<div class="qq-line-head">'
+                + '<input class="qq-line-style input" type="text" inputmode="text" autocomplete="off" spellcheck="false" placeholder="Style #, e.g. PC55" value="' + esc(r.raw) + '" data-uid="' + r.uid + '">'
+                + '<div class="qq-line-ctrls">'
+                + '<button type="button" class="qq-line-mv" data-uid="' + r.uid + '" data-dir="-1" aria-label="Move up"' + (idx === 0 ? ' disabled' : '') + '>&uarr;</button>'
+                + '<button type="button" class="qq-line-mv" data-uid="' + r.uid + '" data-dir="1" aria-label="Move down"' + (idx === state.lineStyles.length - 1 ? ' disabled' : '') + '>&darr;</button>'
+                + '<button type="button" class="qq-line-rm" data-uid="' + r.uid + '" aria-label="Remove style">&times;</button>'
+                + '</div></div>'
+                + '<div class="qq-line-content" id="qqlc-' + r.uid + '"></div>'
+                + '</div>';
+        }).join('');
+        state.lineStyles.forEach(updateLineRow);
+        var searching = state.lineStyles.filter(function (r) { return r.status === 'search'; })[0];
+        if (searching && window.QuickQuoteWorkspace) window.QuickQuoteWorkspace.reattach(document.querySelector('.qq-line-style[data-uid="' + searching.uid + '"]'));
         updateLineActions();
     }
     function updateLineRow(row) {
         var el = document.getElementById('qqlc-' + row.uid); if (!el) return;
         if (row.status === 'empty') { el.innerHTML = ''; return; }
         if (row.status === 'loading') { el.innerHTML = '<span class="qq-line-stat loading">Looking up&hellip;</span>'; return; }
-        if (row.status === 'error') { el.innerHTML = '<span class="qq-line-stat err">' + esc(row.error || 'Not found') + '</span>'; return; }
+        if (row.status === 'search') { el.innerHTML = '<span class="qq-line-stat">Choose a product below, or type a style number.</span>'; return; }
+        if (row.status === 'error') {
+            el.innerHTML = '<span class="qq-line-stat err">' + esc(row.error || 'No product found.') + '</span>'
+                + (row.retry ? '<button type="button" class="qq-link-btn qq-line-retry" data-uid="' + row.uid + '">Retry</button>' : '');
+            return;
+        }
         var img = row.color && row.color.image;
         var thumb = img
-            ? '<img class="qq-line-thumb" src="' + esc(img) + '" alt="" referrerpolicy="no-referrer" onerror="this.style.visibility=\'hidden\'">'
+            ? '<img class="qq-line-thumb" src="' + esc(img) + '" alt="" referrerpolicy="no-referrer">'
             : '<span class="qq-line-thumb is-empty"></span>';
         var colorSel = '';
         if (row.product && row.product.colors.length) {
-            colorSel = '<select class="qq-line-color" data-uid="' + row.uid + '" aria-label="Color">'
+            colorSel = '<select class="qq-line-color" data-uid="' + row.uid + '" aria-label="Color for ' + esc(row.product.style) + '">'
                 + row.product.colors.map(function (c) {
                     return '<option value="' + esc(c.catalog) + '"' + (row.color && c.catalog === row.color.catalog ? ' selected' : '') + '>' + esc(c.name) + '</option>';
                 }).join('') + '</select>';
         }
-        var price = row.error ? '<span class="qq-line-stat err">' + esc(row.error) + '</span>'
-            : row.pricing ? '<span class="qq-line-stat loading">Pricing&hellip;</span>' : '';
-        el.innerHTML = thumb + '<div class="qq-line-meta"><span class="qq-line-name">' + esc(row.product.name) + '</span>' + colorSel + price + '</div>';
+        var status = row.error ? '<span class="qq-line-stat err">' + esc(row.error) + '</span>'
+            : row.pricing ? '<span class="qq-line-stat loading">Pricing&hellip;</span>'
+            : row.notice ? '<span class="qq-line-stat">' + esc(row.notice) + '</span>' : '';
+        // Re-rendering replaces the color menu; keep keyboard focus on it.
+        var hadFocus = document.activeElement && document.activeElement.matches('.qq-line-color[data-uid="' + row.uid + '"]');
+        el.innerHTML = thumb + '<div class="qq-line-meta"><span class="qq-line-name">' + esc(row.product.name) + '</span>' + colorSel + status + '</div>';
+        if (hadFocus) { var sel = el.querySelector('.qq-line-color'); if (sel) sel.focus({ preventScroll: true }); }
     }
     function updateLineActions() {
-        var n = state.lineStyles.length;
-        $('qqLineAdd').disabled = n >= LINE_MAX;
-        $('qqLineAdd').textContent = n >= LINE_MAX ? 'Max ' + LINE_MAX + ' products' : n ? '+ Add another product' : '+ Enter a style';
-        $('qqProductFinder').hidden = state.mode === 'linesheet' && n > 0;
-        $('qqLineList').classList.toggle('qq-single-product', n === 1);
+        var full = state.lineStyles.length >= LINE_MAX && state.lineStyles.every(function (r) { return r.raw.trim(); });
+        $('qqLineAdd').disabled = full;
+        $('qqLineAdd').textContent = full ? 'Max ' + LINE_MAX + ' styles' : '+ Add style';
         notifyWorkspace();
     }
 
     function onLineStyleInput(uid, raw) {
         var row = lineRow(uid); if (!row) return;
-        invalidateLine(row);
+        clearTimeout(row._lookup);
+        invalidateLine(row); row.pricing = false;
         row.raw = raw;
         var style = String(raw || '').trim().toUpperCase();
-        if (!style) { row.product = null; row.color = null; row.status = 'empty'; row.tiers = null; updateLineRow(row); updateLineActions(); renderLinePreview(); return; }
-        row.status = 'loading'; row.error = ''; updateLineRow(row);
+        row.product = null; row.color = null; row.tiers = null; row.error = ''; row.notice = ''; row.retry = false;
+        if (!style) { row.status = 'empty'; ++row._tok; updateLineRow(row); updateLineActions(); renderLinePreview(); return; }
+        row.status = 'loading'; updateLineRow(row); notifyWorkspace();
         var token = ++state.lineSeq; row._tok = token;
         fetchProduct(style).then(function (product) {
             if (row._tok !== token) return;
-            row.product = product;
-            row.color = product.colors.length ? product.colors[0] : null;
-            row.status = 'ok'; row.tiers = null;
             return loadProductSizes(product).then(function () {
                 if (row._tok !== token) return;
+                row.product = product;
+                row.color = product.colors.length ? product.colors[0] : null;
+                row.status = 'ok';
                 updateLineRow(row);
                 priceLineRow(row);
             });
-        }).catch(function () {
+        }).catch(function (err) {
             if (row._tok !== token) return;
-            row.product = null; row.color = null; row.status = 'error'; row.error = 'Not found'; row.tiers = null;
+            row.status = 'error'; row.error = lookupMessage(err, style); row.retry = !(err && err.notFound);
             updateLineRow(row); updateLineActions(); renderLinePreview();
+            if (err && err.notFound && window.QuickQuoteWorkspace) window.QuickQuoteWorkspace.suggest(document.querySelector('.qq-line-style[data-uid="' + uid + '"]'));
         });
     }
     function onLineColorChange(uid, catalog) {
         var row = lineRow(uid); if (!row || !row.product) return;
         row.color = (row.product.colors || []).filter(function (c) { return c.catalog === catalog; })[0] || row.color;
-        row.tiers = null;
-        updateLineRow(row);
+        row.tiers = null; row.colorChanged = false;
         priceLineRow(row);
     }
 
@@ -1589,19 +1727,45 @@
         if (!row) return;
         row._ptok = ++state.lineSeq; row.preview = null; row.tiers = null; row.pricing = true;
     }
+    // Embroidery follows a confirmed product (cap → cap embroidery, garment → embroidery), as the
+    // EMB builder does per row. The builder's own cap check still differs on some styles (New Era
+    // and Richardson apparel, visors). Unconfirmed products and flat headwear keep the rep's choice.
+    function lineMethodFor(row) {
+        var m = state.lineMethod, h = row.product && row.product.headwear;
+        if ((m !== 'emb' && m !== 'capemb') || !h || !h.confident || h.isFlat) return m;
+        return h.isCap ? 'capemb' : 'emb';
+    }
     async function priceLineRow(row) {
         invalidateLine(row);
-        if (!state.lineMethod || !row.product) { renderLinePreview(); return; }
-        var token = row._ptok, method = state.lineMethod, def = METHODS[method];
-        var product = row.product, color = row.color, qty = state.lineQty;
-        row.error = ''; updateLineRow(row); notifyWorkspace();
+        if (!state.lineMethod || !row.product) { row.pricing = false; updateLineRow(row); renderLinePreview(); return; }
+        var token = row._ptok, method = lineMethodFor(row), def = METHODS[method];
+        var product = row.product, color = row.color, qty = state.lineQty, headwear = product.headwear || {};
+        row.pricedVersion = configVersion;
+        var embroidery = method === 'emb' || method === 'capemb', notices = [];
+        row.method = method; row.error = ''; row.notice = '';
+        updateLineRow(row); notifyWorkspace();
         try {
             if (qty !== null && (!Number.isInteger(qty) || qty < 1 || qty > 100000)) throw new Error('Enter a whole quantity between 1 and 100,000, or leave it blank for price breaks.');
-            if (product.isCap !== (method === 'capemb')) throw new Error(product.isCap ? 'Choose cap embroidery for this cap.' : 'Choose a garment decoration method for this product.');
-            var eligibility = await resolveEligibility(product);
-            if (!product.isCap && !eligibility[def.engineMethod]) throw new Error('This decoration is not available for this product.');
+            if (product.isCap && headwear.confident && !embroidery) throw new Error(product.style + (headwear.isFlat ? ' is headwear' : ' is a cap') + ' — choose Embroidery or Cap embroidery.');
+            if (method === 'capemb' && state.embAddl.length > 1) throw new Error('Caps take one extra logo (cap back). Remove the other logos to price ' + product.style + '.');
+            var methodWords = def.label.replace(/^[A-Z](?=[a-z])/, function (c) { return c.toLowerCase(); }); // "DTG print" keeps its capitals
+            if (method !== state.lineMethod) notices.push('Priced as ' + methodWords + '.');
+            else if (method === 'capemb' && !headwear.confident) notices.push('Not confirmed as a cap — priced as cap embroidery, as chosen.');
+            else if (method === 'capemb' && headwear.isFlat) notices.push('Flat headwear — the Embroidery builder prices it as flat embroidery.');
+            if (row.colorChanged) notices.push('The saved color is no longer offered — check the color.');
+            // Cap pricing skips the category rules (the "Caps" rule lists no garment methods).
+            if (method !== 'capemb' && !(embroidery && product.isCap)) {
+                var eligibility = await categoryEligibility(product);
+                if (row._ptok !== token) return;
+                // decoration-methods.js contract: an unknown category is a visible warning, never a block.
+                if (eligibility.source === 'fallback') {
+                    if (eligibility.rulesDown) notices.push('Decoration rules didn’t load — confirm ' + methodWords + ' works for this product, or refresh.');
+                    else if (!methodAllowed(eligibility, def.engineMethod)) notices.push('This category isn’t in our decoration rules — confirm ' + methodWords + ' works for it.');
+                }
+                else if (!methodAllowed(eligibility, def.engineMethod)) throw new Error(def.label + ' isn’t offered for ' + (product.category || 'this product') + '.');
+                else if (eligibility[def.engineMethod] === 'warn') notices.push('Check the fabric — DTG prints best on cotton.');
+            }
             if (def.available && !def.available()) throw new Error('Choose a supported decoration placement.');
-            if (row._ptok !== token) return;
             var sizes = {}; sizes[stdSizeFor(product)] = qty;
             var values = await Promise.all([
                 probeLadder(method, product, color),
@@ -1610,33 +1774,25 @@
             if (row._ptok !== token) return;
             if (values[1] && !values[1].ok) throw new Error(values[1].error?.message || 'Pricing unavailable. Try again.');
             if (!values[0].length) throw new Error('Quantity prices are unavailable. Try again.');
-            // Customer columns show real quantities, starting at the API's tier minimum.
-            // Ask the engine again: freight and small-order shares can vary within a tier.
-            var customerTiers = await Promise.all(values[0].map(async function (tier) {
-                var sampleSizes = {}; sampleSizes[stdSizeFor(product)] = tier.range.min;
-                var sample = await window.QuoteCartEngine.singleItemPreview(buildItemFor(def, product, color, sampleSizes), { groups: def.groups(), deps: engineDeps(), nudge: false });
-                if (!sample.ok) throw new Error(sample.error?.message || 'A quantity price is unavailable. Try again.');
-                var setup = (sample.fees || []).reduce(function (sum, fee) { return sum + (fee.oneTime ? Number(fee.amount) : 0); }, 0);
-                return Object.assign({}, tier, { sampleQuantity: tier.range.min, sampleUnit: (sample.groupTotal - setup) / tier.range.min, sampleSetup: setup, samplePreview: sample });
-            }));
-            if (row._ptok !== token) return;
-            row.tiers = customerTiers; row.preview = values[1] || customerTiers[0].samplePreview; row.pricing = false;
+            row.tiers = values[0]; row.preview = values[1] || values[0][0].preview; row.pricing = false; row.notice = notices.join(' ');
         } catch (error) {
             if (row._ptok !== token) return;
-            row.tiers = []; row.preview = null; row.pricing = false; row.error = error.message;
+            row.tiers = []; row.preview = null; row.pricing = false; row.error = (error && error.message) || 'Pricing unavailable. Try again.';
         }
         updateLineRow(row); updateLineActions(); renderLinePreview();
     }
 
     function renderLinePreview() { notifyWorkspace(); }
     function notifyWorkspace() { if (window.QuickQuoteWorkspace) window.QuickQuoteWorkspace.refresh(); }
+    function stitchText(n) { return (num(n) || 8000).toLocaleString('en-US') + ' stitches'; }
     function decorationDescription(id) {
         if (id === 'emb' || id === 'capemb') {
-            var primary = id === 'capemb' ? 'Cap front' : 'Left chest';
-            return primary + ': ' + state.adv.embStitch.toLocaleString() + ' stitches'
-                + state.embAddl.map(function (a, i) { return '; ' + (id === 'capemb' ? 'Cap back' : 'Additional logo ' + (i + 1)) + ': ' + Number(a.stitch).toLocaleString() + ' stitches'; }).join('')
-                + (id === 'capemb' ? '; ' + state.capEmb.replace(/-/g, ' ') : '')
-                + (state.adv.digitizing ? '. New logo digitizing included below.' : '. Existing embroidery-ready artwork assumed.');
+            var cap = id === 'capemb';
+            var parts = [(cap ? 'Cap front ' : 'Left chest ') + stitchText(state.adv.embStitch)];
+            state.embAddl.forEach(function (a) { parts.push((cap ? 'cap back ' : 'additional logo ') + stitchText(a.stitch)); });
+            if (cap && state.capEmb !== 'embroidery') parts.push(state.capEmb === '3d-puff' ? '3D puff' : 'laser patch');
+            if (state.adv.digitizing) parts.push('new-logo digitizing');
+            return parts.join(', ');
         }
         return configText(id);
     }
@@ -1644,53 +1800,94 @@
         return {
             state: state,
             options: function () {
-                if (state.mode === 'linesheet') return state.lineStyles.filter(function (r) { return r.product && r.preview && !r.pricing; }).map(function (r) {
-                    return { key: String(r.uid), product: r.product, color: r.color, method: state.lineMethod, preview: r.preview, tiers: r.tiers, quantityRequested: state.lineQty !== null,
-                        description: decorationDescription(state.lineMethod), placements: configPlacements(state.lineMethod), sizes: 'Standard-size pricing; extended sizes may cost more.', builderHref: state.lineQty === null ? '' : builderHrefFor(state.lineMethod, r.product, r.color, { [stdSizeFor(r.product)]: state.lineQty }) };
+                if (state.mode === 'linesheet') return state.lineStyles.filter(function (r) { return r.status === 'ok' && r.product && r.preview && !r.pricing && !r.error; }).map(function (r) {
+                    var m = r.method || state.lineMethod, sizes = {};
+                    sizes[stdSizeFor(r.product)] = state.lineQty;
+                    return { key: String(r.uid), product: r.product, color: r.color, method: m, preview: r.preview, tiers: r.tiers, quantityRequested: state.lineQty !== null,
+                        unitWord: m === 'capemb' ? 'cap' : 'pc', description: decorationDescription(m),
+                        builderHref: state.lineQty === null ? '' : builderHrefFor(m, r.product, r.color, sizes) };
                 });
+                var sizeMix = state.useSizes ? 'Sizes: ' + Object.entries(currentSizes()).map(function (p) { return p[0] + ' ' + p[1]; }).join(', ') : '';
                 return state.methods.filter(function (m) { return state.results[m.id]?.status === 'ok'; }).map(function (m) {
-                    return { key: m.id, product: state.product, color: state.color, method: m.id, preview: state.results[m.id].preview,
-                        description: decorationDescription(m.id), placements: configPlacements(m.id), sizes: state.useSizes ? 'Sizes: ' + Object.entries(currentSizes()).filter(function (p) { return p[1] > 0; }).map(function (p) { return p[0] + ': ' + p[1]; }).join(', ') : 'Standard-size pricing; extended sizes may cost more.', builderHref: builderHref(m.id) };
+                    return { key: m.id, product: state.product, color: state.color, method: m.id, preview: state.results[m.id].preview, sizes: sizeMix,
+                        unitWord: state.product.isCap ? 'cap' : 'pc', description: decorationDescription(m.id), builderHref: builderHref(m.id) };
                 });
             },
-            pending: function () { return state.mode === 'linesheet' ? state.lineStyles.some(function (r) { return r.raw.trim() && (!r.preview || r.pricing || r.status !== 'ok'); }) : state.methods.some(function (m) { return !state.results[m.id] || state.results[m.id].status === 'loading'; }); },
-            errors: function () { return state.mode === 'linesheet' ? state.lineStyles.filter(function (r) { return r.error; }).map(function (r) { return r.raw + ': ' + r.error; }) : []; },
+            // The sheet header names the method and its decoration once for the whole sheet.
+            subtitle: function () { return state.mode === 'linesheet' && state.lineMethod ? METHODS[state.lineMethod].label + ' · ' + decorationDescription(state.lineMethod) : ''; },
+            method: function () { return state.mode === 'linesheet' ? state.lineMethod : ''; },
+            pending: function () {
+                if (state.mode !== 'linesheet') {
+                    if (!state.product) return false;
+                    return state.quickVersion !== configVersion || state.methods.some(function (m) { return !state.results[m.id] || state.results[m.id].status === 'loading'; });
+                }
+                return state.lineStyles.some(function (r) { return r.status === 'loading' || (r.status === 'ok' && !r.error && (r.pricing || !r.preview || r.pricedVersion !== configVersion)); });
+            },
+            errors: function () {
+                if (state.mode !== 'linesheet') return [];
+                return state.lineStyles.filter(function (r) { return r.error || r.status === 'search'; }).map(function (r) {
+                    var name = r.product ? r.product.style : r.raw.trim().toUpperCase();
+                    if (r.status === 'search') return '“' + r.raw.trim() + '”: choose a product from the list or type a style number.';
+                    return r.error.indexOf(name) >= 0 ? r.error : name + ': ' + r.error;
+                });
+            },
             choose: function (style, uid) {
                 if (state.mode === 'linesheet') {
                     var row = uid ? lineRow(uid) : null;
-                    if (!row) { if (state.lineStyles.length >= LINE_MAX) throw new Error('Remove an option before adding another product.'); addLineStyle(); row = state.lineStyles[state.lineStyles.length - 1]; }
+                    if (!row) row = state.lineStyles.filter(function (r) { return r.status === 'search'; })[0] || addLineStyle(false);
+                    if (!row) throw new Error('A sheet holds ' + LINE_MAX + ' styles. Remove one to add another.');
                     document.querySelector('.qq-line-style[data-uid="' + row.uid + '"]').value = style;
                     onLineStyleInput(row.uid, style);
                 } else { $('qqStyle').value = style; lookupStyle(style); }
+            },
+            // Enter in a style box: look it up now instead of waiting for the typing pause.
+            commit: function (input) {
+                var style = input.value.trim().toUpperCase();
+                if (input.id === 'qqStyle') {
+                    clearTimeout(quickStyleTimer);
+                    if (!(state.product && state.product.style === style)) lookupStyle(input.value);
+                    return;
+                }
+                var row = lineRow(Number(input.dataset.uid)); if (!row) return;
+                clearTimeout(row._lookup);
+                if (!(row.product && row.product.style === style && row.status === 'ok')) onLineStyleInput(row.uid, input.value);
             },
             setQuantity: function (qty) { state.lineQty = qty; $('qqLineQty').value = qty === null ? '' : qty; repriceActiveDebounced(); },
             reprice: repriceActive,
             restore: restoreWorkspaceInputs
         };
     }
-    function configPlacements(id) {
-        if (id === 'emb' || id === 'capemb') return [id === 'capemb' ? 'Cap front' : 'Left chest'].concat(state.embAddl.map(function () { return id === 'capemb' ? 'Cap back' : 'Additional logo'; }));
-        if (id === 'dtf') return dtfLocations().map(function (loc) { return DTF_LOC_LABEL[loc]; });
-        return [FRONT_LABELS[state.front], BACK_LABELS[state.back]].filter(Boolean).concat(id === 'scp' ? [state.sleeves.left ? 'Left sleeve' : '', state.sleeves.right ? 'Right sleeve' : ''].filter(Boolean) : []);
-    }
     async function restoreWorkspaceInputs(draft) {
         setMode(draft.mode === 'quick' ? 'quick' : 'linesheet');
         var fields = ['front', 'back', 'sleeves', 'frontInk', 'backInk', 'sleeveInkL', 'sleeveInkR', 'adv', 'embAddl', 'capEmb', 'qty', 'sizes', 'useSizes', 'lineQty', 'scpDarkUserSet'];
-        function config() { fields.forEach(function (key) { if (Object.prototype.hasOwnProperty.call(draft, key)) state[key] = draft[key]; }); $('qqQty').value = state.qty; $('qqLineQty').value = state.lineQty; renderConfigControls(); }
+        function config() {
+            fields.forEach(function (key) { if (Object.prototype.hasOwnProperty.call(draft, key)) state[key] = draft[key]; });
+            if (state.mode === 'linesheet' && state.lineMethod !== 'capemb') state.capEmb = 'embroidery';
+            ++configVersion;
+            $('qqQty').value = state.qty; $('qqLineQty').value = state.lineQty; renderConfigControls();
+        }
         if (state.mode === 'linesheet') {
             state.lineStyles = []; state.lineMethod = draft.lineMethod || 'emb'; config(); renderLineMethods();
+            // Each saved style restores on its own; one discontinued style never blocks the rest.
             for (var saved of (draft.products || []).slice(0, LINE_MAX)) {
-                addLineStyle(); var row = state.lineStyles[state.lineStyles.length - 1]; row.raw = saved.style; row.product = await fetchProduct(saved.style); await loadProductSizes(row.product);
-                row.color = row.product.colors.find(function (c) { return c.catalog === saved.color; });
-                if (!row.color) throw new Error('A saved color is no longer available. Choose it again.');
-                row.status = 'ok';
+                var row = addLineStyle(false); row.raw = saved.style;
+                try {
+                    var product = await fetchProduct(saved.style); await loadProductSizes(product);
+                    row.product = product; row.status = 'ok';
+                    row.color = product.colors.find(function (c) { return c.catalog === saved.color; }) || product.colors[0] || null;
+                    row.colorChanged = !!row.color && row.color.catalog !== saved.color;
+                } catch (err) {
+                    row.status = 'error'; row.error = lookupMessage(err, saved.style); row.retry = !(err && err.notFound);
+                }
             }
+            if (!state.lineStyles.length) addLineStyle(false);
             renderLineList(); repriceLineAll();
         } else if (draft.products?.length) {
             var savedProduct = draft.products[0]; state.product = await fetchProduct(savedProduct.style); await loadProductSizes(state.product);
-            applyProduct(await resolveEligibility(state.product)); config();
-            state.color = state.product.colors.find(function (c) { return c.catalog === savedProduct.color; });
-            if (!state.color) throw new Error('A saved color is no longer available. Choose it again.');
+            var elig = await resolveEligibility(state.product);
+            state.product.eligibility = elig; applyProduct(elig); config();
+            state.color = state.product.colors.find(function (c) { return c.catalog === savedProduct.color; }) || state.product.colors[0] || null;
+            if (state.color && state.color.catalog !== savedProduct.color) $('qqStyleStatus').innerHTML = '<span class="err">The saved color is no longer offered — check the color.</span>';
             $('qqStyle').value = savedProduct.style; $('qqSizes').hidden = !state.useSizes; $('qqQty').disabled = state.useSizes;
             if (state.useSizes) buildSizeGrid(); renderColorSwatches(); renderThumb(); loadInventory(); repriceAll();
         }
@@ -1746,8 +1943,18 @@
     function wire() {
         if (!window.QuoteCartEngine) { $('qqEngineError').hidden = false; }
 
-        var scheduleLookup = debounce(function (value) { lookupStyle(value); }, 450);
-        $('qqStyle').addEventListener('input', function (e) { ++lookupSeq; ++sizeSeq; state.product = null; invalidateQuick(); scheduleLookup(e.target.value); });
+        $('qqStyle').addEventListener('input', function (e) {
+            ++lookupSeq; ++sizeSeq; state.product = null; invalidateQuick();
+            clearTimeout(quickStyleTimer);
+            var value = e.target.value.trim();
+            // Product names are searched by the workspace; style numbers price after a short pause.
+            if (value && !looksLikeStyle(value)) {
+                $('qqStyleStatus').innerHTML = '<span class="loading">Choose a product below, or type a style number.</span>';
+                renderAll();
+                return;
+            }
+            quickStyleTimer = setTimeout(function () { lookupStyle(e.target.value); }, LOOKUP_PAUSE);
+        });
 
         // Click a priced method card to show its price-breaks matrix below.
         $('qqResults').addEventListener('click', function (e) {
@@ -1835,16 +2042,6 @@
         }
         $('qqFront').addEventListener('click', onPlaceChip);
         $('qqBack').addEventListener('click', onPlaceChip);
-        [$('qqFront'), $('qqBack')].forEach(function (host) {
-            host.addEventListener('change', function (event) {
-                var input = event.target.closest('[data-placement]'); if (!input) return;
-                if (input.dataset.placement === 'front') state.front = input.value; else state.back = input.value;
-                var placementKind = input.dataset.placement;
-                renderPlacements();
-                document.querySelector('[data-placement="' + placementKind + '"]')?.focus();
-                repriceActive();
-            });
-        });
         $('qqSleeveL').addEventListener('change', function (e) { state.sleeves.left = e.target.checked; renderSleeveRow(); repriceActive(); });
         $('qqSleeveR').addEventListener('change', function (e) { state.sleeves.right = e.target.checked; renderSleeveRow(); repriceActive(); });
         $('qqSleeveInkL').addEventListener('input', function (e) {
@@ -1900,12 +2097,23 @@
             var b = e.target.closest('[data-mode]'); if (!b) return;
             setMode(b.getAttribute('data-mode'));
         });
-        $('qqLineMethod').addEventListener('change', function (e) { setLineMethod(e.target.value); });
-        $('qqLineAdd').addEventListener('click', addLineStyle);
-        // The workspace's shared search handles both exact styles and product names.
+        $('qqLineMethodChips').addEventListener('click', function (e) {
+            var b = e.target.closest('[data-line-method]'); if (!b) return;
+            setLineMethod(b.getAttribute('data-line-method'));
+        });
+        $('qqLineAdd').addEventListener('click', function () { addLineStyle(); });
+        // Typing a style number looks it up after a pause (each row keeps its own timer);
+        // a product name is searched by the workspace instead.
         $('qqLineList').addEventListener('input', function (e) {
-            var si = e.target.closest('.qq-line-style');
-            if (si) { var row = lineRow(Number(si.getAttribute('data-uid'))); invalidateLine(row); row.raw = si.value; row.product = null; row.status = 'empty'; row.error = ''; ++row._tok; updateLineRow(row); notifyWorkspace(); }
+            var si = e.target.closest('.qq-line-style'); if (!si) return;
+            var row = lineRow(Number(si.getAttribute('data-uid'))); if (!row) return;
+            var value = si.value.trim();
+            clearTimeout(row._lookup);
+            invalidateLine(row); row.pricing = false; ++row._tok;
+            row.raw = si.value; row.product = null; row.color = null; row.tiers = null; row.error = ''; row.notice = ''; row.retry = false;
+            row.status = !value ? 'empty' : looksLikeStyle(value) ? 'loading' : 'search';
+            updateLineRow(row); updateLineActions();
+            if (row.status === 'loading') row._lookup = setTimeout(function () { onLineStyleInput(row.uid, si.value); }, LOOKUP_PAUSE);
         });
         $('qqLineList').addEventListener('change', function (e) {
             var cs = e.target.closest('.qq-line-color'); if (cs) onLineColorChange(Number(cs.getAttribute('data-uid')), cs.value);
@@ -1913,7 +2121,13 @@
         $('qqLineList').addEventListener('click', function (e) {
             var mv = e.target.closest('.qq-line-mv'); if (mv && !mv.disabled) { moveLineStyle(Number(mv.getAttribute('data-uid')), Number(mv.getAttribute('data-dir'))); return; }
             var rm = e.target.closest('.qq-line-rm'); if (rm) { removeLineStyle(Number(rm.getAttribute('data-uid'))); return; }
+            var retry = e.target.closest('.qq-line-retry'); if (retry) { var row = lineRow(Number(retry.getAttribute('data-uid'))); if (row) onLineStyleInput(row.uid, row.raw); }
         });
+        // A product photo that fails to load is hidden rather than shown broken.
+        $('qqLineList').addEventListener('error', function (e) {
+            if (e.target.matches && e.target.matches('img.qq-line-thumb')) { e.target.removeAttribute('src'); e.target.classList.add('is-empty'); }
+        }, true);
+        $('qqMatrix').addEventListener('click', function (e) { if (e.target.closest('.qq-matrix-retry')) renderMatrix(); });
         $('qqLineQty').addEventListener('input', function (e) { state.lineQty = e.target.validity.badInput ? NaN : e.target.value === '' ? null : Number(e.target.value); repriceActiveDebounced(); });
         window.QuickQuoteWorkspace.mount(workspaceBridge());
 
@@ -1943,13 +2157,17 @@
                 $('qqStyle').value = qStyle.toUpperCase();
                 lookupStyle(qStyle.toUpperCase());
             }
-        } catch (_) { }
+        } catch (err) { console.error('[quick-quote] could not read the page link settings:', err); }
         renderMode();
         renderLineMethods();
+        if (!state.lineStyles.length) addLineStyle(false);   // one row ready to type into
         renderLineList();
         renderConfigControls();
         renderLinePreview();
         renderResults();
+        // Line Sheet opens ready for a style number.
+        var first = document.querySelector('.qq-line-style');
+        if (state.mode === 'linesheet' && first && document.activeElement === document.body) first.focus({ preventScroll: true });
     }
 
     if (document.readyState === 'loading') {

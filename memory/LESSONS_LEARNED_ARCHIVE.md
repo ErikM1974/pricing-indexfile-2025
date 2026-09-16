@@ -4,6 +4,13 @@ Resolved entries aged out of `LESSONS_LEARNED.md` (300-line cap). Newest first. 
 
 ---
 
+## Archived 2026-09-16
+## Fast price sheets need explicit sample quantities (2026-09-14, superseded 2026-09-16 by the classic line-sheet restore)
+
+- Problem/root cause: the expanded estimate workflow pushed quantity breaks and everyday settings below the viewport. A tier's base "from" price could differ from the customer price at the displayed quantity.
+- Solution: compact left controls, one exact-first search, optional quantity and immediate customer tiers. Price every labeled sample through the existing engine; never show a sample order as the customer's requested total. Share one model across copy, screen, print and PDF.
+- Prevention: preserve canonical monetary functions and original hashes. Test replacement/search races, no-quantity draft restore, invalid quantities, copy fallback, 1265 × 712 geometry, four widths, every PDF page and real builder handoff totals. Trial with both reps before adding personal presets.
+
 ## Archived 2026-09-07
 ## 2026-09-06 — Adding `<main>` to 96 pages found two markup bugs a browser had been hiding (`v2026.09.06.51`)
 

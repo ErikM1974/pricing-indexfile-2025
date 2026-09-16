@@ -100,4 +100,21 @@ describe('Quick Quote ↔ configurator engine-wiring parity (Rule #7)', () => {
         // priceMethod requests nudge:true; the matrix probe stays nudge:false
         expect(QQ).toMatch(/singleItemPreview\(buildItem\(def\)[\s\S]{0,120}nudge:\s*true/);
     });
+
+    // 2026-09-16: 112FPR (Richardson, blank category) was refused cap embroidery by a local
+    // regex + hard block, and DTG was never blocked because eligibility says 'no' as a string.
+    test('cap/garment comes from the shared headwear classifier, loaded before the page', () => {
+        const HTML = fs.readFileSync(path.join(ROOT, 'calculators', 'quick-quote', 'index.html'), 'utf8');
+        expect(QQ).not.toMatch(/function isCapProduct/);
+        expect(QQ).toContain('HeadwearClassifier.classify');
+        expect(HTML.indexOf('/shared_components/js/headwear-classifier.js')).toBeGreaterThan(-1);
+        expect(HTML.indexOf('/shared_components/js/headwear-classifier.js')).toBeLessThan(HTML.indexOf('/calculators/quick-quote/quick-quote.js'));
+    });
+
+    test('line-sheet rows route embroidery by product and read DTG eligibility as yes/warn/no', () => {
+        expect(QQ).not.toContain("product.isCap !== (method === 'capemb')");
+        expect(QQ).not.toContain('!eligibility[def.engineMethod]');
+        expect(QQ).toMatch(/function methodAllowed\(elig, key\)[\s\S]{0,120}v === true \|\| v === 'yes' \|\| v === 'warn'/);
+        expect(QQ).toMatch(/var token = row\._ptok, method = lineMethodFor\(row\), def = METHODS\[method\]/);
+    });
 });
