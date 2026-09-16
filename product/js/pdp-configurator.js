@@ -6,7 +6,8 @@
  *   Q1  How many?            qty stepper (default 24, min 1, ±6)
  *   Q2  Where does it go?    placement chips (garments: Left chest / Full
  *                            front / Back / Front + back · caps: Front /
- *                            Front + back) + SCP ink-colors stepper (1-4,
+ *                            Front + back · flat headwear: Front only)
+ *                            + SCP ink-colors stepper (1-4,
  *                            asked once — applies to both placements).
  *                            Only placements at least ONE eligible method can
  *                            price are rendered (currentLocations()), so an
@@ -40,6 +41,8 @@
  *   PdpConfigurator.setColor()     re-price after a swatch change (EMB
  *                                    prices per color via /api/size-pricing)
  *   PdpConfigurator.getSelection() current selection for the quote CTA
+ *   PdpConfigurator.getLocations() placement chips on this page
+ *                                    ([{ key, label, sub }], [] before init)
  */
 (function () {
     'use strict';
@@ -141,14 +144,13 @@
         { key: 'front', label: 'Front', sub: 'Front logo' },
         { key: 'frontBack', label: 'Front + back', sub: 'Front + back logos' }
     ];
-    // Flat headwear (beanies, headbands — ctx.isFlat) is priced as garment
-    // embroidery, so it keeps the garment keys and engine inputs; only the chip
-    // words change ("Left chest" means nothing on a beanie).
-    const FLAT_HEADWEAR_WORDS = {
-        leftChest: { label: 'Front', sub: 'Front logo' },
-        back: { label: 'Back', sub: 'Back logo' },
-        frontBack: { label: 'Front + back', sub: 'Front + back logos' }
-    };
+    // Flat headwear (beanies, headbands, gaiters — ctx.isFlat) has ONE placement,
+    // the front (Erik 2026-09-16). It is priced as garment embroidery, so it keeps
+    // the garment leftChest key and engine inputs; only the words change
+    // ("Left chest" means nothing on a beanie).
+    const FLAT_HEADWEAR_LOCATIONS = [
+        { key: 'leftChest', label: 'Front', sub: 'Front logo' }
+    ];
 
     const DTG_CODES = { leftChest: 'LC', fullFront: 'FF', back: 'FB', frontBack: 'LC_FB' };
     const DTF_KEYS = {
@@ -674,9 +676,7 @@
      */
     function currentLocations() {
         const all = state.ctx.isCap ? CAP_LOCATIONS
-            : state.ctx.isFlat ? GARMENT_LOCATIONS.map(function (l) {
-                return Object.assign({}, l, FLAT_HEADWEAR_WORDS[l.key]);
-            })
+            : state.ctx.isFlat ? FLAT_HEADWEAR_LOCATIONS
             : GARMENT_LOCATIONS;
         const live = all.filter(function (l) {
             return state.methods.some(function (m) {
@@ -1279,7 +1279,7 @@
      * @param {Object} ctx
      *   style        style number (required)
      *   isCap        cap product → cap placements + cap-embroidery pricing
-     *   isFlat       flat headwear (beanie, headband) → garment pricing, "Front" chip words
+     *   isFlat       flat headwear (beanie, headband, gaiter) → garment pricing, one "Front" chip
      *   productName  display name for CTAs
      *   eligibility  DecorationMethods.eligibleFor() result (garments; null for caps)
      *   getColor     () → { name: COLOR_NAME, catalog: CATALOG_COLOR } | null
@@ -1384,9 +1384,22 @@
         return sel;
     }
 
+    /**
+     * The placement chips this page offers (copies). The product page words its
+     * quote-conflict message with these, so a beanie page says "Front" and a
+     * tee page says "Left chest" for the same stored key.
+     */
+    function getLocations() {
+        if (!state.initialized || !state.ctx) return [];
+        return currentLocations().map(function (l) {
+            return { key: l.key, label: l.label, sub: l.sub };
+        });
+    }
+
     window.PdpConfigurator = {
         init: init,
         setColor: setColor,
-        getSelection: getSelection
+        getSelection: getSelection,
+        getLocations: getLocations
     };
 })();

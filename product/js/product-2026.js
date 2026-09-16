@@ -19,8 +19,12 @@
  *   - CAP vs GARMENT via the shared HeadwearClassifier
  *     (shared_components/js/headwear-classifier.js — the one rule every price
  *     surface uses): isCap → caps branch; flat headwear (beanies, headbands,
- *     gaiters…) → garment embroidery only, without the category rules;
- *     module missing → visible pricing error, never a keyword guess.
+ *     gaiters…) → garment embroidery with one "Front" placement. Flat items in
+ *     Caps (category or subcategory) are embroidery only, without the category
+ *     rules (the live Caps rule turns every method off); flat items elsewhere
+ *     (Personal Protection gaiters, Accessories headbands, Workwear beanies)
+ *     keep their category's rules. Module missing → visible pricing error,
+ *     never a keyword guess.
  *
  * URL contract (preserved from the legacy /product app):
  *   ?style= | ?StyleNumber=    style number (required)
@@ -220,6 +224,22 @@
         });
     }
 
+    /** CATEGORY_NAME or SUBCATEGORY_NAME is "Caps" (Youth/Caps and Ladies/Caps included). */
+    function inCapsCategory(product) {
+        return !!product && (/^caps$/i.test(product.category || '') || /^caps$/i.test(product.subcategory || ''));
+    }
+
+    /**
+     * Embroidery is the only decoration offered: caps, and flat headwear listed
+     * under Caps (beanies, Caps-category headbands). Flat items in other
+     * categories keep that category's decoration rules (Erik 2026-09-16: no new
+     * blocks on print methods).
+     */
+    function embroideryOnlyHeadwear() {
+        if (state.isCap) return true;
+        return !!(state.headwear && state.headwear.isFlat && inCapsCategory(state.product));
+    }
+
     function pickInitialColor(colorParam) {
         if (colorParam) {
             const want = normColor(colorParam);
@@ -281,7 +301,7 @@
         const canonical = window.location.origin + '/product.html?style=' + encodeURIComponent(state.style);
         const ssrHead = !/^Product Details \|/.test(document.title);
         const desc = (bullets.lead || displayName) + ' Live inventory and decoration pricing — embroidery'
-            + (state.isCap ? '' : ', screen print, DTG, and DTF') + ' from Northwest Custom Apparel, Milton WA.';
+            + (embroideryOnlyHeadwear() ? '' : ', screen print, DTG, and DTF') + ' from Northwest Custom Apparel, Milton WA.';
         if (!ssrHead) {
             document.title = state.style + ' ' + displayName + ' — Custom ' + (state.isCap ? 'Caps' : 'Apparel')
                 + ' | Northwest Custom Apparel';
@@ -565,10 +585,11 @@
     }
 
     /**
-     * Flat headwear (beanies, headbands, gaiters…) is embroidered flat and priced
-     * as garment embroidery. The live "Caps" decoration rule turns every method
-     * off, so the category rules are not asked — the same embroidery-only set
-     * Quick Quote uses (calculators/quick-quote/quick-quote.js resolveEligibility).
+     * Flat headwear listed under Caps (beanies, Caps-category headbands) is
+     * embroidered flat and priced as garment embroidery. The live "Caps"
+     * decoration rule turns every method off, so that rule is not asked:
+     * embroidery only. Flat items in any other category never come here —
+     * they take getEligibility() like every garment.
      */
     function flatHeadwearEligibility() {
         return { EMB: true, DTG: 'no', SCP: false, DTF: false, source: 'flat-headwear' };
@@ -589,7 +610,7 @@
             return;
         }
         if (state.isCap) state.decoration = null;
-        else if (state.headwear.isFlat) state.decoration = flatHeadwearEligibility();
+        else if (embroideryOnlyHeadwear()) state.decoration = flatHeadwearEligibility();
         else state.decoration = await getEligibility();
         renderMethodAlert();
 
@@ -639,7 +660,8 @@
 
     /**
      * Visible warning whenever eligibility fell back to the safe set; a short
-     * note when flat headwear is limited to embroidery on purpose.
+     * note only where flat headwear is embroidery-only on purpose (listed under
+     * Caps) — flat items in other categories show their category's methods.
      */
     function renderMethodAlert() {
         const slot = $('methodAlert');
@@ -790,6 +812,9 @@
      * Pooling-scope guard (staff-builder rule, design doc §Grouping): pieces
      * of one decoration method share ONE placement/design so quantities pool —
      * a mismatched add would price a configuration staff can't reproduce.
+     * The placement is named with THIS page's chip for the stored key, never the
+     * stored label: a tee and a beanie share the leftChest key but call it
+     * "Left chest" and "Front", and the shopper can only pick what this page shows.
      */
     function quoteConflictMessage(sel) {
         const existing = window.QuoteCartStore.getItems().filter(function (i) {
@@ -798,8 +823,13 @@
         if (existing.length === 0) return null;
         const first = existing[0];
         if (first.placement !== sel.locationKey) {
-            return 'Your quote\'s ' + (sel.methodLabel || 'decorated') + ' pieces use "'
-                + (first.placementLabel || first.placement)
+            const pieces = 'Your quote\'s ' + (sel.methodLabel || 'decorated') + ' pieces use ';
+            const label = pagePlacementLabel(first.placement);
+            if (!label) {
+                return pieces + 'a placement this style doesn\'t offer — one placement per decoration type '
+                    + 'so quantities pool for the discount. Email us to price this style with a different layout.';
+            }
+            return pieces + '"' + label
                 + '" — one placement per decoration type so quantities pool for the discount. '
                 + 'Switch the placement to match, or email us for a mixed layout.';
         }
@@ -810,6 +840,45 @@
                 + first.inkColors + ' to add this piece, or email us to price a separate second design.';
         }
         return null;
+    }
+
+    /** This page's chip label for a placement key, or null when the page doesn't offer it. */
+    function pagePlacementLabel(key) {
+        const cfg = window.PdpConfigurator;
+        const locations = cfg && typeof cfg.getLocations === 'function' ? cfg.getLocations() : [];
+        const hit = locations.filter(function (l) { return l.key === key; })[0];
+        return hit ? hit.label : null;
+    }
+
+    // Size labels that mean "one size" — the cart shows no size grid for them.
+    const ONE_SIZE = /^(OSFA|OSFM|OS|O\/S|ONE ?SIZE|ADJ)$/i;
+
+    /** Distinct stock sizes for the selected color, or null when the stock feed has none. */
+    function selectedColorSizes() {
+        if (!state.inventoryRows || !state.selected) return null;
+        const want = normColor(state.selected.catalog);
+        const sizes = new Set();
+        state.inventoryRows.forEach(function (r) {
+            const size = String(r.size || '').trim();
+            if (size && normColor(r.color) === want) sizes.add(size);
+        });
+        return sizes.size ? Array.from(sizes) : null;
+    }
+
+    /**
+     * Will the quote cart ask for sizes on this line? Never for caps; garments
+     * always land on one standard size and are split in the cart's size grid;
+     * flat headwear only when the style comes in more than one size (the cart
+     * shows its grid for two or more sizes). Stock feed unavailable → judge by
+     * the size the engine priced.
+     */
+    function cartAsksForSizes(sel) {
+        if (sel.isCap) return false;
+        if (!state.headwear || !state.headwear.isFlat) return true;
+        const sizes = selectedColorSizes();
+        if (sizes) return sizes.length > 1;
+        const priced = Object.keys(sel.sizes || {});
+        return !(priced.length === 1 && ONE_SIZE.test(priced[0]));
     }
 
     function onAddToQuote() {
@@ -841,8 +910,9 @@
         const n = window.QuoteCartStore.count();
         const unit = sel.isCap ? 'cap' : 'piece';
         // Garments land on one standard size here — the cart's size matrix is
-        // where the customer distributes them (2026-08-19), so say so.
-        const cta = sel.isCap ? 'View quote' : 'Set sizes &amp; view quote';
+        // where the customer distributes them (2026-08-19), so say so. Caps and
+        // one-size flat headwear have no sizes to set.
+        const cta = cartAsksForSizes(sel) ? 'Set sizes &amp; view quote' : 'View quote';
         showToast('success', 'Added — ' + sel.qty + ' ' + unit + (sel.qty === 1 ? '' : 's')
             + ' · ' + escapeHtml(sel.methodLabel)
             + ' &nbsp;<a href="/quote-cart">' + cta + ' (' + n + ')</a>');

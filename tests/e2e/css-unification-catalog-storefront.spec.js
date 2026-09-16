@@ -97,20 +97,23 @@ async function productReady(page,method,qty){
  await expect(page.locator('#cfgMethods')).not.toContainText('Getting your live price…');
 }
 // Cap vs garment embroidery comes from the shared headwear classifier (Erik 2026-09-16).
-// The beanie runs under the live-like Caps rule (every method off): only the flat path prices it.
-test('catalog storefront headwear: beanie CP90 is flat garment embroidery labelled Front',async({page})=>{
- const events=await open(page,{url:'/product.html?style=CP90',allMethods:true,liveCapsRule:true});
+// Flat headwear has ONE placement, Front (the garment leftChest key). The beanie runs under the live-like
+// Caps rule (every method off): only the embroidery-only flat path prices it. The gaiter sits in Personal
+// Protection and keeps that rule (embroidery, screen print, DTF).
+async function toastLink(page){const link=page.locator('#toastStack .toast-success a[href="/quote-cart"]').last();await expect(link).toBeVisible();return (await link.textContent()).trim();}
+test('catalog storefront headwear: beanie CP90 is flat garment embroidery with one Front placement',async({page})=>{
+ const events=await open(page,{url:'/product.html?style=CP90',allMethods:true,liveRules:true});
  await productReady(page);
  await expect(page.locator('#cfgMethods [data-method]')).toHaveCount(1);
  await expect(page.locator('#cfgMethods [data-method="emb"]')).toBeVisible();
  await expect(page.locator('#flatHeadwearNote')).toContainText('Beanies and other soft headwear are embroidered flat');
- await expect(page.locator('#cfgLocations [data-loc]')).toHaveText([/^Front\s*Front logo$/,/^Back\s*Back logo$/,/^Front \+ back\s*Front \+ back logos$/]);
+ await expect(page.locator('#cfgLocations [data-loc]')).toHaveText([/^Front\s*Front logo$/]);
  await expect(page.locator('#cfgInkRow')).toBeHidden();
  await expect(page.locator('#cfgMatrix')).toContainText('Price per piece');
  expect(await page.evaluate(()=>window.PdpConfigurator.getSelection())).toMatchObject({methodId:'emb',engineMethod:'EMB',isCap:false,locationKey:'leftChest',locationLabel:'Front'});
  const bundles=events.reads.filter(r=>r.path==='/api/pricing-bundle').map(r=>new URLSearchParams(r.query).get('method'));
  expect(bundles).toContain('EMB');expect(bundles).not.toContain('CAP');
- expect(events.reads.some(r=>r.path==='/api/decoration-methods'),'flat headwear never asks the Caps rule').toBe(false);
+ expect(events.reads.some(r=>r.path==='/api/decoration-methods'),'Caps-listed flat headwear never asks the Caps rule').toBe(false);
  fs.mkdirSync(out,{recursive:true});
  for(const width of [1440,768,390,320]){
   await page.setViewportSize({width,height:1000});
@@ -121,6 +124,49 @@ test('catalog storefront headwear: beanie CP90 is flat garment embroidery labell
  await page.setViewportSize({width:1440,height:1000});
  await page.locator('#cfgAddToQuote').click();
  expect(await page.evaluate(()=>window.QuoteCartStore.getItems())).toMatchObject([{style:'CP90',method:'EMB',placement:'leftChest',placementLabel:'Front',isCap:false}]);
+ // One-size beanie: nothing to size in the cart.
+ expect(await toastLink(page)).toBe('View quote (1)');
+ // A tee on the back is told the pooled embroidery placement in ITS words (Left chest), never the beanie's.
+ await page.goto('/product.html?style=PC61');await productReady(page);
+ await page.locator('#cfgMethods [data-method="emb"]').click();await page.locator('#cfgLocations [data-loc="back"]').click();await productReady(page,'emb');
+ await page.locator('#cfgAddToQuote').click();
+ const warn=page.locator('#toastStack .toast-warn').last();
+ await expect(warn).toContainText('Your quote\'s Embroidery pieces use "Left chest"');
+ await expect(warn).not.toContainText('"Front"');
+ expect(await page.evaluate(()=>window.QuoteCartStore.getItems())).toHaveLength(1);
+ expect((await new AxeBuilder({page}).include('#toastStack').withTags(['wcag2a','wcag2aa','wcag21aa']).analyze()).violations.map(v=>v.id)).toEqual([]);
+ check(expect,events);
+});
+test('catalog storefront headwear: gaiter FS07 keeps its Personal Protection methods with one Front placement',async({page})=>{
+ const events=await open(page,{url:'/product.html?style=FS07',allMethods:true,liveRules:true});
+ await productReady(page);
+ await expect(page.locator('#cfgMethods [data-method]')).toHaveCount(3);
+ for(const method of ['emb','scp','dtf'])await expect(page.locator('#cfgMethods [data-method="'+method+'"]')).toBeVisible();
+ await expect(page.locator('#cfgMethods [data-method="dtg"]')).toHaveCount(0);
+ await expect(page.locator('#flatHeadwearNote')).toHaveCount(0);
+ await expect(page.locator('#methodAlert')).toBeEmpty();
+ await expect(page.locator('#cfgLocations [data-loc]')).toHaveText([/^Front\s*Front logo$/]);
+ await expect(page.locator('#cfgInkRow')).toBeVisible();
+ expect(events.reads.some(r=>r.path==='/api/decoration-methods'),'flat headwear outside Caps asks its category rule').toBe(true);
+ expect(await page.evaluate(()=>window.PdpConfigurator.getSelection())).toMatchObject({methodId:'emb',engineMethod:'EMB',isCap:false,locationKey:'leftChest',locationLabel:'Front'});
+ for(const method of ['scp','dtf']){await page.locator('#cfgMethods [data-method="'+method+'"]').click();await productReady(page,method);}
+ fs.mkdirSync(out,{recursive:true});
+ for(const width of [1440,768,390,320]){
+  await page.setViewportSize({width,height:1000});
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+  await page.locator('section[aria-labelledby="pricingHeading"]').screenshot({path:path.join(out,'catalog-storefront-headwear-FS07-'+width+'.png')});
+ }
+ expect((await new AxeBuilder({page}).include('section[aria-labelledby="pricingHeading"]').withTags(['wcag2a','wcag2aa','wcag21aa']).analyze()).violations.map(v=>v.id)).toEqual([]);
+ await page.setViewportSize({width:1440,height:1000});
+ await page.locator('#cfgAddToQuote').click();
+ expect(await page.evaluate(()=>window.QuoteCartStore.getItems())).toMatchObject([{style:'FS07',method:'DTF',placement:'leftChest',placementLabel:'Front',isCap:false}]);
+ expect(await toastLink(page)).toBe('View quote (1)');
+ await page.locator('#cfgMethods [data-method="emb"]').click();await productReady(page,'emb');
+ await page.locator('#cfgAddToQuote').click();
+ expect(await page.evaluate(()=>window.QuoteCartStore.getItems())).toMatchObject([{style:'FS07',method:'DTF'},{style:'FS07',method:'EMB',placement:'leftChest',placementLabel:'Front',isCap:false}]);
+ expect(await toastLink(page)).toBe('View quote (2)');
+ const bundles=events.reads.filter(r=>r.path==='/api/pricing-bundle').map(r=>new URLSearchParams(r.query).get('method'));
+ expect(bundles).toEqual(expect.arrayContaining(['EMB','ScreenPrint','DTF']));expect(bundles).not.toContain('CAP');
  check(expect,events);
 });
 test('catalog storefront headwear: blank-category Richardson 112FPR is priced as a cap',async({page})=>{

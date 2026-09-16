@@ -18,10 +18,11 @@ const garment='<svg xmlns="http://www.w3.org/2000/svg" width="600" height="720">
 const image='/__catalog-fixture/garment.svg';
 function source(file){let s=restorePreHoliday(file, restorePreQuickQuote(file,fs.readFileSync(path.join(root,file),'utf8').replace(/\r\n/g,'\n')));for(const c of original.changes.filter(c=>c.file===file).reverse()){if(s.split(c.after).length-1!==c.count)throw Error('Original mapping drift '+file);s=s.split(c.after).join(c.before);}return s;}
 function products(){return ['PC61','PC54','K500','C112'].map((styleNumber,i)=>({styleNumber,productName:['Core Cotton Tee','Essential Cotton Tee','Silk Touch Polo','Embroidered Cap'][i],brand:i===2?'Port Authority':'Port & Company',category:i===3?'Caps':i===2?'Polos/Knits':'T-Shirts',subcategory:'100% Cotton',description:'Comfortable, durable 100% cotton apparel for the whole team.',displayPriceLabel:['$19.25 with embroidery','$18.75 with embroidery','$25.50 with embroidery','$22.50 with embroidery'][i],images:{main:image,display:image,thumbnail:image},colors:colors.map(c=>({name:c.name,catalogColor:c.catalog,swatchUrl:image,productImageUrl:image})),sizes:i===3?['OSFA']:sizes,features:{isTopSeller:i<2,isNew:i===2}}));}
-// Headwear product pages only (never in the catalog listing): a beanie in Caps and a blank-category
-// Richardson cap, shaped like their live /api/product-details rows (shared headwear classifier).
-const headwear={CP90:{productName:'Port Authority Knit Cap. CP90',brand:'Port Authority',category:'Caps',subcategory:'Fleece/Beanies',description:'A snug acrylic beanie that takes a sharp embroidered logo.'},'112FPR':{productName:'Richardson Five-Panel with Rope 112FPR',brand:'Richardson',category:'',subcategory:'',description:'mesh back     5 panels     Structured     Precurved bill     Adjustable snapback'}};
-const oneSize=style=>['C112','CP90','112FPR'].includes(style),capPricing=style=>['C112','112FPR'].includes(style);
+// Headwear product pages only (never in the catalog listing): a beanie in Caps, a neck gaiter in
+// Personal Protection and a blank-category Richardson cap, shaped like their live /api/product-details
+// rows (shared headwear classifier).
+const headwear={CP90:{productName:'Port Authority Knit Cap. CP90',brand:'Port Authority',category:'Caps',subcategory:'Fleece/Beanies',description:'A snug acrylic beanie that takes a sharp embroidered logo.'},FS07:{productName:'Port Authority Fleece Neck Gaiter. FS07',brand:'Port Authority',category:'Personal Protection',subcategory:'Face Coverings',description:'A soft fleece neck gaiter that pulls up over the face.'},'112FPR':{productName:'Richardson Five-Panel with Rope 112FPR',brand:'Richardson',category:'',subcategory:'',description:'mesh back     5 panels     Structured     Precurved bill     Adjustable snapback'}};
+const oneSize=style=>['C112','CP90','FS07','112FPR'].includes(style),capPricing=style=>['C112','112FPR'].includes(style);
 function details(style){const p=headwear[style]||products().find(p=>p.styleNumber===style)||products()[0];return colors.map(c=>({STYLE:style,PRODUCT_TITLE:p.productName,BRAND_NAME:p.brand,CATEGORY_NAME:p.category,SUBCATEGORY_NAME:p.subcategory,PRODUCT_DESCRIPTION:p.description,PRODUCT_STATUS:'Active',CATALOG_COLOR:c.catalog,COLOR_NAME:c.name,COLOR_SQUARE_IMAGE:image,FRONT_MODEL:image,BACK_MODEL:image,FRONT_FLAT:image,BACK_FLAT:image,PRODUCT_IMAGE:image}));}
 async function open(page,state={}){
  const events={errors:[],writes:[],unknown:[],missing:[],reads:[],actions:[],dialogs:[]};
@@ -46,7 +47,12 @@ async function open(page,state={}){
   if(p==='/api/safety-stripes/top-sellers/styles')return route.fulfill({json:{records:[]}});
   if(p==='/api/dtg/top-sellers/styles')return route.fulfill({json:{records:[{style:'PC54'},{style:'PC61'}]}});
   if(p==='/api/caps/catalog')return route.fulfill({json:[{style:'C112'}]});
-  if(p==='/api/decoration-methods')return route.fulfill({status:state.rulesFailed?503:200,json:{rules:['T-Shirts','Polos/Knits','Caps'].map(category=>state.liveCapsRule&&category==='Caps'?{category,EMB:false,DTG:false,SCP:false,DTF:false}:({category,EMB:true,DTG:!!state.allMethods,SCP:!!state.allMethods,DTF:!!state.allMethods})),overrides:[]}});
+  // liveRules: the live Caps rule (every method off) and Personal Protection (EMB + SCP + DTF, no DTG), checked 2026-09-16.
+  if(p==='/api/decoration-methods'){
+   const rules=['T-Shirts','Polos/Knits','Caps'].map(category=>state.liveRules&&category==='Caps'?{category,EMB:false,DTG:false,SCP:false,DTF:false}:({category,EMB:true,DTG:!!state.allMethods,SCP:!!state.allMethods,DTF:!!state.allMethods}));
+   if(state.liveRules)rules.push({category:'Personal Protection',EMB:true,DTG:false,SCP:true,DTF:true});
+   return route.fulfill({status:state.rulesFailed?503:200,json:{rules,overrides:[]}});
+  }
   if(p==='/api/products/search'){
    if(state.searchFailed)return route.fulfill({status:503,json:{error:'Synthetic catalog unavailable'}});
    const q=(u.searchParams.get('q')||'').toLowerCase(),brand=u.searchParams.get('brand'),category=u.searchParams.get('category');
