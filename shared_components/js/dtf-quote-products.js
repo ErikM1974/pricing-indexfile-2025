@@ -22,6 +22,8 @@ class DTFQuoteProducts {
 
         // Initialize exact match search (optimized for sales reps)
         this.exactMatchSearch = null;
+        // Searches the cap filter emptied: normalized query → what to tell the rep
+        this.hiddenCapSearches = new Map();
 
         dtfquotprodLog('[DTFQuoteProducts] Products manager initialized');
     }
@@ -49,20 +51,71 @@ class DTFQuoteProducts {
             onNavigate: options.onNavigate || null,
             onSelect: options.onSelect || null,
             onClose: options.onClose || null,
-            filterFunction: (item) => {
-                // Filter out caps (caps can't have DTF transfers)
-                // Use shared ProductCategoryFilter for comprehensive cap detection
-                if (typeof ProductCategoryFilter !== 'undefined') {
-                    return !ProductCategoryFilter.isStructuredCap(item);
-                }
-                // Fallback if utility not loaded (shouldn't happen)
-                const label = (item.label || '').toUpperCase();
-                return !(label.includes('CAP') || label.includes('HAT') || label.includes('BEANIE'));
-            }
+            // Caps can't take DTF transfers, so they stay out of the search
+            filterFunction: (item) => !this.isCapSuggestion(item),
+            // Every result was a hidden cap: say so instead of a bare "No products found"
+            onFilteredOut: (items, query) => this.rememberHiddenCaps(items, query)
         });
 
         dtfquotprodLog('[DTFQuoteProducts] Exact match search initialized with keyboard navigation');
         return true;
+    }
+
+    /**
+     * Does DTF search hide this style-search suggestion as a cap? Caps can't take DTF transfers.
+     * Erik 2026-09-16: keep every style the search showed before. A row is hidden only when BOTH
+     * the old keyword rule (ProductCategoryFilter.isStructuredCap) AND the shared rule
+     * (HeadwearClassifier) call it a cap, so bucket hats and Richardson five/seven-panel or
+     * wide-brim styles stay listed, and garments the keyword list hid ("Capital" blazer,
+     * "Fitted Tee", "Baseball Tee", scrub caps, skull caps) come back.
+     * A missing helper is a visible error, never a guess (Rule 4).
+     * @param {{value?: string, label?: string}} item - /api/stylesearch row ("STYLE - TITLE" label)
+     * @returns {boolean}
+     */
+    isCapSuggestion(item) {
+        const classifier = typeof window !== 'undefined' ? window.HeadwearClassifier : null;
+        const keywordRule = typeof window !== 'undefined' ? window.ProductCategoryFilter : null;
+        if (!classifier || typeof classifier.classify !== 'function' ||
+            !keywordRule || typeof keywordRule.isStructuredCap !== 'function') {
+            const message = 'The cap/garment check did not load, so product search is unavailable. Refresh the page.';
+            if (typeof window !== 'undefined' && typeof window.showToast === 'function') window.showToast(message, 'error', 8000);
+            throw new Error(message);
+        }
+        const row = item || {};
+        return keywordRule.isStructuredCap(row) === true &&
+            classifier.classify({ PRODUCT_TITLE: row.label || '', STYLE: row.value || '' }).isCap === true;
+    }
+
+    /** The search module's query form (trimmed, no spaces, upper case). */
+    normalizeSearchQuery(query) {
+        return String(query == null ? '' : query).trim().replace(/\s+/g, '').toUpperCase();
+    }
+
+    /**
+     * ExactMatchSearch onFilteredOut: every result for `query` was a cap the search hides.
+     * Remembered per query because the search caches the emptied result and does not call
+     * the hook again for a repeat search.
+     * @param {Array<{value?: string}>} items - the hidden rows
+     * @param {string} query - the normalized query
+     */
+    rememberHiddenCaps(items, query) {
+        const key = this.normalizeSearchQuery(query);
+        if (!key || !items || items.length === 0) return;
+        const exact = items.find(item => this.normalizeSearchQuery(item && item.value) === key);
+        this.hiddenCapSearches.delete(key);   // re-insert as newest; the oldest goes past 50
+        this.hiddenCapSearches.set(key, exact
+            ? `${exact.value} is a cap — DTF search doesn’t list caps.`
+            : `Only caps match ${key} — DTF search doesn’t list caps.`);
+        if (this.hiddenCapSearches.size > 50) this.hiddenCapSearches.delete(this.hiddenCapSearches.keys().next().value);
+    }
+
+    /**
+     * What to show instead of "No products found" for this search text, or null.
+     * @param {string} query - the search box text
+     * @returns {string|null}
+     */
+    hiddenSearchMessage(query) {
+        return this.hiddenCapSearches.get(this.normalizeSearchQuery(query)) || null;
     }
 
     /**
@@ -112,15 +165,8 @@ class DTFQuoteProducts {
 
             const suggestions = await response.json();
 
-            // Filter out caps using shared utility
-            const filteredSuggestions = suggestions.filter(item => {
-                if (typeof ProductCategoryFilter !== 'undefined') {
-                    return !ProductCategoryFilter.isStructuredCap(item);
-                }
-                // Fallback
-                const label = (item.label || '').toUpperCase();
-                return !(label.includes('CAP') || label.includes('HAT') || label.includes('BEANIE'));
-            });
+            // Filter out caps using the shared headwear rule
+            const filteredSuggestions = suggestions.filter(item => !this.isCapSuggestion(item));
 
             // Transform to product format
             const products = filteredSuggestions.map(item => ({

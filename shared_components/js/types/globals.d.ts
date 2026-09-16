@@ -441,6 +441,9 @@ declare const wrapWithRepricingIndicator: any; // T4 lift — bare-global page c
 
 declare const EXTENDED_SIZE_ORDER: any; // T4 lift — bare-global page contract
 declare const ProductCategoryFilter: any; // T4 lift — bare-global page contract
+/** Shared cap / flat headwear / garment rule — shared_components/js/headwear-classifier.js (Erik 2026-09-16). */
+interface HeadwearClassification { kind: 'cap' | 'flat' | 'garment'; isCap: boolean; isFlat: boolean; confident: boolean; reason: string }
+declare const HeadwearClassifier: { classify(product: Record<string, any> | null | undefined): HeadwearClassification } | undefined; // bare-global page contract
 declare const SIZE_TO_SUFFIX: any; // T4 lift — bare-global page contract
 declare const SKUValidationService: any; // T4 lift — bare-global page contract
 declare const ScreenPrintPricingService: any; // T4 lift — bare-global page contract

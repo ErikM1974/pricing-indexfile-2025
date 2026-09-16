@@ -29,9 +29,9 @@ const path = require('path');
 // These are OBJECTS, not functions — the code feature-detects with `typeof !== "undefined"`
 // and then calls a method, so a bare no-op function throws.
 globalThis.QuoteOrderSummary = { configure: () => {}, render: () => {}, renderShipTo: () => {} };
-// isFlatHeadwear false → cap detection falls back to the style/title keyword rules,
-// which is the behaviour we actually want to assert.
-globalThis.ProductCategoryFilter = { isFlatHeadwear: () => false, isCap: () => false };
+// Cap vs garment is the REAL shared headwear rule (Erik 2026-09-16) — the page loads it
+// before the bundle, and isCapProduct refuses to guess without it.
+require('../../shared_components/js/headwear-classifier.js');
 globalThis.SKUValidationService = { validate: () => ({ valid: true }) };
 // A DECORATOR, not a hook: pricing-sync rebinds `recalculatePricing` to whatever this
 // returns. A no-op returning undefined wipes the function entirely.
@@ -177,5 +177,19 @@ describe('cap vs garment', () => {
         const row = document.getElementById('row-1');
         apply(row, 1, item());
         expect(row.dataset.isCap).toBe('false');
+    });
+
+    test('a typed beanie or headband is flat headwear — garment pricing, garment sizes', () => {
+        const row = document.getElementById('row-1');
+        apply(row, 1, item({ style: 'VND-BEANIE', description: 'Vendor Knit Beanie' }));
+        expect(row.dataset.isCap).toBe('false');
+        apply(row, 1, item({ style: 'VND-HB', description: 'Fleece Headband' }));
+        expect(row.dataset.isCap).toBe('false');
+    });
+
+    test('a typed visor is a cap', () => {
+        const row = document.getElementById('row-1');
+        apply(row, 1, item({ style: 'VND-VISOR', description: 'Performance Visor' }));
+        expect(row.dataset.isCap).toBe('true');
     });
 });

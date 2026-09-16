@@ -6,7 +6,8 @@
  *   Q1  How many?            qty stepper (default 24, min 1, ±6)
  *   Q2  Where does it go?    placement chips (garments: Left chest / Full
  *                            front / Back / Front + back · caps: Front /
- *                            Front + back) + SCP ink-colors stepper (1-4,
+ *                            Front + back · flat headwear: Front only)
+ *                            + SCP ink-colors stepper (1-4,
  *                            asked once — applies to both placements).
  *                            Only placements at least ONE eligible method can
  *                            price are rendered (currentLocations()), so an
@@ -35,11 +36,13 @@
  *     "not available for this placement" state (no layout jumps).
  *
  * Public API (consumed by product/js/product-2026.js):
- *   PdpConfigurator.init(ctx)      ctx = { style, isCap, productName,
+ *   PdpConfigurator.init(ctx)      ctx = { style, isCap, isFlat, productName,
  *                                    eligibility, getColor(), onChange() }
  *   PdpConfigurator.setColor()     re-price after a swatch change (EMB
  *                                    prices per color via /api/size-pricing)
  *   PdpConfigurator.getSelection() current selection for the quote CTA
+ *   PdpConfigurator.getLocations() placement chips on this page
+ *                                    ([{ key, label, sub }], [] before init)
  */
 (function () {
     'use strict';
@@ -140,6 +143,13 @@
     const CAP_LOCATIONS = [
         { key: 'front', label: 'Front', sub: 'Front logo' },
         { key: 'frontBack', label: 'Front + back', sub: 'Front + back logos' }
+    ];
+    // Flat headwear (beanies, headbands, gaiters — ctx.isFlat) has ONE placement,
+    // the front (Erik 2026-09-16). It is priced as garment embroidery, so it keeps
+    // the garment leftChest key and engine inputs; only the words change
+    // ("Left chest" means nothing on a beanie).
+    const FLAT_HEADWEAR_LOCATIONS = [
+        { key: 'leftChest', label: 'Front', sub: 'Front logo' }
     ];
 
     const DTG_CODES = { leftChest: 'LC', fullFront: 'FF', back: 'FB', frontBack: 'LC_FB' };
@@ -325,7 +335,7 @@
                     note: loc === 'frontBack'
                         ? 'Per-piece price includes the garment plus TWO embroidered logos (left chest + back), up to 10,000 stitches each.'
                         : 'Per-piece price includes the garment plus an embroidered logo up to 10,000 stitches ('
-                            + (loc === 'back' ? 'back' : 'left chest') + ').',
+                            + (loc === 'back' ? 'back' : state.ctx.isFlat ? 'front' : 'left chest') + ').',
                     foot: 'Larger logos and extra locations are quoted per design.',
                     stdSize: std,
                     multiSize: (b.uniqueSizes || []).length > 1,
@@ -665,7 +675,9 @@
      * list rather than a placement-less configurator.
      */
     function currentLocations() {
-        const all = state.ctx.isCap ? CAP_LOCATIONS : GARMENT_LOCATIONS;
+        const all = state.ctx.isCap ? CAP_LOCATIONS
+            : state.ctx.isFlat ? FLAT_HEADWEAR_LOCATIONS
+            : GARMENT_LOCATIONS;
         const live = all.filter(function (l) {
             return state.methods.some(function (m) {
                 return METHODS[m.id] && METHODS[m.id].supports[l.key];
@@ -1267,6 +1279,7 @@
      * @param {Object} ctx
      *   style        style number (required)
      *   isCap        cap product → cap placements + cap-embroidery pricing
+     *   isFlat       flat headwear (beanie, headband, gaiter) → garment pricing, one "Front" chip
      *   productName  display name for CTAs
      *   eligibility  DecorationMethods.eligibleFor() result (garments; null for caps)
      *   getColor     () → { name: COLOR_NAME, catalog: CATALOG_COLOR } | null
@@ -1371,9 +1384,22 @@
         return sel;
     }
 
+    /**
+     * The placement chips this page offers (copies). The product page words its
+     * quote-conflict message with these, so a beanie page says "Front" and a
+     * tee page says "Left chest" for the same stored key.
+     */
+    function getLocations() {
+        if (!state.initialized || !state.ctx) return [];
+        return currentLocations().map(function (l) {
+            return { key: l.key, label: l.label, sub: l.sub };
+        });
+    }
+
     window.PdpConfigurator = {
         init: init,
         setColor: setColor,
-        getSelection: getSelection
+        getSelection: getSelection,
+        getLocations: getLocations
     };
 })();

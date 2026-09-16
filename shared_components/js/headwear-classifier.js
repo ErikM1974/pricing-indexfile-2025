@@ -7,6 +7,11 @@
  * and subcategory, the title (with "cap sleeve" removed), and — only when the
  * category is blank — cap-shape words and cap anatomy in the description.
  *
+ * Erik's rules (2026-09-16), the same on every price surface: beanies, knit caps, fleece hats,
+ * headbands, gaiters, face masks, helmet liners, skull caps, scrub caps and the Caps-category
+ * duck hood are FLAT (garment embroidery) whatever their category; visors are CAPS; bandanas
+ * and apparel (New Era, Richardson, "Capital", "Crosshatch") are garments.
+ *
  *   HeadwearClassifier.classify(productRow)
  *     → { kind: 'cap'|'flat'|'garment', isCap, isFlat, confident, reason }
  *
@@ -24,7 +29,9 @@
     // Cap anatomy in the description, blank category only. Never "cap" (tees say "cap sleeve")
     // and never low/mid-pro (jacket descriptions use it).
     var CAP_ANATOMY = /\b(sweatband|backstrap|snap ?back closure|pre-?curved|flat ?bill)\b/i;
-    var FLAT_TITLE = /\b(beanies?|knit(?:ted)?\s+(?:caps?|hats?)|watch\s+(?:caps?|hats?)|winter\s+hats?|toboggans?|skull\s?caps?|headbands?|face\s+masks?|gaiters?|helmet[- ]liners?|balaclavas?|scrub\s+caps?|bandanas?|fleece\s+hats?|2-in-1\s+headwear)\b/i;
+    var FLAT_TITLE = /\b(beanies?|knit(?:ted)?\s+(?:caps?|hats?)|watch\s+(?:caps?|hats?)|winter\s+hats?|toboggans?|skull\s?caps?|headbands?|face\s+masks?|gaiters?|helmet[- ]liners?|balaclavas?|scrub\s+caps?|fleece\s+hats?|2-in-1\s+headwear)\b/i;
+    // A hood only counts inside "Caps" ("Richardson Hood River 173" is a cap with no category).
+    var CAP_CATEGORY_HOOD = /\bhoods?\b/i;
     var CAP_SLEEVE = /\bcap[- ]sleeves?\b/gi;
     // With no category, a garment word outranks a cap shape ("Trucker Jacket", "Bucket Bag").
     var GARMENT_WORD = /\b(jackets?|coats?|vests?|parkas?|bags?|totes?|backpacks?|shirts?|tees?|t-shirts?|hoodies?|sweatshirts?|pullovers?|polos?|pants?|shorts|joggers?|aprons?|blankets?|towels?)\b/i;
@@ -42,14 +49,14 @@
         var p = product && typeof product === 'object' ? product : {};
         var category = pick(p, ['CATEGORY_NAME', 'category', 'categoryName']);
         var subcategory = pick(p, ['SUBCATEGORY_NAME', 'subcategory', 'subcategoryName']);
-        var title = pick(p, ['PRODUCT_TITLE', 'title', 'productTitle', 'name']).replace(CAP_SLEEVE, ' ');
+        var title = pick(p, ['PRODUCT_TITLE', 'title', 'productTitle', 'productName', 'name']).replace(CAP_SLEEVE, ' ');
         var description = pick(p, ['PRODUCT_DESCRIPTION', 'description']);
         var style = pick(p, ['STYLE', 'style', 'styleNumber', 'STYLE_NUMBER']).toUpperCase();
         var capCategory = /^caps$/i.test(category) || /^caps$/i.test(subcategory); // incl. Youth/Caps, Ladies/Caps
-        var flat = /beanies/i.test(subcategory) || FLAT_TITLE.test(title);
+        var flat = /beanies/i.test(subcategory) || FLAT_TITLE.test(title) || (capCategory && CAP_CATEGORY_HOOD.test(title));
 
         if (capCategory) return result(flat ? 'flat' : 'cap', true, 'category');
-        if (flat) return category ? result('garment', true, 'category') : result('flat', true, 'title');
+        if (flat) return result('flat', true, 'title'); // headbands in Accessories, gaiters, scrub caps
         if (CAP_WORD.test(title)) return result('cap', true, 'title');
         if (category) return result('garment', true, 'category');
         if (GARMENT_WORD.test(title)) return result('garment', false, 'title');

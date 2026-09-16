@@ -344,7 +344,7 @@
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
 | `/shared_components/js/decoration-methods.js` | **NEW 2026-06-11** Decoration method eligibility — fetches `/api/decoration-methods` rules+overrides (sessionStorage 1h cache), `eligibleFor(product)` → EMB/SCP/DTF bools + DTG `'yes'/'warn'/'no'` cotton gate, `categoriesFor(method)` for the catalog Decoration filter; API down → embroidery-only fallback (`source:'fallback'`, caller must show a visible warning) | APP_CONFIG (optional) | ✅ Active |
-| `/shared_components/js/product-category-filter.js` | Single source of truth for cap-vs-flat-headwear classification | — | ✅ Active |
+| `/shared_components/js/product-category-filter.js` | Legacy cap/flat keyword lists — only the DTF builder search still reads them; cap vs garment pricing uses `headwear-classifier.js` (2026-09-16) | — | ✅ Active |
 | `/shared_components/js/safety-stripe-recs.js` | **NEW (2026-06-28)** Shared renderer for curated hi-vis "safety apparel" recommendation cards (`SafetyStripeRecs.render(mountId, {variant,audience,onAdd,limit})`). Used by all 4 quote builders, Quick Quote, and the customer catalog. Fetches `GET /api/safety-stripes/top-sellers/styles` (Caspio `Safety_Stripe_Top_Sellers_2026`); `variant:'builder'` = one-click Add, `variant:'catalog'` = customer card (no sales numbers). Fails quiet (optional cross-sell). | safety-stripe-recs.css, caspio-proxy API | ✅ Active |
 | `/shared_components/js/product-pricing-ui.js` | Product pricing UI rendering | universal-pricing-grid.js | ✅ Active |
 | `/shared_components/js/exact-match-search.js` | Optimized exact-style-number search for sales reps | /api/products/search | ✅ Active |

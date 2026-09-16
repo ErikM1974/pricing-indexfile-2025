@@ -19,6 +19,8 @@
    QuotePersistence, QuoteSession, getLtmControlState, setLtmControlState,
    assertQuoteEditable, updateEditModeUI, setQuoteDateDefaults, markAsUnsaved,
    updateArtworkCharges, Event */
+// Reopened-quote price check (2026-09-16) prices with the save path's own logo inputs.
+import { buildLogoConfiguration } from './pricing-sync.js';
 import { applyDesignFromCache, showDesignThumbnail, lookupDesignNumber } from './design-search.js';
 import { collectProductsFromTable, onShipMethodChange, recalculatePricing, updateTaxCalculation } from './pricing-sync.js';
 import { updateAdditionalCharges, updateDiscountType } from './quote-lifecycle.js';
@@ -589,12 +591,18 @@ function _restoreTaxShipLtm(session, items) {
     }
 }
 
+/**
+ * @param {string} quoteId
+ * @param {{forDuplicate?: boolean, onRestored?: () => void}} [opts] - onRestored runs once the
+ *   quote is on the page, before the price comparison (duplicateQuote drops the source state there).
+ */
 export async function loadQuoteForEditing(quoteId, opts = {}) {
     showToast('Loading quote...', 'info');
     // P0 guard (audit 2026-06-06): a pickup quote's restore re-fires the live Milton tax lookup async;
     // block lookupTaxRate() for the whole restore so it can't overwrite the saved rate. finally re-enables.
      
     window._restoringQuote = true;
+    let comparison = null;
 
     try {
         const result = await embState.quoteService.loadQuote(quoteId);
@@ -670,14 +678,14 @@ export async function loadQuoteForEditing(quoteId, opts = {}) {
         _restoreTaxShipLtm(session, items);
 
         // Recalculate pricing to update totals
-        recalculatePricing();
+        let repricing = recalculatePricing();
 
         // Apply pending LTM state after panel is rendered
         if (_pendingLtmState) {
             setLtmControlState('emb-ltm-panel', _pendingLtmState);
             _pendingLtmState = null;
             // Re-run pricing with the restored state
-            recalculatePricing();
+            repricing = recalculatePricing();
         }
 
         if (!opts.forDuplicate) showToast(`Editing ${quoteId} (Rev ${embState.editingRevision})`, 'success');
@@ -707,6 +715,8 @@ export async function loadQuoteForEditing(quoteId, opts = {}) {
             } catch (_) { /* telemetry only */ }
         })();
 
+        comparison = { session, items, repricing };
+
     } catch (error) {
         console.error('[EditMode] Error loading quote:', error);
         showToast('Error loading quote: ' + error.message, 'error');
@@ -718,6 +728,310 @@ export async function loadQuoteForEditing(quoteId, opts = {}) {
          
         window._restoringQuote = false;  // restore complete — re-enable live tax lookups for the rep
     }
+
+    // Today's rules can price a saved product differently (Erik 2026-09-16: beanies and other
+    // flat headwear moved to garment pricing) — show the rep what moved. This runs after the
+    // restore guard is off, so a tax lookup or ship-mode change made meanwhile is not skipped.
+    if (comparison) {
+        if (typeof opts.onRestored === 'function') opts.onRestored();
+        await noticeRepricedProducts(comparison.session, comparison.items, comparison.repricing, opts);
+    }
+}
+
+// ============================================================
+// REOPENED QUOTE — PRICE CHANGE NOTICE (Erik 2026-09-16)
+// ============================================================
+// A reopened quote reprices with today's data and rules, including the shared cap/garment
+// rule (headwear-classifier.js) that moved beanies, headbands and other flat headwear onto
+// garment pricing. The rep must SEE any product whose price moved before a Save Revision
+// writes it. Pushed quotes never open here (assertQuoteEditable) and the customer quote view
+// reads the saved rows, so neither changes until a revision is saved.
+
+const REPRICED_NOTICE_ID = 'reopen-price-notice';
+const money = (n) => `$${n.toFixed(2)}`;
+// Same rounding the save applies to FinalUnitPrice (embroidery-quote-service.js).
+const savedUnit = (n) => parseFloat(Number(n).toFixed(2));
+
+/**
+ * The saved product lines, grouped per style + colour, with the cap/garment side each was
+ * priced on when that can be proven. The save writes every garment line before any cap line
+ * (calculateQuote prices garments first) and stores both piece counts on the session
+ * (ALGarmentQty / ALCapQty), so the running quantity in LineNumber order says which side a
+ * line was on. When the counts don't add up, `savedCap` is null and the notice only lists
+ * the price change.
+ * @returns {Map<string, {style: string, color: string, lines: {unit: number, qty: number}[], savedCap: boolean|null}>}
+ */
+export function savedProductGroups(session, items) {
+    const lines = (items || []).filter(isSavedProductItem)
+        .map((item, index) => ({ item, index }))
+        .sort((a, b) => ((Number(a.item.LineNumber) || 0) - (Number(b.item.LineNumber) || 0)) || (a.index - b.index))
+        .map(({ item }) => item);
+    const counted = (v) => v !== null && v !== undefined && v !== '' && Number.isFinite(Number(v));
+    const garmentQty = Number(session && session.ALGarmentQty);
+    const capQty = Number(session && session.ALCapQty);
+    const total = lines.reduce((sum, item) => sum + (Number(item.Quantity) || 0), 0);
+    let sidesKnown = total > 0 && counted(session && session.ALGarmentQty) && counted(session && session.ALCapQty)
+        && total === garmentQty + capQty;
+    const sides = new Map();
+    const groups = new Map();
+    let running = 0;
+    for (const item of lines) {
+        const qty = Number(item.Quantity) || 0;
+        const side = running < garmentQty ? 'garment' : 'cap';
+        running += qty;
+        if (side === 'garment' && running > garmentQty) sidesKnown = false;   // a line straddles the split
+        const key = `${item.StyleNumber}|${item.Color}`;
+        if (!groups.has(key)) {
+            groups.set(key, { style: item.StyleNumber, color: item.Color || '', lines: [], savedCap: null });
+            sides.set(key, new Set());
+        }
+        groups.get(key).lines.push({ unit: Number(item.FinalUnitPrice), qty });
+        sides.get(key).add(side);
+    }
+    for (const [key, group] of groups) {
+        const seen = sides.get(key);
+        group.savedCap = sidesKnown && seen.size === 1 ? seen.has('cap') : null;
+    }
+    return groups;
+}
+
+/** Lowest and average unit price of a set of lines (null when nothing is priced). */
+function priceSummary(lines) {
+    const priced = (lines || []).filter(l => Number.isFinite(l.unit) && l.qty > 0);
+    if (priced.length === 0) return null;
+    const qty = priced.reduce((sum, l) => sum + l.qty, 0);
+    const cents = priced.reduce((sum, l) => sum + Math.round(l.unit * 100) * l.qty, 0);
+    return { base: Math.min(...priced.map(l => l.unit)), average: cents / qty / 100 };
+}
+
+/** The same groups from a fresh engine result (the unit price a save would write). */
+function repricedProductGroups(pricing) {
+    const groups = new Map();
+    for (const pp of (pricing && pricing.products) || []) {
+        const product = pp.product || {};
+        const key = `${product.style}|${product.color}`;
+        if (!groups.has(key)) groups.set(key, { isCap: product.isCap === true, lines: [] });
+        for (const li of pp.lineItems || []) {
+            groups.get(key).lines.push({ unit: savedUnit(li.unitPriceWithLTM || li.unitPrice || 0), qty: Number(li.quantity) || 0 });
+        }
+    }
+    return groups;
+}
+
+// Charges the engine adds only while that side has products (embroidery-quote-pricing.js
+// gates them on the cap / garment count), with the words a rep reads them by.
+const SIDE_CHARGES = {
+    cap: { 'AS-CAP': 'extra stitches', '3D-EMB': '3D puff', 'Laser Patch': 'laser patch' },
+    garment: { 'AS-Garm': 'extra stitches', 'AS-GARM': 'extra stitches' },
+};
+// Add-on logo lines reload with their saved quantity, so they stay on the quote.
+const SIDE_ADD_ON = { cap: 'AL-CAP', garment: 'AL' };
+
+/** The saved logo on one side, in words, when it differs from the builder's default. */
+function savedLogoSummary(session, side) {
+    const s = session || {};
+    const parts = [];
+    const position = side === 'cap' ? s.CapPrintLocation : s.PrintLocation;
+    const stitches = Number(side === 'cap' ? s.CapStitchCount : s.StitchCount) || 0;
+    if (position && position !== (side === 'cap' ? 'CF' : 'Left Chest')) parts.push(String(position));
+    if (stitches && stitches !== 8000) parts.push(`${stitches.toLocaleString('en-US')} stitches`);
+    if (side === 'cap' && s.CapEmbellishmentType === '3d-puff') parts.push('3D puff');
+    if (side === 'cap' && s.CapEmbellishmentType === 'laser-patch') parts.push('laser patch');
+    return parts.join(', ');
+}
+
+/**
+ * When products moved off a side and none are left there, that side's saved logo settings,
+ * charges and add-on logo line no longer match the quote — say so, so the rep checks them
+ * before a revision writes the quote without them.
+ * @param {{cap: string[], garment: string[]}} moved - labels of products that left each side
+ */
+function sideLeftNotes(moved, repriced, session, items) {
+    const notes = [];
+    for (const side of /** @type {const} */ (['cap', 'garment'])) {
+        if (moved[side].length === 0) continue;
+        if ([...repriced.values()].some(g => g.isCap === (side === 'cap'))) continue;
+        const other = side === 'cap' ? 'garment' : 'cap';
+        const logo = savedLogoSummary(session, side);
+        if (logo) {
+            notes.push(`The saved ${side} logo (${logo}) no longer applies: ${moved[side].join(', ')} now ${moved[side].length > 1 ? 'use' : 'uses'} the ${other} logo. Check the ${other} logo before saving.`);
+        }
+        const totals = new Map();
+        for (const item of items || []) {
+            const words = SIDE_CHARGES[side][item.StyleNumber];
+            const amount = Number(item.LineTotal) || 0;
+            if (words && amount > 0) totals.set(item.StyleNumber, { words, amount: (totals.get(item.StyleNumber)?.amount || 0) + amount });
+        }
+        if (totals.size > 0) {
+            const list = [...totals].map(([code, t]) => `${t.words} (${code}) ${money(t.amount)}`).join(', ');
+            notes.push(`No ${side}s are left, so these saved ${side} charges no longer apply: ${list}.`);
+        }
+        if ((items || []).some(item => String(item.StyleNumber || '').toUpperCase() === SIDE_ADD_ON[side])) {
+            notes.push(`Check the ${side} add-on logo line (${SIDE_ADD_ON[side]}): no ${side}s are left.`);
+        }
+    }
+    return notes;
+}
+
+/**
+ * One sentence per product whose price moved. "now priced as a garment/cap" only when the
+ * saved side is proven (savedProductGroups); otherwise just the price change. A proven side
+ * switch is listed even at the same price, and when a side is left empty the notice also
+ * names that side's saved logo settings and charges (sideLeftNotes).
+ * @param {Map<string, any>} saved - savedProductGroups()
+ * @param {{products?: any[]}} pricing - calculateQuote() result for the restored rows
+ * @param {any} [session] - the saved quote session
+ * @param {any[]} [items] - the saved quote items
+ * @returns {string[]}
+ */
+export function describeRepricedProducts(saved, pricing, session = null, items = []) {
+    const repriced = repricedProductGroups(pricing);
+    const perStyle = {};
+    for (const group of saved.values()) perStyle[group.style] = (perStyle[group.style] || 0) + 1;
+    const changes = [];
+    const moved = { cap: [], garment: [] };
+    for (const [key, group] of saved) {
+        const before = priceSummary(group.lines);
+        if (!before) continue;
+        const label = perStyle[group.style] > 1 && group.color ? `${group.style} ${group.color}` : group.style;
+        const now = repriced.get(key);
+        const after = now ? priceSummary(now.lines) : null;
+        if (!after) {
+            changes.push(`${label} could not be repriced — check that line before saving`);
+            continue;
+        }
+        const switched = group.savedCap !== null && group.savedCap !== now.isCap;
+        if (switched) moved[group.savedCap ? 'cap' : 'garment'].push(label);
+        const baseMoved = Math.abs(after.base - before.base) >= 0.005;
+        const averageMoved = Math.abs(after.average - before.average) >= 0.005;
+        if (!baseMoved && !averageMoved) {
+            if (switched) changes.push(`${label} is now priced as a ${now.isCap ? 'cap' : 'garment'} (same price)`);
+            continue;
+        }
+        const price = baseMoved
+            ? `${money(before.base)} → ${money(after.base)}`
+            : `average ${money(before.average)} → ${money(after.average)}`;
+        changes.push(switched
+            ? `${label} is now priced as a ${now.isCap ? 'cap' : 'garment'} (${price})`
+            : `${label}: ${price}`);
+    }
+    changes.push(...sideLeftNotes(moved, repriced, session, items));
+    return changes;
+}
+
+// The notice text goes into its live region this long after the region is on the page — the
+// same pause the builders' announce() helper uses. A live region that arrives already holding
+// its text is often not read out.
+const REPRICED_ANNOUNCE_DELAY_MS = 30;
+
+/**
+ * Where the notice sits: just above the product table (its scroll wrapper when present).
+ * @returns {HTMLElement|null}
+ */
+function repricedNoticeAnchor() {
+    const table = document.getElementById('product-table');
+    return table ? (/** @type {HTMLElement|null} */ (table.closest('.product-table-wrapper')) || table) : null;
+}
+
+/**
+ * Persistent notice above the product table, using the shared warning alert
+ * (components.css .alert.alert-warn — this page no longer loads the old
+ * .import-summary-banner styles). Text only — no markup
+ * from data. Replaces any earlier notice; no changes → no notice.
+ *   • The text is announced politely: an EMPTY live region is inserted first and filled
+ *     after insertion. The Dismiss button stays outside it.
+ *   • Dismiss moves keyboard focus to the product table wrapper (tabindex=0), not <body>.
+ *   • A duplicated quote saves as a NEW quote, so its note says that.
+ * @param {string[]} changes
+ * @param {{forDuplicate?: boolean}} [opts]
+ * @returns {HTMLElement|null}
+ */
+export function showRepricedNotice(changes, opts = {}) {
+    clearRepricedNotice();
+    if (!changes || changes.length === 0) return null;
+    const forDuplicate = !!(opts && opts.forDuplicate);
+    const heading = forDuplicate ? 'Prices changed from the original quote' : 'Prices changed from the saved quote';
+    const banner = document.createElement('div');
+    banner.id = REPRICED_NOTICE_ID;
+    banner.className = 'alert alert-warn';
+    const message = document.createElement('div');
+    message.setAttribute('role', 'status');
+    message.setAttribute('aria-live', 'polite');
+    message.setAttribute('aria-atomic', 'true');
+    const title = document.createElement('strong');
+    title.className = 'banner-title';
+    title.textContent = heading;
+    const detail = document.createElement('div');
+    detail.className = 'banner-detail alert-body';
+    for (const text of changes) {
+        const line = document.createElement('div');
+        line.textContent = text;
+        detail.appendChild(line);
+    }
+    const note = document.createElement('div');
+    note.textContent = forDuplicate
+        ? 'These are today\'s prices. Saving creates a new quote at these prices.'
+        : 'These are today\'s prices. The saved quote keeps its old prices until you save a revision.';
+    detail.appendChild(note);
+    const dismiss = document.createElement('button');
+    dismiss.type = 'button';
+    dismiss.className = 'btn-dismiss-banner';
+    dismiss.textContent = 'Dismiss';
+    dismiss.setAttribute('aria-label', 'Dismiss the price change notice');
+    dismiss.addEventListener('click', () => {
+        const hadFocus = banner.contains(document.activeElement);
+        banner.remove();
+        if (hadFocus) focusProductTable();
+    });
+    banner.append(message, dismiss);
+    const anchor = repricedNoticeAnchor();
+    if (anchor && anchor.parentElement) anchor.parentElement.insertBefore(banner, anchor);
+    else document.body.prepend(banner);
+    setTimeout(() => {
+        if (message.isConnected && !message.hasChildNodes()) message.append(title, detail);
+    }, REPRICED_ANNOUNCE_DELAY_MS);
+    showToast(`${heading} — see the notice above the products.`, 'warning', 10000);
+    return banner;
+}
+
+/** After Dismiss: keyboard focus lands on the products the notice was about. */
+function focusProductTable() {
+    const target = repricedNoticeAnchor();
+    if (!target) return;
+    if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
+    target.focus();
+}
+
+/** Remove the notice (new quote / another quote loaded). */
+export function clearRepricedNotice() {
+    const existing = document.getElementById(REPRICED_NOTICE_ID);
+    if (existing) existing.remove();
+}
+
+/**
+ * After a reload has repriced, price the restored rows with the SAVE path's inputs
+ * (collectProductsFromTable + buildLogoConfiguration + the LTM panel) and compare each
+ * product with what the quote saved. Never blocks the load; a failed comparison says so.
+ */
+async function noticeRepricedProducts(session, items, repricing, opts = {}) {
+    clearRepricedNotice();
+    try {
+        try { await repricing; } catch (_) { /* recalculatePricing surfaces its own failure */ }
+        const saved = savedProductGroups(session, items);
+        if (saved.size === 0 || !embState.pricingCalculator) return;
+        const products = collectProductsFromTable().filter(p => !p.isService);
+        let pricing = { products: [] };
+        if (products.length > 0) {
+            const { logoConfigs, allLogos } = buildLogoConfiguration();
+            const ltmEnabled = getLtmControlState('emb-ltm-panel').enabled;
+            pricing = await embState.pricingCalculator.calculateQuote(products, allLogos, logoConfigs, { ltmEnabled });
+            if (!pricing || pricing.success === false) return;   // the reprice already showed the pricing error
+        }
+        showRepricedNotice(describeRepricedProducts(saved, pricing, session, items), { forDuplicate: !!opts.forDuplicate });
+    } catch (error) {
+        console.error('[EditMode] Could not compare prices with the saved quote:', error);
+        showToast('Could not compare prices with the saved quote — check each line before saving.', 'warning', 8000);
+    }
 }
 
 /**
@@ -728,16 +1042,19 @@ export async function loadQuoteForEditing(quoteId, opts = {}) {
  * pushed/locked quotes too (the classic reorder case): the source is never written.
  */
 export async function duplicateQuote(sourceQuoteId) {
-    await loadQuoteForEditing(sourceQuoteId, { forDuplicate: true });
+    // Clear edit/push state (mirrors the resetQuote checklist) so save → NEW quote. It runs as
+    // soon as the copy is on the page, so a Save during the price comparison can't reach the source.
+    const dropSourceQuote = () => {
+        embState.editingQuoteId = null;
+        embState.editingRevision = null;
+        embState.lastImportMetadata = null;          // PaidToDate / SW audit / order # belong to the ORIGINAL order
+        embState._pushAlreadyDone = false;
+        embState._pushQuoteId = null;
+        if (typeof updatePushButtonState === 'function') { try { updatePushButtonState(); } catch (_) {} }
+    };
+    await loadQuoteForEditing(sourceQuoteId, { forDuplicate: true, onRestored: dropSourceQuote });
     if (!document.querySelector('#product-tbody tr')) return;   // load failed — error already shown
-
-    // Clear edit/push state (mirrors the resetQuote checklist) so save → NEW quote
-    embState.editingQuoteId = null;
-    embState.editingRevision = null;
-    embState.lastImportMetadata = null;          // PaidToDate / SW audit / order # belong to the ORIGINAL order
-    embState._pushAlreadyDone = false;
-    embState._pushQuoteId = null;
-    if (typeof updatePushButtonState === 'function') { try { updatePushButtonState(); } catch (_) {} }
+    dropSourceQuote();
 
     // Order-specific fields must not carry over
     const clearVal = (id) => { const el = /** @type {HTMLInputElement|null} */ (document.getElementById(id)); if (el) el.value = ''; };
@@ -968,19 +1285,27 @@ function _restoreCustomerSuppliedRow(serviceRow, serviceItem, serviceType) {
     if (serviceItem.Notes) serviceRow.dataset.csNotes = serviceItem.Notes;
 }
 
+// Service items to create as service product rows (2026-02 refactor)
+const SERVICE_STYLE_NUMBERS = [
+    'DECG', 'DECC', 'AL', 'AL-CAP', 'DECG-FB', 'CB', 'CS', 'Monogram', 'AS-Garm', 'AS-CAP',
+    '3D-EMB', 'Laser Patch', 'Name/Number', 'WEIGHT', 'SEG', 'SECC', 'DT', 'CTR-GARMT', 'CTR-CAP',
+    // Legacy backward-compat (old quotes):
+    'FB', 'MONOGRAM', 'AS-GARM', 'NAME'
+];
+
+/** A saved quote_items row that restores as a product row (not a service/fee row). */
+function isSavedProductItem(item) {
+    return item.EmbellishmentType === 'embroidery' &&
+        !!item.StyleNumber &&
+        !item.StyleNumber.startsWith('AL-') &&
+        !SERVICE_STYLE_NUMBERS.includes(item.StyleNumber);
+}
+
 /**
  * Populate products from line items
  * Handles regular products AND service items (DECG, DECC, MONOGRAM)
  */
 async function populateProducts(items) {
-    // Service items to create as service product rows (2026-02 refactor)
-    const SERVICE_STYLE_NUMBERS = [
-        'DECG', 'DECC', 'AL', 'AL-CAP', 'DECG-FB', 'CB', 'CS', 'Monogram', 'AS-Garm', 'AS-CAP',
-        '3D-EMB', 'Laser Patch', 'Name/Number', 'WEIGHT', 'SEG', 'SECC', 'DT', 'CTR-GARMT', 'CTR-CAP',
-        // Legacy backward-compat (old quotes):
-        'FB', 'MONOGRAM', 'AS-GARM', 'NAME'
-    ];
-
     // Separate service items from regular products
     const serviceItems = items.filter(item =>
         SERVICE_STYLE_NUMBERS.includes(item.StyleNumber) ||
@@ -990,12 +1315,7 @@ async function populateProducts(items) {
     );
 
     // Filter to only regular product items
-    const productItems = items.filter(item =>
-        item.EmbellishmentType === 'embroidery' &&
-        item.StyleNumber &&
-        !item.StyleNumber.startsWith('AL-') &&
-        !SERVICE_STYLE_NUMBERS.includes(item.StyleNumber)
-    );
+    const productItems = items.filter(isSavedProductItem);
 
     // Group items by StyleNumber + Color to consolidate size quantities
     const productGroups = {};

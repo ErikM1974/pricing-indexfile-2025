@@ -24,7 +24,16 @@
     const ENTRIES = [
         {
             version: null,
-            fingerprint: '2148889f2625c9cb',
+            fingerprint: '22aa28f5d285711f',
+            notes: [
+                'Headbands, gaiters, face masks, skull caps and scrub caps now price as flat embroidery, the same as the Quote Builder.',
+                'Gaiters, face masks and headbands outside the Caps category keep their category’s other methods, so a gaiter can still be screen printed or DTF printed.',
+                'On the Line Sheet, embroidery follows each product as a cap or a garment. When the catalog doesn’t confirm which it is, the row asks you to check the product.',
+                'New Era and Richardson apparel now price as garments in the Quote Builder too, so Full quote keeps the same price.',
+            ],
+        },
+        {
+            version: '2026.09.16.3',
             notes: [
                 'This version line and What’s new. Please mention the version when you send feedback.',
             ],

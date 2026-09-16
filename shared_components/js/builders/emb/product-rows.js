@@ -17,7 +17,7 @@
 /* global
    escapeHtml, showToast, renderOrderRecap, QuoteOrderSummary, markAsUnsaved,
    Event, cleanProductTitle, getSwatchStyle, productThumbnailModal, formatPrice,
-   ProductCategoryFilter, SKUValidationService, SIZE_TO_SUFFIX,
+   HeadwearClassifier, SKUValidationService, SIZE_TO_SUFFIX,
    EXTENDED_SIZE_ORDER */
 import { getServicePrice } from './pricing.js';
 import { positionColorDropdown } from '../shared/color-dropdown-position.js';
@@ -1198,8 +1198,13 @@ export async function onStyleChange(input, rowId) {
             const categoryName = colorsData.CATEGORY_NAME || '';
             row.dataset.category = categoryName;
 
-            // Check for cap products using CATEGORY_NAME (definitive) or pattern matching (fallback)
-            const isCap = isCapProduct(styleNumber, product.PRODUCT_TITLE, categoryName);
+            // Cap vs garment: the shared headwear rule over everything this response carries
+            // (a blank category is common — every Richardson cap — so the subcategory and
+            // description matter). Flat headwear prices as garment embroidery.
+            const isCap = isCapProduct(styleNumber, colorsData.productTitle || colorsData.PRODUCT_TITLE || product.PRODUCT_TITLE, categoryName, {
+                subcategory: colorsData.SUBCATEGORY_NAME || '',
+                description: colorsData.PRODUCT_DESCRIPTION || '',
+            });
             const capBadge = document.getElementById(`cap-badge-${rowId}`);
             if (isCap) {
                 row.dataset.isCap = 'true';
@@ -1416,6 +1421,7 @@ export function stampManualItem(row, rowId, item) {
 
     row.querySelector('.btn-add-nonsanmar-block')?.remove();
 
+    // Only a style and a typed description here — the shared headwear rule reads both.
     const isCap = isCapProduct(item.style, label, '');
     row.dataset.isCap = isCap ? 'true' : 'false';
     const capBadge = document.getElementById(`cap-badge-${rowId}`);
@@ -1488,8 +1494,8 @@ export function populateNonSanmarRow(row, rowId, product) {
     const dupBtn = row.querySelector('.btn-duplicate-row');
     if (dupBtn) dupBtn.disabled = false;
 
-    // Detect cap vs garment
-    const isCap = isCapProduct(product.StyleNumber, product.ProductName, product.Category || '');
+    // Detect cap vs garment (shared headwear rule — flat headwear prices as a garment)
+    const isCap = isCapProduct(product.StyleNumber, product.ProductName, product.Category || '', { description: product.Description || '' });
     const capBadge = document.getElementById(`cap-badge-${rowId}`);
     if (isCap) {
         row.dataset.isCap = 'true';
@@ -1733,10 +1739,23 @@ export function parseShopWorksDescription(description, _partNumber) {
         }
     }
 
-    // Category detection from keywords
+    // Category detection. Headwear follows the shared rule (Erik 2026-09-16) on the SAME text
+    // the ShopWorks import prices from (forceImportAsNonSanmar: isCapProduct(partNumber,
+    // description)) — the whole description, so "Pacific Headwear P747 Perforated" and
+    // "Outdoor Cap OC771" are filed under Caps even though the brand holds the cap word, and
+    // the saved product (Category "Caps") loads as a cap every later time. Never files a
+    // garment under Caps ("Trucker Jacket", "Cap Sleeve Tee"). Caps AND flat headwear go
+    // under Caps, as SanMar files them; the rule still prices beanies/headbands as garments.
     const combined = `${result.name} ${desc}`.toLowerCase();
-    if (/\b(cap|hat|beanie|visor|snapback|trucker|headwear|skull cap)\b/.test(combined)) {
-        result.category = 'Caps';
+    const isCap = isCapProduct(_partNumber || '', description);   // throws visibly without the shared rule
+    const isFlat = !isCap && HeadwearClassifier.classify({ STYLE: _partNumber || '', PRODUCT_TITLE: description }).isFlat;
+    if (isCap || isFlat) {
+        // A later load prices from the saved ProductName + Category (populateNonSanmarRow).
+        // Inside "Caps" a hood is flat ("Richardson Hood River 173" is a cap by its style), so
+        // leave the category blank when only that keeps the product on its imported side.
+        const savedName = result.name || desc;
+        const loadsAsCap = (category) => isCapProduct(_partNumber || '', savedName, category);
+        result.category = loadsAsCap('Caps') !== isCap && loadsAsCap('') === isCap ? '' : 'Caps';
     } else if (/\b(tee|t-shirt|tshirt)\b/.test(combined)) {
         result.category = 'T-Shirts';
     } else if (/\b(polo|pique)\b/.test(combined)) {
@@ -1918,56 +1937,63 @@ export function updateRowBreakdown(rowId, product, lineItem, logoConfig) {
 }
 
 /**
- * Check if a style number is a cap/hat product
+ * Is this product priced as cap embroidery? ONE rule for every price surface:
+ * HeadwearClassifier (shared_components/js/headwear-classifier.js, Erik 2026-09-16).
+ * Beanies, knit caps, headbands, gaiters and the other flat headwear are NOT caps —
+ * they price as garment embroidery. Visors are caps. isCap is used as returned, even
+ * when the classifier is not confident.
  * @param {string} style - Style number
- * @param {string} productTitle - Product title/description
- * @param {string} categoryName - CATEGORY_NAME from SanMar API (most reliable)
- * @returns {boolean} True if cap/hat
+ * @param {string} productTitle - Product title (the stylesearch label "STYLE - TITLE",
+ *   a vendor product name, or a ShopWorks description)
+ * @param {string} categoryName - CATEGORY_NAME from SanMar API
+ * @param {{subcategory?: string, description?: string}} [details] - SUBCATEGORY_NAME and
+ *   PRODUCT_DESCRIPTION when the caller has them (/api/product-colors)
+ * @returns {boolean} True when the product takes cap embroidery pricing
  */
-export function isCapProduct(style, productTitle = '', categoryName = '') {
-    // PRIORITY: Flat headwear (beanies, knit caps) use garment pricing, NOT cap pricing
-    // Matches ProductCategoryFilter used by calculator pages
-    if (typeof ProductCategoryFilter !== 'undefined' && productTitle) {
-        if (ProductCategoryFilter.isFlatHeadwear({ PRODUCT_TITLE: productTitle })) {
-            return false;
-        }
+export function isCapProduct(style, productTitle = '', categoryName = '', details = {}) {
+    // Rule 4: never fall back to the old keyword rules — a missing classifier is a visible error.
+    if (typeof HeadwearClassifier === 'undefined' || !HeadwearClassifier || typeof HeadwearClassifier.classify !== 'function') {
+        const message = 'The cap/garment check did not load, so this product cannot be priced. Refresh the page.';
+        if (typeof showToast === 'function') showToast(message, 'error', 8000);
+        throw new Error(message);
     }
+    // ShopWorks service descriptions ("Di. Embroider Cap - T-shirt") name the SERVICE first;
+    // strip that prefix so the word "Cap" doesn't make a T-shirt a cap.
+    const title = String(productTitle || '').replace(/^DI\.\s*EMBROIDER\s+(CAP|GARMENT)\s*-\s*/i, '');
+    const extra = details || {};
+    return HeadwearClassifier.classify({
+        STYLE: style || '',
+        PRODUCT_TITLE: title,
+        CATEGORY_NAME: categoryName || '',
+        SUBCATEGORY_NAME: extra.subcategory || '',
+        PRODUCT_DESCRIPTION: extra.description || '',
+    }).isCap === true;
+}
 
-    // BEST METHOD: Check CATEGORY_NAME from SanMar API
-    // SanMar categorizes all caps/hats under "Caps" category
-    if (categoryName && categoryName.toLowerCase() === 'caps') {
-        return true;
+/**
+ * Cap vs garment for a style before its row exists (the ShopWorks import review), from the
+ * same /api/product-colors fields onStyleChange classifies — so the review's logo sections
+ * match the rows it builds. ShopWorks descriptions alone mislead ("Port  Companyknit Cap" is
+ * the CP90 beanie). The response is cached for onStyleChange. A style the catalog doesn't
+ * carry (404: non-SanMar items) is decided from its own description, as the non-SanMar
+ * import does; any other failure throws for the caller to show.
+ * @param {string} styleNumber
+ * @param {string} [fallbackTitle] - the ShopWorks description
+ * @returns {Promise<boolean>}
+ */
+export async function catalogIsCap(styleNumber, fallbackTitle = '') {
+    let colorsData = productColorsCache.get(styleNumber);
+    if (!colorsData) {
+        const response = await fetch(`${API_BASE}/api/product-colors?styleNumber=${encodeURIComponent(styleNumber)}`);
+        if (response.status === 404) return isCapProduct(styleNumber, fallbackTitle);
+        if (!response.ok) throw new Error(`Colors API returned ${response.status}`);
+        colorsData = await response.json();
+        productColorsCache.set(styleNumber, colorsData);
     }
-
-    // FALLBACK: Pattern matching for cases where category isn't available
-    if (!style) return false;
-    const styleUpper = style.toUpperCase();
-    const titleUpper = (productTitle || '').toUpperCase();
-
-    // Check style patterns:
-    // CP* caps (CP80, CP90, etc)
-    // NE* caps (NE1000, NE400)
-    // C+digit (C112, C118)
-    // Richardson styles (112, 110, 115, etc) - numeric only
-    if (/^C[P0-9]/.test(styleUpper) || styleUpper.startsWith('NE')) {
-        return true;
-    }
-
-    // Richardson caps - 2-3 digit numeric styles (100-999)
-    if (/^\d{2,3}$/.test(styleUpper)) {
-        return true;
-    }
-
-    // Check title keywords — but first strip DECG/service prefixes so
-    // "Di. Embroider Cap - T-shirt" doesn't match on "Cap" in the prefix
-    const strippedTitle = titleUpper.replace(/^DI\.\s*EMBROIDER\s+(CAP|GARMENT)\s*-\s*/i, '');
-    if (strippedTitle.includes('CAP') || strippedTitle.includes('HAT') ||
-        strippedTitle.includes('BEANIE') || strippedTitle.includes('SNAPBACK') ||
-        strippedTitle.includes('TRUCKER') || strippedTitle.includes('RICHARDSON')) {
-        return true;
-    }
-
-    return false;
+    return isCapProduct(styleNumber, colorsData.productTitle || colorsData.PRODUCT_TITLE || fallbackTitle, colorsData.CATEGORY_NAME || '', {
+        subcategory: colorsData.SUBCATEGORY_NAME || '',
+        description: colorsData.PRODUCT_DESCRIPTION || '',
+    });
 }
 
 /**

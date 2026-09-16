@@ -2,14 +2,19 @@ const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
 const espree = require('espree');
+const HeadwearClassifier = require('../../shared_components/js/headwear-classifier');
 
 // Exercise the actual product loader, fetch stages and error UI without loading
 // autocomplete, gallery or DOM-ready side effects unrelated to these requests.
 function calculator(kind, failure) {
     const file = kind === 'cap' ? 'cap-embroidery-pricing-integrated-page.js' : 'embroidery-pricing-page.js';
     const source = fs.readFileSync(path.join(__dirname, '../../calculators/js', file), 'utf8');
-    const names = new Set(['loadColors', 'showApiError', 'hideApiError', 'showLoading', 'showProduct', 'showNoProduct',
-        kind === 'cap' ? 'loadCapProduct' : 'loadProduct', ...(kind === 'cap' ? [] : ['loadSizePricing'])]);
+    // The real cap/garment gate runs (shared headwear classifier), so each calculator gets its own product type.
+    const names = new Set(['loadColors', 'showApiError', 'hideApiError', 'showLoading', 'showProduct', 'showNoProduct', 'classifyHeadwear',
+        kind === 'cap' ? 'loadCapProduct' : 'loadProduct', ...(kind === 'cap' ? [] : ['loadSizePricing', 'validateProductType', 'hideLoading'])]);
+    const product = kind === 'cap'
+        ? {STYLE: 'C112', PRODUCT_TITLE: 'Port Authority Snapback Trucker Cap. C112', CATEGORY_NAME: 'Caps'}
+        : {STYLE: 'PC54', PRODUCT_TITLE: 'Port & Company Core Cotton Tee. PC54', CATEGORY_NAME: 'T-Shirts'};
     const functions = espree.parse(source, {ecmaVersion: 'latest', range: true}).body
         .filter(n => n.type === 'FunctionDeclaration' && names.has(n.id.name))
         .map(n => source.slice(...n.range)).join('\n');
@@ -24,13 +29,12 @@ function calculator(kind, failure) {
     const context = vm.createContext({
         EMB_API_BASE: 'https://pricing.example.test', CAPEMB_API_BASE: 'https://pricing.example.test',
         currentProduct: null, currentColors: [], selectedColor: null, pricingData: null,
-        window: {currentSizePricing: {StyleNumber: 'PREVIOUS'}},
+        window: {currentSizePricing: {StyleNumber: 'PREVIOUS'}, HeadwearClassifier},
         document: {getElementById: element, querySelector: element},
         loadingState: element('loading'), productHero: element('hero'),
         pricingSection: element('pricing'), orderInfoSection: element('order-info'),
         console: {error: jest.fn()},
-        validateProductType: () => true,
-        ProductCategoryFilter: {isFlatHeadwear: () => false, isStructuredCap: () => true},
+        showProductMismatchOverlay: jest.fn(),
         updateProductInfo: jest.fn(), setMainProductImage: jest.fn(), updateSelectedColor: jest.fn(),
         displayColorSwatches: jest.fn(), loadSizes: jest.fn(), updatePricing: jest.fn(),
         updateLTMPricingData: jest.fn(), updateCapPricing: jest.fn(), updateLTMCapPricing: jest.fn(),
@@ -42,7 +46,7 @@ function calculator(kind, failure) {
                 if (failure.invalidJson) return {ok: true, json: async () => {throw new Error('Invalid JSON');}};
                 return {ok: failure.ok ?? false, status: 503, json: async () => failure.body};
             }
-            const data = {'/api/product-details': [{STYLE: 'PC54', PRODUCT_TITLE: 'Test Product'}],
+            const data = {'/api/product-details': [product],
                 '/api/color-swatches': colors, '/api/size-pricing': [sizeData]}[endpoint];
             if (!data) throw new Error('Unexpected API request: ' + endpoint);
             return {ok: true, json: async () => data};
@@ -73,6 +77,7 @@ describe.each(['garment', 'cap'])('%s calculator API errors', kind => {
         expect(h.context.displayColorSwatches).toHaveBeenCalledWith(h.colors);
         expect(h.fetchPricingData).toHaveBeenCalledWith('PC54');
         expect(h.element('pricing').style.display).toBe('block');
+        expect(h.context.showProductMismatchOverlay).not.toHaveBeenCalled();
         if (kind === 'garment') expect(h.context.window.currentSizePricing).toEqual(h.sizeData);
     });
 });

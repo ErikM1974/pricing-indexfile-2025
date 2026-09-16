@@ -118,51 +118,51 @@ describe('Quick Quote ↔ configurator engine-wiring parity (Rule #7)', () => {
         expect(QQ).toMatch(/var token = row\._ptok, method = lineMethodFor\(row\), def = METHODS\[method\]/);
     });
 
-    // Erik 2026-09-16: beanies/knit caps are flat (garment) embroidery, as in the EMB builder
-    // (.claude/rules/quote-builders.md) — never cap pricing, never the "Caps" category rule.
+    // Erik 2026-09-16: soft headwear (beanies, headbands, gaiters, face masks, skull and scrub caps)
+    // is flat (garment) embroidery, as in the EMB builder (.claude/rules/quote-builders.md) — never
+    // cap pricing, never the "Caps" category rule. The builders use the same shared classifier, so
+    // Quick Quote takes its answer as returned: isCap picks cap pricing and nothing re-checks it.
     test('flat headwear is priced as garment embroidery in both modes', () => {
         expect(QQ).toContain('var cap = headwear.isCap;');
         expect(QQ).not.toContain('headwear.isCap || headwear.isFlat');
-        expect(QQ).toContain("if (isFlatHeadwear(product)) return Promise.resolve({ EMB: true, DTG: 'no', SCP: false, DTF: false, source: 'flat-headwear' });");
-        expect(QQ).toContain("if ((m !== 'emb' && m !== 'capemb') || !h || !h.confident) return m;");
+        // Embroidery rows use isCap as returned, even when the classifier is not confident (the row says so).
+        expect(QQ).toMatch(/function lineMethodFor\(row\) \{\s+var m = state\.lineMethod, h = row\.product && row\.product\.headwear;\s+if \(\(m !== 'emb' && m !== 'capemb'\) \|\| !h\) return m;\s+return h\.isCap \? 'capemb' : 'emb';\s+\}/);
+        expect(QQ).not.toContain('!h.confident');
+        expect(QQ).not.toContain('Not confirmed as a cap');
+        expect(QQ).toContain("if (embroidery && !headwear.confident) notices.push('Not confirmed from the catalog — check the product.');");
         expect(QQ).not.toMatch(/function lineMethodFor[\s\S]{0,200}isFlat/);
-        expect(QQ).toMatch(/if \(product\.isCap\) return Promise\.resolve\(null\);[^\n]*\n[^\n]*\n\s+if \(isFlatHeadwear\(product\)\)/);
-        expect(QQ).toContain('!(embroidery && (product.isCap || flat))');
-        expect(QQ).toContain("var headwear = matchBuilderFlat(classifyHeadwear(meta), style, meta.PRODUCT_TITLE || '');");
+        expect(QQ).toContain('var headwear = classifyHeadwear(meta);');
+        // A missing classifier is a visible lookup error, never the old keyword rules (Rule 4).
+        expect(QQ).toMatch(/function classifyHeadwear\(meta\) \{\s+if \(!window\.HeadwearClassifier\) throw lookupError\('[^']+', false\);\s+return window\.HeadwearClassifier\.classify\(meta\);\s+\}/);
+        // One rule: no second opinion from the builder's old keyword filter.
+        expect(QQ).not.toContain('matchBuilderFlat');
+        expect(QQ).not.toContain('ProductCategoryFilter');
         const HTML = fs.readFileSync(path.join(ROOT, 'calculators', 'quick-quote', 'index.html'), 'utf8');
-        expect(HTML.indexOf('/shared_components/js/product-category-filter.js')).toBeGreaterThan(-1);
-        expect(HTML.indexOf('/shared_components/js/product-category-filter.js')).toBeLessThan(HTML.indexOf('/calculators/quick-quote/quick-quote.js'));
+        expect(HTML).not.toContain('/shared_components/js/product-category-filter.js');
+        expect(HTML).toMatch(/<script src="\/shared_components\/js\/headwear-classifier\.js\?v=[\d.]+"><\/script>/); // /deploy moves the version
     });
 
-    // 2026-09-16 review: the classifier also calls fleece headbands, gaiters and skull caps "flat", but
-    // the EMB builder prices those "Caps" rows as caps. Runs the builder's real isCapProduct() and
-    // ProductCategoryFilter against Quick Quote's rule on the live sample rows.
-    test('Quick Quote prices headwear as flat embroidery only when the EMB builder does', () => {
-        const vm = require('vm');
-        const sandbox = { window: { location: { hostname: 'test', search: '' } }, URLSearchParams };
-        vm.runInNewContext(fs.readFileSync(path.join(ROOT, 'shared_components', 'js', 'product-category-filter.js'), 'utf8'), sandbox);
-        const PCF = sandbox.window.ProductCategoryFilter;
-        const cut = (src, signature, end) => {
-            const start = src.indexOf(signature);
-            expect(start).toBeGreaterThan(-1);
-            return src.slice(start, src.indexOf(end, start) + end.length);
-        };
-        const ROWS_SRC = fs.readFileSync(path.join(ROOT, 'shared_components', 'js', 'builders', 'emb', 'product-rows.js'), 'utf8').replace(/\r\n/g, '\n');
-        const isCapProduct = new Function('ProductCategoryFilter', cut(ROWS_SRC, 'function isCapProduct(', '\n}\n') + 'return isCapProduct;')(PCF);
-        const matchBuilderFlat = new Function('window', 'lookupError', cut(QQ.replace(/\r\n/g, '\n'), 'function matchBuilderFlat(', '\n    }\n') + 'return matchBuilderFlat;')(
-            { ProductCategoryFilter: PCF }, message => new Error(message));
-        const { classify } = require('../../shared_components/js/headwear-classifier');
-        const { rows } = require('../fixtures/headwear-classifier-rows.json');
-        const kinds = {};
-        for (const { row } of rows) {
-            const quick = matchBuilderFlat(classify(row), row.STYLE, row.PRODUCT_TITLE);
-            const builderCap = isCapProduct(row.STYLE, row.STYLE + ' - ' + row.PRODUCT_TITLE, row.CATEGORY_NAME || '');
-            kinds[row.STYLE] = quick.kind;
-            if (quick.isFlat) expect([row.STYLE, builderCap]).toEqual([row.STYLE, false]);
-            if (/^caps$/i.test(row.CATEGORY_NAME || '') && quick.kind !== 'flat') expect([row.STYLE, quick.isCap, builderCap]).toEqual([row.STYLE, true, true]);
-        }
-        expect(kinds).toMatchObject({ CP90: 'flat', CP91: 'flat', NE900: 'flat', C939: 'flat', CT104597: 'flat', NE908: 'flat', CTA207: 'cap', C916: 'cap', HT01: 'cap' });
-        expect(matchBuilderFlat(classify({ STYLE: 'HT01', PRODUCT_TITLE: 'Skull Cap', CATEGORY_NAME: 'Caps' }), 'HT01', 'Skull Cap')).toMatchObject({ isCap: true, isFlat: false, confident: true });
-        expect(matchBuilderFlat(classify({ STYLE: 'X9', PRODUCT_TITLE: 'Fleece Headband' }), 'X9', 'Fleece Headband')).toMatchObject({ isCap: true, confident: false });
+    // Live rules (2026-09-16): "Caps" allows no garment method, but Personal Protection allows EMB,
+    // SCP and DTF, and Accessories/Workwear allow EMB. Only flat headwear in "Caps" is embroidery
+    // only; a gaiter or headband keeps its own category's methods (Erik: no new print blocks).
+    test('only flat headwear in "Caps" is embroidery only; other flat items follow their category', () => {
+        expect(QQ).toMatch(/function inCapsCategory\(product\) \{\s+return !!product && \[product\.category, product\.subcategory\]\.some\(function \(c\) \{ return \/\^\\s\*caps\\s\*\$\/i\.test\(c \|\| ''\); \}\);\s+\}/);
+        expect(QQ).toContain('function flatEmbroideryOnly(product) { return isFlatHeadwear(product) && inCapsCategory(product); }');
+        expect(QQ).toContain("if (flatEmbroideryOnly(product)) return Promise.resolve({ EMB: true, DTG: 'no', SCP: false, DTF: false, source: 'flat-headwear' });");
+        expect(QQ).not.toContain('if (isFlatHeadwear(product)) return Promise.resolve(');
+        expect(QQ).toMatch(/if \(product\.isCap\) return Promise\.resolve\(null\);[^\n]*\n[^\n]*\n\s+if \(flatEmbroideryOnly\(product\)\)[^\n]*\n\s+return categoryEligibility\(product\);/);
+        // Line sheet: print blocks and the skipped category check cover caps and "Caps" flat items only.
+        expect(QQ).toContain('flat = isFlatHeadwear(product), flatOnly = flatEmbroideryOnly(product);');
+        expect(QQ).toContain('if ((product.isCap || flatOnly) && headwear.confident && !embroidery) throw');
+        expect(QQ).toContain('!(embroidery && (product.isCap || flatOnly))');
+        expect(QQ).not.toContain('(product.isCap || flat)');
+        // Quick Price: a one-size product keeps print placements when a print method is offered.
+        expect(QQ).toMatch(/function renderPlacementVisibility\(\) \{[\s\S]{0,400}pf\.hidden = state\.mode === 'linesheet' \? !printing : oneSize\(state\.product\) && !printing;/);
+    });
+
+    test('flat headwear notes cover all soft headwear, not just beanies', () => {
+        expect(QQ).toContain('Beanies, headbands and other soft headwear are priced as flat embroidery, the same as the Embroidery builder.');
+        expect(QQ).toContain("' — soft headwear is flat embroidery, as in the Embroidery builder.'");
+        expect(QQ).not.toMatch(/beanies are flat embroidery|Beanies and knit caps are priced/);
     });
 });

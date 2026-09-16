@@ -5,6 +5,24 @@ Resolved entries aged out of `LESSONS_LEARNED.md` (300-line cap). Newest first. 
 ---
 
 ## Archived 2026-09-16
+## Customer print previews must wait for successful assets (2026-09-13)
+
+- Problem/root cause: the customer-supplied quote printed on load and ignored image failures; narrow columns split numeric headings and phones clipped the table.
+- Solution: reuse staff-print readiness, report blocked/missing helper/style/image failures in the preview and parent, and give the full table keyboard scrolling with unbroken numeric columns. Preserve the captured calculation, notes and waiver.
+- Prevention: real popup tests with a local HTTP asset server, delayed and failed resources, zero OS printing, original amount/source locks, all four screen widths and both complete paper quotes. Protocol interception can stall document.write styles, so readiness tests serve deterministic assets directly.
+
+## Cart removals need one notice and a remaining focus target (2026-09-13)
+
+- Problem/root cause: the drawer added its own success toast after the service already announced removal, creating overlapping messages. Replacing the item list removed the focused button.
+- Solution: keep the service notification as the single owner and focus the next removal control or drawer close button after successful removal.
+- Prevention: both direct hosts, four widths, exactly one visible top-layer notice, exact remaining style, keyboard focus after first/last removal, timer cleanup and print visibility. Preserve the original source reversal ledger.
+
+## Email themes need static output and preserved binding contracts (2026-09-13)
+
+- Problem/root cause: four provider templates repeated typography/colors and fixed widths; generic table traversal spread section padding into nested data cells. Incremental inline serialization could drift on repeated builds.
+- Solution: compile one ordered theme from canonical tokens into static inline output, mark only immediate card sections, and clear/replay theme-owned properties consistently. Preserve every variable, raw HTML slot, link and plain-text copy.
+- Prevention: immutable original hashes/content, idempotent compiler checks, structural section bounds, four widths, long names, blocked images and every PDF page. Local Chromium review does not certify mail clients or publish provider templates.
+
 ## Fast price sheets need explicit sample quantities (2026-09-14, superseded 2026-09-16 by the classic line-sheet restore)
 
 - Problem/root cause: the expanded estimate workflow pushed quantity breaks and everyday settings below the viewport. A tier's base "from" price could differ from the customer price at the displayed quantity.

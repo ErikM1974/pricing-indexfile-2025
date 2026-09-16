@@ -20,6 +20,7 @@ import { calculateDiscountableSubtotal, onShipMethodChange, recalculatePricing }
 import { updatePushButtonState } from './save-push.js';
 import { _syncALArrays, handleCapEmbellishmentChange, updateNotesBadge } from './logo-config.js';
 import { updateLogoCardHeader } from './product-rows.js';
+import { clearRepricedNotice } from './persistence.js';
 import { embState, EMB_DEFAULTS } from './state.js';
 
 /**
@@ -319,6 +320,7 @@ function _resetEmbFormFields() {
 
 export function resetQuote() {
     clearCustomerContextBanners();  // P2-8: don't bleed the prior customer's CRM banners into a new quote
+    clearRepricedNotice();          // the reopened quote's "prices changed" notice belongs to that quote
     // Hide + zero the sidebar TOTAL bar (re-shown on first recalc)
     const _stb = document.getElementById('sidebar-total-bar');
     if (_stb) _stb.hidden = true;

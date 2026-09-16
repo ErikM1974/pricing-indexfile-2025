@@ -9,10 +9,13 @@ dtg.allDtgCostsR=[];
 for(const [location,base]of [['LC',7],['FF',10],['FB',10],['JF',12],['JB',12]])for(const [i,tier]of dtg.tiersR.entries())dtg.allDtgCostsR.push({PrintLocationCode:location,TierLabel:tier.TierLabel,PrintCost:base+4-i});
 const image='/__core-fixture/garment.svg',garment='<svg xmlns="http://www.w3.org/2000/svg" width="600" height="720"><rect width="600" height="720" fill="white"/><path d="M175 80L235 60Q300 125 365 60L425 80L545 200L455 285L415 240L425 640L175 640L185 240L145 285L55 200Z" fill="#263b46"/></svg>';
 const colors=[{name:'Jet Black',catalog:'JetBlack',hex:'#263b46'},{name:'Brilliant Orange',catalog:'BrillOrng',hex:'#c64f13'}];
-const headwear={C112:'Structured Twill Cap',CP90:'Knit Beanie',C916:'Port Authority Two-Color Fleece Headband'};
-const capStyle=style=>style==='C112'||style==='C916';
-function details(style='PC54'){return colors.map(c=>({STYLE:style,PRODUCT_TITLE:headwear[style]||'Essential Cotton Tee',PRODUCT_DESCRIPTION:'Comfortable, durable cotton apparel for the whole team.',BRAND_NAME:headwear[style]?'Port Authority':'Port & Company',CATEGORY:headwear[style]?'Caps':'T-Shirts',CATEGORY_NAME:headwear[style]?'Caps':'T-Shirts',PRODUCT_STATUS:'Active',CATALOG_COLOR:c.catalog,COLOR_NAME:c.name,HEX_CODE:c.hex,COLOR_SQUARE_IMAGE:image,MAIN_IMAGE_URL:image,FRONT_MODEL:image,BACK_MODEL:image,FRONT_FLAT:image,BACK_FLAT:image,PRODUCT_IMAGE:image}));}
-function sizePricing(style){const template=pricing('size-pricing-'+(capStyle(style)?'C112':'PC61')+'.json')[0];return colors.map(c=>({...template,styleNumber:style,color:c.name}));}
+// Live shapes (2026-09-16): SanMar files beanies and headbands under Caps / Fleece/Beanies. The builders
+// decide cap vs garment from this data with the shared headwear rule: C112 is a cap; CP90 and C916 are
+// flat headwear priced as garment embroidery. oneSize = the OSFA-only styles (sizes + one-size base price).
+const headwear={C112:['Structured Twill Cap','Mesh Back'],CP90:['Knit Beanie','Fleece/Beanies'],C916:['Port Authority Two-Color Fleece Headband','Fleece/Beanies']};
+const oneSize=style=>style==='C112'||style==='C916';
+function details(style='PC54'){return colors.map(c=>({STYLE:style,PRODUCT_TITLE:headwear[style]?.[0]||'Essential Cotton Tee',PRODUCT_DESCRIPTION:'Comfortable, durable cotton apparel for the whole team.',BRAND_NAME:headwear[style]?'Port Authority':'Port & Company',CATEGORY:headwear[style]?'Caps':'T-Shirts',CATEGORY_NAME:headwear[style]?'Caps':'T-Shirts',SUBCATEGORY_NAME:headwear[style]?.[1]||'Basics',PRODUCT_STATUS:'Active',CATALOG_COLOR:c.catalog,COLOR_NAME:c.name,HEX_CODE:c.hex,COLOR_SQUARE_IMAGE:image,MAIN_IMAGE_URL:image,FRONT_MODEL:image,BACK_MODEL:image,FRONT_FLAT:image,BACK_FLAT:image,PRODUCT_IMAGE:image}));}
+function sizePricing(style){const template=pricing('size-pricing-'+(oneSize(style)?'C112':'PC61')+'.json')[0];return colors.map(c=>({...template,styleNumber:style,color:c.name}));}
 function source(file){let s=restorePreQuickQuote(file, fs.readFileSync(path.join(root,file),'utf8').replace(/\r\n/g,'\n'));for(const c of original.changes.filter(c=>c.file===file).reverse()){if(s.split(c.after).length-1!==c.count)throw Error('Original mapping drift '+file);s=s.split(c.after).join(c.before);}return s;}
 async function open(page,state={}){
  const events={errors:[],writes:[],unknown:[],missing:[],reads:[],dialogs:[],mutations:[]};
@@ -74,10 +77,10 @@ async function open(page,state={}){
   if(p==='/api/product-details'||p==='/api/color-swatches')return route.fulfill({status:state.productFailed?503:200,json:state.productEmpty?[]:details(style)});
   if(p==='/api/product-colors')return route.fulfill({status:state.productFailed?503:200,json:{...details(style)[0],styleNumber:style,productTitle:details(style)[0].PRODUCT_TITLE,colors:state.productEmpty?[]:details(style)}});
   if(p==='/api/products/search'){const q=u.searchParams.get('q')||'PC54';return route.fulfill({json:{success:true,data:{products:[{styleNumber:q,productName:details(q)[0].PRODUCT_TITLE,images:{display:image}}]}}});}
-  if(p==='/api/stylesearch')return route.fulfill({json:['PC54','C112','CP90','C916'].filter(s=>s.toLowerCase().includes((u.searchParams.get('term')||'').toLowerCase())).map(s=>({style:s,value:s,label:details(s)[0].PRODUCT_TITLE,thumb:image}))});
+  if(p==='/api/stylesearch')return route.fulfill({json:['PC54','C112','CP90','C916'].filter(s=>s.toLowerCase().includes((u.searchParams.get('term')||'').toLowerCase())).map(s=>({style:s,value:s,label:s+' - '+details(s)[0].PRODUCT_TITLE,thumb:image}))});
   if(p==='/api/size-pricing')return route.fulfill({json:sizePricing(style)});
-  if(p==='/api/sizes-by-style-color')return route.fulfill({json:capStyle(style)?['OSFA']:['S','M','L','XL','2XL','3XL','4XL']});
-  if(p==='/api/sanmar-shopworks/import-format')return route.fulfill({json:capStyle(style)?[{PartNumber:style,Color:'JetBlack',Size01:'OSFA'}]:[{PartNumber:style,Color:'JetBlack',Size01:'S',Size02:'M',Size03:'L',Size04:'XL',Size05:'2XL',Size06:'3XL'},{PartNumber:style+'_4XL',Color:'JetBlack',Size06:'4XL'}]});
+  if(p==='/api/sizes-by-style-color')return route.fulfill({json:oneSize(style)?['OSFA']:['S','M','L','XL','2XL','3XL','4XL']});
+  if(p==='/api/sanmar-shopworks/import-format')return route.fulfill({json:oneSize(style)?[{PartNumber:style,Color:'JetBlack',Size01:'OSFA'}]:[{PartNumber:style,Color:'JetBlack',Size01:'S',Size02:'M',Size03:'L',Size04:'XL',Size05:'2XL',Size06:'3XL'},{PartNumber:style+'_4XL',Color:'JetBlack',Size06:'4XL'}]});
   if(p==='/api/base-item-costs')return route.fulfill({json:{baseCosts:sizePricing(style)[0].basePrices}});
   if(p==='/api/max-prices-by-style')return route.fulfill({json:{maxPrices:sizePricing(style)[0].basePrices,sizes:Object.entries(sizePricing(style)[0].basePrices).map(([size,maxPrice])=>({size,maxPrice})),sellingPriceDisplayAddOns:sizePricing(style)[0].sizeUpcharges}});
   if(p==='/api/dtg/product-bundle')return route.fulfill({status:state.pricingFailed?503:200,json:{product:{...details(style)[0],styleNumber:style,colors:details(style)},pricing:{tiers:dtg.tiersR,costs:dtg.allDtgCostsR,sizes:dtg.sizes,upcharges:dtg.sellingPriceDisplayAddOns}}});
@@ -100,7 +103,7 @@ async function open(page,state={}){
    return route.fulfill({json:{garments:category('emb-al-bundle.json',8000),caps:category('cap-al-bundle.json',5000)}});
   }
   if(p==='/api/decg-pricing')return route.fulfill({json:{fullBack:{minStitches:25000,ratesPerThousand:{'1-7':1.6,'8-23':1.4,'24-47':1.2,'48-71':1.1,'72+':1}}}});
-  if(p.startsWith('/api/sanmar/inventory/')){const sizes=p.includes('C112')?['OSFA']:['S','M','L','XL','2XL','3XL','4XL'],qty=state.out?0:125;return route.fulfill({status:state.stockFailed?503:200,json:{grandTotal:sizes.length*qty,inventory:sizes.map(size=>({size,totalQty:qty,warehouses:[{id:1,name:'Synthetic warehouse',qty}]}))}});}
+  if(p.startsWith('/api/sanmar/inventory/')){const sizes=/C112|C916/.test(p)?['OSFA']:['S','M','L','XL','2XL','3XL','4XL'],qty=state.out?0:125;return route.fulfill({status:state.stockFailed?503:200,json:{grandTotal:sizes.length*qty,inventory:sizes.map(size=>({size,totalQty:qty,warehouses:[{id:1,name:'Synthetic warehouse',qty}]}))}});}
   // Axe fetches these same linked styles to evaluate contrast.
   if(['fonts.googleapis.com','fonts.gstatic.com'].includes(u.hostname)||(u.hostname==='cdnjs.cloudflare.com'&&/^\/ajax\/libs\/font-awesome\/6\.(4|6)\.0\/css\/all\.min\.css$/.test(p))||(u.hostname==='cdn.jsdelivr.net'&&p==='/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css'))return route.continue();
   if(p.startsWith('/api/')||['fetch','xhr'].includes(request.resourceType())){events.unknown.push(request.url());return route.fulfill({status:503});}

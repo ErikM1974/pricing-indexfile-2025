@@ -1,5 +1,11 @@
 # LESSONS LEARNED
 
+## One product-type rule for every price surface (2026-09-16)
+
+- Problem/root cause: the builders, product page, public embroidery calculators and Quick Quote each decided cap vs garment embroidery their own way (style prefixes, substring keywords, category only). On 2,484 live styles they disagreed with Erik's rules on 85, 86, 297 and 8 rows: New Era/Richardson apparel priced as caps, every beanie priced as a cap on the product page, "capacity" bags sent to the cap calculator. The flat calculator also crashed (`hideLoading` never existed) whenever a cap opened it.
+- Solution: every surface calls `HeadwearClassifier.classify()` and uses `isCap` as returned; Erik's rules live only in the classifier; `tests/unit/headwear-surfaces-parity.test.js` runs each surface's real decision code on live rows. Reopened builder quotes show which prices changed. See `memory/HEADWEAR_ALIGNMENT_2026-09.md`.
+- Prevention: a new surface that prices headwear must call the classifier and join the parity test — never a keyword substring or style prefix. Before making anything "embroidery only", read the live `/api/decoration-methods` rules (Personal Protection allows print). Test mocks must copy the live API shapes (stylesearch labels are "STYLE - TITLE"). Classify from catalog fields, never ShopWorks text alone ("Port  Companyknit Cap" is a beanie). When a product changes pricing side, check what the old side carried (logo settings, AS-CAP/3D-EMB charges), not only its unit price.
+
 ## Browser evidence must not pin the order of concurrent requests (2026-09-16)
 
 - Problem/root cause: `CAPTURE_QUICK_QUOTE_ORIGINAL=1` compared each state's whole record with `toEqual`, including `reads` (every mocked `/api` request in arrival order). Quick Quote fires its pricing-bundle, DTG-pricing and inventory reads concurrently, so five capture states (quick price normal/screenprint/pricing-failed/stock-failed, safety) failed on unmodified 556721b1 with the same entries reordered, even with one worker. The pricing-failed state had a second cause: the original page's `#pricing-api-warning` banner pulses forever (2 s, ignores reduced motion), so axe's colour-contrast result for its two buttons (4.3–4.4 against 4.5) depends on the frame it samples and moved between viewport states.
@@ -215,24 +221,6 @@ Browser baselines must work from a fresh checkout. The tumbler export test previ
 - Problem/root cause: call sheets, mailing labels and thread sheets carried isolated CSS and printed on a timer or load event; blocked windows and missing assets could fail silently. An imported thread run was inserted as HTML.
 - Solution: canonical tokens/components plus one staff-print sheet, with a shared promise for styles/fonts/images, visible failures in the parent and preview, and escaped thread text with validated color data. Keep Avery 5160 dimensions explicit in print media.
 - Prevention: real-window ready/blocked/delayed/missing-file cases; preserve original addresses, amounts and source hashes; test each label at 2.625 by 1 inch, 0.125-inch column gaps and all 32 labels across two pages. Inspect every screen scroll segment and PDF page. Baseline replay must reverse newer print edits before older family edits.
-
-## Customer print previews must wait for successful assets (2026-09-13)
-
-- Problem/root cause: the customer-supplied quote printed on load and ignored image failures; narrow columns split numeric headings and phones clipped the table.
-- Solution: reuse staff-print readiness, report blocked/missing helper/style/image failures in the preview and parent, and give the full table keyboard scrolling with unbroken numeric columns. Preserve the captured calculation, notes and waiver.
-- Prevention: real popup tests with a local HTTP asset server, delayed and failed resources, zero OS printing, original amount/source locks, all four screen widths and both complete paper quotes. Protocol interception can stall document.write styles, so readiness tests serve deterministic assets directly.
-
-## Cart removals need one notice and a remaining focus target (2026-09-13)
-
-- Problem/root cause: the drawer added its own success toast after the service already announced removal, creating overlapping messages. Replacing the item list removed the focused button.
-- Solution: keep the service notification as the single owner and focus the next removal control or drawer close button after successful removal.
-- Prevention: both direct hosts, four widths, exactly one visible top-layer notice, exact remaining style, keyboard focus after first/last removal, timer cleanup and print visibility. Preserve the original source reversal ledger.
-
-## Email themes need static output and preserved binding contracts (2026-09-13)
-
-- Problem/root cause: four provider templates repeated typography/colors and fixed widths; generic table traversal spread section padding into nested data cells. Incremental inline serialization could drift on repeated builds.
-- Solution: compile one ordered theme from canonical tokens into static inline output, mark only immediate card sections, and clear/replay theme-owned properties consistently. Preserve every variable, raw HTML slot, link and plain-text copy.
-- Prevention: immutable original hashes/content, idempotent compiler checks, structural section bounds, four widths, long names, blocked images and every PDF page. Local Chromium review does not certify mail clients or publish provider templates.
 
 ## Faded action notices must leave keyboard navigation (2026-09-13)
 

@@ -6,7 +6,7 @@
  */
 /* global SIZE_TO_SUFFIX, EXTENDED_SIZE_ORDER, getAvailableExtendedSizes,
    markScreenPrintDirty, recalculatePricing, escapeHtml, showToast,
-   SKUValidationService, ProductCategoryFilter, cleanProductTitle,
+   SKUValidationService, HeadwearClassifier, cleanProductTitle,
    getSwatchStyle, productThumbnailModal, Event */
 import { scpState, API_BASE, SIZE06_EXTENDED_SIZES } from './state.js';
 import { positionColorDropdown } from '../shared/color-dropdown-position.js';
@@ -300,8 +300,12 @@ export async function onStyleChange(input, rowId) {
             const categoryName = colorsData.CATEGORY_NAME || '';
             row.dataset.category = categoryName;
 
-            // Screen Print can print both garments and caps
-            const isCap = isCapProduct(styleNumber, product.PRODUCT_TITLE, categoryName);
+            // Screen Print can print both garments and caps (shared headwear rule, same
+            // inputs as the EMB builder — Rule 8)
+            const isCap = isCapProduct(styleNumber, colorsData.productTitle || colorsData.PRODUCT_TITLE || product.PRODUCT_TITLE, categoryName, {
+                subcategory: colorsData.SUBCATEGORY_NAME || '',
+                description: colorsData.PRODUCT_DESCRIPTION || '',
+            });
             row.dataset.isCap = isCap ? 'true' : 'false';
 
             if (colors && colors.length > 0) {
@@ -442,53 +446,35 @@ const POSITION_FULL_NAMES = {
 // buildPricingBreakdown() and updateRowBreakdown() removed — dead code (embroidery-specific, never called in screenprint)
 
 /**
- * Check if a style number is a cap/hat product
+ * Is this product a cap? Same rule as the EMB builder and every price surface:
+ * HeadwearClassifier (shared_components/js/headwear-classifier.js, Erik 2026-09-16).
+ * Flat headwear (beanies, headbands, gaiters) is NOT a cap; visors are. Screen print
+ * keeps accepting caps — this only sets the row's cap flag. (Rule 8: mirrors
+ * builders/emb/product-rows.js isCapProduct.)
  * @param {string} style - Style number
- * @param {string} productTitle - Product title/description
- * @param {string} categoryName - CATEGORY_NAME from SanMar API (most reliable)
- * @returns {boolean} True if cap/hat
+ * @param {string} productTitle - Product title (the stylesearch label "STYLE - TITLE")
+ * @param {string} categoryName - CATEGORY_NAME from SanMar API
+ * @param {{subcategory?: string, description?: string}} [details] - SUBCATEGORY_NAME and
+ *   PRODUCT_DESCRIPTION when the caller has them (/api/product-colors)
+ * @returns {boolean} True when the product is a cap
  */
-function isCapProduct(style, productTitle = '', categoryName = '') {
-    // PRIORITY: Flat headwear (beanies, knit caps) use garment pricing, NOT cap pricing
-    if (typeof ProductCategoryFilter !== 'undefined' && productTitle) {
-        if (ProductCategoryFilter.isFlatHeadwear({ PRODUCT_TITLE: productTitle })) {
-            return false;
-        }
+export function isCapProduct(style, productTitle = '', categoryName = '', details = {}) {
+    // Rule 4: never fall back to the old keyword rules — a missing classifier is a visible error.
+    if (typeof HeadwearClassifier === 'undefined' || !HeadwearClassifier || typeof HeadwearClassifier.classify !== 'function') {
+        const message = 'The cap/garment check did not load, so this product cannot be added. Refresh the page.';
+        if (typeof showToast === 'function') showToast(message, 'error', 8000);
+        throw new Error(message);
     }
-
-    // BEST METHOD: Check CATEGORY_NAME from SanMar API
-    // SanMar categorizes all caps/hats under "Caps" category
-    if (categoryName && categoryName.toLowerCase() === 'caps') {
-        return true;
-    }
-
-    // FALLBACK: Pattern matching for cases where category isn't available
-    if (!style) return false;
-    const styleUpper = style.toUpperCase();
-    const titleUpper = (productTitle || '').toUpperCase();
-
-    // Check style patterns:
-    // CP* caps (CP80, CP90, etc)
-    // NE* caps (NE1000, NE400)
-    // C+digit (C112, C118)
-    // Richardson styles (112, 110, 115, etc) - numeric only
-    if (/^C[P0-9]/.test(styleUpper) || styleUpper.startsWith('NE')) {
-        return true;
-    }
-
-    // Richardson caps - 2-3 digit numeric styles (100-999)
-    if (/^\d{2,3}$/.test(styleUpper)) {
-        return true;
-    }
-
-    // Check title keywords
-    if (titleUpper.includes('CAP') || titleUpper.includes('HAT') ||
-        titleUpper.includes('BEANIE') || titleUpper.includes('SNAPBACK') ||
-        titleUpper.includes('TRUCKER') || titleUpper.includes('RICHARDSON')) {
-        return true;
-    }
-
-    return false;
+    // Same service-prefix strip as the EMB builder ("Di. Embroider Cap - T-shirt").
+    const title = String(productTitle || '').replace(/^DI\.\s*EMBROIDER\s+(CAP|GARMENT)\s*-\s*/i, '');
+    const extra = details || {};
+    return HeadwearClassifier.classify({
+        STYLE: style || '',
+        PRODUCT_TITLE: title,
+        CATEGORY_NAME: categoryName || '',
+        SUBCATEGORY_NAME: extra.subcategory || '',
+        PRODUCT_DESCRIPTION: extra.description || '',
+    }).isCap === true;
 }
 
 /**

@@ -302,8 +302,9 @@ test('the version line names the release and What’s new clears the Updated bad
     check(expect, e);
 });
 
-// Erik 2026-09-16: beanies are flat embroidery everywhere, the same as the Embroidery builder.
-test('beanies price as flat embroidery on every sheet and in Quick Price', async ({ page }) => {
+// Erik 2026-09-16: soft headwear (beanies, headbands, gaiters, skull caps...) is flat embroidery
+// everywhere, the same as the Embroidery builder — one shared classifier decides it.
+test('soft headwear prices as flat embroidery on every sheet and in Quick Price', async ({ page }) => {
     const e = await open(page, { url: '/calculators/quick-quote/index.html' });
     await typeStyle(page, 'CP90');
     await expect(page.locator('#qqLineDownload')).toBeEnabled();
@@ -312,7 +313,7 @@ test('beanies price as flat embroidery on every sheet and in Quick Price', async
     await expect(ladder.locator('th')).toHaveText('Per pc');
     const flatPrices = await ladder.locator('td').allTextContents();
     await methodChip(page, 'capemb');
-    await expect(page.locator('.qq-line-row').first()).toContainText('Priced as embroidery — beanies are flat embroidery, as in the Embroidery builder.');
+    await expect(page.locator('.qq-line-row').first()).toContainText('Priced as embroidery — soft headwear is flat embroidery, as in the Embroidery builder.');
     await expect(page.locator('.qq-sheet-item .qq-sheet-method')).toContainText('Embroidery · Front 8,000 stitches');
     await expect(page.locator('#qqLineDownload')).toBeEnabled();
     await expect(ladder.locator('th')).toHaveText('Per pc');
@@ -321,17 +322,74 @@ test('beanies price as flat embroidery on every sheet and in Quick Price', async
     await expect(page.locator('.qq-line-row').first()).toContainText('CP90 is headwear — choose Embroidery or Cap embroidery.');
     await page.locator('[data-mode="quick"]').click();
     await page.locator('#qqStyle').fill('CP90');
-    await expect(page.locator('.qq-elig-note')).toHaveText('Beanies and knit caps are priced as flat embroidery, the same as the Embroidery builder.');
+    const flatNote = 'Beanies, headbands and other soft headwear are priced as flat embroidery, the same as the Embroidery builder.';
+    await expect(page.locator('.qq-elig-note')).toHaveText(flatNote);
     await expect(page.locator('.qq-card[data-method]')).toHaveCount(1);
     await expect(page.locator('.qq-card[data-method="emb"]')).toContainText('/pc');
     await expect(page.locator('.qq-card[data-method="emb"]')).not.toHaveClass(/is-error|is-unavailable/);
     await expect(page.locator('.qq-emb-pos').first()).toHaveText('Front');
     await expect(page.locator('#qqPlacementField')).toBeHidden();
-    // A fleece headband in "Caps" is a cap in the Embroidery builder, so it stays a cap here.
+    // A fleece headband in "Caps" is flat too (Erik 2026-09-16), the same as the beanie.
     await page.locator('#qqStyle').fill('C916');
-    await expect(page.locator('.qq-card[data-method="capemb"]')).toContainText('/cap');
+    await expect(page.locator('#qqProductName')).toHaveText('Port Authority Two-Color Fleece Headband');
+    await expect(page.locator('.qq-elig-note')).toHaveText(flatNote);
     await expect(page.locator('.qq-card[data-method]')).toHaveCount(1);
+    await expect(page.locator('.qq-card[data-method="emb"]')).toContainText('/pc');
+    await expect(page.locator('.qq-card[data-method="emb"]')).not.toHaveClass(/is-error|is-unavailable/);
+    await expect(page.locator('.qq-card[data-method="capemb"]')).toHaveCount(0);
+    await expect(page.locator('.qq-emb-pos').first()).toHaveText('Front');
+    await expect(page.locator('#qqPlacementField')).toBeHidden();
+    // On a line sheet the headband follows the beanie: cap embroidery re-routes to flat embroidery.
+    await page.locator('[data-mode="linesheet"]').click();
+    await typeStyle(page, 'C916');
+    await methodChip(page, 'capemb');
+    await expect(page.locator('.qq-line-row').first()).toContainText('Priced as embroidery — soft headwear is flat embroidery, as in the Embroidery builder.');
+    await expect(page.locator('.qq-sheet-item .qq-sheet-method')).toContainText('Embroidery · Front 8,000 stitches');
+    await expect(page.locator('.qq-sheet-ladder tbody tr').first().locator('th')).toHaveText('Per pc');
+    check(expect, e);
+});
+
+// Live rules (2026-09-16): only flat headwear in "Caps" is embroidery only. A gaiter in Personal
+// Protection keeps that category's methods (embroidery, screen print, DTF; no DTG) — no new print blocks.
+test('a gaiter outside "Caps" keeps its category’s print methods; a beanie stays embroidery only', async ({ page }) => {
+    const e = await open(page, { url: '/calculators/quick-quote/index.html' });
+    await page.locator('[data-mode="quick"]').click();
+    await page.locator('#qqStyle').fill('FS07');
+    await expect(page.locator('#qqProductName')).toHaveText('Port Authority Fleece Neck Gaiter');
+    await expect(page.locator('.qq-card[data-method]')).toHaveCount(3);
+    for (const method of ['emb', 'scp', 'dtf']) {
+        await expect(page.locator('.qq-card[data-method="' + method + '"]')).toContainText('/pc');
+        await expect(page.locator('.qq-card[data-method="' + method + '"]')).not.toHaveClass(/is-error|is-unavailable/);
+    }
+    await expect(page.locator('.qq-card[data-method="dtg"]')).toHaveCount(0);
+    await expect(page.locator('.qq-card[data-method="capemb"]')).toHaveCount(0);
     await expect(page.locator('.qq-elig-note')).toHaveCount(0);
+    await expect(page.locator('#qqPlacementField')).toBeVisible();
+    await expect(page.locator('#qqFront [data-code="LC"]')).toBeVisible();
+    await expect(page.locator('#qqInkField')).toBeVisible();
+    await expect(page.locator('.qq-emb-pos').first()).toHaveText('Front');
+    // Line sheet: the gaiter screen prints; DTG follows the category rule; cap embroidery is flat embroidery.
+    await page.locator('[data-mode="linesheet"]').click();
+    await methodChip(page, 'scp');
+    await typeStyle(page, 'FS07');
+    await expect(page.locator('.qq-sheet-item')).toHaveCount(1);
+    await expect(page.locator('.qq-line-stat.err')).toHaveCount(0);
+    await expect(page.locator('#qqLineDownload')).toBeEnabled();
+    await methodChip(page, 'dtg');
+    await expect(page.locator('.qq-line-row').first()).toContainText('DTG print isn’t offered for Personal Protection.');
+    await expect(page.locator('.qq-line-row').first()).not.toContainText('is headwear');
+    await methodChip(page, 'capemb');
+    await expect(page.locator('.qq-line-row').first()).toContainText('Priced as embroidery — soft headwear is flat embroidery, as in the Embroidery builder.');
+    await expect(page.locator('.qq-line-row').first()).not.toContainText('Not confirmed from the catalog');
+    await expect(page.locator('.qq-sheet-item .qq-sheet-method')).toContainText('Embroidery · Front 8,000 stitches');
+    // The beanie in "Caps" stays embroidery only, with no print placements.
+    await page.locator('[data-mode="quick"]').click();
+    await page.locator('#qqStyle').fill('CP90');
+    await expect(page.locator('#qqProductName')).toHaveText('Knit Beanie');
+    await expect(page.locator('.qq-elig-note')).toHaveText('Beanies, headbands and other soft headwear are priced as flat embroidery, the same as the Embroidery builder.');
+    await expect(page.locator('.qq-card[data-method]')).toHaveCount(1);
+    await expect(page.locator('.qq-card[data-method="emb"]')).toContainText('/pc');
+    await expect(page.locator('#qqPlacementField')).toBeHidden();
     check(expect, e);
 });
 
@@ -383,6 +441,15 @@ test('a garment with no category warns instead of blocking print methods', async
     await typeStyle(page, 'BC3001');
     await expect(page.locator('#qqLineDownload')).toBeEnabled();
     await expect(page.locator('.qq-line-row').first()).toContainText('This category isn’t in our decoration rules — confirm DTF transfer works for it.');
+    await expect(page.locator('.qq-line-row').first()).not.toContainText('Not confirmed from the catalog');
+    // Embroidery follows the shared classifier as returned: an unconfirmed garment on a cap sheet
+    // prices as garment embroidery, and the row says the catalog did not confirm it.
+    await methodChip(page, 'capemb');
+    await expect(page.locator('.qq-line-row').first()).toContainText('Priced as embroidery.');
+    await expect(page.locator('.qq-line-row').first()).toContainText('Not confirmed from the catalog — check the product.');
+    await expect(page.locator('.qq-sheet-item .qq-sheet-method')).toContainText('Embroidery · Left chest 8,000 stitches');
+    await expect(page.locator('.qq-sheet-ladder tbody tr').first().locator('th')).toHaveText('Per pc');
+    await expect(page.locator('#qqLineDownload')).toBeEnabled();
     await page.locator('[data-mode="quick"]').click();
     await page.locator('#qqStyle').fill('BC3001');
     await expect(page.locator('.qq-elig-note')).toContainText('only embroidery is shown');
@@ -416,7 +483,9 @@ for (const method of ['emb', 'capemb', 'dtg', 'scp', 'dtf']) test('customer shee
     check(expect, e);
 });
 
-for (const [method, quantity, style] of [['emb', 3], ['emb', 7], ['emb', 3, 'CP90'], ['capemb', 3, 'CP90'], ['emb', 7, 'CP90'], ['emb', 3, 'C916'], ['capemb', 3], ['capemb', 7], ['dtg', 23], ['dtf', 23], ['scp', 24], ['scp', 37]]) test('small-order price survives the full builder: ' + method + ' ' + quantity + (style ? ' ' + style : ''), async ({ page, context }) => {
+// Flat headwear (CP90 beanie, C916 fleece headband in "Caps") hands off as flat embroidery, whichever
+// embroidery chip the rep picked: the builder uses the same shared classifier.
+for (const [method, quantity, style] of [['emb', 3], ['emb', 7], ['emb', 3, 'CP90'], ['capemb', 3, 'CP90'], ['emb', 7, 'CP90'], ['emb', 3, 'C916'], ['capemb', 3, 'C916'], ['capemb', 3], ['capemb', 7], ['dtg', 23], ['dtf', 23], ['scp', 24], ['scp', 37]]) test('small-order price survives the full builder: ' + method + ' ' + quantity + (style ? ' ' + style : ''), async ({ page, context }) => {
     const e = await open(page, { url: '/calculators/quick-quote/index.html' });
     await methodChip(page, method);
     await page.locator('#qqLineQty').fill(String(quantity));

@@ -51,6 +51,8 @@ const UTILS_SRC = read('shared_components/js/quote-builder-utils.js');
 // globals (SIZE_TO_SUFFIX, EXTENDED_SIZE_ORDER); without it any child-row restore throws.
 const ESC_SRC = read('shared_components/js/extended-sizes-config.js');
 const PCF_SRC = read('shared_components/js/product-category-filter.js');
+// The shared cap/garment rule (Erik 2026-09-16) — the page loads it before the bundle.
+const HEADWEAR_SRC = read('shared_components/js/headwear-classifier.js');
 const SERVICE_SRC = read('shared_components/js/embroidery-quote-service.js');
 const SUMMARY_SRC = read('shared_components/js/quote-order-summary.js');
 const BUILDER_SRC = read('shared_components/js/embroidery-quote-builder.js');
@@ -147,6 +149,7 @@ async function buildBuilder(routes) {
   inject(UTILS_SRC);
   inject(ESC_SRC);
   inject(PCF_SRC);
+  inject(HEADWEAR_SRC);
   inject(SERVICE_SRC + '\n;window.EmbroideryQuoteService = EmbroideryQuoteService;');
   inject(SUMMARY_SRC);  // shared order-summary band — must load before the builder (matches production) so the builder's QuoteOrderSummary.configure() wires #order-recap / #ship-to-card
   inject(BUILDER_SRC);
@@ -409,5 +412,129 @@ describe('Batch 2.0 — reloaded ladies XXL stays XXL (never renamed to 2XL)', (
     const m = SRC.match(/if \(size === '2XL' \|\| size === 'XXL'\)[\s\S]{0,1400}?\n        \} else if \(isExtendedSize\)/);
     expect(m).not.toBeNull();
     expect(m[0]).toMatch(/createChildRow\(rowIdNum, 'XXL', qty\)/);
+  });
+});
+
+// ============================================================================
+// 2026-09-16 — a reopened quote reprices with the shared cap/garment rule and SAYS what moved
+// ============================================================================
+describe('reopened quote — the shared headwear rule reprices, and the rep sees it', () => {
+  // A beanie saved in September as a CAP (the old rule: "Caps" category wins). Today's
+  // rule prices it as flat (garment) embroidery. Session counts prove the saved side.
+  const beanieSession = {
+    QuoteID: 'EMB-HW-1', Status: 'Open', RevisionNumber: 1, CustomerName: 'Beanie Co',
+    CapPrintLocation: 'CF', CapStitchCount: 8000, ALGarmentQty: 0, ALCapQty: 24,
+  };
+  const beanieItems = [{
+    EmbellishmentType: 'embroidery', LineNumber: 1, StyleNumber: 'CP90', Color: 'Black',
+    ProductName: 'Port Authority Knit Cap - Black', SizeBreakdown: '{"OSFA":24}', Quantity: 24,
+    BaseUnitPrice: 15, FinalUnitPrice: 15, LineTotal: 360,
+  }];
+  const beanieRoutes = (session) => [
+    ['/api/quote_sessions', [session]],
+    ['/api/quote_items', beanieItems],
+    ['/api/stylesearch', [{ value: 'CP90', label: 'CP90 - Port Authority Knit Cap. CP90' }]],
+    ['/api/product-colors', {
+      productTitle: 'Port Authority Knit Cap. CP90', CATEGORY_NAME: 'Caps', SUBCATEGORY_NAME: 'Fleece/Beanies',
+      PRODUCT_DESCRIPTION: 'A snug acrylic beanie.', colors: [{ COLOR_NAME: 'Black', CATALOG_COLOR: 'Black', HEX_CODE: '#000' }],
+    }],
+    ['/api/sanmar-shopworks/import-format', [{ PartNumber: 'CP90', Color: 'Black', Size01: 'OSFA' }]],
+    ['/api/sizes-by-style-color', { data: ['OSFA'] }],
+    ['/api/service-codes', []],
+  ];
+  // Engine stub: every piece $15.00 as a cap, `garmentUnit` as a garment — enough to see
+  // which side priced the row and what the notice compares.
+  const engine = (garmentUnit) => ({
+    initializeConfig: async () => {},
+    calculateQuote: async (products) => ({
+      products: products.map((product) => ({ product, lineItems: [{ description: 'OSFA(24)', quantity: product.totalQuantity, unitPrice: product.isCap ? 15 : garmentUnit }] })),
+      grandTotal: 0, totalQuantity: 0, tier: '24-47', logos: [],
+    }),
+  });
+  const reopen = async (session, garmentUnit) => {
+    const built = await buildBuilder(beanieRoutes(session));
+    built.window.__embTest.pricingCalculator = engine(garmentUnit);
+    await built.window.loadQuoteForEditing(session.QuoteID);
+    await flush();
+    return built.window;
+  };
+
+  test('the beanie saved as a cap now prices as a garment, and the notice says so', async () => {
+    const window = await reopen(beanieSession, 12.5);
+    const row = [...window.document.querySelectorAll('tr[data-row-id]')].find((r) => r.dataset.style === 'CP90');
+    expect(row.dataset.isCap).toBe('false');
+    expect(row.dataset.osfaQty).toBe('24');
+    const notice = window.document.getElementById('reopen-price-notice');
+    expect(notice).toBeTruthy();
+    // Read out politely from its own live region (filled after insertion); Dismiss is outside it.
+    const live = notice.querySelector('[role="status"][aria-live="polite"]');
+    expect(live).toBeTruthy();
+    expect(live.textContent).toContain('Prices changed from the saved quote');
+    expect(live.textContent).toContain('CP90 is now priced as a garment ($15.00 → $12.50)');
+    expect(live.textContent).toContain('The saved quote keeps its old prices until you save a revision.');
+    // Sits above the products, and a new quote clears it.
+    expect(notice.nextElementSibling.classList.contains('product-table-wrapper')).toBe(true);
+    window.resetQuote();
+    expect(window.document.getElementById('reopen-price-notice')).toBeNull();
+  });
+
+  test('same price today: only the proven side switch is listed; nothing proven → no notice', async () => {
+    const window = await reopen({ ...beanieSession, QuoteID: 'EMB-HW-2' }, 15);
+    const notice = window.document.getElementById('reopen-price-notice');
+    await flush();
+    expect(notice.textContent).toContain('CP90 is now priced as a garment (same price)');
+    const { ALGarmentQty, ALCapQty, ...noCounts } = beanieSession;
+    const quiet = await reopen({ ...noCounts, QuoteID: 'EMB-HW-2B' }, 15);
+    expect(quiet.document.getElementById('reopen-price-notice')).toBeNull();
+  });
+
+  test('a session without the piece counts lists the price change without claiming a switch', async () => {
+    const { ALGarmentQty, ALCapQty, ...noCounts } = beanieSession;
+    const window = await reopen({ ...noCounts, QuoteID: 'EMB-HW-3' }, 12.5);
+    const notice = window.document.getElementById('reopen-price-notice');
+    expect(notice.textContent).toContain('CP90: $15.00 → $12.50');
+    expect(notice.textContent).not.toContain('now priced as');
+  });
+
+  test('a duplicated quote says saving creates a NEW quote, not a revision', async () => {
+    const session = { ...beanieSession, QuoteID: 'EMB-HW-4' };
+    const built = await buildBuilder(beanieRoutes(session));
+    built.window.__embTest.pricingCalculator = engine(12.5);
+    await built.window.duplicateQuote(session.QuoteID);
+    await flush();
+    expect(built.window.__embTest.editingQuoteId).toBeNull();
+    const notice = built.window.document.getElementById('reopen-price-notice');
+    expect(notice).toBeTruthy();
+    expect(notice.textContent).toContain('Prices changed from the original quote');
+    expect(notice.textContent).toContain('CP90 is now priced as a garment ($15.00 → $12.50)');
+    expect(notice.textContent).toContain('Saving creates a new quote at these prices.');
+    expect(notice.textContent).not.toContain('save a revision');
+  });
+
+  test('the comparison runs after the restore guard is off; a duplicate has already left the source quote', async () => {
+    const seen = [];
+    const spy = (built) => {
+      const inner = engine(12.5);
+      built.window.__embTest.pricingCalculator = { ...inner, calculateQuote: async (products, ...rest) => {
+        seen.push({ restoring: built.window._restoringQuote, editing: built.window.__embTest.editingQuoteId });
+        return inner.calculateQuote(products, ...rest);
+      } };
+    };
+    const reopened = await buildBuilder(beanieRoutes({ ...beanieSession, QuoteID: 'EMB-HW-5' }));
+    spy(reopened);
+    await reopened.window.loadQuoteForEditing('EMB-HW-5');
+    await flush();
+    expect(seen.length).toBeGreaterThan(0);
+    // The last price call is the comparison: live tax lookups etc. are no longer blocked.
+    expect(seen[seen.length - 1]).toEqual({ restoring: false, editing: 'EMB-HW-5' });
+
+    seen.length = 0;
+    const copied = await buildBuilder(beanieRoutes({ ...beanieSession, QuoteID: 'EMB-HW-6' }));
+    spy(copied);
+    await copied.window.duplicateQuote('EMB-HW-6');
+    await flush();
+    // A Save during the comparison can't reach the source quote.
+    expect(seen[seen.length - 1]).toEqual({ restoring: false, editing: null });
+    expect(copied.window.document.getElementById('reopen-price-notice').textContent).toContain('Prices changed from the original quote');
   });
 });

@@ -83,11 +83,13 @@ function setupSearch() {
             const beanieResults = [];
 
             results.forEach(item => {
-                // Use shared utility for filtering
-                if (ProductCategoryFilter.isFlatHeadwear(item)) {
-                    beanieResults.push(item);
-                } else if (ProductCategoryFilter.isStructuredCap(item)) {
+                // Suggestion rows carry only a label and the style number, so the label is the title and the
+                // value is the style (3-digit Richardson caps like 220, 173 sort as caps). Garments are left out.
+                const headwear = classifyHeadwear({ PRODUCT_TITLE: item.label, STYLE: item.value });
+                if (headwear.isCap) {
                     capResults.push(item);
+                } else if (headwear.isFlat) {
+                    beanieResults.push(item);
                 }
             });
 
@@ -138,6 +140,7 @@ function setupSearch() {
         } catch (error) {
             console.error('Search error:', error);
             resultsContainer.innerHTML = '<div class="search-no-results">Search failed. Please try again.</div>';
+            if (error.headwearClassifierMissing) showApiError(error.message);
         }
     }
 
@@ -173,6 +176,20 @@ function setupSearch() {
     });
 }
 
+// Cap vs garment embroidery is ONE rule on every price surface (Erik 2026-09-16):
+// shared_components/js/headwear-classifier.js. Only isCap prices here; beanies, knit/skull caps,
+// headbands and garments go to flat embroidery. A missing classifier is a visible error,
+// never the old keyword guess (Rule 4).
+function classifyHeadwear(row) {
+    const classifier = window.HeadwearClassifier;
+    if (!classifier || typeof classifier.classify !== 'function') {
+        const error = new Error('The product type check did not load, so this page cannot tell caps from garments. Please refresh the page.');
+        error.headwearClassifierMissing = true;
+        throw error;
+    }
+    return classifier.classify(row);
+}
+
 // Load cap product data
 async function loadCapProduct(styleNumber) {
 
@@ -199,14 +216,11 @@ async function loadCapProduct(styleNumber) {
 
         currentProduct = productArray[0];
 
-        // Validate that this is actually a cap product
-        const productTitle = (currentProduct.PRODUCT_TITLE || currentProduct.ProductTitle || '').toLowerCase();
-        const productDescription = (currentProduct.PRODUCT_DESCRIPTION || currentProduct.Description || '').toLowerCase();
-        const category = (currentProduct.CATEGORY || currentProduct.Category || '').toLowerCase();
+        // Validate that this is actually a cap product (visors and bucket hats included)
         const brand = currentProduct.BRAND_NAME || currentProduct.BRAND || currentProduct.Brand || '';
+        const headwear = classifyHeadwear(currentProduct);
 
-        // Use shared utility for filtering
-        if (ProductCategoryFilter.isFlatHeadwear(currentProduct)) {
+        if (headwear.isFlat) {
             showProductMismatchOverlay(
                 styleNumber,
                 `${brand} ${currentProduct.PRODUCT_TITLE || currentProduct.ProductTitle || styleNumber}`,
@@ -215,7 +229,7 @@ async function loadCapProduct(styleNumber) {
             return; // Stop loading the rest of the page
         }
 
-        if (!ProductCategoryFilter.isStructuredCap(currentProduct)) {
+        if (!headwear.isCap) {
             // This is not a cap - likely a shirt or other item
             showProductMismatchOverlay(
                 styleNumber,
@@ -822,7 +836,7 @@ function showProductMismatchOverlay(styleNumber, productName, reason) {
     document.getElementById('mismatchMessage').innerHTML = `
         <strong>${productName}</strong><br><br>
         ${reason}<br><br>
-        Cap embroidery pricing is only for structured caps like baseball caps and trucker hats.
+        Cap embroidery pricing is for caps, visors and bucket hats.
     `;
 
     document.getElementById('redirectButton').href = `/pricing/embroidery?StyleNumber=${styleNumber}`;

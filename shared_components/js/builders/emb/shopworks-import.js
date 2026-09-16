@@ -27,7 +27,7 @@ import { _syncALArrays, handleCapEmbellishmentChange, updateNotesBadge } from '.
 // populateNonSanmarRow + API_BASE dropped 2026-08-15: their only consumer here was
 // saveNonSanmarProduct, which went with the Add-Product modal. The catalog-lookup path
 // in product-rows.js still uses populateNonSanmarRow directly.
-import { addNewRow, createServiceProductRow, dateToInputValue, hideVariantOnlyParents, isCapProduct, onSizeChange, onStyleChange, parseShopWorksDescription, selectColor, selectNonSanmarColor, updateCapLogoSectionVisibility, updateLogoCardHeader, updateNonSanmarPriceCell } from './product-rows.js';
+import { addNewRow, catalogIsCap, createServiceProductRow, dateToInputValue, hideVariantOnlyParents, isCapProduct, onSizeChange, onStyleChange, parseShopWorksDescription, selectColor, selectNonSanmarColor, updateCapLogoSectionVisibility, updateLogoCardHeader, updateNonSanmarPriceCell } from './product-rows.js';
 import { embState, SIZE06_EXTENDED_SIZES } from './state.js';
 
 
@@ -958,7 +958,7 @@ export function collectAlReviewItem(additionalLogos, serviceReviewItems, orderQt
 /** Import steps 8-10 — collect product + service review items (AL / DECG / DECC /
  * Monogram) and build the embroidery-config options, incl. the digitized-design
  * stitch lookup (+ ShopWorks_Designs fallback). Pure collection: no DOM writes. */
-async function buildReviewPayload(data, additionalLogos, progress) {
+export async function buildReviewPayload(data, additionalLogos, progress) {
     // 8. Collect product items for pricing review (deferred import)
     const productReviewItems = [];
     const totalProductQty = data.products.reduce((sum, p) => {
@@ -966,7 +966,16 @@ async function buildReviewPayload(data, additionalLogos, progress) {
     }, 0);
 
     for (const product of data.products) {
-        const isCap = isCapProduct(product.partNumber, product.description || '');
+        // Decide the side from the catalog, as the rows built later do (onStyleChange), so the
+        // review's garment/cap logo settings land on the side the products price on.
+        let isCap;
+        try {
+            isCap = await catalogIsCap(product.partNumber, product.description || '');
+        } catch (e) {
+            console.warn(`[ShopWorks Import] Catalog check failed for ${product.partNumber}:`, e);
+            isCap = isCapProduct(product.partNumber, product.description || '');
+            showToast(`Could not check ${product.partNumber} in the catalog. Cap or garment was read from the ShopWorks description — check the logo settings after import.`, 'warning', 8000);
+        }
         let sizePrices = null;
         if (embState.pricingCalculator) {
             try {
@@ -1974,7 +1983,7 @@ async function forceImportAsNonSanmar(row, rowId, product, sellPriceOverride, se
         row.dataset.productName = importData.description;
     }
 
-    // Detect cap vs garment and enable appropriate size inputs
+    // Detect cap vs garment (shared headwear rule) and enable appropriate size inputs
     const isCap = isCapProduct(product.partNumber, product.description || '');
     if (isCap) {
         row.dataset.isCap = 'true';
@@ -2077,15 +2086,16 @@ async function selectImportedColor(row, rowId, product, sellPriceOverride) {
  * rows for extended/2XL/XXL sizes (with per-size sell overrides), standard
  * sizes straight into parent inputs.
  */
-function applyImportedSizes(row, rowId, product, sellPriceOverride, sellPriceOverrides) {
+export function applyImportedSizes(row, rowId, product, sellPriceOverride, sellPriceOverrides) {
     // 5. Set sizes (inputs should now be enabled from selectColor)
     // Extended sizes (from SIZE06_EXTENDED_SIZES) need child rows, not direct input
     // Also: 2XL typically uses Size05 column, but if disabled, treat it as extended size
     const IMPORT_EXTENDED_SIZES = [...SIZE06_EXTENDED_SIZES, '2XL', 'XXL'];  // 2XL/XXL: Size05-column child rows, deliberately not in the Size06 list (Batch 2.0)
 
-    // Detect if this is a cap product for size mapping
-    const isCapRow = row.dataset.isCap === 'true' ||
-                     isCapProduct(product.partNumber, product.description || '');
+    // Cap size mapping follows the row's own cap flag — set by onStyleChange / the vendor
+    // path from the shared headwear rule. A second guess here from the ShopWorks text alone
+    // could disagree with the row's pricing (a beanie row mapped to cap sizes).
+    const isCapRow = row.dataset.isCap === 'true';
 
     // Cap size mapping: ShopWorks uses S, M, L but caps have S/M, M/L, L/XL, OSFA
     const CAP_SIZE_MAP = {

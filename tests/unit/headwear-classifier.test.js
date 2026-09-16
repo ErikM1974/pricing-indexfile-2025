@@ -15,6 +15,16 @@ test.each(rows.map(r => [r.row.STYLE, r.expected, r.row]))('%s is %s', (style, e
     expect(result.isFlat).toBe(expected === 'flat');
 });
 
+test('Erik 2026-09-16: soft headwear is flat in any category; hoods only inside Caps; bandanas are garments', () => {
+    expect(classify({ STYLE: 'C910', PRODUCT_TITLE: 'Port Authority R-Tek Stretch Fleece Headband. C910', CATEGORY_NAME: 'Accessories' })).toMatchObject({ kind: 'flat', confident: true });
+    expect(classify({ STYLE: 'FS07', PRODUCT_TITLE: 'Port Authority Fleece Neck Gaiter. FS07', CATEGORY_NAME: 'Personal Protection' }).kind).toBe('flat');
+    expect(classify({ STYLE: 'C960', PRODUCT_TITLE: 'Port Authority Cotton Bandana C960', CATEGORY_NAME: 'Personal Protection' }).kind).toBe('garment');
+    expect(classify({ STYLE: 'CT102368', PRODUCT_TITLE: 'Carhartt Firm Duck Hood CT102368', CATEGORY_NAME: 'Caps' }).kind).toBe('flat');
+    expect(classify({ STYLE: '173', PRODUCT_TITLE: 'Richardson Hood River 173', CATEGORY_NAME: '', PRODUCT_DESCRIPTION: 'Pre-curved visor.' }).kind).toBe('cap');
+    expect(classify({ STYLE: 'NKFB6446', PRODUCT_TITLE: 'Nike Dri-FIT Ace Swoosh Visor', CATEGORY_NAME: '' }).kind).toBe('cap');
+    expect(classify({ productName: 'Knit Beanie', category: 'Caps' }).kind).toBe('flat');
+});
+
 test('Richardson caps with a blank category are caps, Richardson apparel is not', () => {
     expect(classify({ STYLE: '112FPR', PRODUCT_TITLE: 'Richardson Five-Panel with Rope 112FPR', CATEGORY_NAME: '' }).kind).toBe('cap');
     expect(classify({ STYLE: 'RA7110SS', PRODUCT_TITLE: 'Richardson Short Sleeve Tee', CATEGORY_NAME: '', PRODUCT_DESCRIPTION: 'Soft cotton tee.' }).kind).toBe('garment');
