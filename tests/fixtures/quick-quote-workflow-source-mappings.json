@@ -1,5 +1,5 @@
 {
-  "description": "Authorized September 13, 2026 Quick Quote redesign. Apply before historical CSS mappings. Original hashes remain immutable; current pricing/handoffs tested independently. classic-restore-2026-09-16: Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings. release-2026.09.16.2: Deploy v2026.09.16.2 cache-bust of the Quick Quote assets. release-notes-2026-09-16: Erik approved 2026-09-16: Quick Quote shows its version (from the deploy's cache-bust), a What's new list and a one-time Updated badge for Nika and Taneisha's trial. release-2026.09.16.3: Deploy v2026.09.16.3 cache-bust of the Quick Quote assets. headwear-alignment-2026-09-16: Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps. release-2026.09.16.4: Deploy v2026.09.16.4 cache-bust of the headwear alignment assets.",
+  "description": "Authorized September 13, 2026 Quick Quote redesign. Apply before historical CSS mappings. Original hashes remain immutable; current pricing/handoffs tested independently. classic-restore-2026-09-16: Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings. release-2026.09.16.2: Deploy v2026.09.16.2 cache-bust of the Quick Quote assets. release-notes-2026-09-16: Erik approved 2026-09-16: Quick Quote shows its version (from the deploy's cache-bust), a What's new list and a one-time Updated badge for Nika and Taneisha's trial. release-2026.09.16.3: Deploy v2026.09.16.3 cache-bust of the Quick Quote assets. headwear-alignment-2026-09-16: Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps. release-2026.09.16.4: Deploy v2026.09.16.4 cache-bust of the headwear alignment assets. print-methods-unlimited-2026-09-16: Erik approved 2026-09-16: screen print and DTF are never limited by product category in Quick Quote; embroidery and DTG outside the category rules still price, with a note (the rep decides). builder-runtime-styles-2026-09-16: Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons.",
   "changes": [
     {
       "file": "calculators/quick-quote/dtf-prints-prototype.html",
@@ -2450,6 +2450,430 @@
       "count": 1,
       "stage": "release-2026.09.16.4",
       "reason": "Deploy v2026.09.16.4 cache-bust of the headwear alignment assets."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "    }\n",
+      "after": "    }\n    // Erik 2026-09-16: the rep decides what can be printed. Screen print and DTF are never limited;\n    // embroidery and DTG outside their category rules still price, with a note to check the garment.\n    // rule:true = the category rules don't list the method, so it is never the \"lowest price\" pick.\n    function methodCaution(elig, key, product) {\n        if (!elig || key === 'SCP' || key === 'DTF') return null;\n        var dtg = key === 'DTG', check = dtg ? 'the fabric' : 'the garment';\n        if (elig.source === 'fallback') {\n            if (!dtg) return null; // embroidery is the safe method when the rules are missing\n            return { rule: true, text: 'Check the fabric before quoting DTG — ' + (elig.rulesDown ? 'the decoration rules didn’t load.' : 'this category isn’t in our decoration rules.') };\n        }\n        if (!methodAllowed(elig, key)) {\n            return { rule: true, text: (dtg ? 'DTG print' : 'Embroidery') + ' isn’t usually offered for ' + ((product && product.category) || 'this product') + ' — check ' + check + ' before quoting.' };\n        }\n        if (elig[key] === 'warn') return { rule: false, text: 'Check the fabric — DTG prints best on cotton.' };\n        return null;\n    }\n    function methodEntry(id) {\n        for (var i = 0; i < state.methods.length; i++) if (state.methods[i].id === id) return state.methods[i];\n        return null;\n    }\n",
+      "count": 1,
+      "stage": "print-methods-unlimited-2026-09-16",
+      "reason": "Erik approved 2026-09-16: screen print and DTF are never limited by product category in Quick Quote; embroidery and DTG outside the category rules still price, with a note (the rep decides)."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "            var e = elig || { EMB: true, DTG: 'no', SCP: false, DTF: false };\n            state.methods = [\n                { id: 'emb', on: e.EMB },\n                { id: 'dtg', on: e.DTG && e.DTG !== 'no' },\n                { id: 'scp', on: e.SCP },\n                { id: 'dtf', on: e.DTF }\n            ].filter(function (m) { return m.on; }).map(function (m) { return { id: m.id }; });",
+      "after": "            var e = elig || { EMB: true, DTG: 'no', SCP: false, DTF: false, source: 'fallback' };\n            state.methods = e.source === 'flat-headwear'\n                ? [{ id: 'emb' }]\n                : ['emb', 'dtg', 'scp', 'dtf'].map(function (id) {\n                    return { id: id, caution: methodCaution(e, METHODS[id].engineMethod, state.product) };\n                });",
+      "count": 1,
+      "stage": "print-methods-unlimited-2026-09-16",
+      "reason": "Erik approved 2026-09-16: screen print and DTF are never limited by product category in Quick Quote; embroidery and DTG outside the category rules still price, with a note (the rep decides)."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "            var r = state.results[m.id];\n            if (r && r.status === 'ok' && r.summary.total != null && r.summary.total < bestTotal) { bestTotal = r.summary.total; bestId = m.id; }",
+      "after": "            var r = state.results[m.id];\n            if (m.caution && m.caution.rule) return;\n            if (r && r.status === 'ok' && r.summary.total != null && r.summary.total < bestTotal) { bestTotal = r.summary.total; bestId = m.id; }",
+      "count": 1,
+      "stage": "print-methods-unlimited-2026-09-16",
+      "reason": "Erik approved 2026-09-16: screen print and DTF are never limited by product category in Quick Quote; embroidery and DTG outside the category rules still price, with a note (the rep decides)."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "        // decoration-methods.js contract: an unknown category must say that only embroidery is shown.\n        var elig = state.product.eligibility;\n        var eligNote = elig && elig.source === 'fallback'\n            ? '<p class=\"qq-elig-note\" role=\"status\">' + (elig.rulesDown\n                ? 'Decoration rules didn’t load, so only embroidery is shown. Refresh to see the other methods.'\n                : 'This product’s category isn’t in our decoration rules, so only embroidery is shown. Other methods may work — confirm before quoting, or price one on the Line Sheet.') + '</p>'",
+      "after": "        // decoration-methods.js contract: missing rules are a visible warning.\n        var elig = state.product.eligibility;\n        var eligNote = elig && elig.source === 'fallback'\n            ? '<p class=\"qq-elig-note\" role=\"status\">' + (elig.rulesDown\n                ? 'Decoration rules didn’t load. Every method is priced — check the product before quoting DTG, or refresh.'\n                : 'This product’s category isn’t in our decoration rules. Every method is priced — check the product before quoting DTG.') + '</p>'",
+      "count": 1,
+      "stage": "print-methods-unlimited-2026-09-16",
+      "reason": "Erik approved 2026-09-16: screen print and DTF are never limited by product category in Quick Quote; embroidery and DTG outside the category rules still price, with a note (the rep decides)."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "\n        var dm = ' data-method=\"' + esc(id) + '\"';\n        if (!r || r.status === 'loading') {\n            return '<div class=\"qq-card\"' + dm + '><div class=\"qq-card-top\">' + head + '<div class=\"qq-skeleton\" style=\"width:120px\"></div></div></div>';\n        }\n        if (r.status === 'unavailable' || r.status === 'belowmin') {\n            var stCls = (r.status === 'belowmin') ? 'is-belowmin' : 'is-unavailable';\n            return '<div class=\"qq-card ' + stCls + '\"' + dm + '><div class=\"qq-card-top\">' + head + '</div><div class=\"qq-card-msg\">' + esc(r.message) + '</div></div>';\n        }\n        if (r.status === 'error') {\n            return '<div class=\"qq-card is-error\"' + dm + '><div class=\"qq-card-top\">' + head + '</div>'",
+      "after": "        var entry = methodEntry(id);\n        var caution = entry && entry.caution ? '<p class=\"qq-card-caution\">' + esc(entry.caution.text) + '</p>' : '';\n\n        var dm = ' data-method=\"' + esc(id) + '\"';\n        if (!r || r.status === 'loading') {\n            return '<div class=\"qq-card\"' + dm + '><div class=\"qq-card-top\">' + head + '<div class=\"qq-skeleton\" style=\"width:120px\"></div></div>' + caution + '</div>';\n        }\n        if (r.status === 'unavailable' || r.status === 'belowmin') {\n            var stCls = (r.status === 'belowmin') ? 'is-belowmin' : 'is-unavailable';\n            return '<div class=\"qq-card ' + stCls + '\"' + dm + '><div class=\"qq-card-top\">' + head + '</div>' + caution + '<div class=\"qq-card-msg\">' + esc(r.message) + '</div></div>';\n        }\n        if (r.status === 'error') {\n            return '<div class=\"qq-card is-error\"' + dm + '><div class=\"qq-card-top\">' + head + '</div>' + caution",
+      "count": 1,
+      "stage": "print-methods-unlimited-2026-09-16",
+      "reason": "Erik approved 2026-09-16: screen print and DTF are never limited by product category in Quick Quote; embroidery and DTG outside the category rules still price, with a note (the rep decides)."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "            + '<div class=\"qq-card-total\">' + fmt(s.total) + ' total' + (isBest ? ' <span class=\"qq-best-tag\"><svg class=\"qq-star\" viewBox=\"0 0 24 24\" width=\"11\" height=\"11\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M12 2l2.9 6.3 6.9.7-5.1 4.7 1.4 6.8L12 17.8 6 21.2l1.4-6.8L2.3 9.7l6.9-.7z\"/></svg>lowest price</span>' : '') + '</div></div></div>'\n            + configChips(id)",
+      "after": "            + '<div class=\"qq-card-total\">' + fmt(s.total) + ' total' + (isBest ? ' <span class=\"qq-best-tag\"><svg class=\"qq-star\" viewBox=\"0 0 24 24\" width=\"11\" height=\"11\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M12 2l2.9 6.3 6.9.7-5.1 4.7 1.4 6.8L12 17.8 6 21.2l1.4-6.8L2.3 9.7l6.9-.7z\"/></svg>lowest price</span>' : '') + '</div></div></div>'\n            + caution\n            + configChips(id)",
+      "count": 1,
+      "stage": "print-methods-unlimited-2026-09-16",
+      "reason": "Erik approved 2026-09-16: screen print and DTF are never limited by product category in Quick Quote; embroidery and DTG outside the category rules still price, with a note (the rep decides)."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "            // Cap pricing and flat headwear in \"Caps\" skip the category rules (the \"Caps\" rule lists no\n            // garment methods); other flat items (gaiters, headbands) follow their category like any garment.\n            if (method !== 'capemb' && !(embroidery && (product.isCap || flatOnly))) {\n                var eligibility = await categoryEligibility(product);\n                if (row._ptok !== token) return;\n                // decoration-methods.js contract: an unknown category is a visible warning, never a block.\n                if (eligibility.source === 'fallback') {\n                    if (eligibility.rulesDown) notices.push('Decoration rules didn’t load — confirm ' + methodWords + ' works for this product, or refresh.');\n                    else if (!methodAllowed(eligibility, def.engineMethod)) notices.push('This category isn’t in our decoration rules — confirm ' + methodWords + ' works for it.');\n                }\n                else if (!methodAllowed(eligibility, def.engineMethod)) throw new Error(def.label + ' isn’t offered for ' + (product.category || 'this product') + '.');\n                else if (eligibility[def.engineMethod] === 'warn') notices.push('Check the fabric — DTG prints best on cotton.');",
+      "after": "            // The category rules only add notes (Erik 2026-09-16: the rep decides): screen print and DTF\n            // are never limited, and cap pricing / flat headwear in \"Caps\" skip the rules (the \"Caps\" rule\n            // lists no garment methods); other flat items (gaiters, headbands) follow their category.\n            if (method === 'emb' || method === 'dtg') {\n                if (!(embroidery && (product.isCap || flatOnly))) {\n                    var eligibility = await categoryEligibility(product);\n                    if (row._ptok !== token) return;\n                    var caution = methodCaution(eligibility, def.engineMethod, product);\n                    if (caution) notices.push(caution.text);\n                }",
+      "count": 1,
+      "stage": "print-methods-unlimited-2026-09-16",
+      "reason": "Erik approved 2026-09-16: screen print and DTF are never limited by product category in Quick Quote; embroidery and DTG outside the category rules still price, with a note (the rep decides)."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.js",
+      "before": "                        unitWord: state.product.isCap ? 'cap' : 'pc', description: decorationDescription(m.id, state.product), builderHref: builderHref(m.id) };",
+      "after": "                        unitWord: state.product.isCap ? 'cap' : 'pc', description: decorationDescription(m.id, state.product), builderHref: builderHref(m.id),\n                        caution: m.caution && m.caution.rule ? m.caution.text : '' };",
+      "count": 1,
+      "stage": "print-methods-unlimited-2026-09-16",
+      "reason": "Erik approved 2026-09-16: screen print and DTF are never limited by product category in Quick Quote; embroidery and DTG outside the category rules still price, with a note (the rep decides)."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.css",
+      "before": "    :where([data-ui=\"unified\"][data-quick-quote]) :is(.qq-elig-note, [id=\"qqDocumentStatus\"].is-error) {\n        color: var(--color-warning-ink);\n    }\n\n    :where([data-ui=\"unified\"][data-quick-quote]) .qq-elig-note {",
+      "after": "    :where([data-ui=\"unified\"][data-quick-quote]) :is(.qq-elig-note, .qq-card-caution, [id=\"qqDocumentStatus\"].is-error) {\n        color: var(--color-warning-ink);\n    }\n\n    :where([data-ui=\"unified\"][data-quick-quote]) :is(.qq-elig-note, .qq-card-caution) {",
+      "count": 1,
+      "stage": "print-methods-unlimited-2026-09-16",
+      "reason": "Erik approved 2026-09-16: screen print and DTF are never limited by product category in Quick Quote; embroidery and DTG outside the category rules still price, with a note (the rep decides)."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote.css",
+      "before": "        font-size: var(--font-size-sm);\n    }",
+      "after": "        font-size: var(--font-size-sm);\n    }\n\n    :where([data-ui=\"unified\"][data-quick-quote]) .qq-card-caution {\n        margin-top: var(--space-2);\n    }",
+      "count": 1,
+      "stage": "print-methods-unlimited-2026-09-16",
+      "reason": "Erik approved 2026-09-16: screen print and DTF are never limited by product category in Quick Quote; embroidery and DTG outside the category rules still price, with a note (the rep decides)."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote-workspace.js",
+      "before": "    let recommendation = '', excluded = new Set(), context = '', lastOptions = '', lastMarkup = '', libraryPromise;",
+      "after": "    let recommendation = '', excluded = new Set(), cautioned = new Set(), context = '', lastOptions = '', lastMarkup = '', libraryPromise;",
+      "count": 1,
+      "stage": "print-methods-unlimited-2026-09-16",
+      "reason": "Erik approved 2026-09-16: screen print and DTF are never limited by product category in Quick Quote; embroidery and DTG outside the category rules still price, with a note (the rep decides)."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote-workspace.js",
+      "before": "        const optionsKey = JSON.stringify([quick, all.map(o => [o.key, o.product.style, o.method, o.builderHref])]);",
+      "after": "        const optionsKey = JSON.stringify([quick, all.map(o => [o.key, o.product.style, o.method, o.builderHref, o.caution || ''])]);",
+      "count": 1,
+      "stage": "print-methods-unlimited-2026-09-16",
+      "reason": "Erik approved 2026-09-16: screen print and DTF are never limited by product category in Quick Quote; embroidery and DTG outside the category rules still price, with a note (the rep decides)."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote-workspace.js",
+      "before": "                const label = document.createElement('label'); label.className = 'qq-check'; label.hidden = all.length === 1;\n                const check = document.createElement('input'); check.type = 'checkbox'; check.checked = !excluded.has(o.key); check.dataset.option = o.key;\n                check.addEventListener('change', () => { if (check.checked) excluded.delete(o.key); else excluded.add(o.key); refresh(); });\n                label.append(check, document.createTextNode(quick ? doc().names[o.method] : o.product.style)); row.append(label);",
+      "after": "                const label = document.createElement('label'); label.className = 'qq-check'; label.hidden = all.length === 1 && !o.caution;\n                const check = document.createElement('input'); check.type = 'checkbox'; check.checked = !excluded.has(o.key); check.dataset.option = o.key;\n                check.addEventListener('change', () => { if (check.checked) excluded.delete(o.key); else excluded.add(o.key); refresh(); });\n                label.append(check, document.createTextNode(quick ? doc().names[o.method] + (o.caution ? ' (check first)' : '') : o.product.style));\n                if (o.caution) label.title = o.caution;\n                row.append(label);",
+      "count": 1,
+      "stage": "print-methods-unlimited-2026-09-16",
+      "reason": "Erik approved 2026-09-16: screen print and DTF are never limited by product category in Quick Quote; embroidery and DTG outside the category rules still price, with a note (the rep decides)."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote-workspace.js",
+      "before": "        if (nextContext !== context) { context = nextContext; recommendation = ''; excluded = new Set(); lastOptions = ''; lastMarkup = null; }\n        const inputs = bridge.options();",
+      "after": "        if (nextContext !== context) { context = nextContext; recommendation = ''; excluded = new Set(); cautioned = new Set(); lastOptions = ''; lastMarkup = null; }\n        const inputs = bridge.options();\n        // A method outside the category rules starts unticked on the customer estimate; the rep can tick it.\n        for (const o of inputs) if (o.caution && !cautioned.has(o.key)) { cautioned.add(o.key); excluded.add(o.key); }",
+      "count": 1,
+      "stage": "print-methods-unlimited-2026-09-16",
+      "reason": "Erik approved 2026-09-16: screen print and DTF are never limited by product category in Quick Quote; embroidery and DTG outside the category rules still price, with a note (the rep decides)."
+    },
+    {
+      "file": "calculators/quick-quote/quick-quote-releases.js",
+      "before": "            fingerprint: '22aa28f5d285711f',",
+      "after": "            fingerprint: '51f893f0110a5b28',\n            notes: [\n                'Screen print and DTF are never limited by product category: safety vests, polos, jackets and bags price for print like any tee.',\n                'Embroidery and DTG outside a category’s usual methods still price, with a note to check the garment. They are never picked as the lowest price and start unticked on the customer estimate.',\n            ],\n        },\n        {\n            version: '2026.09.16.4',",
+      "count": 1,
+      "stage": "print-methods-unlimited-2026-09-16",
+      "reason": "Erik approved 2026-09-16: screen print and DTF are never limited by product category in Quick Quote; embroidery and DTG outside the category rules still price, with a note (the rep decides)."
+    },
+    {
+      "file": "shared_components/js/builders/emb/shopworks-import.js",
+      "before": "/* global openAccessibleModal, closeAccessibleModal, reorderRowByProductType, escapeHtml, showToast,",
+      "after": "/* global openAccessibleModal, closeAccessibleModal, escapeHtml, showToast,",
+      "count": 1,
+      "stage": "builder-runtime-styles-2026-09-16",
+      "reason": "Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons; vendor imports finish, and a vendor line waiting for a price is not an API failure but blocks save, print and copy."
+    },
+    {
+      "file": "shared_components/js/builders/emb/shopworks-import.js",
+      "before": "import { addNewRow, catalogIsCap, createServiceProductRow, dateToInputValue, hideVariantOnlyParents, isCapProduct, onSizeChange, onStyleChange, parseShopWorksDescription, selectColor, selectNonSanmarColor, updateCapLogoSectionVisibility, updateLogoCardHeader, updateNonSanmarPriceCell } from './product-rows.js';",
+      "after": "import { addNewRow, catalogIsCap, createServiceProductRow, dateToInputValue, hideVariantOnlyParents, isCapProduct, onSizeChange, onStyleChange, parseShopWorksDescription, reorderRowByProductType, selectColor, selectNonSanmarColor, updateCapLogoSectionVisibility, updateLogoCardHeader, updateNonSanmarPriceCell } from './product-rows.js';",
+      "count": 1,
+      "stage": "builder-runtime-styles-2026-09-16",
+      "reason": "Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons; vendor imports finish, and a vendor line waiting for a price is not an API failure but blocks save, print and copy."
+    },
+    {
+      "file": "shared_components/js/builders/emb/shopworks-import.js",
+      "before": "/**\n * Show a post-import summary banner above the product table.\n * Lists non-SanMar products with price status indicators.\n */\nfunction showImportSummaryBanner(sanMarCount, nonSanMarItems) {\n    // Remove any existing banner\n    const existing = document.getElementById('import-summary-banner');\n    if (existing) existing.remove();\n\n    const totalProducts = sanMarCount + nonSanMarItems.length;\n    if (totalProducts === 0) return;\n\n    const hasZeroPrice = nonSanMarItems.some(item => !item.price || item.price <= 0);\n    const bannerClass = hasZeroPrice ? 'banner-warning' : 'banner-success';\n\n    let html = `<div class=\"banner-title\">Import Complete: ${totalProducts} product${totalProducts !== 1 ? 's' : ''} imported</div>`;\n    html += `<div class=\"banner-detail\">`;\n    if (sanMarCount > 0) {\n        html += `&#8226; ${sanMarCount} SanMar product${sanMarCount !== 1 ? 's' : ''} &mdash; priced automatically<br>`;\n    }\n    if (nonSanMarItems.length > 0) {\n        const zeroCount = nonSanMarItems.filter(i => !i.price || i.price <= 0).length;\n        if (zeroCount > 0) {\n            html += `&#8226; ${nonSanMarItems.length} non-SanMar product${nonSanMarItems.length !== 1 ? 's' : ''} &mdash; <strong>${zeroCount} need${zeroCount !== 1 ? '' : 's'} pricing</strong><br>`;\n        } else {\n            html += `&#8226; ${nonSanMarItems.length} non-SanMar product${nonSanMarItems.length !== 1 ? 's' : ''} &mdash; using ShopWorks prices<br>`;\n        }\n        for (const item of nonSanMarItems) {\n            const priceOk = item.price && item.price > 0;\n            const icon = priceOk\n                ? '<span class=\"ns-price-ok\">&#10003;</span>'\n                : '<span class=\"ns-price-warn\">&#9888;</span>';\n            const priceStr = priceOk ? `$${item.price.toFixed(2)}` : '$0.00';\n            html += `<div class=\"banner-ns-item\" data-row-id=\"${item.rowId}\" data-call=\"scrollToProductRow\" data-args=\"[${item.rowId}]\">`;\n            html += `&nbsp;&nbsp;&#9656; ${escapeHtml(item.style)} (${escapeHtml(item.description)}) &mdash; ${priceStr} ${icon}`;\n            html += `</div>`;\n        }\n    }\n    html += `</div>`;\n    html += `<button class=\"btn-dismiss-banner\" data-call=\"dismissImportBanner\" title=\"Dismiss\">Dismiss</button>`;\n\n    const banner = document.createElement('div');\n    banner.id = 'import-summary-banner';\n    banner.className = `import-summary-banner ${bannerClass}`;\n    // eslint-disable-next-line no-unsanitized/property -- audited (1.4): every user/API string escapeHtml-wrapped at build; icons/notes internal or numeric\n    banner.innerHTML = html;\n\n    // Insert before the product table\n    const productTable = document.getElementById('product-table');\n    if (productTable && productTable.parentElement) {\n        productTable.parentElement.insertBefore(banner, productTable);\n    }\n\n    // Auto-dismiss after 30s (unless there are $0 products)\n    if (!hasZeroPrice) {\n        setTimeout(() => dismissImportBanner(), 30000);",
+      "after": "// ── Post-import summary (Erik 2026-09-16) ─────────────────────────────────────────────\n// Built like the reopened-quote notice (persistence.js showRepricedNotice): the shared\n// components.css alert (warning while a non-SanMar product still needs a price, success once\n// every one has a price), text only, an EMPTY polite live region filled after insertion, one\n// keyboard button per product that jumps to its price, and Dismiss outside the live region.\n// It sits above the product table (never inside its scroll region), stays until dismissed,\n// and is replaced by the next import, a new quote or a loaded quote.\nconst IMPORT_SUMMARY_ID = 'import-summary-banner';\nconst IMPORT_SUMMARY_ANNOUNCE_DELAY_MS = 30;\n\n/** The non-SanMar product rows a ShopWorks import created. */\nfunction importedVendorRows() {\n    return /** @type {HTMLElement[]} */ (Array.from(document.querySelectorAll('#product-tbody tr[data-non-sanmar=\"true\"][data-import-data]:not(.child-row)')));\n}\n\n/** A non-SanMar row's price, read from the row itself. */\nfunction vendorPriceStatus(row) {\n    if (row.dataset.nsPricingMode === 'costPlus') return { priced: true, text: 'priced from blank cost' };\n    const price = parseFloat(row.dataset.sellPrice) || 0;\n    return price > 0 ? { priced: true, text: `$${price.toFixed(2)} each` } : { priced: false, text: 'needs a price' };\n}\n\n/** The product table's scroll wrapper — notices go just above it. */\nfunction productTableAnchor() {\n    const table = document.getElementById('product-table');\n    return table ? (/** @type {HTMLElement|null} */ (table.closest('.product-table-wrapper')) || table) : null;\n}\n\nconst plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;\n\n/**\n * Write the summary's text and item states from the rows as they are now. The live region is\n * only rewritten when its words change, so a price edit elsewhere is not read out again.\n * @param {HTMLElement} banner\n * @param {{ fillLater?: boolean, detail?: (unpriced: number, removed: number) => string|null }} [opts]\n */\nfunction paintImportSummary(banner, opts = {}) {\n    const sanMar = Number(banner.dataset.sanmarCount) || 0;\n    const buttons = /** @type {HTMLButtonElement[]} */ (Array.from(banner.querySelectorAll('.import-summary-item')));\n    let unpriced = 0, removed = 0;\n    for (const button of buttons) {\n        const row = document.getElementById(`row-${button.dataset.rowId}`);\n        button.replaceChildren();\n        if (!row) {\n            removed++;\n            button.textContent = `${button.dataset.style || 'Product'} — no longer on the quote`;\n            button.disabled = true;\n            continue;\n        }\n        const style = row.dataset.style || 'Product';\n        const description = row.dataset.productName\n            || /** @type {HTMLInputElement|null} */ (row.querySelector('[data-field=\"description\"]'))?.value || '';\n        const status = vendorPriceStatus(row);\n        const name = description ? `${style} (${description})` : style;\n        button.dataset.style = style;\n        const state = document.createElement('span');\n        state.textContent = status.text;\n        if (!status.priced) { state.className = 'is-unpriced'; unpriced++; }\n        button.append(document.createTextNode(`${name} — `), state);\n        button.setAttribute('aria-label', `${name} — ${status.text}. Go to its price.`);\n    }\n    banner.className = `alert ${unpriced > 0 ? 'alert-warn' : 'alert-success'} emb-screen-notice`;\n\n    const title = document.createElement('strong');\n    title.className = 'banner-title';\n    title.textContent = `Import complete: ${plural(sanMar + buttons.length, 'product')}`;\n    const detail = document.createElement('p');\n    detail.className = 'banner-detail alert-body';\n    const parts = [];\n    if (sanMar > 0) parts.push(`${plural(sanMar, 'SanMar product')} priced automatically.`);\n    parts.push(unpriced > 0\n        ? `${plural(buttons.length, 'non-SanMar product')} — ${unpriced} still ${unpriced === 1 ? 'needs' : 'need'} a price before you can save.`\n        : `${plural(buttons.length, 'non-SanMar product')} — all have a price.`);\n    detail.textContent = (opts.detail && opts.detail(unpriced, removed)) || parts.join(' ');\n    const message = /** @type {HTMLElement} */ (banner.querySelector('.import-summary-message'));\n    const words = `${title.textContent} ${detail.textContent}`;\n    const fill = () => {\n        if (!message.isConnected || message.dataset.words === words) return;\n        message.dataset.words = words;\n        message.replaceChildren(title, detail);\n    };\n    if (opts.fillLater) setTimeout(fill, IMPORT_SUMMARY_ANNOUNCE_DELAY_MS);\n    else fill();\n    banner.dataset.unpriced = String(unpriced);\n}\n\n/**\n * Show the post-import summary above the product table. Shown only when the import brought\n * in non-SanMar products (SanMar products price themselves).\n * @param {number} sanMarCount - SanMar products this import added\n * @returns {HTMLElement|null}\n */\nexport function showImportSummaryBanner(sanMarCount) {\n    document.getElementById(IMPORT_SUMMARY_ID)?.remove();\n    const rows = importedVendorRows();\n    if (rows.length === 0) return null;\n\n    const banner = document.createElement('div');\n    banner.id = IMPORT_SUMMARY_ID;\n    banner.dataset.sanmarCount = String(sanMarCount || 0);\n    const message = document.createElement('div');\n    message.className = 'import-summary-message';\n    message.setAttribute('role', 'status');\n    message.setAttribute('aria-live', 'polite');\n    message.setAttribute('aria-atomic', 'true');\n    const list = document.createElement('ul');\n    list.className = 'import-summary-list';\n    list.setAttribute('aria-label', 'Non-SanMar products from this import');\n    for (const row of rows) {\n        const item = document.createElement('li');\n        const button = document.createElement('button');\n        button.type = 'button';\n        button.className = 'import-summary-item';\n        button.dataset.rowId = row.dataset.rowId;\n        button.dataset.call = 'scrollToProductRow';\n        button.dataset.args = JSON.stringify([Number(row.dataset.rowId)]);\n        item.append(button);\n        list.append(item);\n    }\n    const dismiss = document.createElement('button');\n    dismiss.type = 'button';\n    dismiss.className = 'btn-dismiss-banner';\n    dismiss.dataset.call = 'dismissImportBanner';\n    dismiss.textContent = 'Dismiss';\n    dismiss.setAttribute('aria-label', 'Dismiss the import summary');\n    banner.append(message, list, dismiss);\n\n    const anchor = productTableAnchor();\n    if (anchor && anchor.parentElement) anchor.parentElement.insertBefore(banner, anchor);\n    else document.body.prepend(banner);\n    paintImportSummary(banner, { fillLater: true });\n    return banner;\n}\n\n/** Refresh the summary after a price changes; says so when the last product gets its price. */\nexport function syncImportSummary() {\n    const banner = document.getElementById(IMPORT_SUMMARY_ID);\n    if (!banner) return;\n    const before = Number(banner.dataset.unpriced) || 0;\n    paintImportSummary(banner, {\n        detail: (unpriced, removed) => {\n            if (!(before > 0 && unpriced === 0)) return null;\n            return removed > 0 ? 'No product on this list still needs a price.' : 'All non-SanMar products now have a price.';\n        },\n    });\n}\n\n/**\n * Dismiss the import summary. Keyboard focus that was inside it moves to the product table.\n */\nexport function dismissImportBanner() {\n    const banner = document.getElementById(IMPORT_SUMMARY_ID);\n    if (!banner) return;\n    const hadFocus = banner.contains(document.activeElement);\n    banner.remove();\n    if (hadFocus) {\n        const anchor = productTableAnchor();\n        if (anchor) {\n            if (!anchor.hasAttribute('tabindex')) anchor.setAttribute('tabindex', '-1');\n            anchor.focus();\n        }",
+      "count": 1,
+      "stage": "builder-runtime-styles-2026-09-16",
+      "reason": "Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons; vendor imports finish, and a vendor line waiting for a price is not an API failure but blocks save, print and copy."
+    },
+    {
+      "file": "shared_components/js/builders/emb/shopworks-import.js",
+      "before": " * Dismiss the import summary banner\n */\nexport function dismissImportBanner() {\n    const banner = document.getElementById('import-summary-banner');\n    if (banner) {\n        banner.style.transition = 'opacity 0.2s';\n        banner.style.opacity = '0';\n        setTimeout(() => banner.remove(), 200);\n    }\n}\n\n/**\n * Scroll to a specific product row and briefly highlight it\n */\nexport function scrollToProductRow(rowId) {\n    const row = document.getElementById(`row-${rowId}`);\n    if (!row) return;\n    row.scrollIntoView({ behavior: 'smooth', block: 'center' });\n    row.style.transition = 'background 0.3s';\n    row.style.background = '#ede9fe';\n    setTimeout(() => { row.style.background = ''; }, 1500);",
+      "after": " * Go to a product row's price (the summary's item buttons): scroll it into view, move\n * keyboard focus to its price (or style box) and mark the row for a moment.\n */\nexport function scrollToProductRow(rowId) {\n    let row = document.getElementById(`row-${rowId}`);\n    if (row && row.dataset.variantOnlyHidden === 'true') {\n        row = /** @type {HTMLElement|null} */ (document.querySelector(`tr[data-parent-row-id=\"${Number(rowId)}\"]`)) || row;\n    }\n    if (!row || !row.isConnected || window.getComputedStyle(row).display === 'none') {\n        showToast('That product is no longer on the quote.', 'warning');\n        syncImportSummary();\n        return;\n    }\n    const target = /** @type {HTMLElement} */ (row.querySelector('.ns-price-btn') || row.querySelector('.style-input') || row);\n    const reduceMotion = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;\n    target.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center', inline: 'nearest' });\n    if (target !== row) target.focus({ preventScroll: true });\n    row.classList.add('is-located');\n    setTimeout(() => row.classList.remove('is-located'), 1500);",
+      "count": 1,
+      "stage": "builder-runtime-styles-2026-09-16",
+      "reason": "Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons; vendor imports finish, and a vendor line waiting for a price is not an API failure but blocks save, print and copy."
+    },
+    {
+      "file": "shared_components/js/builders/emb/shopworks-import.js",
+      "before": "    // Flag non-SanMar products with $0 pricing + collect for summary banner\n    const nonSanMarBannerItems = [];\n    document.querySelectorAll('#product-tbody tr[data-non-sanmar=\"true\"]').forEach(nsRow => {\n        const nsRowId = parseInt(/** @type {HTMLElement} */ (nsRow).dataset.rowId);\n        const sellPrice = parseFloat(/** @type {HTMLElement} */ (nsRow).dataset.sellPrice) || 0;\n        const nsStyle = /** @type {HTMLElement} */ (nsRow).dataset.style || '';\n        const nsDesc = /** @type {HTMLElement} */ (nsRow).dataset.productName || /** @type {HTMLInputElement|null} */ (nsRow.querySelector('[data-field=\"description\"]'))?.value || '';\n\n        nonSanMarBannerItems.push({\n            rowId: nsRowId,\n            style: nsStyle,\n            description: nsDesc,\n            price: sellPrice\n        });\n\n        // Update price cell with pencil icon affordance\n        updateNonSanmarPriceCell(nsRow, nsRowId);",
+      "after": "    // Non-SanMar rows: paint the price button ($0.00 rows say they need a price).\n    document.querySelectorAll('#product-tbody tr[data-non-sanmar=\"true\"]').forEach(nsRow => {\n        updateNonSanmarPriceCell(nsRow, parseInt(/** @type {HTMLElement} */ (nsRow).dataset.rowId));",
+      "count": 1,
+      "stage": "builder-runtime-styles-2026-09-16",
+      "reason": "Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons; vendor imports finish, and a vendor line waiting for a price is not an API failure but blocks save, print and copy."
+    },
+    {
+      "file": "shared_components/js/builders/emb/shopworks-import.js",
+      "before": "    // Show import summary banner (non-SanMar detail)\n    // Count SanMar vs non-SanMar among all imported product rows\n    const allImportedRows = document.querySelectorAll('#product-tbody tr[data-style]:not(.child-row):not(.service-product-row):not(.fee-row)');\n    const sanMarRowCount = Array.from(allImportedRows).filter(r => /** @type {HTMLElement} */ (r).dataset.nonSanmar !== 'true').length;\n    if (nonSanMarBannerItems.length > 0) {\n        showImportSummaryBanner(sanMarRowCount, nonSanMarBannerItems);\n    }",
+      "after": "    // Import summary (shown when the import brought in non-SanMar products)\n    const importedRows = document.querySelectorAll('#product-tbody tr[data-import-data]:not(.child-row):not(.service-product-row):not(.fee-row)');\n    const sanMarRowCount = Array.from(importedRows).filter(r => /** @type {HTMLElement} */ (r).dataset.nonSanmar !== 'true').length;\n    showImportSummaryBanner(sanMarRowCount);",
+      "count": 1,
+      "stage": "builder-runtime-styles-2026-09-16",
+      "reason": "Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons; vendor imports finish, and a vendor line waiting for a price is not an API failure but blocks save, print and copy."
+    },
+    {
+      "file": "shared_components/js/builders/emb/product-rows.js",
+      "before": " */\nexport function updateNonSanmarPriceCell(row, rowId) {",
+      "after": " */\n/**\n * The price button for a non-SanMar row: a real button (keyboard + screen reader) that opens\n * the price editor. $0.00 says, in words, that the product needs a price. The accessible name\n * starts with the visible text and names the style.\n * @param {number|string} rowId\n * @param {number} price\n * @param {string} [style]\n * @returns {string}\n */\nexport function nsPriceButtonHtml(rowId, price, style) {\n    const id = escapeHtml(String(rowId));\n    const name = escapeHtml(style || 'this product');\n    const open = `<button type=\"button\" class=\"ns-price-display ns-price-btn\" data-call=\"enablePriceOverride\" data-args=\"[${id}]\"`;\n    const pencil = '<i class=\"fas fa-pencil-alt\" aria-hidden=\"true\"></i>';\n    if (price > 0) {\n        const text = `$${escapeHtml(price.toFixed(2))}`;\n        return `${open} aria-label=\"${text} — edit the unit price for ${name}\">${text} ${pencil}</button>`;\n    }\n    return `${open} aria-label=\"$0.00 needs a price — set the unit price for ${name}\">$0.00 <span class=\"is-unpriced\">needs a price</span> ${pencil}</button>`;\n}\n\nexport function updateNonSanmarPriceCell(row, rowId) {",
+      "count": 1,
+      "stage": "builder-runtime-styles-2026-09-16",
+      "reason": "Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons; vendor imports finish, and a vendor line waiting for a price is not an API failure but blocks save, print and copy."
+    },
+    {
+      "file": "shared_components/js/builders/emb/product-rows.js",
+      "before": "    if (sellPrice > 0) {\n        // eslint-disable-next-line no-unsanitized/property -- audited (1.4): numeric price + rowId only\n        priceCell.innerHTML = `<span class=\"ns-price-display\" data-call=\"enablePriceOverride\" data-args=\"[${rowId}]\" title=\"Click to edit price\">$${sellPrice.toFixed(2)} <i class=\"fas fa-pencil-alt\" aria-hidden=\"true\"></i></span>`;\n        priceCell.classList.remove('ns-price-zero');\n    } else {\n        // eslint-disable-next-line no-unsanitized/property -- audited (1.4): numeric price + rowId only\n        priceCell.innerHTML = `<span class=\"ns-price-display\" data-call=\"enablePriceOverride\" data-args=\"[${rowId}]\" title=\"Click to set price\">$0.00 &#9888; <i class=\"fas fa-pencil-alt\" aria-hidden=\"true\"></i></span>`;\n        priceCell.classList.add('ns-price-zero');\n        row.classList.add('price-warning');",
+      "after": "    // eslint-disable-next-line no-unsanitized/property -- audited (1.4): numeric price + rowId, style escaped in nsPriceButtonHtml\n    priceCell.innerHTML = nsPriceButtonHtml(rowId, sellPrice, row.dataset.style);\n    priceCell.classList.toggle('ns-price-zero', !(sellPrice > 0));\n    row.classList.toggle('price-warning', !(sellPrice > 0));\n    if (!(sellPrice > 0)) {\n        // Nothing priced this line: drop any engine price left from a previous style.\n        delete priceCell.dataset.exactUnitPrice;\n        const totalCell = document.getElementById(`row-total-${rowId}`);\n        if (totalCell) totalCell.textContent = '-';",
+      "count": 1,
+      "stage": "builder-runtime-styles-2026-09-16",
+      "reason": "Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons; vendor imports finish, and a vendor line waiting for a price is not an API failure but blocks save, print and copy."
+    },
+    {
+      "file": "shared_components/js/builders/emb/product-rows.js",
+      "before": "        if (/** @type {HTMLElement} */ (parentRow).dataset.isOsfaOnly === 'true') return;\n",
+      "after": "        if (/** @type {HTMLElement} */ (parentRow).dataset.isOsfaOnly === 'true') return;\n        // A vendor product's price is set on its parent row, so that row stays visible.\n        if (/** @type {HTMLElement} */ (parentRow).dataset.nonSanmar === 'true') return;\n",
+      "count": 1,
+      "stage": "builder-runtime-styles-2026-09-16",
+      "reason": "Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons; vendor imports finish, and a vendor line waiting for a price is not an API failure but blocks save, print and copy."
+    },
+    {
+      "file": "shared_components/js/builders/emb/product-rows.js",
+      "before": " */\nfunction reorderRowByProductType(row) {",
+      "after": " * (exported 2026-09-16: the ShopWorks import called it as a page global, which never existed\n * in the bundle, so every force-imported vendor product stopped before its color and sizes)\n */\nexport function reorderRowByProductType(row) {",
+      "count": 1,
+      "stage": "builder-runtime-styles-2026-09-16",
+      "reason": "Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons; vendor imports finish, and a vendor line waiting for a price is not an API failure but blocks save, print and copy."
+    },
+    {
+      "file": "shared_components/js/builders/emb/product-rows.js",
+      "before": "    // Read current displayed price (strip $ and any reset button text)\n    const currentText = priceCell.textContent.replace(/[^0-9.]/g, '');\n    const currentPrice = parseFloat(currentText) || 0;",
+      "after": "    // Starting price. A fixed-price vendor row starts only from its own sell price (blank when it\n    // has none) — the cell may still carry an engine price from the style it replaced.\n    const vendorPriced = isNonSanmar && row.dataset.nsPricingMode !== 'costPlus';\n    const currentPrice = vendorPriced\n        ? (parseFloat(row.dataset.sellPrice) || 0)\n        : (parseFloat(row.dataset.sellPrice) || parseFloat(priceCell.dataset.exactUnitPrice)\n            || parseFloat(priceCell.textContent.replace(/[^0-9.]/g, '')) || 0);",
+      "count": 1,
+      "stage": "builder-runtime-styles-2026-09-16",
+      "reason": "Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons; vendor imports finish, and a vendor line waiting for a price is not an API failure but blocks save, print and copy."
+    },
+    {
+      "file": "shared_components/js/builders/emb/product-rows.js",
+      "before": "        step=\"0.01\" min=\"0\" value=\"${currentPrice.toFixed(2)}\">`;\n\n    const input = priceCell.querySelector('.price-override-input');\n    /** @type {HTMLElement} */ (input).focus();\n    /** @type {HTMLInputElement} */ (input).select();\n\n    // Commit on Enter or blur\n    function commitOverride() {\n        const newPrice = parseFloat(/** @type {HTMLInputElement} */ (input).value);\n        if (isNaN(newPrice) || newPrice <= 0) {\n            cancelOverride();",
+      "after": "        step=\"0.01\" min=\"0\" inputmode=\"decimal\" value=\"${currentPrice > 0 ? currentPrice.toFixed(2) : ''}\">`;\n\n    const input = /** @type {HTMLInputElement} */ (priceCell.querySelector('.price-override-input'));\n    input.setAttribute('aria-label', `Unit price for ${row.dataset.style || 'this product'}`);\n    input.focus();\n    input.select();\n\n    // After a keyboard commit or cancel, keyboard focus returns to the price button.\n    function afterRepaint(repricing, fromKeyboard) {\n        Promise.resolve(repricing).catch(() => {}).then(() => {\n            if (typeof window.syncImportSummary === 'function') window.syncImportSummary();\n            if (!fromKeyboard) return;\n            const button = /** @type {HTMLElement|null} */ (document.querySelector(`#row-price-${rowId} .ns-price-btn`));\n            if (button) button.focus();\n        });\n    }\n\n    // Commit on Enter or blur\n    function commitOverride(fromKeyboard) {\n        const typed = input.value.trim();\n        const newPrice = parseFloat(typed);\n        if (isNaN(newPrice) || newPrice <= 0) {\n            if (typed !== '') showToast('Enter a price above $0.00.', 'warning');   // leaving it blank just closes\n            cancelOverride(fromKeyboard);",
+      "count": 1,
+      "stage": "builder-runtime-styles-2026-09-16",
+      "reason": "Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons; vendor imports finish, and a vendor line waiting for a price is not an API failure but blocks save, print and copy."
+    },
+    {
+      "file": "shared_components/js/builders/emb/product-rows.js",
+      "before": "        recalculatePricing();\n    }\n\n    // Cancel on Escape — restore original display\n    function cancelOverride() {\n        // Remove input, let recalculatePricing restore the cell\n        // If there was an existing override, keep it; otherwise clear\n        recalculatePricing();",
+      "after": "        const repricing = recalculatePricing();\n        if (vendorPriced) updateNonSanmarPriceCell(row, rowId);\n        afterRepaint(repricing, fromKeyboard);\n    }\n\n    // Cancel on Escape — restore original display\n    function cancelOverride(fromKeyboard) {\n        // A vendor row the engine can't price keeps its $0.00 button (the recalculation\n        // never repaints it); every other row is repainted by the recalculation.\n        if (vendorPriced) updateNonSanmarPriceCell(row, rowId);\n        afterRepaint(recalculatePricing(), fromKeyboard);",
+      "count": 1,
+      "stage": "builder-runtime-styles-2026-09-16",
+      "reason": "Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons; vendor imports finish, and a vendor line waiting for a price is not an API failure but blocks save, print and copy."
+    },
+    {
+      "file": "shared_components/js/builders/emb/product-rows.js",
+      "before": "            commitOverride();\n        } else if (/** @type {KeyboardEvent} */ (e).key === 'Escape') {\n            e.preventDefault();\n            committed = true;\n            cancelOverride();",
+      "after": "            commitOverride(true);\n        } else if (/** @type {KeyboardEvent} */ (e).key === 'Escape') {\n            e.preventDefault();\n            committed = true;\n            cancelOverride(true);",
+      "count": 1,
+      "stage": "builder-runtime-styles-2026-09-16",
+      "reason": "Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons; vendor imports finish, and a vendor line waiting for a price is not an API failure but blocks save, print and copy."
+    },
+    {
+      "file": "shared_components/js/builders/emb/product-rows.js",
+      "before": "            commitOverride();",
+      "after": "            committed = true;\n            commitOverride(false);",
+      "count": 1,
+      "stage": "builder-runtime-styles-2026-09-16",
+      "reason": "Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons; vendor imports finish, and a vendor line waiting for a price is not an API failure but blocks save, print and copy."
+    },
+    {
+      "file": "shared_components/js/builders/emb/pricing-sync.js",
+      "before": "import { createServiceProductRow, updateRowBreakdown } from './product-rows.js';",
+      "after": "import { createServiceProductRow, nsPriceButtonHtml, updateRowBreakdown } from './product-rows.js';",
+      "count": 1,
+      "stage": "builder-runtime-styles-2026-09-16",
+      "reason": "Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons; vendor imports finish, and a vendor line waiting for a price is not an API failure but blocks save, print and copy."
+    },
+    {
+      "file": "shared_components/js/builders/emb/pricing-sync.js",
+      "before": "                            // Non-SanMar: pencil icon, no clear button (price override IS the price)\n                            priceCell.classList.remove('price-overridden');\n                            priceCell.classList.remove('ns-price-zero');\n                            priceCell.innerHTML = `<span class=\"ns-price-display\" data-call=\"enablePriceOverride\" data-args=\"[${escapeHtml(String(rowId))}]\" title=\"Click to edit price\">$${escapeHtml(displayPrice.toFixed(2))} <i class=\"fas fa-pencil-alt\" aria-hidden=\"true\"></i></span>`;",
+      "after": "                            // Non-SanMar: the price button, no clear button (price override IS the price)\n                            priceCell.classList.remove('price-overridden');\n                            priceCell.classList.remove('ns-price-zero');\n                            /** @type {HTMLElement} */ (parentRow).classList.remove('price-warning');\n                            // eslint-disable-next-line no-unsanitized/property -- audited (1.4): numeric price + rowId, style escaped in nsPriceButtonHtml\n                            priceCell.innerHTML = nsPriceButtonHtml(rowId, displayPrice, /** @type {HTMLElement} */ (parentRow).dataset.style);",
+      "count": 1,
+      "stage": "builder-runtime-styles-2026-09-16",
+      "reason": "Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons; vendor imports finish, and a vendor line waiting for a price is not an API failure but blocks save, print and copy."
+    },
+    {
+      "file": "shared_components/js/builders/emb/pricing-sync.js",
+      "before": "\nexport function collectProductsFromTable() {",
+      "after": "\n/**\n * Non-SanMar products with nothing to price from (no fixed price, no blank cost). The engine\n * leaves them out of the total (unpricedProducts), so save, print and copy refuse while any remain.\n * @param {any[]} products - collectProductsFromTable()\n * @returns {string[]} their styles\n */\nexport function vendorStylesWithoutPrice(products) {\n    return (products || []).filter(p => {\n        if (!p || p.isService) return false;\n        const row = document.getElementById(`row-${p.rowId}`);\n        if (!row || row.dataset.nonSanmar !== 'true') return false;\n        if (p.sellPriceOverride > 0) return false;                    // fixed price / manual override\n        if (parseFloat(row.dataset.blankCost) > 0) return false;      // cost-plus — the engine priced it\n        return true;\n    }).map(p => p.style);\n}\n\nexport function collectProductsFromTable() {",
+      "count": 1,
+      "stage": "builder-runtime-styles-2026-09-16",
+      "reason": "Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons; vendor imports finish, and a vendor line waiting for a price is not an API failure but blocks save, print and copy."
+    },
+    {
+      "file": "shared_components/js/builders/emb/pricing-sync.js",
+      "before": "                    imageUrl: /** @type {HTMLElement} */ (row).dataset.imageUrl || '',  // Image URL for quote view display\n                    sellPriceOverride: parseFloat(/** @type {HTMLElement} */ (row).dataset.sellPrice) || 0,  // Non-SanMar fixed sell price",
+      "after": "                    imageUrl: /** @type {HTMLElement} */ (row).dataset.imageUrl || '',  // Image URL for quote view display\n                    isNonSanmar: /** @type {HTMLElement} */ (row).dataset.nonSanmar === 'true',  // vendor row: no price and no cost = \"needs a price\", not an API failure\n                    sellPriceOverride: parseFloat(/** @type {HTMLElement} */ (row).dataset.sellPrice) || 0,  // Non-SanMar fixed sell price",
+      "count": 1,
+      "stage": "builder-runtime-styles-2026-09-16",
+      "reason": "Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons; vendor imports finish, and a vendor line waiting for a price is not an API failure but blocks save, print and copy."
+    },
+    {
+      "file": "shared_components/js/builders/emb/quote-lifecycle.js",
+      "before": "    clearRepricedNotice();          // the reopened quote's \"prices changed\" notice belongs to that quote\n    // Hide + zero the sidebar TOTAL bar (re-shown on first recalc)",
+      "after": "    clearRepricedNotice();          // the reopened quote's \"prices changed\" notice belongs to that quote\n    if (typeof window.dismissImportBanner === 'function') window.dismissImportBanner();   // and the last import's summary\n    // Hide + zero the sidebar TOTAL bar (re-shown on first recalc)",
+      "count": 1,
+      "stage": "builder-runtime-styles-2026-09-16",
+      "reason": "Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons; vendor imports finish, and a vendor line waiting for a price is not an API failure but blocks save, print and copy."
+    },
+    {
+      "file": "shared_components/js/builders/emb/persistence.js",
+      "before": "async function restoreDraftProducts(draft) {\n    const draftProducts = (draft && draft.products) || [];",
+      "after": "async function restoreDraftProducts(draft) {\n    if (typeof window.dismissImportBanner === 'function') window.dismissImportBanner();   // a restored draft replaces the table\n    const draftProducts = (draft && draft.products) || [];",
+      "count": 1,
+      "stage": "builder-runtime-styles-2026-09-16",
+      "reason": "Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons; vendor imports finish, and a vendor line waiting for a price is not an API failure but blocks save, print and copy."
+    },
+    {
+      "file": "shared_components/js/builders/emb/persistence.js",
+      "before": "    window._restoringQuote = true;\n    let comparison = null;",
+      "after": "    window._restoringQuote = true;\n    if (typeof window.dismissImportBanner === 'function') window.dismissImportBanner();   // the summary belonged to the previous table\n    let comparison = null;",
+      "count": 1,
+      "stage": "builder-runtime-styles-2026-09-16",
+      "reason": "Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons; vendor imports finish, and a vendor line waiting for a price is not an API failure but blocks save, print and copy."
+    },
+    {
+      "file": "shared_components/js/builders/emb/persistence.js",
+      "before": "    banner.className = 'alert alert-warn';",
+      "after": "    banner.className = 'alert alert-warn emb-screen-notice';",
+      "count": 1,
+      "stage": "builder-runtime-styles-2026-09-16",
+      "reason": "Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons; vendor imports finish, and a vendor line waiting for a price is not an API failure but blocks save, print and copy."
+    },
+    {
+      "file": "shared_components/js/builders/emb/save-push.js",
+      "before": "import { buildLogoConfiguration, collectProductsFromTable, getOrderPieceCounts, recalculatePricing, syncALRows, syncDECGRows } from './pricing-sync.js';",
+      "after": "import { buildLogoConfiguration, collectProductsFromTable, getOrderPieceCounts, recalculatePricing, syncALRows, syncDECGRows, vendorStylesWithoutPrice } from './pricing-sync.js';",
+      "count": 1,
+      "stage": "builder-runtime-styles-2026-09-16",
+      "reason": "Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons; vendor imports finish, and a vendor line waiting for a price is not an API failure but blocks save, print and copy."
+    },
+    {
+      "file": "shared_components/js/builders/emb/save-push.js",
+      "before": "    const zeroPriceRows = products.filter(p => {\n        const row = document.getElementById(`row-${p.rowId}`);\n        if (!row || row.dataset.nonSanmar !== 'true') return false;\n        if (p.sellPriceOverride > 0) return false;                    // fixed price / manual override\n        if (parseFloat(row.dataset.blankCost) > 0) return false;      // cost-plus — the engine priced it\n        return true;\n    });\n    if (zeroPriceRows.length > 0) {\n        const styleList = zeroPriceRows.map(p => p.style).join(', ');\n        showToast(`No cost and no price on: ${styleList}. Open the product to enter a blank cost, or double-click the price cell to set a fixed price.`, 'error', 7000);",
+      "after": "    const zeroPriceStyles = vendorStylesWithoutPrice(products);\n    if (zeroPriceStyles.length > 0) {\n        const styleList = zeroPriceStyles.join(', ');\n        showToast(`No cost and no price on: ${styleList}. Open the product to enter a blank cost, or select its price in the Unit $ column to set a fixed price.`, 'error', 7000);",
+      "count": 1,
+      "stage": "builder-runtime-styles-2026-09-16",
+      "reason": "Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons; vendor imports finish, and a vendor line waiting for a price is not an API failure but blocks save, print and copy."
+    },
+    {
+      "file": "shared_components/js/builders/emb/save-push.js",
+      "before": "            if (!finishSuccessfulSave(result, skipShareModal)) return;\n        } else {",
+      "after": "            if (!finishSuccessfulSave(result, skipShareModal)) return;\n            return true;   // callers that save first (Email, Push) continue only on a complete save\n        } else {",
+      "count": 1,
+      "stage": "builder-runtime-styles-2026-09-16",
+      "reason": "Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons; vendor imports finish, and a vendor line waiting for a price is not an API failure but blocks save, print and copy."
+    },
+    {
+      "file": "shared_components/js/builders/emb/save-push.js",
+      "before": "            await saveAndGetLink({ skipShareModal: true });   // silent save → showPushButton sets _pushQuoteId",
+      "after": "            // silent save → showPushButton sets _pushQuoteId. A blocked or partial save must stop\n            // here, or the preview would open for the LAST saved revision without the new changes.\n            const saved = await saveAndGetLink({ skipShareModal: true });\n            if (saved !== true) return;",
+      "count": 1,
+      "stage": "builder-runtime-styles-2026-09-16",
+      "reason": "Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons; vendor imports finish, and a vendor line waiting for a price is not an API failure but blocks save, print and copy."
+    },
+    {
+      "file": "shared_components/js/builders/emb/output.js",
+      "before": "import { buildLogoConfiguration, calculateDiscountableSubtotal, collectProductsFromTable, recalculatePricing, syncALRows, syncDECGRows } from './pricing-sync.js';",
+      "after": "import { buildLogoConfiguration, calculateDiscountableSubtotal, collectProductsFromTable, recalculatePricing, syncALRows, syncDECGRows, vendorStylesWithoutPrice } from './pricing-sync.js';",
+      "count": 1,
+      "stage": "builder-runtime-styles-2026-09-16",
+      "reason": "Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons; vendor imports finish, and a vendor line waiting for a price is not an API failure but blocks save, print and copy."
+    },
+    {
+      "file": "shared_components/js/builders/emb/output.js",
+      "before": "    }\n",
+      "after": "    }\n    const unpriced = vendorStylesWithoutPrice(productList);\n    if (unpriced.length > 0) {\n        showToast(`Set a price for ${unpriced.join(', ')} before copying — it isn't in the total yet.`, 'error', 7000);\n        return;\n    }\n",
+      "count": 1,
+      "stage": "builder-runtime-styles-2026-09-16",
+      "reason": "Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons; vendor imports finish, and a vendor line waiting for a price is not an API failure but blocks save, print and copy."
+    },
+    {
+      "file": "shared_components/js/builders/emb/output.js",
+      "before": "    }\n",
+      "after": "    }\n    // A vendor line waiting for a price is left out of the total — never print it at $0.00.\n    const unpriced = vendorStylesWithoutPrice(allItems);\n    if (unpriced.length > 0) {\n        showToast(`Set a price for ${unpriced.join(', ')} before printing — it isn't in the total yet.`, 'error', 7000);\n        return;\n    }\n",
+      "count": 1,
+      "stage": "builder-runtime-styles-2026-09-16",
+      "reason": "Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons; vendor imports finish, and a vendor line waiting for a price is not an API failure but blocks save, print and copy."
+    },
+    {
+      "file": "shared_components/js/builders/emb/output.js",
+      "before": "        await saveAndGetLink({ skipShareModal: true });",
+      "after": "        const saved = await saveAndGetLink({ skipShareModal: true });\n        if (saved !== true) return;   // blocked or partial save — never email the previous revision",
+      "count": 1,
+      "stage": "builder-runtime-styles-2026-09-16",
+      "reason": "Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons; vendor imports finish, and a vendor line waiting for a price is not an API failure but blocks save, print and copy."
+    },
+    {
+      "file": "shared_components/js/builders/emb/index.js",
+      "before": "    dismissImportBanner,\n    scrollToProductRow,",
+      "after": "    dismissImportBanner,\n    syncImportSummary,\n    scrollToProductRow,",
+      "count": 1,
+      "stage": "builder-runtime-styles-2026-09-16",
+      "reason": "Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons; vendor imports finish, and a vendor line waiting for a price is not an API failure but blocks save, print and copy."
+    },
+    {
+      "file": "shared_components/js/builders/emb/index.js",
+      "before": "window.dismissImportBanner = dismissImportBanner;\nwindow.scrollToProductRow = scrollToProductRow;",
+      "after": "window.dismissImportBanner = dismissImportBanner;\nwindow.syncImportSummary = syncImportSummary;\nwindow.scrollToProductRow = scrollToProductRow;",
+      "count": 1,
+      "stage": "builder-runtime-styles-2026-09-16",
+      "reason": "Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons; vendor imports finish, and a vendor line waiting for a price is not an API failure but blocks save, print and copy."
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "                <div id=\"min-order-warning\" style=\"display: none;\">",
+      "after": "                <div id=\"min-order-warning\" class=\"workspace-min-order\" style=\"display: none;\">",
+      "count": 1,
+      "stage": "builder-runtime-styles-2026-09-16",
+      "reason": "Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons; vendor imports finish, and a vendor line waiting for a price is not an API failure but blocks save, print and copy."
+    },
+    {
+      "file": "shared_components/js/embroidery-quote-pricing.js",
+      "before": "        const failedProducts = [];  // products whose size-pricing API call failed → must NOT silently vanish from the total (review C5)\n        let subtotal = 0;",
+      "after": "        const failedProducts = [];  // products whose size-pricing API call failed → must NOT silently vanish from the total (review C5)\n        // A non-SanMar product with neither a sell price nor a blank cost has nothing to price from.\n        // That is not an API failure (2026-09-16): its row says \"needs a price\", it stays out of the\n        // total, and the save gate (save-push.js zeroPriceRows) refuses to save until it has one.\n        const unpricedProducts = [];\n        const needsPrice = (p) => p.isNonSanmar === true && !(p.sellPriceOverride > 0) && !(p.blankCost > 0);\n        let subtotal = 0;",
+      "count": 1,
+      "stage": "builder-runtime-styles-2026-09-16",
+      "reason": "Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons; vendor imports finish, and a vendor line waiting for a price is not an API failure but blocks save, print and copy."
+    },
+    {
+      "file": "shared_components/js/embroidery-quote-pricing.js",
+      "before": "        for (const product of garmentProducts) {\n            const pricing = await this.calculateProductPrice(product, garmentQuantity);",
+      "after": "        for (const product of garmentProducts) {\n            if (needsPrice(product)) { unpricedProducts.push({ style: product.style, color: product.color, isCap: false }); continue; }\n            const pricing = await this.calculateProductPrice(product, garmentQuantity);",
+      "count": 1,
+      "stage": "builder-runtime-styles-2026-09-16",
+      "reason": "Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons; vendor imports finish, and a vendor line waiting for a price is not an API failure but blocks save, print and copy."
+    },
+    {
+      "file": "shared_components/js/embroidery-quote-pricing.js",
+      "before": "        for (const product of capProducts) {\n            const pricing = await this.calculateCapProductPrice(product, capQuantity, capStitchCount, capEmbellishmentType);",
+      "after": "        for (const product of capProducts) {\n            if (needsPrice(product)) { unpricedProducts.push({ style: product.style, color: product.color, isCap: true }); continue; }\n            const pricing = await this.calculateCapProductPrice(product, capQuantity, capStitchCount, capEmbellishmentType);",
+      "count": 1,
+      "stage": "builder-runtime-styles-2026-09-16",
+      "reason": "Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons; vendor imports finish, and a vendor line waiting for a price is not an API failure but blocks save, print and copy."
+    },
+    {
+      "file": "shared_components/js/embroidery-quote-pricing.js",
+      "before": "            failedProducts: failedProducts,  // review C5 — builder gates save/push if any product price failed\n            costFallbackUsed: this._costFallbackUsed || null,  // customer engine REFUSES fallback-derived prices (Rule 4)",
+      "after": "            failedProducts: failedProducts,  // review C5 — builder gates save/push if any product price failed\n            unpricedProducts: unpricedProducts,  // vendor rows waiting for a price (left out of the total; save is gated)\n            costFallbackUsed: this._costFallbackUsed || null,  // customer engine REFUSES fallback-derived prices (Rule 4)",
+      "count": 1,
+      "stage": "builder-runtime-styles-2026-09-16",
+      "reason": "Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons; vendor imports finish, and a vendor line waiting for a price is not an API failure but blocks save, print and copy."
     }
   ]
 }

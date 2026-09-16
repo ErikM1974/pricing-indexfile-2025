@@ -24,7 +24,14 @@
     const ENTRIES = [
         {
             version: null,
-            fingerprint: '22aa28f5d285711f',
+            fingerprint: '51f893f0110a5b28',
+            notes: [
+                'Screen print and DTF are never limited by product category: safety vests, polos, jackets and bags price for print like any tee.',
+                'Embroidery and DTG outside a category’s usual methods still price, with a note to check the garment. They are never picked as the lowest price and start unticked on the customer estimate.',
+            ],
+        },
+        {
+            version: '2026.09.16.4',
             notes: [
                 'Headbands, gaiters, face masks, skull caps and scrub caps now price as flat embroidery, the same as the Quote Builder.',
                 'Gaiters, face masks and headbands outside the Caps category keep their category’s other methods, so a gaiter can still be screen printed or DTF printed.',

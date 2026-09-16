@@ -350,25 +350,27 @@ test('soft headwear prices as flat embroidery on every sheet and in Quick Price'
 });
 
 // Live rules (2026-09-16): only flat headwear in "Caps" is embroidery only. A gaiter in Personal
-// Protection keeps that category's methods (embroidery, screen print, DTF; no DTG) — no new print blocks.
-test('a gaiter outside "Caps" keeps its category’s print methods; a beanie stays embroidery only', async ({ page }) => {
+// Protection prices every method; DTG, which that category's rule leaves out, carries a note (Erik: the rep decides).
+test('a gaiter outside "Caps" prices every method, DTG with a note; a beanie stays embroidery only', async ({ page }) => {
     const e = await open(page, { url: '/calculators/quick-quote/index.html' });
     await page.locator('[data-mode="quick"]').click();
     await page.locator('#qqStyle').fill('FS07');
     await expect(page.locator('#qqProductName')).toHaveText('Port Authority Fleece Neck Gaiter');
-    await expect(page.locator('.qq-card[data-method]')).toHaveCount(3);
-    for (const method of ['emb', 'scp', 'dtf']) {
+    await expect(page.locator('.qq-card[data-method]')).toHaveCount(4);
+    for (const method of ['emb', 'dtg', 'scp', 'dtf']) {
         await expect(page.locator('.qq-card[data-method="' + method + '"]')).toContainText('/pc');
         await expect(page.locator('.qq-card[data-method="' + method + '"]')).not.toHaveClass(/is-error|is-unavailable/);
     }
-    await expect(page.locator('.qq-card[data-method="dtg"]')).toHaveCount(0);
+    await expect(page.locator('.qq-card[data-method="dtg"] .qq-card-caution')).toHaveText('DTG print isn’t usually offered for Personal Protection — check the fabric before quoting.');
+    await expect(page.locator('.qq-card[data-method="dtg"]')).not.toHaveClass(/is-best/);
+    await expect(page.locator('.qq-card-caution')).toHaveCount(1);
     await expect(page.locator('.qq-card[data-method="capemb"]')).toHaveCount(0);
     await expect(page.locator('.qq-elig-note')).toHaveCount(0);
     await expect(page.locator('#qqPlacementField')).toBeVisible();
     await expect(page.locator('#qqFront [data-code="LC"]')).toBeVisible();
     await expect(page.locator('#qqInkField')).toBeVisible();
     await expect(page.locator('.qq-emb-pos').first()).toHaveText('Front');
-    // Line sheet: the gaiter screen prints; DTG follows the category rule; cap embroidery is flat embroidery.
+    // Line sheet: the gaiter screen prints; DTG prices with the category note; cap embroidery is flat embroidery.
     await page.locator('[data-mode="linesheet"]').click();
     await methodChip(page, 'scp');
     await typeStyle(page, 'FS07');
@@ -376,8 +378,11 @@ test('a gaiter outside "Caps" keeps its category’s print methods; a beanie sta
     await expect(page.locator('.qq-line-stat.err')).toHaveCount(0);
     await expect(page.locator('#qqLineDownload')).toBeEnabled();
     await methodChip(page, 'dtg');
-    await expect(page.locator('.qq-line-row').first()).toContainText('DTG print isn’t offered for Personal Protection.');
+    await expect(page.locator('.qq-line-row').first()).toContainText('DTG print isn’t usually offered for Personal Protection — check the fabric before quoting.');
     await expect(page.locator('.qq-line-row').first()).not.toContainText('is headwear');
+    await expect(page.locator('.qq-line-stat.err')).toHaveCount(0);
+    await expect(page.locator('.qq-sheet-item')).toHaveCount(1);
+    await expect(page.locator('#qqLineDownload')).toBeEnabled();
     await methodChip(page, 'capemb');
     await expect(page.locator('.qq-line-row').first()).toContainText('Priced as embroidery — soft headwear is flat embroidery, as in the Embroidery builder.');
     await expect(page.locator('.qq-line-row').first()).not.toContainText('Not confirmed from the catalog');
@@ -435,13 +440,17 @@ test('caps: a Richardson cap with no category prices as a cap and embroidery fol
     check(expect, e);
 });
 
-test('a garment with no category warns instead of blocking print methods', async ({ page }) => {
+test('a garment with no category prices every method; only DTG carries a note', async ({ page }) => {
     const e = await open(page, { url: '/calculators/quick-quote/index.html' });
     await methodChip(page, 'dtf');
     await typeStyle(page, 'BC3001');
     await expect(page.locator('#qqLineDownload')).toBeEnabled();
-    await expect(page.locator('.qq-line-row').first()).toContainText('This category isn’t in our decoration rules — confirm DTF transfer works for it.');
+    await expect(page.locator('.qq-sheet-item')).toHaveCount(1);
+    await expect(page.locator('.qq-line-row').first()).not.toContainText('decoration rules');
     await expect(page.locator('.qq-line-row').first()).not.toContainText('Not confirmed from the catalog');
+    await methodChip(page, 'dtg');
+    await expect(page.locator('.qq-line-row').first()).toContainText('Check the fabric before quoting DTG — this category isn’t in our decoration rules.');
+    await expect(page.locator('#qqLineDownload')).toBeEnabled();
     // Embroidery follows the shared classifier as returned: an unconfirmed garment on a cap sheet
     // prices as garment embroidery, and the row says the catalog did not confirm it.
     await methodChip(page, 'capemb');
@@ -452,8 +461,50 @@ test('a garment with no category warns instead of blocking print methods', async
     await expect(page.locator('#qqLineDownload')).toBeEnabled();
     await page.locator('[data-mode="quick"]').click();
     await page.locator('#qqStyle').fill('BC3001');
-    await expect(page.locator('.qq-elig-note')).toContainText('only embroidery is shown');
-    await expect(page.locator('.qq-card[data-method]')).toHaveCount(1);
+    await expect(page.locator('.qq-elig-note')).toHaveText('This product’s category isn’t in our decoration rules. Every method is priced — check the product before quoting DTG.');
+    await expect(page.locator('.qq-card[data-method]')).toHaveCount(4);
+    await expect(page.locator('.qq-card[data-method="dtg"] .qq-card-caution')).toHaveText('Check the fabric before quoting DTG — this category isn’t in our decoration rules.');
+    await expect(page.locator('.qq-card-caution')).toHaveCount(1);
+    check(expect, e);
+});
+
+// Taneisha 2026-09-16: a safety vest must screen print. Erik: screen print and DTF are never limited;
+// the rep decides. The mock keeps Workwear's old embroidery-only row, so this proves the code, not the data.
+test('a Workwear safety vest prices screen print and DTF; DTG is priced with a note and left off the estimate', async ({ page }) => {
+    const e = await open(page, { url: '/calculators/quick-quote/index.html' });
+    await methodChip(page, 'scp');
+    await typeStyle(page, 'CSV101');
+    await expect(page.locator('.qq-sheet-item')).toHaveCount(1);
+    await expect(page.locator('.qq-line-stat.err')).toHaveCount(0);
+    await expect(page.locator('.qq-line-row').first()).not.toContainText('offered');
+    await expect(page.locator('#qqDocumentStatus')).not.toContainText('Before sending');
+    await expect(page.locator('#qqLineDownload')).toBeEnabled();
+    await methodChip(page, 'dtf');
+    await expect(page.locator('.qq-sheet-item')).toHaveCount(1);
+    await expect(page.locator('.qq-line-row').first()).not.toContainText('offered');
+    await methodChip(page, 'emb');
+    await expect(page.locator('.qq-sheet-item')).toHaveCount(1);
+    await expect(page.locator('.qq-line-row').first()).not.toContainText('offered');
+    // Quick Price: every method is priced; only DTG says to check, and it is never the lowest-price pick.
+    await page.locator('[data-mode="quick"]').click();
+    await page.locator('#qqStyle').fill('CSV101');
+    await expect(page.locator('#qqProductName')).toHaveText('CornerStone ANSI 107 Class 2 Economy Mesh Zippered Vest');
+    await expect(page.locator('.qq-card[data-method]')).toHaveCount(4);
+    for (const method of ['emb', 'dtg', 'scp', 'dtf']) await expect(page.locator('.qq-card[data-method="' + method + '"]')).toContainText('/pc');
+    await expect(page.locator('.qq-card-caution')).toHaveCount(1);
+    await expect(page.locator('.qq-card[data-method="dtg"] .qq-card-caution')).toHaveText('DTG print isn’t usually offered for Workwear — check the fabric before quoting.');
+    await expect(page.locator('.qq-card[data-method="dtg"]')).not.toHaveClass(/is-best/);
+    await expect(page.locator('.qq-card.is-best')).toHaveCount(1);
+    await expect(page.locator('.qq-elig-note')).toHaveCount(0);
+    // Customer estimate: DTG starts unticked (the rep can tick it); the others are on the sheet.
+    const dtgOption = page.locator('#qqDocumentOptions input[data-option="dtg"]');
+    await expect(dtgOption).not.toBeChecked();
+    await expect(page.locator('#qqDocumentOptions label').filter({ has: page.locator('input[data-option="dtg"]') })).toHaveText('DTG print (check first)');
+    for (const method of ['emb', 'scp', 'dtf']) await expect(page.locator('#qqDocumentOptions input[data-option="' + method + '"]')).toBeChecked();
+    await expect(page.locator('#qqSheet')).toContainText('Screen print');
+    await expect(page.locator('#qqSheet')).not.toContainText('DTG');
+    await dtgOption.check();
+    await expect(page.locator('#qqSheet')).toContainText('DTG');
     check(expect, e);
 });
 

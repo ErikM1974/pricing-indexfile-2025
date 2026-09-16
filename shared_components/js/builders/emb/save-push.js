@@ -18,7 +18,7 @@
    getLtmControlState, parseRatePercent, markAsSaved, updateEditModeUI,
    QuoteShareModal, renderPushChecklist, getPushBlockers, hasUnsavedChanges */
 import { getServicePrice } from './pricing.js';
-import { buildLogoConfiguration, collectProductsFromTable, getOrderPieceCounts, recalculatePricing, syncALRows, syncDECGRows } from './pricing-sync.js';
+import { buildLogoConfiguration, collectProductsFromTable, getOrderPieceCounts, recalculatePricing, syncALRows, syncDECGRows, vendorStylesWithoutPrice } from './pricing-sync.js';
 import { getAdditionalCharges, collectDECGItems } from './quote-lifecycle.js';
 import { getCapEmbellishmentType } from './logo-config.js';
 import { dateFromInputValue } from './product-rows.js';
@@ -417,16 +417,10 @@ function validateSaveInputs(products) {
     // already blocked upstream by buildSavePricing()'s failedProducts check — so this
     // must not also demand a sellPriceOverride, or every vendor product created in
     // Margin mode would be unsaveable.
-    const zeroPriceRows = products.filter(p => {
-        const row = document.getElementById(`row-${p.rowId}`);
-        if (!row || row.dataset.nonSanmar !== 'true') return false;
-        if (p.sellPriceOverride > 0) return false;                    // fixed price / manual override
-        if (parseFloat(row.dataset.blankCost) > 0) return false;      // cost-plus — the engine priced it
-        return true;
-    });
-    if (zeroPriceRows.length > 0) {
-        const styleList = zeroPriceRows.map(p => p.style).join(', ');
-        showToast(`No cost and no price on: ${styleList}. Open the product to enter a blank cost, or double-click the price cell to set a fixed price.`, 'error', 7000);
+    const zeroPriceStyles = vendorStylesWithoutPrice(products);
+    if (zeroPriceStyles.length > 0) {
+        const styleList = zeroPriceStyles.join(', ');
+        showToast(`No cost and no price on: ${styleList}. Open the product to enter a blank cost, or select its price in the Unit $ column to set a fixed price.`, 'error', 7000);
         return null;
     }
 
@@ -535,6 +529,7 @@ async function _saveAndGetLinkInner(opts = {}) {
 
         if (result && result.quoteID) {
             if (!finishSuccessfulSave(result, skipShareModal)) return;
+            return true;   // callers that save first (Email, Push) continue only on a complete save
         } else {
             throw new Error(result?.error || 'Failed to save quote');
         }
@@ -694,7 +689,10 @@ export async function pushToShopWorks() {
     try {
         const dirty = (typeof hasUnsavedChanges === 'function') ? hasUnsavedChanges() : true;
         if (!embState._pushQuoteId || dirty) {
-            await saveAndGetLink({ skipShareModal: true });   // silent save → showPushButton sets _pushQuoteId
+            // silent save → showPushButton sets _pushQuoteId. A blocked or partial save must stop
+            // here, or the preview would open for the LAST saved revision without the new changes.
+            const saved = await saveAndGetLink({ skipShareModal: true });
+            if (saved !== true) return;
         }
         if (!embState._pushQuoteId) return;            // save failed / validation blocked it — error already shown
         await openPushPreview();

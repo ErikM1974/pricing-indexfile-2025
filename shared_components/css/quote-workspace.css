@@ -58,7 +58,7 @@
 :where([data-ui="unified"][data-quote-workspace]) .search-icon { position:absolute; left:14px; top:16px; color:var(--ui-muted); }
 :where([data-ui="unified"][data-quote-workspace]) .search-suggestions,:where([data-ui="unified"][data-quote-workspace]) .customer-lookup-dropdown,:where([data-ui="unified"][data-quote-workspace]) .customer-search-dropdown,:where([data-ui="unified"][data-quote-workspace]) .recent-quotes-menu { position:absolute; top:100%; left:0; right:0; margin-top:6px; max-height:360px; overflow:auto; border:1px solid var(--ui-line-strong); border-radius:var(--radius-sm); background:var(--ui-surface); box-shadow:var(--shadow-md); z-index:var(--z-overlay); }
 :where([data-ui="unified"][data-quote-workspace]) .suggestion-item,:where([data-ui="unified"][data-quote-workspace]) .customer-lookup-item,:where([data-ui="unified"][data-quote-workspace]) .customer-search-item { display:flex; align-items:center; gap:12px; padding:12px; min-height:52px; border-bottom:1px solid var(--ui-line); cursor:pointer; }
-:where([data-ui="unified"][data-quote-workspace]) .suggestion-item:hover,:where([data-ui="unified"][data-quote-workspace]) .suggestion-item.selected,:where([data-ui="unified"][data-quote-workspace]) .customer-lookup-item:hover { background:var(--ui-tint); }
+:where([data-ui="unified"][data-quote-workspace]) .suggestion-item:hover,:where([data-ui="unified"][data-quote-workspace]) .suggestion-item.selected,:where([data-ui="unified"][data-quote-workspace]) .customer-lookup-item:hover,:where([data-ui="unified"][data-quote-workspace]) .customer-lookup-item.highlighted { background:var(--ui-tint); }
 :where([data-ui="unified"][data-quote-workspace]) .suggestion-item img { width:40px; height:44px; object-fit:contain; }
 :where([data-ui="unified"][data-quote-workspace]) .suggestion-style { font-weight:700; }
 :where([data-ui="unified"][data-quote-workspace]) .suggestion-name,:where([data-ui="unified"][data-quote-workspace]) .suggestion-title { color:var(--ui-muted); }
@@ -405,6 +405,30 @@
  :where([data-ui="unified"][data-quote-workspace]):is([data-quote-workspace="screenprint"],[data-quote-workspace="dtf"]) .pricing-row { padding:5px 0; }
  :where([data-ui="unified"][data-quote-workspace]):is([data-quote-workspace="screenprint"],[data-quote-workspace="dtf"]) .modal-overlay,:where([data-ui="unified"][data-quote-workspace]):is([data-quote-workspace="screenprint"],[data-quote-workspace="dtf"]) .estimate-ship-row { display:none; }
  :where([data-ui="unified"][data-quote-workspace]):is([data-quote-workspace="screenprint"],[data-quote-workspace="dtf"]) .workspace-customer-grid { gap:8px; }
+}
+
+/* Runtime notices, pickers and states the retired builder sheets styled (restored 2026-09-16:
+ * without these they rendered as plain text at the end of the page). */
+:where([data-ui="unified"][data-quote-workspace]) .qb-error-banner { position:sticky; top:0; z-index:var(--z-overlay); display:flex; align-items:center; gap:12px; padding:10px 16px; border-bottom:2px solid var(--color-danger-ink); background:var(--color-danger-bg); color:var(--color-danger-ink); font-weight:600; }
+:where([data-ui="unified"][data-quote-workspace]) .qb-error-banner .qb-error-banner-text { flex:1; min-width:0; }
+:where([data-ui="unified"][data-quote-workspace]) .qb-error-banner .qb-error-banner-close { min-height:32px; padding:2px 8px; border:0; background:none; color:inherit; font-size:var(--font-size-lg); line-height:1; }
+:where([data-ui="unified"][data-quote-workspace]) .qb-fallback-badge { position:fixed; bottom:14px; left:14px; z-index:var(--z-overlay); max-width:min(380px, calc(100vw - 28px)); padding:8px 14px; border:1px solid var(--color-warning); border-radius:var(--radius-sm); background:var(--color-warning-bg); color:var(--color-warning-ink); font-size:var(--font-size-sm); font-weight:600; box-shadow:var(--shadow-md); }
+:where([data-ui="unified"][data-quote-workspace]) .repricing-indicator { position:fixed; bottom:14px; right:14px; z-index:var(--z-overlay); display:inline-flex; align-items:center; gap:8px; padding:8px 14px; border:1px solid var(--ui-accent); border-radius:var(--radius-pill); background:var(--ui-surface); color:var(--ui-accent); font-size:var(--font-size-sm); font-weight:700; box-shadow:var(--shadow-md); }
+:where([data-ui="unified"][data-quote-workspace]) .accepted-quote-banner { display:flex; align-items:center; gap:10px; margin:0 0 12px; padding:10px 14px; border:1px solid var(--color-warning); border-left-width:4px; border-radius:var(--radius-sm); background:var(--color-warning-bg); color:var(--color-warning-ink); line-height:1.45; }
+:where([data-ui="unified"][data-quote-workspace]) .accepted-quote-banner .fa-file-signature { flex-shrink:0; font-size:var(--font-size-lg); }
+:where([data-ui="unified"][data-quote-workspace]) .product-table .xxxl-picker-btn { cursor:pointer; border:1px dashed var(--ui-accent); background:var(--ui-tint); color:var(--ui-accent); font-weight:600; }
+:where([data-ui="unified"][data-quote-workspace]) .product-table .xxxl-picker-btn::placeholder { color:var(--ui-accent); opacity:1; }
+:where([data-ui="unified"][data-quote-workspace]) .inv-badge { display:inline-block; min-width:22px; margin-top:2px; padding:1px 4px; border:1px solid transparent; border-radius:var(--radius-sm); font-size:10px; font-weight:600; line-height:1.2; text-align:center; cursor:help; }
+:where([data-ui="unified"][data-quote-workspace]) .inv-badge--good { border-color:var(--color-success); background:var(--color-success-bg); color:var(--color-brand-deep); }
+:where([data-ui="unified"][data-quote-workspace]) .inv-badge--low { border-color:var(--color-warning); background:var(--color-warning-bg); color:var(--color-warning-ink); }
+:where([data-ui="unified"][data-quote-workspace]) .inv-badge--oos { border-color:var(--color-danger-ink); background:var(--color-danger-bg); color:var(--color-danger-ink); }
+:where([data-ui="unified"][data-quote-workspace]) .inv-badge--unknown { border-color:var(--ui-line); background:var(--ui-canvas); color:var(--ui-muted); }
+:where([data-ui="unified"][data-quote-workspace]) .pr-item.pr-warn { margin-top:4px; padding:4px 8px; border-radius:var(--radius-sm); background:var(--color-warning-bg); color:var(--color-warning-ink); font-weight:600; }
+:where([data-ui="unified"][data-quote-workspace]):is([data-quote-workspace="screenprint"],[data-quote-workspace="dtf"]) .modal-overlay.show { display:flex; }
+:where([data-ui="unified"][data-quote-workspace]):is([data-quote-workspace="screenprint"],[data-quote-workspace="dtf"]) [id="company-name-dropdown"] { right:auto; width:max-content; min-width:min(280px, calc(100vw - 32px)); max-width:min(360px, calc(100vw - 32px)); }
+
+@media print {
+ :where([data-ui="unified"][data-quote-workspace]):is([data-quote-workspace="screenprint"],[data-quote-workspace="dtf"]) .modal-overlay.show { display:none; }
 }
 
 }

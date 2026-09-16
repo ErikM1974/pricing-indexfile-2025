@@ -393,6 +393,45 @@ describe('EMB parity (EmbroideryPricingCalculator authority)', () => {
         expect(res.grandTotal).toBe(1290);
     });
 
+    test('a vendor line with no price and no cost is "needs a price", not an API failure (2026-09-16)', async () => {
+        const calc = new EmbroideryPricingCalculator({ skipInit: true });
+        await calc.initializeConfig();
+        const warn = jest.spyOn(calc, 'showAPIWarning').mockImplementation(() => {});
+        const fetched = [];
+        const realFetch = calc.fetchSizePricing.bind(calc);
+        calc.fetchSizePricing = async (style) => { fetched.push(style); return realFetch(style); };
+        const pc61 = {
+            style: 'PC61', color: 'Deep Marine', catalogColor: 'DeepMarine', title: 'PC61',
+            sizeBreakdown: { S: 6, M: 6, L: 6, XL: 6 }, totalQuantity: 24, isCap: false, isNonSanmar: false,
+            sellPriceOverride: 0, sizeOverrides: {},
+            logoAssignments: { primary: { logoId: 'primary', quantity: 24 }, additional: [] }
+        };
+        const vendor = { ...pc61, style: 'VND100', color: 'Black', catalogColor: 'Black', title: 'VND100', isNonSanmar: true, blankCost: 0 };
+        const logoConfigs = {
+            garment: { primary: { position: 'Left Chest', stitchCount: 8000, needsDigitizing: false }, additional: [] },
+            cap: { primary: { position: 'Cap Front', stitchCount: 8000, needsDigitizing: false }, additional: [] }
+        };
+        const result = await calc.calculateQuote([pc61, vendor], [], logoConfigs, { ltmEnabled: true });
+        expect(result.failedProducts).toEqual([]);
+        expect(result.unpricedProducts).toEqual([{ style: 'VND100', color: 'Black', isCap: false }]);
+        expect(result.products.map(p => p.product ? p.product.style : p.style)).not.toContain('VND100');
+        expect(fetched).not.toContain('VND100');
+        expect(warn).not.toHaveBeenCalled();
+        // Priced (a sell price) it joins the quote; a SanMar line that fails to load is still an API failure.
+        const priced = await calc.calculateQuote([pc61, { ...vendor, sellPriceOverride: 15 }], [], logoConfigs, { ltmEnabled: true });
+        expect(priced.unpricedProducts).toEqual([]);
+        expect(priced.grandTotal).toBeGreaterThan(result.grandTotal);
+        calc.fetchSizePricing = async () => [];
+        const hadDocument = 'document' in global;
+        if (!hadDocument) global.document = { getElementById: () => null };
+        try {
+            await calc.calculateQuote([{ ...vendor, isNonSanmar: false }], [], logoConfigs, { ltmEnabled: true });
+        } finally {
+            if (!hadDocument) delete global.document;
+        }
+        expect(warn).toHaveBeenCalledWith(expect.stringContaining('VND100'), 'main-pricing');
+    });
+
     test('missing Caspio Shirt/48-71 cost row → HARD ERROR, never the $12 fallback price (Rule 4)', async () => {
         // Healthy control: 48× PC61 prices the 48-71 tier from Caspio ($13 cost → $20 unit).
         const healthy = await run({

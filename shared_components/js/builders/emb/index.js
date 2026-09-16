@@ -48,6 +48,7 @@ import {
     parseAndPreviewShopWorks,
     confirmShopWorksImport,
     dismissImportBanner,
+    syncImportSummary,
     scrollToProductRow,
 } from './shopworks-import.js';
 import {
@@ -200,6 +201,7 @@ window.closeShopWorksImportModal = closeShopWorksImportModal;
 window.parseAndPreviewShopWorks = parseAndPreviewShopWorks;
 window.confirmShopWorksImport = confirmShopWorksImport;
 window.dismissImportBanner = dismissImportBanner;
+window.syncImportSummary = syncImportSummary;
 window.scrollToProductRow = scrollToProductRow;
 
 // persistence (callers: the DOMContentLoaded init in the monolith — autosave

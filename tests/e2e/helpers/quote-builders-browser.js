@@ -56,6 +56,10 @@ async function open(page,state={}){
    if(method==='POST'){const body=request.postDataJSON();events.mutations.push({path:p,method,body:{...body,...(body.SessionID?{SessionID:'synthetic-session'}:{})}});return route.fulfill({status:state.saveFailed?503:201,json:state.saveFailed?{error:'Synthetic save failure'}:{PK_ID:99001,QuoteID:body.QuoteID}});}
   }
   if(state.save&&u.hostname==='api.emailjs.com'&&method==='POST'){const body=request.postDataJSON();events.mutations.push({path:'emailjs',method,body:{template_id:body.template_id,template_params:body.template_params}});return route.fulfill({status:200,body:'OK'});}
+  // Vendor (non-SanMar) styles: not in the SanMar catalog or the vendor table; the import registers them.
+  if(state.vendor&&state.vendor.includes(style)&&['/api/product-colors','/api/product-details','/api/size-pricing','/api/sanmar-shopworks/import-format','/api/sizes-by-style-color'].includes(p))return route.fulfill({status:404,json:{error:'Product not found'}});
+  if(state.vendor&&p.startsWith('/api/non-sanmar-products/style/'))return route.fulfill({status:404,json:{success:false,error:'Not found'}});
+  if(state.vendor&&p==='/api/non-sanmar-products'&&method==='POST'){events.mutations.push({path:p,method,body:request.postDataJSON()});return route.fulfill({status:201,json:{success:true}});}
   if(p==='/api/tax-rates/lookup'&&method==='POST'){events.reads.push({path:p,method,body:request.postDataJSON()});return route.fulfill({json:{success:true,taxRate:10.1,locationCode:'EXAMPLE',account:'2200.101',outOfState:false,fallback:false}});}
   if(p==='/api/dtg/quote-pricing'&&method==='POST'){
    const body=request.postDataJSON();events.reads.push({path:p,method,body});

@@ -1664,6 +1664,11 @@ class EmbroideryPricingCalculator {
         // Calculate each product's pricing
         const productPricing = [];
         const failedProducts = [];  // products whose size-pricing API call failed → must NOT silently vanish from the total (review C5)
+        // A non-SanMar product with neither a sell price nor a blank cost has nothing to price from.
+        // That is not an API failure (2026-09-16): its row says "needs a price", it stays out of the
+        // total, and the save gate (save-push.js zeroPriceRows) refuses to save until it has one.
+        const unpricedProducts = [];
+        const needsPrice = (p) => p.isNonSanmar === true && !(p.sellPriceOverride > 0) && !(p.blankCost > 0);
         let subtotal = 0;
         let garmentSubtotal = 0;
         let capSubtotal = 0;
@@ -1672,6 +1677,7 @@ class EmbroideryPricingCalculator {
         // Uses garmentQuantity for tier determination (NOT combined total)
         // Extra stitches are NOT passed in — they are billed once as a separate AS-Garm line.
         for (const product of garmentProducts) {
+            if (needsPrice(product)) { unpricedProducts.push({ style: product.style, color: product.color, isCap: false }); continue; }
             const pricing = await this.calculateProductPrice(product, garmentQuantity);
             if (pricing) {
                 pricing.isCap = false;
@@ -1690,6 +1696,7 @@ class EmbroideryPricingCalculator {
         const capEmbellishmentType = capPrimaryLogo?.embellishmentType || 'embroidery';
 
         for (const product of capProducts) {
+            if (needsPrice(product)) { unpricedProducts.push({ style: product.style, color: product.color, isCap: true }); continue; }
             const pricing = await this.calculateCapProductPrice(product, capQuantity, capStitchCount, capEmbellishmentType);
             if (pricing) {
                 productPricing.push(pricing);
@@ -2012,6 +2019,7 @@ class EmbroideryPricingCalculator {
         return {
             products: productPricing,
             failedProducts: failedProducts,  // review C5 — builder gates save/push if any product price failed
+            unpricedProducts: unpricedProducts,  // vendor rows waiting for a price (left out of the total; save is gated)
             costFallbackUsed: this._costFallbackUsed || null,  // customer engine REFUSES fallback-derived prices (Rule 4)
             roundingFallbackUsed: this._roundingFallbackUsed || null,  // advisory: prices rounded whole-dollar, not refused (see toast above)
             totalQuantity: totalQuantity,

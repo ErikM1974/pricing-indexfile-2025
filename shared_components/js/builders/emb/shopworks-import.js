@@ -17,7 +17,7 @@
  * this module reads/writes them through the global scope chain.
  */
 // lands with this cluster's render/state split (see emb-decomposition-plan.md).
-/* global openAccessibleModal, closeAccessibleModal, reorderRowByProductType, escapeHtml, showToast,
+/* global openAccessibleModal, closeAccessibleModal, escapeHtml, showToast,
    createOrUpdateExtendedChildRow, ShopWorksImportParser, updateArtworkCharges,
    Event, APP_CONFIG, setLtmControlState, markAsUnsaved */
 import { showServicePricingReview, getSprEmbConfigOptions } from './spr-modal.js';
@@ -27,7 +27,7 @@ import { _syncALArrays, handleCapEmbellishmentChange, updateNotesBadge } from '.
 // populateNonSanmarRow + API_BASE dropped 2026-08-15: their only consumer here was
 // saveNonSanmarProduct, which went with the Add-Product modal. The catalog-lookup path
 // in product-rows.js still uses populateNonSanmarRow directly.
-import { addNewRow, catalogIsCap, createServiceProductRow, dateToInputValue, hideVariantOnlyParents, isCapProduct, onSizeChange, onStyleChange, parseShopWorksDescription, selectColor, selectNonSanmarColor, updateCapLogoSectionVisibility, updateLogoCardHeader, updateNonSanmarPriceCell } from './product-rows.js';
+import { addNewRow, catalogIsCap, createServiceProductRow, dateToInputValue, hideVariantOnlyParents, isCapProduct, onSizeChange, onStyleChange, parseShopWorksDescription, reorderRowByProductType, selectColor, selectNonSanmarColor, updateCapLogoSectionVisibility, updateLogoCardHeader, updateNonSanmarPriceCell } from './product-rows.js';
 import { embState, SIZE06_EXTENDED_SIZES } from './state.js';
 
 
@@ -97,87 +97,190 @@ export function closeShopWorksImportModal() {
 /** Reveal the free-text vendor box only for the Other… escape. */
 /** The VendorCode we persist (curated code, or the typed one-off, upper-cased). */
 /** Show exactly one money field — the two numbers mean very different things. */
+// ── Post-import summary (Erik 2026-09-16) ─────────────────────────────────────────────
+// Built like the reopened-quote notice (persistence.js showRepricedNotice): the shared
+// components.css alert (warning while a non-SanMar product still needs a price, success once
+// every one has a price), text only, an EMPTY polite live region filled after insertion, one
+// keyboard button per product that jumps to its price, and Dismiss outside the live region.
+// It sits above the product table (never inside its scroll region), stays until dismissed,
+// and is replaced by the next import, a new quote or a loaded quote.
+const IMPORT_SUMMARY_ID = 'import-summary-banner';
+const IMPORT_SUMMARY_ANNOUNCE_DELAY_MS = 30;
+
+/** The non-SanMar product rows a ShopWorks import created. */
+function importedVendorRows() {
+    return /** @type {HTMLElement[]} */ (Array.from(document.querySelectorAll('#product-tbody tr[data-non-sanmar="true"][data-import-data]:not(.child-row)')));
+}
+
+/** A non-SanMar row's price, read from the row itself. */
+function vendorPriceStatus(row) {
+    if (row.dataset.nsPricingMode === 'costPlus') return { priced: true, text: 'priced from blank cost' };
+    const price = parseFloat(row.dataset.sellPrice) || 0;
+    return price > 0 ? { priced: true, text: `$${price.toFixed(2)} each` } : { priced: false, text: 'needs a price' };
+}
+
+/** The product table's scroll wrapper — notices go just above it. */
+function productTableAnchor() {
+    const table = document.getElementById('product-table');
+    return table ? (/** @type {HTMLElement|null} */ (table.closest('.product-table-wrapper')) || table) : null;
+}
+
+const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
+
 /**
- * Show a post-import summary banner above the product table.
- * Lists non-SanMar products with price status indicators.
+ * Write the summary's text and item states from the rows as they are now. The live region is
+ * only rewritten when its words change, so a price edit elsewhere is not read out again.
+ * @param {HTMLElement} banner
+ * @param {{ fillLater?: boolean, detail?: (unpriced: number, removed: number) => string|null }} [opts]
  */
-function showImportSummaryBanner(sanMarCount, nonSanMarItems) {
-    // Remove any existing banner
-    const existing = document.getElementById('import-summary-banner');
-    if (existing) existing.remove();
-
-    const totalProducts = sanMarCount + nonSanMarItems.length;
-    if (totalProducts === 0) return;
-
-    const hasZeroPrice = nonSanMarItems.some(item => !item.price || item.price <= 0);
-    const bannerClass = hasZeroPrice ? 'banner-warning' : 'banner-success';
-
-    let html = `<div class="banner-title">Import Complete: ${totalProducts} product${totalProducts !== 1 ? 's' : ''} imported</div>`;
-    html += `<div class="banner-detail">`;
-    if (sanMarCount > 0) {
-        html += `&#8226; ${sanMarCount} SanMar product${sanMarCount !== 1 ? 's' : ''} &mdash; priced automatically<br>`;
-    }
-    if (nonSanMarItems.length > 0) {
-        const zeroCount = nonSanMarItems.filter(i => !i.price || i.price <= 0).length;
-        if (zeroCount > 0) {
-            html += `&#8226; ${nonSanMarItems.length} non-SanMar product${nonSanMarItems.length !== 1 ? 's' : ''} &mdash; <strong>${zeroCount} need${zeroCount !== 1 ? '' : 's'} pricing</strong><br>`;
-        } else {
-            html += `&#8226; ${nonSanMarItems.length} non-SanMar product${nonSanMarItems.length !== 1 ? 's' : ''} &mdash; using ShopWorks prices<br>`;
+function paintImportSummary(banner, opts = {}) {
+    const sanMar = Number(banner.dataset.sanmarCount) || 0;
+    const buttons = /** @type {HTMLButtonElement[]} */ (Array.from(banner.querySelectorAll('.import-summary-item')));
+    let unpriced = 0, removed = 0;
+    for (const button of buttons) {
+        const row = document.getElementById(`row-${button.dataset.rowId}`);
+        button.replaceChildren();
+        if (!row) {
+            removed++;
+            button.textContent = `${button.dataset.style || 'Product'} — no longer on the quote`;
+            button.disabled = true;
+            continue;
         }
-        for (const item of nonSanMarItems) {
-            const priceOk = item.price && item.price > 0;
-            const icon = priceOk
-                ? '<span class="ns-price-ok">&#10003;</span>'
-                : '<span class="ns-price-warn">&#9888;</span>';
-            const priceStr = priceOk ? `$${item.price.toFixed(2)}` : '$0.00';
-            html += `<div class="banner-ns-item" data-row-id="${item.rowId}" data-call="scrollToProductRow" data-args="[${item.rowId}]">`;
-            html += `&nbsp;&nbsp;&#9656; ${escapeHtml(item.style)} (${escapeHtml(item.description)}) &mdash; ${priceStr} ${icon}`;
-            html += `</div>`;
-        }
+        const style = row.dataset.style || 'Product';
+        const description = row.dataset.productName
+            || /** @type {HTMLInputElement|null} */ (row.querySelector('[data-field="description"]'))?.value || '';
+        const status = vendorPriceStatus(row);
+        const name = description ? `${style} (${description})` : style;
+        button.dataset.style = style;
+        const state = document.createElement('span');
+        state.textContent = status.text;
+        if (!status.priced) { state.className = 'is-unpriced'; unpriced++; }
+        button.append(document.createTextNode(`${name} — `), state);
+        button.setAttribute('aria-label', `${name} — ${status.text}. Go to its price.`);
     }
-    html += `</div>`;
-    html += `<button class="btn-dismiss-banner" data-call="dismissImportBanner" title="Dismiss">Dismiss</button>`;
+    banner.className = `alert ${unpriced > 0 ? 'alert-warn' : 'alert-success'} emb-screen-notice`;
+
+    const title = document.createElement('strong');
+    title.className = 'banner-title';
+    title.textContent = `Import complete: ${plural(sanMar + buttons.length, 'product')}`;
+    const detail = document.createElement('p');
+    detail.className = 'banner-detail alert-body';
+    const parts = [];
+    if (sanMar > 0) parts.push(`${plural(sanMar, 'SanMar product')} priced automatically.`);
+    parts.push(unpriced > 0
+        ? `${plural(buttons.length, 'non-SanMar product')} — ${unpriced} still ${unpriced === 1 ? 'needs' : 'need'} a price before you can save.`
+        : `${plural(buttons.length, 'non-SanMar product')} — all have a price.`);
+    detail.textContent = (opts.detail && opts.detail(unpriced, removed)) || parts.join(' ');
+    const message = /** @type {HTMLElement} */ (banner.querySelector('.import-summary-message'));
+    const words = `${title.textContent} ${detail.textContent}`;
+    const fill = () => {
+        if (!message.isConnected || message.dataset.words === words) return;
+        message.dataset.words = words;
+        message.replaceChildren(title, detail);
+    };
+    if (opts.fillLater) setTimeout(fill, IMPORT_SUMMARY_ANNOUNCE_DELAY_MS);
+    else fill();
+    banner.dataset.unpriced = String(unpriced);
+}
+
+/**
+ * Show the post-import summary above the product table. Shown only when the import brought
+ * in non-SanMar products (SanMar products price themselves).
+ * @param {number} sanMarCount - SanMar products this import added
+ * @returns {HTMLElement|null}
+ */
+export function showImportSummaryBanner(sanMarCount) {
+    document.getElementById(IMPORT_SUMMARY_ID)?.remove();
+    const rows = importedVendorRows();
+    if (rows.length === 0) return null;
 
     const banner = document.createElement('div');
-    banner.id = 'import-summary-banner';
-    banner.className = `import-summary-banner ${bannerClass}`;
-    // eslint-disable-next-line no-unsanitized/property -- audited (1.4): every user/API string escapeHtml-wrapped at build; icons/notes internal or numeric
-    banner.innerHTML = html;
-
-    // Insert before the product table
-    const productTable = document.getElementById('product-table');
-    if (productTable && productTable.parentElement) {
-        productTable.parentElement.insertBefore(banner, productTable);
+    banner.id = IMPORT_SUMMARY_ID;
+    banner.dataset.sanmarCount = String(sanMarCount || 0);
+    const message = document.createElement('div');
+    message.className = 'import-summary-message';
+    message.setAttribute('role', 'status');
+    message.setAttribute('aria-live', 'polite');
+    message.setAttribute('aria-atomic', 'true');
+    const list = document.createElement('ul');
+    list.className = 'import-summary-list';
+    list.setAttribute('aria-label', 'Non-SanMar products from this import');
+    for (const row of rows) {
+        const item = document.createElement('li');
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'import-summary-item';
+        button.dataset.rowId = row.dataset.rowId;
+        button.dataset.call = 'scrollToProductRow';
+        button.dataset.args = JSON.stringify([Number(row.dataset.rowId)]);
+        item.append(button);
+        list.append(item);
     }
+    const dismiss = document.createElement('button');
+    dismiss.type = 'button';
+    dismiss.className = 'btn-dismiss-banner';
+    dismiss.dataset.call = 'dismissImportBanner';
+    dismiss.textContent = 'Dismiss';
+    dismiss.setAttribute('aria-label', 'Dismiss the import summary');
+    banner.append(message, list, dismiss);
 
-    // Auto-dismiss after 30s (unless there are $0 products)
-    if (!hasZeroPrice) {
-        setTimeout(() => dismissImportBanner(), 30000);
-    }
+    const anchor = productTableAnchor();
+    if (anchor && anchor.parentElement) anchor.parentElement.insertBefore(banner, anchor);
+    else document.body.prepend(banner);
+    paintImportSummary(banner, { fillLater: true });
+    return banner;
+}
+
+/** Refresh the summary after a price changes; says so when the last product gets its price. */
+export function syncImportSummary() {
+    const banner = document.getElementById(IMPORT_SUMMARY_ID);
+    if (!banner) return;
+    const before = Number(banner.dataset.unpriced) || 0;
+    paintImportSummary(banner, {
+        detail: (unpriced, removed) => {
+            if (!(before > 0 && unpriced === 0)) return null;
+            return removed > 0 ? 'No product on this list still needs a price.' : 'All non-SanMar products now have a price.';
+        },
+    });
 }
 
 /**
- * Dismiss the import summary banner
+ * Dismiss the import summary. Keyboard focus that was inside it moves to the product table.
  */
 export function dismissImportBanner() {
-    const banner = document.getElementById('import-summary-banner');
-    if (banner) {
-        banner.style.transition = 'opacity 0.2s';
-        banner.style.opacity = '0';
-        setTimeout(() => banner.remove(), 200);
+    const banner = document.getElementById(IMPORT_SUMMARY_ID);
+    if (!banner) return;
+    const hadFocus = banner.contains(document.activeElement);
+    banner.remove();
+    if (hadFocus) {
+        const anchor = productTableAnchor();
+        if (anchor) {
+            if (!anchor.hasAttribute('tabindex')) anchor.setAttribute('tabindex', '-1');
+            anchor.focus();
+        }
     }
 }
 
 /**
- * Scroll to a specific product row and briefly highlight it
+ * Go to a product row's price (the summary's item buttons): scroll it into view, move
+ * keyboard focus to its price (or style box) and mark the row for a moment.
  */
 export function scrollToProductRow(rowId) {
-    const row = document.getElementById(`row-${rowId}`);
-    if (!row) return;
-    row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    row.style.transition = 'background 0.3s';
-    row.style.background = '#ede9fe';
-    setTimeout(() => { row.style.background = ''; }, 1500);
+    let row = document.getElementById(`row-${rowId}`);
+    if (row && row.dataset.variantOnlyHidden === 'true') {
+        row = /** @type {HTMLElement|null} */ (document.querySelector(`tr[data-parent-row-id="${Number(rowId)}"]`)) || row;
+    }
+    if (!row || !row.isConnected || window.getComputedStyle(row).display === 'none') {
+        showToast('That product is no longer on the quote.', 'warning');
+        syncImportSummary();
+        return;
+    }
+    const target = /** @type {HTMLElement} */ (row.querySelector('.ns-price-btn') || row.querySelector('.style-input') || row);
+    const reduceMotion = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    target.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center', inline: 'nearest' });
+    if (target !== row) target.focus({ preventScroll: true });
+    row.classList.add('is-located');
+    setTimeout(() => row.classList.remove('is-located'), 1500);
 }
 
 /**
@@ -1667,23 +1770,9 @@ function finalizeImport({ data, productsImported, customProductsImported, produc
         showToast(`Warning: ${dropped} product(s) may not have imported correctly. Review rows for missing colors.`, 'warning', 8000);
     }
 
-    // Flag non-SanMar products with $0 pricing + collect for summary banner
-    const nonSanMarBannerItems = [];
+    // Non-SanMar rows: paint the price button ($0.00 rows say they need a price).
     document.querySelectorAll('#product-tbody tr[data-non-sanmar="true"]').forEach(nsRow => {
-        const nsRowId = parseInt(/** @type {HTMLElement} */ (nsRow).dataset.rowId);
-        const sellPrice = parseFloat(/** @type {HTMLElement} */ (nsRow).dataset.sellPrice) || 0;
-        const nsStyle = /** @type {HTMLElement} */ (nsRow).dataset.style || '';
-        const nsDesc = /** @type {HTMLElement} */ (nsRow).dataset.productName || /** @type {HTMLInputElement|null} */ (nsRow.querySelector('[data-field="description"]'))?.value || '';
-
-        nonSanMarBannerItems.push({
-            rowId: nsRowId,
-            style: nsStyle,
-            description: nsDesc,
-            price: sellPrice
-        });
-
-        // Update price cell with pencil icon affordance
-        updateNonSanmarPriceCell(nsRow, nsRowId);
+        updateNonSanmarPriceCell(nsRow, parseInt(/** @type {HTMLElement} */ (nsRow).dataset.rowId));
     });
 
     // Finalize progress
@@ -1693,13 +1782,10 @@ function finalizeImport({ data, productsImported, customProductsImported, produc
     hideImportProgress();
     closeShopWorksImportModal();
 
-    // Show import summary banner (non-SanMar detail)
-    // Count SanMar vs non-SanMar among all imported product rows
-    const allImportedRows = document.querySelectorAll('#product-tbody tr[data-style]:not(.child-row):not(.service-product-row):not(.fee-row)');
-    const sanMarRowCount = Array.from(allImportedRows).filter(r => /** @type {HTMLElement} */ (r).dataset.nonSanmar !== 'true').length;
-    if (nonSanMarBannerItems.length > 0) {
-        showImportSummaryBanner(sanMarRowCount, nonSanMarBannerItems);
-    }
+    // Import summary (shown when the import brought in non-SanMar products)
+    const importedRows = document.querySelectorAll('#product-tbody tr[data-import-data]:not(.child-row):not(.service-product-row):not(.fee-row)');
+    const sanMarRowCount = Array.from(importedRows).filter(r => /** @type {HTMLElement} */ (r).dataset.nonSanmar !== 'true').length;
+    showImportSummaryBanner(sanMarRowCount);
 
     const summary = [];
     if (productsImported > 0) {

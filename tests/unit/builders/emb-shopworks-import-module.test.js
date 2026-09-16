@@ -22,6 +22,7 @@ const BRIDGED = [
     'confirmShopWorksImport',
     'dismissImportBanner',
     'scrollToProductRow',
+    'syncImportSummary',
 ];
 
 // Batch 3.3 bridge diet (2026-07-09): exports whose window bridges were deleted —

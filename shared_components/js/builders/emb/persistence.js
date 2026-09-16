@@ -358,6 +358,7 @@ export function restoreEmbroideryDraft(draft) {
 }
 
 async function restoreDraftProducts(draft) {
+    if (typeof window.dismissImportBanner === 'function') window.dismissImportBanner();   // a restored draft replaces the table
     const draftProducts = (draft && draft.products) || [];
     if (draftProducts.length === 0) {
         showToast('Draft restored successfully', 'success');
@@ -602,6 +603,7 @@ export async function loadQuoteForEditing(quoteId, opts = {}) {
     // block lookupTaxRate() for the whole restore so it can't overwrite the saved rate. finally re-enables.
      
     window._restoringQuote = true;
+    if (typeof window.dismissImportBanner === 'function') window.dismissImportBanner();   // the summary belonged to the previous table
     let comparison = null;
 
     try {
@@ -953,7 +955,7 @@ export function showRepricedNotice(changes, opts = {}) {
     const heading = forDuplicate ? 'Prices changed from the original quote' : 'Prices changed from the saved quote';
     const banner = document.createElement('div');
     banner.id = REPRICED_NOTICE_ID;
-    banner.className = 'alert alert-warn';
+    banner.className = 'alert alert-warn emb-screen-notice';
     const message = document.createElement('div');
     message.setAttribute('role', 'status');
     message.setAttribute('aria-live', 'polite');

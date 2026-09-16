@@ -509,6 +509,26 @@
         var v = elig && elig[key];
         return v === true || v === 'yes' || v === 'warn';
     }
+    // Erik 2026-09-16: the rep decides what can be printed. Screen print and DTF are never limited;
+    // embroidery and DTG outside their category rules still price, with a note to check the garment.
+    // rule:true = the category rules don't list the method, so it is never the "lowest price" pick.
+    function methodCaution(elig, key, product) {
+        if (!elig || key === 'SCP' || key === 'DTF') return null;
+        var dtg = key === 'DTG', check = dtg ? 'the fabric' : 'the garment';
+        if (elig.source === 'fallback') {
+            if (!dtg) return null; // embroidery is the safe method when the rules are missing
+            return { rule: true, text: 'Check the fabric before quoting DTG — ' + (elig.rulesDown ? 'the decoration rules didn’t load.' : 'this category isn’t in our decoration rules.') };
+        }
+        if (!methodAllowed(elig, key)) {
+            return { rule: true, text: (dtg ? 'DTG print' : 'Embroidery') + ' isn’t usually offered for ' + ((product && product.category) || 'this product') + ' — check ' + check + ' before quoting.' };
+        }
+        if (elig[key] === 'warn') return { rule: false, text: 'Check the fabric — DTG prints best on cotton.' };
+        return null;
+    }
+    function methodEntry(id) {
+        for (var i = 0; i < state.methods.length; i++) if (state.methods[i].id === id) return state.methods[i];
+        return null;
+    }
 
     // Real per-style size run (XS–6XL, tall, youth, OSFA…) — same endpoint the
     // quote builders use, so the breakdown shows exactly what's orderable and
@@ -559,13 +579,12 @@
             state.front = 'LC'; state.back = ''; state.sleeves = { left: false, right: false };
             state.adv.embStitch = 8000; state.adv.embBackStitch = 5000;
         } else {
-            var e = elig || { EMB: true, DTG: 'no', SCP: false, DTF: false };
-            state.methods = [
-                { id: 'emb', on: e.EMB },
-                { id: 'dtg', on: e.DTG && e.DTG !== 'no' },
-                { id: 'scp', on: e.SCP },
-                { id: 'dtf', on: e.DTF }
-            ].filter(function (m) { return m.on; }).map(function (m) { return { id: m.id }; });
+            var e = elig || { EMB: true, DTG: 'no', SCP: false, DTF: false, source: 'fallback' };
+            state.methods = e.source === 'flat-headwear'
+                ? [{ id: 'emb' }]
+                : ['emb', 'dtg', 'scp', 'dtf'].map(function (id) {
+                    return { id: id, caution: methodCaution(e, METHODS[id].engineMethod, state.product) };
+                });
             state.front = 'LC'; state.back = ''; state.sleeves = { left: false, right: false };
             state.adv.embStitch = 8000; state.adv.embBackStitch = 8000;
         }
@@ -1155,6 +1174,7 @@
         var bestId = null, bestTotal = Infinity;
         state.methods.forEach(function (m) {
             var r = state.results[m.id];
+            if (m.caution && m.caution.rule) return;
             if (r && r.status === 'ok' && r.summary.total != null && r.summary.total < bestTotal) { bestTotal = r.summary.total; bestId = m.id; }
         });
 
@@ -1176,12 +1196,12 @@
             if (state.prevPP[m.id] != null && state.prevPP[m.id] !== pp) state.flashUntil[m.id] = nowT + 600;
             state.prevPP[m.id] = pp;
         });
-        // decoration-methods.js contract: an unknown category must say that only embroidery is shown.
+        // decoration-methods.js contract: missing rules are a visible warning.
         var elig = state.product.eligibility;
         var eligNote = elig && elig.source === 'fallback'
             ? '<p class="qq-elig-note" role="status">' + (elig.rulesDown
-                ? 'Decoration rules didn’t load, so only embroidery is shown. Refresh to see the other methods.'
-                : 'This product’s category isn’t in our decoration rules, so only embroidery is shown. Other methods may work — confirm before quoting, or price one on the Line Sheet.') + '</p>'
+                ? 'Decoration rules didn’t load. Every method is priced — check the product before quoting DTG, or refresh.'
+                : 'This product’s category isn’t in our decoration rules. Every method is priced — check the product before quoting DTG.') + '</p>'
             : elig && elig.source === 'flat-headwear'
             ? '<p class="qq-elig-note" role="status">Beanies, headbands and other soft headwear are priced as flat embroidery, the same as the Embroidery builder.</p>'
             : '';
@@ -1391,17 +1411,19 @@
         var def = METHODS[id];
         var r = state.results[id];
         var head = '<div class="qq-card-method">' + def.icon + '<span>' + esc(def.label) + '</span></div>';
+        var entry = methodEntry(id);
+        var caution = entry && entry.caution ? '<p class="qq-card-caution">' + esc(entry.caution.text) + '</p>' : '';
 
         var dm = ' data-method="' + esc(id) + '"';
         if (!r || r.status === 'loading') {
-            return '<div class="qq-card"' + dm + '><div class="qq-card-top">' + head + '<div class="qq-skeleton" style="width:120px"></div></div></div>';
+            return '<div class="qq-card"' + dm + '><div class="qq-card-top">' + head + '<div class="qq-skeleton" style="width:120px"></div></div>' + caution + '</div>';
         }
         if (r.status === 'unavailable' || r.status === 'belowmin') {
             var stCls = (r.status === 'belowmin') ? 'is-belowmin' : 'is-unavailable';
-            return '<div class="qq-card ' + stCls + '"' + dm + '><div class="qq-card-top">' + head + '</div><div class="qq-card-msg">' + esc(r.message) + '</div></div>';
+            return '<div class="qq-card ' + stCls + '"' + dm + '><div class="qq-card-top">' + head + '</div>' + caution + '<div class="qq-card-msg">' + esc(r.message) + '</div></div>';
         }
         if (r.status === 'error') {
-            return '<div class="qq-card is-error"' + dm + '><div class="qq-card-top">' + head + '</div>'
+            return '<div class="qq-card is-error"' + dm + '><div class="qq-card-top">' + head + '</div>' + caution
                 + '<div class="qq-card-msg">Pricing unavailable — ' + esc(r.message) + '</div>'
                 + '<button type="button" class="qq-retry" data-id="' + id + '">Retry</button></div>';
         }
@@ -1433,6 +1455,7 @@
             + '<div class="qq-card-top">' + head
             + '<div class="qq-card-price"><div class="qq-card-pp">' + fmt(s.perPiece) + '<span class="per">/' + unitWord + '</span></div>'
             + '<div class="qq-card-total">' + fmt(s.total) + ' total' + (isBest ? ' <span class="qq-best-tag"><svg class="qq-star" viewBox="0 0 24 24" width="11" height="11" fill="currentColor" aria-hidden="true"><path d="M12 2l2.9 6.3 6.9.7-5.1 4.7 1.4 6.8L12 17.8 6 21.2l1.4-6.8L2.3 9.7l6.9-.7z"/></svg>lowest price</span>' : '') + '</div></div></div>'
+            + caution
             + configChips(id)
             + breakdownHtml
             + oneTimeHtml
@@ -1767,18 +1790,16 @@
             if (method !== state.lineMethod) notices.push('Priced as ' + methodWords + (flat ? ' — soft headwear is flat embroidery, as in the Embroidery builder.' : '.'));
             if (embroidery && !headwear.confident) notices.push('Not confirmed from the catalog — check the product.');
             if (row.colorChanged) notices.push('The saved color is no longer offered — check the color.');
-            // Cap pricing and flat headwear in "Caps" skip the category rules (the "Caps" rule lists no
-            // garment methods); other flat items (gaiters, headbands) follow their category like any garment.
-            if (method !== 'capemb' && !(embroidery && (product.isCap || flatOnly))) {
-                var eligibility = await categoryEligibility(product);
-                if (row._ptok !== token) return;
-                // decoration-methods.js contract: an unknown category is a visible warning, never a block.
-                if (eligibility.source === 'fallback') {
-                    if (eligibility.rulesDown) notices.push('Decoration rules didn’t load — confirm ' + methodWords + ' works for this product, or refresh.');
-                    else if (!methodAllowed(eligibility, def.engineMethod)) notices.push('This category isn’t in our decoration rules — confirm ' + methodWords + ' works for it.');
+            // The category rules only add notes (Erik 2026-09-16: the rep decides): screen print and DTF
+            // are never limited, and cap pricing / flat headwear in "Caps" skip the rules (the "Caps" rule
+            // lists no garment methods); other flat items (gaiters, headbands) follow their category.
+            if (method === 'emb' || method === 'dtg') {
+                if (!(embroidery && (product.isCap || flatOnly))) {
+                    var eligibility = await categoryEligibility(product);
+                    if (row._ptok !== token) return;
+                    var caution = methodCaution(eligibility, def.engineMethod, product);
+                    if (caution) notices.push(caution.text);
                 }
-                else if (!methodAllowed(eligibility, def.engineMethod)) throw new Error(def.label + ' isn’t offered for ' + (product.category || 'this product') + '.');
-                else if (eligibility[def.engineMethod] === 'warn') notices.push('Check the fabric — DTG prints best on cotton.');
             }
             if (def.available && !def.available()) throw new Error('Choose a supported decoration placement.');
             var sizes = {}; sizes[stdSizeFor(product)] = qty;
@@ -1825,7 +1846,8 @@
                 var sizeMix = state.useSizes ? 'Sizes: ' + Object.entries(currentSizes()).map(function (p) { return p[0] + ' ' + p[1]; }).join(', ') : '';
                 return state.methods.filter(function (m) { return state.results[m.id]?.status === 'ok'; }).map(function (m) {
                     return { key: m.id, product: state.product, color: state.color, method: m.id, preview: state.results[m.id].preview, sizes: sizeMix,
-                        unitWord: state.product.isCap ? 'cap' : 'pc', description: decorationDescription(m.id, state.product), builderHref: builderHref(m.id) };
+                        unitWord: state.product.isCap ? 'cap' : 'pc', description: decorationDescription(m.id, state.product), builderHref: builderHref(m.id),
+                        caution: m.caution && m.caution.rule ? m.caution.text : '' };
                 });
             },
             // The sheet header names the method and its decoration once for the whole sheet.

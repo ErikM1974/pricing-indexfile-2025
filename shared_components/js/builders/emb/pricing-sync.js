@@ -26,7 +26,7 @@ import { updateAdditionalCharges } from './quote-lifecycle.js';
 import { renderPushReadiness } from './save-push.js';
 import { markEmbroideryDirty } from './persistence.js';
 import { getCapEmbellishmentType } from './logo-config.js';
-import { createServiceProductRow, updateRowBreakdown } from './product-rows.js';
+import { createServiceProductRow, nsPriceButtonHtml, updateRowBreakdown } from './product-rows.js';
 import { embState, EMB_DEFAULTS, SIZE06_EXTENDED_SIZES, API_BASE } from './state.js';
 
 // Module state — was window._* flags (Batch 3.4, 2026-07-09); nothing outside this file reads them.
@@ -752,10 +752,12 @@ function paintRowPrices(pricing, logoConfigs, ltmDisplayMode) {
                         const isCostPlus = /** @type {HTMLElement} */ (parentRow).dataset.nsPricingMode === 'costPlus';
 
                         if (isNsRow && !isCostPlus) {
-                            // Non-SanMar: pencil icon, no clear button (price override IS the price)
+                            // Non-SanMar: the price button, no clear button (price override IS the price)
                             priceCell.classList.remove('price-overridden');
                             priceCell.classList.remove('ns-price-zero');
-                            priceCell.innerHTML = `<span class="ns-price-display" data-call="enablePriceOverride" data-args="[${escapeHtml(String(rowId))}]" title="Click to edit price">$${escapeHtml(displayPrice.toFixed(2))} <i class="fas fa-pencil-alt" aria-hidden="true"></i></span>`;
+                            /** @type {HTMLElement} */ (parentRow).classList.remove('price-warning');
+                            // eslint-disable-next-line no-unsanitized/property -- audited (1.4): numeric price + rowId, style escaped in nsPriceButtonHtml
+                            priceCell.innerHTML = nsPriceButtonHtml(rowId, displayPrice, /** @type {HTMLElement} */ (parentRow).dataset.style);
                         } else if (hasOverride) {
                             priceCell.classList.add('price-overridden');
                             priceCell.innerHTML = `<span class="price-override-wrapper">$${escapeHtml(displayPrice.toFixed(2))}<button class="btn-clear-override" data-stop="1" data-call="clearPriceOverride" data-args="[${escapeHtml(String(rowId))}]" title="Clear override">&times;</button></span>`;
@@ -1007,6 +1009,23 @@ function collectChildRowsIntoGroups(rowId, colorGroups) {
     return sizeOverrides;
 }
 
+/**
+ * Non-SanMar products with nothing to price from (no fixed price, no blank cost). The engine
+ * leaves them out of the total (unpricedProducts), so save, print and copy refuse while any remain.
+ * @param {any[]} products - collectProductsFromTable()
+ * @returns {string[]} their styles
+ */
+export function vendorStylesWithoutPrice(products) {
+    return (products || []).filter(p => {
+        if (!p || p.isService) return false;
+        const row = document.getElementById(`row-${p.rowId}`);
+        if (!row || row.dataset.nonSanmar !== 'true') return false;
+        if (p.sellPriceOverride > 0) return false;                    // fixed price / manual override
+        if (parseFloat(row.dataset.blankCost) > 0) return false;      // cost-plus — the engine priced it
+        return true;
+    }).map(p => p.style);
+}
+
 export function collectProductsFromTable() {
     const products = [];
     // Only collect from parent rows (not child rows or AL config rows)
@@ -1121,6 +1140,7 @@ export function collectProductsFromTable() {
                     isCap: isCap,  // Cap detection for pricing routing
                     rowId: rowId,  // Track row for AL price updates
                     imageUrl: /** @type {HTMLElement} */ (row).dataset.imageUrl || '',  // Image URL for quote view display
+                    isNonSanmar: /** @type {HTMLElement} */ (row).dataset.nonSanmar === 'true',  // vendor row: no price and no cost = "needs a price", not an API failure
                     sellPriceOverride: parseFloat(/** @type {HTMLElement} */ (row).dataset.sellPrice) || 0,  // Non-SanMar fixed sell price
                     blankCost: parseFloat(/** @type {HTMLElement} */ (row).dataset.blankCost) || 0,  // Vendor (non-SanMar) cost-plus: feeds buildSyntheticSizePricing()
                     sizeUpchargeOverrides: parseJsonDataset(/** @type {HTMLElement} */ (row).dataset.sizeUpchargeOverrides),  // Per-style XL/2XL/3XL upcharges
