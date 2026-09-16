@@ -1,3 +1,20 @@
+## v2026.09.16.4 (2026.09.16)
+
+- Memory: Quick Quote version line live (v2026.09.16.3)
+- Headwear classifier: Erik's flat/cap rules for every price surface
+- Builders: cap vs garment through the shared headwear classifier
+- Builders: DTF search keeps today's caps, vendor filing, reopened-quote notice
+- Product page: cap vs garment embroidery from the shared headwear classifier
+- Product page: flat headwear keeps its category rules outside Caps; one Front placement
+- Embroidery calculators: cap vs garment from the shared headwear classifier
+- Embroidery calculators: search sorts by style number too; clearer cap copy
+- Quick Quote: one headwear rule, the shared classifier as returned
+- Quick Quote: isCap as returned on the line sheet; flat items outside Caps keep their methods
+- Headwear alignment: ledgers, cross-surface parity test and docs
+- Builders: reopened-quote notice uses the shared warning alert
+- Headwear alignment: review fixes (ShopWorks import side, reopened-quote side notes)
+- Deploy v2026.09.16.4: 9 files (cap-embroidery-pricing-integrated.html, embroidery-pricing.html, index.html...)
+
 ## v2026.09.16.3 (2026.09.16)
 
 - Quick Quote capture mode: compare API reads in any order
