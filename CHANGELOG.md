@@ -1,3 +1,10 @@
+## v2026.09.16.3 (2026.09.16)
+
+- Quick Quote capture mode: compare API reads in any order
+- Memory: Quick Quote classic restore live (v2026.09.16.2), release fixture-stage rule
+- Quick Quote: version line, What's new dropdown and Updated badge
+- Deploy v2026.09.16.3: Quick Quote version line and What's new; capture-mode reads fix
+
 ## v2026.09.16.2 (2026.09.16)
 
 - Memory: garment waiver e-sign is live (proxy v2026.09.15.1, app v2026.09.15.7)
