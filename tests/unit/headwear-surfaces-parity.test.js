@@ -50,7 +50,7 @@ beforeAll(async () => {
         { document: doc, HeadwearClassifier, APP_CONFIG: { API: { BASE_URL: 'http://test' } }, addEventListener() {}, location: { search: '', hostname: 'test' } },
         doc, { log() {}, warn() {}, error() {} });
     ({ emb, scp } = mod.exports);
-});
+}, 30000);   // esbuild bundling can outlast jest's 5 s default on a busy machine
 
 const win = { HeadwearClassifier };
 const detectHeadwear = new Function('window', 'console', cut(read('product/js/product-2026.js'), 'function detectHeadwear(product, style) {', '\n    }\n') + 'return detectHeadwear;')(win, console);

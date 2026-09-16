@@ -37,7 +37,7 @@ beforeAll(async () => {
         doc, { log() {}, warn() {}, error() {} }
     );
     builders = moduleObj.exports;
-});
+}, 30000);   // esbuild bundling can outlast jest's 5 s default on a busy machine
 
 const builderInputs = (row) => [
     row.STYLE,

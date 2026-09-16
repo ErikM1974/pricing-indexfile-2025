@@ -27,7 +27,7 @@ import { _syncALArrays, handleCapEmbellishmentChange, updateNotesBadge } from '.
 // populateNonSanmarRow + API_BASE dropped 2026-08-15: their only consumer here was
 // saveNonSanmarProduct, which went with the Add-Product modal. The catalog-lookup path
 // in product-rows.js still uses populateNonSanmarRow directly.
-import { addNewRow, createServiceProductRow, dateToInputValue, hideVariantOnlyParents, isCapProduct, onSizeChange, onStyleChange, parseShopWorksDescription, selectColor, selectNonSanmarColor, updateCapLogoSectionVisibility, updateLogoCardHeader, updateNonSanmarPriceCell } from './product-rows.js';
+import { addNewRow, catalogIsCap, createServiceProductRow, dateToInputValue, hideVariantOnlyParents, isCapProduct, onSizeChange, onStyleChange, parseShopWorksDescription, selectColor, selectNonSanmarColor, updateCapLogoSectionVisibility, updateLogoCardHeader, updateNonSanmarPriceCell } from './product-rows.js';
 import { embState, SIZE06_EXTENDED_SIZES } from './state.js';
 
 
@@ -958,7 +958,7 @@ export function collectAlReviewItem(additionalLogos, serviceReviewItems, orderQt
 /** Import steps 8-10 — collect product + service review items (AL / DECG / DECC /
  * Monogram) and build the embroidery-config options, incl. the digitized-design
  * stitch lookup (+ ShopWorks_Designs fallback). Pure collection: no DOM writes. */
-async function buildReviewPayload(data, additionalLogos, progress) {
+export async function buildReviewPayload(data, additionalLogos, progress) {
     // 8. Collect product items for pricing review (deferred import)
     const productReviewItems = [];
     const totalProductQty = data.products.reduce((sum, p) => {
@@ -966,9 +966,16 @@ async function buildReviewPayload(data, additionalLogos, progress) {
     }, 0);
 
     for (const product of data.products) {
-        // Only the part number and ShopWorks description exist at this point; the rows built
-        // later re-check with the full catalog data (onStyleChange).
-        const isCap = isCapProduct(product.partNumber, product.description || '');
+        // Decide the side from the catalog, as the rows built later do (onStyleChange), so the
+        // review's garment/cap logo settings land on the side the products price on.
+        let isCap;
+        try {
+            isCap = await catalogIsCap(product.partNumber, product.description || '');
+        } catch (e) {
+            console.warn(`[ShopWorks Import] Catalog check failed for ${product.partNumber}:`, e);
+            isCap = isCapProduct(product.partNumber, product.description || '');
+            showToast(`Could not check ${product.partNumber} in the catalog. Cap or garment was read from the ShopWorks description — check the logo settings after import.`, 'warning', 8000);
+        }
         let sizePrices = null;
         if (embState.pricingCalculator) {
             try {

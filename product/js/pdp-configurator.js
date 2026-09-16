@@ -335,7 +335,7 @@
                     note: loc === 'frontBack'
                         ? 'Per-piece price includes the garment plus TWO embroidered logos (left chest + back), up to 10,000 stitches each.'
                         : 'Per-piece price includes the garment plus an embroidered logo up to 10,000 stitches ('
-                            + (loc === 'back' ? 'back' : 'left chest') + ').',
+                            + (loc === 'back' ? 'back' : state.ctx.isFlat ? 'front' : 'left chest') + ').',
                     foot: 'Larger logos and extra locations are quoted per design.',
                     stdSize: std,
                     multiSize: (b.uniqueSizes || []).length > 1,

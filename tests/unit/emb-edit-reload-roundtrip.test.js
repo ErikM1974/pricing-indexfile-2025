@@ -478,9 +478,14 @@ describe('reopened quote — the shared headwear rule reprices, and the rep sees
     expect(window.document.getElementById('reopen-price-notice')).toBeNull();
   });
 
-  test('same price today → no notice', async () => {
+  test('same price today: only the proven side switch is listed; nothing proven → no notice', async () => {
     const window = await reopen({ ...beanieSession, QuoteID: 'EMB-HW-2' }, 15);
-    expect(window.document.getElementById('reopen-price-notice')).toBeNull();
+    const notice = window.document.getElementById('reopen-price-notice');
+    await flush();
+    expect(notice.textContent).toContain('CP90 is now priced as a garment (same price)');
+    const { ALGarmentQty, ALCapQty, ...noCounts } = beanieSession;
+    const quiet = await reopen({ ...noCounts, QuoteID: 'EMB-HW-2B' }, 15);
+    expect(quiet.document.getElementById('reopen-price-notice')).toBeNull();
   });
 
   test('a session without the piece counts lists the price change without claiming a switch', async () => {
@@ -504,5 +509,32 @@ describe('reopened quote — the shared headwear rule reprices, and the rep sees
     expect(notice.textContent).toContain('CP90 is now priced as a garment ($15.00 → $12.50)');
     expect(notice.textContent).toContain('Saving creates a new quote at these prices.');
     expect(notice.textContent).not.toContain('save a revision');
+  });
+
+  test('the comparison runs after the restore guard is off; a duplicate has already left the source quote', async () => {
+    const seen = [];
+    const spy = (built) => {
+      const inner = engine(12.5);
+      built.window.__embTest.pricingCalculator = { ...inner, calculateQuote: async (products, ...rest) => {
+        seen.push({ restoring: built.window._restoringQuote, editing: built.window.__embTest.editingQuoteId });
+        return inner.calculateQuote(products, ...rest);
+      } };
+    };
+    const reopened = await buildBuilder(beanieRoutes({ ...beanieSession, QuoteID: 'EMB-HW-5' }));
+    spy(reopened);
+    await reopened.window.loadQuoteForEditing('EMB-HW-5');
+    await flush();
+    expect(seen.length).toBeGreaterThan(0);
+    // The last price call is the comparison: live tax lookups etc. are no longer blocked.
+    expect(seen[seen.length - 1]).toEqual({ restoring: false, editing: 'EMB-HW-5' });
+
+    seen.length = 0;
+    const copied = await buildBuilder(beanieRoutes({ ...beanieSession, QuoteID: 'EMB-HW-6' }));
+    spy(copied);
+    await copied.window.duplicateQuote('EMB-HW-6');
+    await flush();
+    // A Save during the comparison can't reach the source quote.
+    expect(seen[seen.length - 1]).toEqual({ restoring: false, editing: null });
+    expect(copied.window.document.getElementById('reopen-price-notice').textContent).toContain('Prices changed from the original quote');
   });
 });

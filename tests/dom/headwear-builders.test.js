@@ -9,7 +9,9 @@
  *   • A ShopWorks vendor product is filed under Caps from the same text the import prices
  *     from, and loads on the same side every later time.
  *   • A reopened EMB quote whose prices moved shows a visible notice, and says
- *     "now priced as a garment/cap" only when the saved quote proves the old side.
+ *     "now priced as a garment/cap" only when the saved quote proves the old side. When a
+ *     side is left with no products, it names that side's saved logo and charges.
+ *   • The ShopWorks import review decides cap or garment from the catalog, like the rows.
  */
 const fs = require('fs');
 const path = require('path');
@@ -226,6 +228,63 @@ describe('ShopWorks import: cap size mapping trusts the row flag only', () => {
     });
 });
 
+describe('ShopWorks import review: cap or garment from the catalog, like the rows it builds', () => {
+    /** /api/product-colors per style (live shapes); unknown styles 404 like the live proxy. */
+    function mockStyles(byStyle, failures = {}) {
+        window.fetch = global.fetch = jest.fn((url) => {
+            const text = String(url);
+            const style = new URL(text, 'http://localhost').searchParams.get('styleNumber');
+            if (!text.includes('/api/product-colors')) return Promise.resolve({ ok: false, status: 404, json: () => Promise.resolve(null) });
+            if (failures[style]) return Promise.resolve({ ok: false, status: failures[style], json: () => Promise.resolve({ error: 'Server error' }) });
+            const row = byStyle[style];
+            if (!row) return Promise.resolve({ ok: false, status: 404, json: () => Promise.resolve({ error: 'Product not found' }) });
+            return Promise.resolve({ ok: true, status: 200, json: () => Promise.resolve({
+                productTitle: row.PRODUCT_TITLE, CATEGORY_NAME: row.CATEGORY_NAME,
+                SUBCATEGORY_NAME: row.SUBCATEGORY_NAME, PRODUCT_DESCRIPTION: row.PRODUCT_DESCRIPTION, colors: [],
+            }) });
+        });
+    }
+    const order = (products) => ({
+        products: products.map(([partNumber, description]) => ({ partNumber, description, color: 'Black', sizes: { OSFA: 12 }, unitPrice: 0 })),
+        services: {}, decgItems: [], notes: [],
+    });
+    const review = (data) => embImport.buildReviewPayload(data, [], { step: 0, total: 1 });
+
+    test('ShopWorks "Port  Companyknit Cap" (the CP90 beanie, batch9) reviews as a garment, as its row prices', async () => {
+        // The ShopWorks text alone reads as a cap — why the review asks the catalog.
+        expect(HeadwearClassifier.classify({ STYLE: 'CP90', PRODUCT_TITLE: 'Port  Companyknit Cap, Black' }).isCap).toBe(true);
+        mockStyles({ CP90: fixtureRow('CP90') });
+        const { productReviewItems, embConfigOptions } = await review(order([['CP90', 'Port  Companyknit Cap, Black']]));
+        expect(productReviewItems.map(p => p.isCap)).toEqual([false]);
+        expect(embConfigOptions).toMatchObject({ hasGarments: true, hasCaps: false });
+    });
+
+    test('beanies next to real caps open both logo sections (batch13 shape)', async () => {
+        mockStyles({ C916: fixtureRow('C916'), C112: fixtureRow('C112') });
+        const { productReviewItems, embConfigOptions } = await review(order([
+            ['C916', 'Port  Companytwo-Color Fleece Headband'], ['C112', 'Port Authority Snapback Trucker Cap'],
+        ]));
+        expect(productReviewItems.map(p => [p.partNumber, p.isCap])).toEqual([['C916', false], ['C112', true]]);
+        expect(embConfigOptions).toMatchObject({ hasGarments: true, hasCaps: true });
+    });
+
+    test('a style the catalog does not carry is read from its ShopWorks description, as the vendor import does', async () => {
+        mockStyles({});
+        toasts.length = 0;
+        const { productReviewItems } = await review(order([['P747', 'Pacific Headwear P747 Perforated'], ['VT100', 'Vendor Tee']]));
+        expect(productReviewItems.map(p => p.isCap)).toEqual([true, false]);
+        expect(toasts).toEqual([]);
+    });
+
+    test('a failed catalog check is a visible warning, and the description decides', async () => {
+        mockStyles({ STC57: fixtureRow('STC57') }, { STC57: 503 });
+        toasts.length = 0;
+        const { productReviewItems } = await review(order([['STC57', 'Sport-Tek Visor']]));
+        expect(productReviewItems.map(p => p.isCap)).toEqual([true]);
+        expect(toasts).toEqual([{ message: expect.stringContaining('Could not check STC57 in the catalog'), type: 'warning' }]);
+    });
+});
+
 describe('DTF search hides a row only when both cap rules agree', () => {
     let DTFQuoteProducts;
     let DTFQuoteBuilder;
@@ -424,6 +483,53 @@ describe('reopened EMB quote: price change notice', () => {
         expect(embPersistence.describeRepricedProducts(saved, pricingFor([['PC54', false, 10], ['VISOR1', true, 16]])))
             .toEqual(['VISOR1 is now priced as a cap ($14.00 → $16.00)']);
         expect(embPersistence.describeRepricedProducts(saved, pricingFor([['PC54', false, 10], ['VISOR1', false, 14]]))).toEqual([]);
+    });
+
+    test('a product that left the caps: the saved cap logo, charges and add-on line are named', () => {
+        const items = [
+            line({ StyleNumber: 'C916', Quantity: 24, FinalUnitPrice: 15 }),
+            { EmbellishmentType: 'fee', StyleNumber: 'AS-CAP', LineNumber: 2, Quantity: 24, LineTotal: 96 },
+            { EmbellishmentType: 'fee', StyleNumber: '3D-EMB', LineNumber: 3, Quantity: 24, LineTotal: 60 },
+            { EmbellishmentType: 'embroidery-additional', StyleNumber: 'AL-CAP', LineNumber: 4, Quantity: 24, LineTotal: 120 },
+        ];
+        const session = { ALGarmentQty: 0, ALCapQty: 24, CapPrintLocation: 'CF', CapStitchCount: 12000, CapEmbellishmentType: '3d-puff', PrintLocation: '', StitchCount: 0 };
+        const saved = embPersistence.savedProductGroups(session, items);
+        expect(embPersistence.describeRepricedProducts(saved, pricingFor([['C916', false, 13, 24]]), session, items)).toEqual([
+            'C916 is now priced as a garment ($15.00 → $13.00)',
+            'The saved cap logo (12,000 stitches, 3D puff) no longer applies: C916 now uses the garment logo. Check the garment logo before saving.',
+            'No caps are left, so these saved cap charges no longer apply: extra stitches (AS-CAP) $96.00, 3D puff (3D-EMB) $60.00.',
+            'Check the cap add-on logo line (AL-CAP): no caps are left.',
+        ]);
+    });
+
+    test('a visor that left the garments: the saved garment logo and charge are named; a same-price move is still listed', () => {
+        const items = [
+            line({ StyleNumber: 'STC57', Quantity: 12, FinalUnitPrice: 20 }),
+            { EmbellishmentType: 'fee', StyleNumber: 'AS-Garm', LineNumber: 2, Quantity: 12, LineTotal: 48 },
+        ];
+        const session = { ALGarmentQty: 12, ALCapQty: 0, PrintLocation: 'Full Back', StitchCount: 25000, CapPrintLocation: '', CapStitchCount: 0 };
+        const saved = embPersistence.savedProductGroups(session, items);
+        expect(embPersistence.describeRepricedProducts(saved, pricingFor([['STC57', true, 20]]), session, items)).toEqual([
+            'STC57 is now priced as a cap (same price)',
+            'The saved garment logo (Full Back, 25,000 stitches) no longer applies: STC57 now uses the cap logo. Check the cap logo before saving.',
+            'No garments are left, so these saved garment charges no longer apply: extra stitches (AS-Garm) $48.00.',
+        ]);
+    });
+
+    test('no side notes while that side still has products, or when its saved logo was the default', () => {
+        const items = [
+            line({ StyleNumber: 'CP90', LineNumber: 1, Quantity: 12, FinalUnitPrice: 15 }),
+            line({ StyleNumber: 'C112', LineNumber: 2, Quantity: 12, FinalUnitPrice: 15 }),
+            { EmbellishmentType: 'fee', StyleNumber: 'AS-CAP', LineNumber: 3, Quantity: 24, LineTotal: 96 },
+        ];
+        const session = { ALGarmentQty: 0, ALCapQty: 24, CapPrintLocation: 'CF', CapStitchCount: 12000 };
+        const saved = embPersistence.savedProductGroups(session, items);
+        expect(embPersistence.describeRepricedProducts(saved, pricingFor([['CP90', false, 12.5], ['C112', true, 15]]), session, items))
+            .toEqual(['CP90 is now priced as a garment ($15.00 → $12.50)']);
+        const plain = { ALGarmentQty: 0, ALCapQty: 12, CapPrintLocation: 'CF', CapStitchCount: 8000, CapEmbellishmentType: 'embroidery' };
+        const beanie = [line({ StyleNumber: 'CP90', Quantity: 12, FinalUnitPrice: 15 })];
+        expect(embPersistence.describeRepricedProducts(embPersistence.savedProductGroups(plain, beanie), pricingFor([['CP90', false, 12.5]]), plain, beanie))
+            .toEqual(['CP90 is now priced as a garment ($15.00 → $12.50)']);
     });
 
     test('an upcharge-only move shows the average; a missing product is called out; colours disambiguate', () => {

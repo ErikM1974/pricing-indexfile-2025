@@ -1971,6 +1971,32 @@ export function isCapProduct(style, productTitle = '', categoryName = '', detail
 }
 
 /**
+ * Cap vs garment for a style before its row exists (the ShopWorks import review), from the
+ * same /api/product-colors fields onStyleChange classifies — so the review's logo sections
+ * match the rows it builds. ShopWorks descriptions alone mislead ("Port  Companyknit Cap" is
+ * the CP90 beanie). The response is cached for onStyleChange. A style the catalog doesn't
+ * carry (404: non-SanMar items) is decided from its own description, as the non-SanMar
+ * import does; any other failure throws for the caller to show.
+ * @param {string} styleNumber
+ * @param {string} [fallbackTitle] - the ShopWorks description
+ * @returns {Promise<boolean>}
+ */
+export async function catalogIsCap(styleNumber, fallbackTitle = '') {
+    let colorsData = productColorsCache.get(styleNumber);
+    if (!colorsData) {
+        const response = await fetch(`${API_BASE}/api/product-colors?styleNumber=${encodeURIComponent(styleNumber)}`);
+        if (response.status === 404) return isCapProduct(styleNumber, fallbackTitle);
+        if (!response.ok) throw new Error(`Colors API returned ${response.status}`);
+        colorsData = await response.json();
+        productColorsCache.set(styleNumber, colorsData);
+    }
+    return isCapProduct(styleNumber, colorsData.productTitle || colorsData.PRODUCT_TITLE || fallbackTitle, colorsData.CATEGORY_NAME || '', {
+        subcategory: colorsData.SUBCATEGORY_NAME || '',
+        description: colorsData.PRODUCT_DESCRIPTION || '',
+    });
+}
+
+/**
  * Check if product is pants (waist/inseam sizing not supported)
  * @param {string} style - Style number
  * @param {string} productTitle - Product title/description
