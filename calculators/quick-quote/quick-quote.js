@@ -336,7 +336,10 @@
     }
 
     function sizeList() { return (state.product && state.product.sizes) || []; }
-    function defaultSizes() { return (state.product && state.product.isCap) ? ['OSFA'] : ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL']; }
+    function isFlatHeadwear(product) { return !!(product && product.headwear && product.headwear.isFlat); }
+    function oneSize(product) { return !!(product && product.isCap) || isFlatHeadwear(product); }
+    function frontLogoLabel(cap, product) { return cap ? 'Cap front' : isFlatHeadwear(product) ? 'Front' : 'Left chest'; }
+    function defaultSizes() { return oneSize(state.product) ? ['OSFA'] : ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL']; }
     function stdSizeFor(product) {
         var sizes = (product && product.sizes) || [];
         if (product && product.isCap) return sizes.indexOf('OSFA') >= 0 ? 'OSFA' : (sizes[0] || 'OSFA');
@@ -363,12 +366,20 @@
     // STYLE LOOKUP
     // ============================================================
     // Cap vs garment comes from the shared classifier: Richardson caps have no category and
-    // Richardson/New Era also sell apparel. Flat headwear (beanies) counts as a cap in Quick
-    // Price (cap pricing, as before); a line sheet prices it by the chosen embroidery method.
-    // The EMB builder prices it flat — Erik to decide; see memory/QUICK_QUOTE_2026-09.md.
+    // Richardson/New Era also sell apparel. Flat headwear (beanies, knit caps) is not a cap: it is
+    // one size and priced as flat (garment) embroidery, as the EMB builder does (Erik 2026-09-16).
     function classifyHeadwear(meta) {
         if (!window.HeadwearClassifier) throw lookupError('The product type check did not load. Refresh the page.', false);
         return window.HeadwearClassifier.classify(meta);
+    }
+    // Rule 9: flat only when the EMB builder agrees. Its isCapProduct() asks ProductCategoryFilter about
+    // the style-search label ("STYLE - TITLE") before the category, so fleece headbands, gaiters and skull
+    // caps in "Caps" stay caps there — and here. Blank-category ones keep the rep's choice on a line sheet.
+    function matchBuilderFlat(headwear, style, title) {
+        if (!headwear.isFlat) return headwear;
+        if (!window.ProductCategoryFilter) throw lookupError('The product type check did not load. Refresh the page.', false);
+        if (window.ProductCategoryFilter.isFlatHeadwear({ PRODUCT_TITLE: style + ' - ' + title })) return headwear;
+        return Object.assign({}, headwear, { kind: 'cap', isCap: true, isFlat: false, confident: headwear.reason === 'category', reason: 'builder' });
     }
     function lookupError(message, notFound) {
         var err = new Error(message); err.notFound = notFound; return err;
@@ -405,8 +416,8 @@
                 var category = meta.CATEGORY_NAME || '';
                 var subcat = meta.SUBCATEGORY_NAME || '';
                 var desc = meta.PRODUCT_DESCRIPTION || '';
-                var headwear = classifyHeadwear(meta);
-                var cap = headwear.isCap || headwear.isFlat;
+                var headwear = matchBuilderFlat(classifyHeadwear(meta), style, meta.PRODUCT_TITLE || '');
+                var cap = headwear.isCap;
                 // unique colors keyed by CATALOG_COLOR (+ swatch & image for the picker / line sheet)
                 var seen = {}, colors = [];
                 rows.forEach(function (row) {
@@ -468,6 +479,8 @@
 
     function resolveEligibility(product) {
         if (product.isCap) return Promise.resolve(null); // caps → cap embroidery only
+        // Flat headwear → garment embroidery only (the "Caps" category rule lists no garment methods).
+        if (isFlatHeadwear(product)) return Promise.resolve({ EMB: true, DTG: 'no', SCP: false, DTF: false, source: 'flat-headwear' });
         return categoryEligibility(product);
     }
     // The category rules for any product (never null); the line sheet also asks this for unconfirmed caps.
@@ -927,7 +940,7 @@
         } else {
             capWrap.hidden = true;
         }
-        var rows = [embLogoRow('primary', isCap ? 'Cap front' : 'Left chest', state.adv.embStitch, false)];
+        var rows = [embLogoRow('primary', frontLogoLabel(isCap, state.mode === 'linesheet' ? null : state.product), state.adv.embStitch, false)];
         state.embAddl.forEach(function (a, i) {
             rows.push(embLogoRow(String(i), isCap ? 'Cap back' : 'Additional logo', a.stitch, true));
         });
@@ -1170,6 +1183,8 @@
             ? '<p class="qq-elig-note" role="status">' + (elig.rulesDown
                 ? 'Decoration rules didn’t load, so only embroidery is shown. Refresh to see the other methods.'
                 : 'This product’s category isn’t in our decoration rules, so only embroidery is shown. Other methods may work — confirm before quoting, or price one on the Line Sheet.') + '</p>'
+            : elig && elig.source === 'flat-headwear'
+            ? '<p class="qq-elig-note" role="status">Beanies and knit caps are priced as flat embroidery, the same as the Embroidery builder.</p>'
             : '';
         box.innerHTML = eligNote + state.methods.map(function (m) {
             var changed = !!(state.flashUntil[m.id] && nowT < state.flashUntil[m.id]);
@@ -1465,7 +1480,7 @@
     function renderPlacementVisibility() {
         var pf = $('qqPlacementField'); if (!pf) return;
         if (state.mode === 'linesheet') pf.hidden = !(hasActive('dtg') || hasActive('scp') || hasActive('dtf'));
-        else pf.hidden = !!(state.product && state.product.isCap);
+        else pf.hidden = oneSize(state.product);
         renderSleeveRow();
     }
     // Sleeve row: DTF (≤5×5" transfer, priced like a left chest) and/or screen print (each sleeve =
@@ -1705,7 +1720,7 @@
     // fetches for pricing, so it's warm in cache; falls back to a default run on failure.
     function loadProductSizes(product) {
         if (!product || product.sizes) return Promise.resolve();
-        var fallback = product.isCap ? ['OSFA'] : ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'];
+        var fallback = oneSize(product) ? ['OSFA'] : ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'];
         return fetch(API_BASE + '/api/pricing-bundle?method=BLANK&styleNumber=' + encodeURIComponent(product.style))
             .then(function (r) { return r.ok ? r.json() : null; })
             .then(function (d) {
@@ -1727,34 +1742,33 @@
         if (!row) return;
         row._ptok = ++state.lineSeq; row.preview = null; row.tiers = null; row.pricing = true;
     }
-    // Embroidery follows a confirmed product (cap → cap embroidery, garment → embroidery), as the
-    // EMB builder does per row. The builder's own cap check still differs on some styles (New Era
-    // and Richardson apparel, visors). Unconfirmed products and flat headwear keep the rep's choice.
+    // Embroidery follows a confirmed product (cap → cap embroidery; garment or flat headwear →
+    // embroidery), as the EMB builder does per row. The builder's own cap check still differs on
+    // some styles (New Era and Richardson apparel, visors). Unconfirmed products keep the rep's choice.
     function lineMethodFor(row) {
         var m = state.lineMethod, h = row.product && row.product.headwear;
-        if ((m !== 'emb' && m !== 'capemb') || !h || !h.confident || h.isFlat) return m;
+        if ((m !== 'emb' && m !== 'capemb') || !h || !h.confident) return m;
         return h.isCap ? 'capemb' : 'emb';
     }
     async function priceLineRow(row) {
         invalidateLine(row);
         if (!state.lineMethod || !row.product) { row.pricing = false; updateLineRow(row); renderLinePreview(); return; }
         var token = row._ptok, method = lineMethodFor(row), def = METHODS[method];
-        var product = row.product, color = row.color, qty = state.lineQty, headwear = product.headwear || {};
+        var product = row.product, color = row.color, qty = state.lineQty, headwear = product.headwear || {}, flat = isFlatHeadwear(product);
         row.pricedVersion = configVersion;
         var embroidery = method === 'emb' || method === 'capemb', notices = [];
         row.method = method; row.error = ''; row.notice = '';
         updateLineRow(row); notifyWorkspace();
         try {
             if (qty !== null && (!Number.isInteger(qty) || qty < 1 || qty > 100000)) throw new Error('Enter a whole quantity between 1 and 100,000, or leave it blank for price breaks.');
-            if (product.isCap && headwear.confident && !embroidery) throw new Error(product.style + (headwear.isFlat ? ' is headwear' : ' is a cap') + ' — choose Embroidery or Cap embroidery.');
+            if ((product.isCap || flat) && headwear.confident && !embroidery) throw new Error(product.style + (flat ? ' is headwear' : ' is a cap') + ' — choose Embroidery or Cap embroidery.');
             if (method === 'capemb' && state.embAddl.length > 1) throw new Error('Caps take one extra logo (cap back). Remove the other logos to price ' + product.style + '.');
             var methodWords = def.label.replace(/^[A-Z](?=[a-z])/, function (c) { return c.toLowerCase(); }); // "DTG print" keeps its capitals
-            if (method !== state.lineMethod) notices.push('Priced as ' + methodWords + '.');
+            if (method !== state.lineMethod) notices.push('Priced as ' + methodWords + (flat ? ' — beanies are flat embroidery, as in the Embroidery builder.' : '.'));
             else if (method === 'capemb' && !headwear.confident) notices.push('Not confirmed as a cap — priced as cap embroidery, as chosen.');
-            else if (method === 'capemb' && headwear.isFlat) notices.push('Flat headwear — the Embroidery builder prices it as flat embroidery.');
             if (row.colorChanged) notices.push('The saved color is no longer offered — check the color.');
-            // Cap pricing skips the category rules (the "Caps" rule lists no garment methods).
-            if (method !== 'capemb' && !(embroidery && product.isCap)) {
+            // Cap pricing and flat headwear skip the category rules (the "Caps" rule lists no garment methods).
+            if (method !== 'capemb' && !(embroidery && (product.isCap || flat))) {
                 var eligibility = await categoryEligibility(product);
                 if (row._ptok !== token) return;
                 // decoration-methods.js contract: an unknown category is a visible warning, never a block.
@@ -1785,10 +1799,10 @@
     function renderLinePreview() { notifyWorkspace(); }
     function notifyWorkspace() { if (window.QuickQuoteWorkspace) window.QuickQuoteWorkspace.refresh(); }
     function stitchText(n) { return (num(n) || 8000).toLocaleString('en-US') + ' stitches'; }
-    function decorationDescription(id) {
+    function decorationDescription(id, product) {
         if (id === 'emb' || id === 'capemb') {
             var cap = id === 'capemb';
-            var parts = [(cap ? 'Cap front ' : 'Left chest ') + stitchText(state.adv.embStitch)];
+            var parts = [frontLogoLabel(cap, product) + ' ' + stitchText(state.adv.embStitch)];
             state.embAddl.forEach(function (a) { parts.push((cap ? 'cap back ' : 'additional logo ') + stitchText(a.stitch)); });
             if (cap && state.capEmb !== 'embroidery') parts.push(state.capEmb === '3d-puff' ? '3D puff' : 'laser patch');
             if (state.adv.digitizing) parts.push('new-logo digitizing');
@@ -1804,13 +1818,13 @@
                     var m = r.method || state.lineMethod, sizes = {};
                     sizes[stdSizeFor(r.product)] = state.lineQty;
                     return { key: String(r.uid), product: r.product, color: r.color, method: m, preview: r.preview, tiers: r.tiers, quantityRequested: state.lineQty !== null,
-                        unitWord: m === 'capemb' ? 'cap' : 'pc', description: decorationDescription(m),
+                        unitWord: m === 'capemb' ? 'cap' : 'pc', description: decorationDescription(m, r.product),
                         builderHref: state.lineQty === null ? '' : builderHrefFor(m, r.product, r.color, sizes) };
                 });
                 var sizeMix = state.useSizes ? 'Sizes: ' + Object.entries(currentSizes()).map(function (p) { return p[0] + ' ' + p[1]; }).join(', ') : '';
                 return state.methods.filter(function (m) { return state.results[m.id]?.status === 'ok'; }).map(function (m) {
                     return { key: m.id, product: state.product, color: state.color, method: m.id, preview: state.results[m.id].preview, sizes: sizeMix,
-                        unitWord: state.product.isCap ? 'cap' : 'pc', description: decorationDescription(m.id), builderHref: builderHref(m.id) };
+                        unitWord: state.product.isCap ? 'cap' : 'pc', description: decorationDescription(m.id, state.product), builderHref: builderHref(m.id) };
                 });
             },
             // The sheet header names the method and its decoration once for the whole sheet.

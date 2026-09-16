@@ -245,17 +245,36 @@ test('Ctrl+P while prices update prints a notice, never the old prices', async (
     check(expect, e);
 });
 
-test('beanies follow the chosen embroidery sheet and say how the builder prices them', async ({ page }) => {
+// Erik 2026-09-16: beanies are flat embroidery everywhere, the same as the Embroidery builder.
+test('beanies price as flat embroidery on every sheet and in Quick Price', async ({ page }) => {
     const e = await open(page, { url: '/calculators/quick-quote/index.html' });
     await typeStyle(page, 'CP90');
     await expect(page.locator('#qqLineDownload')).toBeEnabled();
     await expect(page.locator('.qq-line-stat')).toHaveCount(0);
-    await expect(page.locator('.qq-sheet-ladder tbody th').first()).toHaveText('Per pc');
+    const ladder = page.locator('.qq-sheet-ladder tbody tr').first();
+    await expect(ladder.locator('th')).toHaveText('Per pc');
+    const flatPrices = await ladder.locator('td').allTextContents();
     await methodChip(page, 'capemb');
-    await expect(page.locator('.qq-line-row').first()).toContainText('Flat headwear — the Embroidery builder prices it as flat embroidery.');
-    await expect(page.locator('.qq-sheet-ladder tbody th').first()).toHaveText('Per cap');
+    await expect(page.locator('.qq-line-row').first()).toContainText('Priced as embroidery — beanies are flat embroidery, as in the Embroidery builder.');
+    await expect(page.locator('.qq-sheet-item .qq-sheet-method')).toContainText('Embroidery · Front 8,000 stitches');
+    await expect(page.locator('#qqLineDownload')).toBeEnabled();
+    await expect(ladder.locator('th')).toHaveText('Per pc');
+    expect(await ladder.locator('td').allTextContents()).toEqual(flatPrices);
     await methodChip(page, 'dtg');
     await expect(page.locator('.qq-line-row').first()).toContainText('CP90 is headwear — choose Embroidery or Cap embroidery.');
+    await page.locator('[data-mode="quick"]').click();
+    await page.locator('#qqStyle').fill('CP90');
+    await expect(page.locator('.qq-elig-note')).toHaveText('Beanies and knit caps are priced as flat embroidery, the same as the Embroidery builder.');
+    await expect(page.locator('.qq-card[data-method]')).toHaveCount(1);
+    await expect(page.locator('.qq-card[data-method="emb"]')).toContainText('/pc');
+    await expect(page.locator('.qq-card[data-method="emb"]')).not.toHaveClass(/is-error|is-unavailable/);
+    await expect(page.locator('.qq-emb-pos').first()).toHaveText('Front');
+    await expect(page.locator('#qqPlacementField')).toBeHidden();
+    // A fleece headband in "Caps" is a cap in the Embroidery builder, so it stays a cap here.
+    await page.locator('#qqStyle').fill('C916');
+    await expect(page.locator('.qq-card[data-method="capemb"]')).toContainText('/cap');
+    await expect(page.locator('.qq-card[data-method]')).toHaveCount(1);
+    await expect(page.locator('.qq-elig-note')).toHaveCount(0);
     check(expect, e);
 });
 
@@ -340,11 +359,11 @@ for (const method of ['emb', 'capemb', 'dtg', 'scp', 'dtf']) test('customer shee
     check(expect, e);
 });
 
-for (const [method, quantity] of [['emb', 3], ['emb', 7], ['capemb', 3], ['capemb', 7], ['dtg', 23], ['dtf', 23], ['scp', 24], ['scp', 37]]) test('small-order price survives the full builder: ' + method + ' ' + quantity, async ({ page, context }) => {
+for (const [method, quantity, style] of [['emb', 3], ['emb', 7], ['emb', 3, 'CP90'], ['capemb', 3, 'CP90'], ['emb', 7, 'CP90'], ['emb', 3, 'C916'], ['capemb', 3], ['capemb', 7], ['dtg', 23], ['dtf', 23], ['scp', 24], ['scp', 37]]) test('small-order price survives the full builder: ' + method + ' ' + quantity + (style ? ' ' + style : ''), async ({ page, context }) => {
     const e = await open(page, { url: '/calculators/quick-quote/index.html' });
     await methodChip(page, method);
     await page.locator('#qqLineQty').fill(String(quantity));
-    await typeStyle(page, method === 'capemb' ? 'C112' : 'PC54'); await page.locator('.qq-line-style').press('Enter');
+    await typeStyle(page, style || (method === 'capemb' ? 'C112' : 'PC54')); await page.locator('.qq-line-style').press('Enter');
     await expect(page.locator('#qqLinePrint')).toBeEnabled();
     const expectedTotal = Number(await page.locator('.qq-sheet-exact').getAttribute('data-total'));
     await expect(page.locator('.qq-sheet-exact')).toContainText('$' + expectedTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' total');
