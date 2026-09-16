@@ -454,7 +454,7 @@ describe('reopened EMB quote: price change notice', () => {
         document.body.innerHTML = TABLE;
         const banner = embPersistence.showRepricedNotice(['CP90 is now priced as a garment ($15.00 → $12.50)', '<img src=x>: $1.00 → $2.00']);
         expect(banner.id).toBe('reopen-price-notice');
-        expect(banner.className).toBe('import-summary-banner banner-warning');
+        expect(banner.className).toBe('alert alert-warn');   // the shared warning alert the builder page styles
         expect(banner.nextElementSibling.className).toBe('product-table-wrapper');
         await filled();
         expect(banner.querySelector('.banner-title').textContent).toBe('Prices changed from the saved quote');

@@ -856,8 +856,9 @@ function repricedNoticeAnchor() {
 }
 
 /**
- * Persistent notice above the product table, built from the EMB builder's existing
- * notice component (.import-summary-banner.banner-warning). Text only — no markup
+ * Persistent notice above the product table, using the shared warning alert
+ * (components.css .alert.alert-warn — this page no longer loads the old
+ * .import-summary-banner styles). Text only — no markup
  * from data. Replaces any earlier notice; no changes → no notice.
  *   • The text is announced politely: an EMPTY live region is inserted first and filled
  *     after insertion. The Dismiss button stays outside it.
@@ -874,16 +875,16 @@ export function showRepricedNotice(changes, opts = {}) {
     const heading = forDuplicate ? 'Prices changed from the original quote' : 'Prices changed from the saved quote';
     const banner = document.createElement('div');
     banner.id = REPRICED_NOTICE_ID;
-    banner.className = 'import-summary-banner banner-warning';
+    banner.className = 'alert alert-warn';
     const message = document.createElement('div');
     message.setAttribute('role', 'status');
     message.setAttribute('aria-live', 'polite');
     message.setAttribute('aria-atomic', 'true');
-    const title = document.createElement('div');
+    const title = document.createElement('strong');
     title.className = 'banner-title';
     title.textContent = heading;
     const detail = document.createElement('div');
-    detail.className = 'banner-detail';
+    detail.className = 'banner-detail alert-body';
     for (const text of changes) {
         const line = document.createElement('div');
         line.textContent = text;
