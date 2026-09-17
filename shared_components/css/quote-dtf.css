@@ -42,7 +42,6 @@
 :where([data-ui="unified"][data-quote-workspace="dtf"]) .workspace-shipping-money input { padding-left:28px; }
 :where([data-ui="unified"][data-quote-workspace="dtf"]) .workspace-tax-status { min-height:14px; color:var(--ui-muted); font-size:12px; }
 :where([data-ui="unified"][data-quote-workspace="dtf"]) .workspace-order-notes { min-height:90px; }
-:where([data-ui="unified"][data-quote-workspace="dtf"]) .keyboard-hint { padding:12px 16px; color:var(--ui-muted); font-size:12px; line-height:1.8; }
 
 @media (width <= 900px) {
  :where([data-ui="unified"][data-quote-workspace="dtf"]) .location-columns { grid-template-columns:minmax(0,1fr); }
@@ -68,7 +67,6 @@
  :where([data-ui="unified"][data-quote-workspace="dtf"]) .reference-artwork-section,:where([data-ui="unified"][data-quote-workspace="dtf"]) .workspace-min-order { break-inside:avoid; }
  :where([data-ui="unified"][data-quote-workspace="dtf"]) .workspace-shipping-money input { padding-left:22px; }
  :where([data-ui="unified"][data-quote-workspace="dtf"]) .workspace-shipping-currency { left:8px; }
- :where([data-ui="unified"][data-quote-workspace="dtf"]) .keyboard-hint { display:none; }
 }
 
 :where([data-ui="unified"][data-quote-workspace="dtf"]) .dtf-toast { position:fixed; bottom:20px; left:50%; z-index:var(--z-toast); display:flex; align-items:center; gap:10px; max-width:min(480px, calc(100vw - 32px)); padding:14px 24px; border-radius:var(--radius-md); background:var(--ui-ink); color:var(--color-on-brand); box-shadow:var(--shadow-md); font-weight:500; opacity:0; transform:translate(-50%, 100px); transition:opacity .3s ease, transform .3s ease; }

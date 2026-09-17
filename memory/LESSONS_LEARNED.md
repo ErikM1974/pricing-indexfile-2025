@@ -1,10 +1,16 @@
 # LESSONS LEARNED
 
+## A page `:hover` rule on a filled button needs the workspace's `:not(:disabled)` form (2026-09-17)
+
+- Problem/root cause: the DTG builder's axe check failed now and then on `.dtg-cc-add-default` and its colour label. In the same layer, the workspace's generic `button:hover:not(:disabled)` (0,2,1) outranks a page's `.x:hover` (0,2,0), so a hovered white-text button got the pale tint background (1.05:1). The spec leaves the pointer where it clicked, then resizes and runs axe, so a button landed under the pointer only in some layouts.
+- Solution: the DTG hover rules now end in `:hover:not(:disabled)` (0,3,0) for `.dtg-cc-add-default` and `.dtg-fullcat-trigger`; every restored filled button (push, preview confirm, share actions, Enter manually, Retry, Proceed) has the same form. All DTG browser checks pass.
+- Prevention: when a page gives a button a filled background, write its hover as `:hover:not(:disabled)`. `css-unification-quote-builder-workflows.spec.js` probes the restored button and state styles on all four builders.
+
 ## A CSS migration must carry the classes JavaScript adds at runtime (2026-09-16)
 
 - Problem/root cause: the September builder CSS release (v2026.09.13.2) replaced each builder's old sheets with the unified family, but the census only covered markup and static states. 47 classes that JavaScript adds later kept their only rules in the retired sheets: the Screen Print and DTF "Push to ShopWorks" dialog stayed `display:none` after `.show`, the pricing-error banner, fallback-price badge and "Updating prices…" pill rendered as plain text at the end of the page, the Embroidery monogram/manual-item dialogs and stitch estimator appeared below the footer, and $0 vendor rows, low-stock badges and review deltas lost their warning colours. Nobody saw it for three days because no browser test opened those states.
 - Solution: the rules are back, token-based and scoped (`quote-workspace.css` for shared pieces, `quote-<method>.css` for the rest), and the Embroidery import summary and $0 price are rebuilt as keyboard buttons. `tests/e2e/css-unification-quote-builder-workflows.spec.js` checks the computed style of every restored overlay/notice on all four builders and runs a full vendor import by keyboard.
-- Prevention: before retiring a sheet, list every class the page's JS applies (classList, className, template strings) and check a loaded sheet styles it; open each runtime state in a browser test. The audit list (52 cosmetic-only classes still unstyled) is in `memory/CSS_UNIFICATION_2026-09.md`.
+- Prevention: before retiring a sheet, list every class the page's JS applies (classList, className, template strings) and check a loaded sheet styles it; open each runtime state in a browser test. The 52 cosmetic-only groups the audit also found were restored on 2026-09-17 (`memory/CSS_UNIFICATION_2026-09.md`).
 
 ## A module-private function used as a page global fails only after bundling (2026-09-16)
 
@@ -156,13 +162,6 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 - Problem/root cause: legacy price tables clipped rightmost size columns on paper; page-local print rules hid price-load failures, while broad class matching missed compound quantity-control classes.
 - Solution: canonical fields on every quantity selector/input, focusable named scroll regions and selected-type state; scoped print table sizing and visible error banners. Preserve each amount, tier, fee and original financial transformation.
 - Prevention: compare actual original/current values at four widths, keyboard-scroll all sizes, exercise failure and print-view restoration, and inspect every rendered page including long service lists and the contact footer. Keep headings with rows without making entire long categories unbreakable.
-
-## Storefront quantity edits and scoped CSS (2026-09-11)
-
-- Problem/root cause: the quantity debounce retained the previous successful price and size breakdown for350ms, while the quantity field had already changed; the email/cart controls could therefore reference the old quote.
-- Solution: immediately invalidate prior requests, mark methods loading, clear totals/table and refresh handoff controls; retain the existing quantity normalization and pricing engines. A browser regression reconstructs the original defect and checks that the current page withholds price until the new sized result arrives.
-- Prevention: readiness must match both selected quantity and priced sizes. Immutable screenshots taken mid-debounce record transient states; retain them as defect evidence and capture a separate settled contract.
-- CSS lesson: an empty PostCSS selector list reads back as an empty selector string. Remove the rule explicitly before adding a page scope, or it can target the whole page. Keep drawer styles inside the drawer, test keyboard focus, and inspect every printed page for image overflow and footer-only sheets.
 
 ## CRM UI recovery and print (2026-09-09, archived)
 Full entry in LESSONS_LEARNED_ARCHIVE.md; preserve asynchronous view ownership and native dialog/table semantics.
