@@ -1,5 +1,11 @@
 # LESSONS LEARNED
 
+## A failed Playwright expect can leave closed `<details>` with a stale layout answer (2026-09-17)
+
+- Problem/root cause: 15 webstore and emblem CSS browser checks lost the first heading or id inside each closed accordion ("Key benefits", `emblemGridWrap`), while later ones in the same accordion stayed. Not the Chrome update: Chrome 152 and 153 behave the same. When an `expect()` attempt fails on a hidden element, Playwright renders an ARIA snapshot of the whole `body`; after that walk, Chrome answers the first `getClientRects()` inside each closed `<details>` (`content-visibility: hidden`) with no boxes, and the snapshot helpers read that first answer as "not visible". It only happens when the page's `load` (CDN images) finishes before the assistant drawer auto-opens at 600 ms, so `toHaveAttribute('aria-hidden', 'false')` fails at least once; on 2026-09-12 the images were slower and the checks passed.
+- Solution: the webstore and specialty snapshot helpers read `getClientRects()` until two answers agree, so visibility is the settled layout. The rule, the spec comparisons and the immutable fixtures are unchanged, and content that is really hidden inside a closed accordion still drops out.
+- Prevention: a browser snapshot must not depend on what ran before it; read settled layout, or open the section on purpose. A spec that waits with `expect()` before a snapshot may have had Playwright walk the whole page on a failed attempt.
+
 ## A page `:hover` rule on a filled button needs the workspace's `:not(:disabled)` form (2026-09-17)
 
 - Problem/root cause: the DTG builder's axe check failed now and then on `.dtg-cc-add-default` and its colour label. In the same layer, the workspace's generic `button:hover:not(:disabled)` (0,2,1) outranks a page's `.x:hover` (0,2,0), so a hovered white-text button got the pale tint background (1.05:1). The spec leaves the pointer where it clicked, then resizes and runs axe, so a button landed under the pointer only in some layouts.
@@ -171,12 +177,6 @@ Historical deployment, token, builder, junction, server split and proxy-auth mig
 Exact-source CI must pass its actual browser/parity jobs, including credentials when required; local green is not CI green. Resolved runner/secret incidents are in LESSONS_LEARNED_ARCHIVE.md.
 
 Quote-operation access rollout (2026-09-07) is archived in LESSONS_LEARNED_ARCHIVE.md; caller/quote scope and live-mutation boundaries remain enforced by quote-sync-access.test.js.
-
-## Record workspaces need current-response checks before secondary writes (2026-09-10)
-
-- Problem/root cause: A stale linked quote can update the current lead after refresh; removed kit/art hosts can still receive asynchronous callbacks. Native dialog conversion and fixed banners can also lose focus or cover recovery controls.
-- Solution: bind quote rendering and existing value sync to the current view sequence, lead object, quote ID and connected target. Reject malformed replies, ignore superseded loads, preserve uncertain outreach warnings beside the action, contain modal focus, and block all unknown API traffic in previews.
-- Prevention: mock delayed responses and every write, verify unchanged valid quote sync and original payloads, reverse recorded controller changes into original source hashes, and retain explicit shared-module ownership. Inspect populated PDFs: narrow grids can split money; give the order table full width and verify every row and rendered page. Precompute file updates before writing so a missing preview anchor cannot leave a partial batch. Timestamp-based browser snapshots must set the baseline time zone explicitly; fixed Date.now alone does not standardize local date formatting on Windows and Linux.
 
 ## 2026-09-12: Background calculator rendering must not move keyboard focus
 
