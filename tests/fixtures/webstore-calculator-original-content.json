@@ -104,6 +104,14 @@
       "after": "/shared_components/js/webstore-pricing-page.js?v=2026.09.13.2",
       "count": 1,
       "reason": "Release asset version; resolved against its actual HTML consumer."
+    },
+    {
+      "file": "calculators/webstores.html",
+      "before": "    <link rel=\"stylesheet\" href=\"/shared_components/css/specialty-assistant.css?v=2026.09.13.2\">",
+      "after": "    <link rel=\"stylesheet\" href=\"/shared_components/css/specialty-assistant.css?v=2026.09.17.1\">",
+      "count": 1,
+      "stage": "release-2026.09.17.1",
+      "reason": "Release asset version; resolved against its actual HTML consumer."
     }
   ]
 }

@@ -376,3 +376,57 @@ for(const method of ['embroidery','screenprint','dtf','dtg'])test('CSS quote bui
  if(method==='dtf')expect(styles.toast.position).toBe('fixed');
  if(method==='dtg')expect(styles.oosDot.width).toBe('6px');
 });
+
+// The cosmetic runtime states (2026-09-17): buttons, row states, fee/tier hints, previews, badges and assistant cards
+// keep a real style instead of falling back to plain text.
+for(const method of ['embroidery','screenprint','dtf','dtg'])test('CSS quote builders: '+method+' cosmetic runtime states are styled',async({page})=>{
+ test.skip(original,'The original page loaded the retired sheets.');
+ await open(page,{url:'/quote-builders/'+method+'-quote-builder.html'});
+ const s=await page.evaluate(()=>{
+  const box=document.createElement('div');document.body.appendChild(box);
+  box.innerHTML=`<div class="toast toast-success">x</div><div class="toast toast-info">x</div>
+   <div class="ltm-control-panel"><div class="ltm-control-header">x</div><div class="ltm-control-body"><label class="ltm-checkbox-label"><input type="checkbox">x<span class="ltm-status-badge">Applied</span></label></div></div>
+   <div class="quantity-nudge quantity-nudge-clickable" role="button">x <span class="nudge-apply-hint">x</span></div>
+   <div class="action-panel"><button class="btn-action btn-push-shopworks">x</button><button class="btn-action btn-secondary-action btn-email-quote">x</button></div>
+   <div class="ship-to-card"><div class="st-title">Ship To</div><div class="st-actions"><button class="st-btn st-btn-reest">x</button></div></div>
+   <div class="customer-lookup-item"><div class="customer-lookup-company">x</div><div class="customer-lookup-details">x</div></div>
+   <table class="qb-table-13"><tr class="qb-th"><th class="qb-td--r">x</th></tr></table><div class="qb-warn-box">x</div>
+   <table class="product-table"><tr class="child-row different-color"><td><span class="style-display">x</span></td></tr><tr class="new-row"><td><input class="cell-input desc-input" readonly></td></tr></table>
+   <div class="import-progress-bar-container"><div class="import-progress-bar"></div></div><div class="preview-item-label">x</div>
+   <div class="chat-message assistant"><div class="chat-bubble">x</div></div><span class="spr-type-badge spr-type-fb">FB</span><button class="btn-add-nonsanmar">x</button><div class="pricing-breakdown">x</div>
+   <div class="keyboard-hint">x</div><span class="step-badge step-3">3</span>
+   <div class="dtg-fullcat-results"></div><button class="dscm-btn dscm-btn-proceed">x</button>`;
+  const c=(sel,prop)=>getComputedStyle(box.querySelector(sel))[prop];
+  const out={
+   success:c('.toast-success','backgroundColor'),info:c('.toast-info','backgroundColor'),plain:getComputedStyle(document.body).backgroundColor,
+   ltmBorder:c('.ltm-control-panel','borderTopStyle'),ltmBadge:c('.ltm-status-badge','float'),nudge:c('.quantity-nudge','borderTopStyle'),
+   push:c('.btn-push-shopworks','backgroundColor'),pushColor:c('.btn-push-shopworks','color'),email:c('.btn-email-quote','backgroundColor'),action:c('.btn-action','display'),
+   stTitle:c('.st-title','textTransform'),stActions:c('.st-actions','display'),lookup:c('.customer-lookup-item','flexDirection'),
+   previewTable:c('.qb-table-13','borderCollapse'),warnBox:c('.qb-warn-box','borderTopStyle'),
+   differentColor:c('.different-color > td','backgroundColor'),newRow:c('.new-row > td','backgroundColor'),readonlyDesc:c('.desc-input','borderTopColor'),
+   progress:c('.import-progress-bar-container','height'),previewLabel:c('.preview-item-label','textTransform'),bubble:c('.chat-bubble','whiteSpace'),
+   fb:c('.spr-type-badge','backgroundColor'),manual:c('.btn-add-nonsanmar','backgroundColor'),breakdown:c('.pricing-breakdown','fontFamily'),
+   hint:c('.keyboard-hint','fontSize'),step:c('.step-badge','borderRadius'),fullcat:c('.dtg-fullcat-results','gridColumnEnd'),proceed:c('.dscm-btn-proceed','backgroundColor'),
+  };
+  box.remove();return out;
+ });
+ const clear='rgba(0, 0, 0, 0)',white='rgb(255, 255, 255)';
+ for(const key of ['success','info'])expect(s[key],key).not.toBe(white);
+ expect(s.success).not.toBe(s.info);
+ if(method==='dtg'){
+  expect(s.fullcat).toBe('-1');
+  expect(s.proceed).not.toBe(white);
+  return;
+ }
+ expect(s.ltmBorder).toBe('solid');expect(s.ltmBadge).toBe('right');expect(s.nudge).toBe('solid');
+ expect(s.push).not.toBe(white);expect(s.pushColor).toBe(white);expect(s.email).not.toBe(white);expect(s.action).toBe('flex');
+ expect(s.stTitle).toBe('uppercase');expect(s.stActions).toBe('flex');expect(s.lookup).toBe('column');
+ expect(s.previewTable).toBe('collapse');expect(s.warnBox).toBe('solid');
+ expect(s.differentColor).not.toBe(clear);expect(s.newRow).not.toBe(clear);expect(s.readonlyDesc).toBe(clear);
+ if(method==='embroidery'){
+  expect(s.progress).toBe('8px');expect(s.previewLabel).toBe('uppercase');expect(s.bubble).toBe('normal');
+  expect(s.fb).not.toBe(clear);expect(s.manual).not.toBe(white);expect(s.breakdown).toMatch(/mono/i);
+ }else{
+  expect(s.hint).toBe('12px');expect(s.step).toBe('50%');
+ }
+});

@@ -88,4 +88,12 @@
  :where([data-ui="unified"][data-specialty-assistant]) .rate { font-size: 11pt; }
  :where([data-ui="unified"][data-specialty-assistant]) .included-badge { font-size: 7pt; margin-bottom: 4px; padding: 2px 5px; }
 }
+
+/* Assistant shell details the retired builder sheets styled (restored 2026-09-17). */
+:where([data-ui="unified"][data-specialty-assistant]) .ai-sparkle { filter:drop-shadow(0 0 4px color-mix(in srgb, var(--amber-200) 70%, transparent)); }
+:where([data-ui="unified"][data-specialty-assistant]) .floating-quote-label { letter-spacing:.02em; }
+:where([data-ui="unified"][data-specialty-assistant]) .chat-message.assistant { align-self:flex-start; }
+:where([data-ui="unified"][data-specialty-assistant]) .ai-action-btn.primary:not(:disabled) { border-color:var(--ui-accent); background:var(--ui-accent); color:var(--color-on-brand); }
+:where([data-ui="unified"][data-specialty-assistant]) .ai-action-btn.primary:hover:not(:disabled) { background:var(--ui-accent-hover); }
+
 }

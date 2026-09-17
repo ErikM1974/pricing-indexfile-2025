@@ -6478,7 +6478,7 @@
       ],
       "test": "tests/e2e/css-unification-specialty-decal-emblem.spec.js",
       "maxCssBytes": 80519,
-      "measuredRawCssBytes": 79607,
+      "measuredRawCssBytes": 78667,
       "baseline": {
         "commit": "97cc05080d4689785bc0885b6a4223c0f1356cbf",
         "rawCssBytes": 89181,
@@ -6708,7 +6708,7 @@
       ],
       "test": "tests/e2e/css-unification-webstore-calculator.spec.js",
       "maxCssBytes": 82897,
-      "measuredRawCssBytes": 79154,
+      "measuredRawCssBytes": 79925,
       "baseline": {
         "commit": "dd8d94de",
         "rawCssBytes": 89528,
@@ -6907,11 +6907,12 @@
         "garment-cap-puff-patch-full-back-services",
         "customer-save-failure-import-shipping-gallery-assistant",
         "complete-builder-paper-and-real-generated-invoice",
-        "runtime-dialogs-notices-and-warning-states-restored-2026-09-16"
+        "runtime-dialogs-notices-and-warning-states-restored-2026-09-16",
+        "cosmetic-buttons-rows-previews-badges-and-assistant-cards-restored-2026-09-17"
       ],
       "test": "tests/e2e/css-unification-quote-builder-workflows.spec.js",
-      "measuredRawCssBytes": 264084,
-      "maxCssBytes": 266132,
+      "measuredRawCssBytes": 315770,
+      "maxCssBytes": 317818,
       "baseline": {
         "commit": "d25e4ddb",
         "rawCssBytes": 623614,
@@ -6942,11 +6943,12 @@
         "healthy-fees-safety-recommendations-and-order-fields",
         "customer-save-failure-and-visible-pricing-errors",
         "complete-builder-paper-and-real-generated-invoice",
-        "runtime-dialogs-notices-and-warning-states-restored-2026-09-16"
+        "runtime-dialogs-notices-and-warning-states-restored-2026-09-16",
+        "cosmetic-buttons-rows-previews-badges-and-assistant-cards-restored-2026-09-17"
       ],
       "test": "tests/e2e/css-unification-quote-builder-workflows.spec.js",
-      "measuredRawCssBytes": 242140,
-      "maxCssBytes": 244188,
+      "measuredRawCssBytes": 262457,
+      "maxCssBytes": 264505,
       "baseline": {
         "commit": "d25e4ddb",
         "rawCssBytes": 494161,
@@ -6982,11 +6984,12 @@
         "healthy-fees-and-shipping-fields",
         "complete-extended-size-dialog",
         "complete-builder-paper-and-real-generated-invoice",
-        "runtime-dialogs-notices-and-warning-states-restored-2026-09-16"
+        "runtime-dialogs-notices-and-warning-states-restored-2026-09-16",
+        "cosmetic-buttons-rows-previews-badges-and-assistant-cards-restored-2026-09-17"
       ],
       "test": "tests/e2e/css-unification-quote-builder-workflows.spec.js",
-      "measuredRawCssBytes": 241294,
-      "maxCssBytes": 243342,
+      "measuredRawCssBytes": 261371,
+      "maxCssBytes": 263419,
       "baseline": {
         "commit": "d25e4ddb",
         "rawCssBytes": 540541,
@@ -7018,11 +7021,12 @@
         "successful-and-failed-save",
         "research-assistant-hidden-disabled-quote-actions",
         "complete-builder-paper-and-real-generated-invoice",
-        "runtime-dialogs-notices-and-warning-states-restored-2026-09-16"
+        "runtime-dialogs-notices-and-warning-states-restored-2026-09-16",
+        "cosmetic-buttons-rows-previews-badges-and-assistant-cards-restored-2026-09-17"
       ],
       "test": "tests/e2e/css-unification-quote-builder-alternate-workflows.spec.js",
-      "measuredRawCssBytes": 288795,
-      "maxCssBytes": 290843,
+      "measuredRawCssBytes": 319409,
+      "maxCssBytes": 321457,
       "baseline": {
         "commit": "d25e4ddb",
         "rawCssBytes": 326706,
