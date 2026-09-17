@@ -1,5 +1,5 @@
 {
-  "description": "Authorized September 13, 2026 Quick Quote redesign. Apply before historical CSS mappings. Original hashes remain immutable; current pricing/handoffs tested independently. classic-restore-2026-09-16: Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings. release-2026.09.16.2: Deploy v2026.09.16.2 cache-bust of the Quick Quote assets. release-notes-2026-09-16: Erik approved 2026-09-16: Quick Quote shows its version (from the deploy's cache-bust), a What's new list and a one-time Updated badge for Nika and Taneisha's trial. release-2026.09.16.3: Deploy v2026.09.16.3 cache-bust of the Quick Quote assets. headwear-alignment-2026-09-16: Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps. release-2026.09.16.4: Deploy v2026.09.16.4 cache-bust of the headwear alignment assets. print-methods-unlimited-2026-09-16: Erik approved 2026-09-16: screen print and DTF are never limited by product category in Quick Quote; embroidery and DTG outside the category rules still price, with a note (the rep decides). builder-runtime-styles-2026-09-16: Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons. release-2026.09.16.5: Deploy v2026.09.16.5 cache-bust of the Quick Quote, product, cart and quote builder assets. release-2026.09.17.1: Deploy v2026.09.17.1 cache-bust for the restored builder cosmetic styles dtg-dialogs-and-swatches-2026-09-17: Requested 2026-09-17 (DTG accessibility follow-up): the push and assistant-overwrite confirms are native modal dialogs named by their titles (Tab stays inside, Escape closes only the confirm, focus returns to the opener); top-seller colour chips are coloured through CSSOM instead of a style attribute; a failed placeholder-src swatch shows a blank pixel instead of the broken-image icon and alt text. builder-native-dialogs-2026-09-17: Requested 2026-09-17 (embroidery dialog accessibility follow-up): the embroidery goods, names and manual-item dialogs and the DTG confirms share builders/shared/modal-dialog.js. They are native modal dialogs named by their titles; Tab stays inside, Escape and the dimmed layer close only the dialog, and focus returns to the opener (or, when that is hidden or gone, to the row's quantity, the services-bar menu button or the first size). The manual-item cost error also shows inside the dialog. builder-runtime-style-attributes-2026-09-17: Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the shared builder scripts and the DTG row/colour menu carries no style attributes. Static styles are token classes in quote-workspace.css / quote-dtg.css: edit-mode label, push checklist link, tier nudge, recent ShopWorks orders, customer warning banner, UPS estimate notes and DTG colour menu rows. Data-driven values go through CSSOM: the DTG row swatch image and the hidden logo assumption panel. Same look; three slate text/border shades map to the nearest grey tokens. builder-static-style-attributes-2026-09-17: Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look. builder-runtime-style-attributes-emb-scp-dtf-2026-09-17: Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens. emb-push-preview-button-gate-2026-09-17: Requested 2026-09-17 (bug found while moving the push status styles): the embroidery Push button no longer disables itself before openPushPreview(), which bails on a disabled button. A quote with nothing to save (just saved, or reopened for editing) skipped the save that used to re-enable it, so the preview never opened and no message appeared. _pushInFlight remains the double-click guard, as in SCP and DTF; the spinner label and the save-skip are unchanged.",
+  "description": "Authorized September 13, 2026 Quick Quote redesign. Apply before historical CSS mappings. Original hashes remain immutable; current pricing/handoffs tested independently. classic-restore-2026-09-16: Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings. release-2026.09.16.2: Deploy v2026.09.16.2 cache-bust of the Quick Quote assets. release-notes-2026-09-16: Erik approved 2026-09-16: Quick Quote shows its version (from the deploy's cache-bust), a What's new list and a one-time Updated badge for Nika and Taneisha's trial. release-2026.09.16.3: Deploy v2026.09.16.3 cache-bust of the Quick Quote assets. headwear-alignment-2026-09-16: Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps. release-2026.09.16.4: Deploy v2026.09.16.4 cache-bust of the headwear alignment assets. print-methods-unlimited-2026-09-16: Erik approved 2026-09-16: screen print and DTF are never limited by product category in Quick Quote; embroidery and DTG outside the category rules still price, with a note (the rep decides). builder-runtime-styles-2026-09-16: Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons. release-2026.09.16.5: Deploy v2026.09.16.5 cache-bust of the Quick Quote, product, cart and quote builder assets. release-2026.09.17.1: Deploy v2026.09.17.1 cache-bust for the restored builder cosmetic styles dtg-dialogs-and-swatches-2026-09-17: Requested 2026-09-17 (DTG accessibility follow-up): the push and assistant-overwrite confirms are native modal dialogs named by their titles (Tab stays inside, Escape closes only the confirm, focus returns to the opener); top-seller colour chips are coloured through CSSOM instead of a style attribute; a failed placeholder-src swatch shows a blank pixel instead of the broken-image icon and alt text. builder-native-dialogs-2026-09-17: Requested 2026-09-17 (embroidery dialog accessibility follow-up): the embroidery goods, names and manual-item dialogs and the DTG confirms share builders/shared/modal-dialog.js. They are native modal dialogs named by their titles; Tab stays inside, Escape and the dimmed layer close only the dialog, and focus returns to the opener (or, when that is hidden or gone, to the row's quantity, the services-bar menu button or the first size). The manual-item cost error also shows inside the dialog. builder-runtime-style-attributes-2026-09-17: Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the shared builder scripts and the DTG row/colour menu carries no style attributes. Static styles are token classes in quote-workspace.css / quote-dtg.css: edit-mode label, push checklist link, tier nudge, recent ShopWorks orders, customer warning banner, UPS estimate notes and DTG colour menu rows. Data-driven values go through CSSOM: the DTG row swatch image and the hidden logo assumption panel. Same look; three slate text/border shades map to the nearest grey tokens. builder-static-style-attributes-2026-09-17: Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): the embroidery, screen print and DTF builder pages carry no static style attributes. Markup that starts hidden uses hidden data-qb-hidden, and quote-builder-utils.js hands it to style.display before the builders run, so their style.display toggles and reads behave as before. Visible display values and the dimmed art charge are token-scoped rules in quote-embroidery.css / quote-workspace.css. The share modal and recent-quotes menu start hidden through CSSOM. Same look. builder-runtime-style-attributes-emb-scp-dtf-2026-09-17: Requested 2026-09-17 (CSP preparation, 'unsafe-inline' stays for now): runtime markup from the embroidery, screen print and DTF builder scripts carries no style attributes. Static styles are token classes in quote-embroidery.css / quote-workspace.css / quote-dtf.css (product and service rows, import preview, service pricing review, push status, design badge and gallery, design combobox, extended-size popup, child rows). Swatch colours and images are data attributes painted through CSSOM (getSwatchAttrs + qbPaintSwatches replace getSwatchStyle); hidden parts start hidden through CSSOM; the pricing warning banner and the DTF configuration error style their parts through CSSOM because they must not depend on a sheet. No pricing logic changed. Same look; off-palette shades map to the nearest tokens. emb-push-preview-button-gate-2026-09-17: Requested 2026-09-17 (bug found while moving the push status styles): the embroidery Push button no longer disables itself before openPushPreview(), which bails on a disabled button. A quote with nothing to save (just saved, or reopened for editing) skipped the save that used to re-enable it, so the preview never opened and no message appeared. _pushInFlight remains the double-click guard, as in SCP and DTF; the spinner label and the save-skip are unchanged. release-2026.09.17.2: Deploy v2026.09.17.2 cache-bust: ?v= query strings bumped to 2026.09.17.2 on the pages that reference the changed builder assets (quote-workspace/quote-embroidery/quote-dtf/quote-dtg CSS, quote-builder-utils and the other shared builder scripts). Presentation-only; the served builder pages are content-hashed, so this only refreshes the source refs. release-2026.09.17.2-quick-quote: Deploy v2026.09.17.2 cache-bust: ?v= bumped on the Quick Quote page for the changed shared builder assets (embroidery-quote-pricing.js, safety-stripe-recs.js). Presentation-only.",
   "changes": [
     {
       "file": "calculators/quick-quote/dtf-prints-prototype.html",
@@ -4874,6 +4874,230 @@
       "count": 1,
       "stage": "emb-push-preview-button-gate-2026-09-17",
       "reason": "Requested 2026-09-17 (bug found while moving the push status styles): the embroidery Push button no longer disables itself before openPushPreview(), which bails on a disabled button. A quote with nothing to save (just saved, or reopened for editing) skipped the save that used to re-enable it, so the preview never opened and no message appeared. _pushInFlight remains the double-click guard, as in SCP and DTF; the spinner label and the save-skip are unchanged."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "    <link rel=\"stylesheet\" href=\"/shared_components/css/quote-workspace.css?v=2026.09.17.1\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/quote-embroidery.css?v=2026.09.17.1\">",
+      "after": "    <link rel=\"stylesheet\" href=\"/shared_components/css/quote-workspace.css?v=2026.09.17.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/quote-embroidery.css?v=2026.09.17.2\">",
+      "count": 1,
+      "stage": "release-2026.09.17.2",
+      "reason": "Deploy v2026.09.17.2 cache-bust: ?v= query strings bumped to 2026.09.17.2 on the pages that reference the changed builder assets (quote-workspace/quote-embroidery/quote-dtf/quote-dtg CSS, quote-builder-utils and the other shared builder scripts). Presentation-only; the served builder pages are content-hashed, so this only refreshes the source refs."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "    <script src=\"/shared_components/js/quote-extended-sizes.js?v=2026.09.06.22\"></script>",
+      "after": "    <script src=\"/shared_components/js/quote-extended-sizes.js?v=2026.09.17.2\"></script>",
+      "count": 1,
+      "stage": "release-2026.09.17.2",
+      "reason": "Deploy v2026.09.17.2 cache-bust: ?v= query strings bumped to 2026.09.17.2 on the pages that reference the changed builder assets (quote-workspace/quote-embroidery/quote-dtf/quote-dtg CSS, quote-builder-utils and the other shared builder scripts). Presentation-only; the served builder pages are content-hashed, so this only refreshes the source refs."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "    <script src=\"/shared_components/js/quote-builder-utils.js?v=2026.09.13.6\"></script>\n    <script src=\"/shared_components/js/quote-services-bar.js?v=2026.09.06.22\"></script>\n    <script src=\"/shared_components/js/exact-match-search.js?v=2026.09.06.37\"></script>\n    <script src=\"/shared_components/js/quote-share-modal.js?v=2026.09.06.22\"></script>\n    <script src=\"/shared_components/js/embroidery-pricing-service.js?v=2026.09.06.31\"></script>\n    <script src=\"/shared_components/js/embroidery-quote-pricing.js?v=2026.09.16.5\"></script>",
+      "after": "    <script src=\"/shared_components/js/quote-builder-utils.js?v=2026.09.17.2\"></script>\n    <script src=\"/shared_components/js/quote-services-bar.js?v=2026.09.06.22\"></script>\n    <script src=\"/shared_components/js/exact-match-search.js?v=2026.09.06.37\"></script>\n    <script src=\"/shared_components/js/quote-share-modal.js?v=2026.09.17.2\"></script>\n    <script src=\"/shared_components/js/embroidery-pricing-service.js?v=2026.09.06.31\"></script>\n    <script src=\"/shared_components/js/embroidery-quote-pricing.js?v=2026.09.17.2\"></script>",
+      "count": 1,
+      "stage": "release-2026.09.17.2",
+      "reason": "Deploy v2026.09.17.2 cache-bust: ?v= query strings bumped to 2026.09.17.2 on the pages that reference the changed builder assets (quote-workspace/quote-embroidery/quote-dtf/quote-dtg CSS, quote-builder-utils and the other shared builder scripts). Presentation-only; the served builder pages are content-hashed, so this only refreshes the source refs."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "    <script src=\"/shared_components/js/quote-session.js?v=2026.09.06.37\"></script>",
+      "after": "    <script src=\"/shared_components/js/quote-session.js?v=2026.09.17.2\"></script>",
+      "count": 1,
+      "stage": "release-2026.09.17.2",
+      "reason": "Deploy v2026.09.17.2 cache-bust: ?v= query strings bumped to 2026.09.17.2 on the pages that reference the changed builder assets (quote-workspace/quote-embroidery/quote-dtf/quote-dtg CSS, quote-builder-utils and the other shared builder scripts). Presentation-only; the served builder pages are content-hashed, so this only refreshes the source refs."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "    <script src=\"/shared_components/js/customer-context-banners.js?v=2026.07.07.2\"></script>\n\n    <!-- Product Thumbnail Modal (click to enlarge) -->\n    <script src=\"/shared_components/js/product-thumbnail-modal.js?v=2026.09.08.5\"></script>",
+      "after": "    <script src=\"/shared_components/js/customer-context-banners.js?v=2026.09.17.2\"></script>\n\n    <!-- Product Thumbnail Modal (click to enlarge) -->\n    <script src=\"/shared_components/js/product-thumbnail-modal.js?v=2026.09.17.2\"></script>",
+      "count": 1,
+      "stage": "release-2026.09.17.2",
+      "reason": "Deploy v2026.09.17.2 cache-bust: ?v= query strings bumped to 2026.09.17.2 on the pages that reference the changed builder assets (quote-workspace/quote-embroidery/quote-dtf/quote-dtg CSS, quote-builder-utils and the other shared builder scripts). Presentation-only; the served builder pages are content-hashed, so this only refreshes the source refs."
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "    <script src=\"/shared_components/js/quote-order-summary.js?v=2026.09.06.31\"></script>",
+      "after": "    <script src=\"/shared_components/js/quote-order-summary.js?v=2026.09.17.2\"></script>",
+      "count": 1,
+      "stage": "release-2026.09.17.2",
+      "reason": "Deploy v2026.09.17.2 cache-bust: ?v= query strings bumped to 2026.09.17.2 on the pages that reference the changed builder assets (quote-workspace/quote-embroidery/quote-dtf/quote-dtg CSS, quote-builder-utils and the other shared builder scripts). Presentation-only; the served builder pages are content-hashed, so this only refreshes the source refs."
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "    <script src=\"/shared_components/js/quote-extended-sizes.js?v=2026.09.06.22\"></script>",
+      "after": "    <script src=\"/shared_components/js/quote-extended-sizes.js?v=2026.09.17.2\"></script>",
+      "count": 1,
+      "stage": "release-2026.09.17.2",
+      "reason": "Deploy v2026.09.17.2 cache-bust: ?v= query strings bumped to 2026.09.17.2 on the pages that reference the changed builder assets (quote-workspace/quote-embroidery/quote-dtf/quote-dtg CSS, quote-builder-utils and the other shared builder scripts). Presentation-only; the served builder pages are content-hashed, so this only refreshes the source refs."
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "    <link rel=\"stylesheet\" href=\"/shared_components/css/quote-workspace.css?v=2026.09.17.1\">",
+      "after": "    <link rel=\"stylesheet\" href=\"/shared_components/css/quote-workspace.css?v=2026.09.17.2\">",
+      "count": 1,
+      "stage": "release-2026.09.17.2",
+      "reason": "Deploy v2026.09.17.2 cache-bust: ?v= query strings bumped to 2026.09.17.2 on the pages that reference the changed builder assets (quote-workspace/quote-embroidery/quote-dtf/quote-dtg CSS, quote-builder-utils and the other shared builder scripts). Presentation-only; the served builder pages are content-hashed, so this only refreshes the source refs."
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "    <script src=\"/shared_components/js/quote-builder-utils.js?v=2026.09.13.6\"></script>\n    <script src=\"/shared_components/js/exact-match-search.js?v=2026.09.06.37\"></script>\n    <script src=\"/shared_components/js/quote-share-modal.js?v=2026.09.06.22\"></script>",
+      "after": "    <script src=\"/shared_components/js/quote-builder-utils.js?v=2026.09.17.2\"></script>\n    <script src=\"/shared_components/js/exact-match-search.js?v=2026.09.06.37\"></script>\n    <script src=\"/shared_components/js/quote-share-modal.js?v=2026.09.17.2\"></script>",
+      "count": 1,
+      "stage": "release-2026.09.17.2",
+      "reason": "Deploy v2026.09.17.2 cache-bust: ?v= query strings bumped to 2026.09.17.2 on the pages that reference the changed builder assets (quote-workspace/quote-embroidery/quote-dtf/quote-dtg CSS, quote-builder-utils and the other shared builder scripts). Presentation-only; the served builder pages are content-hashed, so this only refreshes the source refs."
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "    <script src=\"/shared_components/js/quote-session.js?v=2026.09.06.37\"></script>",
+      "after": "    <script src=\"/shared_components/js/quote-session.js?v=2026.09.17.2\"></script>",
+      "count": 1,
+      "stage": "release-2026.09.17.2",
+      "reason": "Deploy v2026.09.17.2 cache-bust: ?v= query strings bumped to 2026.09.17.2 on the pages that reference the changed builder assets (quote-workspace/quote-embroidery/quote-dtf/quote-dtg CSS, quote-builder-utils and the other shared builder scripts). Presentation-only; the served builder pages are content-hashed, so this only refreshes the source refs."
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "    <script src=\"/shared_components/js/customer-context-banners.js?v=2026.07.07.2\"></script>",
+      "after": "    <script src=\"/shared_components/js/customer-context-banners.js?v=2026.09.17.2\"></script>",
+      "count": 1,
+      "stage": "release-2026.09.17.2",
+      "reason": "Deploy v2026.09.17.2 cache-bust: ?v= query strings bumped to 2026.09.17.2 on the pages that reference the changed builder assets (quote-workspace/quote-embroidery/quote-dtf/quote-dtg CSS, quote-builder-utils and the other shared builder scripts). Presentation-only; the served builder pages are content-hashed, so this only refreshes the source refs."
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "    <script src=\"/shared_components/js/product-thumbnail-modal.js?v=2026.09.08.5\"></script>",
+      "after": "    <script src=\"/shared_components/js/product-thumbnail-modal.js?v=2026.09.17.2\"></script>",
+      "count": 1,
+      "stage": "release-2026.09.17.2",
+      "reason": "Deploy v2026.09.17.2 cache-bust: ?v= query strings bumped to 2026.09.17.2 on the pages that reference the changed builder assets (quote-workspace/quote-embroidery/quote-dtf/quote-dtg CSS, quote-builder-utils and the other shared builder scripts). Presentation-only; the served builder pages are content-hashed, so this only refreshes the source refs."
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "    <script src=\"/shared_components/js/customer-design-combobox.js?v=2026.09.06.31\"></script>\n    <!-- [2026-06-08] Shared order-summary band — MUST load after quote-builder-utils.js + before the builders/scp bundle (configure() runs at its eval) -->\n    <script src=\"/shared_components/js/quote-order-summary.js?v=2026.09.06.31\"></script>\n    <script src=\"/shared_components/js/safety-stripe-recs.js?v=2026.09.13.2\"></script>",
+      "after": "    <script src=\"/shared_components/js/customer-design-combobox.js?v=2026.09.17.2\"></script>\n    <!-- [2026-06-08] Shared order-summary band — MUST load after quote-builder-utils.js + before the builders/scp bundle (configure() runs at its eval) -->\n    <script src=\"/shared_components/js/quote-order-summary.js?v=2026.09.17.2\"></script>\n    <script src=\"/shared_components/js/safety-stripe-recs.js?v=2026.09.17.2\"></script>",
+      "count": 1,
+      "stage": "release-2026.09.17.2",
+      "reason": "Deploy v2026.09.17.2 cache-bust: ?v= query strings bumped to 2026.09.17.2 on the pages that reference the changed builder assets (quote-workspace/quote-embroidery/quote-dtf/quote-dtg CSS, quote-builder-utils and the other shared builder scripts). Presentation-only; the served builder pages are content-hashed, so this only refreshes the source refs."
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "    <script src=\"/shared_components/js/product-thumbnail-modal.js?v=2026.09.08.5\"></script>",
+      "after": "    <script src=\"/shared_components/js/product-thumbnail-modal.js?v=2026.09.17.2\"></script>",
+      "count": 1,
+      "stage": "release-2026.09.17.2",
+      "reason": "Deploy v2026.09.17.2 cache-bust: ?v= query strings bumped to 2026.09.17.2 on the pages that reference the changed builder assets (quote-workspace/quote-embroidery/quote-dtf/quote-dtg CSS, quote-builder-utils and the other shared builder scripts). Presentation-only; the served builder pages are content-hashed, so this only refreshes the source refs."
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "    <link rel=\"stylesheet\" href=\"/shared_components/css/quote-workspace.css?v=2026.09.17.1\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/quote-dtf.css?v=2026.09.17.1\">",
+      "after": "    <link rel=\"stylesheet\" href=\"/shared_components/css/quote-workspace.css?v=2026.09.17.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/quote-dtf.css?v=2026.09.17.2\">",
+      "count": 1,
+      "stage": "release-2026.09.17.2",
+      "reason": "Deploy v2026.09.17.2 cache-bust: ?v= query strings bumped to 2026.09.17.2 on the pages that reference the changed builder assets (quote-workspace/quote-embroidery/quote-dtf/quote-dtg CSS, quote-builder-utils and the other shared builder scripts). Presentation-only; the served builder pages are content-hashed, so this only refreshes the source refs."
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "    <script src=\"/shared_components/js/quote-builder-utils.js?v=2026.09.13.6\"></script>",
+      "after": "    <script src=\"/shared_components/js/quote-builder-utils.js?v=2026.09.17.2\"></script>",
+      "count": 1,
+      "stage": "release-2026.09.17.2",
+      "reason": "Deploy v2026.09.17.2 cache-bust: ?v= query strings bumped to 2026.09.17.2 on the pages that reference the changed builder assets (quote-workspace/quote-embroidery/quote-dtf/quote-dtg CSS, quote-builder-utils and the other shared builder scripts). Presentation-only; the served builder pages are content-hashed, so this only refreshes the source refs."
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "    <script src=\"/shared_components/js/quote-share-modal.js?v=2026.09.06.22\"></script>",
+      "after": "    <script src=\"/shared_components/js/quote-share-modal.js?v=2026.09.17.2\"></script>",
+      "count": 1,
+      "stage": "release-2026.09.17.2",
+      "reason": "Deploy v2026.09.17.2 cache-bust: ?v= query strings bumped to 2026.09.17.2 on the pages that reference the changed builder assets (quote-workspace/quote-embroidery/quote-dtf/quote-dtg CSS, quote-builder-utils and the other shared builder scripts). Presentation-only; the served builder pages are content-hashed, so this only refreshes the source refs."
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "    <script src=\"/shared_components/js/quote-session.js?v=2026.09.06.37\"></script>",
+      "after": "    <script src=\"/shared_components/js/quote-session.js?v=2026.09.17.2\"></script>",
+      "count": 1,
+      "stage": "release-2026.09.17.2",
+      "reason": "Deploy v2026.09.17.2 cache-bust: ?v= query strings bumped to 2026.09.17.2 on the pages that reference the changed builder assets (quote-workspace/quote-embroidery/quote-dtf/quote-dtg CSS, quote-builder-utils and the other shared builder scripts). Presentation-only; the served builder pages are content-hashed, so this only refreshes the source refs."
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "    <script src=\"/shared_components/js/customer-context-banners.js?v=2026.07.07.2\"></script>",
+      "after": "    <script src=\"/shared_components/js/customer-context-banners.js?v=2026.09.17.2\"></script>",
+      "count": 1,
+      "stage": "release-2026.09.17.2",
+      "reason": "Deploy v2026.09.17.2 cache-bust: ?v= query strings bumped to 2026.09.17.2 on the pages that reference the changed builder assets (quote-workspace/quote-embroidery/quote-dtf/quote-dtg CSS, quote-builder-utils and the other shared builder scripts). Presentation-only; the served builder pages are content-hashed, so this only refreshes the source refs."
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "    <script src=\"/shared_components/js/customer-design-combobox.js?v=2026.09.06.31\"></script>\n    <!-- [2026-06-08] Shared order-summary band — MUST load before the builders/dtf bundle (the class calls QuoteOrderSummary.configure() during init) -->\n    <script src=\"/shared_components/js/quote-order-summary.js?v=2026.09.06.31\"></script>\n    <script src=\"/shared_components/js/safety-stripe-recs.js?v=2026.09.13.2\"></script>",
+      "after": "    <script src=\"/shared_components/js/customer-design-combobox.js?v=2026.09.17.2\"></script>\n    <!-- [2026-06-08] Shared order-summary band — MUST load before the builders/dtf bundle (the class calls QuoteOrderSummary.configure() during init) -->\n    <script src=\"/shared_components/js/quote-order-summary.js?v=2026.09.17.2\"></script>\n    <script src=\"/shared_components/js/safety-stripe-recs.js?v=2026.09.17.2\"></script>",
+      "count": 1,
+      "stage": "release-2026.09.17.2",
+      "reason": "Deploy v2026.09.17.2 cache-bust: ?v= query strings bumped to 2026.09.17.2 on the pages that reference the changed builder assets (quote-workspace/quote-embroidery/quote-dtf/quote-dtg CSS, quote-builder-utils and the other shared builder scripts). Presentation-only; the served builder pages are content-hashed, so this only refreshes the source refs."
+    },
+    {
+      "file": "quote-builders/dtg-quote-builder.html",
+      "before": "    <link rel=\"stylesheet\" href=\"/shared_components/css/quote-workspace.css?v=2026.09.17.1\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/specialty-assistant.css?v=2026.09.17.1\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/quote-dtg.css?v=2026.09.17.1\">",
+      "after": "    <link rel=\"stylesheet\" href=\"/shared_components/css/quote-workspace.css?v=2026.09.17.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/specialty-assistant.css?v=2026.09.17.1\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/quote-dtg.css?v=2026.09.17.2\">",
+      "count": 1,
+      "stage": "release-2026.09.17.2",
+      "reason": "Deploy v2026.09.17.2 cache-bust: ?v= query strings bumped to 2026.09.17.2 on the pages that reference the changed builder assets (quote-workspace/quote-embroidery/quote-dtf/quote-dtg CSS, quote-builder-utils and the other shared builder scripts). Presentation-only; the served builder pages are content-hashed, so this only refreshes the source refs."
+    },
+    {
+      "file": "quote-builders/dtg-quote-builder.html",
+      "before": "    <script src=\"/shared_components/js/customer-context-banners.js?v=2026.07.07.2\"></script>",
+      "after": "    <script src=\"/shared_components/js/customer-context-banners.js?v=2026.09.17.2\"></script>",
+      "count": 1,
+      "stage": "release-2026.09.17.2",
+      "reason": "Deploy v2026.09.17.2 cache-bust: ?v= query strings bumped to 2026.09.17.2 on the pages that reference the changed builder assets (quote-workspace/quote-embroidery/quote-dtf/quote-dtg CSS, quote-builder-utils and the other shared builder scripts). Presentation-only; the served builder pages are content-hashed, so this only refreshes the source refs."
+    },
+    {
+      "file": "quote-builders/dtg-quote-builder.html",
+      "before": "    <script src=\"/shared_components/js/quote-builder-utils.js?v=2026.09.13.6\"></script>",
+      "after": "    <script src=\"/shared_components/js/quote-builder-utils.js?v=2026.09.17.2\"></script>",
+      "count": 1,
+      "stage": "release-2026.09.17.2",
+      "reason": "Deploy v2026.09.17.2 cache-bust: ?v= query strings bumped to 2026.09.17.2 on the pages that reference the changed builder assets (quote-workspace/quote-embroidery/quote-dtf/quote-dtg CSS, quote-builder-utils and the other shared builder scripts). Presentation-only; the served builder pages are content-hashed, so this only refreshes the source refs."
+    },
+    {
+      "file": "quote-builders/dtg-quote-builder.html",
+      "before": "    <script src=\"/shared_components/js/quote-order-summary.js?v=2026.09.06.31\"></script>\n    <!-- Chat controller — listens for PRICE_QUOTE blocks and fills the form -->\n    <script src=\"/shared_components/js/dtg-quote-page.js?v=2026.09.08.5\"></script>",
+      "after": "    <script src=\"/shared_components/js/quote-order-summary.js?v=2026.09.17.2\"></script>\n    <!-- Chat controller — listens for PRICE_QUOTE blocks and fills the form -->\n    <script src=\"/shared_components/js/dtg-quote-page.js?v=2026.09.17.2\"></script>",
+      "count": 1,
+      "stage": "release-2026.09.17.2",
+      "reason": "Deploy v2026.09.17.2 cache-bust: ?v= query strings bumped to 2026.09.17.2 on the pages that reference the changed builder assets (quote-workspace/quote-embroidery/quote-dtf/quote-dtg CSS, quote-builder-utils and the other shared builder scripts). Presentation-only; the served builder pages are content-hashed, so this only refreshes the source refs."
+    },
+    {
+      "file": "product.html",
+      "before": "    <script src=\"/shared_components/js/embroidery-quote-pricing.js?v=2026.09.16.5\" defer></script>",
+      "after": "    <script src=\"/shared_components/js/embroidery-quote-pricing.js?v=2026.09.17.2\" defer></script>",
+      "count": 1,
+      "stage": "release-2026.09.17.2",
+      "reason": "Deploy v2026.09.17.2 cache-bust: ?v= query strings bumped to 2026.09.17.2 on the pages that reference the changed builder assets (quote-workspace/quote-embroidery/quote-dtf/quote-dtg CSS, quote-builder-utils and the other shared builder scripts). Presentation-only; the served builder pages are content-hashed, so this only refreshes the source refs."
+    },
+    {
+      "file": "product.html",
+      "before": "    <script src=\"/shared_components/js/safety-stripe-recs.js?v=2026.09.13.2\" defer></script>",
+      "after": "    <script src=\"/shared_components/js/safety-stripe-recs.js?v=2026.09.17.2\" defer></script>",
+      "count": 1,
+      "stage": "release-2026.09.17.2",
+      "reason": "Deploy v2026.09.17.2 cache-bust: ?v= query strings bumped to 2026.09.17.2 on the pages that reference the changed builder assets (quote-workspace/quote-embroidery/quote-dtf/quote-dtg CSS, quote-builder-utils and the other shared builder scripts). Presentation-only; the served builder pages are content-hashed, so this only refreshes the source refs."
+    },
+    {
+      "file": "pages/quote-cart.html",
+      "before": "    <script src=\"/shared_components/js/embroidery-quote-pricing.js?v=2026.09.16.5\" defer></script>",
+      "after": "    <script src=\"/shared_components/js/embroidery-quote-pricing.js?v=2026.09.17.2\" defer></script>",
+      "count": 1,
+      "stage": "release-2026.09.17.2",
+      "reason": "Deploy v2026.09.17.2 cache-bust: ?v= query strings bumped to 2026.09.17.2 on the pages that reference the changed builder assets (quote-workspace/quote-embroidery/quote-dtf/quote-dtg CSS, quote-builder-utils and the other shared builder scripts). Presentation-only; the served builder pages are content-hashed, so this only refreshes the source refs."
+    },
+    {
+      "file": "calculators/quick-quote/index.html",
+      "before": "    <script src=\"/shared_components/js/embroidery-quote-pricing.js?v=2026.09.16.5\"></script>\n    <script src=\"/shared_components/js/dtf-quote-pricing.js?v=2026.09.06.37\"></script>\n    <script src=\"/shared_components/js/quote-cart-engine.js?v=2026.09.13.6\"></script>\n    <!-- Page logic -->\n    <script src=\"/shared_components/js/safety-stripe-recs.js?v=2026.09.13.2\"></script>",
+      "after": "    <script src=\"/shared_components/js/embroidery-quote-pricing.js?v=2026.09.17.2\"></script>\n    <script src=\"/shared_components/js/dtf-quote-pricing.js?v=2026.09.06.37\"></script>\n    <script src=\"/shared_components/js/quote-cart-engine.js?v=2026.09.13.6\"></script>\n    <!-- Page logic -->\n    <script src=\"/shared_components/js/safety-stripe-recs.js?v=2026.09.17.2\"></script>",
+      "count": 1,
+      "stage": "release-2026.09.17.2-quick-quote",
+      "reason": "Deploy v2026.09.17.2 cache-bust: ?v= bumped on the Quick Quote page for the changed shared builder assets (embroidery-quote-pricing.js, safety-stripe-recs.js). Presentation-only."
     }
   ]
 }
