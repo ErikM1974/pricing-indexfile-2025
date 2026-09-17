@@ -1,3 +1,15 @@
+## v2026.09.17.2 (2026.09.17)
+
+- Memory: builder cosmetic states live (v2026.09.17.1)
+- DTG builder: push and assistant confirms become native modal dialogs
+- Quote builders: make original capture mode repeatable
+- Embroidery builder: goods, names and manual-item dialogs become native modal dialogs
+- Quote builders: shared runtime markup drops its style attributes
+- Quote builders: EMB, SCP and DTF pages drop their static style attributes
+- Quote builders: EMB, SCP and DTF runtime markup drops its style attributes
+- Embroidery: Push opens its preview for a saved, unchanged quote
+- Deploy v2026.09.17.2: 11 files (index.html,customer-product.html,quote-cart.html,...)
+
 ## v2026.09.17.1 (2026.09.17)
 
 - Memory: print methods and builder runtime styles live (v2026.09.16.5)
