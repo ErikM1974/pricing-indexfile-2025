@@ -1,5 +1,11 @@
 # LESSONS LEARNED
 
+## Push must not disable the button its own preview gate reads (2026-09-17)
+
+- Problem/root cause: embroidery `pushToShopWorks()` disabled `#emb-push-shopworks-btn` before awaiting, and `openPushPreview()` bails on a disabled button. It only ever worked because the silent save re-enabled it, so a quote with nothing to save (just saved, or reopened for editing) opened no preview and showed no message — Push looked dead.
+- Solution: `pushToShopWorks()` no longer disables the button; `embState._pushInFlight` is the double-click guard, which is what SCP and DTF already do and say in comments. The spinner label and the save-skip for a clean quote stay.
+- Prevention: never let a handler flip the UI state that a function it calls uses as its gate. A browser test pushes a saved, unchanged quote and expects the preview plus no second save.
+
 ## Saved browser evidence must not record timing samples (2026-09-17)
 
 - Problem/root cause: `CAPTURE_QUOTE_BUILDERS_ORIGINAL=1` failed 30 of 79 replayed builder states on every run, even on the commit before the September 16 changes, although the replayed sources are hash-locked. The saved records held values that change between runs: `Math.random` artwork-widget ids, share links on port 3414, toasts that expire on real timers, guided-step titles that fail contrast only under the resting pointer (Chromium re-applies `:hover` asynchronously after a resize or full-page screenshot), the fast-quote step fade-in (0.3 s, no reduced-motion rule), and the company lookup replacing its "Searching..." node while axe ran. axe names a node that left the document `:root`.
@@ -246,9 +252,3 @@ Browser baselines must work from a fresh checkout. The tumbler export test previ
 - Problem/root cause: SCP floored its LTM share before multiplication; EMB/SCP PDFs read rounded DOM text. Saved customer views preferred base prices, and screen-print handoffs had no returned row ID.
 - Solution: retain exact per-unit values for output, allocate saved row cents cumulatively, display billed totals/quantity and return the created product row. Keep API fees authoritative and display customer LTM inside unit prices.
 - Prevention: real Quick Quote-to-builder numeric handoffs for every method plus cap puff/patch/back-only, small quantities 3/7/23/24/37, screen/PDF consistency, seven-row fractional cents and saved/customer-cart checks. Check a real supplier-photo PDF too: external images need the same-origin relay for canvas access even when HTML displays them. See QUICK_QUOTE_2026-09.md.
-
-## Downloaded PDF layout is separate from print CSS (2026-09-15)
-
-- Problem/root cause: Quick Quote's jsPDF download used plain text columns and a small image; changing website print CSS would not improve that downloaded file. Rough height estimates could also miss wrapped content.
-- Solution: update the existing PDF renderer with measured table rows, flowing text, a local logo and appropriately sized image canvases; keep pricing in the shared document model.
-- Prevention: inspect actual generated PDF pages and exercise long notes, multiple options, sampled quantities and setup fees. Preserve the caller's model, exact totals and original source estimate. No-quantity sheets must omit order totals.

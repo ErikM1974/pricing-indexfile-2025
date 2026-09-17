@@ -5,6 +5,12 @@ Resolved entries aged out of `LESSONS_LEARNED.md` (300-line cap). Newest first. 
 ---
 
 ## Archived 2026-09-17
+## Downloaded PDF layout is separate from print CSS (2026-09-15)
+
+- Problem/root cause: Quick Quote's jsPDF download used plain text columns and a small image; changing website print CSS would not improve that downloaded file. Rough height estimates could also miss wrapped content.
+- Solution: update the existing PDF renderer with measured table rows, flowing text, a local logo and appropriately sized image canvases; keep pricing in the shared document model.
+- Prevention: inspect actual generated PDF pages and exercise long notes, multiple options, sampled quantities and setup fees. Preserve the caller's model, exact totals and original source estimate. No-quantity sheets must omit order totals.
+
 ## Calculator references need complete field and paper ownership (2026-09-11)
 
 - Problem/root cause: legacy price tables clipped rightmost size columns on paper; page-local print rules hid price-load failures, while broad class matching missed compound quantity-control classes.

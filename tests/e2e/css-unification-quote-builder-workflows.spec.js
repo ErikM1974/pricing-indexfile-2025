@@ -591,6 +591,34 @@ test('CSS quote builders: embroidery runtime markup keeps its look with style at
  expect(e.errors).toEqual([]);expect(e.writes).toEqual([]);expect(e.unknown).toEqual([]);
 });
 
+// Push opens its preview even when the quote has nothing to save (just saved, or reopened for editing).
+// It used to disable the button before calling openPushPreview(), which bails on a disabled button, so
+// that click did nothing at all (2026-09-17). Every request here is synthetic — no order is created.
+test('CSS quote builders: embroidery push reopens the preview for a saved, unchanged quote',async({page})=>{
+ test.skip(original,'The push preview postdates the reviewed migration.');
+ page.setDefaultTimeout(20000);
+ const e=await open(page,{save:true,url:'/quote-builders/embroidery-quote-builder.html'});
+ let previews=0;
+ await page.route('**/api/embroidery-push/preview/**',r=>{previews++;return r.fulfill({json:{extOrderId:'NWCA-EMB-2026-777',designCount:1,orderJson:{id_Customer:10001,LinesOE:[{PartNumber:'PC54',Description:'Tee',Qty:48,Price:20}],Designs:[{id_Design:4321}],Notes:[]}}});});
+ await addProduct(page,'embroidery');
+ await page.evaluate(()=>{document.getElementById('customer-number').value='10001';document.getElementById('customer-name').value='Example Customer';document.getElementById('customer-email').value='customer@example.invalid';});
+ const modal=page.locator('#emb-sw-push-modal'),pushBtn=page.locator('#emb-push-shopworks-btn');
+ await page.evaluate(()=>pushToShopWorks());
+ await expect(modal).toHaveClass(/active/);
+ await expect(page.locator('#emb-sw-push-preview')).toContainText('NWCA-EMB-2026-777');
+ await page.evaluate(()=>closePushPreview());
+ await expect(pushBtn).toBeEnabled();
+ // Saved and unchanged: the preview opens again, and the redundant save is still skipped.
+ const saves=e.mutations.length;
+ await page.evaluate(()=>{markAsSaved();pushToShopWorks();});
+ await expect(modal).toHaveClass(/active/);
+ expect(previews).toBe(2);
+ expect(e.mutations.length).toBe(saves);
+ await page.evaluate(()=>closePushPreview());
+ await expect(pushBtn).toBeEnabled();
+ expect(e.errors).toEqual([]);expect(e.writes).toEqual([]);expect(e.unknown).toEqual([]);
+});
+
 for(const method of ['screenprint','dtf'])test('CSS quote builders: '+method+' runtime markup keeps its look with style attributes blocked',async({page})=>{
  test.skip(original,'Runtime markup moved to classes after the reviewed migration.');
  page.setDefaultTimeout(20000);

@@ -678,7 +678,11 @@ export async function pushToShopWorks() {
     embState._pushInFlight = true;
     const pushBtn = /** @type {HTMLInputElement|null} */ (document.getElementById('emb-push-shopworks-btn'));
     if (pushBtn) {
-        pushBtn.disabled = true;  // disable synchronously, BEFORE the first await
+        // Do NOT disable the button here — openPushPreview() bails when it is disabled (SCP/DTF say the
+        // same). _pushInFlight above is the double-click guard. Disabling it synchronously (2026-06-07)
+        // only worked because the save re-enabled it: a quote with nothing to save — just saved, or
+        // reopened for editing — skipped that save, so the preview never opened and Push looked dead
+        // (2026-09-17).
         // [2026-06-07] The silent save before the preview modal takes ~2-3s — show a spinner so the rep knows
         // it's working. Update the LABEL's content, NOT the button's innerHTML — replacing the button HTML
         // destroys #emb-push-shopworks-label, which updatePushButtonState needs, and would strand the button
