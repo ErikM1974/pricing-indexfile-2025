@@ -4,6 +4,7 @@
  */
 /* global showToast,
    emailQuote, markAsSaved, EmbroideryInvoiceGenerator */
+import { showModalDialog } from '../shared/modal-dialog.js';
 import { artFeeAddOns, artFeeTotals } from './fees.js';
 import { effectiveLocationCode, effectiveLocationLabel, isRowColorInvalid, updateSubmitEnabled } from './form-core.js';
 import { clearSessionState, getQuoteID } from './persistence.js';
@@ -42,12 +43,9 @@ export function collectStockIssues() {
     return issues;
 }
 
-// Both confirms are native modal dialogs (NWCA-2026-GUIDE: showModal()/close()
-// and the opener gets focus back). The <dialog> is the dimmed full-screen layer
-// .dtg-stock-confirm-backdrop has always styled, so the panel looks unchanged;
-// showModal() makes the builder behind it inert.
-const CONFIRM_FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
-const openConfirmDialogs = [];
+// Both confirms are native modal dialogs (shared/modal-dialog.js). The <dialog> is
+// the dimmed full-screen layer .dtg-stock-confirm-backdrop has always styled, so
+// the panel looks unchanged.
 let confirmDialogCount = 0;
 
 // The caller's markup gives its title and body the ids `${dialog.id}-title`
@@ -55,7 +53,7 @@ let confirmDialogCount = 0;
 function createConfirmDialog() {
     const dialog = document.createElement('dialog');
     dialog.id = `dtg-confirm-${++confirmDialogCount}`;
-    dialog.className = 'dtg-stock-confirm-backdrop';
+    dialog.className = 'dtg-stock-confirm-backdrop qb-overlay-dialog';
     dialog.setAttribute('aria-labelledby', `${dialog.id}-title`);
     dialog.setAttribute('aria-describedby', `${dialog.id}-body`);
     return dialog;
@@ -63,47 +61,18 @@ function createConfirmDialog() {
 
 // Opens a filled confirm dialog. Resolves true from its [data-action="confirm"]
 // button; Cancel, Escape, a click on the dimmed layer or any other close request
-// resolve false. Tab wraps inside the newest open confirm, and Escape stops here
-// so the assistant panel behind it stays open.
+// resolve false.
 function showConfirmDialog(dialog) {
     return new Promise((resolve) => {
-        const opener = /** @type {HTMLElement|null} */ (document.activeElement);
+        const cancel = /** @type {HTMLElement} */ (dialog.querySelector('[data-action="cancel"]'));
+        // Focus the "Cancel" button by default — safer than auto-confirming.
+        const close = showModalDialog(dialog, { initialFocus: cancel, onDismiss: () => finish(false) });
         function finish(confirmed) {
-            const index = openConfirmDialogs.indexOf(dialog);
-            if (index === -1) return;
-            openConfirmDialogs.splice(index, 1);
-            document.removeEventListener('keydown', onKey, true);
-            if (dialog.open) dialog.close();
-            dialog.remove();
-            if (opener && opener !== document.body && opener.isConnected) opener.focus({ preventScroll: true });
+            close();
             resolve(confirmed);
         }
-        function onKey(e) {
-            if (openConfirmDialogs[openConfirmDialogs.length - 1] !== dialog) return;
-            if (e.key === 'Escape') {
-                e.preventDefault();
-                e.stopPropagation();
-                finish(false);
-            } else if (e.key === 'Tab') {
-                const stops = /** @type {HTMLElement[]} */ (Array.from(dialog.querySelectorAll(CONFIRM_FOCUSABLE)));
-                const first = stops[0];
-                const last = stops[stops.length - 1];
-                if (!dialog.contains(document.activeElement) || document.activeElement === (e.shiftKey ? first : last)) {
-                    e.preventDefault();
-                    (e.shiftKey ? last : first).focus();
-                }
-            }
-        }
-        dialog.addEventListener('click', (e) => { if (e.target === dialog) finish(false); });
-        dialog.addEventListener('close', () => finish(false));
-        dialog.querySelector('[data-action="cancel"]').addEventListener('click', () => finish(false));
+        cancel.addEventListener('click', () => finish(false));
         dialog.querySelector('[data-action="confirm"]').addEventListener('click', () => finish(true));
-        document.addEventListener('keydown', onKey, true);
-        openConfirmDialogs.push(dialog);
-        document.body.appendChild(dialog);
-        dialog.showModal();
-        // Focus the "Cancel" button by default — safer than auto-confirming.
-        /** @type {HTMLElement} */ (dialog.querySelector('[data-action="cancel"]')).focus();
     });
 }
 

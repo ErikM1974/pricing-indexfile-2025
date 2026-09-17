@@ -356,6 +356,74 @@ test('CSS quote builders: embroidery import summary and vendor price by keyboard
  expect(e.errors).toEqual([]);expect(e.writes).toEqual([]);expect(e.unknown).toEqual([]);
 });
 
+// The customer goods, names and manual-item dialogs are native modal dialogs (2026-09-17): named by their
+// titles, Tab stays inside, Escape and the dimmed layer close only the dialog, and focus goes back.
+test('CSS quote builders: embroidery runtime dialogs keep and return focus',async({page})=>{
+ test.skip(original,'Native dialogs replaced the original overlays.');
+ page.setDefaultTimeout(20000);
+ const e=await open(page,{assistant:true,vendor:['VND100'],url:'/quote-builders/embroidery-quote-builder.html'});
+ await addProduct(page,'embroidery');
+ const inside=dialog=>dialog.evaluate(d=>d.matches(':modal')&&d.contains(document.activeElement));
+ const cycle=async(dialog,stops)=>{for(let i=0;i<=stops;i++){await page.keyboard.press('Tab');expect(await inside(dialog)).toBe(true);}await page.keyboard.press('Shift+Tab');expect(await inside(dialog)).toBe(true);};
+ const noViolations=async sel=>expect((await new AxeBuilder({page}).include(sel).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze()).violations.map(v=>v.id)).toEqual([]);
+ // Customer goods, from the row's Describe button. Escape leaves the assistant panel open.
+ await page.locator('.guided-step[data-step="1"]').click();
+ await page.locator('.service-cat-btn').filter({hasText:'Customer-Supplied'}).click();await page.locator('.sci-add-config[data-code="DECG"]').click();
+ await page.locator('.guided-step[data-step="0"]').click();
+ const describe=page.locator('.btn-describe-cs');await expect(describe).toBeVisible();
+ const panel=page.locator('#aiChatPanel');await page.locator('#floatingQuoteBtn').click();await expect(panel).toHaveClass(/open/);
+ await expect(page.locator('#aiChatMessages')).toContainText('I can help with embroidery products');
+ const goods=page.getByRole('dialog',{name:'What is the customer bringing?'});
+ await describe.focus();await page.keyboard.press('Enter');
+ await expect(goods.locator('.csg-brand')).toBeFocused();
+ expect(await page.evaluate(()=>{document.getElementById('product-search').focus();return document.activeElement.id;})).not.toBe('product-search');
+ await cycle(goods,5);await noViolations('#cs-goods-dialog');
+ await page.keyboard.press('Escape');await expect(goods).toHaveCount(0);await expect(panel).toHaveClass(/open/);await expect(describe).toBeFocused();
+ await page.keyboard.press('Escape');await expect(panel).not.toHaveClass(/open/);
+ await describe.click();
+ await goods.locator('.csg-brand').fill('Carhartt CTK87');await goods.locator('.csg-color').fill('Navy');await goods.locator('.csg-details').fill('S(4) M(10)');
+ await goods.getByRole('button',{name:'Save'}).click();await expect(goods).toHaveCount(0);await expect(describe).toBeFocused();
+ const decg=page.locator('tr[data-service-type="decg"]');
+ await expect(decg.locator('.service-description')).toHaveText('Customer-Supplied Garments (8K stitches) — Carhartt CTK87 · Navy');
+ expect(await decg.evaluate(r=>r.dataset.csNotes)).toBe('S(4) M(10)');
+ await describe.click();await expect(goods.locator('.csg-brand')).toHaveValue('Carhartt CTK87');
+ await page.mouse.click(8,8);await expect(goods).toHaveCount(0);await expect(describe).toBeFocused();
+ // Manual item, from an unknown style's "Enter manually" button. Saving removes that button, so focus goes to the first size.
+ const search=page.locator('#product-search');await search.click();await search.pressSequentially('VND100',{delay:40});
+ await expect(search).toHaveValue('VND100');await search.press('Enter');
+ await page.locator('.suggestion-add-nonsanmar').click();
+ const enter=page.getByRole('button',{name:'Enter manually'});await enter.click();
+ const manual=page.getByRole('dialog',{name:'Enter this item manually'});
+ await expect(manual.locator('.mi-desc')).toBeFocused();await cycle(manual,7);await noViolations('#manual-item-dialog');
+ await page.keyboard.press('Escape');await expect(manual).toHaveCount(0);await expect(enter).toBeFocused();
+ await enter.press('Enter');
+ await manual.locator('.mi-desc').fill('S&S Bella+Canvas Jersey Tee');await manual.locator('.mi-color').fill('Navy');
+ // A missing cost keeps the dialog open and says why beside the field (the toast is under the modal layer).
+ const addToQuote=manual.getByRole('button',{name:'Add to quote'}),cost=manual.locator('.mi-cost');
+ await addToQuote.click();await expect(manual.getByRole('alert')).toHaveText('Enter what we pay per blank — the price is built from it.');
+ await expect(cost).toBeFocused();await expect(cost).toHaveAttribute('aria-invalid','true');
+ await expect(cost).toHaveAccessibleDescription('Enter what we pay per blank — the price is built from it.');await noViolations('#manual-item-dialog');
+ await cost.fill('8.42');await addToQuote.click();await expect(manual).toHaveCount(0);
+ const vendor=page.locator('tr[data-style="VND100"]');
+ await expect(vendor.locator('.non-sanmar-badge')).toHaveText('Manual');await expect(vendor.locator('input[data-size="S"]')).toBeFocused();
+ expect(await vendor.evaluate(r=>[r.dataset.manualItem,r.dataset.blankCost])).toEqual(['true','8.42']);
+ // Names, opened by the services bar. Guided steps hide the new row, so focus returns to the menu button;
+ // with every section shown it goes to the row's quantity.
+ await page.locator('.guided-step[data-step="1"]').click();
+ const addOns=page.locator('.service-cat-btn').filter({hasText:'Add-Ons'});
+ const addMonogram=async()=>{await addOns.click();await page.locator('button.service-cat-item[data-code="Monogram"]').click();};
+ const names=page.getByRole('dialog',{name:'Monogram — who gets one?'});
+ await addMonogram();await expect(names.locator('textarea')).toBeFocused();await cycle(names,3);await noViolations('#monogram-names-dialog');
+ await page.keyboard.press('Escape');await expect(names).toHaveCount(0);await expect(addOns).toBeFocused();
+ await page.locator('.guided-toggle').click();
+ await addMonogram();await names.locator('textarea').fill('Sarah M\nJohn D, XL');await names.getByRole('button',{name:'Add names'}).click();
+ const quantity=page.locator('tr[data-service-type="monogram"] .service-qty').last();
+ await expect(names).toHaveCount(0);await expect(quantity).toBeFocused();await expect(quantity).toHaveValue('2');
+ await expect(page.locator('#notes')).toHaveValue(/--- Names\/Monograms ---\nSarah M\nJohn D, XL$/);
+ await addMonogram();await page.mouse.click(8,8);await expect(names).toHaveCount(0);await expect(quantity).toBeFocused();await expect(quantity).toHaveValue('1');
+ expect(e.errors).toEqual([]);expect(e.writes).toEqual([]);expect(e.unknown).toEqual([]);expect(e.mutations).toEqual([]);
+});
+
 // Every runtime overlay, notice and warning state the retired sheets styled has a real style again.
 for(const method of ['embroidery','screenprint','dtf','dtg'])test('CSS quote builders: '+method+' runtime overlays and warning states are styled',async({page})=>{
  test.skip(original,'The original page loaded the retired sheets.');

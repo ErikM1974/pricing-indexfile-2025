@@ -21,6 +21,7 @@
    EXTENDED_SIZE_ORDER */
 import { getServicePrice } from './pricing.js';
 import { positionColorDropdown } from '../shared/color-dropdown-position.js';
+import { showModalDialog } from '../shared/modal-dialog.js';
 import { recalculatePricing, updateTaxCalculation, collectProductsFromTable, getOrderPieceCounts, syncALRows, syncDECGRows } from './pricing-sync.js';
 import { updateNotesBadge, updateEmbellishmentDropdownLabels, getCapEmbellishmentType } from './logo-config.js';
 import { updateAdditionalCharges } from './quote-lifecycle.js';
@@ -868,6 +869,18 @@ function _applyCustomerSuppliedDescription(row, fields) {
 }
 
 /**
+ * The goods, names and manual-item dialogs share one look (.monogram-names-dialog) and
+ * open as native modal dialogs (shared/modal-dialog.js), named by their title element.
+ */
+function createOverlayDialog(id, titleId) {
+    const dialog = document.createElement('dialog');
+    dialog.id = id;
+    dialog.className = 'monogram-names-dialog qb-overlay-dialog';
+    dialog.setAttribute('aria-labelledby', titleId);
+    return dialog;
+}
+
+/**
  * Editor for "what is the customer actually bringing us?" on a DECG/DECC row.
  *
  * Customer-supplied lines used to read only "Customer-Supplied Garments (8K
@@ -886,12 +899,10 @@ export function openCustomerSuppliedDialog(rowId) {
 
     document.getElementById('cs-goods-dialog')?.remove();
     const existing = String(row.dataset.csDescription || '').split(' · ');
-    const wrap = document.createElement('div');
-    wrap.id = 'cs-goods-dialog';
-    wrap.className = 'monogram-names-dialog';
+    const wrap = createOverlayDialog('cs-goods-dialog', 'csg-title');
     // Every interpolated value goes through escapeHtml (rep-typed free text).
     wrap.innerHTML =
-        '<div class="mnd-card" role="dialog" aria-modal="true" aria-labelledby="csg-title">' +
+        '<div class="mnd-card">' +
         '  <div id="csg-title" class="mnd-title"><i class="fas fa-box-open" aria-hidden="true"></i> What is the customer bringing?</div>' +
         '  <div class="mnd-hint">Shows on the quote and the work order, so production and Receiving know what to expect. All optional.</div>' +
         '  <input type="text" class="mnd-input csg-brand" maxlength="80" placeholder="Brand / style — e.g. Carhartt CTK87" value="' + escapeHtml(existing[0] || '') + '">' +
@@ -902,13 +913,9 @@ export function openCustomerSuppliedDialog(rowId) {
         '    <button type="button" class="mnd-apply">Save</button>' +
         '  </div>' +
         '</div>';
-    document.body.appendChild(wrap);
 
-    const close = () => { wrap.remove(); document.removeEventListener('keydown', onKey); };
-    const onKey = (e) => { if (e.key === 'Escape') close(); };
-    wrap.querySelector('.mnd-skip').addEventListener('click', close);
-    wrap.addEventListener('click', (e) => { if (e.target === wrap) close(); });
-    document.addEventListener('keydown', onKey);
+    const close = showModalDialog(wrap, { initialFocus: /** @type {HTMLElement} */ (wrap.querySelector('.csg-brand')) });
+    wrap.querySelector('.mnd-skip').addEventListener('click', () => close());
     wrap.querySelector('.mnd-apply').addEventListener('click', () => {
         _applyCustomerSuppliedDescription(row, {
             brandStyle: /** @type {HTMLInputElement} */ (wrap.querySelector('.csg-brand')).value,
@@ -920,7 +927,6 @@ export function openCustomerSuppliedDialog(rowId) {
         recalculatePricing();
         showToast('Customer goods description saved', 'success');
     });
-    setTimeout(() => /** @type {HTMLElement} */ (wrap.querySelector('.csg-brand')).focus(), 50);
 }
 window.openCustomerSuppliedDialog = openCustomerSuppliedDialog;
 
@@ -933,11 +939,9 @@ window.openCustomerSuppliedDialog = openCustomerSuppliedDialog;
  */
 export function openMonogramNamesDialog(row, serviceType) {
     document.getElementById('monogram-names-dialog')?.remove();
-    const wrap = document.createElement('div');
-    wrap.id = 'monogram-names-dialog';
-    wrap.className = 'monogram-names-dialog';
+    const wrap = createOverlayDialog('monogram-names-dialog', 'mnd-title');
     wrap.innerHTML =
-        '<div class="mnd-card" role="dialog" aria-modal="true" aria-labelledby="mnd-title">' +
+        '<div class="mnd-card">' +
         '  <div id="mnd-title" class="mnd-title"><i class="fas fa-font" aria-hidden="true"></i> ' + escapeHtml(serviceType) + ' — who gets one?</div>' +
         '  <div class="mnd-hint">One name per line (add size/placement after a comma if needed, e.g. "Sarah M, L"). The line count becomes the quantity.</div>' +
         '  <textarea class="mnd-names" rows="6" placeholder="Sarah M&#10;John D, XL&#10;Riley P"></textarea>' +
@@ -946,22 +950,24 @@ export function openMonogramNamesDialog(row, serviceType) {
         '    <button type="button" class="mnd-apply">Add names</button>' +
         '  </div>' +
         '</div>';
-    document.body.appendChild(wrap);
-    const ta = wrap.querySelector('.mnd-names');
-    const close = () => { wrap.remove(); document.removeEventListener('keydown', onKey); };
-    const onKey = (e) => { if (e.key === 'Escape') { close(); focusQty(); } };
-    const focusQty = () => {
-        const q = row.querySelector('.service-qty');
-        if (q) { q.focus(); q.select(); }
+    const ta = /** @type {HTMLTextAreaElement} */ (wrap.querySelector('.mnd-names'));
+    // Closing focuses the row's quantity (skipping — button, Escape, the dimmed layer —
+    // also selects it for typing). In guided mode the row is on the hidden Products step,
+    // so focus goes back to the services-bar menu button the rep used instead.
+    const menuButton = /** @type {HTMLElement|null} */ (document.activeElement?.closest('.service-cat')?.querySelector('.service-cat-btn') || null);
+    const qtyInput = () => /** @type {HTMLInputElement|null} */ (row.querySelector('.service-qty'));
+    const skip = () => {
+        const q = qtyInput();
+        close(q, menuButton);
+        if (q && document.activeElement === q) q.select();
     };
-    wrap.querySelector('.mnd-skip').addEventListener('click', () => { close(); focusQty(); });
-    wrap.addEventListener('click', (e) => { if (e.target === wrap) { close(); focusQty(); } });
-    document.addEventListener('keydown', onKey);
+    const close = showModalDialog(wrap, { initialFocus: ta, onDismiss: skip });
+    wrap.querySelector('.mnd-skip').addEventListener('click', skip);
     wrap.querySelector('.mnd-apply').addEventListener('click', () => {
-        const names = /** @type {HTMLInputElement} */ (ta).value.split('\n').map(s => s.trim()).filter(Boolean);
-        close();
-        if (!names.length) { focusQty(); return; }
-        const q = row.querySelector('.service-qty');
+        const names = ta.value.split('\n').map(s => s.trim()).filter(Boolean);
+        if (!names.length) { skip(); return; }
+        const q = qtyInput();
+        close(q, menuButton);
         if (q) {
             q.value = String(names.length);
             q.dispatchEvent(new Event('change', { bubbles: true }));   // reprices via onServiceQtyChange
@@ -978,7 +984,6 @@ export function openMonogramNamesDialog(row, serviceType) {
         recalculatePricing();
         showToast(`${names.length} name${names.length === 1 ? '' : 's'} captured — qty set to ${names.length}; list saved to Special Notes.`, 'success');
     });
-    setTimeout(() => /** @type {HTMLElement} */ (ta).focus(), 50);
 }
 window.openMonogramNamesDialog = openMonogramNamesDialog;
 
@@ -1328,13 +1333,11 @@ export function openManualItemDialog(rowId) {
     if (!row) return;
 
     document.getElementById('manual-item-dialog')?.remove();
-    const wrap = document.createElement('div');
-    wrap.id = 'manual-item-dialog';
-    wrap.className = 'monogram-names-dialog';
+    const wrap = createOverlayDialog('manual-item-dialog', 'mi-title');
     const style = row.dataset.style || '';
     // The only interpolated value is escapeHtml(style); everything else is static markup.
     wrap.innerHTML =
-        '<div class="mnd-card" role="dialog" aria-modal="true" aria-labelledby="mi-title">' +
+        '<div class="mnd-card">' +
         '  <div id="mi-title" class="mnd-title"><i class="fas fa-pen-to-square" aria-hidden="true"></i> Enter this item manually</div>' +
         '  <div class="mnd-hint">We don\'t carry pricing for this style. Enter what we pay per blank and we price it exactly like a SanMar garment — margin, tier, embroidery and size upcharges all applied. Nothing is saved to the catalog.</div>' +
         '  <input type="text" class="mnd-input mi-style" maxlength="40" placeholder="Style" value="' + escapeHtml(style) + '">' +
@@ -1348,25 +1351,30 @@ export function openManualItemDialog(rowId) {
         '  <input type="text" class="mnd-input mi-color" maxlength="40" placeholder="Color — e.g. Navy">' +
         '  <input type="number" class="mnd-input mi-cost" step="0.01" min="0.01" placeholder="Our cost per blank ($) — e.g. 8.42">' +
         '  <input type="text" class="mnd-input mi-sizes" maxlength="120" placeholder="Sizes (comma-separated) — default S,M,L,XL,2XL,3XL">' +
+        '  <div class="alert alert-error mi-cost-error" id="mi-cost-error" role="alert" hidden></div>' +
         '  <div class="mnd-actions">' +
         '    <button type="button" class="mnd-skip">Cancel</button>' +
         '    <button type="button" class="mnd-apply">Add to quote</button>' +
         '  </div>' +
         '</div>';
-    document.body.appendChild(wrap);
 
-    const close = () => { wrap.remove(); document.removeEventListener('keydown', onKey); };
-    const onKey = (e) => { if (e.key === 'Escape') close(); };
-    wrap.querySelector('.mnd-skip').addEventListener('click', close);
-    wrap.addEventListener('click', (e) => { if (e.target === wrap) close(); });
-    document.addEventListener('keydown', onKey);
+    const close = showModalDialog(wrap, { initialFocus: /** @type {HTMLElement} */ (wrap.querySelector('.mi-desc')) });
+    wrap.querySelector('.mnd-skip').addEventListener('click', () => close());
 
     wrap.querySelector('.mnd-apply').addEventListener('click', () => {
         const val = sel => /** @type {HTMLInputElement} */ (wrap.querySelector(sel)).value.trim();
         const cost = parseFloat(val('.mi-cost'));
         if (!Number.isFinite(cost) || cost <= 0) {
-            showToast('Enter what we pay per blank — the price is built from it.', 'error');
-            /** @type {HTMLElement} */ (wrap.querySelector('.mi-cost')).focus();
+            const message = 'Enter what we pay per blank — the price is built from it.';
+            showToast(message, 'error');
+            // Toasts sit under the modal layer, so the dialog shows the error by the field too.
+            const costInput = /** @type {HTMLElement} */ (wrap.querySelector('.mi-cost'));
+            const costError = /** @type {HTMLElement} */ (wrap.querySelector('.mi-cost-error'));
+            costError.textContent = message;
+            costError.hidden = false;
+            costInput.setAttribute('aria-invalid', 'true');
+            costInput.setAttribute('aria-describedby', 'mi-cost-error');
+            costInput.focus();
             return;
         }
         applyManualItem(row, rowId, {
@@ -1376,9 +1384,9 @@ export function openManualItemDialog(rowId) {
             cost: cost,
             sizes: val('.mi-sizes')
         });
-        close();
+        // Saving removes the "Enter manually" button, so focus goes to the row's first size.
+        close(/** @type {HTMLElement|null} */ (row.querySelector('.size-input:not([disabled])')));
     });
-    setTimeout(() => /** @type {HTMLElement} */ (wrap.querySelector('.mi-desc')).focus(), 50);
 }
 window.openManualItemDialog = openManualItemDialog;
 
