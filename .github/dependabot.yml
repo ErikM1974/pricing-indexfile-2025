@@ -4,6 +4,12 @@ version: 2
 updates:
   - package-ecosystem: npm
     directory: "/"
+    # 🔴 Without this, dependabot targets the repo's default branch (main) and every
+    # dependency PR bypasses develop → main → Heroku. Five PRs opened 2026-09-14 did
+    # exactly that; merging one would have put main ahead of develop, and /deploy
+    # cache-busts against origin/main. Dependency work belongs on develop like all
+    # other work, and reaches production through a normal /deploy.
+    target-branch: develop
     schedule:
       interval: weekly
       day: monday
