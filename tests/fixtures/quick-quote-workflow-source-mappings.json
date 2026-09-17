@@ -1,5 +1,5 @@
 {
-  "description": "Authorized September 13, 2026 Quick Quote redesign. Apply before historical CSS mappings. Original hashes remain immutable; current pricing/handoffs tested independently. classic-restore-2026-09-16: Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings. release-2026.09.16.2: Deploy v2026.09.16.2 cache-bust of the Quick Quote assets. release-notes-2026-09-16: Erik approved 2026-09-16: Quick Quote shows its version (from the deploy's cache-bust), a What's new list and a one-time Updated badge for Nika and Taneisha's trial. release-2026.09.16.3: Deploy v2026.09.16.3 cache-bust of the Quick Quote assets. headwear-alignment-2026-09-16: Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps. release-2026.09.16.4: Deploy v2026.09.16.4 cache-bust of the headwear alignment assets. print-methods-unlimited-2026-09-16: Erik approved 2026-09-16: screen print and DTF are never limited by product category in Quick Quote; embroidery and DTG outside the category rules still price, with a note (the rep decides). builder-runtime-styles-2026-09-16: Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons. release-2026.09.16.5: Deploy v2026.09.16.5 cache-bust of the Quick Quote, product, cart and quote builder assets.",
+  "description": "Authorized September 13, 2026 Quick Quote redesign. Apply before historical CSS mappings. Original hashes remain immutable; current pricing/handoffs tested independently. classic-restore-2026-09-16: Erik approved 2026-09-16: last week's Line Sheet workflow for Nika and Taneisha (visible mode toggle, one-tap methods and placements, style rows priced as typed, Qty/Per pc/Small-batch fee table), headwear classifier and eligibility warnings. release-2026.09.16.2: Deploy v2026.09.16.2 cache-bust of the Quick Quote assets. release-notes-2026-09-16: Erik approved 2026-09-16: Quick Quote shows its version (from the deploy's cache-bust), a What's new list and a one-time Updated badge for Nika and Taneisha's trial. release-2026.09.16.3: Deploy v2026.09.16.3 cache-bust of the Quick Quote assets. headwear-alignment-2026-09-16: Erik approved 2026-09-16: one headwear rule (shared classifier) on the builders, product page, embroidery calculators and Quick Quote; soft headwear flat, visors caps, reopened-quote price notice, DTF search keeps today's caps. release-2026.09.16.4: Deploy v2026.09.16.4 cache-bust of the headwear alignment assets. print-methods-unlimited-2026-09-16: Erik approved 2026-09-16: screen print and DTF are never limited by product category in Quick Quote; embroidery and DTG outside the category rules still price, with a note (the rep decides). builder-runtime-styles-2026-09-16: Erik approved 2026-09-16: restore the builder notices, dialogs and warning states the September CSS migration left unstyled; the import summary and non-SanMar prices use keyboard buttons. release-2026.09.16.5: Deploy v2026.09.16.5 cache-bust of the Quick Quote, product, cart and quote builder assets. release-2026.09.17.1: Deploy v2026.09.17.1 cache-bust for the restored builder cosmetic styles",
   "changes": [
     {
       "file": "calculators/quick-quote/dtf-prints-prototype.html",
@@ -2986,6 +2986,46 @@
       "count": 1,
       "stage": "release-2026.09.16.5",
       "reason": "Deploy v2026.09.16.5 cache-bust of the Quick Quote, product, cart and quote builder assets."
+    },
+    {
+      "file": "quote-builders/dtf-quote-builder.html",
+      "before": "    <link rel=\"stylesheet\" href=\"/shared_components/css/quote-workspace.css?v=2026.09.16.5\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/quote-dtf.css?v=2026.09.16.5\">",
+      "after": "    <link rel=\"stylesheet\" href=\"/shared_components/css/quote-workspace.css?v=2026.09.17.1\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/quote-dtf.css?v=2026.09.17.1\">",
+      "count": 1,
+      "stage": "release-2026.09.17.1",
+      "reason": "Deploy v2026.09.17.1 cache-bust for the restored builder cosmetic styles"
+    },
+    {
+      "file": "quote-builders/dtg-quote-builder.html",
+      "before": "    <link rel=\"stylesheet\" href=\"/shared_components/css/quote-workspace.css?v=2026.09.16.5\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/specialty-assistant.css?v=2026.09.13.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/quote-dtg.css?v=2026.09.16.5\">",
+      "after": "    <link rel=\"stylesheet\" href=\"/shared_components/css/quote-workspace.css?v=2026.09.17.1\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/specialty-assistant.css?v=2026.09.17.1\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/quote-dtg.css?v=2026.09.17.1\">",
+      "count": 1,
+      "stage": "release-2026.09.17.1",
+      "reason": "Deploy v2026.09.17.1 cache-bust for the restored builder cosmetic styles"
+    },
+    {
+      "file": "quote-builders/embroidery-quote-builder.html",
+      "before": "    <link rel=\"stylesheet\" href=\"/shared_components/css/quote-workspace.css?v=2026.09.16.5\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/quote-embroidery.css?v=2026.09.16.5\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/specialty-assistant.css?v=2026.09.13.2\">",
+      "after": "    <link rel=\"stylesheet\" href=\"/shared_components/css/quote-workspace.css?v=2026.09.17.1\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/quote-embroidery.css?v=2026.09.17.1\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/specialty-assistant.css?v=2026.09.17.1\">",
+      "count": 1,
+      "stage": "release-2026.09.17.1",
+      "reason": "Deploy v2026.09.17.1 cache-bust for the restored builder cosmetic styles"
+    },
+    {
+      "file": "quote-builders/screenprint-quote-builder.html",
+      "before": "    <link rel=\"stylesheet\" href=\"/shared_components/css/quote-workspace.css?v=2026.09.16.5\">",
+      "after": "    <link rel=\"stylesheet\" href=\"/shared_components/css/quote-workspace.css?v=2026.09.17.1\">",
+      "count": 1,
+      "stage": "release-2026.09.17.1",
+      "reason": "Deploy v2026.09.17.1 cache-bust for the restored builder cosmetic styles"
+    },
+    {
+      "file": "calculators/embroidered-emblem/index.html",
+      "before": "    <link rel=\"stylesheet\" href=\"/shared_components/css/specialty-assistant.css?v=2026.09.13.2\">",
+      "after": "    <link rel=\"stylesheet\" href=\"/shared_components/css/specialty-assistant.css?v=2026.09.17.1\">",
+      "count": 1,
+      "stage": "release-2026.09.17.1",
+      "reason": "Deploy v2026.09.17.1 cache-bust for the restored builder cosmetic styles"
     }
   ]
 }
