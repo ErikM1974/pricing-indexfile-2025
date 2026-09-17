@@ -129,9 +129,9 @@
                     'border-left:4px solid #d97706;border-radius:4px;padding:10px 14px;margin:8px 0;' +
                     'color:#78350f;font-size:13px;line-height:1.45;';
                 warningEl.innerHTML =
-                    '<span style="font-size:18px;line-height:1;color:#d97706;">⚠️</span>' +
+                    '<span class="ccb-warning-icon">⚠️</span>' +
                     '<div>' +
-                    '<div style="font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:.04em;font-size:11px;">Customer Warning</div>' +
+                    '<div class="ccb-warning-label">Customer Warning</div>' +
                     '<div>' + escapeHtml(cw) + '</div>' +
                     '</div>';
                 warningEl.hidden = false;

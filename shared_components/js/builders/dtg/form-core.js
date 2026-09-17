@@ -671,7 +671,7 @@ export function renderTable() {
                     <div class="dtg-line-color dtg-row-color${colorInvalid ? ' dtg-row-color-invalid' : ''}">
                         <div class="dtg-combobox" data-row-id="${escapeHtml(row.id)}" data-combo-kind="color">
                             ${row.colorSwatch
-                                ? `<span class="dtg-row-color-swatch" style="background-image:url('${escapeHtml(row.colorSwatch)}');" aria-hidden="true"></span>`
+                                ? `<span class="dtg-row-color-swatch" data-swatch-url="${escapeHtml(row.colorSwatch)}" aria-hidden="true"></span>`
                                 : (row.color ? `<span class="dtg-row-color-swatch dtg-row-color-swatch--blank" aria-hidden="true"></span>` : '')}
                             <input type="text" value="${escapeHtml(row.color)}" placeholder="${row.style ? 'Pick color' : 'Pick style first'}" autocomplete="off" ${row.style ? '' : 'disabled'} ${row.colorSwatch || row.color ? 'data-has-swatch="true"' : ''}>
                             <i class="fas fa-caret-down dtg-combobox-chevron" aria-hidden="true"></i>
@@ -697,6 +697,13 @@ export function renderTable() {
             </div>
         `;
     }).join('');
+
+    // Swatch images go through CSSOM: a style="" attribute only renders while the CSP allows
+    // inline styles, and a quoted CSS string keeps a quote in the URL from ending it.
+    container.querySelectorAll('.dtg-row-color-swatch[data-swatch-url]').forEach((el) => {
+        const swatch = /** @type {HTMLElement} */ (el);
+        swatch.style.backgroundImage = `url(${JSON.stringify(swatch.dataset.swatchUrl)})`;
+    });
 
     wireRowHandlers();
 }

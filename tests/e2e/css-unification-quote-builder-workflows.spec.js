@@ -424,6 +424,25 @@ test('CSS quote builders: embroidery runtime dialogs keep and return focus',asyn
  expect(e.errors).toEqual([]);expect(e.writes).toEqual([]);expect(e.unknown).toEqual([]);expect(e.mutations).toEqual([]);
 });
 
+// The UPS estimate notes are classes, not style="" attributes (2026-09-17), with the same colours.
+test('CSS quote builders: embroidery shipping estimate notes carry no style attributes',async({page})=>{
+ test.skip(original,'Runtime markup moved to classes after the reviewed migration.');
+ page.setDefaultTimeout(20000);
+ await page.route('**/api/shipping/box-density',route=>route.fulfill({json:{density:{}}}));
+ await page.route('**/api/shipping/estimate-ups-ground',route=>route.fulfill({json:{estimate:14.37,billableWeightLb:6,boxes:1,zone:2,basis:'cost',markupPct:0.15,rough:false}}));
+ const e=await open(page,{url:'/quote-builders/embroidery-quote-builder.html'});await addProduct(page,'embroidery');
+ // No SanMar weights for the style, so the estimate notes that it used fallback weights.
+ await page.route('**/api/inventory?**',route=>route.fulfill({json:[]}));
+ await page.locator('.guided-step[data-step="3"]').click();await page.locator('[data-call="openShippingModal"]').click();await page.locator('#ship-mode-ship').click();
+ await page.locator('#ship-zip').fill('98354');await page.locator('#estimate-ship-btn').click();
+ const result=page.locator('#estimate-ship-result');await expect(result).toContainText('$14.37');
+ await expect(result.locator('.ship-estimate-fallback')).toHaveText('(some weights estimated)');
+ await expect(result.locator('.ship-estimate-fallback')).toHaveCSS('color','rgb(217, 119, 6)');
+ await expect(result.locator('.ship-estimate-basis')).toHaveCSS('color','rgb(156, 163, 175)');
+ await expect(result.locator('[style]')).toHaveCount(0);
+ expect(e.errors).toEqual([]);expect(e.writes).toEqual([]);expect(e.unknown).toEqual([]);expect(e.mutations).toEqual([]);
+});
+
 // Every runtime overlay, notice and warning state the retired sheets styled has a real style again.
 for(const method of ['embroidery','screenprint','dtf','dtg'])test('CSS quote builders: '+method+' runtime overlays and warning states are styled',async({page})=>{
  test.skip(original,'The original page loaded the retired sheets.');

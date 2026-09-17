@@ -6909,11 +6909,12 @@
         "complete-builder-paper-and-real-generated-invoice",
         "runtime-dialogs-notices-and-warning-states-restored-2026-09-16",
         "cosmetic-buttons-rows-previews-badges-and-assistant-cards-restored-2026-09-17",
-        "native-goods-names-and-manual-item-dialogs-tab-escape-backdrop-cost-error-and-returned-focus-2026-09-17"
+        "native-goods-names-and-manual-item-dialogs-tab-escape-backdrop-cost-error-and-returned-focus-2026-09-17",
+        "shared-runtime-pieces-as-classes-and-ups-estimate-notes-without-style-attributes-2026-09-17"
       ],
       "test": "tests/e2e/css-unification-quote-builder-workflows.spec.js",
-      "measuredRawCssBytes": 316354,
-      "maxCssBytes": 317818,
+      "measuredRawCssBytes": 318843,
+      "maxCssBytes": 320891,
       "baseline": {
         "commit": "d25e4ddb",
         "rawCssBytes": 623614,
@@ -6945,11 +6946,12 @@
         "customer-save-failure-and-visible-pricing-errors",
         "complete-builder-paper-and-real-generated-invoice",
         "runtime-dialogs-notices-and-warning-states-restored-2026-09-16",
-        "cosmetic-buttons-rows-previews-badges-and-assistant-cards-restored-2026-09-17"
+        "cosmetic-buttons-rows-previews-badges-and-assistant-cards-restored-2026-09-17",
+        "shared-runtime-pieces-as-classes-covered-on-dtg-page-with-style-attributes-blocked-2026-09-17"
       ],
       "test": "tests/e2e/css-unification-quote-builder-workflows.spec.js",
-      "measuredRawCssBytes": 263041,
-      "maxCssBytes": 264505,
+      "measuredRawCssBytes": 265530,
+      "maxCssBytes": 267578,
       "baseline": {
         "commit": "d25e4ddb",
         "rawCssBytes": 494161,
@@ -6986,11 +6988,12 @@
         "complete-extended-size-dialog",
         "complete-builder-paper-and-real-generated-invoice",
         "runtime-dialogs-notices-and-warning-states-restored-2026-09-16",
-        "cosmetic-buttons-rows-previews-badges-and-assistant-cards-restored-2026-09-17"
+        "cosmetic-buttons-rows-previews-badges-and-assistant-cards-restored-2026-09-17",
+        "shared-runtime-pieces-as-classes-covered-on-dtg-page-with-style-attributes-blocked-2026-09-17"
       ],
       "test": "tests/e2e/css-unification-quote-builder-workflows.spec.js",
-      "measuredRawCssBytes": 261955,
-      "maxCssBytes": 263419,
+      "measuredRawCssBytes": 264444,
+      "maxCssBytes": 266492,
       "baseline": {
         "commit": "d25e4ddb",
         "rawCssBytes": 540541,
@@ -7025,11 +7028,12 @@
         "runtime-dialogs-notices-and-warning-states-restored-2026-09-16",
         "cosmetic-buttons-rows-previews-badges-and-assistant-cards-restored-2026-09-17",
         "native-push-and-assistant-confirm-dialogs-tab-escape-backdrop-and-returned-focus-2026-09-17",
-        "assistant-colour-chips-under-style-attribute-csp-and-failed-swatch-placeholder-2026-09-17"
+        "assistant-colour-chips-under-style-attribute-csp-and-failed-swatch-placeholder-2026-09-17",
+        "row-swatch-colour-menu-and-shared-pieces-with-style-attributes-blocked-2026-09-17"
       ],
       "test": "tests/e2e/css-unification-quote-builder-alternate-workflows.spec.js",
-      "measuredRawCssBytes": 319993,
-      "maxCssBytes": 321457,
+      "measuredRawCssBytes": 322609,
+      "maxCssBytes": 324657,
       "baseline": {
         "commit": "d25e4ddb",
         "rawCssBytes": 326706,

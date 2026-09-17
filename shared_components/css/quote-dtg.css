@@ -98,6 +98,7 @@
 :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-combobox-menu { position:fixed; max-height:300px; overflow:auto; background:var(--ui-surface); color:var(--ui-ink); border:1px solid var(--ui-line-strong); border-radius:var(--radius-sm); box-shadow:var(--shadow-md); z-index:var(--z-modal); }
 :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-combobox-item,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-combobox-empty,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-combobox-hint { padding:12px; border-bottom:1px solid var(--ui-line); font-size:13px; overflow-wrap:anywhere; }
 :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-combobox-item { cursor:pointer; min-height:44px; }
+:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-combobox-item-body { display:flex; align-items:center; gap:8px; }
 :where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-combobox-item:hover,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-combobox-item.active { background:var(--ui-tint); }
 :where([data-ui="unified"][data-quote-workspace="dtg"]) .ci-primary { font-weight:600; }
 :where([data-ui="unified"][data-quote-workspace="dtg"]) .ci-secondary,:where([data-ui="unified"][data-quote-workspace="dtg"]) .dtg-combobox-hint { color:var(--ui-muted); font-size:12px; }

@@ -22,6 +22,7 @@
 :where([data-ui="unified"][data-quote-workspace]) .power-header-center { flex:1; min-width:min(260px,100%); }
 :where([data-ui="unified"][data-quote-workspace]) .power-header-title { font-size:clamp(19px,1.8vw,26px); font-weight:700; line-height:1.25; }
 :where([data-ui="unified"][data-quote-workspace]) .power-header-subtitle { color:var(--ui-muted); margin-top:6px; font-size:13px; }
+:where([data-ui="unified"][data-quote-workspace]) .qb-edit-mode-label { color:var(--amber-400); }
 :where([data-ui="unified"][data-quote-workspace]) .header-actions { display:flex; flex-wrap:wrap; gap:8px; }
 :where([data-ui="unified"][data-quote-workspace]) .header-actions button { white-space:nowrap; }
 :where([data-ui="unified"][data-quote-workspace]) .btn-new-quote,:where([data-ui="unified"][data-quote-workspace]) .guided-next,:where([data-ui="unified"][data-quote-workspace]) .size-popup-apply,:where([data-ui="unified"][data-quote-workspace]) .btn-parse-import,:where([data-ui="unified"][data-quote-workspace]) .quote-share-btn-primary,:where([data-ui="unified"][data-quote-workspace]) .ship-modal-done,:where([data-ui="unified"][data-quote-workspace]) .btn-push-shopworks,:where([data-ui="unified"][data-quote-workspace]) .btn-primary-action,:where([data-ui="unified"][data-quote-workspace]) [id="emb-push-shopworks-btn"],:where([data-ui="unified"][data-quote-workspace]) .size-popup-footer .btn-apply,:where([data-ui="unified"][data-quote-workspace]) .quote-share-btn-copy,:where([data-ui="unified"][data-quote-workspace]) .quote-share-btn-view,:where([data-ui="unified"][data-quote-workspace]) .quote-share-btn-email { color:var(--color-on-brand); background:var(--ui-accent); border-color:var(--ui-accent); }
@@ -132,6 +133,7 @@
 :where([data-ui="unified"][data-quote-workspace]) .pr-item { display:flex; align-items:center; gap:8px; padding:4px 0; }
 :where([data-ui="unified"][data-quote-workspace]) .pr-item.pr-ok { color:var(--ui-accent); }
 :where([data-ui="unified"][data-quote-workspace]) .pr-item.pr-no { color:var(--ui-muted); }
+:where([data-ui="unified"][data-quote-workspace]) button.pr-item.pr-no { background:none; border:none; font:inherit; color:inherit; width:100%; text-align:left; text-decoration:underline dotted; text-underline-offset:2px; }
 :where([data-ui="unified"][data-quote-workspace]) .action-panel { display:grid; gap:10px; }
 :where([data-ui="unified"][data-quote-workspace]) .action-panel button { width:100%; }
 :where([data-ui="unified"][data-quote-workspace]) .btn-share-link { color:var(--ui-accent); background:var(--ui-tint); border-color:var(--ui-accent); }
@@ -203,6 +205,7 @@
 :where([data-ui="unified"][data-quote-workspace]) .ship-mode-btn { flex:1; }
 :where([data-ui="unified"][data-quote-workspace]) .ship-mode-btn.active { color:var(--ui-accent); border-color:var(--ui-accent); background:var(--ui-tint); }
 :where([data-ui="unified"][data-quote-workspace]) .ship-modal-done { min-width:120px; }
+:where([data-ui="unified"][data-quote-workspace]) .ship-estimate-fallback { color:var(--amber-600); }
 :where([data-ui="unified"][data-quote-workspace]) .loading-overlay { position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:var(--ui-surface); z-index:var(--z-modal); }
 :where([data-ui="unified"][data-quote-workspace]) .import-progress-overlay { display:none; }
 :where([data-ui="unified"][data-quote-workspace]) .import-progress-overlay.active { display:flex; }
@@ -485,6 +488,21 @@
 :where([data-ui="unified"][data-quote-workspace]) .quantity-nudge { margin:4px 0 8px; padding:6px 10px; border:1px solid var(--color-warning); border-radius:var(--radius-sm); background:color-mix(in srgb, var(--color-warning-bg) 55%, var(--ui-surface)); color:var(--color-warning-ink); font-size:12px; line-height:1.45; }
 :where([data-ui="unified"][data-quote-workspace]) .nudge-apply-hint { color:var(--ui-accent); font-weight:600; white-space:nowrap; }
 :where([data-ui="unified"][data-quote-workspace]) .quantity-nudge-clickable:is(:hover,:focus-visible) .nudge-apply-hint { text-decoration:underline; }
+:where([data-ui="unified"][data-quote-workspace]) .quantity-nudge .nudge-icon { margin-right:4px; }
+:where([data-ui="unified"][data-quote-workspace]) .quantity-nudge .nudge-savings { color:var(--green-700); }
+
+/* JS-built pieces (no style attributes): recent ShopWorks orders, customer warning. */
+:where([data-ui="unified"][data-quote-workspace]) .qb-recent-orders { margin-top:8px; padding:8px 10px; border:1px solid var(--slate-200); border-radius:var(--radius-sm); background:var(--slate-50); color:var(--gray-700); font-size:12px; }
+:where([data-ui="unified"][data-quote-workspace]) .qb-ro-head { display:flex; align-items:center; margin-bottom:4px; }
+:where([data-ui="unified"][data-quote-workspace]) .qb-ro-title { flex:1; color:var(--slate-500); font-size:11px; letter-spacing:.4px; text-transform:uppercase; }
+:where([data-ui="unified"][data-quote-workspace]) .qb-ro-title i { margin-right:5px; }
+:where([data-ui="unified"][data-quote-workspace]) .qb-ro-row { display:flex; align-items:center; gap:8px; padding:3px 0; }
+:where([data-ui="unified"][data-quote-workspace]) .qb-ro-text { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+:where([data-ui="unified"][data-quote-workspace]) .qb-ro-date,:where([data-ui="unified"][data-quote-workspace]) .ship-estimate-basis { color:var(--gray-400); }
+:where([data-ui="unified"][data-quote-workspace]) .qb-recent-orders button.qb-ro-ref { padding:2px 8px; border:1px solid var(--gray-300); border-radius:4px; background:var(--color-surface); color:var(--gray-700); font-size:11px; }
+:where([data-ui="unified"][data-quote-workspace]) .qb-recent-orders button.qb-ro-dismiss { padding:0 2px; border:none; background:none; color:var(--gray-400); font-size:14px; line-height:1; }
+:where([data-ui="unified"][data-quote-workspace]) .ccb-warning-icon { color:var(--amber-600); font-size:18px; line-height:1; }
+:where([data-ui="unified"][data-quote-workspace]) .ccb-warning-label { color:var(--amber-800); font-size:11px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; }
 :where([data-ui="unified"][data-quote-workspace]) .ship-to-card .st-title { margin-bottom:4px; color:var(--ui-muted); font-size:11px; letter-spacing:.04em; text-transform:uppercase; }
 :where([data-ui="unified"][data-quote-workspace]) .ship-to-card .st-line { padding:1px 0; line-height:1.4; }
 :where([data-ui="unified"][data-quote-workspace]) .ship-to-card .st-co { font-weight:600; }

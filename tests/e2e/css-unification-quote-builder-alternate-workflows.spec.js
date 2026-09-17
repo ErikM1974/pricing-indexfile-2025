@@ -194,6 +194,53 @@ test('CSS quote builders: dtg assistant swatches render without inline styles or
  check(expect,e);
 });
 
+// Runtime markup from the builder scripts carries no style="" attributes (2026-09-17). This page has no static
+// style attributes either, so it serves with them blocked; the shared pieces are mounted into test hosts here.
+test('CSS quote builders: runtime pieces keep their styles with style attributes blocked',async({page})=>{
+ test.skip(original,'Runtime markup moved to classes after the reviewed migration.');
+ const html=fs.readFileSync(path.join(__dirname,'../../quote-builders/dtg-quote-builder.html'));
+ await page.route('**/quote-builders/dtg-quote-builder.html',route=>route.fulfill({contentType:'text/html',headers:{'Content-Security-Policy':"style-src-attr 'none'"},body:html}));
+ await page.route('**/api/mo/orders**',route=>route.fulfill({json:{result:[{id_Order:141001,DesignName:'Example Logo',date_Ordered:'2026-08-03T10:00:00'}]}}));
+ const e=await open(page,{richCatalog:true,url:'/quote-builders/dtg-quote-builder.html'});await page.waitForLoadState('networkidle');
+ // DTG line card: the colour swatch image and the colour menu rows.
+ await page.locator('.dtg-cc-add-default').first().click();
+ await expect(page.locator('.dtg-line-card .dtg-row-color-swatch').first()).toHaveCSS('background-image',/garment\.svg/);
+ const colour=page.locator('.dtg-line-card [data-combo-kind="color"] input').first();await colour.click();await colour.fill('');
+ const menuRow=page.locator('.dtg-combobox-item-body').first();
+ await expect(menuRow).toHaveCSS('display','flex');await expect(menuRow).toHaveCSS('gap','8px');await expect(menuRow).toHaveCSS('align-items','center');
+ await colour.press('Escape');
+ await page.evaluate(()=>{
+  document.querySelector('main').insertAdjacentHTML('beforeend','<section id="qb-shared-hosts"><div id="qb-test-checklist"></div><div class="quantity-nudge" id="qb-test-nudge"></div><div class="qb-test-logo-mount"></div><textarea id="qb-test-notes" aria-label="Notes"></textarea><div class="form-group"><input id="qb-test-lookup" aria-label="Customer"></div><div id="qb-test-warning"></div></section>');
+  updateEditModeUI('DTG-2026-777',2);
+  renderPushChecklist(document.getElementById('qb-test-checklist'),[{ok:true,label:'Customer name'},{ok:false,label:'Design number',focusId:'qb-test-notes'}]);
+  updateQuantityNudge(20,'emb',1.25,'qb-test-nudge','garment');
+  initLogoStatusChips({mountSel:'.qb-test-logo-mount',notesSel:'#qb-test-notes',assumption:()=>'Pricing assumes a standard logo.'});
+  showRecentCustomerOrders(10001,{anchorId:'qb-test-lookup'});
+  surfaceCustomerContext({Customer_Warning:'Pay before release'},{warningContainerId:'qb-test-warning'});
+ });
+ const hosts=page.locator('#qb-shared-hosts');
+ await expect(page.locator('.power-header-subtitle .qb-edit-mode-label')).toHaveCSS('color','rgb(251, 191, 36)');
+ const todo=hosts.locator('button.pr-item.pr-no');
+ for(const hover of [false,true]){
+  if(hover)await todo.hover();
+  await expect(todo).toHaveCSS('background-color','rgba(0, 0, 0, 0)');await expect(todo).toHaveCSS('border-top-width','0px');
+  await expect(todo).toHaveCSS('text-decoration-style','dotted');await expect(todo).toHaveCSS('text-align','left');await expect(todo).toHaveCSS('font-weight','400');
+ }
+ await expect(hosts.locator('.nudge-icon')).toHaveCSS('margin-right','4px');await expect(hosts.locator('.nudge-savings')).toHaveCSS('color','rgb(21, 128, 61)');
+ const assumption=hosts.locator('#logo-assumption-panel');await expect(assumption).toBeHidden();
+ const tbd=hosts.locator('.lsc-chip[data-status="tbd"]');
+ await tbd.click();await expect(assumption).toBeVisible();await expect(assumption).toContainText('Pricing assumes a standard logo.');
+ await tbd.click();await expect(assumption).toBeHidden();
+ const orders=hosts.locator('#qb-recent-orders');
+ await expect(orders).toHaveCSS('background-color','rgb(248, 250, 252)');await expect(orders).toHaveCSS('border-top-color','rgb(226, 232, 240)');await expect(orders).toHaveCSS('font-size','12px');
+ await expect(orders.locator('.qb-ro-head')).toHaveCSS('display','flex');await expect(orders.locator('.qb-ro-title')).toHaveCSS('text-transform','uppercase');
+ await expect(orders.locator('.qb-ro-row')).toHaveCSS('display','flex');await expect(orders.locator('.qb-ro-text')).toHaveCSS('white-space','nowrap');
+ await expect(orders.locator('.qb-ro-date')).toHaveCSS('color','rgb(156, 163, 175)');
+ await expect(orders.locator('.qb-ro-ref')).toHaveCSS('border-top-width','1px');await expect(orders.locator('.qb-ro-dismiss')).toHaveCSS('border-top-width','0px');
+ await expect(hosts.locator('.ccb-warning-icon')).toHaveCSS('font-size','18px');await expect(hosts.locator('.ccb-warning-label')).toHaveCSS('color','rgb(146, 64, 14)');
+ check(expect,e);
+});
+
 test('CSS quote builders: screenprint-fast keyboard and duplicate protection',async({page})=>{
  test.skip(original,'Behavior introduced by the reviewed migration.');
  const e=await open(page,{save:true,url:'/quote-builders/screenprint-fast-quote.html'});

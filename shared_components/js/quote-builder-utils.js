@@ -979,7 +979,7 @@ function assertQuoteEditable(session, opts = {}) {
 function updateEditModeUI(quoteId, revision) {
     const headerSubtitle = document.querySelector('.power-header .power-header-subtitle');
     if (headerSubtitle) {
-        headerSubtitle.innerHTML = `<span style="color: #fbbf24;">✏️ Editing: ${escapeHtml(String(quoteId))} • Rev ${escapeHtml(String(revision))}</span>`;
+        headerSubtitle.innerHTML = `<span class="qb-edit-mode-label">✏️ Editing: ${escapeHtml(String(quoteId))} • Rev ${escapeHtml(String(revision))}</span>`;
     }
     const saveBtn = document.querySelector('.btn-save-quote, [onclick*="saveAndGetLink"]');
     if (saveBtn) {
@@ -1086,8 +1086,7 @@ function renderPushChecklist(el, blockers) {
     const item = (b) => b.ok
         ? `<div class="pr-item pr-ok"><i class="fas fa-check-circle" aria-hidden="true"></i>${b.label}</div>`
         : `<button type="button" class="pr-item pr-no" data-pr-focus="${escapeHtml(b.focusId)}"
-             title="Click to jump to this field"
-             style="background:none;border:none;font:inherit;color:inherit;cursor:pointer;width:100%;text-align:left;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:2px;">
+             title="Click to jump to this field">
              <i class="fas fa-circle" aria-hidden="true"></i>${b.label}</button>`;
     // Logo TBD = NON-blocking warning (2026-07-07): quoting on an assumption is
     // fine, but nobody should start a production order on art we've never seen
@@ -1699,9 +1698,9 @@ function updateQuantityNudge(totalQty, method, savingsPerPiece = null, container
         // (EMB: caps + garments) — a bare "pieces" implied adding ANY product moves
         // the tier, which is false for mixed orders.
         const pieceWord = categoryLabel ? `${categoryLabel} piece` : 'piece';
-        let html = `<i class="fas fa-arrow-up" aria-hidden="true" style="margin-right: 4px;"></i>Add <strong>${needed}</strong> more ${pieceWord}${needed === 1 ? '' : 's'} to reach <strong>${tierLabel}</strong> tier pricing`;
+        let html = `<i class="fas fa-arrow-up nudge-icon" aria-hidden="true"></i>Add <strong>${needed}</strong> more ${pieceWord}${needed === 1 ? '' : 's'} to reach <strong>${tierLabel}</strong> tier pricing`;
         if (savingsPerPiece && savingsPerPiece > 0.01) {
-            html += ` — <strong style="color: #15803d;">save ~$${savingsPerPiece.toFixed(2)}/piece</strong>`;
+            html += ` — <strong class="nudge-savings">save ~$${savingsPerPiece.toFixed(2)}/piece</strong>`;
         }
         // Clickable nudge (2026-07-06, UX audit P1 #3): one click adds the missing
         // pieces, scaled proportionally across the sizes already entered.
@@ -2338,7 +2337,9 @@ function initLogoStatusChips(cfg) {
         '    <button type="button" class="lsc-chip" data-status="tbd" title="Haven&#39;t seen the logo yet — quote on a stated assumption"><i class="fas fa-circle-question" aria-hidden="true"></i> TBD — quote first</button>' +
         '  </div>' +
         '</div>' +
-        '<div class="lsc-assumption" id="logo-assumption-panel" style="display:none;"></div>';
+        '<div class="lsc-assumption" id="logo-assumption-panel"></div>';
+    // Hidden until TBD is picked; renderPanel()/setStatus() toggle the same inline display.
+    /** @type {HTMLElement} */ (wrap.querySelector('.lsc-assumption')).style.display = 'none';
     mountHost.insertAdjacentElement('afterbegin', wrap);
 
     const notesEl = () => document.querySelector(cfg.notesSel);
@@ -2510,25 +2511,22 @@ function _renderRecentOrdersPanel(anchor, orders, cfg) {
     if (!host) return;
     const panel = document.createElement('div');
     panel.id = 'qb-recent-orders';
-    panel.style.cssText = 'margin-top:8px;padding:8px 10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;font-size:12px;color:#334155;';
+    panel.className = 'qb-recent-orders';   // styled in quote-workspace.css (no style attributes: CSP)
     const rows = orders.map((o, i) => {
         const design = o.DesignName ? String(o.DesignName) : '(no design name)';
         const date = _fmtOrderDate(o.date_Ordered);
-        return '<div style="display:flex;align-items:center;gap:8px;padding:3px 0;">'
-            + '<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'
+        return '<div class="qb-ro-row">'
+            + '<span class="qb-ro-text">'
             + '<strong>#' + escapeHtml(String(o.id_Order || '')) + '</strong> · ' + escapeHtml(design)
-            + (date ? ' <span style="color:#94a3b8;">· ' + escapeHtml(date) + '</span>' : '')
+            + (date ? ' <span class="qb-ro-date">· ' + escapeHtml(date) + '</span>' : '')
             + '</span>'
-            + '<button type="button" data-ro-ref="' + i + '" title="Insert this order # + design into the quote notes"'
-            + ' style="background:#fff;border:1px solid #cbd5e1;border-radius:4px;padding:2px 8px;font-size:11px;color:#334155;cursor:pointer;">Reference</button>'
+            + '<button type="button" class="qb-ro-ref" data-ro-ref="' + i + '" title="Insert this order # + design into the quote notes">Reference</button>'
             + '</div>';
     }).join('');
     // eslint-disable-next-line no-unsanitized/property -- audited (1.4): recent-orders rows escapeHtml every ShopWorks value at build
-    panel.innerHTML = '<div style="display:flex;align-items:center;margin-bottom:4px;">'
-        + '<strong style="flex:1;font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:#64748b;">'
-        + '<i class="fas fa-history" aria-hidden="true" style="margin-right:5px;"></i>Recent ShopWorks orders</strong>'
-        + '<button type="button" data-ro-dismiss="1" aria-label="Dismiss recent orders"'
-        + ' style="background:none;border:none;color:#94a3b8;font-size:14px;cursor:pointer;line-height:1;padding:0 2px;">&times;</button>'
+    panel.innerHTML = '<div class="qb-ro-head">'
+        + '<strong class="qb-ro-title"><i class="fas fa-history" aria-hidden="true"></i>Recent ShopWorks orders</strong>'
+        + '<button type="button" class="qb-ro-dismiss" data-ro-dismiss="1" aria-label="Dismiss recent orders">&times;</button>'
         + '</div>' + rows;
     panel.addEventListener('click', (e) => {
         if (e.target.closest('[data-ro-dismiss]')) { removeRecentOrdersPanel(); return; }
