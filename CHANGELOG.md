@@ -1,3 +1,9 @@
+## v2026.09.17.1 (2026.09.17)
+
+- Memory: print methods and builder runtime styles live (v2026.09.16.5)
+- Builders: restore the cosmetic runtime states the September CSS release left plain
+- Deploy v2026.09.17.1: 8 files (index.html, webstores.html, dtf-quote-builder.html...)
+
 ## v2026.09.16.5 (2026.09.16)
 
 - Memory: headwear alignment live (v2026.09.16.4)
