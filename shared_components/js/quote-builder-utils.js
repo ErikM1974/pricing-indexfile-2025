@@ -2784,6 +2784,10 @@ function qbInstallCallDelegator() {
         const kd = t.closest('[data-keydown]');
         if (kd) qbRunList(kd.dataset.keydown, kd.dataset.keydownArgs, kd, event);
     });
+    // Chrome keeps a failed image's broken icon and alt text even after its src is removed, so
+    // placeholder-src shows this transparent pixel instead: the .placeholder background fills the
+    // box and the alt text still names the image for screen readers.
+    const blankImage = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
     document.addEventListener('error', (event) => {
         const img = event.target;
         if (!img || img.tagName !== 'IMG' || !img.dataset || !img.dataset.onerror) return;
@@ -2792,7 +2796,7 @@ function qbInstallCallDelegator() {
         else if (mode === 'hide-parent' && img.parentElement) img.parentElement.hidden = true;
         else if (mode === 'no-image' && img.parentElement) { img.parentElement.classList.add('no-image'); img.hidden = true; }
         else if (mode === 'placeholder-icon' && img.parentElement) img.parentElement.innerHTML = '<i class="fas fa-image" aria-hidden="true"></i>';
-        else if (mode === 'placeholder-src') { img.classList.add('placeholder'); img.removeAttribute('src'); }
+        else if (mode === 'placeholder-src') { img.classList.add('placeholder'); if (img.getAttribute('src') !== blankImage) img.src = blankImage; }
         else if (mode === 'hide-closest') { const t = img.dataset.onerrorClosest && img.closest(img.dataset.onerrorClosest); if (t) t.hidden = true; }
         if (img.dataset.onerrorParentClass && img.parentElement) img.parentElement.classList.add(img.dataset.onerrorParentClass);
     }, true);

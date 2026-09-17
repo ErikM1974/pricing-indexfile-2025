@@ -7022,10 +7022,12 @@
         "research-assistant-hidden-disabled-quote-actions",
         "complete-builder-paper-and-real-generated-invoice",
         "runtime-dialogs-notices-and-warning-states-restored-2026-09-16",
-        "cosmetic-buttons-rows-previews-badges-and-assistant-cards-restored-2026-09-17"
+        "cosmetic-buttons-rows-previews-badges-and-assistant-cards-restored-2026-09-17",
+        "native-push-and-assistant-confirm-dialogs-tab-escape-backdrop-and-returned-focus-2026-09-17",
+        "assistant-colour-chips-under-style-attribute-csp-and-failed-swatch-placeholder-2026-09-17"
       ],
       "test": "tests/e2e/css-unification-quote-builder-alternate-workflows.spec.js",
-      "measuredRawCssBytes": 319409,
+      "measuredRawCssBytes": 319977,
       "maxCssBytes": 321457,
       "baseline": {
         "commit": "d25e4ddb",

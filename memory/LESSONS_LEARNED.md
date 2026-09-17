@@ -1,5 +1,11 @@
 # LESSONS LEARNED
 
+## Moving an overlay to a native `<dialog>` has three traps (2026-09-17)
+
+- Problem/root cause: the DTG push and assistant-overwrite confirms were unnamed `div[role=dialog]` overlays; Tab walked out to the page and Escape or a backdrop click left focus on `<body>`. Switching to `showModal()` brings its own traps: an overlay class with `display:flex` overrides the browser's `dialog:not([open]) { display:none }`; a panel class with `position:relative` computes to `absolute` in the top layer, so it opens above a scrolled page; and Chrome's native modal still lets Tab leave for the browser toolbar.
+- Solution: the `<dialog>` carries the full-screen `.dtg-stock-confirm-backdrop` class (sized, and hidden when closed, by `dialog.` rules in `quote-dtg.css`); `aria-labelledby`/`aria-describedby` name it; a capture-phase keydown wraps Tab and consumes Escape for the newest confirm only (the assistant panel behind stays open); closing refocuses the opener.
+- Prevention: find each dialog by role and name in the browser test, then press Tab past the last button, Escape and a backdrop click (`css-unification-quote-builder-alternate-workflows.spec.js`). Also: removing a failed image's `src` still shows Chrome's broken-image icon and alt text, so `placeholder-src` now loads a blank pixel.
+
 ## A page `:hover` rule on a filled button needs the workspace's `:not(:disabled)` form (2026-09-17)
 
 - Problem/root cause: the DTG builder's axe check failed now and then on `.dtg-cc-add-default` and its colour label. In the same layer, the workspace's generic `button:hover:not(:disabled)` (0,2,1) outranks a page's `.x:hover` (0,2,0), so a hovered white-text button got the pale tint background (1.05:1). The spec leaves the pointer where it clicked, then resizes and runs axe, so a button landed under the pointer only in some layouts.
@@ -171,12 +177,6 @@ Historical deployment, token, builder, junction, server split and proxy-auth mig
 Exact-source CI must pass its actual browser/parity jobs, including credentials when required; local green is not CI green. Resolved runner/secret incidents are in LESSONS_LEARNED_ARCHIVE.md.
 
 Quote-operation access rollout (2026-09-07) is archived in LESSONS_LEARNED_ARCHIVE.md; caller/quote scope and live-mutation boundaries remain enforced by quote-sync-access.test.js.
-
-## Record workspaces need current-response checks before secondary writes (2026-09-10)
-
-- Problem/root cause: A stale linked quote can update the current lead after refresh; removed kit/art hosts can still receive asynchronous callbacks. Native dialog conversion and fixed banners can also lose focus or cover recovery controls.
-- Solution: bind quote rendering and existing value sync to the current view sequence, lead object, quote ID and connected target. Reject malformed replies, ignore superseded loads, preserve uncertain outreach warnings beside the action, contain modal focus, and block all unknown API traffic in previews.
-- Prevention: mock delayed responses and every write, verify unchanged valid quote sync and original payloads, reverse recorded controller changes into original source hashes, and retain explicit shared-module ownership. Inspect populated PDFs: narrow grids can split money; give the order table full width and verify every row and rendered page. Precompute file updates before writing so a missing preview anchor cannot leave a partial batch. Timestamp-based browser snapshots must set the baseline time zone explicitly; fixed Date.now alone does not standardize local date formatting on Windows and Linux.
 
 ## 2026-09-12: Background calculator rendering must not move keyboard focus
 

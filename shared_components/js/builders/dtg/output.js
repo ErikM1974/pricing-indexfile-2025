@@ -42,101 +42,127 @@ export function collectStockIssues() {
     return issues;
 }
 
+// Both confirms are native modal dialogs (NWCA-2026-GUIDE: showModal()/close()
+// and the opener gets focus back). The <dialog> is the dimmed full-screen layer
+// .dtg-stock-confirm-backdrop has always styled, so the panel looks unchanged;
+// showModal() makes the builder behind it inert.
+const CONFIRM_FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+const openConfirmDialogs = [];
+let confirmDialogCount = 0;
+
+// The caller's markup gives its title and body the ids `${dialog.id}-title`
+// and `${dialog.id}-body`, which name and describe the dialog.
+function createConfirmDialog() {
+    const dialog = document.createElement('dialog');
+    dialog.id = `dtg-confirm-${++confirmDialogCount}`;
+    dialog.className = 'dtg-stock-confirm-backdrop';
+    dialog.setAttribute('aria-labelledby', `${dialog.id}-title`);
+    dialog.setAttribute('aria-describedby', `${dialog.id}-body`);
+    return dialog;
+}
+
+// Opens a filled confirm dialog. Resolves true from its [data-action="confirm"]
+// button; Cancel, Escape, a click on the dimmed layer or any other close request
+// resolve false. Tab wraps inside the newest open confirm, and Escape stops here
+// so the assistant panel behind it stays open.
+function showConfirmDialog(dialog) {
+    return new Promise((resolve) => {
+        const opener = /** @type {HTMLElement|null} */ (document.activeElement);
+        function finish(confirmed) {
+            const index = openConfirmDialogs.indexOf(dialog);
+            if (index === -1) return;
+            openConfirmDialogs.splice(index, 1);
+            document.removeEventListener('keydown', onKey, true);
+            if (dialog.open) dialog.close();
+            dialog.remove();
+            if (opener && opener !== document.body && opener.isConnected) opener.focus({ preventScroll: true });
+            resolve(confirmed);
+        }
+        function onKey(e) {
+            if (openConfirmDialogs[openConfirmDialogs.length - 1] !== dialog) return;
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                e.stopPropagation();
+                finish(false);
+            } else if (e.key === 'Tab') {
+                const stops = /** @type {HTMLElement[]} */ (Array.from(dialog.querySelectorAll(CONFIRM_FOCUSABLE)));
+                const first = stops[0];
+                const last = stops[stops.length - 1];
+                if (!dialog.contains(document.activeElement) || document.activeElement === (e.shiftKey ? first : last)) {
+                    e.preventDefault();
+                    (e.shiftKey ? last : first).focus();
+                }
+            }
+        }
+        dialog.addEventListener('click', (e) => { if (e.target === dialog) finish(false); });
+        dialog.addEventListener('close', () => finish(false));
+        dialog.querySelector('[data-action="cancel"]').addEventListener('click', () => finish(false));
+        dialog.querySelector('[data-action="confirm"]').addEventListener('click', () => finish(true));
+        document.addEventListener('keydown', onKey, true);
+        openConfirmDialogs.push(dialog);
+        document.body.appendChild(dialog);
+        dialog.showModal();
+        // Focus the "Cancel" button by default — safer than auto-confirming.
+        /** @type {HTMLElement} */ (dialog.querySelector('[data-action="cancel"]')).focus();
+    });
+}
+
 // Generic confirm-modal helper used by both A3 (design # soft warning)
 // and C9 (chat-form overwrite warning). Promise resolves true on proceed,
 // false on cancel/Esc/backdrop-click. Buttons take string labels;
 // proceedClass controls the proceed-button color (default amber/warn).
 export function genericConfirm({ icon, title, body, cancelLabel, proceedLabel, proceedClass }) {
-    return new Promise((resolve) => {
-        const backdrop = document.createElement('div');
-        backdrop.className = 'dtg-stock-confirm-backdrop';
-        backdrop.setAttribute('role', 'dialog');
-        backdrop.setAttribute('aria-modal', 'true');
-        // eslint-disable-next-line no-unsanitized/property -- audited (Batch 5 move): every interpolation is escapeHtml()d, numeric, or static config
-        backdrop.innerHTML = `
-            <div class="dtg-stock-confirm-modal" role="document">
-                <div class="dscm-head">
-                    <span class="dscm-head-icon" aria-hidden="true">${escapeHtml(icon || '⚠')}</span>
-                    <h3 class="dscm-title">${escapeHtml(title)}</h3>
-                </div>
-                <p class="dscm-body">${body /* trusted — caller controls */}</p>
-                <div class="dscm-actions">
-                    <button type="button" class="dscm-btn dscm-btn-cancel" data-action="cancel">${escapeHtml(cancelLabel || 'Cancel')}</button>
-                    <button type="button" class="dscm-btn ${proceedClass || 'dscm-btn-proceed'}" data-action="confirm">${escapeHtml(proceedLabel || 'Proceed')}</button>
-                </div>
+    const dialog = createConfirmDialog();
+    // eslint-disable-next-line no-unsanitized/property -- audited (Batch 5 move): every interpolation is escapeHtml()d, numeric, or static config
+    dialog.innerHTML = `
+        <div class="dtg-stock-confirm-modal">
+            <div class="dscm-head">
+                <span class="dscm-head-icon" aria-hidden="true">${escapeHtml(icon || '⚠')}</span>
+                <h3 class="dscm-title" id="${dialog.id}-title">${escapeHtml(title)}</h3>
             </div>
-        `;
-        function cleanup(result) {
-            document.removeEventListener('keydown', onKey);
-            backdrop.remove();
-            resolve(result);
-        }
-        function onKey(e) { if (e.key === 'Escape') cleanup(false); }
-        backdrop.addEventListener('click', (e) => { if (e.target === backdrop) cleanup(false); });
-        backdrop.querySelector('[data-action="cancel"]').addEventListener('click', () => cleanup(false));
-        backdrop.querySelector('[data-action="confirm"]').addEventListener('click', () => cleanup(true));
-        document.addEventListener('keydown', onKey);
-        document.body.appendChild(backdrop);
-        /** @type {HTMLElement} */ (backdrop.querySelector('[data-action="cancel"]')).focus();
-    });
+            <p class="dscm-body" id="${dialog.id}-body">${body /* trusted — caller controls */}</p>
+            <div class="dscm-actions">
+                <button type="button" class="dscm-btn dscm-btn-cancel" data-action="cancel">${escapeHtml(cancelLabel || 'Cancel')}</button>
+                <button type="button" class="dscm-btn ${proceedClass || 'dscm-btn-proceed'}" data-action="confirm">${escapeHtml(proceedLabel || 'Proceed')}</button>
+            </div>
+        </div>
+    `;
+    return showConfirmDialog(dialog);
 }
 
 // Show the stock-confirm modal. Returns a Promise that resolves to true
 // (proceed) or false (cancel). Backdrop click / Escape / Cancel = false.
 export function confirmStockOverflow(issues) {
-    return new Promise((resolve) => {
-        const backdrop = document.createElement('div');
-        backdrop.className = 'dtg-stock-confirm-backdrop';
-        backdrop.setAttribute('role', 'dialog');
-        backdrop.setAttribute('aria-modal', 'true');
+    const itemsHtml = issues.map((it) => `
+        <li class="dscm-item">
+            <span class="dscm-style">${escapeHtml(it.style)}</span>
+            <span class="dscm-color">${escapeHtml(it.color || '(no color)')}</span>
+            <span class="dscm-size">${escapeHtml(it.size)} × ${it.qty}</span>
+            <span class="dscm-stock">${it.available.toLocaleString()} in stock</span>
+        </li>
+    `).join('');
 
-        const itemsHtml = issues.map((it) => `
-            <li class="dscm-item">
-                <span class="dscm-style">${escapeHtml(it.style)}</span>
-                <span class="dscm-color">${escapeHtml(it.color || '(no color)')}</span>
-                <span class="dscm-size">${escapeHtml(it.size)} × ${it.qty}</span>
-                <span class="dscm-stock">${it.available.toLocaleString()} in stock</span>
-            </li>
-        `).join('');
-
-        // eslint-disable-next-line no-unsanitized/property -- audited (Batch 5 move): every interpolation is escapeHtml()d, numeric, or static config
-        backdrop.innerHTML = `
-            <div class="dtg-stock-confirm-modal" role="document">
-                <div class="dscm-head">
-                    <span class="dscm-head-icon" aria-hidden="true">⚠</span>
-                    <h3 class="dscm-title">Stock check</h3>
-                </div>
-                <p class="dscm-body">
-                    ${issues.length === 1 ? '1 size exceeds' : `${issues.length} sizes exceed`}
-                    SanMar's current stock. May need backorder, drop-ship, or
-                    extended lead time. Push to ShopWorks anyway?
-                </p>
-                <ul class="dscm-list">${itemsHtml}</ul>
-                <div class="dscm-actions">
-                    <button type="button" class="dscm-btn dscm-btn-cancel" data-action="cancel">Cancel</button>
-                    <button type="button" class="dscm-btn dscm-btn-proceed" data-action="confirm">Proceed anyway</button>
-                </div>
+    const dialog = createConfirmDialog();
+    // eslint-disable-next-line no-unsanitized/property -- audited (Batch 5 move): every interpolation is escapeHtml()d, numeric, or static config
+    dialog.innerHTML = `
+        <div class="dtg-stock-confirm-modal">
+            <div class="dscm-head">
+                <span class="dscm-head-icon" aria-hidden="true">⚠</span>
+                <h3 class="dscm-title" id="${dialog.id}-title">Stock check</h3>
             </div>
-        `;
-
-        function cleanup(result) {
-            document.removeEventListener('keydown', onKey);
-            backdrop.remove();
-            resolve(result);
-        }
-        function onKey(e) { if (e.key === 'Escape') cleanup(false); }
-
-        backdrop.addEventListener('click', (e) => {
-            if (e.target === backdrop) cleanup(false);
-        });
-        backdrop.querySelector('[data-action="cancel"]').addEventListener('click', () => cleanup(false));
-        backdrop.querySelector('[data-action="confirm"]').addEventListener('click', () => cleanup(true));
-        document.addEventListener('keydown', onKey);
-
-        document.body.appendChild(backdrop);
-        // Focus the "Cancel" button by default — safer than auto-confirming.
-        /** @type {HTMLElement} */ (backdrop.querySelector('[data-action="cancel"]')).focus();
-    });
+            <p class="dscm-body" id="${dialog.id}-body">
+                ${issues.length === 1 ? '1 size exceeds' : `${issues.length} sizes exceed`}
+                SanMar's current stock. May need backorder, drop-ship, or
+                extended lead time. Push to ShopWorks anyway?
+            </p>
+            <ul class="dscm-list">${itemsHtml}</ul>
+            <div class="dscm-actions">
+                <button type="button" class="dscm-btn dscm-btn-cancel" data-action="cancel">Cancel</button>
+                <button type="button" class="dscm-btn dscm-btn-proceed" data-action="confirm">Proceed anyway</button>
+            </div>
+        </div>
+    `;
+    return showConfirmDialog(dialog);
 }
 
 // ========================================================================

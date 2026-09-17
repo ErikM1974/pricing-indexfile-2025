@@ -1,6 +1,8 @@
 const {test,expect}=require('@playwright/test');
+const fs=require('node:fs'),path=require('node:path');
 const {open,check}=require('./helpers/quote-builders-browser');
 const {evidence}=require('./helpers/quote-builder-workflow-review');
+const AxeBuilder=require('@axe-core/playwright').default;
 const original=process.env.CAPTURE_QUOTE_BUILDERS_ORIGINAL==='1';
 test.setTimeout(120000);
 test.use({timezoneId:'America/Los_Angeles',locale:'en-US',reducedMotion:'reduce'});
@@ -100,6 +102,95 @@ test('CSS quote builders: dtg keyboard and date controls',async({page})=>{
   const pickup=page.locator('#dtgPickupToggle');await pickup.focus();await pickup.press('Space');await expect(page.locator('#dtgShipToBlock')).toBeVisible();await pickup.press('Space');await expect(page.locator('#dtgShipToBlock')).toBeHidden();
   for(const id of ['dtgDueDate','dtgDropDeadDate']){const field=page.locator('#'+id);await expect(field).toBeVisible();const box=await field.boundingBox();expect(box.width).toBeGreaterThanOrEqual(185);expect(box.x+box.width).toBeLessThanOrEqual(width);}
  }
+ check(expect,e);
+});
+
+test('CSS quote builders: dtg push confirms are named modal dialogs that keep and return focus',async({page})=>{
+ test.skip(original,'Native confirm dialogs replaced the reviewed overlay.');
+ const e=await open(page,{richCatalog:true,url:'/quote-builders/dtg-quote-builder.html'});await page.waitForLoadState('networkidle');
+ // A push that gets past both confirms is refused here, so nothing leaves the browser.
+ const pushes=[];await page.route('**/api/submit-order-form',route=>{pushes.push(route.request().postDataJSON());return route.fulfill({status:503,json:{error:'Synthetic push refused'}});});
+ await page.locator('.dtg-cc-add-default').first().click();
+ const qty=page.locator('.dtg-line-card input[data-size="M"]').first();await qty.fill('200');await qty.dispatchEvent('change');
+ await expect(page.locator('#dtgPriceSummary')).toContainText('$');
+ await page.locator('#dtgFirstName').fill('Example');await page.locator('#dtgLastName').fill('Customer');await page.locator('#dtgEmail').fill('customer@example.invalid');
+ const email=page.locator('#dtgEmail'),status=page.locator('#dtgSubmitStatus'),push=page.locator('#dtgSubmitBtn');
+ // Push is blocked without a design #, so the design warning is reached through the form API.
+ await email.focus();await page.evaluate(()=>{window.__push=window.DTGInlineForm.submitToShopWorks().then(()=>'settled');});
+ const design=page.getByRole('dialog',{name:'No design # entered'});
+ await expect(design).toBeVisible();await expect(design).toHaveAccessibleDescription(/art team can assign one/);
+ expect(await design.evaluate(d=>d.matches(':modal'))).toBe(true);
+ await expect(design.getByRole('button',{name:'Cancel'})).toBeFocused();
+ expect(await page.evaluate(()=>{document.getElementById('dtgFirstName').focus();return document.activeElement.id;})).not.toBe('dtgFirstName');
+ for(const [key,name] of [['Tab','Push without design #'],['Tab','Cancel'],['Shift+Tab','Push without design #'],['Shift+Tab','Cancel'],['Shift+Tab','Push without design #']]){await page.keyboard.press(key);await expect(design.getByRole('button',{name})).toBeFocused();}
+ await page.keyboard.press('Escape');await expect(design).toHaveCount(0);await expect(email).toBeFocused();
+ await expect(status).toContainText('Push cancelled — add a design #');expect(await page.evaluate(()=>window.__push)).toBe('settled');
+ // Proceeding without a design # opens the stock check, which returns focus to the same opener.
+ await page.evaluate(()=>{window.__push=window.DTGInlineForm.submitToShopWorks();});
+ await design.getByRole('button',{name:'Push without design #'}).click();
+ const stock=page.getByRole('dialog',{name:'Stock check'});
+ await expect(stock).toBeVisible();await expect(design).toHaveCount(0);
+ await stock.getByRole('button',{name:'Cancel'}).click();await expect(stock).toHaveCount(0);await expect(email).toBeFocused();
+ await expect(status).toContainText('Push cancelled — adjust quantities');
+ // The Push button itself: described dialog, Tab kept inside, backdrop click, then proceed.
+ const designNumber=page.locator('#dtgDesignNumber');await designNumber.fill('12345');await designNumber.dispatchEvent('change');await designNumber.press('Tab');
+ await expect(push).toBeEnabled();await push.press('Enter');
+ await expect(stock).toBeVisible();await expect(stock).toHaveAccessibleDescription(/^1 size exceeds SanMar's current stock\./);
+ await expect(stock.locator('.dscm-item')).toHaveText('PC54 Jet Black M × 200 125 in stock');
+ for(let i=0;i<4;i++){await page.keyboard.press('Tab');expect(await stock.evaluate(d=>d.contains(document.activeElement))).toBe(true);}
+ const axe=await new AxeBuilder({page}).include('dialog.dtg-stock-confirm-backdrop').withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
+ expect(axe.violations.map(v=>v.id)).toEqual([]);
+ await status.evaluate(n=>{n.textContent='';});
+ await page.mouse.click(8,8);await expect(stock).toHaveCount(0);await expect(push).toBeFocused();
+ await expect(status).toContainText('Push cancelled — adjust quantities');expect(pushes).toHaveLength(0);
+ await push.press('Enter');await stock.getByRole('button',{name:'Proceed anyway'}).click();await expect(stock).toHaveCount(0);
+ await expect.poll(()=>pushes.length).toBe(1);await expect(status).toContainText('Synthetic push refused');
+ check(expect,e);
+});
+
+test('CSS quote builders: dtg assistant overwrite confirm keeps the panel open and returns focus',async({page})=>{
+ test.skip(original,'Native confirm dialogs replaced the reviewed overlay.');
+ const e=await open(page,{assistant:true,richCatalog:true,url:'/quote-builders/dtg-quote-builder.html'});await page.waitForLoadState('networkidle');
+ await page.locator('.dtg-cc-add-default').first().click();
+ const qty=page.locator('.dtg-line-card input[data-size="M"]').first();await qty.fill('24');await qty.dispatchEvent('change');
+ await expect(page.locator('#dtgPriceSummary')).toContainText('$396.72');
+ await page.locator('#floatingQuoteBtn').click();await expect(page.locator('#aiChatPanel')).toHaveClass(/open/);await expect(page.locator('#aiChatMessages')).toContainText('Synthetic research reply.');
+ const input=page.locator('#aiChatTextarea'),panel=page.locator('#aiChatPanel');await input.focus();
+ const quote={locationCode:'LC',lineItems:[{styleNumber:'PC54',color:'Jet Black',sizes:{L:12}}]};
+ await page.evaluate(q=>{window.__fill=window.DTGInlineForm.fillFromQuote(q,null).then(()=>'settled');},quote);
+ const overwrite=page.getByRole('dialog',{name:'AI updated the quote'});
+ await expect(overwrite).toBeVisible();await expect(overwrite).toHaveAccessibleDescription(/^You have edits on the form\./);
+ await expect(overwrite.getByRole('button',{name:'Keep my edits'})).toBeFocused();
+ // Escape closes only the confirm; the assistant behind it stays open and the edits stay.
+ await page.keyboard.press('Escape');await expect(overwrite).toHaveCount(0);
+ await expect(panel).toHaveClass(/open/);await expect(input).toBeFocused();
+ expect(await page.evaluate(()=>window.__fill)).toBe('settled');await expect(qty).toHaveValue('24');
+ await page.evaluate(q=>{window.__fill=window.DTGInlineForm.fillFromQuote(q,null);},quote);
+ await overwrite.getByRole('button',{name:'Apply new quote'}).click();await expect(overwrite).toHaveCount(0);
+ await expect(page.locator('.dtg-line-card input[data-size="L"]').first()).toHaveValue('12');await expect(input).toBeFocused();
+ await page.keyboard.press('Escape');await expect(panel).not.toHaveClass(/open/);
+ check(expect,e);
+});
+
+test('CSS quote builders: dtg assistant swatches render without inline styles or broken images',async({page})=>{
+ test.skip(original,'Runtime swatch rendering changed after the reviewed migration.');
+ // Block style attributes as the target CSP will, so a colour written as style="" would render transparent.
+ const html=fs.readFileSync(path.join(__dirname,'../../quote-builders/dtg-quote-builder.html'));
+ await page.route('**/quote-builders/dtg-quote-builder.html',route=>route.fulfill({contentType:'text/html',headers:{'Content-Security-Policy':"style-src-attr 'none'"},body:html}));
+ const e=await open(page,{assistant:true,richCatalog:true,url:'/quote-builders/dtg-quote-builder.html'});await page.waitForLoadState('networkidle');
+ const image='/__core-fixture/garment.svg',sse=(event,data)=>'event: '+event+'\ndata: '+JSON.stringify(data)+'\n\n';
+ await page.route('**/__missing-swatch/**',route=>route.fulfill({status:404,body:''}));
+ await page.route('**/api/dtg-quote-ai/chat',route=>route.fulfill({contentType:'text/event-stream',body:
+  sse('tool_result',{tool:'recommend_top_sellers',result:{category:'T-Shirts',count:1,products:[{styleNumber:'PC54',name:'Essential Cotton Tee',brand:'Port & Company',fabric:'100% cotton',salesRank:1,bestColors:[{color:'#263b46',name:'Jet Black',units:'240'},{color:'#c64f13',name:'Brilliant Orange'}]}]}})
+  +sse('tool_result',{tool:'lookup_product_details',result:{styleNumber:'PC54',title:'Essential Cotton Tee',colorCount:2,sizeCount:2,colors:[{name:'Jet Black',catalogColor:'JetBlack',swatchImageUrl:'/__missing-swatch/jet-black.png',mainImageUrl:image},{name:'Brilliant Orange',catalogColor:'BrillOrng',swatchImageUrl:image,mainImageUrl:image}],sizes:[{size:'S'},{size:'M'}]}})
+  +sse('delta',{text:'Synthetic research reply.'})}));
+ await page.locator('#floatingQuoteBtn').click();await expect(page.locator('#aiChatMessages')).toContainText('Synthetic research reply.');
+ const chips=page.locator('.ts-color-chip .swatch');await expect(chips).toHaveCount(2);
+ await expect(chips.nth(0)).toHaveCSS('background-color','rgb(38, 59, 70)');await expect(chips.nth(1)).toHaveCSS('background-color','rgb(198, 79, 19)');
+ // The failed swatch shows the placeholder through a loaded blank image, keeping its alt text for screen readers.
+ const failed=page.locator('.product-details-card .color-swatch[data-color-name="Jet Black"] .cs-img');
+ await expect(failed).toHaveClass(/placeholder/);await expect(failed).toHaveAttribute('alt','Jet Black');
+ await expect.poll(()=>failed.evaluate(img=>img.complete&&img.naturalWidth)).toBe(1);
  check(expect,e);
 });
 
