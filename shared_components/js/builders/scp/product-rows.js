@@ -7,7 +7,7 @@
 /* global SIZE_TO_SUFFIX, EXTENDED_SIZE_ORDER, getAvailableExtendedSizes,
    markScreenPrintDirty, recalculatePricing, escapeHtml, showToast,
    SKUValidationService, HeadwearClassifier, cleanProductTitle,
-   getSwatchStyle, productThumbnailModal, Event */
+   getSwatchAttrs, qbPaintSwatches, productThumbnailModal, Event */
 import { scpState, API_BASE, SIZE06_EXTENDED_SIZES } from './state.js';
 import { positionColorDropdown } from '../shared/color-dropdown-position.js';
 
@@ -310,7 +310,7 @@ export async function onStyleChange(input, rowId) {
 
             if (colors && colors.length > 0) {
                 // Populate custom color picker dropdown with swatches
-                // eslint-disable-next-line no-unsanitized/property -- audited (1.4): COLOR_NAME/CATALOG_COLOR escapeHtml-wrapped; swatch via hardened getSwatchStyle (C32)
+                // eslint-disable-next-line no-unsanitized/property -- audited (1.4): COLOR_NAME/CATALOG_COLOR escapeHtml-wrapped; swatch via hardened getSwatchAttrs (C32)
                 pickerDropdown.innerHTML = colors.map(c => `
                     <div class="color-picker-option"
                          data-color-name="${escapeHtml(c.COLOR_NAME)}"
@@ -319,10 +319,11 @@ export async function onStyleChange(input, rowId) {
                          data-hex="${escapeHtml(c.HEX_CODE || '#ccc')}"
                          data-image-url="${escapeHtml(c.MAIN_IMAGE_URL || c.FRONT_MODEL || c.FRONT_FLAT || '')}"
                          data-call="selectColor" data-args='[${rowId}, "$this"]'>
-                        <span class="color-swatch" style="${getSwatchStyle(c)}"></span>
+                        <span class="color-swatch" ${getSwatchAttrs(c)}></span>
                         <span class="color-name">${escapeHtml(c.COLOR_NAME)}</span>
                     </div>
                 `).join('');
+                qbPaintSwatches(pickerDropdown);
 
                 // Enable the picker
                 pickerSelected.classList.remove('disabled');
@@ -1069,7 +1070,7 @@ function extractAllSizes(skus) {
     });
 }
 
-// getSwatchStyle() — now provided by quote-builder-utils.js
+// getSwatchAttrs() / qbPaintSwatches() — now provided by quote-builder-utils.js
 
 // ============================================================
 // COLOR PICKER FUNCTIONS
@@ -1701,18 +1702,13 @@ export function createChildRow(parentRowId, size, qty) {
              data-swatch-url="${escapeHtml(c.COLOR_SQUARE_IMAGE || '')}"
              data-hex="${escapeHtml(c.HEX_CODE || '#ccc')}"
              data-call="selectChildColor" data-args='[${childRowId}, ${parentRowId}, "$this"]'>
-            <span class="color-swatch" style="${getSwatchStyle(c)}"></span>
+            <span class="color-swatch" ${getSwatchAttrs(c)}></span>
             <span class="color-name">${escapeHtml(c.COLOR_NAME)}</span>
         </div>`
     ).join('');
 
-    // Build current color display — sanitize before interpolating into (CSS/attribute
-    // breakout); ports EMB's hardened block (review C32) that never synced here (1.4 audit).
-    const _swUrl = String(parentSwatchUrl || '').replace(/["'()\\\s]/g, '');
-    const _swHex = (parentHex && /^#[0-9a-fA-F]{3,8}$/.test(parentHex)) ? parentHex : '#ccc';
-    const currentSwatchStyle = /^https?:\/\//i.test(_swUrl)
-        ? `background-image: url('${_swUrl}'); background-size: cover; background-position: center;`
-        : `background-color: ${_swHex};`;
+    // Current color display — the same hardened swatch attributes as EMB (review C32, 1.4 audit).
+    const currentSwatchAttrs = getSwatchAttrs({ COLOR_SQUARE_IMAGE: parentSwatchUrl, HEX_CODE: parentHex });
 
     const childRow = document.createElement('tr');
     childRow.id = `row-${childRowId}`;
@@ -1762,7 +1758,7 @@ export function createChildRow(parentRowId, size, qty) {
         <td>
             <div class="color-picker-wrapper child-color-picker" data-row-id="${childRowId}">
                 <div class="color-picker-selected" data-call="toggleColorPicker" data-args="[${childRowId}]" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-label="Garment color" data-keydown="handleColorPickerKeydown" data-keydown-args='["$event", ${childRowId}]'>
-                    <span class="color-swatch" style="${currentSwatchStyle}"></span>
+                    <span class="color-swatch" ${currentSwatchAttrs}></span>
                     <span class="color-name">${escapeHtml(parentColor)}</span>
                     <i class="fas fa-chevron-down picker-arrow" aria-hidden="true"></i>
                 </div>
@@ -1775,8 +1771,8 @@ export function createChildRow(parentRowId, size, qty) {
         <td><input type="number" class="cell-input size-input qb-bg-gray" data-size="M" aria-label="Quantity M" disabled value=""></td>
         <td><input type="number" class="cell-input size-input qb-bg-gray" data-size="L" aria-label="Quantity L" disabled value=""></td>
         <td><input type="number" class="cell-input size-input qb-bg-gray" data-size="XL" aria-label="Quantity XL" disabled value=""></td>
-        <td><input type="number" class="cell-input size-input" data-size="2XL" aria-label="Quantity 2XL" ${isSize05 ? '' : 'disabled'} value="${isSize05 ? qty : ''}" placeholder="${isSize05 ? qty : ''}" style="${isSize05 ? '' : 'background: #f5f5f5;'}" data-change="onChildSizeChange" data-change-args='[${childRowId}, ${parentRowId}, "${size}"]' data-keydown="handleCellKeydown" data-keydown-args='["$event", "$this"]'></td>
-        <td><input type="number" class="cell-input size-input" data-size="${size}" ${isSize06 ? '' : 'disabled'} value="${isSize06 ? qty : ''}" placeholder="${isSize06 ? qty : ''}" style="${isSize06 ? '' : 'background: #f5f5f5;'}" data-change="onChildSizeChange" data-change-args='[${childRowId}, ${parentRowId}, "${size}"]' data-keydown="handleCellKeydown" data-keydown-args='["$event", "$this"]'></td>
+        <td><input type="number" class="cell-input size-input${isSize05 ? '' : ' size-input-off'}" data-size="2XL" aria-label="Quantity 2XL" ${isSize05 ? '' : 'disabled'} value="${isSize05 ? qty : ''}" placeholder="${isSize05 ? qty : ''}" data-change="onChildSizeChange" data-change-args='[${childRowId}, ${parentRowId}, "${size}"]' data-keydown="handleCellKeydown" data-keydown-args='["$event", "$this"]'></td>
+        <td><input type="number" class="cell-input size-input${isSize06 ? '' : ' size-input-off'}" data-size="${size}" ${isSize06 ? '' : 'disabled'} value="${isSize06 ? qty : ''}" placeholder="${isSize06 ? qty : ''}" data-change="onChildSizeChange" data-change-args='[${childRowId}, ${parentRowId}, "${size}"]' data-keydown="handleCellKeydown" data-keydown-args='["$event", "$this"]'></td>
         <td class="cell-qty qty-display" id="row-qty-${childRowId}">${qty}</td>
         <td class="cell-price unit-price-display" id="row-price-${childRowId}">-</td>
         <td class="cell-total" id="row-total-${childRowId}">-</td>
@@ -1786,6 +1782,7 @@ export function createChildRow(parentRowId, size, qty) {
             </button>
         </td>
     `;
+    qbPaintSwatches(childRow);
 
     // Insert in correct size order: XS, 2XL, 3XL, 4XL, 5XL, 6XL
     const existingChildren = Array.from(document.querySelectorAll(`tr[data-parent-row-id="${parentRowId}"]`));

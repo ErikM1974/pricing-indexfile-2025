@@ -77,7 +77,7 @@
         } else {
             // Show loading spinner for non-pants
             grid.innerHTML = `
-                <div class="size-popup-loading" style="grid-column: 1 / -1;">
+                <div class="size-popup-loading">
                     <div class="spinner"></div>
                     <span>Loading available sizes...</span>
                 </div>
@@ -93,7 +93,7 @@
         if (!availableSizes || availableSizes.length === 0) {
             const sizeType = isPants ? 'waist/inseam' : (isShorts ? 'waist' : 'extended');
             grid.innerHTML = `
-                <div class="size-popup-empty" style="grid-column: 1 / -1;">
+                <div class="size-popup-empty">
                     <i class="fas fa-info-circle" aria-hidden="true"></i><br>
                     No ${sizeType} sizes available for ${escapeHtml(styleNumber)}.
                 </div>
@@ -160,12 +160,14 @@
                             <span>Waist ${escapeHtml(waist)}</span>
                             <span class="waist-count">(${waistGroups[waist].length} sizes)</span>
                         </div>
-                        <div class="waist-sizes" style="${isExpanded ? '' : 'display: none;'}">
+                        <div class="waist-sizes">
                             ${sizesHtml}
                         </div>
                     </div>
                 `;
             }).join('');
+            // Collapsed waists start hidden; toggleWaistGroup writes style.display.
+            grid.querySelectorAll('.pants-waist-group.collapsed .waist-sizes').forEach(el => { el.style.display = 'none'; });
         } else {
             // Non-pants: flat list (existing behavior)
             grid.innerHTML = availableSizes.map(size => {

@@ -410,7 +410,8 @@ declare const emailjs: any; // T4 lift — bare-global page contract
 declare const getLtmControlState: any; // T4 lift — bare-global page contract
 declare const getServicePrice: any; // T4 lift — bare-global page contract
 declare const getSharedRushRate: any; // T4 lift — bare-global page contract
-declare const getSwatchStyle: any; // T4 lift — bare-global page contract
+declare const getSwatchAttrs: any; // T4 lift — bare-global page contract
+declare const qbPaintSwatches: any; // T4 lift — bare-global page contract
 declare const hasUnsavedChanges: any; // T4 lift — bare-global page contract
 declare const id: any; // T4 lift — bare-global page contract
 declare const initLogoStatusChips: any; // T4 lift — bare-global page contract

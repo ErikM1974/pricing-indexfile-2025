@@ -678,7 +678,11 @@ export async function pushToShopWorks() {
     embState._pushInFlight = true;
     const pushBtn = /** @type {HTMLInputElement|null} */ (document.getElementById('emb-push-shopworks-btn'));
     if (pushBtn) {
-        pushBtn.disabled = true;  // disable synchronously, BEFORE the first await
+        // Do NOT disable the button here — openPushPreview() bails when it is disabled (SCP/DTF say the
+        // same). _pushInFlight above is the double-click guard. Disabling it synchronously (2026-06-07)
+        // only worked because the save re-enabled it: a quote with nothing to save — just saved, or
+        // reopened for editing — skipped that save, so the preview never opened and Push looked dead
+        // (2026-09-17).
         // [2026-06-07] The silent save before the preview modal takes ~2-3s — show a spinner so the rep knows
         // it's working. Update the LABEL's content, NOT the button's innerHTML — replacing the button HTML
         // destroys #emb-push-shopworks-label, which updatePushButtonState needs, and would strand the button
@@ -783,7 +787,7 @@ function renderPushPreview(data) {
         '<div class="preview-item-value">' + escapeHtml(data.extOrderId || '') + '</div></div>';
     html += '<div class="preview-item"><div class="preview-item-label">Customer #</div>' +
         '<div class="preview-item-value">' + escapeHtml(String(o.id_Customer || '')) +
-        (o.ExtCustomerID ? ' <span style="color:#94a3b8;">(ext ' + escapeHtml(String(o.ExtCustomerID)) + ')</span>' : '') +
+        (o.ExtCustomerID ? ' <span class="push-ext-id">(ext ' + escapeHtml(String(o.ExtCustomerID)) + ')</span>' : '') +
         '</div></div>';
     html += '<div class="preview-item"><div class="preview-item-label">Contact</div>' +
         '<div class="preview-item-value">' +
@@ -822,7 +826,7 @@ function renderPushPreview(data) {
             const locs = Array.isArray(d.Locations) ? d.Locations : [];
             const thumb = (locs.find(l => l && l.ImageURL) || {}).ImageURL;
             html += '<div class="preview-product-item">' +
-                (thumb ? '<img src="' + escapeHtml(thumb) + '" alt="" style="width:40px;height:40px;object-fit:contain;border:1px solid #e2e8f0;border-radius:4px;margin-right:8px;">' : '') +
+                (thumb ? '<img src="' + escapeHtml(thumb) + '" alt="" class="push-design-thumb">' : '') +
                 '<span class="preview-product-desc">' + escapeHtml(d.DesignName || '(unnamed)') + ' · ' + escapeHtml(String(locs.length)) + ' location(s)</span>' +
                 '</div>';
         }
@@ -922,16 +926,15 @@ export async function confirmPushToShopWorks() {
         updatePushButtonState();
         const extId = data.extOrderId || embState._pushQuoteId;
         if (statusEl) {
-            statusEl.innerHTML = '<div class="shopworks-import-preview active" style="background:#eff6ff; border-color:#bfdbfe;">' +
+            statusEl.innerHTML = '<div class="shopworks-import-preview active push-sent">' +
                 '<h4><i class="fas fa-paper-plane" aria-hidden="true"></i> Sent to ManageOrders</h4>' +
                 '<div class="preview-item-value">Uploaded as <strong>' + escapeHtml(extId) + '</strong> · ' +
                 escapeHtml(String(data.lineItemCount || 0)) + ' line items · ' +
                 escapeHtml(String(data.designCount || 0)) + ' design(s).</div>' +
-                '<div style="margin-top:10px; color:#475569;">ShopWorks imports new orders on its own download cycle — ' +
+                '<div class="push-sent-note">ShopWorks imports new orders on its own download cycle — ' +
                 'confirm it actually landed in OnSite:</div>' +
-                '<div id="emb-sw-import-result" style="margin-top:8px; font-size:0.92em;"></div>' +
-                '<button type="button" id="emb-sw-verify-btn" style="margin-top:8px; padding:6px 12px; background:#1a5276; ' +
-                'color:#fff; border:none; border-radius:6px; cursor:pointer;">' +
+                '<div id="emb-sw-import-result" class="push-import-result"></div>' +
+                '<button type="button" id="emb-sw-verify-btn" class="push-verify-btn">' +
                 '<i class="fas fa-magnifying-glass" aria-hidden="true"></i> Verify in ShopWorks</button></div>';
             const vbtn = document.getElementById('emb-sw-verify-btn');
             if (vbtn) vbtn.addEventListener('click', () => verifyShopWorksImport(extId));
@@ -974,7 +977,7 @@ export async function verifyShopWorksImport(extOrderId) {
         const row = Array.isArray(data.result) && data.result.length ? data.result[0] : null;
         const orderNo = row ? (row.id_Order || row.ID_Order || row) : null;
         if (orderNo) {
-            out.innerHTML = '<span style="color:#15803d; font-weight:600;"><i class="fas fa-check-circle" aria-hidden="true"></i> ' +
+            out.innerHTML = '<span class="push-confirmed"><i class="fas fa-check-circle" aria-hidden="true"></i> ' +
                 'Confirmed in ShopWorks — order #' + escapeHtml(String(orderNo)) + '</span>';
         } else {
             out.innerHTML = '<span class="qb-amber-dark"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i> ' +

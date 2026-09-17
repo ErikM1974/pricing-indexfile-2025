@@ -5,6 +5,24 @@ Resolved entries aged out of `LESSONS_LEARNED.md` (300-line cap). Newest first. 
 ---
 
 ## Archived 2026-09-17
+## Downloaded PDF layout is separate from print CSS (2026-09-15)
+
+- Problem/root cause: Quick Quote's jsPDF download used plain text columns and a small image; changing website print CSS would not improve that downloaded file. Rough height estimates could also miss wrapped content.
+- Solution: update the existing PDF renderer with measured table rows, flowing text, a local logo and appropriately sized image canvases; keep pricing in the shared document model.
+- Prevention: inspect actual generated PDF pages and exercise long notes, multiple options, sampled quantities and setup fees. Preserve the caller's model, exact totals and original source estimate. No-quantity sheets must omit order totals.
+
+## Calculator references need complete field and paper ownership (2026-09-11)
+
+- Problem/root cause: legacy price tables clipped rightmost size columns on paper; page-local print rules hid price-load failures, while broad class matching missed compound quantity-control classes.
+- Solution: canonical fields on every quantity selector/input, focusable named scroll regions and selected-type state; scoped print table sizing and visible error banners. Preserve each amount, tier, fee and original financial transformation.
+- Prevention: compare actual original/current values at four widths, keyboard-scroll all sizes, exercise failure and print-view restoration, and inspect every rendered page including long service lists and the contact footer. Keep headings with rows without making entire long categories unbreakable.
+
+## Record workspaces need current-response checks before secondary writes (2026-09-10)
+
+- Problem/root cause: A stale linked quote can update the current lead after refresh; removed kit/art hosts can still receive asynchronous callbacks. Native dialog conversion and fixed banners can also lose focus or cover recovery controls.
+- Solution: bind quote rendering and existing value sync to the current view sequence, lead object, quote ID and connected target. Reject malformed replies, ignore superseded loads, preserve uncertain outreach warnings beside the action, contain modal focus, and block all unknown API traffic in previews.
+- Prevention: mock delayed responses and every write, verify unchanged valid quote sync and original payloads, reverse recorded controller changes into original source hashes, and retain explicit shared-module ownership. Inspect populated PDFs: narrow grids can split money; give the order table full width and verify every row and rendered page. Precompute file updates before writing so a missing preview anchor cannot leave a partial batch. Timestamp-based browser snapshots must set the baseline time zone explicitly; fixed Date.now alone does not standardize local date formatting on Windows and Linux.
+
 ## Storefront quantity edits and scoped CSS (2026-09-11)
 
 - Problem/root cause: the quantity debounce retained the previous successful price and size breakdown for350ms, while the quantity field had already changed; the email/cart controls could therefore reference the old quote.

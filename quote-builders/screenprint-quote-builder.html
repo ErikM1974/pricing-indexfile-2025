@@ -55,13 +55,13 @@
 
     <!-- Extended Sizes Shared Module (2026-03-21 consolidation) -->
     <script src="/shared_components/js/extended-sizes-config.js?v=2026.09.07.33"></script>
-    <script src="/shared_components/js/quote-extended-sizes.js?v=2026.09.06.22"></script>
+    <script src="/shared_components/js/quote-extended-sizes.js?v=2026.09.17.2"></script>
 
     <!-- Quote workspace replaces quote-session.css on this page. -->
     <!-- Quote workspace replaces quote-builder-utilities.css on this page. -->
     <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.12.2">
     <link rel="stylesheet" href="/shared_components/css/utilities.css?v=2026.09.12.2">
-    <link rel="stylesheet" href="/shared_components/css/quote-workspace.css?v=2026.09.17.1">
+    <link rel="stylesheet" href="/shared_components/css/quote-workspace.css?v=2026.09.17.2">
     <link rel="stylesheet" href="/shared_components/css/quote-screenprint.css?v=2026.09.16.5">
 </head>
 <body class="scp-builder qb-shell-body" data-ui="unified" data-quote-workspace="screenprint">
@@ -165,7 +165,7 @@
                             <div class="section-label">
                                 <i class="fas fa-plus-circle qb-c-qb-gray" aria-hidden="true" id="back-icon"></i> BACK LOCATION <span class="qb-fw-400-c-qb-gray">(optional)</span>
                             </div>
-                            <div class="workspace-location-stack" style="display: flex">
+                            <div class="workspace-location-stack">
                                 <label class="location-radio">
                                     <input type="radio" name="back-location" value="" checked data-change="updatePrintConfig">
                                     <span>None</span>
@@ -181,9 +181,9 @@
                                 </label>
                             </div>
                             <!-- Ink Colors for Back (hidden when None) -->
-                            <div class="workspace-ink-section" id="back-colors-section" style="display: none">
+                            <div class="workspace-ink-section" id="back-colors-section" hidden data-qb-hidden>
                                 <div class="qb-fs-11-c-qb-gray-mb-6">INK COLORS</div>
-                                <div class="ink-color-selector qb-gap-4" style="display: flex">
+                                <div class="ink-color-selector qb-gap-4">
                                     <label class="ink-btn"><input type="radio" name="back-colors" value="1" checked data-change="updatePrintConfig"><span>1</span></label>
                                     <label class="ink-btn"><input type="radio" name="back-colors" value="2" data-change="updatePrintConfig"><span>2</span></label>
                                     <label class="ink-btn"><input type="radio" name="back-colors" value="3" data-change="updatePrintConfig"><span>3</span></label>
@@ -205,9 +205,9 @@
                                 <input type="checkbox" id="left-sleeve-toggle" data-change="updatePrintConfig">
                                 <span>Left Sleeve</span>
                             </label>
-                            <div class="workspace-sleeve-inks" id="left-sleeve-colors-section" style="display: none">
+                            <div class="workspace-sleeve-inks" id="left-sleeve-colors-section" hidden data-qb-hidden>
                                 <div class="qb-fs-11-c-qb-gray-mb-6">LEFT SLEEVE INK COLORS</div>
-                                <div class="ink-color-selector qb-gap-4" style="display: flex">
+                                <div class="ink-color-selector qb-gap-4">
                                     <label class="ink-btn"><input type="radio" name="left-sleeve-colors" value="1" checked data-change="updatePrintConfig"><span>1</span></label>
                                     <label class="ink-btn"><input type="radio" name="left-sleeve-colors" value="2" data-change="updatePrintConfig"><span>2</span></label>
                                     <label class="ink-btn"><input type="radio" name="left-sleeve-colors" value="3" data-change="updatePrintConfig"><span>3</span></label>
@@ -222,9 +222,9 @@
                                 <input type="checkbox" id="right-sleeve-toggle" data-change="updatePrintConfig">
                                 <span>Right Sleeve</span>
                             </label>
-                            <div class="workspace-ink-section" id="right-sleeve-colors-section" style="display: none">
+                            <div class="workspace-ink-section" id="right-sleeve-colors-section" hidden data-qb-hidden>
                                 <div class="qb-fs-11-c-qb-gray-mb-6">RIGHT SLEEVE INK COLORS</div>
-                                <div class="ink-color-selector qb-gap-4" style="display: flex">
+                                <div class="ink-color-selector qb-gap-4">
                                     <label class="ink-btn"><input type="radio" name="right-sleeve-colors" value="1" checked data-change="updatePrintConfig"><span>1</span></label>
                                     <label class="ink-btn"><input type="radio" name="right-sleeve-colors" value="2" data-change="updatePrintConfig"><span>2</span></label>
                                     <label class="ink-btn"><input type="radio" name="right-sleeve-colors" value="3" data-change="updatePrintConfig"><span>3</span></label>
@@ -241,7 +241,7 @@
                             <div class="qb-fs-11-c-qb-gray-mb-4">SETUP FEE</div>
                             <div class="qb-fs-12-c-qb-gray-mb-4" id="total-screens-display">1 screen total</div>
                             <div class="workspace-setup-total" id="setup-fee-display">$30.00</div>
-                            <div class="qb-fs-10-c-qb-gray-mt-4" id="dark-garment-note" style="display: none">Includes white underbase</div>
+                            <div class="qb-fs-10-c-qb-gray-mt-4" id="dark-garment-note" hidden data-qb-hidden>Includes white underbase</div>
                         </div>
                     </div>
                 </div>
@@ -273,7 +273,7 @@
                 </div>
 
                 <!-- Minimum Order Warning Banner -->
-                <div id="min-order-warning" class="workspace-min-order" style="display: none;">
+                <div id="min-order-warning" class="workspace-min-order" hidden data-qb-hidden>
                     <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                     <strong>Minimum Order: 24 pieces</strong> -
                     Orders under 48 pieces include a $50 small-batch fee — it drops off at 48+.
@@ -323,7 +323,7 @@
                                 <td class="cell-total" id="setup-fee-total">$30.00</td>
                                 <td class="cell-actions"></td>
                             </tr>
-                            <tr id="ltm-fee-row" class="fee-row" style="display: none;">
+                            <tr id="ltm-fee-row" class="fee-row" hidden data-qb-hidden>
                                 <td colspan="10" class="fee-label">
                                     <i class="fas fa-info-circle" aria-hidden="true"></i> <span title="Also called the Less Than Minimum (LTM) fee">Small-batch fee</span>
                                 </td>
@@ -332,7 +332,7 @@
                                 <td class="cell-total" id="ltm-row-total">$50.00</td>
                                 <td class="cell-actions"></td>
                             </tr>
-                            <tr id="art-charge-row" class="fee-row" style="display: none;">
+                            <tr id="art-charge-row" class="fee-row" hidden data-qb-hidden>
                                 <td colspan="10" class="fee-label">
                                     <i class="fas fa-palette" aria-hidden="true"></i> Art Charge (Logo Mockup & Review)
                                 </td>
@@ -341,7 +341,7 @@
                                 <td class="cell-total" id="art-charge-total">$0.00</td>
                                 <td class="cell-actions"></td>
                             </tr>
-                            <tr id="graphic-design-row" class="fee-row" style="display: none;">
+                            <tr id="graphic-design-row" class="fee-row" hidden data-qb-hidden>
                                 <td colspan="10" class="fee-label">
                                     <i class="fas fa-pencil-ruler" aria-hidden="true"></i> Graphic Design (<span id="design-hours-label">0</span> hrs × $75)
                                 </td>
@@ -350,7 +350,7 @@
                                 <td class="cell-total" id="graphic-design-total-row">$0.00</td>
                                 <td class="cell-actions"></td>
                             </tr>
-                            <tr id="rush-fee-row" class="fee-row" style="display: none;">
+                            <tr id="rush-fee-row" class="fee-row" hidden data-qb-hidden>
                                 <td colspan="10" class="fee-label">
                                     <i class="fas fa-bolt" aria-hidden="true"></i> Rush Fee
                                 </td>
@@ -359,7 +359,7 @@
                                 <td class="cell-total" id="rush-fee-total">$0.00</td>
                                 <td class="cell-actions"></td>
                             </tr>
-                            <tr id="vellum-fee-row" class="fee-row" style="display: none;">
+                            <tr id="vellum-fee-row" class="fee-row" hidden data-qb-hidden>
                                 <td colspan="10" class="fee-label">
                                     <i class="fas fa-file-image" aria-hidden="true"></i> Vellum Print (<span id="vellum-qty-label">0</span> × <span id="vellum-per-label">$10</span>)
                                 </td>
@@ -368,7 +368,7 @@
                                 <td class="cell-total" id="vellum-fee-total">$0.00</td>
                                 <td class="cell-actions"></td>
                             </tr>
-                            <tr id="color-change-fee-row" class="fee-row" style="display: none;">
+                            <tr id="color-change-fee-row" class="fee-row" hidden data-qb-hidden>
                                 <td colspan="10" class="fee-label">
                                     <i class="fas fa-fill-drip" aria-hidden="true"></i> Color Change (<span id="color-change-qty-label">0</span> × <span id="color-change-per-label">$15</span>)
                                 </td>
@@ -435,14 +435,14 @@
                     </div>
                     <i id="charges-chevron" class="fas fa-chevron-down collapsible-chevron" aria-hidden="true"></i>
                 </div>
-                <div id="fees-charges-content" class="charges-content hidden" style="display:none">
-                    <div class="workspace-charge-fields" style="display: flex">
+                <div id="fees-charges-content" class="charges-content hidden" hidden data-qb-hidden>
+                    <div class="workspace-charge-fields">
                         <div class="charge-field qb-m0">
                             <label class="d-flex align-items-center gap-2 qb-cur-pointer">
                                 <input type="checkbox" id="art-charge-toggle" data-change="toggleArtCharge,updateAdditionalCharges">
                                 <span>Logo Mockup &amp; Review</span>
                             </label>
-                            <div class="input-with-prefix" id="art-charge-wrapper" style="opacity: 0.4;">
+                            <div class="input-with-prefix art-charge-wrapper" id="art-charge-wrapper">
                                 <span class="prefix">$</span>
                                 <input type="number" id="art-charge" aria-label="Art charge in dollars" class="quote-input"
                                        min="0" step="0.01" value="0" disabled
@@ -559,7 +559,7 @@
             <!-- Customer Info (moved above Quote Summary 2026-03-23) -->
             <div class="customer-panel qb-p-12-16-bb-1-solid-gray-200-m-16-16-16-16">
                 <div class="customer-panel-header qb-mb8" data-toggle-hidden="spc-customer-fields" tabindex="0" role="button" aria-label="Toggle customer details" data-keyclick="1">
-                    <h4 class="qb-ai-center-gap-6" style="display: flex"><i class="fas fa-user qb-c-brand-700" aria-hidden="true"></i> Customer</h4>
+                    <h4 class="qb-ai-center-gap-6"><i class="fas fa-user qb-c-brand-700" aria-hidden="true"></i> Customer</h4>
                     <i class="fas fa-chevron-down qb-fs-12-c-print-line" aria-hidden="true"></i>
                 </div>
                 <div id="spc-customer-fields">
@@ -573,14 +573,14 @@
 
                         <!-- Customer context banners (Erik 2026-05-23) -->
                         <div id="customer-warning-banner" hidden></div>
-                        <div class="workspace-customer-search-row" style="display: flex">
+                        <div class="workspace-customer-search-row">
                             <span id="customer-tax-chip" hidden></span>
                             <span id="customer-tier-badge" hidden></span>
                         </div>
                     </div>
                     <details class="customer-manual" id="spc-customer-manual">
                     <summary>Enter details manually <span class="cm-hint">— the search fills these for you</span></summary>
-                    <div class="workspace-customer-grid" style="display: grid">
+                    <div class="workspace-customer-grid">
                         <div class="customer-field">
                             <label class="quote-label">NAME *</label>
                             <input type="text" id="customer-name" aria-label="Customer name" placeholder="Customer name" class="quote-input" data-input="?renderOrderRecap,?updateScpPushButtonState">
@@ -648,12 +648,12 @@
                     <span class="value" id="sidebar-front">Left Chest (1-color)</span>
                 </div>
 
-                <div class="pricing-row" id="sidebar-back-row" style="display: none;">
+                <div class="pricing-row" id="sidebar-back-row" hidden data-qb-hidden>
                     <span class="label">Back Print:</span>
                     <span class="value" id="sidebar-back">-</span>
                 </div>
 
-                <div class="pricing-row" id="sidebar-sleeves-row" style="display: none;">
+                <div class="pricing-row" id="sidebar-sleeves-row" hidden data-qb-hidden>
                     <span class="label">Sleeves:</span>
                     <span class="value" id="sidebar-sleeves">-</span>
                 </div>
@@ -663,12 +663,12 @@
                     <span class="value" id="sidebar-screens">1</span>
                 </div>
 
-                <div class="pricing-row" id="sidebar-dark-row" style="display: none;">
+                <div class="pricing-row" id="sidebar-dark-row" hidden data-qb-hidden>
                     <span class="label">Dark Garment:</span>
                     <span class="value qb-c-amber-500">+ underbase</span>
                 </div>
 
-                <div class="pricing-row" id="sidebar-stripes-row" style="display: none;">
+                <div class="pricing-row" id="sidebar-stripes-row" hidden data-qb-hidden>
                     <span class="label">Safety Stripes:</span>
                     <span class="value qb-c-amber-500" id="sidebar-stripes-cost">+$2.00/pc</span>
                 </div>
@@ -684,13 +684,13 @@
                     <span class="label">Pricing Tier:</span>
                     <span class="tier-badge" id="pricing-tier" title="Your price break — the more pieces on the order, the cheaper each piece gets">24-36</span>
                 </div>
-                <div class="quantity-nudge" id="quantity-nudge" style="display: none;"></div>
+                <div class="quantity-nudge" id="quantity-nudge" hidden data-qb-hidden></div>
 
                 <div class="pricing-row">
                     <span class="label">Products Subtotal:</span>
                     <span class="value" id="subtotal">$0.00</span>
                 </div>
-                <div class="pricing-row qb-fs-12-c-gray-500-bb-none-p-2-0" id="per-unit-price-row" style="display: none">
+                <div class="pricing-row qb-fs-12-c-gray-500-bb-none-p-2-0" id="per-unit-price-row" hidden data-qb-hidden>
                     <span class="label qb-fst-italic">Per Piece:</span>
                     <span class="value qb-fst-italic-fw-500" id="per-unit-price">-</span>
                 </div>
@@ -706,7 +706,7 @@
 
 
             <!-- LTM Control Panel (shown only when qty <= 71) -->
-            <div class="qb-mb-12" id="spc-ltm-wrapper" style="display: none">
+            <div class="qb-mb-12" id="spc-ltm-wrapper" hidden data-qb-hidden>
                 <div id="spc-ltm-panel"></div>
             </div>
 
@@ -789,9 +789,9 @@
 
     <!-- Core Dependencies -->
     <script src="/shared_components/js/product-category-filter.js?v=2026.09.06.37"></script>
-    <script src="/shared_components/js/quote-builder-utils.js?v=2026.09.13.6"></script>
+    <script src="/shared_components/js/quote-builder-utils.js?v=2026.09.17.2"></script>
     <script src="/shared_components/js/exact-match-search.js?v=2026.09.06.37"></script>
-    <script src="/shared_components/js/quote-share-modal.js?v=2026.09.06.22"></script>
+    <script src="/shared_components/js/quote-share-modal.js?v=2026.09.17.2"></script>
     <script src="/shared_components/js/screenprint-pricing-service.js?v=2026.09.06.44"></script>
     <script src="/shared_components/js/screenprint-quote-service.js?v=2026.09.06.37"></script>
     <script src="/shared_components/js/sku-validation-service.js?v=2026.09.06.37"></script>
@@ -802,7 +802,7 @@
 
     <!-- Auto-Save & Draft Recovery (2026 consolidation) -->
     <script src="/shared_components/js/quote-persistence.js?v=2026.09.06.37"></script>
-    <script src="/shared_components/js/quote-session.js?v=2026.09.06.37"></script>
+    <script src="/shared_components/js/quote-session.js?v=2026.09.17.2"></script>
 
     <!-- Staff Authentication Helper (auto-select sales rep) -->
     <script src="/shared_components/js/staff-auth-helper.js?v=2026.09.06.37"></script>
@@ -810,13 +810,13 @@
     <!-- Customer Lookup Autocomplete -->
     <script src="/shared_components/js/customer-lookup-service.js?v=2026.09.07.25"></script>
     <!-- Customer Context Banners (Erik 2026-05-23) — Warning/Tax/Tier autofill -->
-    <script src="/shared_components/js/customer-context-banners.js?v=2026.07.07.2"></script>
+    <script src="/shared_components/js/customer-context-banners.js?v=2026.09.17.2"></script>
 
     <!-- Sidebar Resize (2026 UX improvement) -->
     <script src="/shared_components/js/sidebar-resize.js?v=2026.05.26.1"></script>
 
     <!-- Product Thumbnail Modal (click to enlarge) -->
-    <script src="/shared_components/js/product-thumbnail-modal.js?v=2026.09.08.5"></script>
+    <script src="/shared_components/js/product-thumbnail-modal.js?v=2026.09.17.2"></script>
 
     <!-- Power Quote Controller (extracted to external JS) -->
     <!-- Phase 9 → Phase 11.3 artwork upload (rich mode: design name + per-file placement) -->
@@ -826,10 +826,10 @@
     <script src="/shared_components/js/inventory-badges.js?v=2026.07.11.6"></script>
     <!-- Phase 11.1: customer-aware design lookup -->
     <script src="/shared_components/js/box-url.js?v=2026.08.06.1"></script>
-    <script src="/shared_components/js/customer-design-combobox.js?v=2026.09.06.31"></script>
+    <script src="/shared_components/js/customer-design-combobox.js?v=2026.09.17.2"></script>
     <!-- [2026-06-08] Shared order-summary band — MUST load after quote-builder-utils.js + before the builders/scp bundle (configure() runs at its eval) -->
-    <script src="/shared_components/js/quote-order-summary.js?v=2026.09.06.31"></script>
-    <script src="/shared_components/js/safety-stripe-recs.js?v=2026.09.13.2"></script>
+    <script src="/shared_components/js/quote-order-summary.js?v=2026.09.17.2"></script>
+    <script src="/shared_components/js/safety-stripe-recs.js?v=2026.09.17.2"></script>
 
     <!-- Guided Quote shell (Phase B, 2026-07-07) — 4-step flow over the existing
          sections, sidebar stays the price rail; "Show everything" restores the

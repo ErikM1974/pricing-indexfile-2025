@@ -703,20 +703,35 @@ function cleanProductTitle(title, styleNumber) {
 }
 
 /**
- * Generate inline CSS style string for a color swatch
- * Uses COLOR_SQUARE_IMAGE if available, falls back to HEX_CODE
+ * Swatch data attributes for a color: its COLOR_SQUARE_IMAGE, or HEX_CODE as the fallback.
+ * Runtime markup carries no style="" attribute (blocked without 'unsafe-inline'); call
+ * qbPaintSwatches() on the inserted markup to apply them through CSSOM.
  */
-function getSwatchStyle(color) {
+function getSwatchAttrs(color) {
     if (color.COLOR_SQUARE_IMAGE) {
         // Strip quotes/parens/backslashes/whitespace + require an http(s) URL so a crafted swatch value
-        // can't break out of the style="" attribute or the url() (CSS/attribute injection). (review C32)
+        // can't break out of the attribute or the url() (CSS/attribute injection). (review C32)
         const safe = String(color.COLOR_SQUARE_IMAGE).replace(/["'()\\\s]/g, '');
         if (/^https?:\/\//i.test(safe)) {
-            return `background-image: url('${safe}'); background-size: cover; background-position: center;`;
+            return `data-swatch-image="${escapeHtml(safe)}"`;
         }
     }
     const hex = (color.HEX_CODE && /^#[0-9a-fA-F]{3,8}$/.test(color.HEX_CODE)) ? color.HEX_CODE : '#ccc';
-    return `background-color: ${hex};`;
+    return `data-swatch-color="${hex}"`;
+}
+
+/** Paints the data-swatch-image / data-swatch-color elements inside root through CSSOM. */
+function qbPaintSwatches(root) {
+    if (!root) return;
+    root.querySelectorAll('[data-swatch-image], [data-swatch-color]').forEach((el) => {
+        if (el.dataset.swatchImage) {
+            el.style.backgroundImage = `url(${JSON.stringify(el.dataset.swatchImage)})`;
+            el.style.backgroundSize = 'cover';
+            el.style.backgroundPosition = 'center';
+        } else {
+            el.style.backgroundColor = el.dataset.swatchColor;
+        }
+    });
 }
 
 // ============================================
@@ -979,7 +994,7 @@ function assertQuoteEditable(session, opts = {}) {
 function updateEditModeUI(quoteId, revision) {
     const headerSubtitle = document.querySelector('.power-header .power-header-subtitle');
     if (headerSubtitle) {
-        headerSubtitle.innerHTML = `<span style="color: #fbbf24;">✏️ Editing: ${escapeHtml(String(quoteId))} • Rev ${escapeHtml(String(revision))}</span>`;
+        headerSubtitle.innerHTML = `<span class="qb-edit-mode-label">✏️ Editing: ${escapeHtml(String(quoteId))} • Rev ${escapeHtml(String(revision))}</span>`;
     }
     const saveBtn = document.querySelector('.btn-save-quote, [onclick*="saveAndGetLink"]');
     if (saveBtn) {
@@ -1086,8 +1101,7 @@ function renderPushChecklist(el, blockers) {
     const item = (b) => b.ok
         ? `<div class="pr-item pr-ok"><i class="fas fa-check-circle" aria-hidden="true"></i>${b.label}</div>`
         : `<button type="button" class="pr-item pr-no" data-pr-focus="${escapeHtml(b.focusId)}"
-             title="Click to jump to this field"
-             style="background:none;border:none;font:inherit;color:inherit;cursor:pointer;width:100%;text-align:left;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:2px;">
+             title="Click to jump to this field">
              <i class="fas fa-circle" aria-hidden="true"></i>${b.label}</button>`;
     // Logo TBD = NON-blocking warning (2026-07-07): quoting on an assumption is
     // fine, but nobody should start a production order on art we've never seen
@@ -1699,9 +1713,9 @@ function updateQuantityNudge(totalQty, method, savingsPerPiece = null, container
         // (EMB: caps + garments) — a bare "pieces" implied adding ANY product moves
         // the tier, which is false for mixed orders.
         const pieceWord = categoryLabel ? `${categoryLabel} piece` : 'piece';
-        let html = `<i class="fas fa-arrow-up" aria-hidden="true" style="margin-right: 4px;"></i>Add <strong>${needed}</strong> more ${pieceWord}${needed === 1 ? '' : 's'} to reach <strong>${tierLabel}</strong> tier pricing`;
+        let html = `<i class="fas fa-arrow-up nudge-icon" aria-hidden="true"></i>Add <strong>${needed}</strong> more ${pieceWord}${needed === 1 ? '' : 's'} to reach <strong>${tierLabel}</strong> tier pricing`;
         if (savingsPerPiece && savingsPerPiece > 0.01) {
-            html += ` — <strong style="color: #15803d;">save ~$${savingsPerPiece.toFixed(2)}/piece</strong>`;
+            html += ` — <strong class="nudge-savings">save ~$${savingsPerPiece.toFixed(2)}/piece</strong>`;
         }
         // Clickable nudge (2026-07-06, UX audit P1 #3): one click adds the missing
         // pieces, scaled proportionally across the sizes already entered.
@@ -2338,7 +2352,9 @@ function initLogoStatusChips(cfg) {
         '    <button type="button" class="lsc-chip" data-status="tbd" title="Haven&#39;t seen the logo yet — quote on a stated assumption"><i class="fas fa-circle-question" aria-hidden="true"></i> TBD — quote first</button>' +
         '  </div>' +
         '</div>' +
-        '<div class="lsc-assumption" id="logo-assumption-panel" style="display:none;"></div>';
+        '<div class="lsc-assumption" id="logo-assumption-panel"></div>';
+    // Hidden until TBD is picked; renderPanel()/setStatus() toggle the same inline display.
+    /** @type {HTMLElement} */ (wrap.querySelector('.lsc-assumption')).style.display = 'none';
     mountHost.insertAdjacentElement('afterbegin', wrap);
 
     const notesEl = () => document.querySelector(cfg.notesSel);
@@ -2510,25 +2526,22 @@ function _renderRecentOrdersPanel(anchor, orders, cfg) {
     if (!host) return;
     const panel = document.createElement('div');
     panel.id = 'qb-recent-orders';
-    panel.style.cssText = 'margin-top:8px;padding:8px 10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;font-size:12px;color:#334155;';
+    panel.className = 'qb-recent-orders';   // styled in quote-workspace.css (no style attributes: CSP)
     const rows = orders.map((o, i) => {
         const design = o.DesignName ? String(o.DesignName) : '(no design name)';
         const date = _fmtOrderDate(o.date_Ordered);
-        return '<div style="display:flex;align-items:center;gap:8px;padding:3px 0;">'
-            + '<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'
+        return '<div class="qb-ro-row">'
+            + '<span class="qb-ro-text">'
             + '<strong>#' + escapeHtml(String(o.id_Order || '')) + '</strong> · ' + escapeHtml(design)
-            + (date ? ' <span style="color:#94a3b8;">· ' + escapeHtml(date) + '</span>' : '')
+            + (date ? ' <span class="qb-ro-date">· ' + escapeHtml(date) + '</span>' : '')
             + '</span>'
-            + '<button type="button" data-ro-ref="' + i + '" title="Insert this order # + design into the quote notes"'
-            + ' style="background:#fff;border:1px solid #cbd5e1;border-radius:4px;padding:2px 8px;font-size:11px;color:#334155;cursor:pointer;">Reference</button>'
+            + '<button type="button" class="qb-ro-ref" data-ro-ref="' + i + '" title="Insert this order # + design into the quote notes">Reference</button>'
             + '</div>';
     }).join('');
     // eslint-disable-next-line no-unsanitized/property -- audited (1.4): recent-orders rows escapeHtml every ShopWorks value at build
-    panel.innerHTML = '<div style="display:flex;align-items:center;margin-bottom:4px;">'
-        + '<strong style="flex:1;font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:#64748b;">'
-        + '<i class="fas fa-history" aria-hidden="true" style="margin-right:5px;"></i>Recent ShopWorks orders</strong>'
-        + '<button type="button" data-ro-dismiss="1" aria-label="Dismiss recent orders"'
-        + ' style="background:none;border:none;color:#94a3b8;font-size:14px;cursor:pointer;line-height:1;padding:0 2px;">&times;</button>'
+    panel.innerHTML = '<div class="qb-ro-head">'
+        + '<strong class="qb-ro-title"><i class="fas fa-history" aria-hidden="true"></i>Recent ShopWorks orders</strong>'
+        + '<button type="button" class="qb-ro-dismiss" data-ro-dismiss="1" aria-label="Dismiss recent orders">&times;</button>'
         + '</div>' + rows;
     panel.addEventListener('click', (e) => {
         if (e.target.closest('[data-ro-dismiss]')) { removeRecentOrdersPanel(); return; }
@@ -2664,7 +2677,7 @@ if (typeof window !== 'undefined') {
 
 // Node.js export (testing) — pure functions only
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { parseQuickQuoteDecoration, getQuickQuotePrefill, escapeHtml, formatPrice, cleanProductTitle, getSwatchStyle, parseRatePercent, parseBulkSizes, distributeProportionally, stashMethodSwitchPrefill, takeMethodSwitchPrefill, NON_SANMAR_VENDORS, vendorLabel, resolveNonSanmarPricingMode };
+    module.exports = { parseQuickQuoteDecoration, getQuickQuotePrefill, escapeHtml, formatPrice, cleanProductTitle, getSwatchAttrs, parseRatePercent, parseBulkSizes, distributeProportionally, stashMethodSwitchPrefill, takeMethodSwitchPrefill, NON_SANMAR_VENDORS, vendorLabel, resolveNonSanmarPricingMode };
 }
 
 // QuoteBuilderUtils v3.1.0 loaded
@@ -2784,6 +2797,10 @@ function qbInstallCallDelegator() {
         const kd = t.closest('[data-keydown]');
         if (kd) qbRunList(kd.dataset.keydown, kd.dataset.keydownArgs, kd, event);
     });
+    // Chrome keeps a failed image's broken icon and alt text even after its src is removed, so
+    // placeholder-src shows this transparent pixel instead: the .placeholder background fills the
+    // box and the alt text still names the image for screen readers.
+    const blankImage = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
     document.addEventListener('error', (event) => {
         const img = event.target;
         if (!img || img.tagName !== 'IMG' || !img.dataset || !img.dataset.onerror) return;
@@ -2792,10 +2809,23 @@ function qbInstallCallDelegator() {
         else if (mode === 'hide-parent' && img.parentElement) img.parentElement.hidden = true;
         else if (mode === 'no-image' && img.parentElement) { img.parentElement.classList.add('no-image'); img.hidden = true; }
         else if (mode === 'placeholder-icon' && img.parentElement) img.parentElement.innerHTML = '<i class="fas fa-image" aria-hidden="true"></i>';
-        else if (mode === 'placeholder-src') { img.classList.add('placeholder'); img.removeAttribute('src'); }
+        else if (mode === 'placeholder-src') { img.classList.add('placeholder'); if (img.getAttribute('src') !== blankImage) img.src = blankImage; }
         else if (mode === 'hide-closest') { const t = img.dataset.onerrorClosest && img.closest(img.dataset.onerrorClosest); if (t) t.hidden = true; }
         if (img.dataset.onerrorParentClass && img.parentElement) img.parentElement.classList.add(img.dataset.onerrorParentClass);
     }, true);
+}
+/**
+ * Builder markup that starts hidden carries `hidden data-qb-hidden` instead of style="display: none",
+ * which only renders while the CSP allows inline style attributes. The builders show and hide those
+ * elements through el.style.display (and read it back), so this hands the state to CSSOM before
+ * their code runs: display none on the style object, then the attribute and marker come off.
+ */
+function qbAdoptHiddenMarkup() {
+    document.querySelectorAll('[data-qb-hidden]').forEach((el) => {
+        el.style.display = 'none';
+        el.hidden = false;
+        el.removeAttribute('data-qb-hidden');
+    });
 }
 if (typeof window !== 'undefined') {
     window.qbFocusMain = qbFocusMain;
@@ -2803,7 +2833,11 @@ if (typeof window !== 'undefined') {
     window.qbReload = qbReload;
     window.qbInstallCallDelegator = qbInstallCallDelegator;
     if (typeof document !== 'undefined') {
-        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', qbInstallCallDelegator, { once: true });
-        else qbInstallCallDelegator();
+        // Now for the markup parsed so far, and again at DOMContentLoaded for anything after this script.
+        qbAdoptHiddenMarkup();
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', qbAdoptHiddenMarkup, { once: true });
+            document.addEventListener('DOMContentLoaded', qbInstallCallDelegator, { once: true });
+        } else qbInstallCallDelegator();
     }
 }

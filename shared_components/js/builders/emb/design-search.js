@@ -345,7 +345,7 @@ async function applyDesignToCard(type, designNum, design) {
     const dstArr = design.dstFilenames || [];
     if (dstArr.length > 0) {
         const dstDisplay = dstArr.length <= 2 ? dstArr.join(', ') : dstArr.slice(0, 2).join(', ') + ' +' + (dstArr.length - 2) + ' more';
-        badgeHtml += '<br><span class="qb-hint-indigo"><i class="fas fa-file-code" aria-hidden="true" style="margin-right:2px;"></i>DST: ' + escapeHtml(dstDisplay) + '</span>';
+        badgeHtml += '<br><span class="qb-hint-indigo"><i class="fas fa-file-code design-dst-icon" aria-hidden="true"></i>DST: ' + escapeHtml(dstDisplay) + '</span>';
     }
 
     // Order history
@@ -361,7 +361,7 @@ async function applyDesignToCard(type, designNum, design) {
     // badge announced the per-piece surcharge and then billed nothing, a permanent
     // margin leak on every multi-color design).
     if (design.extraColors > 0 && design.extraColorSurcharge > 0) {
-        badgeHtml += '<br><span style="font-size:11px;color:#d97706;font-weight:600;">⚠ +' + design.extraColors + ' extra colors (+$' + design.extraColorSurcharge.toFixed(2) + '/pc surcharge)</span>'
+        badgeHtml += '<br><span class="design-extra-colors">⚠ +' + design.extraColors + ' extra colors (+$' + design.extraColorSurcharge.toFixed(2) + '/pc surcharge)</span>'
             + ' <button type="button" class="btn-add-extra-colors" data-call="addExtraColorSurchargeRow" data-args="' + escapeHtml(JSON.stringify([type, Number(design.extraColors), Number(design.extraColorSurcharge)])) + '">Add to quote</button>';
     }
 
@@ -752,7 +752,7 @@ async function loadCustomerDesignGallery(customerId) {
             const searchInput = /** @type {(HTMLInputElement & { _galleryMode?: boolean })|null} */ (document.getElementById('design-search-input'));
             const searchHint = document.getElementById('design-search-hint');
             const searchBtn = document.getElementById('design-search-go');
-            if (results) results.innerHTML = '<div class="design-search-empty" style="display:flex;"><i class="fas fa-folder-open" aria-hidden="true"></i><p>No designs found for this customer. Use the search bar to find designs by name or number.</p></div>';
+            if (results) results.innerHTML = '<div class="design-search-empty is-gallery-empty"><i class="fas fa-folder-open" aria-hidden="true"></i><p>No designs found for this customer. Use the search bar to find designs by name or number.</p></div>';
             if (searchInput) {
                 searchInput.placeholder = 'Search by company name or design number...';
                 searchInput._galleryMode = false;
@@ -856,7 +856,7 @@ function buildDesignSearchCardHtml(d) {
         + '<div class="design-gallery-thumb" id="gallery-thumb-' + dn + '">' + thumbHtml + '</div>'
         + '<div class="design-gallery-info">'
             + '<div class="design-gallery-number">#' + dn + '</div>'
-            + (company ? '<div class="design-gallery-name" title="' + escapeHtml(company) + '" style="font-style:normal;color:#374151;font-weight:500;">' + escapeHtml(company.length > 28 ? company.substring(0, 26) + '...' : company) + '</div>' : '')
+            + (company ? '<div class="design-gallery-name is-company" title="' + escapeHtml(company) + '">' + escapeHtml(company.length > 28 ? company.substring(0, 26) + '...' : company) + '</div>' : '')
             + (name ? '<div class="design-gallery-name" title="' + escapeHtml(d.designName || '') + '">' + escapeHtml(name) + '</div>' : '')
             + '<div class="design-gallery-meta">' + tierBadge + (stitchText ? ' <span class="design-result-stitch">' + stitchText + '</span>' : '') + '</div>'
             + ((placementBadge || threadText) ? '<div class="design-gallery-detail">' + placementBadge + (threadText ? '<span class="design-thread-info" title="' + escapeHtml(d.threadColors || '') + '">' + escapeHtml(threadText) + '</span>' : '') + '</div>' : '')

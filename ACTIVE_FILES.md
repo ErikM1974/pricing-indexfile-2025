@@ -1,5 +1,7 @@
 # Active Files Registry
 
+- `shared_components/js/builders/shared/modal-dialog.js` — **NEW (2026-09-17)** native modal dialog helper for the quote builders (focus wrap, one Escape, focus return); used by the DTG confirms and the embroidery goods, names and manual-item dialogs. Listed in docs/active-files/services-and-components.md.
+
 - `email-templates/holiday-box-customer.html` and `email-templates/holiday-box-sales.html` — shared-theme sources for server-sent holiday request confirmations; provider IDs `holiday_box_customer` / `holiday_box_sales`.
 
 - `config/christmas-campaign.json` — holiday campaign deadline, product assortment and copy; update this file when replacing featured products. Charges come from Caspio.

@@ -6,7 +6,7 @@
  * delete/duplicate, thumbnails. Moved verbatim; cross-module calls stay bare
  * globals resolved via the index.js bridges (SCP pattern).
  */
-/* global dtfQuoteBuilder, showToast, escapeHtml, getSwatchStyle, productThumbnailModal,
+/* global dtfQuoteBuilder, showToast, escapeHtml, getSwatchAttrs, qbPaintSwatches, productThumbnailModal,
    cleanProductTitle */
 import { dtfState, API_BASE } from './state.js';
 import { positionColorDropdown } from '../shared/color-dropdown-position.js';
@@ -16,12 +16,16 @@ import { positionColorDropdown } from '../shared/color-dropdown-position.js';
 if (!window.ExtendedSizesConfig) {
     console.error('❌ ExtendedSizesConfig module not loaded! Check script includes.');
     document.body.innerHTML = `
-        <div style="padding: 40px; text-align: center; color: #c00;">
+        <div class="dtf-config-error">
             <h2>Configuration Error</h2>
             <p>Extended sizes module failed to load. Please refresh the page.</p>
-            <p style="font-size: 12px; color: #666;">If this persists, contact support.</p>
+            <p class="dtf-config-error-note">If this persists, contact support.</p>
         </div>
     `;
+    // Styled through CSSOM: this last-resort screen must not depend on the page's sheets,
+    // and a style="" attribute needs 'unsafe-inline'.
+    /** @type {HTMLElement} */ (document.querySelector('.dtf-config-error')).style.cssText = 'padding: 40px; text-align: center; color: #c00;';
+    /** @type {HTMLElement} */ (document.querySelector('.dtf-config-error-note')).style.cssText = 'font-size: 12px; color: #666;';
     throw new Error('ExtendedSizesConfig module required but not loaded');
 }
 
@@ -186,7 +190,7 @@ export async function onStyleChange(input, rowId) {
 
             // Populate color picker (now includes MAIN_IMAGE_URL from product-colors API)
             if (colors && colors.length > 0) {
-                // eslint-disable-next-line no-unsanitized/property -- audited (Batch 4.3): every color field escapeHtml-wrapped; swatch via hardened getSwatchStyle
+                // eslint-disable-next-line no-unsanitized/property -- audited (Batch 4.3): every color field escapeHtml-wrapped; swatch via hardened getSwatchAttrs
                 pickerDropdown.innerHTML = colors.map(c => `
                     <div class="color-picker-option"
                          data-color-name="${escapeHtml(c.COLOR_NAME)}"
@@ -195,10 +199,11 @@ export async function onStyleChange(input, rowId) {
                          data-hex="${escapeHtml(c.HEX_CODE || '#ccc')}"
                          data-image-url="${escapeHtml(c.MAIN_IMAGE_URL || c.FRONT_MODEL || c.FRONT_FLAT || '')}"
                          data-call="selectColor" data-args='[${rowId}, "$this"]'>
-                        <span class="color-swatch" style="${getSwatchStyle(c)}"></span>
+                        <span class="color-swatch" ${getSwatchAttrs(c)}></span>
                         <span class="color-name">${escapeHtml(c.COLOR_NAME)}</span>
                     </div>
                 `).join('');
+                qbPaintSwatches(pickerDropdown);
 
                 pickerSelected.classList.remove('disabled');
                 row.dataset.colors = JSON.stringify(colors);
@@ -508,7 +513,7 @@ function buildChildColorOptionsHtml(parentColors, parentColor, childRowId, paren
              data-swatch-url="${escapeHtml(c.COLOR_SQUARE_IMAGE || '')}"
              data-hex="${escapeHtml(c.HEX_CODE || '#ccc')}"
              data-call="selectChildColor" data-args='[${childRowId}, ${parentRowId}, "$this"]'>
-            <span class="color-swatch" style="${getSwatchStyle(c)}"></span>
+            <span class="color-swatch" ${getSwatchAttrs(c)}></span>
             <span class="color-name">${escapeHtml(c.COLOR_NAME)}</span>
         </div>`
     ).join('');
@@ -543,10 +548,10 @@ export function createChildRow(parentRowId, size, qty) {
 
     const colorOptionsHtml = buildChildColorOptionsHtml(parentColors, parentColor, childRowId, parentRowId);
 
-    // Build current color display style
-    const currentSwatchStyle = parentSwatchUrl
-        ? `background-image: url('${parentSwatchUrl}'); background-size: cover; background-position: center;`
-        : `background-color: ${parentHex};`;
+    // Current color display: the parent's swatch image or colour, painted through CSSOM
+    const currentSwatchAttrs = parentSwatchUrl
+        ? `data-swatch-image="${escapeHtml(parentSwatchUrl)}"`
+        : `data-swatch-color="${escapeHtml(parentHex)}"`;
 
     const childRow = document.createElement('tr');
     childRow.id = `row-${childRowId}`;
@@ -575,7 +580,7 @@ export function createChildRow(parentRowId, size, qty) {
     const isSize05 = SIZE05_SIZES.includes(size);
     const isSize06 = !isSize05;
 
-    // eslint-disable-next-line no-unsanitized/property -- audited (Batch 4.3, mirrors emb/product-rows C32): childRowId numeric (getNextRowId), partNumber/size internal codes, colors escapeHtml-wrapped, swatch via hardened getSwatchStyle
+    // eslint-disable-next-line no-unsanitized/property -- audited (Batch 4.3, mirrors emb/product-rows C32): childRowId numeric (getNextRowId), partNumber/size internal codes, colors escapeHtml-wrapped, swatches as escaped data attributes painted through CSSOM
     childRow.innerHTML = `
         <td>
             <span class="style-display">${escapeHtml(partNumber)}</span>
@@ -584,7 +589,7 @@ export function createChildRow(parentRowId, size, qty) {
             <div class="product-thumbnail qb-thumb-box" id="thumb-${childRowId}">
                 <img src="${parentRow.dataset.imageUrl || ''}"
                      alt="${escapeHtml(productName)}"
-                     style="max-width: 100%; max-height: 100%; object-fit: contain;"
+                     class="qb-thumb-box-img"
                      data-onerror="no-image">
             </div>
         </td>
@@ -594,7 +599,7 @@ export function createChildRow(parentRowId, size, qty) {
         <td>
             <div class="color-picker-wrapper child-color-picker" data-row-id="${childRowId}">
                 <div class="color-picker-selected" data-call="toggleColorPicker" data-args="[${childRowId}]" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-label="Garment color" data-keydown="handleColorPickerKeydown" data-keydown-args='["$event", ${childRowId}]'>
-                    <span class="color-swatch" style="${currentSwatchStyle}"></span>
+                    <span class="color-swatch" ${currentSwatchAttrs}></span>
                     <span class="color-name">${escapeHtml(parentColor)}</span>
                     <i class="fas fa-chevron-down picker-arrow" aria-hidden="true"></i>
                 </div>
@@ -620,6 +625,7 @@ export function createChildRow(parentRowId, size, qty) {
             </button>
         </td>
     `;
+    qbPaintSwatches(childRow);
 
     // Insert in correct position (maintain size order)
     const existingChildren = Array.from(
@@ -985,7 +991,7 @@ export function updateProductThumbnail(rowId, imageUrl, productName, styleNumber
     }
 }
 
-// getSwatchStyle() — now provided by quote-builder-utils.js
+// getSwatchAttrs() / qbPaintSwatches() — now provided by quote-builder-utils.js
 
 // showToast() is now provided by quote-builder-utils.js (fixed - no longer uses alert())
 

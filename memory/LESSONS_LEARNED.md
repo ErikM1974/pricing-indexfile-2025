@@ -1,5 +1,23 @@
 # LESSONS LEARNED
 
+## Push must not disable the button its own preview gate reads (2026-09-17)
+
+- Problem/root cause: embroidery `pushToShopWorks()` disabled `#emb-push-shopworks-btn` before awaiting, and `openPushPreview()` bails on a disabled button. It only ever worked because the silent save re-enabled it, so a quote with nothing to save (just saved, or reopened for editing) opened no preview and showed no message — Push looked dead.
+- Solution: `pushToShopWorks()` no longer disables the button; `embState._pushInFlight` is the double-click guard, which is what SCP and DTF already do and say in comments. The spinner label and the save-skip for a clean quote stay.
+- Prevention: never let a handler flip the UI state that a function it calls uses as its gate. A browser test pushes a saved, unchanged quote and expects the preview plus no second save.
+
+## Saved browser evidence must not record timing samples (2026-09-17)
+
+- Problem/root cause: `CAPTURE_QUOTE_BUILDERS_ORIGINAL=1` failed 30 of 79 replayed builder states on every run, even on the commit before the September 16 changes, although the replayed sources are hash-locked. The saved records held values that change between runs: `Math.random` artwork-widget ids, share links on port 3414, toasts that expire on real timers, guided-step titles that fail contrast only under the resting pointer (Chromium re-applies `:hover` asynchronously after a resize or full-page screenshot), the fast-quote step fade-in (0.3 s, no reduced-motion rule), and the company lookup replacing its "Searching..." node while axe ran. axe names a node that left the document `:root`.
+- Solution: `evidence()` lets finite animations finish before each width. Capture mode compares `stableOriginal()` forms of the new record and the saved one, which normalize only those identities and samples on both sides. Customer values, amounts, quote ids, visible text and saved requests stay exact, and settled fast-quote pages must show no contrast failure. No fixture was regenerated.
+- Prevention: settle animations before recording axe or snapshots, keep random ids and ports out of saved evidence, and treat an axe `:root` target as a node replaced mid-run.
+
+## Moving an overlay to a native `<dialog>` has five traps (2026-09-17)
+
+- Problem/root cause: the DTG confirms and the embroidery goods, names and manual-item dialogs were `div` overlays; Tab walked out to the page, Escape reached page handlers, and closing left focus on `<body>`. `showModal()` brings its own traps: an overlay class with `display:flex` overrides the browser's `dialog:not([open]) { display:none }`; a panel class with `position:relative` computes to `absolute` in the top layer (off-screen on a scrolled page); Chrome still lets Tab leave for the browser toolbar; page toasts render UNDER the modal layer; and the opener is often hidden or gone by close time (a services-bar menu item, a guided step, a button the save removes).
+- Solution: `builders/shared/modal-dialog.js` (`showModalDialog` → `close(...focusTargets)`); the `<dialog>` keeps the page's overlay class plus `qb-overlay-dialog` (sized and hidden by quote-workspace.css); a capture-phase keydown wraps Tab and consumes Escape for the newest dialog only; close focuses the first target that takes focus, then the opener; the manual-item cost error also shows inside the dialog.
+- Prevention: find each dialog by role and name in a browser test, then press Tab past the last control, Escape and a backdrop click, and assert where focus lands (`css-unification-quote-builder-alternate-workflows.spec.js` for DTG, `…-workflows.spec.js` for embroidery). A message a dialog needs goes inside the dialog, not in a toast. Also: removing a failed image's `src` still shows Chrome's broken-image icon and alt text, so `placeholder-src` now loads a blank pixel.
+
 ## A page `:hover` rule on a filled button needs the workspace's `:not(:disabled)` form (2026-09-17)
 
 - Problem/root cause: the DTG builder's axe check failed now and then on `.dtg-cc-add-default` and its colour label. In the same layer, the workspace's generic `button:hover:not(:disabled)` (0,2,1) outranks a page's `.x:hover` (0,2,0), so a hovered white-text button got the pale tint background (1.05:1). The spec leaves the pointer where it clicked, then resizes and runs axe, so a button landed under the pointer only in some layouts.
@@ -157,12 +175,6 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 - Solution: use the displayed product style with CATALOG_COLOR, canonical scoped CSS and keyboard controls, complete table scroll regions, an independent product wrapper, static print headers and persistent dismissible pricing errors. Save keyboard horizontal movement synchronously before refresh; bind search to actual results and preserve Escape focus. Keep every financial function body and pricing service unchanged.
 - Prevention: immutable original source/value contracts, exact financial function checks, every quantity/color/input path, keyboard focus after generated controls are replaced, failed inventory/pricing, and visual review of every paper page. Do not make whole long sections unbreakable.
 
-## Calculator references need complete field and paper ownership (2026-09-11)
-
-- Problem/root cause: legacy price tables clipped rightmost size columns on paper; page-local print rules hid price-load failures, while broad class matching missed compound quantity-control classes.
-- Solution: canonical fields on every quantity selector/input, focusable named scroll regions and selected-type state; scoped print table sizing and visible error banners. Preserve each amount, tier, fee and original financial transformation.
-- Prevention: compare actual original/current values at four widths, keyboard-scroll all sizes, exercise failure and print-view restoration, and inspect every rendered page including long service lists and the contact footer. Keep headings with rows without making entire long categories unbreakable.
-
 ## CRM UI recovery and print (2026-09-09, archived)
 Full entry in LESSONS_LEARNED_ARCHIVE.md; preserve asynchronous view ownership and native dialog/table semantics.
 
@@ -171,12 +183,6 @@ Historical deployment, token, builder, junction, server split and proxy-auth mig
 Exact-source CI must pass its actual browser/parity jobs, including credentials when required; local green is not CI green. Resolved runner/secret incidents are in LESSONS_LEARNED_ARCHIVE.md.
 
 Quote-operation access rollout (2026-09-07) is archived in LESSONS_LEARNED_ARCHIVE.md; caller/quote scope and live-mutation boundaries remain enforced by quote-sync-access.test.js.
-
-## Record workspaces need current-response checks before secondary writes (2026-09-10)
-
-- Problem/root cause: A stale linked quote can update the current lead after refresh; removed kit/art hosts can still receive asynchronous callbacks. Native dialog conversion and fixed banners can also lose focus or cover recovery controls.
-- Solution: bind quote rendering and existing value sync to the current view sequence, lead object, quote ID and connected target. Reject malformed replies, ignore superseded loads, preserve uncertain outreach warnings beside the action, contain modal focus, and block all unknown API traffic in previews.
-- Prevention: mock delayed responses and every write, verify unchanged valid quote sync and original payloads, reverse recorded controller changes into original source hashes, and retain explicit shared-module ownership. Inspect populated PDFs: narrow grids can split money; give the order table full width and verify every row and rendered page. Precompute file updates before writing so a missing preview anchor cannot leave a partial batch. Timestamp-based browser snapshots must set the baseline time zone explicitly; fixed Date.now alone does not standardize local date formatting on Windows and Linux.
 
 ## 2026-09-12: Background calculator rendering must not move keyboard focus
 
@@ -246,9 +252,3 @@ Browser baselines must work from a fresh checkout. The tumbler export test previ
 - Problem/root cause: SCP floored its LTM share before multiplication; EMB/SCP PDFs read rounded DOM text. Saved customer views preferred base prices, and screen-print handoffs had no returned row ID.
 - Solution: retain exact per-unit values for output, allocate saved row cents cumulatively, display billed totals/quantity and return the created product row. Keep API fees authoritative and display customer LTM inside unit prices.
 - Prevention: real Quick Quote-to-builder numeric handoffs for every method plus cap puff/patch/back-only, small quantities 3/7/23/24/37, screen/PDF consistency, seven-row fractional cents and saved/customer-cart checks. Check a real supplier-photo PDF too: external images need the same-origin relay for canvas access even when HTML displays them. See QUICK_QUOTE_2026-09.md.
-
-## Downloaded PDF layout is separate from print CSS (2026-09-15)
-
-- Problem/root cause: Quick Quote's jsPDF download used plain text columns and a small image; changing website print CSS would not improve that downloaded file. Rough height estimates could also miss wrapped content.
-- Solution: update the existing PDF renderer with measured table rows, flowing text, a local logo and appropriately sized image canvases; keep pricing in the shared document model.
-- Prevention: inspect actual generated PDF pages and exercise long notes, multiple options, sampled quantities and setup fees. Preserve the caller's model, exact totals and original source estimate. No-quantity sheets must omit order totals.

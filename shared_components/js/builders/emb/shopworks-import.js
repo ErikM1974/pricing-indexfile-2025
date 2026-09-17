@@ -19,7 +19,7 @@
 // lands with this cluster's render/state split (see emb-decomposition-plan.md).
 /* global openAccessibleModal, closeAccessibleModal, escapeHtml, showToast,
    createOrUpdateExtendedChildRow, ShopWorksImportParser, updateArtworkCharges,
-   Event, APP_CONFIG, setLtmControlState, markAsUnsaved */
+   Event, APP_CONFIG, setLtmControlState, markAsUnsaved, qbPaintSwatches */
 import { showServicePricingReview, getSprEmbConfigOptions } from './spr-modal.js';
 import { lookupTaxRate, onShipMethodChange, recalculatePricing, updateTaxCalculation } from './pricing-sync.js';
 import { applyDesignFromCache, lookupDesignNumber } from './design-search.js';
@@ -303,11 +303,12 @@ async function reImportNonSanmarRow(row, rowId, importData) {
                     data-catalog-color="${escapeHtml(importData.color)}"
                     data-swatch-url="" data-hex="#ccc" data-image-url=""
                     data-call="selectNonSanmarColor" data-args='[${rowId}, "$this"]'>
-                    <span class="color-swatch" style="background-color:#ccc"></span>
+                    <span class="color-swatch" data-swatch-color="#ccc"></span>
                     <span class="color-name">${escapeHtml(importData.color)}</span>
                 </div>`;
                 // eslint-disable-next-line no-unsanitized/method -- audited (1.4): every user/API string escapeHtml-wrapped at build; icons/notes internal or numeric
                 pickerDropdown.insertAdjacentHTML('afterbegin', optHtml);
+                qbPaintSwatches(pickerDropdown);
                 selectNonSanmarColor(rowId, pickerDropdown.querySelector('.color-picker-option'));
             }
         }
@@ -406,7 +407,7 @@ function _paintImportGrid(data) {
     const grid = document.getElementById('preview-grid');
     // Customer & order info grid
     const pricingIcon = data.pricingSource === 'caspio' ? '✓' : '⚠';
-    const pricingColor = data.pricingSource === 'caspio' ? '#28a745' : '#ffc107';
+    const pricingClass = data.pricingSource === 'caspio' ? 'is-live' : 'is-fallback';
     // eslint-disable-next-line no-unsanitized/property -- audited (1.4): every user/API string escapeHtml-wrapped at build; icons/notes internal or numeric
     grid.innerHTML = `
         <div class="preview-item">
@@ -427,7 +428,7 @@ function _paintImportGrid(data) {
         </div>
         <div class="preview-item">
             <div class="preview-item-label">Pricing</div>
-            <div class="preview-item-value" style="color: ${pricingColor};">${pricingIcon} ${data.pricingSource === 'caspio' ? 'Live API' : 'Fallback'}</div>
+            <div class="preview-item-value preview-pricing-source ${pricingClass}">${pricingIcon} ${data.pricingSource === 'caspio' ? 'Live API' : 'Fallback'}</div>
         </div>
     `;
 }
@@ -443,7 +444,7 @@ function _paintImportProducts(data) {
             productsHtml += `
                 <div class="preview-product-item">
                     <input type="checkbox" class="product-include-check" data-product-index="${idx}" checked
-                           style="flex-shrink:0; width:16px; height:16px; cursor:pointer;" title="Uncheck to exclude from import">
+                           title="Uncheck to exclude from import">
                     <span class="preview-product-style">${escapeHtml(product.partNumber)}</span>
                     <span class="preview-product-desc">${escapeHtml(product.description || '')}</span>
                     <span class="preview-product-qty">Qty: ${totalQty}</span>
@@ -467,7 +468,7 @@ function _paintImportProducts(data) {
                 const sourceIcon = decg.pricingSource === 'decg-api' ? '✓' : '⚠';
                 productsHtml += `
                     <div class="preview-product-item">
-                        <span class="preview-product-style" style="background: #fef3c7; color: #92400e;">DECG</span>
+                        <span class="preview-product-style is-decg">DECG</span>
                         <span class="preview-product-desc">${escapeHtml(decg.description || 'Customer garment')} <small class="qb-muted">${stitchNote}${tierNote}</small></span>
                         <span class="preview-product-qty">${sourceIcon} Qty: ${decg.quantity} @ $${decg.calculatedUnitPrice.toFixed(2)}${ltmNote}</span>
                     </div>
@@ -485,7 +486,7 @@ function _paintImportProducts(data) {
                 const sourceIcon = decc.pricingSource === 'decg-api' ? '✓' : '⚠';
                 productsHtml += `
                     <div class="preview-product-item">
-                        <span class="preview-product-style" style="background: #dbeafe; color: #1e40af;">DECC</span>
+                        <span class="preview-product-style is-decc">DECC</span>
                         <span class="preview-product-desc">${escapeHtml(decc.description || 'Customer cap')} <small class="qb-muted">${stitchNote}${tierNote}</small></span>
                         <span class="preview-product-qty">${sourceIcon} Qty: ${decc.quantity} @ $${decc.calculatedUnitPrice.toFixed(2)}${ltmNote}</span>
                     </div>
@@ -495,19 +496,19 @@ function _paintImportProducts(data) {
         }
 
         // Add note about stitch count confirmation
-        productsHtml += '<p style="font-size: 11px; color: #64748b; margin-top: 8px; font-style: italic;"><i class="fas fa-info-circle" aria-hidden="true"></i> After import, you\'ll be prompted to confirm stitch counts for accurate pricing</p>';
+        productsHtml += '<p class="preview-stitch-note"><i class="fas fa-info-circle" aria-hidden="true"></i> After import, you\'ll be prompted to confirm stitch counts for accurate pricing</p>';
     }
 
     // Non-SanMar products (require manual pricing)
     if (data.customProducts && data.customProducts.length > 0) {
-        productsHtml += '<h5 style="margin-top: 12px; color: #c2410c;">Non-SanMar Products - Manual Pricing Required (' + data.customProducts.length + ')</h5><div class="preview-products-list">';
+        productsHtml += '<h5 class="preview-custom-title">Non-SanMar Products - Manual Pricing Required (' + data.customProducts.length + ')</h5><div class="preview-products-list">';
         for (const product of data.customProducts) {
             const totalQty = Object.values(product.sizes || {}).reduce((sum, q) => sum + q, 0) || product.quantity || 0;
             productsHtml += `
-                <div class="preview-product-item" style="border-left: 3px solid #c2410c;">
-                    <span class="preview-product-style" style="background: #fed7aa; color: #c2410c;">${escapeHtml(product.partNumber)}</span>
+                <div class="preview-product-item is-custom">
+                    <span class="preview-product-style is-custom">${escapeHtml(product.partNumber)}</span>
                     <span class="preview-product-desc">${escapeHtml(product.description || product.color || 'Unknown')}</span>
-                    <span class="preview-product-qty" style="color: #c2410c;">Qty: ${totalQty} - MANUAL</span>
+                    <span class="preview-product-qty is-custom">Qty: ${totalQty} - MANUAL</span>
                 </div>
             `;
         }
@@ -598,7 +599,7 @@ function _paintImportWarnings(data) {
         // Show DECG API failure as prominent error banner
         if (data.decgApiFailed) {
             warningsHtml += `
-                <div style="background: #fef2f2; border: 1px solid #ef4444; border-radius: 6px; padding: 10px 12px; margin-bottom: 10px; color: #b91c1c;">
+                <div class="preview-decg-error">
                     <strong><i class="fas fa-exclamation-circle" aria-hidden="true"></i> DECG API Error:</strong> Unable to load current pricing from server.
                     Prices shown are <em>fallback estimates</em> and may be incorrect.
                     <strong>Verify DECG prices manually before sending quote.</strong>
@@ -651,11 +652,11 @@ function _paintImportWarnings(data) {
 
     // Show "Items for Review" section with checkboxes
     if (allReviewItems.length > 0) {
-        let reviewHtml = '<h5 style="margin-top: 12px; color: #b45309;"><i class="fas fa-search" aria-hidden="true"></i> Items for Review — Check to Import as Notes</h5>';
-        reviewHtml += '<div style="max-height: 150px; overflow-y: auto; padding: 4px 0;">';
+        let reviewHtml = '<h5 class="preview-review-title"><i class="fas fa-search" aria-hidden="true"></i> Items for Review — Check to Import as Notes</h5>';
+        reviewHtml += '<div class="preview-review-list">';
         allReviewItems.forEach((item, i) => {
             const hasPrice = item.unitPrice > 0;
-            reviewHtml += `<label style="display: flex; align-items: center; gap: 8px; padding: 4px 0; font-size: 13px; cursor: pointer;">
+            reviewHtml += `<label class="preview-review-item">
                 <input type="checkbox" class="review-item-check" data-index="${i}" ${hasPrice ? 'checked' : ''}>
                 <span><strong>${escapeHtml(item.partNumber || '(no PN)')}</strong>: ${escapeHtml(item.description || '')}${hasPrice ? ' — $' + item.unitPrice.toFixed(2) + '/ea × ' + (item.quantity || 1) : ''}</span>
             </label>`;

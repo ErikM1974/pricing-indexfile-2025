@@ -160,7 +160,7 @@ function renderSprServicesSection(serviceItems) {
             if (hasStitches) {
                 html += `<td><input type="number" class="spr-stitch-input" id="spr-stitch-${idx}" value="${item.stitchCount || 8000}" min="1000" max="200000" step="1000" data-change="onSprStitchChange" data-change-args='[${idx}]'></td>`;
             } else {
-                html += `<td style="text-align:center; color:#94a3b8;">&mdash;</td>`;
+                html += `<td class="spr-na-cell">&mdash;</td>`;
             }
 
             html += `<td class="spr-radio-cell">`;
@@ -184,14 +184,14 @@ function renderSprServicesSection(serviceItems) {
             html += `<input type="number" class="spr-custom-input${defaultSel !== 'custom' ? ' spr-muted' : ''}" id="spr-custom-${idx}" step="0.01" min="0" placeholder="0.00" onfocus="onSprCustomServiceFocus(${idx})" data-input="onSprCustomServiceFocus" data-input-args='[${idx}]'></label>`;
             html += `</td>`;
 
-            html += `<td style="text-align:center;">${deltaBadgeHtml}</td>`;
+            html += `<td class="spr-delta-cell">${deltaBadgeHtml}</td>`;
             html += `</tr>`;
 
             // DECG/DECC per-item detail row (expandable if aggregated)
             if ((typeUpper === 'DECG' || typeUpper === 'DECC') && item._sourceItems && item._sourceItems.length > 1) {
                 html += `<tr class="spr-decg-detail"><td colspan="7">`;
-                html += `<details><summary style="cursor:pointer; font-size:11px; color:#64748b;">${item._sourceItems.length} individual items</summary>`;
-                html += `<table style="width:100%; margin-top:4px;">`;
+                html += `<details><summary class="spr-detail-summary">${item._sourceItems.length} individual items</summary>`;
+                html += `<table class="spr-detail-table">`;
                 for (const si of item._sourceItems) {
                     const siSw = si.unitPrice || 0;
                     const siApi = item.apiPrice || 0;
@@ -272,14 +272,14 @@ function _buildSprDesignRow(entry, defaultAssignments, embConfigOptions, st) {
         const thumbUrl = inDb ? (dbInfo.mockupUrl || dbInfo.dstPreviewUrl || dbInfo.thumbnailUrl || dbInfo.artworkUrl || '') : '';
         const designNameText = inDb ? (dbInfo.designName || '') : (fallbackInfo?.designName || '');
 
-        rowHtml += `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;flex-wrap:wrap;">`;
+        rowHtml += `<div class="spr-design-row">`;
         if (thumbUrl) {
-            rowHtml += `<img src="${escapeHtml(thumbUrl)}" alt="Design #${escapeHtml(num)}" style="width:40px;height:40px;border-radius:4px;object-fit:cover;border:1px solid #ddd;flex-shrink:0;" data-onerror="hide">`;
+            rowHtml += `<img src="${escapeHtml(thumbUrl)}" alt="Design #${escapeHtml(num)}" class="spr-design-row-thumb" data-onerror="hide">`;
         }
-        rowHtml += `<span id="spr-thumb-${escapeHtml(num)}" style="display:none;"></span>`;
+        rowHtml += `<span id="spr-thumb-${escapeHtml(num)}" class="spr-thumb-slot"></span>`;
         rowHtml += `<strong>#${escapeHtml(num)}</strong>`;
         if (designNameText) {
-            rowHtml += `<span style="color:#64748b;font-size:11px;font-style:italic;">${escapeHtml(designNameText.length > 30 ? designNameText.substring(0, 28) + '...' : designNameText)}</span>`;
+            rowHtml += `<span class="spr-design-name">${escapeHtml(designNameText.length > 30 ? designNameText.substring(0, 28) + '...' : designNameText)}</span>`;
         }
 
         if (inDb) {
@@ -355,9 +355,9 @@ function _buildSprDesignRow(entry, defaultAssignments, embConfigOptions, st) {
                 rowHtml += `<span class="qb-ink">${escapeHtml(fallbackInfo.companyName)}</span>`;
             }
             if (fallbackInfo.designName) {
-                rowHtml += `<span style="color:#64748b;font-size:11px;">${escapeHtml(fallbackInfo.designName)}</span>`;
+                rowHtml += `<span class="spr-design-name is-fallback">${escapeHtml(fallbackInfo.designName)}</span>`;
             }
-            rowHtml += '<span style="background:#d97706;color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:600;margin-left:4px;">No stitch data</span>';
+            rowHtml += '<span class="spr-design-flag">No stitch data</span>';
             if (fallbackInfo.threadColors) {
                 rowHtml += `<span class="qb-note-11" title="${escapeHtml(fallbackInfo.threadColors)}">${fallbackInfo.colorCount} colors</span>`;
             }
@@ -367,13 +367,13 @@ function _buildSprDesignRow(entry, defaultAssignments, embConfigOptions, st) {
             if (nameMatch) {
                 rowHtml += `<span class="qb-ink">${escapeHtml(nameMatch[1].trim())}</span>`;
             }
-            rowHtml += '<span style="background:#94a3b8;color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:600;margin-left:4px;">Not in database</span>';
+            rowHtml += '<span class="spr-design-flag is-missing">Not in database</span>';
         }
 
         // Assignment dropdown (only for 2+ designs)
         if (st.showAssignment) {
             const defaultVal = defaultAssignments[num] || 'garment';
-            rowHtml += `<select id="spr-design-assign-${escapeHtml(num)}" data-design-num="${escapeHtml(num)}" class="spr-design-assign" style="margin-left:auto;padding:2px 6px;font-size:11px;border:1px solid #cbd5e1;border-radius:4px;background:#fff;">`;
+            rowHtml += `<select id="spr-design-assign-${escapeHtml(num)}" data-design-num="${escapeHtml(num)}" class="spr-design-assign">`;
             if (embConfigOptions.hasGarments) rowHtml += `<option value="garment"${defaultVal === 'garment' ? ' selected' : ''}>Garment Logo</option>`;
             if (embConfigOptions.hasCaps) rowHtml += `<option value="cap"${defaultVal === 'cap' ? ' selected' : ''}>Cap Logo</option>`;
             rowHtml += `<option value="both"${defaultVal === 'both' ? ' selected' : ''}>Both</option>`;
@@ -390,7 +390,7 @@ function _renderSprDesignBanner(embConfigOptions, designEntries, st) {
     st.showAssignment = designEntries.length >= 2 && (embConfigOptions.hasGarments || embConfigOptions.hasCaps);
 
     if (st.showAssignment) {
-        bannerHtml += `<div style="font-size:11px;font-weight:600;color:#1e40af;margin-bottom:6px;"><i class="fas fa-object-group qb-mr4" aria-hidden="true"></i>Design Logo Assignment</div>`;
+        bannerHtml += `<div class="spr-banner-title"><i class="fas fa-object-group qb-mr4" aria-hidden="true"></i>Design Logo Assignment</div>`;
     }
 
     // Smart auto-assign defaults
@@ -420,7 +420,7 @@ function _renderSprDesignBanner(embConfigOptions, designEntries, st) {
 
     st.designBanner.style.display = '';
     st.designBanner.style.background = '#eff6ff';
-    const headerText = st.showAssignment ? '' : '<div style="font-size:11px;font-weight:600;color:#1e40af;margin-bottom:4px;"><i class="fas fa-search qb-mr4" aria-hidden="true"></i>Design Stitch Lookup</div>';
+    const headerText = st.showAssignment ? '' : '<div class="spr-banner-title is-lookup"><i class="fas fa-search qb-mr4" aria-hidden="true"></i>Design Stitch Lookup</div>';
     // eslint-disable-next-line no-unsanitized/property -- audited (1.4): numeric prices/indices + internal enums; typeUpper escapeHtml-wrapped
     st.designBanner.innerHTML = headerText + bannerHtml;
 
@@ -666,7 +666,7 @@ export function renderSprEmbConfigSection(embConfigOptions) {
     } else if (embConfigOptions.designInfo) {
         // Fallback: show simple design text if lookup had no results and no raw design numbers
         st.designBanner.style.display = '';
-        st.designBanner.innerHTML = `<i class="fas fa-palette" aria-hidden="true" style="margin-right:6px;"></i><span>${escapeHtml(embConfigOptions.designInfo)}</span>`;
+        st.designBanner.innerHTML = `<i class="fas fa-palette qb-mr-6" aria-hidden="true"></i><span>${escapeHtml(embConfigOptions.designInfo)}</span>`;
     } else {
         st.designBanner.style.display = 'none';
     }

@@ -920,7 +920,7 @@ const AI_ENDPOINT = '/api/dtg-quote-ai/chat';
             const rankClass = rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : '';
             const colorChips = (p.bestColors || []).slice(0, 4).map(c => `
                 <span class="ts-color-chip">
-                    <span class="swatch" style="background:${escapeHtml(c.color || '#000')}"></span>
+                    <span class="swatch" data-swatch-color="${escapeHtml(c.color || '#000')}"></span>
                     ${escapeHtml(c.name)}${c.units ? ` (${escapeHtml(c.units)})` : ''}
                 </span>`).join('');
             const warnings = (p.warnings || []).map(w => `<div class="ts-warning">⚠ ${escapeHtml(w)}</div>`).join('');
@@ -942,6 +942,8 @@ const AI_ENDPOINT = '/api/dtg-quote-ai/chat';
                 </div>`;
         });
         wrap.innerHTML = html;
+        // Colour the chips through CSSOM: a style="" attribute only renders while the CSP allows inline styles.
+        wrap.querySelectorAll('.swatch[data-swatch-color]').forEach((s) => { s.style.backgroundColor = s.dataset.swatchColor; });
         return wrap;
     }
 

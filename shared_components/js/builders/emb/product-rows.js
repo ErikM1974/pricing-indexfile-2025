@@ -16,11 +16,12 @@
 // lands with this cluster's render/state split (see emb-decomposition-plan.md).
 /* global
    escapeHtml, showToast, renderOrderRecap, QuoteOrderSummary, markAsUnsaved,
-   Event, cleanProductTitle, getSwatchStyle, productThumbnailModal, formatPrice,
+   Event, cleanProductTitle, getSwatchAttrs, qbPaintSwatches, productThumbnailModal, formatPrice,
    HeadwearClassifier, SKUValidationService, SIZE_TO_SUFFIX,
    EXTENDED_SIZE_ORDER */
 import { getServicePrice } from './pricing.js';
 import { positionColorDropdown } from '../shared/color-dropdown-position.js';
+import { showModalDialog } from '../shared/modal-dialog.js';
 import { recalculatePricing, updateTaxCalculation, collectProductsFromTable, getOrderPieceCounts, syncALRows, syncDECGRows } from './pricing-sync.js';
 import { updateNotesBadge, updateEmbellishmentDropdownLabels, getCapEmbellishmentType } from './logo-config.js';
 import { updateAdditionalCharges } from './quote-lifecycle.js';
@@ -301,7 +302,7 @@ function showSearchSuggestions(products) {
         // eslint-disable-next-line no-unsanitized/property -- audited (1.4): only escapeHtml(q) interpolations (nested-ternary shape the rule cannot parse)
         suggestions.innerHTML = `
             <div class="suggestion-item"><span>No SanMar products found${q ? ` for "${escapeHtml(q)}"` : ''}</span></div>
-            ${q ? `<div class="suggestion-item suggestion-add-nonsanmar" data-call="addNonSanmarFromSearch" style="cursor:pointer; color:#16a34a; font-weight:600;"><span><i class="fas fa-plus-circle" aria-hidden="true"></i> Enter "${escapeHtml(q)}" manually — type the cost we pay</span></div>` : ''}`;
+            ${q ? `<div class="suggestion-item suggestion-add-nonsanmar" data-call="addNonSanmarFromSearch"><span><i class="fas fa-plus-circle" aria-hidden="true"></i> Enter "${escapeHtml(q)}" manually — type the cost we pay</span></div>` : ''}`;
         suggestions.classList.add('show');
         return;
     }
@@ -405,7 +406,7 @@ export function addNewRow() {
                        placeholder="(auto)"
                        data-field="description"
                        readonly>
-                <span class="cap-badge" id="cap-badge-${rowId}" style="display: none;">
+                <span class="cap-badge" id="cap-badge-${rowId}">
                     <i class="fas fa-hat-cowboy" aria-hidden="true"></i> Cap
                 </span>
             </div>
@@ -441,6 +442,8 @@ export function addNewRow() {
             </button>
         </td>
     `;
+    // The cap badge starts hidden; its toggles write style.display.
+    /** @type {HTMLElement} */ (row.querySelector('.cap-badge')).style.display = 'none';
 
     tbody.appendChild(row);
 
@@ -572,33 +575,32 @@ export function createServiceProductRow(serviceType, data) {
     // eslint-disable-next-line no-unsanitized/property -- audited (1.4): internal service-type enums + numeric qty/rowId only
     row.innerHTML = `
         <td>
-            <span class="service-style-badge" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; background: ${isCap ? '#dbeafe' : '#fef3c7'}; color: ${isCap ? '#1e40af' : '#92400e'}; border-radius: 4px; font-weight: 600; font-size: 12px;">
+            <span class="service-style-badge${isCap ? ' is-cap' : ''}">
                 <i class="fas ${meta.icon}" aria-hidden="true"></i>
                 ${serviceType}
             </span>
         </td>
         <td class="thumbnail-col">
-            <div class="service-icon" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; background: ${isCap ? '#eff6ff' : '#fffbeb'}; border-radius: 6px;">
-                <i class="fas ${meta.icon}" aria-hidden="true" style="font-size: 20px; color: ${isCap ? '#3b82f6' : '#f59e0b'};"></i>
+            <div class="service-icon${isCap ? ' is-cap' : ''}">
+                <i class="fas ${meta.icon}" aria-hidden="true"></i>
             </div>
         </td>
         <td class="desc-cell">
             <div class="desc-row">
-                <span class="service-description" style="font-size: 13px; color: #334155;">${escapeHtml(displayDescription)}</span>
-                ${isCap ? '<span class="cap-badge" style="display: inline-flex;"><i class="fas fa-hat-cowboy" aria-hidden="true"></i> Cap</span>' : ''}
+                <span class="service-description">${escapeHtml(displayDescription)}</span>
+                ${isCap ? '<span class="cap-badge"><i class="fas fa-hat-cowboy" aria-hidden="true"></i> Cap</span>' : ''}
                 ${['DECG', 'DECC'].includes(serviceType) ? `<button type="button" class="btn-describe-cs" data-call="openCustomerSuppliedDialog" data-args="[${rowId}]" title="Describe the customer's goods"><i class="fas fa-pencil-alt" aria-hidden="true"></i> Describe</button>` : ''}
             </div>
         </td>
         <td>
-            <span style="color: #64748b; font-size: 12px;">N/A</span>
+            <span class="service-na">N/A</span>
         </td>
-        <td colspan="6" style="text-align: center; color: #94a3b8; font-size: 11px; font-style: italic;">
+        <td colspan="6" class="service-size-note">
             Service item - no size breakdown
         </td>
         <td class="cell-qty">
             <input type="number" class="cell-input service-qty" min="0" max="9999" value="${quantity}"
-                   data-change="onServiceQtyChange" data-change-args='[${rowId}]' data-keydown="handleCellKeydown" data-keydown-args='["$event", "$this"]'
-                   style="width: 60px; text-align: center;">
+                   data-change="onServiceQtyChange" data-change-args='[${rowId}]' data-keydown="handleCellKeydown" data-keydown-args='["$event", "$this"]'>
         </td>
         <td class="cell-price" id="row-price-${rowId}"
             ${['DECG', 'DECC'].includes(serviceType) ? `ondblclick="enablePriceOverride(${rowId})" title="Double-click to override price"` : ''}>$${unitPrice.toFixed(2)}</td>
@@ -868,6 +870,18 @@ function _applyCustomerSuppliedDescription(row, fields) {
 }
 
 /**
+ * The goods, names and manual-item dialogs share one look (.monogram-names-dialog) and
+ * open as native modal dialogs (shared/modal-dialog.js), named by their title element.
+ */
+function createOverlayDialog(id, titleId) {
+    const dialog = document.createElement('dialog');
+    dialog.id = id;
+    dialog.className = 'monogram-names-dialog qb-overlay-dialog';
+    dialog.setAttribute('aria-labelledby', titleId);
+    return dialog;
+}
+
+/**
  * Editor for "what is the customer actually bringing us?" on a DECG/DECC row.
  *
  * Customer-supplied lines used to read only "Customer-Supplied Garments (8K
@@ -886,12 +900,10 @@ export function openCustomerSuppliedDialog(rowId) {
 
     document.getElementById('cs-goods-dialog')?.remove();
     const existing = String(row.dataset.csDescription || '').split(' · ');
-    const wrap = document.createElement('div');
-    wrap.id = 'cs-goods-dialog';
-    wrap.className = 'monogram-names-dialog';
+    const wrap = createOverlayDialog('cs-goods-dialog', 'csg-title');
     // Every interpolated value goes through escapeHtml (rep-typed free text).
     wrap.innerHTML =
-        '<div class="mnd-card" role="dialog" aria-modal="true" aria-labelledby="csg-title">' +
+        '<div class="mnd-card">' +
         '  <div id="csg-title" class="mnd-title"><i class="fas fa-box-open" aria-hidden="true"></i> What is the customer bringing?</div>' +
         '  <div class="mnd-hint">Shows on the quote and the work order, so production and Receiving know what to expect. All optional.</div>' +
         '  <input type="text" class="mnd-input csg-brand" maxlength="80" placeholder="Brand / style — e.g. Carhartt CTK87" value="' + escapeHtml(existing[0] || '') + '">' +
@@ -902,13 +914,9 @@ export function openCustomerSuppliedDialog(rowId) {
         '    <button type="button" class="mnd-apply">Save</button>' +
         '  </div>' +
         '</div>';
-    document.body.appendChild(wrap);
 
-    const close = () => { wrap.remove(); document.removeEventListener('keydown', onKey); };
-    const onKey = (e) => { if (e.key === 'Escape') close(); };
-    wrap.querySelector('.mnd-skip').addEventListener('click', close);
-    wrap.addEventListener('click', (e) => { if (e.target === wrap) close(); });
-    document.addEventListener('keydown', onKey);
+    const close = showModalDialog(wrap, { initialFocus: /** @type {HTMLElement} */ (wrap.querySelector('.csg-brand')) });
+    wrap.querySelector('.mnd-skip').addEventListener('click', () => close());
     wrap.querySelector('.mnd-apply').addEventListener('click', () => {
         _applyCustomerSuppliedDescription(row, {
             brandStyle: /** @type {HTMLInputElement} */ (wrap.querySelector('.csg-brand')).value,
@@ -920,7 +928,6 @@ export function openCustomerSuppliedDialog(rowId) {
         recalculatePricing();
         showToast('Customer goods description saved', 'success');
     });
-    setTimeout(() => /** @type {HTMLElement} */ (wrap.querySelector('.csg-brand')).focus(), 50);
 }
 window.openCustomerSuppliedDialog = openCustomerSuppliedDialog;
 
@@ -933,11 +940,9 @@ window.openCustomerSuppliedDialog = openCustomerSuppliedDialog;
  */
 export function openMonogramNamesDialog(row, serviceType) {
     document.getElementById('monogram-names-dialog')?.remove();
-    const wrap = document.createElement('div');
-    wrap.id = 'monogram-names-dialog';
-    wrap.className = 'monogram-names-dialog';
+    const wrap = createOverlayDialog('monogram-names-dialog', 'mnd-title');
     wrap.innerHTML =
-        '<div class="mnd-card" role="dialog" aria-modal="true" aria-labelledby="mnd-title">' +
+        '<div class="mnd-card">' +
         '  <div id="mnd-title" class="mnd-title"><i class="fas fa-font" aria-hidden="true"></i> ' + escapeHtml(serviceType) + ' — who gets one?</div>' +
         '  <div class="mnd-hint">One name per line (add size/placement after a comma if needed, e.g. "Sarah M, L"). The line count becomes the quantity.</div>' +
         '  <textarea class="mnd-names" rows="6" placeholder="Sarah M&#10;John D, XL&#10;Riley P"></textarea>' +
@@ -946,22 +951,24 @@ export function openMonogramNamesDialog(row, serviceType) {
         '    <button type="button" class="mnd-apply">Add names</button>' +
         '  </div>' +
         '</div>';
-    document.body.appendChild(wrap);
-    const ta = wrap.querySelector('.mnd-names');
-    const close = () => { wrap.remove(); document.removeEventListener('keydown', onKey); };
-    const onKey = (e) => { if (e.key === 'Escape') { close(); focusQty(); } };
-    const focusQty = () => {
-        const q = row.querySelector('.service-qty');
-        if (q) { q.focus(); q.select(); }
+    const ta = /** @type {HTMLTextAreaElement} */ (wrap.querySelector('.mnd-names'));
+    // Closing focuses the row's quantity (skipping — button, Escape, the dimmed layer —
+    // also selects it for typing). In guided mode the row is on the hidden Products step,
+    // so focus goes back to the services-bar menu button the rep used instead.
+    const menuButton = /** @type {HTMLElement|null} */ (document.activeElement?.closest('.service-cat')?.querySelector('.service-cat-btn') || null);
+    const qtyInput = () => /** @type {HTMLInputElement|null} */ (row.querySelector('.service-qty'));
+    const skip = () => {
+        const q = qtyInput();
+        close(q, menuButton);
+        if (q && document.activeElement === q) q.select();
     };
-    wrap.querySelector('.mnd-skip').addEventListener('click', () => { close(); focusQty(); });
-    wrap.addEventListener('click', (e) => { if (e.target === wrap) { close(); focusQty(); } });
-    document.addEventListener('keydown', onKey);
+    const close = showModalDialog(wrap, { initialFocus: ta, onDismiss: skip });
+    wrap.querySelector('.mnd-skip').addEventListener('click', skip);
     wrap.querySelector('.mnd-apply').addEventListener('click', () => {
-        const names = /** @type {HTMLInputElement} */ (ta).value.split('\n').map(s => s.trim()).filter(Boolean);
-        close();
-        if (!names.length) { focusQty(); return; }
-        const q = row.querySelector('.service-qty');
+        const names = ta.value.split('\n').map(s => s.trim()).filter(Boolean);
+        if (!names.length) { skip(); return; }
+        const q = qtyInput();
+        close(q, menuButton);
         if (q) {
             q.value = String(names.length);
             q.dispatchEvent(new Event('change', { bubbles: true }));   // reprices via onServiceQtyChange
@@ -978,7 +985,6 @@ export function openMonogramNamesDialog(row, serviceType) {
         recalculatePricing();
         showToast(`${names.length} name${names.length === 1 ? '' : 's'} captured — qty set to ${names.length}; list saved to Special Notes.`, 'success');
     });
-    setTimeout(() => /** @type {HTMLElement} */ (ta).focus(), 50);
 }
 window.openMonogramNamesDialog = openMonogramNamesDialog;
 
@@ -1228,7 +1234,7 @@ export async function onStyleChange(input, rowId) {
 
             if (colors && colors.length > 0) {
                 // Populate custom color picker dropdown with swatches
-                // eslint-disable-next-line no-unsanitized/property -- audited (1.4): COLOR_NAME/CATALOG_COLOR escapeHtml-wrapped; swatch via hardened getSwatchStyle (C32)
+                // eslint-disable-next-line no-unsanitized/property -- audited (1.4): COLOR_NAME/CATALOG_COLOR escapeHtml-wrapped; swatch via hardened getSwatchAttrs (C32)
                 pickerDropdown.innerHTML = colors.map(c => `
                     <div class="color-picker-option"
                          data-color-name="${escapeHtml(c.COLOR_NAME)}"
@@ -1237,10 +1243,11 @@ export async function onStyleChange(input, rowId) {
                          data-hex="${escapeHtml(c.HEX_CODE || '#ccc')}"
                          data-image-url="${escapeHtml(c.MAIN_IMAGE_URL || c.FRONT_MODEL || c.FRONT_FLAT || '')}"
                          data-call="selectColor" data-args='[${rowId}, "$this"]'>
-                        <span class="color-swatch" style="${getSwatchStyle(c)}"></span>
+                        <span class="color-swatch" ${getSwatchAttrs(c)}></span>
                         <span class="color-name">${escapeHtml(c.COLOR_NAME)}</span>
                     </div>
                 `).join('');
+                qbPaintSwatches(pickerDropdown);
 
                 // Enable the picker
                 pickerSelected.classList.remove('disabled');
@@ -1328,13 +1335,11 @@ export function openManualItemDialog(rowId) {
     if (!row) return;
 
     document.getElementById('manual-item-dialog')?.remove();
-    const wrap = document.createElement('div');
-    wrap.id = 'manual-item-dialog';
-    wrap.className = 'monogram-names-dialog';
+    const wrap = createOverlayDialog('manual-item-dialog', 'mi-title');
     const style = row.dataset.style || '';
     // The only interpolated value is escapeHtml(style); everything else is static markup.
     wrap.innerHTML =
-        '<div class="mnd-card" role="dialog" aria-modal="true" aria-labelledby="mi-title">' +
+        '<div class="mnd-card">' +
         '  <div id="mi-title" class="mnd-title"><i class="fas fa-pen-to-square" aria-hidden="true"></i> Enter this item manually</div>' +
         '  <div class="mnd-hint">We don\'t carry pricing for this style. Enter what we pay per blank and we price it exactly like a SanMar garment — margin, tier, embroidery and size upcharges all applied. Nothing is saved to the catalog.</div>' +
         '  <input type="text" class="mnd-input mi-style" maxlength="40" placeholder="Style" value="' + escapeHtml(style) + '">' +
@@ -1348,25 +1353,30 @@ export function openManualItemDialog(rowId) {
         '  <input type="text" class="mnd-input mi-color" maxlength="40" placeholder="Color — e.g. Navy">' +
         '  <input type="number" class="mnd-input mi-cost" step="0.01" min="0.01" placeholder="Our cost per blank ($) — e.g. 8.42">' +
         '  <input type="text" class="mnd-input mi-sizes" maxlength="120" placeholder="Sizes (comma-separated) — default S,M,L,XL,2XL,3XL">' +
+        '  <div class="alert alert-error mi-cost-error" id="mi-cost-error" role="alert" hidden></div>' +
         '  <div class="mnd-actions">' +
         '    <button type="button" class="mnd-skip">Cancel</button>' +
         '    <button type="button" class="mnd-apply">Add to quote</button>' +
         '  </div>' +
         '</div>';
-    document.body.appendChild(wrap);
 
-    const close = () => { wrap.remove(); document.removeEventListener('keydown', onKey); };
-    const onKey = (e) => { if (e.key === 'Escape') close(); };
-    wrap.querySelector('.mnd-skip').addEventListener('click', close);
-    wrap.addEventListener('click', (e) => { if (e.target === wrap) close(); });
-    document.addEventListener('keydown', onKey);
+    const close = showModalDialog(wrap, { initialFocus: /** @type {HTMLElement} */ (wrap.querySelector('.mi-desc')) });
+    wrap.querySelector('.mnd-skip').addEventListener('click', () => close());
 
     wrap.querySelector('.mnd-apply').addEventListener('click', () => {
         const val = sel => /** @type {HTMLInputElement} */ (wrap.querySelector(sel)).value.trim();
         const cost = parseFloat(val('.mi-cost'));
         if (!Number.isFinite(cost) || cost <= 0) {
-            showToast('Enter what we pay per blank — the price is built from it.', 'error');
-            /** @type {HTMLElement} */ (wrap.querySelector('.mi-cost')).focus();
+            const message = 'Enter what we pay per blank — the price is built from it.';
+            showToast(message, 'error');
+            // Toasts sit under the modal layer, so the dialog shows the error by the field too.
+            const costInput = /** @type {HTMLElement} */ (wrap.querySelector('.mi-cost'));
+            const costError = /** @type {HTMLElement} */ (wrap.querySelector('.mi-cost-error'));
+            costError.textContent = message;
+            costError.hidden = false;
+            costInput.setAttribute('aria-invalid', 'true');
+            costInput.setAttribute('aria-describedby', 'mi-cost-error');
+            costInput.focus();
             return;
         }
         applyManualItem(row, rowId, {
@@ -1376,9 +1386,9 @@ export function openManualItemDialog(rowId) {
             cost: cost,
             sizes: val('.mi-sizes')
         });
-        close();
+        // Saving removes the "Enter manually" button, so focus goes to the row's first size.
+        close(/** @type {HTMLElement|null} */ (row.querySelector('.size-input:not([disabled])')));
     });
-    setTimeout(() => /** @type {HTMLElement} */ (wrap.querySelector('.mi-desc')).focus(), 50);
 }
 window.openManualItemDialog = openManualItemDialog;
 
@@ -1516,7 +1526,7 @@ export function populateNonSanmarRow(row, rowId, product) {
     // Populate color dropdown from DefaultColors (comma-separated text)
     const defaultColors = (product.DefaultColors || '').split(',').map(c => c.trim()).filter(Boolean);
     if (defaultColors.length > 0 && pickerDropdown) {
-        // eslint-disable-next-line no-unsanitized/property -- audited (1.4): COLOR_NAME/CATALOG_COLOR escapeHtml-wrapped; swatch via hardened getSwatchStyle (C32)
+        // eslint-disable-next-line no-unsanitized/property -- audited (1.4): COLOR_NAME/CATALOG_COLOR escapeHtml-wrapped; fixed placeholder swatch
         pickerDropdown.innerHTML = defaultColors.map(color => `
             <div class="color-picker-option"
                  data-color-name="${escapeHtml(color)}"
@@ -1525,10 +1535,11 @@ export function populateNonSanmarRow(row, rowId, product) {
                  data-hex="#ccc"
                  data-image-url=""
                  data-call="selectNonSanmarColor" data-args='[${rowId}, "$this"]'>
-                <span class="color-swatch" style="background-color: #ccc;"></span>
+                <span class="color-swatch" data-swatch-color="#ccc"></span>
                 <span class="color-name">${escapeHtml(color)}</span>
             </div>
         `).join('');
+        qbPaintSwatches(pickerDropdown);
 
         pickerSelected.classList.remove('disabled');
         row.dataset.colors = JSON.stringify(defaultColors.map(c => ({ COLOR_NAME: c, CATALOG_COLOR: c })));
@@ -2646,7 +2657,7 @@ function extractAllSizes(skus) {
     });
 }
 
-// getSwatchStyle() — now provided by quote-builder-utils.js
+// getSwatchAttrs() / qbPaintSwatches() — now provided by quote-builder-utils.js
 
 // ============================================================
 // COLOR PICKER FUNCTIONS
@@ -3198,18 +3209,13 @@ export function createChildRow(parentRowId, size, qty) {
              data-swatch-url="${escapeHtml(c.COLOR_SQUARE_IMAGE || '')}"
              data-hex="${escapeHtml(c.HEX_CODE || '#ccc')}"
              data-call="selectChildColor" data-args='[${childRowId}, ${parentRowId}, "$this"]'>
-            <span class="color-swatch" style="${getSwatchStyle(c)}"></span>
+            <span class="color-swatch" ${getSwatchAttrs(c)}></span>
             <span class="color-name">${escapeHtml(c.COLOR_NAME)}</span>
         </div>`
     ).join('');
 
-    // Build current color display — sanitize before interpolating into (CSS/attribute
-    // breakout); mirrors the hardened getSwatchStyle(). (review C32)
-    const _swUrl = String(parentSwatchUrl || '').replace(/["'()\\\s]/g, '');
-    const _swHex = (parentHex && /^#[0-9a-fA-F]{3,8}$/.test(parentHex)) ? parentHex : '#ccc';
-    const currentSwatchStyle = /^https?:\/\//i.test(_swUrl)
-        ? `background-image: url('${_swUrl}'); background-size: cover; background-position: center;`
-        : `background-color: ${_swHex};`;
+    // Current color display — the same hardened swatch attributes as the options (review C32).
+    const currentSwatchAttrs = getSwatchAttrs({ COLOR_SQUARE_IMAGE: parentSwatchUrl, HEX_CODE: parentHex });
 
     const childRow = document.createElement('tr');
     childRow.id = `row-${childRowId}`;
@@ -3259,7 +3265,7 @@ export function createChildRow(parentRowId, size, qty) {
         <td>
             <div class="color-picker-wrapper child-color-picker" data-row-id="${childRowId}">
                 <div class="color-picker-selected" data-call="toggleColorPicker" data-args="[${childRowId}]" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-label="Garment color" data-keydown="handleColorPickerKeydown" data-keydown-args='["$event", ${childRowId}]'>
-                    <span class="color-swatch" style="${currentSwatchStyle}"></span>
+                    <span class="color-swatch" ${currentSwatchAttrs}></span>
                     <span class="color-name">${escapeHtml(parentColor)}</span>
                     <i class="fas fa-chevron-down picker-arrow" aria-hidden="true"></i>
                 </div>
@@ -3272,8 +3278,8 @@ export function createChildRow(parentRowId, size, qty) {
         <td><input type="number" class="cell-input size-input qb-bg-gray" data-size="M" aria-label="Quantity M" disabled value=""></td>
         <td><input type="number" class="cell-input size-input qb-bg-gray" data-size="L" aria-label="Quantity L" disabled value=""></td>
         <td><input type="number" class="cell-input size-input qb-bg-gray" data-size="XL" aria-label="Quantity XL" disabled value=""></td>
-        <td><input type="number" class="cell-input size-input" data-size="2XL" aria-label="Quantity 2XL" ${isSize05 ? '' : 'disabled'} value="${isSize05 ? qty : ''}" placeholder="${isSize05 ? qty : ''}" style="${isSize05 ? '' : 'background: #f5f5f5;'}" data-change="onChildSizeChange" data-change-args='[${childRowId}, ${parentRowId}, "${size}"]' data-keydown="handleCellKeydown" data-keydown-args='["$event", "$this"]'></td>
-        <td><input type="number" class="cell-input size-input" data-size="${size}" aria-label="Quantity ${size}" ${isSize06 ? '' : 'disabled'} value="${isSize06 ? qty : ''}" placeholder="${isSize06 ? qty : ''}" style="${isSize06 ? '' : 'background: #f5f5f5;'}" data-change="onChildSizeChange" data-change-args='[${childRowId}, ${parentRowId}, "${size}"]' data-keydown="handleCellKeydown" data-keydown-args='["$event", "$this"]'></td>
+        <td><input type="number" class="cell-input size-input${isSize05 ? '' : ' size-input-off'}" data-size="2XL" aria-label="Quantity 2XL" ${isSize05 ? '' : 'disabled'} value="${isSize05 ? qty : ''}" placeholder="${isSize05 ? qty : ''}" data-change="onChildSizeChange" data-change-args='[${childRowId}, ${parentRowId}, "${size}"]' data-keydown="handleCellKeydown" data-keydown-args='["$event", "$this"]'></td>
+        <td><input type="number" class="cell-input size-input${isSize06 ? '' : ' size-input-off'}" data-size="${size}" aria-label="Quantity ${size}" ${isSize06 ? '' : 'disabled'} value="${isSize06 ? qty : ''}" placeholder="${isSize06 ? qty : ''}" data-change="onChildSizeChange" data-change-args='[${childRowId}, ${parentRowId}, "${size}"]' data-keydown="handleCellKeydown" data-keydown-args='["$event", "$this"]'></td>
         <td class="cell-qty qty-display" id="row-qty-${childRowId}">${qty}</td>
         <td class="cell-price unit-price-display" id="row-price-${childRowId}"
             ondblclick="enablePriceOverride(${childRowId})"
@@ -3285,6 +3291,7 @@ export function createChildRow(parentRowId, size, qty) {
             </button>
         </td>
     `;
+    qbPaintSwatches(childRow);
 
     // Insert in correct size order: XS, 2XL, 3XL, 4XL, 5XL, 6XL
     const existingChildren = Array.from(document.querySelectorAll(`tr[data-parent-row-id="${parentRowId}"]`));

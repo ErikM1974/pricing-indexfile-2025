@@ -150,7 +150,8 @@ export function restoreScreenPrintDraft(draft) {
 
             const colorCell = row.querySelector('.cell-color');
             if (colorCell) {
-                colorCell.innerHTML = `<span class="color-swatch" style="background: #ccc;"></span>${escapeHtml(product.color || '')}`;
+                colorCell.innerHTML = `<span class="color-swatch"></span>${escapeHtml(product.color || '')}`;
+                /** @type {HTMLElement} */ (colorCell.querySelector('.color-swatch')).style.background = '#ccc';
             }
 
             // Restore size quantities

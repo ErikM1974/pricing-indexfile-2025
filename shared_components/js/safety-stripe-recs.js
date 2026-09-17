@@ -87,7 +87,7 @@
     var colors = Array.isArray(style.colors) ? style.colors : [];
     return colors.map(function (c, i) {
       return '<button type="button" class="ssr-swatch' + (i === 0 ? ' is-selected' : '') + '"'
-        + ' style="--swatch:' + hueHex(c.color_name) + '"'
+        + ' data-swatch-hex="' + hueHex(c.color_name) + '"'
         + ' title="' + esc(c.color_name) + '"'
         + ' data-color-name="' + esc(c.color_name) + '"'
         + ' data-catalog-color="' + esc(c.catalog_color) + '"'
@@ -231,6 +231,8 @@
         + (collapsible ? '<i class="fas fa-chevron-down ssr-head-chevron" aria-hidden="true"></i>' : '')
         + '</div>'
         + '<div class="ssr-grid">' + list.map(function (s) { return cardHtml(s, opts); }).join('') + '</div>';
+      // Dot colours go through CSSOM (a style="" attribute needs 'unsafe-inline').
+      root.querySelectorAll('.ssr-swatch[data-swatch-hex]').forEach(function (dot) { dot.style.setProperty('--swatch', dot.dataset.swatchHex); });
       wire(root, list, opts);
       if (collapsible) wireAccordion(root, mid);
       return list.length;

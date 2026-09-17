@@ -432,7 +432,7 @@ export function attachColorCombobox(wrap, input, rid) {
             const swatch = c.COLOR_SQUARE_IMAGE || c.colorSwatchUrl || '';
             return `
                 <div class="dtg-combobox-item${i === activeIndex ? ' active' : ''}" data-idx="${i}">
-                    <div style="display:flex;align-items:center;gap:8px;">
+                    <div class="dtg-combobox-item-body">
                         ${swatch ? `<img class="ci-swatch-mini" src="${escapeHtml(swatch)}" alt="">` : ''}
                         <div>
                             <div class="ci-primary">${escapeHtml(name)}</div>

@@ -258,12 +258,13 @@ class QuoteSession {
         
         const dropdown = document.createElement('div');
         dropdown.className = 'recent-quotes-dropdown';
+        // The menu starts hidden through CSSOM below (the toggle reads style.display; no style="" for the CSP).
         dropdown.innerHTML = `
             <button class="recent-quotes-toggle" type="button">
                 <i class="fas fa-history" aria-hidden="true"></i> Recent Quotes
                 <i class="fas fa-chevron-down" aria-hidden="true"></i>
             </button>
-            <div class="recent-quotes-menu" style="display: none;">
+            <div class="recent-quotes-menu">
                 ${recent.map(quote => `
                     <div class="recent-quote-item" data-quote-id="${quote.id}">
                         <div class="recent-quote-info">
@@ -285,12 +286,13 @@ class QuoteSession {
             // (2026-09-06) styles live in /shared_components/css/quote-session.css — linked by every consumer page, nothing injected.
         }
         
+        const menu = dropdown.querySelector('.recent-quotes-menu');
+        menu.style.display = 'none';
         container.appendChild(dropdown);
-        
+
         // Toggle menu
         const toggle = dropdown.querySelector('.recent-quotes-toggle');
-        const menu = dropdown.querySelector('.recent-quotes-menu');
-        
+
         toggle.addEventListener('click', () => {
             menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
         });

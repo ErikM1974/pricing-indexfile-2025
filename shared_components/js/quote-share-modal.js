@@ -24,6 +24,10 @@ const QuoteShareModal = {
             return; // Already initialized
         }
         document.body.insertAdjacentHTML('beforeend', this.getModalHTML());
+        // Start hidden through CSSOM: the show/hide code sets and reads style.display, and a
+        // style="" attribute only renders while the CSP allows inline styles.
+        document.getElementById('quote-share-modal').style.display = 'none';
+        document.getElementById('quote-share-note').style.display = 'none';
         this.bindEvents();
     },
 
@@ -33,14 +37,14 @@ const QuoteShareModal = {
      */
     getModalHTML() {
         return `
-        <div id="quote-share-modal" class="quote-share-modal-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="quote-share-title">
+        <div id="quote-share-modal" class="quote-share-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="quote-share-title">
             <div class="quote-share-modal-content">
                 <div class="quote-share-modal-header">
                     <i class="fas fa-check-circle" aria-hidden="true"></i>
                     <h3 id="quote-share-title">Quote Saved!</h3>
                 </div>
                 <div class="quote-share-modal-body">
-                    <p>Quote ID: <strong id="quote-share-modal-id">---</strong> <span id="quote-share-note" class="quote-share-note" style="display:none;"></span></p>
+                    <p>Quote ID: <strong id="quote-share-modal-id">---</strong> <span id="quote-share-note" class="quote-share-note"></span></p>
                     <p id="quote-share-instructions">Share this link with your customer:</p>
                     <div class="quote-share-url-container">
                         <input type="text" id="quote-share-url" class="quote-share-url-input" readonly aria-label="Shareable quote URL" aria-describedby="quote-share-instructions">
